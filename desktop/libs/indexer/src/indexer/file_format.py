@@ -26,7 +26,7 @@ from desktop.lib import i18n
 from indexer.argument import CheckboxArgument, TextDelimiterArgument
 from indexer.conf import ENABLE_NEW_INDEXER
 from indexer.fields import Field, guess_field_type_from_samples
-from indexer.operations import get_operator
+from indexer.morphline_operations import get_operator
 
 
 LOG = logging.getLogger(__name__)
@@ -41,14 +41,15 @@ def get_format_types():
 
   if ENABLE_NEW_INDEXER.get():
     formats.extend([
-      HueLogFormat,
       ApacheCombinedFormat,
-      RubyLogFormat,
       SyslogFormat,
-      ParquetFormat
+      HueLogFormat,
+      #RubyLogFormat,
+      #ParquetFormat
     ])
 
   return formats
+
 
 def get_file_indexable_format_types():
   return [format_ for format_ in get_format_types() if format_.is_file_indexable]

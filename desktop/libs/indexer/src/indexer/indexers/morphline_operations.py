@@ -20,6 +20,7 @@ from indexer.argument import TextArgument, CheckboxArgument, MappingArgument
 
 
 class Operator():
+
   def __init__(self, name, args, output_type):
     self._name = name
     self._args = args

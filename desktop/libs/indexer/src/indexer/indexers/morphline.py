@@ -33,7 +33,7 @@ from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
 from indexer.fields import get_field_type
 from indexer.file_format import get_file_format_instance, get_file_format_class
-from indexer.operations import get_checked_args
+from indexer.morphline_operations import get_checked_args
 
 
 LOG = logging.getLogger(__name__)
