@@ -358,10 +358,9 @@ def upload_query(request):
   response = {'status': -1}
 
   source_platform = request.POST.get('sourcePlatform', 'default')
+  query_id = request.POST.get('query_id')
 
-  if OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and source_platform in ('hive', 'impala'):
-    query_id = request.POST.get('query_id')
-
+  if OPTIMIZER.AUTO_UPLOAD_QUERIES.get() and source_platform in ('hive', 'impala') and query_id:
     doc = Document2.objects.document(request.user, doc_id=query_id)
 
     query_data = Notebook(document=doc).get_data()
