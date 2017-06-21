@@ -24,7 +24,7 @@ from desktop.views import _ko
 
 <%def name="all()">
   <script type="text/html" id="hue-drop-down-template">
-    <!-- ko if: !dropDownVisible() || !searchable -->
+    <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
       <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
       <!-- ko if: value -->
@@ -33,7 +33,7 @@ from desktop.views import _ko
       <i class="fa fa-caret-down"></i>
     </a>
     <!-- /ko -->
-    <!-- ko if: dropDownVisible() && searchable -->
+    <!-- ko if: !menuOnly && (dropDownVisible() && searchable) -->
     <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': value }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
@@ -57,7 +57,8 @@ from desktop.views import _ko
     (function () {
       var HueDropDown = function (params, element) {
         var self = this;
-        self.dropDownVisible = ko.observable(false);
+        self.dropDownVisible = ko.observable(!!params.showOnInit);
+        self.menuOnly = !!params.menuOnly;
         self.icon = params.icon;
         self.value = params.value;
         self.entries = params.entries;

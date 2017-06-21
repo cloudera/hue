@@ -4200,26 +4200,40 @@
         var contextmenuListener = function (e) {
           var selectionRange = editor.selection.getRange();
           huePubSub.publish('sql.context.popover.hide');
+          huePubSub.publish('sql.syntax.dropdown.hide');
           if (selectionRange.isEmpty()) {
             var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
             var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-
-            if (token !== null && typeof token.parseLocation !== 'undefined') {
-              var range = markLocation(token.parseLocation);
+            if (token && (token.parseLocation || token.syntaxError)) {
+              var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
               var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
               var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
-              huePubSub.publish('sql.context.popover.show', {
-                data: token.parseLocation,
-                sourceType: snippet.type(),
-                defaultDatabase: snippet.database(),
-                pinEnabled: true,
-                source: {
-                  left: startCoordinates.pageX - 3,
-                  top: startCoordinates.pageY,
-                  right: endCoordinates.pageX - 3,
-                  bottom: endCoordinates.pageY + editor.renderer.lineHeight
-                }
-              });
+              var source = {
+                 // TODO: add element likely in the event
+                left: startCoordinates.pageX - 3,
+                top: startCoordinates.pageY,
+                right: endCoordinates.pageX - 3,
+                bottom: endCoordinates.pageY + editor.renderer.lineHeight
+              };
+
+              if (token.parseLocation) {
+                huePubSub.publish('sql.context.popover.show', {
+                  data: token.parseLocation,
+                  sourceType: snippet.type(),
+                  defaultDatabase: snippet.database(),
+                  pinEnabled: true,
+                  source: source
+                });
+              } else if (token.syntaxError) {
+                huePubSub.publish('sql.syntax.dropdown.show', {
+                  data: token.syntaxError,
+                  editor: editor,
+                  range: range,
+                  sourceType: snippet.type(),
+                  defaultDatabase: snippet.database(),
+                  source: source
+                });
+              }
               e.preventDefault();
               return false;
             }
