@@ -778,6 +778,34 @@ class TestDocument2Permissions(object):
       assert_true(doc.can_read(self.user_not_me))
       assert_true(doc.can_write(self.user_not_me))
 
+    # Test that sharing read permissions allows a user to access but not write to directory
+    response = self.client.post("/desktop/api2/doc/share", {
+      'uuid': json.dumps(parent_dir.uuid),
+      'data': json.dumps({
+        'read': {
+          'user_ids': [],
+          'group_ids': [self.default_group.id]
+        },
+        'write': {
+          'user_ids': [],
+          'group_ids': []
+        }
+      })
+    })
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+    for doc in [parent_dir, child_doc, nested_dir, nested_doc]:
+      assert_true(doc.can_read(self.user_not_me))
+      assert_false(doc.can_write(self.user_not_me))
+
+    # Assert that creating a directory within the read-only directory failes
+    response = self.client_not_me.post('/desktop/api2/doc/mkdir',
+                                {'parent_uuid': json.dumps(parent_dir.uuid), 'name': json.dumps('test_mkdir')})
+    data = json.loads(response.content)
+
+    assert_equal(-1, data['status'], data)
+    assert_false('directory' in data)
+    assert_equal('User not_perm_user does not have permission to create a directory at this path', data['message'])
+
 
   def test_get_shared_documents(self):
     not_shared = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)

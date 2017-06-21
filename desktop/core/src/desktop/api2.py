@@ -292,20 +292,25 @@ def move_document(request):
 @api_error_handler
 @require_POST
 def create_directory(request):
+  response = { 'status': 0 }
   parent_uuid = json.loads(request.POST.get('parent_uuid'))
   name = json.loads(request.POST.get('name'))
 
   if not parent_uuid or not name:
     raise PopupException(_('create_directory requires parent_uuid and name'))
 
-  parent_dir = Directory.objects.get_by_uuid(user=request.user, uuid=parent_uuid, perm_type='write')
+  try:
+    parent_dir = Directory.objects.get_by_uuid(user=request.user, uuid=parent_uuid, perm_type='write')
+    directory = Directory.objects.create(name=name, owner=request.user, parent_directory=parent_dir)
+    response['directory'] = directory.to_dict()
+  except PopupException, e:
+    if "you don't have the permission" in e.message:
+      response['status'] = -1
+      response['message'] = _('User %s does not have permission to create a directory at this path') % request.user.username
+    else:
+      raise e
 
-  directory = Directory.objects.create(name=name, owner=request.user, parent_directory=parent_dir)
-
-  return JsonResponse({
-      'status': 0,
-      'directory': directory.to_dict()
-  })
+  return JsonResponse(response)
 
 
 @api_error_handler
