@@ -201,7 +201,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   </thead>
                   <tbody data-bind="foreach: jobs.apps">
                     <tr class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
-                      <td>
+                      <td data-bind="click: function() {}, clickBubble: false">
                         <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
                       </td>
                       <td data-bind="text: id"></td>
@@ -1162,7 +1162,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </thead>
             <tbody data-bind="foreach: apps">
               <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': ['SUCCEEDED', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1, 'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'}, click: function() {  if (properties.externalId() && properties.externalId() != '-') { $root.job().id(properties.externalId()); $root.job().fetchJob();} }">
-                <td>
+                <td data-bind="click: function() {}, clickBubble: false">
                   <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
                 <td data-bind="text: properties.status"></td>
