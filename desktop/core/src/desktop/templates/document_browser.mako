@@ -285,7 +285,7 @@ from desktop.views import _ko
         <!-- /ko -->
         <!-- ko if: entriesToDelete().length > 0 -->
         <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
-        <input type="submit" data-bind="click: function() { if (isTrash() || isTrashed()) { removeDocuments(true) } else { moveToTrash() } }" class="btn btn-danger" value="${_('Yes')}"/>
+        <input type="submit" data-bind="click: function() { if (isTrash() || isTrashed()) { removeDocuments(true) } else { moveToTrash() } }, disable: deletingEntries" class="btn btn-danger disable-feedback" value="${_('Yes')}"/>
         <!-- /ko -->
       </div>
       <!-- /ko -->
