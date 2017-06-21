@@ -33,13 +33,13 @@ from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
 from indexer.fields import get_field_type
 from indexer.file_format import get_file_format_instance, get_file_format_class
-from indexer.morphline_operations import get_checked_args
+from indexer.indexers.morphline_operations import get_checked_args
 
 
 LOG = logging.getLogger(__name__)
 
 
-class Indexer(object):
+class MorhlineIndexer(object):
 
   def __init__(self, username, fs=None, jt=None):
     self.fs = fs
@@ -68,7 +68,7 @@ class Indexer(object):
     workspace_path = self._upload_workspace(morphline)
 
     task = make_notebook(
-      name=_('Indexer job for %s') % collection_name,
+      name=_('MorhlineIndexer job for %s') % collection_name,
       editor_type='notebook',
       on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
       is_task=True,
