@@ -26,7 +26,7 @@ from desktop.lib import i18n
 from indexer.argument import CheckboxArgument, TextDelimiterArgument
 from indexer.conf import ENABLE_NEW_INDEXER
 from indexer.fields import Field, guess_field_type_from_samples
-from indexer.morphline_operations import get_operator
+from indexer.indexers.morphline_operations import get_operator
 
 
 LOG = logging.getLogger(__name__)

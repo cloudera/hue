@@ -31,14 +31,14 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
 from indexer.fields import Field
 from indexer.indexers.morphline_operations import get_operator
-from indexer.indexers.morphline import Indexer
+from indexer.indexers.morphline import MorhlineIndexer
 
 
 LOG = logging.getLogger(__name__)
 
 
 def _test_fixed_type_format_generate_morphline(format_):
-  indexer = Indexer("test")
+  indexer = MorhlineIndexer("test")
   format_instance = format_()
 
   morphline = indexer.generate_morphline_config("test_collection", {
@@ -52,7 +52,7 @@ def _test_generate_field_operation_morphline(operation_format):
   fields = TestIndexer.simpleCSVFields[:]
   fields[0]['operations'].append(operation_format)
 
-  indexer = Indexer("test")
+  indexer = MorhlineIndexer("test")
   morphline =indexer.generate_morphline_config("test_collection", {
       "columns": fields,
       "format": TestIndexer.simpleCSVFormat
@@ -125,7 +125,7 @@ class TestIndexer():
 
   def test_guess_csv_format(self):
     stream = StringIO.StringIO(TestIndexer.simpleCSVString)
-    indexer = Indexer("test")
+    indexer = MorhlineIndexer("test")
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
@@ -143,7 +143,7 @@ class TestIndexer():
         assert_equal(expected[key], actual[key])
 
   def test_guess_format_invalid_csv_format(self):
-    indexer = Indexer("test")
+    indexer = MorhlineIndexer("test")
     stream = StringIO.StringIO(TestIndexer.simpleCSVString)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
@@ -170,7 +170,7 @@ class TestIndexer():
     assert_equal(fields, [])
 
   def test_generate_csv_morphline(self):
-    indexer = Indexer("test")
+    indexer = MorhlineIndexer("test")
     morphline =indexer.generate_morphline_config("test_collection", {
         "columns": self.simpleCSVFields,
         "format": self.simpleCSVFormat
@@ -258,7 +258,7 @@ class TestIndexer():
     make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     user = User.objects.get(username="test")
     collection_name = "test_collection"
-    indexer = Indexer("test", fs=fs, jt=cluster.jt)
+    indexer = MorhlineIndexer("test", fs=fs, jt=cluster.jt)
     input_loc = "/tmp/test.csv"
 
     # upload the test file to hdfs
