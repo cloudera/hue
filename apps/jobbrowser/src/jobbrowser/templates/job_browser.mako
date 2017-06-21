@@ -419,7 +419,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </div>
           </li>
           <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
+          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="text: submitted"></span></li>
         </ul>
@@ -736,7 +736,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </div>
           </li>
           <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
+          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="text: submitted"></span></li>
         </ul>
@@ -772,7 +772,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </div>
           </li>
           <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
+          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="text: submitted"></span></li>
         </ul>
@@ -826,7 +826,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Status') } <span data-bind="text: status"></span>
   ${ _('User') } <span data-bind="text: user"></span>
   ${ _('Progress') } <span data-bind="text: progress"></span>
-  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Duration') } <span data-bind="text: duration().toHHMMSS()"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
   <div data-bind="template: { name: 'render-properties${ SUFFIX }', data: properties['properties'] }"></div>
@@ -902,7 +902,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </div>
           </li>
           <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
+          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
           <!-- ko if: properties['parameters'].length > 0 -->
