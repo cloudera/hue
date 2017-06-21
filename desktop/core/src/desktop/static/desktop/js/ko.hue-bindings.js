@@ -3592,11 +3592,7 @@
             if (hueDebug.showSyntaxParseResult) {
               console.log(e.data.syntaxError);
             }
-            var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column);
-            if (token && token.value && /`$/.test(token.value)) {
-              // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
-              token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
-            }
+            var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
             token.syntaxError = e.data.syntaxError;
             var AceRange = ace.require('ace/range').Range;
             var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
