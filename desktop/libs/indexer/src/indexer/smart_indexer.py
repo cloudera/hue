@@ -25,12 +25,12 @@ from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
 
 from desktop.models import Document2
+from libzookeeper.conf import ENSEMBLE
 from notebook.connectors.base import get_api
 from notebook.models import Notebook, make_notebook
 
 from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
-from indexer.conf import zkensemble
 from indexer.fields import get_field_type
 from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.operations import get_checked_args
@@ -64,19 +64,17 @@ class Indexer(object):
 
     return hdfs_workspace_path
 
-  def run_morphline(self, request, collection_name, morphline, input_path, query=None):
+  def run_morphline(self, request, collection_name, morphline, input_path, query=None, start_time=None):
     workspace_path = self._upload_workspace(morphline)
-# 
-    task = Notebook(
-        name='Indexer job for %s' % collection_name,
-        isManaged=True
+
+    task = make_notebook(
+      name=_('Indexer job for %s') % collection_name,
+      editor_type='notebook',
+      on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
+      is_task=True,
+      is_notebook=True,
+      last_executed=start_time
     )
-#     task = make_notebook(
-#       name=_('Indexer job for %s') % collection_name,
-#       editor_type='notebook',
-#       on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
-#       is_task=True
-#     )
 
     if query:
       q = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=query))
@@ -87,7 +85,7 @@ class Indexer(object):
 
       destination = '__hue_%s' % notebook_data['uuid'][:4]
       location = '/user/%s/__hue-%s' % (request.user,  notebook_data['uuid'][:4])
-      sql, success_url = api.export_data_as_table(notebook_data, snippet, destination, is_temporary=True, location=location)
+      sql, _success_url = api.export_data_as_table(notebook_data, snippet, destination, is_temporary=True, location=location)
       input_path = '${nameNode}%s' % location
 
       task.add_hive_snippet(snippet['database'], sql)
@@ -104,7 +102,7 @@ class Indexer(object):
           u'log4j.properties',
           u'--go-live',
           u'--zk-host',
-          zkensemble(),
+          ENSEMBLE.get(),
           u'--collection',
           collection_name,
           input_path,
@@ -185,7 +183,7 @@ class Indexer(object):
       "get_kept_args": get_checked_args,
       "grok_dictionaries_location" : grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
       "geolite_db_location" : geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
-      "zk_host": zkensemble()
+      "zk_host": ENSEMBLE.get()
     }
 
     oozie_workspace = CONFIG_INDEXING_TEMPLATES_PATH.get()
