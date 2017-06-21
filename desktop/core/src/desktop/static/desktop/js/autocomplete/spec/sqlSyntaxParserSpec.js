@@ -74,6 +74,7 @@
       expect(result).toBeTruthy();
       expect(result.loc.first_column).toEqual(10);
       expect(result.loc.last_column).toEqual(14);
+      expect(expectedToStrings(result.expected)).toEqual(['from', 'group', 'order', 'where', 'limit', 'union', 'having']);
     });
 
     it('should find errors for "select * from customers c cultster by awasd asd afd;"', function () {
