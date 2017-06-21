@@ -162,6 +162,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/download.min.js') }"></script>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
+<%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
 
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -189,6 +190,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   }
 % endif
 </style>
+
+
+${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <div class="print-logo">
   <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }"  alt="${ _('Hue logo') }"/>
