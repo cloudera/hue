@@ -133,6 +133,21 @@ class SolrClient(object):
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
 
 
+  def index(self, name, data, content_type='csv', version=None, **kwargs):
+    """
+    separator = ','
+    fieldnames = 'a,b,c' # header=true
+    skip 'a,b'
+    encapsulator="
+    escape=\
+    map
+    split
+    overwrite=true
+    rowid=id
+    """
+    return self.api.update(name, data, content_type=content_type, version=version, **kwargs)
+
+
   def _create_cloud_config(self, name, fields, unique_key_field, df):
     with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
       tmp_path, solr_config_path = copy_configs(fields=fields, unique_key_field=unique_key_field, df=df, solr_cloud_mode=True)
@@ -198,7 +213,7 @@ class SolrClient(object):
         raise PopupException(_('Could not remove collection: %(message)s') % result)
 
 
-  def list_configs(self):    
+  def list_configs(self):
     return self.api.configs()
 
 

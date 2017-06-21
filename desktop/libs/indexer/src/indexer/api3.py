@@ -34,7 +34,7 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.sql import SQLIndexer
-from indexer.solr_client import SolrClient, SolrClientException
+from indexer.solr_client import SolrClient, SolrClientException, MAX_UPLOAD_SIZE
 
 
 LOG = logging.getLogger(__name__)
@@ -167,10 +167,40 @@ def importer_submit(request):
   start_time = json.loads(request.POST.get('start_time', '-1'))
 
   if destination['ouputFormat'] == 'index':
-    _convert_format(source["format"], inverse=True)
-    collection_name = destination["name"]
     source['columns'] = destination['columns']
-    job_handle = _index(request, source, collection_name, start_time=start_time)
+    index_name = destination["name"]
+
+    if destination['indexerRunJob']:
+      _convert_format(source["format"], inverse=True)
+      job_handle = _index(request, source, index_name, start_time=start_time)
+    else:
+      client = SolrClient(request.user)
+      unique_key_field = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
+      df = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
+      kwargs = {}
+
+      stats = request.fs.stats(source["path"])
+      if stats.size > MAX_UPLOAD_SIZE:
+        raise PopupException(_('File size is too large to handle!'))
+
+      indexer = MorphlineIndexer(request.user, request.fs)
+      fields = indexer.get_kept_field_list(source['columns'])
+      if not unique_key_field:
+        unique_key_field = 'hue_id'
+        fields += [{"name": unique_key_field, "type": "string"}]
+        kwargs['rowid'] = unique_key_field
+
+      client.create_index(
+          name=index_name,
+          fields=fields,
+          unique_key_field=unique_key_field,
+          df=df
+      )
+
+      data = request.fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
+      client.index(name=index_name, data=data, **kwargs)
+
+      job_handle = {'status': 0, 'on_success_url': reverse('search:browse', kwargs={'name': index_name})}
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
   else:
@@ -227,7 +257,7 @@ def _index(request, file_format, collection_name, query=None, start_time=None):
   if is_unique_generated:
     schema_fields += [{"name": unique_field, "type": "string"}]
 
-  client = SolrClient(user=request.user) 
+  client = SolrClient(user=request.user)
   try:
     client.get_index_schema(collection_name)
   except SolrClientException:
