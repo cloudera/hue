@@ -1623,7 +1623,8 @@ var SqlParseSupport = (function () {
         parser.yy.error.expected.forEach(function (expected) {
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
-          if (!IGNORED_EXPECTED[expected]) {
+          // TODO: Only suggest alphanumeric?
+          if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
             if (expected.length > 0 && expected.indexOf('<') !== 0) {
               weightedExpected.push({
                 text: isLowerCase ? expected.toLowerCase() : expected,
@@ -1638,6 +1639,9 @@ var SqlParseSupport = (function () {
             }
           }
         });
+        if (weightedExpected.length === 0) {
+          return false; // Don't mark it as an error if there are not suggestions
+        }
         weightedExpected.sort(function (a, b) {
           if (a.distance === b.distance) {
             return a.text.localeCompare(b.text);
