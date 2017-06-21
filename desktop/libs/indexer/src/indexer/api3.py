@@ -169,7 +169,7 @@ def importer_submit(request):
     _convert_format(source["format"], inverse=True)
     collection_name = destination["name"]
     source['columns'] = destination['columns']
-    job_handle = _index(request, source, collection_name)
+    job_handle = _index(request, source, collection_name, start_time=start_time)
   elif destination['ouputFormat'] == 'database':
     job_handle = create_database(request, source, destination, start_time)
   else:
@@ -390,7 +390,7 @@ def _create_table_from_a_file(request, source, destination, start_time=-1):
   )
 
 
-def _index(request, file_format, collection_name, query=None):
+def _index(request, file_format, collection_name, query=None, start_time=None):
   indexer = Indexer(request.user, request.fs)
 
   unique_field = indexer.get_unique_field(file_format)
@@ -425,4 +425,4 @@ def _index(request, file_format, collection_name, query=None):
 
   morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
 
-  return indexer.run_morphline(request, collection_name, morphline, input_path, query)
+  return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time)
