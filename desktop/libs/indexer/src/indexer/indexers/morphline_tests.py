@@ -30,8 +30,8 @@ from indexer.conf import ENABLE_NEW_INDEXER
 from indexer.controller import CollectionManagerController
 from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
 from indexer.fields import Field
-from indexer.operations import get_operator
-from indexer.smart_indexer import Indexer
+from indexer.indexers.morphline_operations import get_operator
+from indexer.indexers.morphline import Indexer
 
 
 LOG = logging.getLogger(__name__)

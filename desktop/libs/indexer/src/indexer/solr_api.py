@@ -103,10 +103,9 @@ def create_index(request):
   return JsonResponse(response)
 
 
+@require_POST
+@api_error_handler
 def delete_indexes(request):
-  if request.method != 'POST':
-    raise PopupException(_('POST request required.'))
-
   response = {'status': -1}
 
   indexes = json.loads(request.POST.get('indexes', '[]'))
@@ -147,32 +146,26 @@ def create_alias(request):
   return JsonResponse(response)
 
 
+@require_POST
+@api_error_handler
 def design_schema(request, index):
-  if request.method == 'POST':
-    pass # TODO: Support POST for update?
-
   result = {'status': -1, 'message': ''}
 
-  try:
-    searcher = SolrClient(request.user)
-    unique_key, fields = searcher.get_index_schema(index)
+  searcher = SolrClient(request.user)
+  unique_key, fields = searcher.get_index_schema(index)
 
-    result['status'] = 0
-    formatted_fields = []
-    for field in fields:
-      formatted_fields.append({
-        'name': field,
-        'type': fields[field]['type'],
-        'required': fields[field].get('required', None),
-        'indexed': fields[field].get('indexed', None),
-        'stored': fields[field].get('stored', None),
-        'multivalued': fields[field].get('multivalued', None),
-      })
-    result['fields'] = formatted_fields
-    result['unique_key'] = unique_key
-  except Exception, e:
-    result['message'] = _('Could not get index schema: %s') % e
+  result['status'] = 0
+  formatted_fields = []
+  for field in fields:
+    formatted_fields.append({
+      'name': field,
+      'type': fields[field]['type'],
+      'required': fields[field].get('required', None),
+      'indexed': fields[field].get('indexed', None),
+      'stored': fields[field].get('stored', None),
+      'multivalued': fields[field].get('multivalued', None),
+    })
+  result['fields'] = formatted_fields
+  result['unique_key'] = unique_key
 
   return JsonResponse(result)
-
-
