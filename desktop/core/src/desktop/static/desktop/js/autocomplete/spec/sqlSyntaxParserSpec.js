@@ -69,11 +69,16 @@
       expect(result.loc.last_column).toEqual(11);
     });
 
-    it ('should find errors for "select *  form ', function () {
+    it('should find errors for "select *  form "', function () {
       var result = sqlSyntaxParser.parseSyntax('select *  form ', '');
       expect(result).toBeTruthy();
       expect(result.loc.first_column).toEqual(10);
       expect(result.loc.last_column).toEqual(14);
+    });
+
+    fit('should find errors for "select * from customers c cultster by awasd asd afd;"', function () {
+      var result = sqlSyntaxParser.parseSyntax('select * from customers c cultster by awasd asd afd;', '');
+      expect(result).toBeTruthy();
     });
 
     it('should suggest expected words for "SLELECT "', function() {
