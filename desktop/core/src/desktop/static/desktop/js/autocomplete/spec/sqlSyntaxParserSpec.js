@@ -15,7 +15,7 @@
 // limitations under the License.
 
 (function () {
-  describe('sqlSyntaxParser.js', function() {
+  fdescribe('sqlSyntaxParser.js', function() {
 
     var expectedToStrings = function (expected) {
       return $.map(expected, function(ex) { return ex.text; })
@@ -103,7 +103,7 @@
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'hive');
         expect(result).toBeTruthy();
-        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'INSERT', 'RELOAD', 'ANALYZE', 'CREATE', 'CREATE', 'EXPLAIN', 'EXPORT', 'GRANT', 'IMPORT', 'LOAD', 'MSCK', 'REVOKE', 'SHOW', 'SHOW', 'USE', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE']);
+        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'RELOAD', 'ANALYZE', 'CREATE', 'EXPLAIN', 'EXPORT', 'GRANT', 'IMPORT', 'LOAD', 'MSCK', 'REVOKE', 'SHOW', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE']);
       });
     });
 
@@ -111,7 +111,7 @@
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'impala');
         expect(result).toBeTruthy();
-        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'SET', 'ALTER', 'INSERT', 'INSERT', 'CREATE', 'CREATE', 'EXPLAIN', 'GRANT', 'LOAD', 'REFRESH', 'REVOKE', 'SHOW', 'USE', 'COMPUTE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE', 'INVALIDATE']);
+        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'SET', 'ALTER', 'INSERT', 'CREATE', 'EXPLAIN', 'GRANT', 'LOAD', 'REFRESH', 'REVOKE', 'SHOW', 'USE', 'COMPUTE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE', 'INVALIDATE']);
       });
     })
 
