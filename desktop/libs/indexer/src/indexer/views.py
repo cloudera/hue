@@ -28,7 +28,7 @@ from indexer.solr_client import SolrClient
 from indexer.fields import FIELD_TYPES, Field
 from indexer.file_format import get_file_indexable_format_types
 from indexer.management.commands import indexer_setup
-from indexer.operations import OPERATORS
+from indexer.morphline_operations import OPERATORS
 
 
 LOG = logging.getLogger(__name__)

@@ -32,7 +32,7 @@ from notebook.models import make_notebook
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
-from indexer.smart_indexer import Indexer
+from indexer.indexers.morphline import Indexer
 from indexer.solr_client import SolrClient, SolrClientException
 
 

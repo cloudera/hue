@@ -585,7 +585,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/html" id="assist-collections-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.toggleSearch, css: { 'blue' : $parent.isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
-      <a class="inactive-action" data-bind="hueLink: '/indexer#create'" title="${_('Create index')}" href="javascript:void(0)">
+      <a class="inactive-action" data-bind="hueLink: '/indexer/#create'" title="${_('Create index')}" href="javascript:void(0)">
         <i class="pointer fa fa-plus" title="${_('Create index')}"></i>
       </a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.collections.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
