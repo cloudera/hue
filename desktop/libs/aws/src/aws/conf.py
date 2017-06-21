@@ -16,6 +16,7 @@
 from __future__ import absolute_import
 
 import logging
+import re
 
 import boto.utils
 from boto.s3.connection import Location
@@ -30,7 +31,16 @@ from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key
 LOG = logging.getLogger(__name__)
 
 
-DEFAULT_CALLING_FORMAT='boto.s3.connection.OrdinaryCallingFormat'
+DEFAULT_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'
+SUBDOMAIN_ENDPOINT_RE = 's3.(?P<region>[a-z0-9-]+).amazonaws.com'
+HYPHEN_ENDPOINT_RE = 's3-(?P<region>[a-z0-9-]+).amazonaws.com'
+DUALSTACK_ENDPOINT_RE = 's3.dualstack.(?P<region>[a-z0-9-]+).amazonaws.com'
+
+
+def get_locations():
+  return (Location.EU, Location.EUCentral1, Location.EUWest, Location.EUWest2, Location.CACentral, Location.USEast,
+          Location.USEast2, Location.USWest, Location.USWest2, Location.SAEast, Location.APNortheast,
+          Location.APNortheast2, Location.APSoutheast, Location.APSoutheast2, Location.APSouth, Location.CNNorth1)
 
 
 def get_default_access_key_id():
@@ -50,7 +60,27 @@ def get_default_secret_key():
 
 
 def get_default_region():
-  return AWS_ACCOUNTS['default'].REGION.get() if 'default' in AWS_ACCOUNTS else Location.DEFAULT
+  region = Location.DEFAULT
+
+  if 'default' in AWS_ACCOUNTS:
+    # First check the host/endpoint configuration
+    if AWS_ACCOUNTS['default'].HOST.get():
+      endpoint = AWS_ACCOUNTS['default'].HOST.get()
+      if re.search(SUBDOMAIN_ENDPOINT_RE, endpoint, re.IGNORECASE):
+        region = re.search(SUBDOMAIN_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
+      elif re.search(HYPHEN_ENDPOINT_RE, endpoint, re.IGNORECASE):
+        region = re.search(HYPHEN_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
+      elif re.search(DUALSTACK_ENDPOINT_RE, endpoint, re.IGNORECASE):
+        region = re.search(DUALSTACK_ENDPOINT_RE, endpoint, re.IGNORECASE).group('region')
+    elif AWS_ACCOUNTS['default'].REGION.get():
+      region = AWS_ACCOUNTS['default'].REGION.get()
+
+    # If the parsed out region is not in the list of supported regions, fallback to the default
+    if region not in get_locations():
+      LOG.warn("Region, %s, not found in the list of supported regions: %s" % (region, ', '.join(get_locations())))
+      region = Location.DEFAULT
+
+  return region
 
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
