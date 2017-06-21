@@ -40,7 +40,7 @@ class Client(object):
     self._access_key_id = aws_access_key_id
     self._secret_access_key = aws_secret_access_key
     self._security_token = aws_security_token
-    self._region = region.lower() if region else get_default_region()
+    self._region = region.lower()
     self._timeout = timeout
     self._host = host
     self._proxy_address = proxy_address
@@ -70,7 +70,7 @@ class Client(object):
       aws_access_key_id=access_key_id,
       aws_secret_access_key=secret_access_key,
       aws_security_token=security_token,
-      region=conf.REGION.get(),
+      region=get_default_region(),
       host=conf.HOST.get(),
       proxy_address=conf.PROXY_ADDRESS.get(),
       proxy_port=conf.PROXY_PORT.get(),

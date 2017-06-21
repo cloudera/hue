@@ -31,7 +31,7 @@ from boto.s3.prefix import Prefix
 from django.utils.translation import ugettext as _
 
 from aws import s3
-from aws.conf import get_default_region
+from aws.conf import get_default_region, get_locations
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
@@ -153,8 +153,7 @@ class S3FileSystem(object):
         raise S3FileSystemException(e.message or e.reason)
 
   def _get_location(self):
-    if get_default_region() in (Location.EU, Location.EUCentral1, Location.CACentral, Location.USWest, Location.USWest2, Location.SAEast,
-                                Location.APNortheast, Location.APSoutheast, Location.APSoutheast2, Location.CNNorth1):
+    if get_default_region() in get_locations():
       return get_default_region()
     else:
       return Location.DEFAULT
