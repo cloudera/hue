@@ -76,8 +76,13 @@
       expect(result.loc.last_column).toEqual(14);
     });
 
-    fit('should find errors for "select * from customers c cultster by awasd asd afd;"', function () {
+    it('should find errors for "select * from customers c cultster by awasd asd afd;"', function () {
       var result = sqlSyntaxParser.parseSyntax('select * from customers c cultster by awasd asd afd;', '');
+      expect(result).toBeTruthy();
+    });
+
+    it('should find errors for "select asdf wer qwer qewr   qwer"', function () {
+      var result = sqlSyntaxParser.parseSyntax('select asdf wer qwer qewr   qwer', '');
       expect(result).toBeTruthy();
     });
 

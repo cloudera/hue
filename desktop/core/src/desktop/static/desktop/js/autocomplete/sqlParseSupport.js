@@ -1564,6 +1564,8 @@ var SqlParseSupport = (function () {
       parser[noopFn] = SYNTAX_PARSER_NOOP
     });
 
+    parser.yy.locations = [{}];
+
     parser.determineCase = function (text) {
       if (!parser.yy.caseDetermined) {
         parser.yy.lowerCase = text.toLowerCase() === text;
@@ -1610,9 +1612,11 @@ var SqlParseSupport = (function () {
         if (debug) {
           console.log(err);
           console.error(err.stack);
+          console.log(parser.yy.error);
         }
       }
-      if (parser.yy.error && !beforeCursor.endsWith(parser.yy.error.text)) {
+
+      if (parser.yy.error && (parser.yy.error.loc.last_column < beforeCursor.length || !beforeCursor.endsWith(parser.yy.error.text))) {
         var weightedExpected = [];
 
         var isLowerCase = parser.yy.caseDetermined && parser.yy.lowerCase || parser.yy.error.text.toLowerCase() === parser.yy.error.text;
