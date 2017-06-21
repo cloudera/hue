@@ -1543,10 +1543,26 @@ var SqlParseSupport = (function () {
     };
   };
 
+
+  var SYNTAX_PARSER_NOOP_FUNCTIONS = ['prepareNewStatement', 'addCommonTableExpressions', 'pushQueryState', 'popQueryState', 'suggestSelectListAliases',
+    'isHive', 'isImpala', 'mergeSuggestKeywords', 'suggestValueExpressionKeywords', 'getValueExpressionKeywords', 'getTypeKeywords',
+    'getColumnDataTypeKeywords', 'addColRefIfExists', 'selectListNoTableSuggest', 'suggestJoinConditions', 'suggestJoins', 'valueExpressionSuggest',
+    'applyTypeToSuggestions', 'findCaseType', 'findReturnTypes', 'applyArgumentTypesToSuggestions', 'commitLocations', 'expandImpalaIdentifierChain',
+    'identifyPartials', 'expandLateralViews', 'expandIdentifierChain', 'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'getKeywordsForOptionalsLR',
+    'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords', 'createWeightedKeywords', 'suggestKeywords', 'suggestColRefKeywords',
+    'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions', 'suggestColumns', 'suggestGroupBys',
+    'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation', 'addStatementLocation', 'addHdfsLocation',
+    'addDatabaseLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs',
+    'suggestValues', 'handleQuotedValueWithCursor'];
+
+  var SYNTAX_PARSER_NOOP = function () {};
+
   var initSyntaxParser = function (parser) {
-    parser.prepareNewStatement = function () {
-      // Empty for compatibility with the autocomplete parser
-    };
+
+    // Noop functions for compatibility with the autocomplete parser as the grammar is shared
+    SYNTAX_PARSER_NOOP_FUNCTIONS.forEach(function (noopFn) {
+      parser[noopFn] = SYNTAX_PARSER_NOOP
+    });
 
     parser.determineCase = function (text) {
       if (!parser.yy.caseDetermined) {
