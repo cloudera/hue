@@ -472,7 +472,7 @@ class SolrApi(object):
       )
 
       data = self._root.post('admin/collections', params=params, contenttype='application/json')
-      if 'success' in data['responseHeader']['status'] == 0:
+      if data['responseHeader']['status'] == 0:
         response['status'] = 0
       else:
         response['message'] = "Could not remove collection: %s" % data
