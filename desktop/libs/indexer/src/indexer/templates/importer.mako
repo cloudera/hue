@@ -426,7 +426,7 @@ ${ assist.assistPanel() }
     </div>
 
     <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
-    <div class="card step">
+    <div class="card step" data-bind="visible: createWizard.source.inputFormat() == 'file'">
       <!-- ko if: createWizard.isGuessingFormat -->
       <h3 class="card-heading simple">${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h3>
       <!-- /ko -->
@@ -1156,7 +1156,7 @@ ${ assist.assistPanel() }
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
 
-      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : file);
+      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : 'file');
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
         self.sample.removeAll();
@@ -1206,9 +1206,16 @@ ${ assist.assistPanel() }
       self.rdbmsTableName = ko.computed(function() {
         return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[1] : self.rdbmsTable();
       });
+      self.rdbmsTableName.subscribe(function(val) {
+        if (val) {
+          vm.createWizard.guessFormat();
+        }
+        resizeElements();
+      });
       self.rdbmsDatabaseName = ko.computed(function() {
         return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[0] : 'default';
       });
+
 
       // Table
       self.table = ko.observable('');
@@ -1255,7 +1262,7 @@ ${ assist.assistPanel() }
         } else if (self.inputFormat() == 'manual') {
           return true;
         }  else if (self.inputFormat() == 'rdbms') {
-          return (self.rdbmsName().length > 0 && self.rdbmsTable().length > 0);
+          return self.rdbmsName().length > 0 && self.rdbmsTable().length > 0;
         }
       });
 
@@ -1364,9 +1371,13 @@ ${ assist.assistPanel() }
           if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
             return false;
           }
-          else if (format.value == 'file' && wizard.source.inputFormat() != 'manual') {
+          else if (format.value == 'file' && wizard.source.inputFormat() == 'file') {
             return false;
           }
+          else if (format.value == 'table' && wizard.source.inputFormat() == 'rdbms') {
+            return false;
+          }
+
           return true;
         })
       });

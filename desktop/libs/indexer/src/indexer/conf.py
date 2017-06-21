@@ -78,8 +78,14 @@ CONFIG_INDEXER_LIBS_PATH = Config(
   help=_t("oozie workspace template for indexing:"),
   type=str,
   default='/tmp/smart_indexer_lib'
-  )
+)
 
+ENABLE_SQOOP = Config(
+  key="enable_sqoop",
+  help=_t("Flag to turn on Sqoop imports."),
+  type=bool,
+  default=False
+)
 
 # Unused
 BATCH_INDEXER_PATH = Config(

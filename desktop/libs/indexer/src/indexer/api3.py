@@ -99,19 +99,7 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
   elif file_format['inputFormat'] == 'rdbms':
-    query_server = rdbms.get_query_server_config(server=file_format['rdbmsName'])
-    db = rdbms.get(request.user, query_server=query_server)
-    assist = Assist(db)
-    response = {'status': -1}
-    sample = assist.get_sample_data(file_format['rdbmsDatabaseName'], table_name=file_format['tableName'])
-    format_ = {
-        "sample": sample['rows'][:4],
-        "sample_cols": sample.meta,
-        "columns": [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-            for col in sample.meta
-        ]
-    }
+    format_ = {"type": "csv"}
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -156,6 +144,21 @@ def guess_field_types(request):
         "columns": [
             Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
             for col in sample.meta
+        ]
+    }
+  elif file_format['inputFormat'] == 'rdbms':
+    query_server = rdbms.get_query_server_config(server=file_format['rdbmsName'])
+    db = rdbms.get(request.user, query_server=query_server)
+    assist = Assist(db)
+    response = {'status': -1}
+    sample = assist.get_sample_data(database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
+    table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
+
+    format_ = {
+        "sample": list(sample.rows()),
+        "columns": [
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            for col in table_metadata
         ]
     }
 

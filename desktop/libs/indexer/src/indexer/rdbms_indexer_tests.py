@@ -20,7 +20,6 @@ import json
 import logging
 
 from django.contrib.auth.models import User
-#from django.core.urlresolvers import reverse
 
 from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
 from desktop.lib.django_test_util import make_logged_in_client
@@ -39,7 +38,6 @@ class TestRdbmsIndexer():
 
     indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
     data = indexer.get_sample_data(database='hue', table='employee')
-    #data = json.loads(resp.content)
 
     assert_equal(0, data['status'], data)
     assert_true(data['rows'], data)
