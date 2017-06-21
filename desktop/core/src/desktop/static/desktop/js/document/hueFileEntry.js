@@ -236,6 +236,7 @@ var HueFileEntry = (function () {
     });
 
     self.entriesToDelete = ko.observableArray();
+    self.deletingEntries = ko.observable(false);
 
     self.selected = ko.observable(false);
 
@@ -636,32 +637,34 @@ var HueFileEntry = (function () {
 
   HueFileEntry.prototype.removeDocuments = function (deleteForever) {
     var self = this;
-    if (self.app === 'documents') {
-      if (self.entriesToDelete().indexOf(self) !== -1) {
-        self.activeEntry(self.parent);
-      }
+    if (self.entriesToDelete().indexOf(self) !== -1) {
+      self.activeEntry(self.parent);
+    }
 
-      var deleteNext = function () {
-        if (self.entriesToDelete().length > 0) {
-          var nextUuid = self.entriesToDelete().shift().definition().uuid;
-          self.apiHelper.deleteDocument({
-            uuid: nextUuid,
-            skipTrash: deleteForever,
-            successCallback: function () {
-              deleteNext();
-            },
-            errorCallback: function () {
-              self.activeEntry().load();
-            }
-          });
-        } else {
-          huePubSub.publish('assist.document.refresh');
-          self.activeEntry().load();
-        }
-      };
+    var deleteNext = function () {
+      if (self.entriesToDelete().length > 0) {
+        var nextUuid = self.entriesToDelete().shift().definition().uuid;
+        self.apiHelper.deleteDocument({
+          uuid: nextUuid,
+          skipTrash: deleteForever,
+          successCallback: function () {
+            deleteNext();
+          },
+          errorCallback: function () {
+            self.activeEntry().load();
+            $('#deleteEntriesModal').modal('hide');
+            self.deletingEntries(false);
+          }
+        });
+      } else {
+        self.deletingEntries(false);
+        huePubSub.publish('assist.document.refresh');
+        $('#deleteEntriesModal').modal('hide');
+        self.activeEntry().load();
+      }
     };
+    self.deletingEntries(true);
     deleteNext();
-    $('#deleteEntriesModal').modal('hide');
   };
 
 
