@@ -587,6 +587,9 @@ function renderCrons() {
       $(document).on('showSubmitPopup', function (event, data) {
         $('.submit-modal').html(data);
         $('.submit-modal').modal('show');
+        $('.submit-modal').on('hidden', function () {
+          huePubSub.publish('hide.datepicker');
+        });
         var _sel = $('.submit-form .control-group[rel!="popover"]:visible');
         if (_sel.length > 0) {
           $('.submit-modal .modal-body').height($('.submit-modal .modal-body').height() + 60);
