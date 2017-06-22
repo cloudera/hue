@@ -313,6 +313,20 @@ class YarnApi(JobBrowserApi):
     api = node_manager_api.get_node_manager_api('http://' + node_manager_http_address)
     return Container(api.container(container_id))
 
+  def get_nodes(self):
+    nodes = {}
+
+    try:
+      nodes_resp = self.resource_manager_api.nodes()
+    except RestException, e:
+      raise PopupException(_('Failed to get nodes from the Resource Manager'), detail=e)
+    except Exception, e:
+      raise PopupException(_('Encountered an unexpected exception while attempting to get nodes from Resource Manager'), detail=e)
+
+    if nodes_resp and 'nodes' in nodes_resp and 'node' in nodes_resp['nodes']:
+      for node in nodes_resp['nodes']['node']:
+        nodes[node['id']] = node['nodeHTTPAddress']
+    return nodes
 
 class ApplicationNotRunning(Exception):
 

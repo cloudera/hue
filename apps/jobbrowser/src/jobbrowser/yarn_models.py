@@ -424,6 +424,13 @@ class Attempt:
       self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobTaskAttemptCounters']
     return self._counters
 
+  def get_node_address(self, node_id):
+    # TODO: Find a way to access to rm_api or at least jobbrowser/api so that we can call nodes endpoint
+    # Unfortunately, self.task.job.api points to MapreduceApi, which makes all calls using the proxy
+    # Once this is implemented, we can replace the logic below for node_url by looking the actual nodeHttpAddress based
+    # on the nodeId
+    pass
+
   def get_task_log(self, offset=0):
     logs = []
     attempt = self.task.job.job_attempts['jobAttempt'][-1]

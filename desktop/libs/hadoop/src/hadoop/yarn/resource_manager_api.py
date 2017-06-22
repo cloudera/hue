@@ -123,6 +123,12 @@ class ResourceManagerApi(object):
     params = self._get_params()
     return self._execute(self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE})
 
+  def nodes(self, **kwargs):
+    params = self._get_params()
+    params.update(kwargs)
+    params['healthy'] = True
+    return self._execute(self._root.get, 'cluster/nodes', params=params, headers={'Accept': _JSON_CONTENT_TYPE})
+
   def kill(self, app_id):
     data = {'state': 'KILLED'}
     token = None
