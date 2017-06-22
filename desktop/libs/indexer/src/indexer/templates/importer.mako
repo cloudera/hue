@@ -1337,7 +1337,7 @@ ${ assist.assistPanel() }
       var self = this;
 
       self.name = ko.observable('').extend({throttle: 500});
-      self.name.subscribe(function(name) {
+      self.nameChanged = function(name) {
         var exists = false;
 
         if (name.length == 0) {
@@ -1355,7 +1355,10 @@ ${ assist.assistPanel() }
             $.get("/" + (self.apiHelperType() == 'hive' ? 'beeswax' : self.apiHelperType()) + "/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
               self.isTargetExisting(data.code != 500 && data.code != 404);
               self.isTargetChecking(false);
-            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
+            }).fail(function (xhr, textStatus, errorThrown) {
+              self.isTargetExisting(false);
+              self.isTargetChecking(false);
+            });
           }
           else {
             self.isTargetExisting(false);
@@ -1369,7 +1372,10 @@ ${ assist.assistPanel() }
             $.get("/" + (self.apiHelperType() == 'hive' ? 'beeswax' : self.apiHelperType()) + "/api/autocomplete/" + self.databaseName(), function (data) {
               self.isTargetExisting(data.tables_meta && data.tables_meta.length > 0);
               self.isTargetChecking(false);
-            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
+            }).fail(function (xhr, textStatus, errorThrown) {
+              self.isTargetExisting(false);
+              self.isTargetChecking(false);
+            });
           }
           else {
             self.isTargetExisting(false);
@@ -1383,11 +1389,21 @@ ${ assist.assistPanel() }
           }, function (data) {
             self.isTargetExisting(data.status == 0);
             self.isTargetChecking(false);
-            // Fetch indexerConfigSets
-          }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
+          }).fail(function (xhr, textStatus, errorThrown) {
+            self.isTargetExisting(false);
+            self.isTargetChecking(false);
+          });
+          $.post("/indexer/api/configs/list/", function (data) {
+            if (data.status == 0) {
+              self.indexerConfigSets(data.configs);
+            } else {
+              $(document).trigger("error", data.message);
+            }
+          });
         }
         resizeElements();
-      });
+      };
+      self.name.subscribe(self.nameChanged);
 
       self.apiHelperType = ko.observable('${ sourceType }');
 
@@ -1395,6 +1411,7 @@ ${ assist.assistPanel() }
       self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');
       self.outputFormat.subscribe(function (newValue) {
         if (newValue && newValue != 'database' && ((newValue == 'table' || newValue == 'index') && wizard.source.path().length > 0)) {
+          self.nameChanged(self.name());
           wizard.guessFieldTypes();
           resizeElements();
         }

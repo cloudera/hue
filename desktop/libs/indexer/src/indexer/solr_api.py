@@ -148,6 +148,19 @@ def create_alias(request):
 
 @require_POST
 @api_error_handler
+def list_configs(request):
+  response = {'status': -1}
+
+  client = SolrClient(user=request.user)
+
+  response['configs'] = client.list_configs()
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@api_error_handler
 def design_schema(request, index):
   result = {'status': -1, 'message': ''}
 
