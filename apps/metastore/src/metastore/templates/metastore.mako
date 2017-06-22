@@ -883,8 +883,10 @@ ${ components.menubar(is_embeddable) }
   % if has_write_access:
   <div class="show-inactive-on-hover">
     <a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a>
-    <div data-bind="attr:{ title: comment }, editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block margin-left-5 table-description">
-      ${ _('Add a description...') }
+    <div data-bind="toggleOverflow: {height: 24}">
+      <div data-bind="attr:{ title: comment }, editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block margin-left-5">
+        ${ _('Add a description...') }
+      </div>
     </div>
   </div>
   % else:
