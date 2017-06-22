@@ -449,3 +449,23 @@ ul.errorlist {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+
+.toggle-overflow {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.toggle-overflow-gradient {
+  position: relative;
+  z-index: 2;
+  top: -10px;
+  height: 10px;
+  line-height: 10px;
+  background-color: @cui-gray-050;
+  cursor: s-resize;
+  text-align: center;
+}
+
+.toggle-overflow-gradient:hover {
+  background-color: @cui-gray-100;
+}
