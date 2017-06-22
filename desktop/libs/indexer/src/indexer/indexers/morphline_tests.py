@@ -182,6 +182,7 @@ class TestIndexer():
     _test_fixed_type_format_generate_morphline(ApacheCombinedFormat)
 
   def test_generate_ruby_logs_morphline(self):
+    raise SkipTest
     _test_fixed_type_format_generate_morphline(RubyLogFormat)
 
   def test_generate_hue_log_morphline(self):

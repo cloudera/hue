@@ -112,14 +112,14 @@ ROW FORMAT   DELIMITED
 TBLPROPERTIES("skip.header.line.count" = "1")''' in  sql, sql)
 
   assert_true('''CREATE TABLE `default`.`index_data` COMMENT "Big Data"
-      PRIMARY KEY (id)
-      PARTITION BY HASH PARTITIONS 16
-      STORED AS kudu
-      TBLPROPERTIES(
-      'kudu.num_tablet_replicas' = '1'
-      )
-      AS SELECT `id`, `business_id`, `cool`, `date`, `funny`, `stars`, `text`, `type`, `useful`, `user_id`, `name`, `full_address`, `latitude`, `longitude`, `neighborhoods`, `open`, `review_count`, `state`
-      FROM `default`.`hue__tmp_index_data`;''' in  sql, sql)
+        PRIMARY KEY (id)
+        PARTITION BY HASH PARTITIONS 16
+        STORED AS kudu
+        TBLPROPERTIES(
+        'kudu.num_tablet_replicas' = '1'
+        )
+        AS SELECT `id`, `business_id`, `cool`, `date`, `funny`, `stars`, `text`, `type`, `useful`, `user_id`, `name`, `full_address`, `latitude`, `longitude`, `neighborhoods`, `open`, `review_count`, `state`
+        FROM `default`.`hue__tmp_index_data`;''' in  sql, sql)
 
 
 def test_generate_create_parquet_table():
@@ -149,9 +149,9 @@ TBLPROPERTIES("skip.header.line.count" = "1")
 ;''' in  sql, sql)
 
   assert_true('''CREATE TABLE `default`.`parquet_table`
-      STORED AS parquet
-      AS SELECT *
-      FROM `default`.`hue__tmp_parquet_table`;
+        STORED AS parquet
+        AS SELECT *
+        FROM `default`.`hue__tmp_parquet_table`;
 ''' in  sql, sql)
 
   assert_true('''DROP TABLE IF EXISTS `default`.`hue__tmp_parquet_table`;
