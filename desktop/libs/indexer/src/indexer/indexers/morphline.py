@@ -64,7 +64,7 @@ class MorphlineIndexer(object):
 
     return hdfs_workspace_path
 
-  def run_morphline(self, request, collection_name, morphline, input_path, query=None, start_time=None):
+  def run_morphline(self, request, collection_name, morphline, input_path, query=None, start_time=None, lib_path=None):
     workspace_path = self._upload_workspace(morphline)
 
     task = make_notebook(
@@ -92,7 +92,7 @@ class MorphlineIndexer(object):
 
     task.add_java_snippet(
       clazz='org.apache.solr.hadoop.MapReduceIndexerTool',
-      app_jar=CONFIG_INDEXER_LIBS_PATH.get(),
+      app_jar=lib_path if lib_path is not None else CONFIG_INDEXER_LIBS_PATH.get(),
       arguments=[
           u'--morphline-file',
           u'morphline.conf',
