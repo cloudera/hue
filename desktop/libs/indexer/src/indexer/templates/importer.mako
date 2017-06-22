@@ -704,7 +704,7 @@ ${ assist.assistPanel() }
                   <input type="number" class="input-small" placeholder="1" data-bind="value: indexerNumShards">
                 </label>
               </div>
-              
+
               <div class="control-group">
                 <label for="indexerReplicationFactor" class="control-label"><div>${ _('Replication factor') }</div>
                   <input type="number" class="input-small" placeholder="1" data-bind="value: indexerReplicationFactor">
@@ -1304,33 +1304,6 @@ ${ assist.assistPanel() }
           return true;
         }
       });
-
-      self.defaultName = ko.computed(function() {
-        var name = ''
-
-        if (self.inputFormat() == 'file') {
-          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
-
-          if (self.path()) {
-            name += '.' + self.path().split('/').pop().split('.')[0];
-          }
-        } else if (self.inputFormat() == 'table') {
-          if (self.table().split('.', 2).length == 2) {
-            name = self.table();
-          }
-        } else if (self.inputFormat() == 'query') {
-          if (self.query()) {
-            name = self.name();
-          }
-        } else if (self.inputFormat() == 'manual') {
-          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
-        }
-
-        return name.replace(/ /g, '_').toLowerCase();
-      });
-      self.defaultName.subscribe(function(newVal) {
-        vm.createWizard.destination.name(newVal);
-      });
     };
 
     var Destination = function (vm, wizard) {
@@ -1444,6 +1417,36 @@ ${ assist.assistPanel() }
         } else {
           vm.currentStep(1);
         }
+      });
+      self.defaultName = ko.computed(function() {
+        var name = ''
+
+        if (wizard.source.inputFormat() == 'file') {
+          if (self.outputFormat() == 'table') {
+            name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
+
+            if (wizard.source.path()) {
+              name += '.' + wizard.source.path().split('/').pop().split('.')[0];
+            }
+          } else { // Index
+            name = wizard.source.path().split('/').pop().split('.')[0];
+          }
+        } else if (wizard.source.inputFormat() == 'table') {
+          if (wizard.source.table().split('.', 2).length == 2) {
+            name = wizard.source.table();
+          }
+        } else if (wizard.source.inputFormat() == 'query') {
+          if (wizard.source.query()) {
+            name = wizard.source.name();
+          }
+        } else if (wizard.source.inputFormat() == 'manual') {
+          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
+        }
+
+        return name.replace(/ /g, '_').toLowerCase();
+      });
+      self.defaultName.subscribe(function(newVal) {
+        self.name(newVal);
       });
 
       self.format = ko.observable();
