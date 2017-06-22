@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
-  from indexer.conf import ENABLE_NEW_INDEXER
+  from indexer.conf import ENABLE_NEW_INDEXER, CONFIG_INDEXER_LIBS_PATH
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -1395,7 +1395,9 @@ ${ assist.assistPanel() }
           });
           $.post("/indexer/api/configs/list/", function (data) {
             if (data.status == 0) {
-              self.indexerConfigSets(data.configs);
+              self.indexerConfigSets(data.configs.map(function (config) {
+                return {'name': config, 'value': config};
+              }));
             } else {
               $(document).trigger("error", data.message);
             }
@@ -1545,7 +1547,7 @@ ${ assist.assistPanel() }
 
       // Index
       self.indexerRunJob = ko.observable(false);
-      self.indexerJobLibPath = ko.observable('');
+      self.indexerJobLibPath = ko.observable('${ CONFIG_INDEXER_LIBS_PATH.get() }');
       self.indexerConfigSet = ko.observable('');
       self.indexerConfigSets = ko.observableArray([]);
       self.indexerNumShards = ko.observable('');
