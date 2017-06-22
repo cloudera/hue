@@ -109,11 +109,17 @@
       }
 
       if (editableOptions.toggleElement) {
-        $element.parent().find(editableOptions.toggleElement).on('click', function (e) {
-          e.stopPropagation();
-          e.preventDefault();
-          $editable.editable('toggle');
-        });
+        var $clickable = $element.parent().find(editableOptions.toggleElement);
+        if ($element.parents('.show-inactive-on-hover').length > 0) {
+          $clickable = $element.parents('.show-inactive-on-hover').find(editableOptions.toggleElement);
+        }
+        if ($clickable !== null) {
+          $clickable.on('click', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            $editable.editable('toggle');
+          });
+        }
       }
 
       if (editableOptions.save) {
