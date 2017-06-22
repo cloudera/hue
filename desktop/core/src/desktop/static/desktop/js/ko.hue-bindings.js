@@ -3565,16 +3565,21 @@
       });
     };
 
+    AceLocationHandler.prototype.clearMarkedErrors = function () {
+      var self = this;
+      for (var marker in self.editor.session.$backMarkers) {
+        if (self.editor.session.$backMarkers[marker].clazz === 'hue-ace-syntax-error') {
+          var token = self.editor.session.$backMarkers[marker].token;
+          delete token.syntaxError;
+          self.editor.session.removeMarker(self.editor.session.$backMarkers[marker].id);
+        }
+      }
+    };
+
     AceLocationHandler.prototype.checkForSyntaxErrors = function (statementLocation, cursorPosition) {
       var self = this;
       if (self.aceSqlSyntaxWorker !== null) {
-        for (var marker in self.editor.session.$backMarkers) {
-          if (self.editor.session.$backMarkers[marker].clazz === 'hue-ace-syntax-error') {
-            var token = self.editor.session.$backMarkers[marker].token;
-            delete token.syntaxError;
-            self.editor.session.removeMarker(self.editor.session.$backMarkers[marker].id);
-          }
-        }
+        self.clearMarkedErrors();
         var AceRange = ace.require('ace/range').Range;
         var beforeCursor = self.editor.session.getTextRange(new AceRange(statementLocation.first_line - 1, statementLocation.first_column, cursorPosition.row, cursorPosition.column));
         var afterCursor = self.editor.session.getTextRange(new AceRange(cursorPosition.row, cursorPosition.column, statementLocation.last_line - 1, statementLocation.last_column));
@@ -3599,15 +3604,18 @@
             var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-error');
             self.editor.session.$backMarkers[markerId].token = token;
           }
-        }
+        };
+        huePubSub.publish('editor.refresh.statement.locations', self.snippet);
       }
     };
 
     AceLocationHandler.prototype.detachSqlSyntaxWorker = function () {
-      if (self.aceSqlSyntaxWorker !== null) {
+      var self = this;
+      if (self.aceSqlSyntaxWorker) {
         self.aceSqlSyntaxWorker.terminate();
         self.aceSqlSyntaxWorker = null;
       }
+      self.clearMarkedErrors();
     };
 
     AceLocationHandler.prototype.attachSqlWorker = function () {
