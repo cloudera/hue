@@ -3598,11 +3598,15 @@
               console.log(e.data.syntaxError);
             }
             var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
-            token.syntaxError = e.data.syntaxError;
-            var AceRange = ace.require('ace/range').Range;
-            var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
-            var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-error');
-            self.editor.session.$backMarkers[markerId].token = token;
+            if (token) {
+              token.syntaxError = e.data.syntaxError;
+              var AceRange = ace.require('ace/range').Range;
+              var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
+              var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-error');
+              self.editor.session.$backMarkers[markerId].token = token;
+            } else {
+              console.warn("couldn't find a token at line: " + (e.data.syntaxError.loc.first_line - 1) + ", column: " + (e.data.syntaxError.loc.first_column + 1));
+            }
           }
         };
         huePubSub.publish('editor.refresh.statement.locations', self.snippet);
