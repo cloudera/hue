@@ -1588,6 +1588,11 @@ var SqlParseSupport = (function () {
       parser.yy.caseDetermined = false;
       parser.yy.error = undefined;
 
+      parser.yy.latestTablePrimaries = [];
+      parser.yy.subQueries = [];
+      parser.yy.selectListAliases = [];
+      parser.yy.latestTablePrimaries = [];
+
       parser.yy.activeDialect = (dialect !== 'hive' && dialect !== 'impala') ? undefined : dialect;
 
       // Hack to set the inital state of the lexer without first having to hit a token
