@@ -2413,6 +2413,9 @@ var EditorViewModel = (function() {
                   $(document).on("showSubmitPopup", function (event, data) {
                     $('.submit-modal-editor').html(data);
                     $('.submit-modal-editor').modal('show');
+                    $('.submit-modal-editor').on('hidden', function () {
+                      huePubSub.publish('hide.datepicker');
+                    });
                     var _sel = $('.submit-form .control-group[rel!="popover"]:visible');
                     if (_sel.length > 0) {
                       $('.submit-modal-editor .modal-body').height($('.submit-modal-editor .modal-body').height() + 60);

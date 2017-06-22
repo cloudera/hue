@@ -246,6 +246,9 @@ ${ commonshare() | n,unicode }
     $(document).on("showSubmitPopup", function(event, data){
       $('#submit-notebook-modal').html(data);
       $('#submit-notebook-modal').modal('show');
+      $('#submit-notebook-moda').on('hidden', function () {
+        huePubSub.publish('hide.datepicker');
+      });
     });
 
     var oTable = $("#notebookTable").dataTable({
