@@ -1791,8 +1791,9 @@ ${ assist.assistPanel() }
             if (resp.history_uuid) {
               $.jHueNotify.info("${ _('Task submitted.') }");
               huePubSub.publish('notebook.task.submitted', resp.history_uuid);
-            } else {
+            } else if (resp.on_success_url) {
               $.jHueNotify.info("${ _('Creation success.') }");
+              huePubSub.publish('open.link', resp.on_success_url);
             }
           } else {
             $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
