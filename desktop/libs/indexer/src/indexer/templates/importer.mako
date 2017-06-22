@@ -1043,6 +1043,9 @@ ${ assist.assistPanel() }
         "double": "double",
         "date": "date"
       },
+      HIVE_TO_SOLR: {
+        "bigint": "long"
+      },
       get: function(type, key, defaultValue) {
         return type[key] || defaultValue
       }
@@ -1391,7 +1394,7 @@ ${ assist.assistPanel() }
       self.description = ko.observable('');
       self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');
       self.outputFormat.subscribe(function (newValue) {
-        if (newValue && newValue != 'database' && (newValue == 'table' && wizard.source.path().length > 0)) {
+        if (newValue && newValue != 'database' && ((newValue == 'table' || newValue == 'index') && wizard.source.path().length > 0)) {
           wizard.guessFieldTypes();
           resizeElements();
         }
@@ -1673,6 +1676,8 @@ ${ assist.assistPanel() }
           resp.columns.forEach(function (entry, i, arr) {
             if (self.destination.outputFormat() === 'table'){
               entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
+            } else if (self.destination.outputFormat() === 'index'){
+              entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);
             }
             arr[i] = loadField(entry, self.destination, i);
           });
