@@ -15,7 +15,7 @@
 // limitations under the License.
 
 (function () {
-  fdescribe('sqlSyntaxParser.js', function() {
+  describe('sqlSyntaxParser.js', function() {
 
     var expectedToStrings = function (expected) {
       return $.map(expected, function(ex) { return ex.text; })
@@ -97,6 +97,11 @@
       var result = sqlSyntaxParser.parseSyntax('slelect ', '');
       expect(result).toBeTruthy();
       expect(expectedToStrings(result.expected)).toEqual(['select', 'set', 'alter', 'insert', 'create', 'show', 'use', 'drop', 'from', 'truncate', 'update', 'with']);
+    });
+
+    it('should find errors for "select * from sample_07 where and\\n\\nselect unknownCol from sample_07;"', function () {
+      var result = sqlSyntaxParser.parseSyntax('select * from sample_07 where and\n\nselect unknownCol from sample_07;', '', 'hive', false);
+      expect(result).toBeTruthy();
     });
 
     describe('Hive specific', function () {
