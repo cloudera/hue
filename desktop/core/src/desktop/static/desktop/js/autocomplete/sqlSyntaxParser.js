@@ -1628,23 +1628,25 @@ case 1183: case 1184:
 break;
 case 1194:
 
-      this.$ = $$[$0];
+     this.$ = $$[$0];
 
-      var idx = parser.yy.latestTablePrimaries.length - 1;
-      var tables = [];
-      do {
-        var tablePrimary = parser.yy.latestTablePrimaries[idx];
-        if (!tablePrimary.subQueryAlias) {
-          tables.unshift(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain, alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain })
-        }
-        idx--;
-      } while (idx >= 0 && tablePrimary.join && !tablePrimary.subQueryAlias)
+     if (parser.yy.latestTablePrimaries.length > 0) {
+       var idx = parser.yy.latestTablePrimaries.length - 1;
+       var tables = [];
+       do {
+         var tablePrimary = parser.yy.latestTablePrimaries[idx];
+         if (!tablePrimary.subQueryAlias) {
+           tables.unshift(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain, alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain })
+         }
+         idx--;
+       } while (idx >= 0 && tablePrimary.join && !tablePrimary.subQueryAlias)
 
-      if (tables.length > 0) {
-        this.$.suggestJoins = {
-          prependJoin: true,
-          tables: tables
-        };
+       if (tables.length > 0) {
+         this.$.suggestJoins = {
+           prependJoin: true,
+           tables: tables
+         };
+       }
       }
    
 break;
@@ -1662,7 +1664,9 @@ case 1201:
      if ($$[$0].suggestKeywords) {
        this.$.suggestKeywords = $$[$0].suggestKeywords;
      }
-     parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
+     if (parser.yy.latestTablePrimaries.length > 0) {
+        parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
+     }
    
 break;
 case 1202:
@@ -1679,7 +1683,9 @@ case 1202:
      if ($$[$0-1].suggestKeywords) {
        this.$.suggestKeywords = $$[$0-1].suggestKeywords;
      }
-     parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
+     if (parser.yy.latestTablePrimaries.length > 0) {
+       parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
+     }
    
 break;
 case 1203:
@@ -1693,7 +1699,7 @@ case 1212:
      if (!$$[$0-2] && parser.isImpala()) {
        parser.suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
      }
-     if (!$$[$0-2]) {
+     if (!$$[$0-2] && parser.yy.latestTablePrimaries.length > 0) {
        var idx = parser.yy.latestTablePrimaries.length - 1;
        var tables = [];
        do {
