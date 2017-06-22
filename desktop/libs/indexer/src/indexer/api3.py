@@ -149,15 +149,6 @@ def guess_field_types(request):
   return JsonResponse(format_)
 
 
-def index_file(request):
-  file_format = json.loads(request.POST.get('fileFormat', '{}'))
-  _convert_format(file_format["format"], inverse=True)
-  collection_name = file_format["name"]
-
-  job_handle = _index(request, file_format, collection_name)
-  return JsonResponse(job_handle)
-
-
 @api_error_handler
 def importer_submit(request):
   source = json.loads(request.POST.get('source', '{}'))
@@ -172,7 +163,7 @@ def importer_submit(request):
 
     if destination['indexerRunJob']:
       _convert_format(source["format"], inverse=True)
-      job_handle = _index(request, source, index_name, start_time=start_time)
+      job_handle = _index(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'])
     else:
       client = SolrClient(request.user)
       unique_key_field = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
@@ -247,7 +238,7 @@ def _create_table(request, source, destination, start_time=-1):
   return notebook.execute(request, batch=False)
 
 
-def _index(request, file_format, collection_name, query=None, start_time=None):
+def _index(request, file_format, collection_name, query=None, start_time=None, lib_path=None):
   indexer = MorphlineIndexer(request.user, request.fs)
 
   unique_field = indexer.get_unique_field(file_format)
@@ -282,4 +273,4 @@ def _index(request, file_format, collection_name, query=None, start_time=None):
 
   morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
 
-  return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time)
+  return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)
