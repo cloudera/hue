@@ -189,7 +189,7 @@ def importer_submit(request):
   elif destination['ouputFormat'] == 'database':
     job_handle = create_database(request, source, destination, start_time)
   elif destination['outputFormat'] == 'file' and source['inputFormat'] == 'rdbms':
-    job_handle = run_morphline(request, source, 'sqoop')
+    job_handle = run_sqoop(request, source, destination, start_time)
   else:
     job_handle = _create_table(request, source, destination, start_time)
   print JsonResponse(job_handle)
@@ -440,22 +440,27 @@ def _index(request, file_format, collection_name, query=None):
   return run_morphline(request, collection_name, morphline, input_path, query)
 
 
-def run_morphline(self, request, collection_name, morphline, input_path, query=None):
+def run_sqoop(request, source, destination, start_time):
+  print source['rdbmsName']
 
-    task = Notebook(
-        name='Indexer job for %s' % collection_name,
-        isManaged=True
-    )
-#     task = make_notebook(
-#       name=_('Indexer job for %s') % collection_name,
-#       editor_type='notebook',
-#       on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
-#       is_task=True
-#     )
+  print source['rdbmsDatabaseName']
+  print source['rdbmsTableName']
+  
+  print destination['name']
 
-    task.add_sqoop_snippet(
-      statement='org.apache.solr.hadoop.MapReduceIndexerTool',
-      files = [{"path": "/user/admin/mysql-connector-java-5.1.42-bin.jar", "type": "jar"}]
-    )
+  task = make_notebook(
+      name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
+          'rdbmsDatabaseName': source['rdbmsDatabaseName'],
+          'rdbmsDatabaseName': source['rdbmsDatabaseName'],
+          'path': destination['name']
+        },
+      editor_type='sqoop1',
+      statement='export .... .... ',
+      files = [{"path": "/user/admin/mysql-connector-java-5.1.42-bin.jar", "type": "jar"}],
+      status='ready',
+      on_success_url='/filebrowser/view/%s(name)s' % destination,
+      last_executed=start_time,
+      is_task=True
+  )
 
-    return task.execute(request, batch=True)
+  return task.execute(request, batch=True)

@@ -1694,6 +1694,12 @@ ${ assist.assistPanel() }
                   aceMode: 'ace/mode/impala',
                   snippetImage: '${ static("impala/art/icon_impala_48.png") }',
                   sqlDialect: true
+                },
+                sqoop1: {
+                  placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+                  aceMode: 'ace/mode/impala',
+                  snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+                  sqlDialect: true
                 }
               }
             });
