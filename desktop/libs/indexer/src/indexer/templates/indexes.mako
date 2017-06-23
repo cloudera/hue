@@ -15,9 +15,11 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
+
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
 %>
+
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
@@ -67,35 +69,18 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
         <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true); }">
           <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
         </a>
-
-        <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Query the table')}" href="javascript:void(0)">
-          <i class="fa fa-play fa-fw"></i>
-        </a>
-
-        <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Refresh')}" href="javascript:void(0)">
-          <i class="pointer fa fa-refresh fa-fw"></i>
-        </a>
-
-        <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Import Data')}">
-          <i class="fa fa-upload fa-fw"></i>
-        </a>
-
-        <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }">
-          <i class="fa fa-times fa-fw"></i>
-        </a>
       </%def>
     </%actionbar:render>
 
     <!-- ko template: { if: alias.showCreateModal(), name: 'create-alias' }--><!-- /ko -->
     <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
     <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
-
   </div>
 </div>
 
 
 <script type="text/html" id="list-indexes">
-  <table id="indexTable" class="table datatables">
+  <table class="table datatables">
     <thead>
       <tr>
         <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
@@ -124,50 +109,158 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 
 
 <script type="text/html" id="list-index">
+  <div class="pull-right">
+    <a class="inactive-action" data-bind="hueLink: '/search/browse/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Search the index')}" href="javascript:void(0)">
+      <i class="fa fa-search fa-fw"></i>
+    </a>
+
+    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Refresh')}" href="javascript:void(0)">
+      <i class="pointer fa fa-refresh fa-fw"></i>
+    </a>
+
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Index Data')}">
+      <i class="fa fa-upload fa-fw"></i>
+    </a>
+
+    <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }">
+      <i class="fa fa-times fa-fw"></i>
+    </a>
+  </div>
+
+
   <div class="clearfix"></div>
 
   <ul class="nav nav-pills margin-top-30">
-    <li class="active"><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
-    <li><a href="#columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
-    <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
+    <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
+    <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
+    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
-    <div class="tab-pane" id="overview">
-      <!-- ko template: { if: $root.tab() == 'index-overview', name: 'index-overview-tab' }--><!-- /ko -->
+    <div class="tab-pane active" id="index-overview">
+      <!-- ko template: { if: $root.tab() == 'index-overview', name: 'indexes-index-overview' }--><!-- /ko -->
     </div>
 
-    <div class="tab-pane" id="columns">
+    <div class="tab-pane" id="index-columns">
       <!-- ko if: $root.tab() == 'index-columns' -->
         <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a column...') }" data-bind="clearable: $root.columnFilter, value: $root.columnFilter, valueUpdate: 'afterkeydown'"/>
-        <!-- ko template: 'index-columns-tab' --><!-- /ko -->
+        <!-- ko template: 'indexes-index-fields' --><!-- /ko -->
       <!-- /ko -->
     </div>
 
-    <div class="tab-pane" id="sample">
-      <!-- ko template: { if: $root.tab() == 'index-sample', name: 'index-sample-tab' }--><!-- /ko -->
+    <div class="tab-pane" id="index-sample">
+      <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample() }--><!-- /ko -->
     </div>
   </div>
 </script>
 
 
-<script type="text/html" id="index-overview-tab">
+<script type="text/html" id="indexes-index-overview">
   <div>
     Overview
+    
+    <!-- ko template: 'indexes-index-properties' --><!-- /ko -->
+
+    <!-- ko template: { name: 'indexes-index-fields-fields', data: fieldsPreview }--><!-- /ko -->
+    <a class="pointer" data-bind="visible: fields().length > fieldsPreview().length, click: function() { $('li a[href=\'#index-columns\']').click(); }">
+      ${_('View more...')}
+    </a>
+
+    <!-- ko template: { name: 'indexes-index-sample', data: samplePreview }--><!-- /ko -->
+    <a class="pointer" data-bind="visible: sample().length > samplePreview().length, click: function() { $('li a[href=\'#index-sample\']').click(); }">
+      ${_('View more...')}
+    </a>
   </div>
 </script>
 
 
-<script type="text/html" id="index-columns-tab">
+<script type="text/html" id="indexes-index-properties">
+  <h4>${ _('Properties') }</h4>
+  <div class="row-fluid">
+    <div title="${ _('Type') }">
+      <i class="fa fa-fw fa-eye muted"></i> ${ _('Collection') }
+    </div>
+    <div title="${ _('Unique Key') }">
+      <i class="fa fa-fw fa-key muted"></i> <span data-bind="text: uniqueKey"></span>
+    </div>    
+  </div>
+</script>
+
+
+<script type="text/html" id="indexes-index-fields-fields">
   <div>
     Fields
+
+    <table id="indexTable" class="table datatables">
+      <thead>
+        <tr>
+          <th width="1%"></th>
+          <th>${ _('Name') }</th>
+          <th>${ _('Type') }</th>
+          <th>${ _('Required') }</th>
+          <th>${ _('Stored') }</th>
+          <th>${ _('Indexed') }</th>
+          <th>${ _('Multivalued') }</th>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: $data">
+        <tr>
+          <td>
+            <div></div>
+          </td>
+          <td data-bind="text: name"></td>
+          <td data-bind="text: type"></td>
+          <td><i data-bind="visible: $data.required" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.stored" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: indexed" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.multiValued" class="fa fa-check muted"></i></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </script>
 
 
-<script type="text/html" id="index-sample-tab">
+<script type="text/html" id="indexes-index-fields">
+  <div>
+    <!-- ko template: { name: 'indexes-index-fields-fields', data: fields }--><!-- /ko -->
+    
+    Copy Fields
+    <span data-bind="text: ko.mapping.toJSON(copyFields)"></span>
+  
+  
+    Dynamic Fields
+    <span data-bind="text: ko.mapping.toJSON(dynamicFields)"></span> 
+  </div>
+</script>
+
+
+<script type="text/html" id="indexes-index-sample">
   <div>
     Sample
+    
+    <a data-bind="click: $root.index().getSample">Load</a>
+
+    <table class="table table-condensed table-nowrap sample-table">
+      <thead>
+        <tr>
+          <th style="width: 1%">&nbsp;</th>
+          <!-- ko foreach: $root.index().fields() -->
+          <th data-bind="text: name"></th>
+          <!-- /ko -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ko foreach: $data -->
+          <tr>
+            <td data-bind="text: $index() + 1"></td>
+            <!-- ko foreach: $root.index().fields() -->
+              <td data-bind="text: $parent[name()]"></td>
+            <!-- /ko -->
+          </tr>
+        <!-- /ko -->
+      </tbody>
+    </table>
   </div>
 </script>
 
@@ -248,8 +341,31 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     self.name = ko.observable(data.name);
     self.uniqueKey = ko.observable(data.schema.uniqueKey);
     self.fields = ko.mapping.fromJS(data.schema.fields);
+    self.fieldsPreview = ko.pureComputed(function() {
+      return self.fields().splice(0, 5)
+    });
     self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
     self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
+    
+    self.sample = ko.observableArray();
+    self.samplePreview = ko.pureComputed(function() {
+      return self.sample().splice(0, 5)
+    });
+    
+    self.getSample = function() {
+      $.post("${ url('indexer:sample_index') }", {
+        name: self.name(),
+        rows: 100
+      }, function(data) {
+        if (data.status == 0) {
+          self.sample(data.sample)
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
   };
 
 

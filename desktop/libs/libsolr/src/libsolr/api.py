@@ -287,6 +287,21 @@ class SolrApi(object):
           break
 
 
+  def select(self, collection, query=None, rows=100, start=0):
+    if query is None:
+      query = EMPTY_QUERY.get()
+
+    params = self._get_params() + (
+        ('q', query),
+        ('wt', 'json'),
+        ('rows', rows),
+        ('start', start),
+    )
+
+    response = self._root.get('%s/select' % collection, params)
+    return self._get_json(response)
+
+
   def suggest(self, collection, query):
     try:
       params = self._get_params() + (

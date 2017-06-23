@@ -163,6 +163,21 @@ def create_alias(request):
 
 @require_POST
 @api_error_handler
+def sample_index(request):
+  response = {'status': -1}
+
+  name = request.POST.get('name')
+
+  client = SolrClient(user=request.user)
+
+  response['sample'] = client.sample_index(name)['response']['docs']
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@api_error_handler
 def list_configs(request):
   response = {'status': -1}
 
