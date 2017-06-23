@@ -22,7 +22,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from libsolr.api import SolrApi
 
@@ -57,6 +56,22 @@ def list_indexes(request):
   client = SolrClient(user=request.user)
 
   response['collections'] = client.get_indexes()
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@api_error_handler
+def list_index(request):
+  response = {'status': -1}
+  
+  name = request.POST.get('name')
+  
+  client = SolrClient(user=request.user)
+
+  response['schema'] = client.list_schema(name)
+  response['name'] = name
   response['status'] = 0
 
   return JsonResponse(response)

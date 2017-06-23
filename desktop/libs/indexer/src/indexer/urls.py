@@ -48,6 +48,7 @@ urlpatterns += patterns('indexer.solr_api',
   # V2
   url(r'^api/aliases/create/$', 'create_alias', name='create_alias'),
   url(r'^api/configs/list/$', 'list_configs', name='list_configs'),
+  url(r'^api/indexe/list/$', 'list_index', name='list_index'),
   url(r'^api/indexes/list/$', 'list_indexes', name='list_indexes'),
   url(r'^api/indexes/create/$', 'create_index', name='create_index'),
   url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes'),
