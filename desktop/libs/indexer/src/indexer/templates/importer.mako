@@ -453,14 +453,7 @@ ${ assist.assistPanel() }
             </thead>
             <tbody data-bind="foreach: createWizard.source.sample">
             <tr data-bind="foreach: $data">
-              ##<!-- ko if: $index() < $root.createWizard.source.columns().length -->
-              ##<td data-bind="visible: $root.createWizard.source.columns()[$index()].keep, text: $data"></td>
               <td data-bind="truncatedText: $data"></td>
-
-              ##<!-- ko with: $root.createWizard.source.columns()[$index()] -->
-              ##  <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
-              ##<!-- /ko -->
-              ##<!-- /ko -->
             </tr>
             </tbody>
           </table>
@@ -878,17 +871,8 @@ ${ assist.assistPanel() }
     <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
       <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
     <!-- /ko -->
-    <!-- ko if: $root.createWizard.source.inputFormat() != 'manual' && level() == 0 && (typeof isPartition === 'undefined' || !isPartition()) -->
-      <!-- ko if: $root.createWizard.source.sample() && $root.createWizard.source.sample().length > 0 -->
-        <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]"></div>
-        <!-- ko if: $root.createWizard.source.sample().length > 1 -->
-        <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]"></div>
-        <!-- /ko -->
-      <!-- /ko -->
-      <!-- ko if: !$root.createWizard.source.sample() || $root.createWizard.source.sample().length === 0 -->
-      <div class="inline-block muted field-content-preview">${ _("No sample to be shown") }</div>
-      <!-- /ko -->
-    <!-- /ko -->
+
+    <div data-bind="template: { name:'field-column-example' }"></div>
 
     <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
       <div class="operation" data-bind="template: { name: 'table-field-template', foreach: nested }"></div>
@@ -928,6 +912,23 @@ ${ assist.assistPanel() }
 
   <!-- ko if: operations().length > 0 -->
   <a class="pointer" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation to')} <span data-bind="text: name"></span></a>
+  <!-- /ko -->
+  
+  <span data-bind="template: { name:'field-column-example' }"></span>
+</script>
+
+
+<script type="text/html" id="field-column-example">
+  <!-- ko if: $root.createWizard.source.inputFormat() != 'manual' && level() == 0 && (typeof isPartition === 'undefined' || !isPartition()) -->
+    <!-- ko if: $root.createWizard.source.sample() && $root.createWizard.source.sample().length > 0 -->
+      <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]"></div>
+      <!-- ko if: $root.createWizard.source.sample().length > 1 -->
+      <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]"></div>
+      <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: !$root.createWizard.source.sample() || $root.createWizard.source.sample().length === 0 -->
+    <div class="inline-block muted field-content-preview">${ _("No sample to be shown") }</div>
+    <!-- /ko -->
   <!-- /ko -->
 </script>
 

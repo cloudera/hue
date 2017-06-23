@@ -193,12 +193,12 @@ except ImportError, e:
         % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Explore result in a dashboard') }">
-            <i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }
+            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
           </a>
         </li>
         % endif
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
             <i class="fa fa-fw fa-save"></i> ${ _('Save') }
           </a>
         </li>
@@ -264,7 +264,7 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="search-index">
-                  &nbsp;${ _('Dashboard') }
+                  &nbsp;${ _('Index') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
