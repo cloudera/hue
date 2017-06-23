@@ -1957,6 +1957,8 @@ $(document).ready(function () {
     MRJOBS: "${_('MR Jobs')}"
   };
 
+  $('.assist').css('top', '36px');
+
   $(window).resize(function () {
     resizeLogs();
   });
