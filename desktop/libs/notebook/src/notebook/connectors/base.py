@@ -137,6 +137,23 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
+  def add_sqoop_snippet(self, statement, arguments, files):
+    _data = json.loads(self.data)
+
+    _data['snippets'].append(self._make_snippet({
+        u'type': u'sqoop1',
+        u'status': u'running',
+        u'properties':  {
+          u'files': files,
+          u'arguments': arguments,
+          u'archives': [],
+          u'statement': statement
+        }
+    }))
+    self._add_session(_data, 'java')
+
+    self.data = json.dumps(_data)
+
   def add_shell_snippet(self, shell_command, arguments, archives, files, env_var):
     _data = json.loads(self.data)
 

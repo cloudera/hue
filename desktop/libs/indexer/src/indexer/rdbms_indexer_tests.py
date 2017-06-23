@@ -21,8 +21,10 @@ import logging
 
 from django.contrib.auth.models import User
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
 from desktop.lib.django_test_util import make_logged_in_client
+from indexer.conf import ENABLE_SQOOP
 
 from indexer.rdbms_indexer import RdbmsIndexer
 
@@ -31,7 +33,8 @@ LOG = logging.getLogger(__name__)
 
 
 class TestRdbmsIndexer():
-
+  if not ENABLE_SQOOP.get():
+    raise SkipTest
   def test_get_sample_data(self):
     self.client = make_logged_in_client()
     self.user = User.objects.get(username='test')

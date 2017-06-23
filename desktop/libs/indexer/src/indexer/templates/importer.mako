@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
-  from indexer.conf import ENABLE_NEW_INDEXER
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -500,7 +500,7 @@ ${ assist.assistPanel() }
           <div class="control-group">
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
             <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
-              <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+              <input type="text" class="form-control name input-xlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, uploadFile: false, uploadFolder: true}" placeholder="${ _('Name') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
@@ -1166,7 +1166,9 @@ ${ assist.assistPanel() }
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
           {'value': 'manual', 'name': 'Manually'},
+          % if ENABLE_SQOOP.get():
           {'value': 'rdbms', 'name': 'External Database'},
+          % endif
           % if ENABLE_NEW_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
           {'value': 'table', 'name': 'Table'},
@@ -1371,6 +1373,9 @@ ${ assist.assistPanel() }
           if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
             return false;
           }
+          if (format.value == 'file' && wizard.source.inputFormat() == 'manual') {
+            return false;
+          }
           else if (format.value == 'file' && wizard.source.inputFormat() == 'file') {
             return false;
           }
@@ -1552,7 +1557,7 @@ ${ assist.assistPanel() }
          return self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name()));
       });
       self.readyToIndex = ko.computed(function () {
-        var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
+        var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database' || self.destination.outputFormat() == 'file';
         var validTableColumns = self.destination.outputFormat() != 'table' || ($.grep(self.destination.columns(), function(column) {
             return column.name().length == 0;
           }).length == 0
@@ -1560,7 +1565,7 @@ ${ assist.assistPanel() }
             return column.name().length == 0 || (self.source.inputFormat() != 'manual' && column.partitionValue().length == 0);
           }).length == 0
         );
-        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
+        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index' || self.destination.outputFormat() == 'file';
         var isValidTable = self.destination.outputFormat() != 'table' || (
           self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)

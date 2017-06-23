@@ -150,7 +150,6 @@ def guess_field_types(request):
     query_server = rdbms.get_query_server_config(server=file_format['rdbmsName'])
     db = rdbms.get(request.user, query_server=query_server)
     assist = Assist(db)
-    response = {'status': -1}
     sample = assist.get_sample_data(database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
     table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
 
@@ -189,9 +188,11 @@ def importer_submit(request):
     job_handle = _index(request, source, collection_name)
   elif destination['ouputFormat'] == 'database':
     job_handle = create_database(request, source, destination, start_time)
+  elif destination['outputFormat'] == 'file' and source['inputFormat'] == 'rdbms':
+    job_handle = run_morphline(request, source, 'sqoop')
   else:
     job_handle = _create_table(request, source, destination, start_time)
-
+  print JsonResponse(job_handle)
   return JsonResponse(job_handle)
 
 
@@ -410,16 +411,16 @@ def _create_table_from_a_file(request, source, destination, start_time=-1):
 def _index(request, file_format, collection_name, query=None):
   indexer = Indexer(request.user, request.fs)
 
-  unique_field = indexer.get_unique_field(file_format)
-  is_unique_generated = indexer.is_unique_generated(file_format)
+  #unique_field = indexer.get_unique_field(file_format)
+  #is_unique_generated = indexer.is_unique_generated(file_format)
 
-  schema_fields = indexer.get_kept_field_list(file_format['columns'])
-  if is_unique_generated:
-    schema_fields += [{"name": unique_field, "type": "string"}]
+  #schema_fields = indexer.get_kept_field_list(file_format['columns'])
+  #if is_unique_generated:
+  #  schema_fields += [{"name": unique_field, "type": "string"}]
 
-  collection_manager = CollectionManagerController(request.user)
-  if not collection_manager.collection_exists(collection_name):
-    collection_manager.create_collection(collection_name, schema_fields, unique_key_field=unique_field)
+  #collection_manager = CollectionManagerController(request.user)
+  #if not collection_manager.collection_exists(collection_name):
+  #  collection_manager.create_collection(collection_name, schema_fields, unique_key_field=unique_field)
 
   if file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
@@ -434,6 +435,27 @@ def _index(request, file_format, collection_name, query=None):
   else:
     input_path = None
 
-  morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
+  morphline = indexer.generate_morphline_config(collection_name, file_format, None) #unique_field)
 
-  return indexer.run_morphline(request, collection_name, morphline, input_path, query)
+  return run_morphline(request, collection_name, morphline, input_path, query)
+
+
+def run_morphline(self, request, collection_name, morphline, input_path, query=None):
+
+    task = Notebook(
+        name='Indexer job for %s' % collection_name,
+        isManaged=True
+    )
+#     task = make_notebook(
+#       name=_('Indexer job for %s') % collection_name,
+#       editor_type='notebook',
+#       on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
+#       is_task=True
+#     )
+
+    task.add_sqoop_snippet(
+      statement='org.apache.solr.hadoop.MapReduceIndexerTool',
+      files = [{"path": "/user/admin/mysql-connector-java-5.1.42-bin.jar", "type": "jar"}]
+    )
+
+    return task.execute(request, batch=True)
