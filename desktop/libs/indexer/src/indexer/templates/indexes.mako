@@ -26,32 +26,55 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 
 <div class="container-fluid">
   <div class="card card-small">
-  <h1 class="card-heading simple">${ _('Index Browser') }</h1>
-
-  <%actionbar:render>
-    <%def name="search()">
-      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, description, etc...')}">
-    </%def>
-
-    <%def name="actions()">
-      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndex').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
-          <i class="fa fa-times"></i> ${ _('Delete') }
+    <h1 class="card-heading simple">${ _('Index Browser') }</h1>
+  
+    <%actionbar:render>
+      <%def name="search()">
+        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name...')}">
+      </%def>
+  
+      <%def name="actions()">
+        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndex').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+            <i class="fa fa-times"></i> ${ _('Delete') }
+          </a>
+        </div>
+      </%def>
+  
+      <%def name="creation()">
+        <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/default'">
+          <i class="fa fa-plus-circle"></i> ${ _('Create index') }
         </a>
-      </div>
-    </%def>
+        <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true); }">
+          <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
+        </a>
+        
+        <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Query the table')}" href="javascript:void(0)">
+          <i class="fa fa-play fa-fw"></i>
+        </a>
 
-    <%def name="creation()">
-      <a href="javascript:void(0)" class="btn" data-bind="click: function() { index.showCreateModal(true) }">
-        <i class="fa fa-plus-circle"></i> ${ _('Create index') }
-      </a>
-      <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
-        <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
-      </a>
-    </%def>
-  </%actionbar:render>
+        <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Refresh')}" href="javascript:void(0)">
+          <i class="pointer fa fa-refresh fa-fw"></i>
+        </a>
+
+        <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Import Data')}">
+          <i class="fa fa-upload fa-fw"></i>
+        </a>
+
+        <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }">
+          <i class="fa fa-times fa-fw"></i>
+        </a>
+      </%def>
+    </%actionbar:render>
+  
+    <!-- ko template: { if: alias.showCreateModal(), name: 'create-alias' }--><!-- /ko -->
+    <!-- ko template: { if: section() == 'indexes', name: 'list-indexes' }--><!-- /ko -->
+
+  </div>
+</div>
 
 
+<script type="text/html" id="list-indexes">
   <table id="indexTable" class="table datatables">
     <thead>
       <tr>
@@ -84,31 +107,11 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       </tr>
     </tbody>
   </table>
-
-  </div>
-</div>
-
-<!-- ko template: 'create-index' --><!-- /ko -->
-
-<script type="text/html" id="create-index">
-  <div class="snippet-settings" data-bind="visible: index.showCreateModal">
-
-    <input type="text" data-bind="value: index.name"/>
-
-    <a href="javascript:void(0)" class="btn" data-bind="click: index.create">
-      <i class="fa fa-plus-circle"></i> ${ _('Create index') }
-    </a>
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { index.showCreateModal(false) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
-    </a>
-  </div>
 </script>
 
 
-<!-- ko template: 'create-alias' --><!-- /ko -->
-
 <script type="text/html" id="create-alias">
-  <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
+  <div class="snippet-settings">
 
     <input type="text" data-bind="value: alias.name"/>
     <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name', optionsValue: 'name'" size="5" multiple="true"></select>
@@ -146,29 +149,6 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
-  var Index = function () {
-    var self = this;
-
-    self.showCreateModal = ko.observable(false);
-
-    self.name = ko.observable('');
-
-    self.create = function() {
-      $.post("${ url('indexer:create_index') }", {
-        "name": self.name
-      }, function (data) {
-        if (data.status == 0) {
-          window.location.reload();
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-        self.status('failed');
-      });
-
-    }
-  };
 
   var Alias = function (vm) {
     var self = this;
@@ -200,58 +180,14 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     }
   };
 
-  var FileWizard = function (vm) {
-    var self = this;
-
-    self.name = ko.observable('file');
-    self.sample = ko.observableArray();
-    self.show = ko.observable(false);
-
-    self.path = ko.observable('');
-    self.format = ko.observable('csv');
-    self.availableFormats = ko.observableArray(['csv', 'log', 'apache logs', 'mailbox']);
-  };
-
-  var HiveWizard = function (vm) {
-    var self = this;
-
-    self.name = ko.observable('hive');
-    self.show = ko.observable(false);
-
-    self.database = ko.observable('');
-    self.table = ko.observable('');
-  };
-
-  var CreateWizard = function (vm) {
-    var self = this;
-
-    self.show = ko.observable(false);
-    self.showCreate = ko.observable(false);
-
-    self.fileWizard = new FileWizard(vm);
-    self.hiveWizard = new HiveWizard(vm);
-
-    self.name = ko.observable('');
-    self.wizard = ko.observable();
-    self.wizard.subscribe(function(val) {
-      val.show(true);
-    });
-    self.wizard(self.fileWizard);
-    self.availableWizards = ko.observableArray([self.fileWizard, self.hiveWizard]);
-
-    self.edit = function() {
-      self.show(true);
-    }
-  };
 
   var Editor = function () {
     var self = this;
 
-    self.indexes = ko.observable([]);
+    self.section = ko.observable('indexes');
 
-    self.index = new Index(self);
+    self.indexes = ko.observable([]);
     self.alias = new Alias(self);
-    self.createWizard = new CreateWizard(self);
 
     self.selectedIndexes = ko.computed(function() {
       return $.grep(self.indexes(), function(index) { return index.isSelected(); });
