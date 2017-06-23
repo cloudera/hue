@@ -30,7 +30,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
   <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
     <li>
       <a href="javascript:void(0);" data-bind="click: function() { section('list-indexes'); }">${ _('Indexes') }
-        <!-- ko if: index --> 
+        <!-- ko if: index -->
         <span class="divider">&gt;</span>
         <!-- /ko -->
       </a>
@@ -46,7 +46,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 <div class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${ _('Index Browser') }</h1>
-    
+
     <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
 
     <%actionbar:render>
@@ -158,7 +158,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 <script type="text/html" id="indexes-index-overview">
   <div>
     Overview
-    
+
     <!-- ko template: 'indexes-index-properties' --><!-- /ko -->
 
     <!-- ko template: { name: 'indexes-index-fields-fields', data: fieldsPreview }--><!-- /ko -->
@@ -177,12 +177,9 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 <script type="text/html" id="indexes-index-properties">
   <h4>${ _('Properties') }</h4>
   <div class="row-fluid">
-    <div title="${ _('Type') }">
-      <i class="fa fa-fw fa-eye muted"></i> ${ _('Collection') }
-    </div>
     <div title="${ _('Unique Key') }">
       <i class="fa fa-fw fa-key muted"></i> <span data-bind="text: uniqueKey"></span>
-    </div>    
+    </div>
   </div>
 </script>
 
@@ -194,7 +191,9 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     <table id="indexTable" class="table datatables">
       <thead>
         <tr>
+          <th style="width: 1%">&nbsp;</th>
           <th width="1%"></th>
+          <th></th>
           <th>${ _('Name') }</th>
           <th>${ _('Type') }</th>
           <th>${ _('Required') }</th>
@@ -205,6 +204,10 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       </thead>
       <tbody data-bind="foreach: $data">
         <tr>
+          <td data-bind="text: $index() + 1"></td>
+          <td>
+            <i class="fa fa-info muted pointer analysis"></i>
+          </td>
           <td>
             <div></div>
           </td>
@@ -224,13 +227,13 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 <script type="text/html" id="indexes-index-fields">
   <div>
     <!-- ko template: { name: 'indexes-index-fields-fields', data: fields }--><!-- /ko -->
-    
+
     Copy Fields
     <span data-bind="text: ko.mapping.toJSON(copyFields)"></span>
-  
-  
+
+
     Dynamic Fields
-    <span data-bind="text: ko.mapping.toJSON(dynamicFields)"></span> 
+    <span data-bind="text: ko.mapping.toJSON(dynamicFields)"></span>
   </div>
 </script>
 
@@ -238,7 +241,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 <script type="text/html" id="indexes-index-sample">
   <div>
     Sample
-    
+
     <a data-bind="click: $root.index().getSample">Load</a>
 
     <table class="table table-condensed table-nowrap sample-table">
@@ -346,12 +349,12 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     });
     self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
     self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
-    
+
     self.sample = ko.observableArray();
     self.samplePreview = ko.pureComputed(function() {
       return self.sample().splice(0, 5)
     });
-    
+
     self.getSample = function() {
       $.post("${ url('indexer:sample_index') }", {
         name: self.name(),

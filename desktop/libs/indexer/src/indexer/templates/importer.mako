@@ -913,8 +913,8 @@ ${ assist.assistPanel() }
   <!-- ko if: operations().length > 0 -->
   <a class="pointer" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation to')} <span data-bind="text: name"></span></a>
   <!-- /ko -->
-  
-  <span data-bind="template: { name:'field-column-example' }"></span>
+
+  <span data-bind="template: { name: 'field-column-example' }"></span>
 </script>
 
 
