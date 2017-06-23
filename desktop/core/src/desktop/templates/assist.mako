@@ -1671,16 +1671,32 @@ from notebook.conf import get_ordered_interpreters
           </div>
         </div>
         <div data-bind="css: { 'assist-flex-fill': !selectedFunction(), 'assist-flex-half': selectedFunction() }">
-          <ul class="assist-function-categories" data-bind="foreach: filteredCategories">
+          <!-- ko ifnot: query -->
+          <ul class="assist-function-categories" data-bind="foreach: activeCategories">
             <li>
               <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
-              <ul class="assist-functions" data-bind="slideVisible: open, foreach: filteredFunctions">
+              <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
                 <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
                   <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parents[1].selectedFunction() === $data }, multiClick: { click: function () { $parents[1].selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }, text: signature"></a>
                 </li>
               </ul>
             </li>
           </ul>
+          <!-- /ko -->
+          <!-- ko if: query -->
+          <!-- ko if: filteredFunctions().length > 0 -->
+          <ul class="assist-functions" data-bind="foreach: filteredFunctions">
+            <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
+              <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parent.selectedFunction() === $data }, multiClick: { click: function () { $parent.selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }, text: signature"></a>
+            </li>
+          </ul>
+          <!-- /ko -->
+          <!-- ko if: filteredFunctions().length === 0 -->
+          <ul class="assist-functions">
+            <li class="assist-no-entries">${ _('No functions found. ') }</li>
+          </ul>
+          <!-- /ko -->
+          <!-- /ko -->
         </div>
         <!-- ko if: selectedFunction -->
         <div class="assist-flex-half assist-function-details" data-bind="with: selectedFunction">
@@ -1716,18 +1732,38 @@ from notebook.conf import get_ordered_interpreters
         self.selectedFunction.subscribe(function (newFunction) {
           if (newFunction) {
             selectedFunctionPerType[self.activeType()] = newFunction;
+            if (!newFunction.category.open()) {
+              newFunction.category.open(true);
+            }
           }
         });
 
-        self.activeCategories = ko.observable();
+        self.activeCategories = ko.observableArray();
 
-        self.filteredCategories = ko.pureComputed(function () {
-          if (! self.activeCategories()) {
-            return [];
-          }
-          return self.activeCategories().filter(function (category) {
-            return category.filteredFunctions().length > 0;
-          })
+        self.filteredFunctions = ko.pureComputed(function () {
+          var result = [];
+          var lowerCaseQuery = self.query().toLowerCase();
+          self.activeCategories().forEach(function (category) {
+            category.functions.forEach(function (fn) {
+              if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) === 0) {
+                fn.weight = 2;
+                result.push(fn);
+              } else if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) !== -1) {
+                fn.weight = 1;
+                result.push(fn);
+              } else if ((fn.description && fn.description.toLowerCase().indexOf(lowerCaseQuery) !== -1)) {
+                fn.weight = 0;
+                result.push(fn);
+              }
+            });
+          });
+          result.sort(function (a, b) {
+            if (a.weight !== b.weight) {
+              return b.weight - a.weight;
+            }
+            return a.signature.localeCompare(b.signature);
+          });
+          return result;
         });
 
         var apiHelper = ApiHelper.getInstance();
@@ -1785,17 +1821,11 @@ from notebook.conf import get_ordered_interpreters
                 signature: fn.signature,
                 description: fn.description
               }
-            }),
-            filteredFunctions: ko.pureComputed(function () {
-              if (self.query()) {
-                return koCategory.functions.filter(function (fn) {
-                  return fn.signature.toLowerCase().indexOf(self.query().toLowerCase()) !== -1 || (fn.description && fn.description.toLowerCase().indexOf(self.query().toLowerCase()) !== -1);
-                });
-              } else {
-                return koCategory.functions;
-              }
             })
           };
+          koCategory.functions.forEach(function (fn) {
+            fn.category = koCategory;
+          });
           self.categories[dialect].push(koCategory)
         });
       };
