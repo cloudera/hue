@@ -473,7 +473,7 @@ var AssistDbEntry = (function () {
     var self = this;
     huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbSource.sourceType);
   };
-  
+
   AssistDbEntry.prototype.openInMetastore = function () {
     var self = this;
     var url;

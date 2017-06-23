@@ -103,8 +103,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       </a>
     </li>
     % if HAS_SQL_ENABLED.get():
-    <li><a href="javascript: void(0);" data-bind="click: explore">
-      <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
+    <li>
+      <a href="javascript: void(0);" data-bind="click: explore">
+        <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }
+      </a>
+    </li>
     % endif
     <!-- /ko -->
     %if ENABLE_QUERY_BUILDER.get():
