@@ -24,15 +24,34 @@
 ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
 
 
+<script type="text/html" id="indexes-breadcrumbs">
+  <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
+    <li>
+      <a href="javascript:void(0);" data-bind="click: function() { section('list-indexes'); }">${ _('Indexes') }
+        <!-- ko if: index --> 
+        <span class="divider">&gt;</span>
+        <!-- /ko -->
+      </a>
+    </li>
+    <!-- ko with: index -->
+    <li>
+      <span data-bind="text: name"></span>
+    </li>
+    <!-- /ko -->
+  </ul>
+</script>
+
 <div class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${ _('Index Browser') }</h1>
-  
+    
+    <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
+
     <%actionbar:render>
       <%def name="search()">
-        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name...')}">
+        <input data-bind="clearable: indexFilter, value: indexFilter, valueUpdate: 'afterkeydown'" type="text" class="input-xlarge search-query" placeholder="${_('Search for name...')}">
       </%def>
-  
+
       <%def name="actions()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndex').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
@@ -40,7 +59,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
           </a>
         </div>
       </%def>
-  
+
       <%def name="creation()">
         <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/default'">
           <i class="fa fa-plus-circle"></i> ${ _('Create index') }
@@ -48,7 +67,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
         <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true); }">
           <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
         </a>
-        
+
         <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Query the table')}" href="javascript:void(0)">
           <i class="fa fa-play fa-fw"></i>
         </a>
@@ -66,9 +85,10 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
         </a>
       </%def>
     </%actionbar:render>
-  
+
     <!-- ko template: { if: alias.showCreateModal(), name: 'create-alias' }--><!-- /ko -->
-    <!-- ko template: { if: section() == 'indexes', name: 'list-indexes' }--><!-- /ko -->
+    <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
+    <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
 
   </div>
 </div>
@@ -82,16 +102,14 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
         <th>${ _('Name') }</th>
         <th>${ _('Type') }</th>
         <th>${ _('Collections') }</th>
-        <th>${ _('Schema') }</th>
       </tr>
     </thead>
-    <tbody data-bind="foreach: { data: indexes }">
+    <tbody data-bind="foreach: {data: indexes}">
       <tr>
-        <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
-          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
-          ## <a data-bind="attr: { 'href': '${ url('search:index') }?index=' + id() }" data-row-selector="true"></a>
+        <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
+          <div data-bind="css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
         </td>
-        <td data-bind="text: name"></td>
+        <td data-bind="text: name, click: function() { $root.fetchIndex(name()); }"></td>
         <td data-bind="text: type"></td>
         <td>
           <span data-bind="text: collections"></span>
@@ -99,14 +117,58 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
             <i class="fa fa-pencil"></i> ${ _('Edit') }
           </a>
         </td>
-        <td>
-          <a data-bind="attr: { 'href': '/indexer/api/indexes/' + name() + '/schema/' }, visible: type() == 'collection'">
-            <i class="fa fa-pencil"></i> ${ _('Edit') }
-          </a>
-        </td>
       </tr>
     </tbody>
   </table>
+</script>
+
+
+<script type="text/html" id="list-index">
+  <div class="clearfix"></div>
+
+  <ul class="nav nav-pills margin-top-30">
+    <li class="active"><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
+    <li><a href="#columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
+    <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
+  </ul>
+
+  <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
+    <div class="tab-pane" id="overview">
+      <!-- ko template: { if: $root.tab() == 'index-overview', name: 'index-overview-tab' }--><!-- /ko -->
+    </div>
+
+    <div class="tab-pane" id="columns">
+      <!-- ko if: $root.tab() == 'index-columns' -->
+        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a column...') }" data-bind="clearable: $root.columnFilter, value: $root.columnFilter, valueUpdate: 'afterkeydown'"/>
+        <!-- ko template: 'index-columns-tab' --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    <div class="tab-pane" id="sample">
+      <!-- ko template: { if: $root.tab() == 'index-sample', name: 'index-sample-tab' }--><!-- /ko -->
+    </div>
+  </div>
+</script>
+
+
+<script type="text/html" id="index-overview-tab">
+  <div>
+    Overview
+  </div>
+</script>
+
+
+<script type="text/html" id="index-columns-tab">
+  <div>
+    Fields
+  </div>
+</script>
+
+
+<script type="text/html" id="index-sample-tab">
+  <div>
+    Sample
+  </div>
 </script>
 
 
@@ -146,7 +208,6 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 </div>
 
 
-<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
 
@@ -181,13 +242,29 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
   };
 
 
+  var Index = function (vm, data) {
+    var self = this;
+
+    self.name = ko.observable(data.name);
+    self.uniqueKey = ko.observable(data.schema.uniqueKey);
+    self.fields = ko.mapping.fromJS(data.schema.fields);
+    self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
+    self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
+  };
+
+
   var Editor = function () {
     var self = this;
 
-    self.section = ko.observable('indexes');
+    self.section = ko.observable('list-indexes');
+    self.tab = ko.observable('');
 
     self.indexes = ko.observable([]);
     self.alias = new Alias(self);
+    self.index = ko.observable();
+
+    self.indexFilter = ko.observable('');
+    self.columnFilter = ko.observable('');
 
     self.selectedIndexes = ko.computed(function() {
       return $.grep(self.indexes(), function(index) { return index.isSelected(); });
@@ -229,6 +306,18 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       });
     };
 
+    self.fetchIndex = function(name) {
+      $.post("${ url('indexer:list_index') }", {
+        name: name
+      }, function(data) {
+        self.index(new Index(self, data));
+        self.section('list-index');
+        self.tab('index-overview');
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
+
     self.deleteIndexes = function() {
       $.post("${ url('indexer:delete_indexes') }", {
         "indexes": ko.mapping.toJSON(self.selectedIndexes)
@@ -246,55 +335,6 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
   $(document).ready(function () {
     viewModel = new Editor();
     ko.applyBindings(viewModel);
-
-    var oTable = $("#indexTable").dataTable({
-      "sPaginationType":"bootstrap",
-      'iDisplayLength':50,
-      "bLengthChange":false,
-      "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
-      "aoColumns":[
-        { "bSortable":false },
-        null,
-        null,
-        null,
-        { "bSortable":false },
-      ],
-      "aaSorting":[
-        [1, 'asc' ]
-      ],
-      "oLanguage":{
-        "sEmptyTable":"${_('No data available')}",
-        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords":"${_('No matching records')}",
-        "oPaginate":{
-          "sFirst":"${_('First')}",
-          "sLast":"${_('Last')}",
-          "sNext":"${_('Next')}",
-          "sPrevious":"${_('Previous')}"
-        },
-        "bDestroy": true
-      },
-      "fnDrawCallback":function (oSettings) {
-        $("a[data-row-selector='true']").jHueRowSelector();
-      }
-    });
-
-    viewModel.datatable = oTable;
-
-    $("#filterInput").keydown(function (e) {
-      if (e.which == 13) {
-        e.preventDefault();
-        return false;
-      }
-    });
-
-    $("#filterInput").keyup(function () {
-      oTable.fnFilter($(this).val());
-    });
-
-    $("a[data-row-selector='true']").jHueRowSelector();
 
     viewModel.fetchIndexes();
   });
