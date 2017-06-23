@@ -1070,7 +1070,7 @@ class TestDocument2ImportExport(object):
     assert_equal(owned_query.uuid, imported_doc.uuid)
     assert_equal(owned_query.owner, imported_doc.owner)
 
-    # Test that import non-existing doc creates it, sets parent to home
+    # Test that import non-existing doc creates it, sets parent to home by default
     Document2.objects.get(name='query.sql').delete()
     assert_equal(0, Document2.objects.filter(name='query.sql').count())
 
@@ -1081,6 +1081,7 @@ class TestDocument2ImportExport(object):
     assert_equal(owned_query.uuid, imported_doc.uuid)
     assert_equal(owned_query.owner, imported_doc.owner)
     assert_equal(owned_query.parent_directory, imported_doc.parent_directory)
+
 
   def test_import_nonowned_document(self):
     owned_query = Document2.objects.create(
@@ -1094,7 +1095,7 @@ class TestDocument2ImportExport(object):
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([owned_query.id]), 'format': 'json'})
     documents = response.content
 
-    # Test that importing non-owned doc copies it, sets parent to home
+    # Test that importing non-owned doc copies it, sets parent to home by default
     response = self.client_not_me.post('/desktop/api2/doc/import/', {'documents': documents})
 
     assert_equal(2, Document2.objects.filter(name='query.sql').count())
@@ -1110,6 +1111,32 @@ class TestDocument2ImportExport(object):
     assert_equal(1, data['created_count'])
     assert_true('updated_count' in data)
     assert_equal(0, data['updated_count'])
+
+
+  def test_import_to_directory(self):
+    owned_query = Document2.objects.create(
+      name='query.sql',
+      type='query-hive',
+      owner=self.user,
+      data=json.dumps({'description': 'original_query'}),
+      parent_directory=self.home_dir
+    )
+    subdir = Directory.objects.create(name='subdir', owner=self.user_not_me, parent_directory=self.not_me_home_dir)
+
+    response = self.client.get('/desktop/api2/doc/export/',
+                               {'documents': json.dumps([owned_query.id]), 'format': 'json'})
+    documents = response.content
+
+    # Test that importing to a specific parent directory saves it to that subdirectory
+    response = self.client_not_me.post('/desktop/api2/doc/import/', {'documents': documents,
+                                                                     'parent_uuid': subdir.uuid})
+
+    assert_equal(2, Document2.objects.filter(name='query.sql').count())
+    imported_doc = Document2.objects.get(name='query.sql', owner=self.user_not_me)
+    assert_true(owned_query.uuid != imported_doc.uuid)
+    assert_equal(self.user_not_me, imported_doc.owner)
+    assert_equal(subdir.uuid, imported_doc.parent_directory.uuid)
+
 
   def test_import_with_history_dependencies(self):
     query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},

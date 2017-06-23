@@ -479,6 +479,15 @@ def export_documents(request):
 
 @ensure_csrf_cookie
 def import_documents(request):
+  # Get parent directory UUID where documents should be imported to, otherwise default to user's home directory
+  parent_dir_uuid = request.POST.get('parent_uuid')
+
+  parent_dir = None
+  try:
+    parent_dir = Directory.objects.get(uuid=parent_dir_uuid)
+  except Directory.DoesNotExist:
+    LOG.warn("Could not find directory with UUID: %s, will import to user's home directory." % parent_dir_uuid)
+
   def is_reserved_directory(doc):
     return doc['fields']['type'] == 'directory' and doc['fields']['name'] in (Document2.HOME_DIR, Document2.TRASH_DIR)
 
@@ -509,9 +518,9 @@ def import_documents(request):
 
       # If doc is not owned by current user, make a copy of the document with current user as owner
       if doc['fields']['owner'][0] != request.user.username:
-        doc = _copy_document_with_owner(doc, request.user, uuids_map)
+        doc = _copy_document_with_owner(doc, request.user, uuids_map, parent_dir)
       else:  # Update existing doc or create new
-        doc = _create_or_update_document_with_owner(doc, request.user, uuids_map)
+        doc = _create_or_update_document_with_owner(doc, request.user, uuids_map, parent_dir)
 
       # For oozie docs replace dependent uuids with the newly created ones
       if doc['fields']['type'].startswith('oozie-'):
@@ -685,8 +694,9 @@ def _get_dependencies(documents, deps_mode=True):
   return doc_set
 
 
-def _copy_document_with_owner(doc, owner, uuids_map):
-  home_dir = Directory.objects.get_home_directory(owner)
+def _copy_document_with_owner(doc, owner, uuids_map, parent_dir=None):
+  if parent_dir is None:
+    parent_dir = Directory.objects.get_home_directory(owner)
 
   doc['fields']['owner'] = [owner.username]
   doc['pk'] = None
@@ -716,9 +726,9 @@ def _copy_document_with_owner(doc, owner, uuids_map):
     doc['fields']['parent_directory'] = [uuids_map[parent_uuid], 1, False]
   else:
     if parent_uuid is not None:
-      LOG.warn('Could not find parent directory with UUID: %s in JSON import, will set parent to home directory' %
-                parent_uuid)
-    doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
+      LOG.warn('Could not find parent directory with UUID: %s in JSON import, will set parent to directory with UUID: %s' %
+               (parent_uuid, parent_dir.uuid))
+    doc['fields']['parent_directory'] = [parent_dir.uuid, parent_dir.version, parent_dir.is_history]
 
   # Remap dependencies if needed
   idx = 0
@@ -734,8 +744,9 @@ def _copy_document_with_owner(doc, owner, uuids_map):
   return doc
 
 
-def _create_or_update_document_with_owner(doc, owner, uuids_map):
-  home_dir = Directory.objects.get_home_directory(owner)
+def _create_or_update_document_with_owner(doc, owner, uuids_map, parent_dir=None):
+  if parent_dir is None:
+    parent_dir = Directory.objects.get_home_directory(owner)
   create_new = False
 
   try:
@@ -758,8 +769,8 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
     uuid, version, is_history = doc['fields']['parent_directory']
     if uuid not in uuids_map.keys() and \
             not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
-      LOG.warn('Could not find parent document with UUID: %s, will set parent to home directory' % uuid)
-      doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
+      LOG.warn('Could not find parent document with UUID: %s, will set parent to directory with UUID:' % parent_dir.uuid)
+      doc['fields']['parent_directory'] = [parent_dir.uuid, parent_dir.version, parent_dir.is_history]
 
   # Verify that dependencies exist, raise critical error if any dependency not found
   # Ignore history dependencies
