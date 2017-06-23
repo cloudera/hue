@@ -216,19 +216,9 @@ class SolrClient(object):
   def list_configs(self):
     return self.api.configs()
 
-
-  def get_index_schema(self, index_name):
-    """
-    Returns a tuple of the unique key and schema fields for a given index
-    """
-    try:
-      field_data = self.api.fields(index_name)
-      fields = self._format_flags(field_data['schema']['fields'])
-      uniquekey = self.api.uniquekey(index_name)
-      return uniquekey, fields
-    except Exception, e:
-      LOG.exception(e.message)
-      raise SolrClientException(_("Error in getting schema information for index '%s'" % index_name))
+  
+  def list_schema(self, index_name):
+    return self.api.get_schema(index_name)
 
 
   def delete_alias(self, name):

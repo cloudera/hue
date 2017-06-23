@@ -654,7 +654,7 @@ ${ assist.assistPanel() }
           <h3 class="card-heading simple">${_('Properties')}</h3>
           <div class="card-body">
             <div class="control-group">
-              <label class="checkbox inline-block" title="${ _('Executw a cluster job to index large datasets.') }">
+              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }">
                 <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
               </label>
             </div>
