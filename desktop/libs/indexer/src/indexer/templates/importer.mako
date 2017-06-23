@@ -654,8 +654,8 @@ ${ assist.assistPanel() }
           <h3 class="card-heading simple">${_('Properties')}</h3>
           <div class="card-body">
             <div class="control-group">
-              <label class="checkbox inline-block">
-                <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Run Indexer job')}
+              <label class="checkbox inline-block" title="${ _('Executw a cluster job to index large datasets.') }">
+                <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
               </label>
             </div>
 
@@ -686,7 +686,7 @@ ${ assist.assistPanel() }
                 </label>
               </div>
 
-              <div class="control-group">
+              <div class="control-group" data-bind="visible: indexerRunJob">
                 <label for="path" class="control-label" data-bind="indexerRunJob"><div>${ _('Libs') }</div>
                   <input type="text" class="form-control path input-xxlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
                 </label>
