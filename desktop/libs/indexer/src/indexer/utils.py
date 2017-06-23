@@ -32,12 +32,12 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode, smart_str
+from dashboard.conf import get_properties
 from libsentry.conf import is_enabled as is_sentry_enabled
+from libsolr.conf import FS_STORAGE
 
 from indexer import conf
 from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES, DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
-from dashboard.conf import get_properties
-from libsolr.conf import FS_STORAGE
 
 
 LOG = logging.getLogger(__name__)
@@ -119,7 +119,7 @@ def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
       else:
         solr_config_name = 'solrconfig.xml.solr6'
     if is_sentry_enabled():
-      solr_config_name = 'solrconfig.xml.secure'      
+      solr_config_name = 'solrconfig.xml.secure'
     solrconfig = 'conf/%s' % solr_config_name
 
     # Get complete solrconfig.xml

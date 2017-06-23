@@ -513,12 +513,6 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-#   def add_fields(self, collection, fields):
-#     try:
-#       params = self._get_params()
-#       return self._root.post('%s/schema/fields' % collection, params=params, data=json.dumps(fields), contenttype='application/json')
-#     except RestException, e:
-#       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def cores(self):
     try:
@@ -677,7 +671,6 @@ class SolrApi(object):
 
 
   def export(self, name, query, fl, sort, rows=100):
-    # /solr/demo6/export?user.name=hue&doAs=romain&q=code_s:[0%20TO%20400]&wt=json&rows=25&start=0&fl=code_s&sort=code_s+desc
     try:
       params = self._get_params() + (
           ('q', query),

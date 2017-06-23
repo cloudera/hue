@@ -98,10 +98,6 @@ class SolrClient(object):
 
 
   def create_index(self, name, fields, config_name=None, unique_key_field=None, df=None):
-    """
-    Create solr collection or core and instance dir.
-    Create schema.xml file so that we can set UniqueKey field.
-    """
     if self.is_solr_cloud_mode():
       if config_name is None:
         self._create_cloud_config(name, fields, unique_key_field, df)
@@ -120,15 +116,8 @@ class SolrClient(object):
 
   def index(self, name, data, content_type='csv', version=None, **kwargs):
     """
-    separator = ','
-    fieldnames = 'a,b,c' # header=true
-    skip 'a,b'
-    encapsulator="
-    escape=\
-    map
-    split
-    overwrite=true
-    rowid=id
+    e.g. Parameters: separator = ',', fieldnames = 'a,b,c', header=true, skip 'a,b', encapsulator="
+      escape=\, map, split, overwrite=true, rowid=id
     """
     return self.api.update(name, data, content_type=content_type, version=version, **kwargs)
 
@@ -168,15 +157,10 @@ class SolrClient(object):
     except Exception, e:
       raise PopupException(_('Could not create index. Check error logs for more info.'), detail=e)
     finally:
-      # Delete instance directory if we couldn't create the core.
       shutil.rmtree(instancedir)
 
 
-  def delete_index(self, name):
-    """
-    Delete solr collection/core and instance dir
-    """
-    # TODO: Implement deletion of local Solr cores
+  def delete_index(self, name, keep_config=True):
     if not self.is_solr_cloud_mode():
       raise PopupException(_('Cannot remove non-Solr cloud cores.'))
 
@@ -184,15 +168,15 @@ class SolrClient(object):
 
     if result['status'] == 0:
       # Delete instance directory.
-#       try:
-#         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-#         with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
-#           zc.delete_path(root_node)
-#       except Exception, e:
-#         # Re-create collection so that we don't have an orphan config
-#         self.api.add_collection(name)
-#         raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
-      pass
+      if not keep_config:
+        try:
+          root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+          with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+            zc.delete_path(root_node)
+        except Exception, e:
+          # Re-create collection so that we don't have an orphan config
+          self.api.add_collection(name)
+          raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
     else:
       if not 'Cannot unload non-existent core' in json.dumps(result):
         raise PopupException(_('Could not remove collection: %(message)s') % result)
@@ -212,11 +196,3 @@ class SolrClient(object):
 
   def delete_alias(self, name):
     return self.api.delete_alias(name)
-
-
-  def _format_flags(self, fields):
-    for name, properties in fields.items():
-      for (code, value) in FLAGS:
-        if code in properties['flags']:
-          properties[value] = True  # Add a new key-value boolean for the decoded flag
-    return fields
