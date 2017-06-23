@@ -414,12 +414,16 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     self.fetchIndexes = function() {
       $.post("${ url('indexer:list_indexes') }", {
       }, function(data) {
-        var indexes = []
-        data.collections.forEach(function(index) {
-          index.isSelected = false;
-          indexes.push(ko.mapping.fromJS(index));
-        });
-        self.indexes(indexes);
+        if (data.status == 0) {
+          var indexes = []
+          data.collections.forEach(function(index) {
+            index.isSelected = false;
+            indexes.push(ko.mapping.fromJS(index));
+          });
+          self.indexes(indexes);
+        } else {
+          $(document).trigger("error", data.message);
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
@@ -429,9 +433,13 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       $.post("${ url('indexer:list_index') }", {
         name: name
       }, function(data) {
-        self.index(new Index(self, data));
-        self.section('list-index');
-        self.tab('index-overview');
+        if (data.status == 0) {
+          self.index(new Index(self, data));
+          self.section('list-index');
+          self.tab('index-overview');
+        } else {
+          $(document).trigger("error", data.message);
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
@@ -441,7 +449,11 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       $.post("${ url('indexer:delete_indexes') }", {
         "indexes": ko.mapping.toJSON(self.selectedIndexes)
       }, function() {
-        window.location.reload();
+        if (data.status == 0) {
+          window.location.reload();
+        } else {
+          $(document).trigger("error", data.message);
+        }
         $('#deleteIndex').modal('hide');
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
