@@ -38,7 +38,7 @@ def api_error_handler(func):
     try:
       return func(*args, **kwargs)
     except Exception, e:
-      LOG.exception('Error running %s' % func)
+      LOG.exception('Error running %s' % func.__name__)
       response['status'] = -1
       response['message'] = smart_unicode(e)
     finally:
@@ -65,9 +65,9 @@ def list_indexes(request):
 @api_error_handler
 def list_index(request):
   response = {'status': -1}
-  
+
   name = request.POST.get('name')
-  
+
   client = SolrClient(user=request.user)
 
   response['schema'] = client.list_schema(name)
@@ -187,28 +187,3 @@ def list_configs(request):
   response['status'] = 0
 
   return JsonResponse(response)
-
-
-@require_POST
-@api_error_handler
-def design_schema(request, index):
-  result = {'status': -1, 'message': ''}
-
-  searcher = SolrClient(request.user)
-  unique_key, fields = searcher.get_index_schema(index)
-
-  result['status'] = 0
-  formatted_fields = []
-  for field in fields:
-    formatted_fields.append({
-      'name': field,
-      'type': fields[field]['type'],
-      'required': fields[field].get('required', None),
-      'indexed': fields[field].get('indexed', None),
-      'stored': fields[field].get('stored', None),
-      'multivalued': fields[field].get('multivalued', None),
-    })
-  result['fields'] = formatted_fields
-  result['unique_key'] = unique_key
-
-  return JsonResponse(result)
