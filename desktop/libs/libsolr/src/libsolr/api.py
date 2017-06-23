@@ -524,6 +524,18 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+
+  def get_schema(self, collection):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+      )
+      response = self._root.get('%(core)s/schema' % {'core': collection}, params=params)
+      return self._get_json(response)['schema']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+  # Deprecated
   def schema(self, core):
     try:
       params = self._get_params() + (
