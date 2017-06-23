@@ -45,24 +45,9 @@ ZK_SOLR_CONFIG_NAMESPACE = 'configs'
 IS_SOLR_CLOUD = None
 
 
-DEFAULT_FIELD = {
-  'name': None,
-  'type': 'text',
-  'indexed': True,
-  'stored': True,
-  'required': False,
-  'multiValued': False
-}
-
 
 class SolrClientException(Exception):
   pass
-
-
-def _get_fields(name='id', type='text'):
-  default_field = DEFAULT_FIELD.copy()
-  default_field.update({'name': name, 'type': type})
-  return [default_field]
 
 
 class SolrClient(object):
@@ -211,6 +196,10 @@ class SolrClient(object):
     else:
       if not 'Cannot unload non-existent core' in json.dumps(result):
         raise PopupException(_('Could not remove collection: %(message)s') % result)
+
+
+  def sample_index(self, collection, rows=100):
+    return self.api.select(collection, rows=min(rows, 1000))
 
 
   def list_configs(self):
