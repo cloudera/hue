@@ -182,7 +182,13 @@ input[type='password']::-ms-reveal {
 
 .hue-ace-syntax-error {
   position: absolute;
-  border-bottom: 1px dotted #FF0000;
+  border-bottom: 1px dotted @hue-error-color;
+  border-radius: 0 !important;
+}
+
+.hue-ace-syntax-warning {
+  position: absolute;
+  border-bottom: 1px dotted @hue-warning-color;
   border-radius: 0 !important;
 }
 

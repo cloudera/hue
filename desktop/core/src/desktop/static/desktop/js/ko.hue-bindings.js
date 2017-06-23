@@ -3568,7 +3568,7 @@
     AceLocationHandler.prototype.clearMarkedErrors = function () {
       var self = this;
       for (var marker in self.editor.session.$backMarkers) {
-        if (self.editor.session.$backMarkers[marker].clazz === 'hue-ace-syntax-error') {
+        if (self.editor.session.$backMarkers[marker].clazz.indexOf('hue-ace-syntax-') === 0) {
           var token = self.editor.session.$backMarkers[marker].token;
           delete token.syntaxError;
           self.editor.session.removeMarker(self.editor.session.$backMarkers[marker].id);
@@ -3620,6 +3620,52 @@
         self.aceSqlSyntaxWorker = null;
       }
       self.clearMarkedErrors();
+    };
+
+    AceLocationHandler.prototype.verifyExists = function (token) {
+      var self = this;
+
+      // the syntax worker is only defined when syntax check is on
+      // TODO: Only do this when browser caching is turned on
+      if (self.aceSqlSyntaxWorker && token.parseLocation && token.parseLocation.identifierChain) {
+        // We want to check the parent to see if it contains the entry for performance, as opposed to checking
+        // each entry with the API.
+        ApiHelper.getInstance().fetchAutocomplete({
+          sourceType: self.snippet.type(),
+          identifierChain: token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1),
+          defaultDatabase: self.snippet.database(),
+          silenceErrors: true,
+          errorCallback: function (data) {
+            console.log('error');
+            console.log(data);
+          },
+          successCallback: function (data) {
+            if (token.parseLocation.type === 'table' && data.tables_meta) {
+              var tableLowerCase = token.value.toLowerCase();
+              for (var i = 0; i < data.tables_meta.length; i++) {
+                if (data.tables_meta[i].name.toLowerCase() === tableLowerCase) {
+                  break;
+                }
+                if (i + 1 === data.tables_meta.length) {
+                  token.notFound = true;
+                  ApiHelper.getInstance().identifierChainToPath({
+                    identifierChain: token.parseLocation.identifierChain,
+                    sourceType: self.snippet.type(),
+                    defaultDatabase: self.snippet.database()
+                  }, function (path) {
+                    token.notFound = true;
+                    token.qualifiedIdentifier = path.join('.');
+                    var AceRange = ace.require('ace/range').Range;
+                    var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
+                    var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
+                    self.editor.session.$backMarkers[markerId].token = token;
+                  })
+                }
+              }
+            }
+          }
+        });
+      }
     };
 
     AceLocationHandler.prototype.attachSqlWorker = function () {
@@ -3703,6 +3749,7 @@
                           delete location.tables;
                           token.parseLocation = location;
                           activeTokens.push(token);
+                          self.verifyExists(token);
                         } else if (tablesToGo.length > 0) {
                           findIdentifierChainInTable(tablesToGo);
                         }
@@ -3724,6 +3771,7 @@
             } else {
               token.parseLocation = location;
               activeTokens.push(token);
+              self.verifyExists(token);
             }
           }
         });
@@ -4142,7 +4190,7 @@
             var endTestPosition = editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
             if (endTestPosition.column !== pointerPosition.column) {
               var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-              if (token !== null && token.parseLocation && !disableTooltip) {
+              if (token !== null && !token.notFound && token.parseLocation && !disableTooltip) {
                 tooltipTimeout = window.setTimeout(function () {
                   var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
 
@@ -4156,8 +4204,16 @@
                   }
                   contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                 }, 500);
+              } else if (token !== null && token.notFound) {
+                tooltipTimeout = window.setTimeout(function () {
+                  // TODO: i18n
+                  var tooltipText = 'Could not find ' + (token.qualifiedIdentifier || token.value) + '';
+                  var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                }, 500);
               } else if (token !== null && token.syntaxError) {
                 tooltipTimeout = window.setTimeout(function () {
+                  // TODO: i18n
                   var tooltipText = 'Did you mean "' + token.syntaxError.expected[0].text + '"?';
                   var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
                   contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
@@ -4167,7 +4223,7 @@
               }
               if (lastHoveredToken !== token) {
                 clearActiveMarkers();
-                if (token !== null && token.parseLocation) {
+                if (token !== null && !token.notFound && token.parseLocation) {
                   markLocation(token.parseLocation);
                 }
                 lastHoveredToken = token;
@@ -4224,7 +4280,7 @@
                 bottom: endCoordinates.pageY + editor.renderer.lineHeight
               };
 
-              if (token.parseLocation) {
+              if (token.parseLocation && !token.notFound) {
                 huePubSub.publish('sql.context.popover.show', {
                   data: token.parseLocation,
                   sourceType: snippet.type(),

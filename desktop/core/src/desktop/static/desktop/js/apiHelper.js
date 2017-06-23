@@ -1315,7 +1315,7 @@ var ApiHelper = (function () {
     var self = this;
     var identifierChainClone = options.identifierChain.concat();
     var path = [];
-    if (! self.containsDatabase(options.sourceType, identifierChainClone[0].name)) {
+    if (identifierChainClone.length === 0 || ! self.containsDatabase(options.sourceType, identifierChainClone[0].name)) {
       path.push(options.defaultDatabase);
     } else {
       path.push(identifierChainClone.shift().name)
