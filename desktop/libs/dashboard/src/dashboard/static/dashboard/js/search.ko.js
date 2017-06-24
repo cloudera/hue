@@ -718,7 +718,7 @@ var Collection = function (vm, collection) {
     }
     if (typeof facet.properties.facets != 'undefined') {
       $.each(facet.properties.facets(), function (index, pivotFacet) {
-        if (pivotFacet.aggregate) {
+        if (pivotFacet.aggregate && pivotFacet.aggregate.function) {
           pivotFacet.aggregate.function.subscribe(function () {
             vm.search();
           });
@@ -2355,7 +2355,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
       if (typeof facet.properties.facets != 'undefined') {
         $.each(facet.properties.facets(), function (index, pivotFacet) {
-          if (pivotFacet.aggregate) {
+          if (pivotFacet.aggregate && pivotFacet.aggregate.function) {
             pivotFacet.aggregate.function.subscribe(function () {
               vm.search();
             });
