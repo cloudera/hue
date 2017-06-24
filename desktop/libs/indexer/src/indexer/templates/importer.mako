@@ -657,6 +657,10 @@ ${ assist.assistPanel() }
               <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }">
                 <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
               </label>
+
+              <label for="path" class="control-label" data-bind="visible: indexerRunJob"><div>${ _('Libs') }</div>
+                <input type="text" class="form-control path input-xxlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+              </label>
             </div>
 
             <div class="control-group">
@@ -683,12 +687,6 @@ ${ assist.assistPanel() }
               <div class="control-group">
                 <label for="destinationFormat" class="control-label"><div>${ _('Config set') }</div>
                   <select id="destinationFormat" data-bind="selectize: indexerConfigSets, value: indexerConfigSet, optionsValue: 'value', optionsText: 'name'"></select>
-                </label>
-              </div>
-
-              <div class="control-group" data-bind="visible: indexerRunJob">
-                <label for="path" class="control-label" data-bind="indexerRunJob"><div>${ _('Libs') }</div>
-                  <input type="text" class="form-control path input-xxlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
                 </label>
               </div>
 
@@ -1722,6 +1720,7 @@ ${ assist.assistPanel() }
         if (! self.readyToIndex()) {
           return;
         }
+        $(".jHueNotify").hide();
 
 %if not is_embeddable:
         self.indexingStarted(true);
@@ -1736,6 +1735,9 @@ ${ assist.assistPanel() }
             $(document).trigger("error", resp.message);
             self.indexingStarted(false);
             self.isIndexing(false);
+          } else if (resp.on_success_url) {
+            $.jHueNotify.info("${ _('Creation success.') }");
+            huePubSub.publish('open.link', resp.on_success_url);
           } else {
             self.showCreate(true);
             self.editorId(resp.history_id);
