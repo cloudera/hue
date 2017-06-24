@@ -112,9 +112,9 @@ ${ hueIcons.symbols() }
         <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
-          <button class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
+          <a class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
             <span data-bind="text: displayName"></span>
-          </button>
+          </a>
           <!-- /ko -->
           <!-- /ko -->
           <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1">
