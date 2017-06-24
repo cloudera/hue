@@ -113,7 +113,7 @@ def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
 
     # Use template depending on type of Solr
     solr_config_name = 'solrconfig.xml'
-    if get_properties().get('solr', {}).get('analytics'):
+    if get_properties().get('solr', {}).get('analytics') and False:
       if FS_STORAGE.get() != 'hdfs':
         solr_config_name = 'solrconfig.xml.solr6NonHdfs'
       else:

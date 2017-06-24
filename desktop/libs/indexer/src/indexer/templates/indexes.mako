@@ -452,7 +452,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     self.deleteIndexes = function() {
       $.post("${ url('indexer:delete_indexes') }", {
         "indexes": ko.mapping.toJSON(self.selectedIndexes)
-      }, function() {
+      }, function(data) {
         if (data.status == 0) {
           window.location.reload();
         } else {

@@ -102,7 +102,7 @@ class MorphlineIndexer(object):
           u'log4j.properties',
           u'--go-live',
           u'--zk-host',
-          ENSEMBLE.get(),
+          ENSEMBLE.get() + '/solr',
           u'--collection',
           collection_name,
           input_path,

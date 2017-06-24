@@ -43,7 +43,9 @@ ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored'), ('M', 'multivalued')]
 ZK_SOLR_CONFIG_NAMESPACE = 'configs'
 IS_SOLR_CLOUD = None
-
+IS_SOLR_6_PLUS = None
+IS_SOLR_WITH_HDFS = None
+IS_CDH_SOLR = None
 
 
 class SolrClientException(Exception):
@@ -109,7 +111,7 @@ class SolrClient(object):
           'stored': field.get('stored', True)
         } for field in fields
       ]
-      self.api.add_fields(name, fields)
+      #self.api.add_fields(name, fields)
     else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
 
@@ -129,7 +131,10 @@ class SolrClient(object):
       try:
         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
         config_root_path = '%s/%s' % (solr_config_path, 'conf')
-        zc.copy_path(root_node, config_root_path)
+        if not zc.path_exists(root_node):
+          zc.copy_path(root_node, config_root_path)
+        else:
+          LOG.warn('Config %s already existing.' % name)
       except Exception, e:
         if zc.path_exists(root_node):
           zc.delete_path(root_node)
@@ -196,3 +201,14 @@ class SolrClient(object):
 
   def delete_alias(self, name):
     return self.api.delete_alias(name)
+
+  # Used by morphline indexer
+  def get_index_schema(self, index_name):
+    try:
+      field_data = self.api.fields(index_name)
+      fields = self._format_flags(field_data['schema']['fields'])
+      uniquekey = self.api.uniquekey(index_name)
+      return uniquekey, fields
+    except Exception, e:
+      LOG.exception(e.message)
+      raise SolrClientException(_("Error in getting schema information for index '%s'" % index_name))
