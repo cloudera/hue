@@ -25,7 +25,9 @@ from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
+from hadoop import conf
 from librdbms.server import dbms as rdbms
+from librdbms.conf import DATABASES, get_database_password
 from notebook.connectors.base import get_api, Notebook
 from notebook.connectors.rdbms import Assist
 from notebook.decorators import api_error_handler
@@ -441,12 +443,23 @@ def _index(request, file_format, collection_name, query=None):
 
 
 def run_sqoop(request, source, destination, start_time):
-  print source['rdbmsName']
-
-  print source['rdbmsDatabaseName']
-  print source['rdbmsTableName']
-  
-  print destination['name']
+  rdbmsName = source['rdbmsName']
+  rdbmsHost = DATABASES[rdbmsName].HOST.get()
+  rdbmsPort = DATABASES[rdbmsName].PORT.get()
+  rdbmsDatabaseName = source['rdbmsDatabaseName']
+  rdbmsTableName = source['rdbmsTableName']
+  rdbmsUserName = DATABASES[rdbmsName].USER.get()
+  rdbmsPassword = get_database_password(rdbmsName)
+  targetDir = conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.get()+destination['name']
+  print rdbmsName
+  print rdbmsHost
+  print rdbmsPort
+  print rdbmsDatabaseName
+  print rdbmsTableName
+  print rdbmsUserName
+  print rdbmsPassword
+  print targetDir
+  print 'import --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT a.* FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose'
 
   task = make_notebook(
       name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
@@ -455,8 +468,8 @@ def run_sqoop(request, source, destination, start_time):
           'path': destination['name']
         },
       editor_type='sqoop1',
-      statement='export .... .... ',
-      files = [{"path": "/user/admin/mysql-connector-java-5.1.42-bin.jar", "type": "jar"}],
+      statement='import --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT a.* FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose',
+      files = [{"path": "/user/admin/mysql-connector-java.jar", "type": "jar"}],
       status='ready',
       on_success_url='/filebrowser/view/%s(name)s' % destination,
       last_executed=start_time,
