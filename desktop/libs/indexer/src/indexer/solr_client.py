@@ -42,10 +42,10 @@ MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored'), ('M', 'multivalued')]
 ZK_SOLR_CONFIG_NAMESPACE = 'configs'
-IS_SOLR_CLOUD = None
-IS_SOLR_6_PLUS = None
-IS_SOLR_WITH_HDFS = None
-IS_CDH_SOLR = None
+
+_IS_SOLR_CLOUD = None
+_IS_SOLR_6_OR_MORE = None
+_IS_SOLR_WITH_HDFS = None
 
 
 class SolrClientException(Exception):
@@ -58,14 +58,16 @@ class SolrClient(object):
     self.user = user
     self.api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
 
+  def _fillup_properties(self):
+    global _IS_SOLR_CLOUD
+    global _IS_SOLR_6_OR_MORE
+    global _IS_SOLR_WITH_HDFS
 
-  def is_solr_cloud_mode(self):
-    global IS_SOLR_CLOUD
+    properties = self.api.info_system()
 
-    if IS_SOLR_CLOUD is None:
-      IS_SOLR_CLOUD = self.api.info_system().get('mode', 'solrcloud') == 'solrcloud'
-
-    return IS_SOLR_CLOUD
+    _IS_SOLR_CLOUD = properties.get('mode', 'solrcloud') == 'solrcloud'
+    _IS_SOLR_6_OR_MORE = not str(properties.get('lucene', {}).get('solr-spec-version')).startswith('4.')
+    _IS_SOLR_WITH_HDFS = 'solr.hdfs.home' in str(properties.get('jvm', {}).get('jmx'))
 
 
   def get_indexes(self, include_cores=False):
@@ -111,7 +113,8 @@ class SolrClient(object):
           'stored': field.get('stored', True)
         } for field in fields
       ]
-      #self.api.add_fields(name, fields)
+      if self.is_solr_six():
+        self.api.add_fields(name, fields)
     else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
 
@@ -126,7 +129,14 @@ class SolrClient(object):
 
   def _create_cloud_config(self, name, fields, unique_key_field, df):
     with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
-      tmp_path, solr_config_path = copy_configs(fields=fields, unique_key_field=unique_key_field, df=df, solr_cloud_mode=True)
+      tmp_path, solr_config_path = copy_configs(
+          fields=fields,
+          unique_key_field=unique_key_field,
+          df=df,
+          solr_cloud_mode=True,
+          is_solr_six_or_more=self.is_solr_six_or_more(),
+          is_solr_hdfs_mode=self.is_solr_with_hdfs()
+      )
 
       try:
         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
@@ -194,13 +204,41 @@ class SolrClient(object):
   def list_configs(self):
     return self.api.configs()
 
-  
+
   def list_schema(self, index_name):
     return self.api.get_schema(index_name)
 
 
   def delete_alias(self, name):
     return self.api.delete_alias(name)
+
+
+  def is_solr_cloud_mode(self):
+    global _IS_SOLR_CLOUD
+
+    if _IS_SOLR_CLOUD is None:
+      self._fillup_properties()
+
+    return _IS_SOLR_CLOUD
+
+
+  def is_solr_six_or_more(self):
+    global _IS_SOLR_6_OR_MORE
+
+    if _IS_SOLR_6_OR_MORE is None:
+      self._fillup_properties()
+
+    return _IS_SOLR_6_OR_MORE
+
+
+  def is_solr_with_hdfs(self):
+    global _IS_SOLR_WITH_HDFS
+
+    if _IS_SOLR_WITH_HDFS is None:
+      self._fillup_properties()
+
+    return _IS_SOLR_WITH_HDFS
+
 
   # Used by morphline indexer
   def get_index_schema(self, index_name):
