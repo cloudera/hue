@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
 
 from desktop.models import Document2
+from libsolr.conf import SOLR_ZK_PATH
 from libzookeeper.conf import ENSEMBLE
 from notebook.connectors.base import get_api
 from notebook.models import Notebook, make_notebook
@@ -102,7 +103,7 @@ class MorphlineIndexer(object):
           u'log4j.properties',
           u'--go-live',
           u'--zk-host',
-          ENSEMBLE.get() + '/solr',
+          ENSEMBLE.get() + SOLR_ZK_PATH.get(),
           u'--collection',
           collection_name,
           input_path,
