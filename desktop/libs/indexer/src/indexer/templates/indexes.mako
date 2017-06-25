@@ -327,6 +327,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
+      hueAnalytics.log('indexes', 'create_alias');
     }
 
     self.edit = function(alias) {
@@ -368,6 +369,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
+      hueAnalytics.log('indexes', 'sample_index');
     };
   };
 
@@ -427,6 +429,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
+      hueAnalytics.log('indexes', 'list_indexes');
     };
 
     self.fetchIndex = function(name) {
@@ -443,6 +446,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
+      hueAnalytics.log('indexes', 'list_index');
     };
 
     self.deleteIndexes = function() {
@@ -458,6 +462,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
+      hueAnalytics.log('indexes', 'delete_indexes');
     };
   };
 
