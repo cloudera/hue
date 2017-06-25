@@ -67,3 +67,33 @@ class RdbmsIndexer():
       response['message'] = _('Failed to get sample data.')
 
     return response
+
+  def get_tables(self, database=None):
+    query_server = dbms.get_query_server_config(server=self.db_conf_name)
+    db = dbms.get(self.user, query_server=query_server)
+    assist = Assist(db)
+    response = {'status': -1}
+    sample_data = assist.get_tables(database)
+
+    if sample_data:
+      response['status'] = 0
+      response['data'] = sample_data
+    else:
+      response['message'] = _('Failed to get sample data.')
+
+    return response
+
+  def get_columns(self, database=None, table=None):
+    query_server = dbms.get_query_server_config(server=self.db_conf_name)
+    db = dbms.get(self.user, query_server=query_server)
+
+    assist = Assist(db)
+    response = {'status': -1}
+    sample_data = assist.get_columns(database, table)
+
+    if sample_data:
+      response = sample_data
+    else:
+      response['message'] = _('Failed to get sample data.')
+
+    return response

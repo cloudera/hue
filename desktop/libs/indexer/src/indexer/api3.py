@@ -18,6 +18,7 @@
 import json
 import logging
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
@@ -25,7 +26,9 @@ from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
+from hadoop import conf
 from librdbms.server import dbms as rdbms
+from librdbms.conf import DATABASES, get_database_password
 from notebook.connectors.base import get_api, Notebook
 from notebook.connectors.rdbms import Assist
 from notebook.decorators import api_error_handler
@@ -165,6 +168,48 @@ def guess_field_types(request):
     }
 
   return JsonResponse(format_)
+
+
+def get_databases(request):
+  #source = json.loads(request.POST.get('source', '{}'))
+  #username = DATABASES[source['rdbmsType']].USER.get()
+  #user = User.objects.get(username=username)
+  #query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  #db = rdbms.get(user, query_server=query_server)
+  #assist = Assist(db)
+  #data = assist.get_databases() #format of data ['abc','def','ghi',...,'xyz']
+  #if data:
+    #format_ = [{'\'value\':'+value, '\'name\':'+name} for value, name in zip(data, data)]
+  #else:
+    #format_ = []
+  format_ = {"data": [{"name": "db1", "value": "db1"},{"name": "db2", "value": "db2"}]}
+  format_['status'] = 0
+  return JsonResponse(format_)
+
+
+def get_tables(request):
+  source = json.loads(request.POST.get('source', '{}'))
+  username = DATABASES[source['rdbmsType']].USER.get()
+  user = User.objects.get(username=username)
+  query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  db = rdbms.get(user, query_server=query_server)
+  assist = Assist(db)
+  data = assist.get_tables(source['rdbmsDatabaseName']) ##format of data ['abc','def','ghi',...,'xyz']
+  if data:
+    format_ = [{'\'value\':'+value, '\'name\':'+name} for value, name in zip(data, data)]
+  else:
+    format_ = []
+  print format_
+  return JsonResponse(format_)
+
+
+def index_file(request):
+  file_format = json.loads(request.POST.get('fileFormat', '{}'))
+  _convert_format(file_format["format"], inverse=True)
+  collection_name = file_format["name"]
+
+  job_handle = _index(request, file_format, collection_name)
+  return JsonResponse(job_handle)
 
 
 @api_error_handler
@@ -315,12 +360,23 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
   return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)
 
 def run_sqoop(request, source, destination, start_time):
-  print source['rdbmsName']
-
-  print source['rdbmsDatabaseName']
-  print source['rdbmsTableName']
-  
-  print destination['name']
+  rdbmsName = source['rdbmsName']
+  rdbmsHost = DATABASES[rdbmsName].HOST.get()
+  rdbmsPort = DATABASES[rdbmsName].PORT.get()
+  rdbmsDatabaseName = source['rdbmsDatabaseName']
+  rdbmsTableName = source['rdbmsTableName']
+  rdbmsUserName = DATABASES[rdbmsName].USER.get()
+  rdbmsPassword = get_database_password(rdbmsName)
+  targetDir = conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.get()+destination['name']
+  print rdbmsName
+  print rdbmsHost
+  print rdbmsPort
+  print rdbmsDatabaseName
+  print rdbmsTableName
+  print rdbmsUserName
+  print rdbmsPassword
+  print targetDir
+  print 'import --connect jdbc:'+rdbmsName+'://'+'127.0.0.1'+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT * FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose --split-by a.empid'
 
   task = make_notebook(
       name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
@@ -329,8 +385,8 @@ def run_sqoop(request, source, destination, start_time):
           'path': destination['name']
         },
       editor_type='sqoop1',
-      statement='export .... .... ',
-      files = [{"path": "/user/admin/mysql-connector-java-5.1.42-bin.jar", "type": "jar"}],
+      statement='import --connect jdbc:mysql://172.31.114.131:3306/hue --username hue --password 12345678 --query SELECT * FROM employee WHERE $CONDITIONS --target-dir hdfs://nightly512-unsecure-1.gce.cloudera.com:8020/user/admin/test77 -m 1',
+      files = [{"path": "/user/admin/mysql-connector-java.jar", "type": "jar"}],
       status='ready',
       on_success_url='/filebrowser/view/%s(name)s' % destination,
       last_executed=start_time,
