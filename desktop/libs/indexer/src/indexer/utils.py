@@ -32,9 +32,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode, smart_str
-from dashboard.conf import get_properties
 from libsentry.conf import is_enabled as is_sentry_enabled
-from libsolr.conf import FS_STORAGE
 
 from indexer import conf
 from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES, DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
@@ -90,7 +88,7 @@ class SolrConfigXml(object):
     self.xml = force_unicode(force_unicode(self.xml).replace(u'<str name="df">text</str>', u'<str name="df">%s</str>' % force_unicode(df) if df is not None else ''))
 
 
-def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
+def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six_or_more=False, is_solr_hdfs_mode=True):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
 
@@ -113,13 +111,16 @@ def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
 
     # Use template depending on type of Solr
     solr_config_name = 'solrconfig.xml'
-    if get_properties().get('solr', {}).get('analytics') and False:
-      if FS_STORAGE.get() != 'hdfs':
+
+    if is_solr_six_or_more:
+      if is_solr_hdfs_mode:
         solr_config_name = 'solrconfig.xml.solr6NonHdfs'
       else:
         solr_config_name = 'solrconfig.xml.solr6'
+
     if is_sentry_enabled():
-      solr_config_name = 'solrconfig.xml.secure'
+      solr_config_name += '.secure'
+
     solrconfig = 'conf/%s' % solr_config_name
 
     # Get complete solrconfig.xml
