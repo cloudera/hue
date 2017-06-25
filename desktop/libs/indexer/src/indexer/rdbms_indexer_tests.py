@@ -35,15 +35,6 @@ LOG = logging.getLogger(__name__)
 class TestRdbmsIndexer():
   if not ENABLE_SQOOP.get():
     raise SkipTest
-  def test_get_sample_data(self):
-    self.client = make_logged_in_client()
-    self.user = User.objects.get(username='test')
-
-    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
-    data = indexer.get_sample_data(database='hue', table='employee')
-
-    assert_equal(0, data['status'], data)
-    assert_true(data['rows'], data)
 
   def test_get_databases(self):
     self.client = make_logged_in_client()
@@ -52,4 +43,33 @@ class TestRdbmsIndexer():
     indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
 
     data = indexer.get_databases()
+    assert_equal(1, data['status'], data)
+
+  def test_get_sample_data(self):
+    self.client = make_logged_in_client()
+    self.user = User.objects.get(username='test')
+
+    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
+    data = indexer.get_sample_data(database='hue', table='employee', column='empname')
+
+    assert_equal(0, data['status'], data)
+    assert_equal('',data['rows'], data)
+
+  def test_columns(self):
+    self.client = make_logged_in_client()
+    self.user = User.objects.get(username='test')
+
+    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
+    data = indexer.get_columns(database='hue', table='employee')
+
+    assert_not_equal([], data, data)
+    assert_true(data, data)
+
+  def test_get_tables(self):
+    self.client = make_logged_in_client()
+    self.user = User.objects.get(username='test')
+
+    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
+
+    data = indexer.get_tables('hue')
     assert_equal(0, data['status'], data)

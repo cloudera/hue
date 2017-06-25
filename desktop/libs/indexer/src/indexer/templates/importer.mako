@@ -16,7 +16,6 @@
 
 <%!
   from django.utils.translation import ugettext as _
-
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
@@ -73,6 +72,153 @@ ${ assist.assistPanel() }
     top: 112px!important;
   }
 % endif
+  .path {
+    margin-bottom: 0!important;
+    border-right: none!important;
+  }
+  .step .card-heading.simple {
+    font-size: 17px;
+  }
+  .step .card-body {
+    margin-top: 14px;
+  }
+  .step label > div:first-child {
+    width: 120px;
+    text-align: right;
+    padding-right: 8px;
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 6px;
+  }
+  .step label.checkbox {
+    margin-left: 130px;
+  }
+  .step .index-field label.checkbox {
+    margin-left: 5px;
+  }
+  .step .index-field label > div:first-child {
+    width: initial;
+  }
+  .step .field-properties label.checkbox {
+    margin-left: 10px;
+  }
+  .step label:not(.checkbox) {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .step input[type='text'] {
+    margin-bottom: 0;
+  }
+  .step .selectize-control {
+    display: inline-block;
+    vertical-align: middle;
+    width: 578px !important;
+  }
+  .step .form-inline .selectize-control {
+    width: 120px !important;
+    margin-bottom: -8px;
+  }
+  .step .inline-labels {
+    display: table;
+  }
+  .step .inline-labels .selectize-control {
+    width: 120px !important;
+    vertical-align: -12px;
+  }
+  .step .selectize-input {
+    max-height: 31px;
+  }
+  .step .selectize-control.multi .selectize-input {
+    padding-top: 3px!important;
+  }
+  .step .show-edit-on-hover a {
+    opacity: 0;
+    -webkit-transition: opacity 0.2s linear;
+    -moz-transition: opacity 0.2s linear;
+    -ms-transition: opacity 0.2s linear;
+    -o-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;
+  }
+  .step .show-edit-on-hover:hover a {
+    opacity: 1;
+  }
+  .step .show-edit-on-hover .inactive-action {
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .step .fa-padding-top {
+    padding-top: 8px;
+  }
+  .kudu-partitions li {
+    width: 578px !important;
+    padding: 5px;
+  }
+  .kudu-partitions li:hover {
+    background-color: #F7F7F7;
+  }
+  .kudu-partitions .range-partition {
+    padding: 5px;
+  }
+  .kudu-partitions .range-partition:hover {
+    background-color: #F1F1F1;
+  }
+  .step .kudu-partitions li .selectize-control {
+    width: 100px !important;
+    vertical-align: top;
+  }
+  .field {
+    padding: 4px;
+    padding-left: 10px;
+    border-left: 4px solid #DBE8F1;
+  }
+  .operation {
+    border-left: 4px solid #EEE;
+    padding-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+  }
+  .field-content-preview {
+    width: 180px;
+    margin-left: 20px;
+  }
+  .table-preview {
+    margin:auto;
+    text-align:left;
+  }
+  .table-preview td, .table-preview th {
+    white-space: nowrap;
+  }
+  .content-panel {
+    overflow-x: hidden;
+  }
+  .content-panel-inner {
+    margin: 10px;
+    margin-bottom: 100px;
+  }
+  .form-control.path {
+    vertical-align: top;
+  }
+  .form-actions {
+    position: fixed;
+    bottom: 0;
+    margin: 0;
+    z-index: 1000;
+    border-top: 1px solid #e5e5e5;
+  }
+  #importerNotebook {
+    height: 5px;
+    float: right;
+  }
+  #importerNotebook .snippet-error-container  {
+    background: transparent;
+  }
+  .inline-table {
+    display: inline-table;
+  }
+  .columns-form {
+    margin-bottom: 200px;
+  }
 </style>
 
 <span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
@@ -208,13 +354,23 @@ ${ assist.assistPanel() }
       <div class="card-body">
         <div>
           <div class="control-group" data-bind="visible: createWizard.prefill.target_type().length == 0 || createWizard.prefill.source_type() == 'all'">
-            <label for="sourceType" class="control-label"><div>${ _('Type') }</div>
-              <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
+            <label for="source_type" class="control-label"><div>${ _('Type') }</div>
+              <select id="source_type" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
+            </label>
+          </div>
+          <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsMode" class="control-label"><div>${ _('Database Mode') }</div>
+              <label class="radio inline-block">
+                <input type="radio" name="rdbmsMode" value="customRdbms" data-bind="checked: createWizard.source.rdbmsMode" /> ${_('Custom')}
+              </label>
+              <label class="radio inline-block">
+                <input type="radio" name="rdbmsMode" value="configRdbms" data-bind="checked: createWizard.source.rdbmsMode" /> ${_('Configured')}
+              </label>
             </label>
           </div>
 
           <div class="control-group" data-bind="visible: createWizard.prefill.target_type() == 'database'">
-            <label for="sourceType" class="control-label">${ _('No source is needed for creating a database.') }</label>
+            <label for="source_type" class="control-label">${ _('No source is needed for creating a database.') }</label>
           </div>
 
           <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'file'">
@@ -228,15 +384,57 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           </div>
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsName" class="control-label"><div>${ _('Database') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsName" placeholder="${ _('Enter name of your database') }">
+          <div class="control-group" data-bind="visible: (createWizard.source.rdbmsMode() == 'configRdbms' || createWizard.source.rdbmsMode() == 'customRdbms') && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsType" class="control-label"><div>${ _('Database') }</div>
+              <select id="rdbmsType" data-bind="selectize: createWizard.source.rdbmsTypes, value: createWizard.source.rdbmsType, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
           </div>
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsTable" class="control-label"><div>${ _('Table') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsTable" placeholder="${ _('Enter name of your table') }">
+          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'configRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsConfigDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
+              <select id="rdbmsConfigDatabaseName" data-bind="selectize: createWizard.source.rdbmsConfigDatabaseNames, value: createWizard.source.rdbmsConfigDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'configRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsConfigTableName" class="control-label"><div>${ _('Table Name') }</div>
+              <select id="rdbmsConfigTableName" data-bind="selectize: createWizard.source.rdbmsConfigTableNames, value: createWizard.source.rdbmsConfigTableName, optionsText: 'name', optionsValue: 'value'"></select>
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsHostname" class="control-label"><div>${ _('Database Hostname') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.vpc.cloudera.com or 74.217.76.101') }">
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsPort" class="control-label"><div>${ _('Database Port') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here eg. 3306') }">
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsUsername" class="control-label"><div>${ _('Database Username') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsUsername" placeholder="${ _('Enter username here') }">
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsPassword" class="control-label"><div>${ _('Database Password') }</div>
+              <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPassword" placeholder="${ _('Enter password here') }">
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsCustomDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsCustomDatabaseName" placeholder="${ _('Enter database name here') }">
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsTableNames" class="control-label"><div>${ _('Table Name') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsTableNames" placeholder="${ _('Enter table name here') }">
             </label>
           </div>
 
@@ -879,11 +1077,8 @@ ${ assist.assistPanel() }
   % else:
   var MAIN_SCROLLABLE = '.content-panel';
   % endif
-
   (function () {
-
     ko.options.deferUpdates = true;
-
     var MAPPINGS = {
       SOLR_TO_HIVE: {
         "string": "string",
@@ -898,25 +1093,18 @@ ${ assist.assistPanel() }
         return type[key] || defaultValue
       }
     }
-
     var fieldNum = 0;
-
     var getNewFieldName = function () {
       fieldNum++;
       return "new_field_" + fieldNum
     };
-
     var createDefaultField = function () {
       var defaultField = ko.mapping.fromJS(${default_field_type | n});
-
       defaultField.name = ko.observable(getNewFieldName());
-
       return defaultField;
     };
-
     var Operation = function (type) {
       var self = this;
-
       var createArgumentValue = function (arg) {
         if (arg.type == "mapping") {
           return ko.observableArray([]);
@@ -928,17 +1116,13 @@ ${ assist.assistPanel() }
           return ko.observable("");
         }
       }
-
       var constructSettings = function (type) {
         var settings = {};
-
         var operation = viewModel.createWizard.operationTypes.find(function (currOperation) {
           return currOperation.name == type;
         });
-
         for (var i = 0; i < operation.args.length; i++) {
           var argVal = createArgumentValue(operation.args[i]);
-
           if (operation.args[i].type == "checkbox" && operation.outputType == "checkbox_fields") {
             argVal.subscribe(function (newVal) {
               if (newVal) {
@@ -949,32 +1133,25 @@ ${ assist.assistPanel() }
               }
             });
           }
-
           settings[operation.args[i].name] = argVal;
         }
-
         settings.getArguments = function () {
           return operation.args
         };
-
         settings.outputType = function () {
           return operation.outputType;
         }
-
         return settings;
       };
-
       var init = function () {
         self.fields([]);
         self.numExpectedFields(0);
-
         self.numExpectedFields.subscribe(function (numExpectedFields) {
           if (numExpectedFields < self.fields().length) {
             self.fields(self.fields().slice(0, numExpectedFields));
           }
           else if (numExpectedFields > self.fields().length) {
             var difference = numExpectedFields - self.fields().length;
-
             for (var i = 0; i < difference; i++) {
               self.fields.push(createDefaultField());
             }
@@ -982,86 +1159,66 @@ ${ assist.assistPanel() }
         });
         self.settings(constructSettings(self.type()));
       }
-
       self.load = function (data) {
         self.numExpectedFields(data.numExpectedFields);
-
         var newSettings = constructSettings(data.type);
         for (var key in data.settings) {
           newSettings[key] = ko.mapping.fromJS(data.settings[key]);
         }
         self.settings(newSettings);
-
         data.fields.forEach(function (field) {
           self.fields.push(loadField(field));
         });
       }
-
       self.type = ko.observable(type);
       self.fields = ko.observableArray();
       self.numExpectedFields = ko.observable();
       self.settings = ko.observable();
-
       init();
-
       self.type.subscribe(function (newType) {
         init();
       });
     }
-
     var FileType = function (typeName, args) {
       var self = this;
       var type;
-
       var init = function () {
         self.type = ko.observable(typeName);
-
         var types = viewModel.createWizard.fileTypes;
-
         for (var i = 0; i < types.length; i++) {
           if (types[i].name == typeName) {
             type = types[i];
             break;
           }
         }
-
         for (var i = 0; i < type.args.length; i++) {
           self[type.args[i].name] = ko.observable();
         }
-
         if (args) {
           loadFromObj(args);
         }
-
         for (var i = 0; i < type.args.length; i++) {
           self[type.args[i].name].subscribe(viewModel.createWizard.guessFieldTypes);
         }
       }
-
       var loadFromObj = function (args) {
         for (var attr in args) {
           self[attr] = ko.mapping.fromJS(args[attr]);
         }
       }
-
       self.getArguments = function () {
         return type.args;
       }
-
       self.isCustomizable = function () {
         return type.isCustomizable;
       }
-
       init();
     }
-
     var Source = function (vm, wizard) {
       var self = this;
-
       self.name = ko.observable('');
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
-
       self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : 'file');
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
@@ -1091,7 +1248,6 @@ ${ assist.assistPanel() }
           return self.inputFormatsAll();
         }
       });
-
       // File
       self.path = ko.observable('');
       self.path.subscribe(function(val) {
@@ -1107,23 +1263,53 @@ ${ assist.assistPanel() }
       self.isObjectStore.subscribe(function(newVal) {
         vm.createWizard.destination.useDefaultLocation(!newVal);
       });
-
       // Rdbms
-      self.rdbmsName = ko.observable('');
-      self.rdbmsTable = ko.observable('');
-      self.rdbmsTableName = ko.computed(function() {
-        return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[1] : self.rdbmsTable();
+      self.rdbmsMode = ko.observable('');
+      self.rdbmsTypesAll = ko.observableArray([
+          {'value': 'mysql', 'name': 'Mysql'},
+          {'value': 'oracle', 'name': 'Oracle'},
+          {'value': 'postgresql', 'name': 'PostgreSQL'},
+          {'value': 'db2', 'name': 'DB2'}
+      ]);
+      self.rdbmsTypes = ko.pureComputed(function() {
+        return self.rdbmsTypesAll();
       });
-      self.rdbmsTableName.subscribe(function(val) {
-        if (val) {
-          vm.createWizard.guessFormat();
-        }
+      self.rdbmsType = ko.observable('');
+      self.rdbmsType.subscribe(function(val) {
+        viewModel = new IndexerViewModel();
+        self.path('');
         resizeElements();
+        var abc = { rdbmsConfigDatabaseNamesAll: ko.observableArray() };
+        $.post("${ url('indexer:get_databases') }", {
+          "source": ko.mapping.toJSON(self)
+        }, function(resp) {
+          console.log(resp);
+          this.rdbmsConfigDatabaseName = ko.observable();
+          this.rdbmsConfigDatabaseNamesAll = ko.observableArray([]);
+          var mappedjobTitles = $.map(resp.data, function (item) {
+                return new rdbmsConfigDatabaseNamesAll(item)
+          });
+          this.rdbmsConfigDatabaseNamesAll(mappedjobTitles);
+        });
       });
-      self.rdbmsDatabaseName = ko.computed(function() {
-        return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[0] : 'default';
+      self.rdbmsConfigDatabaseName = ko.observable('');
+      //self.rdbmsConfigDatabaseName.subscribe(function(val) {
+      //  $.post("${ url('indexer:get_tables') }", {
+      //    "source": ko.mapping.toJSON(self)
+      //  }, function(resp) {
+      //    console.log(resp);
+      //    // set rdbmsConfigTableNamesAll here
+      //  });
+      //});
+      self.rdbmsConfigDatabaseNamesAll = ko.observableArray([]);
+      self.rdbmsConfigDatabaseNames = ko.pureComputed(function() {
+        return self.rdbmsConfigDatabaseNamesAll();
       });
-
+      self.rdbmsConfigTableName = ko.observable('');
+      self.rdbmsConfigTableNamesAll = ko.observableArray([]);
+      self.rdbmsConfigTableNames = ko.pureComputed(function() {
+        return self.rdbmsConfigTableNamesAll();
+      });
 
       // Table
       self.table = ko.observable('');
@@ -1141,7 +1327,6 @@ ${ assist.assistPanel() }
       // Queries
       self.query = ko.observable('');
       self.draggedQuery = ko.observable();
-
       self.format = ko.observable();
       self.format.subscribe(function(newVal) {
         if (typeof newVal.hasHeader !== 'undefined') {
@@ -1150,7 +1335,6 @@ ${ assist.assistPanel() }
             vm.createWizard.destination.hasHeader(newVal);
           });
         }
-
         if (typeof newVal.fieldSeparator !== 'undefined') {
           vm.createWizard.destination.useCustomDelimiters(newVal.fieldSeparator() != ',');
           vm.createWizard.destination.customFieldDelimiter(newVal.fieldSeparator());
@@ -1159,7 +1343,6 @@ ${ assist.assistPanel() }
           });
         }
       });
-
       self.show = ko.computed(function() {
         if (self.inputFormat() == 'file') {
           return self.path().length > 0;
@@ -1169,19 +1352,39 @@ ${ assist.assistPanel() }
           return self.query();
         } else if (self.inputFormat() == 'manual') {
           return true;
-        }  else if (self.inputFormat() == 'rdbms') {
-          return self.rdbmsName().length > 0 && self.rdbmsTable().length > 0;
+        } else if (self.inputFormat() == 'rdbms') {
+          return true; //self.rdbmsDatabaseName().length > 0 && self.rdbmsTableName().length > 0;
         }
       });
+      self.defaultName = ko.computed(function() {
+        var name = ''
+        if (self.inputFormat() == 'file') {
+          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
+          if (self.path()) {
+            name += '.' + self.path().split('/').pop().split('.')[0];
+          }
+        } else if (self.inputFormat() == 'table') {
+          if (self.table().split('.', 2).length == 2) {
+            name = self.table();
+          }
+        } else if (self.inputFormat() == 'query') {
+          if (self.query()) {
+            name = self.name();
+          }
+        } else if (self.inputFormat() == 'manual') {
+          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
+        }
+        return name.replace(/ /g, '_').toLowerCase();
+      });
+      self.defaultName.subscribe(function(newVal) {
+        vm.createWizard.destination.name(newVal);
+      });
     };
-
     var Destination = function (vm, wizard) {
       var self = this;
-
       self.name = ko.observable('').extend({throttle: 500});
       self.nameChanged = function(name) {
         var exists = false;
-
         if (name.length == 0) {
           self.isTargetExisting(false);
           self.isTargetChecking(false);
@@ -1282,7 +1485,6 @@ ${ assist.assistPanel() }
           else if (format.value == 'table' && wizard.source.inputFormat() == 'rdbms') {
             return false;
           }
-
           return true;
         })
       });
@@ -1327,17 +1529,14 @@ ${ assist.assistPanel() }
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
-
       // UI
       self.bulkColumnNames = ko.observable('');
       self.showProperties = ko.observable(false);
-
       self.columns.subscribe(function (newVal) {
         self.bulkColumnNames(newVal.map(function (item) {
           return item.name()
         }).join(','));
       });
-
       self.processBulkColumnNames = function () {
         var val = self.bulkColumnNames();
         try {
@@ -1358,7 +1557,6 @@ ${ assist.assistPanel() }
         }
         $('#fieldsBulkEditor').modal('hide');
       };
-
       self.isTargetExisting = ko.observable();
       self.isTargetChecking = ko.observable(false);
       self.existingTargetUrl = ko.computed(function() { // Should open generic sample popup instead
@@ -1379,7 +1577,6 @@ ${ assist.assistPanel() }
         }
         return '';
       });
-
       // Table
       self.tableName = ko.computed(function() {
         return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[1] : self.name();
@@ -1395,7 +1592,6 @@ ${ assist.assistPanel() }
       });
       self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [{value: ''}], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
       self.KUDU_DEFAULT_PARTITION_COLUMN = {columns: [], range_partitions: [self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN], name: 'HASH', int_val: 16};
-
       self.tableFormats = ko.observableArray([
           {'value': 'text', 'name': 'Text'},
           {'value': 'parquet', 'name': 'Parquet'},
@@ -1406,24 +1602,19 @@ ${ assist.assistPanel() }
           {'value': 'regexp', 'name': 'Regexp'},
           {'value': 'orc', 'name': 'ORC'},
       ]);
-
       self.partitionColumns = ko.observableArray();
       self.kuduPartitionColumns = ko.observableArray();
       self.primaryKeys = ko.observableArray();
       self.primaryKeyObjects = ko.observableArray();
-
       self.importData = ko.observable(true);
       self.useDefaultLocation = ko.observable(true);
       self.nonDefaultLocation = ko.observable('');
-
       self.hasHeader = ko.observable(true);
-
       self.useCustomDelimiters = ko.observable(false);
       self.customFieldDelimiter = ko.observable(',');
       self.customCollectionDelimiter = ko.observable('\\002');
       self.customMapDelimiter = ko.observable('\\003');
       self.customRegexp = ko.observable('');
-
       // Index
       self.indexerRunJob = ko.observable(false);
       self.indexerJobLibPath = ko.observable('${ CONFIG_INDEXER_LIBS_PATH.get() }');
@@ -1436,18 +1627,15 @@ ${ assist.assistPanel() }
       self.indexerDefaultField = ko.observableArray();
       self.indexerDefaultFieldObject = ko.observableArray();
     };
-
     var CreateWizard = function (vm) {
       var self = this;
       var guessFieldTypesXhr;
-
       self.fileType = ko.observable();
       self.fileType.subscribe(function (newType) {
         if (self.source.format()) {
           self.source.format().type(newType.name);
         }
       });
-
       self.fileTypeName = ko.observable();
       self.fileTypeName.subscribe(function (newType) {
         for (var i = 0; i < self.fileTypes.length; i++) {
@@ -1457,25 +1645,19 @@ ${ assist.assistPanel() }
           }
         }
       });
-
       self.operationTypes = ${operators_json | n};
-
       self.fieldTypes = ${fields_json | n}.solr;
       self.hivePrimitiveFieldTypes = ${fields_json | n}.hivePrimitive;
       self.hiveFieldTypes = ${fields_json | n}.hive;
       self.fileTypes = ${file_types_json | n};
       self.prefill = ko.mapping.fromJS(${prefill | n});
-
       self.prefill.source_type.subscribe(function(newValue) {
         self.source.inputFormat(newValue == 'manual' ? 'manual' : 'file');
       });
-
       self.show = ko.observable(true);
       self.showCreate = ko.observable(false);
-
       self.source = new Source(vm, self);
       self.destination = new Destination(vm, self);
-
       self.customDelimiters = ko.observableArray([
         {'value': ',', 'name': 'Comma (,)'},
         {'value': '\\t', 'name': '^Tab (\\t)'},
@@ -1486,13 +1668,10 @@ ${ assist.assistPanel() }
         {'value': '\\002', 'name': '^B (\\002)'},
         {'value': '\\003', 'name': '^C (\\003)'},
       ]);
-
       self.editorId = ko.observable();
       self.jobId = ko.observable();
       self.editorVM = null;
-
       self.indexingStarted = ko.observable(false);
-
       self.isValidDestination = ko.pureComputed(function() {
          return self.destination.name().length > 0 && (
            (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
@@ -1520,9 +1699,7 @@ ${ assist.assistPanel() }
 
         return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable;
       });
-
       self.formatTypeSubscribed = false;
-
       self.source.format.subscribe(function (newVal) {
         for (var i = 0; i < self.fileTypes.length; i++) {
           if (self.fileTypes[i].name == self.source.format().type()) {
@@ -1531,7 +1708,6 @@ ${ assist.assistPanel() }
             break;
           }
         }
-
         if (self.source.format().type) {
           if (!self.formatTypeSubscribed) {
             self.formatTypeSubscribed = true;
@@ -1543,7 +1719,6 @@ ${ assist.assistPanel() }
           }
         }
       });
-
       self.isGuessingFormat = ko.observable(false);
       self.guessFormat = function () {
         self.isGuessingFormat(true);
@@ -1558,7 +1733,6 @@ ${ assist.assistPanel() }
             self.source.format(newFormat);
             self.guessFieldTypes();
           }
-
           self.isGuessingFormat(false);
           viewModel.wizardEnabled(true);
         }).fail(function (xhr, textStatus, errorThrown) {
@@ -1567,9 +1741,7 @@ ${ assist.assistPanel() }
           self.isGuessingFormat(false);
         });
       };
-
       self.isGuessingFieldTypes = ko.observable(false);
-
       self.guessFieldTypes = function () {
         if (guessFieldTypesXhr) {
           guessFieldTypesXhr.abort();
@@ -1596,7 +1768,6 @@ ${ assist.assistPanel() }
           viewModel.isLoading(false);
         });
       };
-
       self.isIndexing = ko.observable(false);
       self.indexingError = ko.observable(false);
       self.indexingSuccess = ko.observable(false);
@@ -1610,7 +1781,6 @@ ${ assist.assistPanel() }
         self.indexingStarted(true);
         viewModel.isLoading(true);
         self.isIndexing(true);
-
         $.post("${ url('indexer:importer_submit') }", {
           "source": ko.mapping.toJSON(self.source),
           "destination": ko.mapping.toJSON(self.destination)
@@ -1627,7 +1797,6 @@ ${ assist.assistPanel() }
             self.editorId(resp.history_id);
             self.jobId(resp.handle.id);
             $('#importerNotebook').html($('#importerNotebook-progress').html());
-
             self.editorVM = new EditorViewModel(resp.history_uuid, '', {
               user: '${ user.username }',
               userId: ${ user.id },
@@ -1660,7 +1829,6 @@ ${ assist.assistPanel() }
             self.editorVM.isNotificationManager(true);
             ko.cleanNode($("#importerNotebook")[0]);
             ko.applyBindings(self.editorVM, $("#importerNotebook")[0]);
-
             self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
               self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
                 if (val == 100){
@@ -1683,7 +1851,7 @@ ${ assist.assistPanel() }
                         var db = match[1];
                         huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
                       }
-                      huePubSub.publish('assist.clear.db.cache', { sourceType: self.source.apiHelperType() });
+                      huePubSub.publish('assist.clear.db.cache', { source_type: self.source.apiHelperType() });
                       window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                     }
                   } else { // Perform last DROP statement execute
@@ -1725,20 +1893,16 @@ ${ assist.assistPanel() }
           $(document).trigger("error", xhr.responseText);
         });
 % endif
-
         hueAnalytics.log('importer', 'submit/' + self.source.inputFormat() + '/' + self.destination.outputFormat());
       };
-
       self.removeOperation = function (operation, operationList) {
         operationList.remove(operation);
         hueAnalytics.log('importer', 'step/removeOperation');
       };
-
       self.addOperation = function (field) {
         field.operations.push(new Operation("split"));
         hueAnalytics.log('importer', 'step/addOperation');
       };
-
       self.load = function (state) {
         self.source.name(state.name);
         self.source.show(state.show);
@@ -1755,14 +1919,12 @@ ${ assist.assistPanel() }
         }
       }
     };
-
     var loadDefaultField = function (options) {
       if (!options.name) {
         options.name = getNewFieldName();
       }
       return loadField($.extend({}, ${default_field_type | n}, options));
     };
-
     var loadField = function (currField, parent, idx) {
       var koField = ko.mapping.fromJS(currField);
       if (koField.name && parent) {
@@ -1780,16 +1942,12 @@ ${ assist.assistPanel() }
           }).join(','));
         });
       }
-
       koField.operations.removeAll();
-
       currField.operations.forEach(function (operationData) {
         var operation = new Operation(operationData.type);
         operation.load(operationData);
-
         koField.operations.push(operation);
       });
-
       var autoExpand = function (newVal) {
         if ((newVal == 'array' || newVal == 'map' || newVal == 'struct') && koField.nested().length == 0) {
           koField.nested.push(loadDefaultField({level: koField.level() + 1}));
@@ -1797,21 +1955,16 @@ ${ assist.assistPanel() }
       };
       koField.type.subscribe(autoExpand);
       koField.keyType.subscribe(autoExpand);
-
       return koField;
     };
-
     var IndexerViewModel = function () {
       var self = this;
-
       self.apiHelper = ApiHelper.getInstance();
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
       self.loadDefaultField = loadDefaultField;
-
       self.createWizard = new CreateWizard(self);
-
       // Wizard related
       self.wizardEnabled = ko.observable(false);
       self.currentStep = ko.observable(self.createWizard.prefill.target_type() == 'database' ? 2 : 1);
@@ -1840,13 +1993,9 @@ ${ assist.assistPanel() }
           hueAnalytics.log('importer', 'step/' + self.currentStep());
         }
       };
-
       self.isLoading = ko.observable(false);
-
     };
-
     var viewModel;
-
     function resizeElements () {
       var $contentPanel = $('#importerComponents').find('.content-panel-inner');
       $('.form-actions').width($contentPanel.width() - 50);
@@ -1856,24 +2005,16 @@ ${ assist.assistPanel() }
       document.styleSheets[0].addRule('.step-indicator li:last-child:before','max-width: ' + ($contentPanel.find('.step-indicator li:last-child .caption').width()) + 'px');
       document.styleSheets[0].addRule('.step-indicator li:last-child:before','right: ' + ($contentPanel.find('.step-indicator li:last-child .caption').width()/2) + 'px');
     }
-
     $(document).ready(function () {
       viewModel = new IndexerViewModel();
       ko.applyBindings(viewModel, $('#importerComponents')[0]);
-
-
       var draggableMeta = {};
       huePubSub.subscribe('draggable.text.meta', function (meta) {
         draggableMeta = meta;
       });
-
-
       huePubSub.subscribe('split.panel.resized', resizeElements);
-
       hueUtils.waitForRendered('.step-indicator li:first-child .caption', function(el){ return el.width() < $('#importerComponents').find('.content-panel-inner').width()/2 }, resizeElements);
-
       $(window).on('resize', resizeElements);
-
       $('.content-panel').droppable({
         accept: ".draggableText",
         drop: function (e, ui) {
