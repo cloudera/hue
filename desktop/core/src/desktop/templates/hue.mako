@@ -944,6 +944,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page(ctx.path.replace(/home2/gi, 'home'));
           }},
           { url: '/home*', app: 'home' },
+          { url: '/indexer/indexes', app: 'indexes' },
           { url: '/indexer/', app: 'indexes' },
           { url: '/indexer/importer/', app: 'importer' },
           { url: '/indexer/importer/prefill/*', app: function (ctx) {
