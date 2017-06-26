@@ -1859,16 +1859,21 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             <!-- /ko -->
           </div>
         </div>
-        <div class="assist-flex-half">
+        <div class="assist-flex-half assist-db-scrollable">
           <!-- ko if: activeTables().length === 0 -->
           <div class="assist-no-entries">${ _('No tables identified.') }</div>
           <!-- /ko -->
           <!-- ko if: activeTables().length > 0 -->
-          <ul class="assist-active-tables" data-bind="foreach: activeTables">
-            <li data-bind="event: { mouseover: function (data, event) { showContextPopoverDelayed(data, event, 'left'); }, mouseout: clearContextPopoverDelay },">
-              <a class="inactive-action-dark" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }, text: database.name + '.' + name"></a>
-            </li>
+          <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: activeTables, minHeight: 23, container: '.assist-db-scrollable' }">
+            <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
+            <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry' } --><!-- /ko -->
           </ul>
+##
+##           <ul class="assist-active-tables" data-bind="foreach: activeTables">
+##             <li data-bind="event: { mouseover: function (data, event) { showContextPopoverDelayed(data, event, 'left'); }, mouseout: clearContextPopoverDelay },">
+##               <a class="inactive-action-dark" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }, text: database.name + '.' + name"></a>
+##             </li>
+##           </ul>
           <!-- /ko -->
         </div>
 
@@ -1939,12 +1944,31 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var createQualifiedIdentifier = function (identifierChain) {
           return $.map(identifierChain, function (identifier) {
             return identifier.name;
-          }).join('.');
+          }).join('.').toLowerCase();
         };
 
+        var databaseIndex = {};
+
         var activeTableIndex = {};
+        var filter = {
+          query: ko.observable(''),
+          showViews: ko.observable(true),
+          showTables: ko.observable(true)
+        };
+        var navigationSettings = {
+          showStats: true
+        };
+        var i18n = {};
+
+        var assistDbSource = new AssistDbSource({
+          i18n : i18n,
+          type: 'hive',
+          name: 'hive',
+          navigationSettings: navigationSettings
+        });
 
         var handleLocationUpdate = function (activeLocations) {
+          assistDbSource.sourceType = activeLocations.type;
           if (!activeLocations) {
             return;
           }
@@ -1956,13 +1980,43 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             var tableQidIndex = {};
             activeLocations.activeStatementLocations.forEach(function (location) {
               if (location.type === 'table') {
+                var database = location.identifierChain.length === 2 ? location.identifierChain[0].name : activeLocations.defaultDatabase;
+                database = database.toLowerCase();
+                if (!databaseIndex[database]) {
+                  databaseIndex[database] = new AssistDbEntry(
+                    {
+                      name: database,
+                      type: 'database',
+                      isDatabase: true
+                    },
+                    null,
+                    assistDbSource,
+                    filter,
+                    i18n,
+                    navigationSettings,
+                    {}
+                  )
+                }
                 var qid = createQualifiedIdentifier(location.identifierChain);
                 tableQidIndex[qid] = true;
                 if (!activeTableIndex[qid]) {
-                  activeTableIndex[createQualifiedIdentifier(location.identifierChain)] = {
-                    name: location.identifierChain[location.identifierChain.length - 1].name,
-                    identifierChain: location.identifierChain
-                  };
+                  var tableName = location.identifierChain[location.identifierChain.length - 1].name;
+                  var displayName = database + '.' + tableName;
+
+                  activeTableIndex[createQualifiedIdentifier(location.identifierChain)] = new AssistDbEntry(
+                    {
+                      name: tableName,
+                      type: 'table',
+                      isTable: true,
+                      displayName: displayName.toLowerCase()
+                    },
+                    databaseIndex[database],
+                    assistDbSource,
+                    filter,
+                    {},
+                    navigationSettings,
+                    {}
+                  );
                   updateTables = true;
                 }
               }
@@ -1975,16 +2029,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             });
 
             if (updateTables) {
-              self.activeTables($.map(activeTableIndex, function (value) {
-                return new MetastoreTable({
-                  database: {
-                    name: value.identifierChain.length === 2 ? value.identifierChain[0].name : activeLocations.defaultDatabase
-                  },
-                  type: 'table',
-                  sourceType: activeLocations.type,
-                  name: value.name
-                });
-              }));
+              var tables = Object.values(activeTableIndex);
+              tables.sort(function (a, b) {
+                return a.definition.name.localeCompare(b.definition.name);
+              })
+              self.activeTables(tables);
             }
           }
         };

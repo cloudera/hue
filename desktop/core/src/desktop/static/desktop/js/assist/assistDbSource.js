@@ -37,7 +37,6 @@ var AssistDbSource = (function () {
   /**
    * @param {Object} options
    * @param {Object} options.i18n
-   * @param {ApiHelper} options.apiHelper
    * @param {string} options.type
    * @param {string} options.name
    * @param {Object} options.navigationSettings
@@ -48,7 +47,7 @@ var AssistDbSource = (function () {
     var self = this;
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
-    self.apiHelper = options.apiHelper;
+    self.apiHelper = ApiHelper.getInstance();
     self.sourceType = options.type;
     self.name = options.name;
 
@@ -56,6 +55,7 @@ var AssistDbSource = (function () {
     self.simpleStyles = ko.observable(false);
     self.isSearchVisible = ko.observable(false);
     self.editingSearch = ko.observable(false);
+    self.sortFunctions = sortFunctions;
 
     self.highlight = ko.observable(false);
 
