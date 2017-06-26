@@ -17,80 +17,83 @@
 
 import itertools
 import logging
-import uuid
 import os
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
-from hadoop import cluster
-
 from useradmin.models import install_sample_user
-from indexer import utils, controller
+
+from indexer import utils
 from indexer.solr_client import SolrClient
 
 
 LOG = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
   """
   Install examples but do not overwrite them.
   """
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     self.user = install_sample_user()
-    self.fs = cluster.get_hdfs()
-    self.searcher = controller.CollectionManagerController(self.user)
+    self.client = SolrClient(self.user)
 
-    LOG.info(_("Installing twitter collection"))
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
-    self._setup_collection_from_csv({
-      'name': 'twitter_demo',
-      'fields': self._parse_fields(path),
-      'uniqueKeyField': 'id',
-      'df': 'text'
-    }, path)
-    LOG.info(_("Twitter collection successfully installed"))
+    collection = options['data']
 
-    LOG.info(_("Installing yelp collection"))
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_yelp_demo/index_data.csv'))
-    self._setup_collection_from_csv({
-      'name': 'yelp_demo',
-      'fields': self._parse_fields(path),
-      'uniqueKeyField': 'id',
-      'df': 'text'
-    }, path)
-    LOG.info(_("Yelp collection successfully installed"))
+    if collection == 'twitter_demo':
+      LOG.info("Installing twitter collection")
+      path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
+      self._setup_collection_from_csv({
+          'name': 'twitter_demo',
+          'fields': self._parse_fields(path),
+          'uniqueKeyField': 'id',
+          'df': 'text'
+        },
+        path
+      )
+      LOG.info("Twitter collection successfully installed")
 
-    LOG.info(_("Installing logs collection"))
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_log_analytics_demo/index_data.csv'))
-    self._setup_collection_from_csv({
-      'name': 'log_analytics_demo',
-      'fields': self._parse_fields(path, fieldtypes={
-        'region_code': 'string',
-        'referer': 'string'
-      }),
-      'uniqueKeyField': 'id',
-      'df': 'record'
-    }, path)
-    LOG.info(_("Logs collection successfully installed"))
+    if collection == 'yelp_demo':
+      LOG.info("Installing yelp collection")
+      path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_yelp_demo/index_data.csv'))
+      self._setup_collection_from_csv({
+          'name': 'yelp_demo',
+          'fields': self._parse_fields(path),
+          'uniqueKeyField': 'id',
+          'df': 'text'
+        },
+        path
+      )
+      LOG.info("Yelp collection successfully installed")
+
+    if collection == 'log_analytics_demo':
+      LOG.info("Installing logs collection")
+      path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_log_analytics_demo/index_data.csv'))
+      self._setup_collection_from_csv({
+          'name': 'log_analytics_demo',
+          'fields': self._parse_fields(path, fieldtypes={
+            'region_code': 'string',
+            'referer': 'string'
+          }),
+          'uniqueKeyField': 'id',
+          'df': 'record'
+        },
+        path
+      )
+      LOG.info("Logs collection successfully installed")
 
 
-  def _setup_collection_from_csv(self, collection, path, separator=',', quote_character='"'):
-    if not self.searcher.collection_exists(collection['name']):
-      self.searcher.create_collection(collection['name'], collection['fields'], collection['uniqueKeyField'], collection['df'])
-
-    with open(path) as fh:
-      client = SolrClient(self.user)
-
-      collection = client.create_index(
+  def _setup_collection_from_csv(self, collection, path):
+    if not self.client.exists(collection['name']):
+      self.client.create_index(
           name=collection['name'],
           fields=collection['fields'],
           unique_key_field=collection['uniqueKeyField'],
           df=collection['df']
       )
-      
-      client.index(collection['name'], fh.read())
+      with open(path) as fh:
+        self.client.index(collection['name'], fh.read())
 
 
   def _parse_fields(self, path, separator=',', quote_character='"', fieldtypes={}):

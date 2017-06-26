@@ -101,8 +101,8 @@ ${ layout.menubar(section='quick_start') }
               % endif
               % if 'search' in app_names:
                   <li>
-                    <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                       data-sample-url="${ url('search:install_examples') }">
+                    <a href="javascript:void(0)" class="installAllBtn" data-loading-text="${ _('Installing...') }"
+                       data-sample-url="${ url('search:install_examples') }" data-sample-data='["log_analytics_demo", "twitter_demo", "yelp_demo"]'>
                       <i class="fa fa-download"></i> ${ apps['search'].nice_name }
                     </a>
                   </li>
@@ -311,20 +311,20 @@ $(document).ready(function(){
   $(".installAllBtn").click(function() {
     var button = $(this);
     $(button).button('loading');
-    var calls = jQuery.map($("[data-sample-url]"), function(app) {
-      return $.post($(app).data("sample-url"), function(data) {
+    var calls = jQuery.map($(button).data("sample-data"), function(app) {
+      return $.post($(button).data("sample-url"), {data: app}, function(data) {
         if (data.status != 0) {
           $(document).trigger('error', data.message);
         }
       });
     });
     $.when.apply(this, calls)
-      .then(function() {
-        $(document).trigger('info', '${ _("Examples refreshed") }');
-      })
-      .always(function(data) {
-        $(button).button('reset');
-      });
+    .then(function() {
+      $(document).trigger('info', '${ _("Examples refreshed") }');
+    })
+    .always(function(data) {
+      $(button).button('reset');
+    });
   });
 
   var currentStep = "step1";
