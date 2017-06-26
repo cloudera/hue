@@ -28,13 +28,12 @@ import tablib
 from desktop.lib.exceptions_renderable import PopupException
 from dashboard.models import Collection2
 from libsolr.api import SolrApi
-from libsolr.conf import SOLR_ZK_PATH
-from libzookeeper.conf import ENSEMBLE
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from indexer.conf import CORE_INSTANCE_DIR
+from indexer.conf import CORE_INSTANCE_DIR, get_solr_ensemble
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
+from indexer.solr_client import SolrClient
 
 
 LOG = logging.getLogger(__name__)
@@ -42,10 +41,6 @@ MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored')]
 ZK_SOLR_CONFIG_NAMESPACE = 'configs'
-
-
-def get_solr_ensemble():
-  return '%s%s' % (ENSEMBLE.get(), SOLR_ZK_PATH.get())
 
 
 class CollectionManagerController(object):
@@ -63,15 +58,8 @@ class CollectionManagerController(object):
     return fields
 
   def is_solr_cloud_mode(self):
-    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
-    if not hasattr(self, '_solr_cloud_mode'):
-      try:
-        api.collections()
-        setattr(self, '_solr_cloud_mode', True)
-      except Exception, e:
-        LOG.info('Non SolrCloud server: %s' % e)
-        setattr(self, '_solr_cloud_mode', False)
-    return getattr(self, '_solr_cloud_mode')
+    client = SolrClient(self.user)
+    return client.is_solr_cloud_mode()
 
   def collection_exists(self, collection):
     return collection in self.get_collections()
@@ -156,7 +144,16 @@ class CollectionManagerController(object):
     with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
       root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
 
-      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
+      client = SolrClient(self.user)
+
+      tmp_path, solr_config_path = copy_configs(
+          fields=fields,
+          unique_key_field=unique_key_field,
+          df=df,
+          solr_cloud_mode=client.is_solr_cloud_mode(),
+          is_solr_six_or_more=client.is_solr_six_or_more(),
+          is_solr_hdfs_mode=client.is_solr_with_hdfs()
+      )
       try:
         config_root_path = '%s/%s' % (solr_config_path, 'conf')
         try:
@@ -164,7 +161,7 @@ class CollectionManagerController(object):
 
         except Exception, e:
           zc.delete_path(root_node)
-          raise PopupException(_('Error in copying Solr configurations.'), detail=e)
+          raise PopupException(_('Error in copying Solr configurations: %s') % e)
       finally:
         # Don't want directories laying around
         shutil.rmtree(tmp_path)
