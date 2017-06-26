@@ -16,17 +16,36 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from desktop import conf
 
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
 %>
 
-
+<%namespace name="assist" file="/assist.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
 %if not is_embeddable:
 ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
-%endif
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
+${ assist.assistJSModels() }
+<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .show-assist {
+    top: 110px!important;
+  }
+  .main-content {
+    top: 112px!important;
+  }
+% endif
+</style>
+
+${ assist.assistPanel() }
+
+%endif
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('indexer/css/indexes.css') }" type="text/css">
 
 <script type="text/html" id="indexes-breadcrumbs">
@@ -64,56 +83,100 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     </div>
 </div>
 
-<div id="indexesComponents" class="container-fluid">
+<div id="indexesComponents" class="notebook">
 
-  <div class="indexer-main">
-    <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
+  % if not is_embeddable:
+  <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function () { $root.isLeftPanelVisible(true); }">
+    <i class="fa fa-chevron-right"></i>
+  </a>
+  % endif
 
-    <%actionbar:render>
-      <%def name="search()">
-        <input data-bind="clearable: indexFilter, value: indexFilter, valueUpdate: 'afterkeydown'" type="text" class="input-xlarge search-query" placeholder="${_('Search for name...')}">
-      </%def>
-
-      <%def name="actions()">
-        <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-          <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndex').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
-            <i class="fa fa-times"></i> ${ _('Delete') }
+  <div class="main-content">
+    <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
+      <div class="vertical-full row-fluid panel-container">
+        % if not is_embeddable:
+        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
+            <i class="fa fa-chevron-left"></i>
           </a>
+          <div class="assist" data-bind="component: {
+              name: 'assist-panel',
+              params: {
+                user: '${user.username}',
+                sql: {
+                  navigationSettings: {
+                    openItem: true,
+                    showStats: true
+                  }
+                },
+                visibleAssistPanels: ['sql']
+              }
+            }"></div>
         </div>
-      </%def>
-
-      <%def name="creation()">
-        <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/default'">
-          <i class="fa fa-plus-circle"></i> ${ _('Create index') }
-        </a>
-        <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true); }">
-          <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
-        </a>
-      </%def>
-    </%actionbar:render>
-
-    <!-- ko template: { if: alias.showCreateModal(), name: 'create-alias' }--><!-- /ko -->
-    <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
-    <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
-  </div>
-  <div class="hueOverlay" data-bind="visible: isLoading">
-    <i class="fa fa-spinner fa-spin big-spinner"></i>
-  </div>
+        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+        % endif
+        <div class="content-panel" ${ not is_embeddable and 'data-bind="niceScroll"' or ''}>
 
 
-  <div id="deleteIndex" class="modal hide fade">
-    <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
-      ${ csrf_token(request) | n,unicode }
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 id="deleteIndexMessage" class="modal-title">${ _('Delete the selected index(es)?') }</h2>
+          <div class="indexer-main">
+            <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
+
+            <%actionbar:render>
+              <%def name="search()">
+                <input data-bind="clearable: indexFilter, value: indexFilter, valueUpdate: 'afterkeydown'" type="text" class="input-xlarge search-query" placeholder="${_('Search for name...')}">
+              </%def>
+
+              <%def name="actions()">
+                <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+                  <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndex').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+                    <i class="fa fa-times"></i> ${ _('Delete') }
+                  </a>
+                </div>
+              </%def>
+
+              <%def name="creation()">
+                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/default'">
+                  <i class="fa fa-plus-circle"></i> ${ _('Create index') }
+                </a>
+                <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true); }">
+                  <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
+                </a>
+              </%def>
+            </%actionbar:render>
+
+            <!-- ko template: { if: alias.showCreateModal(), name: 'create-alias' }--><!-- /ko -->
+            <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
+            <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
+          </div>
+          <div class="hueOverlay" data-bind="visible: isLoading">
+            <i class="fa fa-spinner fa-spin big-spinner"></i>
+          </div>
+
+
+          <div id="deleteIndex" class="modal hide fade">
+            <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
+              ${ csrf_token(request) | n,unicode }
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+                <h2 id="deleteIndexMessage" class="modal-title">${ _('Delete the selected index(es)?') }</h2>
+              </div>
+              <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+                <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+              </div>
+            </form>
+          </div>
+
+
+        </div>
       </div>
-      <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
-        <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
-      </div>
-    </form>
+    </div>
   </div>
+
+
+
+
+
 
 </div>
 
@@ -393,8 +456,14 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
   };
 
 
-  var Editor = function () {
+  var IndexesViewModel = function (options) {
     var self = this;
+
+    self.assistAvailable = ko.observable(true);
+    self.apiHelper = ApiHelper.getInstance();
+    self.isHue4 = ko.observable(options.hue4);
+    self.isLeftPanelVisible = ko.observable();
+    self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.section = ko.observable('list-indexes');
     self.tab = ko.observable('');
@@ -488,7 +557,13 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
   var viewModel;
 
   $(document).ready(function () {
-    viewModel = new Editor();
+    var options = {
+      user: '${ user.username }',
+      % if is_embeddable:
+      hue4: true,
+      % endif
+    };
+    viewModel = new IndexesViewModel(options);
     ko.applyBindings(viewModel, $('#indexesComponents')[0]);
 
     viewModel.fetchIndexes();
