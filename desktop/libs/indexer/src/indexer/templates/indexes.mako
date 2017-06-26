@@ -389,185 +389,193 @@ ${ assist.assistPanel() }
 
 <script type="text/javascript">
 
-  var Alias = function (vm) {
-    var self = this;
+  var IndexesViewModel = (function () {
 
-    self.showCreateModal = ko.observable(false);
+    var Alias = function (vm) {
+      var self = this;
 
-    self.name = ko.observable('');
-    self.chosenCollections = ko.observableArray();
-    self.availableCollections = ko.computed(function() {
-      return $.grep(vm.indexes(), function(index) { return index.type() == 'collection'; });
-    });
+      self.showCreateModal = ko.observable(false);
 
-    self.create = function() {
-      $.post("${ url('indexer:create_alias') }", {
-        "alias": self.name,
-        "collections": ko.mapping.toJSON(self.chosenCollections)
-      }, function() {
-        window.location.reload();
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+      self.name = ko.observable('');
+      self.chosenCollections = ko.observableArray();
+      self.availableCollections = ko.computed(function () {
+        return $.grep(vm.indexes(), function (index) {
+          return index.type() == 'collection';
+        });
       });
-      hueAnalytics.log('indexes', 'create_alias');
-    }
 
-    self.edit = function(alias) {
-      self.name(alias.name());
-      self.chosenCollections(alias.collections());
-
-      self.showCreateModal(true);
-    }
-  };
-
-
-  var Index = function (vm, data) {
-    var self = this;
-
-    self.name = ko.observable(data.name);
-    self.uniqueKey = ko.observable(data.schema.uniqueKey);
-    self.fields = ko.mapping.fromJS(data.schema.fields);
-    self.fieldsPreview = ko.pureComputed(function() {
-      return self.fields().splice(0, 5)
-    });
-    self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
-    self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
-
-    self.sample = ko.observableArray();
-    self.samplePreview = ko.pureComputed(function() {
-      return self.sample().splice(0, 5)
-    });
-
-    self.getSample = function() {
-      $.post("${ url('indexer:sample_index') }", {
-        name: self.name(),
-        rows: 100
-      }, function(data) {
-        if (data.status == 0) {
-          self.sample(data.sample)
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-      hueAnalytics.log('indexes', 'sample_index');
-    };
-  };
-
-
-  var IndexesViewModel = function (options) {
-    var self = this;
-
-    self.assistAvailable = ko.observable(true);
-    self.apiHelper = ApiHelper.getInstance();
-    self.isHue4 = ko.observable(options.hue4);
-    self.isLeftPanelVisible = ko.observable();
-    self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
-
-    self.section = ko.observable('list-indexes');
-    self.tab = ko.observable('');
-
-    self.indexes = ko.observable([]);
-    self.alias = new Alias(self);
-    self.index = ko.observable();
-
-    self.indexFilter = ko.observable('');
-    self.columnFilter = ko.observable('');
-
-    self.selectedIndexes = ko.computed(function() {
-      return $.grep(self.indexes(), function(index) { return index.isSelected(); });
-    });
-    self.isLoading = ko.observable(false);
-
-    self.oneSelected = ko.computed(function() {
-      return self.selectedIndexes().length == 1;
-    });
-    self.atLeastOneSelected = ko.computed(function() {
-      return self.selectedIndexes().length >= 1;
-    });
-    self.allSelected = ko.observable(false);
-
-    self.handleSelect = function(index) {
-      index.isSelected(! index.isSelected());
-    }
-
-    self.selectAll = function() {
-      self.allSelected(! self.allSelected());
-      ko.utils.arrayForEach(self.indexes(), function (index) {
-        index.isSelected(self.allSelected());
-      });
-    }
-
-    self.datatable = null;
-
-    self.fetchIndexes = function() {
-      $.post("${ url('indexer:list_indexes') }", {
-      }, function(data) {
-        if (data.status == 0) {
-          var indexes = []
-          data.collections.forEach(function(index) {
-            index.isSelected = false;
-            indexes.push(ko.mapping.fromJS(index));
-          });
-          self.indexes(indexes);
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-      hueAnalytics.log('indexes', 'list_indexes');
-    };
-
-    self.fetchIndex = function(name) {
-      $.post("${ url('indexer:list_index') }", {
-        name: name
-      }, function(data) {
-        if (data.status == 0) {
-          self.index(new Index(self, data));
-          self.section('list-index');
-          self.tab('index-overview');
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-      hueAnalytics.log('indexes', 'list_index');
-    };
-
-    self.deleteIndexes = function() {
-      $.post("${ url('indexer:delete_indexes') }", {
-        "indexes": ko.mapping.toJSON(self.selectedIndexes)
-      }, function(data) {
-        if (data.status == 0) {
+      self.create = function () {
+        $.post("${ url('indexer:create_alias') }", {
+          "alias": self.name,
+          "collections": ko.mapping.toJSON(self.chosenCollections)
+        }, function () {
           window.location.reload();
-        } else {
-          $(document).trigger("error", data.message);
-        }
-        $('#deleteIndex').modal('hide');
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'create_alias');
+      }
+
+      self.edit = function (alias) {
+        self.name(alias.name());
+        self.chosenCollections(alias.collections());
+
+        self.showCreateModal(true);
+      }
+    };
+
+
+    var Index = function (vm, data) {
+      var self = this;
+
+      self.name = ko.observable(data.name);
+      self.uniqueKey = ko.observable(data.schema.uniqueKey);
+      self.fields = ko.mapping.fromJS(data.schema.fields);
+      self.fieldsPreview = ko.pureComputed(function () {
+        return self.fields().splice(0, 5)
       });
-      hueAnalytics.log('indexes', 'delete_indexes');
+      self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
+      self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
+
+      self.sample = ko.observableArray();
+      self.samplePreview = ko.pureComputed(function () {
+        return self.sample().splice(0, 5)
+      });
+
+      self.getSample = function () {
+        $.post("${ url('indexer:sample_index') }", {
+          name: self.name(),
+          rows: 100
+        }, function (data) {
+          if (data.status == 0) {
+            self.sample(data.sample)
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'sample_index');
+      };
     };
-  };
 
-  var viewModel;
 
-  $(document).ready(function () {
-    var options = {
-      user: '${ user.username }',
-      % if is_embeddable:
-      hue4: true,
-      % endif
+    var IndexesViewModel = function (options) {
+      var self = this;
+
+      self.assistAvailable = ko.observable(true);
+      self.apiHelper = ApiHelper.getInstance();
+      self.isHue4 = ko.observable(options.hue4);
+      self.isLeftPanelVisible = ko.observable();
+      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+
+      self.section = ko.observable('list-indexes');
+      self.tab = ko.observable('');
+
+      self.indexes = ko.observable([]);
+      self.alias = new Alias(self);
+      self.index = ko.observable();
+
+      self.indexFilter = ko.observable('');
+      self.columnFilter = ko.observable('');
+
+      self.selectedIndexes = ko.computed(function () {
+        return $.grep(self.indexes(), function (index) {
+          return index.isSelected();
+        });
+      });
+      self.isLoading = ko.observable(false);
+
+      self.oneSelected = ko.computed(function () {
+        return self.selectedIndexes().length == 1;
+      });
+      self.atLeastOneSelected = ko.computed(function () {
+        return self.selectedIndexes().length >= 1;
+      });
+      self.allSelected = ko.observable(false);
+
+      self.handleSelect = function (index) {
+        index.isSelected(!index.isSelected());
+      }
+
+      self.selectAll = function () {
+        self.allSelected(!self.allSelected());
+        ko.utils.arrayForEach(self.indexes(), function (index) {
+          index.isSelected(self.allSelected());
+        });
+      }
+
+      self.datatable = null;
+
+      self.fetchIndexes = function () {
+        $.post("${ url('indexer:list_indexes') }", {}, function (data) {
+          if (data.status == 0) {
+            var indexes = []
+            data.collections.forEach(function (index) {
+              index.isSelected = false;
+              indexes.push(ko.mapping.fromJS(index));
+            });
+            self.indexes(indexes);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'list_indexes');
+      };
+
+      self.fetchIndex = function (name) {
+        $.post("${ url('indexer:list_index') }", {
+          name: name
+        }, function (data) {
+          if (data.status == 0) {
+            self.index(new Index(self, data));
+            self.section('list-index');
+            self.tab('index-overview');
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'list_index');
+      };
+
+      self.deleteIndexes = function () {
+        $.post("${ url('indexer:delete_indexes') }", {
+          "indexes": ko.mapping.toJSON(self.selectedIndexes)
+        }, function (data) {
+          if (data.status == 0) {
+            window.location.reload();
+          } else {
+            $(document).trigger("error", data.message);
+          }
+          $('#deleteIndex').modal('hide');
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'delete_indexes');
+      };
     };
-    viewModel = new IndexesViewModel(options);
-    ko.applyBindings(viewModel, $('#indexesComponents')[0]);
+    return IndexesViewModel;
+  })();
 
-    viewModel.fetchIndexes();
-  });
+
+  (function () {
+    $(document).ready(function () {
+      var options = {
+        user: '${ user.username }',
+        % if is_embeddable:
+          hue4: true,
+        % endif
+      };
+      var viewModel = new IndexesViewModel(options);
+      ko.applyBindings(viewModel, $('#indexesComponents')[0]);
+
+      viewModel.fetchIndexes();
+    });
+  })();
 </script>
 
 %if not is_embeddable:
