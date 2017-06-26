@@ -114,9 +114,9 @@ def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six
 
     if is_solr_six_or_more:
       if is_solr_hdfs_mode:
-        solr_config_name = 'solrconfig.xml.solr6NonHdfs'
-      else:
         solr_config_name = 'solrconfig.xml.solr6'
+      else:
+        solr_config_name = 'solrconfig.xml.solr6NonHdfs'
 
     if is_sentry_enabled():
       solr_config_name += '.secure'
