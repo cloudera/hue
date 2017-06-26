@@ -1931,6 +1931,8 @@ from notebook.conf import get_ordered_interpreters
           }).join('.');
         };
 
+        var activeTableIndex = {};
+
         var handleLocationUpdate = function (activeLocations) {
           if (!activeLocations) {
             return;
@@ -1939,26 +1941,40 @@ from notebook.conf import get_ordered_interpreters
           self.activeStatementIndex(activeLocations.activeStatementIndex);
 
           if (activeLocations.activeStatementLocations) {
-            var tableIndex = {};
+            var updateTables = false;
+            var tableQidIndex = {};
             activeLocations.activeStatementLocations.forEach(function (location) {
               if (location.type === 'table') {
-                tableIndex[createQualifiedIdentifier(location.identifierChain)] = {
-                  name: location.identifierChain[location.identifierChain.length - 1].name,
-                  identifierChain: location.identifierChain
-                };
+                var qid = createQualifiedIdentifier(location.identifierChain);
+                tableQidIndex[qid] = true;
+                if (!activeTableIndex[qid]) {
+                  activeTableIndex[createQualifiedIdentifier(location.identifierChain)] = {
+                    name: location.identifierChain[location.identifierChain.length - 1].name,
+                    identifierChain: location.identifierChain
+                  };
+                  updateTables = true;
+                }
+              }
+            });
+            Object.keys(activeTableIndex).forEach(function (key) {
+              if (!tableQidIndex[key]) {
+                delete activeTableIndex[key];
+                updateTables = true;
               }
             });
 
-            self.activeTables($.map(tableIndex, function (value) {
-              return new MetastoreTable({
-                database: {
-                  name: value.identifierChain.length === 2 ? value.identifierChain[0].name : activeLocations.defaultDatabase
-                },
-                type: 'table',
-                sourceType: activeLocations.type,
-                name: value.name
-              });
-            }));
+            if (updateTables) {
+              self.activeTables($.map(activeTableIndex, function (value) {
+                return new MetastoreTable({
+                  database: {
+                    name: value.identifierChain.length === 2 ? value.identifierChain[0].name : activeLocations.defaultDatabase
+                  },
+                  type: 'table',
+                  sourceType: activeLocations.type,
+                  name: value.name
+                });
+              }));
+            }
           }
         };
 
