@@ -36,13 +36,12 @@ var AssistDbEntry = (function () {
    * @param {Object} navigationSettings
    * @constructor
    */
-  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings, sortFunctions) {
+  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings) {
     var self = this;
     self.i18n = i18n;
     self.definition = definition;
-    self.sortFunctions = sortFunctions;
-
     self.assistDbSource = assistDbSource;
+    self.sortFunctions = assistDbSource.sortFunctions;
     self.parent = parent;
     self.filter = filter;
     self.isSearchVisible = assistDbSource.isSearchVisible;
