@@ -29,7 +29,8 @@ from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
 from libsolr import conf as libsolr_conf
 from libzookeeper import conf as libzookeeper_conf
 
-from indexer.controller import get_solr_ensemble, CollectionManagerController
+from indexer.conf import get_solr_ensemble
+from indexer.controller import CollectionManagerController
 
 
 def test_get_ensemble():
