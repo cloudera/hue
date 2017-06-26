@@ -27,27 +27,46 @@
 ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
 %endif
 
+<link rel="stylesheet" href="${ static('indexer/css/indexes.css') }" type="text/css">
+
 <script type="text/html" id="indexes-breadcrumbs">
-  <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
-    <li>
-      <a href="javascript:void(0);" data-bind="click: function() { section('list-indexes'); }">${ _('Indexes') }
-        <!-- ko if: index -->
-        <span class="divider">&gt;</span>
-        <!-- /ko -->
-      </a>
-    </li>
-    <!-- ko with: index -->
-    <li>
-      <span data-bind="text: name"></span>
-    </li>
-    <!-- /ko -->
-  </ul>
+  <h1>
+    <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
+      <li>
+        <a href="javascript:void(0);" data-bind="click: function() { section('list-indexes'); }">${ _('Indexes') }
+          <!-- ko if: index -->
+          <span class="divider">&gt;</span>
+          <!-- /ko -->
+        </a>
+      </li>
+      <!-- ko with: index -->
+      <li>
+        <a href="#index-overview" data-bind="text: name"></a>
+      </li>
+      <!-- /ko -->
+    </ul>
+  </h1>
 </script>
 
-<div id="indexesComponents" class="container-fluid">
-  <div class="card card-small">
-    <h1 class="card-heading simple">${ _('Index Browser') }</h1>
+<div class="navbar hue-title-bar nokids">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="app-header">
+              <a href="/${app_name}">
+                ${ _('Index Browser') }
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+</div>
 
+<div id="indexesComponents" class="container-fluid">
+
+  <div class="indexer-main">
     <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
 
     <%actionbar:render>

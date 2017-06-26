@@ -61,6 +61,7 @@ module.exports = function(grunt) {
           'apps/hbase/src/hbase/static/hbase/css/hbase.css': 'apps/hbase/src/hbase/static/hbase/less/hbase.less',
           'apps/security/src/security/static/security/css/security.css': 'apps/security/src/security/static/security/less/security.less',
           'apps/sqoop/src/sqoop/static/sqoop/css/sqoop.css': 'apps/sqoop/src/sqoop/static/sqoop/less/sqoop.less',
+          'desktop/libs/indexer/src/indexer/static/indexer/css/indexes.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/indexes.less',
         }
       }
     },
