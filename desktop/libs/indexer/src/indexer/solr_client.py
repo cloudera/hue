@@ -30,8 +30,7 @@ from libsentry.conf import is_enabled as is_sentry_enabled
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from indexer.conf import CORE_INSTANCE_DIR
-from indexer.controller import get_solr_ensemble
+from indexer.conf import CORE_INSTANCE_DIR, get_solr_ensemble
 from indexer.utils import copy_configs
 
 
@@ -113,7 +112,7 @@ class SolrClient(object):
           'stored': field.get('stored', True)
         } for field in fields
       ]
-      if self.is_solr_six():
+      if self.is_solr_six_or_more():
         self.api.add_fields(name, fields)
     else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)

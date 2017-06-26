@@ -595,9 +595,10 @@
       For more information about this and other Spatial fields new to Solr 4, see:
       http://wiki.apache.org/solr/SolrAdaptersForLuceneSpatial4
     -->
+    <!--
     <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
         geo="true" distErrPct="0.025" maxDistErr="0.000009" units="degrees" />
-
+    -->
    <!-- Money/currency field type. See http://wiki.apache.org/solr/MoneyFieldType
         Parameters:
           defaultCurrency: Specifies the default currency if none specified. Defaults to "USD"
@@ -928,6 +929,7 @@
     </fieldType>
     
     <!-- Thai -->
+    <!--
     <fieldType name="text_th" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -936,7 +938,7 @@
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_th.txt" enablePositionIncrements="true"/>
       </analyzer>
     </fieldType>
-    
+     -->
     <!-- Turkish -->
     <fieldType name="text_tr" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
