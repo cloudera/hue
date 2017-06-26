@@ -199,12 +199,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
-      <div class="assist-actions table-actions" style="opacity: 0">
+      <div class="assist-actions table-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }">
-        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView, 'fa-table': definition.isTable }"></i>
+        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView && !navigationSettings.rightAssist, 'fa-table': definition.isTable && !navigationSettings.rightAssist }"></i>
         <span class="highlightable" data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </a>
       <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
@@ -214,16 +214,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
   <script type="text/html" id="assist-column-entry">
     <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn || definition.isComplex }">
-      <div class="assist-actions column-actions" style="opacity: 0">
+      <div class="assist-actions column-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
       </div>
       <!-- ko if: expandable -->
-      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }">
+      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: definition.primary_key === 'true' --> <i class="fa fa-key"></i><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }">
+      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key === 'true'  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
@@ -1868,12 +1868,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
             <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry' } --><!-- /ko -->
           </ul>
-##
-##           <ul class="assist-active-tables" data-bind="foreach: activeTables">
-##             <li data-bind="event: { mouseover: function (data, event) { showContextPopoverDelayed(data, event, 'left'); }, mouseout: clearContextPopoverDelay },">
-##               <a class="inactive-action-dark" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }, text: database.name + '.' + name"></a>
-##             </li>
-##           </ul>
           <!-- /ko -->
         </div>
 
@@ -1956,7 +1950,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           showTables: ko.observable(true)
         };
         var navigationSettings = {
-          showStats: true
+          showStats: true,
+          rightAssist: true
         };
         var i18n = {};
 
