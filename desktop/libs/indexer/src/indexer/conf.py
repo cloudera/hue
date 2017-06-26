@@ -22,16 +22,15 @@ from urlparse import urlparse
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config
-from libsolr.conf import SOLR_ZK_PATH
-from libzookeeper.conf import ENSEMBLE
+from libsolr import conf as libsolr_conf
+from libzookeeper import conf as libzookeeper_conf
 
 
 LOG = logging.getLogger(__name__)
 
 
 def get_solr_ensemble():  
-  return '%s%s' % (ENSEMBLE.get(), SOLR_ZK_PATH.get())
-  #return '%s%s' % ('localhost:9983', '')
+  return '%s%s' % (libzookeeper_conf.ENSEMBLE.get(), libsolr_conf.SOLR_ZK_PATH.get())
 
 
 def solrctl():
