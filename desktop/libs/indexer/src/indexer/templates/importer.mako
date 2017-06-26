@@ -870,7 +870,7 @@ ${ assist.assistPanel() }
       <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
     <!-- /ko -->
 
-    <div data-bind="template: { name:'field-column-example' }"></div>
+    <div class="inline-block" data-bind="template: { name:'field-column-example' }"></div>
 
     <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
       <div class="operation" data-bind="template: { name: 'table-field-template', foreach: nested }"></div>
@@ -904,6 +904,8 @@ ${ assist.assistPanel() }
   <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation, visible: $root.createWizard.destination.indexerRunJob" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
   <!-- /ko -->
 
+  <div class="inline-block" data-bind="template: { name: 'field-column-example' }"></div>
+
   <div data-bind="foreach: operations">
     <div data-bind="template: { name:'operation-template',data:{operation: $data, list: $parent.operations}}"></div>
   </div>
@@ -912,7 +914,6 @@ ${ assist.assistPanel() }
   <a class="pointer" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation to')} <span data-bind="text: name"></span></a>
   <!-- /ko -->
 
-  <span data-bind="template: { name: 'field-column-example' }"></span>
 </script>
 
 
