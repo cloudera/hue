@@ -270,7 +270,7 @@ class WebHdfs(Hdfs):
 
   def _ensure_current_trash_directory(self, path):
     """Create trash directory for a user if it doesn't exist."""
-    if self.exists(self.current_trash_path(path)):
+    if not self.exists(self.current_trash_path(path)):
       self.mkdir(self.current_trash_path(path))
     return self.current_trash_path(path)
 
