@@ -23,8 +23,9 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
-
+%endif
 
 <script type="text/html" id="indexes-breadcrumbs">
   <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
@@ -43,7 +44,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
   </ul>
 </script>
 
-<div class="container-fluid">
+<div id="indexesComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${ _('Index Browser') }</h1>
 
@@ -76,6 +77,25 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
     <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
   </div>
+  <div class="hueOverlay" data-bind="visible: isLoading">
+    <i class="fa fa-spinner fa-spin big-spinner"></i>
+  </div>
+
+
+  <div id="deleteIndex" class="modal hide fade">
+    <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
+      ${ csrf_token(request) | n,unicode }
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+        <h2 id="deleteIndexMessage" class="modal-title">${ _('Delete the selected index(es)?') }</h2>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+        <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+      </div>
+    </form>
+  </div>
+
 </div>
 
 
@@ -284,26 +304,6 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 </script>
 
 
-<div class="hueOverlay" data-bind="visible: isLoading">
-  <i class="fa fa-spinner fa-spin big-spinner"></i>
-</div>
-
-
-<div id="deleteIndex" class="modal hide fade">
-  <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
-    ${ csrf_token(request) | n,unicode }
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 id="deleteIndexMessage" class="modal-title">${ _('Delete the selected index(es)?') }</h2>
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
-      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
-    </div>
-  </form>
-</div>
-
-
 
 <script type="text/javascript">
 
@@ -470,10 +470,12 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 
   $(document).ready(function () {
     viewModel = new Editor();
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $('#indexesComponents')[0]);
 
     viewModel.fetchIndexes();
   });
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif
