@@ -38,8 +38,10 @@ def install_examples(request):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      search_setup.Command().handle_noargs()
-      indexer_setup.Command().handle_noargs()
+      data = request.POST['data']
+      if 'log_analytics_demo' == data: # Hue documents installed only one time
+        search_setup.Command().handle_noargs()
+      indexer_setup.Command().handle(data=data)
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)
