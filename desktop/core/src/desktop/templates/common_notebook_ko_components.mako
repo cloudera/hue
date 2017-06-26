@@ -15,11 +15,14 @@
 ## limitations under the License.
 
 <%!
+import logging
 from django.utils.translation import ugettext as _
 
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
+
+LOG = logging.getLogger(__name__)
 
 try:
   from beeswax.conf import DOWNLOAD_ROW_LIMIT
