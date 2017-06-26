@@ -27,6 +27,7 @@ from hadoop import cluster
 
 from useradmin.models import install_sample_user
 from indexer import utils, controller
+from indexer.solr_client import SolrClient
 
 
 LOG = logging.getLogger(__name__)
@@ -74,28 +75,23 @@ class Command(NoArgsCommand):
     }, path)
     LOG.info(_("Logs collection successfully installed"))
 
+
   def _setup_collection_from_csv(self, collection, path, separator=',', quote_character='"'):
     if not self.searcher.collection_exists(collection['name']):
       self.searcher.create_collection(collection['name'], collection['fields'], collection['uniqueKeyField'], collection['df'])
 
-    try:
-      hdfs_path = '/tmp/%s' % uuid.uuid4()
+    with open(path) as fh:
+      client = SolrClient(self.user)
 
-      with open(path) as fh:
-        self.fs.do_as_user(self.user.username, self.fs.create, hdfs_path, data=fh.read())
-
-      self.searcher.update_data_from_hdfs(
-          self.fs,
-          collection['name'],
-          collection['fields'],
-          hdfs_path,
-          'separated',
-          separator=separator,
-          quote_character=quote_character
+      collection = client.create_index(
+          name=collection['name'],
+          fields=collection['fields'],
+          unique_key_field=collection['uniqueKeyField'],
+          df=collection['df']
       )
-    finally:
-      if self.fs.do_as_user(self.user.username, self.fs.exists, hdfs_path):
-        self.fs.do_as_user(self.user.username, self.fs.remove, hdfs_path, skip_trash=True)
+      
+      client.index(collection['name'], fh.read())
+
 
   def _parse_fields(self, path, separator=',', quote_character='"', fieldtypes={}):
     with open(path) as fh:
