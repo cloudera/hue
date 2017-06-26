@@ -31,7 +31,7 @@ from libsolr.api import SolrApi
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from indexer.conf import CORE_INSTANCE_DIR, get_solr_ensemble
+from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
 from indexer.solr_client import SolrClient
 
@@ -141,10 +141,10 @@ class CollectionManagerController(object):
       self._create_non_solr_cloud_collection(name, fields, unique_key_field, df)
 
   def _create_solr_cloud_collection(self, name, fields, unique_key_field, df):
-    with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
-      root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+    client = SolrClient(self.user)
 
-      client = SolrClient(self.user)
+    with ZookeeperClient(hosts=client.get_zookeeper_host(), read_only=False) as zc:
+      root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
 
       tmp_path, solr_config_path = copy_configs(
           fields=fields,
@@ -200,6 +200,8 @@ class CollectionManagerController(object):
     Delete solr collection/core and instance dir
     """
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+    client = SolrClient(self.user)
+
     if core:
       raise PopupException(_('Cannot remove Solr cores.'))
 
@@ -207,7 +209,7 @@ class CollectionManagerController(object):
       # Delete instance directory.
       try:
         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-        with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+        with ZookeeperClient(hosts=client.get_zookeeper_host(), read_only=False) as zc:
           zc.delete_path(root_node)
       except Exception, e:
         # Re-create collection so that we don't have an orphan config

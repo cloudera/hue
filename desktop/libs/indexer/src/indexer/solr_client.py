@@ -45,6 +45,7 @@ ZK_SOLR_CONFIG_NAMESPACE = 'configs'
 _IS_SOLR_CLOUD = None
 _IS_SOLR_6_OR_MORE = None
 _IS_SOLR_WITH_HDFS = None
+_ZOOKEEPER_HOST = None
 
 
 class SolrClientException(Exception):
@@ -53,20 +54,9 @@ class SolrClientException(Exception):
 
 class SolrClient(object):
 
-  def __init__(self, user):
+  def __init__(self, user, api=None):
     self.user = user
-    self.api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
-
-  def _fillup_properties(self):
-    global _IS_SOLR_CLOUD
-    global _IS_SOLR_6_OR_MORE
-    global _IS_SOLR_WITH_HDFS
-
-    properties = self.api.info_system()
-
-    _IS_SOLR_CLOUD = properties.get('mode', 'solrcloud') == 'solrcloud'
-    _IS_SOLR_6_OR_MORE = not str(properties.get('lucene', {}).get('solr-spec-version')).startswith('4.')
-    _IS_SOLR_WITH_HDFS = 'solr.hdfs.home' in str(properties.get('jvm', {}).get('jmx'))
+    self.api = api if api is not None else SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
 
 
   def get_indexes(self, include_cores=False):
@@ -127,7 +117,7 @@ class SolrClient(object):
 
 
   def _create_cloud_config(self, name, fields, unique_key_field, df):
-    with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+    with ZookeeperClient(hosts=self.get_zookeeper_host(), read_only=False) as zc:
       tmp_path, solr_config_path = copy_configs(
           fields=fields,
           unique_key_field=unique_key_field,
@@ -185,7 +175,7 @@ class SolrClient(object):
       if not keep_config:
         try:
           root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-          with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+          with ZookeeperClient(hosts=self.get_zookeeper_host(), read_only=False) as zc:
             zc.delete_path(root_node)
         except Exception, e:
           # Re-create collection so that we don't have an orphan config
@@ -237,6 +227,45 @@ class SolrClient(object):
       self._fillup_properties()
 
     return _IS_SOLR_WITH_HDFS
+
+
+  def get_zookeeper_host(self):
+    global _ZOOKEEPER_HOST
+
+    if _ZOOKEEPER_HOST is None:
+      self._fillup_properties()
+
+    return _ZOOKEEPER_HOST
+
+
+  def _fillup_properties(self):
+    global _IS_SOLR_CLOUD
+    global _IS_SOLR_6_OR_MORE
+    global _IS_SOLR_WITH_HDFS
+    global _ZOOKEEPER_HOST
+
+    properties = self.api.info_system()
+
+    _IS_SOLR_CLOUD = properties.get('mode', 'solrcloud') == 'solrcloud'
+    _IS_SOLR_6_OR_MORE = not str(properties.get('lucene', {}).get('solr-spec-version')).startswith('4.')
+    _IS_SOLR_WITH_HDFS = False
+    _ZOOKEEPER_HOST = properties.get('zkHost', get_solr_ensemble())
+
+    command_line_args = properties.get('jvm', {}).get('jmx', {}).get('commandLineArgs', [])
+    for command_line_arg in command_line_args:
+      if not _IS_SOLR_WITH_HDFS and 'solr.hdfs.home' in command_line_arg:
+        _IS_SOLR_WITH_HDFS = True
+      if '-DzkHost=' in command_line_arg:
+        _ZOOKEEPER_HOST = command_line_arg.split('-DzkHost=', 1)[1]
+
+
+  def _reset_properties(self):
+    global _IS_SOLR_CLOUD
+    global _IS_SOLR_6_OR_MORE
+    global _IS_SOLR_WITH_HDFS
+    global _ZOOKEEPER_HOST
+
+    _IS_SOLR_CLOUD = _IS_SOLR_6_OR_MORE = _IS_SOLR_6_OR_MORE = _IS_SOLR_WITH_HDFS = _ZOOKEEPER_HOST = None
 
 
   # Used by morphline indexer
