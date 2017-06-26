@@ -20,6 +20,7 @@ from __future__ import absolute_import
 import inspect
 import json
 import logging
+import mimetypes
 import os.path
 import re
 import tempfile
@@ -99,8 +100,10 @@ class ExceptionMiddleware(object):
         response.status_code = getattr(exception, 'error_code', 500)
         return response
       else:
-        response = render("error.mako", request,
-                      dict(error=exception.response_data.get("message")))
+        response = render("error.mako", request, {
+          'error': exception.response_data.get("message"),
+          'is_embeddable': request.GET.get('is_embeddable', False),
+        })
         response.status_code = getattr(exception, 'error_code', 500)
         return response
 
@@ -305,7 +308,7 @@ class LoginAndPermissionMiddleware(object):
         app_accessed = ui_app_accessed
 
       if app_accessed and \
-          app_accessed not in ("desktop", "home", "home2", "about", "notebook") and \
+          app_accessed not in ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500") and \
           not (request.user.has_hue_permission(action="access", app=app_accessed) or
                request.user.has_hue_permission(action=access_view, app=app_accessed)):
         access_log(request, 'permission denied', level=access_log_level)
@@ -646,7 +649,10 @@ class EnsureSafeRedirectURLMiddleware(object):
       if is_safe_url(location, request.get_host()):
         return response
 
-      response = render("error.mako", request, dict(error=_('Redirect to %s is not allowed.') % response['Location']))
+      response = render("error.mako", request, {
+        'error': _('Redirect to %s is not allowed.') % response['Location'],
+        'is_embeddable': request.GET.get('is_embeddable', False),
+      })
       response.status_code = 403
       return response
     else:
@@ -683,4 +689,22 @@ class ContentSecurityPolicyMiddleware(object):
     if self.secure_content_security_policy and not 'Content-Security-Policy' in response:
       response["Content-Security-Policy"] = self.secure_content_security_policy
 
+    return response
+
+
+class MimeTypeJSFileFixStreamingMiddleware(object):
+  """
+  Middleware to detect and fix ".js" mimetype. SLES 11SP4 as example OS which detect js file
+  as "text/x-js" and if strict X-Content-Type-Options=nosniff is set then browser fails to
+  execute javascript file.
+  """
+  def __init__(self):
+    jsmimetypes = ['application/javascript', 'application/ecmascript']
+    if mimetypes.guess_type("dummy.js")[0] in jsmimetypes:
+      LOG.info('Unloading MimeTypeJSFileFixStreamingMiddleware')
+      raise exceptions.MiddlewareNotUsed
+
+  def process_response(self, request, response):
+    if request.path_info.endswith('.js'):
+      response['Content-Type'] = "application/javascript"
     return response

@@ -27,7 +27,7 @@ from desktop.views import _ko
 
   <style>
     .config-property {
-      display: inline-block;
+      display: block;
       vertical-align: top;
       margin-bottom: 20px;
       position: relative;
@@ -39,7 +39,6 @@ from desktop.views import _ko
       margin: 4px 10px;
       float:left;
       text-align: right;
-      cursor: default;
     }
 
     .config-controls {
@@ -63,17 +62,6 @@ from desktop.views import _ko
       color: #888;
     }
 
-    .selectize-wrapper {
-      display: inline-block;
-      float:left;
-      margin-right: 4px;
-    }
-
-    .selectize-input {
-      padding-top: 6px !important;
-      padding-bottom: 5px !important;
-    }
-
     .config-actions {
       display: inline-block;
       font-size: 13px;
@@ -86,6 +74,11 @@ from desktop.views import _ko
   <script type="text/html" id="property-selector-template">
     <!-- ko foreach: selectedProperties -->
     <div>
+      <div class="config-property-remove">
+        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
+          <i class="fa fa-times"></i>
+        </a>
+      </div>
       <!-- ko template: {
         name: 'property',
         data: {
@@ -97,11 +90,6 @@ from desktop.views import _ko
           visibleObservable: $parent.visibleObservable
         }
       } --><!-- /ko -->
-      <div class="config-property-remove">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { $parent.removeProperty($data) }" title="${ _('Remove') }">
-          <i class="fa fa-times"></i>
-        </a>
-      </div>
     </div>
     <!-- /ko -->
     <div class="config-property-available margin-left-10" data-bind="visible: availableProperties().length > 0">
@@ -133,7 +121,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       function MultiGroupAlternative(alt, params, initiallyChecked) {
         var self = this;
@@ -224,7 +212,7 @@ from desktop.views import _ko
     })();
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function PropertySelectorViewModel(params) {
@@ -308,7 +296,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="property">
     <div class="config-property" data-bind="visibleOnHover: { selector: '.hover-actions' }">
-      <label class="config-label">
+      <label class="config-label" data-bind="click: function(data, event){ $(event.target).siblings('.config-controls').find('.config-property-add-value a').click(); }">
         <!-- ko text: label --><!-- /ko --><!-- ko if: typeof helpText !== 'undefined' --><div class="property-help" data-bind="tooltip: { title: helpText(), placement: 'bottom' }"><i class="fa fa-question-circle-o"></i></div><!-- /ko -->
       </label>
       <div class="config-controls">
@@ -360,19 +348,6 @@ from desktop.views import _ko
     <div data-bind="component: { name: 'csv-list-input', params: { value: value, inputTemplate: 'property-hdfs-file', placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
   </script>
 
-  <div id="chooseFile" class="modal hide fade">
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
-    </div>
-    <div class="modal-body">
-      <div id="filechooser">
-      </div>
-    </div>
-    <div class="modal-footer">
-    </div>
-  </div>
-
   <script type="text/html" id="property-hdfs-file">
     <div class="input-append">
       <input type="text" style="min-width: 300px" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
@@ -387,7 +362,7 @@ from desktop.views import _ko
     <input type="text" class="input-small" data-bind="numericTextInput: { value: value, precision: 0, allowEmpty: true }" /> <select class="input-mini" data-bind="options: units, value: selectedUnit" />
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       var JVM_MEM_PATTERN = /([0-9]+)([MG])$/;
       var UNITS = {'MB': 'M', 'GB': 'G'};
@@ -427,8 +402,8 @@ from desktop.views import _ko
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li style="clear:both;">
         <!-- ko if: $parent.options.length > 0 -->
-        <div class="selectize-wrapper" style="min-width: 200px;">
-          <select placeholder="${ _('Key') }" data-bind="selectize: $parent.options, value: key, options: $parent.options, optionsText: 'value', optionsValue: 'value'"></select>
+        <div class="selectize-wrapper" style="width: 200px;">
+          <select placeholder="${ _('Key') }" data-bind="selectize: $parent.options, selectizeOptions: {create: true}, value: key, options: $parent.options, optionsText: 'value', optionsValue: 'value'"></select>
         </div>
         <!-- /ko -->
         <div class="input-append" style="margin-bottom: 4px">
@@ -441,14 +416,15 @@ from desktop.views import _ko
         </div>
       </li>
     </ul>
-    <div class="config-property-add-value" style="margin-top: 5px;">
+    <div class="config-property-add-value" style="margin-top: 5px; float: left">
       <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
     </div>
+    <div class="clearfix"></div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function KeyValueListInputViewModel(params) {
@@ -520,7 +496,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function NameValueListInputViewModel(params) {
@@ -585,7 +561,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function FunctionListInputViewModel(params) {
@@ -625,7 +601,7 @@ from desktop.views import _ko
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: values().length" class="unstyled">
       <li>
         <div class="input-append" style="margin-bottom: 4px">
-          <input type="text" class="filechooser-input" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+          <input type="text" class="filechooser-input input-xxlarge" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
           <span class="add-on move-widget muted" data-bind="visible: $parent.values().length > 1"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
@@ -638,7 +614,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       var identifyType = function (path) {
@@ -717,7 +693,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       function CsvListInputViewModel(params) {
         this.valueObservable = params.value;

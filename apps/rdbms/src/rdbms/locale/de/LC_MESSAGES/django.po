@@ -1,14 +1,14 @@
 # German translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/rdbms/api.py:138 src/rdbms/api.py:183 src/rdbms/api.py:266
+#: src/rdbms/api.py:139 src/rdbms/api.py:184 src/rdbms/api.py:267
 msgid "A POST request is required."
 msgstr "Eine POST-Anforderung ist erforderlich."
 
-#: src/rdbms/api.py:170 src/rdbms/api.py:208
+#: src/rdbms/api.py:171 src/rdbms/api.py:209
 msgid "There was an error with your query."
 msgstr "Bei Ihrer Anfrage ist ein Fehler aufgetreten."
 
-#: src/rdbms/api.py:293
+#: src/rdbms/api.py:294
 msgid "A GET request is required."
 msgstr "Eine GET-Anforderung ist erforderlich."
 
-#: src/rdbms/api.py:334
+#: src/rdbms/api.py:335
 msgid "Server specified doesn't exist."
 msgstr "Der angegebene Server ist nicht vorhanden."
 
-#: src/rdbms/api.py:340
+#: src/rdbms/api.py:341
 msgid "No databases are available. Permissions could be missing."
 msgstr "Keine Datenbanken verfügbar. Möglicherweise fehlen Berechtigungen."
 
@@ -45,6 +45,10 @@ msgstr "Abfrage-Editor"
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr "Ungültiger Designtyp %(type)s"
+
+#: src/rdbms/templates/common.mako:26
+msgid "DBQuery icon"
+msgstr "DBQuery-Symbol"
 
 #: src/rdbms/templates/common.mako:27
 msgid "DB Query"
@@ -71,8 +75,12 @@ msgid "There are currently no databases configured."
 msgstr "Derzeit sind keine Datenbanken konfiguriert."
 
 #: src/rdbms/templates/error.mako:35
-msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
-msgstr "Rufen Sie Ihre Hue-Konfiguration auf und fügen Sie eine Datenbank unter dem Abschnitt \"rdbms\" hinzu."
+msgid ""
+"Please go to your Hue configuration and add a database under the "
+"\"rdbms\" section."
+msgstr ""
+"Rufen Sie Ihre Hue-Konfiguration auf und fügen Sie eine Datenbank unter "
+"dem Abschnitt \"rdbms\" hinzu."
 
 #: src/rdbms/templates/execute.mako:32
 msgid "Assist"
@@ -80,7 +88,9 @@ msgstr "Unterstützung"
 
 #: src/rdbms/templates/execute.mako:39
 msgid "Double click on a table name or field to insert it in the editor"
-msgstr "Auf einen Tabellennamen oder ein Feld doppelklicken, der/das in den Editor eingefügt werden soll"
+msgstr ""
+"Auf einen Tabellennamen oder ein Feld doppelklicken, der/das in den "
+"Editor eingefügt werden soll"
 
 #: src/rdbms/templates/execute.mako:40
 msgid "Manually refresh the table list"
@@ -92,7 +102,7 @@ msgstr "Server"
 
 #: src/rdbms/templates/execute.mako:46 src/rdbms/templates/execute.mako:52
 msgid "Choose a database..."
-msgstr "Datenbank auswählen.."
+msgstr "Datenbank auswählen..."
 
 #: src/rdbms/templates/execute.mako:49
 msgid "database"
@@ -106,110 +116,110 @@ msgstr "Tabellenname..."
 msgid "The selected database has no tables."
 msgstr "Die ausgewählte Datenbank enthält keine Tabellen."
 
-#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:821
+#: src/rdbms/templates/execute.mako:95 src/rdbms/templates/execute.mako:815
 msgid "Query name"
 msgstr "Abfragename"
 
-#: src/rdbms/templates/execute.mako:104
+#: src/rdbms/templates/execute.mako:103
 msgid "Query description"
 msgstr "Abfragebeschreibung"
 
-#: src/rdbms/templates/execute.mako:115
+#: src/rdbms/templates/execute.mako:114
 msgid "Your query has the following error(s):"
 msgstr "Ihre Abfrage enthält folgende(n) Fehler:"
 
-#: src/rdbms/templates/execute.mako:124
+#: src/rdbms/templates/execute.mako:123
 msgid "Execute"
 msgstr "Ausführen"
 
-#: src/rdbms/templates/execute.mako:125 src/rdbms/templates/execute.mako:199
+#: src/rdbms/templates/execute.mako:124 src/rdbms/templates/execute.mako:196
 msgid "Save"
 msgstr "Speichern"
 
-#: src/rdbms/templates/execute.mako:126
+#: src/rdbms/templates/execute.mako:125
 msgid "Save as..."
 msgstr "Speichern unter..."
 
-#: src/rdbms/templates/execute.mako:127
+#: src/rdbms/templates/execute.mako:126
 msgid "Explain"
 msgstr "Erklären"
 
-#: src/rdbms/templates/execute.mako:128
+#: src/rdbms/templates/execute.mako:127
 msgid "or create a"
 msgstr "oder erstellen Sie eine"
 
-#: src/rdbms/templates/execute.mako:128
+#: src/rdbms/templates/execute.mako:127
 msgid "New query"
 msgstr "Neue Abfrage"
 
-#: src/rdbms/templates/execute.mako:154
+#: src/rdbms/templates/execute.mako:152
 msgid "The server returned no results."
 msgstr "Vom Server wurden keine Ergebnisse ausgegeben."
 
-#: src/rdbms/templates/execute.mako:179
+#: src/rdbms/templates/execute.mako:175
+msgid "Close"
+msgstr "Schließen"
+
+#: src/rdbms/templates/execute.mako:176
 msgid "Save your query"
 msgstr "Abfrage speichern"
 
-#: src/rdbms/templates/execute.mako:184
+#: src/rdbms/templates/execute.mako:181
 msgid "Name"
 msgstr "Name"
 
-#: src/rdbms/templates/execute.mako:190
+#: src/rdbms/templates/execute.mako:187
 msgid "Description"
 msgstr "Beschreibung"
 
-#: src/rdbms/templates/execute.mako:198
+#: src/rdbms/templates/execute.mako:195
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/rdbms/templates/execute.mako:395
+#: src/rdbms/templates/execute.mako:389
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "Beispiel: \"SELECT * FROM Tabellenname\", oder STRG + Leerzeichen drücken"
 
-#: src/rdbms/templates/execute.mako:584
+#: src/rdbms/templates/execute.mako:578
 msgid "Did you know?"
 msgstr "Wussten Sie schon?"
 
-#: src/rdbms/templates/execute.mako:670
+#: src/rdbms/templates/execute.mako:664
 msgid "No query provided to save."
 msgstr "Keine zu speichernde Abfrage angegeben."
 
-#: src/rdbms/templates/execute.mako:692
+#: src/rdbms/templates/execute.mako:686
 msgid "Oops, no server found!"
 msgstr "Kein Server gefunden!"
 
-#: src/rdbms/templates/execute.mako:698
+#: src/rdbms/templates/execute.mako:692
 msgid "Oops, no database found!"
 msgstr "Keine Datenbank gefunden!"
 
-#: src/rdbms/templates/execute.mako:815
+#: src/rdbms/templates/execute.mako:809
 msgid "This field is required."
 msgstr "Dieses Feld ist erforderlich."
 
-#: src/rdbms/templates/execute.mako:828
+#: src/rdbms/templates/execute.mako:822
 msgid "Empty description"
 msgstr "Leere Beschreibung"
 
-#: src/rdbms/templates/execute.mako:834
+#: src/rdbms/templates/execute.mako:828
 msgid "Query saved successfully!"
 msgstr "Abfrage erfolgreich gespeichert!"
 
-#: src/rdbms/templates/execute.mako:880
+#: src/rdbms/templates/execute.mako:874
 msgid "No data available"
 msgstr "Keine Daten verfügbar"
 
-#: src/rdbms/templates/execute.mako:881
+#: src/rdbms/templates/execute.mako:875
 msgid "No matching records"
 msgstr "Keine übereinstimmenden Datensätze"
 
-#: src/rdbms/templates/execute.mako:919
+#: src/rdbms/templates/execute.mako:913
 msgid "Server error occured: "
 msgstr "Serverfehler aufgetreten: "
 
-#: src/rdbms/templates/execute.mako:922
+#: src/rdbms/templates/execute.mako:916
 msgid "Unmanageable server error occured: "
 msgstr "Unlösbarer Serverfehler: "
-
-#~ msgid "Share"
-#~ msgstr "Freigeben"
-

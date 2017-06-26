@@ -22,8 +22,8 @@
 <%namespace name="utils" file="utils.inc.mako" />
 
 
-<%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None)">
-    <div class="navbar navbar-inverse navbar-fixed-top">
+<%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None, is_embeddable=False)">
+    <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">
           %if pullright:
@@ -31,7 +31,15 @@
           %endif
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
+                <%def name="getInterpreter(section)"><%
+                  if section == 'coordinators':
+                    return 'oozie-coordinator'
+                  elif section == 'bundles':
+                    return 'oozie-bundle'
+                  else:
+                    return 'oozie-workflow'
+                %></%def>
                 <%def name="getURL(section, dashboard, is_v2)">
                 <%
                   if dashboard:
@@ -61,12 +69,14 @@
 
                 % if dashboard:
                 <a title="${ _('Switch to the editor') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
-                  <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" /> ${ _('Oozie Dashboard') }
-                % else:
-                <a title="${ _('Switch to the dashboard') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
-                  <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Oozie Editor') }
-                % endif
+                  <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" alt="${ _('Oozie dashboard icon') }" /> ${ _('Oozie Dashboard') }
                 </a>
+                % else:
+                <a title="${ _('Switch to the dashboard') }" href="${ is_embeddable and '/hue/jobbrowser/#!workflows' or getURL(section, dashboard, ENABLE_V2.get())}">
+                  <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie"></use></svg> ${ _('Oozie Editor') }
+                  <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'scheduler', interpreter: '${ getInterpreter(section) }' }} --><!-- /ko -->
+                </a>
+                % endif
                </li>
               % if dashboard:
                 <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_oozie_workflows')}">${ _('Workflows') }</a></li>
@@ -76,9 +86,27 @@
                 <li class="${utils.is_selected(section, 'oozie')}"><a href="${url('oozie:list_oozie_info')}">${ _('Oozie') }</a></li>
               % else:
                 % if is_editor:
-                  <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_editor_workflows')}">${ _('Workflows') }</a></li>
-                  <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_editor_coordinators')}">${ _('Coordinators') }</a></li>
-                  <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_editor_bundles')}">${ _('Bundles') }</a></li>
+                  <li class="${utils.is_selected(section, 'workflows')}">
+                    % if is_embeddable:
+                    <a href="/home?type=oozie-workflow2">${ _('Workflows') }</a>
+                    % else:
+                    <a href="${url('oozie:list_editor_workflows')}">${ _('Workflows') }</a>
+                    % endif
+                  </li>
+                  <li class="${utils.is_selected(section, 'coordinators')}">
+                    % if is_embeddable:
+                    <a href="/home?type=oozie-coordinator2">${ _('Coordinators') }</a>
+                    % else:
+                    <a href="${url('oozie:list_editor_coordinators')}">${ _('Coordinators') }</a>
+                    % endif
+                  </li>
+                  <li class="${utils.is_selected(section, 'bundles')}">
+                    % if is_embeddable:
+                    <a href="/home?type=oozie-bundle2">${ _('Bundles') }</a>
+                    % else:
+                    <a href="${url('oozie:list_editor_bundles')}">${ _('Bundles') }</a>
+                    % endif
+                  </li>
                 % else:
                   <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
                   <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>

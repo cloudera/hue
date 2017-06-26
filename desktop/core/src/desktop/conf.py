@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+## -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -21,6 +22,11 @@ import os
 import socket
 import stat
 
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
+
 from django.utils.translation import ugettext_lazy as _
 
 from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
@@ -29,7 +35,7 @@ from desktop.redaction.engine import parse_redaction_policy_from_file
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
                              validate_path, list_of_compiled_res, coerce_str_lowercase, \
-                             coerce_password_from_script
+                             coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
@@ -55,7 +61,7 @@ def coerce_port(port):
     port = int(port)
     if port == 0:
       port = ''
-  except ValueError, e:
+  except ValueError:
     port = ''
   return port
 
@@ -69,12 +75,24 @@ def coerce_file(path):
 def coerce_timedelta(value):
   return datetime.timedelta(seconds=int(value))
 
-def get_dn():
+def get_dn(fqdn=None):
   """This function returns fqdn(if possible)"""
   val = []
   LOG = logging.getLogger(__name__)
   try:
-    val.append(socket.getfqdn())
+    if fqdn is None:
+      fqdn = socket.getfqdn()
+
+    if '.' in fqdn:
+      tups = fqdn.split('.')
+      if len(tups) > 2:
+        val.append(".%s" % ('.'.join(tups[-2:])))
+      else:
+        LOG.warning("allowed_hosts value to '*'. It is a security risk")
+        val.append('*')
+    else:
+      LOG.warning("allowed_hosts value to '*'. It is a security risk")
+      val.append('*')
   except:
     LOG.warning("allowed_hosts value to '*'. It is a security risk")
     val.append('*')
@@ -85,6 +103,18 @@ def coerce_positive_integer(integer):
 
   if integer <= 0:
     raise Exception('integer is not positive')
+
+  return integer
+
+def is_lb_enabled():
+  """Check for Hue Load Balancer is available"""
+  return bool(HUE_LOAD_BALANCER.get())
+
+def coerce_zero_or_positive_integer(integer):
+  integer = int(integer)
+
+  if integer < 0:
+    raise Exception('integer is negative')
 
   return integer
 
@@ -110,6 +140,13 @@ HTTP_ALLOWED_METHODS = Config(
   type=coerce_csv,
   private=True,
   default=['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT'])
+
+HUE_LOAD_BALANCER = Config(
+  key="hue_load_balancer",
+  help=_("A comma-separated list of available Hue load balancers."),
+  type=coerce_csv,
+  default=[]
+)
 
 X_FRAME_OPTIONS = Config(
   key="http_x_frame_options",
@@ -208,11 +245,11 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   key="secure_content_security_policy",
   help=_('X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.'),
   type=str,
-  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net *.mathjax.org data:;"+
+  default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net data:;"+
           "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
-          "style-src 'self' 'unsafe-inline';"+
+          "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
           "connect-src 'self';"+
-          "child-src 'self' data:;"+
+          "child-src 'self' data: *.vimeo.com;"+
           "object-src 'none'")
 
 SECURE_SSL_REDIRECT = Config(
@@ -373,7 +410,7 @@ USE_X_FORWARDED_HOST = Config(
   key="use_x_forwarded_host",
   help=_("Enable X-Forwarded-Host header if the load balancer requires it."),
   type=coerce_bool,
-  default=False)
+  dynamic_default=is_lb_enabled)
 
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
@@ -387,6 +424,12 @@ APP_BLACKLIST = Config(
   type=coerce_csv,
   help=_('Comma separated list of apps to not load at server startup.')
 )
+
+CLUSTER_ID = Config(
+  key="cluster_id",
+  help=_("Id of the cluster where Hue is located."),
+  private=False,
+  default='default')
 
 DEMO_ENABLED = Config( # Internal and Temporary
   key="demo_enabled",
@@ -403,10 +446,47 @@ LOG_REDACTION_FILE = Config(
 
 ALLOWED_HOSTS = Config(
   key='allowed_hosts',
-  dynamic_default=get_dn,
+  # dynamic_default=get_dn, # Currently off as pretty disruptive
+  default=['*'],
   type=coerce_csv,
   help=_('Comma separated list of strings representing the host/domain names that the Hue server can serve.')
 )
+
+VCS = UnspecifiedConfigSection(
+  "vcs",
+  help="One entry for each Version Control",
+  each=ConfigSection(
+    help="""Configuration options for source version control used to list and
+            save files from the editor. Example: Git, SVN""",
+    members=dict(
+      REMOTE_URL = Config(
+        key="remote_url",
+        help=_("Base URL to Interface Remote Server"),
+        default='https://github.com/cloudera/hue/tree/master',
+        type=coerce_string,
+      ),
+      API_URL = Config(
+        key="api_url",
+        help=_("Base URL to Interface API"),
+        default='https://api.github.com',
+        type=coerce_string,
+      ),
+      CLIENT_ID = Config(
+        key="client_id",
+        help=_("The Client ID of the Interface application."),
+        type=coerce_string,
+        default=""
+      ),
+      CLIENT_SECRET = Config(
+        key="client_secret",
+        help=_("The Client Secret of the Interface application."),
+        type=coerce_string,
+        default=""
+      )
+    )
+  )
+)
+
 
 def default_secure_cookie():
   """Enable secure cookies if HTTPS is enabled."""
@@ -551,6 +631,12 @@ DATABASE = ConfigSection(
       type=str,
       default='',
     ),
+    SCHEMA=Config(
+      key='schema',
+      help=_('Database schema, to be used only when public schema is revoked in postgres.'),
+      type=str,
+      default='public',
+    ),
     PASSWORD=Config(
       key='password',
       help=_('Database password.'),
@@ -582,6 +668,12 @@ DATABASE = ConfigSection(
       help=_('Database options to send to the server when connecting.'),
       type=coerce_json_dict,
       dynamic_default=default_database_options
+    ),
+    CONN_MAX_AGE=Config(
+      key='conn_max_age',
+      help=_('The CONN_MAX_AGE parameter controls db connections persistency in seconds.'),
+      type=coerce_zero_or_positive_integer,
+      default=0,
     )
   )
 )
@@ -717,6 +809,9 @@ CUSTOM = ConfigSection(
                    default=86400000,
                    type=int,
                    help=_("The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 it disables the cache.")),
+    LOGO_SVG=Config("logo_svg",
+                   default="",
+                   help=_("SVG code to replace the default Hue logo in the top bar and sign in screen")),
 ))
 
 AUTH = ConfigSection(
@@ -794,7 +889,8 @@ AUTH = ConfigSection(
     ),
     LOGIN_COOLOFF_TIME = Config(
       key="login_cooloff_time",
-      help=_("If set, defines period of inactivity in seconds after which failed logins will be forgotten"),
+      help=_("If set, defines period of inactivity in hours after which failed logins will be forgotten."
+             "A value of 0 or None will disable this check. Default: None."),
       type=coerce_timedelta,
       default=None,
     ),
@@ -822,7 +918,7 @@ AUTH = ConfigSection(
       key="behind_reverse_proxy",
       help=_("If True, it will look for the IP address from the header defined at reverse_proxy_header."),
       type=coerce_bool,
-      default=False,
+      dynamic_default=is_lb_enabled,
     ),
     REVERSE_PROXY_HEADER = Config(
       key="reverse_proxy_header",
@@ -928,6 +1024,12 @@ LDAP = ConfigSection(
                                     help=_("Whether or not to follow referrals."),
                                     type=coerce_bool,
                                     default=False),
+          TEST_LDAP_USER=Config("test_ldap_user",
+                           default=None,
+                           help=_("The test user name to use for LDAP search.")),
+          TEST_LDAP_GROUP=Config("test_ldap_group",
+                            default=None,
+                            help=_("The test group name to use for LDAP search.")),
 
           DEBUG = Config("debug",
             type=coerce_bool,
@@ -1011,6 +1113,12 @@ LDAP = ConfigSection(
                    default=True,
                    type=coerce_bool,
                    help=_("Use search bind authentication.")),
+    TEST_LDAP_USER=Config("test_ldap_user",
+                   default=None,
+                   help=_("The test user name to use for LDAP search.")),
+    TEST_LDAP_GROUP=Config("test_ldap_group",
+                   default=None,
+                   help=_("The test group name to use for LDAP search.")),
 
     USERS = ConfigSection(
       key="users",
@@ -1184,18 +1292,18 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
-USE_NEW_AUTOCOMPLETER = Config( # To remove when it's working properly, not supported by old editor
+USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
   key='use_new_autocompleter',
   default=True,
   type=coerce_bool,
-  help=_('Enable the new editor SQL autocompleter')
+  help=_('Enable the improved editor autocomplete dropdown.')
 )
 
 EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   key='editor_autocomplete_timeout',
   type=int,
-  default=5000,
-  help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled')
+  default=30000,
+  help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled.')
 )
 
 USE_NEW_EDITOR = Config( # To remove in Hue 4
@@ -1205,9 +1313,14 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
   help=_('Choose whether to show the new SQL editor.')
 )
 
+def is_hue4():
+  """Hue is configured to show version 4."""
+  return IS_HUE_4.get()
+
+
 USE_NEW_SIDE_PANELS = Config( # To remove in Hue 4
   key='use_new_side_panels',
-  default=False,
+  dynamic_default=is_hue4,
   type=coerce_bool,
   help=_('Choose whether to show extended left and right panels.')
 )
@@ -1219,11 +1332,54 @@ USE_DEFAULT_CONFIGURATION = Config(
   help=_('Enable saved default configurations for Hive, Impala, Spark, and Oozie.')
 )
 
+
 IS_HUE_4 = Config( # To remove in Hue 5
   key='is_hue_4',
-  default=False,
+  default=True,
   type=coerce_bool,
-  help=_('Choose whether to enable the new interface.')
+  help=_('Choose whether to enable the new Hue 4 interface.')
+)
+
+
+def get_clusters():
+  if CLUSTERS.get():
+    cluster_config = CLUSTERS.get()
+    clusters = OrderedDict([
+      (i, {
+        'name': i,
+        'type': cluster_config[i].TYPE.get(),
+        'interfaces': [{'name': i, 'type': cluster_config[i].TYPE.get(), 'interface': interface} for interface in cluster_config[i].INTERFACES.get()]
+      }) for i in cluster_config]
+    )
+  else:
+    clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini', 'interfaces': []})])
+
+  if 'Data Eng' in clusters:
+    clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c1'})
+    clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c2'})
+  return clusters
+
+
+CLUSTERS = UnspecifiedConfigSection(
+  "clusters",
+  help="One entry for each additional cluster Hue can interact with.",
+  each=ConfigSection(
+    help=_("Name of the cluster to show to the user."),
+    members=dict(
+      TYPE=Config(
+          "type",
+          help=_("Type of cluster, e.g. local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
+          default='local',
+          type=str,
+      ),
+      INTERFACES=Config(
+          "interfaces",
+          help=_("List of cluster instances of the cluster (optional)."),
+          default=[],
+          type=coerce_csv,
+      ),
+    )
+  )
 )
 
 
@@ -1351,6 +1507,19 @@ def config_validator(user):
 
   if not _is_oozie_mail_enabled(user):
     res.append(('OOZIE_EMAIL_SERVER', unicode(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
+
+  from notebook.models import make_notebook
+  from notebook.api import _save_notebook
+
+  notebook = make_notebook(name='test', editor_type='hive', statement='select "ทดสอบ"', status='ready')
+  notebook_doc = None
+  try:
+    notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
+  except:
+    res.append(('DATABASE_CHARACTER_SET', unicode(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. </br>'
+                                                    '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
+  if notebook_doc:
+    notebook_doc.delete()
 
   return res
 

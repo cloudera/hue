@@ -131,8 +131,8 @@ urlpatterns += patterns(
   url(r'^list_oozie_workflow_action/(?P<action>[-\w@]+)/$', 'list_oozie_workflow_action', name='list_oozie_workflow_action'),
   url(r'^list_oozie_bundle/(?P<job_id>[-\w]+)$', 'list_oozie_bundle', name='list_oozie_bundle'),
 
-  url(r'^rerun_oozie_job/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_job', name='rerun_oozie_job'),
-  url(r'^rerun_oozie_coord/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_coordinator', name='rerun_oozie_coord'),
+  url(r'^rerun_oozie_job/(?P<job_id>[-\w]+)/(?P<app_path>.+?)?$', 'rerun_oozie_job', name='rerun_oozie_job'),
+  url(r'^rerun_oozie_coord/(?P<job_id>[-\w]+)/(?P<app_path>.+?)?$', 'rerun_oozie_coordinator', name='rerun_oozie_coord'),
   url(r'^rerun_oozie_bundle/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_bundle', name='rerun_oozie_bundle'),
   url(r'^sync_coord_workflow/(?P<job_id>[-\w]+)$', 'sync_coord_workflow', name='sync_coord_workflow'),
   url(r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun|change|ignore))$', 'manage_oozie_jobs', name='manage_oozie_jobs'),

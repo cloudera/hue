@@ -30,12 +30,12 @@ ko.bindingHandlers.droppable = {
 };
 
 
-function magicLayout(vm) {
-  loadLayout(vm, vm.initial.layout);
-  $(document).trigger("magicLayout");
+function magicWorkflowLayout(vm) {
+  loadWorkflowLayout(vm, vm.initial.layout);
+  $(document).trigger("magicWorkflowLayout");
 }
 
-function loadColumns(viewModel, json_layout) {
+function loadWorkflowColumns(viewModel, json_layout) {
   var _columns = [];
 
   $(json_layout).each(function (cnt, json_col) {
@@ -55,17 +55,17 @@ function loadColumns(viewModel, json_layout) {
         });
         row.addWidget(_w);
       });
-      row.columns(loadColumns(viewModel, json_row.columns));
+      row.columns(loadWorkflowColumns(viewModel, json_row.columns));
       _rows.push(row);
     });
-    var column = new ExtendedColumn(json_col.size, _rows);
+    var column = new ExtendedColumn(json_col.size, _rows, viewModel);
     _columns = _columns.concat(column);
   });
   return _columns;
 }
 
-function loadLayout(viewModel, json_layout) {
-  var _cols = loadColumns(viewModel, json_layout);
+function loadWorkflowLayout(viewModel, json_layout) {
+  var _cols = loadWorkflowColumns(viewModel, json_layout);
   viewModel.oozieColumns(_cols);
 }
 
@@ -84,31 +84,13 @@ var Node = function (node, vm) {
   self.properties = ko.mapping.fromJS(typeof node.properties != "undefined" && node.properties != null ? node.properties : {});
   self.children = ko.mapping.fromJS(typeof node.children != "undefined" && node.children != null ? node.children : []);
 
+  self.associatedDocumentLoading = ko.observable(true);
   self.associatedDocument = ko.observable();
 
-  function setAssociatedDocument(uuid) {
-    if (vm.documentStore[uuid]){
-      self.associatedDocument(vm.documentStore[uuid]);
-    }
-    $.get('/desktop/api2/doc/', {
-      uuid: uuid
-    }, function(data){
-      if (data && data.document){
-        self.associatedDocument(ko.mapping.fromJS(data.document));
-        vm.documentStore[uuid] = self.associatedDocument();
-      }
-    });
-  }
-
-  if (node.properties.uuid){
-    setAssociatedDocument(node.properties.uuid);
-  }
-
-  if (self.properties.uuid){
-    self.properties.uuid.subscribe(function(val){
-      setAssociatedDocument(val);
-    });
-  }
+  self.associatedDocumentUuid = ko.observable(typeof node.properties.uuid != "undefined" && node.properties.uuid != null ? node.properties.uuid : null);
+  self.associatedDocumentUuid.subscribe(function(val){
+    self.properties.uuid(val);
+  });
 
   self.actionParameters = ko.observableArray([]);
   self.actionParametersUI = ko.computed(function () {
@@ -192,7 +174,7 @@ var Node = function (node, vm) {
     });
   }
 
-  if ((type == 'hive-document-widget' || type == 'spark-document-widget') && typeof self.properties.uuid != "undefined") {
+  if ((type == 'hive-document-widget' || type == 'impala-document-widget' || type == 'spark-document-widget') && typeof self.properties.uuid != "undefined") {
     self.properties.uuid.subscribe(function () {
       self.actionParametersFetched(false);
       self.fetch_parameters();
@@ -211,7 +193,12 @@ var Workflow = function (vm, workflow) {
 
   self.tracker = new ChangeTracker(self, ko, {
     ignore: [
-      "associatedDocument"
+      "associatedDocument",
+      "associatedDocumentUuid",
+      "associatedDocumentLoading",
+      "actionParameters",
+      "actionParametersFetched",
+      "actionParametersUI"
     ]
   }); // from ko.common-dashboard.js
 
@@ -302,10 +289,9 @@ var Workflow = function (vm, workflow) {
             callback(widget, sourceNode);
           }
         }
-      },
-      async: false
+      }
     });
-    logGA('new_node/' + widget.widgetType());
+    hueAnalytics.log('oozie/editor/workflow', 'new_node/' + widget.widgetType());
   };
 
   self.addNode = function (widget, copiedNode) {
@@ -408,7 +394,7 @@ var Workflow = function (vm, workflow) {
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
-    logGA('add_node');
+    hueAnalytics.log('oozie/editor/workflow', 'add_node');
   };
 
   self.removeNode = function (node_id) {
@@ -466,7 +452,7 @@ var Workflow = function (vm, workflow) {
     else {
       self.nodes.remove(node);
     }
-    logGA('remove_node');
+    hueAnalytics.log('oozie/editor/workflow', 'remove_node');
   };
 
   self.moveNode = function (widget) {
@@ -500,12 +486,23 @@ var Workflow = function (vm, workflow) {
     });
     return _node;
   };
+
+  self.hasKillNode = ko.pureComputed(function() {
+    return $.grep(self.nodes(), function(node) {
+      return node.type() == 'kill-widget';
+    }).length > 0;
+  });
 }
 
-var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json, can_edit_json, history_json) {
+var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json, can_edit_json) {
   var self = this;
 
   self.isNested = ko.observable(true);
+
+  self.currentDraggableSection = ko.observable();
+  self.currentDraggableSection.subscribe(function (newVal) {
+    huePubSub.publish('oozie.draggable.section.change', newVal);
+  });
 
   self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(workflow_json.id == null);
@@ -524,6 +521,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.columns = ko.observableArray([]);
   self.oozieColumns = ko.observableArray([]);
+  self.availableActions = ko.observableArray([]);
 
   self.previewColumns = ko.observable("");
   self.workflow = new Workflow(self, workflow_json);
@@ -532,55 +530,12 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.inited = ko.observable(self.oozieColumns().length > 0);
   self.init = function (callback) {
     self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
-    loadLayout(self, layout_json);
+    loadWorkflowLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
+    self.workflow.tracker().markCurrentStateAsClean();
   };
 
-  self.documentStore = {};
-  self.documentsAutocompleteSource = function (request, callback) {
-    var TYPE_MAP = {
-      'hive': 'query-hive',
-      'impala': 'query-impala',
-      'java': 'query-java',
-      'spark': 'query-spark2',
-      'pig': 'query-pig',
-      'sqoop': 'query-sqoop1',
-      'distcp-doc': 'query-distcp',
-      'mapreduce-doc': 'query-mapreduce'
-    }
-    var type = 'query-hive';
-    if (this.options && typeof this.options.type === 'function') {
-      type = TYPE_MAP[this.options.type()] ? TYPE_MAP[this.options.type()] : this.options.type();
-    }
-    $.get('/desktop/api2/docs/', {
-      type: type,
-      text: request.term,
-      include_trashed: false,
-      limit: 100
-    }, function (data) {
-      if (data && data.documents) {
-        var docs = [];
-        if (data.documents.length > 0) {
-          $.each(data.documents, function (index, doc) {
-            docs.push({
-              data: {name: doc.name, type: doc.type, description: doc.description},
-              value: doc.uuid,
-              label: doc.name
-            });
-            self.documentStore[doc.uuid] = ko.mapping.fromJS(doc);
-          });
-        }
-        else {
-          docs.push({
-            data: {name: 'No matches found', description: ''},
-            label: 'No matches found',
-            value: ''
-          });
-        }
-        callback(docs);
-      }
-    });
-  };
+  self.tempDocument = ko.observable();
 
   self.addActionProperties = ko.observableArray([]);
   self.addActionPropertiesFilledOut = ko.computed(function () {
@@ -605,12 +560,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
 
   self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
-  self.history = ko.mapping.fromJS(history_json);
-
-  self.getDocumentById = function (type, uuid) {
-    var doc = self.documentStore[uuid];
-    return doc;
-  };
 
   self.getSubWorkflow = function (uuid) {
     var wf = $.grep(self.subworkflows(), function (wf, i) {
@@ -1222,7 +1171,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       widget.name(_newName);
       $(document).trigger("drawArrows");
     }
-  }
+  };
 
   self.save = function () {
     if (! self.isSaving()) {
@@ -1237,14 +1186,15 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             window.location.replace(data.url);
           }
           if (self.workflow.id() == null) {
-            shareViewModel.setDocUuid(data.uuid);
+            shareViewModel.setDocUuid(data.doc_uuid);
           }
           self.workflow.id(data.id);
           $(document).trigger("info", data.message);
-          if (window.location.search.indexOf("workflow") == -1) {
+          if (window.location.search.indexOf("workflow") == -1 && !IS_HUE_4) {
             window.location.hash = '#workflow=' + data.id;
           }
           self.workflow.tracker().markCurrentStateAsClean();
+          huePubSub.publish('assist.document.refresh');
         }
         else {
           $(document).trigger("error", data.message);
@@ -1254,7 +1204,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       }).always(function () {
         self.isSaving(false);
       });
-    logGA('save');
+    hueAnalytics.log('oozie/editor/workflow', 'save');
     }
   };
 
@@ -1277,6 +1227,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitPopup = function () {
     $(".jHueNotify").hide();
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
+      format: IS_HUE_4 ? 'json' : 'html'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -1287,6 +1238,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitActionPopup = function (w) {
     $(".jHueNotify").hide();
     $.get("/oozie/editor/workflow/submit_single_action/" + self.workflow.id() + "/" + self.workflow.getNodeById(w.id()).id(), {
+      format: IS_HUE_4 ? 'json' : 'html'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -1295,9 +1247,82 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.schedule = function () {
-    logGA('schedule');
-    window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
+    hueAnalytics.log('oozie/editor/workflow', 'schedule');
+    if (IS_HUE_4) {
+      huePubSub.publish('open.link', '/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
+    }
+    else {
+      window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
+    }
   };
+
+
+  self.drawArrows = function () {
+    function linkWidgets(fromId, toId) {
+      var _from = $("#wdg_" + (typeof fromId == "function" ? fromId() : fromId));
+      var _to = $("#wdg_" + (typeof toId == "function" ? toId() : toId));
+      if (_from.length > 0 && _to.length > 0) {
+        var $painter = $(document.body);
+        var correction = 0;
+
+        if ($('.oozie_workflowComponents:visible').length > 0) {
+          $painter = $('.oozie_workflowComponents:visible');
+          correction = $('.page-content').scrollTop();
+        }
+
+        var _fromCenter = {
+          x: _from.position().left + _from.outerWidth() / 2,
+          y: _from.position().top + correction + _from.outerHeight() + 3
+        }
+
+        var _toCenter = {
+          x: _to.position().left + _to.outerWidth() / 2,
+          y: _to.position().top + correction - 5
+        }
+
+        var _curveCoords = {};
+
+        if (_fromCenter.x == _toCenter.x) {
+          _curveCoords.x = _fromCenter.x;
+          _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
+        } else {
+          if (_fromCenter.x > _toCenter.x) {
+            _fromCenter.x = _fromCenter.x - 5;
+            _toCenter.x = _toCenter.x + 5;
+          } else {
+            _fromCenter.x = _fromCenter.x + 5;
+            _toCenter.x = _toCenter.x - 5;
+          }
+          _curveCoords.x = _fromCenter.x - (_fromCenter.x - _toCenter.x) / 4;
+          _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
+        }
+
+        $painter.curvedArrow({
+          p0x: _fromCenter.x,
+          p0y: _fromCenter.y,
+          p1x: _curveCoords.x,
+          p1y: _curveCoords.y,
+          p2x: _toCenter.x,
+          p2y: _toCenter.y,
+          lineWidth: 2,
+          size: 10,
+          strokeStyle: self.isEditing() ? '#e5e5e5' : '#dddddd'
+        });
+      }
+    }
+
+    $("canvas").remove();
+    if (self.oozieColumns()[0].rows().length > 3) {
+      var _links = self.workflow.linkMapping();
+      Object.keys(_links).forEach(function (id) {
+        if (_links[id].length > 0) {
+          _links[id].forEach(function (nextId) {
+            linkWidgets(id, nextId);
+          });
+        }
+      });
+    }
+  }
 
   function bareWidgetBuilder(name, type) {
     return new ExtendedWidget({
@@ -1310,6 +1335,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.draggableHiveAction = ko.observable(bareWidgetBuilder("Hive Script", "hive-widget"));
   self.draggableHive2Action = ko.observable(bareWidgetBuilder("HiveServer2 Script", "hive2-widget"));
+  self.draggableImpalaAction = ko.observable(bareWidgetBuilder("Impala Script", "impala-widget"));
   self.draggablePigAction = ko.observable(bareWidgetBuilder("Pig Script", "pig-widget"));
   self.draggableJavaAction = ko.observable(bareWidgetBuilder("Java program", "java-widget"));
   self.draggableMapReduceAction = ko.observable(bareWidgetBuilder("MapReduce job", "mapreduce-widget"));
@@ -1324,6 +1350,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableSparkAction = ko.observable(bareWidgetBuilder("Spark", "spark-widget"));
   self.draggableGenericAction = ko.observable(bareWidgetBuilder("Generic", "generic-widget"));
   self.draggableHiveDocumentAction = ko.observable(bareWidgetBuilder("Hive", "hive-document-widget"));
+  self.draggableImpalaDocumentAction = ko.observable(bareWidgetBuilder("Impala", "impala-document-widget"));
   self.draggableJavaDocumentAction = ko.observable(bareWidgetBuilder("Java", "java-document-widget"));
   self.draggableSparkDocumentAction = ko.observable(bareWidgetBuilder("Spark", "spark-document-widget"));
   self.draggablePigDocumentAction = ko.observable(bareWidgetBuilder("Pig", "pig-document-widget"));
@@ -1345,14 +1372,8 @@ function getOtherSubworkflows(vm, workflows) {
   return _cleanedSubworkflows;
 }
 
-function logGA(page) {
-  if (typeof trackOnGA == 'function') {
-    trackOnGA('oozie/editor/workflow/' + page);
-  }
-}
-
-var ExtendedColumn = function (size, rows) {
-  var self = new Column(size, rows);
+var ExtendedColumn = function (size, rows, viewModel) {
+  var self = new Column(size, rows, viewModel);
   self.rowPrototype = ExtendedRow;
   self.oozieStartRow = ko.computed(function () {
     var _row = null;
@@ -1426,6 +1447,7 @@ var ExtendedWidget = function (params) {
   self.progress = ko.observable(0);
   self.actionURL = ko.observable("");
   self.logsURL = ko.observable("");
+  self.externalId = ko.observable("");
   self.externalIdUrl = ko.observable("");
   return self;
 }

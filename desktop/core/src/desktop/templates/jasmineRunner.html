@@ -8,18 +8,62 @@
   <link rel="stylesheet" href="../static/desktop/ext/js/jasmine-2.3.4/jasmine.css">
 
   <script type="text/javascript" charset="utf-8">
-    ApiHelperGlobals = {
+    var ApiHelperGlobals = {
       i18n: {
         errorLoadingDatabases: 'errorLoadingDatabases',
         errorLoadingTablePreview: 'errorLoadingTablePreview'
       },
       user: 'user'
-    }
+    };
+
+
+    var AUTOCOMPLETE_TIMEOUT = 0;
+
+    var AutocompleterGlobals = {
+      i18n: {
+        category: {
+          all: 'All',
+          column: 'Columns',
+          cte: 'CTEs',
+          database: 'Databases',
+          identifier: 'Identifiers',
+          keyword: 'Keywords',
+          popular: 'Popular',
+          sample: 'Samples',
+          table: 'Tables',
+          udf: 'UDFs',
+          variable: 'Variables'
+        },
+        meta: {
+          aggregateFunction: 'aggregate',
+          alias: 'alias',
+          commonTableExpression: 'cte',
+          database: 'database',
+          filter: 'filter',
+          groupBy: 'group by',
+          join: 'join',
+          joinCondition: 'condition',
+          keyword: 'keyword',
+          orderBy: 'order by',
+          table: 'table',
+          sample: 'sample',
+          variable: 'variable',
+          view: 'view',
+          virtual: 'virtual'
+        }
+      }
+    };
+
+    var HAS_OPTIMIZER = false;
+
+    var CACHEABLE_TTL = 0;
   </script>
 
   <script type="text/javascript" src="../static/desktop/ext/js/jquery/jquery-2.1.1.min.js"></script>
   <script type="text/javascript" src="../static/desktop/js/jquery.migration.js"></script>
+  <script type="text/javascript" src="../static/desktop/js/hue.colors.js"></script>
   <script type="text/javascript" src="../static/desktop/js/hue.utils.js"></script>
+  <script type="text/javascript" src="../static/desktop/js/hue4.utils.js"></script>
   <script type="text/javascript" src="../static/desktop/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
   <script type="text/javascript" src="../static/desktop/js/ace/ace.js"></script>
   <script type="text/javascript" src="../static/desktop/js/ace/ext-language_tools.js"></script>
@@ -34,6 +78,9 @@
   <script type="text/javascript" src="../static/desktop/ext/js/jasmine-2.3.4/boot.js"></script>
   <script type="text/javascript" src="../static/desktop/ext/js/jasmine-2.3.4/mock-ajax.js"></script>
 
+  <script type="text/javascript" src="../static/desktop/spec/hueUtilsSpec.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/hue4UtilsSpec.js"></script>
+
   <script type="text/javascript" src="../static/desktop/spec/apiHelperSpec.js"></script>
 
   <script type="text/javascript" src="../static/desktop/js/sqlAutocompleter.js"></script>
@@ -42,22 +89,31 @@
   <script type="text/javascript" src="../static/desktop/js/sqlAutocompleter2.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/sqlAutocompleter2Spec.js"></script>
 
+  <script type="text/javascript" src="../static/desktop/js/sqlUtils.js"></script>
+  <script type="text/javascript" src="../static/desktop/js/sqlAutocompleter3.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/sqlAutocompleter3Spec.js"></script>
+
   <script type="text/javascript" src="../static/desktop/js/sqlFunctions.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/sqlFunctionsSpec.js"></script>
+
+  <script type="text/javascript" src="../static/desktop/js/autocomplete/sqlStatementsParser.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlStatementsParserSpec.js"></script>
 
   <script type="text/javascript" src="../static/desktop/js/hdfsAutocompleter.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/hdfsAutocompleterSpec.js"></script>
 
-
+  <script type="text/javascript" src="../static/desktop/js/autocomplete/sqlParseSupport.js"></script>
   <script type="text/javascript" src="../static/desktop/js/autocomplete/sql.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpec.js"></script>
 
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecAlter.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecAnalyze.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecCreate.js"></script>
-  <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecDescribe.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecDescribe_hive.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecDescribe_impala.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecDrop.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecError.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecGrant.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecInsert.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecLoad.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/autocomplete/sqlSpecLocations.js"></script>
@@ -75,8 +131,8 @@
         consolidateAll: false
       }));
       jasmine.getEnv().addReporter(new jasmineReporters.TerminalReporter());
+      window.onload();
     }
-    window.onload();
   </script>
 </head>
 <body></body>

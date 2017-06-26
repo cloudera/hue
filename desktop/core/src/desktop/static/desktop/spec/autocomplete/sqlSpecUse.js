@@ -69,7 +69,7 @@
         expectedResult: {
           useDatabase: 'database_two',
           lowerCase: true,
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [] },
           suggestAnalyticFunctions: true,
           suggestFunctions: {},
           suggestTables: {
@@ -93,7 +93,7 @@
         expectedResult: {
           useDatabase: 'closest_db',
           lowerCase: false,
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [] },
           suggestAnalyticFunctions: true,
           suggestFunctions: {},
           suggestTables: {
@@ -117,7 +117,7 @@
         expectedResult: {
           useDatabase: 'closest_db',
           lowerCase: false,
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [] },
           suggestAnalyticFunctions: true,
           suggestFunctions: {},
           suggestTables: {

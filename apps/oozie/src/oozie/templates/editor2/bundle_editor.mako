@@ -20,11 +20,13 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
+<%namespace name="utils" file="../utils.inc.mako" />
 
-
+% if not is_embeddable:
 ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
+% endif
 
-<div id="editor">
+<div id="oozie_bundleComponents">
 
 <%def name="buttons()">
   <div class="pull-right" style="padding-right: 10px">
@@ -37,19 +39,13 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-play"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}, visible: canEdit">
       <i class="fa fa-cog"></i>
     </a>
-
-    &nbsp;&nbsp;&nbsp;
 
     <a type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit() && bundle.coordinators().length > 0">
       <i class="fa fa-save"></i>
@@ -62,21 +58,23 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-users"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a class="btn" href="${ url('oozie:new_bundle') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
-
   </div>
 </%def>
 
-${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
+${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embeddable=is_embeddable) }
 
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("bundle") > -1) {
-      location.href = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      var url = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      % if is_embeddable:
+        huePubSub.publish('open.link', url);
+      % else:
+        location.href = url;
+      % endif
     }
   }
 </script>
@@ -103,12 +101,12 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
           </a>
         </div>
       </div>
-          
+
       <div data-bind="foreach: bundle.coordinators">
         <div class="card card-home" style="margin-bottom: 20px; padding-bottom: 10px">
           <h1 class="card-heading simple">
             <a class="pointer" data-bind="click: function() { showChooseCoordinator(this); }, text: $root.getCoordinatorById(coordinator()).name"></a>
-            <a data-bind="attr: { href: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id() }" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id()" target="_blank" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
             <a class="pointer pull-right" data-bind="click: function() { $root.bundle.coordinators.remove(this); }, visible: $root.isEditing">
@@ -122,7 +120,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
                 <strong data-bind="text: name"></strong>
                 <em data-bind="text: value"></em>
               </li>
-              <li data-bind="visible: $root.isEditing">              
+              <li data-bind="visible: $root.isEditing">
                 <input data-bind="value: name" type="text" class="no-margin-bottom"/>
                 <div class="controls inline-block">
                   <input data-bind="value: value, filechooser: value" type="text" class="input-xlarge filechooser-input"/>
@@ -146,36 +144,46 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 </div>
 
 
-<div id="chooseCoordinatorDemiModal" class="demi-modal fade" data-backdrop="false">
+<div id="chooseCoordinatorDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="${ is_embeddable and 'true' or 'false' }">
+  %if is_embeddable:
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${ _('Choose a coordinator') }</h2>
+    </div>
+  %endif
   <div class="modal-body">
+    %if not is_embeddable:
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    %endif
     <div style="float: left; margin-right: 10px;text-align: center">
       <input type="text" data-bind="clearable: $root.coordinatorModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter coordinators')}" class="input" style="float: left" /><br/>
     </div>
     <div>
       <ul data-bind="foreach: $root.filteredModalCoordinators().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.filteredModalCoordinators().length > 0"
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
-        <li>
+        <li style="${ not is_embeddable and 'line-height: 30px' or ''}">
           <span data-bind="click: selectCoordinator" class="badge badge-info"><span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
-          <a data-bind="attr: { href: '${ url('oozie:edit_coordinator') }?uuid=' + uuid() }" target="_blank" title="${ _('Open') }">
+          <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?uuid=' + uuid()" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </li>
       </ul>
-      <div class="alert alert-info inline" data-bind="visible: $root.filteredModalCoordinators().length == 0" style="margin-left: 250px;margin-right: 50px; height: 42px;line-height: 42px">
+      <div class="label inline" data-bind="visible: $root.filteredModalCoordinators().length == 0" style="line-height: 30px">
         ${_('There are no coordinators matching your search term.')}
       </div>
     </div>
   </div>
+  %if not is_embeddable:
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
+  %endif
 </div>
 
 
 <div id="settingsModal" class="modal hide fade">
-  <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="myModalLabel">${ _('Settings') }</h3>
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 id="myModalLabel" class="modal-title">${ _('Settings') }</h2>
   </div>
   <div class="modal-body">
       <h4>${ _('Kick off time') }</h4>
@@ -211,20 +219,6 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 
 
 </div>
-
-<div id="chooseFile" class="modal hide fade" style="z-index: 10000;">
-  <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
-  </div>
-  <div class="modal-body">
-      <div id="filechooser">
-      </div>
-  </div>
-  <div class="modal-footer">
-  </div>
-</div>
-
 
 <script type="text/html" id="calendar-dropdown">
 <div class="btn-group">
@@ -265,14 +259,15 @@ ${ commonshare() | n,unicode }
 ${ dashboard.import_bindings() }
 
 <script src="${ static('oozie/js/bundle-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+
+${ utils.submit_popup_event() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 
 
 <script type="text/javascript">
   var viewModel = new BundleEditorViewModel(${ bundle_json | n,unicode }, ${ coordinators_json | n,unicode }, ${ can_edit_json | n,unicode });
-  ko.applyBindings(viewModel, $("#editor")[0]);
+  ko.applyBindings(viewModel, $("#oozie_bundleComponents")[0]);
 
   viewModel.bundle.tracker().markCurrentStateAsClean();
 
@@ -282,7 +277,7 @@ ${ dashboard.import_bindings() }
   var tempCoordinator = null;
   function showChooseCoordinator(coord) {
     if (typeof coord != "undefined"){
-      tempCoordinator = coord;  
+      tempCoordinator = coord;
     }
     $("#chooseCoordinatorDemiModal").modal("show");
   }
@@ -291,7 +286,7 @@ ${ dashboard.import_bindings() }
     if (tempCoordinator != null){
       tempCoordinator.coordinator(coord.uuid());
       tempCoordinator = null;
-    } 
+    }
     else  {
       viewModel.addBundledCoordinator(coord.uuid());
     }
@@ -312,32 +307,45 @@ ${ dashboard.import_bindings() }
       $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm[Z]"));
     });
 
-    $(document).on("click", ".calendar-link", function(){
+    $(document).on("click", ".calendar-link", function () {
       var DATE_FORMAT = "YYYY-MM-DD";
       var _el = $(this).parents(".controls").find("input[type='text']");
       _el.off("keyup");
-      _el.on("keyup", function(){
+      _el.on("keyup", function () {
         _el.data("lastValue", _el.val());
       });
       _el.data("lastValue", _el.val());
       _el.datepicker({
         format: DATE_FORMAT.toLowerCase()
-       }).on("changeDate", function () {
+      }).on("changeDate", function () {
         _el.datepicker("hide");
       }).on("hide", function () {
         var _val = _el.data("lastValue") ? _el.data("lastValue") : _el.val();
-        if (_val.indexOf("T") == -1){
+        if (_val.indexOf("T") == -1) {
           _el.val(_el.val() + "T00:00Z");
         }
         else if (_el.val().indexOf("T") == "-1") {
-          _el.val(_el.val() + "T" +  _val.split("T")[1]);
+          _el.val(_el.val() + "T" + _val.split("T")[1]);
         }
       });
-     _el.datepicker('show');
+      _el.datepicker('show');
+      huePubSub.subscribeOnce('hide.datepicker', function () {
+        _el.datepicker('hide');
+      });
     });
 
-
+    huePubSub.subscribe('submit.popup.return', function (data) {
+      if (data.type == 'bundle') {
+        $.jHueNotify.info('${_('Bundle submitted.')}');
+        huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+        huePubSub.publish('browser.job.open.link', data.job_id);
+        $('.submit-modal').modal('hide');
+        $('.modal-backdrop').hide();
+      }
+    }, 'oozie');
   });
 </script>
 
+% if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+% endif

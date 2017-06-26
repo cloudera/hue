@@ -18,7 +18,11 @@
 <%namespace name="common" file="workflow-common.xml.mako" />
 
     <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }${ common.retry_max(node['properties']['retry_max']) }${ common.retry_interval(node['properties']['retry_interval']) }>
+      % if node['properties']['files']:
         <spark xmlns="uri:oozie:spark-action:0.2">
+      % else:
+        <spark xmlns="uri:oozie:spark-action:0.1">
+      % endif
             <job-tracker>${'${'}jobTracker}</job-tracker>
             <name-node>${'${'}nameNode}</name-node>
 

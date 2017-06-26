@@ -21,8 +21,9 @@ import logging
 import os
 import posixpath
 import re
+import time
 
-from boto.exception import S3ResponseError
+from boto.exception import BotoClientError, S3ResponseError
 from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
@@ -30,7 +31,7 @@ from boto.s3.prefix import Prefix
 from django.utils.translation import ugettext as _
 
 from aws import s3
-from aws.conf import get_default_region
+from aws.conf import get_default_region, get_locations
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
@@ -42,8 +43,33 @@ BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*
 LOG = logging.getLogger(__name__)
 
 
-class S3FileSystemException(Exception):
-  pass
+class S3FileSystemException(IOError):
+
+  def __init__(self, *args, **kwargs):
+    super(S3FileSystemException, self).__init__(*args, **kwargs)
+
+
+def auth_error_handler(view_fn):
+  def decorator(*args, **kwargs):
+    try:
+      return view_fn(*args, **kwargs)
+    except (S3ResponseError, IOError), e:
+      if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
+        path = kwargs.get('path')
+        if not path and len(args) > 1:
+          path = args[1]  # We assume that the path is the first argument
+        msg = _('User is not authorized to perform the attempted operation. Check that the user has appropriate permissions.')
+        if path:
+          msg = _('User is not authorized to write or modify path: %s. Check that the user has write permissions.') % path
+        raise S3FileSystemException(msg)
+      else:
+        msg = str(e)
+        if isinstance(e, S3ResponseError):
+          msg = e.message or e.reason
+        raise S3FileSystemException(msg)
+    except Exception, e:
+      raise e
+  return decorator
 
 
 class S3FileSystem(object):
@@ -55,29 +81,36 @@ class S3FileSystem(object):
     if self._bucket_cache is None:
       try:
         buckets = self._s3_connection.get_all_buckets()
+      except S3FileSystemException, e:
+        raise e
       except S3ResponseError, e:
-        raise S3FileSystemException(e.message or e.reason)
+        raise S3FileSystemException(_('Failed to initialize bucket cache: %s') % e.reason)
+      except Exception, e:
+        raise S3FileSystemException(_('Failed to initialize bucket cache: %s') % e)
       self._bucket_cache = {}
       for bucket in buckets:
         self._bucket_cache[bucket.name] = bucket
 
   def _get_bucket(self, name):
     self._init_bucket_cache()
-    name = name.lower()
     if name not in self._bucket_cache:
       self._bucket_cache[name] = self._s3_connection.get_bucket(name)
     return self._bucket_cache[name]
 
   def _get_or_create_bucket(self, name):
     try:
-      name = name.lower()
       bucket = self._get_bucket(name)
+    except BotoClientError, e:
+      raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
     except S3ResponseError, e:
       if e.status == 403 or e.status == 301:
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
       elif e.status == 404:
-        bucket = self._s3_connection.create_bucket(name, location=self._get_location())
+        kwargs = {}
+        if self._get_location():
+          kwargs['location'] = self._get_location()
+        bucket = self._s3_connection.create_bucket(name, **kwargs)
         self._bucket_cache[name] = bucket
       elif e.status == 400:
         raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
@@ -108,16 +141,19 @@ class S3FileSystem(object):
     bucket = self._get_bucket(bucket_name)
     try:
       return bucket.get_key(key_name, validate=validate)
+    except BotoClientError, e:
+      raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
     except S3ResponseError, e:
-      if e.status == 301:
+      if e.status in (301, 400):
         raise S3FileSystemException(_('Failed to access path: "%s" '
-          'Check that you have access to read this bucket and that the region is correct.') % path)
+          'Check that you have access to read this bucket and that the region is correct: %s') % (path, e.message or e.reason))
+      elif e.status == 403:
+        raise S3FileSystemException(_('User is not authorized to access path at "%s".' % path))
       else:
         raise S3FileSystemException(e.message or e.reason)
 
   def _get_location(self):
-    if get_default_region() in (Location.EU, Location.EUCentral1, Location.USWest, Location.USWest2, Location.SAEast,
-                                Location.APNortheast, Location.APSoutheast, Location.APSoutheast2, Location.CNNorth1):
+    if get_default_region() in get_locations():
       return get_default_region()
     else:
       return Location.DEFAULT
@@ -128,6 +164,8 @@ class S3FileSystem(object):
 
     try:
       key = self._get_key(path, validate=True)
+    except BotoClientError, e:
+      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
     except S3ResponseError as e:
       if e.status == 404:
         return None
@@ -253,6 +291,7 @@ class S3FileSystem(object):
     return [s3.parse_uri(x.path)[2] for x in self.listdir_stats(path, glob)]
 
   @translate_s3_error
+  @auth_error_handler
   def rmtree(self, path, skipTrash=True):
     if not skipTrash:
       raise NotImplementedError(_('Moving to trash is not implemented for S3'))
@@ -275,13 +314,14 @@ class S3FileSystem(object):
         to_delete = itertools.chain(keys, to_delete)
       result = key.bucket.delete_keys(to_delete)
       if result.errors:
-        msg = "%d errors occurred during deleting '%s':\n%s" % (
-          len(result.errors),
-          '\n'.join(map(repr, result.errors)))
+        msg = "%d errors occurred while attempting to delete the following S3 paths:\n%s" % (
+          len(result.errors), '\n'.join(['%s: %s' % (error.key, error.message) for error in result.errors])
+        )
         LOG.error(msg)
         raise S3FileSystemException(msg)
 
   @translate_s3_error
+  @auth_error_handler
   def remove(self, path, skip_trash=True):
     self.rmtree(path, skipTrash=skip_trash)
 
@@ -289,6 +329,7 @@ class S3FileSystem(object):
     raise NotImplementedError(_('Moving to trash is not implemented for S3'))
 
   @translate_s3_error
+  @auth_error_handler
   def mkdir(self, path, *args, **kwargs):
     """
     Creates a directory and any parent directory if necessary.
@@ -301,8 +342,12 @@ class S3FileSystem(object):
 
     try:
       self._get_or_create_bucket(bucket_name)
+    except S3FileSystemException, e:
+      raise e
     except S3ResponseError, e:
       raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e.reason))
+    except Exception, e:
+      raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e))
 
     stats = self._stats(path)
     if stats:
@@ -314,16 +359,19 @@ class S3FileSystem(object):
     self.create(path)  # create empty object
 
   @translate_s3_error
+  @auth_error_handler
   def copy(self, src, dst, recursive=False, *args, **kwargs):
     self._copy(src, dst, recursive=recursive, use_src_basename=True)
 
   @translate_s3_error
+  @auth_error_handler
   def copyfile(self, src, dst, *args, **kwargs):
     if self.isdir(dst):
       raise S3FileSystemException("Copy dst '%s' is a directory" % dst)
     self._copy(src, dst, recursive=False, use_src_basename=False)
 
   @translate_s3_error
+  @auth_error_handler
   def copy_remote_dir(self, src, dst, *args, **kwargs):
     self._copy(src, dst, recursive=True, use_src_basename=False)
 
@@ -364,14 +412,14 @@ class S3FileSystem(object):
       key.copy(dst_bucket, dst_name)
 
   @translate_s3_error
+  @auth_error_handler
   def rename(self, old, new):
     new = s3.abspath(old, new)
     self.copy(old, new, recursive=True)
-    if self.isdir(old):
-      self.rename_star(old, new)
     self.rmtree(old, skipTrash=True)
 
   @translate_s3_error
+  @auth_error_handler
   def rename_star(self, old_dir, new_dir):
     if not self.isdir(old_dir):
       raise S3FileSystemException("'%s' is not a directory" % old_dir)
@@ -382,11 +430,13 @@ class S3FileSystem(object):
       self.rename(s3.join(old_dir, entry), s3.join(new_dir, entry))
 
   @translate_s3_error
+  @auth_error_handler
   def create(self, path, overwrite=False, data=None):
     key = self._get_key(path, validate=False)
     key.set_contents_from_string(data or '', replace=overwrite)
 
   @translate_s3_error
+  @auth_error_handler
   def copyFromLocal(self, local_src, remote_dst, *args, **kwargs):
     local_src = self._cut_separator(local_src)
     remote_dst = self._cut_separator(remote_dst)
@@ -418,6 +468,7 @@ class S3FileSystem(object):
     pass  # upload is handled by S3FileUploadHandler
 
   @translate_s3_error
+  @auth_error_handler
   def append(self, path, data):
     key = self._get_key(path, validate=False)
     current_data = key.get_contents_as_string() or ''
@@ -427,14 +478,18 @@ class S3FileSystem(object):
   @translate_s3_error
   def check_access(self, path, permission='READ'):
     permission = permission.upper()
-    bucket_name, key_name = s3.parse_uri(path)[:2]
-    bucket = self._get_bucket(bucket_name)
-    acp = bucket.get_acl()
-    for grant in acp.acl.grants:
-      if grant.permission == permission or grant.permission == 'FULL_CONTROL':
-        # TODO: Check grant.uri for user list too
-        return True
-    return False
+    try:
+      if permission == 'WRITE':
+        tmp_file = 'temp_%s' % str(int(time.time() * 1000))
+        tmp_path = '%s/%s' % (path, tmp_file)
+        self.create(path=tmp_path, overwrite=True)
+        self.remove(path=tmp_path)
+      else:
+        self.open(path)
+    except Exception, e:
+      LOG.warn('S3 check_access encountered error verifying %s permission at path "%s": %s' % (permission, path, str(e)))
+      return False
+    return True
 
   def setuser(self, user):
     pass  # user-concept doesn't have sense for this implementation

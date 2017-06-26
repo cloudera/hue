@@ -21,11 +21,11 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-<form action="${ action }" method="POST">
+<form action="${ action }" method="POST" class="form submit-external-workflow-form">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Submit this job?') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Submit this job?') }</h2>
   </div>
   <div class="modal-body">
     <fieldset>
@@ -52,6 +52,10 @@
             </div>
           </div>
          % endfor
+
+        % if return_json:
+          <input type="hidden" name="format" value="json">
+        % endif
       </div>
     </fieldset>
 
@@ -66,3 +70,28 @@
     <input id="submit-btn" type="submit" class="btn btn-primary" value="${ _('Submit') }"/>
   </div>
 </form>
+
+% if return_json:
+<script type="text/javascript">
+    $('.submit-external-workflow-form').submit(function (e) {
+      $.ajax({
+        type: "POST",
+        url: '${ action }',
+        data: $('.submit-external-workflow-form').serialize(),
+        dataType: "json",
+        success: function (data) {
+          if (data.status == 0) {
+            huePubSub.publish('submit.popup.return', data);
+          } else {
+            var message = "${ _('Submission was not successful') }";
+            if (data.message) {
+              message = data.message;
+            }
+            $.jHueNotify.error(data.message + (data.detail ? (': ' + data.detail) : ''));
+          }
+        }
+      });
+      e.preventDefault();
+    });
+</script>
+% endif

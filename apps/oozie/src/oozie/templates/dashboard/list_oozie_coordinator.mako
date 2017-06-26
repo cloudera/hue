@@ -137,7 +137,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 </div>
                 % endif
               </li>
-              <li class="nav-header">${ _('Edit') }</li>
+              <li class="nav-header">${ _('Synchronize') }</li>
               <li class="white">
                 <div class="btn-group" style="margin-left: 0; margin-bottom: 5px">
                   % if has_job_edition_permission(oozie_coordinator, user):
@@ -221,7 +221,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               </div>
               <div class="clearfix"></div>
 
-              <table class="table table-striped table-condensed margin-top-10">
+              <table class="table table-condensed margin-top-10">
                 <thead>
                 <tr>
                   <th width="20"><div data-bind="click: selectAll, css: { 'fa-check': allSelected }" class="hueCheckbox fa"></div></th>
@@ -234,7 +234,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <tfoot>
                   <tr data-bind="visible: isLoading()">
                     <td colspan="3" class="left">
-                      <img src="${ static('desktop/art/spinner.gif') }" />
+                      <i class="fa fa-spinner fa-spin"></i>
                     </td>
                   </tr>
                   <tr data-bind="visible: filteredActions().length == 0 && !isLoading()">
@@ -278,7 +278,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <a class="btn btn-status btn-danger disable-feedback" data-table="actions" data-value="ERROR">${ _('Error') }</a>
               </div>
               <div class="clearfix"></div>
-              <table class="table table-striped table-condensed margin-top-10" cellpadding="0" cellspacing="0">
+              <table class="table table-condensed margin-top-10" cellpadding="0" cellspacing="0">
                 <thead>
                 <tr>
                   <th width="1%">${ _('Number') }</th>
@@ -305,7 +305,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <tfoot>
                 <tr data-bind="visible: isLoading()">
                   <td colspan="10" class="left">
-                    <img src="${ static('desktop/art/spinner.gif') }" />
+                    <i class="fa fa-spinner fa-spin"></i>
                   </td>
                 </tr>
                 <tr data-bind="visible: !isLoading() && filteredActions().length == 0">
@@ -418,7 +418,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             <div class="tab-pane" id="sla" style="padding-left: 20px">
               <div id="yAxisLabel" class="hide">${_('Time since Nominal Time in min')}</div>
               <div id="slaChart"></div>
-              <table id="slaTable" class="table table-striped table-condensed hide">
+              <table id="slaTable" class="table table-condensed hide">
                 <thead>
                   <th>${_('Status')}</th>
                   <th>${_('Nominal Time')}</th>
@@ -463,8 +463,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <div id="confirmation" class="modal hide">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 class="confirmation_header"></h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title confirmation_header"></h2>
   </div>
   <div id="update-coord" class="span10">
     ${ utils.render_field_no_popover(update_coord_form['endTime'], show_label=True) }
@@ -492,8 +492,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <div id="rerun-coord-modal" class="modal hide"></div>
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 % if oozie_coordinator.has_sla:
 <script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -508,7 +506,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <script src="${ static('desktop/js/bootstrap-spinedit.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }" type="text/javascript" charset="utf-8"></script>
 

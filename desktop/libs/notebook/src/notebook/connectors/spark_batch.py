@@ -33,19 +33,30 @@ class SparkBatchApi(Api):
 
   def execute(self, notebook, snippet):
     api = get_spark_api(self.user)
-
-    properties = {
-        'file': snippet['properties'].get('app_jar'),
-        'className': snippet['properties'].get('class'),
-        'args': snippet['properties'].get('arguments'),
-        'pyFiles': snippet['properties'].get('py_file'),
-        'files': snippet['properties'].get('files'),
-        # driverMemory
-        # driverCores
-        # executorMemory
-        # executorCores
-        # archives
-    }
+    if snippet['type'] == 'jar':
+        properties = {
+            'file': snippet['properties'].get('app_jar'),
+            'className': snippet['properties'].get('class'),
+            'args': snippet['properties'].get('arguments'),
+        }
+    elif snippet['type'] == 'py':
+        properties = {
+            'file': snippet['properties'].get('py_file'),
+            'args': snippet['properties'].get('argument'),
+        }
+    else:
+        properties = {
+            'file': snippet['properties'].get('app_jar'),
+            'className': snippet['properties'].get('class'),
+            'args': snippet['properties'].get('arguments'),
+            'pyFiles': snippet['properties'].get('py_file'),
+            'files': snippet['properties'].get('files'),
+            # driverMemory
+            # driverCores
+            # executorMemory
+            # executorCores
+            # archives
+        }
 
     response = api.submit_batch(properties)
     return {

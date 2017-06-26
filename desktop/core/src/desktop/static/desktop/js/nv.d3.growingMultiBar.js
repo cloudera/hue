@@ -24,8 +24,8 @@ nv.models.growingMultiBar = function() {
   var margin = {top: 0, right: 0, bottom: 0, left: 0}
     , width = 960
     , height = 500
-    , x = d3.scale.ordinal()
-    , y = d3.scale.linear()
+    , x = d3v3.scale.ordinal()
+    , y = d3v3.scale.linear()
     , id = Math.floor(Math.random() * 10000) //Create semi-unique ID in case user doesn't select one
     , getX = function(d) { return d.x }
     , getY = function(d) { return d.y }
@@ -44,7 +44,7 @@ nv.models.growingMultiBar = function() {
     , yRange
     , groupSpacing = 0.1
     , selectBars = null
-    , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout')
+    , dispatch = d3v3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout')
     ;
 
   //============================================================
@@ -64,7 +64,7 @@ nv.models.growingMultiBar = function() {
     selection.each(function(data) {
       var availableWidth = width - margin.left - margin.right,
           availableHeight = height - margin.top - margin.bottom,
-          container = d3.select(this);
+          container = d3v3.select(this);
 
       if(hideable && data.length) hideable = [{
         values: data[0].values.map(function(d) {
@@ -77,7 +77,7 @@ nv.models.growingMultiBar = function() {
       )}];
 
       if (stacked)
-        data = d3.layout.stack()
+        data = d3v3.layout.stack()
                  .offset(stackOffset)
                  .values(function(d){ return d.values })
                  .y(getY)
@@ -124,11 +124,11 @@ nv.models.growingMultiBar = function() {
               })
             });
 
-      x   .domain(xDomain || d3.merge(seriesData).map(function(d) { return d.x }))
+      x   .domain(xDomain || d3v3.merge(seriesData).map(function(d) { return d.x }))
           .rangeBands(xRange || [0, availableWidth], groupSpacing);
 
-      //y   .domain(yDomain || d3.extent(d3.merge(seriesData).map(function(d) { return d.y + (stacked ? d.y1 : 0) }).concat(forceY)))
-      y   .domain(yDomain || d3.extent(d3.merge(seriesData).map(function(d) { return stacked ? (d.y > 0 ? d.y1 : d.y1 + d.y ) : d.y }).concat(forceY)))
+      //y   .domain(yDomain || d3v3.extent(d3v3.merge(seriesData).map(function(d) { return d.y + (stacked ? d.y1 : 0) }).concat(forceY)))
+      y   .domain(yDomain || d3v3.extent(d3v3.merge(seriesData).map(function(d) { return stacked ? (d.y > 0 ? d.y1 : d.y1 + d.y ) : d.y }).concat(forceY)))
           .range(yRange || [availableHeight, 0]);
 
       // If scale's domain don't have a range, slightly adjust to make one... so a chart can show a single data point
@@ -212,7 +212,7 @@ nv.models.growingMultiBar = function() {
           $(selected.rangeValues).each(function(cnt, item){
             bars.each(function(d, i) {
               if (parseInt(d.x) >= parseInt(item.from) && parseInt(d.x_end) <= parseInt(item.to)) {
-                d3.select(this).classed('selected', true);
+                d3v3.select(this).classed('selected', true);
               }
             });
           });
@@ -228,18 +228,18 @@ nv.models.growingMultiBar = function() {
             bars.each(function(d, i) {
               if (_pivotField != null){
                 if ((Array.isArray(_pivotField) ? ko.toJSON(d.obj.fq_fields) == ko.toJSON(_pivotField) : d.obj.fq_fields == _pivotField) && (item.values ? ko.toJSON(d.obj.fq_values) == ko.toJSON(item.values) : d.obj.fq_values == item)){
-                  d3.select(this).classed('selected', true);
+                  d3v3.select(this).classed('selected', true);
                 }
               }
               else {
                 if (d.x instanceof Date){
                   if (moment(d.x).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") == item) {
-                    d3.select(this).classed('selected', true);
+                    d3v3.select(this).classed('selected', true);
                   }
                 }
                 else {
                   if (d.x == item) {
-                    d3.select(this).classed('selected', true);
+                    d3v3.select(this).classed('selected', true);
                   }
                 }
               }
@@ -264,7 +264,7 @@ nv.models.growingMultiBar = function() {
           .style('stroke', function(d,i,j){ return color(d, j, i); });
       barsEnter
           .on('mouseover', function(d,i) {
-            d3.select(this).classed('hover', true);
+            d3v3.select(this).classed('hover', true);
             dispatch.elementMouseover({
               value: getY(d,i),
               point: d,
@@ -272,18 +272,18 @@ nv.models.growingMultiBar = function() {
               pos: [x(getX(d,i)) + (x.rangeBand() * (stacked ? data.length / 2 : d.series + .5) / data.length), y(getY(d,i) + (stacked ? d.y0 : 0))],  // TODO: Figure out why the value appears to be shifted
               pointIndex: i,
               seriesIndex: d.series,
-              e: d3.event
+              e: d3v3.event
             });
           })
           .on('mouseout', function(d,i) {
-            d3.select(this).classed('hover', false);
+            d3v3.select(this).classed('hover', false);
             dispatch.elementMouseout({
               value: getY(d,i),
               point: d,
               series: data[d.series],
               pointIndex: i,
               seriesIndex: d.series,
-              e: d3.event
+              e: d3v3.event
             });
           })
           .on('click', function(d,i) {
@@ -294,9 +294,9 @@ nv.models.growingMultiBar = function() {
               pos: [x(getX(d,i)) + (x.rangeBand() * (stacked ? data.length / 2 : d.series + .5) / data.length), y(getY(d,i) + (stacked ? d.y0 : 0))],  // TODO: Figure out why the value appears to be shifted
               pointIndex: i,
               seriesIndex: d.series,
-              e: d3.event
+              e: d3v3.event
             });
-            d3.event.stopPropagation();
+            d3v3.event.stopPropagation();
           })
           .on('dblclick', function(d,i) {
             dispatch.elementDblClick({
@@ -306,9 +306,9 @@ nv.models.growingMultiBar = function() {
               pos: [x(getX(d,i)) + (x.rangeBand() * (stacked ? data.length / 2 : d.series + .5) / data.length), y(getY(d,i) + (stacked ? d.y0 : 0))],  // TODO: Figure out why the value appears to be shifted
               pointIndex: i,
               seriesIndex: d.series,
-              e: d3.event
+              e: d3v3.event
             });
-            d3.event.stopPropagation();
+            d3v3.event.stopPropagation();
           });
       bars
           .attr('class', function(d,i) { return getY(d,i) < 0 ? 'nv-bar negative' : 'nv-bar positive'})
@@ -318,8 +318,8 @@ nv.models.growingMultiBar = function() {
       if (barColor) {
         if (!disabled) disabled = data.map(function() { return true });
         bars
-          .style('fill', function(d,i,j) { return d3.rgb(barColor(d,i)).darker(  disabled.map(function(d,i) { return i }).filter(function(d,i){ return !disabled[i]  })[j]   ).toString(); })
-          .style('stroke', function(d,i,j) { return d3.rgb(barColor(d,i)).darker(  disabled.map(function(d,i) { return i }).filter(function(d,i){ return !disabled[i]  })[j]   ).toString(); });
+          .style('fill', function(d,i,j) { return d3v3.rgb(barColor(d,i)).darker(  disabled.map(function(d,i) { return i }).filter(function(d,i){ return !disabled[i]  })[j]   ).toString(); })
+          .style('stroke', function(d,i,j) { return d3v3.rgb(barColor(d,i)).darker(  disabled.map(function(d,i) { return i }).filter(function(d,i){ return !disabled[i]  })[j]   ).toString(); });
       }
 
 

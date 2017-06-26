@@ -84,7 +84,7 @@ class LastActivityMiddleware(object):
       logout = True
 
     # Save last activity for user except when polling
-    if not (request.path.strip('/') == 'jobbrowser' and request.GET.get('format') == 'json') and not (request.path == '/desktop/debug/is_idle'):
+    if not (request.path.strip('/') == 'jobbrowser/jobs' and request.POST.get('format') == 'json') and not (request.path == '/desktop/debug/is_idle'):
       try:
         profile.last_activity = datetime.now()
         profile.save()

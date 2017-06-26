@@ -162,13 +162,13 @@ def test_reverse_with_get():
   # Basic view
   assert_equal("/", reverse_with_get("desktop.views.index"))
   # Arguments for the view
-  assert_equal("/desktop/prefs/foo", reverse_with_get("desktop.views.prefs", kwargs=dict(key="foo")))
+  assert_equal("/desktop/api2/user_preferences/foo", reverse_with_get("desktop.api2.user_preferences", kwargs=dict(key="foo")))
   # Arguments for the view as well as GET parameters
-  assert_equal("/desktop/prefs/foo?a=1&b=2",
-    reverse_with_get("desktop.views.prefs", kwargs=dict(key="foo"), get=dict(a=1,b=2)))
+  assert_equal("/desktop/api2/user_preferences/foo?a=1&b=2",
+    reverse_with_get("desktop.api2.user_preferences", kwargs=dict(key="foo"), get=dict(a=1,b=2)))
   # You can use a list of args instead of kwargs, too
-  assert_equal("/desktop/prefs/foo?a=1&b=2",
-    reverse_with_get("desktop.views.prefs", args=["foo"], get=dict(a=1,b=2)))
+  assert_equal("/desktop/api2/user_preferences/foo?a=1&b=2",
+    reverse_with_get("desktop.api2.user_preferences", args=["foo"], get=dict(a=1,b=2)))
   # Just GET parameters
   assert_equal("/?a=1", reverse_with_get("desktop.views.index", get=dict(a="1")))
   # No GET parameters

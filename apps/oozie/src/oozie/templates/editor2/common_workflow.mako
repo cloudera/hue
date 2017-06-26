@@ -25,9 +25,13 @@
   from django.utils.translation import ugettext as _
   from desktop.views import _ko
 %>
+
 <%namespace name="utils" file="../utils.inc.mako" />
 
+
 <%def name="render()">
+<link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 
 <script type="text/html" id="doc-search-autocomp-item">
   <a>
@@ -75,7 +79,9 @@
 
     <div data-bind="template: { name: 'row-template', data: oozieEndRow }"></div>
 
-    <div data-bind="template: { name: 'row-template', data: oozieKillRow }" style="margin-top: 60px"></div>
+    <!-- ko if: $root.workflow.hasKillNode() -->
+      <div data-bind="template: { name: 'row-template', data: oozieKillRow }" style="margin-top: 60px"></div>
+    <!-- /ko -->
   </div>
 </script>
 
@@ -114,19 +120,19 @@
 
 <script type="text/html" id="internal-row-template">
   <div class="container-fluid">
-    <div class="row-fluid" data-bind="visible: $index() > 0 && $root.isEditing() && ! $root.isRowBeforeJoin($data) && ! $root.isRowAfterFork($data)" style="margin-bottom: 10px">
-      <div data-bind="css: {'span1': true, 'offset3andhalf': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}"></div>
-      <div data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'offset3andhalf': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
+    <div class="row-fluid row-internal" data-bind="visible: $index() > 0 && $root.isEditing() && ! $root.isRowBeforeJoin($data) && ! $root.isRowAfterFork($data)" style="margin-bottom: 10px">
+      <div data-bind="css: {'span1': true, 'offset3': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': ($parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}"></div>
+      <div data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'offset3': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing() && ! enableOozieDropOnBefore(), css: {'drop-target drop-target-disabled': true, 'drop-target-dragging': $root.isDragging(), 'is-editing': $root.isEditing}"></div>
         <div style="text-align: left" data-bind="visible: $root.isEditing() && enableOozieDropOnBefore(), css: {'drop-target': true, 'drop-target-dragging': $root.isDragging(), 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addDraggedWidget($data); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
       <div data-bind="css: {'span1': true, 'readonly': ! $root.isEditing()}"></div>
     </div>
     <div class="row-fluid" data-bind="style: {'width': columns().length < 5 ? '100%' : (columns().length * 25)+'%' }">
-      <div data-bind="css: {'span1': true, 'offset3andhalf': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
+      <div data-bind="css: {'span1': true, 'offset3': ($root.isEditing() && $parents.length <= 2 && columns().length == 0), 'offset4': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: $root.isEditing() && enableOozieDropOnSide() && !($data.widgets().length > 0 && ['join-widget', 'decision-widget'].indexOf($data.widgets()[0].widgetType()) > -1), css: {'drop-target drop-target-side': true, 'drop-target-dragging': $root.isDragging(), 'is-editing': $root.isEditing}, droppable: {enabled: $root.isEditing, onDrop: function(){ var _w = $root.addSideDraggedWidget($data, true); widgetDraggedAdditionalHandler(_w); } }"></div>
       </div>
-      <div  data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'offset3andhalf': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
+      <div  data-bind="css: {'span10': ($parents.length > 2 || columns().length > 0), 'span4': ($parents.length <= 2 && columns().length == 0), 'offset3': (!$root.isEditing() && $parents.length <= 2 && columns().length == 0), 'readonly': ! $root.isEditing()}">
         <div data-bind="visible: columns().length == 0, css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
           sortable: { template: 'widget-template', data: widgets, allowDrop: enableOozieDrop, isEnabled: enableOozieDrop,
           options: {'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
@@ -163,15 +169,19 @@
       </span>
 
       <!-- ko if: widgetType() == 'hive-widget' -->
-      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon" alt="${ _('Hive icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'hive2-widget' || widgetType() == 'hive-document-widget' -->
-      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon"><sup style="color: #338bb8; margin-left: -4px">2</sup>
+      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon" alt="${ _('Hive icon') }"><sup style="color: #0B7FAD; margin-left: -4px">2</sup>
+      <!-- /ko -->
+
+      <!-- ko if: widgetType() == 'impala-widget' || widgetType() == 'impala-document-widget' -->
+      <img src="${ static('oozie/art/icon_impala_48.png') }" class="widget-icon" alt="${ _('Impala icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'pig-widget' || widgetType() == 'pig-document-widget'  -->
-      <img src="${ static('oozie/art/icon_pig_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_pig_48.png') }" class="widget-icon" alt="${ _('Pig icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'java-widget' || widgetType() == 'java-document-widget' -->
@@ -179,7 +189,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'sqoop-widget' || widgetType() == 'sqoop-document-widget' -->
-      <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="widget-icon" alt="${ _('Sqoop icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'mapreduce-widget' || widgetType() == 'mapreduce-document-widget' -->
@@ -215,7 +225,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'spark-widget' || widgetType() == 'spark-document-widget' -->
-      <img src="${ static('oozie/art/icon_spark_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_spark_48.png') }" class="widget-icon" alt="${ _('Spark icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'generic-widget' -->
@@ -227,7 +237,12 @@
       <!-- /ko -->
 
       <span data-bind="visible: typeof $root.isViewer == 'undefined' || ! $root.isViewer(), editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
-      <a class="pointer" data-bind="visible: typeof $root.isViewer != 'undefined' && $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name" title="${ _('View workflow action') }"></a>
+      <!-- ko if: typeof $root.isEmbeddable !== 'undefined' -->
+        <a class="pointer" data-bind="visible: typeof $root.isEmbeddable != 'undefined' && $root.isEmbeddable(), click: function(){ huePubSub.publish('oozie.action.click', $data); }, text: name" title="${ _('View workflow action') }"></a>
+      <!-- /ko -->
+      <!-- ko if: typeof $root.isEmbeddable === 'undefined' -->
+        <a class="pointer" data-bind="visible: typeof $root.isViewer != 'undefined' && $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name" title="${ _('View workflow action') }"></a>
+      <!-- /ko -->
 
       <div class="inline pull-right" data-bind="visible: (typeof $root.isViewer == 'undefined' || ! $root.isViewer()) && !$root.isEditing()" style="margin-right: 4px">
         <a href="javascript:void(0)" data-bind="click: function(w) { viewModel.showSubmitActionPopup(w); }"><i class="fa fa-play-circle-o"></i></a>
@@ -503,12 +518,12 @@
       ${ _('Arguments') } <i class="fa fa-plus"></i>
     </a>
   </h6>
-  <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0,  sortable: { data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
+  <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0,  sortable: { allowDrop: false, data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
     <li style="margin-bottom: 3px">
       <span class="muted move-widget">
         <i class="fa fa-arrows"></i>
       </span>
-      <input type="text" class="span11" data-bind="value: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }" validate="nonempty"/>
+      <input type="text" class="span11" data-bind="value: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }, parseArguments: { list: $parent.properties.arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
       <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
@@ -543,7 +558,7 @@
   </h6>
   <ul class="unstyled" data-bind="foreach: properties.parameters">
     <li style="margin-bottom: 3px">
-      <input type="text" class="filechooser-input seventy" data-bind="value: value, filechooser: value, filechooserOptions: globalFilechooserOptions, filechooserPrefixSeparator: '=', hdfsAutocomplete: value, attr: { placeholder: ' ${ _ko("Fill me up!") }' + ' e.g. limit=${'${'}n}' }, typeahead: { target: value, source: $parent.actionParametersUI, sourceSuffix: '=', triggerOnFocus: true }"  validate="nonempty"/>
+      <input type="text" class="filechooser-input seventy" data-bind="value: value, filechooser: value, filechooserOptions: globalFilechooserOptions, filechooserPrefixSeparator: '=', hdfsAutocomplete: value, attr: { placeholder: ' ${ _ko("Fill me up!") }' + ' e.g. limit=${'${'}n}' }, typeahead: { target: value, source: $parent.actionParametersUI, sourceSuffix: '=', triggerOnFocus: true }, parseArguments: { list: $parent.properties.parameters, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }"  validate="nonempty"/>
       <span data-bind='template: { name: "param-fs-link", data: {path: value()} }'></span>
       <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
@@ -576,16 +591,23 @@
 
 
 <script type="text/html" id="common-action-credentials">
-  <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
-  <ul data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, foreach: $root.credentials" class="unstyled">
-    <li>
-      <label class="checkbox"><input type="checkbox" data-bind="checkedValue: $data, checked: $parent.properties.credentials" /> <span data-bind="text: $data"></span></label>
-    </li>
-  </ul>
+  <!-- ko if: $parent.widgetType() != 'impala-widget' && $parent.widgetType() != 'impala-document-widget' -->
+    <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
+    <ul data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, foreach: $root.credentials" class="unstyled">
+      <li>
+        <label class="checkbox"><input type="checkbox" data-bind="checkedValue: $data, checked: $parent.properties.credentials" /> <span data-bind="text: $data"></span></label>
+      </li>
+    </ul>
 
-  <em data-bind="visible: properties.credentials && properties.credentials.indexOf('hbase') != -1">
-    ${ _('Requires hbase-site.xml in job path') }
-  </em>
+    <em data-bind="visible: properties.credentials && properties.credentials.indexOf('hbase') != -1">
+      ${ _('Requires hbase-site.xml in job path') }
+    </em>
+  <!-- /ko -->
+
+  <!-- ko if: $parent.widgetType() == 'impala-widget' || $parent.widgetType() == 'impala-document-widget' -->
+    <input type="text" class="filechooser-input seventy" data-bind="filechooser: properties.key_tab_path, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.key_tab_path, attr: { placeholder:  $root.workflow_properties.key_tab_path.help_text }"/>
+    <input type="text" data-bind="value: properties.user_principal, attr: { placeholder: $root.workflow_properties.user_principal.help_text }" />
+  <!-- /ko -->
 </script>
 
 
@@ -599,13 +621,13 @@
 <script type="text/html" id="common-fs-link">
  <!-- ko if: $data.path.length > 0 -->
    <!-- ko if: with_label -->
-     <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path , title: '${ _ko('Open') } '+ $data.path }" target="_blank">
+     <a data-bind="hueLink: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path, attr: { title: '${ _ko('Open') } '+ $data.path }" target="_blank">
       <span data-bind="text: $data.path.lastIndexOf('/') == $data.path.length - 1 ? $data.path : $data.path.split('/').pop()"></span>
      </a>
    <!-- /ko -->
 
    <!-- ko if: ! with_label -->
-     <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path }" target="_blank" title="${ _('Open') }">
+     <a data-bind="hueLink: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path" target="_blank" title="${ _('Open') }">
        <i class="fa fa-external-link-square"></i>
      </a>
    <!-- /ko -->
@@ -613,38 +635,29 @@
 </script>
 
 <script type="text/html" id="common-document-widget">
-  <div data-bind="visible: ! $root.isEditing()">
+  <div data-bind="visible: !$root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
+      <!-- ko if: associatedDocumentLoading -->
+        <i class="fa fa-spinner fa-spin muted"></i>
+      <!-- /ko -->
       <!-- ko with: associatedDocument -->
-        <a data-bind="attr: { href: absoluteUrl() }" target="_blank"><span data-bind='text: name'></span></a>
+        <a data-bind="hueLink: absoluteUrl" target="_blank"><span data-bind='text: name'></span></a>
         <br/>
         <span data-bind='text: description' class="muted"></span>
       <!-- /ko -->
     </div>
 
     <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+      <div data-bind="visible: !$parent.ooziePropertiesExpanded()" class="nowrap">
+        <div class="selectize-wrapper" style="width: 300px;">
+          <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: type }"></select>
+        </div>
         <!-- ko if: associatedDocument -->
-          <div class="select-like">
-          <input placeholder="${ _('Search your documents...') }" type="text" data-bind="autocomplete: {
-              source: $root.documentsAutocompleteSource,
-              showOnFocus: true,
-              blurOnEnter: true,
-              type: associatedDocument().type,
-              create: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
-              select: function (event, ui) { ko.dataFor(event.target).properties.uuid(ui.item.value); this.value = ui.item.label; return false;},
-              focus: function (event, ui) { this.value = ui.item.label; return false;},
-              change: function (event, ui) { this.value = ko.dataFor(event.target).associatedDocument().name(); return false;},
-              itemTemplate: 'doc-search-autocomp-item'
-            }, valueUpdate: 'afterkeydown'">
-            <span class="inactive-action">
-                <i class="fa fa-sort"></i>
-              </span>
-          </div>
-          <a href="#" data-bind="attr: { href: associatedDocument().absoluteUrl() }" target="_blank" title="${ _('Open') }">
+          <a href="#" data-bind="hueLink: associatedDocument().absoluteUrl" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
-          <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>
+          <div class="clearfix"></div>
+          <div data-bind='text: associatedDocument().description' style="padding-left: 3px;" class="muted"></div>
         <!-- /ko -->
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
@@ -657,7 +670,7 @@
 
 <script type="text/html" id="param-fs-link">
   <!-- ko if: path.split('=', 2)[1] && path.split('=', 2)[1].charAt(0) == '/' -->
-    <a data-bind="attr: {href: '/filebrowser/view=' + $data.path.split('=', 2)[1] }" target="_blank" title="${ _('Open') }">
+    <a data-bind="hueLink: '/filebrowser/view=' + $data.path.split('=', 2)[1]" target="_blank" title="${ _('Open') }">
       <i class="fa fa-external-link-square"></i>
     </a>
   <!-- /ko -->
@@ -666,10 +679,15 @@
 
 <script type="text/html" id="logs-icon">
   <!-- ko if: $parent.widgetType() != 'subworkflow-widget' && $parent.logsURL() != '' && $parent.logsURL() != null -->
-    <a class="pull-right pointer logs-icon" data-bind="click: function(){ location.href = $parent.logsURL(); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
+    <!-- ko if: typeof $root.isEmbeddable !== 'undefined' -->
+    <a class="pull-right pointer logs-icon" data-bind="click: function(){ huePubSub.publish('oozie.action.logs.click', $parent); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
+    <!-- /ko -->
+    <!-- ko if: typeof $root.isEmbeddable === 'undefined' -->
+    <a class="pull-right pointer logs-icon" data-bind="hueLink: $parent.logsURL" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
+    <!-- /ko -->
   <!-- /ko -->
   <!-- ko if: $parent.widgetType() == 'subworkflow-widget' && $parent.externalIdUrl()-->
-    <a class="pull-right pointer logs-icon" data-bind="attr: { href: $parent.externalIdUrl() }" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon"/></a>
+    <a class="pull-right pointer logs-icon" data-bind="hueLink: $parent.externalIdUrl" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon" alt="${ _('Oozie workflow icon') }"/></a>
   <!-- /ko -->
 </script>
 
@@ -762,22 +780,31 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <!-- ko if: $root.workflow_properties.jdbc_url -->
           <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
           <input type="text" data-bind="value: properties.jdbc_url, attr: { placeholder: $root.workflow_properties.jdbc_url.help_text }" />
           <br/>
+          <!-- /ko -->
+          <!-- ko if: $root.workflow_properties.password -->
           <span data-bind="text: $root.workflow_properties.password.label"></span>
           <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
           <br/>
+          <!-- /ko -->
+          <!-- ko if: $root.workflow_properties.impalad_host -->
+          <span data-bind="text: $root.workflow_properties.impalad_host.label"></span>
+          <input type="text" data-bind="value: properties.impalad_host, attr: { placeholder: $root.workflow_properties.impalad_host.help_text }" />
+          <br/>
+          <!-- /ko -->
           <a class="pointer" data-bind="click: function(){ properties.arguments.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }">
             ${ _('Arguments') } <i class="fa fa-plus"></i>
           </a>
           <div class="row-fluid">
-            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0, sortable: { data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
+            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0, sortable: { allowDrop: false, data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
               <li>
                 <span class="muted move-widget">
                   <i class="fa fa-arrows"></i>
                 </span>
-                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.arguments.help_text }" validate="nonempty"/>
+                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }, parseArguments: { list: $parent.properties.arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
                 <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
                 <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); $(document).trigger('drawArrows') }">
                   <i class="fa fa-minus"></i>
@@ -807,6 +834,11 @@
     </div>
   </div>
   <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="impala-widget">
+  <span data-bind="template: { name: 'hive2-widget' }"></span>
 </script>
 
 
@@ -934,12 +966,12 @@
 
         <div class="row-fluid">
           <div>
-            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.spark_arguments().length > 0, sortable: { data: properties.spark_arguments, options: { axis: 'y', containment: 'parent' }}">
+            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.spark_arguments().length > 0, sortable: { allowDrop: false, data: properties.spark_arguments, options: { axis: 'y', containment: 'parent' }}">
               <li>
                 <span class="muted move-widget">
                   <i class="fa fa-arrows"></i>
                 </span>
-                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }" validate="nonempty"/>
+                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }, parseArguments: { list: $parent.properties.spark_arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
                 <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
                 <a href="#" data-bind="click: function(){ $parent.properties.spark_arguments.remove(this); $(document).trigger('drawArrows') }">
                   <i class="fa fa-minus"></i>
@@ -1114,12 +1146,21 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <!-- ko if: typeof properties.jdbc_url != 'undefined' -->
           <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
           <input type="text" data-bind="value: properties.jdbc_url, attr: { placeholder: $root.workflow_properties.jdbc_url.help_text }" />
           <br/>
+          <!-- /ko -->
+          <!-- ko if: typeof properties.password != 'undefined' -->
           <span data-bind="text: $root.workflow_properties.password.label"></span>
           <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
           <br/>
+          <!-- /ko -->
+          <!-- ko if: typeof properties.impalad_host != 'undefined' -->
+          <span data-bind="text: $root.workflow_properties.impalad_host.label"></span>
+          <input type="text" data-bind="value: properties.impalad_host, attr: { placeholder: $root.workflow_properties.impalad_host.help_text }" />
+          <br/>
+          <!-- /ko -->
           <span data-bind="template: { name: 'common-action-properties' }"></span>
           <br/>
           <br/>
@@ -1141,6 +1182,11 @@
   </div>
   </div>
   <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="impala-document-widget">
+  <span data-bind="template: { name: 'hive-document-widget' }"></span>
 </script>
 
 
@@ -1516,7 +1562,7 @@
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
         <select data-bind="valueAllowUnset: true, options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
         <span data-bind="visible: properties.workflow().length > 0">
-          <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow() }" target="_blank" title="${ _('Open') }">
+          <a href="#" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow()" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </span>
@@ -1547,7 +1593,7 @@
       <span data-bind="template: { name: 'logs-icon' }"></span>
       <!-- ko if: $root.getSubWorkflow(properties.workflow()) -->
         <span data-bind="with: $root.getSubWorkflow(properties.workflow())">
-          <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
+          <a href="#" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value()" target="_blank" title="${ _('Open') }">
             <span data-bind="text: $data.name"></span>
           </a>
         </span>
@@ -2102,12 +2148,12 @@
             <span data-bind="text: $root.workflow_properties.distcp_parameters.label"></span> <i class="fa fa-plus"></i>
           </a>
         </h6>
-        <ul class="unstyled white sortable-arguments" data-bind="sortable: { data: properties.distcp_parameters, options: { axis: 'y', containment: 'parent' }}">
+        <ul class="unstyled white sortable-arguments" data-bind="sortable: { allowDrop: false, data: properties.distcp_parameters, options: { axis: 'y', containment: 'parent' }}">
           <li>
             <span class="muted move-widget">
               <i class="fa fa-arrows"></i>
             </span>
-            <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }" validate="nonempty"/>
+            <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }, parseArguments: { list: $parent.properties.distcp_parameters, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.distcp_parameters.remove(this);  }">
               <i class="fa fa-minus"></i>

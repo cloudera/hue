@@ -29,6 +29,7 @@ from desktop.lib.exceptions import StructuredThriftTransportException
 
 from beeswax.settings import NICE_NAME
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -96,12 +97,24 @@ LIST_PARTITIONS_LIMIT = Config(
   type=int,
   help=_t('Limit the number of partitions that can be listed. A positive value will be set as the LIMIT.'))
 
+# Deprecated
 DOWNLOAD_CELL_LIMIT = Config(
   key='download_cell_limit',
   default=10000000,
   type=int,
   help=_t('A limit to the number of cells (rows * columns) that can be downloaded from a query '
           '(e.g. - 10K rows * 1K columns = 10M cells.) '
+          'A value of -1 means there will be no limit.'))
+
+def get_deprecated_download_cell_limit():
+  """Get the old default"""
+  return DOWNLOAD_CELL_LIMIT.get() / 100 if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
+
+DOWNLOAD_ROW_LIMIT = Config(
+  key='download_row_limit',
+  dynamic_default=get_deprecated_download_cell_limit,
+  type=int,
+  help=_t('A limit to the number of rows that can be downloaded from a query before it is truncated. '
           'A value of -1 means there will be no limit.'))
 
 APPLY_NATURAL_SORT_MAX = Config(
@@ -208,6 +221,7 @@ AUTH_PASSWORD_SCRIPT = Config(
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
   # import in method to avoid circular dependency
+  from beeswax.design import hql_query
   from beeswax.server import dbms
 
   res = []
@@ -215,7 +229,12 @@ def config_validator(user):
     try:
       if not 'test' in sys.argv: # Avoid tests hanging
         server = dbms.get(user)
-        server.execute_statement("SELECT 'Hello World!';")
+        query = hql_query("SELECT 'Hello World!';")
+        handle = server.execute_and_wait(query, timeout_sec=10.0)
+
+        if handle:
+          server.fetch(handle, rows=100)
+          server.close(handle)
     except StructuredThriftTransportException, e:
       if 'Error validating the login' in str(e):
         msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'

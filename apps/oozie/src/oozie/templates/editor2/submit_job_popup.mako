@@ -25,11 +25,11 @@
 <form action="${ action }" method="POST" class="form submit-form">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     % if header:
-      <h3>${header}</h3>
+      <h2 class="modal-title">${header}</h2>
     % else:
-      <h3>${ _('Submit %(job)s?') % {'job': name} }</h3>
+      <h2 class="modal-title">${ _('Submit %(job)s?') % {'job': name} }</h2>
     % endif
   </div>
   <div class="modal-body">
@@ -80,7 +80,7 @@
          </label>
       % endif
       % if is_oozie_mail_enabled:
-        </br>
+        <br/>
         <label class="checkbox" style="display: inline-block; margin-top: 5px">
           <input type="checkbox" name="email_checkbox"
           % if not email_id:
@@ -104,21 +104,7 @@
   </div>
 </form>
 
-<div id="chooseFile" class="modal hide fade">
-  <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
-  </div>
-  <div class="modal-body">
-      <div id="filechooser">
-      </div>
-  </div>
-  <div class="modal-footer">
-  </div>
-</div>
 
-
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }" type="text/css" media="screen" title="no title" charset="utf-8" />
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }" type="text/css" media="screen" title="no title" charset="utf-8" />
 
@@ -149,28 +135,31 @@
     $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm"));
   });
 
-  $(".calendar-link").on("click", function(){
+  $(".calendar-link").on("click", function () {
     var DATE_FORMAT = "YYYY-MM-DD";
     var _el = $(this).parents(".controls").find("input[type='text']");
     _el.off("keyup");
-    _el.on("keyup", function(){
+    _el.on("keyup", function () {
       _el.data("lastValue", _el.val());
     });
     _el.data("lastValue", _el.val());
     _el.datepicker({
       format: DATE_FORMAT.toLowerCase()
-     }).on("changeDate", function () {
+    }).on("changeDate", function () {
       _el.datepicker("hide");
     }).on("hide", function () {
       var _val = _el.data("lastValue") ? _el.data("lastValue") : _el.val();
-      if (_val.indexOf("T") == -1){
+      if (_val.indexOf("T") == -1) {
         _el.val(_el.val() + "T00:00Z");
       }
       else if (_el.val().indexOf("T") == "-1") {
-        _el.val(_el.val() + "T" +  _val.split("T")[1]);
+        _el.val(_el.val() + "T" + _val.split("T")[1]);
       }
     });
-   _el.datepicker('show');
+    _el.datepicker('show');
+    huePubSub.subscribeOnce('hide.datepicker', function () {
+      _el.datepicker('hide');
+    });
   });
 
   % if return_json:
@@ -179,8 +168,17 @@
         type: "POST",
         url: '${ action }',
         data: $('.submit-form').serialize(),
+        dataType: "json",
         success: function (data) {
-          huePubSub.publish('submit.popup.return', data);
+          if (data.status == 0) {
+            huePubSub.publish('submit.popup.return', data);
+          } else {
+            var message = "${ _('Submission was not successful') }";
+            if (data.message) {
+              message = data.message;
+            }
+            $.jHueNotify.error(data.message + (data.detail ? (': ' + data.detail) : ''));
+          }
         }
       });
       e.preventDefault();

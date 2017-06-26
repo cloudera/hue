@@ -14,28 +14,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 import csv
+import gzip
 import operator
 import itertools
 import logging
 
 from django.utils.translation import ugettext as _
 
+from desktop.lib import i18n
+
+from indexer.argument import CheckboxArgument, TextDelimiterArgument
+from indexer.conf import ENABLE_NEW_INDEXER
 from indexer.fields import Field, guess_field_type_from_samples
-from indexer.argument import TextArgument, CheckboxArgument
 from indexer.operations import get_operator
+
 
 LOG = logging.getLogger(__name__)
 
 
+IMPORT_PEEK_SIZE = 1024 * 1024 * 5
+IMPORT_PEEK_NLINES = 20
+
+
 def get_format_types():
-  return [
-    CSVFormat,
-    HueLogFormat,
-    ApacheCombinedFormat,
-    RubyLogFormat,
-    SyslogFormat,
-    ParquetFormat
-  ]
+  formats = [CSVFormat]
+
+  if ENABLE_NEW_INDEXER.get():
+    formats.extend([
+      HueLogFormat,
+      ApacheCombinedFormat,
+      RubyLogFormat,
+      SyslogFormat,
+      ParquetFormat
+    ])
+
+  return formats
 
 def get_file_indexable_format_types():
   return [format_ for format_ in get_format_types() if format_.is_file_indexable]
@@ -272,12 +285,26 @@ class CSVFormat(FileFormat):
   _name = "csv"
   _description = _("CSV File")
   _args = [
-    TextArgument("fieldSeparator", "Field Separator"),
-    TextArgument("recordSeparator", "Record Separator"),
-    TextArgument("quoteChar", "Quote Character"),
+    TextDelimiterArgument("fieldSeparator", "Field Separator"),
+    TextDelimiterArgument("recordSeparator", "Record Separator"),
+    TextDelimiterArgument("quoteChar", "Quote Character"),
     CheckboxArgument("hasHeader", "Has Header")
   ]
   _extensions = ["csv", "tsv"]
+
+  def __init__(self, delimiter=',', line_terminator='\n', quote_char='"', has_header=False, sample="", fields=None):
+    self._delimiter = delimiter
+    self._line_terminator = line_terminator
+    self._quote_char = quote_char
+    self._has_header = has_header
+
+    # sniffer insists on \r\n even when \n. This is safer and good enough for a preview
+    self._line_terminator = self._line_terminator.replace("\r\n", "\n")
+    self._sample_rows = self._get_sample_rows(sample)
+    self._num_columns = self._guess_num_columns(self._sample_rows)
+    self._fields = fields if fields else self._guess_fields(sample)
+
+    super(CSVFormat, self).__init__()
 
   @staticmethod
   def format_character(string):
@@ -311,48 +338,56 @@ class CSVFormat(FileFormat):
 
   @classmethod
   def _guess_from_file_stream(cls, file_stream):
-    sample = cls._get_sample(file_stream)
+    for sample in  cls._get_sample(file_stream):
+      try:
+        dialect, has_header = cls._guess_dialect(sample)
+        delimiter = dialect.delimiter
+        line_terminator = dialect.lineterminator
+        quote_char = dialect.quotechar
 
-    try:
-      dialect, has_header = cls._guess_dialect(sample)
-      delimiter = dialect.delimiter
-      line_terminator = dialect.lineterminator
-      quote_char = dialect.quotechar
-    except Exception:
-      # guess dialect failed, fall back to defaults:
-      return cls()
+        return cls(**{
+          "delimiter": delimiter,
+          "line_terminator": line_terminator,
+          "quote_char": quote_char,
+          "has_header": has_header,
+          "sample": sample
+        })
+      except Exception:
+        LOG.exception('Warning, cannot read the file format.')
 
-    return cls(**{
-      "delimiter":delimiter,
-      "line_terminator": line_terminator,
-      "quote_char": quote_char,
-      "has_header": has_header,
-      "sample": sample
-    })
+    # Guess dialect failed, fall back to defaults:
+    return cls()
 
   @classmethod
   def _get_sample(cls, file_stream):
-    file_stream.seek(0)
-    sample = '\n'.join(file_stream.read(1024*1024*5).splitlines())
-    file_stream.seek(0)
+    encoding = i18n.get_site_encoding()
 
-    return sample
+    for reader in [TextFileReader, GzipFileReader]:
+      file_stream.seek(0)
+      lines = reader.readlines(file_stream, encoding)
+      file_stream.seek(0)
+
+      if lines is not None:
+        yield '\n'.join(lines)
 
   @classmethod
   def _from_format(cls, file_stream, format_):
-    sample = cls._get_sample(file_stream)
+    for sample in cls._get_sample(file_stream):
+      try:
+        delimiter = format_["fieldSeparator"].encode('utf-8')
+        line_terminator = format_["recordSeparator"].encode('utf-8')
+        quote_char = format_["quoteChar"].encode('utf-8')
+        has_header = format_["hasHeader"]
 
-    delimiter = format_["fieldSeparator"].encode('utf-8')
-    line_terminator = format_["recordSeparator"].encode('utf-8')
-    quote_char = format_["quoteChar"].encode('utf-8')
-    has_header = format_["hasHeader"]
-    return cls(**{
-      "delimiter":delimiter,
-      "line_terminator": line_terminator,
-      "quote_char": quote_char,
-      "has_header": has_header,
-      "sample": sample
-    })
+        return cls(**{
+          "delimiter": delimiter,
+          "line_terminator": line_terminator,
+          "quote_char": quote_char,
+          "has_header": has_header,
+          "sample": sample
+        })
+      except Exception:
+        LOG.exception('Warning, cannot read the file format.')
 
   @classmethod
   def get_instance(cls, file_stream, format_):
@@ -360,23 +395,6 @@ class CSVFormat(FileFormat):
       return cls._from_format(file_stream, format_)
     else:
       return cls._guess_from_file_stream(file_stream)
-
-  def __init__(self, delimiter=',', line_terminator='\n', quote_char='"', has_header=False, sample="", fields=None):
-    self._delimiter = delimiter
-    self._line_terminator = line_terminator
-    self._quote_char = quote_char
-    self._has_header = has_header
-
-    # sniffer insists on \r\n even when \n. This is safer and good enough for a preview
-    self._line_terminator = self._line_terminator.replace("\r\n", "\n")
-
-    self._sample_rows = self._get_sample_rows(sample)
-
-    self._num_columns = self._guess_num_columns(self._sample_rows)
-
-    self._fields = fields if fields else self._guess_fields(sample)
-
-    super(CSVFormat, self).__init__()
 
   @property
   def sample(self):
@@ -401,10 +419,10 @@ class CSVFormat(FileFormat):
   def get_format(self):
     format_ = super(CSVFormat, self).get_format()
     specific_format = {
-      "fieldSeparator":self.delimiter,
-      "recordSeparator":self.line_terminator,
-      "quoteChar":self.quote_char,
-      "hasHeader":self._has_header
+      "fieldSeparator": self.delimiter,
+      "recordSeparator": self.line_terminator,
+      "quoteChar": self.quote_char,
+      "hasHeader": self._has_header
     }
     format_.update(specific_format)
 
@@ -452,7 +470,7 @@ class CSVFormat(FileFormat):
     if self._has_header:
       header = first_row
     else:
-      header = ["field_%d" % (i+1) for i in range(self._num_columns)]
+      header = ["field_%d" % (i + 1) for i in range(self._num_columns)]
 
     return header
 
@@ -479,6 +497,35 @@ class CSVFormat(FileFormat):
 
     return fields
 
+
+class GzipFileReader(object):
+  TYPE = 'gzip'
+
+  @staticmethod
+  def readlines(fileobj, encoding):
+    gz = gzip.GzipFile(fileobj=fileobj, mode='rb')
+    try:
+      data = gz.read(IMPORT_PEEK_SIZE)
+    except IOError:
+      return None
+    try:
+      return data.splitlines()[:IMPORT_PEEK_NLINES]
+    except UnicodeError:
+      return None
+
+
+class TextFileReader(object):
+  TYPE = 'text'
+
+  @staticmethod
+  def readlines(fileobj, encoding):
+    try:
+      data = fileobj.read(IMPORT_PEEK_SIZE)
+      return data.splitlines()[:IMPORT_PEEK_NLINES]
+    except UnicodeError:
+      return None
+
+
 class HiveFormat(CSVFormat):
   FIELD_TYPE_TRANSLATE = {
     "BOOLEAN_TYPE": "string",
@@ -495,7 +542,7 @@ class HiveFormat(CSVFormat):
     "DATE_TYPE": "date",
     "boolean": "string",
     "tinyint": "long",
-    "samllint": "long",
+    "smallint": "long",
     "int": "long",
     "bigint": "long",
     "float": "double",
@@ -517,7 +564,7 @@ class HiveFormat(CSVFormat):
       fields.append(Field(
         name=field["name"],
         field_type_name=cls.FIELD_TYPE_TRANSLATE.get(field['type'], 'string')
-        ))
+      ))
 
     return cls(**{
       "delimiter":',',

@@ -1,0 +1,231 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+ul {
+  list-style-type: none;
+}
+
+#modal-window .modal-content {
+  height: 300px;
+  overflow: auto;
+}
+
+#node-modal {
+  width: auto;
+}
+
+#node-modal .modal-content {
+  background: white;
+  max-height: 500px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding: 5px;
+}
+
+#editKill [class*="span"] {
+    margin-left: 0;
+}
+
+.action, .editor-action {
+  border: 0!important;
+  padding: 0;
+}
+
+.action h4, .editor-action h4 {
+  margin-bottom: 1px;
+}
+
+.node-link {
+  border: 1px dashed #DDD;
+  margin: 10px;
+}
+
+.node-description {
+  padding-top: 10px;
+}
+
+.node-action-bar {
+  background-color: #EEE;
+  padding-top: 5px;
+  margin-top: 10px;
+  -webkit-box-shadow: inset 0 3px 5px 0 #DDD;
+  box-shadow: inset 0 3px 5px 0 #DDD;
+}
+
+#graph {
+  margin-top: 20px;
+}
+
+#graph, #new-node {
+  text-align: center;
+}
+
+.node-link-hover {
+  background: #D9EDF7;
+}
+
+.node-action-hover {
+  background: #D9EDF7;
+}
+
+.node-fork-hover {
+  background: #EEE;
+}
+
+.popover {
+  z-index: 2060 !important;
+  margin-left: 166px!important;
+}
+
+.control-group.error .CodeMirror {
+  border: 1px solid #B94A48;
+}
+
+.new-node-link {
+  text-align: left;
+  cursor: move;
+}
+
+#workflow {
+  margin-bottom: 80px;
+}
+
+#actionToolbar {
+  z-index: 1000;
+  padding: 4px;
+  padding-bottom: 8px;
+  background-color: #FFF;
+  text-align: center;
+}
+
+#actionToolbar.shadowed {
+  -webkit-box-shadow: 0 3px 5px rgba(150, 150, 150, 0.15);
+  -moz-box-shadow: 0 3px 5px rgba(150, 150, 150, 0.15);
+  box-shadow: 0 3px 5px rgba(150, 150, 150, 0.15);
+}
+
+#actionToolbar h5 {
+  margin-left: 10px;
+}
+
+.form-horizontal .form-actions {
+  padding-left: 0;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  margin-bottom: 0;
+  -webkit-box-shadow: 0 -1px 3px rgba(50, 50, 50, 0.15);
+  -moz-box-shadow: 0 -1px 3px rgba(50, 50, 50, 0.15);
+  box-shadow: 0 -1px 3px rgba(50, 50, 50, 0.15);
+  z-index: 1020;
+  margin-left: -20px;
+  left:0;
+}
+
+.draggable-button {
+  display: inline;
+  margin: 1px;
+  line-height: 40px;
+}
+
+.draggable-button a {
+  padding: 7px;
+}
+
+@media (max-width: 1365px) {
+  .draggable-button a {
+    padding: 4px;
+  }
+}
+
+@media (max-width: 1260px) {
+  .draggable-button a {
+    padding: 1px;
+  }
+}
+
+
+.typeahead {
+  z-index: 2000;
+}
+
+#importAction .action-row, #importOozieAction .action-row {
+  cursor: pointer;
+}
+
+.action > .nav-tabs > li,
+.action > .nav-pills > li,
+.action > .tabs-below > .nav-tabs > li,
+.action > .tabs-below > .nav-pills > li,
+.editor-action > .nav-tabs > li,
+.editor-action > .nav-pills > li,
+.editor-action > .tabs-below > .nav-tabs > li,
+.editor-action > .tabs-below > .nav-pills > li {
+    float:none;
+    display:inline-block;
+    *display:inline; /* ie7 fix */
+     zoom:1; /* hasLayout ie7 trigger */
+}
+
+.action > .nav-tabs,
+.action > .nav-pills,
+.action > .tabs-below > .nav-tabs,
+.action > .tabs-below > .nav-pills,
+.editor-action > .nav-tabs,
+.editor-action > .nav-pills,
+.editor-action > .tabs-below > .nav-tabs,
+.editor-action > .tabs-below > .nav-pills {
+    text-align:center;
+}
+
+.action .btn-mini i, .editor-action .btn-mini i {
+  line-height: 18px!important;
+}
+
+.gradient {
+  background: #f9f9f9; /* Old browsers */
+  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y5ZjlmOSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top,  #f9f9f9 0%, #ffffff 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f9f9f9), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #f9f9f9 0%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #f9f9f9 0%,#ffffff 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #f9f9f9 0%,#ffffff 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #f9f9f9 0%,#ffffff 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f9f9f9', endColorstr='#ffffff',GradientType=0 ); /* IE6-8 */
+}
+
+.inverse_gradient {
+  background: #ffffff; /* Old browsers */
+  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2Y5ZjlmOSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmZmZmZmYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+  background: -moz-linear-gradient(top,  #ffffff 0%, #f9f9f9 100%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#f9f9f9)); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top,  #ffffff 0%,#f9f9f9 100%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top,  #ffffff 0%,#f9f9f9 100%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top,  #ffffff 0%,#f9f9f9 100%); /* IE10+ */
+  background: linear-gradient(to bottom,  #ffffff 0%,#f9f9f9 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f9f9f9',GradientType=0 ); /* IE6-8 */
+}
+
+.editor-action-body {
+  text-align:left;
+  padding:10px;
+  border:1px solid #DDD!important;
+  border-top:0!important;
+}

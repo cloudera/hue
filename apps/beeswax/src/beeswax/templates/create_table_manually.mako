@@ -24,25 +24,23 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 
 ${ commonheader(_("Create table manually"), 'metastore', user, request) | n,unicode }
+
+<span class="notebook">
 ${ layout.metastore_menubar() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
-<script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+
 
 ${ assist.assistJSModels() }
 
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -74,10 +72,6 @@ ${ assist.assistPanel() }
               params: {
                 user: '${user.username}',
                 sql: {
-                  sourceTypes: [{
-                    name: 'hive',
-                    type: 'hive'
-                  }],
                   navigationSettings: {
                     openItem: false,
                     showStats: true
@@ -89,7 +83,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
 
-        <div class="right-panel">
+        <div class="content-panel">
 
           <div class="metastore-main">
 
@@ -97,7 +91,7 @@ ${ assist.assistPanel() }
               <div class="inline-block pull-right" style="margin-top: -8px">
                 <a href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}" class="inactive-action"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
               </div>
-              <ul id="breadcrumbs" class="nav nav-pills hueBreadcrumbBar">
+              <ul id="breadcrumbs" class="nav nav-pills hue-breadcrumbs-bar">
                 <li>
                   <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
                 </li>
@@ -503,19 +497,6 @@ ${ assist.assistPanel() }
 
 
 
-<div id="chooseFile" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Choose a file')}</h3>
-    </div>
-    <div class="modal-body">
-        <div id="filechooser">
-        </div>
-    </div>
-    <div class="modal-footer">
-    </div>
-</div>
-
 <style type="text/css">
   #filechooser {
     min-height: 100px;
@@ -563,17 +544,16 @@ ${ assist.assistPanel() }
 </div>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   (function () {
     ko.options.deferUpdates = true;
 
-    function MetastoreViewModel(options) {
+    function CreateTableViewModel() {
       var self = this;
-      self.apiHelper = ApiHelper.getInstance(options);
+      self.apiHelper = ApiHelper.getInstance();
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
-
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
         location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name;
@@ -586,15 +566,7 @@ ${ assist.assistPanel() }
 
     $(document).ready(function () {
 
-      var options = {
-        user: '${ user.username }',
-        i18n: {
-          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
-        }
-      }
-
-      var viewModel = new MetastoreViewModel(options);
+      var viewModel = new CreateTableViewModel();
 
       ko.applyBindings(viewModel);
 
@@ -768,7 +740,7 @@ ${ assist.assistPanel() }
           if (!isValid($.trim(_field.val()))) {
             showFieldError(_field);
             if (scrollTo == 0) {
-              scrollTo = $(this).offset().top + $('.right-panel').scrollTop() - 150;
+              scrollTo = $(this).offset().top + $('.content-panel').scrollTop() - 150;
             }
             step6Valid = false;
           }
@@ -780,7 +752,7 @@ ${ assist.assistPanel() }
             if ($.trim($(this).val()) != "" && $.trim($(this).val()) == $.trim(_field.val())) {
               _lastSecondErrorField = $(this);
               if (scrollTo == 0) {
-                scrollTo = _field.offset().top + $('.right-panel').scrollTop() - 150;
+                scrollTo = _field.offset().top + $('.content-panel').scrollTop() - 150;
               }
               step6Valid = false;
             }
@@ -793,7 +765,7 @@ ${ assist.assistPanel() }
           }
         });
         if (!step6Valid && scrollTo > 0) {
-          $('.right-panel').animate({
+          $('.content-panel').animate({
             'scrollTop' : scrollTo
           }, 500);
         }
@@ -915,4 +887,5 @@ ${ assist.assistPanel() }
   })();
 </script>
 
+</span>
 ${ commonfooter(request, messages) | n,unicode }

@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DJANGO_APPS = [ "indexer" ]
-NICE_NAME = "Solr Indexer"
+DJANGO_APPS = ["indexer"]
+NICE_NAME = "Data Importer"
 REQUIRES_HADOOP = False
 MENU_INDEX = 43
 ICON = "search/art/icon_search_48.png"

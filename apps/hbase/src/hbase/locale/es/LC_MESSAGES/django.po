@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2012 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -38,58 +38,84 @@ msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "El clúster con el nombre %s no existe en la configuración."
 
 #: src/hbase/api.py:118
-msgid "The kerberos principal name is missing from the hbase-site.xml configuration file."
-msgstr "Falta el nombre principal de Kerberos del archivo de configuración hbase-site.xml."
+msgid ""
+"The kerberos principal name is missing from the hbase-site.xml "
+"configuration file."
+msgstr ""
+"Falta el nombre principal de Kerberos del archivo de configuración hbase-"
+"site.xml."
 
 #: src/hbase/conf.py:33
-msgid "Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security.Prefix hostname with https:// if using SSL and http mode with impersonation."
-msgstr "Lista separada por comas de los servidores HBase Thrift para clústeres con formato '(nombre|host:puerto)'. Use el nombre completo del host con seguridad. Nombre de host con prefijo con https:// si utiliza SSL y el modo http con suplantación."
+msgid ""
+"Comma-separated list of HBase Thrift servers for clusters in the format "
+"of '(name|host:port)'. Use full hostname with security.Prefix hostname "
+"with https:// if using SSL and http mode with impersonation."
+msgstr ""
+"Lista separada por comas de los servidores HBase Thrift para clústeres "
+"con formato '(nombre|host:puerto)'. Use el nombre completo del host con "
+"seguridad. Nombre de host con prefijo con https:// si utiliza SSL y el "
+"modo http con suplantación."
 
 #: src/hbase/conf.py:41
 msgid "Hard limit of rows or columns per row fetched before truncating."
 msgstr "Límite fijo de filas o columnas por fila obtenido antes de truncar."
 
 #: src/hbase/conf.py:48
-msgid "'buffered' is the default of the HBase Thrift Server and supports security. 'framed' can be used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
-msgstr "'buffered' es el valor predeterminado del servidor HBase Thrift y es compatible con seguridad. 'framed' se puede utilizar para fragmentar respuestas, lo que resulta útil cuando se utiliza con el servidor sin bloqueo en Thrift."
+msgid ""
+"'buffered' is the default of the HBase Thrift Server and supports "
+"security. 'framed' can be used to chunk up responses, which is useful "
+"when used in conjunction with the nonblocking server in Thrift."
+msgstr ""
+"'buffered' es el valor predeterminado del servidor HBase Thrift y es "
+"compatible con seguridad. 'framed' se puede utilizar para fragmentar "
+"respuestas, lo que resulta útil cuando se utiliza con el servidor sin "
+"bloqueo en Thrift."
 
 #: src/hbase/conf.py:56
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "Directorio de configuración de HBase, donde está hbase-site.xml."
 
 #: src/hbase/conf.py:63
-msgid "Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties."
-msgstr "Fuerce a Hue para que utilice el modo Http Thrift con suplantación \"doAs\", independientemente de las propiedades de hbase-site.xml."
+msgid ""
+"Force Hue to use Http Thrift mode with doas impersonation, regarless of "
+"hbase-site.xml properties."
+msgstr ""
+"Fuerce a Hue para que utilice el modo Http Thrift con suplantación "
+"\"doAs\", independientemente de las propiedades de hbase-site.xml."
 
-#: src/hbase/views.py:135
+#: src/hbase/views.py:136
 msgid "A POST request is required."
 msgstr "Se necesita una solicitud POST."
 
-#: src/hbase/templates/app.mako:35
+#: src/hbase/templates/app.mako:36
+msgid "HBase icon"
+msgstr "Icono de HBase"
+
+#: src/hbase/templates/app.mako:37
 msgid "HBase Browser"
 msgstr "HBase Browser"
 
-#: src/hbase/templates/app.mako:73
+#: src/hbase/templates/app.mako:74
 msgid "Refresh Row"
 msgstr "Actualizar fila"
 
-#: src/hbase/templates/app.mako:75
+#: src/hbase/templates/app.mako:76
 msgid "Delete Row"
 msgstr "Eliminar fila"
 
-#: src/hbase/templates/app.mako:79 src/hbase/templates/app.mako:274
+#: src/hbase/templates/app.mako:80 src/hbase/templates/app.mako:274
 msgid "Toggle Collapse Selected"
 msgstr "Alternar Contraer la selección"
 
-#: src/hbase/templates/app.mako:80 src/hbase/templates/app.mako:275
+#: src/hbase/templates/app.mako:81 src/hbase/templates/app.mako:275
 msgid "Select All Visible"
 msgstr "Seleccionar todos los visibles"
 
-#: src/hbase/templates/app.mako:85
+#: src/hbase/templates/app.mako:86
 msgid "Add New Column/Cell"
 msgstr "Agregar nueva columna/celda"
 
-#: src/hbase/templates/app.mako:98
+#: src/hbase/templates/app.mako:99
 msgid "Full Editor"
 msgstr "Editor completo"
 
@@ -129,6 +155,12 @@ msgstr "Descartar"
 msgid "New Table"
 msgstr "Nueva tabla"
 
+#: src/hbase/templates/app.mako:192 src/hbase/templates/app.mako:321
+#: src/hbase/templates/app.mako:344 src/hbase/templates/app.mako:369
+#: src/hbase/templates/app.mako:434
+msgid "Close"
+msgstr "Cerrar"
+
 #: src/hbase/templates/app.mako:193
 msgid "Create New Table"
 msgstr "Crear nueva tabla"
@@ -147,7 +179,7 @@ msgstr "Añadir una familia de columnas adicional"
 
 #: src/hbase/templates/app.mako:203 src/hbase/templates/app.mako:334
 #: src/hbase/templates/app.mako:357 src/hbase/templates/app.mako:399
-#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:439
+#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:440
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -172,8 +204,12 @@ msgid "Add a column property"
 msgstr "Añadir una propiedad de columna"
 
 #: src/hbase/templates/app.mako:246
-msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
-msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
 
 #: src/hbase/templates/app.mako:256
 msgid "Autocomplete Suggestions:"
@@ -287,105 +323,102 @@ msgstr "Guardar"
 msgid "Revert"
 msgstr "Revertir"
 
-#: src/hbase/templates/app.mako:440 src/hbase/templates/app.mako:458
+#: src/hbase/templates/app.mako:411
+msgid "Cell image"
+msgstr "Imagen de celda"
+
+#: src/hbase/templates/app.mako:441 src/hbase/templates/app.mako:462
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: src/hbase/templates/app.mako:452
+#: src/hbase/templates/app.mako:456
 msgid "Confirm Delete"
 msgstr "Confirmar eliminación"
 
-#: src/hbase/templates/app.mako:453
+#: src/hbase/templates/app.mako:457
 msgid "Delete row "
 msgstr "Eliminar fila "
 
-#: src/hbase/templates/app.mako:454
+#: src/hbase/templates/app.mako:458
 msgid "? (This cannot be undone)"
 msgstr "? (No se puede deshacer)"
 
-#: src/hbase/templates/app.mako:455
+#: src/hbase/templates/app.mako:459
 msgid "Are you sure you want to drop this column?"
 msgstr "¿Está seguro de que desea descartar esta columna?"
 
-#: src/hbase/templates/app.mako:456
+#: src/hbase/templates/app.mako:460
 msgid "enable"
 msgstr "activar"
 
-#: src/hbase/templates/app.mako:457
+#: src/hbase/templates/app.mako:461
 msgid "disable"
 msgstr "desactivar"
 
-#: src/hbase/templates/app.mako:459
+#: src/hbase/templates/app.mako:463
 msgid "Are you sure you want to"
 msgstr "¿Está seguro de que desea"
 
-#: src/hbase/templates/app.mako:460
+#: src/hbase/templates/app.mako:464
 msgid "this table?"
 msgstr "esta tabla?"
 
-#: src/hbase/templates/app.mako:461
+#: src/hbase/templates/app.mako:465
 msgid "End Query"
 msgstr "Finalizar consulta"
 
-#: src/hbase/templates/app.mako:462
+#: src/hbase/templates/app.mako:466
 msgid "Prefix Scan"
 msgstr "Análisis de prefijos"
 
-#: src/hbase/templates/app.mako:463
+#: src/hbase/templates/app.mako:467
 msgid "Start Scan"
 msgstr "Iniciar examen"
 
-#: src/hbase/templates/app.mako:464
+#: src/hbase/templates/app.mako:468
 msgid "Start Select Columns"
 msgstr "Iniciar columnas seleccionadas"
 
-#: src/hbase/templates/app.mako:465
+#: src/hbase/templates/app.mako:469
 msgid "End Column/Family"
 msgstr "Finalizar columna/familia"
 
-#: src/hbase/templates/app.mako:466
+#: src/hbase/templates/app.mako:470
 msgid "End Select Columns"
 msgstr "Finalizar columnas seleccionadas"
 
-#: src/hbase/templates/app.mako:467
+#: src/hbase/templates/app.mako:471
 msgid "Start FilterString"
 msgstr "Iniciar FilterString"
 
-#: src/hbase/templates/app.mako:468
+#: src/hbase/templates/app.mako:472
 msgid "End FilterString"
 msgstr "Finalizar FilterString"
 
-#: src/hbase/templates/app.mako:469
+#: src/hbase/templates/app.mako:473
 msgid "Row Key Value"
 msgstr "Valor de clave de fila"
 
-#: src/hbase/templates/app.mako:470
+#: src/hbase/templates/app.mako:474
 msgid "Length of Scan or Row Key"
 msgstr "Longitud de examen o clave de fila"
 
-#: src/hbase/templates/app.mako:471
+#: src/hbase/templates/app.mako:475
 msgid "Column Family: Column Name"
 msgstr "Familia de columnas: nombre de columna"
 
-#: src/hbase/templates/app.mako:472
+#: src/hbase/templates/app.mako:476
 msgid "Rows starting with"
 msgstr "Filas que empiezan por"
 
-#: src/hbase/templates/app.mako:473
+#: src/hbase/templates/app.mako:477
 msgid "String"
 msgstr "Cadena"
 
-#: src/hbase/templates/app.mako:474
+#: src/hbase/templates/app.mako:478
 msgid "Integer"
 msgstr "Entero"
 
-#: src/hbase/templates/app.mako:475
+#: src/hbase/templates/app.mako:479
 msgid "Column Range"
 msgstr "Intervalo de columnas"
-
-#~ msgid "There are no tables matching the search criteria."
-#~ msgstr "No hay ninguna tabla que coincida con los criterios de búsqueda."
-
-#~ msgid "OK"
-#~ msgstr "Aceptar"
-

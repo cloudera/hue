@@ -23,7 +23,7 @@
       COLORS = {
         ORANGE: "#FB950D",
         GREEN: "#419E08",
-        BLUE: "#338BB8",
+        BLUE: "#0B7FAD",
         RED: "#CE151D",
         PURPLE: "#572B91",
         TURQUOISE: "#049D84",

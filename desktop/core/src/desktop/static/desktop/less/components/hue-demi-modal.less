@@ -1,0 +1,85 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.demi-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1050;
+  width: 100%;
+  margin: -1px;
+  padding: 0;
+  background-color: @cui-white;
+  min-height: 210px;
+  border: 1px solid @cui-gray-400;
+  -webkit-border-bottom-right-radius: 0px;
+  -webkit-border-bottom-left-radius: 0px;
+  -moz-border-radius-bottomright: 0px;
+  -moz-border-radius-bottomleft: 0px;
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+  outline: none;
+  &.fade {
+    top: -500px;
+    .hue-linear-transition(opacity);
+  }
+
+  &.fade.in {
+    top: 0;
+  }
+
+  & .modal-header {
+    padding: 9px 15px;
+    border-bottom: 1px solid @cui-gray-100;
+  }
+
+  & .modal-header .close {
+    margin-top: 2px;
+  }
+
+  & .modal-body {
+    position: relative;
+    max-height: 400px;
+    padding: 15px;
+    overflow-y: auto;
+  }
+
+  & .modal-footer {
+    padding: 10px;
+  }
+
+}
+
+.demi-modal-half {
+  width: 500px;
+  left: 50%;
+  margin-left: -250px;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.demi-modal-chevron {
+  text-align: center;
+  width: 100%;
+  display: table;
+}
+
+.demi-modal-chevron:hover {
+  background-color: @cui-gray-050;
+}

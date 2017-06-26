@@ -20,6 +20,8 @@ import logging
 import os
 import time
 
+from string import Template
+
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
@@ -37,6 +39,7 @@ from liboozie.credentials import Credentials
 
 
 LOG = logging.getLogger(__name__)
+
 
 def submit_dryrun(run_func):
   def decorate(self, deployment_dir=None):
@@ -87,6 +90,9 @@ class Submission(object):
         properties['start_date'] = convert_to_server_timezone(self.properties['start_date'], local_tz)
       if 'end_date' in self.properties:
         properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
+
+    if 'nominal_time' in self.properties:
+      properties['nominal_time'] = convert_to_server_timezone(self.properties['nominal_time'], local_tz)
 
     self.properties['security_enabled'] = self.api.security_enabled
 
@@ -199,6 +205,45 @@ class Submission(object):
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
+        elif action.data['type'] == 'impala' or action.data['type'] == 'impala-document':
+          from oozie.models2 import _get_impala_url
+          from impala.impala_flags import get_ssl_server_certificate
+
+          if action.data['type'] == 'impala-document':
+            from notebook.models import Notebook
+            if action.data['properties'].get('uuid'):
+              notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
+              statements = notebook.get_str()
+              statements = Template(statements).safe_substitute(**self.properties)
+              script_name = action.data['name'] + '.sql'
+              self._create_file(deployment_dir, script_name, statements)
+          else:
+            script_name = os.path.basename(action.data['properties'].get('script_path'))
+
+          if self.api.security_enabled:
+            kinit = 'kinit -k -t *.keytab %(user_principal)s' % {
+              'user_principal': self.properties.get('user_principal', action.data['properties'].get('user_principal'))
+            }
+          else:
+            kinit = ''
+
+          shell_script = """#!/bin/bash
+
+# Needed to launch impala shell in oozie
+export PYTHON_EGG_CACHE=./myeggs
+
+%(kinit)s
+
+impala-shell %(kerberos_option)s %(ssl_option)s -i %(impalad_host)s -f %(query_file)s""" % {
+  'impalad_host': action.data['properties'].get('impalad_host') or _get_impala_url(),
+  'kerberos_option': '-k' if self.api.security_enabled else '',
+  'ssl_option': '--ssl' if get_ssl_server_certificate() else '',
+  'query_file': script_name,
+  'kinit': kinit
+  }
+
+          self._create_file(deployment_dir, action.data['name'] + '.sh', shell_script)
+
         elif action.data['type'] == 'hive-document':
           from notebook.models import Notebook
           if action.data['properties'].get('uuid'):
@@ -299,6 +344,37 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
       credentials.fetch(self.api)
       self.properties['credentials'] = credentials.get_properties()
 
+      self._update_credentials_from_hive_action(credentials)
+
+
+  def _update_credentials_from_hive_action(self, credentials):
+    """
+    Hive JDBC url from conf should be replaced when URL is set in hive action. Use _HOST from
+    this URL to update the hive2_host in hive principal hive/hive2_host@YOUR-REALM.COM
+    """
+    if hasattr(self.job, 'nodes'):
+      for action in self.job.nodes:
+        if action.data['type'] in ('hive2', 'hive-document') and \
+                        credentials.hiveserver2_name in self.properties['credentials'] and \
+                        action.data['properties']['jdbc_url']:
+          try:
+            hive_jdbc_url = action.data['properties']['jdbc_url']
+            hive_host_from_action = hive_jdbc_url.split('//')[1].split(':')[0]
+
+            hive_principal_from_conf = self.properties['credentials'][credentials.hiveserver2_name]['properties'][1][1]
+            updated_hive_principal = hive_principal_from_conf.split('/')[0] + '/' + hive_host_from_action + '@' + hive_principal_from_conf.split('@')[1]
+
+            self.properties['credentials'][credentials.hiveserver2_name]['properties'] = [
+              ('hive2.jdbc.url', hive_jdbc_url),
+              ('hive2.server.principal', updated_hive_principal)
+            ]
+          except Exception, ex:
+            msg = 'Failed to update the Hive JDBC URL from %s action properties: %s' % (action.data['type'], str(ex))
+            LOG.error(msg)
+            raise PopupException(message=_(msg), detail=str(ex))
+
+
+
   def _create_deployment_dir(self):
     """
     Return the job deployment directory in HDFS, creating it if necessary.
@@ -311,7 +387,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
     has_deployment_dir_access = False
     if self.job.deployment_dir and self.fs.exists(self.job.deployment_dir):
       statbuf = self.fs.stats(self.job.deployment_dir)
-      has_deployment_dir_access = statbuf and (statbuf.user == self.job.user.username)
+      has_deployment_dir_access = statbuf and (statbuf.user == self.user.username)
 
     # Case of a shared job
     if self.job.document and self.user != self.job.document.owner or not has_deployment_dir_access:

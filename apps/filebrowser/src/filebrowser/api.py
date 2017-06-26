@@ -17,8 +17,6 @@
 
 import logging
 
-from django.utils.translation import ugettext as _
-
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.fsmanager import FS_GETTERS
 from desktop.lib.i18n import smart_unicode
@@ -48,9 +46,7 @@ def get_filesystems(request):
 
   filesystems = {}
   for k, v in FS_GETTERS.items():
-    if k.startswith('s3') and has_s3_access(request.user):
-      filesystems[k] = v is not None
-    else:
+    if not k.startswith('s3') or has_s3_access(request.user):
       filesystems[k] = v is not None
 
   response['status'] = 0

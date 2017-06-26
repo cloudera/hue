@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2012 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -38,58 +38,77 @@ msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "%s という名前のクラスタが設定に存在しません。"
 
 #: src/hbase/api.py:118
-msgid "The kerberos principal name is missing from the hbase-site.xml configuration file."
+msgid ""
+"The kerberos principal name is missing from the hbase-site.xml "
+"configuration file."
 msgstr "Kerberos プリンシパル名が  hbase-site.xml 設定ファイルに見つかりません。"
 
 #: src/hbase/conf.py:33
-msgid "Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security.Prefix hostname with https:// if using SSL and http mode with impersonation."
-msgstr "クラスターを構成する HBase Thrift サーバーを、(name|host:port) の形式で指定したカンマ区切りリストです。セキュリティで保護される完全なホスト名を使用します。つまり、権限の借用で SSL と http モードを使用する場合、ホスト名の前に https:// を指定します。"
+msgid ""
+"Comma-separated list of HBase Thrift servers for clusters in the format "
+"of '(name|host:port)'. Use full hostname with security.Prefix hostname "
+"with https:// if using SSL and http mode with impersonation."
+msgstr ""
+"クラスターを構成する HBase Thrift サーバーを、(name|host:port) "
+"の形式で指定したカンマ区切りリストです。セキュリティで保護される完全なホスト名を使用します。つまり、権限の借用で SSL と http "
+"モードを使用する場合、ホスト名の前に https:// を指定します。"
 
 #: src/hbase/conf.py:41
 msgid "Hard limit of rows or columns per row fetched before truncating."
 msgstr "切り詰めの実行前に取得された行または行ごとの列のハード制限です。"
 
 #: src/hbase/conf.py:48
-msgid "'buffered' is the default of the HBase Thrift Server and supports security. 'framed' can be used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
-msgstr "HBase Thrift サーバーのデフォルトである 'buffered' はセキュリティをサポートします。'framed' を使用する応答を集めることができます。これは、 Thrift でノンブロッキングサーバーと組み合わせて使用する場合に役に立ちます。"
+msgid ""
+"'buffered' is the default of the HBase Thrift Server and supports "
+"security. 'framed' can be used to chunk up responses, which is useful "
+"when used in conjunction with the nonblocking server in Thrift."
+msgstr ""
+"HBase Thrift サーバーのデフォルトである 'buffered' はセキュリティをサポートします。'framed' "
+"を使用する応答を集めることができます。これは、 Thrift でノンブロッキングサーバーと組み合わせて使用する場合に役に立ちます。"
 
 #: src/hbase/conf.py:56
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "hbase-site.xml を保存する HBase 設定ディレクトリ。"
 
 #: src/hbase/conf.py:63
-msgid "Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties."
+msgid ""
+"Force Hue to use Http Thrift mode with doas impersonation, regarless of "
+"hbase-site.xml properties."
 msgstr "hbase-site.xml プロパティにかかわらず、権限の借用と同様に、Http Thrift モードの使用を Hue に強制します。"
 
-#: src/hbase/views.py:135
+#: src/hbase/views.py:136
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
-#: src/hbase/templates/app.mako:35
+#: src/hbase/templates/app.mako:36
+msgid "HBase icon"
+msgstr "HBase アイコン"
+
+#: src/hbase/templates/app.mako:37
 msgid "HBase Browser"
 msgstr "HBase Browser"
 
-#: src/hbase/templates/app.mako:73
+#: src/hbase/templates/app.mako:74
 msgid "Refresh Row"
 msgstr "行を更新"
 
-#: src/hbase/templates/app.mako:75
+#: src/hbase/templates/app.mako:76
 msgid "Delete Row"
 msgstr "行を削除"
 
-#: src/hbase/templates/app.mako:79 src/hbase/templates/app.mako:274
+#: src/hbase/templates/app.mako:80 src/hbase/templates/app.mako:274
 msgid "Toggle Collapse Selected"
 msgstr "縮小の選択を切り替え"
 
-#: src/hbase/templates/app.mako:80 src/hbase/templates/app.mako:275
+#: src/hbase/templates/app.mako:81 src/hbase/templates/app.mako:275
 msgid "Select All Visible"
 msgstr "表示されているすべてを選択"
 
-#: src/hbase/templates/app.mako:85
+#: src/hbase/templates/app.mako:86
 msgid "Add New Column/Cell"
 msgstr "新規の列／セルを追加"
 
-#: src/hbase/templates/app.mako:98
+#: src/hbase/templates/app.mako:99
 msgid "Full Editor"
 msgstr "フルエディタ"
 
@@ -129,6 +148,12 @@ msgstr "ドロップ"
 msgid "New Table"
 msgstr "新しいテーブル"
 
+#: src/hbase/templates/app.mako:192 src/hbase/templates/app.mako:321
+#: src/hbase/templates/app.mako:344 src/hbase/templates/app.mako:369
+#: src/hbase/templates/app.mako:434
+msgid "Close"
+msgstr "閉じる"
+
 #: src/hbase/templates/app.mako:193
 msgid "Create New Table"
 msgstr "新しいテーブルを作成"
@@ -147,7 +172,7 @@ msgstr "列ファミリを追加"
 
 #: src/hbase/templates/app.mako:203 src/hbase/templates/app.mako:334
 #: src/hbase/templates/app.mako:357 src/hbase/templates/app.mako:399
-#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:439
+#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:440
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -172,8 +197,12 @@ msgid "Add a column property"
 msgstr "列のプロパティを追加"
 
 #: src/hbase/templates/app.mako:246
-msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
-msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
 
 #: src/hbase/templates/app.mako:256
 msgid "Autocomplete Suggestions:"
@@ -287,105 +316,102 @@ msgstr "保存"
 msgid "Revert"
 msgstr "復帰"
 
-#: src/hbase/templates/app.mako:440 src/hbase/templates/app.mako:458
+#: src/hbase/templates/app.mako:411
+msgid "Cell image"
+msgstr "セルのイメージ"
+
+#: src/hbase/templates/app.mako:441 src/hbase/templates/app.mako:462
 msgid "Confirm"
 msgstr "確認"
 
-#: src/hbase/templates/app.mako:452
+#: src/hbase/templates/app.mako:456
 msgid "Confirm Delete"
 msgstr "削除を確認"
 
-#: src/hbase/templates/app.mako:453
+#: src/hbase/templates/app.mako:457
 msgid "Delete row "
 msgstr "行を削除 "
 
-#: src/hbase/templates/app.mako:454
+#: src/hbase/templates/app.mako:458
 msgid "? (This cannot be undone)"
 msgstr "?（これは元に戻せません）"
 
-#: src/hbase/templates/app.mako:455
+#: src/hbase/templates/app.mako:459
 msgid "Are you sure you want to drop this column?"
 msgstr "この列をドロップしてもよろしいですか？"
 
-#: src/hbase/templates/app.mako:456
+#: src/hbase/templates/app.mako:460
 msgid "enable"
 msgstr "有効化"
 
-#: src/hbase/templates/app.mako:457
+#: src/hbase/templates/app.mako:461
 msgid "disable"
 msgstr "無効化"
 
-#: src/hbase/templates/app.mako:459
+#: src/hbase/templates/app.mako:463
 msgid "Are you sure you want to"
 msgstr "よろしいですか"
 
-#: src/hbase/templates/app.mako:460
+#: src/hbase/templates/app.mako:464
 msgid "this table?"
 msgstr "このテーブルですか？"
 
-#: src/hbase/templates/app.mako:461
+#: src/hbase/templates/app.mako:465
 msgid "End Query"
 msgstr "クエリを終了"
 
-#: src/hbase/templates/app.mako:462
+#: src/hbase/templates/app.mako:466
 msgid "Prefix Scan"
 msgstr "プレフィックススキャン"
 
-#: src/hbase/templates/app.mako:463
+#: src/hbase/templates/app.mako:467
 msgid "Start Scan"
 msgstr "スキャンを開始"
 
-#: src/hbase/templates/app.mako:464
+#: src/hbase/templates/app.mako:468
 msgid "Start Select Columns"
 msgstr "列の選択を開始"
 
-#: src/hbase/templates/app.mako:465
+#: src/hbase/templates/app.mako:469
 msgid "End Column/Family"
 msgstr "列／ファミリを終了"
 
-#: src/hbase/templates/app.mako:466
+#: src/hbase/templates/app.mako:470
 msgid "End Select Columns"
 msgstr "列の選択を終了"
 
-#: src/hbase/templates/app.mako:467
+#: src/hbase/templates/app.mako:471
 msgid "Start FilterString"
 msgstr "FilterString を開始"
 
-#: src/hbase/templates/app.mako:468
+#: src/hbase/templates/app.mako:472
 msgid "End FilterString"
 msgstr "FilterString を終了"
 
-#: src/hbase/templates/app.mako:469
+#: src/hbase/templates/app.mako:473
 msgid "Row Key Value"
 msgstr "行キー値"
 
-#: src/hbase/templates/app.mako:470
+#: src/hbase/templates/app.mako:474
 msgid "Length of Scan or Row Key"
 msgstr "スキャンまたは行キーの長さ"
 
-#: src/hbase/templates/app.mako:471
+#: src/hbase/templates/app.mako:475
 msgid "Column Family: Column Name"
 msgstr "列ファミリ：列名"
 
-#: src/hbase/templates/app.mako:472
+#: src/hbase/templates/app.mako:476
 msgid "Rows starting with"
 msgstr "行の先頭の値"
 
-#: src/hbase/templates/app.mako:473
+#: src/hbase/templates/app.mako:477
 msgid "String"
 msgstr "文字列"
 
-#: src/hbase/templates/app.mako:474
+#: src/hbase/templates/app.mako:478
 msgid "Integer"
 msgstr "整数"
 
-#: src/hbase/templates/app.mako:475
+#: src/hbase/templates/app.mako:479
 msgid "Column Range"
 msgstr "列の範囲"
-
-#~ msgid "There are no tables matching the search criteria."
-#~ msgstr "検索条件に一致するグループが存在しません。"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-

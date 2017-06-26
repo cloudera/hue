@@ -1,15 +1,15 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: VERSIÓN DEL PROYECTO\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
-"Last-Translator: NOMBRE COMPLETO <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2017-05-16 08:40-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -17,13 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/libsentry/api.py:239 src/libsentry/api2.py:238
-msgid "No Sentry servers are available."
-msgstr "No hay servidores Sentry disponibles."
+#: src/libsentry/api.py:44 src/libsentry/api2.py:44
+#, python-format
+msgid "Failed to connect to Sentry server %s, and Sentry HA is not enabled."
+msgstr "Error al conectar con el servidor Sentry %s; no se ha habilitado la HA de Sentry."
 
-#: src/libsentry/api.py:268 src/libsentry/api2.py:267
-msgid "Error in retrieving Sentry server properties from Zookeeper."
-msgstr "Error al recuperar las propiedades del servidor Sentry de Zookeeper."
+#: src/libsentry/api.py:53 src/libsentry/api.py:91 src/libsentry/api2.py:53
+#: src/libsentry/api2.py:91
+msgid "Failed to find an available Sentry server."
+msgstr "Error al buscar un servidor Sentry disponible."
+
+#: src/libsentry/api.py:57 src/libsentry/api2.py:57
+msgid "Encountered unexpected error in SentryApi."
+msgstr "Se ha producido un error inesperado en la API de Sentry."
 
 #: src/libsentry/conf.py:29
 msgid "Hostname or IP of server."
@@ -37,3 +43,33 @@ msgstr "Puerto en el que se ejecuta el servicio de Sentry."
 msgid "Sentry configuration directory, where sentry-site.xml is located."
 msgstr "Directorio de configuración de Sentry, donde está sentry-site.xml."
 
+#: src/libsentry/conf.py:49
+msgid "Number of seconds when the privilege list of a user is cached."
+msgstr "Tiempo en segundos durante el que se guarda en caché la lista de privilegios de un usuario."
+
+#: src/libsentry/sentry_ha.py:46 src/libsentry/tests.py:58
+msgid "Cannot create a Sentry client without server hostname and port."
+msgstr "No se puede crear un cliente de Sentry sin el nombre de host y el puerto del servidor."
+
+#: src/libsentry/sentry_ha.py:76
+#, python-format
+msgid ""
+"Encountered unexpected error while trying to find available Sentry "
+"client: %s"
+msgstr ""
+"Se ha producido un error inesperado al buscar un cliente de Sentry "
+"disponible: %s"
+
+#: src/libsentry/sentry_site.py:133
+msgid "No Sentry servers are configured."
+msgstr "No se han configurado servidores Sentry."
+
+#: src/libsentry/sentry_site.py:152
+msgid "Error in retrieving Sentry server properties."
+msgstr "Error al recuperar las propiedades del servidor Sentry."
+
+#~ msgid "No Sentry servers are available."
+#~ msgstr ""
+
+#~ msgid "Error in retrieving Sentry server properties from Zookeeper."
+#~ msgstr ""

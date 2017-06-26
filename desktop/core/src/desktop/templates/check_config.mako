@@ -16,13 +16,13 @@
 <%!
 from django.utils.translation import ugettext as _
 %>
-    ${_('Configuration files located in')} <code style="color: #338BB8">${conf_dir}</code>
+    ${_('Configuration files located in')} <code style="color: #0B7FAD">${conf_dir}</code>
 
     <br/><br/>
     % if error_list:
       <div class="alert alert-warn">${_('Potential misconfiguration detected. Fix and restart Hue.')}</div>
       <br/>
-        <table class="table table-striped">
+        <table class="table table-condensed">
       % for error in error_list:
         <tr>
             <td width="15%">

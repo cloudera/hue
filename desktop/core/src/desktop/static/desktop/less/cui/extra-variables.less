@@ -1,0 +1,365 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+@import (reference) "colors.less";
+
+@gray-base:              @cui-black;
+@gray-darker:            @cui-gray-900;
+@gray-dark:              @cui-gray-800;
+@gray:                   @cui-gray-700;
+@gray-light:             @cui-gray-600;
+@gray-lighter:           @cui-gray-050;
+
+@brand-primary:         @cui-blue-700;
+@brand-success:         @cui-lime-500;
+@brand-info:            @cui-blue-500;
+@brand-warning:         @cui-orange-500;
+@brand-danger:          @cui-red-500;
+
+@font-size-h1: 24px;
+@font-size-h2: 18px;
+@font-size-h3: 16px;
+@font-size-h4: 16px;
+@font-size-h5: 16px;
+@font-size-h6: 14px;
+@font-size-base: 14px;
+@font-size-small: 12px;
+
+@font-weight-h1: normal;
+@font-weight-h2: 400;
+@font-weight-h3: 600;
+@font-weight-h4: 400;
+@font-weight-h5: 400;
+@font-weight-h6: normal;
+
+@line-height-h1: 48px;
+@line-height-h2: 32px;
+@line-height-h3: 24px;
+@line-height-h4: 20px;
+@line-height-h5: 20px;
+@line-height-h6: 20px;
+
+@breadcrumb-padding-vertical: 0;
+@breadcrumb-padding-horizontal: 24px;
+@breadcrumb-bg:                 transparent;
+@breadcrumb-color:              @cui-gray-400;
+@breadcrumb-separator:          "/";
+
+// The default border color.
+@cui-default-border-color: @cui-gray-300;
+
+// The default background color for content area.
+@cui-default-bg-color: @cui-white;
+
+// The default foreground color when used on an inverse element.
+@cui-default-inverse-color: @cui-default-bg-color;
+
+// Scaffolding
+@text-color: @cui-gray-800;
+@pre-color: @text-color;
+
+// The background color of the body element.
+@body-bg: @cui-blue-gray-050;
+
+// The color of any links.
+@link-color: @cui-blue-700;
+@link-hover-color: @cui-blue-500;
+
+// Many of the paddings/margins are defined based on this variable
+@page-padding-base: 24px;
+@page-header-border-color: @cui-default-border-color;
+
+// Grid gutter
+@grid-gutter-width:         24px;
+
+@state-success-text:             @cui-lime-800;
+@state-success-bg:               @cui-lime-010;
+@state-success-border:           @state-success-bg;
+
+@state-info-text:                @cui-blue-700;
+@state-info-bg:                  @cui-blue-010;
+@state-info-border:              @state-info-bg;
+
+@state-warning-text:             @cui-orange-900;
+@state-warning-bg:               @cui-yellow-010;
+@state-warning-border:           @state-warning-bg;
+
+@state-danger-text:              @cui-red-700;
+@state-danger-bg:                @cui-pink-010;
+@state-danger-border:            @state-danger-bg;
+
+@alert-padding:               @page-padding-base;
+@alert-border-radius:         0;
+@alert-link-font-weight:      normal;
+
+@panel-heading-padding:    0 23px    0 23px;
+@panel-body-padding:    15px 23px 15px 23px;
+@panel-footer-padding:   7px 23px 12px 23px;
+
+@panel-bg:                    @cui-default-bg-color;
+@panel-footer-bg:             @cui-default-bg-color;
+@panel-inner-border:          transparent;
+@panel-default-border:        @cui-default-border-color;
+@panel-default-heading-bg:    transparent;
+@panel-default-text:          @text-color;
+
+@navbar-height:                    48px;
+@navbar-margin-bottom:             0;
+@navbar-border-radius:             0;
+
+@navbar-default-color:             @cui-gray-700;
+@navbar-default-bg:                @cui-default-bg-color;
+@navbar-default-border:            @cui-default-border-color;
+
+// Navbar links
+@navbar-default-link-color:                @cui-gray-700;
+@navbar-default-link-hover-color:          @cui-gray-700;
+@navbar-default-link-hover-bg:             @cui-gray-100;
+@navbar-default-link-active-color:         @text-color;
+@navbar-default-link-active-bg:            @cui-purple-gray-050;
+@navbar-default-link-disabled-color:       @cui-gray-400;
+@navbar-default-link-disabled-bg:          transparent;
+
+@navbar-inverse-color:             @cui-default-inverse-color;
+@navbar-inverse-bg:                @cui-blue-gray-900;
+@navbar-inverse-border:            transparent;
+
+@navbar-inverse-link-color:        @cui-default-inverse-color;
+@navbar-inverse-link-hover-color:  @cui-default-inverse-color;
+@navbar-inverse-link-hover-bg:     @cui-gray-800;
+@navbar-inverse-link-active-color: @cui-default-inverse-color;
+@navbar-inverse-link-active-bg:    @cui-gray-800;
+
+// Inverted navbar brand label
+@navbar-inverse-brand-color:       @navbar-inverse-link-color;
+@navbar-inverse-brand-hover-color: @cui-default-inverse-color;
+@navbar-inverse-brand-hover-bg:    transparent;
+
+// Typography
+@headings-color: @text-color;
+@font-family-monospace:  Roboto Mono, Menlo, Monaco, Consolas, "Courier New", monospace;
+@font-family-sans-serif: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+// Nav tabs
+@nav-tabs-active-link-hover-color: @text-color;
+@nav-tabs-link-hover-border-color: @cui-default-border-color;
+@nav-tabs-active-link-hover-bg: @cui-default-bg-color;
+@nav-tabs-justified-active-link-border-color: @cui-default-bg-color;
+@thumbnail-bg:                @cui-default-bg-color;
+
+// Table
+@table-cell-padding:            7px 8px 8px 8px;
+@table-condensed-cell-padding:  3px 8px 4px 8px;
+@table-border-color: @cui-default-border-color;
+@table-bg: @cui-default-bg-color;
+@table-bg-accent: @cui-default-bg-color;
+@table-bg-hover: @cui-gray-050;
+
+
+// Replace References to Bootstrap 3 Variables
+@border-radius-base: 4px;
+
+// This should be (input-height-base - line-height-computed) / 2 - 1 (border);
+@padding-base-vertical:     5px;
+@padding-base-horizontal:   12px;
+@padding-large-vertical:    12px;
+@padding-large-horizontal:  16px;
+@padding-small-vertical:    5px;
+@padding-small-horizontal:  10px;
+@padding-xs-vertical:       1px;
+@padding-xs-horizontal:     5px;
+
+// === Buttons : Sizing === //
+
+// Border Radius
+@btn-border-radius-base: @border-radius-base; // 4px
+@btn-border-radius-large: @btn-border-radius-base;
+@btn-border-radius-small: @btn-border-radius-base;
+// Note: btn-xs uses the same radius as btn-sm
+
+// Button Height
+@cui-btn-height-lg: 48px;
+@cui-btn-height-md: 32px;
+@cui-btn-height-sm: 28px;
+@cui-btn-height-xs: 24px;
+
+// Button Line Height (Computed)
+@cui-btn-border-offset: 2 * 1px;
+@cui-btn-line-height-lg: (@cui-btn-height-lg - @cui-btn-border-offset - 2 * @padding-large-vertical);
+@cui-btn-line-height-md: (@cui-btn-height-md - @cui-btn-border-offset - 2 * @padding-base-vertical);
+@cui-btn-line-height-sm: (@cui-btn-height-sm - @cui-btn-border-offset - 2 * @padding-small-vertical);
+@cui-btn-line-height-xs: (@cui-btn-height-xs - @cui-btn-border-offset - 2 * @padding-xs-vertical);
+
+// Button Side Padding
+@cui-btn-shoulder-padding-lg: @padding-large-horizontal;
+@cui-btn-shoulder-padding-md: @padding-base-horizontal;
+@cui-btn-shoulder-padding-sm: @padding-small-horizontal;
+@cui-btn-shoulder-padding-xs: @padding-small-horizontal;
+
+// Button Font Size
+@cui-btn-font-size-lg: @font-size-h2;    // 20px
+@cui-btn-font-size-md: @font-size-base;  // 14px
+@cui-btn-font-size-sm: 13px;
+@cui-btn-font-size-xs: @font-size-small; // 12px
+
+@cui-btn-circle-size-md: 22px;
+
+// === Buttons : Colors === //
+
+@btn-default-color:  @cui-blue-700;
+@btn-default-bg:     @cui-default-bg-color;
+@btn-default-border: @cui-gray-400;
+
+@btn-primary-color:  @cui-default-inverse-color;
+@btn-primary-bg:     @link-color;
+@btn-primary-border: @btn-primary-bg;
+
+// Reset Alert Colors
+// @btn-success-color:  @btn-primary-color;
+// @btn-warning-color:  @btn-primary-color;
+// @btn-danger-color:   @btn-primary-color;
+// @btn-info-color:     @btn-primary-color;
+
+// @btn-success-bg:     @btn-primary-bg;
+// @btn-warning-bg:     @btn-primary-bg;
+// @btn-danger-bg:      @btn-primary-bg;
+// @btn-info-bg:        @btn-primary-bg;
+
+// @btn-success-border: @btn-primary-border;
+// @btn-warning-border: @btn-primary-border;
+// @btn-danger-border:  @btn-primary-border;
+// @btn-info-border:    @btn-primary-border;
+
+// === Buttons : Pseudo-Classes === //
+
+@cui-btn-hover-color: @link-hover-color;
+@cui-btn-hover-bg: @btn-default-bg;
+@cui-btn-hover-border: @link-hover-color;
+
+@cui-btn-primary-hover-color: @cui-default-inverse-color;
+@cui-btn-primary-hover-bg: @link-hover-color;
+@cui-btn-primary-hover-border: @link-hover-color;
+
+@cui-btn-disabled-font-color:           @cui-gray-600;
+@cui-btn-disabled-default-bg-color:     @cui-default-bg-color;
+@cui-btn-disabled-primary-bg-color:     @cui-gray-200;
+@cui-btn-disabled-default-border-color: @cui-default-border-color;
+@cui-btn-disabled-primary-border-color: @cui-btn-disabled-primary-bg-color;
+
+@cui-btn-active-shadow: inset 0 0 2px rgba(0,0,0,0.5);
+
+// Dropdown Highlight
+@dropdown-link-hover-color: @cui-default-inverse-color;
+@dropdown-link-hover-bg:    @cui-btn-hover-color;
+
+// Pagination
+@pagination-bg: transparent;
+@pagination-border: transparent;
+@pagination-active-color: @cui-black;
+@pagination-active-bg: transparent;
+@pagination-active-border: transparent;
+
+// Border radius
+@border-radius-base: 4px;
+@border-radius-large: 4px;
+@border-radius-small: 4px;
+
+@navbar-border-radius: 0;
+@pager-border-radius: 0;
+@alert-border-radius: 0;
+@progress-border-radius: 0;
+@list-group-border-radius: 0;
+@panel-border-radius: 0;
+@thumbnail-border-radius: 0;
+@badge-border-radius: 0;
+
+// === Modals : Backdrop === //
+@modal-backdrop-bg:      @cui-black;
+@modal-backdrop-opacity: .68;
+
+// === Modals : Shape and Position === //
+@cui-modal-clearing: 30px; // For calculating max-height
+@cui-modal-border-radius: 7px;
+// @cui-modal-margin-top:    7%;
+@cui-modal-box-shadow:    0 0 3px 0 rgba(0, 0, 0, 0.11);
+
+// === Modals : Spacing === //
+@cui-modal-header-height: 60px;
+@modal-title-line-height: @cui-modal-header-height;
+@modal-inner-padding: 24px;
+// Cloudera UI does not set modal title font size;
+// Use markups to specific font size, e.g. <h2>Title</h2>
+@cui-modal-height-ratio: 0.8;
+@cui-modal-footer-height: (@modal-inner-padding * 2 + @cui-btn-height-md);
+@cui-modal-reserve-height: (@cui-modal-clearing * 2 + @cui-modal-header-height + @cui-modal-footer-height);
+// Reserve for calculating the max-height of .modal-body: 30 * 2 + 68 + 24 * 2 + 32 = 208
+
+// === Modals : Colors === //
+@cui-modal-title-color: @cui-gray-700;
+@cui-modal-header-bg:   @cui-purple-gray-050;
+@cui-modal-footer-bg:   @cui-default-bg-color;
+
+@modal-header-border-color:  @cui-default-border-color; // border-bottom only
+@modal-content-border-color: @cui-gray-800;
+@modal-footer-border-color:  @cui-default-border-color;
+@modal-content-bg:           @cui-default-bg-color;
+
+// === Modals : Sizing === //
+@cui-modal-width-md: 580px;
+@cui-modal-width-lg: 900px;
+@cui-modal-width-xl: 90%;
+
+// Wells
+@well-bg: @cui-gray-050;
+@well-border: @cui-default-border-color;
+
+// popover
+@popover-title-bg: @cui-purple-gray-050;
+@popover-border-color: @cui-default-border-color;
+
+// Forms and Inputs
+
+// `<input>` background color
+@input-bg:                       @cui-default-bg-color;
+
+// `<input disabled>` background color
+@input-bg-disabled:              @cui-gray-050;
+
+// Text color for `<input>`s
+@input-color:                    @text-color;
+
+// `<input>` border color
+@input-border:                   @cui-gray-400;
+
+// Placeholder text color
+@input-color-placeholder:        @cui-gray-500;
+
+// Regular input height, these should be the same as regular buttons.
+@input-height-base: @cui-btn-height-md;
+
+// Large input height, these should be the same as the large buttons.
+@input-height-large: @cui-btn-height-lg;
+
+// Small input height, these should be the same as the small buttons.
+@input-height-small: @cui-btn-height-sm;
+
+@form-group-margin-bottom: 16px;
+
+@input-group-addon-bg:           @well-bg;
+
+// Border color for textual input addons
+@input-group-addon-border-color: @input-border;

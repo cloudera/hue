@@ -36,7 +36,7 @@
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 $(document).ready(function () {
   $('#createBundledCoordinatorFormBtn').click(function () {
      $("#id_create-bundled-coordinator-parameters").val(ko.utils.stringifyJson(window.viewModel.create_bundled_coordinator_parameters));

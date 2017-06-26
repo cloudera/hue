@@ -21,8 +21,15 @@ import errno
 
 from urlparse import urlparse
 
+from django.contrib.auth.models import User
+
+from aws.conf import has_s3_access
+from aws.s3 import S3A_ROOT
+from aws.s3.s3fs import S3FileSystemException
+
 
 class ProxyFS(object):
+
   def __init__(self, filesystems_dict, default_scheme):
     if default_scheme not in filesystems_dict:
       raise ValueError(
@@ -46,6 +53,15 @@ class ProxyFS(object):
       object.__setattr__(self, key, value)
 
   def _get_scheme(self, path):
+    if path.lower().startswith(S3A_ROOT):
+      from desktop.auth.backend import rewrite_user # Avoid cyclic loop
+      try:
+        user = User.objects.get(username=self.user)
+        if not has_s3_access(rewrite_user(user)):
+          raise S3FileSystemException("Missing permissions for %s on %s" % (self.user, path,))
+      except User.DoesNotExist:
+        raise S3FileSystemException("Can't check permissions for %s on %s" % (self.user, path))
+
     split = urlparse(path)
     if split.scheme:
       return split.scheme
@@ -55,11 +71,11 @@ class ProxyFS(object):
   def _get_fs(self, path):
     scheme = self._get_scheme(path)
     if not scheme:
-      raise IOError(errno.EINVAL, 'Can not figure out scheme for path "%s"' % path)
+      raise S3FileSystemException('Can not figure out scheme for path "%s"' % path)
     try:
       return self._fs_dict[scheme]
     except KeyError:
-      raise IOError(errno.EINVAL, 'Unknown scheme %s, available schemes: %s' % (scheme, self._fs_dict.keys()))
+      raise S3FileSystemException('Unknown scheme %s, available schemes: %s' % (scheme, self._fs_dict.keys()))
 
   def _get_fs_pair(self, src, dst):
     """
@@ -73,7 +89,7 @@ class ProxyFS(object):
     return src_fs, self._get_fs(dst)
 
   def setuser(self, user):
-    """Set a new user. Return the current user."""
+    """Set a new user. Return the past current user."""
     curr = self.user
     for fs in self._fs_set:
       fs.setuser(user)

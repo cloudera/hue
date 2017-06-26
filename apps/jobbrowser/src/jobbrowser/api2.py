@@ -50,8 +50,12 @@ def jobs(request):
   response = {'status': -1}
 
   interface = json.loads(request.POST.get('interface'))
+  filters = dict([(key, value) for _filter in json.loads(request.POST.get('filters', '[]')) for key, value in _filter.items() if value])
 
-  response['apps'] = get_api(request.user, interface).apps()
+  jobs = get_api(request.user, interface).apps(filters)
+
+  response['apps'] = jobs['apps']
+  response['total'] = jobs.get('total')
   response['status'] = 0
 
   return JsonResponse(response)
@@ -62,29 +66,57 @@ def job(request):
   response = {'status': -1}
 
   interface = json.loads(request.POST.get('interface'))
-  appid = json.loads(request.POST.get('appid'))
+  app_id = json.loads(request.POST.get('app_id'))
 
-  response['app'] = get_api(request.user, interface).app(appid)
+  response['app'] = get_api(request.user, interface).app(app_id)
   response['status'] = 0
 
   return JsonResponse(response)
 
 
 @api_error_handler
-def kill(request): return {}
+def action(request):
+  response = {'status': -1, 'message': ''}
+
+  interface = json.loads(request.POST.get('interface'))
+  app_ids = json.loads(request.POST.get('app_ids'))
+  operation = json.loads(request.POST.get('operation'))
+
+  response['operation'] = operation
+  response.update(get_api(request.user, interface).action(app_ids, operation))
+
+  return JsonResponse(response)
+
 
 @api_error_handler
-def progress(request): return {'progress': 0}
+def logs(request):
+  response = {'status': -1}
+
+  interface = json.loads(request.POST.get('interface'))
+  app_id = json.loads(request.POST.get('app_id'))
+  app_type = json.loads(request.POST.get('type'))
+  log_name = json.loads(request.POST.get('name'))
+
+  response['logs'] = get_api(request.user, interface).logs(app_id, app_type, log_name)
+  response['status'] = 0
+
+  return JsonResponse(response)
 
 
 @api_error_handler
-def tasks(request): return []
+def profile(request):
+  response = {'status': -1}
 
+  interface = json.loads(request.POST.get('interface'))
+  app_id = json.loads(request.POST.get('app_id'))
+  app_type = json.loads(request.POST.get('app_type'))
+  app_property = json.loads(request.POST.get('app_property'))
+  app_filters = dict([(key, value) for _filter in json.loads(request.POST.get('app_filters', '[]')) for key, value in _filter.items() if value])
 
-@api_error_handler
-def logs(request): return {'stderr': '', 'stdout': ''}
+  api = get_api(request.user, interface)
+  api._set_request(request) # For YARN
 
+  response[app_property] = api.profile(app_id, app_type, app_property, app_filters)
+  response['status'] = 0
 
-@api_error_handler
-def profile(request): return {}
-
+  return JsonResponse(response)

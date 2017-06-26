@@ -30,6 +30,7 @@ def hive(request):
           'sentry_provider': get_hive_sentry_provider(),
           'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
       }),
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'has_impersonation_perm': _has_impersonation_perm(request.user),
   })
 
@@ -50,6 +51,7 @@ def _sentry(request, component):
           'sentry_provider': get_solr_sentry_provider() if component == 'solr' else get_hive_sentry_provider(),
           'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
       }),
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'has_impersonation_perm': _has_impersonation_perm(request.user) and component == 'hive',
       'component': component
   })
@@ -59,6 +61,7 @@ def hdfs(request):
 
   return render("hdfs.mako", request, {
       'initial': json.dumps({'user': request.user.username}),
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'has_impersonation_perm': _has_impersonation_perm(request.user)
   })
 

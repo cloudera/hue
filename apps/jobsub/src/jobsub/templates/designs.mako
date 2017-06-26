@@ -28,10 +28,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('jobsub/css/jobsub.css') }">
 
 <script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow.models.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow.node-fields.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('jobsub/js/jobsub.templates.js') }" type="text/javascript" charset="utf-8"></script>
@@ -39,14 +37,14 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 <script src="${ static('jobsub/js/jobsub.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-<div class="navbar navbar-inverse navbar-fixed-top nokids">
+<div class="navbar hue-title-bar nokids">
     <div class="navbar-inner">
       <div class="container-fluid">
         <div class="nav-collapse">
           <ul class="nav">
-            <li class="currentApp">
+            <li class="app-header">
               <a href="/${app_name}">
-                <img src="${ static('jobsub/art/icon_jobsub_48.png') }" class="app-icon" />
+                <img src="${ static('jobsub/art/icon_jobsub_48.png') }" class="app-icon" alt="${ _('Job Designer icon') }" />
                 ${ _('Job Designer') }
               </a>
             </li>
@@ -59,6 +57,13 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div class="container-fluid">
   <div class="card card-small">
+  % if is_hue_4:
+    <div class="alert">
+      ${ _('This is the old Job Editor, it is recommended to instead use the new ') }
+        <a href="${ url('notebook:editor') }" target="_blank">${_('Editor')}</a>
+    </div>
+  % endif
+
   <h1 class="card-heading simple">${_('Designs')}</h1>
 
   <%actionbar:render>
@@ -177,12 +182,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 </div>
 
 <div class="hueOverlay" data-bind="visible: isLoading">
-  <!--[if lte IE 9]>
-    <img src="${ static('desktop/art/spinner-big.gif') }" />
-  <![endif]-->
-  <!--[if !IE]> -->
-    <i class="fa fa-spinner fa-spin"></i>
-  <!-- <![endif]-->
+  <i class="fa fa-spinner fa-spin big-spinner"></i>
 </div>
 
 <script id="designTemplate" type="text/html">
@@ -213,8 +213,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="trashWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="trashWfMessage">${_('Move the selected designs to trash?')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 id="trashWfMessage" class="modal-title">${_('Move the selected designs to trash?')}</h2>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -227,8 +227,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="destroyWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="destroyWfMessage">${_('Delete selected designs?')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 id="destroyWfMessage" class="modal-title">${_('Delete selected designs?')}</h2>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -241,8 +241,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="purgeWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="purgeWfMessage">${_('Delete all trashed designs?')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 id="purgeWfMessage" class="modal-title">${_('Delete all trashed designs?')}</h2>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -255,8 +255,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="restoreWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="restoreWfMessage">${_('Restore selected designs?')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 id="restoreWfMessage" class="modal-title">${_('Restore selected designs?')}</h2>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -267,8 +267,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a file')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">
     <div class="chooser">
@@ -280,8 +280,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="chooseDirectory" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a directory')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Choose a directory')}</h2>
   </div>
   <div class="modal-body">
     <div class="chooser">
@@ -293,8 +293,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="choosePath" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a path')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Choose a path')}</h2>
   </div>
   <div class="modal-body">
     <div class="chooser">
@@ -304,7 +304,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 //// Contexts
 // Context matches up with jobsub.templates.js and various templates defined there.
 // If there is an update to any of the templates,
@@ -793,11 +793,14 @@ function redraw() {
  * Knockout doesn't work without this.
  * Clearing the table is necessary so multiple rows will not be added.
  */
+
 function reload() {
   designs.isLoading(true);
   $(document).one('load.designs', function() {
-    designTable.fnClearTable();
-    designTable.fnDestroy();
+    if (designTable != null){
+      designTable.fnClearTable();
+      designTable.fnDestroy();
+    }
   });
   $(document).one('initialized.designs', function() {
     designTable = $('#designTable').dataTable( designTableOptions );
@@ -816,10 +819,8 @@ $(document).bind('loaded.designs', function() {
     }
   });
 });
-$(document).bind('saved.design', reload);
-$(document).bind('deleted.design', reload);
-$(document).bind('cloned.design', reload);
-$(document).bind('restored.design', reload);
+
+$(document).bind('reload.designs', reload);
 
 reload();
 

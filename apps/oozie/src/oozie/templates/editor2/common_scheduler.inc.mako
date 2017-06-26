@@ -43,13 +43,13 @@ from django.utils.translation import ugettext as _
             <!-- ko if: isEditing -->
             <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name"></a>
 
-            <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow() }" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" target="_blank" title="${ _('Open') }">
              <i class="fa fa-external-link-square"></i>
             </a>
             <!-- /ko -->
             <!-- ko ifnot: isEditing -->
             <span data-bind="text: getWorkflowById(coordinator.properties.workflow()).name"></span>
-            <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow() }" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" target="_blank" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
             <!-- /ko -->
@@ -79,9 +79,9 @@ from django.utils.translation import ugettext as _
                 <div class="control-group" data-bind="visible: coordinator.properties.cron_advanced">
                   <label class="control-label">${ _('Crontab') }</label>
                   <div class="controls">
-                    <input id="coord-frequency" type="text" data-bind="value: coordinator.properties.cron_frequency, enable: $root.isEditing, attachViewModelToElementData" name="cron_frequency"/>
+                    <input id="coord-frequency" type="text" data-bind="textInput: coordinator.properties.cron_frequency, enable: $root.isEditing, attachViewModelToElementData, tagsNotAllowed" name="cron_frequency"/>
                     <span class="help-inline">
-                      <a data-bind="visible: coordinator.properties.cron_advanced" href="http://quartz-scheduler.org/api/2.2.0/org/quartz/CronExpression.html" target="_blank">
+                      <a data-bind="visible: coordinator.properties.cron_advanced" href="http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html" target="_blank">
                       <i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
                     </span>
                   </div>
@@ -387,36 +387,46 @@ from django.utils.translation import ugettext as _
 
 <%def name="import_modals()">
 
-<div id="chooseWorkflowDemiModal" class="demi-modal fade" data-backdrop="false">
+<div id="chooseWorkflowDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="${ is_embeddable and 'true' or 'false' }">
+  %if is_embeddable:
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 id="myModalLabel" class="modal-title">${_('Choose a workflow')}</h2>
+  </div>
+  %endif
   <div class="modal-body">
+    %if not is_embeddable:
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    %endif
     <div style="float: left; margin-right: 10px;text-align: center">
       <input type="text" data-bind="clearable: $root.workflowModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter workflows')}" class="input" style="float: left" /><br/>
     </div>
     <div>
       <ul data-bind="foreach: $root.filteredModalWorkflows().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.filteredModalWorkflows().length > 0"
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
-        <li>
+        <li style="${ not is_embeddable and 'line-height: 30px' or ''}">
           <span class="badge badge-info" data-bind="click: selectWorkflow">
             <span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
-          <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + uuid() }" target="_blank" title="${ _('Open') }">
+          <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + uuid()" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </li>
       </ul>
-      <div class="alert alert-info inline" data-bind="visible: $root.filteredModalWorkflows().length == 0" style="margin-left: 250px;margin-right: 50px; height: 42px;line-height: 42px">
+      <div class="label inline" data-bind="visible: $root.filteredModalWorkflows().length == 0" style="line-height: 30px">
         ${_('There are no workflows matching your search term.')}
       </div>
     </div>
   </div>
+  %if not is_embeddable:
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
+  %endif
 </div>
 
 <div id="settingsModal" class="modal hide fade">
-  <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="myModalLabel">${ _('Coordinator Settings') }</h3>
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 id="myModalLabel" class="modal-title">${_('Coordinator Settings')}</h2>
   </div>
   <div class="modal-body">
       <h4>${ _('Submission Parameters') }</h4>
@@ -472,9 +482,6 @@ from django.utils.translation import ugettext as _
   <script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
   <link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
   <script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
-
-  <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script type="text/javascript">
     function showChooseWorkflow() {

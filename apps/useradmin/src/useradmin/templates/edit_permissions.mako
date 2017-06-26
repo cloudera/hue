@@ -14,15 +14,19 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
 import urllib
+
+from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
-${layout.menubar(section='permissions')}
+%endif
 
+${layout.menubar(section='permissions')}
 
 <%def name="render_field(field)">
   %if not field.is_hidden:
@@ -39,7 +43,7 @@ ${layout.menubar(section='permissions')}
   %endif
 </%def>
 
-<div class="container-fluid">
+<div id="editPermissionsComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Permissions - Edit app: %(app)s') % dict(app=app)}</h1>
     <br/>
@@ -54,25 +58,45 @@ ${layout.menubar(section='permissions')}
       <br/>
 
       <div class="form-actions">
-        <input type="submit" class="btn btn-primary" value="${_('Update permission')}"/>
+        <input type="submit" class="btn btn-primary disable-feedback" value="${_('Update permission')}"/>
+        % if is_embeddable:
+          <input type="hidden" value="true" name="is_embeddable" />
+        % endif
         <a href="/useradmin/permissions" class="btn">${_('Cancel')}</a>
       </div>
     </form>
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
+    var $editPermissionsComponents = $('#editPermissionsComponents');
     $("#id_groups").jHueSelector({
       selectAllLabel: "${_('Select all')}",
       searchPlaceholder: "${_('Search')}",
       noChoicesFound: "${_('No groups found.')}",
       width: 600,
-      height: 240
+      height: 500
     });
+    % if is_embeddable:
+    $editPermissionsComponents.find('#editForm').ajaxForm({
+      dataType:  'json',
+      success: function(data) {
+        if (data && data.status == -1) {
+          renderUseradminErrors(data.errors);
+        }
+        else if (data && data.url) {
+          huePubSub.publish('open.link', data.url);
+          $.jHueNotify.info("${ _('Permission information updated correctly') }");
+        }
+      }
+    });
+    % endif
   });
 </script>
 
 ${layout.commons()}
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

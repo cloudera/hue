@@ -17,6 +17,7 @@
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from metadata.conf import has_optimizer, OPTIMIZER
 
 home_url = url('desktop.views.home')
 from desktop.conf import USE_NEW_EDITOR
@@ -49,9 +50,10 @@ if USE_NEW_EDITOR.get():
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/bootplus-responsive.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
+
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue-mobile.css') }" rel="stylesheet">
 
@@ -62,10 +64,18 @@ if USE_NEW_EDITOR.get():
     }
   </style>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
+    var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+
+    var CACHEABLE_TTL = {
+      default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
+      optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
+    };
+
+    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() }
 
     // jHue plugins global configuration
     jHueFileChooserGlobals = {
@@ -94,17 +104,9 @@ if USE_NEW_EDITOR.get():
       labels: {
         GO_TO_COLUMN: "${_('Go to column:')}",
         PLACEHOLDER: "${_('column name...')}",
-        LOCK: "${_('Click to lock this row')}",
-        UNLOCK: "${_('Click to unlock this row')}"
-      }
-    };
-
-    jHueTourGlobals = {
-      labels: {
-        AVAILABLE_TOURS: "${_('Available tours')}",
-        NO_AVAILABLE_TOURS: "${_('None for this page.')}",
-        MORE_INFO: "${_('Read more about it...')}",
-        TOOLTIP_TITLE: "${_('Demo tutorials')}"
+        LOCK: "${_('Lock this row')}",
+        UNLOCK: "${_('Unlock this row')}",
+        ROW_DETAILS: "${_('Show row details')}"
       }
     };
 
@@ -153,9 +155,28 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
+  <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
+  <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
+  <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+  <script src="${ static('desktop/js/hue.colors.js') }"></script>
+  <script src="${ static('desktop/js/ace/ace.js') }"></script>
+  <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
+  <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
+  <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
+  <script src="${ static('desktop/js/ace.extended.js') }"></script>
+  <script>
+    ace.config.set("basePath", "/static/desktop/js/ace");
+  </script>
 
-  <script type="text/javascript" charset="utf-8">
+
+  <script type="text/javascript">
 
     moment.locale(window.navigator.userLanguage || window.navigator.language);
     localeFormat = function (time) {
@@ -229,9 +250,14 @@ if USE_NEW_EDITOR.get():
       % if 'jobbrowser' in apps:
       var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
+      var lastJobBrowserRequest = null;
 
       function checkJobBrowserStatus(){
-        $.post("/jobbrowser/jobs/", {
+        if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
+          return;
+        }
+        window.clearTimeout(checkJobBrowserStatusIdx);
+        lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
             "format": "json",
             "state": "running",
             "user": "${user.username}"
@@ -274,7 +300,7 @@ if USE_NEW_EDITOR.get():
        count += 1
     return found_app, count
 %>
-<div class="navbar navbar-fixed-top">
+<div class="navbar hue-title-bar">
   <div class="navbar-inner">
     <div class="container">
       <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -283,12 +309,12 @@ if USE_NEW_EDITOR.get():
         <span class="icon-bar"></span>
       </button>
       <a class="brand" href="#">
-        <img src="${ static('desktop/art/hue-logo-mini-white.png') }" />
+        <img src="${ static('desktop/art/hue-logo-mini-white.png') }" alt="${ _('Hue logo') }" />
         ${get_title(title)}
       </a>
       <div class="nav-collapse collapse">
         <ul class="nav">
-          <li><a title="${_('Assist')}" rel="navigator-tooltip" href="${ url('desktop.views.assist_m') }">${_('Assist')}</a></li>
+          <li><a title="${_('Assist')}" data-rel="navigator-tooltip" href="${ url('desktop.views.assist_m') }">${_('Assist')}</a></li>
           % if 'beeswax' in apps:
              % if USE_NEW_EDITOR.get():
              <li><a href="${ url('notebook:editor_m') }?type=hive">${_('Hive')}</a></li>

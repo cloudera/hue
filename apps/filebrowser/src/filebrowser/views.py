@@ -27,12 +27,13 @@ import shutil
 import stat as stat_module
 import urllib
 
+from bz2 import decompress
 from datetime import datetime
 from cStringIO import StringIO
 from gzip import GzipFile
 
-from django.contrib import messages
 from django.contrib.auth.models import User, Group
+from django.core.paginator import EmptyPage
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified, HttpResponseForbidden
@@ -54,10 +55,13 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
 from desktop.lib.i18n import smart_str
+from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
+from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
 
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.conf import SHOW_DOWNLOAD_BUTTON
 from filebrowser.conf import SHOW_UPLOAD_BUTTON
@@ -66,7 +70,7 @@ from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
-                              TrashPurgeForm
+                              TrashPurgeForm, SetReplicationFactorForm
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -157,6 +161,13 @@ def download(request, path):
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
     response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
+
+    request.audit = {
+        'operation': 'DOWNLOAD',
+        'operationText': 'User %s downloaded file %s with size: %d bytes' % (request.user.username, path, stats['size']),
+        'allowed': True
+    }
+
     return response
 
 
@@ -171,11 +182,10 @@ def view(request, path):
 
     # default_to_home is set in bootstrap.js
     if 'default_to_trash' in request.GET:
-        home_trash = request.fs.join(request.fs.trash_path, 'Current', request.user.get_home_directory()[1:])
-        if request.fs.isdir(home_trash):
-            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=home_trash)))
-        if request.fs.isdir(request.fs.trash_path):
-            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path)))
+        if request.fs.isdir(_home_trash_path(request.fs, request.user, path)):
+            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=_home_trash_path(request.fs, request.user, path))))
+        if request.fs.isdir(request.fs.trash_path(path)):
+            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path(path))))
 
     try:
         decoded_path = urllib.unquote(path)
@@ -186,20 +196,6 @@ def view(request, path):
             return listdir_paged(request, path)
         else:
             return display(request, path)
-    except (IOError, WebHdfsException), e:
-        msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
-        if "Connection refused" in e.message:
-            msg += _(" The HDFS REST service is not available. ")
-        if request.user.is_superuser and not _is_hdfs_superuser(request):
-            msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
-                % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
-        if request.is_ajax():
-          exception = {
-            'error': msg
-          }
-          return JsonResponse(exception)
-        else:
-          raise PopupException(msg , detail=e)
     except S3FileSystemException, e:
         msg = _("S3 filesystem exception.")
         if request.is_ajax():
@@ -209,6 +205,28 @@ def view(request, path):
             return JsonResponse(exception)
         else:
             raise PopupException(msg, detail=e)
+    except (IOError, WebHdfsException), e:
+        msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
+
+        if "Connection refused" in e.message:
+            msg += _(" The HDFS REST service is not available. ")
+
+        if request.fs._get_scheme(path).lower() == 'hdfs':
+            if request.user.is_superuser and not _is_hdfs_superuser(request):
+                msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
+                        % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
+
+        if request.is_ajax():
+          exception = {
+            'error': msg
+          }
+          return JsonResponse(exception)
+        else:
+          raise PopupException(msg , detail=e)
+
+
+def _home_trash_path(fs, user, path):
+  return fs.join(fs.trash_path(path), 'Current', user.get_home_directory()[1:])
 
 
 def home_relative_view(request, path):
@@ -257,13 +275,15 @@ def edit(request, path, form=None):
 
     data = dict(
         exists=(stats is not None),
-        stats=stats,
-        form=form,
         path=path,
         filename=os.path.basename(path),
         dirname=os.path.dirname(path),
-        breadcrumbs = parse_breadcrumbs(path),
-        show_download_button = SHOW_DOWNLOAD_BUTTON.get())
+        breadcrumbs=parse_breadcrumbs(path),
+        is_embeddable=request.GET.get('is_embeddable', False),
+        show_download_button=SHOW_DOWNLOAD_BUTTON.get())
+    if request.META.get('HTTP_X_REQUESTED_WITH') != 'XMLHttpRequest':
+        data['stats'] = stats;
+        data['form'] = form;
     return render("edit.mako", request, data)
 
 def save_file(request):
@@ -300,7 +320,6 @@ def save_file(request):
     except Exception, e:
         raise PopupException(_("The file could not be saved"), detail=e)
 
-    messages.info(request, _('Saved %(path)s.') % {'path': os.path.basename(path)})
     request.path = reverse("filebrowser.views.edit", kwargs=dict(path=path))
     return edit(request, path, form)
 
@@ -316,7 +335,7 @@ def parse_breadcrumbs(path):
     return breadcrumbs
 
 
-def listdir(request, path, chooser):
+def listdir(request, path):
     """
     Implements directory listing (or index).
 
@@ -349,7 +368,8 @@ def listdir(request, path, chooser):
         'superuser': request.fs.superuser,
         'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0],
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
-        'show_upload_button': SHOW_UPLOAD_BUTTON.get()
+        'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
+        'is_embeddable': request.GET.get('is_embeddable', False),
     }
 
     stats = request.fs.listdir_stats(path)
@@ -364,10 +384,7 @@ def listdir(request, path, chooser):
         stats.insert(0, parent_stat)
 
     data['files'] = [_massage_stats(request, stat) for stat in stats]
-    if chooser:
-        return render('chooser.mako', request, data)
-    else:
-        return render('listdir.mako', request, data)
+    return render('listdir.mako', request, data)
 
 def _massage_page(page):
     return {
@@ -435,8 +452,13 @@ def listdir_paged(request, path):
 
 
     # Do pagination
-    page = paginator.Paginator(all_stats, pagesize).page(pagenum)
-    shown_stats = page.object_list
+    try:
+      page = paginator.Paginator(all_stats, pagesize).page(pagenum)
+      shown_stats = page.object_list
+    except EmptyPage:
+      logger.warn("No results found for requested page.")
+      page = None
+      shown_stats = []
 
     # Include parent dir always as second option, unless at filesystem root.
     if not request.fs.isroot(path):
@@ -456,9 +478,12 @@ def listdir_paged(request, path):
     current_stat['name'] = "."
     shown_stats.insert(1, current_stat)
 
-    page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
+    if page:
+      page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
 
-    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs'
+    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and \
+                       (request.fs.isdir(_home_trash_path(request.fs, request.user, path)) or
+                        request.fs.isdir(request.fs.trash_path(path)))
 
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
@@ -466,8 +491,8 @@ def listdir_paged(request, path):
         'breadcrumbs': breadcrumbs,
         'current_request_path': request.path,
         'is_trash_enabled': is_trash_enabled,
-        'files': page.object_list,
-        'page': _massage_page(page),
+        'files': page.object_list if page else [],
+        'page': _massage_page(page) if page else {},
         'pagesize': pagesize,
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
         'descending': descending_param,
@@ -483,28 +508,10 @@ def listdir_paged(request, path):
         'is_sentry_managed': request.fs.is_sentry_managed(path),
         'apps': appmanager.get_apps_dict(request.user).keys(),
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
-        'show_upload_button': SHOW_UPLOAD_BUTTON.get()
+        'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
+        'is_embeddable': request.GET.get('is_embeddable', False),
     }
     return render('listdir.mako', request, data)
-
-
-def chooser(request, path):
-    """
-    Returns the html to JFrame that will display a file prompt.
-
-    Dispatches viewing of a path to either index() or fileview(), depending on type.
-    """
-    # default_to_home is set in bootstrap.js
-    home_dir_path = request.user.get_home_directory()
-    if 'default_to_home' in request.GET and request.fs.isdir(home_dir_path):
-        return listdir(request, home_dir_path, True)
-
-    if request.fs.isdir(path):
-        return listdir(request, path, True)
-    elif request.fs.isfile(path):
-        return display(request, path)
-    else:
-        raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
 
 
 def _massage_stats(request, stats):
@@ -544,10 +551,11 @@ def stat(request, path):
 def content_summary(request, path):
     if not request.fs.exists(path):
         raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
-
     response = {'status': -1, 'message': '', 'summary': None}
     try:
         stats = request.fs.get_content_summary(path)
+        replication_factor = request.fs.stats(path)['replication']
+        stats.summary.update({'replication': replication_factor})
         response['status'] = 0
         response['summary'] = stats.summary
     except WebHdfsException, e:
@@ -639,6 +647,7 @@ def display(request, path):
     dirname = posixpath.dirname(path)
     # Start with index-like data:
     data = _massage_stats(request, request.fs.stats(path))
+    data["is_embeddable"] = request.GET.get('is_embeddable', False)
     # And add a view structure:
     data["success"] = True
     data["view"] = {
@@ -701,6 +710,8 @@ def read_contents(codec_type, path, fs, offset, length):
             if path.endswith('.gz') and detect_gzip(contents):
                 codec_type = 'gzip'
                 offset = 0
+            elif (path.endswith('.bz2') or path.endswith('.bzip2')) and detect_bz2(contents):
+                codec_type = 'bz2'
             elif path.endswith('.avro') and detect_avro(contents):
                 codec_type = 'avro'
             elif detect_parquet(fhandle):
@@ -716,6 +727,8 @@ def read_contents(codec_type, path, fs, offset, length):
 
         if codec_type == 'gzip':
             contents = _read_gzip(fhandle, path, offset, length, stats)
+        elif codec_type == 'bz2':
+            contents = _read_bz2(fhandle, path, offset, length, stats)
         elif codec_type == 'avro':
             contents = _read_avro(fhandle, path, offset, length, stats)
         elif codec_type == 'parquet':
@@ -804,6 +817,16 @@ def _read_gzip(fhandle, path, offset, length, stats):
     return contents
 
 
+def _read_bz2(fhandle, path, offset, length, stats):
+    contents = ''
+    try:
+        contents = decompress(fhandle.read(length))
+    except Exception, e:
+        logging.exception('Could not decompress file at "%s": %s' % (path, e))
+        raise PopupException(_("Failed to decompress file."))
+    return contents
+
+
 def _read_simple(fhandle, path, offset, length, stats):
     contents = ''
     try:
@@ -818,6 +841,11 @@ def _read_simple(fhandle, path, offset, length, stats):
 def detect_gzip(contents):
     '''This is a silly small function which checks to see if the file is Gzip'''
     return contents[:2] == '\x1f\x8b'
+
+
+def detect_bz2(contents):
+    '''This is a silly small function which checks to see if the file is Bz2'''
+    return contents[:3] == 'BZh'
 
 
 def detect_avro(contents):
@@ -1069,6 +1097,14 @@ def rename(request):
 
     return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None)
 
+def set_replication(request):
+    def smart_set_replication(src_path, replication_factor):
+        result = request.fs.set_replication(src_path, replication_factor)
+        if not result:
+            raise PopupException(_("Setting of replication factor failed"))
+
+    return generic_op(SetReplicationFactorForm, request, smart_set_replication, ["src_path", "replication_factor"], None)
+
 
 def mkdir(request):
     def smart_mkdir(path, name):
@@ -1234,6 +1270,7 @@ def _upload_file(request):
         try:
             request.fs.upload(file=uploaded_file, path=dest, username=request.user.username)
             response['status'] = 0
+
         except IOError, ex:
             already_exists = False
             try:
@@ -1241,9 +1278,9 @@ def _upload_file(request):
             except Exception:
               pass
             if already_exists:
-                msg = _('Destination %(name)s already exists.')  % {'name': dest}
+                msg = _('Destination %(name)s already exists.')  % {'name': filepath}
             else:
-                msg = _('Copy to %(name)s failed: %(error)s') % {'name': dest, 'error': ex}
+                msg = _('Copy to %(name)s failed: %(error)s') % {'name': filepath, 'error': ex}
             raise PopupException(msg)
 
         response.update({
@@ -1347,6 +1384,49 @@ def _upload_archive(request):
         return response
     else:
         raise PopupException(_("Error in upload form: %s") % (form.errors,))
+
+
+@require_http_methods(["POST"])
+def extract_archive_using_batch_job(request):
+
+  response = {'status': -1, 'data': ''}
+  if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+    upload_path = request.POST.get('upload_path', None)
+    archive_name = request.POST.get('archive_name', None)
+
+    if upload_path and archive_name:
+      try:
+        response = extract_archive_in_hdfs(request, upload_path, archive_name)
+      except Exception, e:
+        response['message'] = _('Exception occurred while extracting archive: %s' % e)
+  else:
+    response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
+                            'has to be enabled before calling this method.')
+
+  return JsonResponse(response)
+
+
+@require_http_methods(["POST"])
+def compress_files_using_batch_job(request):
+
+  response = {'status': -1, 'data': ''}
+  if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+    upload_path = request.POST.get('upload_path', None)
+    archive_name = request.POST.get('archive_name', None)
+    file_names = request.POST.getlist('files[]')
+
+    if upload_path and file_names and archive_name:
+      try:
+        response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
+      except Exception, e:
+        response['message'] = _('Exception occurred while compressing files: %s' % e)
+    else:
+      response['message'] = _('Error: Output directory is not set.');
+  else:
+    response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
+                            'has to be enabled before calling this method.')
+
+  return JsonResponse(response)
 
 
 def status(request):

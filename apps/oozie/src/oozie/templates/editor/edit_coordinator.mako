@@ -45,9 +45,7 @@ ${ layout.menubar(section='coordinators') }
   }
 </style>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <div class="container-fluid">
@@ -165,7 +163,7 @@ ${ layout.menubar(section='coordinators') }
               <div class="alert">${ _('This type of coordinator does not require any dataset.') }</div>
             % endif
             % if data_input_formset.forms:
-              <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_input_missing">
+              <table class="table table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_input_missing">
                 <thead>
                 <tr>
                   <th width="10%">${ _('Name') }</th>
@@ -218,7 +216,7 @@ ${ layout.menubar(section='coordinators') }
             % endif
 
             % if data_output_formset.forms:
-            <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_output_missing">
+            <table class="table table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_output_missing">
               <thead>
                 <tr>
                   <th width="10%">${ _('Name') }</th>
@@ -338,7 +336,7 @@ ${ layout.menubar(section='coordinators') }
           % if coordinator.id:
           <div>
             % if dataset_formset.forms:
-            <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_missing">
+            <table class="table table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_missing">
               <thead>
                 <tr>
                   <th>${ _('Name') }</th>
@@ -471,7 +469,7 @@ ${ layout.menubar(section='coordinators') }
     }
   </style>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     /**
      * Initial state is used to define when to display the "initial state" of a table.

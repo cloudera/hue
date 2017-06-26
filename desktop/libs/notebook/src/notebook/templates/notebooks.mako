@@ -23,27 +23,27 @@
 ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
 
 
-<div class="navbar navbar-inverse navbar-fixed-top" data-bind="visible: ! $root.isPlayerMode()">
+<div class="navbar hue-title-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="nav-collapse">
         <ul class="nav editor-nav">
-          <li class="currentApp">
+          <li class="app-header">
               <a href="${ url('notebook:editor') }?type=${ editor_type }" title="${ _('%s Editor') % editor_type.title() }" style="cursor: pointer">
               % if editor_type == 'impala':
-                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }" />
                 ${ _('Impala Queries') }
               % elif editor_type == 'rdbms':
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 ${ _('SQL Queries') }
               % elif editor_type == 'pig':
-                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
+                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" alt="${ _('Pig icon') }" />
                 ${ _('Pig Scripts') }
               % elif editor_type in ('beeswax', 'hive'):
-                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }" />
                 ${ _('Hive Queries') }
               % else:
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 ${ _('Notebooks') }
               % endif
               </a>
@@ -108,7 +108,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Owner') }</th>
-        <th width="10%">${ _('Last Modified') }</th>
+        <th style="width: 170px">${ _('Last Modified') }</th>
       </tr>
     </thead>
     <tbody data-bind="foreach: { data: jobs }">
@@ -130,12 +130,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
 
 
 <div class="hueOverlay" data-bind="visible: isLoading">
-  <!--[if lte IE 9]>
-    <img src="${ static('desktop/art/spinner-big.gif') }" />
-  <![endif]-->
-  <!--[if !IE]> -->
-    <i class="fa fa-spinner fa-spin"></i>
-  <!-- <![endif]-->
+  <i class="fa fa-spinner fa-spin big-spinner"></i>
 </div>
 
 <div id="submit-notebook-modal" class="modal hide"></div>
@@ -144,18 +139,19 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
   <form id="deleteNotebookForm" method="POST" data-bind="submit: delete2">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+
       % if editor_type == 'pig':
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected script(s)?') }</h3>
+      <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected script(s)?') }</h2>
       % elif editor_type in ('beeswax', 'hive', 'rdbms', 'impala'):
       <!-- ko if: selectedJobs().length == 1 -->
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected query?') }</h3>
+      <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected query?') }</h2>
       <!-- /ko -->
       <!-- ko if: selectedJobs().length >1 -->
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected queries?') }</h3>
+      <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected queries?') }</h2>
       <!-- /ko -->
       % else:
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected notebook(s)?') }</h3>
+      <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected notebook(s)?') }</h2>
       % endif
     </div>
     <div class="modal-footer">
@@ -164,23 +160,17 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
     </div>
   </form>
 </div>
-
-${ commonimportexport(request) | n,unicode }
-
-
 </div>
 
 
+${ commonimportexport(request) | n,unicode }
 ${ commonshare() | n,unicode }
 
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var Editor = function () {
     var self = this;
 
@@ -256,6 +246,9 @@ ${ commonshare() | n,unicode }
     $(document).on("showSubmitPopup", function(event, data){
       $('#submit-notebook-modal').html(data);
       $('#submit-notebook-modal').modal('show');
+      $('#submit-notebook-moda').on('hidden', function () {
+        huePubSub.publish('hide.datepicker');
+      });
     });
 
     var oTable = $("#notebookTable").dataTable({

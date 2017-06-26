@@ -224,8 +224,10 @@
 
     <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
 
+    <!--
     <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
         geo="true" distErrPct="0.025" maxDistErr="0.000009" units="degrees" />
+    -->
 
     <fieldType name="currency" class="solr.CurrencyField" precisionStep="8" defaultCurrency="USD" currencyConfig="currency.xml" />
 
@@ -561,6 +563,7 @@
     </fieldType>
 
     <!-- Thai -->
+    <!--
     <fieldType name="text_th" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -569,7 +572,7 @@
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_th.txt" />
       </analyzer>
     </fieldType>
-
+   -->
     <!-- Turkish -->
     <fieldType name="text_tr" class="solr.TextField" positionIncrementGap="100">
       <analyzer>

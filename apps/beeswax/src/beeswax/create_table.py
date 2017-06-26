@@ -103,7 +103,7 @@ DELIMITER_READABLE = {'\\001' : _('ctrl-As'),
                       '\\t'   : _('tabs'),
                       ','     : _('commas'),
                       ' '     : _('spaces')}
-FILE_READERS = [ ]
+FILE_READERS = []
 
 def import_wizard(request, database='default'):
   """
@@ -341,8 +341,7 @@ def _delim_preview(fs, file_form, encoding, file_types, delimiters):
 
 def _parse_fields(path, file_obj, encoding, filetypes, delimiters):
   """
-  _parse_fields(path, file_obj, encoding, filetypes, delimiters)
-                                  -> (delimiter, filetype, fields_list)
+  _parse_fields(path, file_obj, encoding, filetypes, delimiters) -> (delimiter, filetype, fields_list)
 
   Go through the list of ``filetypes`` (gzip, text) and stop at the first one
   that works for the data. Then apply the list of ``delimiters`` and pick the
@@ -351,7 +350,7 @@ def _parse_fields(path, file_obj, encoding, filetypes, delimiters):
 
   Return the best delimiter, filetype and the data broken down into rows of fields.
   """
-  file_readers = [ reader for reader in FILE_READERS if reader.TYPE in filetypes ]
+  file_readers = [reader for reader in FILE_READERS if reader.TYPE in filetypes]
 
   for reader in file_readers:
     LOG.debug("Trying %s for file: %s" % (reader.TYPE, path))
@@ -382,7 +381,7 @@ def _readfields(lines, delimiters):
     The score is always non-negative. The higher the better.
     """
     n_lines = len(fields_list)
-    len_list = [ len(fields) for fields in fields_list ]
+    len_list = [len(fields) for fields in fields_list]
 
     if not len_list:
       raise PopupException(_("Could not find any columns to import"))
@@ -394,7 +393,7 @@ def _readfields(lines, delimiters):
     avg_n_fields = sum(len_list) / n_lines
     sq_of_exp = avg_n_fields * avg_n_fields
 
-    len_list_sq = [ l * l for l in len_list ]
+    len_list_sq = [l * l for l in len_list]
     exp_of_sq = sum(len_list_sq) / n_lines
     var = exp_of_sq - sq_of_exp
     # Favour more fields

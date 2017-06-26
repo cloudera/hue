@@ -34,7 +34,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
     <%def name="search()">
       ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
       &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for text')}" value="${ text_filter or '' }">
-      <img id="loading" src="${ static('desktop/art/spinner.gif') }" />
+        <span id="loading"><i class="fa fa-spinner fa-spin"></i></span>
     </%def>
 
     <%def name="creation()">
@@ -54,9 +54,16 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
         <a class="btn btn-status btn-inverse disable-feedback" data-value="killed">${ _('Killed') }</a>
       </span>
+      &nbsp;&nbsp;${_('in the last')} <input id="timeValue" class="input-mini no-margin" type="number" value="7" min="1" max="3650">
+      <select id="timeUnit" class="input-small no-margin">
+        <option value="days">${_('days')}</option>
+        <option value="hours">${_('hours')}</option>
+        <option value="minutes">${_('minutes')}</option>
+      </select>
     </%def>
   </%actionbar:render>
 
+  <div id ="JobCountBanner" class="pull-center alert alert-warning hide">${ _("Showing oldest 1000 jobs. Use days filter to get the recent ones.") }</div>
   <div id="noJobs" class="alert"><i class="fa fa-exclamation-triangle"></i>&nbsp; ${_('There are no jobs that match your search criteria.')}</div>
 
   <table id="jobsTable" class="datatables table table-condensed">
@@ -85,8 +92,8 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
 
 <div id="killModal" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm Kill')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Confirm Kill')}</h2>
   </div>
   <div class="modal-body">
     <p>${_('Are you sure you want to kill this job?')}</p>
@@ -100,7 +107,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('jobbrowser/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
   $(document).ready(function () {
 
@@ -149,11 +156,16 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         $("#loading").addClass("hide");
         $("#noJobs").hide();
         $(".datatables").show();
-        if (data.length == 0) {
+        if (data.jobs.length == 0) {
           $("#noJobs").show();
           $(".datatables").hide();
         }
         else {
+          if (data.jobs.length == 1000) {
+            $("#JobCountBanner").removeClass('hide');
+          } else {
+            $("#JobCountBanner").addClass('hide');
+          }
           var rows = [];
           $(data.jobs).each(function (cnt, job) {
             rows.push(getJobRow(job));
@@ -286,6 +298,13 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
       });
     }
 
+    function validTimeValue() {
+      var numberValue = parseInt($("#timeValue").val().trim());
+      return $("#timeValue").val().trim() != "" && !isNaN(numberValue) && 1 <= numberValue && numberValue <= 3650;
+    }
+
+    var lastTimeValue = null;
+
     function callJsonData(callback, justRunning) {
       var _url_params = {"format": "json"};
 
@@ -313,6 +332,12 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         _url_params["text"] = $('#textFilter').val().trim();
       }
 
+      if (validTimeValue()) {
+        _url_params["time_value"] = parseInt($('#timeValue').val().trim());
+        lastTimeValue = $('#timeValue').val();
+        _url_params["time_unit"] = $('#timeUnit :selected').text();
+      }
+
       if ($("#showRetired").is(":checked")) {
         _url_params["retired"] = "on";
       }
@@ -325,8 +350,28 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
       callJsonData(populateTable);
     });
 
+
+
+    $("#timeValue").jHueDelayedInput(function(){
+      if (validTimeValue() && lastTimeValue !== $('#timeValue').val()) {
+        $("#loading").removeClass("hide");
+        callJsonData(populateTable);
+      }
+    });
+
+    $("#timeValue").change(function(){
+      if (validTimeValue() && lastTimeValue !== $('#timeValue').val()) {
+        $("#loading").removeClass("hide");
+        callJsonData(populateTable);
+      }
+    });
+
     $("#showRetired").change(function () {
       $("#loading").removeClass("hide");
+      callJsonData(populateTable);
+    });
+
+    $('#timeUnit').change(function(){
       callJsonData(populateTable);
     });
 

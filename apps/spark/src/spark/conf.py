@@ -44,6 +44,12 @@ LIVY_SERVER_SESSION_KIND = Config( # Note: this one is ignored by Livy, this sho
    help=_t("Configure livy to start in local 'process' mode, or 'yarn' workers."),
    default="yarn")
 
+SECURITY_ENABLED = Config(
+  key="security_enabled",
+  help=_t("Whether Livy requires client to perform Kerberos authentication."),
+  default=False,
+  type=coerce_bool)
+
 # Spark SQL
 SQL_SERVER_HOST = Config(
   key="sql_server_host",

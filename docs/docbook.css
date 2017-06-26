@@ -35,7 +35,7 @@ hr {
 }
 
 .title, h1, .toc p, h2 {
-    color: #338BB8;
+    color: #0B7FAD;
     font-size: 24px;
     font-weight: 600;
     margin-bottom: 15px;
@@ -48,7 +48,7 @@ h2 {
 }
 
 a:link, a:visited {
-    color: #338BB8;
+    color: #0B7FAD;
     text-decoration: none;
 }
 a:hover {

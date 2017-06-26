@@ -51,22 +51,19 @@ ${ comps.menubar() }
             <div class="tab-content">
               <div class="tab-pane active" id="stdout">
                 <pre id="stdout-container">
-                  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+                  <i class="fa fa-spinner fa-spin"></i>
                 </pre>
               </div>
 
               <div class="tab-pane" id="stderr">
                 <pre id="stderr-container">
-                  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+                  <i class="fa fa-spinner fa-spin"></i>
                 </pre>
               </div>
 
               <div class="tab-pane" id="syslog">
                 <pre id="syslog-container">
-                  <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+                  <i class="fa fa-spinner fa-spin"></i>
                 </pre>
               </div>
             </div>
@@ -79,7 +76,7 @@ ${ comps.menubar() }
 
 <script src="${ static('jobbrowser/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     enableResizeLogs();
 

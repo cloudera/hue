@@ -16,56 +16,88 @@
 # limitations under the License.
 
 import logging
-import json
-import random
 import threading
-import time
 
 from django.utils.translation import ugettext as _
 
+from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.exceptions_renderable import PopupException
-from libzookeeper.models import ZookeeperClient
 
 from libsentry.client import SentryClient
-from libsentry.conf import HOSTNAME, PORT
-from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_server_ha_zookeeper_quorum, get_sentry_server_ha_zookeeper_namespace
+from libsentry.sentry_ha import get_next_available_server, create_client
+from libsentry.sentry_site import get_sentry_server, is_ha_enabled
 
 
 LOG = logging.getLogger(__name__)
 
-
-_api_cache = None
-_api_cache_lock = threading.Lock()
+API_CACHE = None
+API_CACHE_LOCK = threading.Lock()
 
 
 def ha_error_handler(func):
-  def decorator(*args, **kwargs):
-    retries = 15
 
-    while retries > 0:
-      try:
-        return func(*args, **kwargs)
-      except SentryException, e:
-        raise e
-      except Exception, e:
-        retries -= 1
-        if not get_sentry_server_ha_enabled() or retries == 0:
-          raise e
+  def decorator(*args, **kwargs):
+    try:
+      return func(*args, **kwargs)
+    except StructuredThriftTransportException, e:
+      if not is_ha_enabled():
+        raise PopupException(_('Failed to connect to Sentry server %s, and Sentry HA is not enabled.') % args[0].client.host, detail=e)
+      else:
+        LOG.warn("Failed to connect to Sentry server %s, will attempt to find next available host." % args[0].client.host)
+        server, attempts = get_next_available_server(SentryClient, args[0].client.username, args[0].client.host)
+        if server is not None:
+          args[0].client = create_client(SentryClient, args[0].client.username, server)
+          set_api_cache(server)
+          return func(*args, **kwargs)
         else:
-          # Right now retries on any error and pull a fresh list of servers from ZooKeeper
-          LOG.info('Retrying fetching an available client in ZooKeeper.')
-          global _api_cache
-          _api_cache = None
-          time.sleep(1)
-          args[0].client = _get_client(args[0].client.username)
-          LOG.info('Picked %s' % args[0].client)
+          raise PopupException(_('Failed to find an available Sentry server.'))
+    except (SentryException, PopupException), e:
+      raise e
+    except Exception, e:
+      raise PopupException(_('Encountered unexpected error in SentryApi.'), detail=e)
 
   return decorator
 
 
-def get_api(user):
-  client = _get_client(user.username)
+def clear_api_cache():
+  global API_CACHE
+  if API_CACHE is not None:
+    LOG.info("Force resetting the currently cached Sentry server: %s:%s" % (API_CACHE['hostname'], API_CACHE['port']))
+    API_CACHE = None
 
+
+def set_api_cache(server):
+  global API_CACHE
+  global API_CACHE_LOCK
+  API_CACHE_LOCK.acquire()
+  try:
+    API_CACHE = server
+    LOG.info("Setting cached Sentry server: %s:%s" % (API_CACHE['hostname'], API_CACHE['port']))
+  finally:
+    API_CACHE_LOCK.release()
+  return server
+
+
+def get_cached_server(current_host=None):
+  global API_CACHE
+  if current_host and API_CACHE is not None:
+    clear_api_cache()
+
+  if API_CACHE is None:
+    server = get_sentry_server(current_host)
+    if server is not None:
+      set_api_cache(server)
+    else:
+      raise PopupException(_('Failed to find an available Sentry server.'))
+  else:
+    LOG.debug("Returning cached Sentry server: %s:%s" % (API_CACHE['hostname'], API_CACHE['port']))
+
+  return API_CACHE
+
+
+def get_api(user):
+  server = get_cached_server()
+  client = create_client(SentryClient, user.username, server)
   return SentryApi(client)
 
 
@@ -228,45 +260,3 @@ class SentryException(Exception):
 
   def __str__(self):
     return self.message
-
-
-def _get_client(username):
-  if get_sentry_server_ha_enabled():
-    servers = _get_server_properties()
-    if servers:
-      server = random.choice(servers)
-    else:
-      raise PopupException(_('No Sentry servers are available.'))
-  else:
-    server = {
-        'hostname': HOSTNAME.get(),
-        'port': PORT.get()
-    }
-
-  return SentryClient(server['hostname'], server['port'], username)
-
-
-def _get_server_properties():
-  global _api_cache
-
-  if not _api_cache: # If we need to refresh the list or if previously no servers were up 
-    _api_cache_lock.acquire()
-
-    try:
-      if not _api_cache:
-
-        servers = []
-        with ZookeeperClient(hosts=get_sentry_server_ha_zookeeper_quorum()) as client:
-          sentry_servers = client.get_children_data(namespace=get_sentry_server_ha_zookeeper_namespace())
-
-        for data in sentry_servers:
-          server = json.loads(data.decode("utf-8"))
-          servers.append({'hostname': server['address'], 'port': server['sslPort'] if server['sslPort'] else server['port']})
-
-        _api_cache = servers
-    except Exception, e:
-      raise PopupException(_('Error in retrieving Sentry server properties from Zookeeper.'), detail=e)
-    finally:
-      _api_cache_lock.release()
-
-  return _api_cache

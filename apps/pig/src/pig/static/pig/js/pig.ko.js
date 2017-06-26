@@ -635,7 +635,7 @@ var PigViewModel = function (props) {
       self.showLogsAtEnd = $(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight;
     });
     if (workflow.isRunning) {
-      $("#logsModal img").removeClass("hide");
+      $("#logsModal i").removeClass("hide");
       $("#logsModal pre").addClass("hide");
       $("#logsModal").modal({
         keyboard: true,
@@ -650,7 +650,7 @@ var PigViewModel = function (props) {
             window.clearInterval(self.showLogsInterval);
           }
           if (data.logs.pig) {
-            $("#logsModal img").addClass("hide");
+            $("#logsModal i").addClass("hide");
             $("#logsModal pre").removeClass("hide");
             var _logsEl = $("#logsModal pre");
             var newLines = data.logs.pig.split("\n").slice(_logsEl.html().split("<br>").length);

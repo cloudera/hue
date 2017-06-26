@@ -16,11 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime
 import json
 
 from nose.tools import assert_equal, assert_false, assert_true
 from django.contrib.auth.models import User
 
+from desktop.conf import IS_HUE_4
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -29,6 +31,8 @@ from librdbms.design import SQLdesign
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
+from oozie.models import Link, Workflow
+from oozie.tests import add_node
 from pig.models import create_or_update_script
 from useradmin.models import get_default_user_group
 
@@ -40,6 +44,7 @@ class TestDocumentConverter(object):
     self.user = User.objects.get(username="doc2")
     grant_access("doc2", "doc2", "beeswax")
     grant_access("doc2", "doc2", "pig")
+    grant_access("doc2", "doc2", "jobsub")
 
     # This creates the user directories for the new user
     response = self.client.get('/desktop/api2/doc/')
@@ -67,6 +72,10 @@ class TestDocumentConverter(object):
         desc='Test Hive query'
     )
     doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
+
+    # Setting doc.last_modified to older date
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
 
     query2 = SavedQuery.objects.create(
         type=SavedQuery.TYPES_MAPPING['hql'],
@@ -113,7 +122,7 @@ class TestDocumentConverter(object):
 
       # Verify default properties
       assert_true(doc2.data_dict['isSaved'])
-
+      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       #
       # Query History
@@ -123,6 +132,7 @@ class TestDocumentConverter(object):
       # Verify Document2 attributes
       assert_equal(doch.name, doc2.data_dict['name'])
       assert_equal(doch.description, doc2.data_dict['description'])
+      assert_equal(doch.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       # Verify session type
       assert_equal('hive', doc2.data_dict['sessions'][0]['type'])
@@ -154,6 +164,45 @@ class TestDocumentConverter(object):
       query2.delete()
 
 
+  def test_convert_hive_query_with_special_chars(self):
+    sql = 'SELECT * FROM sample_07'
+    settings = [
+      {'key': 'hive.exec.scratchdir', 'value': '/tmp/mydir'},
+      {'key': 'hive.querylog.location', 'value': '/tmp/doc2'}
+    ]
+    file_resources = [{'type': 'jar', 'path': '/tmp/doc2/test.jar'}]
+    functions = [{'name': 'myUpper', 'class_name': 'org.hue.udf.MyUpper'}]
+    design = hql_query(sql, database='etl', settings=settings, file_resources=file_resources, functions=functions)
+
+    query = SavedQuery.objects.create(
+      type=SavedQuery.TYPES_MAPPING['hql'],
+      owner=self.user,
+      data=design.dumps(),
+      name='Test / Hive query',
+      desc='Test Hive query'
+    )
+    doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
+
+    try:
+      # Test that corresponding doc2 is created after convert
+      assert_equal(0, Document2.objects.filter(owner=self.user, type='query-hive').count())
+
+      converter = DocumentConverter(self.user)
+      converter.convert()
+
+      assert_equal(1, Document2.objects.filter(owner=self.user, type='query-hive').count())
+
+      doc2 = Document2.objects.get(owner=self.user, type='query-hive', is_history=False)
+
+      # Verify name is maintained
+      assert_equal('Test / Hive query', doc2.name)
+
+      # Verify Document2 path is stripped of invalid chars
+      assert_equal('/Test%20/%20Hive%20query', doc2.path)
+    finally:
+      query.delete()
+
+
   def test_convert_impala_query(self):
     sql = 'SELECT * FROM sample_07'
     settings = [
@@ -171,6 +220,10 @@ class TestDocumentConverter(object):
     )
     doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
 
+    # Setting doc.last_modified to older date
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
     try:
       # Test that corresponding doc2 is created after convert
       assert_false(Document2.objects.filter(owner=self.user, type='query-impala').exists())
@@ -183,6 +236,7 @@ class TestDocumentConverter(object):
       # Verify Document2 attributes
       assert_equal(doc.name, doc2.data_dict['name'])
       assert_equal(doc.description, doc2.data_dict['description'])
+      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       # Verify session type
       assert_equal('impala', doc2.data_dict['sessions'][0]['type'])
@@ -224,6 +278,10 @@ class TestDocumentConverter(object):
     )
     doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
 
+    # Setting doc.last_modified to older date
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
     try:
       # Test that corresponding doc2 is created after convert
       assert_false(Document2.objects.filter(owner=self.user, type='query-sqlite').exists())
@@ -236,6 +294,7 @@ class TestDocumentConverter(object):
       # Verify Document2 attributes
       assert_equal(doc.name, doc2.data_dict['name'])
       assert_equal(doc.description, doc2.data_dict['description'])
+      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       # Verify session type
       assert_equal('sqlite', doc2.data_dict['sessions'][0]['type'])
@@ -248,9 +307,179 @@ class TestDocumentConverter(object):
       query.delete()
 
 
-  def test_convert_workflow(self):
-    # TODO: write me
-    pass
+  def test_convert_mapreduce(self):
+    wf = Workflow.objects.new_workflow(self.user)
+    wf.save()
+    Workflow.objects.initialize(wf)
+    Link.objects.filter(parent__workflow=wf).delete()
+    action = add_node(wf, 'action-name-1', 'mapreduce', [wf.start], {
+      'description': 'Test MR job design',
+      'files': '[]',
+      'jar_path': '/user/hue/oozie/examples/lib/hadoop-examples.jar',
+      'job_properties': '[{"name": "sleep.job.map.sleep.time", "value": "5"}, {"name": "sleep.job.reduce.sleep.time", "value": "10"}]',
+      'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
+      'archives': '[]',
+    })
+    Link(parent=action, child=wf.end, name="ok").save()
+
+    # Setting doc.last_modified to older date
+    doc = Document.objects.get(id=wf.doc.get().id)
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
+    try:
+      if IS_HUE_4.get():
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='query-mapreduce').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='query-mapreduce')
+
+        # Verify snippet values
+        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+        assert_equal('/user/hue/oozie/examples/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
+        assert_equal(['sleep.job.map.sleep.time=5', 'sleep.job.reduce.sleep.time=10'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+      else:
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
+
+        # Verify absolute_url
+        response = self.client.get(doc2.get_absolute_url())
+        assert_equal(200, response.status_code)
+        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+    finally:
+      wf.delete()
+
+
+  def test_convert_shell(self):
+    wf = Workflow.objects.new_workflow(self.user)
+    wf.save()
+    Workflow.objects.initialize(wf)
+    Link.objects.filter(parent__workflow=wf).delete()
+    action = add_node(wf, 'action-name-1', 'shell', [wf.start], {
+      u'job_xml': 'my-job.xml',
+      u'files': '["hello.py"]',
+      u'name': 'Shell',
+      u'job_properties': '[{"name": "mapred.job.queue.name", "value": "test"}]',
+      u'capture_output': 'on',
+      u'command': 'hello.py',
+      u'archives': '[{"dummy": "", "name": "test.zip"}]',
+      u'prepares': '[]',
+      u'params': '[{"type": "argument", "value": "baz"}, {"type": "env-var", "value": "foo=bar"}]',
+      u'description': 'Execute a Python script printing its arguments'
+    })
+    Link(parent=action, child=wf.end, name="ok").save()
+
+    # Setting doc.last_modified to older date
+    doc = Document.objects.get(id=wf.doc.get().id)
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
+    try:
+      if IS_HUE_4.get():
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='query-shell').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='query-shell')
+
+        # Verify snippet values
+        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+        assert_equal('hello.py', doc2.data_dict['snippets'][0]['properties']['command_path'])
+        assert_equal(['baz'], doc2.data_dict['snippets'][0]['properties']['arguments'])
+        assert_equal(['foo=bar'], doc2.data_dict['snippets'][0]['properties']['env_var'])
+        assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+        assert_equal(['test.zip'], doc2.data_dict['snippets'][0]['properties']['archives'])
+        assert_equal([{'type': 'file', 'path': 'hello.py'}], doc2.data_dict['snippets'][0]['properties']['files'])
+        assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
+      else:
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
+
+        # Verify absolute_url
+        response = self.client.get(doc2.get_absolute_url())
+        assert_equal(200, response.status_code)
+        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+    finally:
+      wf.delete()
+
+
+  def test_convert_java(self):
+    wf = Workflow.objects.new_workflow(self.user)
+    wf.save()
+    Workflow.objects.initialize(wf)
+    Link.objects.filter(parent__workflow=wf).delete()
+    action = add_node(wf, 'action-name-1', 'java', [wf.start], {
+      'name': 'MyTeragen',
+      "description": "Generate N number of records",
+      "main_class": "org.apache.hadoop.examples.terasort.TeraGen",
+      "args": "1000 ${output_dir}/teragen",
+      "files": '["my_file","my_file2"]',
+      "job_xml": "",
+      "java_opts": "-Dexample-property=natty",
+      "jar_path": "/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
+      'job_properties': '[{"name": "mapred.job.queue.name", "value": "test"}]',
+      "prepares": '[{"value":"/test","type":"mkdir"}]',
+      "archives": '[{"dummy":"","name":"my_archive"},{"dummy":"","name":"my_archive2"}]',
+      "capture_output": "on",
+    })
+    Link(parent=action, child=wf.end, name="ok").save()
+
+    # Setting doc.last_modified to older date
+    doc = Document.objects.get(id=wf.doc.get().id)
+    Document.objects.filter(id=doc.id).update(
+      last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
+    try:
+      if IS_HUE_4.get():
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='query-java').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='query-java')
+
+        # Verify snippet values
+        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+        assert_equal('/user/hue/oozie/workspaces/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
+        assert_equal('org.apache.hadoop.examples.terasort.TeraGen', doc2.data_dict['snippets'][0]['properties']['class'])
+        assert_equal('1000 ${output_dir}/teragen', doc2.data_dict['snippets'][0]['properties']['args'])
+        assert_equal('-Dexample-property=natty', doc2.data_dict['snippets'][0]['properties']['java_opts'])
+        assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+        assert_equal(['my_archive', 'my_archive2'], doc2.data_dict['snippets'][0]['properties']['archives'])
+        assert_equal([{'type': 'file', 'path': 'my_file'}, {'type': 'file', 'path': 'my_file2'}], doc2.data_dict['snippets'][0]['properties']['files'])
+        assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
+      else:
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
+
+        # Verify absolute_url
+        response = self.client.get(doc2.get_absolute_url())
+        assert_equal(200, response.status_code)
+        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+    finally:
+      wf.delete()
 
 
   def test_convert_pig_script(self):
@@ -259,24 +488,57 @@ class TestDocumentConverter(object):
       'id': 1000,
       'name': 'Test',
       'script': 'A = LOAD "$data"; STORE A INTO "$output";',
-      'parameters': [],
-      'resources': [],
-      'hadoopProperties': []
+      'hadoopProperties': [
+        {u'name': u'mapred.job.queue.name', u'value': u'pig'},
+        {u'name': u'mapreduce.task.profile', u'value': u'true'}
+      ],
+      'parameters': [
+        {u'name': u'input', u'value': u'/user/test/data'},
+        {u'name': u'verbose', u'value': u'true'}
+      ],
+      'resources': [
+        {u'type': u'file', u'value': u'/user/test/test.txt'},
+        {u'type': u'archive', u'value': u'/user/test/test.jar'}
+      ],
     }
     pig_script = create_or_update_script(**attrs)
+    pig_script.save()
+
+    # Setting doc.last_modified to older date
+    doc = Document.objects.get(id=pig_script.doc.get().id)
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
 
     try:
-      # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='link-pigscript').exists())
+      if IS_HUE_4.get():
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='query-pig').exists())
 
-      converter = DocumentConverter(self.user)
-      converter.convert()
+        converter = DocumentConverter(self.user)
+        converter.convert()
 
-      doc2 = Document2.objects.get(owner=self.user, type='link-pigscript')
+        doc2 = Document2.objects.get(owner=self.user, type='query-pig')
 
-      # Verify absolute_url
-      response = self.client.get(doc2.get_absolute_url())
-      assert_equal(200, response.status_code)
+        # Verify snippet values
+        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+        assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement'], doc2.data_dict)
+        assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement_raw'])
+        assert_equal(['mapred.job.queue.name=pig', 'mapreduce.task.profile=true'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+        assert_equal(['input=/user/test/data', 'verbose=true'], doc2.data_dict['snippets'][0]['properties']['parameters'])
+        assert_equal(['/user/test/test.txt', '/user/test/test.jar'], doc2.data_dict['snippets'][0]['properties']['resources'])
+      else:
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='link-pigscript').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='link-pigscript')
+
+        # Verify absolute_url
+        response = self.client.get(doc2.get_absolute_url())
+        assert_equal(200, response.status_code)
+        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
     finally:
       pig_script.delete()
 

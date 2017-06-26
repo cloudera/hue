@@ -25,7 +25,9 @@ urlpatterns = patterns('indexer.views',
   url(r'^indexes/$', 'indexes', name='indexes'),
 
   # V3
-  url(r'^indexer/$', 'indexer', name='indexer')
+  url(r'^indexer/$', 'indexer', name='indexer'),
+  url(r'^importer/$', 'importer', name='importer'),
+  url(r'^importer/prefill/(?P<source_type>[^/]+)/(?P<target_type>[^/]+)/(?P<target_path>[^/]+)?$', 'importer_prefill', name='importer_prefill'),
 )
 
 urlpatterns += patterns('indexer.api',
@@ -56,4 +58,6 @@ urlpatterns += patterns('indexer.api3',
   url(r'^api/indexer/guess_format/$', 'guess_format', name='guess_format'),
   url(r'^api/indexer/index_file/$', 'index_file', name='index_file'),
   url(r'^api/indexer/guess_field_types/$', 'guess_field_types', name='guess_field_types'),
+
+  url(r'^api/importer/submit', 'importer_submit', name='importer_submit')
 )

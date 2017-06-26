@@ -29,7 +29,7 @@
 ${ commonheader(_("Workflow Dashboard"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='workflows', dashboard=True) }
 
-<div class="container-fluid" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<div id="oozie_workflowComponents" class="container-fluid oozie_workflowComponents">
 <div class="card card-small">
   <div class="card-body">
   <p>
@@ -133,7 +133,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       </div>
     </div>
 
-    <div class="span10" style="margin-left: 2.127659574468085%;">
+    <div class="span10" style="margin-left: 2.56410256%;">
       <h1 class="card-heading simple card-heading-nopadding card-heading-noborder card-heading-blue" style="margin-bottom: 10px">
         % if oozie_bundle:
           ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
@@ -165,7 +165,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
       <div id="workflow-tab-content" class="tab-content" style="min-height:200px; overflow: visible">
         % if workflow_graph != 'MISSING':
-        <div id="graph" class="tab-pane active">
+        <div id="graph" class="tab-pane active dashboard-container">
         % if layout_json == '':
         ${ workflow_graph | n,unicode }
         % else:
@@ -176,7 +176,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         % else:
         <div id="actions" class="tab-pane active">
         % endif
-          <table class="table table-striped table-condensed selectable">
+          <table class="table table-condensed selectable">
             <thead>
             <tr>
               <th>${ _('Logs') }</th>
@@ -300,7 +300,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <div class="tab-pane" id="sla" style="padding-left: 20px">
           <div id="yAxisLabel" class="hide">${_('Time since Nominal Time in min')}</div>
           <div id="slaChart"></div>
-          <table id="slaTable" class="table table-striped table-condensed hide">
+          <table id="slaTable" class="table table-condensed hide">
             <thead>
               <th>${_('Status')}</th>
               <th>${_('Nominal Time')}</th>
@@ -347,8 +347,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
 <div id="confirmation" class="modal hide">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 class="message"></h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title message"></h2>
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -358,10 +358,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="${ static('oozie/css/workflow.css') }">
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 % if oozie_workflow.has_sla:
 <script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -372,11 +369,15 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 %endif
 
 % if layout_json != '':
+
 <link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
 <link rel="stylesheet" href="${ static('oozie/css/workflow-editor.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 
 ${ dashboard.import_layout() }
 
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('oozie/js/workflow-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>
@@ -419,13 +420,7 @@ ${ dashboard.import_layout() }
 
 <script type="text/javascript">
 
-${ utils.slaGlobal() }
-
-  ko.bindingHandlers.editable = { // overwrite the editable bindings with a simple text filler
-    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-      $(element).text(valueAccessor()());
-    }
-  }
+  ${ utils.slaGlobal() }
 
   var Action = function (action) {
     return {
@@ -460,11 +455,24 @@ ${ utils.slaGlobal() }
   ko.applyBindings(actionsViewModel, $("#actions")[0]);
 
   % if layout_json != '':
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }); 
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#graph")[0]);
   viewModel.isViewer = ko.observable(true);
   viewModel.init();
   fullLayout(viewModel);
+
+  var globalFilechooserOptions = {
+    skipInitialPathIfEmpty: true,
+    showExtraHome: true,
+    uploadFile: true,
+    createFolder: true,
+    extraHomeProperties: {
+      label: '${ _('Workspace') }',
+      icon: 'fa-folder-open',
+      path: viewModel.workflow.properties.deployment_dir()
+    },
+    deploymentDir: viewModel.workflow.properties.deployment_dir()
+  }
   %endif
 
   var CHART_LABELS = {
@@ -479,7 +487,7 @@ ${ utils.slaGlobal() }
 
   $(document).ready(function() {
     % if layout_json != '':
-    drawArrows();
+    viewModel.drawArrows();
     %endif
 
     var CURRENT_ZOOM = 1;
@@ -542,7 +550,7 @@ ${ utils.slaGlobal() }
     $("a[data-toggle='tab']").on("shown", function (e) {
       if ($(e.target).attr("href") == "#graph") {
         % if layout_json != '':
-        drawArrows();
+        viewModel.drawArrows();
         %endif
       }
       else {
@@ -667,7 +675,7 @@ ${ utils.slaGlobal() }
               _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
             }
             else {
-              _w = viewModel.getWidgetById($("[id^=wdg_" + actionId + "]").attr("id").substr(4));
+              _w = viewModel.getWidgetById($("[id^=wdg_" + actionId.toLowerCase() + "]").attr("id").substr(4));
             }
             if (_w != null) {
               if (['SUCCEEDED', 'OK', 'DONE'].indexOf(action.status) > -1) {
@@ -733,7 +741,7 @@ ${ utils.slaGlobal() }
         resizeLogs();
         if ($("#graph").is(":visible")){
           % if layout_json != '':
-          drawArrows();
+          viewModel.drawArrows();
           %endif
         }
       }, 200);

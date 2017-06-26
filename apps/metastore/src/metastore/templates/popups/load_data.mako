@@ -22,10 +22,12 @@ from django.utils.translation import ugettext as _
 <form method="POST" class="form-horizontal" id="load-data-form" onsubmit="return false;">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Import data')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Import Data')}</h2>
     </div>
     <div class="modal-body">
+        <input id="load_data_is_embeddable" type="hidden" name="is_embeddable" value="false">
+        <input type="hidden" name="start_time" value=""/>
 
         <div class="control-group">
             ${comps.bootstrapLabel(load_form["path"])}
@@ -40,14 +42,14 @@ from django.utils.translation import ugettext as _
             <div class="control-group">
                  ${comps.bootstrapLabel(load_form[pf])}
                  <div class="controls">
-                   ${comps.field(load_form[pf], render_default=True, attrs={'klass': 'input-xlarge'})}
+                   ${comps.field(load_form[pf], render_default=True, attrs={'klass': 'input-xxlarge'})}
                 </div>
             </div>
         % endfor
 
         <div class="control-group">
           <div class="controls">
-            <label class="checkbox">
+            <label class="checkbox inline-block">
                 <input type="checkbox" name="overwrite"/> ${_('Overwrite existing data')}
               </label>
             </div>
@@ -68,9 +70,13 @@ from django.utils.translation import ugettext as _
    #filechooser {
      display: none;
      min-height: 100px;
-     height: 250px;
+     height: 380px;
      overflow-y: auto;
      margin-top: 10px;
+   }
+
+   .modal-body {
+     max-height: 540px;
    }
 
    .form-horizontal .controls {
@@ -83,7 +89,7 @@ from django.utils.translation import ugettext as _
    }
 </style>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $(".fileChooserBtn").click(function (e) {
       e.preventDefault();
@@ -126,22 +132,33 @@ from django.utils.translation import ugettext as _
     }
 
     $("#load-data-submit-btn").click(function (e) {
+      if (IS_HUE_4) {
+        $("#load_data_is_embeddable").val("true");
+        $("#load-data-form").find('input[name=start_time]').val(ko.mapping.toJSON(new Date().getTime()));
+      }
       $.post("${ url('metastore:load_table', database=database, table=table.name) }",
-              $("#load-data-form").serialize(),
-              function (response) {
-                $("#load-data-submit-btn").button('reset');
-                if (response['status'] != 0) {
-                  if (response['status'] == 1) {
-                    $('#load-data-error').html(response['data']);
-                    $('#load-data-error').show();
-                  } else {
-                    $('#import-data-modal').html(response['data']);
-                  }
-                } else {
-                  window.location.replace(response['data']);
-                }
-              }
-      );
+        $("#load-data-form").serialize(),
+        function (response) {
+          if (response['status'] != 0) {
+            if (response['status'] == 1) {
+              $('#load-data-error').html(response['data']);
+              $('#load-data-error').show();
+            } else {
+              $('#import-data-modal').html(response['data']);
+            }
+          } else {
+            if (IS_HUE_4) {
+              huePubSub.publish('notebook.task.submitted', response.history_uuid);
+              $("#import-data-modal").modal("hide");
+            } else {
+              window.location.replace(response['data']);
+            }
+          }
+        }
+      ).always(function () {
+        $("#load-data-submit-btn").button('reset');
+        $("#load-data-submit-btn").removeAttr("disabled");
+      });
     });
   });
 </script>

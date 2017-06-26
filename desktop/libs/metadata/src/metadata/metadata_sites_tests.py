@@ -38,9 +38,9 @@ class TestReadConfiguration:
     ]
 
     try:
-      file(os.path.join(tmpdir, 'navigator.client.properties'), 'w').write("""
+      file(os.path.join(tmpdir, 'navigator.lineage.client.properties'), 'w').write("""
 navigator.client.serviceType=HUE
-navigator.server.url=http://hue-rocks.com:7186
+navigator.server.url=http://hue-rocks.com:7187
 navigator.client.roleName=HUE-1-HUE_SERVER-50cf99601c4bf64e9ccded4c8cd96d12
 navigator.client.roleType=HUE_SERVER
 audit_event_log_dir=/var/log/hue/audit
@@ -49,7 +49,7 @@ navigator.audit_log_max_file_size=100
 
       metadata_sites.reset()
 
-      assert_equal(get_navigator_server_url(), 'http://hue-rocks.com:7186')
+      assert_equal(get_navigator_server_url(), 'http://hue-rocks.com:7187')
     finally:
       metadata_sites.reset()
       for reset in resets:

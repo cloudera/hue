@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import os
 import sys
 import socket
 
@@ -24,8 +25,11 @@ from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAM
   AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
 from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
+from desktop.lib.paths import get_desktop_root
 
+from impala.impala_flags import get_ssl_server_certificate, get_max_result_cache_size, is_impersonation_enabled
 from impala.settings import NICE_NAME
+
 
 LOG = logging.getLogger(__name__)
 
@@ -51,7 +55,7 @@ IMPERSONATION_ENABLED=Config(
   key='impersonation_enabled',
   help=_t("Turn on/off impersonation mechanism when talking to Impala."),
   type=coerce_bool,
-  default=False)
+  dynamic_default=is_impersonation_enabled)
 
 QUERYCACHE_ROWS=Config(
   key='querycache_rows',
@@ -59,7 +63,7 @@ QUERYCACHE_ROWS=Config(
           " support re-fetching them for downloading them."
           " Set to 0 for disabling the option and backward compatibility."),
   type=int,
-  default=50000)
+  dynamic_default=get_max_result_cache_size)
 
 SERVER_CONN_TIMEOUT = Config(
   key='server_conn_timeout',
@@ -96,6 +100,12 @@ CONFIG_WHITELIST = Config(
   default='debug_action,explain_level,mem_limit,optimize_partition_key_scans,query_timeout_s,request_pool',
   type=coerce_csv,
   help=_t('A comma-separated list of white-listed Impala configuration properties that users are authorized to set.')
+)
+
+IMPALA_CONF_DIR = Config(
+  key='impala_conf_dir',
+  help=_t('Impala configuration directory, where impala_flags is located.'),
+  default=os.environ.get("HUE_CONF_DIR", get_desktop_root("conf")) + '/impala-conf'
 )
 
 SSL = ConfigSection(
@@ -174,6 +184,7 @@ AUTH_PASSWORD_SCRIPT = Config(
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
   # import in method to avoid circular dependency
+  from beeswax.design import hql_query
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config
 
@@ -183,7 +194,12 @@ def config_validator(user):
       if not 'test' in sys.argv: # Avoid tests hanging
         query_server = get_query_server_config(name='impala')
         server = dbms.get(user, query_server)
-        server.execute_statement("SELECT 'Hello World!';")
+        query = hql_query("SELECT 'Hello World!';")
+        handle = server.execute_and_wait(query, timeout_sec=10.0)
+
+        if handle:
+          server.fetch(handle, rows=100)
+          server.close(handle)
     except StructuredThriftTransportException, ex:
       if 'TSocket read 0 bytes' in str(ex):  # this message appears when authentication fails
         msg = "Failed to authenticate to Impalad, check authentication configurations."

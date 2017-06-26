@@ -25,81 +25,149 @@
   path_enc = path
   dirname_enc = urlencode(view['dirname'])
   base_url = url('filebrowser.views.view', path=path_enc)
+  edit_url = url('filebrowser.views.edit', path=path_enc)
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user, request) | n,unicode }
+%endif
+
+
 ${ fb_components.menubar() }
 
-<link href="${ static('filebrowser/css/display.css') }" rel="stylesheet" />
-<div class="container-fluid">
+<div id="fileviewerComponents" class="container-fluid">
+  <link href="${ static('filebrowser/css/display.css') }" rel="stylesheet" type="text/css">
   <div class="row-fluid">
     <div class="span2">
-      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats, show_download_button, view) }
+      <div class="sidebar-nav margin-top-10">
+        <!-- ko if: $root.file -->
+        <ul class="nav nav-list">
+          <!-- ko if: $root.isViewing -->
+            <!-- ko if: $root.file().view.mode() === 'binary' -->
+            <li><a class="pointer" data-bind="click: function(){ switchMode('text'); }"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
+            <!-- /ko -->
+
+            <!-- ko if: $root.file().view.mode() === 'text' -->
+              <li><a class="pointer" data-bind="click: function(){ switchMode('binary'); }"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
+            <!-- /ko -->
+
+            <!-- ko if: $root.file().view.compression() !== "gzip" && $root.file().path().toLowerCase().endsWith('.gz') -->
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('gzip'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
+            <!-- /ko -->
+
+            <!-- ko if: $root.file().view.compression() !== "bz2" && ($root.file().path().toLowerCase().endsWith('.bz2') || $root.file().path().toLowerCase().endsWith('.bzip2'))-->
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('bz2'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Bzip2')}</a></li>
+            <!-- /ko -->
+
+            <!-- ko if: $root.file().view.compression() !== "avro" && $root.file().view.compression() !== "snappy_avro" && $root.file().path().toLowerCase().endsWith('.avro') -->
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('avro'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Avro')}</a></li>
+            <!-- /ko -->
+
+            <!-- ko if: $root.file().view.compression() && $root.file().view.compression() !== "none" -->
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('none'); }"><i class="fa fa-times-circle"></i> ${_('Stop preview')}</a></li>
+            <!-- /ko -->
+
+            <!-- ko if: $root.file().view.compression() && $root.file().view.compression() === "none" && $root.file().editable -->
+              <li><a class="pointer" data-bind="click: $root.editFile"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
+            <!-- /ko -->
+          <!-- /ko -->
+          <!-- ko ifnot: $root.isViewing -->
+            <li><a class="pointer" data-bind="click: $root.viewFile"><i class="fa fa-eye"></i> ${_('View file')}</a></li>
+          <!-- /ko -->
+
+          <!-- ko if: $root.isViewing -->
+          <!-- ko if: $root.file().show_download_button -->
+           <li><a class="pointer" data-bind="click: $root.downloadFile"><i class="fa fa-download"></i> ${_('Download')}</a></li>
+          <!-- /ko -->
+           <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-file-text"></i> ${_('View file location')}</a></li>
+           <li><a class="pointer" data-bind="click: changePage"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
+          <!-- /ko -->
+
+           <!-- ko if: $root.file().stats -->
+           <li class="white">
+            <dl class="muted">
+              <dt>${_('Last modified')}</dt>
+              <dd data-bind="text: localeFormat($root.file().stats.mtime()*1000)"></dd>
+              <dt>${_('User')}</dt>
+              <dd data-bind="text: $root.file().stats.user"></dd>
+              <dt>${_('Group')}</dt>
+              <dd data-bind="text: $root.file().stats.group"></dd>
+              <dt>${_('Size')}</dt>
+              <dd data-bind="text: filesize($root.file().stats.size())"></dd>
+              <dt>${_('Mode')}</dt>
+              <dd data-bind="text: $root.file().stats.mode().toString(8)"></dd>
+            </dl>
+           </li>
+           <!-- /ko -->
+        </ul>
+        <!-- /ko -->
+      </div>
     </div>
     <div class="span10">
       <div class="card card-small" style="margin-bottom: 5px">
-        % if not view['compression'] or view['compression'] in ("none", "avro"):
+        <!-- ko if: $root.isViewing() && $root.file() && ($root.file().view.compression() === null || $root.file().view.compression() === "avro" || $root.file().view.compression() === "none") -->
           <div class="pull-right" style="margin-right: 20px; margin-top: 14px;">
             <div class="form-inline pagination-input-form inline">
               <span>${_('Page')}</span>
               <input type="text" data-bind="value: page, valueUpdate: 'afterkeydown', event: { change: pageChanged }" class="pagination-input" />
-              <span data-bind="visible: totalPages() > MAX_PAGES_TO_ENABLE_SCROLLING || viewModel.mode() == 'binary'">
-              to <input type="text" data-bind="value: upperPage, valueUpdate: 'afterkeydown', event: { change: upperPageChanged }" class="pagination-input"/></span>
-              of <span data-bind="text: totalPages"></span>
+              ${_('to')} <input type="text" data-bind="value: upperPage, valueUpdate: 'afterkeydown', event: { change: upperPageChanged }" class="pagination-input"/>
+              ${_('of')} <span data-bind="text: totalPages"></span>
             </div>
             <div class="pagination inline">
               <ul>
-                <li class="first-page prev disabled"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a></li>
-                <li class="previous-page disabled"><a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a></li>
-                <li class="next-page"><a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a></li>
-                <li class="last-page next"><a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fa fa-fast-forward"></i></a></li>
+                <li class="first-page prev" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a></li>
+                <li class="previous-page" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a></li>
+                <li class="next-page" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a></li>
+                <li class="last-page next" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fa fa-fast-forward"></i></a></li>
               </ul>
             </div>
           </div>
-        % endif
+        <!-- /ko -->
         % if breadcrumbs:
           ${fb_components.breadcrumbs(path, breadcrumbs)}
         %endif
-        <div class="card-body">
-          % if stats['size'] == 0:
+        <div class="card-body" style="padding: 0">
+            <!-- ko if: $root.file() && $root.file().stats.size() === 0 && $root.isViewing() -->
             <div class="center empty-wrapper">
-              <i class="fa fa-frown-o"></i>
-
               <h1>${_('The current file is empty.')}</h1>
               <br/>
             </div>
-          % else:
-          % if 'contents' in view and view['masked_binary_data']:
-            <div class="alert alert-warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
-          % endif
-          %if view['compression'] in ('avro', 'gzip', 'parquet', 'snappy'):
-            <p class="muted"><i class="fa fa-info-circle"></i> ${_('Output rendered from compressed %s file.') % view['compression']}</p>
-          %endif
-            <div id="fileArea" data-bind="css: {'loading': isLoading}">
-              <div id="loader" data-bind="visible: isLoading">
-                <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
-                <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-              </div>
-              % if 'contents' in view:
-                <pre></pre>
-              % else:
-                <table class="binary">
-                  <tbody>
-                  </tbody>
-                </table>
-              % endif
+            <!-- /ko -->
+            <!-- ko if: $root.file -->
+              <!-- ko ifnot: $root.file().stats.size() === 0 -->
+                <!-- ko if: $root.file().view.contents && $root.file().view.masked_binary_data() -->
+                <div class="alert alert-warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
+                <!-- /ko -->
+                <!-- ko if: ['avro', 'bz2', 'gzip', 'parquet', 'snappy'].indexOf($root.file().view.compression()) > -1 -->
+                <div class="alert alert-warning"><i class="fa fa-info-circle"></i> ${_('Output rendered from compressed %s file.') % view['compression']}</div>
+                <!-- /ko -->
+              <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko hueSpinner: { spin: !$root.file() && isLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
+            <!-- ko if: $root.isViewing -->
+            <div id="fileArea" data-bind="css: {'loading': isLoading}, visible: $root.file() && $root.file().stats.size()">
+              <!-- ko hueSpinner: { spin: isLoading, center: true, size: 'xlarge' } --><!-- /ko -->
+              <pre></pre>
+              <table class="binary">
+                <tbody>
+                </tbody>
+              </table>
             </div>
-          % endif
+            <!-- /ko -->
+            <!-- ko if not: $root.isViewing -->
+            <div id="fileeditor"></div>
+            <!-- /ko -->
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.visible.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript" charset="utf-8">
+
+<script type="text/javascript">
 (function () {
   <%
     MAX_ALLOWED_PAGES_PER_REQUEST = 255
@@ -107,16 +175,25 @@ ${ fb_components.menubar() }
 
   var pages = {};
 
-  function resizeText () {
-    var _fileArea = $("#fileArea");
-    if (_fileArea.height() > 0) {
-      _fileArea.height($(window).height() - _fileArea.offset().top - 26);
-      $("#loader").css("marginLeft", (_fileArea.width() - $("#loader").width()) / 2);
-    }
+  var viewModel = new DisplayViewModel({
+    base_url: "${ base_url }",
+    compression: "${view['compression']}",
+    mode: "${ view['mode'] }",
+    begin: ${view['offset'] + 1},
+    end: ${view['end']},
+    length: ${view['length']},
+    size: ${stats['size']},
+    max_size: ${view['max_chunk_size']}
+  });
+
+  function resizeText() {
+    hueUtils.waitForRendered('#fileArea', function(el){ return el.is(':visible') }, function(){
+      $("#fileArea").height($(window).height() - $("#fileArea").offset().top - 30);
+    });
   }
 
-  function formatHex (number, padding) {
-    if ("undefined" != typeof number){
+  function formatHex(number, padding) {
+    if ("undefined" != typeof number) {
       var _filler = "";
       for (var i = 0; i < padding - 1; i++) {
         _filler += "0";
@@ -126,18 +203,10 @@ ${ fb_components.menubar() }
     return "";
   }
 
-  function renderPages () {
+  function renderPages() {
     var _html = "";
-    var fileAreaHeight = $("#fileArea").height();
-
-    if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING) { // enable scrolling
-      for (var i = 1; i <= viewModel.totalPages(); i++) {
-        _html += "<a id='page" + i + "'><div class='fill-file-area' style='height: " + fileAreaHeight + "px'></div></a>";
-      }
-    } else {
-      for (i = viewModel.page(); i <= viewModel.upperPage(); i++) {
-        _html += "<a id='page" + i + "'><div class='fill-file-area' style='height: " + fileAreaHeight + "px'></div></a>";
-      }
+    for (var i = viewModel.page(); i <= viewModel.upperPage(); i++) {
+      _html += "<a id='page" + i + "'><div class='fill-file-area'></div></a>";
     }
     $("#fileArea pre").html(_html);
   }
@@ -165,7 +234,10 @@ ${ fb_components.menubar() }
     $.getJSON(_baseUrl, params, function (data) {
       var _html = "";
 
+      viewModel.file(ko.mapping.fromJS(data, { 'ignore': ['view.contents', 'view.xxd'] }));
       if (data.view.contents) {
+        $('#fileArea pre').show();
+        $('.binary').hide();
         var chunks = getChunks(startPage, endPage, data.view)
         for (var i = startPage; i <= endPage; i++) {
           pages[i] = chunks.shift();
@@ -183,12 +255,13 @@ ${ fb_components.menubar() }
 
       if (data.view.xxd != null) {
         pages[startPage] = data.view.xxd;
+        $('#fileArea pre').hide();
+        $('.binary').show();
 
         $(data.view.xxd).each(function (cnt, item) {
-          var i;
           _html += "<tr><td>" + formatHex(item[0], 7) + ":&nbsp;</td><td>";
 
-          for (i = 0; i < item[1].length; i++) {
+          for (var i = 0; i < item[1].length; i++) {
             _html += formatHex(item[1][i][0], 2) + " " + formatHex(item[1][i][1], 2) + " ";
           }
 
@@ -209,34 +282,37 @@ ${ fb_components.menubar() }
   function DisplayViewModel (params) {
     var self = this;
 
-    function changePage () {
-      if (viewModel.totalPages() >= viewModel.MAX_PAGES_TO_ENABLE_SCROLLING || viewModel.mode() == "binary") {
-        renderPages();
-      }
+    self.changePage = function () {
+      renderPages();
       getContent(function () {
-        if (viewModel.totalPages() >= viewModel.MAX_PAGES_TO_ENABLE_SCROLLING || viewModel.mode() == "binary") {
-          location.hash = "#p" + viewModel.page() + (viewModel.page() != viewModel.upperPage() ? "-p" + viewModel.upperPage() : "");
-          $("#fileArea").scrollTop(0);
-
-        } else {
-          location.hash = "#page" + viewModel.page();
-        }
+        $("#fileArea").scrollTop(0);
       });
     }
 
-    self.MAX_ALLOWED_PAGES_PER_REQUEST = ${MAX_ALLOWED_PAGES_PER_REQUEST};
-    self.MAX_PAGES_TO_ENABLE_SCROLLING = 300;
+    self.MAX_ALLOWED_PAGES_PER_REQUEST = ${ MAX_ALLOWED_PAGES_PER_REQUEST };
     self.PAGES_PER_CHUNK = 50;
+
+    self.isViewing = ko.observable(true);
+    self.isViewing.subscribe(function(val){
+      if (val){
+        window.setTimeout(resizeText, 0);
+      }
+    });
 
     self.base_url = ko.observable(params.base_url);
     self.compression = ko.observable(params.compression);
     self.mode = ko.observable(params.mode);
+    self.mode.subscribe(function(val){
+      window.setTimeout(resizeText, 0);
+    });
     self.begin = ko.observable(params.begin);
     self.end = ko.observable(params.end);
     self.length = ko.observable(params.length);
     self.size = ko.observable(params.size);
     self.page = ko.observable(1);
     self.isLoading = ko.observable(false);
+
+    self.file = ko.observable();
 
     self.totalPages = ko.computed(function () {
       return Math.max(Math.ceil(self.size() / self.length()), 1);
@@ -256,20 +332,44 @@ ${ fb_components.menubar() }
               + "&mode=" + self.mode();
     });
 
-    self.toggleDisables = function () {
-      $(".next-page").removeClass("disabled");
-      $(".last-page").removeClass("disabled");
-      $(".first-page").removeClass("disabled");
-      $(".previous-page").removeClass("disabled");
+    self.switchMode = function (newMode) {
+      self.mode(newMode);
+      self.changePage();
+    }
 
-      if (self.page() == self.totalPages() || self.upperPage() == self.totalPages()) {
-        $(".next-page").addClass("disabled");
-        $(".last-page").addClass("disabled");
-      }
-      if (self.page() == 1) {
-        $(".first-page").addClass("disabled");
-        $(".previous-page").addClass("disabled");
-      }
+    self.switchCompression = function (newCompression) {
+      self.compression(newCompression);
+      self.page(1);
+      self.upperPage(1);
+      self.changePage();
+    }
+
+    self.editFile = function() {
+      self.isViewing(false);
+      self.isLoading(true);
+      $.ajax({
+        url: '${ edit_url }' + '?is_embeddable=true',
+        beforeSend:function (xhr) {
+          xhr.setRequestHeader('X-Requested-With', 'Hue');
+        },
+        dataType:'html',
+        success:function (response) {
+          $('#fileeditor').html(response);
+          self.isLoading(false);
+        }
+      });
+    }
+
+    self.viewFile = function() {
+      $('#fileeditor').html('');
+      self.isViewing(true);
+      self.page(1);
+      self.upperPage(1);
+      self.changePage();
+    }
+
+    self.downloadFile = function () {
+      location.href = "${url('filebrowser.views.download', path=path_enc)}";
     };
 
     self.pageChanged = function () {
@@ -284,7 +384,7 @@ ${ fb_components.menubar() }
       if (self.page() > self.upperPage()) {
         self.upperPage(self.page());
       }
-      changePage();
+      self.changePage();
     };
 
     self.upperPageChanged = function () {
@@ -303,183 +403,93 @@ ${ fb_components.menubar() }
         self.upperPage(self.page() + self.MAX_ALLOWED_PAGES_PER_REQUEST);
         $.jHueNotify.info("${_('Sorry, you cannot request for more than %s pages.' % MAX_ALLOWED_PAGES_PER_REQUEST)}");
       }
-      changePage();
+      self.changePage();
     };
-
-    self.page.subscribe(function (value) {
-      self.toggleDisables();
-    });
-
-    self.upperPage.subscribe(function (value) {
-      self.toggleDisables();
-    });
 
     self.nextPage = function () {
       self.page(self.page() * 1);
       self.upperPage(self.upperPage() * 1);
-      if (! ($(".next-page").hasClass("disabled"))) {
-        if (viewModel.page() == viewModel.upperPage()) {
-          viewModel.page(viewModel.page() + 1);
-          viewModel.upperPage(viewModel.upperPage() + 1);
+      if (!($("#fileviewerComponents .next-page").hasClass("disabled"))) {
+        if (self.page() == self.upperPage()) {
+          self.page(self.page() + 1);
+          self.upperPage(self.upperPage() + 1);
         } else {
           var _difference = self.upperPage() - self.page();
           self.page(self.upperPage() + 1);
           self.upperPage(Math.min(self.page() + _difference, self.totalPages()));
         }
-        changePage();
+        self.changePage();
       }
     };
 
     self.previousPage = function () {
       self.page(self.page() * 1);
       self.upperPage(self.upperPage() * 1);
-      if (! ($(".previous-page").hasClass("disabled"))) {
-        if (viewModel.page() == viewModel.upperPage()) {
-          viewModel.page(viewModel.page() - 1);
-          viewModel.upperPage(viewModel.upperPage() - 1);
+      if (!($("#fileviewerComponents .previous-page").hasClass("disabled"))) {
+        if (self.page() == self.upperPage()) {
+          self.page(self.page() - 1);
+          self.upperPage(self.upperPage() - 1);
         } else {
           var _difference = self.upperPage() - self.page();
           self.upperPage(self.page() - 1);
           self.page(Math.max(self.page() - _difference - 1, 1));
         }
-        changePage();
+        self.changePage();
       }
     };
 
     self.lastPage = function () {
-      if (! ($(".last-page").hasClass("disabled"))) {
-        var lastDiff = viewModel.upperPage() - viewModel.page() + 1;
-        viewModel.page(Math.max(1, viewModel.totalPages() - lastDiff));
-        viewModel.upperPage(viewModel.totalPages());
-        changePage();
+      if (!($("#fileviewerComponents .last-page").hasClass("disabled"))) {
+        var lastDiff = self.upperPage() - self.page() + 1;
+        self.page(Math.max(1, self.totalPages() - lastDiff));
+        self.upperPage(self.totalPages());
+        self.changePage();
       }
     };
 
     self.firstPage = function () {
-      if (! ($(".first-page").hasClass("disabled"))) {
-        var lastDiff = viewModel.upperPage() - viewModel.page() + 1;
-        viewModel.page(1);
+      if (!($("#fileviewerComponents .first-page").hasClass("disabled"))) {
+        var lastDiff = self.upperPage() - self.page() + 1;
+        self.page(1);
         if (lastDiff > 1) {
-          viewModel.upperPage(Math.min(self.totalPages(), lastDiff))
+          self.upperPage(Math.min(self.totalPages(), lastDiff))
         } else {
-          viewModel.upperPage(Math.min(self.totalPages(), 50));
+          self.upperPage(Math.min(self.totalPages(), 50));
         }
-        changePage();
+        self.changePage();
       }
     };
   }
 
-  window.viewModel = new DisplayViewModel({
-    base_url: "${ base_url }",
-    compression: "${view['compression']}",
-    mode: "${ view['mode'] }",
-    begin: ${view['offset'] + 1},
-    end: ${view['end']},
-    length: ${view['length']},
-    size: ${stats['size']},
-    max_size: ${view['max_chunk_size']}
-  });
-
   $(document).ready(function () {
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $('#fileviewerComponents')[0]);
 
+    % if not is_embeddable:
     $(document).ajaxError(function () {
       $.jHueNotify.error("${_('There was an unexpected server error.')}");
     });
-
-    var _hashPage, _hashUpperPage, _resizeTimeout, _fileAreaScrollTimeout, i,
-      _hash = location.hash;
-
-    _hashPage = 1;
-    _hashUpperPage = 50;
-
-    if (_hash != "") {
-      if (_hash.indexOf("-") > -1) {
-        _hashPage = _hash.split("-")[0].substr(2) * 1;
-        _hashUpperPage = _hash.split("-")[1].substr(1) * 1;
-      } else {
-        _hashPage = _hash.substr(2) * 1;
-        _hashUpperPage = Math.min(viewModel.totalPages(), _hashPage + 50 - 1);
-      }
-
-      if (isNaN(_hashPage)) {
-        _hashPage = 1;
-      }
-
-      if (isNaN(_hashUpperPage)) {
-        _hashUpperPage = Math.min(viewModel.totalPages(), 50);
-      }
-
-      if (_hashUpperPage - _hashPage > viewModel.MAX_ALLOWED_PAGES_PER_REQUEST) {
-        _hashUpperPage = _hashPage + viewModel.MAX_ALLOWED_PAGES_PER_REQUEST;
-      }
-    }
-    viewModel.page(_hashPage);
-    viewModel.upperPage(_hashUpperPage);
-
-    viewModel.toggleDisables();
+    % endif
 
     setTimeout(function () {
-      getContent(function () {
-        if (location.hash != "") {
-          location.hash = "#page" + viewModel.page();
-          location.hash = "#p" + viewModel.page() + (viewModel.page() != viewModel.upperPage() ? "-p" + viewModel.upperPage() : "");
-        }
-      });
+      resizeText();
+      getContent();
     }, 100);
 
-    resizeText();
-
-    _resizeTimeout = -1;
+    var _resizeTimeout = -1;
 
     $(window).on("resize", function () {
       clearTimeout(_resizeTimeout);
       _resizeTimeout = setTimeout(function () {
         resizeText();
-        $('.fill-file-area').css('height', $("#fileArea").height() + 'px');
+        $('#fileviewerComponents .fill-file-area').css('height', $("#fileArea").height() + 'px');
       }, 300);
     });
 
-    $("#refreshBtn").click(function(){
-      window.location.reload();
-    });
-
     $("#fileArea").jHueScrollUp();
-
-    if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING && viewModel.mode() == "text") { // enable scrolling
-      _fileAreaScrollTimeout = -1;
-      $("#fileArea").on("scroll", function () {
-        if (viewModel.compression() === 'gzip') {
-          $("#fileArea").off("scroll");
-          $(document).trigger('warn', "${_('Offsets are not supported with Gzip compression.')}");
-          return false;
-        }
-
-        if ($("#fileArea").scrollTop() < 30) {
-          viewModel.page(1);
-          viewModel.upperPage(viewModel.page());
-        } else {
-          for (i = 1; i <= viewModel.totalPages(); i++) {
-            if ($("#page" + i + " div").visible(true)) {
-              viewModel.page(i);
-              viewModel.upperPage(viewModel.page());
-            }
-          }
-        }
-        clearTimeout(_fileAreaScrollTimeout);
-        _fileAreaScrollTimeout = setTimeout(function () {
-          location.hash = "#p" + viewModel.page();
-          if (viewModel.page() > 1 && pages[viewModel.page() - 1] == null) {
-            viewModel.page(viewModel.page() - 1);
-            getContent();
-          } else if (pages[viewModel.page()] == null) {
-            getContent();
-          }
-        }, 100);
-      });
-    }
   });
 }());
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

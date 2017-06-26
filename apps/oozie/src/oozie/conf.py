@@ -19,6 +19,7 @@ import os.path
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from desktop.conf import is_hue4
 from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
 from liboozie.conf import get_oozie_status
@@ -60,9 +61,14 @@ REMOTE_SAMPLE_DIR = Config(
   help=_t("Location on HDFS where the Oozie workflows are stored. Parameters are $TIME and $USER, e.g. /user/$USER/hue/workspaces/workflow-$TIME")
 )
 
+
+def get_oozie_job_count():
+  '''Returns the maximum of jobs fetched by the API depending on the Hue version'''
+  return 100 if is_hue4() else 50
+
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
-  default=50,
+  dynamic_default=get_oozie_job_count,
   type=int,
   help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.')
 )
@@ -81,9 +87,23 @@ ENABLE_CRON_SCHEDULING = Config( # Until Hue 3.8
   help=_t('Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.')
 )
 
+ENABLE_OOZIE_BACKEND_FILTERING = Config(
+  key='enable_oozie_backend_filtering',
+  default=True,
+  type=coerce_bool,
+  help=_t('Flag to enable Oozie backend filtering instead of doing it at the page level in Javascript. Requires Oozie 4.3+.')
+)
+
 ENABLE_DOCUMENT_ACTION = Config(
   key="enable_document_action",
   help=_t("Flag to enable the saved Editor queries to be dragged and dropped into a workflow."),
+  type=bool,
+  default=True
+)
+
+ENABLE_IMPALA_ACTION = Config(
+  key="enable_impala_action",
+  help=_t("Flag to enable the Impala action."),
   type=bool,
   default=False
 )

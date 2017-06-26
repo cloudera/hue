@@ -55,8 +55,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
             <div id="navigatorNoTables" style="margin-top: 20px">${_('The selected database has no tables.')}</div>
             <ul id="navigatorTables" class="unstyled"></ul>
             <div id="navigatorLoader">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+              <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i>
             </div>
           </div>
         </div>
@@ -66,8 +65,8 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
 
 
       </div>
-      <div class="resizer" data-bind="splitDraggable : { appName: 'rdbms' }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
-      <div class="right-panel">
+      <div class="resizer" data-bind="splitDraggable : { appName: 'rdbms', leftPanelVisible: true }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+      <div class="content-panel">
         <div id="query">
           <div class="card card-small">
 
@@ -136,7 +135,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
         </div>
         <div data-bind="css: {'hide': rows().length == 0}" class="hide">
           <div class="card card-small scrollable">
-            <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
+            <table id="resultTable" class="table table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
               <thead>
                 <tr data-bind="foreach: columns">
                   <th data-bind="text: $data, css:{'datatables-counter-col': $index() == 0}"></th>
@@ -150,7 +149,6 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
           <div class="card card-small scrollable">
             <div class="row-fluid">
               <div class="span10 offset1 center empty-wrapper">
-                <i class="fa fa-frown-o"></i>
                 <h1>${_('The server returned no results.')}</h1>
                 <br />
               </div>
@@ -162,8 +160,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
           <div class="card card-small scrollable">
             <div class="row-fluid">
               <div class="span10 offset1 center" style="padding: 30px">
-                <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
-                <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+                <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
               </div>
             </div>
           </div>
@@ -175,8 +172,8 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
 
   <div id="saveAsQueryModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Save your query')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Save your query')}</h2>
     </div>
     <div class="modal-body">
       <form class="form-horizontal">
@@ -233,7 +230,7 @@ ${ commonshare() | n,unicode }
     cursor: ew-resize;
   }
 
-  .right-panel {
+  .content-panel {
     position: absolute;
     outline: none !important;
   }
@@ -254,17 +251,17 @@ ${ commonshare() | n,unicode }
     width: 40px;
   }
 
-  .hueBreadcrumb {
+  .hue-breadcrumbs {
     padding: 12px 14px;
   }
 
-  .hueBreadcrumbBar {
+  .hue-breadcrumbs-bar {
     padding: 0;
     margin: 12px;
   }
 
-  .hueBreadcrumbBar a {
-    color: #338BB8 !important;
+  .hue-breadcrumbs-bar a {
+    color: #0B7FAD !important;
     display: inline !important;
   }
 
@@ -362,9 +359,6 @@ ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('rdbms/js/rdbms.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
@@ -383,7 +377,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-fieldselection.js') }" type="text/javascript"></script>
 <script src="${ static('rdbms/js/autocomplete.utils.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var codeMirror, viewModel;
 
   var RDBMS_AUTOCOMPLETE_BASE_URL = '/rdbms/api';

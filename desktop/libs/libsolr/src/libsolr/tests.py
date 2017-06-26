@@ -38,7 +38,9 @@ try:
   # App can be blacklisted
   from search.conf import SOLR_URL
   from search.models import Collection2
+  search_enabled = True
 except:
+  search_enabled = False
   LOG.exception('Testing libsolr requires the search app to not be blacklisted')
 
 
@@ -47,7 +49,7 @@ class TestLibSolrWithSolr:
   @classmethod
   def setup_class(cls):
 
-    if not is_live_cluster():
+    if not is_live_cluster() or not search_enabled:
       raise SkipTest
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)

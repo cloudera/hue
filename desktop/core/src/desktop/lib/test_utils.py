@@ -40,6 +40,16 @@ def add_permission(username, groupname, permname, appname):
         user.groups.add(group)
         user.save()
 
+def revoke_permission(groupname, appname, permname):
+    if HuePermission.objects.filter(app=appname, action=permname).exists():
+        perm = HuePermission.objects.get(app=appname, action=permname)
+
+        if Group.objects.filter(name=groupname).exists():
+          group = Group.objects.get(name=groupname)
+
+          if GroupPermission.objects.filter(group=group, hue_permission=perm).exists():
+              GroupPermission.objects.filter(group=group, hue_permission=perm).delete()
+              return True
 
 def add_to_group(username, groupname=None):
     if groupname is None:

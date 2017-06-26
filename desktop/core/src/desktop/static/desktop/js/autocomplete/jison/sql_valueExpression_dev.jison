@@ -158,7 +158,7 @@ RegularIdentifier
 NewStatement
  : /* empty */
    {
-     prepareNewStatement();
+     parser.prepareNewStatement();
    }
  ;
 
@@ -334,9 +334,10 @@ HiveOrImpalaRightSquareBracket
  | '<impala>]'
  ;
 
-HiveOrImpalaPartitioned
+HiveOrImpalaPartitionedOrPartition
  : '<hive>PARTITIONED'
  | '<impala>PARTITIONED'
+ | '<impala>PARTITION'
  ;
 
 HiveOrImpalaStored
@@ -397,12 +398,12 @@ OptionalAggregateOrAnalytic
  | AggregateOrAnalytic
  ;
 
-OptionalExtended
+OptionalHiveExtended
  :
  | '<hive>EXTENDED'
  ;
 
-OptionalExtendedOrFormatted
+OptionalHiveExtendedOrFormatted
  :
  | '<hive>EXTENDED'
  | '<hive>FORMATTED'
@@ -414,8 +415,9 @@ OptionalExternal
  | '<impala>EXTERNAL'
  ;
 
-OptionalFormatted
+OptionalImpalaExtendedOrFormatted
  :
+ | '<impala>EXTENDED'
  | '<impala>FORMATTED'
  ;
 
@@ -427,11 +429,11 @@ OptionallyFormattedIndex
 OptionallyFormattedIndex_EDIT
  : '<hive>FORMATTED' 'CURSOR'
    {
-     suggestKeywords(['INDEX', 'INDEXES']);
+     parser.suggestKeywords(['INDEX', 'INDEXES']);
    }
  | 'CURSOR' HiveIndexOrIndexes
    {
-     suggestKeywords(['FORMATTED']);
+     parser.suggestKeywords(['FORMATTED']);
    }
  ;
 
@@ -466,7 +468,7 @@ OptionalIfExists
 OptionalIfExists_EDIT
  : 'IF' 'CURSOR'
    {
-     suggestKeywords(['EXISTS']);
+     parser.suggestKeywords(['EXISTS']);
    }
  ;
 
@@ -481,11 +483,11 @@ OptionalIfNotExists
 OptionalIfNotExists_EDIT
  : 'IF' 'CURSOR'
    {
-     suggestKeywords(['NOT EXISTS']);
+     parser.suggestKeywords(['NOT EXISTS']);
    }
  | 'IF' 'NOT' 'CURSOR'
    {
-     suggestKeywords(['EXISTS']);
+     parser.suggestKeywords(['EXISTS']);
    }
  ;
 
@@ -560,7 +562,7 @@ ParenthesizedColumnList_EDIT
  : '(' ColumnList_EDIT RightParenthesisOrError
  | '(' AnyCursor RightParenthesisOrError
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  ;
 
@@ -573,14 +575,14 @@ ColumnList_EDIT
  : ColumnIdentifier_EDIT
  | ColumnList ',' AnyCursor
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  | ColumnList ',' ColumnIdentifier_EDIT
  | ColumnIdentifier_EDIT ',' ColumnList
  | ColumnList ',' ColumnIdentifier_EDIT ',' ColumnList
  | ColumnList ',' AnyCursor ',' ColumnList
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  ;
 
@@ -596,13 +598,13 @@ SimpleValueList
 SchemaQualifiedTableIdentifier
  : RegularOrBacktickedIdentifier
    {
-     addTableLocation(@1, [ { name: $1 } ]);
+     parser.addTableLocation(@1, [ { name: $1 } ]);
      $$ = { identifierChain: [ { name: $1 } ] };
    }
  | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
    {
-     addDatabaseLocation(@1, [ { name: $1 } ]);
-     addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
+     parser.addDatabaseLocation(@1, [ { name: $1 } ]);
+     parser.addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
      $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] };
    }
  | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier ImpalaFields
@@ -615,25 +617,25 @@ SchemaQualifiedTableIdentifier
 SchemaQualifiedTableIdentifier_EDIT
  : PartialBacktickedIdentifier
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | PartialBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
    {
-     suggestDatabases();
+     parser.suggestDatabases();
      $$ = { identifierChain: [{ name: $1 }] };
    }
  | RegularOrBacktickedIdentifier AnyDot PartialBacktickedOrPartialCursor
    {
      // In Impala you can have statements like 'SELECT ... FROM testTable t, t.|'
-     suggestTablesOrColumns($1);
+     parser.suggestTablesOrColumns($1);
    }
  | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier ImpalaFields_EDIT
    {
      // TODO: switch to suggestColumns, it's currently handled in sqlAutocompleter2.js
      // Issue is that suggestColumns is deleted if no tables are defined and this is
      // Impala only cases like "SELECT | FROM db.table.col"
-     suggestTables({ identifierChain: [{ name: $1 }, { name: $3 }].concat($4) });
+     parser.suggestTables({ identifierChain: [{ name: $1 }, { name: $3 }].concat($4) });
    }
  ;
 
@@ -668,11 +670,11 @@ SchemaQualifiedIdentifier
 SchemaQualifiedIdentifier_EDIT
  : PartialBacktickedIdentifier
    {
-     suggestDatabases({ appendDot: true });
+     parser.suggestDatabases({ appendDot: true });
    }
  | PartialBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
    {
-     suggestDatabases();
+     parser.suggestDatabases();
      $$ = { identifierChain: [{ name: $1 }] };
    }
  | RegularOrBacktickedIdentifier AnyDot PartialBacktickedOrPartialCursor
@@ -685,8 +687,7 @@ DatabaseIdentifier
 DatabaseIdentifier_EDIT
  : PartialBacktickedOrCursor
    {
-     suggestDatabases();
-     $$ = { cursorOrPartialIdentifier: true };
+     parser.suggestDatabases();
    }
  ;
 
@@ -711,15 +712,15 @@ PartitionExpression_EDIT
  : ColumnIdentifier '=' ValueExpression_EDIT
  | ColumnIdentifier '=' AnyCursor
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    }
  | PartialBacktickedIdentifier '=' ValueExpression
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  | AnyCursor
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  ;
 
@@ -733,13 +734,13 @@ RegularOrBacktickedIdentifier
 RegularOrBackTickedSchemaQualifiedName
  : RegularOrBacktickedIdentifier
    {
-     addTableLocation(@1, [ { name: $1 } ]);
+     parser.addTableLocation(@1, [ { name: $1 } ]);
      $$ = { identifierChain: [ { name: $1 } ] };
    }
  | RegularOrBacktickedIdentifier AnyDot RegularOrBacktickedIdentifier
    {
-     addDatabaseLocation(@1, [ { name: $1 } ]);
-     addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
+     parser.addDatabaseLocation(@1, [ { name: $1 } ]);
+     parser.addTableLocation(@3, [ { name: $1 }, { name: $3 } ]);
      $$ = { identifierChain: [ { name: $1 }, { name: $3 } ] };
    }
  ;
@@ -747,12 +748,12 @@ RegularOrBackTickedSchemaQualifiedName
 RegularOrBackTickedSchemaQualifiedName_EDIT
  : PartialBacktickedIdentifier
    {
-     suggestTables();
-     suggestDatabases({ prependDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ prependDot: true });
    }
  | RegularOrBacktickedIdentifier AnyDot PartialBacktickedOrPartialCursor
    {
-     suggestTablesOrColumns($1);
+     parser.suggestTablesOrColumns($1);
    }
  ;
 
@@ -783,12 +784,12 @@ BasicIdentifierChain
  : ColumnIdentifier
    {
      $$ = [$1];
-     addUnknownLocation(@1, [$1]);
+     parser.addUnknownLocation(@1, [$1]);
    }
  | BasicIdentifierChain AnyDot ColumnIdentifier
    {
      $1.push($3);
-     addUnknownLocation(@3, $1.concat());
+     parser.addUnknownLocation(@3, $1.concat());
    }
  ;
 
@@ -797,31 +798,31 @@ BasicIdentifierChain_EDIT
  : ColumnIdentifier_EDIT
    {
      if ($1.insideKey) {
-       suggestKeyValues({ identifierChain: [{ name: $1.name }] });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    }
  | BasicIdentifierChain AnyDot ColumnIdentifier_EDIT
    {
      if ($3.insideKey) {
-       suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    }
  | BasicIdentifierChain AnyDot ColumnIdentifier_EDIT AnyDot BasicIdentifierChain
  | ColumnIdentifier_EDIT AnyDot BasicIdentifierChain
  | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor
    {
-     suggestColumns({
+     parser.suggestColumns({
        identifierChain: $1
      });
      $$ = { suggestKeywords: [{ value: '*', weight: 1000 }] };
    }
  | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor AnyDot BasicIdentifierChain
    {
-     suggestColumns({
+     parser.suggestColumns({
        identifierChain: $1
      });
      $$ = { suggestKeywords: [{ value: '*', weight: 1000 }] };
@@ -840,50 +841,50 @@ DerivedColumnChain_EDIT
  : ColumnIdentifier_EDIT
    {
      if ($1.insideKey) {
-       suggestKeyValues({ identifierChain: [{ name: $1.name }] });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    }
  | DerivedColumnChain AnyDot ColumnIdentifier_EDIT
    {
      if ($3.insideKey) {
-       suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    }
  | DerivedColumnChain AnyDot ColumnIdentifier_EDIT AnyDot DerivedColumnChain
    {
      if ($3.insideKey) {
-       suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    }
  | ColumnIdentifier_EDIT AnyDot DerivedColumnChain
    {
      if ($1.insideKey) {
-       suggestKeyValues({ identifierChain: [{ name: $1.name }] });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    }
  | PartialBacktickedIdentifierOrPartialCursor
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  | DerivedColumnChain AnyDot PartialBacktickedIdentifierOrPartialCursor
    {
-     suggestColumns({ identifierChain: $1 });
+     parser.suggestColumns({ identifierChain: $1 });
    }
  | DerivedColumnChain AnyDot PartialBacktickedIdentifierOrPartialCursor AnyDot DerivedColumnChain
    {
-     suggestColumns({ identifierChain: $1 });
+     parser.suggestColumns({ identifierChain: $1 });
    }
  | PartialBacktickedIdentifierOrPartialCursor AnyDot DerivedColumnChain
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  ;
 
@@ -982,28 +983,28 @@ SelectStatement_EDIT
        } else {
          keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
        }
-       if (isImpala()) {
+       if (parser.isImpala()) {
          keywords.push('STRAIGHT_JOIN');
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      } else {
-       checkForSelectListKeywords($3);
+       parser.checkForSelectListKeywords($3);
      }
      if ($3.suggestFunctions) {
-       suggestFunctions();
+       parser.suggestFunctions();
      }
      if ($3.suggestColumns) {
-       suggestColumns();
+       parser.suggestColumns();
      }
      if ($3.suggestTables) {
-       suggestTables({ prependQuestionMark: true, prependFrom: true });
+       parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      }
      if ($3.suggestDatabases) {
-       suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+       parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
      }
      if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
+       parser.suggestAggregateFunctions();
+       parser.suggestAnalyticFunctions();
      }
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR'
@@ -1012,27 +1013,27 @@ SelectStatement_EDIT
      if ($2) {
        keywords = [{ value: '*', weight: 1000 }];
        if ($2 === 'ALL') {
-         suggestAggregateFunctions();
-         suggestAnalyticFunctions();
+         parser.suggestAggregateFunctions();
+         parser.suggestAnalyticFunctions();
        }
      } else {
        keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
+       parser.suggestAggregateFunctions();
+       parser.suggestAnalyticFunctions();
      }
-     if (isImpala()) {
+     if (parser.isImpala()) {
        keywords.push('STRAIGHT_JOIN');
      }
-     suggestKeywords(keywords);
-     suggestFunctions();
-     suggestColumns();
-     suggestTables({ prependQuestionMark: true, prependFrom: true });
-     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+     parser.suggestKeywords(keywords);
+     parser.suggestFunctions();
+     parser.suggestColumns();
+     parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
+     parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
  | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_EDIT
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
    {
-     selectListNoTableSuggest($3, $2);
+     parser.selectListNoTableSuggest($3, $2);
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR' TableExpression
    {
@@ -1040,36 +1041,36 @@ SelectStatement_EDIT
      if ($2) {
        keywords = [{ value: '*', weight: 1000 }];
        if ($2 === 'ALL') {
-         suggestAggregateFunctions();
-         suggestAnalyticFunctions();
+         parser.suggestAggregateFunctions();
+         parser.suggestAnalyticFunctions();
        }
      } else {
        keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
+       parser.suggestAggregateFunctions();
+       parser.suggestAnalyticFunctions();
      }
-     if (isImpala()) {
+     if (parser.isImpala()) {
        keywords.push('STRAIGHT_JOIN');
      }
-     suggestKeywords(keywords);
-     suggestFunctions();
-     suggestColumns();
-     suggestTables({ prependQuestionMark: true, prependFrom: true });
-     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+     parser.suggestKeywords(keywords);
+     parser.suggestFunctions();
+     parser.suggestColumns();
+     parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
+     parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' TableExpression
    {
-     checkForSelectListKeywords($3);
+     parser.checkForSelectListKeywords($3);
    }
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' ',' TableExpression
    {
-     checkForSelectListKeywords($3);
+     parser.checkForSelectListKeywords($3);
    }
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR'
    {
-     checkForSelectListKeywords($3);
-     suggestTables({ prependFrom: true });
-     suggestDatabases({ prependFrom: true, appendDot: true });
+     parser.checkForSelectListKeywords($3);
+     parser.suggestTables({ prependFrom: true });
+     parser.suggestDatabases({ prependFrom: true, appendDot: true });
    }
  ;
 
@@ -1093,42 +1094,42 @@ TableExpression_EDIT
      if ($1) {
        if (!$1.hasLateralViews && typeof $1.tableReferenceList.hasJoinCondition !== 'undefined' && !$1.tableReferenceList.hasJoinCondition) {
          keywords.push({ value: 'ON', weight: 3 });
-         if (isImpala()) {
+         if (parser.isImpala()) {
            keywords.push({ value: 'USING', weight: 3 });
          }
        }
        if ($1.suggestKeywords) {
-         keywords = createWeightedKeywords($1.suggestKeywords, 3);
+         keywords = parser.createWeightedKeywords($1.suggestKeywords, 3);
        }
        if (!$1.hasLateralViews && $1.tableReferenceList.suggestKeywords) {
-         keywords = keywords.concat(createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
+         keywords = keywords.concat(parser.createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
        }
 
        if (!$1.hasLateralViews && $1.tableReferenceList.types) {
-         var veKeywords = getValueExpressionKeywords($1.tableReferenceList);
+         var veKeywords = parser.getValueExpressionKeywords($1.tableReferenceList);
          keywords = keywords.concat(veKeywords.suggestKeywords);
          if (veKeywords.suggestColRefKeywords) {
-           suggestColRefKeywords(veKeywords.suggestColRefKeywords);
-           addColRefIfExists($1.tableReferenceList);
+           parser.suggestColRefKeywords(veKeywords.suggestColRefKeywords);
+           parser.addColRefIfExists($1.tableReferenceList);
          }
        }
      }
 
      if ($3.empty && $4 && $4.joinType.toUpperCase() === 'JOIN') {
        keywords = keywords.concat(['FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
-       if (isHive()) {
+       if (parser.isHive()) {
          keywords = keywords.concat(['CROSS', 'LEFT SEMI']);
-       } else if (isImpala()) {
+       } else if (parser.isImpala()) {
          keywords = keywords.concat(['INNER', 'LEFT ANTI', 'LEFT SEMI', 'RIGHT ANTI', 'RIGHT SEMI']);
        } else {
          keywords.push('INNER');
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
        return;
      }
 
      if ($3.suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($3.suggestKeywords, 2));
+       keywords = keywords.concat(parser.createWeightedKeywords($3.suggestKeywords, 2));
      }
 
      if ($3.empty) {
@@ -1136,14 +1137,14 @@ TableExpression_EDIT
      }
 
      keywords = keywords.concat([{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }]);
-     if (isHive()) {
+     if (parser.isHive()) {
        keywords = keywords.concat([{ value: 'CROSS JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }]);
-     } else if (isImpala()) {
+     } else if (parser.isImpala()) {
        keywords = keywords.concat([{ value: 'INNER JOIN', weight: 1 },  { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }]);
      } else {
        keywords.push({ value: 'INNER JOIN', weight: 1 });
      }
-     suggestKeywords(keywords);
+     parser.suggestKeywords(keywords);
   }
  | FromClause OptionalSelectConditions_EDIT OptionalJoins
    {
@@ -1160,18 +1161,18 @@ TableExpression_EDIT
      var keywords = [];
 
      if ($2.suggestColRefKeywords) {
-       suggestColRefKeywords($2.suggestColRefKeywords);
-       addColRefIfExists($2);
+       parser.suggestColRefKeywords($2.suggestColRefKeywords);
+       parser.addColRefIfExists($2);
      }
 
      if ($2.suggestKeywords && $2.suggestKeywords.length) {
-       keywords = keywords.concat(createWeightedKeywords($2.suggestKeywords, 2));
+       keywords = keywords.concat(parser.createWeightedKeywords($2.suggestKeywords, 2));
      }
 
      if ($2.cursorAtEnd) {
        keywords.push({ value: 'UNION', weight: 2.11 });
      }
-     suggestKeywords(keywords);
+     parser.suggestKeywords(keywords);
    }
  ;
 
@@ -1184,12 +1185,12 @@ OptionalJoins
 FromClause
  : 'FROM' TableReferenceList OptionalLateralViews
    {
-     if (isHive()) {
+     if (parser.isHive()) {
        $$ = { tableReferenceList : $2, suggestKeywords: ['LATERAL VIEW'] }
      } else {
        $$ = { tableReferenceList : $2 }
      }
-     if (isHive() && $3) {
+     if (parser.isHive() && $3) {
        parser.yy.lateralViews = $3.lateralViews;
        $$.hasLateralViews = true;
        if ($3.suggestKeywords) {
@@ -1202,8 +1203,8 @@ FromClause
 FromClause_EDIT
  : 'FROM' 'CURSOR'
    {
-       suggestTables();
-       suggestDatabases({ appendDot: true });
+       parser.suggestTables();
+       parser.suggestDatabases({ appendDot: true });
    }
  | 'FROM' TableReferenceList_EDIT OptionalLateralViews
    {
@@ -1217,7 +1218,7 @@ FromClause_EDIT
 OptionalSelectConditions
  : OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
-     var keywords = getKeywordsForOptionalsLR([$1, $2, $3, $4, $5, $6, $7, $8], [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, true, isHive(), true, isHive(), true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$1, $2, $3, $4, $5, $6, $7, $8], [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, true, parser.isHive(), true, parser.isHive(), true, parser.isImpala()]);
      if (keywords.length > 0) {
        $$ = { suggestKeywords: keywords, empty: !$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 }
      }
@@ -1238,11 +1239,11 @@ OptionalSelectConditions_EDIT
 OptionalSelectConditions_EDIT
  : WhereClause 'CURSOR' OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
-     var keywords = getKeywordsForOptionalsLR([$3, $4, $5, $6, $7, $8, $9], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, isHive(), true, isHive(), true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$3, $4, $5, $6, $7, $8, $9], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, parser.isHive(), true, parser.isHive(), true, parser.isImpala()]);
      if ($1.suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($1.suggestKeywords, 1));
+       keywords = keywords.concat(parser.createWeightedKeywords($1.suggestKeywords, 1));
      }
-     $$ = getValueExpressionKeywords($1, keywords);
+     $$ = parser.getValueExpressionKeywords($1, keywords);
      $$.cursorAtEnd = !$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
      if ($1.columnReference) {
        $$.columnReference = $1.columnReference;
@@ -1250,11 +1251,11 @@ OptionalSelectConditions_EDIT
    }
  | OptionalWhereClause GroupByClause 'CURSOR' OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
-     var keywords = getKeywordsForOptionalsLR([$4, $5, $6, $7, $8, $9], [{ value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isHive(), true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$4, $5, $6, $7, $8, $9], [{ value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isHive(), true, parser.isHive(), true, parser.isImpala()]);
      if ($2.suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($2.suggestKeywords, 8));
+       keywords = keywords.concat(parser.createWeightedKeywords($2.suggestKeywords, 8));
      }
-     $$ = getValueExpressionKeywords($2, keywords);
+     $$ = parser.getValueExpressionKeywords($2, keywords);
      if ($2.columnReference) {
        $$.columnReference = $2.columnReference;
      }
@@ -1262,33 +1263,33 @@ OptionalSelectConditions_EDIT
    }
  | OptionalWhereClause OptionalGroupByClause HavingClause 'CURSOR' OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
-     var keywords = getKeywordsForOptionalsLR([$5, $6, $7, $8, $9], [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isHive(), true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$5, $6, $7, $8, $9], [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isHive(), true, parser.isImpala()]);
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$5 && !$6 && !$7 && !$8 && !$9 };
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause 'CURSOR' OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
-     var keywords = getKeywordsForOptionalsLR([$6, $7, $8, $9], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$6, $7, $8, $9], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isHive(), true, parser.isImpala()]);
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$6 && !$7 && !$8 && !$9 };
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause 'CURSOR' OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
-     var keywords = getKeywordsForOptionalsLR([$7, $8, $9], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$7, $8, $9], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isImpala()]);
      if ($5.suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($5.suggestKeywords, 5));
+       keywords = keywords.concat(parser.createWeightedKeywords($5.suggestKeywords, 5));
      }
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$7 && !$8 && !$9 };
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy 'CURSOR' OptionalLimitClause OptionalOffsetClause
    {
-     var keywords = getKeywordsForOptionalsLR([$8, $9], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$8, $9], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isImpala()]);
      if ($6.suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($6.suggestKeywords, 4));
+       keywords = keywords.concat(parser.createWeightedKeywords($6.suggestKeywords, 4));
      }
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$8 && !$9 };
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause 'CURSOR' OptionalOffsetClause
    {
-     var keywords = getKeywordsForOptionalsLR([$9], [{ value: 'OFFSET', weight: 2 }], [isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$9], [{ value: 'OFFSET', weight: 2 }], [parser.isImpala()]);
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$9 };
    }
  ;
@@ -1306,9 +1307,9 @@ WhereClause_EDIT
  : 'WHERE' SearchCondition_EDIT
  | 'WHERE' 'CURSOR'
    {
-     suggestFunctions();
-     suggestColumns();
-     suggestKeywords(['EXISTS', 'NOT EXISTS']);
+     parser.suggestFunctions();
+     parser.suggestColumns();
+     parser.suggestKeywords(['EXISTS', 'NOT EXISTS']);
    }
  ;
 
@@ -1322,7 +1323,7 @@ GroupByClause
    {
      if (!$4) {
        $$ = $3;
-       if (isHive()) {
+       if (parser.isHive()) {
          if (!$$.suggestKeywords) {
            $$.suggestKeywords = [];
          }
@@ -1337,16 +1338,16 @@ GroupByClause
 GroupByClause_EDIT
  : AnyGroup 'BY' GroupByColumnList_EDIT OptionalHiveGroupingSetsCubeOrRollup
    {
-     suggestSelectListAliases();
+     parser.suggestSelectListAliases();
    }
  | AnyGroup 'BY' 'CURSOR' OptionalHiveGroupingSetsCubeOrRollup
    {
-     valueExpressionSuggest();
-     suggestSelectListAliases();
+     parser.valueExpressionSuggest();
+     parser.suggestSelectListAliases();
    }
  | AnyGroup 'CURSOR'
    {
-     suggestKeywords(['BY']);
+     parser.suggestKeywords(['BY']);
    }
  | AnyGroup 'BY' GroupByColumnList OptionalHiveGroupingSetsCubeOrRollup_EDIT
  ;
@@ -1362,8 +1363,8 @@ OptionalHiveGroupingSetsCubeOrRollup_EDIT
  : HiveGroupingSets_EDIT
  | 'WITH' 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['CUBE', 'ROLLUP']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['CUBE', 'ROLLUP']);
      }
    }
  ;
@@ -1375,7 +1376,7 @@ HiveGroupingSets
 HiveGroupingSets_EDIT
  : '<hive>GROUPING' 'CURSOR'
    {
-     suggestKeywords(['SETS']);
+     parser.suggestKeywords(['SETS']);
    }
  | '<hive>GROUPING' '<hive>SETS' '(' ColumnGroupingSets_EDIT RightParenthesisOrError
  ;
@@ -1398,7 +1399,7 @@ ColumnGroupingSets_EDIT
 ColumnGroupingSet_EDIT
  : AnyCursor
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  | ColumnReference_EDIT
  ;
@@ -1412,11 +1413,11 @@ GroupByColumnList_EDIT
  : ValueExpression_EDIT
  | 'CURSOR' ValueExpression
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    }
  | 'CURSOR' ',' GroupByColumnList
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    }
  | ValueExpression_EDIT ',' GroupByColumnList
  | GroupByColumnList ',' GroupByColumnListPartTwo_EDIT
@@ -1428,11 +1429,11 @@ GroupByColumnListPartTwo_EDIT
  : ValueExpression_EDIT
  | AnyCursor ValueExpression
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    }
  | AnyCursor
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    }
  ;
 
@@ -1449,7 +1450,7 @@ OrderByClause_EDIT
  : 'ORDER' 'BY' OrderByColumnList_EDIT
  | 'ORDER' 'CURSOR'
    {
-     suggestKeywords(['BY']);
+     parser.suggestKeywords(['BY']);
    }
  ;
 
@@ -1462,9 +1463,9 @@ OrderByColumnList_EDIT
  : OrderByIdentifier_EDIT
  | 'CURSOR' OrderByIdentifier
    {
-     valueExpressionSuggest();
-     suggestAnalyticFunctions();
-     suggestSelectListAliases();
+     parser.valueExpressionSuggest();
+     parser.suggestAnalyticFunctions();
+     parser.suggestSelectListAliases();
    }
  | OrderByColumnList ',' OrderByIdentifier_EDIT
  | OrderByColumnList ',' OrderByIdentifier_EDIT ','
@@ -1472,20 +1473,20 @@ OrderByColumnList_EDIT
  ;
 
 OrderByIdentifier
- : ValueExpression OptionalAscOrDesc OptionalImpalaNullsFirstOrLast  -> mergeSuggestKeywords($2, $3)
+ : ValueExpression OptionalAscOrDesc OptionalImpalaNullsFirstOrLast  -> parser.mergeSuggestKeywords($2, $3)
  ;
 
 OrderByIdentifier_EDIT
  : ValueExpression_EDIT OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
    {
-     suggestSelectListAliases();
+     parser.suggestSelectListAliases();
    }
  | ValueExpression OptionalAscOrDesc OptionalImpalaNullsFirstOrLast_EDIT
  | AnyCursor OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
    {
-     valueExpressionSuggest();
-     suggestAnalyticFunctions();
-     suggestSelectListAliases();
+     parser.valueExpressionSuggest();
+     parser.suggestAnalyticFunctions();
+     parser.suggestSelectListAliases();
    }
  ;
 
@@ -1503,7 +1504,7 @@ OptionalAscOrDesc
 OptionalImpalaNullsFirstOrLast
  :
   {
-    if (isImpala()) {
+    if (parser.isImpala()) {
       $$ = { suggestKeywords: ['NULLS FIRST', 'NULLS LAST'] };
     } else {
       $$ = {};
@@ -1516,7 +1517,7 @@ OptionalImpalaNullsFirstOrLast
 OptionalImpalaNullsFirstOrLast_EDIT
  : '<impala>NULLS' 'CURSOR'
    {
-     suggestKeywords(['FIRST', 'LAST']);
+     parser.suggestKeywords(['FIRST', 'LAST']);
    }
  ;
 
@@ -1551,12 +1552,12 @@ ClusterByClause_EDIT
    }
  | '<hive>CLUSTER' 'BY' 'CURSOR'
    {
-     suggestColumns();
-     suggestSelectListAliases();
+     parser.suggestColumns();
+     parser.suggestSelectListAliases();
    }
  | '<hive>CLUSTER' 'BY' ColumnList_EDIT
    {
-     suggestSelectListAliases();
+     parser.suggestSelectListAliases();
    }
  ;
 
@@ -1571,12 +1572,12 @@ DistributeByClause_EDIT
    }
  | '<hive>DISTRIBUTE' 'BY' 'CURSOR'
    {
-     suggestColumns();
-     suggestSelectListAliases();
+     parser.suggestColumns();
+     parser.suggestSelectListAliases();
    }
  | '<hive>DISTRIBUTE' 'BY' ColumnList_EDIT
    {
-     suggestSelectListAliases();
+     parser.suggestSelectListAliases();
    }
  ;
 
@@ -1591,7 +1592,7 @@ SortByClause_EDIT
    }
  | '<hive>SORT' 'BY' SortByList_EDIT
    {
-     suggestSelectListAliases();
+     parser.suggestSelectListAliases();
    }
  ;
 
@@ -1615,7 +1616,7 @@ SortByIdentifier_EDIT
  : ColumnIdentifier_EDIT OptionalAscOrDesc
  | AnyCursor OptionalAscOrDesc
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  ;
 
@@ -1633,7 +1634,7 @@ LimitClause_EDIT
  : 'LIMIT' 'CURSOR'
  | '<impala>LIMIT' 'CURSOR'
    {
-     suggestFunctions({ types: ['BIGINT'] });
+     parser.suggestFunctions({ types: ['BIGINT'] });
    }
  | '<impala>LIMIT' ValueExpression_EDIT
    {
@@ -1653,7 +1654,7 @@ OffsetClause
 OffsetClause_EDIT
  : '<impala>OFFSET' 'CURSOR'
    {
-     suggestFunctions({ types: ['BIGINT'] });
+     parser.suggestFunctions({ types: ['BIGINT'] });
    }
  | '<impala>OFFSET' ValueExpression_EDIT
    {
@@ -1680,7 +1681,7 @@ ValueExpression_EDIT
 ValueExpression_EDIT
  : ValueExpression 'NOT' 'CURSOR'
    {
-     suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE']);
+     parser.suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE']);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  ;
@@ -1718,36 +1719,36 @@ ValueExpressionList_EDIT
    }
  | ValueExpressionList ',' AnyCursor
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $1.position += 1;
    }
  | ValueExpressionList ',' AnyCursor ',' ValueExpressionList
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $1.position += 1;
    }
  | ValueExpressionList 'CURSOR' ',' ValueExpressionList
    {
-     suggestValueExpressionKeywords($1);
+     parser.suggestValueExpressionKeywords($1);
    }
  | AnyCursor ',' ValueExpressionList
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$ = { cursorAtStart : true, position: 1 };
    }
  | AnyCursor ','
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$ = { cursorAtStart : true, position: 1 };
    }
  | ',' AnyCursor
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$ = { position: 2 };
    }
  | ',' AnyCursor ',' ValueExpressionList
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$ = { position: 2 };
    }
  ;
@@ -1794,7 +1795,7 @@ ImpalaInterval
 ImpalaInterval_EDIT
  : '<impala>INTERVAL' SignedInteger 'CURSOR'
    {
-     suggestKeywords(['DAYS', 'HOURS', 'MICROSECONDS', 'MILLISECONDS', 'MINUTES', 'MONTHS', 'NANOSECONDS', 'SECONDS', 'WEEKS', 'YEARS']);
+     parser.suggestKeywords(['DAYS', 'HOURS', 'MICROSECONDS', 'MILLISECONDS', 'MINUTES', 'MONTHS', 'NANOSECONDS', 'SECONDS', 'WEEKS', 'YEARS']);
    }
  ;
 
@@ -1811,7 +1812,7 @@ UnsignedValueSpecification
 UnsignedValueSpecification_EDIT
  : UnsignedLiteral_EDIT
    {
-     suggestValues($1);
+     parser.suggestValues($1);
    }
  ;
 
@@ -1892,8 +1893,8 @@ SelectSpecification_EDIT
  : ValueExpression_EDIT OptionalCorrelationName
  | AnyCursor AnyAs RegularOrBacktickedIdentifier
    {
-     suggestFunctions();
-     suggestColumns();
+     parser.suggestFunctions();
+     parser.suggestColumns();
      $$ = { suggestAggregateFunctions: true };
    }
  | ValueExpression OptionalCorrelationName_EDIT  -> $2
@@ -1920,11 +1921,11 @@ SelectList_EDIT
  | SelectSpecification_EDIT ',' SelectList
  | SelectList 'CURSOR' SelectList
    {
-     checkForSelectListKeywords($1);
+     parser.checkForSelectListKeywords($1);
    }
  | SelectList 'CURSOR' ',' SelectList
    {
-     checkForSelectListKeywords($1);
+     parser.checkForSelectListKeywords($1);
    }
  | SelectList ',' AnyCursor
    {
@@ -1950,15 +1951,15 @@ SelectList_EDIT
 DerivedColumn_TWO
  : ColumnIdentifier
    {
-     addColumnLocation(@1, [$1]);
+     parser.addColumnLocation(@1, [$1]);
    }
  | ColumnIdentifier AnyDot '*'
    {
-     addColumnLocation(@1, [$1]);
+     parser.addColumnLocation(@1, [$1]);
    }
  | ColumnIdentifier AnyDot DerivedColumnChain
    {
-     addColumnLocation(@2, [$1].concat($3));
+     parser.addColumnLocation(@2, [$1].concat($3));
    }
  ;
 
@@ -1969,21 +1970,21 @@ DerivedColumn_EDIT_TWO
      if (typeof $1.key === 'undefined') {
        parser.yy.result.suggestStar = true;
      }
-     suggestColumns({
+     parser.suggestColumns({
        identifierChain: [ $1 ]
      });
    }
  | ColumnIdentifier AnyDot DerivedColumnChain '<impala>.' 'PARTIAL_CURSOR'
    {
       $3.unshift($1);
-      suggestColumns({
+      parser.suggestColumns({
         identifierChain: $3
       });
     }
  | ColumnIdentifier AnyDot DerivedColumnChain '<hive>.' 'PARTIAL_CURSOR'
    {
       $3.unshift($1);
-      suggestColumns({
+      parser.suggestColumns({
         identifierChain: $3
       });
     }
@@ -2001,8 +2002,8 @@ TableReferenceList_EDIT
  | TableReferenceList ',' TableReference_EDIT ',' TableReferenceList
  | TableReferenceList ',' AnyCursor
    {
-       suggestTables();
-       suggestDatabases({ appendDot: true });
+       parser.suggestTables();
+       parser.suggestDatabases({ appendDot: true });
    }
  ;
 
@@ -2064,11 +2065,11 @@ Join_EDIT
  | JoinTypes OptionalImpalaBroadcastOrShuffle TablePrimary JoinCondition_EDIT
  | JoinTypes OptionalImpalaBroadcastOrShuffle 'CURSOR' OptionalJoinCondition
    {
-     if (!$2 && isImpala()) {
-       suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
+     if (!$2 && parser.isImpala()) {
+       parser.suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
      }
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
    }
@@ -2100,66 +2101,66 @@ JoinTypes
 JoinTypes_EDIT
  : '<hive>CROSS' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'INNER' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'FULL' 'OUTER' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'FULL' 'CURSOR' 'JOIN'
    {
-     suggestKeywords(['OUTER']);
+     parser.suggestKeywords(['OUTER']);
    }
  | 'LEFT' 'SEMI' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'LEFT' 'OUTER' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'LEFT' '<impala>ANTI' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'LEFT' 'CURSOR' 'JOIN'
    {
-     if (isImpala()) {
-       suggestKeywords(['ANTI', 'OUTER', 'SEMI']);
-     } else if (isHive()) {
-       suggestKeywords(['OUTER', 'SEMI']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['ANTI', 'OUTER', 'SEMI']);
+     } else if (parser.isHive()) {
+       parser.suggestKeywords(['OUTER', 'SEMI']);
      } else {
-       suggestKeywords(['OUTER']);
+       parser.suggestKeywords(['OUTER']);
      }
    }
  | 'RIGHT' '<impala>ANTI' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'RIGHT' 'OUTER' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'RIGHT' 'SEMI' 'CURSOR'
    {
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    }
  | 'RIGHT' 'CURSOR' 'JOIN'
    {
-     if (isImpala()) {
-       suggestKeywords(['ANTI', 'SEMI', 'OUTER']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['ANTI', 'SEMI', 'OUTER']);
      } else {
-       suggestKeywords(['OUTER']);
+       parser.suggestKeywords(['OUTER']);
      }
    }
  ;
 
 OptionalJoinCondition
- :                       -> { suggestKeywords: isImpala() ? ['ON', 'USING'] : ['ON'] }
+ :                       -> { suggestKeywords: parser.isImpala() ? ['ON', 'USING'] : ['ON'] }
  | 'ON' ValueExpression  -> $2
  | '<impala>USING' '(' UsingColList ')'
  ;
@@ -2173,7 +2174,7 @@ JoinCondition_EDIT
  : 'ON' ValueExpression_EDIT
  | 'ON' 'CURSOR'
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    }
  ;
 
@@ -2184,16 +2185,16 @@ TablePrimary
        if ($3) {
          $1.alias = $3
        }
-       addTablePrimary($1);
+       parser.addTablePrimary($1);
      }
      // Right-to-left for cursor after TablePrimary
-     $$.suggestKeywords = getKeywordsForOptionalsLR([$3, $2], [{ value: 'AS', weight: 1 }, { value: 'TABLESAMPLE', weight: 2 }], [true, isHive()]);
+     $$.suggestKeywords = parser.getKeywordsForOptionalsLR([$3, $2], [{ value: 'AS', weight: 1 }, { value: 'TABLESAMPLE', weight: 2 }], [true, parser.isHive()]);
    }
  | DerivedTable OptionalCorrelationName
    {
      if ($2) {
        $1.alias = $2;
-       addTablePrimary({ subQueryAlias: $2 });
+       parser.addTablePrimary({ subQueryAlias: $2 });
      } else {
        $$.suggestKeywords = [{ value: 'AS', weight: 1 }];
      }
@@ -2207,12 +2208,12 @@ TablePrimary_EDIT
      if ($3) {
        $1.alias = $3;
      }
-     addTablePrimary($1);
+     parser.addTablePrimary($1);
    }
  | DerivedTable_EDIT OptionalCorrelationName
    {
      if ($2) {
-       addTablePrimary({ subQueryAlias: $2 });
+       parser.addTablePrimary({ subQueryAlias: $2 });
      }
    }
  | DerivedTable OptionalCorrelationName_EDIT
@@ -2242,20 +2243,20 @@ OptionalTableSample
 OptionalTableSample_EDIT
  : '<hive>TABLESAMPLE' '(' AnyCursor RightParenthesisOrError
    {
-     suggestKeywords(['BUCKET']);
+     parser.suggestKeywords(['BUCKET']);
    }
  | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' 'CURSOR' RightParenthesisOrError
    {
-     suggestKeywords(['OUT OF']);
+     parser.suggestKeywords(['OUT OF']);
    }
  | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' '<hive>OUT' 'CURSOR' RightParenthesisOrError
    {
-     suggestKeywords(['OF']);
+     parser.suggestKeywords(['OF']);
    }
  | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' '<hive>OUT' '<hive>OF' 'UNSIGNED_INTEGER' OptionalOnColumn 'CURSOR' RightParenthesisOrError
    {
      if (!$8) {
-       suggestKeywords(['ON']);
+       parser.suggestKeywords(['ON']);
      }
    }
  | '<hive>TABLESAMPLE' '(' '<hive>BUCKET' 'UNSIGNED_INTEGER' '<hive>OUT' '<hive>OF' 'UNSIGNED_INTEGER' OptionalOnColumn_EDIT RightParenthesisOrError
@@ -2269,7 +2270,7 @@ OptionalOnColumn
 OptionalOnColumn_EDIT
  : 'ON' 'CURSOR'
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    }
  | 'ON' ValueExpression_EDIT
  ;
@@ -2277,14 +2278,14 @@ OptionalOnColumn_EDIT
 PushQueryState
  :
    {
-     pushQueryState();
+     parser.pushQueryState();
    }
  ;
 
 PopQueryState
  :
    {
-     popQueryState();
+     parser.popQueryState();
    }
  ;
 
@@ -2294,7 +2295,7 @@ TableSubQuery
    {
      if ($3) {
        $2.alias = $3;
-       addTablePrimary({ subQueryAlias: $3 });
+       parser.addTablePrimary({ subQueryAlias: $3 });
      }
      $$ = $2;
    }
@@ -2304,19 +2305,19 @@ TableSubQuery_EDIT
  : '(' TableSubQueryInner_EDIT RightParenthesisOrError
  | '(' AnyCursor RightParenthesisOrError
    {
-     suggestKeywords(['SELECT']);
+     parser.suggestKeywords(['SELECT']);
    }
  ;
 
 TableSubQueryInner
  : PushQueryState SubQuery
    {
-     var subQuery = getSubQuery($2);
+     var subQuery = parser.getSubQuery($2);
      subQuery.columns.forEach(function (column) {
-       expandIdentifierChain(column);
+       parser.expandIdentifierChain(column);
        delete column.linked;
      });
-     popQueryState(subQuery);
+     parser.popQueryState(subQuery);
      $$ = subQuery;
    }
  ;
@@ -2434,7 +2435,7 @@ UserDefinedFunction_EDIT
  | AnalyticFunction_EDIT OverClause
  | AnalyticFunction 'CURSOR'
    {
-     suggestKeywords(['OVER']);
+     parser.suggestKeywords(['OVER']);
    }
  | AnalyticFunction OverClause_EDIT
  | CastFunction_EDIT
@@ -2444,20 +2445,20 @@ UserDefinedFunction_EDIT
 ArbitraryFunction
  : RegularIdentifier ArbitraryFunctionRightPart
    {
-     addFunctionLocation(@1, $1);
+     parser.addFunctionLocation(@1, $1);
      if ($2.expression) {
-       $$ = { function: $1, expression: $2.expression, types: findReturnTypes($1) }
+       $$ = { function: $1, expression: $2.expression, types: parser.findReturnTypes($1) }
      } else {
-       $$ = { function: $1, types: findReturnTypes($1) }
+       $$ = { function: $1, types: parser.findReturnTypes($1) }
      }
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart
    {
-     addFunctionLocation(@1, $1);
+     parser.addFunctionLocation(@1, $1);
      if ($2.expression) {
-       $$ = { function: $1, expression: $2.expression, types: findReturnTypes($1) }
+       $$ = { function: $1, expression: $2.expression, types: parser.findReturnTypes($1) }
      } else {
-       $$ = { function: $1, types: findReturnTypes($1) }
+       $$ = { function: $1, types: parser.findReturnTypes($1) }
      }
    }
  ;
@@ -2465,19 +2466,19 @@ ArbitraryFunction
 ArbitraryFunction_EDIT
  : RegularIdentifier ArbitraryFunctionRightPart_EDIT
    {
-     addFunctionLocation(@1, $1);
+     parser.addFunctionLocation(@1, $1);
      if ($2.position) {
-       applyArgumentTypesToSuggestions($1, $2.position);
+       parser.applyArgumentTypesToSuggestions($1, $2.position);
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | ArbitraryFunctionName ArbitraryFunctionRightPart_EDIT
    {
-     addFunctionLocation(@1, $1);
+     parser.addFunctionLocation(@1, $1);
      if ($2.position) {
-       applyArgumentTypesToSuggestions($1, $2.position);
+       parser.applyArgumentTypesToSuggestions($1, $2.position);
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  ;
 
@@ -2496,12 +2497,12 @@ ArbitraryFunctionRightPart
 ArbitraryFunctionRightPart_EDIT
  : '(' AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$ = { position: 1 }
    }
  | '(' ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($3);
+     parser.suggestValueExpressionKeywords($3);
    }
  | '(' ValueExpressionList_EDIT RightParenthesisOrError      -> $2
  ;
@@ -2519,26 +2520,26 @@ AggregateFunction_EDIT
  ;
 
 AnalyticFunction
- : 'ANALYTIC' '(' ')'                      -> { types: findReturnTypes($1) }
- | 'ANALYTIC' '(' ValueExpressionList ')'  -> { function: $1, expression: $2, types: findReturnTypes($1) }
+ : 'ANALYTIC' '(' ')'                      -> { types: parser.findReturnTypes($1) }
+ | 'ANALYTIC' '(' ValueExpressionList ')'  -> { function: $1, expression: $2, types: parser.findReturnTypes($1) }
  ;
 
 AnalyticFunction_EDIT
  : 'ANALYTIC' '(' AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
-     applyArgumentTypesToSuggestions($1, 1);
-     $$ = { types: findReturnTypes($1) };
+     parser.valueExpressionSuggest();
+     parser.applyArgumentTypesToSuggestions($1, 1);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | 'ANALYTIC' '(' ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($3);
-     $$ = { types: findReturnTypes($1) };
+     parser.suggestValueExpressionKeywords($3);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | 'ANALYTIC' '(' ValueExpressionList_EDIT RightParenthesisOrError
    {
-     applyArgumentTypesToSuggestions($1, $3.position);
-     $$ = { types: findReturnTypes($1) };
+     parser.applyArgumentTypesToSuggestions($1, $3.position);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  ;
 
@@ -2570,17 +2571,17 @@ WindowExpression_EDIT
  | '(' AnyCursor OptionalPartitionBy OptionalOrderByAndWindow RightParenthesisOrError
    {
      if (!$3 && !$4) {
-       suggestKeywords([{ value: 'PARTITION BY', weight: 2 }, { value: 'ORDER BY', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'PARTITION BY', weight: 2 }, { value: 'ORDER BY', weight: 1 }]);
      } else if (!$3) {
-       suggestKeywords(['PARTITION BY']);
+       parser.suggestKeywords(['PARTITION BY']);
      }
    }
  | '(' AnyPartition 'BY' ValueExpressionList 'CURSOR' OptionalOrderByAndWindow RightParenthesisOrError
     {
       if (!$6) {
-        suggestValueExpressionKeywords($4, [{ value: 'ORDER BY', weight: 2 }]);
+        parser.suggestValueExpressionKeywords($4, [{ value: 'ORDER BY', weight: 2 }]);
       } else {
-        suggestValueExpressionKeywords($4);
+        parser.suggestValueExpressionKeywords($4);
       }
     }
   ;
@@ -2597,11 +2598,11 @@ PartitionBy
 PartitionBy_EDIT
  : AnyPartition 'CURSOR'
    {
-     suggestKeywords(['BY']);
+     parser.suggestKeywords(['BY']);
    }
  | AnyPartition 'BY' 'CURSOR'
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    }
  | AnyPartition 'BY' ValueExpressionList_EDIT
  ;
@@ -2621,12 +2622,12 @@ OptionalOrderByAndWindow_EDIT
     {
       var keywords = [];
       if ($1.suggestKeywords) {
-        keywords = createWeightedKeywords($1.suggestKeywords, 2);
+        keywords = parser.createWeightedKeywords($1.suggestKeywords, 2);
       }
       if (!$3) {
         keywords = keywords.concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]);
       }
-      suggestKeywords(keywords);
+      parser.suggestKeywords(keywords);
     }
   | OrderByClause WindowSpec_EDIT
   ;
@@ -2643,14 +2644,14 @@ WindowSpec
 WindowSpec_EDIT
  : RowsOrRange 'CURSOR'
    {
-     suggestKeywords(['BETWEEN']);
+     parser.suggestKeywords(['BETWEEN']);
    }
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing 'CURSOR'
    {
      if (!$4 && !$5) {
-       suggestKeywords(['CURRENT ROW', 'UNBOUNDED PRECEDING']);
+       parser.suggestKeywords(['CURRENT ROW', 'UNBOUNDED PRECEDING']);
      } else if (!$5) {
-       suggestKeywords(['AND']);
+       parser.suggestKeywords(['AND']);
      }
    }
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding_EDIT OptionalAndFollowing
@@ -2685,11 +2686,11 @@ OptionalCurrentOrPreceding
 OptionalCurrentOrPreceding_EDIT
  : IntegerOrUnbounded 'CURSOR'
    {
-     suggestKeywords(['PRECEDING']);
+     parser.suggestKeywords(['PRECEDING']);
    }
  | AnyCurrent 'CURSOR'
    {
-     suggestKeywords(['ROW']);
+     parser.suggestKeywords(['ROW']);
    }
  ;
 
@@ -2708,15 +2709,15 @@ OptionalAndFollowing
 OptionalAndFollowing_EDIT
  : 'AND' 'CURSOR'
    {
-     suggestKeywords(['CURRENT ROW', 'UNBOUNDED FOLLOWING']);
+     parser.suggestKeywords(['CURRENT ROW', 'UNBOUNDED FOLLOWING']);
    }
  | 'AND' AnyCurrent 'CURSOR'
    {
-     suggestKeywords(['ROW']);
+     parser.suggestKeywords(['ROW']);
    }
  | 'AND' IntegerOrUnbounded 'CURSOR'
    {
-     suggestKeywords(['FOLLOWING']);
+     parser.suggestKeywords(['FOLLOWING']);
    }
  ;
 
@@ -2737,14 +2738,14 @@ HavingClause
 HavingClause_EDIT
  : 'HAVING' 'CURSOR'
    {
-     valueExpressionSuggest();
-     suggestAggregateFunctions();
-     suggestSelectListAliases(true);
+     parser.valueExpressionSuggest();
+     parser.suggestAggregateFunctions();
+     parser.suggestSelectListAliases(true);
    }
  | 'HAVING' ValueExpression_EDIT
    {
-     suggestAggregateFunctions();
-     suggestSelectListAliases(true);
+     parser.suggestAggregateFunctions();
+     parser.suggestSelectListAliases(true);
    }
  ;
 
@@ -2760,7 +2761,7 @@ WindowClause
 WindowClause_EDIT
  : '<hive>WINDOW' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     suggestKeywords(['AS']);
+     parser.suggestKeywords(['AS']);
    }
  | '<hive>WINDOW' RegularOrBacktickedIdentifier '<hive>AS' WindowExpression_EDIT
  ;
@@ -2773,17 +2774,17 @@ CastFunction
 CastFunction_EDIT
  : 'CAST' '(' AnyCursor AnyAs PrimitiveType RightParenthesisOrError
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$ = { types: [ $5.toUpperCase() ] };
    }
  | 'CAST' '(' AnyCursor AnyAs RightParenthesisOrError
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$ = { types: [ 'T' ] };
    }
  | 'CAST' '(' AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$ = { types: [ 'T' ] };
    }
  | 'CAST' '(' ValueExpression_EDIT AnyAs PrimitiveType RightParenthesisOrError  -> { types: [ $5.toUpperCase() ] }
@@ -2791,77 +2792,77 @@ CastFunction_EDIT
  | 'CAST' '(' ValueExpression_EDIT RightParenthesisOrError                      -> { types: [ 'T' ] }
  | 'CAST' '(' ValueExpression 'CURSOR' PrimitiveType RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($3, [{ value: 'AS', weight: 2 }]);
+     parser.suggestValueExpressionKeywords($3, [{ value: 'AS', weight: 2 }]);
      $$ =  { types: [ $5.toUpperCase() ] };
    }
  | 'CAST' '(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($3, [{ value: 'AS', weight: 2 }]);
+     parser.suggestValueExpressionKeywords($3, [{ value: 'AS', weight: 2 }]);
      $$ = { types: [ 'T' ] };
    }
  | 'CAST' '(' ValueExpression AnyAs 'CURSOR' RightParenthesisOrError
    {
-     suggestKeywords(getTypeKeywords());
+     parser.suggestKeywords(parser.getTypeKeywords());
      $$ = { types: [ 'T' ] };
    }
  | 'CAST' '(' AnyAs 'CURSOR' RightParenthesisOrError
    {
-     suggestKeywords(getTypeKeywords());
+     parser.suggestKeywords(parser.getTypeKeywords());
      $$ = { types: [ 'T' ] };
    }
  ;
 
 CountFunction
- : 'COUNT' '(' '*' ')'                                        -> { types: findReturnTypes($1) }
- | 'COUNT' '(' ')'                                            -> { types: findReturnTypes($1) }
- | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { types: findReturnTypes($1) }
+ : 'COUNT' '(' '*' ')'                                        -> { types: parser.findReturnTypes($1) }
+ | 'COUNT' '(' ')'                                            -> { types: parser.findReturnTypes($1) }
+ | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { types: parser.findReturnTypes($1) }
  ;
 
 CountFunction_EDIT
  : 'COUNT' '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      if (!$3) {
-       var keywords = isImpala() ? [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 1000 }, 'DISTINCT'];
+       var keywords = parser.isImpala() ? [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 1000 }, 'DISTINCT'];
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($4);
-     $$ = { types: findReturnTypes($1) };
+     parser.suggestValueExpressionKeywords($4);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
      if ($4.cursorAtStart && !$3) {
-       if (isImpala()) {
-         suggestKeywords(['ALL', 'DISTINCT']);
+       if (parser.isImpala()) {
+         parser.suggestKeywords(['ALL', 'DISTINCT']);
        } else {
-         suggestKeywords(['DISTINCT']);
+         parser.suggestKeywords(['DISTINCT']);
        }
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  ;
 
 OtherAggregateFunction
- : OtherAggregateFunction_Type '(' OptionalAllOrDistinct ')'                      -> { types: findReturnTypes($1) }
- | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { types: findReturnTypes($1) }
+ : OtherAggregateFunction_Type '(' OptionalAllOrDistinct ')'                      -> { types: parser.findReturnTypes($1) }
+ | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { types: parser.findReturnTypes($1) }
  ;
 
 OtherAggregateFunction_EDIT
  : OtherAggregateFunction_Type '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      if (!$3) {
        var keywords = [];
        if ($1.toLowerCase() === 'group_concat') {
          keywords = ['ALL'];
-       } else if (isImpala()) {
+       } else if (parser.isImpala()) {
          keywords = ['ALL', 'DISTINCT'];
        } else {
          keywords = ['DISTINCT'];
@@ -2869,15 +2870,15 @@ OtherAggregateFunction_EDIT
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
-     applyArgumentTypesToSuggestions($1, 1);
-     $$ = { types: findReturnTypes($1) };
+     parser.applyArgumentTypesToSuggestions($1, 1);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($4);
-     $$ = { types: findReturnTypes($1) };
+     parser.suggestValueExpressionKeywords($4);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
@@ -2885,7 +2886,7 @@ OtherAggregateFunction_EDIT
        var keywords = [];
        if ($1.toLowerCase() === 'group_concat') {
          keywords = ['ALL'];
-       } else if (isImpala()) {
+       } else if (parser.isImpala()) {
          keywords = ['ALL', 'DISTINCT'];
        } else {
          keywords = ['DISTINCT'];
@@ -2893,12 +2894,12 @@ OtherAggregateFunction_EDIT
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
      if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
-       applyArgumentTypesToSuggestions($1, $4.position);
+       parser.applyArgumentTypesToSuggestions($1, $4.position);
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  ;
 
@@ -2935,76 +2936,76 @@ ExtractFunction
 ExtractFunction_EDIT
  : '<impala>EXTRACT' '(' AnyCursor FromOrComma ValueExpression RightParenthesisOrError
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     $$ = { types: findReturnTypes($1) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' AnyCursor FromOrComma RightParenthesisOrError
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     $$ = { types: findReturnTypes($1) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
-     $$ = { types: findReturnTypes($1) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' ValueExpression_EDIT FromOrComma ValueExpression RightParenthesisOrError
    {
-     applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     $$ = { types: findReturnTypes($1) };
+     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' ValueExpression_EDIT FromOrComma RightParenthesisOrError
    {
-     applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     $$ = { types: findReturnTypes($1) };
+     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' ValueExpression_EDIT RightParenthesisOrError
    {
-     applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
-     $$ = { types: findReturnTypes($1) };
+     parser.applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' ValueExpression FromOrComma AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     $$ = { types: findReturnTypes($1) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' FromOrComma AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
-     applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     $$ = { types: findReturnTypes($1) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' ValueExpression FromOrComma ValueExpression_EDIT RightParenthesisOrError
    {
-     applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     $$ = { types: findReturnTypes($1) };
+     parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' FromOrComma ValueExpression_EDIT RightParenthesisOrError
    {
-    applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     $$ = { types: findReturnTypes($1) };
+    parser.applyTypeToSuggestions($4.toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' ValueExpression 'CURSOR' ValueExpression RightParenthesisOrError
    {
      if ($3.types[0] === 'STRING') {
-       suggestValueExpressionKeywords($3, ['FROM']);
+       parser.suggestValueExpressionKeywords($3, ['FROM']);
      } else {
-       suggestValueExpressionKeywords($3);
+       parser.suggestValueExpressionKeywords($3);
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | '<impala>EXTRACT' '(' ValueExpression 'CURSOR' RightParenthesisOrError
    {
      if ($3.types[0] === 'STRING') {
-       suggestValueExpressionKeywords($3, ['FROM']);
+       parser.suggestValueExpressionKeywords($3, ['FROM']);
      } else {
-       suggestValueExpressionKeywords($3);
+       parser.suggestValueExpressionKeywords($3);
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  ;
 
@@ -3014,35 +3015,35 @@ FromOrComma
  ;
 
 SumFunction
- : 'SUM' '(' OptionalAllOrDistinct ValueExpression ')'  -> { types: findReturnTypes($1) }
- | 'SUM' '(' ')'                                        -> { types: findReturnTypes($1) }
+ : 'SUM' '(' OptionalAllOrDistinct ValueExpression ')'  -> { types: parser.findReturnTypes($1) }
+ | 'SUM' '(' ')'                                        -> { types: parser.findReturnTypes($1) }
  ;
 
 SumFunction_EDIT
  : 'SUM' '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
-     valueExpressionSuggest();
-     applyArgumentTypesToSuggestions($1, 1);
+     parser.valueExpressionSuggest();
+     parser.applyArgumentTypesToSuggestions($1, 1);
      if (!$3) {
-       var keywords = isImpala() ? ['ALL', 'DISTINCT'] : ['DISTINCT'];
+       var keywords = parser.isImpala() ? ['ALL', 'DISTINCT'] : ['DISTINCT'];
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | 'SUM' '(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError
    {
-     suggestValueExpressionKeywords($4);
-     $$ = { types: findReturnTypes($1) };
+     parser.suggestValueExpressionKeywords($4);
+     $$ = { types: parser.findReturnTypes($1) };
    }
  | 'SUM' '(' OptionalAllOrDistinct ValueExpression_EDIT RightParenthesisOrError
    {
      if (parser.yy.result.suggestFunctions && ! parser.yy.result.suggestFunctions.types) {
-       applyArgumentTypesToSuggestions($1, 1);
+       parser.applyArgumentTypesToSuggestions($1, 1);
      }
-     $$ = { types: findReturnTypes($1) };
+     $$ = { types: parser.findReturnTypes($1) };
    }
  ;
 
@@ -3071,14 +3072,14 @@ LateralView_EDIT
  | '<hive>LATERAL' '<hive>VIEW' OptionalOuter 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords([{ value: 'OUTER', weight: 2 }, { value: 'explode', weight: 1 }, { value: 'posexplode', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'OUTER', weight: 2 }, { value: 'explode', weight: 1 }, { value: 'posexplode', weight: 1 }]);
      } else {
-       suggestKeywords(['explode', 'posexplode']);
+       parser.suggestKeywords(['explode', 'posexplode']);
      }
    }
  | '<hive>LATERAL' 'CURSOR'
    {
-     suggestKeywords(['VIEW']);
+     parser.suggestKeywords(['VIEW']);
    }
  ;
 

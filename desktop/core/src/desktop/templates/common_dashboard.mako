@@ -26,14 +26,12 @@
 %>
 
 <%def name="import_layout(with_deferred=False)">
-  <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
+  <link rel="stylesheet" href="${ static('dashboard/css/common_dashboard.css') }">
   <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
   %if with_deferred:
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     ko.options.deferUpdates = true;
   </script>
   %endif
@@ -41,22 +39,22 @@
 
 <%def name="layout_toolbar()">
 
-<div class="card card-toolbar" data-bind="slideVisible: isEditing">
+<div class="card card-toolbar" data-bind="visible: isEditing">
   %if not hasattr(caller, "skipLayout"):
   <div style="float: left">
     <div class="toolbar-label">${_('LAYOUT')}</div>
-    <a href="javascript: oneSixthLeftLayout(viewModel)" onmouseover="viewModel.previewColumns('oneSixthLeft')" onmouseout="viewModel.previewColumns('')">
+    <a href="javascript: oneSixthLeftLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('oneSixthLeft')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
         <div class="layout-box" style="width: 72px; margin-left: 4px"></div>
       </div>
     </a>
-    <a href="javascript: fullLayout(viewModel)" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')">
+    <a href="javascript: fullLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
       </div>
     </a>
-    <a data-bind="visible: columns().length == 0" href="javascript: magicLayout(viewModel)" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
+    <a data-bind="visible: columns().length == 0" href="javascript: magicSearchLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
       </div>
@@ -70,7 +68,7 @@
   </div>
   %endif
   %if hasattr(caller, "widgets"):
-  <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
+  <div class="card-toolbar-content" style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     %if hasattr(caller, "widgetSectionName"):
       <div class="toolbar-label">${caller.widgetSectionName()}</div>
     %else:
@@ -84,15 +82,15 @@
 
 </%def>
 
-<%def name="layout_skeleton()">
+<%def name="layout_skeleton(suffix='')">
   <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
   <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
-    <img src="${ static('desktop/art/hint_arrow.png') }" />
+    <img src="${ static('desktop/art/hint_arrow.png') }" alt="${ _('Hint arrow') }" />
   </div>
 
   <div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
     <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
-    <img src="${ static('desktop/art/hint_arrow_horiz_flipped.png') }" />
+    <img src="${ static('desktop/art/hint_arrow_horiz_flipped.png') }" alt="${ _('Hint arrow') }" />
   </div>
 
 
@@ -128,28 +126,29 @@
   <div class="container-fluid">
     <!-- ko if: $root.selectedQDefinition() != null -->
     <div class="row-fluid">
-      <div class="card card-additional card-home span12">
-        <a class="pointer pull-right" data-bind="click: $root.collection.unloadQDefinition"><i class="fa fa-times"></i></a>
+      <div class="card card-additional card-home span12" style="background-color: #F5F5F5">
         <strong data-bind="editable: $root.selectedQDefinition().name, editableOptions: {enabled: true, placement: 'right'}"></strong>
         <!-- ko if: $root.selectedQDefinition().hasChanged() -->
         &nbsp;&nbsp;
         <a class="pointer" data-bind="click: $root.collection.reloadQDefinition" title="${ _('Reload this definition') }"><i class="fa fa-undo"></i></a> <a class="pointer" data-bind="click: $root.collection.updateQDefinition" title="${ _('Update the definition') }"><i class="fa fa-save"></i></a>
         <!-- /ko -->
+        &nbsp;&nbsp;
+        <a class="pointer" data-bind="click: $root.collection.unloadQDefinition" title="${ _('Close this definition') }"><i class="fa fa-times"></i></a>
       </div>
     </div>
     <!-- /ko -->
-    <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
+    <div class="row-fluid" data-bind="template: { name: 'column-template${ suffix }', foreach: columns}">
     </div>
     <div class="clearfix"></div>
   </div>
 </div>
 
-<script type="text/html" id="column-template">
+<script type="text/html" id="column-template${ suffix }">
   <div data-bind="css: klass">
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
-    <div data-bind="template: { name: 'row-template', foreach: rows}">
+    <div data-bind="template: { name: 'row-template${ suffix }', foreach: rows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0">
       <div data-bind="click: function(){$data.addEmptyRow()}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
@@ -157,9 +156,9 @@
   </div>
 </script>
 
-<script type="text/html" id="row-template">
+<script type="text/html" id="row-template${ suffix }">
   <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index() == 0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1">
-    <img src="${ static('desktop/art/hint_arrow_flipped.png') }" style="float:left; margin-right: 10px"/>
+    <img src="${ static('desktop/art/hint_arrow_flipped.png') }" style="float:left; margin-right: 10px" alt="${ _('Hint arrow') }"/>
     <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
     <div class="clearfix"></div>
   </div>
@@ -173,7 +172,7 @@
       </div>
     </div>
     <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
-        sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing,
+        sortable: { template: 'widget-template${ suffix }', data: widgets, isEnabled: $root.isEditing,
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
             'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
             'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
@@ -181,14 +180,14 @@
     </div>
     <div class="container-fluid" data-bind="visible: $root.isNested() && columns().length > 0" style="border: 1px solid #e5e5e5; border-top: none; background-color: #F3F3F3;">
       <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}">
-        <div data-bind="template: { name: 'column-template', foreach: columns}">
+        <div data-bind="template: { name: 'column-template${ suffix }', foreach: columns}">
         </div>
       </div>
     </div>
   </div>
 </script>
 
-<script type="text/html" id="widget-template">
+<script type="text/html" id="widget-template${ suffix }">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
@@ -211,6 +210,7 @@
     </h2>
     <div class="card-body" style="padding: 5px;">
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
+      <div class="clearfix"></div>
     </div>
   </div>
 </script>
@@ -242,14 +242,12 @@
       START: "${_('Start')}",
       END: "${_('End')}",
       INTERVAL: "${_('Interval')}",
-      CUSTOM_FORMAT: "${_('Custom Format')}",
-      DATE_PICKERS: "${_('Date Pickers')}",
+      CUSTOM_FORMAT: "${_('Switch to custom format')}",
+      DATE_PICKERS: "${_('Switch to date pickers')}",
       CUSTOM_POPOVER_TITLE: "${_('e.g.')}",
       CUSTOM_POPOVER_CONTENT: "${_('Start')}: NOW-5DAYS<br/>${_('End')}: NOW<br/>${_('Interval')}: +1HOURS<br/><a href='http://lucene.apache.org/solr/4_10_2/solr-core/org/apache/solr/util/DateMathParser.html' target='_blank'>${_('Read more...')}</a>"
     };
   </script>
-  <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
-
 </%def>
 
 
@@ -261,13 +259,11 @@
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 
   <script src="${ static('desktop/js/hue.geo.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/js/hue.colors.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/leaflet/leaflet.markercluster.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/leaflet/leaflet.zoombox.js') }" type="text/javascript" charset="utf-8"></script>
 
-  <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/topojson.v1.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/topo/world.topo.js') }" type="text/javascript" charset="utf-8"></script>

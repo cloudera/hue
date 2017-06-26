@@ -34,7 +34,7 @@ ${layout.menubar(section='configuration')}
           <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key or value.')}">
           <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
         </form>
-        <table class="table table-striped table-condensed datatables">
+        <table class="table table-condensed datatables">
           <thead>
             <tr>
               <th>${_('Key')}</th>
@@ -54,7 +54,7 @@ ${layout.menubar(section='configuration')}
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 	$(document).ready(function(){
 		$(".datatables").dataTable({
 			"bPaginate": false,

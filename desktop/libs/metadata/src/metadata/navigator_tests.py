@@ -30,7 +30,9 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
-from metadata.conf import has_navigator
+from metadata import conf
+from metadata.conf import has_navigator, NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
+from metadata.navigator_api import _augment_highlighting
 from metadata.navigator_client import NavigatorApi
 
 
@@ -50,7 +52,7 @@ class TestNavigator(object):
     if not is_live_cluster() or not has_navigator(cls.user):
       raise SkipTest
 
-    cls.api = NavigatorApi()
+    cls.api = NavigatorApi(cls.user)
 
 
   @classmethod
@@ -147,3 +149,51 @@ class TestNavigator(object):
     for key, value in post_dict.items():
       json_dict[key] = json.dumps(value)
     return json_dict
+
+
+class TestNavigatorAPI(object):
+
+  def test_augment_highlighting_emty_db_name(self):
+    query_s = 'type:database*'
+    records = [
+      {u'customProperties': None, u'deleteTime': None, u'fileSystemPath': u'hdfs://Enchilada/data/marketsriskcalc/work/hive', u'description': None, u'params': None, u'type': u'DATABASE', u'internalType': u'hv_database', u'sourceType': u'HIVE', u'tags': None, u'deleted': False, u'technicalProperties': None, u'userEntity': False, u'originalDescription': None, u'metaClassName': u'hv_database', u'properties': None, u'identity': u'51002517', u'firstClassParentId': None, u'name': None, u'extractorRunId': u'845beb21b95783c4f55276a4ae38a332##3', u'sourceId': u'56850544', u'packageName': u'nav', u'parentPath': None, u'originalName': u'marketsriskcalc_work'}, {u'customProperties': None, u'deleteTime': None, u'fileSystemPath': u'hdfs://Enchilada/data/catssolprn/work/hive', u'description': None, u'params': None, u'type': u'DATABASE', u'internalType': u'hv_database', u'sourceType': u'HIVE', u'tags': None, u'deleted': False, u'technicalProperties': None, u'userEntity': False, u'originalDescription': None, u'metaClassName': u'hv_database', u'properties': None, u'identity': u'51188932', u'firstClassParentId': None, u'name': None, u'extractorRunId': u'845beb21b95783c4f55276a4ae38a332##3', u'sourceId': u'56850544', u'packageName': u'nav', u'parentPath': None, u'originalName': u'catssolprn_work'}
+    ]
+
+    _augment_highlighting(query_s, records)
+    assert_equal('', records[0]['parentPath'])
+
+  def test_navigator_conf(self):
+    resets = [
+      NAVIGATOR.AUTH_CM_USERNAME.set_for_testing('cm_username'),
+      NAVIGATOR.AUTH_CM_PASSWORD.set_for_testing('cm_pwd'),
+      NAVIGATOR.AUTH_LDAP_USERNAME.set_for_testing('ldap_username'),
+      NAVIGATOR.AUTH_LDAP_PASSWORD.set_for_testing('ldap_pwd'),
+      NAVIGATOR.AUTH_SAML_USERNAME.set_for_testing('saml_username'),
+      NAVIGATOR.AUTH_SAML_PASSWORD.set_for_testing('saml_pwd'),
+    ]
+
+    reset = NAVIGATOR.AUTH_TYPE.set_for_testing('CMDB')
+    conf.NAVIGATOR_AUTH_PASSWORD = None
+
+    try:
+      assert_equal('cm_username', get_navigator_auth_username())
+      assert_equal('cm_pwd', get_navigator_auth_password())
+
+      reset()
+      conf.NAVIGATOR_AUTH_PASSWORD = None
+      reset = NAVIGATOR.AUTH_TYPE.set_for_testing('ldap')
+
+      assert_equal('ldap_username', get_navigator_auth_username())
+      assert_equal('ldap_pwd', get_navigator_auth_password())
+
+      reset()
+      conf.NAVIGATOR_AUTH_PASSWORD = None
+      reset = NAVIGATOR.AUTH_TYPE.set_for_testing('SAML')
+
+      assert_equal('saml_username', get_navigator_auth_username())
+      assert_equal('saml_pwd', get_navigator_auth_password())
+    finally:
+      reset()
+      conf.NAVIGATOR_AUTH_PASSWORD = None
+      for _reset in resets:
+        _reset()

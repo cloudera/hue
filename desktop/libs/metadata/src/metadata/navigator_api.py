@@ -33,8 +33,9 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode, smart_str
 
-from metadata.conf import has_navigator
-from metadata.navigator_client import NavigatorApi
+from metadata.conf import has_navigator, NAVIGATOR, has_navigator_file_search
+from metadata.navigator_client import NavigatorApi, NavigatorApiException, EntityDoesNotExistException,\
+  NavigathorAuthException
 
 
 LOG = logging.getLogger(__name__)
@@ -46,6 +47,12 @@ class MetadataApiException(Exception):
 
 def error_handler(view_fn):
   def decorator(*args, **kwargs):
+    status = 200
+    response = {
+      'status': -1,
+      'message': ''
+    }
+
     try:
       if has_navigator(args[0].user):
         return view_fn(*args, **kwargs)
@@ -53,18 +60,24 @@ def error_handler(view_fn):
         raise MetadataApiException('Navigator API is not configured.')
     except Http404, e:
       raise e
+    except EntityDoesNotExistException, e:
+      response['message'] = e.message
+      response['status'] = -3
+      status = 200
+    except NavigathorAuthException, e:
+      response['message'] = force_unicode(e.message)
+      response['status'] = -2
+    except NavigatorApiException, e:
+      try:
+        response['message'] = json.loads(e.message)
+        response['status'] = -2
+      except Exception:
+        response['message'] = force_unicode(e.message)
     except Exception, e:
       status = 500
       message = force_unicode(e)
       LOG.exception(message)
 
-      if 'Could not find' in message:
-        status = 200
-
-      response = {
-        'status': -1,
-        'message': message
-      }
     return JsonResponse(response, status=status)
   return decorator
 
@@ -74,14 +87,16 @@ def search_entities(request):
   """
   For displaying results.
   """
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
 
   query_s = json.loads(request.POST.get('query_s', ''))
   query_s = smart_str(query_s)
 
   offset = request.POST.get('offset', 0)
-  limit = request.POST.get('limit', 100)
-  sources = json.loads(request.POST.get('sources')) or []
+  limit = int(request.POST.get('limit', 100))
+  sources = json.loads(request.POST.get('sources') or '[]')
+  if sources and not has_navigator_file_search(request.user):
+    sources = ['sql']
 
   query_s = query_s.strip() or '*'
 
@@ -106,15 +121,17 @@ def search_entities_interactive(request):
   """
   For search autocomplete.
   """
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
 
   query_s = json.loads(request.POST.get('query_s', ''))
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
-  limit = request.POST.get('limit', 25)
+  limit = int(request.POST.get('limit', 25))
   field_facets = json.loads(request.POST.get('field_facets') or '[]')
   sources = json.loads(request.POST.get('sources') or '[]')
 
+  if sources and not has_navigator_file_search(request.user):
+    sources = ['sql']
 
   f = {
       "outputFormat" : {
@@ -131,9 +148,6 @@ def search_entities_interactive(request):
       },
       "parentPath" : {
         "type" : "dynamic"
-      },
-      "deleteTime" : {
-        "type" : "date"
       },
       "lastAccessed" : {
         "type" : "date"
@@ -161,9 +175,6 @@ def search_entities_interactive(request):
       },
       "clusteredByColNames" : {
         "type" : "dynamic"
-      },
-      "deleted" : {
-        "type" : "bool"
       },
       "originalName" : {
         "type" : "dynamic"
@@ -218,10 +229,14 @@ def search_entities_interactive(request):
 
   if response.get('facets'): # Remove empty facets
     for fname, fvalues in response['facets'].items():
-      fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
+      if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
+        fvalues = []
+      else:
+        fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
       response['facets'][fname] = OrderedDict(fvalues)
       if ':' in query_s and not response['facets'][fname]:
         del response['facets'][fname]
+
 
   _augment_highlighting(query_s, response.get('results'))
 
@@ -243,9 +258,17 @@ def _augment_highlighting(query_s, records):
         ts.append(term.strip('*'))
 
   for record in records:
-    name = record.get('originalName', '')
+    name = record.get('originalName', '') or ''
     record['hue_description'] = ''
-    record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.').lstrip('.')
+    record['hue_name'] = record.get('parentPath', '') if record.get('parentPath') else ''
+    if record.get('parentPath') is None:
+      record['parentPath'] = ''
+
+    if record['hue_name'] and record.get('sourceType', '') != 'S3':
+      record['hue_name'] = (record['hue_name'].replace('/', '.') + '.').lstrip('.')
+
+    record['originalName'] = record['hue_name'] + name # Inserted when selected in autocomplete, full path
+    record['selectionName'] = name # Use when hovering / selecting a search result
 
     for term in ts:
       name = _highlight(term, name)
@@ -280,7 +303,7 @@ def _highlight_tags(record, term):
 
 @error_handler
 def list_tags(request):
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
 
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
@@ -300,14 +323,13 @@ def list_tags(request):
 def find_entity(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
+
   entity_type = request.GET.get('type', '')
   database = request.GET.get('database', '')
   table = request.GET.get('table', '')
   name = request.GET.get('name', '')
   path = request.GET.get('path', '')
-
-  # TODO: support arbitrary optional filter params
 
   if not entity_type:
     raise MetadataApiException("find_entity requires a type value, e.g. - 'database', 'table', 'file'")
@@ -316,10 +338,11 @@ def find_entity(request):
     if not name:
       raise MetadataApiException('get_database requires name param')
     response['entity'] = api.get_database(name)
-  elif entity_type.lower() == 'table':
+  elif entity_type.lower() == 'table' or entity_type.lower() == 'view':
     if not database or not name:
       raise MetadataApiException('get_table requires database and name param')
-    response['entity'] = api.get_table(database, name)
+    is_view = entity_type.lower() == 'view'
+    response['entity'] = api.get_table(database, name, is_view=is_view)
   elif entity_type.lower() == 'field':
     if not database or not table or not name:
       raise MetadataApiException('get_field requires database, table, and name params')
@@ -347,7 +370,7 @@ def find_entity(request):
 def suggest(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   prefix = request.POST.get('prefix')
 
   suggest = api.suggest(prefix)
@@ -362,7 +385,7 @@ def suggest(request):
 def get_entity(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = request.REQUEST.get('id')
 
   if not entity_id:
@@ -381,11 +404,19 @@ def get_entity(request):
 def add_tags(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', ''))
   tags = json.loads(request.POST.get('tags', []))
 
-  if not entity_id or not tags or not isinstance(tags, list):
+  is_allowed = request.user.has_hue_permission(action='write', app='metadata')
+
+  request.audit = {
+    'allowed': is_allowed,
+    'operation': 'NAVIGATOR_ADD_TAG',
+    'operationText': 'Adding tags %s to entity %s' % (tags, entity_id)
+  }
+
+  if not entity_id or not tags or not isinstance(tags, list) or not is_allowed:
     response['error'] = _("add_tags requires an 'id' parameter and 'tags' parameter that is a non-empty list of tags")
   else:
     response['entity'] = api.add_tags(entity_id, tags)
@@ -399,11 +430,19 @@ def add_tags(request):
 def delete_tags(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', ''))
   tags = json.loads(request.POST.get('tags', []))
 
-  if not entity_id or not tags or not isinstance(tags, list):
+  is_allowed = request.user.has_hue_permission(action='write', app='metadata')
+
+  request.audit = {
+    'allowed': is_allowed,
+    'operation': 'NAVIGATOR_DELETE_TAG',
+    'operationText': 'Removing tags %s to entity %s' % (tags, entity_id)
+  }
+
+  if not entity_id or not tags or not isinstance(tags, list) or not is_allowed:
     response['error'] = _("add_tags requires an 'id' parameter and 'tags' parameter that is a non-empty list of tags")
   else:
     response['entity'] = api.delete_tags(entity_id, tags)
@@ -417,11 +456,19 @@ def delete_tags(request):
 def update_properties(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', ''))
   properties = json.loads(request.POST.get('properties', {}))
 
-  if not entity_id or not properties or not isinstance(properties, dict):
+  is_allowed = request.user.has_hue_permission(action='write', app='metadata')
+
+  request.audit = {
+    'allowed': is_allowed,
+    'operation': 'NAVIGATOR_UPDATE_PROPERTIES',
+    'operationText': 'Updating property %s of entity %s' % (properties, entity_id)
+  }
+
+  if not entity_id or not properties or not isinstance(properties, dict) or not is_allowed:
     response['error'] = _("update_properties requires an 'id' parameter and 'properties' parameter that is a non-empty dict")
   else:
     response['entity'] = api.update_properties(entity_id, properties)
@@ -435,9 +482,17 @@ def update_properties(request):
 def delete_properties(request):
   response = {'status': -1}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = json.loads(request.POST.get('id', ''))
   keys = json.loads(request.POST.get('keys', []))
+
+  is_allowed = request.user.has_hue_permission(action='write', app='metadata')
+
+  request.audit = {
+    'allowed': is_allowed,
+    'operation': 'NAVIGATOR_DELETE_PROPERTIES',
+    'operationText': 'Deleting property %s of entity %s' % (keys, entity_id)
+  }
 
   if not entity_id or not keys or not isinstance(keys, list):
     response['error'] = _("update_properties requires an 'id' parameter and 'keys' parameter that is a non-empty list")
@@ -452,7 +507,7 @@ def delete_properties(request):
 def get_lineage(request):
   response = {'status': -1, 'inputs': [], 'source_query': '', 'target_queries': [], 'targets': []}
 
-  api = NavigatorApi()
+  api = NavigatorApi(request.user)
   entity_id = request.REQUEST.get('id')
 
   if not entity_id:

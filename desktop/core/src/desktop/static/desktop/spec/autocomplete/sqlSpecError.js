@@ -30,11 +30,10 @@
       assertAutoComplete({
         beforeCursor: 'SELECT BAABO BOOAA BLARGH, ',
         afterCursor: ' FROM testTable',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
           suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
@@ -45,11 +44,10 @@
       assertAutoComplete({
         beforeCursor: 'SELECT foo, bar, SELECT, ',
         afterCursor: ' FROM testTable',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
           suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
@@ -60,11 +58,10 @@
       assertAutoComplete({
         beforeCursor: 'SELECT foo, baa baa baa baa, SELECT, ',
         afterCursor: ' FROM testTable',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
           suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
@@ -75,7 +72,6 @@
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM testTable WHERE baa baaa boo',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['GROUP BY', 'ORDER BY'],
         expectedResult: {
           lowerCase: false
@@ -87,10 +83,10 @@
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM testTable WHERE baa baaa boo GROUP ',
         afterCursor: '',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['BY']
+          suggestKeywords: ['BY'],
+          suggestGroupBys: { prefix: 'BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
       });
     });
@@ -99,10 +95,10 @@
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM testTable WHERE baa baaa boo ORDER ',
         afterCursor: '',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['BY']
+          suggestKeywords: ['BY'],
+          suggestOrderBys: { prefix: 'BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
       });
     });
@@ -111,7 +107,6 @@
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM testTable ORDER BY bla bla bla boo ',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['LIMIT', 'UNION'],
         expectedResult: {
           lowerCase: false
@@ -123,7 +118,6 @@
       assertAutoComplete({
         beforeCursor: 'SELECT * FROM testTable ORDER BY bla bla bla boo ',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['LIMIT', 'UNION'],
         expectedResult: {
           lowerCase: false

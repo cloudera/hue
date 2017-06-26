@@ -192,12 +192,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
 
 
 <div class="hueOverlay" data-bind="visible: isLoading">
-  <!--[if lte IE 9]>
-    <img src="${ static('desktop/art/spinner-big.gif') }" />
-  <![endif]-->
-  <!--[if !IE]> -->
-    <i class="fa fa-spinner fa-spin"></i>
-  <!-- <![endif]-->
+  <i class="fa fa-spinner fa-spin big-spinner"></i>
 </div>
 
 
@@ -205,8 +200,8 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
   <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteIndexMessage">${ _('Delete the selected index(es)?') }</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 id="deleteIndexMessage" class="modal-title">${ _('Delete the selected index(es)?') }</h2>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -217,11 +212,8 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
 
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var Index = function () {
     var self = this;
 

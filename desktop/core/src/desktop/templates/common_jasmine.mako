@@ -28,6 +28,10 @@
   <script type="text/javascript" src="${ static('desktop/js/hue.utils.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/js/ace/ace.js') }"></script>
+  <script>
+    ace.config.set("basePath", "/static/desktop/js/ace");
+  </script>
+
   <script type="text/javascript" src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/js/ace.extended.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/ext/js/jasmine-2.3.4/jasmine') }"></script>

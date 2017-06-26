@@ -36,10 +36,11 @@ var AssistDbEntry = (function () {
    * @param {Object} navigationSettings
    * @constructor
    */
-  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings) {
+  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings, sortFunctions) {
     var self = this;
     self.i18n = i18n;
     self.definition = definition;
+    self.sortFunctions = sortFunctions;
 
     self.assistDbSource = assistDbSource;
     self.parent = parent;
@@ -49,7 +50,8 @@ var AssistDbEntry = (function () {
     self.sourceType = self.assistDbSource.sourceType;
     self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
     self.highlight = ko.observable(false);
-    self.highlightParent = ko.observable(false);
+    self.activeSort = self.assistDbSource.activeSort;
+    self.popularity = ko.observable(0);
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
@@ -73,28 +75,16 @@ var AssistDbEntry = (function () {
       return self.entries().length > 0;
     });
 
+    self.assistDbSource.activeSort.subscribe(function (newSort) {
+      self.entries.sort(self.sortFunctions[newSort]);
+    });
+
     self.filteredEntries = ko.pureComputed(function () {
-      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews() && !self.filter.showActive() && self.filter.query().length === 0)) {
+      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews() && self.filter.query().length === 0)) {
         return self.entries();
       }
       var result = [];
       $.each(self.entries(), function (index, entry) {
-        if (self.filter.showActive()) {
-          var found = false;
-          for (var i = 0; i < self.filter.activeEditorTables().length; i++) {
-            var activeTable = self.filter.activeEditorTables()[i];
-            if (activeTable.db && self.definition.name !== activeTable.db) {
-              continue;
-            }
-            if (activeTable.table === entry.definition.name) {
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            return;
-          }
-        }
         if ((entry.definition.isTable && !self.filter.showTables()) || (entry.definition.isView && !self.filter.showViews()) ) {
           return;
         }
@@ -120,32 +110,58 @@ var AssistDbEntry = (function () {
 
     self.editorText = ko.pureComputed(function () {
       if (self.definition.isTable || self.definition.isView) {
-        return self.definition.name;
+        return self.getTableName();
       }
       if (self.definition.isColumn) {
-        return self.definition.name + ", ";
+        return self.getColumnName() + ', ';
       }
-      var parts = [];
-      var entry = self;
-      while (entry != null) {
-        if (entry.definition.isTable || self.definition.isView) {
-          break;
-        }
-        if (entry.definition.isArray || entry.definition.isMapValue) {
-          if (self.assistDbSource.sourceType === 'hive') {
-            parts.push("[]");
-          }
-        } else {
-          parts.push(entry.definition.name);
-          parts.push(".");
-        }
-        entry = entry.parent;
-      }
-      parts.reverse();
-      parts.push(", ");
-      return parts.slice(1).join("");
+      return self.getComplexName() + ', ';
     });
   }
+
+  var findNameInHierarchy = function (entry, searchCondition) {
+    var sourceType = entry.sourceType;
+    while (entry && !searchCondition(entry)) {
+      entry = entry.parent;
+    }
+    if (entry) {
+      return SqlUtils.backTickIfNeeded(sourceType, entry.definition.name);
+    }
+  };
+
+  AssistDbEntry.prototype.getDatabaseName = function () {
+    return findNameInHierarchy(this, function (entry) { return entry.definition.isDatabase });
+  };
+
+  AssistDbEntry.prototype.getTableName = function () {
+    return findNameInHierarchy(this, function (entry) { return entry.definition.isTable || entry.definition.isView });
+  };
+
+  AssistDbEntry.prototype.getColumnName = function () {
+    return findNameInHierarchy(this, function (entry) { return entry.definition.isColumn });
+  };
+
+  AssistDbEntry.prototype.getComplexName = function () {
+    var entry = this;
+    var sourceType = entry.sourceType;
+    var parts = [];
+    while (entry != null) {
+      if (entry.definition.isTable || entry.definition.isView) {
+        break;
+      }
+      if (entry.definition.isArray || entry.definition.isMapValue) {
+        if (sourceType === 'hive') {
+          parts.push("[]");
+        }
+      } else {
+        parts.push(SqlUtils.backTickIfNeeded(sourceType, entry.definition.name));
+        parts.push(".");
+      }
+      entry = entry.parent;
+    }
+    parts.reverse();
+    return parts.slice(1).join("");
+  };
 
   AssistDbEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
     var self = this;
@@ -155,12 +171,27 @@ var AssistDbEntry = (function () {
       offset.left += positionAdjustment.left;
       offset.top += positionAdjustment.top;
     }
+
+    var type;
+    if (self.definition.isColumn) {
+      type = 'column';
+    } else if (self.definition.isComplex) {
+      type = 'complex';
+    } else if (self.definition.isTable) {
+      type = 'table';
+    } else if (self.definition.isView) {
+      type = 'view';
+    } else {
+      type = 'database';
+    }
+
     self.statsVisible(true);
     huePubSub.publish('sql.context.popover.show', {
       data: {
-        type: self.definition.isColumn ? 'column' : 'table',
-        identifierChain: self.definition.isColumn ? [{ name: self.tableName }, { name: self.columnName }] : [{ name: self.tableName }]
+        type: type,
+        identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
       },
+      showInAssistEnabled: false,
       orientation: 'right',
       sourceType: self.sourceType,
       defaultDatabase: self.databaseName,
@@ -184,9 +215,9 @@ var AssistDbEntry = (function () {
     self.editingSearch(self.isSearchVisible());
   };
 
-  AssistDbEntry.prototype.triggerRefresh = function () {
+  AssistDbEntry.prototype.triggerRefresh = function (data, event) {
     var self = this;
-    self.assistDbSource.triggerRefresh();
+    self.assistDbSource.triggerRefresh(data, event);
   };
 
   AssistDbEntry.prototype.highlightInside = function (path) {
@@ -195,28 +226,44 @@ var AssistDbEntry = (function () {
     var searchEntry = function () {
       var foundEntry;
       $.each(self.entries(), function (idx, entry) {
+        entry.highlight(false);
         if (entry.definition.name === path[0]) {
           foundEntry = entry;
-          entry.open(true);
-          return false;
         }
       });
       if (foundEntry) {
-        if (path.length > 1) {
-          foundEntry.highlightParent(true);
-          huePubSub.publish('assist.db.scrollToHighlight');
-          window.setTimeout(function () {
-            foundEntry.highlightInside(path.slice(1));
-          }, 0);
-        } else {
-          foundEntry.highlight(true);
-          huePubSub.publish('assist.db.scrollToHighlight');
+        if (foundEntry.expandable && !foundEntry.open()) {
+          foundEntry.open(true);
         }
+
+        window.setTimeout(function () {
+          if (path.length > 1) {
+            foundEntry.highlightInside(path.slice(1));
+          } else {
+            huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
+              foundEntry.highlight(true);
+              // Timeout is for animation effect
+              window.setTimeout(function () {
+                foundEntry.highlight(false);
+              }, 1800);
+            });
+            huePubSub.publish('assist.db.scrollTo', foundEntry);
+          }
+        }, 0);
       }
     };
 
-    if (self.entries().length == 0) {
-      self.loadEntries(searchEntry);
+    if (self.entries().length === 0) {
+      if (self.loading()) {
+        var subscription = self.loading.subscribe(function (newVal) {
+          if (!newVal) {
+            subscription.dispose();
+            searchEntry();
+          }
+        });
+      } else {
+        self.loadEntries(searchEntry);
+      }
     } else {
       searchEntry();
     }
@@ -229,22 +276,23 @@ var AssistDbEntry = (function () {
     }
     self.loading(true);
 
+    var loadEntriesDeferred = $.Deferred();
+
     var successCallback = function(data) {
       self.entries([]);
       self.hasErrors(false);
       self.loading(false);
 
       var newEntries = [];
+      var index = 0;
       if (typeof data.tables_meta !== "undefined") {
         newEntries = $.map(data.tables_meta, function(table) {
-          return self.createEntry({
-            name: table.name,
-            displayName: table.name,
-            title: table.name + (table.comment ? ' - ' + table.comment : ''),
-            type: table.type,
-            isTable: /table/i.test(table.type),
-            isView: /view/i.test(table.type)
-          });
+          table.index = index++;
+          table.title = table.name + (table.comment ? ' - ' + table.comment : '');
+          table.displayName = table.name;
+          table.isTable = /table/i.test(table.type);
+          table.isView = /view/i.test(table.type);
+          return self.createEntry(table);
         });
       } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
         newEntries = $.map(data.extended_columns, function (columnDef) {
@@ -260,18 +308,18 @@ var AssistDbEntry = (function () {
           if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
             shortType = columnDef.type.match(/^[^<]*/g)[0]; // everything before '<'
           }
-          return self.createEntry({
-            name: columnDef.name,
-            displayName: displayName,
-            title: title,
-            isColumn: true,
-            type: shortType
-          });
+          columnDef.index = index++;
+          columnDef.displayName = displayName;
+          columnDef.title = title;
+          columnDef.isColumn = true;
+          columnDef.type = shortType;
+          return self.createEntry(columnDef);
         });
       } else if (typeof data.columns !== "undefined" && data.columns !== null) {
         newEntries = $.map(data.columns, function(columnName) {
           return self.createEntry({
             name: columnName,
+            index: index++,
             displayName: columnName,
             title: columnName,
             isColumn: true
@@ -282,35 +330,43 @@ var AssistDbEntry = (function () {
           newEntries = [
             self.createEntry({
               name: "key",
+              index: index++,
               displayName: "key (" + data.key.type + ")",
               title: "key (" + data.key.type + ")",
-              type: data.key.type
+              type: data.key.type,
+              isComplex: true
             }),
             self.createEntry({
               name: "value",
+              index: index++,
               displayName: "value (" + data.value.type + ")",
               title: "value (" + data.value.type + ")",
               isMapValue: true,
-              type: data.value.type
+              type: data.value.type,
+              isComplex: true
             })
           ];
         } else if (data.type == "struct") {
           newEntries = $.map(data.fields, function(field) {
             return self.createEntry({
               name: field.name,
+              index: index++,
               displayName: field.name + " (" + field.type + ")",
               title: field.name + " (" + field.type + ")",
-              type: field.type
+              type: field.type,
+              isComplex: true
             });
           });
         } else if (data.type == "array") {
           newEntries = [
             self.createEntry({
               name: "item",
+              index: index++,
               displayName: "item (" + data.item.type + ")",
               title: "item (" + data.item.type + ")",
               isArray: true,
-              type: data.item.type
+              type: data.item.type,
+              isComplex: true
             })
           ];
         }
@@ -321,14 +377,10 @@ var AssistDbEntry = (function () {
         self.entries(newEntries);
         self.entries()[0].open(true);
       } else {
-        newEntries.sort(function (a, b) {
-          if (a.definition.isColumn && b.definition.isColumn) {
-            return 0;
-          }
-          return a.definition.name.localeCompare(b.definition.name);
-        });
+        newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
         self.entries(newEntries);
       }
+      loadEntriesDeferred.resolve(newEntries);
       if (typeof callback === 'function') {
         callback();
       }
@@ -337,7 +389,38 @@ var AssistDbEntry = (function () {
     var errorCallback = function () {
       self.hasErrors(true);
       self.loading(false);
+      loadEntriesDeferred.resolve([]);
     };
+
+    if (HAS_OPTIMIZER && self.definition.isTable) {
+      self.assistDbSource.apiHelper.fetchNavOptTopColumns({
+        sourceType: self.assistDbSource.sourceType,
+        successCallback: function (data) {
+          if (data.status === 0 && data.values && data.values.selectColumns && data.values.selectColumns.length > 0) {
+            var colIndex = {};
+            data.values.selectColumns.forEach(function (col) {
+              colIndex[col.columnName] = col;
+            });
+            $.when(loadEntriesDeferred).done(function () {
+              if (!self.hasErrors()) {
+                self.entries().forEach(function (entry) {
+                  if (colIndex[entry.definition.name]) {
+                    entry.popularity(colIndex[entry.definition.name].columnCount);
+                  }
+                });
+
+                if (self.assistDbSource.activeSort() === 'popular') {
+                  self.entries.sort(self.sortFunctions.popular);
+                }
+              }
+            })
+          }
+        },
+        silenceErrors: true,
+        tables: [{ identifierChain: [{ name: self.definition.name }] }],
+        defaultDatabase: self.parent.definition.name
+      })
+    }
 
     self.assistDbSource.apiHelper.fetchPanelData({
       sourceType: self.assistDbSource.sourceType,
@@ -360,7 +443,7 @@ var AssistDbEntry = (function () {
    */
   AssistDbEntry.prototype.createEntry = function (definition) {
     var self = this;
-    return new AssistDbEntry(definition, self, self.assistDbSource, null, self.i18n, self.navigationSettings)
+    return new AssistDbEntry(definition, self, self.assistDbSource, null, self.i18n, self.navigationSettings, self.sortFunctions)
   };
 
   AssistDbEntry.prototype.getHierarchy = function () {
@@ -377,7 +460,31 @@ var AssistDbEntry = (function () {
 
   AssistDbEntry.prototype.dblClick = function () {
     var self = this;
-    huePubSub.publish('assist.dblClickDbItem', self);
+    if (self.definition.isTable || self.definition.isView) {
+      huePubSub.publish('editor.insert.table.at.cursor', { name: self.getTableName(), database: self.getDatabaseName() });
+    } else if (self.definition.isColumn) {
+      huePubSub.publish('editor.insert.column.at.cursor', { name: self.getColumnName(), table: self.getTableName(), database: self.getDatabaseName() });
+    } else {
+      huePubSub.publish('editor.insert.column.at.cursor', { name: self.getComplexName(), table: self.getTableName(), database: self.getDatabaseName() });
+    }
+  };
+
+  AssistDbEntry.prototype.openInMetastore = function () {
+    var self = this;
+    var url;
+    if (self.definition.isDatabase) {
+      url = '/metastore/tables/' + self.definition.name;
+    } else if (self.definition.isTable || self.definition.isView) {
+      url = '/metastore/table/' + self.parent.definition.name + '/' + self.definition.name;
+    } else {
+      return;
+    }
+
+    if (IS_HUE_4) {
+      huePubSub.publish('open.link', url);
+    } else {
+      window.open(url, '_blank');
+    }
   };
 
   AssistDbEntry.prototype.toggleOpen = function () {

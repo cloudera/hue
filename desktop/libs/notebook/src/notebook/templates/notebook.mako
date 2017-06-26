@@ -22,13 +22,17 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
-<%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
+<%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
+<%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Notebook'), app_name, user, request, "68px") | n,unicode }
+%endif
 
-${ editorComponents.includes() }
-${ editorComponents.topBar() }
-<%editorComponents:commonHTML>
+<span id="notebookComponents" class="notebook">
+${ editorComponents.includes(is_embeddable=is_embeddable, suffix='notebook') }
+${ editorComponents.topBar(suffix='notebook') }
+<%editorComponents:commonHTML is_embeddable="${is_embeddable}" suffix="notebook">
   <%def name="addSnippetHTML()">
     <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
 
@@ -47,13 +51,20 @@ ${ editorComponents.topBar() }
   </%def>
 </%editorComponents:commonHTML>
 
+%if not is_embeddable:
 ${ assist.assistPanel() }
 ${ assist.assistJSModels() }
 ${ configKoComponents.config() }
-${ notebookKoComponents.addSnippetMenu() }
+${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }
-${ notebookKoComponents.snippetDbSelection() }
+${ hueAceAutocompleter.hueAceAutocompleter() }
+%endif
+${ notebookKoComponents.addSnippetMenu() }
 
-${ editorComponents.commonJS() }
+${ editorComponents.commonJS(is_embeddable=is_embeddable, bindableElement='notebookComponents', suffix='notebook') }
 
+</span>
+
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

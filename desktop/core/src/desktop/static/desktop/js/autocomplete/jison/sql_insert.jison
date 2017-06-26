@@ -32,12 +32,12 @@ DataManipulation_EDIT
  | ImpalaInsertStatement_EDIT
  | CommonTableExpression HiveInsertStatement_EDIT
    {
-     addCommonTableExpressions($1);
+     parser.addCommonTableExpressions($1);
    }
  | CommonTableExpression_EDIT HiveInsertStatement
  | CommonTableExpression ImpalaInsertStatement_EDIT
    {
-     addCommonTableExpressions($1);
+     parser.addCommonTableExpressions($1);
    }
  | CommonTableExpression_EDIT ImpalaInsertStatement
  ;
@@ -54,7 +54,7 @@ HiveInsertStatement_EDIT
    {
      var keywords = [];
      if ($1.suggestKeywords) {
-       keywords = createWeightedKeywords($1.suggestKeywords, 2).concat([{ value: 'SELECT', weight: 1}]);
+       keywords = parser.createWeightedKeywords($1.suggestKeywords, 2).concat([{ value: 'SELECT', weight: 1}]);
      } else {
        keywords = ['SELECT'];
      }
@@ -62,7 +62,7 @@ HiveInsertStatement_EDIT
        keywords.push({ weight: 1.1, value: 'VALUES' });
      }
      if (keywords.length > 0) {
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
    }
  | HiveInsertWithoutQuery_EDIT QuerySpecification
@@ -79,18 +79,18 @@ HiveInsertStatement_EDIT
  | FromClause_EDIT SelectWithoutTableExpression OptionalSelectConditions
  | FromClause 'CURSOR'
    {
-     suggestKeywords(['INSERT INTO', 'INSERT OVERWRITE', 'SELECT']);
+     parser.suggestKeywords(['INSERT INTO', 'INSERT OVERWRITE', 'SELECT']);
    }
  | FromClause SelectWithoutTableExpression_EDIT OptionalSelectConditions
    {
      if ($2.cursorAtEnd) {
-       checkForSelectListKeywords($2);
+       parser.checkForSelectListKeywords($2);
        var keywords = parser.yy.result.suggestKeywords || [];
        if ($3.suggestKeywords) {
          keywords = keywords.concat($3.suggestKeywords);
        }
        if (keywords.length > 0) {
-         suggestKeywords(keywords);
+         parser.suggestKeywords(keywords);
        }
      }
      delete parser.yy.result.suggestTables;
@@ -99,7 +99,7 @@ HiveInsertStatement_EDIT
  | FromClause SelectWithoutTableExpression OptionalSelectConditions_EDIT
    {
      if ($3.cursorAtStart) {
-       checkForSelectListKeywords($2.tableExpression);
+       parser.checkForSelectListKeywords($2.tableExpression);
      }
    }
  ;
@@ -108,7 +108,7 @@ HiveInsertWithoutQuery
  : '<hive>INSERT' '<hive>OVERWRITE' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalIfNotExists
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
      if (!$5 && !$6) {
        $$ = { suggestKeywords: ['PARTITION'] }
      } else if (!$6) {
@@ -134,7 +134,7 @@ HiveInsertWithoutQuery
   | '<hive>INSERT' 'INTO' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalParenthesizedColumnList
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
      if (!$5 && !$6) {
        $$ = { suggestKeywords: ['PARTITION'], addValues: true };
      } else if (!$6) {
@@ -146,15 +146,15 @@ HiveInsertWithoutQuery
 HiveInsertWithoutQuery_EDIT
  : '<hive>INSERT' 'CURSOR'
    {
-     suggestKeywords(['OVERWRITE', 'INTO']);
+     parser.suggestKeywords(['OVERWRITE', 'INTO']);
    }
  | '<hive>INSERT' '<hive>OVERWRITE' OptionalHiveTable 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['DIRECTORY', 'LOCAL DIRECTORY', 'TABLE']);
+       parser.suggestKeywords(['DIRECTORY', 'LOCAL DIRECTORY', 'TABLE']);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
      $$ = { keepTables: true }
    }
  | '<hive>INSERT' '<hive>OVERWRITE' OptionalHiveTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec OptionalParenthesizedColumnList
@@ -164,7 +164,7 @@ HiveInsertWithoutQuery_EDIT
  | '<hive>INSERT' '<hive>OVERWRITE' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT OptionalIfNotExists
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.owner = 'insert';
      }
@@ -172,11 +172,11 @@ HiveInsertWithoutQuery_EDIT
  | '<hive>INSERT' '<hive>OVERWRITE' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalIfNotExists_EDIT
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  | '<hive>INSERT' '<hive>OVERWRITE' '<hive>LOCAL' 'CURSOR'
    {
-     suggestKeywords(['DIRECTORY']);
+     parser.suggestKeywords(['DIRECTORY']);
    }
  | '<hive>INSERT' '<hive>OVERWRITE' '<hive>LOCAL' '<hive>DIRECTORY' HdfsPath_EDIT OptionalInsertRowFormat OptionalStoredAs
  | '<hive>INSERT' '<hive>OVERWRITE' '<hive>LOCAL' '<hive>DIRECTORY' HdfsPath OptionalInsertRowFormat_EDIT OptionalStoredAs
@@ -187,10 +187,10 @@ HiveInsertWithoutQuery_EDIT
  | '<hive>INSERT' 'INTO' OptionalHiveTable 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['TABLE']);
+       parser.suggestKeywords(['TABLE']);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
      $$ = { keepTables: true }
    }
  | '<hive>INSERT' 'INTO' OptionalHiveTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec OptionalParenthesizedColumnList
@@ -200,7 +200,7 @@ HiveInsertWithoutQuery_EDIT
  | '<hive>INSERT' 'INTO' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT OptionalParenthesizedColumnList
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.owner = 'insert';
      }
@@ -208,7 +208,7 @@ HiveInsertWithoutQuery_EDIT
  | '<hive>INSERT' 'INTO' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec OptionalParenthesizedColumnList_EDIT
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.owner = 'insert';
      }
@@ -238,21 +238,21 @@ HiveInsert_EDIT
  | HiveInsertWithoutQuery 'CURSOR'
    {
      if ($1.suggestKeywords) {
-       suggestKeywords(createWeightedKeywords($1.suggestKeywords, 2).concat([{ value: 'SELECT', weight: 1}]));
+       parser.suggestKeywords(parser.createWeightedKeywords($1.suggestKeywords, 2).concat([{ value: 'SELECT', weight: 1}]));
      } else {
-       suggestKeywords(['SELECT']);
+       parser.suggestKeywords(['SELECT']);
      }
    }
  | HiveInsertWithoutQuery SelectWithoutTableExpression_EDIT OptionalSelectConditions
    {
      if ($2.cursorAtEnd) {
-       checkForSelectListKeywords($2);
+       parser.checkForSelectListKeywords($2);
        var keywords = parser.yy.result.suggestKeywords || [];
        if ($3.suggestKeywords) {
          keywords = keywords.concat($3.suggestKeywords);
        }
        if (keywords.length > 0) {
-         suggestKeywords(keywords);
+         parser.suggestKeywords(keywords);
        }
      }
    }
@@ -263,34 +263,34 @@ InsertValuesStatement
  : '<hive>INSERT' 'INTO' OptionalHiveTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'VALUES' InsertValuesList
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier 'VALUES' InsertValuesList
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  ;
 
 InsertValuesStatement_EDIT
  : 'INSERT' 'CURSOR'
    {
-     suggestKeywords(['INTO']);
+     parser.suggestKeywords(['INTO']);
    }
  | 'INSERT' 'INTO' OptionalTable 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['TABLE']);
+       parser.suggestKeywords(['TABLE']);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT
  | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier 'CURSOR'
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
-     suggestKeywords(['VALUES']);
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['VALUES']);
    }
  | 'INSERT' 'INTO' OptionalTable SchemaQualifiedTableIdentifier_EDIT 'VALUES' InsertValuesList
  ;
@@ -322,11 +322,11 @@ OptionalInsertRowFormat
 OptionalInsertRowFormat_EDIT
  : 'ROW' 'CURSOR'
    {
-     suggestKeywords(['FORMAT DELIMITED']);
+     parser.suggestKeywords(['FORMAT DELIMITED']);
    }
  | 'ROW' '<hive>FORMAT' 'CURSOR'
    {
-     suggestKeywords(['DELIMITED']);
+     parser.suggestKeywords(['DELIMITED']);
    }
  | 'ROW' '<hive>FORMAT' HiveDelimitedRowFormat_EDIT
  ;
@@ -343,7 +343,7 @@ SelectWithoutTableExpression_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT
    {
-     selectListNoTableSuggest($3, $2);
+     parser.selectListNoTableSuggest($3, $2);
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR'
    {
@@ -351,20 +351,20 @@ SelectWithoutTableExpression_EDIT
      if ($2) {
        keywords = [{ value: '*', weight: 1000 }];
        if ($2 === 'ALL') {
-         suggestAggregateFunctions();
-         suggestAnalyticFunctions();
+         parser.suggestAggregateFunctions();
+         parser.suggestAnalyticFunctions();
        }
      } else {
        keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
+       parser.suggestAggregateFunctions();
+       parser.suggestAnalyticFunctions();
      }
-     if (isImpala()) {
+     if (parser.isImpala()) {
        keywords.push('STRAIGHT_JOIN');
      }
-     suggestKeywords(keywords);
-     suggestFunctions();
-     suggestColumns();
+     parser.suggestKeywords(keywords);
+     parser.suggestFunctions();
+     parser.suggestColumns();
    }
  ;
 
@@ -390,13 +390,13 @@ ImpalaInsertStatementWithoutCTE_EDIT
  : ImpalaInsertLeftPart_EDIT
  | ImpalaInsertLeftPart OptionalImpalaShuffleOrNoShuffle 'CURSOR'
    {
-     var keywords = $1.suggestKeywords && !$2 ? createWeightedKeywords($1.suggestKeywords, 2) : [];
+     var keywords = $1.suggestKeywords && !$2 ? parser.createWeightedKeywords($1.suggestKeywords, 2) : [];
      if (!$2) {
        keywords = keywords.concat(['[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES'])
      } else {
        keywords = keywords.concat(['SELECT'])
      }
-     suggestKeywords(keywords);
+     parser.suggestKeywords(keywords);
    }
  | ImpalaInsertLeftPart_EDIT OptionalImpalaShuffleOrNoShuffle SelectStatement OptionalUnions
  | ImpalaInsertLeftPart OptionalImpalaShuffleOrNoShuffle SelectStatement_EDIT OptionalUnions
@@ -409,7 +409,7 @@ ImpalaInsertLeftPart
  : '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalPartitionSpec
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
      if (!$6) {
        $$ = { suggestKeywords: ['PARTITION'] };
      }
@@ -419,27 +419,27 @@ ImpalaInsertLeftPart
 ImpalaInsertLeftPart_EDIT
  : '<impala>INSERT' 'CURSOR'
    {
-     suggestKeywords(['INTO', 'OVERWRITE']);
+     parser.suggestKeywords(['INTO', 'OVERWRITE']);
    }
  | '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['TABLE']);
+       parser.suggestKeywords(['TABLE']);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable 'CURSOR' SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalPartitionSpec
    {
      if (!$3) {
-       suggestKeywords(['TABLE']);
+       parser.suggestKeywords(['TABLE']);
      }
    }
  | '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable SchemaQualifiedTableIdentifier_EDIT OptionalParenthesizedColumnList OptionalPartitionSpec
  | '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList_EDIT OptionalPartitionSpec
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.owner = 'insert';
      }
@@ -447,7 +447,7 @@ ImpalaInsertLeftPart_EDIT
  | '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalPartitionSpec_EDIT
    {
      $4.owner = 'insert';
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.owner = 'insert';
      }
@@ -489,7 +489,7 @@ ParenthesizedImpalaRowValuesList
 ParenthesizedImpalaRowValuesList_EDIT
  : '(' AnyCursor RightParenthesisOrError
    {
-     suggestFunctions();
+     parser.suggestFunctions();
    }
  | '(' ValueExpressionList_EDIT RightParenthesisOrError
  ;

@@ -94,10 +94,33 @@
       //update observable on save
       if (ko.isObservable(value)) {
         $editable.on('save.ko', function (e, params) {
-          value(params.newValue.replace(/<(?:.|\n)*?>/gm, ''));
+          if (editableOptions.type && editableOptions.type == 'wysihtml5') {
+            if (editableOptions.skipNewLines) {
+              value(params.newValue.replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''));
+            }
+            else {
+              value(params.newValue.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''));
+            }
+          }
+          else {
+            value(params.newValue.replace(/<(?:.|\n)*?>/gm, '').replace(/\r?\n|\r/g, ' '));
+          }
         })
       }
-      ;
+
+      if (editableOptions.toggleElement) {
+        var $clickable = $element.parent().find(editableOptions.toggleElement);
+        if ($element.parents('.show-inactive-on-hover').length > 0) {
+          $clickable = $element.parents('.show-inactive-on-hover').find(editableOptions.toggleElement);
+        }
+        if ($clickable !== null) {
+          $clickable.on('click', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            $editable.editable('toggle');
+          });
+        }
+      }
 
       if (editableOptions.save) {
         $editable.on('save', editableOptions.save);

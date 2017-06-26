@@ -36,6 +36,7 @@ SECURITY_ENABLED = Config(
   default=False,
   type=coerce_bool)
 
+# Unused: deprecated by dashboard
 LATEST = Config(
   key="latest",
   help=_("Use latest Solr 5.2+ features."),

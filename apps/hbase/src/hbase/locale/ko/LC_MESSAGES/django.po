@@ -1,14 +1,14 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2012 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -38,58 +38,77 @@ msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "이름이 %s인 클러스터가 구성에 없습니다."
 
 #: src/hbase/api.py:118
-msgid "The kerberos principal name is missing from the hbase-site.xml configuration file."
+msgid ""
+"The kerberos principal name is missing from the hbase-site.xml "
+"configuration file."
 msgstr "hbase-site.xml 구성 파일에 kerberos 원칙 이름이 누락되었습니다."
 
 #: src/hbase/conf.py:33
-msgid "Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security.Prefix hostname with https:// if using SSL and http mode with impersonation."
-msgstr "'(name|host:port)' 형식의 클러스터에 대한 쉼표로 구분된 HBase Thrift Server 목록입니다. 안전하게 전체 호스트 이름을 사용하십시오. 가장과 함께 SSL 및 http 모드를 사용하는 경우 호스트 이름에 접두사로 https://를 지정하십시오."
+msgid ""
+"Comma-separated list of HBase Thrift servers for clusters in the format "
+"of '(name|host:port)'. Use full hostname with security.Prefix hostname "
+"with https:// if using SSL and http mode with impersonation."
+msgstr ""
+"'(name|host:port)' 형식의 클러스터에 대한 쉼표로 구분된 HBase Thrift Server 목록입니다. 안전하게 "
+"전체 호스트 이름을 사용하십시오. 가장과 함께 SSL 및 http 모드를 사용하는 경우 호스트 이름에 접두사로 https://를 "
+"지정하십시오."
 
 #: src/hbase/conf.py:41
 msgid "Hard limit of rows or columns per row fetched before truncating."
 msgstr "자르기 전에 가져온 행당 행 또는 열 하드 제한입니다."
 
 #: src/hbase/conf.py:48
-msgid "'buffered' is the default of the HBase Thrift Server and supports security. 'framed' can be used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
-msgstr "'buffered'은 HBase Thrift Server의 기본값이며 보안을 지원합니다. 'framed'를 사용하여 응답을 생성할 수 있으며 Thrift의 비차단 서버와 함께 사용할 때 유용합니다."
+msgid ""
+"'buffered' is the default of the HBase Thrift Server and supports "
+"security. 'framed' can be used to chunk up responses, which is useful "
+"when used in conjunction with the nonblocking server in Thrift."
+msgstr ""
+"'buffered'은 HBase Thrift Server의 기본값이며 보안을 지원합니다. 'framed'를 사용하여 응답을 생성할 "
+"수 있으며 Thrift의 비차단 서버와 함께 사용할 때 유용합니다."
 
 #: src/hbase/conf.py:56
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "hive-site.xml이 위치한 HBase 구성 디렉토리입니다."
 
 #: src/hbase/conf.py:63
-msgid "Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties."
+msgid ""
+"Force Hue to use Http Thrift mode with doas impersonation, regarless of "
+"hbase-site.xml properties."
 msgstr "hbase-site.xml 속성에 상관없이 Hue에서 doas 가장과 함께 Http Thrift 모드를 사용합니다."
 
-#: src/hbase/views.py:135
+#: src/hbase/views.py:136
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/hbase/templates/app.mako:35
+#: src/hbase/templates/app.mako:36
+msgid "HBase icon"
+msgstr "HBase 아이콘"
+
+#: src/hbase/templates/app.mako:37
 msgid "HBase Browser"
 msgstr "HBase 브라우저"
 
-#: src/hbase/templates/app.mako:73
+#: src/hbase/templates/app.mako:74
 msgid "Refresh Row"
 msgstr "행 새로 고침"
 
-#: src/hbase/templates/app.mako:75
+#: src/hbase/templates/app.mako:76
 msgid "Delete Row"
 msgstr "행 삭제"
 
-#: src/hbase/templates/app.mako:79 src/hbase/templates/app.mako:274
+#: src/hbase/templates/app.mako:80 src/hbase/templates/app.mako:274
 msgid "Toggle Collapse Selected"
 msgstr "선택한 항목 축소 전환"
 
-#: src/hbase/templates/app.mako:80 src/hbase/templates/app.mako:275
+#: src/hbase/templates/app.mako:81 src/hbase/templates/app.mako:275
 msgid "Select All Visible"
 msgstr "모두 표시 선택"
 
-#: src/hbase/templates/app.mako:85
+#: src/hbase/templates/app.mako:86
 msgid "Add New Column/Cell"
 msgstr "새 열/셀 추가"
 
-#: src/hbase/templates/app.mako:98
+#: src/hbase/templates/app.mako:99
 msgid "Full Editor"
 msgstr "전체 편집기"
 
@@ -129,6 +148,12 @@ msgstr "삭제"
 msgid "New Table"
 msgstr "새 테이블"
 
+#: src/hbase/templates/app.mako:192 src/hbase/templates/app.mako:321
+#: src/hbase/templates/app.mako:344 src/hbase/templates/app.mako:369
+#: src/hbase/templates/app.mako:434
+msgid "Close"
+msgstr "닫기"
+
 #: src/hbase/templates/app.mako:193
 msgid "Create New Table"
 msgstr "새 테이블 생성"
@@ -147,7 +172,7 @@ msgstr "추가 열 패밀리 추가"
 
 #: src/hbase/templates/app.mako:203 src/hbase/templates/app.mako:334
 #: src/hbase/templates/app.mako:357 src/hbase/templates/app.mako:399
-#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:439
+#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:440
 msgid "Cancel"
 msgstr "취소"
 
@@ -172,8 +197,12 @@ msgid "Add a column property"
 msgstr "열 속성 추가"
 
 #: src/hbase/templates/app.mako:246
-msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
-msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
 
 #: src/hbase/templates/app.mako:256
 msgid "Autocomplete Suggestions:"
@@ -287,105 +316,102 @@ msgstr "저장"
 msgid "Revert"
 msgstr "되돌리기"
 
-#: src/hbase/templates/app.mako:440 src/hbase/templates/app.mako:458
+#: src/hbase/templates/app.mako:411
+msgid "Cell image"
+msgstr "셀 이미지"
+
+#: src/hbase/templates/app.mako:441 src/hbase/templates/app.mako:462
 msgid "Confirm"
 msgstr "확인"
 
-#: src/hbase/templates/app.mako:452
+#: src/hbase/templates/app.mako:456
 msgid "Confirm Delete"
 msgstr "삭제 확인"
 
-#: src/hbase/templates/app.mako:453
+#: src/hbase/templates/app.mako:457
 msgid "Delete row "
 msgstr "행 삭제 "
 
-#: src/hbase/templates/app.mako:454
+#: src/hbase/templates/app.mako:458
 msgid "? (This cannot be undone)"
 msgstr "?(이 작업은 실행 취소할 수 없음)"
 
-#: src/hbase/templates/app.mako:455
+#: src/hbase/templates/app.mako:459
 msgid "Are you sure you want to drop this column?"
 msgstr "이 열을 삭제하시겠습니까?"
 
-#: src/hbase/templates/app.mako:456
+#: src/hbase/templates/app.mako:460
 msgid "enable"
 msgstr "설정"
 
-#: src/hbase/templates/app.mako:457
+#: src/hbase/templates/app.mako:461
 msgid "disable"
 msgstr "해제"
 
-#: src/hbase/templates/app.mako:459
+#: src/hbase/templates/app.mako:463
 msgid "Are you sure you want to"
 msgstr "이 테이블을"
 
-#: src/hbase/templates/app.mako:460
+#: src/hbase/templates/app.mako:464
 msgid "this table?"
 msgstr "하시겠습니까?"
 
-#: src/hbase/templates/app.mako:461
+#: src/hbase/templates/app.mako:465
 msgid "End Query"
 msgstr "쿼리 종료"
 
-#: src/hbase/templates/app.mako:462
+#: src/hbase/templates/app.mako:466
 msgid "Prefix Scan"
 msgstr "접두사 검색"
 
-#: src/hbase/templates/app.mako:463
+#: src/hbase/templates/app.mako:467
 msgid "Start Scan"
 msgstr "검색 시작"
 
-#: src/hbase/templates/app.mako:464
+#: src/hbase/templates/app.mako:468
 msgid "Start Select Columns"
 msgstr "열 선택 시작"
 
-#: src/hbase/templates/app.mako:465
+#: src/hbase/templates/app.mako:469
 msgid "End Column/Family"
 msgstr "끝 열/패밀리"
 
-#: src/hbase/templates/app.mako:466
+#: src/hbase/templates/app.mako:470
 msgid "End Select Columns"
 msgstr "열 선택 끝"
 
-#: src/hbase/templates/app.mako:467
+#: src/hbase/templates/app.mako:471
 msgid "Start FilterString"
 msgstr "FilterString 시작"
 
-#: src/hbase/templates/app.mako:468
+#: src/hbase/templates/app.mako:472
 msgid "End FilterString"
 msgstr "FilterString 끝"
 
-#: src/hbase/templates/app.mako:469
+#: src/hbase/templates/app.mako:473
 msgid "Row Key Value"
 msgstr "행 키 값"
 
-#: src/hbase/templates/app.mako:470
+#: src/hbase/templates/app.mako:474
 msgid "Length of Scan or Row Key"
 msgstr "스캔 또는 행 키 길이"
 
-#: src/hbase/templates/app.mako:471
+#: src/hbase/templates/app.mako:475
 msgid "Column Family: Column Name"
 msgstr "열 패밀리: 열 이름"
 
-#: src/hbase/templates/app.mako:472
+#: src/hbase/templates/app.mako:476
 msgid "Rows starting with"
 msgstr "다음으로 시작하는 행"
 
-#: src/hbase/templates/app.mako:473
+#: src/hbase/templates/app.mako:477
 msgid "String"
 msgstr "문자열"
 
-#: src/hbase/templates/app.mako:474
+#: src/hbase/templates/app.mako:478
 msgid "Integer"
 msgstr "정수"
 
-#: src/hbase/templates/app.mako:475
+#: src/hbase/templates/app.mako:479
 msgid "Column Range"
 msgstr "열 범위"
-
-#~ msgid "There are no tables matching the search criteria."
-#~ msgstr "검색 기준과 일치하는 테이블이 없습니다."
-
-#~ msgid "OK"
-#~ msgstr "확인"
-

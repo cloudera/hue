@@ -44,3 +44,11 @@ SHOW_UPLOAD_BUTTON = Config(
   help=_("whether to show the upload button in hdfs file browser."),
   type=coerce_bool,
   default=True)
+
+
+ENABLE_EXTRACT_UPLOADED_ARCHIVE = Config(
+  key="enable_extract_uploaded_archive",
+  help=_("Flag to enable the extraction of a uploaded archive in HDFS."),
+  type=bool,
+  default=False
+)

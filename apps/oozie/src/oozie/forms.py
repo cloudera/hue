@@ -54,7 +54,8 @@ class ParameterForm(forms.Form):
       'hue-id-b',
       'security_enabled',
       'oozie.wf.rerun.failnodes',
-      'dryrun'
+      'dryrun',
+      'send_email'
   )
 
   RERUN_HIDE_PARAMETERS = (
@@ -450,9 +451,11 @@ _node_type_TO_FORM_CLS = {
 
 class RerunForm(forms.Form):
   skip_nodes = forms.MultipleChoiceField(required=False)
+  return_json = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
   def __init__(self, *args, **kwargs):
     oozie_workflow = kwargs.pop('oozie_workflow')
+    return_json = kwargs.pop('return_json', None)
 
     # Build list of skip nodes
     decisions = filter(lambda node: node.type == 'switch', oozie_workflow.get_control_flow_actions())
@@ -469,18 +472,26 @@ class RerunForm(forms.Form):
     self.fields['skip_nodes'].choices = skip_nodes
     self.fields['skip_nodes'].initial = initial_skip_nodes
 
+    if return_json is not None:
+      self.fields['return_json'].initial = return_json
+
 
 class RerunCoordForm(forms.Form):
   refresh = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
   nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
   actions = forms.MultipleChoiceField(required=True)
+  return_json = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
   def __init__(self, *args, **kwargs):
     oozie_coordinator = kwargs.pop('oozie_coordinator')
+    return_json = kwargs.pop('return_json', None)
 
     super(RerunCoordForm, self).__init__(*args, **kwargs)
 
     self.fields['actions'].choices = [(action.actionNumber, action.title) for action in reversed(oozie_coordinator.get_working_actions())]
+
+    if return_json is not None:
+      self.fields['return_json'].initial = return_json
 
 
 class RerunBundleForm(forms.Form):

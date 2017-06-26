@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2013-08-26 11:01-0700\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -125,6 +125,10 @@ msgstr "버전"
 msgid "Go to cluster"
 msgstr "클러스터로 이동"
 
+#: src/zookeeper/templates/shared_components.mako:80
+msgid "Zookeeper icon"
+msgstr "ZooKeeper 아이콘"
+
 #: src/zookeeper/templates/shared_components.mako:81
 msgid "ZooKeeper Browser"
 msgstr "ZooKeeper 브라우저"
@@ -169,6 +173,10 @@ msgstr "텍스트로 편집"
 #: src/zookeeper/templates/tree.mako:87
 msgid "Edit as Base64"
 msgstr "Base64로 편집"
+
+#: src/zookeeper/templates/tree.mako:118
+msgid "Close"
+msgstr "닫기"
 
 #: src/zookeeper/templates/tree.mako:119
 msgid "Delete Znode?"
@@ -269,4 +277,3 @@ msgstr "대기 중인 동기화 수"
 #: src/zookeeper/templates/view.mako:149
 msgid "follower"
 msgstr "팔로워"
-

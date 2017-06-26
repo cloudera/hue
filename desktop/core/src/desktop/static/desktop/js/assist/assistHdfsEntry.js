@@ -16,7 +16,7 @@
 
 var AssistHdfsEntry = (function () {
 
-  var PAGE_SIZE = 50;
+  var PAGE_SIZE = 100;
 
   /**
    * @param {object} options
@@ -44,6 +44,20 @@ var AssistHdfsEntry = (function () {
     self.currentPage = 1;
     self.hasMorePages = true;
 
+    self.isFilterVisible = ko.observable(false);
+    self.editingSearch = ko.observable(false);
+    self.filter = ko.observable('').extend({ rateLimit: 400 });
+
+    self.isFilterVisible.subscribe(function (newValue) {
+      if (!newValue && self.filter()) {
+        self.filter('');
+      }
+    });
+
+    self.filter.subscribe(function () {
+      self.loadEntries();
+    });
+
     self.entries = ko.observableArray([]);
 
     self.loaded = false;
@@ -66,6 +80,12 @@ var AssistHdfsEntry = (function () {
   AssistHdfsEntry.prototype.dblClick = function () {
     var self = this;
     huePubSub.publish('assist.dblClickHdfsItem', self);
+  };
+
+  AssistHdfsEntry.prototype.toggleSearch = function () {
+    var self = this;
+    self.isFilterVisible(!self.isFilterVisible());
+    self.editingSearch(self.isFilterVisible());
   };
 
   AssistHdfsEntry.prototype.loadEntries = function(callback) {
@@ -106,10 +126,15 @@ var AssistHdfsEntry = (function () {
     self.apiHelper.fetchHdfsPath({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
+      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback
     })
+  };
+
+  AssistHdfsEntry.prototype.goHome = function () {
+    huePubSub.publish('assist.hdfs.go.home');
   };
 
   AssistHdfsEntry.prototype.loadDeep = function(folders, callback) {
@@ -120,14 +145,25 @@ var AssistHdfsEntry = (function () {
       return;
     }
 
+    var nextName = folders.shift();
+    var loadedPages = 0;
     var findNextAndLoadDeep = function () {
-      var nextName = folders.shift();
+
       var foundEntry = $.grep(self.entries(), function (entry) {
         return entry.definition.name === nextName && entry.definition.type === 'dir';
       });
+      var passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
+
       if (foundEntry.length === 1) {
         foundEntry[0].loadDeep(folders, callback);
-      } else if (! self.hasErrors()) {
+      } else if (!passedAlphabetically && self.hasMorePages && loadedPages < 50) {
+        loadedPages++;
+        self.fetchMore(function () {
+          findNextAndLoadDeep();
+        }, function () {
+          callback(self);
+        });
+      } else {
         callback(self);
       }
     };
@@ -151,9 +187,18 @@ var AssistHdfsEntry = (function () {
     return parts;
   };
 
-  AssistHdfsEntry.prototype.toggleOpen = function () {
+  AssistHdfsEntry.prototype.toggleOpen = function (data, event) {
     var self = this;
     if (self.definition.type === 'file') {
+      if (IS_HUE_4) {
+        if (event.ctrlKey || event.metaKey || event.which === 2) {
+          window.open('/hue' + self.definition.url, '_blank');
+        } else {
+          huePubSub.publish('open.link', self.definition.url);
+        }
+      } else {
+        window.open(self.definition.url, '_blank');
+      }
       return;
     }
     self.open(!self.open());
@@ -166,7 +211,7 @@ var AssistHdfsEntry = (function () {
     }
   };
 
-  AssistHdfsEntry.prototype.fetchMore = function () {
+  AssistHdfsEntry.prototype.fetchMore = function (successCallback, errorCallback) {
     var self = this;
     if (!self.hasMorePages || self.loadingMore()) {
       return;
@@ -177,6 +222,7 @@ var AssistHdfsEntry = (function () {
     self.apiHelper.fetchHdfsPath({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
+      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: function (data) {
         self.hasMorePages = data.page.next_page_number > self.currentPage;
@@ -191,9 +237,15 @@ var AssistHdfsEntry = (function () {
           })
         })));
         self.loadingMore(false);
+        if (successCallback) {
+          successCallback();
+        }
       },
       errorCallback: function () {
         self.hasErrors(true);
+        if (errorCallback) {
+          errorCallback();
+        }
       }
     });
   };

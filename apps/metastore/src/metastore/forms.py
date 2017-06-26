@@ -45,6 +45,7 @@ class LoadDataForm(forms.Form):
   """Form used for loading data into an existing table."""
   path = PathField(label=_t("Path"))
   overwrite = forms.BooleanField(required=False, initial=False, label=_t("Overwrite?"))
+  is_embeddable = forms.BooleanField(required=False, initial=False)
 
   def __init__(self, table_obj, *args, **kwargs):
     """

@@ -22,10 +22,12 @@ import time
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
+from desktop.conf import IS_HUE_4
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission
 from notebook.api import _historify
-from notebook.models import import_saved_beeswax_query
+from notebook.models import import_saved_beeswax_query, import_saved_java_job, import_saved_mapreduce_job, \
+  import_saved_pig_script, import_saved_shell_job
 
 
 LOG = logging.getLogger(__name__)
@@ -41,129 +43,206 @@ class DocumentConverter(object):
     # If user does not have a home directory, we need to create one and import any orphan documents to it
     self.home_dir = Document2.objects.create_user_directories(self.user)
     self.imported_tag = DocumentTag.objects.get_imported2_tag(user=self.user)
-    self.imported_docs = []
+    self.imported_doc_count = 0
+    self.failed_doc_ids = []
 
 
   def convert(self):
+    self._convert_saved_queries()
+
+    self._convert_query_histories()
+
+    self._convert_job_designs()
+
+    self._convert_pig_scripts()
+
+    # Add converted docs to root directory
+    if self.imported_doc_count:
+      LOG.info('Successfully imported %d documents for user: %s' % (self.imported_doc_count, self.user.username))
+
+    # Log docs that failed to import
+    if self.failed_doc_ids:
+      LOG.error('Failed to import %d document(s) for user: %s - %s' % (len(self.failed_doc_ids), self.user.username, self.failed_doc_ids))
+
+    # Set is_trashed field for old documents with is_trashed=None
+    docs = Document2.objects.filter(owner=self.user, is_trashed=None).exclude(is_history=True)
+    for doc in docs:
+      try:
+        if doc.path and doc.path != '/.Trash':
+          doc_last_modified = doc.last_modified
+          doc.is_trashed = doc.path.startswith('/.Trash')
+          doc.save()
+
+          # save() updates the last_modified to current time. Resetting it using update()
+          Document2.objects.filter(id=doc.id).update(last_modified=doc_last_modified)
+      except Exception, e:
+        LOG.exception("Failed to set is_trashed field with exception: %s" % e)
+
+
+  def _convert_saved_queries(self):
     # Convert SavedQuery documents
     try:
       from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
 
       docs = self._get_unconverted_docs(SavedQuery).filter(extra__in=[HQL, IMPALA, RDBMS])
       for doc in docs:
-        if doc.content_object:
-          notebook = import_saved_beeswax_query(doc.content_object)
-          data = notebook.get_data()
+        try:
+          if doc.content_object:
+            notebook = import_saved_beeswax_query(doc.content_object)
+            data = notebook.get_data()
 
-          if doc.is_historic():
-            data['isSaved'] = False
-
-          doc2 = self._create_doc2(
+            doc2 = self._create_doc2(
               document=doc,
               doctype=data['type'],
               name=data['name'],
               description=data['description'],
               data=notebook.get_json()
-          )
+            )
 
-          if doc.is_historic():
-            doc2.is_history = False
-
-          self.imported_docs.append(doc2)
+            self.imported_doc_count += 1
+        except Exception, e:
+          self.failed_doc_ids.append(doc.id)
+          LOG.exception('Failed to import SavedQuery document id: %d' % doc.id)
     except ImportError:
       LOG.warn('Cannot convert Saved Query documents: beeswax app is not installed')
 
+
+  def _convert_query_histories(self):
     # Convert SQL Query history documents
     try:
       from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
 
-      docs = self._get_unconverted_docs(SavedQuery, with_history=True).filter(extra__in=[HQL, IMPALA, RDBMS]).order_by('-last_modified')
+      docs = self._get_unconverted_docs(SavedQuery, only_history=True).filter(extra__in=[HQL, IMPALA, RDBMS]).order_by(
+        '-last_modified')
 
       for doc in docs:
-        if doc.content_object:
-          notebook = import_saved_beeswax_query(doc.content_object)
-          data = notebook.get_data()
+        try:
+          if doc.content_object:
+            notebook = import_saved_beeswax_query(doc.content_object)
+            data = notebook.get_data()
 
-          data['isSaved'] = False
-          data['snippets'][0]['lastExecuted'] = time.mktime(doc.last_modified.timetuple()) * 1000
+            data['isSaved'] = False
+            data['snippets'][0]['lastExecuted'] = time.mktime(doc.last_modified.timetuple()) * 1000
 
-          doc2 = _historify(data, self.user)
-          doc2.last_modified = doc.last_modified
-          doc2.save()
+            with transaction.atomic():
+              doc2 = _historify(data, self.user)
+              doc2.last_modified = doc.last_modified
 
-          self.imported_docs.append(doc2)
+              # save() updates the last_modified to current time. Resetting it using update()
+              doc2.save()
+              Document2.objects.filter(id=doc2.id).update(last_modified=doc.last_modified)
 
-          # Tag for not re-importing
-          Document.objects.link(
-            doc2,
-            owner=doc2.owner,
-            name=doc2.name,
-            description=doc2.description,
-            extra=doc.extra
-          )
+              self.imported_doc_count += 1
 
-          doc.add_tag(self.imported_tag)
-          doc.save()
+              doc.add_tag(self.imported_tag)
+              doc.save()
+        except Exception, e:
+          self.failed_doc_ids.append(doc.id)
+          LOG.exception('Failed to import history document id: %d' % doc.id)
     except ImportError, e:
-      LOG.warn('Cannot convert Saved Query documents: beeswax app is not installed')
+      LOG.warn('Cannot convert history documents: beeswax app is not installed')
 
 
+  def _convert_job_designs(self):
     # Convert Job Designer documents
     try:
       from oozie.models import Workflow
 
-      # TODO: Change this logic to actually embed the workflow data in Doc2 instead of linking to old job design
       docs = self._get_unconverted_docs(Workflow)
       for doc in docs:
-        if doc.content_object:
-          data = doc.content_object.data_dict
-          data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
-          doc2 = self._create_doc2(
-              document=doc,
-              doctype='link-workflow',
-              description=doc.description,
-              data=json.dumps(data)
-          )
-          self.imported_docs.append(doc2)
+        try:
+          if doc.content_object:
+            node = doc.content_object.start.get_child('to')
+            notebook = None
+
+            if IS_HUE_4.get():
+              if node.node_type == 'mapreduce':
+                notebook = import_saved_mapreduce_job(doc.content_object)
+              elif node.node_type == 'shell':
+                notebook = import_saved_shell_job(doc.content_object)
+              elif node.node_type == 'java':
+                notebook = import_saved_java_job(doc.content_object)
+
+            if notebook:
+              data = notebook.get_data()
+              doc2 = self._create_doc2(
+                document=doc,
+                doctype=data['type'],
+                name=doc.name,
+                description=data['description'],
+                data=notebook.get_json()
+              )
+            else:
+              data = doc.content_object.data_dict
+              data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
+              doc2 = self._create_doc2(
+                document=doc,
+                doctype='link-workflow',
+                name=doc.name,
+                description=doc.description,
+                data=json.dumps(data)
+              )
+            self.imported_doc_count += 1
+        except Exception, e:
+          self.failed_doc_ids.append(doc.id)
+          LOG.exception('Failed to import Job Designer document id: %d' % doc.id)
     except ImportError, e:
       LOG.warn('Cannot convert Job Designer documents: oozie app is not installed')
 
+
+  def _convert_pig_scripts(self):
     # Convert PigScript documents
     try:
       from pig.models import PigScript
 
-      # TODO: Change this logic to actually embed the pig data in Doc2 instead of linking to old pig script
       docs = self._get_unconverted_docs(PigScript)
+
       for doc in docs:
-        if doc.content_object:
-          data = doc.content_object.dict
-          data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
-          doc2 = self._create_doc2(
-              document=doc,
-              doctype='link-pigscript',
-              description=doc.description,
-              data=json.dumps(data)
-          )
-          self.imported_docs.append(doc2)
+        try:
+          if doc.content_object:
+            if IS_HUE_4.get():
+              notebook = import_saved_pig_script(doc.content_object)
+              data = notebook.get_data()
+
+              doc2 = self._create_doc2(
+                document=doc,
+                doctype=data['type'],
+                name=data['name'],
+                description=data['description'],
+                data=notebook.get_json()
+              )
+            else:
+              data = doc.content_object.dict
+              data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
+              doc2 = self._create_doc2(
+                document=doc,
+                doctype='link-pigscript',
+                name=data['name'],
+                description=doc.description,
+                data=json.dumps(data)
+              )
+
+            self.imported_doc_count += 1
+        except Exception, e:
+          self.failed_doc_ids.append(doc.id)
+          LOG.exception('Failed to import Pig document id: %d' % doc.id)
     except ImportError, e:
       LOG.warn('Cannot convert Pig documents: pig app is not installed')
 
-    # Add converted docs to root directory
-    if self.imported_docs:
-      LOG.info('Successfully imported %d documents' % len(self.imported_docs))
 
-
-  def _get_unconverted_docs(self, content_type, with_history=False):
+  def _get_unconverted_docs(self, content_type, only_history=False):
     docs = Document.objects.get_docs(self.user, content_type).filter(owner=self.user)
 
     tags = [
-      DocumentTag.objects.get_trash_tag(user=self.user), # No trashed docs
-      DocumentTag.objects.get_example_tag(user=self.user), # No examples
-      self.imported_tag # No already imported docs
+      DocumentTag.objects.get_trash_tag(user=self.user),  # No trashed docs
+      DocumentTag.objects.get_example_tag(user=self.user),  # No examples
+      self.imported_tag  # No already imported docs
     ]
 
-    if not with_history:
-      tags.append(DocumentTag.objects.get_history_tag(user=self.user)) # No history yet
+    if only_history:
+      docs = docs.filter(tags__in=[DocumentTag.objects.get_history_tag(user=self.user)])
+    else:  # Exclude history docs by default
+      tags.append(DocumentTag.objects.get_history_tag(user=self.user))
 
     return docs.exclude(tags__in=tags)
 
@@ -201,11 +280,14 @@ class DocumentConverter(object):
 
   def _create_doc2(self, document, doctype, name=None, description=None, data=None):
     try:
+      document2 = None
       with transaction.atomic():
+        name = name if name else document.name
+
         document2 = Document2.objects.create(
           owner=self.user,
           parent_directory=self._get_parent_directory(document),
-          name=name if name else document.name,
+          name=name,
           type=doctype,
           description=description,
           data=data
@@ -221,8 +303,15 @@ class DocumentConverter(object):
           extra=document.extra
         )
 
+        # save() updates the last_modified to current time. Resetting it using update()
+        Document2.objects.filter(id=document2.id).update(last_modified=document.last_modified)
+
         document.add_tag(self.imported_tag)
         document.save()
         return document2
     except Exception, e:
+      # Just to be sure we delete Doc2 object incase of exception.
+      # Possible when there are mixed InnoDB and MyISAM tables
+      if document2 and Document2.objects.filter(id=document2.id).exists():
+        document2.delete()
       raise PopupException(_("Failed to convert Document object: %s") % e)

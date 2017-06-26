@@ -15,27 +15,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
+from subprocess import CalledProcessError
+
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
-                         AUTH_PASSWORD_SCRIPT, default_ssl_validate
+from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, CLUSTER_ID as DEFAULT_CLUSTER_ID
 from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
 
 
+OPTIMIZER_AUTH_PASSWORD = None
+NAVIGATOR_AUTH_PASSWORD = None
+
+LOG = logging.getLogger(__name__)
+
+
 def get_auth_username():
   """Get from top level default from desktop"""
   return DEFAULT_AUTH_USERNAME.get()
-
-
-def get_auth_password():
-  """Get from script or backward compatibility"""
-  password = AUTH_PASSWORD_SCRIPT.get()
-  if password:
-    return password
-  return DEFAULT_AUTH_PASSWORD.get()
 
 
 def default_navigator_config_dir():
@@ -50,84 +51,147 @@ def default_navigator_url():
 
 
 def get_optimizer_url():
-  return OPTIMIZER.API_URL.get() and OPTIMIZER.API_URL.get().strip('/')
-
+  return OPTIMIZER.HOSTNAME.get() and OPTIMIZER.HOSTNAME.get().strip('/')
 
 def has_optimizer():
-  return bool(get_optimizer_url())
+  return bool(OPTIMIZER.AUTH_KEY_ID.get())
 
 
 def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
-
 def has_navigator(user):
-  return bool(get_navigator_url() and NAVIGATOR.AUTH_PASSWORD.get()) \
+  return bool(get_navigator_url() and get_navigator_auth_password()) \
       and (user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
+
+
+def get_security_default():
+  '''Get default security value from Hadoop'''
+  from hadoop import cluster # Avoid dependencies conflicts
+  cluster = cluster.get_cluster_conf_for_job_submission()
+
+  return cluster.SECURITY_ENABLED.get()
+
+
+def get_optimizer_password_script():
+  '''Get default password from secured file'''
+  global OPTIMIZER_AUTH_PASSWORD
+
+  if OPTIMIZER_AUTH_PASSWORD is None:
+    OPTIMIZER_AUTH_PASSWORD = OPTIMIZER.AUTH_KEY_SECRET_SCRIPT.get()
+
+  return OPTIMIZER_AUTH_PASSWORD
 
 
 OPTIMIZER = ConfigSection(
   key='optimizer',
   help=_t("""Configuration options for Optimizer API"""),
   members=dict(
-    API_URL=Config(
-      key='api_url',
-      help=_t('Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)'),
-      default=None),
+    HOSTNAME=Config(
+      key='hostname',
+      help=_t('Hostname to Optimizer API or compatible service.'),
+      default='navoptapi.us-west-1.optimizer.altus.cloudera.com'),
 
-    PRODUCT_NAME=Config(
-      key="product_name",
-      help=_t("The name of the product or group which will have API access to the emails associated with it."),
-      private=True,
+    AUTH_KEY_ID=Config(
+      key="auth_key_id",
+      help=_t("The name of the key of the service."),
+      private=False,
       default=None),
-    PRODUCT_SECRET=Config(
-      key="product_secret",
-      help=_t("A secret passphrase associated with the productName."),
+    AUTH_KEY_SECRET=Config(
+      key="auth_key_secret",
+      help=_t("The private part of the key associated with the auth_key."),
       private=True,
-      dynamic_default=get_auth_password),
-    PRODUCT_SECRET_SCRIPT=Config(
-      key="product_secret_script",
-      help=_t("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
+      dynamic_default=get_optimizer_password_script),
+    AUTH_KEY_SECRET_SCRIPT=Config(
+      key="auth_key_secret_script",
+      help=_t("Execute this script to produce the auth_key secret. This will be used when `auth_key_secret` is not set."),
       private=True,
       type=coerce_password_from_script,
       default=None),
-    PRODUCT_AUTH_SECRET=Config(
-      key="product_auth_secret",
-      help=_t("A secret passphrase associated with the productName."),
+    TENANT_ID=Config(
+      key="tenant_id",
+      help=_t("The name of the workload where queries are uploaded and optimizations are calculated from. Automatically guessed from auth_key and cluster_id if not specified."),
       private=True,
-      dynamic_default=get_auth_password),
-    PRODUCT_AUTH_SECRET_SCRIPT=Config(
-      key="product_auth_secret_script",
-      help=_t("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
-      private=True,
-      type=coerce_password_from_script,
       default=None),
+    CLUSTER_ID=Config(
+      key="cluster_id",
+      help=_t("The name of the cluster used to determine the tenant id when this one is not specified. Defaults to the cluster Id or 'default'."),
+      private=True,
+      default=DEFAULT_CLUSTER_ID.get()),
 
-    EMAIL=Config(
-      key="email",
-      help=_t("The email of the Optimizer account you want to associate with the Product."),
-      private=True,
-      dynamic_default=get_auth_username),
-    EMAIL_PASSWORD=Config(
-      key="email_password",
-      help=_t("The password associated with the Optimizer account you to associate with the Product."),
-      private=True,
-      dynamic_default=get_auth_password),
-    EMAIL_PASSWORD_SCRIPT=Config(
-      key="password_script",
-      help=_t("Execute this script to produce the email password. This will be used when `email_password` is not set."),
-      private=True,
-      type=coerce_password_from_script,
-      default=None),
-
-    SSL_CERT_CA_VERIFY = Config(
-      key="ssl_cert_ca_verify",
-      help=_t("In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority"),
-      dynamic_default=default_ssl_validate,
+    APPLY_SENTRY_PERMISSIONS = Config(
+      key="apply_sentry_permissions",
+      help=_t("Perform Sentry privilege filtering. Default to true automatically if the cluster is secure."),
+      dynamic_default=get_security_default,
       type=coerce_bool
+    ),
+    CACHEABLE_TTL=Config(
+      key='cacheable_ttl',
+      type=int,
+      help=_t('The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 to disable the cache.'),
+      default=3600000),
+    AUTO_UPLOAD_QUERIES = Config(
+      key="auto_upload_queries",
+      help=_t("Automatically upload queries after their execution in order to improve recommendations."),
+      default=True,
+      type=coerce_bool
+    ),
+    QUERY_HISTORY_UPLOAD_LIMIT = Config(
+      key="query_history_upload_limit",
+      help=_t("Allow admins to upload the last N executed queries in the quick start wizard. Use 0 to disable."),
+      default=10000,
+      type=int
     ),
   )
 )
+
+
+def get_navigator_auth_type():
+  return NAVIGATOR.AUTH_TYPE.get().lower()
+
+
+def get_navigator_auth_username():
+  '''Get the username to authenticate with.'''
+
+  if get_navigator_auth_type() == 'ldap':
+    return NAVIGATOR.AUTH_LDAP_USERNAME.get()
+  elif get_navigator_auth_type() == 'saml':
+    return NAVIGATOR.AUTH_SAML_USERNAME.get()
+  else:
+    return NAVIGATOR.AUTH_CM_USERNAME.get()
+
+def get_navigator_auth_password():
+  '''Get the password to authenticate with.'''
+  global NAVIGATOR_AUTH_PASSWORD
+
+  if NAVIGATOR_AUTH_PASSWORD is None:
+    try:
+      if get_navigator_auth_type() == 'ldap':
+        NAVIGATOR_AUTH_PASSWORD = NAVIGATOR.AUTH_LDAP_PASSWORD.get()
+      elif get_navigator_auth_type() == 'saml':
+        NAVIGATOR_AUTH_PASSWORD = NAVIGATOR.AUTH_SAML_PASSWORD.get()
+      else:
+        NAVIGATOR_AUTH_PASSWORD = NAVIGATOR.AUTH_CM_PASSWORD.get()
+    except CalledProcessError:
+      LOG.exception('Could not read Navigator password file, need to restart Hue to re-enable it.')
+
+  return NAVIGATOR_AUTH_PASSWORD
+
+def get_navigator_cm_password():
+  '''Get default password from secured file'''
+  return NAVIGATOR.AUTH_CM_PASSWORD_SCRIPT.get()
+
+def get_navigator_ldap_password():
+  '''Get default password from secured file'''
+  return NAVIGATOR.AUTH_LDAP_PASSWORD_SCRIPT.get()
+
+def get_navigator_saml_password():
+  '''Get default password from secured file'''
+  return NAVIGATOR.AUTH_SAML_PASSWORD_SCRIPT.get()
+
+
+def has_navigator_file_search(user):
+  return has_navigator(user) and NAVIGATOR.ENABLE_FILE_SEARCH.get()
 
 
 NAVIGATOR = ConfigSection(
@@ -138,25 +202,99 @@ NAVIGATOR = ConfigSection(
       key='api_url',
       help=_t('Base URL to Navigator API.'),
       dynamic_default=default_navigator_url),
-    AUTH_USERNAME=Config(
-      key="auth_username",
-      help=_t("Auth username of the hue user used for authentications."),
+    AUTH_TYPE=Config(
+      key="navmetadataserver_auth_type",
+      help=_t("Which authentication to use: CM or external via LDAP or SAML."),
+      default='CMDB'),
+
+    AUTH_CM_USERNAME=Config(
+      key="navmetadataserver_cmdb_user",
+      help=_t("Username of the CM user used for authentication."),
       dynamic_default=get_auth_username),
-    AUTH_PASSWORD=Config(
-      key="auth_password",
-      help=_t("LDAP/PAM/.. password of the hue user used for authentications."),
+    AUTH_CM_PASSWORD=Config(
+      key="navmetadataserver_cmdb_password",
+      help=_t("CM password of the user used for authentication."),
       private=True,
-      dynamic_default=get_auth_password),
-    AUTH_PASSWORD_SCRIPT=Config(
-      key="auth_password_script",
-      help=_t("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
+      dynamic_default=get_navigator_cm_password),
+    AUTH_CM_PASSWORD_SCRIPT=Config(
+      key="navmetadataserver_cmdb_password_script",
+      help=_t("Execute this script to produce the CM password. This will be used when the plain password is not set."),
       private=True,
       type=coerce_password_from_script,
       default=None),
+
+    AUTH_LDAP_USERNAME=Config(
+      key="navmetadataserver_ldap_user",
+      help=_t("Username of the LDAP user used for authentication."),
+      dynamic_default=get_auth_username),
+    AUTH_LDAP_PASSWORD=Config(
+      key="navmetadataserver_ldap_password",
+      help=_t("LDAP password of the user used for authentication."),
+      private=True,
+      dynamic_default=get_navigator_ldap_password),
+    AUTH_LDAP_PASSWORD_SCRIPT=Config(
+      key="navmetadataserver_ldap_password_script",
+      help=_t("Execute this script to produce the LDAP password. This will be used when the plain password is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
+    AUTH_SAML_USERNAME=Config(
+      key="navmetadataserver_saml_user",
+      help=_t("Username of the SAML user used for authentication."),
+      dynamic_default=get_auth_username),
+    AUTH_SAML_PASSWORD=Config(
+      key="navmetadataserver_saml_password",
+      help=_t("SAML password of the user used for authentication."),
+      private=True,
+      dynamic_default=get_navigator_saml_password),
+    AUTH_SAML_PASSWORD_SCRIPT=Config(
+      key="navmetadataserver_saml_password_script",
+      help=_t("Execute this script to produce the SAML password. This will be used when the plain password  is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
     CONF_DIR = Config(
       key='conf_dir',
       help=_t('Navigator configuration directory, where navigator.client.properties is located.'),
       dynamic_default=default_navigator_config_dir
+    ),
+    APPLY_SENTRY_PERMISSIONS = Config(
+      key="apply_sentry_permissions",
+      help=_t("Perform Sentry privilege filtering. Default to true automatically if the cluster is secure."),
+      dynamic_default=get_security_default,
+      type=coerce_bool
+    ),
+    FETCH_SIZE_SEARCH = Config(
+      key="fetch_size_search",
+      help=_t("Max number of items to fetch in one call in object search."),
+      default=450,
+      type=int
+    ),
+    FETCH_SIZE_SEARCH_INTERACTIVE = Config(
+      key="fetch_size_search_interactive",
+      help=_t("Max number of items to fetch in one call in object search autocomplete."),
+      default=450,
+      type=int
+    ),
+
+    ENABLE_FILE_SEARCH = Config(
+      key="enable_file_search",
+      help=_t("Enable to search HDFS, S3 files."),
+      type=coerce_bool,
+      default=False
     )
   )
 )
+
+
+def test_metadata_configurations(user):
+  from libsentry.conf import is_enabled
+
+  result = []
+
+  if not is_enabled() and NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
+    result.append(("metadata", "Please enable Sentry when using metadata with Security."))
+
+  return result

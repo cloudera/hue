@@ -98,7 +98,6 @@ default:
 	@echo '  docs        : Build documentation'
 	@echo '  prod        : Generate a tar file for production distribution'
 	@echo '  locales     : Extract strings and update dictionary of each locale'
-	@echo '  theme       : Builds the Hue Bootstrap Theme'
 	@echo '  ace         : Builds the Ace Editor tool'
 # END DEV ONLY >>>>
 
@@ -222,17 +221,6 @@ locales:
 
 
 ###################################
-# Hue Bootstrap Theme
-###################################
-
-# <<<< DEV ONLY
-.PHONY: theme
-theme:
-	@cd tools/bootplus && make
-# END DEV ONLY >>>>
-
-
-###################################
 # Ace Editor
 ###################################
 
@@ -303,4 +291,10 @@ test-slow: java-test
 
 start-dev:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue runserver_plus
+
+devinstall:
+	npm run devinstall
+
+css:
+	npm run less
 # END DEV ONLY >>>>

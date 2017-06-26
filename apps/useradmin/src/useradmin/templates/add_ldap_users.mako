@@ -21,50 +21,73 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="layout.mako" />
-
+%if not is_embeddable:
 ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
+%endif
+
 ${ layout.menubar(section='users') }
 
-
-<div class="container-fluid">
+<div id="addLdapUsersComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>
 
-  <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
-    ${ csrf_token(request) | n,unicode }
-    <fieldset>
-          % for field in form.fields:
-                  % if form[field].is_hidden:
-                      ${ form[field] }
-                  % else:
-                      ${ layout.render_field(form[field]) }
-                  % endif
-          % endfor
-    </fieldset>
-    <br/>
-    <div class="form-actions">
-      % if username:
-        <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
-      % else:
-          <input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
+    <form id="syncForm" action="${ url('useradmin.views.add_ldap_users') }" method="POST" class="form form-horizontal" autocomplete="off">
+      ${ csrf_token(request) | n,unicode }
+      % if is_embeddable:
+        <input type="hidden" value="true" name="is_embeddable" />
       % endif
-      <a href="${url('useradmin.views.list_users')}" class="btn">${_('Cancel')}</a>
-    </div>
-  </form>
-</div>
+      <fieldset>
+        % for field in form.fields:
+          % if form[field].is_hidden:
+            ${ form[field] }
+          % else:
+            ${ layout.render_field(form[field]) }
+          % endif
+        % endfor
+      </fieldset>
+      <br/>
+      <div class="form-actions">
+        % if username:
+          <input type="submit" class="btn btn-primary disable-feedback" value="${_('Update user')}"/>
+        % else:
+          <input type="submit" class="btn btn-primary disable-feedback" value="${_('Add/Sync user')}"/>
+        % endif
+        <a href="${ url('useradmin.views.list_users') }" class="btn">${_('Cancel')}</a>
+      </div>
+    </form>
   </div>
+</div>
 
-<script type="text/javascript" charset="utf-8">
-  $(document).ready(function(){
-    $("#id_groups").jHueSelector({
-            selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
-            width:618,
-            height:240
-        });
+<script type="text/javascript">
+  $(document).ready(function () {
+    var $addLdapUsersComponents = $('#addLdapUsersComponents');
+    $addLdapUsersComponents.find("#id_groups").jHueSelector({
+      selectAllLabel: "${_('Select all')}",
+      searchPlaceholder: "${_('Search')}",
+      noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
+      width: 618,
+      height: 240
+    });
+    %if is_embeddable:
+    $addLdapUsersComponents.find('#syncForm').ajaxForm({
+      dataType:  'json',
+      success: function(data) {
+        if (data && data.status == -1) {
+          renderUseradminErrors(data.errors);
+        }
+        else if (data && data.status === 0) {
+          huePubSub.publish('open.link', '${ url('useradmin.views.list_users') }');
+          $.jHueNotify.info("${ _('User added/synced correctly') }");
+        }
+      }
+    });
+    %endif
   });
 </script>
 
+${layout.commons()}
+
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

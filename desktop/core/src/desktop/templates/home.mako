@@ -83,14 +83,14 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 </style>
 
-<div class="navbar navbar-inverse navbar-fixed-top nokids">
+<div class="navbar hue-title-bar nokids">
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="currentApp">
+          <li class="app-header">
             <a href="${ url('desktop.views.home') }">
-              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+              <img src="${ static('desktop/art/home.png') }" class="app-icon" alt="${ _('Home icon') }" />
               ${ _('My documents') }
             </a>
            </li>
@@ -99,9 +99,9 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
       % if use_new_home:
       <div class="nav-collapse pull-right">
         <ul class="nav">
-          <li class="currentApp">
+          <li class="app-header">
             <a href="${ url('desktop.views.home2') }">
-              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+              <img src="${ static('desktop/art/home.png') }" class="app-icon" alt="${ _('Home icon') }" />
               ${ _('New Home') }
             </a>
            </li>
@@ -112,7 +112,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
   </div>
 </div>
 
-<div id='documentList' class="container-fluid">
+<div id="homeComponents" class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
       <div class="sidebar-nav">
@@ -122,24 +122,24 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
               <a href="#" data-toggle="dropdown"><i class="fa fa-plus-circle"></i> ${_('New document')}</a>
               <ul class="dropdown-menu" role="menu">
                 % if 'beeswax' in apps:
-                  <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+                  <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
                 % endif
                 % if 'impala' in apps:
-                  <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+                  <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
                 % endif
                 % if 'pig' in apps:
-                  <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
+                  <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig Script')}</a></li>
                 % endif
                 % if 'spark' in apps:
-                  <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
+                  <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon" alt="${ _('Spark icon') }"/> ${_('Spark Job')}</a></li>
                 % endif
                 % if 'oozie' in apps:
                 <li class="dropdown-submenu">
-                  <a href="#"><img src="${ static(apps['oozie'].icon_path) }" class="app-icon"/> ${_('Oozie Scheduler')}</a>
+                  <a href="#"><img src="${ static(apps['oozie'].icon_path) }" class="app-icon" alt="${ _('Oozie icon') }"/> ${_('Oozie Scheduler')}</a>
                   <ul class="dropdown-menu">
-                    <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
-                    <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Coordinator')}</a></li>
-                    <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Bundle')}</a></li>
+                    <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
+                    <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Coordinator')}</a></li>
+                    <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle')}</a></li>
                   </ul>
                 </li>
                 % endif
@@ -183,7 +183,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
         <div class="card-body">
           <p>
-          <table id="documents" class="table table-striped table-condensed" data-bind="visible: documents().length > 0">
+          <table id="documents" class="table table-condensed" data-bind="visible: documents().length > 0">
             <thead>
               <tr>
                 <th style="width: 26px">&nbsp;</th>
@@ -226,27 +226,27 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
   <div id="documentMoveModal" class="modal fade hide">
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Move to a project')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Move to a project')}</h2>
     </div>
     <div class="modal-body">
-        <p>
-          ${_('Select the project you want to move this document to')}
-          <ul class="unstyled">
-            <!-- ko foreach: myTags -->
-              <li>
-                <a href="javascript:void(0)" style="padding-left: 4px" data-bind="click: moveDocFinal">
-                  <i class="fa fa-tag"></i> <span data-bind="text: name"></span>
-                </a>
-              </li>
-            <!-- /ko -->
-          </ul>
-        </p>
+      <p>
+        ${_('Select the project you want to move this document to')}
+        <ul class="unstyled">
+          <!-- ko foreach: myTags -->
+            <li>
+              <a href="javascript:void(0)" style="padding-left: 4px" data-bind="click: moveDocFinal">
+                <i class="fa fa-tag"></i> <span data-bind="text: name"></span>
+              </a>
+            </li>
+          <!-- /ko -->
+        </ul>
+      </p>
     </div>
     <div class="modal-footer">
-        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+      <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
     </div>
-</div>
+  </div>
 
 </div>
 
@@ -275,7 +275,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 <script type="text/html" id="document-template">
   <tr>
-    <td style="width: 26px"><img data-bind="attr: { src: icon }" class="app-icon"></td>
+    <td style="width: 26px"><img data-bind="attr: { src: icon }" class="app-icon" alt="${ _('Document icon') }"></td>
     <td><a data-bind="attr: { href: url }, html: name"></a></td>
     <td data-bind="html: description"></td>
     <td data-bind="text: lastModified"></td>
@@ -300,8 +300,8 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 <div id="addTagModal" class="modal hide fade">
   <form class="form-inline form-padding-fix" onsubmit="javascript:{return false;}">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>${_('Create project')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Create project')}</h2>
     </div>
     <div class="modal-body">
       <p>
@@ -321,27 +321,25 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 </div>
 
 <div id="removeTagModal" class="modal hide fade">
-    <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Confirm Delete')}</h3>
-    </div>
-    <div class="modal-body">
-        <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedTagForDelete().name"></span></strong>? ${_('All its documents will be moved to the default tag.')}</p>
-    </div>
-    <div class="modal-footer">
-        <a class="btn" data-dismiss="modal">${_('No')}</a>
-        <a id="tagRemoveBtn" class="pointer btn btn-danger disable-feedback">${_('Yes')}</a>
-    </div>
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Confirm Delete')}</h2>
+  </div>
+  <div class="modal-body">
+    <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedTagForDelete().name"></span></strong>? ${_('All its documents will be moved to the default tag.')}</p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a id="tagRemoveBtn" class="pointer btn btn-danger disable-feedback">${_('Yes')}</a>
+  </div>
 </div>
 
 ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/home.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var viewModel, shareViewModel, JSON_USERS_GROUPS;
 
   var JSON_TAGS = ${ json_tags | n,unicode };
@@ -349,7 +347,7 @@ ${ commonshare() | n,unicode }
 
   $(document).ready(function () {
     viewModel = new HomeViewModel(JSON_TAGS, JSON_DOCS);
-    ko.applyBindings(viewModel, $('#documentList')[0]);
+    ko.applyBindings(viewModel, $('#homeComponents')[0]);
 
     shareViewModel = initSharing("#documentShareModal", viewModel.updateDoc);
 
@@ -498,119 +496,5 @@ ${ commonshare() | n,unicode }
   }
 
 </script>
-
-
-<style type="text/css">
-  .tourSteps {
-    min-height: 150px;
-  }
-</style>
-
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-<script type="text/javascript" charset="utf-8">
-$(document).ready(function(){
-  var currentStep = "tourStep1";
-
-  routie({
-    "tourStep1":function () {
-      showStep("tourStep1");
-    },
-    "tourStep2":function () {
-      showStep("tourStep2");
-    },
-    "tourStep3":function () {
-      showStep("tourStep3");
-    }
-  });
-
-  function showStep(step) {
-    currentStep = step;
-
-    $("a.tourStep").parent().removeClass("active");
-    $("a.tourStep[href=#" + step + "]").parent().addClass("active");
-    if (step == "tourStep3") {
-      $("#tourLastStep").parent().addClass("active");
-    }
-    $(".tourStepDetails").hide();
-    $("#" + step).show();
-  }
-
-  if ($.totalStorage("jHueTourHideModal") == null || $.totalStorage("jHueTourHideModal") == false) {
-    $("#jHueTourModal").modal();
-    $.totalStorage("jHueTourHideModal", true);
-    $("#jHueTourModalChk").attr("checked", "checked");
-    $("#jHueTourModalChk").on("change", function () {
-      $.totalStorage("jHueTourHideModal", $(this).is(":checked"));
-    });
-    $("#jHueTourModalClose").on("click", function () {
-      $("#jHueTourFlag").click();
-      $("#jHueTourModal").modal("hide");
-    });
-  }
-});
-</script>
-
-  <div id="jHueTourModal" class="modal hide fade" tabindex="-1">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>${_('Did you know?')}</h3>
-    </div>
-    <div class="modal-body">
-     <div class="row-fluid">
-       <div id="properties" class="section">
-      <ul class="nav nav-tabs" style="margin-bottom: 0">
-        <li class="active"><a href="#tourStep1" class="tourStep">${ _('Step 1:') } ${ _('Add data') }</a></li>
-        <li><a href="#tourStep2" class="tourStep">${ _('Step 2:') }  ${ _('Query data') }</a></li>
-        <li><a id="tourLastStep" href="#tourStep3" class="tourStep">${ _('Step 3:') } ${_('Do more!') }</a></li>
-      </ul>
-    </div>
-
-    <div class="tourSteps">
-      <div id="tourStep1" class="tourStepDetails">
-        <div class="pull-left" style="color: #DDDDDD;font-size: 116px;margin: 10px; margin-right: 20px"><i class="fa fa-download"></i></div>
-        <div style="margin: 40px">
-          <p>
-            ${ _('With') }  <span class="badge badge-info"><i class="fa fa-file"></i> File Browser</span>
-            ${ _('and the apps in the') }  <span class="badge badge-info">Data Browsers <b class="caret"></b></span> ${ _('section, upload, view your data and create tables.') }
-          </p>
-          <p>
-            ${ _('Pre-installed samples are also already there.') }
-          </p>
-        </div>
-      </div>
-
-      <div id="tourStep2" class="tourStepDetails hide">
-          <div class="pull-left" style="color: #DDDDDD;font-size: 116px;margin: 10px; margin-right: 20px"><i class="fa fa-search"></i></div>
-          <div style="margin: 40px">
-            <p>
-              ${ _('Then query and visualize the data with the') } <span class="badge badge-info">Query Editors <b class="caret"></b></span>
-               ${ _('and') }  <span class="badge badge-info">Search <b class="caret"></b></span>
-            </p>
-          </div>
-      </div>
-
-      <div id="tourStep3" class="tourStepDetails hide">
-        <div class="pull-left" style="color: #DDDDDD;font-size: 116px;margin: 10px; margin-right: 20px"><i class="fa fa-flag-checkered"></i></div>
-        <div style="margin: 40px">
-          % if tours_and_tutorials:
-          <p>
-            ${ _('Tours were created to guide you around.') }
-            ${ _('You can see the list of tours by clicking on the checkered flag icon') } <span class="badge badge-info"><i class="fa fa-flag-checkered"></i></span>
-            ${ ('at the top right of this page.') }
-          </p>
-          % endif
-          <p>
-            ${ _('Additional documentation is available at') } <a href="http://learn.gethue.com">learn.gethue.com</a>.
-          </p>
-        </div>
-      </div>
-     </div>
-     </div>
-     <div class="modal-footer">
-       <label class="checkbox" style="float:left"><input id="jHueTourModalChk" type="checkbox" />${_('Do not show this dialog again')}</label>
-       <a id="jHueTourModalClose" href="#" class="btn btn-primary disable-feedback">${_('Got it, prof!')}</a>
-     </div>
-   </div>
 
 ${ commonfooter(request, messages) | n,unicode }

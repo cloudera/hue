@@ -39,7 +39,7 @@ UseStatement
 UseStatement_EDIT
  : AnyUse 'CURSOR'
    {
-     suggestDatabases();
+     parser.suggestDatabases();
    }
  ;
 

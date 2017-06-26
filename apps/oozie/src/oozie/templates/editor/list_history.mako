@@ -70,7 +70,7 @@ ${ layout.menubar(section='history') }
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function() {
     var oTable = $('#jobTable').dataTable( {
       "bLengthChange": false,

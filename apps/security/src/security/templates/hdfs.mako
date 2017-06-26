@@ -23,9 +23,13 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="tree" file="common_tree.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
-${ layout.menubar(section='hdfs') }
+%endif
 
+${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
+
+<span id="securityHdfsComponents">
 
 <script type="text/html" id="aclDisplay">
   <div data-bind="visible: status() != 'deleted'">
@@ -53,11 +57,11 @@ ${ layout.menubar(section='hdfs') }
     </label>
     <div style="margin-left: 6px">
       <div data-bind="visible: type() == 'user'">
-        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: name, type: 'user'}" style="width: 200px"></select>
+        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: name, type: 'user', vm: $root}" style="width: 200px"></select>
       </div>
 
       <div data-bind="visible: type() == 'group'">
-        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a group") }', update: name, type: 'group'}" style="width: 200px"></select>
+        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a group") }', update: name, type: 'group', vm: $root}" style="width: 200px"></select>
       </div>
 
       <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', visible: type() == 'mask' || type() == 'other'" placeholder="${ _('name ...') }" style="width: 180px; margin-bottom: 0px; height: 26px; min-height: 26px"/>
@@ -97,7 +101,7 @@ ${ layout.menubar(section='hdfs') }
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" data-bind="value: $root.assist.path" autocomplete="off" />
-                  <a data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
+                  <a data-bind="hueLink: '/filebrowser/view=' + $root.assist.path(), attr: {target: IS_HUE_4 ? 'self' : 'blank'}" title="${ _('Open in File Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
@@ -112,7 +116,7 @@ ${ layout.menubar(section='hdfs') }
                         <li data-bind="visible: $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') }</a></li>
                       </ul>
                     </div>
-                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user', vm: $root}" style="width: 120px"></select>
                     % endif
                   </div>
                   <div>
@@ -133,7 +137,7 @@ ${ layout.menubar(section='hdfs') }
                 </div>
               </div>
 
-              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
+              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender', component='hdfs') }
             </div>
             <div class="span4">
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
@@ -158,7 +162,7 @@ ${ layout.menubar(section='hdfs') }
 
                     <span data-bind="visible: ! $root.assist.showAclsAsText()">
                       <h4>${ _('Path') }</h4>
-                      <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }, text: $root.assist.path()" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a>
+                      <a class="force-word-break" data-bind="hueLink: '/filebrowser/view=' + $root.assist.path(), text: $root.assist.path(), attr: {target: IS_HUE_4 ? 'self' : 'blank'}" title="${ _('Open in File Browser') }" rel="tooltip"></a>
 
                       <h4>${ _('User/Group') }</h4>
                       <i class="fa fa-user" style="color: #999999" title="${_('User')}"></i> <span title="${_('User')}" data-bind="text: $root.assist.owner"></span>&nbsp;
@@ -189,7 +193,7 @@ ${ layout.menubar(section='hdfs') }
                     </span>
                   </div>
                 </div>
-                <div class="loading-popover center" data-bind="visible: $root.assist.isLoadingAcls()"><i class="fa fa-spinner fa-spin fa-5x"></i></div>
+                <div class="loading-popover center" data-bind="visible: $root.assist.isLoadingAcls()"><i class="fa fa-spinner fa-spin fa-5x muted"></i></div>
             </div>
           </div>
           </div>
@@ -200,8 +204,8 @@ ${ layout.menubar(section='hdfs') }
 
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Select one operation') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Select one operation')}</h2>
   </div>
   <div class="modal-body" style="overflow-x: hidden">
 
@@ -231,7 +235,7 @@ ${ layout.menubar(section='hdfs') }
       <div class="span4">
         <h4>${ _('to apply to the selection') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
-          <li><a class="force-word-break" data-bind="attr: { href: '/filebrowser/view=' + path }, text: path" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
+          <li><a class="force-word-break" data-bind="hueLink: '/filebrowser/view=' + path, text: path, attr: {target: IS_HUE_4 ? 'self' : 'blank'}" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
         </ul>
       </div>
     </div>
@@ -277,110 +281,118 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 <%def name="aclBitPullRight()">
-  <div class="pull-right rwx" data-bind="style: { color: aclBit() ? '#338bb8': '#999999'}">
+  <div class="pull-right rwx" data-bind="style: { color: aclBit() ? '#0B7FAD': '#999999'}">
     <span data-bind="text: rwx"></span>
   </div>
   <div class="pull-right">
-    <i class="fa fa-shield" data-bind="visible: aclBit()" style="color: #338bb8" title="${ _('Has some ACLs') }"></i>
+    <i class="fa fa-shield" data-bind="visible: aclBit()" style="color: #0B7FAD" title="${ _('Has some ACLs') }"></i>
   </div>
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore', strikedProperty='striked', itemChecked='isChecked') }
+${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore', strikedProperty='striked', itemChecked='isChecked', component='hdfs') }
 
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('security/js/hdfs.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
+  (function () {
+    var viewModel = new HdfsViewModel(${ initial | n,unicode });
+    ko.cleanNode($('#securityHdfsComponents')[0]);
+    ko.applyBindings(viewModel, $('#securityHdfsComponents')[0]);
 
-  var viewModel = new HdfsViewModel(${ initial | n,unicode });
-  ko.applyBindings(viewModel);
+    $(document).ready(function () {
 
-  $(document).ready(function () {
+      $(document).on("loadedUsers", function(){
+        $(".user-list").select2("val", viewModel.doAs());
+      });
 
-    $(document).on("loaded.users", function(){
-      $(".user-list").select2("val", viewModel.doAs());
-    });
-
-    var _initialPath = "/";
-    if (window.location.hash != "") {
-      _initialPath = window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-    }
-    viewModel.init(_initialPath);
-
-    $("#path").jHueHdfsAutocomplete({
-      home: viewModel.assist.path(),
-      skipKeydownEvents: true,
-      onPathChange: function (path) {
-        viewModel.assist.path(path);
-      },
-      onEnter: function (el) {
-        viewModel.assist.path(el.val());
-      },
-      smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"
-    });
-
-    function resizeComponents () {
-      $("#path").width($(".tree-toolbar").width() - 64);
-      $("#expandableTree").height($(window).height() - 260);
-      $(".acl-panel-content").height($(window).height() - 260);
-    }
-
-    resizeComponents();
-
-    $(document).on("rendered.tree", function() {
-      var _path = viewModel.assist.path();
-      if (_path[_path.length-1] == "/"){
-        _path = _path.substr(0, _path.length - 1);
+      var _initialPath = "/";
+      if (window.location.hash != "") {
+        _initialPath = window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
       }
-      window.setTimeout(function(){
-        if ($("a.anchor[href^='"+_path+"']").length > 0){
-          $("#expandableTree").animate({
-            scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4)+"px"
-          }, 200);
+      viewModel.init(_initialPath);
+
+      $("#path").jHueHdfsAutocomplete({
+        home: viewModel.assist.path(),
+        skipKeydownEvents: true,
+        onPathChange: function (path) {
+          viewModel.assist.path(path);
+        },
+        onEnter: function (el) {
+          viewModel.assist.path(el.val());
+        },
+        smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"
+      });
+
+      function resizeComponents () {
+        $("#path").width($(".tree-toolbar").width() - 64);
+        $("#expandableTree").height($(window).height() - 260);
+        $(".acl-panel-content").height($(window).height() - 260);
+      }
+
+      resizeComponents();
+
+      $(document).on("renderedTree", function() {
+        var _path = viewModel.assist.path();
+        if (_path[_path.length-1] == "/"){
+          _path = _path.substr(0, _path.length - 1);
         }
-      }, 200)
+        window.setTimeout(function(){
+          if ($("a.anchor[href^='"+_path+"']").length > 0){
+            $("#expandableTree").animate({
+              scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4)+"px"
+            }, 200);
+          }
+        }, 200)
+      });
+
+      $(document).on("updatedAcls", function() {
+        $(document).trigger("info", "${ _('The selected ACLs have been successfully updated.') }");
+      });
+
+      $(document).on("addedBulkAcls", function() {
+        $(document).trigger("info", "${ _('The current ACLs have been successfully added to the checked paths.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      $(document).on("deletedBulkAcls", function() {
+        $(document).trigger("info", "${ _('All the ACLs have been successfully removed from the checked paths.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      $(document).on("syncdBulkAcls", function() {
+        $(document).trigger("info", "${ _('All the ACLs for the checked items have been replaced with the current selection.') }");
+        $("#bulkActionsModal").modal("hide");
+      });
+
+      var _resizeTimeout = -1;
+      $(window).resize(function(){
+        window.clearTimeout(_resizeTimeout);
+        _resizeTimeout = window.setTimeout(resizeComponents, 100);
+      });
+
+      window.onhashchange = function() {
+        if (window.location.pathname.indexOf('/security/hdfs') > -1) {
+          viewModel.assist.path(window.location.hash.substr(1));
+        }
+      };
+
+      $("#bulkActionsModal").modal({
+        show: false
+      });
+
+      huePubSub.subscribe('app.gained.focus', function (app) {
+        if (app === 'security_hdfs') {
+          window.location.hash = viewModel.lastHash;
+        }
+      }, 'security_hdfs');
+
     });
-
-    $(document).on("updated.acls", function() {
-      $(document).trigger("info", "${ _('The selected ACLs have been successfully updated.') }");
-    });
-
-    $(document).on("added.bulk.acls", function() {
-      $(document).trigger("info", "${ _('The current ACLs have been successfully added to the checked paths.') }");
-      $("#bulkActionsModal").modal("hide");
-    });
-
-    $(document).on("deleted.bulk.acls", function() {
-      $(document).trigger("info", "${ _('All the ACLs have been successfully removed from the checked paths.') }");
-      $("#bulkActionsModal").modal("hide");
-    });
-
-    $(document).on("syncd.bulk.acls", function() {
-      $(document).trigger("info", "${ _('All the ACLs for the checked items have been replaced with the current selection.') }");
-      $("#bulkActionsModal").modal("hide");
-    });
-
-    var _resizeTimeout = -1;
-    $(window).resize(function(){
-      window.clearTimeout(_resizeTimeout);
-      _resizeTimeout = window.setTimeout(resizeComponents, 100);
-    });
-
-    window.onpopstate = function() {
-      viewModel.assist.path(window.location.hash.substr(1));
-    };
-
-    $("#bulkActionsModal").modal({
-      show: false
-    });
-
-  });
+  })();
 </script>
+</span>
 
-
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

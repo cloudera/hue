@@ -1,13 +1,13 @@
 .medium-toolbar-arrow-under:after {
   top: 60px;
-  border-color: #338BB8 transparent transparent transparent; }
+  border-color: #0B7FAD transparent transparent transparent; }
 
 .medium-toolbar-arrow-over:before {
-  border-color: transparent transparent #338BB8 transparent; }
+  border-color: transparent transparent #0B7FAD transparent; }
 
 .medium-editor-toolbar {
   border: 1px solid #357ebd;
-  background-color: #338BB8;
+  background-color: #0B7FAD;
   border-radius: 4px;
   -webkit-transition: top 0.075s ease-out, left 0.075s ease-out;
           transition: top 0.075s ease-out, left 0.075s ease-out; }
@@ -36,12 +36,12 @@
     color: #fff; }
 
 .medium-editor-toolbar-form {
-  background: #338BB8;
+  background: #0B7FAD;
   color: #fff;
   border-radius: 4px; }
   .medium-editor-toolbar-form .medium-editor-toolbar-input {
     height: 60px;
-    background: #338BB8;
+    background: #0B7FAD;
     color: #fff; }
     .medium-editor-toolbar-form .medium-editor-toolbar-input::-webkit-input-placeholder {
       color: #fff;
@@ -61,7 +61,7 @@
     color: #fff; }
 
 .medium-editor-toolbar-anchor-preview {
-  background: #338BB8;
+  background: #0B7FAD;
   color: #fff;
   border-radius: 4px; }
 

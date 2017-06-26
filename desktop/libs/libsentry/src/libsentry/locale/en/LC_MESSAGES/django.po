@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2017-05-16 08:40-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,25 +17,58 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:26
-msgid "Host of the Impala Server."
+#: src/libsentry/api.py:44 src/libsentry/api2.py:44
+#, python-format
+msgid "Failed to connect to Sentry server %s, and Sentry HA is not enabled."
 msgstr ""
 
-#: src/impala/conf.py:31
-msgid "Port of the Impala Server."
+#: src/libsentry/api.py:53 src/libsentry/api.py:91 src/libsentry/api2.py:53
+#: src/libsentry/api2.py:91
+msgid "Failed to find an available Sentry server."
 msgstr ""
 
-#: src/impala/conf.py:37
+#: src/libsentry/api.py:57 src/libsentry/api2.py:57
+msgid "Encountered unexpected error in SentryApi."
+msgstr ""
+
+#: src/libsentry/conf.py:29
+msgid "Hostname or IP of server."
+msgstr ""
+
+#: src/libsentry/conf.py:36
+msgid "Port the sentry service is running on."
+msgstr ""
+
+#: src/libsentry/conf.py:43
+msgid "Sentry configuration directory, where sentry-site.xml is located."
+msgstr ""
+
+#: src/libsentry/conf.py:49
+msgid "Number of seconds when the privilege list of a user is cached."
+msgstr ""
+
+#: src/libsentry/sentry_ha.py:46 src/libsentry/tests.py:58
+msgid "Cannot create a Sentry client without server hostname and port."
+msgstr ""
+
+#: src/libsentry/sentry_ha.py:76
+#, python-format
 msgid ""
-"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
-"'hiveserver2'."
+"Encountered unexpected error while trying to find available Sentry "
+"client: %s"
 msgstr ""
 
-#: src/impala/conf.py:42
-msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
+#: src/libsentry/sentry_site.py:133
+msgid "No Sentry servers are configured."
 msgstr ""
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
+#: src/libsentry/sentry_site.py:152
+msgid "Error in retrieving Sentry server properties."
 msgstr ""
+
+#~ msgid "No Sentry servers are available."
+#~ msgstr ""
+
+#~ msgid "Error in retrieving Sentry server properties from Zookeeper."
+#~ msgstr ""
 

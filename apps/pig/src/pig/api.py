@@ -44,7 +44,7 @@ class OozieApi(object):
 
   WORKFLOW_NAME = 'pig-app-hue-script'
   LOG_START_PATTERN = '(Pig script \[(?:[\w.-]+)\] content:.+)'
-  LOG_END_PATTERN = '(<<< Invocation of Pig command completed <<<|<<< Invocation of Main class completed <<<)'
+  LOG_END_PATTERN = '(&lt;&lt;&lt; Invocation of Pig command completed &lt;&lt;&lt;|&lt;&lt;&lt; Invocation of Main class completed &lt;&lt;&lt;)'
   MAX_DASHBOARD_JOBS = 100
 
 

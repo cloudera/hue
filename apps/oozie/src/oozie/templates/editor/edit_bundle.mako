@@ -43,8 +43,7 @@ ${ layout.menubar(section='bundles') }
   }
 </style>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <div class="container-fluid">
@@ -146,7 +145,7 @@ ${ layout.menubar(section='bundles') }
 
           <div>
             % if bundled_coordinator_formset.forms:
-            <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#bundled_coordinator_missing">
+            <table class="table table-condensed" cellpadding="0" cellspacing="0" data-missing="#bundled_coordinator_missing">
               <thead>
                 <tr>
                   <th data-row-selector-exclude="true">${ _('Name') }</th>
@@ -268,9 +267,7 @@ ${ layout.menubar(section='bundles') }
     }
   </style>
 
-  <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     /**
      * Initial state is used to define when to display the "initial state" of a table.

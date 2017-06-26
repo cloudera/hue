@@ -885,14 +885,14 @@ var SqlAutocompleter = (function () {
         var optData = self.topTablesPerDb[item.database][table];
         item.docHTML = '<table style="margin:10px;">' +
             '<tr style="height: 20px;"><td style="width: 80px;">Table:</td><td style="width: 100px;">' + optData.name + '</td></tr>' +
-            '<tr style="height: 20px;"><td style="width: 80px;">Popularity:</td><td style="width: 100px;"><div class="progress" style="height: 10px; width: 100px;"><div class="bar" style="background-color: #338bb8; width: ' + optData.popularity + '%" ></div></div></td></tr>' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Popularity:</td><td style="width: 100px;"><div class="progress" style="height: 10px; width: 100px;"><div class="bar" style="background-color: #0B7FAD; width: ' + optData.popularity + '%" ></div></div></td></tr>' +
             '<tr style="height: 20px;"><td style="width: 80px;">Columns:</td><td style="width: 100px;">' + optData.column_count + '</td></tr>' +
             '<tr style="height: 20px;"><td style="width: 80px;">Fact:</td><td style="width: 100px;">' + optData.is_fact + '</td></tr>' +
             '</table>';
 
       }
     } else if (item.meta === 'column' && item.popularValues && !item.docHTML) {
-      item.docHTML = '<div style="width: 400px; height: 120px; overflow-y: auto;"><div style="margin:10px; font-size: 14px; margin-bottom: 8px;">Popular Values</div><table style="width: 380px; margin: 5px 10px 0 10px;" class="table table-striped"><tbody>';
+      item.docHTML = '<div style="width: 400px; height: 120px; overflow-y: auto;"><div style="margin:10px; font-size: 14px; margin-bottom: 8px;">Popular Values</div><table style="width: 380px; margin: 5px 10px 0 10px;" class="table"><tbody>';
       item.popularValues.forEach(function (value) {
         item.docHTML += '<tr><td><div style=" width: 360px; overflow-x: hidden; font-family: monospace; white-space: nowrap; text-overflow: ellipsis" title="' + value + '">' + value + '</div></td></tr>';
       });

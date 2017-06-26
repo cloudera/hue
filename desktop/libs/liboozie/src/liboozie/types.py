@@ -24,6 +24,7 @@ http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 
 import logging
 import re
+import time
 
 from cStringIO import StringIO
 from time import mktime
@@ -33,16 +34,19 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_warn
 
 import hadoop.confparse
-from liboozie.utils import parse_timestamp, format_time
+from liboozie.utils import parse_timestamp, format_time, catch_unicode_time
 
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 LOG = logging.getLogger(__name__)
 
+
 class Action(object):
 
   def __init__(self, json_dict):
+    self.json_dict = json_dict
+
     for attr in self._ATTRS:
       setattr(self, attr, json_dict.get(attr))
     self._fixup()
@@ -61,6 +65,9 @@ class Action(object):
 
   def __str__(self):
     return '%s - %s' % (self.type, self.name)
+
+  def to_json(self):
+    return self.json_dict.copy()
 
 
 class ControlFlowAction(Action):
@@ -397,6 +404,14 @@ class Job(object):
   @property
   def has_sla(self):
     return '<sla:info>' in self.definition
+
+  @property
+  def durationTime(self):
+    return self.endTime and self.startTime and ((time.mktime(self.endTime) - time.mktime(self.startTime)) * 1000) or 0
+
+  @property
+  def submissionTime(self):
+    return hasattr(self, 'createdTime') and self.createdTime and time.mktime(catch_unicode_time(self.createdTime)) or 0
 
 
 class Workflow(Job):

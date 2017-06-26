@@ -28,7 +28,8 @@
 
   var pluginName = "jHueScrollUp",
       defaults = {
-        threshold: 100 // it displays it after 100 px of scroll
+        threshold: 100, // it displays it after 100 px of scroll
+        scrollLeft: false
       };
 
   function Plugin(element, options) {
@@ -36,14 +37,19 @@
     this.options = $.extend({}, defaults, options);
     this._defaults = defaults;
     this._name = pluginName;
-    this.init();
+    if ($(element).attr('jHueScrollified') !== 'true') {
+      this.setupScrollUp();
+    }
+    if (this.options.scrollLeft) {
+      $(element).jHueScrollLeft(this.options.threshold);
+    }
   }
 
   Plugin.prototype.setOptions = function (options) {
     this.options = $.extend({}, defaults, options);
   };
 
-  Plugin.prototype.init = function () {
+  Plugin.prototype.setupScrollUp = function () {
     var _this = this,
       link = null;
 
@@ -52,7 +58,7 @@
       $(document).off("click", "#jHueScrollUpAnchor");
     }
     else {
-      link = $("<a/>").attr("id", "jHueScrollUpAnchor").addClass("hueAnchor").attr("href", "javascript:void(0)").html("<i class='fa fa-chevron-up'></i>").appendTo("body");
+      link = $("<a/>").attr("id", "jHueScrollUpAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-up'></i>").appendTo("body");
     }
 
     $(_this.element).attr("jHueScrollified", "true");
@@ -64,11 +70,41 @@
       setScrollBehavior($(_this.element), $(_this.element));
     }
 
+    function positionOtherAnchors() {
+      var upPosition = $('#jHueScrollUpAnchor').css('right').replace(/px/ig, '')*1;
+      var right = upPosition - 30;
+      if ($('#jHueScrollUpAnchor').is(':visible')){
+        right = upPosition;
+      }
+
+      if ($('#jHueScrollLeftAnchor').is(':visible')){
+        $('#jHueScrollLeftAnchor').css('right', (right + 50) + 'px');
+        right += 50;
+      }
+
+      $('.hue-datatable-search').css('right', (right + 50) + 'px');
+    }
+
+    huePubSub.subscribe('reposition.scroll.anchor.up', function(){
+      $('#jHueScrollUpAnchor').css('right', '20px');
+      if (!$(_this.element).is('body') && $(_this.element).is(':visible')) {
+        var adjustRight = $(window).width() - ($(_this.element).width() + $(_this.element).offset().left);
+        if (adjustRight > 0) {
+          $('#jHueScrollUpAnchor').css('right', adjustRight + 'px');
+        }
+      }
+      positionOtherAnchors();
+    });
+
+
     function setScrollBehavior(scrolled, scrollable) {
       scrolled.scroll(function () {
         if (scrolled.scrollTop() > _this.options.threshold) {
           if (link.is(":hidden")) {
-            link.fadeIn(200);
+            huePubSub.publish('reposition.scroll.anchor.up');
+            link.fadeIn(200, function(){
+              huePubSub.publish('reposition.scroll.anchor.up');
+            });
           }
           if ($(_this.element).data("lastScrollTop") == null || $(_this.element).data("lastScrollTop") < scrolled.scrollTop()) {
             $("#jHueScrollUpAnchor").data("caller", scrollable);
@@ -79,6 +115,9 @@
           checkForAllScrolls();
         }
       });
+      window.setTimeout(function() {
+        huePubSub.publish('reposition.scroll.anchor.up');
+      }, 0);
     }
 
     function checkForAllScrolls() {
@@ -98,7 +137,7 @@
         }
       });
       if (_allOk) {
-        link.fadeOut(200);
+        link.fadeOut(200, positionOtherAnchors);
         $("#jHueScrollUpAnchor").data("caller", null);
       }
     }

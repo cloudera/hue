@@ -130,7 +130,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     self.db = dbms.get(self.user, get_query_server_config())
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
-  def _verify_query_state(self, state):
+  def _verify_query_state(self, state, *extra_states):
     """
     Verify the state of the latest query.
     Return the id of that query
@@ -138,7 +138,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     resp = self.client.get('/beeswax/query_history')
     history = resp.context['page'].object_list[0]
     last_state = history.last_state
-    assert_equal(beeswax.models.QueryHistory.STATE[last_state], state)
+    assert_true(beeswax.models.QueryHistory.STATE[last_state] in (state,) + extra_states)
     return history.id
 
 
@@ -229,7 +229,7 @@ for x in sys.stdin:
 
     # Check that we report this query as "running" (this query should take a little while).
     if not is_hive_on_spark():
-      self._verify_query_state(beeswax.models.QueryHistory.STATE.running)
+      self._verify_query_state(beeswax.models.QueryHistory.STATE.running, beeswax.models.QueryHistory.STATE.available)
 
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     content = fetch_query_result_data(self.client, response)
@@ -833,7 +833,7 @@ for x in sys.stdin:
     assert_equal(sheet_data, csv_data)
 
     # Test max cell limit truncation
-    finish = conf.DOWNLOAD_CELL_LIMIT.set_for_testing(num_cols * 5)
+    finish = conf.DOWNLOAD_ROW_LIMIT.set_for_testing(5)
     try:
       hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
       query = hql_query(hql)
@@ -1761,7 +1761,7 @@ for x in sys.stdin:
     finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(1)
     try:
       table_name = 'test_partitions'
-      partition_spec = "(`baz`='baz_one' AND `boom`='boom_two')"
+      partition_spec = "(`baz`='baz_one' AND `boom`=12345)"
       table = self.db.get_table(database=self.db_name, table_name=table_name)
       hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
       assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec))
@@ -1772,7 +1772,7 @@ for x in sys.stdin:
     finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions'
-      partition_spec = "(`baz`='baz_one' AND `boom`='boom_two') OR (`baz`='baz_foo' AND `boom`='boom_bar')"
+      partition_spec = "(`baz`='baz_one' AND `boom`=12345) OR (`baz`='baz_foo' AND `boom`=67890)"
       table = self.db.get_table(database=self.db_name, table_name=table_name)
       hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
       assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec))
@@ -2413,6 +2413,7 @@ class MockHiveServerTable(HiveServerTable):
             {'comment': '\\n                  ', 'col_name': '', 'data_type': 'line.delim          '},
             {'comment': '\\t                  ', 'col_name': '', 'data_type': 'serialization.format'}
         ]
+    self.is_impala_only = False
 
 
 class MockHiveServerTableForPartitions(HiveServerTable):
@@ -2481,7 +2482,8 @@ class MockHiveServerTableForPartitions(HiveServerTable):
         {'comment': 'NULL', 'col_name': 'Sort Columns:       ', 'data_type': '[]                  '},
         {'comment': 'NULL', 'col_name': 'Storage Desc Params:', 'data_type': 'NULL'},
         {'comment': '1       ', 'col_name': '', 'data_type': 'serialization.format'},
-  ]
+      ]
+    self.is_impala_only = False
 
 
 

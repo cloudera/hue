@@ -1,0 +1,92 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+/*!
+ * Based on Hamburgers by Jonathan Suh
+ * @description Tasty CSS-animated hamburgers
+ * @author Jonathan Suh @jonsuh
+ * @site https://jonsuh.com/hamburgers
+ * @link https://github.com/jonsuh/hamburgers
+ */
+.hamburger {
+  padding: 18px 24px 0 0;
+  display: inline-block;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-transform: none;
+  background-color: transparent;
+  border: 0;
+  margin: 0;
+  overflow: visible;
+  .hue-ease-transition(opacity);
+}
+
+.hamburger:hover {
+  opacity: 0.7;
+}
+
+.hamburger-box {
+  width: 24px;
+  height: 18px;
+  display: inline-block;
+  position: relative;
+}
+
+.hamburger-inner {
+  display: block;
+  top: 50%;
+  margin-top: -4px;
+  width: 24px;
+  height: 1px;
+  position: absolute;
+}
+
+.hamburger-inner, .hamburger-inner::before, .hamburger-inner::after {
+  width: 24px;
+  height: 3px;
+  background-color: @hue-primary-color-dark;
+  border-radius: 4px;
+  position: absolute;
+  .hue-ease-transition(~"transform, -webkit-transform");
+}
+
+.hamburger-inner::before, .hamburger-inner::after {
+  content: "";
+  display: block;
+}
+
+.hamburger-inner::before {
+  top: -8px;
+}
+
+.hamburger-inner::after {
+  bottom: -8px;
+}
+
+.hamburger-hue.is-active .hamburger-inner::before {
+  .hue-transform(~"translate3d(-2px, 3px, 0) rotate(-40deg) scale(0.7, 1)");
+}
+
+.hamburger-hue.is-active .hamburger-inner {
+  background-color: transparent;
+}
+
+.hamburger-hue.is-active .hamburger-inner::after {
+  .hue-transform(~"translate3d(-2px, -3px, 0) rotate(40deg) scale(0.7, 1)");
+}

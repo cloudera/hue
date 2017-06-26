@@ -15,10 +15,12 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_raises, eq_
+from boto.s3.connection import Location
+from nose.tools import assert_equal, assert_raises, eq_
 
 from aws import s3
+from aws import conf
+from aws.conf import get_default_region
 
 
 def test_parse_uri():
@@ -68,3 +70,45 @@ def test_s3datetime_to_timestamp():
 
   assert_raises(AssertionError, f, 'Thu, 26 Feb 2015 20:42:07 PDT')
   assert_raises(AssertionError, f, '2015-02-26T20:42:07.040Z')
+
+
+def test_get_default_region():
+  # Verify that Hue can infer region from subdomain hosts
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': 's3.ap-northeast-2.amazonaws.com'}})
+  try:
+    assert_equal('ap-northeast-2', get_default_region())
+  finally:
+    if finish:
+      finish()
+
+  # Verify that Hue can infer region from hyphenated hosts
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': 's3-ap-south-1.amazonaws.com'}})
+  try:
+    assert_equal('ap-south-1', get_default_region())
+  finally:
+    if finish:
+      finish()
+
+  # Verify that Hue can infer region from hyphenated hosts
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': 's3.dualstack.ap-southeast-2.amazonaws.com'}})
+  try:
+    assert_equal('ap-southeast-2', get_default_region())
+  finally:
+    if finish:
+      finish()
+
+  # Verify that Hue falls back to the default if the region is not valid
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': 's3-external-1.amazonaws.com'}})
+  try:
+    assert_equal(Location.DEFAULT, get_default_region())
+  finally:
+    if finish:
+      finish()
+
+  # Verify that Hue uses the region if specified
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': '', 'region': 'ca-central-1'}})
+  try:
+    assert_equal('ca-central-1', get_default_region())
+  finally:
+    if finish:
+      finish()

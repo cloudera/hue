@@ -94,7 +94,7 @@ h3 {
 
 .search-bar h4 {
   font-size: 20px !important;
-  color: #338BB8 !important;
+  color: #0B7FAD !important;
   padding: 0 !important;
   margin-top: 4px !important;
   margin-left: 20px;
@@ -154,7 +154,7 @@ h1.emptyMessage {
 }
 
 .cloud-tmpl.selected {
-  border: 1px dashed #338BB8;
+  border: 1px dashed #0B7FAD;
 }
 
 .cloud-tmpl:hover, .cloud-tmpl.selected:hover  {

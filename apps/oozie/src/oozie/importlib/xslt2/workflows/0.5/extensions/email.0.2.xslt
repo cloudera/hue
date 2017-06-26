@@ -6,8 +6,7 @@
 
   ,"email": {
     "to": "<xsl:value-of select="*[local-name()='to']"/>",
-    "subject": "<xsl:value-of select="*[local-name()='subject']"/>",
-    "body": "<xsl:value-of select="*[local-name()='body']"/>"
+    "subject": "<xsl:value-of select="*[local-name()='subject']"/>"
    }
 
 </xsl:template>

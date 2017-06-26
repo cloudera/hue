@@ -59,13 +59,27 @@ def zkensemble():
     LOG.exception('failed to get solr url')
 
 
-
-ENABLE_NEW_INDEXER = Config(
-  key="enable_new_indexer",
-  help=_t("Flag to turn on the morphline based Solr indexer."),
+ENABLE_NEW_IMPORTER = Config(
+  key="enable_new_importer",
+  help=_t("Flag to turn on the new metadata importer."),
   type=bool,
   default=False
 )
+
+ENABLE_NEW_INDEXER = Config(
+  key="enable_new_indexer",
+  help=_t("Flag to turn on the new Solr indexer."),
+  type=bool,
+  default=False
+)
+
+CONFIG_INDEXER_LIBS_PATH = Config(
+  key="config_indexer_libs_path",
+  help=_t("oozie workspace template for indexing:"),
+  type=str,
+  default='/tmp/smart_indexer_lib'
+  )
+
 
 # Unused
 BATCH_INDEXER_PATH = Config(
@@ -91,13 +105,6 @@ CONFIG_INDEXING_TEMPLATES_PATH = Config(
   help=_t("oozie workspace template for indexing:"),
   type=str,
   default=os.path.join(os.path.dirname(__file__), '..', 'data', 'oozie_workspace')
-  )
-
-CONFIG_INDEXER_LIBS_PATH = Config(
-  key="config_indexer_libs_path",
-  help=_t("oozie workspace template for indexing:"),
-  type=str,
-  default='/tmp/smart_indexer_lib'
   )
 
 SOLRCTL_PATH = Config(

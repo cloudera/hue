@@ -53,12 +53,12 @@ DropStatement_EDIT
  | TruncateTableStatement_EDIT
  | 'DROP' 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
-     } else if (isImpala()) {
-       suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
      } else {
-       suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
+       parser.suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
      }
    }
  ;
@@ -73,21 +73,21 @@ DropDatabaseStatement_EDIT
  | 'DROP' DatabaseOrSchema OptionalIfExists 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestDatabases();
+     parser.suggestDatabases();
    }
  | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['CASCADE', 'RESTRICT']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    }
  | 'DROP' DatabaseOrSchema OptionalIfExists_EDIT RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
  | 'DROP' DatabaseOrSchema OptionalIfExists 'CURSOR' RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
    {
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    }
  ;
@@ -112,37 +112,37 @@ DropImpalaFunction_EDIT
  : 'DROP' '<impala>FUNCTION' OptionalIfExists 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestDatabases({ appendDot: true });
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists 'CURSOR'
    {
      if (!$4) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestDatabases({ appendDot: true });
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'DROP' '<impala>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList
    {
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' '<impala>FUNCTION' OptionalIfExists_EDIT
  | 'DROP' 'CURSOR' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList
    {
-     suggestKeywords(['AGGREGATE']);
+     parser.suggestKeywords(['AGGREGATE']);
    }
  | 'DROP' '<impala>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList_EDIT
  | 'DROP' '<impala>AGGREGATE' 'CURSOR'
    {
-     suggestKeywords(['FUNCTION']);
+     parser.suggestKeywords(['FUNCTION']);
    }
  | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier ParenthesizedImpalaArgumentList
    {
      if (!$4) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' '<impala>AGGREGATE' '<impala>FUNCTION' OptionalIfExists_EDIT
@@ -159,13 +159,13 @@ DropHiveFunction_EDIT
  : 'DROP' '<hive>FUNCTION' OptionalIfExists 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' '<hive>FUNCTION' OptionalIfExists 'CURSOR' SchemaQualifiedIdentifier
    {
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT
@@ -180,57 +180,57 @@ DropRoleStatement
 DropStatsStatement
  : 'DROP' '<impala>STATS' SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec
    {
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  ;
 
 DropStatsStatement_EDIT
  : 'DROP' '<impala>STATS' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'DROP' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT
  | 'DROP' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($4);
-     suggestKeywords(['INCREMENTAL']);
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['INCREMENTAL']);
    }
  | 'DROP' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec
    {
-     addTablePrimary($4);
-     suggestKeywords(['INCREMENTAL']);
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['INCREMENTAL']);
    }
  | 'DROP' '<impala>INCREMENTAL' 'CURSOR'
    {
-     suggestKeywords(['STATS']);
+     parser.suggestKeywords(['STATS']);
    }
  | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT
  | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT PartitionSpec
  | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier 'CURSOR'
    {
-     addTablePrimary($4);
-     suggestKeywords(['PARTITION']);
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['PARTITION']);
    }
  | 'DROP' '<impala>INCREMENTAL' '<impala>STATS' SchemaQualifiedTableIdentifier PartitionSpec_EDIT
    {
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  ;
 
 DropTableStatement
  : 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  ;
 
@@ -239,10 +239,10 @@ DropTableStatement_EDIT
  | 'DROP' AnyTable OptionalIfExists 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestTables({ onlyTables: true });
-     suggestDatabases({
+     parser.suggestTables({ onlyTables: true });
+     parser.suggestDatabases({
        appendDot: true
      });
    }
@@ -255,9 +255,9 @@ DropTableStatement_EDIT
  | 'DROP' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
  | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier 'CURSOR'
    {
-     addTablePrimary($4);
-     if (isHive()) {
-       suggestKeywords(['PURGE']);
+     parser.addTablePrimary($4);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['PURGE']);
      }
    }
  ;
@@ -265,24 +265,24 @@ DropTableStatement_EDIT
 DropIndexStatement
  : 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($6);
+     parser.addTablePrimary($6);
    }
  ;
 
 DropIndexStatement_EDIT
  : 'DROP' '<hive>INDEX' OptionalIfExists 'CURSOR'
    {
-     suggestKeywords(['IF EXISTS']);
+     parser.suggestKeywords(['IF EXISTS']);
    }
  | 'DROP' '<hive>INDEX' OptionalIfExists_EDIT
  | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'CURSOR'
    {
-     suggestKeywords(['ON']);
+     parser.suggestKeywords(['ON']);
    }
  | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier_EDIT
  ;
@@ -294,12 +294,12 @@ DropMacroStatement
 DropMacroStatement_EDIT
  : 'DROP' '<hive>TEMPORARY' 'CURSOR'
    {
-     suggestKeywords(['MACRO']);
+     parser.suggestKeywords(['MACRO']);
    }
  | 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists 'CURSOR'
    {
      if (!$4) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists_EDIT
@@ -308,7 +308,7 @@ DropMacroStatement_EDIT
 DropViewStatement
  : 'DROP' AnyView OptionalIfExists SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  ;
 
@@ -316,22 +316,22 @@ DropViewStatement_EDIT
  : 'DROP' AnyView OptionalIfExists 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestTables({ onlyViews: true });
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables({ onlyViews: true });
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'DROP' AnyView OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($5);
+     parser.addTablePrimary($5);
      if (!$3) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    }
  | 'DROP' AnyView OptionalIfExists_EDIT
  | 'DROP' AnyView OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  | 'DROP' AnyView OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
    {
@@ -344,61 +344,61 @@ DropViewStatement_EDIT
 TruncateTableStatement
  : 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  ;
 
 TruncateTableStatement_EDIT
  : 'TRUNCATE' 'CURSOR'
    {
-     suggestKeywords(['TABLE']);
+     parser.suggestKeywords(['TABLE']);
    }
  | 'TRUNCATE' AnyTable 'CURSOR' OptionalPartitionSpec
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
  | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
    {
-     addTablePrimary($3);
-     if (isHive() && !$4) {
-       suggestKeywords(['PARTITION']);
+     parser.addTablePrimary($3);
+     if (parser.isHive() && !$4) {
+       parser.suggestKeywords(['PARTITION']);
      }
    }
  | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  ;
 
 DeleteStatement
  : '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier OptionalWhereClause
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  ;
 
 DeleteStatement_EDIT
  : '<hive>DELETE' 'CURSOR'
    {
-     suggestKeywords(['FROM']);
+     parser.suggestKeywords(['FROM']);
    }
  | '<hive>DELETE' 'FROM' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier 'CURSOR' OptionalWhereClause
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
      if (!$5) {
-       suggestKeywords(['WHERE']);
+       parser.suggestKeywords(['WHERE']);
      }
    }
  | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier_EDIT OptionalWhereClause
  | '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier WhereClause_EDIT
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  ;

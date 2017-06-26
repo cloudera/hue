@@ -17,6 +17,7 @@
 
 import json
 import logging
+import re
 import uuid
 
 from django.utils.translation import ugettext as _
@@ -24,7 +25,8 @@ from django.utils.translation import ugettext as _
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
-from notebook.conf import get_interpreters
+from notebook.conf import get_ordered_interpreters
+from desktop.models import Cluster
 
 
 LOG = logging.getLogger(__name__)
@@ -34,7 +36,9 @@ class SessionExpired(Exception):
   pass
 
 class QueryExpired(Exception):
-  pass
+  def __init__(self, message=None):
+    super(QueryExpired, self).__init__()
+    self.message = message
 
 class AuthenticationRequired(Exception):
   pass
@@ -71,7 +75,8 @@ class Notebook(object):
           'description': '',
           'type': 'notebook',
           'isSaved': False,
-          'isManaged': False,
+          'isManaged': False, # Aka isTask
+          'skipHistorify': False,
           'sessions': [],
           'snippets': [],
       }
@@ -102,7 +107,7 @@ class Notebook(object):
        'status': 'running',
        'statement_raw': sql,
        'statement': sql,
-       'type': 'query-hive',
+       'type': 'hive',
        'properties': {
             'files': [],
             'functions': [],
@@ -110,7 +115,7 @@ class Notebook(object):
        },
        'database': database,
     }))
-    self._add_session(_data, 'query-hive')
+    self._add_session(_data, 'hive')
 
     self.data = json.dumps(_data)
 
@@ -144,6 +149,7 @@ class Notebook(object):
           u'arguments': arguments,
           u'archives': archives,
           u'env_var': env_var,
+          'command_path': shell_command,
         }
     }))
     self._add_session(_data, 'shell')
@@ -179,12 +185,14 @@ class Notebook(object):
     from notebook.api import _execute_notebook # Cyclic dependency
 
     notebook_data = self.get_data()
-    snippet = {'wasBatchExecuted': batch, 'type': 'oozie', 'id': notebook_data['snippets'][0]['id'], 'statement': ''}
+    snippet = notebook_data['snippets'][0]
+    snippet['wasBatchExecuted'] = batch
 
     return _execute_notebook(request, notebook_data, snippet)
 
 
 def get_api(request, snippet):
+  from notebook.connectors.dataeng import DataEngApi
   from notebook.connectors.hiveserver2 import HS2Api
   from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.rdbms import RdbmsApi
@@ -197,11 +205,16 @@ def get_api(request, snippet):
   if snippet.get('wasBatchExecuted'):
     return OozieApi(user=request.user, request=request)
 
-  interpreter = [interpreter for interpreter in get_interpreters(request.user) if interpreter['type'] == snippet['type']]
+  interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
   interpreter = interpreter[0]
   interface = interpreter['interface']
+
+  # Multi cluster
+  cluster = Cluster(request.user)
+  if cluster and cluster.get_type() == 'dataeng':
+    interface = 'dataeng'
 
   if interface == 'hiveserver2':
     return HS2Api(user=request.user, request=request)
@@ -215,6 +228,8 @@ def get_api(request, snippet):
     return TextApi(request.user)
   elif interface == 'rdbms':
     return RdbmsApi(request.user, interpreter=snippet['type'])
+  elif interface == 'dataeng':
+    return DataEngApi(user=request.user, request=request, cluster_name=cluster.get_interface())
   elif interface == 'jdbc':
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
@@ -256,7 +271,7 @@ class Api(object):
     pass
 
   def fetch_result_size(self, notebook, snippet):
-    pass
+    raise OperationNotSupported()
 
   def download(self, notebook, snippet, format):
     pass
@@ -282,3 +297,12 @@ class Api(object):
   def statement_risk(self, notebook, snippet): raise NotImplementedError()
 
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
+
+  def statement_similarity(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
+
+
+def _get_snippet_name(notebook, unique=False, table_format=False):
+  name = (('%(name)s' + ('%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
+  if table_format:
+    name = re.sub('[-|\s:]', '_', name)
+  return name

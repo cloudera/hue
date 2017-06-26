@@ -211,7 +211,6 @@
             beforeCursor: 'EXPLAIN DEPENDENCY SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             noErrors: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
@@ -278,7 +277,6 @@
             beforeCursor: 'EXPLAIN SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             noErrors: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
@@ -410,7 +408,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE', 'LOAD', 'REFRESH',
+              'DROP', 'EXPLAIN', 'GRANT', 'INSERT', 'INVALIDATE METADATA', 'LOAD', 'REFRESH',
               'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });
@@ -425,8 +423,8 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ALTER', 'ANALYZE', 'CREATE', 'DELETE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
+            suggestKeywords: ['ALTER', 'ANALYZE TABLE', 'CREATE', 'DELETE', 'DESCRIBE',
+              'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'GRANT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
               'RELOAD FUNCTION', 'RESET', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });
@@ -440,6 +438,7 @@
         containsKeywords: ['SELECT'],
         expectedResult: {
           locations: [
+            { type: 'statement', location: { first_line: 1, last_line: 2, first_column: 1, last_column: 25 } },
             { type: 'asterisk', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
             { type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }
           ],
@@ -455,6 +454,7 @@
         containsKeywords: ['SELECT'],
         expectedResult: {
           locations: [
+            { type: 'statement', location: { first_line: 1, last_line: 4, first_column: 1, last_column: 25 } },
             { type: 'asterisk', location: { first_line: 4, last_line: 4, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
             { type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }
           ],
@@ -465,12 +465,15 @@
 
     describe('partial removal', function () {
       it('should identify part lengths', function () {
-        var limitChars = [' ', '\n', '\t', '&', '~', '%', '!', '.', ',', '+', '-', '*', '/', '=', '<', '>', '(', ')', '[', ']', ';'];
+        var limitChars = [' ', '\n', '\t', '&', '~', '%', '!', '.', ',', '+', '-', '*', '/', '=', '<', '>', ')', '[', ']', ';'];
         expect(sql.identifyPartials('', '')).toEqual({left: 0, right: 0});
         expect(sql.identifyPartials('foo', '')).toEqual({left: 3, right: 0});
         expect(sql.identifyPartials(' foo', '')).toEqual({left: 3, right: 0});
         expect(sql.identifyPartials('asdf 1234', '')).toEqual({left: 4, right: 0});
         expect(sql.identifyPartials('foo', 'bar')).toEqual({left: 3, right: 3});
+        expect(sql.identifyPartials('fo', 'o()')).toEqual({left: 2, right: 3});
+        expect(sql.identifyPartials('fo', 'o(')).toEqual({left: 2, right: 2});
+        expect(sql.identifyPartials('fo', 'o(bla bla)')).toEqual({left: 2, right: 10});
         expect(sql.identifyPartials('foo ', '')).toEqual({left: 0, right: 0});
         expect(sql.identifyPartials('foo \'', '\'')).toEqual({left: 0, right: 0});
         expect(sql.identifyPartials('foo "', '"')).toEqual({left: 0, right: 0});

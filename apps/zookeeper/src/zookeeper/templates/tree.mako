@@ -115,8 +115,8 @@ ${ shared.footer() }
 
 <div id="removeModal" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${ _('Delete Znode?') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Delete Znode?') }</h2>
   </div>
   <div class="modal-body">
     <p class="question"></p>
@@ -127,7 +127,7 @@ ${ shared.footer() }
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
   %if znode.get('dataLength', 0) != 0:
     var txt = Base64.decode($("#textarea64").val());

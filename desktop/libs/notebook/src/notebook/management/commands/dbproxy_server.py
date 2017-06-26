@@ -19,6 +19,7 @@ import logging
 import os
 
 from django.core.management.base import NoArgsCommand
+from notebook.conf import DBPROXY_EXTRA_CLASSPATH
 
 
 LOG = logging.getLogger(__name__)
@@ -36,7 +37,10 @@ class Command(NoArgsCommand):
 
     cmd = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", "librdbms", "java", "bin", "dbproxy")
 
-    LOG.info("Executing %r (%r) (%r)" % (args, args, env))
+    if DBPROXY_EXTRA_CLASSPATH.get():
+      env['CLASSPATH'] = '%s:%s' % (DBPROXY_EXTRA_CLASSPATH.get(), env.get('CLASSPATH', ''))
+
+    LOG.info("Executing %r (%r) (%r)" % (cmd, args, env))
 
     # Use exec, so that this takes only one process.
     os.execvpe(cmd, args, env)

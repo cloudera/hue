@@ -16,13 +16,15 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.utils.translation import ugettext as _
 
 from liboozie.oozie_api import get_oozie
-from notebook.connectors.oozie_batch import OozieApi
+from liboozie.utils import format_time
 
-from jobbrowser.apis.base_api import Api
+from jobbrowser.apis.base_api import Api, MockDjangoRequest
+from jobbrowser.apis.workflow_api import _manage_oozie_job, _filter_oozie_jobs
 
 
 LOG = logging.getLogger(__name__)
@@ -30,36 +32,113 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
-  from oozie.views.dashboard import massaged_coordinator_actions_for_json
+  from oozie.views.dashboard import list_oozie_coordinator, get_oozie_job_log, massaged_oozie_jobs_for_json
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
 
 class ScheduleApi(Api):
 
-  def apps(self):
+  def apps(self, filters):
     oozie_api = get_oozie(self.user)
     kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
-    wf_list = oozie_api.get_coordinators(**kwargs)
 
-    return [{
-        'id': app.id,
-        'name': app.appName,
-        'status': app.status,
-        'type': 'coordinator',
-        'user': app.user,
-        'progress': 100,
-        'duration': 10 * 3600,
-        'submitted': 10 * 3600
-    } for app in wf_list.jobs if app.appName.startswith(OozieApi.SCHEDULE_JOB_PREFIX)]
+    _filter_oozie_jobs(self.user, filters, kwargs)
+
+    jobs = oozie_api.get_coordinators(**kwargs)
+
+    return {
+      'apps':[{
+        'id': app['id'],
+        'name': app['appName'],
+        'status': app['status'],
+        'apiStatus': self._api_status(app['status']),
+        'type': 'schedule',
+        'user': app['user'],
+        'progress': app['progress'],
+        'queue': app['group'],
+        'duration': app['durationInMillis'],
+        'submitted': app['startTimeInMillis'] * 1000
+      } for app in massaged_oozie_jobs_for_json(jobs.jobs, self.user)['jobs']],
+      'total': jobs.total
+    }
+
 
   def app(self, appid):
     oozie_api = get_oozie(self.user)
     coordinator = oozie_api.get_coordinator(jobid=appid)
 
-    return {
+    request = MockDjangoRequest(self.user, get=MockGet())
+    response = list_oozie_coordinator(request, job_id=appid)
+
+    common = {
         'id': coordinator.coordJobId,
         'name': coordinator.coordJobName,
         'status': coordinator.status,
-        'actions': massaged_coordinator_actions_for_json(coordinator, None)
+        'apiStatus': self._api_status(coordinator.status),
+        'progress': coordinator.get_progress(),
+        'type': 'schedule',
+        'submitted': format_time(coordinator.startTime),
+        'user': coordinator.user,
     }
+    common['properties'] = json.loads(response.content)
+    common['properties']['tasks'] = common['properties']['actions']
+    common['properties']['xml'] = ''
+    common['properties']['properties'] = ''
+    common['properties']['bundle_id'] = coordinator.conf_dict.get('oozie.bundle.id')
+    common['doc_url'] = common['properties'].get('doc_url')
+
+    return common
+
+
+  def action(self, app_ids, action):
+    return _manage_oozie_job(self.user, action, app_ids)
+
+
+  def logs(self, appid, app_type, log_name=None):
+    request = MockDjangoRequest(self.user)
+    data = get_oozie_job_log(request, job_id=appid)
+
+    return {'logs': json.loads(data.content)['log']}
+
+
+  def profile(self, appid, app_type, app_property, app_filters):
+    if app_property == 'xml':
+      oozie_api = get_oozie(self.user)
+      coordinator = oozie_api.get_coordinator(jobid=appid)
+      return {
+        'xml': coordinator.definition,
+      }
+    elif app_property == 'properties':
+      oozie_api = get_oozie(self.user)
+      coordinator = oozie_api.get_coordinator(jobid=appid)
+      return {
+        'properties': coordinator.conf_dict,
+      }
+    elif app_property == 'tasks':
+      coordinator = self.app(appid)
+      return coordinator['properties']['tasks']
+
+  def _api_status(self, status):
+    if status in ['PREP', 'RUNNING', 'RUNNINGWITHERROR']:
+      return 'RUNNING'
+    elif status in ['PREPSUSPENDED', 'SUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR']:
+      return 'PAUSED'
+    elif status == 'SUCCEEDED':
+      return 'SUCCEEDED'
+    else:
+      return 'FAILED' # DONEWITHERROR, KILLED, FAILED
+
+
+class MockGet():
+  def __ini__(self, statuses):
+    self.statuses = []
+
+  def get(self, prop, default=None):
+    if prop == 'format':
+      return 'json'
+    else:
+      return default
+
+  def getlist(self, prop):
+    return []

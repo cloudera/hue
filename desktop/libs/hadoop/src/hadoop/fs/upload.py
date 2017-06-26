@@ -29,7 +29,7 @@ import errno
 import logging
 import time
 
-from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
+from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException, SkipFile
 from django.utils.translation import ugettext as _
 
 import hadoop.cluster
@@ -43,7 +43,7 @@ LOG = logging.getLogger(__name__)
 UPLOAD_SUBDIR = 'hue-uploads'
 
 
-class HDFSerror(Exception):
+class HDFSerror(UploadFileException):
   pass
 
 
@@ -164,7 +164,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
 
     if not self._activated:
       if self.request.META.get('PATH_INFO').startswith('/filebrowser') and self.request.META.get('PATH_INFO') != '/filebrowser/upload/archive':
-        raise StopUpload()
+        raise SkipFile()
       return raw_data
 
     try:

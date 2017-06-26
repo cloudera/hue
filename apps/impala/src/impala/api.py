@@ -23,7 +23,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
-from django.views.decorators.http import require_POST
 
 from beeswax.api import error_handler
 from beeswax.models import Session

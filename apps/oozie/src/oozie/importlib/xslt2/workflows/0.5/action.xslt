@@ -28,8 +28,9 @@
 <xsl:import href="nodes/pig.xslt"/>
 <xsl:import href="nodes/streaming.xslt"/>
 <xsl:import href="nodes/subworkflow.xslt"/>
+<xsl:import href="nodes/generic.xslt"/>
 
-<xsl:template match="workflow5:action | workflow4:action" xmlns:workflow5="uri:oozie:workflow:0.5" xmlns:workflow4="uri:oozie:workflow:0.4">
+<xsl:template match="workflow5:action | workflow4:action | workflow3:action | workflow2:action | workflow1:action" xmlns:workflow5="uri:oozie:workflow:0.5" xmlns:workflow4="uri:oozie:workflow:0.4" xmlns:workflow3="uri:oozie:workflow:0.3" xmlns:workflow2="uri:oozie:workflow:0.2" xmlns:workflow1="uri:oozie:workflow:0.1">
   {
     "name": "<xsl:value-of select="@name"/>",
     "node_type": "<xsl:value-of select="name(*)"/>",

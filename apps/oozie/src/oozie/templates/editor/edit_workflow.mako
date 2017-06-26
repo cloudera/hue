@@ -404,8 +404,8 @@ ${ layout.menubar(section='workflows') }
 
 <div id="confirmation" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 class="message"></h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title message"></h2>
   </div>
   <div class="modal-body">
   </div>
@@ -417,8 +417,8 @@ ${ layout.menubar(section='workflows') }
 
 <div id="runUnsaved" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('The workflow has some unsaved changes')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('The workflow has some unsaved changes')}</h2>
   </div>
   <div class="modal-body">
     <p>
@@ -442,10 +442,8 @@ ${ layout.menubar(section='workflows') }
 <script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
 <script src="${ static('desktop/ext/js/codemirror-closetag.js') }"></script>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="${ static('oozie/css/workflow.css') }">
@@ -1028,7 +1026,7 @@ $(document).ready(function () {
     }
   });
 
-  window.setInterval(checkModelDirtiness, 500);
+  window.setInterval(checkModelDirtiness, 500, 'oozie_workflow');
   $('#clone-btn').on('click', function () {
     var _url = $(this).data('clone-url');
     $.post(_url, function (data) {

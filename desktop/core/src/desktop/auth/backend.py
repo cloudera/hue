@@ -35,6 +35,7 @@ import pam
 import django.contrib.auth.backends
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
+from django.forms import ValidationError
 from django.utils.importlib import import_module
 
 from django_auth_ldap.backend import LDAPBackend
@@ -45,6 +46,7 @@ from desktop import metrics
 from liboauth.metrics import oauth_authentication_time
 
 from useradmin import ldap_access
+from useradmin.forms import validate_username
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 from useradmin.views import import_ldap_users
 
@@ -357,13 +359,18 @@ class LdapBackend(object):
       def get_or_create_user(self, username, ldap_user):
         username = force_username_case(username)
 
-        if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
-          try:
-            return User.objects.get(username__iexact=username), False
-          except User.DoesNotExist:
+        try:
+          validate_username(username)
+
+          if desktop.conf.LDAP.IGNORE_USERNAME_CASE.get():
+            try:
+              return User.objects.get(username__iexact=username), False
+            except User.DoesNotExist:
+              return User.objects.get_or_create(username=username)
+          else:
             return User.objects.get_or_create(username=username)
-        else:
-          return User.objects.get_or_create(username=username)
+        except ValidationError, e:
+          LOG.exception("LDAP username is invalid: %s" % username)
 
     self._backend = _LDAPBackend()
 

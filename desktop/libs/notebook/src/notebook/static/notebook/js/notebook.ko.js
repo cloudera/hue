@@ -18,10 +18,10 @@ var EditorViewModel = (function() {
 
   var NOTEBOOK_MAPPING = {
     ignore: [
-      "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "selectedStatement", "user",
-      "availableDatabases", "hasProperties", "aceMode", "snippetImage", "errorLoadingQueries",
-      "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta", "cleanedNumericMeta",
-      "dependents", "canWrite", "queries", "avoidClosing"
+      'ace', 'aceMode', 'autocompleter', 'availableDatabases', 'availableSnippets', 'avoidClosing', 'canWrite',
+      'cleanedDateTimeMeta', 'cleanedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
+      'hasProperties', 'history', 'images', 'inFocus', 'queries', 'saveResultsModalVisible', 'selectedStatement',
+      'snippetImage', 'user', 'positionStatement'
     ]
   };
 
@@ -34,7 +34,7 @@ var EditorViewModel = (function() {
       .extend("throttle", 100);
     self.handle = ko.observable(typeof result.handle != "undefined" && result.handle != null ? result.handle : {});
     self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
-    self.size = ko.observable(typeof result.size != "undefined" && result.size != null ? result.size : {});
+    self.rows = ko.observable(typeof result.rows != "undefined" && result.rows != null ? result.rows : null);
     self.hasMore = ko.observable(typeof result.hasMore != "undefined" && result.hasMore != null ? result.hasMore : false);
     self.statement_id = ko.observable(typeof result.statement_id != "undefined" && result.statement_id != null ? result.statement_id : 0);
     self.statement_range = ko.observable(typeof result.statement_range != "undefined" && result.statement_range != null ? result.statement_range : {
@@ -48,6 +48,7 @@ var EditorViewModel = (function() {
       }
     });
     self.statements_count = ko.observable(typeof result.statements_count != "undefined" && result.statements_count != null ? result.statements_count : 1);
+    self.previous_statement_hash = ko.observable(typeof result.previous_statement_hash != "undefined" && result.previous_statement_hash != null ? result.previous_statement_hash : null);
     self.cleanedMeta = ko.computed(function () {
       return ko.utils.arrayFilter(self.meta(), function (item) {
         return item.name != ''
@@ -108,7 +109,7 @@ var EditorViewModel = (function() {
     });
 
     function isNumericColumn(type) {
-      return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+      return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1;
     }
 
     function isDateTimeColumn(type) {
@@ -166,13 +167,14 @@ var EditorViewModel = (function() {
       self.handle({ // Keep multiquery indexing
           has_more_statements: self.handle()['has_more_statements'],
           statement_id: self.handle()['statement_id'],
-          statements_count: self.handle()['statements_count']
+          statements_count: self.handle()['statements_count'],
+          previous_statement_hash: self.handle()['previous_statement_hash'],
       });
       self.startTime(new Date());
       self.endTime(new Date());
       self.explanation('');
       self.logLines = 0;
-      self.size({});
+      self.rows(null);
     };
   };
 
@@ -216,6 +218,10 @@ var EditorViewModel = (function() {
       properties['files'] = [];
     }
 
+    if (snippetType == 'sqoop1') {
+      properties['files'] = [];
+    }
+
     if (snippetType == 'jar' || snippetType == 'java') {
       properties['app_jar'] = '';
       properties['class'] = '';
@@ -227,6 +233,7 @@ var EditorViewModel = (function() {
     }
     else if (snippetType == 'shell') {
       properties['command_path'] = '';
+      properties['arguments'] = [];
       properties['env_var'] = [];
       properties['capture_output'] = true;
     }
@@ -260,9 +267,13 @@ var EditorViewModel = (function() {
     self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
     self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
     self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
+    self.type.subscribe(function(newVal) {
+      self.status('ready');
+    });
 
     self.isBatchable = ko.computed(function() {
       return self.type() == 'hive'
+          || self.type() == 'impala'
           || $.grep(vm.availableLanguages, function(language) { return language.type == self.type() && language.interface == 'oozie'; }).length > 0;
     });
 
@@ -270,8 +281,31 @@ var EditorViewModel = (function() {
     self.ace = ko.observable(null);
     self.errors = ko.observableArray([]);
 
+    self.aceErrorsHolder = ko.observableArray([]);
+    self.aceWarningsHolder = ko.observableArray([]);
+
+    self.aceErrors = ko.pureComputed(function(){
+      return self.showOptimizer() ? self.aceErrorsHolder() : [];
+    });
+    self.aceWarnings = ko.pureComputed(function(){
+      return self.showOptimizer() ? self.aceWarningsHolder() : [];
+    });
+
     self.availableSnippets = vm.availableSnippets();
     self.inFocus = ko.observable(false);
+
+    self.inFocus.subscribe(function (newValue) {
+      if (newValue) {
+        huePubSub.publish('active.snippet.type.changed', self.type());
+      }
+    });
+
+    // TODO: It should only publish if this belongs to the currently active app in Hue 4
+    huePubSub.subscribe('get.active.snippet.type', function () {
+      if (self.inFocus() || notebook.snippets().length === 1) {
+        huePubSub.publish('set.active.snippet.type', self.type());
+      }
+    }, vm.huePubSubId);
 
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;
@@ -312,11 +346,29 @@ var EditorViewModel = (function() {
       }
     };
 
-    huePubSub.subscribe('assist.db.refresh', function (type) {
-      if (self.type() == type) {
+    huePubSub.subscribe('assist.db.refresh', function (options) {
+      if (['hive', 'impala'].indexOf(self.type()) !== -1) {
         updateDatabases();
       }
-    });
+    }, vm.huePubSubId);
+
+    huePubSub.subscribe('save.snippet.to.file', function() {
+      var data = {
+        path: self.statementPath(),
+        contents: self.statement()
+      };
+      var options = {
+        successCallback: function(result) {
+          if (result && result.exists) {
+            $(document).trigger("info", result.path + ' saved successfully.');
+          } else {
+            self._ajaxError(result);
+          }
+        }
+      };
+      var apiHelper = ApiHelper.getInstance();
+      apiHelper.saveSnippetToFile(data, options);
+    }, vm.huePubSubId);
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
@@ -326,7 +378,7 @@ var EditorViewModel = (function() {
       contextData.tabId = 'context' + self.pinnedContextTabs().length;
       self.pinnedContextTabs.push(contextData);
       self.currentQueryTab(contextData.tabId);
-    });
+    }, vm.huePubSubId);
 
     self.removeContextTab = function (context) {
       if (context.tabId === self.currentQueryTab()) {
@@ -339,8 +391,8 @@ var EditorViewModel = (function() {
     self.loadingQueries = ko.observable(false);
 
     self.queriesHasErrors = ko.observable(false);
-    self.queriesCurrentPage = ko.observable(1);
-    self.queriesTotalPages = ko.observable(1);
+    self.queriesCurrentPage = ko.observable(vm.selectedNotebook() && vm.selectedNotebook().snippets().length > 0 ? vm.selectedNotebook().snippets()[0].queriesCurrentPage() : 1);
+    self.queriesTotalPages = ko.observable(vm.selectedNotebook() && vm.selectedNotebook().snippets().length > 0 ? vm.selectedNotebook().snippets()[0].queriesTotalPages() : 1);
     self.queries = ko.observableArray([]);
 
     self.queriesFilter = ko.observable('');
@@ -350,18 +402,19 @@ var EditorViewModel = (function() {
       self.fetchQueries();
     });
 
+    var lastFetchQueriesRequest = null;
+
     self.fetchQueries = function () {
+      self.getApiHelper().cancelActiveRequest(lastFetchQueriesRequest);
+
       var QUERIES_PER_PAGE = 50;
-      if (self.loadingQueries()) {
-        return;
-      }
       lastQueriesPage = self.queriesCurrentPage();
       self.loadingQueries(true);
       self.queriesHasErrors(false);
-      self.getApiHelper().searchDocuments({
+      lastFetchQueriesRequest = self.getApiHelper().searchDocuments({
         successCallback: function (result) {
           self.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
-          self.queries(result.documents);
+          self.queries(ko.mapping.fromJS(result.documents)());
           self.loadingQueries(false);
           self.queriesHasErrors(false);
         },
@@ -375,7 +428,7 @@ var EditorViewModel = (function() {
         query: self.queriesFilter(),
         include_trashed: false
       });
-    }
+    };
 
     var lastQueriesPage = 1;
     self.currentQueryTab.subscribe(function (newValue) {
@@ -403,21 +456,78 @@ var EditorViewModel = (function() {
     self.isSqlDialect.subscribe(updateDatabases);
     updateDatabases();
 
+    huePubSub.subscribeOnce('assist.source.set', function (source) {
+      if (source !== self.type()) {
+        huePubSub.publish('assist.set.source', self.type());
+      }
+    }, vm.huePubSubId);
+
+    huePubSub.publish('assist.get.source');
+
     var handleAssistSelection = function (databaseDef) {
       if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
         self.database(databaseDef.name);
       }
     };
 
-    huePubSub.subscribe("assist.database.set", handleAssistSelection);
-    huePubSub.subscribe("assist.database.selected", handleAssistSelection);
+    huePubSub.subscribe("assist.database.set", handleAssistSelection, vm.huePubSubId);
+    huePubSub.subscribe("assist.database.selected", handleAssistSelection, vm.huePubSubId);
 
     if (! self.database()) {
       huePubSub.publish("assist.get.database", self.type());
     }
 
+    self.statementType = ko.observable(typeof snippet.statementType != "undefined" && snippet.statementType != null ? snippet.statementType : 'text');
+    self.statementTypes = ko.observableArray(['text', 'file']); // Maybe computed later for Spark
+    if (! vm.editorMode()) {
+      self.statementTypes.push('document');
+    }
+    self.statementPath = ko.observable(typeof snippet.statementPath != "undefined" && snippet.statementPath != null ? snippet.statementPath : '');
+    self.statementPath.subscribe(function(newVal) {
+      self.getExternalStatement();
+    });
+    self.externalStatementLoaded = ko.observable(false);
+    self.getExternalStatement = function() {
+      self.externalStatementLoaded(false);
+      $.post("/notebook/api/get_external_statement", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
+        snippet: ko.mapping.toJSON(self.getContext())
+      }, function(data) {
+        if (data.status == 0) {
+          self.externalStatementLoaded(true);
+          self.statement_raw(data.statement);
+          self.ace().setValue(self.statement_raw(), 1);
+        } else {
+          self._ajaxError(data);
+        }
+      });
+    };
+    self.associatedDocumentLoading = ko.observable(true);
+    self.associatedDocument = ko.observable();
+    self.associatedDocumentUuid = ko.observable(typeof snippet.associatedDocumentUuid != "undefined" && snippet.associatedDocumentUuid != null ? snippet.associatedDocumentUuid : null);
+    self.associatedDocumentUuid.subscribe(function(val){
+      if (val !== ''){
+        self.getExternalStatement();
+      }
+      else {
+        self.statement_raw('');
+        self.ace().setValue('', 1);
+      }
+    });
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
+    self.positionStatement = ko.observable(null);
+
+    huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
+      if (self.ace() && self.ace().container.id === statementDetails.id) {
+        if (statementDetails.activeStatement) {
+          self.positionStatement(statementDetails.activeStatement);
+        } else {
+          self.positionStatement(null);
+        }
+      }
+    }, vm.huePubSubId);
+
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
     // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
     self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
@@ -455,16 +565,81 @@ var EditorViewModel = (function() {
     self.variables.subscribe(function (newValue) {
       $(document).trigger("updateResultHeaders", self);
     });
-    self.variableNames = ko.computed(function () {
-      var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
+    self.hasCurlyBracketParameters = ko.computed(function() {
+      return self.type() != 'pig';
+    });
+    self.getPigParameters = function() {
+      var params = {};
+      var variables = self.statement_raw().match(/([^\\]|^)\$[^\d'"](\w*)/g);
+      var declares = self.statement_raw().match(/%declare +([^ ])+/gi);
+      var defaults = self.statement_raw().match(/%default +([^;])+/gi);
+      var macro_defines = self.statement_raw().match(/define [^ ]+ *\(([^\)]*)\)/gi); // no multiline
+      var macro_returns = self.statement_raw().match(/returns +([^\{]*)/gi); // no multiline
 
-      var match, matches = [];
-      while (match = re.exec(self.statement_raw())) {
-        if (matches.indexOf(match[1]) == -1) {
-          matches.push(match[1]);
-        }
+      if (variables) {
+        $.each(variables, function(index, param) {
+          var p = param.substring(param.indexOf('$') + 1);
+          params[p] = '';
+        });
       }
-      return matches;
+      if (declares) {
+        $.each(declares, function(index, param) {
+          param = param.match(/(\w+)/g);
+          if (param && param.length >= 2) {
+            delete params[param[1]];
+          }
+        });
+      }
+      if (defaults) {
+        $.each(defaults, function(index, param) {
+          var line = param.match(/(\w+)/g);
+          if (line && line.length >= 2) {
+            var name = line[1];
+            params[name] = param.substring(param.indexOf(name) + name.length + 1);
+          }
+        });
+      }
+      if (macro_defines) {
+        $.each(macro_defines, function(index, params_line) {
+          var param_line = params_line.match(/(\w+)/g);
+          if (param_line && param_line.length > 2) {
+            $.each(param_line, function(index, param) {
+              if (index >= 2) { // Skips define NAME
+                delete params[param];
+              }
+            });
+          }
+        });
+      }
+      if (macro_returns) {
+        $.each(macro_returns, function(index, params_line) {
+          var param_line = params_line.match(/(\w+)/g);
+          if (param_line) {
+            $.each(param_line, function(index, param) {
+              if (index >= 1) { // Skip returns
+                delete params[param];
+              }
+            });
+          }
+        });
+      }
+
+      return params;
+    };
+    self.variableNames = ko.computed(function () {
+      if (self.type() == 'pig') {
+        return Object.keys(self.getPigParameters());
+      } else {
+        var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
+
+        var match, matches = [];
+        while (match = re.exec(self.statement_raw())) {
+          if (matches.indexOf(match[1]) == -1) {
+            matches.push(match[1]);
+          }
+        }
+        return matches;
+      }
     });
     self.variableNames.extend({ rateLimit: 150 });
     self.variableNames.subscribe(function (newVal) {
@@ -510,19 +685,12 @@ var EditorViewModel = (function() {
       }
     });
     self.statement = ko.computed(function () {
-      var statement = self.isSqlDialect() && self.selectedStatement() ? self.selectedStatement() : self.statement_raw();
+      var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
       $.each(self.variables(), function (index, variable) {
-        statement = statement.replace(RegExp("([^\\\\])?\\${" + variable.name() + "}", "g"), "$1" + variable.value());
+        statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{" : "") + variable.name() + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), "$1" + variable.value());
       });
       return statement;
     });
-    if (vm.isOptimizerEnabled()) {
-      self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
-      self.delayedStatement.subscribe(function (val) {
-        self.getComplexity();
-        self.hasSuggestion(false);
-      }, self);
-    }
 
     self.result = new Result(snippet, snippet.result);
     if (! self.result.hasSomeResults()) {
@@ -542,7 +710,12 @@ var EditorViewModel = (function() {
     self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
     window.setTimeout(function () {
       self.delayedDDLNotification.subscribe(function (val) {
-        huePubSub.publish('assist.db.refresh', self.type());
+        var match = self.statement().match(/(?:CREATE|DROP) (?:TABLE|DATABASE) `([^`]+)`/i); // For importer/metastore generated DDL only currently
+        if (match) {
+          var db = match[1];
+          huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
+        }
+        huePubSub.publish('assist.db.refresh', { sourceType: self.type() });
       });
     }, 0);
 
@@ -559,23 +732,44 @@ var EditorViewModel = (function() {
 
     function prepopulateChart() {
       var type = self.chartType();
-      logGA('chart/' + type);
+      hueAnalytics.log('notebook', 'chart/' + type);
 
-      if (type === ko.HUE_CHARTS.TYPES.MAP && self.chartMapLabel() === null && self.chartX() === null && self.result.cleanedNumericMeta().length === 2) {
-        self.chartX(self.result.cleanedNumericMeta()[0].name);
-        self.chartMapLabel(self.result.cleanedNumericMeta()[1].name);
+      if (type === ko.HUE_CHARTS.TYPES.MAP && self.result.cleanedNumericMeta().length >= 2) {
+        if ((self.chartX() === null || typeof self.chartX() === 'undefined')) {
+          var name = self.result.cleanedNumericMeta()[0].name;
+          self.result.cleanedNumericMeta().forEach(function (fld) {
+            if (fld.name.toLowerCase().indexOf('lat') > -1 || fld.name.toLowerCase().indexOf('ltd') > -1) {
+              name = fld.name;
+            }
+          });
+          self.chartX(name);
+        }
+        if ((self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined')) {
+          var name = self.result.cleanedNumericMeta()[1].name;
+          self.result.cleanedNumericMeta().forEach(function (fld) {
+            if (fld.name.toLowerCase().indexOf('lon') > -1 || fld.name.toLowerCase().indexOf('lng') > -1) {
+              name = fld.name;
+            }
+          });
+          self.chartYSingle(name);
+        }
         return;
       }
 
-      if (self.chartX() === null && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP) && (self.result.cleanedNumericMeta().length === 1 || self.result.cleanedNumericMeta().length === 2)) {
-        self.chartX(self.result.cleanedNumericMeta()[0].name);
+      if ((self.chartX() === null || typeof self.chartX() === 'undefined') && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP) && self.result.cleanedStringMeta().length >= 1) {
+        self.chartX(self.result.cleanedStringMeta()[0].name);
       }
 
       if (self.result.cleanedNumericMeta().length > 0) {
         if (self.chartYMulti().length === 0 && (type === ko.HUE_CHARTS.TYPES.BARCHART || type === ko.HUE_CHARTS.TYPES.LINECHART)) {
           self.chartYMulti.push(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length - 1, 1)].name);
-        } else if ((self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined') && (type === ko.HUE_CHARTS.TYPES.PIECHART || type === ko.HUE_CHARTS.TYPES.MAP || type === ko.HUE_CHARTS.TYPES.GRADIENTMAP || type === ko.HUE_CHARTS.TYPES.SCATTERCHART || (type === ko.HUE_CHARTS.TYPES.BARCHART && self.chartXPivot() !== null && self.chartYMulti().length === 0))) {
-          self.chartYSingle(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length - 1, 1)].name);
+        } else if ((self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined') && (type === ko.HUE_CHARTS.TYPES.PIECHART || type === ko.HUE_CHARTS.TYPES.MAP || type === ko.HUE_CHARTS.TYPES.GRADIENTMAP || type === ko.HUE_CHARTS.TYPES.SCATTERCHART || (type === ko.HUE_CHARTS.TYPES.BARCHART && self.chartXPivot() !== null))) {
+          if (self.chartYMulti().length === 0) {
+            self.chartYSingle(self.result.cleanedNumericMeta()[Math.min(self.result.cleanedNumericMeta().length - 1, 1)].name);
+          }
+          else {
+            self.chartYSingle(self.chartYMulti()[0]);
+          }
         }
       }
     }
@@ -613,16 +807,6 @@ var EditorViewModel = (function() {
 
     self.is_redacted = ko.observable(typeof snippet.is_redacted != "undefined" && snippet.is_redacted != null ? snippet.is_redacted : false);
 
-    self.complexity = ko.observable('');
-    self.complexityLevel = ko.observable('');
-    self.complexityRecommendation = ko.observable('');
-    self.hasComplexity = ko.computed(function () {
-      return self.complexity().length > 0;
-    });
-
-    self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
-    self.hasSuggestion = ko.observable(false);
-
     self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : ko.HUE_CHARTS.TYPES.BARCHART);
     self.chartType.subscribe(prepopulateChart);
     self.chartSorting = ko.observable(typeof snippet.chartSorting != "undefined" && snippet.chartSorting != null ? snippet.chartSorting : "none");
@@ -630,6 +814,9 @@ var EditorViewModel = (function() {
     self.chartScatterSize = ko.observable(typeof snippet.chartScatterSize != "undefined" && snippet.chartScatterSize != null ? snippet.chartScatterSize : null);
     self.chartScope = ko.observable(typeof snippet.chartScope != "undefined" && snippet.chartScope != null ? snippet.chartScope : "world");
     self.chartTimelineType = ko.observable(typeof snippet.chartTimelineType != "undefined" && snippet.chartTimelineType != null ? snippet.chartTimelineType : "bar");
+    self.chartLimits = ko.observableArray([5, 10, 25, 50, 100]);
+    self.chartLimit = ko.observable(typeof snippet.chartLimit != "undefined" && snippet.chartLimit != null ? snippet.chartLimit : null);
+    self.chartLimit.extend({notify: 'always'});
     self.chartX = ko.observable(typeof snippet.chartX != "undefined" && snippet.chartX != null ? snippet.chartX : null);
     self.chartX.extend({notify: 'always'});
     self.chartXPivot = ko.observable(typeof snippet.chartXPivot != "undefined" && snippet.chartXPivot != null ? snippet.chartXPivot : null);
@@ -650,9 +837,6 @@ var EditorViewModel = (function() {
     });
 
     self.hasDataForChart.subscribe(function(newValue) {
-      if (!newValue) {
-        self.isResultSettingsVisible(true);
-      }
       self.chartX.notifySubscribers();
       self.chartX.valueHasMutated();
     });
@@ -691,6 +875,7 @@ var EditorViewModel = (function() {
     }
 
     self.result.meta.subscribe(function (newValue) {
+      self.chartLimit(self.previousChartOptions.chartLimit);
       self.chartX(guessMetaField(self.previousChartOptions.chartX));
       self.chartXPivot(self.previousChartOptions.chartXPivot);
       self.chartYSingle(guessMetaField(self.previousChartOptions.chartYSingle));
@@ -714,6 +899,7 @@ var EditorViewModel = (function() {
     });
 
     self.settingsVisible = ko.observable(typeof snippet.settingsVisible != "undefined" && snippet.settingsVisible != null ? snippet.settingsVisible : false);
+    self.saveResultsModalVisible = ko.observable(false);
 
     self.checkStatusTimeout = null;
 
@@ -722,13 +908,137 @@ var EditorViewModel = (function() {
         id: self.id,
         type: self.type,
         status: self.status,
+        statementType: self.statementType,
         statement: self.statement,
+        statementPath: self.statementPath,
+        associatedDocumentUuid: self.associatedDocumentUuid,
         properties: self.properties,
         result: self.result.getContext(),
         database: self.database,
         wasBatchExecuted: self.wasBatchExecuted()
       };
     };
+
+    self.complexity = ko.observable();
+    self.hasComplexity = ko.pureComputed(function () {
+      return self.complexity() && Object.keys(self.complexity()).length > 0;
+    });
+    self.hasRisks = ko.pureComputed(function () {
+      return self.hasComplexity() && self.complexity()['hints'] && self.complexity()['hints'].length > 0;
+    });
+    self.topRisk = ko.pureComputed(function () {
+      if (self.hasRisks()) {
+        return self.complexity()['hints'][0];
+      } else {
+        return null;
+      }
+    });
+
+    self.suggestion = ko.observable('');
+    self.hasSuggestion = ko.observable(null);
+
+    self.complexityCheckRunning = ko.observable(false);
+    self.compatibilityCheckRunning = ko.observable(false);
+    self.compatibilitySourcePlatform = ko.observable(self.type());
+    self.compatibilitySourcePlatform.subscribe(function(newValue) {
+      if (newValue != self.type()) {
+        self.hasSuggestion(null);
+        self.compatibilityTargetPlatform(self.type());
+        self.queryCompatibility();
+      }
+    });
+    self.compatibilitySourcePlatforms = ko.observableArray([
+      {'name': 'Teradata', 'value': 'teradata'},
+      {'name': 'Oracle', 'value': 'oracle'},
+      {'name': 'Netezza', 'value': 'netezza'},
+      {'name': 'Impala', 'value': 'impala'},
+      {'name': 'Hive', 'value': 'hive'},
+      {'name': 'DB2', 'value': 'db2'},
+      {'name': 'Greenplum', 'value': 'greenplum'},
+      {'name': 'MySQL', 'value': 'mysql'},
+      {'name': 'PostgreSQL', 'value': 'postgresql'},
+      {'name': 'Informix', 'value': 'informix'},
+      {'name': 'SQL Server', 'value': 'sqlserver'},
+      {'name': 'Sybase', 'value': 'sybase'},
+      {'name': 'Access', 'value': 'access'},
+      {'name': 'Firebird', 'value': 'firebird'},
+      {'name': 'ANSISQL', 'value': 'ansisql'},
+      {'name': 'Generic', 'value': 'generic'}
+    ]);
+    self.compatibilityTargetPlatform = ko.observable(self.type());
+    self.compatibilityTargetPlatforms = ko.observableArray([
+      {'name': 'Impala', 'value': 'impala'},
+      {'name': 'Hive', 'value': 'hive'},
+    ]);
+
+    self.showOptimizer = ko.observable(self.getApiHelper().getFromTotalStorage('editor', 'show.optimizer', false));
+    self.showOptimizer.subscribe(function (newValue) {
+      if (newValue !== null) {
+        self.getApiHelper().setInTotalStorage('editor', 'show.optimizer', newValue);
+      }
+    });
+
+
+    if (HAS_OPTIMIZER && ! vm.isNotificationManager()) {
+      var lastComplexityRequest;
+      var lastCheckedComplexityStatement;
+
+      self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 2000 } });
+
+      self.checkComplexity = function () {
+        if (lastCheckedComplexityStatement === self.statement()) {
+          return;
+        }
+
+        self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
+
+        hueAnalytics.log('notebook', 'get_query_risk');
+        self.complexityCheckRunning(true);
+        self.hasSuggestion(null);
+        self.complexity({});
+        huePubSub.publish('editor.active.risks', {});
+
+        lastComplexityRequest = $.ajax({
+          type: 'POST',
+          url: '/notebook/api/optimizer/statement/risk',
+          timeout: 30000, // 30 seconds
+          data: {
+            notebook: ko.mapping.toJSON(notebook.getContext()),
+            snippet: ko.mapping.toJSON(self.getContext())
+          },
+          success: function(data) {
+            if (data.status == 0) {
+              self.hasSuggestion('');
+              self.complexity(data.query_complexity);
+            } else {
+              self.hasSuggestion('error');
+              self.complexity({'hints': []});
+            }
+            huePubSub.publish('editor.active.risks', self.complexity());
+            lastCheckedComplexityStatement = self.statement();
+          },
+          always: function(data) {
+            self.complexityCheckRunning(false);
+          },
+          error: function(data) {
+            self.complexityCheckRunning(false);
+          }
+        });
+      };
+
+      if (self.type() === 'hive' || self.type() === 'impala') {
+        if (self.statement_raw()) {
+          window.setTimeout(function(){
+            self.checkComplexity();
+            //self.querySyntaxCompatibility();
+          }, 2000);
+        }
+        self.delayedStatement.subscribe(function () {
+          self.checkComplexity();
+          //self.querySyntaxCompatibility(); Off for now
+        });
+      }
+    }
 
     self._ajaxError = function (data, callback) {
       if (data.status == -2) { // Session expired
@@ -738,35 +1048,55 @@ var EditorViewModel = (function() {
         } else {
           notebook.createSession(new Session(vm, {'type': self.type()}), callback);
         }
-      }
-      else if (data.status == -3) { // Statement expired
+      } else if (data.status == -3) { // Statement expired
         self.status('expired');
-      }
-      else if (data.status == -4) { // Operation timed out
+        if (data.message) {
+          self.errors.push({message: data.message, line: null, col: null});
+          huePubSub.publish('editor.snippet.result.normal', self);
+        }
+      } else if (data.status == -4) { // Operation timed out
         notebook.retryModalCancel = function () {
           self.status('failed');
           huePubSub.publish('hide.retry.modal');
-        }
+        };
         notebook.retryModalConfirm = function () {
           if (callback) {
             callback();
-          };
+          }
           huePubSub.publish('hide.retry.modal');
-        }
+        };
         huePubSub.publish('show.retry.modal');
-      }
-      else if (data.status == 401) { // Auth required
+      } else if (data.status == 401) { // Auth required
         self.status('expired');
         $(document).trigger("showAuthModal", {'type': self.type(), 'callback': self.execute});
-      }
-      else if (data.status == 1 || data.status == -1) {
+      } else if (data.status == 1 || data.status == -1) {
         self.status('failed');
         var match = ERROR_REGEX.exec(data.message);
-        self.errors.push({
-          message: data.message,
-          line: match === null ? null : parseInt(match[1]) - 1,
-          col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
-        });
+        if (match) {
+          var errorLine = parseInt(match[1]);
+          var errorCol;
+          if (typeof match[3] !== 'undefined') {
+            errorCol = parseInt(match[3]);
+          }
+          if (self.positionStatement()) {
+            if (errorCol && errorLine === 1) {
+              errorCol += self.positionStatement().location.first_column;
+            }
+            errorLine += self.positionStatement().location.first_line - 1;
+          }
+
+          self.errors.push({
+            message: data.message.replace(match[0], 'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')),
+            line: errorLine - 1,
+            col: errorCol
+          })
+        } else {
+          self.errors.push({
+            message: data.message,
+            line: null,
+            col: null
+          });
+        }
       } else {
         $(document).trigger("error", data.message);
         self.status('failed');
@@ -775,12 +1105,16 @@ var EditorViewModel = (function() {
 
     self.wasBatchExecuted = ko.observable(typeof snippet.wasBatchExecuted != "undefined" && snippet.wasBatchExecuted != null ? snippet.wasBatchExecuted : false);
     self.isReady = ko.computed(function() {
-      return (['jar', 'java', 'spark2', 'distcp'].indexOf(self.type()) == -1 && self.statement() !== '') ||
-        (['jar', 'java'].indexOf(self.type()) != -1 && (self.properties().app_jar() != '' && self.properties().class() != '')) ||
-        (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0) ||
-        (['shell'].indexOf(self.type()) != -1 && self.properties().command_path().length > 0) ||
-        (['mapreduce'].indexOf(self.type()) != -1 && self.properties().app_jar().length > 0) ||
-        (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0);
+      return (self.statementType() == 'text' && (
+          (self.isSqlDialect() && self.statement() !== '') ||
+          (['jar', 'java', 'spark2', 'distcp'].indexOf(self.type()) == -1 && self.statement() !== '') ||
+          (['jar', 'java'].indexOf(self.type()) != -1 && (self.properties().app_jar() != '' && self.properties().class() != '')) ||
+          (['spark2'].indexOf(self.type()) != -1 && self.properties().jars().length > 0) ||
+          (['shell'].indexOf(self.type()) != -1 && self.properties().command_path().length > 0) ||
+          (['mapreduce'].indexOf(self.type()) != -1 && self.properties().app_jar().length > 0) ||
+          (['distcp'].indexOf(self.type()) != -1 && self.properties().source_path().length > 0 && self.properties().destination_path().length > 0))) ||
+        (self.statementType() == 'file' && self.statementPath().length > 0) ||
+        (self.statementType() == 'document' && self.associatedDocumentUuid() && self.associatedDocumentUuid().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
 
@@ -805,10 +1139,14 @@ var EditorViewModel = (function() {
       if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
       }
+      if (self.isSqlDialect()) {
+        huePubSub.publish('editor.refresh.statement.locations', self);
+      }
 
       self.previousChartOptions = {
         chartScope: typeof self.chartScope() !== "undefined" ? self.chartScope() : self.previousChartOptions.chartScope,
         chartTimelineType: typeof self.chartTimelineType() !== "undefined" ? self.chartTimelineType() : self.previousChartOptions.chartTimelineType,
+        chartLimit: typeof self.chartLimit() !== "undefined" ? self.chartLimit() : self.previousChartOptions.chartLimit,
         chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
         chartXPivot: typeof self.chartXPivot() !== "undefined" ? self.chartXPivot() : self.previousChartOptions.chartXPivot,
         chartYSingle: typeof self.chartYSingle() !== "undefined" ? self.chartYSingle() : self.previousChartOptions.chartYSingle,
@@ -820,10 +1158,10 @@ var EditorViewModel = (function() {
         chartScatterGroup: typeof self.chartScatterGroup() !== "undefined" ? self.chartScatterGroup() : self.previousChartOptions.chartScatterGroup,
         chartScatterSize: typeof self.chartScatterSize() !== "undefined" ? self.chartScatterSize() : self.previousChartOptions.chartScatterSize
       };
-      $(document).trigger("executeStarted", self);
+      $(document).trigger("executeStarted", {vm: vm, snippet: self});
       self.lastExecuted(now);
       $(".jHueNotify").hide();
-      logGA('execute/' + self.type());
+      hueAnalytics.log('notebook', 'execute/' + self.type());
 
       if (self.result.fetchedOnce()) {
         self.close();
@@ -833,6 +1171,7 @@ var EditorViewModel = (function() {
       self.status('running');
       self.statusForButtons('executing');
       self.errors([]);
+      huePubSub.publish('editor.clear.highlighted.errors', self.ace());
       self.result.clear();
       self.progress(0);
       self.jobs([]);
@@ -847,6 +1186,7 @@ var EditorViewModel = (function() {
           column: 0
         }
       });
+      notebook.historyCurrentPage(1);
 
       // TODO: rename startLongOperationTimeout to startBlockingOperationTimeout
       // TODO: stop blocking operation UI if there is one
@@ -859,7 +1199,7 @@ var EditorViewModel = (function() {
 
       self.currentQueryTab('queryHistory');
 
-      self.executingBlockingOperation = $.post("/notebook/api/execute", {
+      self.executingBlockingOperation = $.post("/notebook/api/execute/" + self.type(), {
         notebook: vm.editorMode() ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
@@ -867,8 +1207,13 @@ var EditorViewModel = (function() {
         stopLongOperationTimeout();
 
         if (vm.editorMode() && data.history_id) {
-          var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
-          hueUtils.changeURL(url);
+          if (! vm.isNotificationManager()) {
+            var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
+            if (vm.isHue4()){
+              url = vm.URLS.hue4 + '?editor=' + data.history_id;
+            }
+            vm.changeURL(url);
+          }
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
           notebook.isHistory(true);
@@ -878,12 +1223,17 @@ var EditorViewModel = (function() {
         if (data.status == 0) {
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
+          if (vm.isOptimizerEnabled()) {
+            huePubSub.publish('editor.upload.query', data.history_id);
+          }
           if (data.handle.sync) {
             self.loadData(data.result, 100);
-            self.status('success');
+            self.status('available');
             self.progress(100);
           } else {
-            if (! notebook.unloaded()) { self.checkStatus(); };
+            if (! notebook.unloaded()) {
+              self.checkStatus();
+            };
           }
         } else {
           self._ajaxError(data, self.execute);
@@ -891,21 +1241,30 @@ var EditorViewModel = (function() {
 
         if (data.handle) {
           if (vm.editorMode()) {
-            notebook.history.unshift(
-              notebook._makeHistoryRecord(
-                url,
-                data.handle.statement,
-                self.lastExecuted(),
-                self.status(),
-                notebook.name(),
-                notebook.uuid()
-              )
-            );
+            if (vm.isNotificationManager()) { // Update task status
+              var tasks = $.grep(notebook.history(), function(row) { return row.uuid() == notebook.uuid()});
+              if (tasks.length == 1) {
+                tasks[0].status(self.status());
+                self.result.logs(data.message);
+              }
+            } else {
+              notebook.history.unshift(
+                notebook._makeHistoryRecord(
+                  url,
+                  data.handle.statement,
+                  self.lastExecuted(),
+                  self.status(),
+                  notebook.name(),
+                  notebook.uuid()
+                )
+              );
+            }
           }
 
           if (data.handle.statements_count != null) {
             self.result.statements_count(data.handle.statements_count);
             self.result.statement_id(data.handle.statement_id);
+            self.result.previous_statement_hash(data.previous_statement_hash);
 
             if (data.handle.statements_count > 1 && data.handle.start != null && data.handle.end != null) {
               self.result.statement_range({
@@ -937,6 +1296,7 @@ var EditorViewModel = (function() {
         column: 0
       };
       self.result.handle()['has_more_statements'] = false;
+      self.result.handle()['previous_statement_hash'] = '';
 
       self.execute();
     };
@@ -947,9 +1307,7 @@ var EditorViewModel = (function() {
 
     self.format = function () {
       if (self.isSqlDialect()) {
-        $.post("/notebook/api/format", {
-          statements: self.ace().getSelectedText() != '' ? self.ace().getSelectedText() : self.statement_raw()
-        }, function(data) {
+        self.getApiHelper().formatSql(self.ace().getSelectedText() != '' ? self.ace().getSelectedText() : self.statement_raw()).done(function (data) {
           if (data.status == 0) {
             if (self.ace().getSelectedText() != '') {
               self.ace().session.replace(self.ace().session.selection.getRange(), data.formatted_statements);
@@ -962,18 +1320,18 @@ var EditorViewModel = (function() {
           }
         });
       }
-      logGA('format');
+      hueAnalytics.log('notebook', 'format');
     };
 
     self.clear = function () {
-      logGA('clear');
+      hueAnalytics.log('notebook', 'clear');
       self.ace().setValue('', 1);
       self.result.clear();
       self.status('ready');
     };
 
     self.explain = function () {
-      logGA('explain');
+      hueAnalytics.log('notebook', 'explain');
 
       if (self.statement() == '' || self.status() == 'running' || self.status() === 'loading') {
         return;
@@ -996,26 +1354,60 @@ var EditorViewModel = (function() {
           self._ajaxError(data);
         }
       });
-    }
+    };
 
-    self.queryCompatibility = function () {
-      logGA('compatibility');
-      self.suggestion(false);
+    var lastCompatibilityRequest;
 
-      $.post("/notebook/api/optimizer/compatibility", {
+    self.querySyntaxCompatibility = function () {
+      self.compatibilitySourcePlatform(self.type());
+      self.compatibilityTargetPlatform(self.type());
+
+      self.queryCompatibility();
+    };
+
+    self.queryCompatibility = function (targetPlatform) {
+      self.getApiHelper().cancelActiveRequest(lastCompatibilityRequest);
+
+      hueAnalytics.log('notebook', 'compatibility');
+      self.compatibilityCheckRunning(targetPlatform != self.type());
+      self.hasSuggestion(null);
+
+      lastCompatibilityRequest = $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
-        sourcePlatform: self.type(),
-        targetPlatform: 'impala'
-      }, function(data) {
+        sourcePlatform: self.compatibilitySourcePlatform(),
+        targetPlatform: self.compatibilityTargetPlatform()
+      }, function (data) {
         if (data.status == 0) {
-         self.suggestion(ko.mapping.fromJS(data.query_compatibility.Impala));
-         self.hasSuggestion(true);
+          self.aceErrorsHolder([]);
+          self.aceWarningsHolder([]);
+          self.suggestion(ko.mapping.fromJS(data.query_compatibility));
+          if (self.suggestion().queryError.errorString()) {
+            var match = ERROR_REGEX.exec(self.suggestion().queryError.errorString());
+            self.aceWarningsHolder.push({
+              message: self.suggestion().queryError.errorString(),
+              line: match === null ? null : parseInt(match[1]) - 1,
+              col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
+            });
+            self.status('with-optimizer-report');
+          }
+          if (self.suggestion().parseError()) {
+            var match = ERROR_REGEX.exec(self.suggestion().parseError());
+            self.aceErrorsHolder.push({
+              message: self.suggestion().parseError(),
+              line: match === null ? null : parseInt(match[1]) - 1,
+              col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
+            });
+            self.status('with-optimizer-report');
+          }
+          self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
+      }).always(function () {
+        self.compatibilityCheckRunning(false);
       });
     };
 
@@ -1030,28 +1422,32 @@ var EditorViewModel = (function() {
     self.isFetchingData = false;
     self.fetchResultData = function (rows, startOver) {
       if (! self.isFetchingData) {
-        startLongOperationTimeout();
-        self.isFetchingData = true;
-        logGA('fetchResult/' + rows + '/' + startOver);
-        $.post("/notebook/api/fetch_result_data", {
-          notebook: ko.mapping.toJSON(notebook.getContext()),
-          snippet: ko.mapping.toJSON(self.getContext()),
-          rows: rows,
-          startOver: startOver
-        }, function (data) {
-          stopLongOperationTimeout();
-          data = JSON.bigdataParse(data);
-          if (data.status == 0) {
-            self.loadData(data.result, rows);
-          } else {
-            self._ajaxError(data, function() {self.isFetchingData = false; self.fetchResultData(rows, startOver); });
-            $(document).trigger("renderDataError", {snippet: self});
-          }
-        }, 'text').fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
-        }).always(function () {
-          self.isFetchingData = false;
-        });
+        if( self.status() == 'available') {
+          startLongOperationTimeout();
+          self.isFetchingData = true;
+          hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
+          $.post("/notebook/api/fetch_result_data", {
+            notebook: ko.mapping.toJSON(notebook.getContext()),
+            snippet: ko.mapping.toJSON(self.getContext()),
+            rows: rows,
+            startOver: startOver
+          }, function (data) {
+            stopLongOperationTimeout();
+            data = JSON.bigdataParse(data);
+            if (data.status == 0) {
+              self.loadData(data.result, rows);
+            } else {
+              self._ajaxError(data, function() {self.isFetchingData = false; self.fetchResultData(rows, startOver); });
+              $(document).trigger("renderDataError", {snippet: self});
+            }
+          }, 'text').fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+          }).always(function () {
+            self.isFetchingData = false;
+          });
+        } else {
+          huePubSub.publish('editor.snippet.result.normal', self);
+        }
       }
     };
 
@@ -1070,6 +1466,10 @@ var EditorViewModel = (function() {
         _tempData.push(row);
       });
 
+      if (self.result.rows() == null || (self.result.rows() + '').indexOf('+') != -1) {
+        self.result.rows(self.result.data().length + (result.has_more ? '+' : ''));
+      }
+
       self.result.images(typeof result.images != "undefined" && result.images != null ? result.images : []);
 
       $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
@@ -1082,7 +1482,7 @@ var EditorViewModel = (function() {
       }
 
       self.result.meta().forEach(function (meta) {
-        if ($.inArray(meta.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE', 'TIMESTAMP_TYPE', 'DATE_TYPE']) > -1) {
+        if ($.inArray(meta.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1) {
           meta.cssClass = 'sort-numeric';
         } else if ($.inArray(meta.type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1) {
           meta.cssClass = 'sort-date';
@@ -1118,20 +1518,30 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.fetchResultSize = function() {
+    self.fetchResultSize = function(n) {
+      if (typeof n === 'undefined') {
+        n = 10;
+      }
+
       $.post("/notebook/api/fetch_result_size", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         if (data.status == 0) {
-          self.result.size(data.result);
+          if (data.result.rows != null) {
+            self.result.rows(data.result.rows);
+          } else if (self.type() == 'impala' && n > 0) {
+            setTimeout(function () {
+              self.fetchResultSize(n - 1);
+            }, 1000);
+          }
         } else if (data.status == 5) {
           // No supported yet for this snippet
         } else {
-          $(document).trigger("error", data.message);
+          //$(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        //$(document).trigger("error", xhr.responseText);
       });
     };
 
@@ -1150,24 +1560,28 @@ var EditorViewModel = (function() {
           if (data.status == 0) {
             self.status(data.query_status.status);
 
-            if (self.status() == 'running' || self.status() == 'starting') {
+            if (self.status() == 'running' || self.status() == 'starting' || self.status() == 'waiting') {
               self.result.endTime(new Date());
-              if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, 1000); };
+              var delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
+              if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, delay); };
             }
             else if (self.status() == 'available') {
               self.fetchResult(100);
-              self.fetchResultSize();
               self.progress(100);
-             if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
-                self.ddlNotification(Math.random());
-                if (self.result.handle().has_more_statements) {
-                  setTimeout(function () {
-                    self.execute(); // Execute next, need to wait as we disabled fast click
-                  }, 1000);
+              if (self.isSqlDialect()) {
+                if (self.result.handle().has_result_set) {
+                  self.fetchResultSize();
+                } else { // Is DDL
+                  self.ddlNotification(Math.random());
+                  if (self.result.handle().has_more_statements) {
+                    setTimeout(function () {
+                      self.execute(); // Execute next, need to wait as we disabled fast click
+                    }, 1000);
+                  }
                 }
               }
-              if (vm.successUrl()) {
-                window.location.href = vm.successUrl();
+              if (! self.result.handle().has_more_statements && vm.successUrl()) {
+                window.location.href = vm.successUrl(); // Not used anymore in Hue 4
               }
             }
             else if (self.status() == 'success') {
@@ -1185,12 +1599,15 @@ var EditorViewModel = (function() {
       });
     };
 
+    self.isCanceling = ko.observable(false);
+
     self.cancel = function () {
+      self.isCanceling(true);
       if (self.checkStatusTimeout != null) {
         clearTimeout(self.checkStatusTimeout);
         self.checkStatusTimeout = null;
       }
-      logGA('cancel');
+      hueAnalytics.log('notebook', 'cancel');
 
       if ($.isEmptyObject(self.result.handle())) { // Query was not even submitted yet
         if (self.executingBlockingOperation != null) {
@@ -1199,6 +1616,7 @@ var EditorViewModel = (function() {
         }
         self.statusForButtons('canceled');
         self.status('failed');
+        self.isCanceling(false);
       } else {
         self.statusForButtons('canceling');
         $.post("/notebook/api/cancel_statement", {
@@ -1215,6 +1633,8 @@ var EditorViewModel = (function() {
           $(document).trigger("error", xhr.responseText);
           self.statusForButtons('canceled');
           self.status('failed');
+        }).always(function (){
+          self.isCanceling(false);
         });
       }
     };
@@ -1271,7 +1691,7 @@ var EditorViewModel = (function() {
             }
           });
 
-          if (data.jobs.length > 0) {
+          if (data.jobs && data.jobs.length > 0) {
             data.jobs.forEach(function (job) {
               var _found = ko.utils.arrayFilter(self.jobs(), function (item) {
                 return item.name === job.name;
@@ -1304,18 +1724,85 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.getComplexity = function () {
-      logGA('get_query_risk');
-      self.complexity('');
+    self.uploadQueryHistory = function (n) {
+      hueAnalytics.log('notebook', 'upload_query_history');
 
-      $.post("/notebook/api/optimizer/statement_risk", {
-        notebook: ko.mapping.toJSON(notebook.getContext()),
-        snippet: ko.mapping.toJSON(self.getContext())
+      $.post("/metadata/api/optimizer/upload/history", {
+        n: typeof n != "undefined" ? n : null,
+        sourcePlatform: self.type()
       }, function(data) {
         if (data.status == 0) {
-          self.complexityLevel(data.query_complexity.risk);
-          self.complexity(data.query_complexity.riskAnalysis);
-          self.complexityRecommendation(data.query_complexity.riskRecommendation);
+          $(document).trigger("info", data.upload_history[self.type()].count + " queries uploaded successfully. Processing them...");
+          self.watchUploadStatus(data.upload_history[self.type()].status.workloadId);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+
+    self.uploadQuery = function (query_id) {
+      $.post("/metadata/api/optimizer/upload/query", {
+        query_id: query_id,
+        sourcePlatform: self.type()
+      });
+    };
+
+    self.uploadTableStats = function (options) {
+      hueAnalytics.log('notebook', 'load_table_stats');
+      $(document).trigger("info", "Preparing table data...");
+
+      $.post("/metadata/api/optimizer/upload/table_stats", {
+        db_tables: ko.mapping.toJSON($.map(options.activeTables, function(table) {
+          return table.database.name + '.' + table.name;
+        })),
+        sourcePlatform: ko.mapping.toJSON(self.type()),
+        with_columns: ko.mapping.toJSON(true),
+        with_ddl: ko.mapping.toJSON(true)
+      }, function(data) {
+        if (data.status == 0) {
+          $(document).trigger("info", $.map(options.activeTables, function(table) { return table.name; }) + " stats sent to analyse");
+          if (data.upload_table_ddl) {
+            self.watchUploadStatus(data.upload_table_ddl.status.workloadId);
+          }
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).always(function () {
+        if (options.callback) {
+          options.callback();
+        }
+      });
+    };
+
+    self.watchUploadStatus = function (workloadId) {
+      $.post("/metadata/api/optimizer/upload/status", {
+        workloadId: workloadId
+      }, function(data) {
+        if (data.status == 0) {
+          $(document).trigger("info", "Query processing: " + data.upload_status.status.state);
+          if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) != -1) {
+            window.setTimeout(function () {
+              self.watchUploadStatus(workloadId);
+            }, 2000);
+          } else {
+            $(document).trigger("warn", data.upload_status.status.statusMsg + (data.upload_status.status.failedQueries > 0 ? '. ' + data.upload_status.status.failQueryDetails.map(function(query) { return query.error; }) : ''));
+          }
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+
+    self.getSimilarQueries = function () {
+      hueAnalytics.log('notebook', 'get_query_similarity');
+
+      $.post("/notebook/api/optimizer/statement/similarity", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
+        snippet: ko.mapping.toJSON(self.getContext()),
+        sourcePlatform: self.type()
+      }, function(data) {
+        if (data.status == 0) {
+          console.log(data.statement_similarity);
         } else {
           $(document).trigger("error", data.message);
         }
@@ -1379,9 +1866,11 @@ var EditorViewModel = (function() {
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
     self.coordinatorUuid = ko.observable(typeof notebook.coordinatorUuid != "undefined" && notebook.coordinatorUuid != null ? notebook.coordinatorUuid : null);
     self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
+    self.isManaged = ko.observable(typeof notebook.isManaged != "undefined" && notebook.isManaged != null ? notebook.isManaged : false);
     self.parentSavedQueryUuid = ko.observable(typeof notebook.parentSavedQueryUuid != "undefined" && notebook.parentSavedQueryUuid != null ? notebook.parentSavedQueryUuid : null); // History parent
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
+    self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
     self.creatingSessionLocks = ko.observableArray();
@@ -1398,9 +1887,9 @@ var EditorViewModel = (function() {
     if (self.dependentsCoordinator().length > 0 && ! self.coordinatorUuid()) {
       self.coordinatorUuid(self.dependentsCoordinator()[0].uuid());
     }
-    self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
+    self.history = ko.observableArray(vm.selectedNotebook() && vm.selectedNotebook().history().length > 0 && vm.selectedNotebook().history()[0].type == self.type() ? vm.selectedNotebook().history() : []);
     self.history.subscribe(function(val) {
-      if (self.id() == null && val.length == 0 && self.historyFilter() === '') {
+      if (self.id() == null && val.length == 0 && self.historyFilter() === '' && ! vm.isNotificationManager()) {
         self.snippets()[0].currentQueryTab('savedQueries');
       }
     });
@@ -1408,8 +1897,18 @@ var EditorViewModel = (function() {
     self.historyFilterVisible = ko.observable(false);
     self.historyFilter.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 900 } });
     self.historyFilter.subscribe(function(val){
+      if (self.historyCurrentPage() != 1) {
+        self.historyCurrentPage(1);
+      } else {
+        self.fetchHistory();
+      }
+    });
+    self.loadingHistory = ko.observable(self.history().length == 0);
+    self.historyCurrentPage = ko.observable(vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1);
+    self.historyCurrentPage.subscribe(function(val) {
       self.fetchHistory();
     });
+    self.historyTotalPages = ko.observable(vm.selectedNotebook() ? vm.selectedNotebook().historyTotalPages() : 1);
 
     self.schedulerViewModel = null;
     self.schedulerViewModelIsLoaded = ko.observable(false);
@@ -1426,8 +1925,7 @@ var EditorViewModel = (function() {
 
     self.avoidClosing = false;
 
-    self.loadingHistory = ko.observable(self.history().length == 0);
-    // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet. Actually, history should go in the assist in Hue 4.
+
     self.getSession = function (session_type) {
       var _s = null;
       $.each(self.sessions(), function (index, s) {
@@ -1596,7 +2094,7 @@ var EditorViewModel = (function() {
         }
       }, 100);
 
-      logGA('add_snippet/' + (type ? type : self.selectedSnippet()));
+      hueAnalytics.log('notebook', 'add_snippet/' + (type ? type : self.selectedSnippet()));
       return snippet;
     };
 
@@ -1622,7 +2120,7 @@ var EditorViewModel = (function() {
     };
 
     self.save = function () {
-      logGA('save');
+      hueAnalytics.log('notebook', 'save');
 
       // Remove the result data from the snippets
       var cp = ko.mapping.toJS(self, NOTEBOOK_MAPPING);
@@ -1648,26 +2146,37 @@ var EditorViewModel = (function() {
           self.isHistory(false);
           $(document).trigger("info", data.message);
           if (vm.editorMode()) {
-            if (! data.save_as && self.snippets()[0].queries().length != 0) {
-              self.snippets()[0].queries.unshift({
-                'uuid': data.uuid,
-                'name': data.name,
-                'description': data.description,
-                'owner': data.owner,
-                'last_modified': data.last_modified
+            if (data.save_as) {
+              var existingQuery = self.snippets()[0].queries().filter(function (item) {
+                return item.uuid() === data.uuid
               });
+              if (existingQuery.length > 0) {
+                existingQuery[0].name(data.name);
+                existingQuery[0].description(data.description);
+                existingQuery[0].last_modified(data.last_modified);
+              }
+            } else {
+              self.snippets()[0].queries.unshift(ko.mapping.fromJS(data));
             }
 
-            if (self.coordinatorUuid()) {
+            if (self.coordinatorUuid() && self.schedulerViewModel) {
               self.saveScheduler();
               self.schedulerViewModel.coordinator.refreshParameters();
             }
 
-            hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+            if (vm.isHue4()){
+              vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
+            } else {
+              vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+            }
+          } else {
+            if (vm.isHue4()){
+              vm.changeURL(vm.URLS.hue4_notebook + '?notebook=' + data.id);
+            } else {
+              vm.changeURL('/notebook/notebook?notebook=' + data.id);
+            }
           }
-          else {
-            hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
-          }
+          huePubSub.publish('assist.document.refresh');
         }
         else {
           $(document).trigger("error", data.message);
@@ -1678,7 +2187,7 @@ var EditorViewModel = (function() {
     };
 
     self.close = function () {
-      logGA('close');
+      hueAnalytics.log('notebook', 'close');
       $.post("/notebook/api/notebook/close", {
         "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
         "editorMode": vm.editorMode()
@@ -1699,7 +2208,7 @@ var EditorViewModel = (function() {
 
       var index = 0;
       self.snippets()[index].execute();
-      var clock = setInterval(next, 100);
+      var clock = window.setInterval(next, 100, 'editor');
 
       function next() {
         if (self.snippets()[index].status() == 'available' || self.snippets()[index].status() == 'failed') {
@@ -1707,7 +2216,7 @@ var EditorViewModel = (function() {
           if (self.snippets().length > index) {
             self.snippets()[index].execute();
           } else {
-            clearInterval(clock);
+            window.clearInterval(clock);
           }
         }
       }
@@ -1747,11 +2256,15 @@ var EditorViewModel = (function() {
     };
 
     self.fetchHistory = function (callback) {
+      var QUERIES_PER_PAGE = 50;
       self.loadingHistory(true);
+
       $.get("/notebook/api/get_history", {
         doc_type: self.selectedSnippet(),
-        limit: 50,
-        doc_text: self.historyFilter()
+        limit: QUERIES_PER_PAGE,
+        page: self.historyCurrentPage(),
+        doc_text: self.historyFilter(),
+        is_notification_manager: vm.isNotificationManager()
       }, function(data) {
         var parsedHistory = [];
         if (data && data.history){
@@ -1769,6 +2282,7 @@ var EditorViewModel = (function() {
           });
         }
         self.history(parsedHistory);
+        self.historyTotalPages(Math.ceil(data.count / QUERIES_PER_PAGE));
       }).always(function(){
         self.loadingHistory(false);
         if (callback) {
@@ -1777,34 +2291,60 @@ var EditorViewModel = (function() {
       });
     };
 
+    self.prevHistoryPage = function () {
+      if (self.historyCurrentPage() !== 1) {
+        self.historyCurrentPage(self.historyCurrentPage() - 1);
+      }
+    };
+
+    self.nextHistoryPage = function () {
+      if (self.historyCurrentPage() < self.historyTotalPages()) {
+        self.historyCurrentPage(self.historyCurrentPage() + 1);
+      }
+    };
+
+
+    self.updateHistoryFailed = false;
     self.updateHistory = function (statuses, interval) {
       var items = $.grep(self.history(), function (item) {
         return statuses.indexOf(item.status()) != -1;
-      });
+      }).slice(0, 25);
 
       function updateHistoryCall(item) {
         $.post("/notebook/api/check_status", {
           notebook: ko.mapping.toJSON({id: item.uuid()}),
-        }, function (data) {
-          var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : 'failed');
-          if (status && item.status() != status) {
-            item.status(status);
-          }
-        }).always(function () {
-          if (items.length > 0) {
-            window.setTimeout(function () {
-              updateHistoryCall(items.pop());
-            }, 1000);
-          } else {
-            window.setTimeout(function() { self.updateHistory(statuses, interval); }, interval);
-          }
-        });
+        }).done(function (data) {
+            var status = data.status == -3 ? 'expired' : (data.status == 0 ? data.query_status.status : 'failed');
+            if (status && item.status() != status) {
+              item.status(status);
+            }
+          }).fail(function (xhr) {
+            items = [];
+            self.updateHistoryFailed = true;
+            console.warn('Lost connectivity to the Hue history refresh backend.');
+          }).always(function () {
+            if (items.length > 0) {
+              window.setTimeout(function () {
+                updateHistoryCall(items.pop());
+              }, 1000);
+            } else {
+              if (!self.updateHistoryFailed){
+                window.setTimeout(function () {
+                  self.updateHistory(statuses, interval);
+                }, interval);
+              }
+            }
+          });
       }
 
-     if (items.length > 0) {
+      if (items.length > 0) {
         updateHistoryCall(items.pop());
       } else {
-        window.setTimeout(function() { self.updateHistory(statuses, interval); }, interval);
+        if (!self.updateHistoryFailed) {
+          window.setTimeout(function () {
+            self.updateHistory(statuses, interval);
+          }, interval);
+        }
       }
     };
 
@@ -1820,16 +2360,22 @@ var EditorViewModel = (function() {
     };
 
     self.clearHistory = function (type) {
-      logGA('clearHistory');
+      hueAnalytics.log('notebook', 'clearHistory');
       $.post("/notebook/api/clear_history", {
         notebook: ko.mapping.toJSON(self.getContext()),
-        doc_type: self.selectedSnippet()
+        doc_type: self.selectedSnippet(),
+        is_notification_manager: vm.isNotificationManager(),
       }, function (data) {
         self.history.removeAll();
         if (self.isHistory()) {
           self.id(null);
           self.uuid(UUID());
-          hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
+          if (vm.isHue4()) {
+            vm.changeURL(vm.URLS.hue4 + '?type=' + vm.editorType());
+          }
+          else {
+            vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
+          }
         }
       }).fail(function (xhr) {
         $(document).trigger("error", xhr.responseText);
@@ -1845,38 +2391,67 @@ var EditorViewModel = (function() {
         } else {
           _action = 'new';
         }
-        logGA('schedule/' + _action);
+        hueAnalytics.log('notebook', 'schedule/' + _action);
 
-        $.get('/oozie/editor/coordinator/' + _action + '/', {
-          format: 'json',
-          document: self.uuid(),
-          coordinator: self.coordinatorUuid()
-        }, function (data) {
-          if ($("#schedulerEditor").length > 0) {
-            $("#schedulerEditor").html(data.layout);
+        function getCoordinator() {
+          $.get('/oozie/editor/coordinator/' + _action + '/', {
+            format: 'json',
+            document: self.uuid(),
+            coordinator: self.coordinatorUuid()
+          }, function (data) {
+            if ($("#schedulerEditor").length > 0) {
+              huePubSub.publish('hue4.process.headers', {
+                response: data.layout,
+                callback: function (r) {
+                  $("#schedulerEditor").html(r);
 
-            self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
+                  self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
 
-            ko.cleanNode($("#schedulerEditor")[0]);
-            ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
+                  ko.cleanNode($("#schedulerEditor")[0]);
+                  ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
+                  $(document).off("showSubmitPopup");
+                  $(document).on("showSubmitPopup", function (event, data) {
+                    $('.submit-modal-editor').html(data);
+                    $('.submit-modal-editor').modal('show');
+                    $('.submit-modal-editor').on('hidden', function () {
+                      huePubSub.publish('hide.datepicker');
+                    });
+                    var _sel = $('.submit-form .control-group[rel!="popover"]:visible');
+                    if (_sel.length > 0) {
+                      $('.submit-modal-editor .modal-body').height($('.submit-modal-editor .modal-body').height() + 60);
+                    }
+                  });
 
-            huePubSub.publish('render.jqcron');
+                  huePubSub.publish('render.jqcron');
 
-            self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-            self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
-            self.schedulerViewModel.isEditing(true);
+                  self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+                  self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+                  self.schedulerViewModel.isEditing(true);
 
-            self.schedulerViewModelIsLoaded(true);
+                  self.schedulerViewModelIsLoaded(true);
 
-            if (_action == 'new') {
-              self.coordinatorUuid(UUID());
-              self.schedulerViewModel.coordinator.uuid(self.coordinatorUuid());
-              self.schedulerViewModel.coordinator.properties.document(self.uuid());
+                  if (_action == 'new') {
+                    self.coordinatorUuid(UUID());
+                    self.schedulerViewModel.coordinator.uuid(self.coordinatorUuid());
+                    self.schedulerViewModel.coordinator.properties.document(self.uuid());
+                  }
+                }
+              });
+
             }
-          }
-        }).fail(function (xhr) {
-          $(document).trigger("error", xhr.responseText);
-        });
+          }).fail(function (xhr) {
+            $(document).trigger("error", xhr.responseText);
+          });
+        }
+
+        if (!IS_HUE_4) {
+          huePubSub.subscribe('hue4.process.headers', function (opts) {
+            opts.callback(opts.response);
+          }, vm.huePubSubId);
+        }
+
+        getCoordinator();
+
       }
     };
 
@@ -1942,16 +2517,18 @@ var EditorViewModel = (function() {
       });
 
       download(JSON.stringify(jupyterNotebook), self.name() + ".ipynb", "text/plain");
-    }
+    };
 
-    huePubSub.subscribe("assist.db.panel.ready", function () {
+    huePubSub.subscribeOnce('assist.db.panel.ready', function () {
       if (self.type().indexOf('query') === 0 && self.snippets().length == 1) {
         huePubSub.publish('assist.set.database', {
           source: self.snippets()[0].type(),
           name: self.snippets()[0].database()
         });
       }
-    });
+    }, vm.huePubSubId);
+
+    huePubSub.publish('assist.is.db.panel.ready');
 
     // Init
     if (notebook.snippets) {
@@ -1960,31 +2537,53 @@ var EditorViewModel = (function() {
       });
       if (vm.editorMode() && self.history().length == 0) {
         self.fetchHistory(function() {
-          self.updateHistory(['starting', 'running'], 20000);
+          self.updateHistory(['starting', 'running'], 30000);
           self.updateHistory(['available'], 60000 * 5);
         });
       }
     }
   };
 
-
   function EditorViewModel(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     var self = this;
+
+    self.URLS = {
+      editor: '/notebook/editor',
+      editorMobile: '/notebook/editor_m',
+      notebook: '/notebook/notebook',
+      hue4: '/hue/editor',
+      hue4_notebook: '/hue/notebook'
+    };
+
+    self.huePubSubId = options.huePubSubId || 'editor';
     self.user = options.user;
     self.userId = options.userId;
+    self.suffix = options.suffix;
     self.isMobile = ko.observable(options.mobile);
+    self.isHue4 = ko.observable(options.hue4);
+    self.isNotificationManager = ko.observable(options.is_notification_manager || false);
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
-      console.log('Should happen on new query, or Hive --> Impala only: reload session, saved queries, history if in editor mode');
+      self.editorMode(newVal != 'notebook');
+      hueUtils.changeURLParameter('type', newVal);
+      if (self.editorMode()) {
+        self.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
+      }
     });
-    self.editorTypeTitle = ko.observable(options.editor_type);
+    self.editorTypeTitle = ko.pureComputed(function () {
+      var foundInterpreter = $.grep(options.languages, function (interpreter) {
+        return interpreter.type === self.editorType();
+      });
+      return foundInterpreter.length > 0 ? foundInterpreter[0].name : self.editorType();
+    });
     self.useNewAutocompleter = options.useNewAutocompleter || false;
     self.autocompleteTimeout = options.autocompleteTimeout;
     self.selectedNotebook = ko.observable();
+
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);
     self.isFullscreenMode = ko.observable(false);
-    self.successUrl = ko.observable(options.success_url);
+    self.successUrl = ko.observable(options.success_url); // Deprecated
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
 
@@ -1999,6 +2598,7 @@ var EditorViewModel = (function() {
       );
     });
 
+    // TODO: Drop the SQL source types from the notebook. They're now set in AssistDbPanel.
     self.sqlSourceTypes = [];
     self.availableLanguages = [];
 
@@ -2007,7 +2607,7 @@ var EditorViewModel = (function() {
         self.availableLanguages.push({
           type: language.type,
           name: language.name,
-          interface: language.interface,
+          interface: language.interface
         });
         var viewSettings = options.snippetViewSettings[language.type];
         if (viewSettings && viewSettings.sqlDialect) {
@@ -2041,7 +2641,7 @@ var EditorViewModel = (function() {
         });
         self.combinedContent(statements);
       }
-      $("#combinedContentModal").modal("show");
+      $("#combinedContentModal" + self.suffix).modal("show");
     };
 
     self.isEditing = ko.observable(false);
@@ -2068,7 +2668,7 @@ var EditorViewModel = (function() {
       }
       if (hasContent) {
         self.removeSnippetConfirmation({ notebook: notebook, snippet: snippet });
-        $("#removeSnippetModal").modal("show");
+        $("#removeSnippetModal" + self.suffix).modal("show");
       }
       else {
         notebook.snippets.remove(snippet);
@@ -2081,16 +2681,24 @@ var EditorViewModel = (function() {
     self.assistAvailable = ko.observable(options.assistAvailable);
 
     self.isLeftPanelVisible = ko.observable();
-    ApiHelper.getInstance(self).withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    ApiHelper.getInstance().withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+
+    self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
+    self.isRightPanelVisible = ko.observable();
+    ApiHelper.getInstance().withTotalStorage('assist', 'right_assist_panel_visible', self.isRightPanelVisible, true);
 
     self.isContextPanelVisible = ko.observable(false);
+    self.isContextPanelVisible.subscribe(function (newValue) {
+      huePubSub.publish('context.panel.visible', newValue);
+    });
+
+    huePubSub.subscribe('context.panel.visible.editor', function (value) {
+      self.isContextPanelVisible(false);
+    }, self.huePubSubId);
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
     self.editorMode = ko.observable(options.mode == 'editor');
-    self.editorMode.subscribe(function(newVal) {
-      console.log('should be switchable when max 1 snippet');
-    });
 
     self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {
@@ -2125,12 +2733,21 @@ var EditorViewModel = (function() {
       return '';
     };
 
+    self.changeURL = function (url) {
+      if (!self.isNotificationManager()) {
+        hueUtils.changeURL(url);
+      }
+    };
+
     self.init = function () {
       if (editor_id) {
         self.openNotebook(editor_id);
-      }
-      else if (notebooks.length > 0) {
+      } else if (window.location.getParameter('editor') !== ''){
+        self.openNotebook(window.location.getParameter('editor'));
+      } else if (notebooks.length > 0) {
         self.loadNotebook(notebooks[0]); // Old way of loading json for /browse
+      } else if (window.location.getParameter('type') !== '') {
+        self.newNotebook(window.location.getParameter('type'));
       } else {
         self.newNotebook();
       }
@@ -2161,6 +2778,7 @@ var EditorViewModel = (function() {
           }
 
           snippet.previousChartOptions = {
+            chartLimit: typeof snippet.chartLimit() !== "undefined" ? snippet.chartLimit() : snippet.previousChartOptions.chartLimit,
             chartX: typeof snippet.chartX() !== "undefined" ? snippet.chartX() : snippet.previousChartOptions.chartX,
             chartXPivot: typeof snippet.chartXPivot() !== "undefined" ? snippet.chartXPivot() : snippet.previousChartOptions.chartXPivot,
             chartYSingle: typeof snippet.chartYSingle() !== "undefined" ? snippet.chartYSingle() : snippet.previousChartOptions.chartYSingle,
@@ -2205,12 +2823,21 @@ var EditorViewModel = (function() {
           data.data.can_write = data.user_perms.can_write;
           var notebook = data.data;
           self.loadNotebook(notebook, queryTab);
-          if (typeof skipUrlChange === 'undefined'){
+          if (typeof skipUrlChange === 'undefined' && ! self.isNotificationManager()){
             if (self.editorMode()) {
-              hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?editor=' + data.document.id);
-            }
-            else {
-              hueUtils.changeURL('/notebook/notebook?notebook=' + data.document.id);
+              self.editorType(data.document.type.substring('query-'.length));
+              huePubSub.publish('active.snippet.type.changed', self.editorType());
+              if (self.isHue4()){
+                self.changeURL(self.URLS.hue4 + '?editor=' + data.document.id + '&type=' + self.editorType());
+              } else {
+                self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id + '&type=' + self.editorType());
+              }
+            } else {
+              if (self.isHue4()){
+                self.changeURL(self.URLS.hue4_notebook + '?notebook=' + data.document.id);
+              } else {
+                self.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
+              }
             }
           }
           if (typeof callback !== 'undefined'){
@@ -2224,26 +2851,26 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.newNotebook = function () {
+    self.newNotebook = function (editorType, callback, queryTab) {
       $.post("/notebook/api/create_notebook", {
-        type: options.editor_type,
+        type: editorType || options.editor_type,
         directory_uuid: window.location.getParameter('directory_uuid')
       }, function (data) {
         self.loadNotebook(data.notebook);
-        if (self.editorMode()) {
-          self.selectedNotebook().newSnippet(self.editorType());
+        if (self.editorMode() && !self.isNotificationManager()) {
+          var snippet = self.selectedNotebook().newSnippet(self.editorType());
+          if (queryTab && ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1) {
+            snippet.currentQueryTab(queryTab);
+          }
           huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
-          if (window.location.getParameter('new') == '') {
-            self.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user + '.' + window.location.getParameter('type')));
-            $.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user +  '.' + window.location.getParameter('type'), '');
+          if (window.location.getParameter('type') === '') {
+            hueUtils.changeURLParameter('type', self.editorType());
           }
-          if (window.location.getParameter('type')) {
-            hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + window.location.getParameter('type'));
-          } else {
-            hueUtils.changeURL('/notebook/editor' + (self.isMobile() ? '_m' : '') + '?type=' + self.editorType());
-          }
-        } else {
-          hueUtils.changeURL('/notebook/notebook');
+          huePubSub.publish('active.snippet.type.changed', editorType);
+        }
+
+        if (typeof callback !== 'undefined' && callback !== null){
+          callback();
         }
       });
     };
@@ -2258,12 +2885,6 @@ var EditorViewModel = (function() {
       self.selectedNotebook().parentSavedQueryUuid(null);
       self.saveNotebook();
     };
-  }
-
-  function logGA(page) {
-    if (typeof trackOnGA == 'function') {
-      trackOnGA('notebook/' + page);
-    }
   }
 
   return EditorViewModel;

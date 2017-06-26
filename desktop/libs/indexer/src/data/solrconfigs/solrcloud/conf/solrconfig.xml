@@ -351,6 +351,7 @@
                 solr data directory.  -->
     <updateLog>
       <str name="dir">${solr.ulog.dir:}</str>
+      <int name="tlogDfsReplication">${solr.ulog.tlogDfsReplication:3}</int>
     </updateLog>
 
     <!-- AutoCommit

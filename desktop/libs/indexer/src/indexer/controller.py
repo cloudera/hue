@@ -18,18 +18,20 @@
 
 import json
 import logging
+import numbers
 import os
 import shutil
 
 from django.utils.translation import ugettext as _
+import tablib
 
 from desktop.lib.exceptions_renderable import PopupException
+from dashboard.models import Collection2
 from libsolr.api import SolrApi
 from libsolr.conf import SOLR_ZK_PATH
 from libzookeeper.conf import ENSEMBLE
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
-from search.models import Collection2
 
 from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
@@ -266,37 +268,30 @@ class CollectionManagerController(object):
     else:
       raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)
 
-  def update_data_from_hive(self, db, collection_or_core_name, database, table, columns, indexing_strategy='upload'):
-    """
-    Add hdfs path contents to index
-    """
-    # Run a custom hive query and post data to collection
-    from beeswax.server import dbms
-    import tablib
+  def update_data_from_hive(self, collection_or_core_name, columns, fetch_handle):
+    MAX_ROWS = 10000
+    ROW_COUNT = 0
+    FETCH_BATCH = 1000
+    has_more = True
 
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
-    if indexing_strategy == 'upload':
-      table = db.get_table(database, table)
-      hql = "SELECT %s FROM `%s.%s` %s" % (','.join(columns), database, table.name, db._get_browse_limit_clause(table))
-      query = dbms.hql_query(hql)
 
-      try:
-        handle = db.execute_and_wait(query)
+    try:
+      while ROW_COUNT < MAX_ROWS and has_more:
+        result = fetch_handle(FETCH_BATCH, ROW_COUNT == 0)
+        has_more = result['has_more']
 
-        if handle:
-          result = db.fetch(handle, rows=100)
-          db.close(handle)
-
+        if result['data']:
           dataset = tablib.Dataset()
           dataset.append(columns)
-          for row in result.rows():
-            dataset.append(row)
+          for i, row in enumerate(result['data']):
+            dataset.append([ROW_COUNT + i] + [cell if cell else (0 if isinstance(cell, numbers.Number) else '') for cell in row])
 
           if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
             raise PopupException(_('Could not update index. Check error logs for more info.'))
-        else:
-          raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))
-      except Exception, e:
-        raise PopupException(_('Could not update index.'), detail=e)
-    else:
-      raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)
+
+        ROW_COUNT += len(dataset)
+    except Exception, e:
+      raise PopupException(_('Could not update index.'), detail=e)
+
+    return ROW_COUNT

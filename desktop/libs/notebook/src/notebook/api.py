@@ -22,18 +22,19 @@ import sqlparse
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
+from desktop.api2 import __paginate
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
-from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError
+from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
+from notebook.connectors.hiveserver2 import HS2Api
+from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
-from notebook.github import GithubClient
-from notebook.models import escape_rows
+from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties
 
 
@@ -103,7 +104,7 @@ def _execute_notebook(request, notebook, snippet):
   result = None
   history = None
 
-  historify = notebook['type'] != 'notebook' or snippet.get('wasBatchExecuted')
+  historify = (notebook['type'] != 'notebook' or snippet.get('wasBatchExecuted')) and not notebook.get('skipHistorify')
 
   try:
     try:
@@ -123,17 +124,18 @@ def _execute_notebook(request, notebook, snippet):
           _snippet['result']['handle'] = response['handle']
           _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
           _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
-          _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']) # For non HS2, as non multi query yet
+          _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']).strip() # For non HS2, as non multi query yet
         else:
           _snippet['status'] = 'failed'
 
-        history.update_data(notebook)
-        history.save()
+        if history:  # If _historify failed, history will be None
+          history.update_data(notebook)
+          history.save()
 
-        response['history_id'] = history.id
-        response['history_uuid'] = history.uuid
-        if notebook['isSaved']: # Keep track of history of saved queries
-          response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
+          response['history_id'] = history.id
+          response['history_uuid'] = history.uuid
+          if notebook['isSaved']: # Keep track of history of saved queries
+            response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
   except QueryError, ex: # We inject the history information from _historify() to the failed queries
     if response.get('history_id'):
       ex.extra['history_id'] = response['history_id']
@@ -155,7 +157,7 @@ def _execute_notebook(request, notebook, snippet):
 @require_POST
 @check_document_access_permission()
 @api_error_handler
-def execute(request):
+def execute(request, engine=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
@@ -195,13 +197,15 @@ def check_status(request):
       status = 'expired'
     else:
       status = 'failed'
-    if notebook['type'].startswith('query'):
+
+    if notebook['type'].startswith('query') or notebook.get('isManaged'):
       nb_doc = Document2.objects.get(id=notebook['id'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()
-        nb['snippets'][0]['status'] = status
-        nb_doc.update_data(nb)
-        nb_doc.save()
+        if status != nb['snippets'][0]['status']:
+          nb['snippets'][0]['status'] = status
+          nb_doc.update_data(nb)
+          nb_doc.save()
 
   return JsonResponse(response)
 
@@ -299,7 +303,7 @@ def get_logs(request):
   response['logs'] = logs.strip()
   response['progress'] = min(db.progress(snippet, full_log), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
-  response['isFullLogs'] = snippet.get('interface') == 'oozie'
+  response['isFullLogs'] = isinstance(db, OozieApi)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -325,18 +329,7 @@ def _save_notebook(notebook, user):
   notebook['isSaved'] = True
   notebook['isHistory'] = False
   notebook['id'] = notebook_doc.id
-
-  if notebook_doc.doc is not None:
-    notebook_doc1 = notebook_doc.doc.get()
-  else:
-    notebook_doc1 = Document.objects.link(
-      notebook_doc,
-      owner=notebook_doc.owner,
-      name=notebook_doc.name,
-      description=notebook_doc.description,
-      extra=notebook_type
-    )
-
+  notebook_doc1 = notebook_doc._get_doc1(doc2_type=notebook_type)
   notebook_doc.update_data(notebook)
   notebook_doc.search = _get_statement(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']
@@ -345,6 +338,7 @@ def _save_notebook(notebook, user):
   notebook_doc1.save()
 
   return notebook_doc, save_as
+
 
 @api_error_handler
 @require_POST
@@ -367,14 +361,18 @@ def save_notebook(request):
 def _historify(notebook, user):
   query_type = notebook['type']
   name = notebook['name'] if (notebook['name'] and notebook['name'].strip() != '') else DEFAULT_HISTORY_NAME
+  is_managed = notebook.get('isManaged') == True  # Prevents None
 
-  history_doc = Document2.objects.create(
-    name=name,
-    type=query_type,
-    owner=user,
-    is_history=True,
-    is_managed=notebook.get('isManaged') == True
-  )
+  if is_managed and Document2.objects.filter(uuid=notebook['uuid']).exists():
+    history_doc = Document2.objects.get(uuid=notebook['uuid'])
+  else:
+    history_doc = Document2.objects.create(
+      name=name,
+      type=query_type,
+      owner=user,
+      is_history=True,
+      is_managed=is_managed
+    )
 
   # Link history of saved query
   if notebook['isSaved']:
@@ -382,13 +380,14 @@ def _historify(notebook, user):
     notebook['parentSavedQueryUuid'] = parent_doc.uuid
     history_doc.dependencies.add(parent_doc)
 
-  Document.objects.link(
-    history_doc,
-    name=history_doc.name,
-    owner=history_doc.owner,
-    description=history_doc.description,
-    extra=query_type
-  )
+  if not is_managed:
+    Document.objects.link(
+      history_doc,
+      name=history_doc.name,
+      owner=history_doc.owner,
+      description=history_doc.description,
+      extra=query_type
+    )
 
   notebook['uuid'] = history_doc.uuid
   history_doc.update_data(notebook)
@@ -418,18 +417,28 @@ def get_history(request):
 
   doc_type = request.GET.get('doc_type')
   doc_text = request.GET.get('doc_text')
-  limit = min(request.GET.get('len', 50), 100)
+  page = min(int(request.GET.get('page', 1)), 100)
+  limit = min(int(request.GET.get('limit', 50)), 100)
+  is_notification_manager = request.GET.get('is_notification_manager', 'false') == 'true'
 
-  docs = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
+  if is_notification_manager:
+    docs = Document2.objects.get_tasks_history(user=request.user)
+  else:
+    docs = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
 
   if doc_text:
     docs = docs.filter(Q(name__icontains=doc_text) | Q(description__icontains=doc_text) | Q(search__icontains=doc_text))
 
+  # Paginate
+  docs = docs.order_by('-last_modified')
+  response['count'] = docs.count()
+  docs = __paginate(page, limit, queryset=docs)['documents']
+
   history = []
-  for doc in docs.order_by('-last_modified')[:limit]:
+  for doc in docs:
     notebook = Notebook(document=doc).get_data()
     if 'snippets' in notebook:
-      statement = _get_statement(notebook)
+      statement = notebook['description'] if is_notification_manager else _get_statement(notebook)
       history.append({
         'name': doc.name,
         'id': doc.id,
@@ -437,7 +446,7 @@ def get_history(request):
         'type': doc.type,
         'data': {
             'statement': statement[:1001] if statement else '',
-            'lastExecuted': notebook['snippets'][0]['lastExecuted'],
+            'lastExecuted': notebook['snippets'][0].get('lastExecuted', -1),
             'status':  notebook['snippets'][0]['status'],
             'parentSavedQueryUuid': notebook.get('parentSavedQueryUuid', '')
         } if notebook['snippets'] else {},
@@ -460,8 +469,12 @@ def clear_history(request):
 
   notebook = json.loads(request.POST.get('notebook'), '{}')
   doc_type = request.POST.get('doc_type')
+  is_notification_manager = request.POST.get('is_notification_manager', 'false') == 'true'
 
-  history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
+  if is_notification_manager:
+    history = Document2.objects.get_tasks_history(user=request.user)
+  else:
+    history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
 
   response['updated'] = history.delete()
   response['message'] = _('History cleared !')
@@ -600,64 +613,6 @@ def format(request):
   return JsonResponse(response)
 
 
-@require_GET
-@api_error_handler
-def github_fetch(request):
-  response = {'status': -1}
-
-  api = GithubClient(access_token=request.session.get('github_access_token'))
-
-  response['url'] = url = request.GET.get('url')
-
-  if url:
-    owner, repo, branch, filepath = api.parse_github_url(url)
-    content = api.get_file_contents(owner, repo, filepath, branch)
-    try:
-      response['content'] = json.loads(content)
-    except ValueError:
-      # Content is not JSON-encoded so return plain-text
-      response['content'] = content
-    response['status'] = 0
-  else:
-    return HttpResponseBadRequest(_('url param is required'))
-
-  return JsonResponse(response)
-
-
-@api_error_handler
-def github_authorize(request):
-  access_token = request.session.get('github_access_token')
-  if access_token and GithubClient.is_authenticated(access_token):
-    response = {
-      'status': 0,
-      'message': _('User is already authenticated to GitHub.')
-    }
-    return JsonResponse(response)
-  else:
-    auth_url = GithubClient.get_authorization_url()
-    request.session['github_callback_redirect'] = request.GET.get('currentURL')
-    request.session['github_callback_fetch'] = request.GET.get('fetchURL')
-    response = {
-      'status': -1,
-      'auth_url':auth_url
-    }
-    if (request.is_ajax()):
-      return JsonResponse(response)
-
-    return HttpResponseRedirect(auth_url)
-
-
-@api_error_handler
-def github_callback(request):
-  redirect_base = request.session['github_callback_redirect'] + "&github_status="
-  if 'code' in request.GET:
-    session_code = request.GET.get('code')
-    request.session['github_access_token'] = GithubClient.get_access_token(session_code)
-    return HttpResponseRedirect(redirect_base + "0&github_fetch=" + request.session['github_callback_fetch'])
-  else:
-    return HttpResponseRedirect(redirect_base + "-1&github_fetch=" + request.session['github_callback_fetch'])
-
-
 @require_POST
 @check_document_access_permission()
 @api_error_handler
@@ -669,11 +624,12 @@ def export_result(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   data_format = json.loads(request.POST.get('format', 'hdfs-file'))
   destination = json.loads(request.POST.get('destination', ''))
-  overwrite = json.loads(request.POST.get('overwrite', False))
+  overwrite = json.loads(request.POST.get('overwrite', 'false'))
+  is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
 
   api = get_api(request, snippet)
 
-  if data_format == 'hdfs-file':
+  if data_format == 'hdfs-file': # Blocking operation, like downloading
     if request.fs.isdir(destination):
       if notebook.get('name'):
         destination += '/%(name)s.csv' % notebook
@@ -683,18 +639,101 @@ def export_result(request):
       request.fs.do_as_user(request.user.username, request.fs.rmtree, destination)
     response['watch_url'] = api.export_data_as_hdfs_file(snippet, destination, overwrite)
     response['status'] = 0
+    request.audit = {
+      'operation': 'EXPORT',
+      'operationText': 'User %s exported to HDFS destination: %s' % (request.user.username, destination),
+      'allowed': True
+    }
   elif data_format == 'hive-table':
-    notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-    response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
-    response['status'] = 0
+    if is_embedded:
+      sql, success_url = api.export_data_as_table(notebook, snippet, destination)
+
+      task = make_notebook(
+        name=_('Export %s query to table %s') % (snippet['type'], destination),
+        description=_('Query %s to %s') % (_get_snippet_name(notebook), success_url),
+        editor_type=snippet['type'],
+        statement=sql,
+        status='ready-execute',
+        database=snippet['database'],
+        on_success_url=success_url,
+        is_task=True
+      )
+      response = task.execute(request)
+    else:
+      notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['status'] = 0
+    request.audit = {
+      'operation': 'EXPORT',
+      'operationText': 'User %s exported to Hive table: %s' % (request.user.username, destination),
+      'allowed': True
+    }
   elif data_format == 'hdfs-directory':
-    notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-    response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
-    response['status'] = 0
+    if is_embedded:
+      sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
+
+      task = make_notebook(
+        name=_('Export %s query to directory') % snippet['type'],
+        description=_('Query %s to %s') % (_get_snippet_name(notebook), success_url),
+        editor_type=snippet['type'],
+        statement=sql,
+        status='ready-execute',
+        database=snippet['database'],
+        on_success_url=success_url,
+        is_task=True
+      )
+      response = task.execute(request)
+    else:
+      notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['status'] = 0
+    request.audit = {
+      'operation': 'EXPORT',
+      'operationText': 'User %s exported to HDFS directory: %s' % (request.user.username, destination),
+      'allowed': True
+    }
   elif data_format == 'search-index':
-    notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-    response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
-    response['status'] = 0
+    if is_embedded:
+      if destination == '__hue__':
+        destination = _get_snippet_name(notebook, unique=True, table_format=True)
+        live_indexing = True
+      else:
+        live_indexing = False
+
+      sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
+
+      from indexer.api3 import _index # Will be moved to the lib
+      from indexer.file_format import HiveFormat
+      from indexer.fields import Field
+
+      file_format = {
+          'name': 'col',
+          'inputFormat': 'query',
+          'format': {'quoteChar': '"', 'recordSeparator': '\n', 'type': 'csv', 'hasHeader': False, 'fieldSeparator': '\u0001'},
+          "sample": '',
+          "columns": [
+              Field(col['name'].rsplit('.')[-1], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+              for col in sample['meta']
+          ]
+      }
+
+      if live_indexing:
+        file_format['inputFormat'] = 'hs2_handle'
+        file_format['fetch_handle'] = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
+        response['rowcount'] = _index(request, file_format, destination, query=notebook['uuid'])
+        response['watch_url'] = reverse('search:browse', kwargs={'name': destination})
+        response['status'] = 0
+      else:
+        response = _index(request, file_format, destination, query=notebook['uuid'])
+    else:
+      notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['status'] = 0
+    request.audit = {
+      'operation': 'EXPORT',
+      'operationText': 'User %s exported to Search index: %s' % (request.user.username, destination),
+      'allowed': True
+    }
 
   return JsonResponse(response)
 
@@ -703,12 +742,12 @@ def export_result(request):
 @check_document_access_permission()
 @api_error_handler
 def statement_risk(request):
-  response = {'status': -1, 'message': _('Risk analysis failed.')}
+  response = {'status': -1, 'message': ''}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  api = get_api(request, snippet)
+  api = HS2Api(request.user, snippet)
 
   response['query_complexity'] = api.statement_risk(notebook, snippet)
   response['status'] = 0
@@ -720,7 +759,7 @@ def statement_risk(request):
 @check_document_access_permission()
 @api_error_handler
 def statement_compatibility(request):
-  response = {'status': -1, 'message': _('Compatibility analysis failed.')}
+  response = {'status': -1, 'message': ''}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
@@ -734,3 +773,48 @@ def statement_compatibility(request):
 
   return JsonResponse(response)
 
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def statement_similarity(request):
+  response = {'status': -1, 'message': ''}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+  source_platform = request.POST.get('sourcePlatform')
+
+  api = get_api(request, snippet)
+
+  response['statement_similarity'] = api.statement_similarity(notebook, snippet, source_platform=source_platform)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def get_external_statement(request):
+  response = {'status': -1, 'message': ''}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  if snippet.get('statementType') == 'file':
+    response['statement'] = _get_statement_from_file(request.user, request.fs, snippet)
+  elif snippet.get('statementType') == 'document':
+    notebook = Notebook(Document2.objects.get_by_uuid(user=request.user, uuid=snippet['associatedDocumentUuid'], perm_type='read'))
+    response['statement'] = notebook.get_str()
+
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+def _get_statement_from_file(user, fs, snippet):
+  script_path = snippet['statementPath']
+  if script_path:
+    script_path = script_path.replace('hdfs://', '')
+    if fs.do_as_user(user, fs.exists, script_path):
+      return fs.do_as_user(user, fs.read, script_path, 0, 16 * 1024 ** 2)

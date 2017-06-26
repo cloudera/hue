@@ -50,15 +50,14 @@ ${ comps.menubar() }
               <br/>
               <br/>
 
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
-              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+              <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
             </p>
       </div>
     </div>
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
 
     function checkStatus() {

@@ -34,7 +34,6 @@
           dialect: 'hive',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -83,7 +82,6 @@
           beforeCursor: 'ALTER INDEX boo ON bla ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'REBUILD']
@@ -96,7 +94,6 @@
           beforeCursor: 'ALTER INDEX boo ON bla PARTITION (baa = 1) ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['REBUILD']
@@ -147,7 +144,6 @@
             afterCursor: '',
             dialect: 'hive',
             containsKeywords: ['SELECT'],
-            hasLocations: true,
             expectedResult: {
               lowerCase: false
             }
@@ -159,7 +155,6 @@
             beforeCursor: 'ALTER TABLE page_view DROP PARTITION (dt=\'2008-08-08\', country=\'us\');',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -172,7 +167,6 @@
             beforeCursor: 'ALTER TABLE page_view ADD PARTITION (dt=\'2008-08-08\', country=\'us\') location \'/path/to/us/part080808\'\nPARTITION (dt=\'2008-08-09\', country=\'us\') location \'/path/to/us/part080809\';',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -185,7 +179,6 @@
             beforeCursor: 'ALTER TABLE bar ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ADD COLUMNS', 'ADD IF NOT EXISTS', 'ADD PARTITION', 'ARCHIVE PARTITION', 'CHANGE',
@@ -202,7 +195,6 @@
             beforeCursor: 'ALTER TABLE bar ADD ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IF NOT EXISTS', 'COLUMNS', 'PARTITION']
@@ -215,7 +207,6 @@
             beforeCursor: 'ALTER TABLE bar ADD COLUMNS (boo ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['INT', 'STRUCT<>'],
             expectedResult: {
               lowerCase: false
@@ -228,7 +219,6 @@
             beforeCursor: 'ALTER TABLE bar ADD COLUMNS (boo INT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COMMENT']
@@ -241,7 +231,6 @@
             beforeCursor: 'ALTER TABLE bar ADD COLUMNS (boo INT) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
@@ -254,7 +243,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['NOT EXISTS']
@@ -267,7 +255,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF NOT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['EXISTS']
@@ -280,7 +267,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']
@@ -293,7 +279,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS PARTITION (dt=\'2008-08-08\', country=\'us\')  ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['LOCATION', 'PARTITION']
@@ -306,7 +291,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS PARTITION (dt=\'2008-08-08\', country=\'us\') LOCATION \'',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: '' }
@@ -319,7 +303,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS PARTITION (dt=\'2008-08-08\', ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] } ,
               lowerCase: false
@@ -332,7 +315,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS PARTITION (dt=\'2008-08-08\') LOCATION \'/boo\' PARTITION  (',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -345,7 +327,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS PARTITION (dt=\'2008-08-08\') LOCATION \'/boo\' PARTITION (baa=1) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['LOCATION', 'PARTITION']
@@ -358,7 +339,6 @@
             beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS PARTITION (dt=\'2008-08-08\') LOCATION \'/boo\' PARTITION (country=\'us\') LOCATION \'',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: '' }
@@ -371,7 +351,6 @@
             beforeCursor: 'ALTER TABLE bar ARCHIVE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']
@@ -384,7 +363,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] },
@@ -398,7 +376,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE boo baa ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['ARRAY<>', 'INT'],
             expectedResult: {
               lowerCase: false
@@ -411,7 +388,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE boo baa INT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COMMENT', 'AFTER', 'FIRST', 'CASCADE', 'RESTRICT']
@@ -424,7 +400,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE boo baa INT COMMENT \'ble\' ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AFTER', 'FIRST', 'CASCADE', 'RESTRICT']
@@ -437,7 +412,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE boo baa INT COMMENT \'ble\' AFTER ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -450,7 +424,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE boo baa INT FIRST ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -463,7 +436,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE boo baa INT FIRST ba ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
@@ -476,7 +448,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE COLUMN boo baa INT AFTER ba ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
@@ -489,7 +460,6 @@
             beforeCursor: 'ALTER TABLE bar CLUSTERED ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BY']
@@ -502,7 +472,6 @@
             beforeCursor: 'ALTER TABLE bar CLUSTERED BY (',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -515,7 +484,6 @@
             beforeCursor: 'ALTER TABLE bar CLUSTERED BY (a, b, ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -528,7 +496,6 @@
             beforeCursor: 'ALTER TABLE bar CLUSTERED BY (a, b, c) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SORTED BY', 'INTO']
@@ -541,7 +508,6 @@
             beforeCursor: 'ALTER TABLE bar CLUSTERED BY (a, b, c) INTO 10 ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BUCKETS']
@@ -554,7 +520,6 @@
             beforeCursor: 'ALTER TABLE bar CLUSTERED BY (a, b, c) SORTED ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BY']
@@ -567,7 +532,6 @@
             beforeCursor: 'ALTER TABLE foo.bar CLUSTERED BY (a, b, c) SORTED BY (',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
@@ -580,7 +544,6 @@
             beforeCursor: 'ALTER TABLE bar CLUSTERED BY (a, b, c) SORTED BY (a) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['INTO']
@@ -593,7 +556,6 @@
             beforeCursor: 'ALTER TABLE bar CLUSTERED BY (a, b, c) SORTED BY (a) INTO 10 ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BUCKETS']
@@ -606,7 +568,6 @@
             beforeCursor: 'ALTER TABLE bar DROP ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IF EXISTS', 'PARTITION']
@@ -619,7 +580,6 @@
             beforeCursor: 'ALTER TABLE bar DROP IF ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['EXISTS']
@@ -632,7 +592,6 @@
             beforeCursor: 'ALTER TABLE bar DROP IF EXISTS ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']
@@ -646,7 +605,6 @@
             beforeCursor: 'ALTER TABLE bar DROP IF EXISTS PARTITION (',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -659,7 +617,6 @@
             beforeCursor: 'ALTER TABLE bar DROP IF EXISTS PARTITION (a=\'baa\'), ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']
@@ -672,7 +629,6 @@
             beforeCursor: 'ALTER TABLE bar DROP PARTITION (a=\'baa\') ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PURGE']
@@ -685,7 +641,6 @@
             beforeCursor: 'ALTER TABLE bar DROP PARTITION (a=\'baa\'), PARTITION (b=\'boo\') ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PURGE']
@@ -698,7 +653,6 @@
             beforeCursor: 'ALTER TABLE bar EXCHANGE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']
@@ -711,7 +665,6 @@
             beforeCursor: 'ALTER TABLE bar EXCHANGE PARTITION ((boo=\'baa\'), (baa=\'boo\')) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['WITH TABLE']
@@ -724,7 +677,6 @@
             beforeCursor: 'ALTER TABLE bar EXCHANGE PARTITION ((boo=\'baa\'), (baa=\'boo\')) WITH ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TABLE']
@@ -737,7 +689,6 @@
             beforeCursor: 'ALTER TABLE bar EXCHANGE PARTITION ((boo=\'baa\'), (baa=\'boo\')) WITH TABLE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestTables: {},
@@ -751,7 +702,6 @@
             beforeCursor: 'ALTER TABLE bar NOT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SKEWED', 'STORED AS DIRECTORIES']
@@ -764,7 +714,6 @@
             beforeCursor: 'ALTER TABLE bar NOT STORED ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AS DIRECTORIES']
@@ -777,7 +726,6 @@
             beforeCursor: 'ALTER TABLE bar NOT STORED AS ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['DIRECTORIES']
@@ -790,7 +738,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ADD COLUMNS', 'CHANGE', 'COMPACT', 'CONCATENATE', 'DISABLE NO_DROP', 'DISABLE OFFLINE',
@@ -805,7 +752,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') ADD ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COLUMNS']
@@ -818,7 +764,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') ADD COLUMNS (boo ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['INT', 'STRUCT<>'],
             expectedResult: {
               lowerCase: false
@@ -831,7 +776,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') ADD COLUMNS (boo INT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COMMENT']
@@ -844,7 +788,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') ADD COLUMNS (boo INT) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
@@ -857,7 +800,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') CHANGE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] },
@@ -871,7 +813,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col1, col2) CHANGE boo baa ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['ARRAY<>', 'INT'],
             expectedResult: {
               lowerCase: false
@@ -884,7 +825,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') CHANGE boo baa ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['ARRAY<>', 'INT'],
             expectedResult: {
               lowerCase: false
@@ -897,7 +837,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') CHANGE boo baa INT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COMMENT', 'AFTER', 'FIRST', 'CASCADE', 'RESTRICT']
@@ -910,7 +849,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') CHANGE boo baa INT COMMENT \'ble\' ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AFTER', 'FIRST', 'CASCADE', 'RESTRICT']
@@ -923,7 +861,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') CHANGE boo baa INT COMMENT \'ble\' AFTER ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -936,7 +873,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') CHANGE boo baa INT FIRST ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -949,7 +885,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') CHANGE boo baa INT FIRST ba ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
@@ -962,7 +897,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') CHANGE COLUMN boo baa INT AFTER ba ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
@@ -975,7 +909,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') DISABLE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['NO_DROP', 'OFFLINE']
@@ -988,7 +921,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') ENABLE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['NO_DROP', 'OFFLINE']
@@ -1001,7 +933,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') RENAME ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TO PARTITION']
@@ -1014,7 +945,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') RENAME TO ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']
@@ -1027,7 +957,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') REPLACE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COLUMNS']
@@ -1040,7 +969,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') REPLACE COLUMNS (boo ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['INT', 'STRUCT<>'],
             expectedResult: {
               lowerCase: false
@@ -1053,7 +981,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') REPLACE COLUMNS (boo INT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COMMENT']
@@ -1066,7 +993,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') REPLACE COLUMNS (boo INT) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
@@ -1079,7 +1005,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') SET ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES']
@@ -1092,7 +1017,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') SET FILEFORMAT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['ORC', 'PARQUET'],
             expectedResult: {
               lowerCase: false
@@ -1105,7 +1029,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') SET LOCATION \'',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: '' }
@@ -1118,7 +1041,6 @@
             beforeCursor: 'ALTER TABLE bar RECOVER ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITIONS']
@@ -1131,7 +1053,6 @@
             beforeCursor: 'ALTER TABLE bar RENAME ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TO']
@@ -1144,7 +1065,6 @@
             beforeCursor: 'ALTER TABLE bar REPLACE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COLUMNS']
@@ -1157,7 +1077,6 @@
             beforeCursor: 'ALTER TABLE bar REPLACE COLUMNS (boo ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['INT', 'STRUCT<>'],
             expectedResult: {
               lowerCase: false
@@ -1170,7 +1089,6 @@
             beforeCursor: 'ALTER TABLE bar REPLACE COLUMNS (boo INT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COMMENT']
@@ -1183,7 +1101,6 @@
             beforeCursor: 'ALTER TABLE bar REPLACE COLUMNS (boo INT) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
@@ -1196,7 +1113,6 @@
             beforeCursor: 'ALTER TABLE bar SET ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']
@@ -1209,7 +1125,6 @@
             beforeCursor: 'ALTER TABLE bar SET FILEFORMAT ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             containsKeywords: ['ORC', 'PARQUET'],
             expectedResult: {
               lowerCase: false
@@ -1222,7 +1137,6 @@
             beforeCursor: 'ALTER TABLE bar SET LOCATION \'',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: '' }
@@ -1235,7 +1149,6 @@
             beforeCursor: 'ALTER TABLE bar SET SERDE \'boo\' ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['WITH SERDEPROPERTIES']
@@ -1248,7 +1161,6 @@
             beforeCursor: 'ALTER TABLE bar SET SERDE \'boo\' WITH ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SERDEPROPERTIES']
@@ -1261,7 +1173,6 @@
             beforeCursor: 'ALTER TABLE bar SET SKEWED ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['LOCATION']
@@ -1274,7 +1185,6 @@
             beforeCursor: 'ALTER TABLE bar SET SKEWED LOCATION (',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -1287,7 +1197,6 @@
             beforeCursor: 'ALTER TABLE bar SET SKEWED LOCATION (a=\'/boo\', ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -1300,7 +1209,6 @@
             beforeCursor: 'ALTER TABLE bar SKEWED ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BY']
@@ -1313,7 +1221,6 @@
             beforeCursor: 'ALTER TABLE bar SKEWED BY (',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns:  { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -1326,7 +1233,6 @@
             beforeCursor: 'ALTER TABLE foo.bar SKEWED BY (a, ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
@@ -1339,7 +1245,6 @@
             beforeCursor: 'ALTER TABLE bar SKEWED BY (a, b) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ON']
@@ -1352,7 +1257,6 @@
             beforeCursor: 'ALTER TABLE bar SKEWED BY (a, b) ON ((1, 2), (2, 3)) ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['STORED AS DIRECTORIES']
@@ -1365,7 +1269,6 @@
             beforeCursor: 'ALTER TABLE bar SKEWED BY (a, b) ON ((1, 2), (2, 3)) STORED ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AS DIRECTORIES']
@@ -1378,7 +1281,6 @@
             beforeCursor: 'ALTER TABLE bar SKEWED BY (a, b) ON ((1, 2), (2, 3)) STORED AS ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['DIRECTORIES']
@@ -1391,7 +1293,6 @@
             beforeCursor: 'ALTER TABLE bar TOUCH ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']
@@ -1404,7 +1305,6 @@
             beforeCursor: 'ALTER TABLE bar UNARCHIVE ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']
@@ -1420,7 +1320,6 @@
             beforeCursor: 'alter table d2.mobile rename to d3.mobile;',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: true
@@ -1433,7 +1332,6 @@
             beforeCursor: 'alter table p1 partition (month=1, day=1) set location \'/usr/external_data/new_years_day\';',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: true
@@ -1446,7 +1344,6 @@
             beforeCursor: 'alter table sales_data add partition (zipcode = cast(9021 * 10 as string));',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: true
@@ -1459,7 +1356,6 @@
             beforeCursor: 'ALTER TABLE table_name SET TBLPROPERTIES(\'EXTERNAL\'=\'FALSE\');',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -1472,7 +1368,6 @@
             beforeCursor: 'ALTER TABLE bar ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ADD COLUMNS', 'ADD PARTITION', 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'PARTITION', 'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED' ]
@@ -1485,7 +1380,6 @@
             beforeCursor: 'ALTER TABLE bar ADD ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COLUMNS', 'PARTITION']
@@ -1498,7 +1392,6 @@
             beforeCursor: 'ALTER TABLE bar ADD COLUMNS (a INT, b ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['INT'],
             doesNotContainKeywords: ['ARRAY<>'],
             expectedResult: {
@@ -1512,7 +1405,6 @@
             beforeCursor: 'ALTER TABLE bar ADD PARTITION (',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -1525,7 +1417,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -1538,7 +1429,6 @@
             beforeCursor: 'ALTER TABLE bar CHANGE foo bar ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['INT'],
             expectedResult: {
               lowerCase: false
@@ -1551,7 +1441,6 @@
             beforeCursor: 'ALTER TABLE bar DROP ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] },
@@ -1566,7 +1455,6 @@
             beforeCursor: 'ALTER TABLE bar DROP PARTITION (',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
@@ -1579,7 +1467,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED']
@@ -1592,7 +1479,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') SET ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']
@@ -1605,7 +1491,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') SET CACHED ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IN']
@@ -1618,7 +1503,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') SET FILEFORMAT ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['PARQUET'],
             doesNotContainKeywords: ['ORC'],
             expectedResult: {
@@ -1632,7 +1516,6 @@
             beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') SET LOCATION \'',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: '' }
@@ -1649,7 +1532,6 @@
           afterCursor: '',
           noErrors: true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1694,7 +1576,6 @@
         assertAutoComplete({
           beforeCursor: 'ALTER VIEW boo ',
           afterCursor: '',
-          hasLocations: true,
           containsKeywords: ['AS'],
           expectedResult: {
             lowerCase: false
@@ -1706,7 +1587,6 @@
         assertAutoComplete({
           beforeCursor: 'ALTER VIEW baa.boo AS ',
           afterCursor: '',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT']
@@ -1718,7 +1598,6 @@
         assertAutoComplete({
           beforeCursor: 'ALTER VIEW baa.boo AS SELECT * FROM ',
           afterCursor: '',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -1734,7 +1613,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -1747,7 +1625,6 @@
             beforeCursor: 'ALTER VIEW boo ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AS', 'SET TBLPROPERTIES']
@@ -1760,7 +1637,6 @@
             beforeCursor: 'ALTER VIEW boo SET ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TBLPROPERTIES']
@@ -1776,7 +1652,6 @@
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -1789,7 +1664,6 @@
             beforeCursor: 'ALTER VIEW boo ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AS', 'RENAME TO']
@@ -1802,7 +1676,6 @@
             beforeCursor: 'ALTER VIEW boo RENAME ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TO']
@@ -1815,7 +1688,6 @@
             beforeCursor: 'ALTER VIEW boo RENAME TO ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestDatabases: { appendDot: true }
@@ -1832,7 +1704,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false

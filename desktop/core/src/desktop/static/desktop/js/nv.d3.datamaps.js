@@ -18,7 +18,7 @@
   var svg;
 
   //save off default references
-  var d3 = window.d3, topojson = window.topojson;
+  var d3 = window.d3v3, topojson = window.topojson;
 
   var defaultOptions = {
     scope: 'world',

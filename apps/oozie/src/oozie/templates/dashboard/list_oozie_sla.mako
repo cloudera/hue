@@ -22,8 +22,11 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_("SLA"), "sla", user, request) | n,unicode }
 ${ layout.menubar(section='sla', dashboard=True) }
+%endif
+
 
 <style type="text/css">
   .label-with-margin {
@@ -55,7 +58,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
 </style>
 
-<div class="container-fluid">
+<div id="oozie_slaComponents" class="container-fluid">
   <div class="card card-small">
     % if show_slas_hint:
       <div class="card-body">
@@ -98,12 +101,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
       <div class="card-body">
         <p>
           <div class="loader hide" style="text-align: center;margin-top: 20px">
-            <!--[if lte IE 9]>
-              <img src="${ static('desktop/art/spinner-big.gif') }" />
-            <![endif]-->
-            <!--[if !IE]> -->
-              <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
-            <!-- <![endif]-->
+            <i class="fa fa-spinner fa-spin big-spinner"></i>
           </div>
 
           <div class="search-something center empty-wrapper">
@@ -113,7 +111,6 @@ ${ layout.menubar(section='sla', dashboard=True) }
           </div>
 
           <div class="no-results center empty-wrapper hide">
-            <i class="fa fa-frown-o"></i>
             <h1>${_('The server returned no results.')}</h1>
             <br/>
           </div>
@@ -128,7 +125,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
              <div class="tab-pane active" id="slaListTab">
                <div class="tabbable">
                  <div class="tab-content">
-                   <table id="slaTable" class="table table-striped table-condensed">
+                   <table id="slaTable" class="table table-condensed">
                      <thead>
                        <th>${_('Status')}</th>
                        <th>${_('Name')}</th>
@@ -167,54 +164,12 @@ ${ layout.menubar(section='sla', dashboard=True) }
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.selection.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.time.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.blueprint.js') }"></script>
 
-<script type="text/javascript" charset="utf-8">
-
-  function performSearch(id) {
-    if ((id != null || $("input[name='job_name']").val().trim()) != "" && slaTable) {
-      window.location.hash = (id != null ? id : $("input[name='job_name']").val().trim());
-      $(".results").addClass("hide");
-      $(".loader").removeClass("hide");
-      $(".search-something").addClass("hide");
-      var IN_DATETIME_FORMAT = "MM/DD/YYYY hh:mm A";
-      var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm[Z]";
-      var _postObj = {
-        "job_name": id != null ? id : $("input[name='job_name']").val()
-      };
-
-      if (window.viewModel.useDates()) {
-        _postObj.useDates = true;
-      }
-      if ($("input[name='start_0']").val() != "" && $("input[name='start_1']").val() != "") {
-        _postObj.start = moment($("input[name='start_0']").val() + " " + $("input[name='start_1']").val(), IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
-      }
-      if ($("input[name='end_0']").val() != "" && $("input[name='end_1']").val() != "") {
-        _postObj.end = moment($("input[name='end_0']").val() + " " + $("input[name='end_1']").val(), IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT)
-      }
-
-      $.post("${ url('oozie:list_oozie_sla') }?format=json", _postObj, function (data) {
-        $(".loader").addClass("hide");
-        slaTable.fnClearTable();
-        if (data['oozie_slas'] && data['oozie_slas'].length > 0) {
-          $(".no-results").addClass("hide");
-          $(".results").removeClass("hide");
-          for (var i = 0; i < data['oozie_slas'].length; i++) {
-            slaTable.fnAddData(getSLArow(data['oozie_slas'][i]));
-          }
-        }
-        else {
-          $(".results").addClass("hide");
-          $(".no-results").removeClass("hide");
-        }
-      });
-    }
-  }
+<script type="text/javascript">
 
   var CHART_LABELS = {
     NOMINAL_TIME: "${_('Nominal Time')}",
@@ -225,27 +180,65 @@ ${ layout.menubar(section='sla', dashboard=True) }
     TOOLTIP_ADDON: "${_('click for more details')}"
   }
 
-  var slaTable;
+  var slaTable, slaVM;
 
   $(document).ready(function () {
     var ViewModel = function () {
       var self = this;
-
       self.useDates = ko.observable(false);
+      self.performSearch = function(id) {
+        if ((id != null || $("input[name='job_name']").val().trim()) != "" && slaTable) {
+          hueUtils.changeURLParameter('id', (id != null ? id : $("input[name='job_name']").val().trim()))
+          $(".results").addClass("hide");
+          $(".loader").removeClass("hide");
+          $(".search-something").addClass("hide");
+          var IN_DATETIME_FORMAT = "MM/DD/YYYY hh:mm A";
+          var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm[Z]";
+          var _postObj = {
+            "job_name": id != null ? id : $("input[name='job_name']").val()
+          };
+
+          if (self.useDates()) {
+            _postObj.useDates = true;
+          }
+          if ($("input[name='start_0']").val() != "" && $("input[name='start_1']").val() != "") {
+            _postObj.start = moment($("input[name='start_0']").val() + " " + $("input[name='start_1']").val(), IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
+          }
+          if ($("input[name='end_0']").val() != "" && $("input[name='end_1']").val() != "") {
+            _postObj.end = moment($("input[name='end_0']").val() + " " + $("input[name='end_1']").val(), IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT)
+          }
+
+          $.post("${ url('oozie:list_oozie_sla') }?format=json", _postObj, function (data) {
+            $(".loader").addClass("hide");
+            slaTable.fnClearTable();
+            if (data['oozie_slas'] && data['oozie_slas'].length > 0) {
+              $(".no-results").addClass("hide");
+              $(".results").removeClass("hide");
+              for (var i = 0; i < data['oozie_slas'].length; i++) {
+                slaTable.fnAddData(getSLArow(data['oozie_slas'][i]));
+              }
+            }
+            else {
+              $(".results").addClass("hide");
+              $(".no-results").removeClass("hide");
+            }
+          });
+        }
+      }
     };
 
-    window.viewModel = new ViewModel([]);
-    ko.applyBindings(window.viewModel);
+    slaVM = new ViewModel([]);
+    ko.applyBindings(slaVM, $('#oozie_slaComponents')[0]);
 
 
     $("a[data-row-selector='true']").jHueRowSelector();
 
     $("*[rel=tooltip]").tooltip();
 
-    $("input[name='start_0']").val(moment().subtract('days', 7).format("MM/DD/YYYY"));
-    $("input[name='start_1']").val(moment().subtract('days', 7).format("hh:mm A"));
-    $("input[name='end_0']").val(moment().add('days', 1).format("MM/DD/YYYY"));
-    $("input[name='end_1']").val(moment().add('days', 1).format("hh:mm A"));
+    $("input[name='start_0']").val(moment().subtract(7, 'days').format("MM/DD/YYYY"));
+    $("input[name='start_1']").val(moment().subtract(7, 'days').format("hh:mm A"));
+    $("input[name='end_0']").val(moment().add(1, 'days').format("MM/DD/YYYY"));
+    $("input[name='end_1']").val(moment().add(1, 'days').format("hh:mm A"));
 
 
     $.getJSON("${url('oozie:list_oozie_workflows')}?format=json&justsla=true", function (data) {
@@ -256,7 +249,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
       $("input[name='job_name']").typeahead({
         source: _autocomplete,
         updater: function (item) {
-          performSearch(item);
+          slaVM.performSearch(item);
           return item;
         }
       });
@@ -264,7 +257,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
     $("input[name='job_name']").on("keydown", function (e) {
       if (e.keyCode == 13) {
-        performSearch();
+        slaVM.performSearch();
       }
     });
 
@@ -296,38 +289,40 @@ ${ layout.menubar(section='sla', dashboard=True) }
       }
     });
 
-    if (window.location.hash != "") {
-      $("input[name='job_name']").val(window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, ""));
-      performSearch(window.location.hash.substr(1));
+    if (window.location.getParameter('id') !== '') {
+      $("input[name='job_name']").val(window.location.getParameter('id').replace(/(<([^>]+)>)/ig, ""));
+      slaVM.performSearch();
     }
   });
 </script>
 
 ${ utils.decorate_datetime_fields() }
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $("input[name='start_0']").parent().datepicker().on("changeDate", function () {
-      performSearch();
+      slaVM.performSearch();
     });
 
     $("input[name='end_0']").parent().datepicker().on("changeDate", function () {
-      performSearch();
+      slaVM.performSearch();
     });
     $("input[name='start_1']").on("change", function (e) {
       // the timepicker plugin doesn't have a change event handler
       // so we need to wait a bit to handle in with the default field event
       window.setTimeout(function () {
-        performSearch();
+        slaVM.performSearch();
       }, 200);
     });
 
     $("input[name='end_1']").on("change", function () {
       window.setTimeout(function () {
-        performSearch();
+        slaVM.performSearch();
       }, 200);
     });
   });
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

@@ -25,21 +25,27 @@ def is_selected(section, matcher):
 %>
 
 <%def name="menubar(section='')">
-  <div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
-                <a href="/about">
-                  <img src="${ static('desktop/art/icon_hue_48.png') }" class="app-icon" />
+              <li class="app-header">
+                <a href="${ url('about:admin_wizard') }">
+                  <img src="${ static('desktop/art/icon_hue_48.png') }" class="app-icon"  alt="${ _('Hue icon') }"/>
                   ${ _('About Hue') }
                 </a>
                </li>
               % if user.is_superuser:
-                <li class="${is_selected(section, 'quick_start')}"><a href="${url("about:admin_wizard")}">${_('Quick start')}</a></li>
-                <li class="${is_selected(section, 'dump_config')}"><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
-                <li class="${is_selected(section, 'log_view')}"><a href="${url("desktop.views.log_view")}">${_('Server Logs')}</a></li>
+                <li class="${is_selected(section, 'quick_start')}">
+                  <a href="${ url('about:admin_wizard') }">${_('Quick start')}</a>
+                </li>
+                <li class="${is_selected(section, 'dump_config')}">
+                  <a href="${ url('desktop.views.dump_config') }">${_('Configuration')}</a>
+                </li>
+                <li class="${is_selected(section, 'log_view')}">
+                  <a href="${ url('desktop.views.log_view') }">${_('Server Logs')}</a>
+                </li>
               % endif
             </ul>
           </div>

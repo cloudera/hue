@@ -17,6 +17,7 @@
 
 import logging
 
+from datetime import datetime, timedelta
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
@@ -184,15 +185,20 @@ class YarnApi(JobBrowserApi):
 
   @rm_ha
   def get_jobs(self, user, **kwargs):
-    state_filters = {'running': 'UNDEFINED', 'completed': 'SUCCEEDED', 'failed': 'FAILED', 'killed': 'KILLED', }
+    state_filters = {'running': 'UNDEFINED', 'completed': 'SUCCEEDED', 'failed': 'FAILED', 'killed': 'KILLED',}
+    states_filters = {'running': 'NEW,NEW_SAVING,SUBMITTED,ACCEPTED,RUNNING', 'completed': 'FINISHED', 'failed': 'FAILED,KILLED',}
     filters = {}
 
     if kwargs['username']:
       filters['user'] = kwargs['username']
     if kwargs['state'] and kwargs['state'] != 'all':
       filters['finalStatus'] = state_filters[kwargs['state']]
+    if kwargs.get('states'):
+      filters['states'] = ','.join([states_filters[_s] for _s in kwargs['states']])
     if kwargs.get('limit'):
       filters['limit'] = kwargs['limit']
+    if kwargs.get('time_value'):
+      filters['startedTimeBegin'] = self._get_started_time_begin(kwargs.get('time_value'), kwargs.get('time_unit'))
 
     json = self.resource_manager_api.apps(**filters)
     if type(json) == str and 'This is standby RM' in json:
@@ -212,6 +218,17 @@ class YarnApi(JobBrowserApi):
                     text in job.queue.lower(), jobs)
 
     return self.filter_jobs(user, jobs)
+
+  def _get_started_time_begin(self, time_value, time_unit):
+    if time_unit == 'hours':
+      start_date = datetime.utcnow() - timedelta(hours=time_value)
+    elif time_unit == 'minutes':
+      start_date = datetime.utcnow() - timedelta(minutes=time_value)
+    else:
+      start_date = datetime.utcnow() - timedelta(days=time_value)
+
+    elapsed_time = start_date - datetime.utcfromtimestamp(0)
+    return int(elapsed_time.days * 86400 + elapsed_time.seconds) * 1000
 
   def filter_jobs(self, user, jobs, **kwargs):
     check_permission = not SHARE_JOBS.get() and not user.is_superuser
@@ -290,7 +307,7 @@ class YarnApi(JobBrowserApi):
     return self.get_job(jobid).filter_tasks(**filters)
 
   def get_task(self, jobid, task_id):
-    return self.get_job(jobid).task(task_id)
+    return self.get_job(jobid).get_task(task_id)
 
   def get_tracker(self, node_manager_http_address, container_id):
     api = node_manager_api.get_node_manager_api('http://' + node_manager_http_address)

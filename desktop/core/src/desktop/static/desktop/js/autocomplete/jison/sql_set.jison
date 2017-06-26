@@ -22,8 +22,8 @@ DataDefinition_EDIT
  : SetRoleStatement_EDIT
  | 'SET' 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['ROLE']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['ROLE']);
      }
    }
  ;
@@ -37,6 +37,6 @@ SetRoleStatement
 SetRoleStatement_EDIT
  : 'SET' '<hive>ROLE' 'CURSOR'
    {
-     suggestKeywords(['ALL', 'NONE']);
+     parser.suggestKeywords(['ALL', 'NONE']);
    }
  ;

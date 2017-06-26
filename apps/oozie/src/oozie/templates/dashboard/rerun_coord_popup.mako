@@ -22,11 +22,11 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-<form action="${ action }" method="POST">
+<form action="${ action }" method="POST" id="submit-rerun-form">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Rerun') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Rerun') }</h2>
   </div>
 
   <div class="modal-body">
@@ -42,6 +42,7 @@
               ${ utils.render_field_no_popover(rerun_form['nocleanup'], show_label=True) }
             </div>
           </div>
+
           <div id="param-container">
             ${ params_form.management_form | n,unicode }
 
@@ -71,6 +72,10 @@
             % endif
           </div>
         </div>
+
+        % for hidden in rerun_form.hidden_fields():
+          ${ hidden | n,unicode }
+        % endfor
       </div>
     </fieldset>
   </div>
@@ -82,15 +87,29 @@
 </form>
 
 <script charset="utf-8">
-  var frag = document.createDocumentFragment();
-  viewModel.selectedActions().forEach(function (item) {
-    var option = $('<option>', {
-      value: item,
-      selected: true
+  % if return_json:
+    $('#submit-rerun-form').submit(function (e) {
+      $.ajax({
+        type: "POST",
+        url: '${ action }',
+        data: $('#submit-rerun-form').serialize(),
+        success: function (data) {
+          huePubSub.publish('submit.rerun.popup.return', data);
+        }
+      });
+      e.preventDefault();
+    });
+  % else:
+    var frag = document.createDocumentFragment();
+    viewModel.selectedActions().forEach(function (item) {
+      var option = $('<option>', {
+        value: item,
+        selected: true
+      });
+
+      option.appendTo($(frag));
     });
 
-    option.appendTo($(frag));
-  });
-
-  $(frag).appendTo('#id_actions');
+    $(frag).appendTo('#id_actions');
+  % endif
 </script>

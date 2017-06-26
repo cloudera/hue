@@ -1,12 +1,9 @@
 <?xml version="1.0"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow5="uri:oozie:workflow:0.5" xmlns:workflow4="uri:oozie:workflow:0.4">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-<xsl:import href="fields/xml.xslt"/>
 
-<xsl:template match="workflow5:*[local-name()!='decision' and local-name()!='end' and local-name()!='fork' and local-name()!='fs' and local-name()!='java' and local-name()!='join' and local-name()!='kill' and local-name()!='map-reduce' and local-name()!='pig' and local-name()!='start' and local-name()!='streaming' and local-name()!='subworkflow' and local-name()!='distcp' and local-name()!='email' and local-name()!='hive' and local-name()!='shell' and local-name()!='sqoop' and local-name()!='ssh' and local-name()!='ok' and local-name()!='error'] | workflow4:*[local-name()!='decision' and local-name()!='end' and local-name()!='fork' and local-name()!='fs' and local-name()!='java' and local-name()!='join' and local-name()!='kill' and local-name()!='map-reduce' and local-name()!='pig' and local-name()!='start' and local-name()!='streaming' and local-name()!='subworkflow' and local-name()!='distcp' and local-name()!='email' and local-name()!='hive' and local-name()!='shell' and local-name()!='sqoop' and local-name()!='ssh' and local-name()!='ok' and local-name()!='error']" xmlns:workflow5="uri:oozie:workflow:0.5" xmlns:workflow4="uri:oozie:workflow:0.4">
-
-  ,"generic": {<xsl:call-template name="xml"/>}
+<xsl:template match="*[name()!='decision' and name()!='end' and name()!='fork' and name()!='fs' and name()!='java' and name()!='join' and name()!='kill' and name()!='map-reduce' and name()!='pig' and name()!='start' and name()!='streaming' and name()!='sub-workflow' and name()!='distcp' and name()!='email' and name()!='hive' and name()!='hive2' and name()!='shell' and name()!='sqoop' and name()!='ssh' and name()!='ok' and name()!='error' and name()!='spark']">
 
 </xsl:template>
 

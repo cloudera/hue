@@ -23,14 +23,14 @@
 ${ commonheader(None, "pig", user, request) | n,unicode }
 
 <div id="pig-editor-app">
-  <div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/${app_name}">
-                  <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon"/>
+                  <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" alt="${ _('Pig icon') }"/>
                   ${ _('Pig Editor') }
                 </a>
               </li>
@@ -41,6 +41,15 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           </div>
         </div>
       </div>
+  </div>
+
+  <div class="container-fluid">
+    % if is_hue_4:
+      <div class="alert">
+        ${ _('This is the old Pig Editor, it is recommended to instead use the new ') }
+        <a href="${ url('notebook:editor') }?type=pig" target="_blank">${_('Editor')}</a>
+      </div>
+    % endif
   </div>
 
   <div class="container-fluid">
@@ -65,7 +74,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           ${_('There are currently no scripts defined. Please add a new script clicking on "New script"')}
         </div>
 
-        <table class="table table-striped table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
+        <table class="table table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
           <thead>
           <tr>
             <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}"></div></th>
@@ -79,7 +88,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           <tfoot>
           <tr data-bind="visible: isLoading()">
             <td colspan="3" class="left">
-              <img src="${ static('desktop/art/spinner.gif') }" />
+              <i class="fa fa-spinner fa-spin"></i>
             </td>
           </tr>
           <tr data-bind="visible: filteredScripts().length == 0 && !isLoading()">
@@ -532,7 +541,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
                 </div>
               </div>
             </script>
-            <pre id="withoutLogs">${ _('No available logs.') } <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: currentScript().isRunning()"/></pre>
+            <pre id="withoutLogs">${ _('No available logs.') } <i class="fa fa-spinner fa-spin" data-bind="visible: currentScript().isRunning()"></i></pre>
             <pre id="withLogs" class="hide scroll"></pre>
           </div>
         </div>
@@ -548,7 +557,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           <div class="alert alert-info" data-bind="visible: runningScripts().length == 0" style="margin-bottom:0">
             ${_('There are currently no running scripts.')}
           </div>
-          <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
+          <table class="table table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
             <thead>
             <tr>
               <th width="20%">${_('Name')}</th>
@@ -572,7 +581,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
             ${_('There are currently no completed scripts.')}
           </div>
-          <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: completedScripts().length > 0">
+          <table class="table table-condensed datatables tablescroller-disable" data-bind="visible: completedScripts().length > 0">
             <thead>
             <tr>
               <th width="20%">${_('Name')}</th>
@@ -620,8 +629,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Confirm Delete')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Confirm Delete')}</h2>
     </div>
     <div class="modal-body">
       <p class="deleteMsg hide single">${_('Are you sure you want to delete this script?')}</p>
@@ -635,11 +644,11 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="logsModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Logs')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Logs')}</h2>
     </div>
     <div class="modal-body">
-      <img src="${ static('desktop/art/spinner.gif') }" class="hide" />
+      <i class="fa fa-spinner fa-spin" class="hide"></i>
       <pre class="scroll hide"></pre>
     </div>
     <div class="modal-footer">
@@ -649,8 +658,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="submitModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Run Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Run Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h2>
     </div>
     <div class="modal-body" data-bind="visible: submissionVariables().length > 0">
       <legend style="color:#666">${_('Script variables')}</legend>
@@ -669,8 +678,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="stopModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h2>
     </div>
     <div class="modal-footer">
       <a class="btn" data-dismiss="modal">${_('No')}</a>
@@ -678,23 +687,10 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
     </div>
   </div>
 
-  <div id="chooseFile" class="modal hide fade">
-      <div class="modal-header">
-          <a href="#" class="close" data-dismiss="modal">&times;</a>
-          <h3>${_('Choose a file')}</h3>
-      </div>
-      <div class="modal-body">
-          <div id="filechooser">
-          </div>
-      </div>
-      <div class="modal-footer">
-      </div>
-  </div>
-
   <div id="confirmModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Are you sure?')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Are you sure?')}</h2>
     </div>
     <div class="modal-body">
       <p>
@@ -709,8 +705,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="nameModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Save script')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Save script')}</h2>
     </div>
     <div class="modal-body">
       <p>
@@ -732,14 +728,11 @@ ${ commonshare() | n,unicode }
 
 <div class="bottomAlert alert"></div>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('pig/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('pig/js/pig.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/apiHelper.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
 <script src="${ static('desktop/js/codemirror-pig.js') }"></script>
 <script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
@@ -748,13 +741,7 @@ ${ commonshare() | n,unicode }
 <link rel="stylesheet" href="${ static('pig/css/pig.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
 
-<style type="text/css">
-  .fileChooserBtn {
-    border-radius: 0 3px 3px 0;
-  }
-</style>
-
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var LABELS = {
     KILL_ERROR: "${ _('The Pig job could not be killed.') }",
     TOOLTIP_PLAY: "${ _('Run this Pig script.') }",
@@ -849,7 +836,7 @@ ${ commonshare() | n,unicode }
         }
       );
       codeMirror.focus();
-      logGA('navigator/click');
+      hueAnalytics.log('pig', 'navigator/click');
     });
 
     $("#navigatorSearch").jHueDelayedInput(function(){
@@ -1159,7 +1146,7 @@ ${ commonshare() | n,unicode }
 
     $(document).on("stopError", function () {
       $.jHueNotify.error(LABELS.KILL_ERROR);
-      logGA('stop');
+      hueAnalytics.log('pig', 'stop');
     });
 
     var _resizeTimeout = -1;
@@ -1201,6 +1188,8 @@ ${ commonshare() | n,unicode }
         }
       });
     }
+
+    var refreshLogsTimeout = null;
 
     function refreshLogs() {
       if (viewModel.currentScript().watchUrl() != "") {
@@ -1244,7 +1233,7 @@ ${ commonshare() | n,unicode }
             else {
               $.jHueTitleUpdater.reset();
             }
-            window.setTimeout(function () {
+            refreshLogsTimeout = window.setTimeout(function () {
               refreshLogs();
             }, 1000);
           }
@@ -1252,6 +1241,7 @@ ${ commonshare() | n,unicode }
             viewModel.currentScript().actions(data.workflow.actions);
             viewModel.currentScript().isRunning(false);
             $.jHueTitleUpdater.reset();
+            clearTimeout(refreshLogsTimeout);
           }
         });
       }
@@ -1286,7 +1276,7 @@ ${ commonshare() | n,unicode }
         highlightMainMenu(mainSection);
       }
       if (includeGA == undefined){
-        logGA(mainSection);
+        hueAnalytics.log('pig', mainSection);
       }
     }
 
@@ -1298,11 +1288,11 @@ ${ commonshare() | n,unicode }
         highlightMenu(section);
       }
 
-      logGA(mainSection + "/" + section);
+      hueAnalytics.log('pig', mainSection + "/" + section);
     }
 
     function highlightMainMenu(mainSection) {
-      $(".navbar-fixed-top .nav li").removeClass("active");
+      $(".hue-title-bar .nav li").removeClass("active");
       $("a[href='#" + mainSection + "']").parent().addClass("active");
     }
 
@@ -1440,11 +1430,6 @@ ${ commonshare() | n,unicode }
     $(document).trigger("info", msg);
   }
 
-  function logGA(page) {
-    if (typeof trackOnGA == 'function'){
-      trackOnGA('pig/' + page);
-    }
-  }
 </script>
 
 ${ commonfooter(request, messages) | n,unicode }

@@ -109,18 +109,18 @@ var HueColors = {
     return _bands;
   },
 
-
-  /**
-   * Gets a palette of colors to be used in charts
-   * It can be used in several ways, e.g.
-   * getChartColor() >> the whole spectrum
-   * @return {array}                  A list of colors in the {'color': '#HEX_VALUE'} format
-   */
-  getCUIChartColors: function getChartColors(swatch, bands, reversed, distributed) {
-    var normalizedColors = {}, i;
+  getNormalizedColors: function () {
+    var normalizedColors = {};
     this.CUIScaleColors.forEach(function (scaleDef) {
       normalizedColors[scaleDef.name] = scaleDef.colors;
     });
+    return normalizedColors;
+  },
+
+  getCUIChartColors: function () {
+    var i;
+
+    var normalizedColors = this.getNormalizedColors();
 
     // optimal visual sequence by contrasting colors
     var sequence = ['blue', 'lime', 'blue-gray', 'pink', 'steel', 'purple', 'teal', 'red', 'orange', 'green'],
@@ -147,22 +147,28 @@ var HueColors = {
       sequence.forEach(addPlus);
       sequence.forEach(addMinus);
     }
-
     return wholeSpectrum;
-
   },
 
   d3Scale: function () {
-    return d3.scale.category20().range().concat(d3.scale.category20b().range().concat(d3.scale.category20c().range()));
+    return d3v3.scale.category20().range().concat(d3v3.scale.category20b().range().concat(d3v3.scale.category20c().range()));
   },
-  cuiD3Scale: function () {
-    return this.getCUIChartColors().map(function (c) {
+  cuiD3Scale: function (swatch) {
+    var colors = this.getCUIChartColors().map(function (c) {
       return c.color;
     });
+    if (swatch) {
+      this.CUIScaleColors.forEach(function (s) {
+        if (s.name === swatch) {
+          colors = s.colors;
+        }
+      });
+    }
+    return colors;
   },
   LIGHT_BLUE: "#DBE8F1",
   BLUE: "#87BAD5",
-  DARK_BLUE: "#338BB8",
+  DARK_BLUE: "#0B7FAD",
   DARKER_BLUE: "#205875",
   PURPLE: "#C0B1E9",
   GRAY: "#666666",

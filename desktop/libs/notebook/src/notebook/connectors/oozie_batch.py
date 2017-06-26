@@ -64,7 +64,7 @@ class OozieApi(Api):
     if not notebook.get('uuid', ''):
       raise PopupException(_('Notebook is missing a uuid, please save the notebook before executing as a batch job.'))
 
-    if notebook['type'] == 'notebook':
+    if notebook['type'] == 'notebook' or notebook['type'] == 'query-java':
       # Convert notebook to workflow
       workflow_doc = WorkflowBuilder().create_notebook_workflow(notebook=notebook, user=self.user, managed=True, name=_("%s for %s") % (OozieApi.BATCH_JOB_PREFIX, notebook['name'] or notebook['type']))
       workflow = Workflow(document=workflow_doc, user=self.user)
@@ -135,14 +135,16 @@ class OozieApi(Api):
     job_id = snippet['result']['handle']['id']
 
     oozie_job = check_job_access_permission(self.request, job_id)
-    return self._get_log_output(oozie_job)
+    logs = self._get_log_output(oozie_job)
+
+    return logs if logs else oozie_job.log
 
 
   def progress(self, snippet, logs):
     job_id = snippet['result']['handle']['id']
 
     oozie_job = check_job_access_permission(self.request, job_id)
-    return oozie_job.get_progress(),
+    return oozie_job.get_progress()
 
 
   def get_jobs(self, notebook, snippet, logs):

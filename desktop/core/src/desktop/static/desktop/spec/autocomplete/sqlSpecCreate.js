@@ -178,7 +178,6 @@
             beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['WITH DBPROPERTIES']
@@ -304,7 +303,6 @@
             beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' SYMBOL=\'baaa\'; ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -318,7 +316,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'cos\' PREPARE_FN=\'cos\' CLOSE_FN=\'cos\' SERIALIZE_FN=\'cos\' FINALIZE_FN=\'cos\'; ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -428,7 +425,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['INIT_FN', 'UPDATE_FN']
@@ -441,11 +437,10 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestAnalyticFunctions: true,
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [] },
               suggestFunctions: {}
             }
           });
@@ -456,7 +451,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['UPDATE_FN']
@@ -469,11 +463,10 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestAnalyticFunctions: true,
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [] },
               suggestFunctions: {}
             }
           });
@@ -484,7 +477,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['MERGE_FN']
@@ -498,7 +490,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'tan\' PREPARE_FN=\'boo\' SERIALIZE_FN=\'baa\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['FINALIZE_FN']
@@ -657,7 +648,6 @@
             beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SYMBOL']
@@ -675,7 +665,6 @@
           'TBLPROPERTIES ("bla"=1) COMMENT \"booo\"; ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -688,7 +677,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE db.tbl (a, b, c) AS \'boo.baa.bitmap\'; ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -738,7 +726,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE foo.bar (',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
@@ -751,7 +738,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE foo.bar (a, b, c, ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
@@ -764,7 +750,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS']
@@ -777,7 +762,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['\'BITMAP\'', '\'COMPACT\'']
@@ -790,7 +774,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BIT',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['\'BITMAP\'', '\'COMPACT\'']
@@ -803,7 +786,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['WITH DEFERRED REBUILD', 'IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
@@ -816,7 +798,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['DEFERRED REBUILD']
@@ -829,7 +810,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH DEFERRED ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['REBUILD']
@@ -842,7 +822,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH DEFERRED REBUILD ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
@@ -855,7 +834,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IDXPROPERTIES ("baa"="boo") ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
@@ -868,7 +846,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TABLE']
@@ -881,7 +858,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN TABLE ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -895,7 +871,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN TABLE boo ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
@@ -908,7 +883,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FORMAT']
@@ -921,7 +895,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['DELIMITED', 'SERDE']
@@ -936,7 +909,6 @@
           dialect: 'hive',
           containsKeywords: ['MAP KEYS TERMINATED BY', 'NULL DEFINED AS', 'LOCATION', 'TBLPROPERTIES', 'COMMENT'],
           doesNotContainKeywords: ['AS'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -948,7 +920,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT DELIMITED NULL ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['DEFINED AS']
@@ -961,7 +932,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' ROW FORMAT DELIMITED STORED ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS']
@@ -974,7 +944,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' STORED ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS', 'BY']
@@ -988,7 +957,6 @@
           afterCursor: '',
           dialect: 'hive',
           containsKeywords: ['ORC', 'PARQUET'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1000,7 +968,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' LOCATION \'',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '' }
@@ -1013,7 +980,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' LOCATION \'/baa\' ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TBLPROPERTIES', 'COMMENT']
@@ -1026,7 +992,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' TBLPROPERTIES ("baa"="boo") ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['COMMENT']
@@ -1195,7 +1160,6 @@
             beforeCursor: 'CREATE TABLE foo LIKE PARQUET \'/blabla/\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['COMMENT', 'CACHED IN'],
             expectedResult: {
               lowerCase: false
@@ -1208,7 +1172,6 @@
             beforeCursor: 'CREATE TABLE foo (id int) LOCATION \'/baa\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TBLPROPERTIES', 'CACHED IN', 'AS']
@@ -1257,10 +1220,9 @@
             beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT ',
             afterCursor: ', boo INT) AS SELECT * FROM baa;',
             dialect: 'impala',
-            hasLocations: true,
+            containsKeywords: ['COMMENT'],
             expectedResult: {
-              lowerCase: false,
-              suggestKeywords: ['COMMENT']
+              lowerCase: false
             }
           });
         });
@@ -1277,14 +1239,14 @@
           });
         });
 
-        it('should suggest keywords for "CREATE TABLE foo (id int) STORED |"', function () {
+        it('should suggest keywords for "CREATE TABLE foo (id int) STORED AS |"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE TABLE foo (id int) STORED AS ',
             afterCursor: '',
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AVRO', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
+              suggestKeywords: ['AVRO', 'KUDU', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
             }
           });
         });
@@ -1423,7 +1385,6 @@
             'CACHED ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IN']
@@ -1441,7 +1402,6 @@
             'CACHED ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IN']
@@ -1470,7 +1430,6 @@
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE boo.baa COMMENT \'Table comment...\' STORED ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AS']
@@ -1488,7 +1447,6 @@
             'CACHED IN \'boo\' AS ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -1505,6 +1463,352 @@
             noErrors: true,
             expectedResult: {
               lowerCase: true
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY RANGE (a, b) (PARTITION 1 <= VALUES < 2) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY RANGE (a, b) (PARTITION 1 <= VALUES < 2) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY RANGE (a) (PARTITION VALUE = 50, PARTITION 50 < VALUES <= 100) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY RANGE (a) (PARTITION VALUE = 50, PARTITION 50 < VALUES <= 100) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE IF NOT EXISTS tbl (i INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY HASH (a, b) PARTITIONS 10 STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS tbl (i INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY HASH (a, b) PARTITIONS 10 STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT PRIMARY KEY) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT, j INT, PRIMARY KEY (i, j)) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT, j INT, PRIMARY KEY (i, j)) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT PRIMARY KEY, PRIMARY KEY(i)) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, PRIMARY KEY(i)) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BLOCK_SIZE', 'COMMENT', 'COMPRESSION', 'DEFAULT', 'ENCODING', 'NOT NULL', 'NULL', 'PRIMARY KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT BLOCK_SIZE 10 NOT NULL |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT BLOCK_SIZE 10 NOT NULL ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'COMPRESSION', 'DEFAULT', 'ENCODING', 'PRIMARY KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT BLOCK_SIZE 10 NOT NULL PRIMARY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT BLOCK_SIZE 10 NOT NULL PRIMARY ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT, "', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT, ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PRIMARY KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT, PRIMARY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT, PRIMARY ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) STORED AS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) STORED AS ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['KUDU'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['PARTITION BY', 'PARTITIONED BY', 'STORED AS'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['HASH', 'RANGE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITION']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VALUE', 'VALUES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION 1 |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION 1 ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['<', '<=']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION 1 < |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION 1 < ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VALUES'],
+              suggestFunctions: { types: ['NUMBER']}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION VALUE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION VALUE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['=']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION VALUE = |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION VALUE = ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: {}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION cos(10) < VALUES, PARTITION VALUES |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION cos(10) < VALUES, PARTITION VALUES ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['<', '<=']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY HASH (i) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY  HASH (i) ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITIONS']
             }
           });
         });
@@ -1639,7 +1943,6 @@
             beforeCursor: 'CREATE TABLE foo (id int) LOCATION \'/baa\' ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TBLPROPERTIES', 'AS']
@@ -1936,7 +2239,6 @@
               'STORED AS ORC LOCATION \'/asdf/boo/\' TBLPROPERTIES ("comment"="boo") AS ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -1951,7 +2253,6 @@
               'LOCATION \'/asdf/boo/\' TBLPROPERTIES ("comment"="boo") AS ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -1964,7 +2265,6 @@
             beforeCursor: 'CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.boo LIKE ',
             afterCursor: ' LOCATION \'/some/loc\';',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestTables: {},
@@ -2202,7 +2502,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -2275,7 +2574,6 @@
           beforeCursor: 'CREATE TEMPORARY MACRO boo(x INT, y STRING) cos(x) + y - ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
@@ -2293,10 +2591,10 @@
           hasLocations:true,
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
-            suggestColumns:  { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
+            suggestColumns:  { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2318,7 +2616,6 @@
         assertAutoComplete({
           beforeCursor: 'CREATE VIEW ',
           afterCursor: ' boo AS SELECT * FROM baa;',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['IF NOT EXISTS']
@@ -2379,10 +2676,10 @@
             hasLocations:true,
             expectedResult: {
               lowerCase: false,
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
-              suggestColumns: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
+              suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
               suggestKeywords: ['*']
             }
           });

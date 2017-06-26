@@ -44,7 +44,8 @@ def has_write_access(user):
 
 def app(request):
   return render('app.mako', request, {
-    'can_write': has_write_access(request.user)
+    'can_write': has_write_access(request.user),
+    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 # action/cluster/arg1/arg2/arg3...
@@ -54,7 +55,7 @@ def api_router(request, url): # On split, deserialize anything
     try:
       return json.loads(re.sub(r'(?:\")([0-9]+)(?:\")', r'\1', str(raw)))
     except:
-      LOG.exception('failed to parse input as json')
+      LOG.debug('Failed to parse input as JSON, falling back to raw input.')
       return raw
 
   def deserialize(data):
@@ -86,7 +87,7 @@ def api_dump(response):
       json.dumps(data)
       return data
     except:
-      LOG.exception('Failed to dump data as JSON')
+      LOG.debug('Failed to dump data as JSON, falling back to raw data.')
       cleaned = {}
       lim = [0]
       if isinstance(data, str): # Not JSON dumpable, meaning some sort of bytestring or byte data

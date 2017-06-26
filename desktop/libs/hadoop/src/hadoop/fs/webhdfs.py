@@ -36,6 +36,7 @@ from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup
 
+
 import hadoop.conf
 import desktop.conf
 
@@ -161,13 +162,24 @@ class WebHdfs(Hdfs):
     except AttributeError:
       return WebHdfs.DEFAULT_USER
 
-  @property
-  def trash_path(self):
-    return self.join(self.get_home_dir(), '.Trash')
+  def trash_path(self, path=None):
+    trash_path = self.join(self.get_home_dir(), '.Trash')
+    try:
+      if not path:
+        path = self.get_home_dir()
+      params = self._getparams()
+      params['op'] = 'GETTRASHROOT'
+      json = self._root.get(path, params)
+      trash_path = json['Path']
+    except WebHdfsException, e:
+      if 'IllegalArgumentException' in e.message:
+        LOG.warn('WebHDFS operation GETTRASHROOT is not implemented, returning default trash path: %s' % trash_path)
+      else:
+        raise e
+    return trash_path
 
-  @property
-  def current_trash_path(self):
-    return self.join(self.trash_path, self.TRASH_CURRENT)
+  def current_trash_path(self, path):
+    return self.join(self.trash_path(path), self.TRASH_CURRENT)
 
   def _getparams(self):
     return {
@@ -256,11 +268,11 @@ class WebHdfs(Hdfs):
   def isroot(self, path):
     return path == '/'
 
-  def _ensure_current_trash_directory(self):
+  def _ensure_current_trash_directory(self, path):
     """Create trash directory for a user if it doesn't exist."""
-    if self.exists(self.current_trash_path):
-      self.mkdir(self.current_trash_path)
-    return self.current_trash_path
+    if self.exists(self.current_trash_path(path)):
+      self.mkdir(self.current_trash_path(path))
+    return self.current_trash_path(path)
 
   def _trash(self, path, recursive=False):
     """
@@ -277,11 +289,11 @@ class WebHdfs(Hdfs):
     if not recursive and self.isdir(path):
       raise IOError(errno.EISDIR, _("File %s is a directory") % path)
 
-    if path.startswith(self.trash_path):
+    if path.startswith(self.trash_path(path)):
       raise IOError(errno.EPERM, _("File %s is already trashed") % path)
 
     # Make path (with timestamp suffix if necessary)
-    base_trash_path = self.join(self._ensure_current_trash_directory(), path[1:])
+    base_trash_path = self.join(self._ensure_current_trash_directory(path), path[1:])
     trash_path = base_trash_path
     while self.exists(trash_path):
       trash_path = base_trash_path + str(time.time())
@@ -333,13 +345,13 @@ class WebHdfs(Hdfs):
     Removing the root from ``path`` will provide the original path.
     Ensure parent directories exist and rename path.
     """
-    if not path.startswith(self.trash_path):
+    if not path.startswith(self.trash_path(path)):
       raise IOError(errno.EPERM, _("File %s is not in trash") % path)
 
     # Build original path
     original_path = []
     split_path = self.split(path)
-    while split_path[0] != self.trash_path:
+    while split_path[0] != self.trash_path(path):
       original_path.append(split_path[1])
       split_path = self.split(split_path[0])
     original_path.reverse()
@@ -357,8 +369,8 @@ class WebHdfs(Hdfs):
 
     Purge all trash in users ``trash_path``
     """
-    for timestamped_directory in self.listdir(self.trash_path):
-      self.rmtree(self.join(self.trash_path, timestamped_directory), True)
+    for timestamped_directory in self.listdir(self.trash_path()):
+      self.rmtree(self.join(self.trash_path(), timestamped_directory), True)
 
   def mkdir(self, path, mode=None):
     """
@@ -404,6 +416,14 @@ class WebHdfs(Hdfs):
     ls = self.listdir(old_dir)
     for dirent in ls:
       self.rename(Hdfs.join(old_dir, dirent), Hdfs.join(new_dir, dirent))
+
+  def set_replication(self, filename, repl_factor):
+    """set replication factor(filename, repl_factor)"""
+    params = self._getparams()
+    params['op'] = 'SETREPLICATION'
+    params['replication'] = repl_factor
+    result = self._root.put(filename, params)
+    return result['boolean']
 
   def chown(self, path, user=None, group=None, recursive=False):
     """chown(path, user=None, group=None, recursive=False)"""
@@ -575,7 +595,7 @@ class WebHdfs(Hdfs):
     try:
       return self._root.get(path, params)
     except WebHdfsException, ex:
-      if ex.code == 500:
+      if ex.code == 500 or ex.code == 400:
         LOG.warn('Failed to check access to path %s, CHECKACCESS operation may not be supported.' % path)
         return None
       else:

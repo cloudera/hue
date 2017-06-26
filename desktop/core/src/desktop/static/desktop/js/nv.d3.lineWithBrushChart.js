@@ -32,7 +32,7 @@ nv.models.lineWithBrushChart = function() {
     , legend = nv.models.legend()
     , controls = nv.models.legend()
     , interactiveLayer = nv.interactiveGuideline()
-    , brush = d3.svg.brush()
+    , brush = d3v3.svg.brush()
     ;
 
   var margin = {top: 30, right: 20, bottom: 50, left: 60}
@@ -55,7 +55,7 @@ nv.models.lineWithBrushChart = function() {
     , state = {}
     , defaultState = null
     , noData = 'No Data Available.'
-    , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
+    , dispatch = d3v3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
     , controlWidth = function() { return showControls ? (selectionHidden ? 240 : 300) : 0 }
     , transitionDuration = 250
     , extent
@@ -99,7 +99,7 @@ nv.models.lineWithBrushChart = function() {
 
   function chart(selection) {
     selection.each(function(data) {
-      var container = d3.select(this),
+      var container = d3v3.select(this),
           that = this;
 
       var availableWidth = (width  || parseInt(container.style('width')) || 960)
@@ -495,7 +495,7 @@ nv.models.lineWithBrushChart = function() {
   chart.yAxis = yAxis;
   chart.interactiveLayer = interactiveLayer;
 
-  d3.rebind(chart, lines, 'defined', 'isArea', 'x', 'y', 'size', 'xScale', 'yScale', 'xDomain', 'yDomain', 'xRange', 'yRange'
+  d3v3.rebind(chart, lines, 'defined', 'isArea', 'x', 'y', 'size', 'xScale', 'yScale', 'xDomain', 'yDomain', 'xRange', 'yRange'
     , 'forceX', 'forceY', 'interactive', 'clipEdge', 'clipVoronoi', 'useVoronoi','id', 'interpolate');
 
   chart.options = nv.utils.optionsFunc.bind(chart);

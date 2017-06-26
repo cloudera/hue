@@ -40,8 +40,7 @@ ${ layout.menubar(section='coordinators') }
   }
 </style>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 
 <div class="container-fluid">
   <div class="row-fluid">
@@ -141,7 +140,7 @@ ${ layout.menubar(section='coordinators') }
 <script type="text/javascript" src="${ static('oozie/js/coordinator.js') }"></script>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
 
     % if enable_cron_scheduling:

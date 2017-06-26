@@ -16,9 +16,12 @@
 # limitations under the License.
 
 import logging
+import posixpath
+import re
 
 from django.utils.translation import ugettext as _
 
+from hadoop.fs.hadoopfs import Hdfs
 from desktop.lib.exceptions_renderable import PopupException
 
 
@@ -26,35 +29,87 @@ LOG = logging.getLogger(__name__)
 
 
 def get_api(user, interface):
-  from jobbrowser.apis.batch_api import BatchApi
-  from jobbrowser.apis.job_api import YarnApi
+  from jobbrowser.apis.bundle_api import BundleApi
+  from jobbrowser.apis.data_eng_api import DataEngClusterApi, DataEngJobApi
+  from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.schedule_api import ScheduleApi
+  from jobbrowser.apis.workflow_api import WorkflowApi
 
-  if interface == 'batches':
-    return BatchApi(user)
+  if interface == 'jobs':
+    return JobApi(user)
+  elif interface == 'workflows':
+    return WorkflowApi(user)
   elif interface == 'schedules':
     return ScheduleApi(user)
-  elif interface == 'jobs':
-    return YarnApi(user)
+  elif interface == 'bundles':
+    return BundleApi(user)
+  elif interface == 'dataeng-clusters':
+    return DataEngClusterApi(user)
+  elif interface == 'dataeng-jobs':
+    return DataEngJobApi(user)
+  elif interface == 'slas':
+    return Api(user)
   else:
     raise PopupException(_('Interface %s is unknown') % interface)
 
 
-class Api():
+class Api(object):
 
   def __init__(self, user):
     self.user = user
+    self.request = None
 
-  def apps(self): return []
+  def apps(self, filters): return {'apps': [], 'total': 0}
 
-  def app(self, appid): return {}
+  def app(self, appid): return {} # Also contains progress (0-100) and status [RUNNING, FINISHED, PAUSED]
 
-  def kill(self): return {}
+  def action(self, app_ids, operation): return {}
 
-  def progress(self): return {'progress': 0}
+  def logs(self, appid, app_type, log_name): return {'progress': 0, 'logs': ''}
 
-  def tasks(self): return []
+  def profile(self, appid, app_type, app_property, app_filters): return {} # Tasks, XML, counters...
 
-  def logs(self): return {'stderr': '', 'stdout': ''}
+  def _set_request(self, request):
+    self.request = request
 
-  def profile(self): return {}
+
+class MockDjangoRequest():
+
+  def __init__(self, user, get=None, post=None, method='POST'):
+    self.user = user
+    self.jt = None
+    self.GET = get if get is not None else {'format': 'json'}
+    self.POST = post if post is not None else {}
+    self.REQUEST = {}
+    self.method = method
+
+
+def _extract_query_params(filters):
+  filter_params = {}
+
+  for name, value in filters.iteritems():
+    if name == 'text':
+      filter_params['text'] = value
+      user_filter = re.search('((user):([^ ]+))', value)
+      if user_filter:
+        filter_params['username'] = user_filter.group(3)
+        filter_params['text'] = filter_params['text'].replace(user_filter.group(1), '').strip()
+    else:
+      filter_params[name] = value
+
+  return filter_params
+
+
+def is_linkable(name, path):
+  return re.search('(dir|path|output|input)', name, re.I) or path.startswith('/') or path.startswith('hdfs://')
+
+
+def hdfs_link_js(url):
+  link = 'javascript:void(0)'
+
+  if url:
+    path = Hdfs.urlsplit(url)[2]
+    if path:
+      link = ('/filebrowser/view=%s' if path.startswith(posixpath.sep) else '/filebrowser/home_relative_view=/%s') % path
+
+  return link

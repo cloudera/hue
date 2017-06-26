@@ -30,7 +30,7 @@ from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
-from desktop.log.access import access_warn, access_log_level
+from desktop.log.access import access_log_level
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.rest.resource import Resource
 from desktop.lib.django_util import JsonResponse, render_json, render, copy_query_dict
@@ -103,7 +103,9 @@ def get_job(request, job_id):
 
 
 def apps(request):
-  return render('apps.mako', request, {
+  return render('job_browser.mako', request, {
+    'is_embeddable': request.GET.get('is_embeddable', False),
+    'is_mini': request.GET.get('is_mini', False),
     'hiveserver2_impersonation_enabled': hiveserver2_impersonation_enabled()
   })
 
@@ -130,11 +132,14 @@ def jobs(request):
   state = request.POST.get('state')
   text = request.POST.get('text')
   retired = request.POST.get('retired')
+  time_value = request.POST.get('time_value', 7)
+  time_unit = request.POST.get('time_unit', 'days')
 
   if request.POST.get('format') == 'json':
     try:
       # Limit number of jobs to be 1000
-      jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired, limit=1000)
+      jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text,
+                                                        retired=retired, limit=1000, time_value=int(time_value), time_unit=time_unit)
     except Exception, ex:
       ex_message = str(ex)
       if 'Connection refused' in ex_message or 'standby RM' in ex_message:
@@ -160,12 +165,13 @@ def jobs(request):
   })
 
 
-def massage_job_for_json(job, request):
+def massage_job_for_json(job, request=None, user=None):
   job = {
     'id': job.jobId,
     'shortId': job.jobId_short,
     'name': hasattr(job, 'jobName') and job.jobName or '',
     'status': job.status,
+    'yarnStatus': hasattr(job, 'yarnStatus') and job.yarnStatus or '',
     'url': job.jobId and reverse('jobbrowser.views.single_job', kwargs={'job': job.jobId}) or '',
     'logs': job.jobId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': job.jobId}) or '',
     'queueName': hasattr(job, 'queueName') and job.queueName or _('N/A'),
@@ -173,6 +179,7 @@ def massage_job_for_json(job, request):
     'user': job.user,
     'isRetired': job.is_retired,
     'isMR2': job.is_mr2,
+    'progress': hasattr(job, 'progress') and job.progress or '',
     'mapProgress': hasattr(job, 'mapProgress') and job.mapProgress or '',
     'reduceProgress': hasattr(job, 'reduceProgress') and job.reduceProgress or '',
     'setupProgress': hasattr(job, 'setupProgress') and job.setupProgress or '',
@@ -193,7 +200,7 @@ def massage_job_for_json(job, request):
     'finishTimeFormatted': hasattr(job, 'finishTimeFormatted') and job.finishTimeFormatted or '',
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
-    'canKill': can_kill_job(job, request.user),
+    'canKill': can_kill_job(job, request.user if request else user),
     'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or '',
   }
   return job
@@ -264,10 +271,6 @@ def kill_job(request, job):
   if request.method != "POST":
     raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s).") % {'method': request.method})
 
-  if job.user != request.user.username and not request.user.is_superuser:
-    access_warn(request, _('Insufficient permission'))
-    raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") % {'username': request.user.username, 'user': job.user})
-
   try:
     job.kill()
   except Exception, e:
@@ -317,11 +320,14 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
     if app['applicationType'] == 'MAPREDUCE':
       if app['finalStatus'] in ('SUCCEEDED', 'FAILED', 'KILLED'):
         attempt_index = int(attempt_index)
-        attempt = job.job_attempts['jobAttempt'][attempt_index]
+        if not job.job_attempts['jobAttempt']:
+          response = {'status': 0, 'log': _('Job has not tasks')}
+        else:
+          attempt = job.job_attempts['jobAttempt'][attempt_index]
 
-        log_link = attempt['logsLink']
-        # Reformat log link to use YARN RM, replace node addr with node ID addr
-        log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
+          log_link = attempt['logsLink']
+          # Reformat log link to use YARN RM, replace node addr with node ID addr
+          log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
       elif app['state'] == 'RUNNING':
         log_link = app['amContainerLogs']
   except (KeyError, RestException), e:

@@ -20,43 +20,59 @@
 
 (function ($, window, document, undefined) {
   var pluginName = "jHueGenericAutocomplete",
-      defaults = {
-        serverType: "HIVE",
-        home: "/",
-        skipColumns: false,
-        onEnter: function () {
-        },
-        onBlur: function () {
-        },
-        onPathChange: function () {
-        },
-        smartTooltip: "",
-        smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
-        showOnFocus: false,
-        startingPath: '',
-        rewriteVal: false,
-        searchEverywhere: false
-      };
+    defaults = {
+      serverType: "HIVE",
+      home: "/",
+      skipColumns: false,
+      skipTables: false,
+      onEnter: function () {
+      },
+      onBlur: function () {
+      },
+      onPathChange: function () {
+      },
+      smartTooltip: "",
+      smartTooltipThreshold: 10, // needs 10 up/down or click actions and no tab to activate the smart tooltip
+      showOnFocus: false,
+      startingPath: '',
+      rewriteVal: false,
+      searchEverywhere: false,
+      apiHelperUser: '',
+      apiHelperType: '',
+      mainScrollable: $(window)
+    };
 
   function Plugin(element, options) {
     this.element = element;
     this.options = $.extend({}, defaults, options);
     this._defaults = defaults;
     this._name = pluginName;
+
+    this.apiHelper = null;
+
+    if (typeof ApiHelper !== 'undefined' && this.options.apiHelperUser !== '') {
+      this.apiHelper = ApiHelper.getInstance({
+        user: this.options.apiHelperUser
+      });
+    }
+
     this.init();
   }
 
   Plugin.prototype.init = function () {
-    var _this = this;
-    var _el = $(_this.element);
+    var self = this;
+    var $el = $(self.element);
 
     // creates autocomplete popover
     if ($("#jHueGenericAutocomplete").length == 0) {
       $("<div>").attr("id", "jHueGenericAutocomplete").addClass("jHueAutocomplete popover")
-          .attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
-          .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><ul class="unstyled"></ul></div></div>')
-          .appendTo($("body"));
+        .attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
+        .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><ul class="unstyled"></ul></div></div>')
+        .appendTo($("body"));
     }
+
+    $el.wrap('<div class="inline">');
+    $el.parent().append('<i class="fa fa-spinner fa-spin muted" style="margin-top: 8px; margin-left: -24px; margin-right: 11px; display:none"></i>');
 
     function setHueBreadcrumbCaretAtEnd(element) {
       var elemLength = element.value.length;
@@ -76,19 +92,19 @@
     }
 
 
-    _el.focus(function () {
+    $el.focus(function () {
       $(document.body).on("contextmenu", function (e) {
         e.preventDefault(); // prevents native menu on FF for Mac from being shown
       });
-      setHueBreadcrumbCaretAtEnd(_this.element);
+      setHueBreadcrumbCaretAtEnd(self.element);
       _pauseBlur = false;
     });
 
-    _el.keydown(function (e) {
+    $el.keydown(function (e) {
       if (e.keyCode == 9) {
         e.preventDefault();
         showAutocomplete(function () {
-          var path = _el.val();
+          var path = $el.val();
           if (path.indexOf(".") > -1) {
             path = path.substr(path.lastIndexOf(".") + 1);
           }
@@ -98,46 +114,47 @@
     });
 
     function smartTooltipMaker() {
-      if (_this.options.smartTooltip != "" && typeof $.totalStorage != "undefined" && $.totalStorage("jHueGenericAutocompleteTooltip") != -1) {
+      if (self.options.smartTooltip != "" && typeof $.totalStorage != "undefined" && $.totalStorage("jHueGenericAutocompleteTooltip") != -1) {
         var cnt = 0;
         if ($.totalStorage("jHueGenericAutocompleteTooltip") != null) {
           cnt = $.totalStorage("jHueGenericAutocompleteTooltip") + 1;
         }
         $.totalStorage("jHueGenericAutocompleteTooltip", cnt);
-        if (cnt >= _this.options.smartTooltipThreshold) {
-          _el.tooltip({
+        if (cnt >= self.options.smartTooltipThreshold) {
+          $el.tooltip({
             animation: true,
-            title: _this.options.smartTooltip,
+            title: self.options.smartTooltip,
             trigger: "manual",
             placement: "top"
           }).tooltip("show");
           window.setTimeout(function () {
-            _el.tooltip("hide");
+            $el.tooltip("hide");
           }, 10000);
           $.totalStorage("jHueGenericAutocompleteTooltip", -1);
         }
       }
     }
 
-    $(window).on("scroll", function(){
-      $("#jHueGenericAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
+    self.options.mainScrollable.on("scroll", function () {
+      $("#jHueGenericAutocomplete").css("top", $el.offset().top + $el.outerHeight() - 1).css("left", $el.offset().left).width($el.outerWidth() - 4);
     });
 
     var _hiveAutocompleteSelectedIndex = -1;
     var _filterTimeout = -1;
-    _el.keyup(function (e) {
+    $el.keyup(function (e) {
       window.clearTimeout(_filterTimeout);
       if ($.inArray(e.keyCode, [17, 38, 40, 13, 32, 191]) == -1) {
         _hiveAutocompleteSelectedIndex = -1;
         _filterTimeout = window.setTimeout(function () {
-          var path = _el.val();
+          var path = $el.val();
           if (path.indexOf(".") > -1) {
             path = path.substr(path.lastIndexOf(".") + 1);
           }
+          $("#jHueGenericAutocomplete").show();
           $("#jHueGenericAutocomplete ul li").show();
-          if (path != ""){
+          if (path != "") {
             $("#jHueGenericAutocomplete ul li").each(function () {
-              if (_this.options.searchEverywhere){
+              if (self.options.searchEverywhere) {
                 if ($(this).text().trim().toLowerCase().indexOf(path.toLowerCase()) == -1) {
                   $(this).hide();
                 }
@@ -148,6 +165,9 @@
                 }
               }
             });
+            if ($("#jHueGenericAutocomplete ul li:visible").length === 0){
+              $("#jHueGenericAutocomplete").hide();
+            }
           }
         }, 500);
       }
@@ -183,42 +203,233 @@
           $("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).click();
         }
         else {
-          _this.options.onEnter($(this));
+          self.options.onEnter($(this));
         }
         $("#jHueGenericAutocomplete").hide();
         _hiveAutocompleteSelectedIndex = -1;
       }
     });
 
-    if (_this.options.showOnFocus){
-      _el.on("focus", function(){
+    if (self.options.showOnFocus) {
+      $el.on("focus", function () {
         showAutocomplete();
       });
     }
 
     var _pauseBlur = false;
 
-    _el.blur(function () {
+    $el.blur(function () {
       if (!_pauseBlur) {
         $(document.body).off("contextmenu");
         $("#jHueGenericAutocomplete").hide();
-        _this.options.onBlur();
+        self.options.onBlur();
       }
     });
 
     var BASE_PATH = "/beeswax/api/autocomplete/";
-    if (_this.options.serverType == "IMPALA"){
+    if (self.options.serverType == "IMPALA") {
       BASE_PATH = "/impala/api/autocomplete/";
     }
-    if (_this.options.serverType == "SOLR"){
+    if (self.options.serverType == "SOLR") {
       BASE_PATH = "/indexer/api/autocomplete/";
     }
     var _currentFiles = [];
 
+    self.getDatabases = function (callback) {
+      var self = this;
+      self.apiHelper.loadDatabases({
+        sourceType: self.options.apiHelperType,
+        successCallback: callback,
+        silenceErrors: false
+      });
+    }
+
+    self.getTables = function (database, callback) {
+      var self = this;
+      self.apiHelper.fetchTables({
+        sourceType: self.options.apiHelperType,
+        databaseName: database,
+        successCallback: callback,
+        silenceErrors: false
+      });
+    }
+
+    self.getColumns = function (database, table, callback) {
+      var self = this;
+      self.apiHelper.fetchTableDetails({
+        sourceType: self.options.apiHelperType,
+        databaseName: database,
+        tableName: table,
+        successCallback: callback,
+        silenceErrors: false
+      });
+    }
+
+    function autocompleteLogic(autocompleteUrl, data) {
+      if (data.error == null) {
+        _currentFiles = [];
+
+        var _ico = "";
+        var _iterable = [];
+        var _isSkipColumns = false;
+        var _isSkipTables = false;
+
+        if (self.options.serverType == "SOLR") {
+          _iterable = data.collections;
+          _ico = "fa-search";
+        }
+        else {
+          if (data.databases != null) { // it's a db
+            _iterable = data.databases;
+            _ico = "fa-database";
+          }
+          else if (data.tables_meta != null) { // it's a table
+            if (!self.options.skipTables) {
+              _iterable = $.map(data.tables_meta, function (tablesMeta) {
+                return tablesMeta.name;
+              });
+              _ico = "fa-table";
+            }
+            else {
+              _isSkipTables = true;
+            }
+          }
+          else {
+            if (!self.options.skipColumns) {
+              _iterable = data.columns;
+              _ico = "fa-columns";
+            }
+            else {
+              _isSkipColumns = true;
+            }
+          }
+        }
+
+        var firstSolrCollection = false;
+        var firstSolrConfig = false;
+
+        if (!_isSkipColumns && !_isSkipTables) {
+          $(_iterable).each(function (cnt, item) {
+            if (self.options.serverType == "SOLR") {
+              if (item.isCollection && !firstSolrCollection) {
+                _currentFiles.push('<li class="hiveAutocompleteItem" data-value="collections.*" title="collections.*"><i class="fa fa-search-plus"></i> collections.*</li>');
+                firstSolrCollection = true;
+              }
+              if (item.isConfig) {
+                _ico = 'fa-cog';
+                if (!firstSolrConfig) {
+                  _currentFiles.push('<li class="hiveAutocompleteItem" data-value="configs.*" title="configs.*"><i class="fa fa-cogs"></i> configs.*</li>');
+                  firstSolrConfig = true;
+                }
+              }
+              _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item.name + '" title="' + item.name + '"><i class="fa ' + _ico + '"></i> ' + item.name + '</li>');
+            }
+            else {
+              _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '" title="' + item + '"><i class="fa ' + _ico + '"></i> ' + item + '</li>');
+            }
+          });
+
+
+
+          $("#jHueGenericAutocomplete").css("top", $el.offset().top + $el.outerHeight() - 1).css("left", $el.offset().left).width($el.outerWidth() - 4);
+          $("#jHueGenericAutocomplete").find("ul").empty().html(_currentFiles.join(""));
+          $("#jHueGenericAutocomplete").find("li").on("click", function (e) {
+            smartTooltipMaker();
+            e.preventDefault();
+            var item = $(this).text().trim();
+            var path = autocompleteUrl.substring(BASE_PATH.length);
+
+            if ($(this).html().indexOf("search") > -1 || $(this).html().indexOf("cog") > -1) {
+              if ($(this).html().indexOf("search") > -1 && $(this).html().indexOf("search-plus") == -1) {
+                $el.val("collections." + item);
+              }
+              else if ($(this).html().indexOf("cog") > -1 && $(this).html().indexOf("cogs") == -1) {
+                $el.val("configs." + item);
+              }
+              else {
+                $el.val(item);
+              }
+              self.options.onPathChange($el.val());
+              $("#jHueGenericAutocomplete").hide();
+              _hiveAutocompleteSelectedIndex = -1;
+              self.options.onEnter($el);
+            }
+
+            if ($(this).html().indexOf("database") > -1) {
+              if (self.options.skipTables) {
+                $el.val(item);
+                $("#jHueGenericAutocomplete").hide();
+              }
+              else {
+                $el.val(item + ".");
+              }
+              self.options.onPathChange($el.val());
+              if (!self.options.skipTables) {
+                showAutocomplete();
+              }
+            }
+
+            if ($(this).html().indexOf("table") > -1) {
+              if ($el.val().indexOf(".") > -1) {
+                if ($el.val().match(/\./gi).length == 1) {
+                  $el.val($el.val().substring(0, $el.val().lastIndexOf(".") + 1) + item);
+                }
+                else {
+                  $el.val($el.val().substring(0, $el.val().indexOf(".") + 1) + item);
+                }
+              }
+              else {
+                if (self.options.rewriteVal) {
+                  $el.val(item);
+                }
+                else {
+                  $el.val($el.val() + item);
+                }
+              }
+              if (!self.options.skipColumns) {
+                $el.val($el.val() + ".");
+              }
+              self.options.onPathChange($el.val());
+              if (!self.options.skipColumns) {
+                showAutocomplete();
+              }
+              else {
+                self.options.onEnter($el);
+                $("#jHueGenericAutocomplete").hide();
+                _hiveAutocompleteSelectedIndex = -1;
+              }
+            }
+
+            if ($(this).html().indexOf("columns") > -1) {
+              if ($el.val().match(/\./gi).length > 1) {
+                $el.val($el.val().substring(0, $el.val().lastIndexOf(".") + 1) + item);
+              }
+              else {
+                $el.val($el.val() + "." + item);
+              }
+              $("#jHueGenericAutocomplete").hide();
+              _hiveAutocompleteSelectedIndex = -1;
+              self.options.onEnter($el);
+            }
+
+          });
+          $("#jHueGenericAutocomplete").show();
+          window.setTimeout(function () {
+            setHueBreadcrumbCaretAtEnd(self.element);
+          }, 100)
+          if ("undefined" != typeof callback) {
+            callback();
+          }
+        }
+      }
+      $el.parent().find('.fa-spinner').hide();
+    }
+
     function showAutocomplete(callback) {
-      var path = _el.val();
-      if (_this.options.startingPath != ''){
-        path = _this.options.startingPath + path;
+      $el.parent().find('.fa-spinner').show();
+      var path = $el.val();
+      if (self.options.startingPath != '') {
+        path = self.options.startingPath + path;
       }
       var autocompleteUrl = BASE_PATH;
 
@@ -227,155 +438,46 @@
       }
 
       if (path != "" && path.lastIndexOf(".") != path.length - 1) {
-        path = path.substring(0, (_this.options.startingPath + _el.val()).lastIndexOf("."));
+        path = path.substring(0, (self.options.startingPath + $el.val()).lastIndexOf("."));
       }
 
-      if (_this.options.serverType != "SOLR") {
+      if (self.options.serverType != "SOLR") {
         autocompleteUrl += path.replace(/\./g, "/");
       }
 
-      $.getJSON(autocompleteUrl, function (data) {
-        if (data.error == null) {
-          _currentFiles = [];
-
-          var _ico = "";
-          var _iterable = [];
-          var _isSkipColumns = false;
-
-          if (_this.options.serverType == "SOLR") {
-            _iterable = data.collections;
-            _ico = "fa-search";
+      if (self.options.serverType != "SOLR" && self.options.apiHelperUser !== '') {
+        var suffix = autocompleteUrl.substr(BASE_PATH.length);
+        if (suffix === '') {
+          self.getDatabases(function (data) {
+            autocompleteLogic(autocompleteUrl, {
+              databases: data
+            });
+          });
+        }
+        else {
+          var details = suffix.split('/');
+          if (details.length > 1 && details[1] !== '') {
+            self.getColumns(details[0], details[1], function (data) {
+              autocompleteLogic(autocompleteUrl, {
+                columns: $.map(data.cols, function (item) {
+                  return item.name
+                })
+              });
+            });
           }
           else {
-            if (data.databases != null) { // it's a db
-              _iterable = data.databases;
-              _ico = "fa-database";
-            }
-            else if (data.tables_meta != null) { // it's a table
-              _iterable = $.map(data.tables_meta, function (tablesMeta) {
-                return tablesMeta.name;
-              });
-              _ico = "fa-table";
-            }
-            else {
-              if (!_this.options.skipColumns) {
-                _iterable = data.columns;
-                _ico = "fa-columns";
-              }
-              else {
-                _isSkipColumns = true;
-              }
-            }
-          }
-
-          var firstSolrCollection = false;
-          var firstSolrConfig = false;
-
-          if (!_isSkipColumns) {
-            $(_iterable).each(function (cnt, item) {
-              if (_this.options.serverType == "SOLR") {
-                if (item.isCollection && !firstSolrCollection) {
-                  _currentFiles.push('<li class="hiveAutocompleteItem" data-value="collections.*" title="collections.*"><i class="fa fa-search-plus"></i> collections.*</li>');
-                  firstSolrCollection = true;
-                }
-                if (item.isConfig) {
-                  _ico = 'fa-cog';
-                  if (!firstSolrConfig) {
-                    _currentFiles.push('<li class="hiveAutocompleteItem" data-value="configs.*" title="configs.*"><i class="fa fa-cogs"></i> configs.*</li>');
-                    firstSolrConfig = true;
-                  }
-                }
-                _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item.name + '" title="' + item.name + '"><i class="fa ' + _ico + '"></i> ' + item.name + '</li>');
-              }
-              else {
-                _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '" title="' + item + '"><i class="fa ' + _ico + '"></i> ' + item + '</li>');
-              }
+            self.getTables(details[0], function (data) {
+              autocompleteLogic(autocompleteUrl, data);
             });
-
-            $("#jHueGenericAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
-            $("#jHueGenericAutocomplete").find("ul").empty().html(_currentFiles.join(""));
-            $("#jHueGenericAutocomplete").find("li").on("click", function (e) {
-              smartTooltipMaker();
-              e.preventDefault();
-              var item = $(this).text().trim();
-              var path = autocompleteUrl.substring(BASE_PATH.length);
-
-              if ($(this).html().indexOf("search") > -1 || $(this).html().indexOf("cog") > -1) {
-                if ($(this).html().indexOf("search") > -1 && $(this).html().indexOf("search-plus") == -1) {
-                  _el.val("collections." + item);
-                }
-                else if ($(this).html().indexOf("cog") > -1 && $(this).html().indexOf("cogs") == -1) {
-                  _el.val("configs." + item);
-                }
-                else {
-                  _el.val(item);
-                }
-                _this.options.onPathChange(_el.val());
-                $("#jHueGenericAutocomplete").hide();
-                _hiveAutocompleteSelectedIndex = -1;
-                _this.options.onEnter(_el);
-              }
-
-              if ($(this).html().indexOf("database") > -1) {
-                _el.val(item + ".");
-                _this.options.onPathChange(_el.val());
-                showAutocomplete();
-              }
-
-              if ($(this).html().indexOf("table") > -1){
-                if (_el.val().indexOf(".") > -1){
-                  if (_el.val().match(/\./gi).length == 1){
-                    _el.val(_el.val().substring(0, _el.val().lastIndexOf(".") + 1) + item);
-                  }
-                  else {
-                    _el.val(_el.val().substring(0, _el.val().indexOf(".") + 1) + item);
-                  }
-                }
-                else {
-                  if (_this.options.rewriteVal) {
-                    _el.val(item);
-                  }
-                  else {
-                    _el.val(_el.val() + item);
-                  }
-                }
-                if (! _this.options.skipColumns){
-                  _el.val(_el.val() + ".");
-                }
-                _this.options.onPathChange(_el.val());
-                if (! _this.options.skipColumns) {
-                  showAutocomplete();
-                }
-                else {
-                  _this.options.onEnter(_el);
-                  $("#jHueGenericAutocomplete").hide();
-                  _hiveAutocompleteSelectedIndex = -1;
-                }
-              }
-
-              if ($(this).html().indexOf("columns") > -1){
-                if (_el.val().match(/\./gi).length > 1){
-                  _el.val(_el.val().substring(0, _el.val().lastIndexOf(".") + 1) + item);
-                }
-                else {
-                  _el.val(_el.val() + "." + item);
-                }
-                $("#jHueGenericAutocomplete").hide();
-                _hiveAutocompleteSelectedIndex = -1;
-                _this.options.onEnter(_el);
-              }
-
-            });
-            $("#jHueGenericAutocomplete").show();
-            window.setTimeout(function(){
-              setHueBreadcrumbCaretAtEnd(_this.element);
-            }, 100)
-            if ("undefined" != typeof callback) {
-              callback();
-            }
           }
         }
-      });
+      }
+      else {
+        $.getJSON(autocompleteUrl, function (data) {
+          autocompleteLogic(autocompleteUrl, data);
+        });
+      }
+
     }
 
     $(document).on("mouseenter", ".hiveAutocompleteItem", function () {
@@ -394,9 +496,9 @@
         }
       }
       if (possibleMatches.length == 1) {
-        _el.val(_el.val() + $(possibleMatches[0]).text().trim().substr(lastChars.length));
+        $el.val($el.val() + $(possibleMatches[0]).text().trim().substr(lastChars.length));
         if ($(possibleMatches[0]).html().indexOf("folder") > -1) {
-          _el.val(_el.val() + "/");
+          $el.val($el.val() + "/");
           showAutocomplete();
         }
       }
@@ -407,11 +509,11 @@
           possibleMatchesPlain.push($(possibleMatches[z]).text().trim());
         }
         var arr = possibleMatchesPlain.slice(0).sort(),
-            word1 = arr[0], word2 = arr[arr.length - 1],
-            j = 0;
+          word1 = arr[0], word2 = arr[arr.length - 1],
+          j = 0;
         while (word1.charAt(j) == word2.charAt(j))++j;
         var match = word1.substring(0, j);
-        _el.val(_el.val() + match.substr(lastChars.length));
+        $el.val($el.val() + match.substr(lastChars.length));
       }
     }
   };
@@ -425,6 +527,9 @@
     return this.each(function () {
       if (!$.data(this, 'plugin_' + pluginName)) {
         $.data(this, 'plugin_' + pluginName, new Plugin(this, options));
+      }
+      else {
+        $.data(this, 'plugin_' + pluginName).setOptions(options);
       }
     });
   }

@@ -27,8 +27,6 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Create table from file'), app_name, user, request) | n,unicode }
 ${layout.menubar(section='query')}
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-
 <div class="container-fluid">
 % if error_msg:
   <h4>${error_msg}</h4>
@@ -76,7 +74,7 @@ ${layout.menubar(section='query')}
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
 

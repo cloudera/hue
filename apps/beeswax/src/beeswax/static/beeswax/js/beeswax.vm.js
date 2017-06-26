@@ -1060,9 +1060,3 @@ function clickHard(el) {
     }
   }, 100);
 }
-
-function logGA(page) {
-  if (typeof trackOnGA == 'function'){
-    trackOnGA('beeswax/' + page);
-  }
-}

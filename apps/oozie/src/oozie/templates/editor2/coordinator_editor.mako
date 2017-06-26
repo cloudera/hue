@@ -14,8 +14,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter, commonshare, _ko
 from django.utils.translation import ugettext as _
+from desktop.views import commonheader, commonfooter, commonshare, _ko
 %>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
@@ -24,9 +24,11 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="scheduler" file="common_scheduler.inc.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
+%endif
 
-<div id="editor">
+<div id="oozie_coordinatorComponents">
 
 <%def name="buttons()">
   <div class="pull-right" style="padding-right: 10px">
@@ -39,19 +41,13 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-play"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}, visible: canEdit">
       <i class="fa fa-cog"></i>
     </a>
-
-    &nbsp;&nbsp;&nbsp;
 
     <a title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
         data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: coordinator.properties.workflow() && canEdit">
@@ -65,8 +61,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-users"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a class="btn" href="${ url('oozie:new_coordinator') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
@@ -74,12 +68,18 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
   </div>
 </%def>
 
-${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
+${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons, is_embeddable=is_embeddable) }
+
 
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("coordinator") > -1) {
-      location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      var url = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      % if is_embeddable:
+        huePubSub.publish('open.link', url);
+      % else:
+        location.href = url;
+      % endif
     }
   }
 </script>
@@ -89,20 +89,6 @@ ${ scheduler.import_modals() }
 
 
 <div class="submit-modal modal hide"></div>
-
-<div id="chooseFile" class="modal hide fade">
-  <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
-  </div>
-  <div class="modal-body">
-      <div id="filechooser">
-      </div>
-  </div>
-  <div class="modal-footer">
-  </div>
-</div>
-
 
 </div>
 
@@ -114,9 +100,6 @@ ${ scheduler.import_modals() }
 
 <link href="${ static('desktop/css/jqCron.css') }" rel="stylesheet" type="text/css" />
 <script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
-
-<script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -134,7 +117,8 @@ ${ commonshare() | n,unicode }
 ${ dashboard.import_bindings() }
 
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+
+${ utils.submit_popup_event() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 
@@ -144,7 +128,7 @@ ${ scheduler.import_sla_cron(coordinator_json) }
 
   var viewModel = new CoordinatorEditorViewModel(${ coordinator_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflows_json | n,unicode }, ${ can_edit_json | n,unicode });
 
-  ko.applyBindings(viewModel, $("#editor")[0]);
+  ko.applyBindings(viewModel, $("#oozie_coordinatorComponents")[0]);
 
   viewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
   viewModel.coordinator.tracker().markCurrentStateAsClean();
@@ -176,12 +160,25 @@ ${ scheduler.import_sla_cron(coordinator_json) }
     $("#chooseWorkflowDemiModal").modal({
       show: false
     });
+
     $(window).bind("keydown", "esc", function () {
       if ($(".demi-modal.fade.in").length > 0) {
         $(".demi-modal.fade.in .demi-modal-chevron").click();
       }
     });
+
+    huePubSub.subscribe('submit.popup.return', function (data) {
+      if (data.type == 'schedule') {
+        $.jHueNotify.info('${_('Schedule submitted.')}');
+        huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+        huePubSub.publish('browser.job.open.link', data.job_id);
+        $('.submit-modal').modal('hide');
+        $('.modal-backdrop').hide();
+      }
+    }, 'oozie');
   });
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

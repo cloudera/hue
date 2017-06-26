@@ -138,7 +138,7 @@
       % if seen or not current_value:
         <input name="${other_key}" class="hide">
       % else:
-        <input name="${other_key}" value="${current_value}">
+        <input name="${other_key}" value="${current_value}" style="margin-bottom: 10px">
       % endif
     % endif
 </%def>

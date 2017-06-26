@@ -169,7 +169,7 @@ ${layout.menubar(section='query')}
             % if expected_first_row != start_row:
                 <div class="alert"><strong>${_('Warning:')}</strong> ${_('Page offset may have incremented since last view.')}</div>
             % endif
-            <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
+            <table id="resultTable" class="table table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
             <thead>
             <tr>
               <th>&nbsp;</th>
@@ -199,7 +199,7 @@ ${layout.menubar(section='query')}
              <div style="text-align: center; padding: 5px; height: 30px">
                <span class="noMore hide"
                      style="color:#999999">${ _('You have reached the last record for this query.') }</span><img
-                     src="${ static('desktop/art/spinner.gif') }"
+                     src="${ static('desktop/art/spinner.gif') }" alt="${ _('Spinner') }"
                      class="spinner"
                      style="display: none;"/>
              </div>
@@ -216,7 +216,7 @@ ${layout.menubar(section='query')}
 
         % if not error:
         <div class="tab-pane" id="columns">
-          <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+          <table class="table table-condensed" cellpadding="0" cellspacing="0">
             <thead>
               <tr><th>${_('Name')}</th></tr>
             </thead>
@@ -300,8 +300,8 @@ ${layout.menubar(section='query')}
         class="form form-inline form-padding-fix">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Save Query Results')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${ _('Save Query Results') }</h2>
     </div>
     <div class="modal-body">
       <label class="radio">
@@ -345,7 +345,7 @@ ${layout.menubar(section='query')}
 <script src="${ static('desktop/ext/js/leaflet/leaflet.markercluster.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.blueprint.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 $(document).ready(function () {
 
   var dataTable = $(".resultTable").dataTable({

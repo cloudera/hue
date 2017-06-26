@@ -15,37 +15,36 @@
 ## limitations under the License.
 
 <%!
+  from django.utils.translation import ugettext as _
+
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
-  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
 
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
-<script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 
 ${ assist.assistJSModels() }
 
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
-<link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
+<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 
+${ assist.assistPanel() }
+%endif
+
+<link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -89,12 +88,8 @@ ${ assist.assistJSModels() }
     margin-left: 10px;
   }
 
-  .right-panel {
+  .content-panel {
     overflow-x: hidden;
-  }
-
-  .fileChooserBtn {
-    height: 29px;
   }
 
   .form-control.path {
@@ -114,16 +109,15 @@ ${ assist.assistJSModels() }
 
 </style>
 
-${ assist.assistPanel() }
-
-<div class="navbar navbar-inverse navbar-fixed-top">
+<span id="indexerComponents" class="notebook">
+<div class="navbar hue-title-bar">
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="currentApp">
+          <li class="app-header">
             <a href="/indexer/indexer">
-              <i class="fa fa-database app-icon"></i> ${_('Indexes')}</a>
+              <i class="fa fa-database app-icon"></i> ${ _('Index Browser') if is_embeddable else _('Indexes') }</a>
             </a>
           </li>
         </ul>
@@ -132,16 +126,17 @@ ${ assist.assistPanel() }
   </div>
 </div>
 
+%if not is_embeddable:
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
-
+%endif
 
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
       <div class="vertical-full row-fluid panel-container">
-
+        %if not is_embeddable:
         <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
           <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
             <i class="fa fa-chevron-left"></i>
@@ -152,10 +147,6 @@ ${ assist.assistPanel() }
                 user: '${user.username}',
                 onlySql: false,
                 sql: {
-                  sourceTypes: [{
-                    name: 'hive',
-                    type: 'hive'
-                  }],
                   navigationSettings: {
                     openItem: false,
                     showStats: true
@@ -166,8 +157,8 @@ ${ assist.assistPanel() }
             }"></div>
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-
-        <div class="right-panel">
+        %endif
+        <div class="content-panel">
           <div style="margin: 10px; margin-bottom: 100px">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
           </div>
@@ -175,17 +166,6 @@ ${ assist.assistPanel() }
       </div>
     </div>
   </div>
-</div>
-
-<div id="chooseFile" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a file')}</h3>
-  </div>
-  <div class="modal-body">
-    <div id="filechooser"></div>
-  </div>
-  <div class="modal-footer"></div>
 </div>
 
 <script type="text/html" id="create-index-wizard">
@@ -327,7 +307,7 @@ ${ assist.assistPanel() }
         <i class="fa fa-spinner fa-spin"></i>
         <!-- /ko -->
         <div style="overflow: auto">
-          <table class="table table-striped table-condensed" style="margin:auto;text-align:left">
+          <table class="table table-condensed" style="margin:auto;text-align:left">
             <thead>
             <tr data-bind="foreach: createWizard.fileFormat().columns">
               <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
@@ -370,7 +350,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 3 -->
-        <button href="javascript:void(0)" class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
+        <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${_('Index it!')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
       <!-- /ko -->
@@ -498,7 +478,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="notebook-progress">
   <!-- ko with: selectedNotebook  -->
     <!-- ko foreach: snippets  -->
-      <div class="progress-snippet progress active" data-bind="css: {
+      <div class="progress-snippet progress" data-bind="css: {
         'progress-starting': progress() == 0 && status() == 'running',
         'progress-warning': progress() > 0 && progress() < 100,
         'progress-success': progress() == 100,
@@ -510,7 +490,7 @@ ${ assist.assistPanel() }
 </script>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   (function () {
     ko.options.deferUpdates = true;
 
@@ -949,10 +929,10 @@ ${ assist.assistPanel() }
       return koField;
     }
 
-    var IndexerViewModel = function (options) {
+    var IndexerViewModel = function () {
       var self = this;
 
-      self.apiHelper = ApiHelper.getInstance(options);
+      self.apiHelper = ApiHelper.getInstance();
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -970,12 +950,12 @@ ${ assist.assistPanel() }
         if (self.nextStepVisible()){
           self.currentStep(self.currentStep()+1);
         }
-      }
+      };
       self.previousStep = function () {
         if (self.previousStepVisible()){
           self.currentStep(self.currentStep()-1);
         }
-      }
+      };
 
       self.collections = ${ indexes_json | n }.
       filter(function (index) {
@@ -997,15 +977,8 @@ ${ assist.assistPanel() }
     var viewModel;
 
     $(document).ready(function () {
-      var options = {
-        user: '${ user.username }',
-        i18n: {
-          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
-        }
-      }
-      viewModel = new IndexerViewModel(options);
-      ko.applyBindings(viewModel);
+      viewModel = new IndexerViewModel();
+      ko.applyBindings(viewModel, $('#indexerComponents')[0]);
 
       var draggableMeta = {};
       huePubSub.subscribe('draggable.text.meta', function (meta) {
@@ -1013,13 +986,13 @@ ${ assist.assistPanel() }
       });
 
       huePubSub.subscribe('split.panel.resized', function () {
-        $('.form-actions').width($('.right-panel').width() - 50);
+        $('.form-actions').width($('.content-panel').width() - 50);
       });
 
-      $('.form-actions').width($('.right-panel').width() - 50);
+      $('.form-actions').width($('.content-panel').width() - 50);
 
 
-      $('.right-panel').droppable({
+      $('.content-panel').droppable({
         accept: ".draggableText",
         drop: function (e, ui) {
           var text = ui.helper.text();
@@ -1058,5 +1031,8 @@ ${ assist.assistPanel() }
     });
   })();
 </script>
+</span>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

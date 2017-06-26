@@ -16,6 +16,22 @@
  limitations under the License.
 */
 
+.step-indicator-fixed {
+  position: fixed;
+  background-color: #FFF;
+  margin-top: -10px;
+  z-index: 100;
+  padding-top: 10px;
+}
+
+.step-indicator-fixed ol {
+  margin: 0;
+}
+
+.vertical-spacer {
+  height: 80px;
+}
+
 .step-indicator {
   border-collapse: separate;
   display: table;
@@ -42,20 +58,20 @@
 }
 
 .step-indicator li:first-child:before {
-  left: 50%;
+  /*left: 50%;*/
 }
 
 .step-indicator li:last-child:before {
-  right: 50%;
+  /*right: 50%;*/
 }
 
 .step-indicator .active .step {
-  border-color: #338BB8;
-  color: #338BB8;
+  border-color: #0B7FAD;
+  color: #0B7FAD;
 }
 
 .step-indicator .active .caption {
-  color: #338BB8;
+  color: #0B7FAD;
 }
 
 .step-indicator .complete .step {
@@ -77,12 +93,12 @@
 }
 
 .step-indicator .active.complete .step {
-  border-color: #338BB8;
-  color: #338BB8;
+  border-color: #0B7FAD;
+  color: #0B7FAD;
 }
 
 .step-indicator .active.complete .caption {
-  color: #338BB8;
+  color: #0B7FAD;
 }
 
 .step-indicator .inactive .caption {
@@ -101,12 +117,10 @@
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  cursor: pointer;
 }
 
 .step-indicator .caption {
   box-sizing: border-box;
   color: #dddddd;
   padding: 11px 16px;
-  cursor: pointer;
 }

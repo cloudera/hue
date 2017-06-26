@@ -44,10 +44,16 @@ SENTRY_CONF_DIR = Config(
   default=os.environ.get("SENTRY_CONF_DIR", '/etc/sentry/conf')
 )
 
+PRIVILEGE_CHECKER_CACHING=Config(
+  key='privilege_checker_caching',
+  help=_t('Number of seconds when the privilege list of a user is cached.'),
+  type=int,
+  default=30,
+)
+
 
 def is_enabled():
-  try:
-    from search.conf import SECURITY_ENABLED
-    return SECURITY_ENABLED.get()
-  except ImportError, e:
-    LOG.warn("Search app is not enabled")
+  from hadoop import cluster # Avoid dependencies conflicts
+  cluster = cluster.get_cluster_conf_for_job_submission()
+
+  return HOSTNAME.get() != 'localhost' and cluster.SECURITY_ENABLED.get()

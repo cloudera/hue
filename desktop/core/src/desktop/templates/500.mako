@@ -20,12 +20,13 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
+%if not is_embeddable:
 ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
-
+%endif
 
 <link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
 
-<div class="container-fluid">
+<div id="httperror" class="container-fluid">
   <div class="row-fluid">
     <div class="span12 center">
       <div class="error-code">500</div>
@@ -49,7 +50,7 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
           &nbsp;|&nbsp;
         <a href="/logs" target="_new" title="${ _('View server logs') }">${_('View logs')}</a>
         <div id="traceback" class="hide">
-          <table class="table table-striped table-condensed margin-top-30" style="background: white; border: 1px solid #DDDDDD;">
+          <table class="table table-condensed margin-top-30" style="background: white; border: 1px solid #DDDDDD;">
             <thead>
               <tr>
                 <td>${_("File Name")}</td>
@@ -70,7 +71,7 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
         </div>
       % else:
         % if user.is_superuser:
-          <a href="/logs" target="_blank" title="${ _('View server logs') }">${_('View logs')}</a>
+          <a href="/logs" ${ not is_embeddable and 'target="_blank"'  or '' } title="${ _('View server logs') }">${_('View logs')}</a>
         % endif
       % endif
 
@@ -84,4 +85,6 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
   }
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

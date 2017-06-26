@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-09-11 13:35-0700\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,19 +17,59 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/about/templates/index.mako:20
-msgid "About Hue"
+#: src/search/conf.py:25
+msgid "URL of the Solr Server."
 msgstr ""
 
-#: src/about/templates/index.mako:25
-msgid "Configuration"
+#: src/search/conf.py:30
+msgid "Query sent when no term is entered."
 msgstr ""
 
-#: src/about/templates/index.mako:26
-msgid "Check for misconfiguration"
+#: src/search/conf.py:35
+msgid "Whether Solr requires client to perform Kerberos authentication."
 msgstr ""
 
-#: src/about/templates/index.mako:27
-msgid "Server Logs"
+#: src/search/conf.py:42
+msgid "Use latest Solr 5.2+ features."
+msgstr ""
+
+#: src/search/models.py:230
+msgid "Solr index name pointing to"
+msgstr ""
+
+#: src/search/models.py:231
+msgid "Friendlier name in UI"
+msgstr ""
+
+#: src/search/models.py:233
+msgid "Collection with cores data"
+msgstr ""
+
+#: src/search/models.py:233
+msgid "Solr json"
+msgstr ""
+
+#: src/search/models.py:235
+msgid "Properties"
+msgstr ""
+
+#: src/search/models.py:236
+msgid "Hue properties (e.g. results by pages number)"
+msgstr ""
+
+#: src/search/models.py:243
+msgid "Owner"
+msgstr ""
+
+#: src/search/models.py:243
+msgid "User who created the job."
+msgstr ""
+
+#: src/search/views.py:35
+msgid "You must be a superuser."
+msgstr ""
+
+#: src/search/views.py:38
+msgid "A POST request is required."
 msgstr ""
 

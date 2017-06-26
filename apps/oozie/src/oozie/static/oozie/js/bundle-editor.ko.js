@@ -108,7 +108,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
           self.bundle.id(data.id);
           self.bundle.tracker().markCurrentStateAsClean();
           $(document).trigger("info", data.message);
-          if (window.location.search.indexOf("bundle") == -1) {
+          if (window.location.search.indexOf("bundle") == -1 && !IS_HUE_4) {
             window.location.hash = '#bundle=' + data.id;
           }
         }
@@ -127,8 +127,9 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
     // If self.bundle.id() == null, need to save wf for now
     $(".jHueNotify").hide();
     if (!self.bundle.isDirty()) {
-      logGA('submit');
+      hueAnalytics.log('oozie/editor/bundle', 'submit');
       $.get("/oozie/editor/bundle/submit/" + self.bundle.id(), {
+        format: IS_HUE_4 ? 'json' : 'html'
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
@@ -137,10 +138,3 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
     }
   };
 };
-
-
-function logGA(page) {
-  if (typeof trackOnGA == 'function') {
-    trackOnGA('oozie/editor/bundle/' + page);
-  }
-}

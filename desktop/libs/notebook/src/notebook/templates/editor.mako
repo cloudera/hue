@@ -22,27 +22,32 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
-<%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
+<%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
+<%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
+%endif
 
-${ editorComponents.includes() }
+<span id="editorComponents" class="editorComponents notebook">
+${ editorComponents.includes(is_embeddable=is_embeddable, suffix='editor') }
 
-<style type="text/css">
-  .snippet {
-    margin-right: 10px;
-  }
-</style>
+${ editorComponents.topBar(suffix='editor') }
+${ editorComponents.commonHTML(is_embeddable=is_embeddable, suffix='editor') }
 
-${ editorComponents.topBar() }
-${ editorComponents.commonHTML() }
-
+%if not is_embeddable:
 ${ assist.assistPanel() }
 ${ assist.assistJSModels() }
 ${ configKoComponents.config() }
+${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }
-${ notebookKoComponents.snippetDbSelection() }
+${ hueAceAutocompleter.hueAceAutocompleter() }
+%endif
 
-${ editorComponents.commonJS() }
 
+${ editorComponents.commonJS(is_embeddable=is_embeddable, suffix='editor') }
+</span>
+
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

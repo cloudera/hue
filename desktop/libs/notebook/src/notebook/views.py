@@ -27,12 +27,13 @@ from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import Document2, Document
+from desktop.models import Document2, Document, FilesystemException
+from desktop.views import serve_403_error
 
 from metadata.conf import has_optimizer, has_navigator
 
-from notebook.conf import get_interpreters
-from notebook.connectors.base import Notebook, get_api
+from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
+from notebook.connectors.base import Notebook, get_api, _get_snippet_name
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
@@ -63,8 +64,11 @@ def notebooks(request):
 
 
 @check_document_access_permission()
-def notebook(request):
-  notebook_id = request.GET.get('notebook')
+def notebook(request, is_embeddable=False):
+  if not SHOW_NOTEBOOKS.get():
+    return serve_403_error(request)
+
+  notebook_id = request.GET.get('notebook', request.GET.get('editor'))
 
   is_yarn_mode = False
   try:
@@ -76,8 +80,9 @@ def notebook(request):
   return render('notebook.mako', request, {
       'editor_id': notebook_id or None,
       'notebooks_json': '{}',
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'options_json': json.dumps({
-          'languages': get_interpreters(request.user),
+          'languages': get_ordered_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
           'is_optimizer_enabled': has_optimizer(),
           'is_navigator_enabled': has_navigator(request.user),
@@ -88,9 +93,17 @@ def notebook(request):
 
 
 @check_document_access_permission()
-def editor(request, is_mobile=False):
+def notebook_embeddable(request):
+  return notebook(request, True)
+
+
+@check_document_access_permission()
+def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
+
+  if editor_type == 'notebook' or request.GET.get('notebook'):
+    return notebook(request)
 
   if editor_id:  # Open existing saved editor document
     document = Document2.objects.get(id=editor_id)
@@ -103,9 +116,10 @@ def editor(request, is_mobile=False):
   return render(template, request, {
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'editor_type': editor_type,
       'options_json': json.dumps({
-        'languages': get_interpreters(request.user),
+        'languages': get_ordered_interpreters(request.user),
         'mode': 'editor',
         'is_optimizer_enabled': has_optimizer(),
         'is_navigator_enabled': has_navigator(request.user),
@@ -113,6 +127,11 @@ def editor(request, is_mobile=False):
         'mobile': is_mobile
       })
   })
+
+
+@check_document_access_permission()
+def editor_embeddable(request):
+  return editor(request, False, True)
 
 
 @check_document_access_permission()
@@ -124,25 +143,29 @@ def new(request):
   return notebook(request)
 
 
-def browse(request, database, table):
-  editor_type = request.GET.get('type', 'hive')
+def browse(request, database, table, partition_spec=None):
+  snippet = {'type': request.POST.get('sourceType', 'hive')}
 
-  snippet = {'type': editor_type}
-  sql_select = get_api(request, snippet).get_select_star_query(snippet, database, table)
+  statement = get_api(request, snippet).get_browse_query(snippet, database, table, partition_spec)
+  editor_type = snippet['type']
 
-  editor = make_notebook(name='Browse', editor_type=editor_type, statement=sql_select, status='ready-execute')
+  if request.method == 'POST':
+    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=statement, status='ready-execute', is_task=True)
+    return JsonResponse(notebook.execute(request, batch=False))
+  else:
+    editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute')
 
-  return render('editor.mako', request, {
-      'notebooks_json': json.dumps([editor.get_data()]),
-      'options_json': json.dumps({
-          'languages': get_interpreters(request.user),
-          'mode': 'editor',
-          'editor_type': editor_type
-      }),
-      'editor_type': editor_type,
-  })
+    return render('editor.mako', request, {
+        'notebooks_json': json.dumps([editor.get_data()]),
+        'options_json': json.dumps({
+            'languages': get_ordered_interpreters(request.user),
+            'mode': 'editor',
+            'editor_type': editor_type
+        }),
+        'editor_type': editor_type,
+    })
 
-
+# Deprecated in Hue 4
 @check_document_access_permission()
 def execute_and_watch(request):
   notebook_id = request.GET.get('editor', request.GET.get('notebook'))
@@ -160,15 +183,23 @@ def execute_and_watch(request):
     sql, success_url = api.export_data_as_table(notebook, snippet, destination)
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
   elif action == 'insert_as_query':
+    # TODO: checks/workarounds in case of non impersonation or Sentry
+    # TODO: keep older simpler way in case of known not many rows?
     sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
-    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
+    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'], on_success_url=success_url)
   elif action == 'index_query':
+    if destination == '__hue__':
+      destination = _get_snippet_name(notebook, unique=True, table_format=True)
+      live_indexing = True
+    else:
+      live_indexing = False
+
     sql, success_url = api.export_data_as_table(notebook, snippet, destination, is_temporary=True, location='')
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
 
     sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
 
-    from indexer.api3 import _index # Will ve moved to the lib in next commit
+    from indexer.api3 import _index # Will ve moved to the lib
     from indexer.file_format import HiveFormat
     from indexer.fields import Field
 
@@ -178,13 +209,21 @@ def execute_and_watch(request):
         'format': {'quoteChar': '"', 'recordSeparator': '\n', 'type': 'csv', 'hasHeader': False, 'fieldSeparator': '\u0001'},
         "sample": '',
         "columns": [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            Field(col['name'].rsplit('.')[-1], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
             for col in sample['meta']
         ]
     }
 
+    if live_indexing:
+      file_format['inputFormat'] = 'hs2_handle'
+      file_format['fetch_handle'] = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
+
     job_handle = _index(request, file_format, destination, query=notebook['uuid'])
-    return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_handle['handle']['id']}))
+
+    if live_indexing:
+      return redirect(reverse('search:browse', kwargs={'name': destination}))
+    else:
+      return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_handle['handle']['id']}))
   else:
     raise PopupException(_('Action %s is unknown') % action)
 
@@ -202,33 +241,67 @@ def execute_and_watch(request):
 
 @check_document_modify_permission()
 def delete(request):
+  response = {'status': -1}
+
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
-  ctr = 0
-  for notebook in notebooks:
-    doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'], perm_type='write')
-    doc = doc2.doc.get()
-    doc.can_write_or_exception(request.user)
-    doc2.trash()
-    ctr += 1
+  if not notebooks:
+    response['message'] = _('No notebooks have been selected for deletion.')
+  else:
+    ctr = 0
+    failures = []
+    for notebook in notebooks:
+      try:
+        doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'], perm_type='write')
+        doc = doc2._get_doc1()
+        doc.can_write_or_exception(request.user)
+        doc2.trash()
+        ctr += 1
+      except FilesystemException, e:
+        failures.append(notebook['uuid'])
+        LOG.exception("Failed to delete document with UUID %s that is writable by user %s, skipping." % (notebook['uuid'], request.user.username))
 
-  return JsonResponse({'status': 0, 'message': _('Trashed %d notebook(s)') % ctr})
+    response['status'] = 0
+    if failures:
+      response['errors'] = failures
+      response['message'] = _('Trashed %d notebook(s) and failed to delete %d notebook(s).') % (ctr, len(failures))
+    else:
+      response['message'] = _('Trashed %d notebook(s)') % ctr
+
+  return JsonResponse(response)
 
 
 @check_document_access_permission()
 def copy(request):
+  response = {'status': -1}
+
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
-  for notebook in notebooks:
-    doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
-    doc = doc2.doc.get()
+  if len(notebooks) == 0:
+    response['message'] = _('No notebooks have been selected for copying.')
+  else:
+    ctr = 0
+    failures = []
+    for notebook in notebooks:
+      try:
+        doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
+        doc = doc2._get_doc1()
+        name = doc2.name + '-copy'
+        doc2 = doc2.copy(name=name, owner=request.user)
 
-    name = doc2.name + '-copy'
-    doc2 = doc2.copy(name=name, owner=request.user)
+        doc.copy(content_object=doc2, name=name, owner=request.user)
+      except FilesystemException, e:
+        failures.append(notebook['uuid'])
+        LOG.exception("Failed to copy document with UUID %s accessible by user %s, skipping." % (notebook['uuid'], request.user.username))
 
-    doc.copy(content_object=doc2, name=name, owner=request.user)
+    response['status'] = 0
+    if failures:
+      response['errors'] = failures
+      response['message'] = _('Copied %d notebook(s) and failed to copy %d notebook(s).') % (ctr, len(failures))
+    else:
+      response['message'] = _('Copied %d notebook(s)') % ctr
 
-  return JsonResponse({})
+  return JsonResponse(response)
 
 
 @check_document_access_permission()
@@ -237,7 +310,16 @@ def download(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
 
-  return get_api(request, snippet).download(notebook, snippet, file_format)
+  response = get_api(request, snippet).download(notebook, snippet, file_format)
+
+  if response:
+    request.audit = {
+      'operation': 'DOWNLOAD',
+      'operationText': 'User %s downloaded results from %s as %s' % (request.user.username, _get_snippet_name(notebook), file_format),
+      'allowed': True
+    }
+
+  return response
 
 
 def install_examples(request):

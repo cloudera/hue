@@ -62,8 +62,9 @@ dynamic_patterns = patterns('desktop.auth.views',
 
 if USE_NEW_EDITOR.get():
   dynamic_patterns += patterns('desktop.views',
-    (r'^home$','home2'),
-    (r'^home2$','home')
+    (r'^home/?$','home2'),
+    (r'^home2$','home'),
+    (r'^home_embeddable$','home_embeddable'),
   )
 else:
   dynamic_patterns += patterns('desktop.views',
@@ -80,7 +81,6 @@ dynamic_patterns += patterns('desktop.views',
   (r'^desktop/reset_all_debug','reset_all_debug'),
   (r'^bootstrap.js$', 'bootstrap'), # unused
 
-  (r'^desktop/prefs/(?P<key>\w+)?$', 'prefs'),
   (r'^desktop/status_bar/?$', 'status_bar'),
   (r'^desktop/debug/is_alive$','is_alive'),
   (r'^desktop/debug/is_idle$','is_idle'),
@@ -92,8 +92,11 @@ dynamic_patterns += patterns('desktop.views',
 
   # Mobile
   (r'^assist_m', 'assist_m'),
-  # Responsive
-  (r'^responsive', 'responsive'),
+  # Hue 4
+  (r'^hue.*/$', 'hue'),
+  (r'^403$', 'path_forbidden'),
+  (r'^404$', 'not_found'),
+  (r'^500$', 'server_error'),
 
   # KO components, change to doc?name=ko_editor or similar
   (r'^ko_editor', 'ko_editor'),
@@ -101,6 +104,9 @@ dynamic_patterns += patterns('desktop.views',
 
   # Jasmine
   (r'^jasmine', 'jasmine'),
+
+  # Web workers
+  (r'^desktop/workers/aceSqlWorker.js', 'ace_sql_worker'),
 
   # Unsupported browsers
   (r'^boohoo$','unsupported'),
@@ -130,10 +136,21 @@ dynamic_patterns += patterns('desktop.api2',
   (r'^desktop/api2/doc/mkdir/?$', 'create_directory'),
   (r'^desktop/api2/doc/update/?$', 'update_document'),
   (r'^desktop/api2/doc/delete/?$', 'delete_document'),
+  (r'^desktop/api2/doc/restore/?$', 'restore_document'),
   (r'^desktop/api2/doc/share/?$', 'share_document'),
+
+  (r'^desktop/api2/get_config/?$', 'get_config'),
+  (r'^desktop/api2/user_preferences/(?P<key>\w+)?$', 'user_preferences'),
 
   (r'^desktop/api2/doc/export/?$', 'export_documents'),
   (r'^desktop/api2/doc/import/?$', 'import_documents'),
+
+  (r'^desktop/api/search/entities/?$', 'search_entities'),
+  (r'^desktop/api/search/entities_interactive/?$', 'search_entities_interactive'),
+)
+
+dynamic_patterns += patterns('notebook.views',
+  (r'^editor', 'editor'),
 )
 
 # Default Configurations
@@ -145,6 +162,11 @@ dynamic_patterns += patterns('desktop.configuration.api',
 
 dynamic_patterns += patterns('useradmin.views',
   (r'^desktop/api/users/autocomplete', 'list_for_autocomplete'),
+)
+
+dynamic_patterns += patterns('desktop.lib.vcs.api',
+  (r'^desktop/api/vcs/contents/?$', 'contents'),
+  (r'^desktop/api/vcs/authorize/?$', 'authorize'),
 )
 
 # Metrics specific

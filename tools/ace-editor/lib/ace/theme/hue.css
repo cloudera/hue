@@ -62,8 +62,15 @@
   margin-left: -3px;
 }
 
+.ace-hue .ace_marker-layer .ace_warning-line {
+  position: absolute;
+  background-color: #fcf8e3;
+  width: 100% !important;
+  margin-left: -3px;
+}
+
 .ace-hue .ace_invisible {
-  color: #D1D1D1
+  color: #BBB
 }
 
 .ace-hue .ace_keyword,
@@ -83,14 +90,19 @@
 }
 
 .ace_gutter > .ace_layer {
-  min-width: 24px !important;
   border-left: 1px solid #DBE8F1;
   color: #737373;
 }
 
 .ace_gutter-cell.ace_error {
   background-color: #f2dede;
-  border-left:1px solid #eed3d7;
+  border-left:1px solid #d6616b;
+  background-image: none !important;
+}
+
+.ace_gutter-cell.ace_warning {
+  background-color: #fcf8e3;
+  border-left:1px solid #f0c36d;
   background-image: none !important;
 }
 

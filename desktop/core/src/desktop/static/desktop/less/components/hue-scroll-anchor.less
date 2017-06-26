@@ -1,0 +1,55 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.hueAnchor {
+  color: @cui-white;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  position: fixed;
+  z-index: 2147483647;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  background-color: @cui-gray-800;
+  padding: 10px;
+  padding-left: 14px;
+  padding-right: 14px;
+  min-height: 22px;
+  &:hover {
+    text-decoration: none;
+    opacity: 0.85;
+    filter: alpha(opacity=85);
+  }
+  & input {
+    min-height: 10px!important;
+    height: 10px!important;
+    margin: 0;
+  }
+}
+
+#jHueScrollUpAnchor {
+  bottom: 20px;
+  right: 20px;
+  display: none;
+}
+
+#jHueScrollLeftAnchor {
+  bottom: 20px;
+  right: 20px;
+  display: none;
+}

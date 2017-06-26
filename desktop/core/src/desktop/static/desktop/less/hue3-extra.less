@@ -1,0 +1,206 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+@import (reference) "cui/colors.less";
+@import (reference) "hue-mixins.less";
+
+@import "hue-assist";
+@import "hue-autocomplete";
+@import "hue-cui-overrides.less";
+@import "hue-cross-version.less";
+
+.svg-hue-logo-main {
+  fill: #f2f2f2;
+}
+
+.svg-hue-logo-trunk {
+  fill: #D7B9EB;
+}
+
+.subnav {
+  background-color: @cui-gray-100;
+  background-image: -moz-linear-gradient(center top, @cui-gray-050 0%, @cui-gray-100 100%);
+  background-repeat: repeat-x;
+  border: 1px solid @cui-gray-200;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  height: 36px;
+  width: 100%;
+}
+
+.subnav .nav {
+  margin-bottom: 0;
+}
+
+.subnav .nav > li > a {
+  border-left: 1px solid @cui-gray-050;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-right: 1px solid @cui-gray-200;
+  margin: 0;
+  padding-bottom: 11px;
+  padding-top: 11px;
+}
+
+.subnav .nav > li > a:hover {
+  border-right: 1px solid @cui-gray-200;
+  border-left: 1px solid @cui-gray-050;
+}
+
+.subnav .nav > .active > a, .subnav .nav > .active > a:hover {
+  background-color: @cui-gray-100;
+  border-left: 0 none;
+  border-right-color: @cui-gray-300;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.05) inset;
+  color: @cui-gray-700;
+  padding-left: 13px;
+}
+
+.subnav .nav > .active > a .caret, .subnav .nav > .active > a:hover .caret {
+  border-top-color: @cui-gray-700;
+}
+
+.subnav .nav > li:first-child > a, .subnav .nav > li:first-child > a:hover {
+  border-left: 0 none;
+  border-radius: 4px 0 0 4px;
+  -webkit-border-radius: 4px 0 0 4px;
+  -moz-border-radius: 4px 0 0 4px;
+  padding-left: 12px;
+}
+
+.subnav .nav > li:last-child > a {
+  border-right: 0 none;
+}
+
+.subnav .dropdown-menu {
+  border-radius: 0 0 4px 4px;
+  -webkit-border-radius: 0 0 4px 4px;
+  -moz-border-radius: 0 0 4px 4px;
+}
+
+.subnav-fixed {
+  border-color: #D5D5D5;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-width: 0 0 1px;
+  box-shadow: 0 1px 0 #FFFFFF inset, 0 1px 5px rgba(0, 0, 0, 0.1);
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 48px;
+  z-index: 1020;
+}
+
+.subnav-fixed .nav {
+  margin: 0 auto;
+  padding: 0 1px;
+}
+
+.subnav .nav > li:first-child > a, .subnav .nav > li:first-child > a:hover {
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+}
+
+.hue-title-bar {
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+  margin-bottom: 0;
+  top: 28px;
+}
+
+.hue-title-bar.nokids .navbar-inner {
+  height: 45px;
+}
+
+.hue-title-bar .navbar-inner {
+  padding-right: 24px;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+
+
+.search-container {
+  .display-flex;
+  .flex(1 1 37px);
+  position: relative;
+  margin: 8px 10px 0 10px;
+}
+
+.search-container > input {
+  .flex(1 1 100%);
+  border-radius: 4px 0 0 4px;
+  border: 1px solid @cui-gray-300;
+  border-right: none;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+.search-container > a {
+  .flex(0 0 31px);
+  margin-bottom: 0;
+  cursor: pointer;
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+  border: 1px solid @cui-gray-300;
+  box-shadow: none;
+  font-size: 15px;
+  line-height: 30px;
+  height: 30px;
+  background-color: @cui-gray-050;
+  width: 31px;
+}
+
+.search-container > a > i {
+  margin-left: 8px;
+}
+
+// Hue 3 CUI overrides
+
+.navigator .nav > li > a:hover,
+.navigator .nav > li > a:focus {
+  background-color: transparent !important;
+}
+
+.nav .dropdown-toggle .caret {
+  border-top-color: @hue-primary-color-light !important;
+  border-bottom-color: @hue-primary-color-light !important;
+}
+
+.vertical-full.container-fluid {
+  padding-top: 0;
+}
+
+.dropdown-menu > li > a > svg {
+  color: @hue-primary-color-dark;
+}
+.dropdown-menu > li.active > a > svg,
+.dropdown-menu > li > a:hover > svg,
+.dropdown-menu > li > a:focus > svg,
+.dropdown-menu > li > a:active > svg {
+  color: #FFF !important;
+}
+
+.dropdown-menu .svg-app-icon {
+  margin-right: 4px;
+}

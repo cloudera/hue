@@ -63,7 +63,7 @@ class HbaseApi(object):
     try:
       full_config = json.loads(conf.HBASE_CLUSTERS.get().replace("'", "\""))
     except:
-      LOG.exception('failed to load the HBase clusters')
+      LOG.debug('Failed to read HBase cluster configuration as JSON, falling back to raw configuration.')
       full_config = [conf.HBASE_CLUSTERS.get()] #hack cause get() is weird
 
     for config in full_config:

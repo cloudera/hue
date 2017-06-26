@@ -20,10 +20,12 @@ import os
 import tempfile
 import string
 
+from django.contrib.auth.models import User
 from nose.tools import assert_equal, assert_false, assert_true, assert_raises, eq_
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
+from desktop.lib.test_utils import grant_access, add_to_group, add_permission, remove_from_group
 
 from aws.s3 import join, parse_uri
 from aws.s3.s3fs import S3FileSystem, S3FileSystemException
@@ -42,6 +44,7 @@ class S3FSTest(S3TestBase):
       cls.c = make_logged_in_client(username='test', is_superuser=False)
       grant_access('test', 'test', 'filebrowser')
       add_to_group('test')
+      cls.user = User.objects.get(username="test")
 
 
   def test_open(self):
@@ -222,8 +225,12 @@ class S3FSTest(S3TestBase):
       assert_true('file_one.txt' in dst_ls)
       assert_true('file_two.txt' in dst_ls)
 
-      # Assert that only the renamed directory, and not an empty file, exists
+      # Assert that the children files are not duplicated at top-level destination
       bucket_ls = self.bucket.list()
+      assert_false('file_one.txt' in bucket_ls)
+      assert_false('file_two.txt' in bucket_ls)
+
+      # Assert that only the renamed directory, and not an empty file, exists
       assert_equal(1, len([key for key in bucket_ls if key.name.strip('/') == self.get_key(dst_dir).name.strip('/')]))
 
 
@@ -297,9 +304,13 @@ class S3FSTest(S3TestBase):
       local_file = local_file.name
       dest_path = '%s/%s' % (dest_dir, os.path.basename(local_file))
 
-      # Just upload the current python file
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % dest_dir, dict(dest=dest_dir, hdfs_file=file(local_file)))
-      response = json.loads(resp.content)
+      add_permission(self.user.username, 'has_s3', permname='s3_access', appname='filebrowser')
+      try:
+        # Just upload the current python file
+        resp = self.c.post('/filebrowser/upload/file?dest=%s' % dest_dir, dict(dest=dest_dir, hdfs_file=file(local_file)))
+        response = json.loads(resp.content)
+      finally:
+        remove_from_group(self.user.username, 'has_s3')
 
       assert_equal(0, response['status'], response)
       stats = self.fs.stats(dest_path)
@@ -308,3 +319,10 @@ class S3FSTest(S3TestBase):
       actual = f.read(file_size)
       expected = file(local_file).read()
       assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
+
+
+  def test_check_access(self):
+    dir_path = self.get_test_path('test_check_access')
+    self.fs.mkdir(dir_path)
+
+    assert_true(self.fs.check_access(dir_path, permission='WRITE'))

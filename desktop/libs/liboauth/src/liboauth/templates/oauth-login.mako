@@ -31,9 +31,13 @@ from django.utils.translation import ugettext as _
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
+
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/hue3-extra.css') }" rel="stylesheet">
 
   <style type="text/css">
     body {
@@ -95,7 +99,7 @@ from django.utils.translation import ugettext as _
     .footer {
       position: fixed;
       bottom: 0;
-      background-color: #338BB8;
+      background-color: #0B7FAD;
       height: 4px;
       width: 100%;
     }
@@ -143,13 +147,8 @@ from django.utils.translation import ugettext as _
 <div class="footer"></div>
 
 <div class="navigator">
-  <div class="pull-right">
-    <ul class="nav nav-pills">
-      <li id="jHueTourFlagPlaceholder"></li>
-    </ul>
-  </div>
   <a class="brand nav-tooltip pull-left" href="#">
-    <img src="${ static('desktop/art/hue-logo-mini-white.png') }"
+    <img src="${ static('desktop/art/hue-logo-mini-white.png') }" alt="${ _('Hue logo') }"
        data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
        data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/>
   </a>
@@ -165,7 +164,7 @@ from django.utils.translation import ugettext as _
       <form method="POST" action="${action}" class="well">
         ${ csrf_token(request) | n,unicode }
         <img id="logo" src="${ static('desktop/art/hue-login-logo.png') }" data-orig="${ static('desktop/art/hue-login-logo.png') }"
-             data-hover="${ static('desktop/art/hue-login-logo-skew.png') }"/>
+             data-hover="${ static('desktop/art/hue-login-logo-skew.png') }" alt="${ _('Hue logo') }"/>
 
         %if login_errors:
             <div class="alert alert-error" style="text-align: center">
@@ -188,25 +187,25 @@ from django.utils.translation import ugettext as _
             <div id="buttons_group" class="buttons-group">
                 %if socialGoogle:
                     <span class="btn btn-large btn-primary google">
-                      <img src="${ static('liboauth/art/icon-gplus.png') }">
+                      <img src="${ static('liboauth/art/icon-gplus.png') }" alt="${ _('Google icon') }">
                       <span>Google</span>
                     </span>
                 %endif
                 %if socialFacebook:
                     <span class="btn btn-large btn-primary facebook">
-                      <img src="${ static('liboauth/art/icon-fb.png') }">
+                      <img src="${ static('liboauth/art/icon-fb.png') }" alt="${ _('Facebook icon') }">
                       <span>Facebook</span>
                     </span>
                 %endif
                 %if socialLinkedin:
                     <span class="btn btn-large btn-primary linkedin">
-                      <img src="${ static('liboauth/art/icon-linkedin.png') }">
+                      <img src="${ static('liboauth/art/icon-linkedin.png') }" alt="${ _('Linkedin icon') }">
                       <span>Linkedin</span>
                     </span>
                 %endif
                 %if socialTwitter:
                     <span class="btn btn-large btn-primary twitter">
-                      <img src="${ static('liboauth/art/icon-twitter.png') }">
+                      <img src="${ static('liboauth/art/icon-twitter.png') }" alt="${ _('Twitter icon') }">
                       <span>Twitter</span>
                     </span>
                 %endif

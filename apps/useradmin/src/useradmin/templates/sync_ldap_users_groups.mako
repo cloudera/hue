@@ -35,9 +35,12 @@ from django.utils.translation import ugettext as _
 
 <form action="${path}" method="POST" class="form form-horizontal">
   ${ csrf_token(request) | n,unicode }
+  % if is_embeddable:
+    <input type="hidden" value="true" name="is_embeddable" />
+  % endif
   <div class="modal-header left">
-    <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h3>${_('Sync LDAP users and groups')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Sync LDAP users and groups')}</h2>
   </div>
   <div class="modal-body">
     <div class="alert alert-info left">
@@ -50,6 +53,6 @@ from django.utils.translation import ugettext as _
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <input type="submit" class="btn btn-primary" value="${_('Sync')}"/>
+    <input type="submit" class="btn btn-primary disable-feedback" value="${_('Sync')}"/>
   </div>
 </form>

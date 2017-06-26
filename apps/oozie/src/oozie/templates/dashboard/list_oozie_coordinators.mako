@@ -18,6 +18,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  from oozie.conf import ENABLE_OOZIE_BACKEND_FILTERING
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -32,7 +33,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   <div class="card-body" style="padding-bottom: 20px">
   <p>
   <form>
-    <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
+    <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search partial name, submitter or complete Id') }">
 
     <div class="btn-toolbar" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
       <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
@@ -165,8 +166,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 
 <div id="confirmation" class="modal hide">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 class="message"></h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title message"></h2>
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -174,14 +175,11 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   </div>
 </div>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
   var Coordinator = function (c) {
     return {
@@ -215,6 +213,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   var runningTableOffset = 1, completedTableOffset = 1;
   var totalRunningJobs = 0, totalCompletedJobs = 0;
   var PAGE_SIZE = 50;
+  var filterTimeout = null;
 
   $(document).ready(function () {
 
@@ -305,14 +304,22 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     });
 
     $("#filterInput").keyup(function () {
-      runningTable.fnFilter($(this).val());
-      completedTable.fnFilter($(this).val());
-
       var hash = "#";
       if ($("a.btn-date.active").length > 0) {
         hash += "date=" + $("a.btn-date.active").text();
       }
       window.location.hash = hash;
+
+      % if ENABLE_OOZIE_BACKEND_FILTERING.get():
+        if (filterTimeout != null) {
+          clearTimeout(filterTimeout);
+        }
+        filterTimeout = setTimeout(refreshTables, 500);
+        refreshPagination();
+      % else:
+        runningTable.fnFilter($(this).val());
+        completedTable.fnFilter($(this).val());
+      % endif
     });
 
     $("a.btn-pagination").on("click", function () {
@@ -352,6 +359,25 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     var hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
     if (hash != "" && hash.indexOf("=") > -1) {
       $("a.btn-date[data-value='" + hash.split("=")[1] + "']").click();
+    }
+
+    function refreshTables() {
+      refreshRunning();
+      refreshCompleted();
+      refreshProgress();
+    }
+
+
+    function getTextFilter() {
+      % if not ENABLE_OOZIE_BACKEND_FILTERING.get():
+        return '';
+      % endif
+      var filterBtn = $("#filterInput");
+      var textFilter = '';
+      if (filterBtn.val()) {
+        textFilter = '&text=' + filterBtn.val();
+      }
+      return textFilter;
     }
 
     function refreshPagination() {
@@ -426,7 +452,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     var numRunning = 0;
 
     refreshRunning = function () {
-      $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running'), function (data) {
+      $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running') + getTextFilter(), function (data) {
         // Refresh pagination buttons
         totalRunningJobs = data.total_jobs;
         refreshPaginationButtons("running", totalRunningJobs);
@@ -538,7 +564,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 
 
     function refreshCompleted() {
-      $.getJSON(window.location.pathname + "?format=json&offset=" + completedTableOffset + getStatuses('completed'), function (data) {
+      $.getJSON(window.location.pathname + "?format=json&offset=" + completedTableOffset + getStatuses('completed') + getTextFilter(), function (data) {
 
         // Refresh pagination buttons
         totalCompletedJobs = data.total_jobs;
@@ -573,7 +599,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     }
 
     function refreshProgress() {
-      $.getJSON(window.location.pathname + "?format=json&type=progress" + getStatuses('running'), function (data) {
+      $.getJSON(window.location.pathname + "?format=json&type=progress" + getStatuses('running') + getTextFilter(), function (data) {
         var nNodes = runningTable.fnGetNodes();
           $(data.jobs).each(function (iCoord, item) {
             var coord = new Coordinator(item);
@@ -605,9 +631,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       });
     }
 
-    refreshRunning();
-    refreshCompleted();
-    refreshProgress();
+    refreshTables();
   });
 </script>
 ${ utils.bulk_dashboard_functions() }

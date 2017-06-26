@@ -52,7 +52,8 @@ APPS := core \
 	libs/libsolr \
 	libs/libzookeeper \
 	libs/metadata \
-	libs/notebook
+	libs/notebook \
+	libs/dashboard
 
 .PHONY: default
 default:: hue syncdb

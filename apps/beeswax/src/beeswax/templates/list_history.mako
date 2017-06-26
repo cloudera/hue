@@ -108,7 +108,7 @@ ${ layout.menubar(section='history') }
             <div class="card-body">
               <p>
 
-            <table class="table table-striped table-condensed datatables" style="padding-left: 0;">
+            <table class="table table-condensed datatables" style="padding-left: 0;">
             <thead>
               <tr>
                 <th width="15%">${_('Time')}</th>
@@ -153,9 +153,7 @@ ${ layout.menubar(section='history') }
     </div>
 </div>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
 
     function HistoryViewModel() {

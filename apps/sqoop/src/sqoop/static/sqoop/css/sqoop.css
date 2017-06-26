@@ -1,137 +1,17 @@
-/*
- Licensed to Cloudera, Inc. under one
- or more contributor license agreements.  See the NOTICE file
- distributed with this work for additional information
- regarding copyright ownership.  Cloudera, Inc. licenses this file
- to you under the Apache License, Version 2.0 (the
- "License"); you may not use this file except in compliance
- with the License.  You may obtain a copy of the License at
+/*!
+Licensed to Cloudera, Inc. under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  Cloudera, Inc. licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-     http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-*/
-
-.row-selectable tr {
-  cursor: pointer;
-}
-
-ul.major-list {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-ul.major-list li {
-  cursor: pointer;
-  border: 1px solid #E3E3E3;
-  height: 60px;
-  margin-bottom: 10px;
-  background-color: #FFFFFF;
-}
-
-ul.major-list li div.main {
-  padding: 10px;
-}
-
-ul.major-list li .pull-right {
-  margin-right: 10px;
-  margin-top: 18px;
-}
-
-.main i, .top-bar h4 i {
-  color: #999999;
-}
-
-.sqoop-progress {
-  width: 0%;
-  background-color: #F89406;
-  height: 3px;
-  margin-top: -2px;
-}
-
-.waiting {
-  color: #DDDDDD;
-  font-size: 196px;
-}
-
-h1.emptyMessage {
-  color: #BBBBBB;
-  line-height: 60px;
-  margin-top: 50px;
-}
-
-.sidebar-nav {
-  padding: 9px 0;
-  min-height: 150px !important;
-}
-
-.top-bar {
-  position: fixed;
-  top:28px;
-  width: 100%;
-  background-color: #FAFAFA;
-  border-bottom: 1px solid #E3E3E3;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
-  margin: 0 0 20px;
-  padding: 10px 20px;
-  text-align: left;
-  height: 30px;
-}
-
-.top-bar h4 {
-  margin-top: 4px;
-  display: inline-block;
-  margin-right: 20px;
-}
-
-.top-bar .pull-right {
-  margin-top: 4px;
-  margin-right: 20px;
-}
-
-.form-actions {
-  padding-left: 20px !important;
-}
-
-.job-form {
-  min-height: 300px;
-}
-
-.big-btn {
-  background-color: #F0F0F0;
-  width: 80px;
-  height: 80px;
-  text-align: center;
-  display: inline-block;
-  margin-right: 10px;
-  padding: 10px;
-  padding-top: 20px;
-  cursor: pointer;
-  line-height: 32px;
-  border: 1px solid #F0F0F0;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-}
-
-.big-btn:hover, .big-btn.selected {
-  background-color: #DDDDDD;
-}
-
-.big-btn.selected {
-  border-color: #CCCCCC;
-}
-
-.big-btn i{
-  font-size: 40px;
-}
-
-.nojobs {
-  cursor: pointer;
-}
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */#sqoopComponents .row-selectable tr{cursor:pointer}#sqoopComponents ul.major-list{list-style-type:none;margin:0;padding:0;width:100%}#sqoopComponents ul.major-list li{cursor:pointer;border:1px solid #E3E3E3;height:60px;margin-bottom:10px;background-color:#FFFFFF}#sqoopComponents ul.major-list li div.main{padding:10px}#sqoopComponents ul.major-list li .pull-right{margin-right:10px;margin-top:18px}#sqoopComponents .main i,#sqoopComponents .top-bar h4 i{color:#999999}#sqoopComponents .sqoop-progress{width:0;background-color:#F89406;height:3px;margin-top:-2px}#sqoopComponents .waiting{color:#DDDDDD;font-size:196px}#sqoopComponents h1.emptyMessage{color:#BBBBBB;line-height:60px;margin-top:50px}#sqoopComponents .sidebar-nav{padding:9px 0;min-height:150px !important}#sqoopComponents .top-bar{position:fixed;top:28px;width:100%;background-color:#FAFAFA;border-bottom:1px solid #E3E3E3;box-shadow:0 1px 4px rgba(0,0,0,0.067);margin:0 0 20px;padding:10px 20px;text-align:left;height:30px}#sqoopComponents .top-bar h4{margin-top:4px;display:inline-block;margin-right:20px}#sqoopComponents .top-bar .pull-right{margin-top:4px;margin-right:20px}#sqoopComponents .form-actions{padding-left:20px !important}#sqoopComponents .job-form{min-height:300px}#sqoopComponents .big-btn{background-color:#F0F0F0;width:80px;height:80px;text-align:center;display:inline-block;margin-right:10px;padding:10px;padding-top:20px;cursor:pointer;line-height:32px;border:1px solid #F0F0F0;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px}#sqoopComponents .big-btn:hover,#sqoopComponents .big-btn.selected{background-color:#DDDDDD}#sqoopComponents .big-btn.selected{border-color:#CCCCCC}#sqoopComponents .big-btn i{font-size:40px}#sqoopComponents .nojobs{cursor:pointer}

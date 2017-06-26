@@ -1,0 +1,228 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+@import (reference) "hue-mixins.less";
+
+.divider {
+  padding-left: 12px;
+  color: #CCC;
+}
+
+.sidebar-nav {
+  padding: 0;
+}
+
+.card-heading {
+  padding-left: 6px !important;
+  border-bottom: none !important;
+}
+
+.sampleTable td, .sampleTable th, .table-nowrap td, .table-nowrap th {
+  white-space: nowrap;
+}
+
+h2.card-heading {
+  border-bottom: 1px solid #e5e5e5!important;
+  font-size: 12px!important;
+  font-weight: bold!important;
+}
+
+.filter-box {
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 4px;
+  background-color: #F5F5F5;
+}
+
+.filter-box a.pull-right {
+  margin: 4px;
+}
+
+.filter-box select, .filter-box input {
+  margin-bottom: 0;
+}
+
+.add-filter {
+  margin: 5px;
+  float: left;
+}
+
+.checkbox.inline.pulled {
+  margin-right: 10px;
+  padding-top: 1px;
+}
+
+.checkbox.inline.pulled input {
+  margin-left: 0;
+  margin-right: 4px;
+}
+
+.metastore-main {
+  padding: 20px;
+  padding-top: 10px;
+}
+
+.metastore-main h3 {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.empty-header-col,
+.metastore-main h4 {
+  font-weight: bold;
+  color: #999;
+  font-size: 14px;
+  text-transform: uppercase;
+  padding-left: 4px;
+  border-bottom: 1px solid #DDD;
+  padding-bottom: 3px;
+}
+
+.tile {
+  margin-bottom: 20px;
+  min-height: 124px;
+}
+
+.properties-table {
+  width: 100%;
+}
+
+.properties-table td {
+  padding-top: 5px;
+}
+
+.property-name {
+  padding-left: 10px;
+}
+
+.empty-message {
+  padding: 10px;
+}
+
+.editable-breadcrumbs {
+  cursor: text;
+}
+
+.editable-breadcrumbs:hover {
+  background-color: #F0F0F0;
+}
+
+.editable-breadcrumb-input {
+  padding: 0!important;
+}
+
+.editable-breadcrumb-input input {
+  font-size: 24px;
+  margin: 0;
+  margin-top: 1px;
+  padding-left: 11px;
+  border-radius: 2px;
+  border: 1px solid #EEE;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-weight: 400;
+}
+
+.acl-panel {
+  border-left: 1px solid #e5e5e5;
+  padding-top: 6px;
+  padding-left: 12px;
+}
+
+.acl-panel .nav-tabs {
+  margin-bottom: 0;
+}
+
+.acl-panel h4:not(:first-child) {
+  margin-top: 20px;
+}
+
+.acl-panel-content {
+  padding: 6px;
+  overflow-y: scroll;
+}
+
+.acl-block-title {
+  background-color: #eeeeee;
+  font-weight: bold;
+  padding: 3px;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+
+.acl-block {
+  background-color: #f6f6f6;
+  padding: 3px;
+  margin-bottom: 4px;
+}
+
+.acl-block .checkbox, .acl-block .radio {
+  margin-left: 6px;
+}
+
+.acl-block-airy {
+  padding: 6px;
+}
+
+.acl-block-airy input {
+  margin-bottom: 0;
+}
+
+.acl-block-section {
+  margin-top: 10px;
+}
+
+.acl-block-section input {
+  margin-left: 14px;
+}
+
+.span6 .acl-block input[type='text'] {
+  width: 25%;
+}
+
+.span6 .acl-block input[type='text'] {
+  width: 21%;
+}
+
+.acl-actions {
+  padding: 5px;
+  text-align: center;
+  color: #CCC;
+  font-size: 20px;
+}
+
+.acl-actions span:hover {
+  color: #999;
+}
+
+.show-inactive-on-hover {
+  .inactive-action {
+    opacity: 0;
+    vertical-align: top;
+  }
+  .editable-unsaved {
+    font-weight: normal;
+  }
+  &:hover {
+    .inactive-action {
+      opacity: 1;
+    }
+  }
+}

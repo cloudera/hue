@@ -424,9 +424,10 @@ class WebhdfsTests(unittest.TestCase):
       assert_true(self.cluster.fs.exists(PATH))
       self.cluster.fs.remove(PATH)
       assert_false(self.cluster.fs.exists(PATH))
-      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path))
-      trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path)
-      trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path, trash_dir, PATH[1:]) for trash_dir in trash_dirs]
+      assert_equals(self.cluster.fs.join(self.cluster.fs.get_home_dir(), '.Trash'), self.cluster.fs.trash_path())
+      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+      trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
+      trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
       exists = map(self.cluster.fs.exists, trash_paths)
       assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
       trash_path = reduce(lambda a, b: a[0] and a or b, zip(exists, trash_paths))[1]
@@ -450,9 +451,9 @@ class WebhdfsTests(unittest.TestCase):
       assert_true(self.cluster.fs.exists(PATH))
       self.cluster.fs.remove(PATH)
       assert_false(self.cluster.fs.exists(PATH))
-      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path))
-      trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path)
-      trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path, trash_dir, PATH[1:]) for trash_dir in trash_dirs]
+      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+      trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
+      trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
       exists = map(self.cluster.fs.exists, trash_paths)
       assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
       trash_path = reduce(lambda a, b: a[0] and a or b, zip(exists, trash_paths))[1]
@@ -476,9 +477,9 @@ class WebhdfsTests(unittest.TestCase):
       assert_true(self.cluster.fs.exists(PATH))
       self.cluster.fs.remove(PATH)
       assert_false(self.cluster.fs.exists(PATH))
-      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path))
-      trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path)
-      trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path, trash_dir, PATH[1:]) for trash_dir in trash_dirs]
+      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+      trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
+      trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
       exists = map(self.cluster.fs.exists, trash_paths)
       assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
       trash_path = reduce(lambda a, b: a[0] and a or b, zip(exists, trash_paths))[1]
@@ -505,9 +506,9 @@ class WebhdfsTests(unittest.TestCase):
       assert_true(self.cluster.fs.exists(PATH))
       self.cluster.fs.remove(PATH)
       assert_false(self.cluster.fs.exists(PATH))
-      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path))
-      trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path)
-      trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path, trash_dir, PATH[1:]) for trash_dir in trash_dirs]
+      assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
+      trash_dirs = self.cluster.fs.listdir(self.cluster.fs.trash_path(PATH))
+      trash_paths = [self.cluster.fs.join(self.cluster.fs.trash_path(PATH), trash_dir, PATH[1:]) for trash_dir in trash_dirs]
       exists = map(self.cluster.fs.exists, trash_paths)
       assert_true(reduce(lambda a, b: a or b, exists), trash_paths)
       trash_path = reduce(lambda a, b: a[0] and a or b, zip(exists, trash_paths))[1]
@@ -551,7 +552,7 @@ class WebhdfsTests(unittest.TestCase):
         assert_true(self.cluster.fs.exists(PATH))
         self.cluster.fs.remove(PATH)
         assert_false(self.cluster.fs.exists(PATH))
-        assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path))
+        assert_true(self.cluster.fs.exists(self.cluster.fs.trash_path(PATH)))
     finally:
       reload(threading)
       self.cluster.fs.setuser(self.cluster.superuser)

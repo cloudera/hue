@@ -1,0 +1,76 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+@import (reference) "cui/colors.less";
+
+#fileviewerComponents {
+  .card-body {
+    padding: 0;
+    margin: 0;
+  }
+
+  .hue-breadcrumbs-bar {
+    margin: 0;
+    padding-bottom: 0;
+  }
+
+  #fileArea {
+    overflow: auto;
+    background-color: @cui-gray-050;
+    position: relative;
+    font-size: 12px;
+    &.loading {
+      opacity: .7;
+    }
+  }
+
+  .binary {
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  pre {
+    border: none;
+  }
+
+  pre a {
+    color: #444;
+    cursor: default;
+    white-space: inherit;
+  }
+
+  pre a:hover {
+    color: #444;
+    text-decoration: none;
+  }
+
+  .pagination-input-form {
+    position: relative;
+    right: 1em;
+    top: -10px;
+  }
+
+  .pagination-input {
+    text-align: center;
+    width: 40px;
+  }
+
+  dd {
+    margin-left: 0;
+    margin-bottom: 6px;
+  }
+}
+

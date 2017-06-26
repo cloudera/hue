@@ -16,8 +16,10 @@
 # limitations under the License.
 
 import logging
-import sys
 import os
+import sys
+
+from notebook.conf import DBPROXY_EXTRA_CLASSPATH
 
 LOG = logging.getLogger(__name__)
 
@@ -51,7 +53,11 @@ class Jdbc():
     if 'py4j' not in sys.modules:
       raise Exception('Required py4j module is not imported.')
 
-    self.gateway = JavaGateway.launch_gateway(classpath=os.environ['CLASSPATH'])
+    classpath = os.environ.get('CLASSPATH', '')
+    if DBPROXY_EXTRA_CLASSPATH.get():
+      classpath = '%s:%s' % (DBPROXY_EXTRA_CLASSPATH.get(), classpath)
+
+    self.gateway = JavaGateway.launch_gateway(classpath=classpath)
 
     self.jdbc_driver = driver_name
     self.db_url = url
@@ -123,7 +129,7 @@ class Cursor():
     else:
       return [[
         self._meta.getColumnName(i),
-        self._meta.getColumnTypeName(i),
+        self._meta.getColumnTypeName(i) + '_TYPE',
         self._meta.getColumnDisplaySize(i),
         self._meta.getColumnDisplaySize(i),
         self._meta.getPrecision(i),

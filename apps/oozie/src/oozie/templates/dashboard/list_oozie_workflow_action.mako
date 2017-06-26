@@ -206,8 +206,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     </div>
 </div>
 
-<script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
-
 <script type="text/javascript">
 
   $(document).ready(function() {

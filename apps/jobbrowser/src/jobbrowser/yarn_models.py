@@ -56,6 +56,7 @@ class Application(object):
   def _fixup(self):
     self.is_mr2 = True
     jobid = self.id
+    self.yarnStatus = self.state
     if self.state in ('FINISHED', 'FAILED', 'KILLED'):
       setattr(self, 'status', self.finalStatus)
     else:
@@ -191,6 +192,8 @@ class Job(object):
 
     self._fixup()
 
+    self.progress = None
+
     # Set MAPS/REDUCES completion percentage
     if hasattr(self, 'mapsTotal'):
       self.desiredMaps = self.mapsTotal
@@ -198,6 +201,7 @@ class Job(object):
         self.maps_percent_complete = 0
       else:
         self.maps_percent_complete = int(round(float(self.finishedMaps) / self.desiredMaps * 100))
+      self.progress = self.maps_percent_complete
 
     if hasattr(self, 'reducesTotal'):
       self.desiredReduces = self.reducesTotal
@@ -205,6 +209,12 @@ class Job(object):
         self.reduces_percent_complete = 0
       else:
         self.reduces_percent_complete = int(round(float(self.finishedReduces) / self.desiredReduces * 100))
+
+      if self.desiredReduces > 0:
+        if self.progress is not None:
+          self.progress = int((self.progress + self.reduces_percent_complete) / 2)
+        else:
+          self.progress = self.reduces_percent_complete
 
 
   def _fixup(self):
@@ -216,10 +226,17 @@ class Job(object):
     setattr(self, 'is_retired', False)
     setattr(self, 'maps_percent_complete', None)
     setattr(self, 'reduces_percent_complete', None)
-    if self.finishTime == 0 or self.startTime == 0:
-      setattr(self, 'duration', None)
+
+    if self.finishTime == 0:
+      finishTime = int(time.time() * 1000)
     else:
-      setattr(self, 'duration', self.finishTime - self.startTime)
+      finishTime = self.finishTime
+    if self.startTime == 0:
+      durationInMillis = None
+    else:
+      durationInMillis = finishTime - self.startTime
+
+    setattr(self, 'duration', durationInMillis)
     setattr(self, 'durationFormatted', self.duration and format_duration_in_millis(self.duration))
     setattr(self, 'finishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
@@ -258,17 +275,25 @@ class Job(object):
 
   @property
   def conf_keys(self):
-    return dict([(line['name'], line['value']) for line in self.full_job_conf['property']])
+    try:
+      return dict([(line['name'], line['value']) for line in self.full_job_conf['property']])
+    except Exception, e:
+      LOG.error('Failed to parse conf_keys from YARN job configuration.')
+      return None
 
   def get_task(self, task_id):
     json = self.api.task(self.id, task_id)['task']
     return Task(self, json)
 
   def filter_tasks(self, task_types=None, task_states=None, task_text=None):
-    return [Task(self, task) for task in self.api.tasks(self.id).get('tasks', {}).get('task', [])
-          if (not task_types or task['type'].lower() in task_types) and
-             (not task_states or task['state'].lower() in task_states) and
-             (not task_text or task_text.lower() in str(task).lower())]
+    tasks = self.api.tasks(self.id).get('tasks', {})
+    if tasks and tasks.get('task'):
+      return [Task(self, task) for task in tasks.get('task', [])
+              if (not task_types or task['type'].lower() in task_types) and
+              (not task_states or task['state'].lower() in task_states) and
+              (not task_text or task_text.lower() in str(task).lower())]
+    else:
+      return []
 
   @property
   def job_attempts(self):
@@ -287,6 +312,7 @@ class KilledJob(Job):
       setattr(self, 'finishTime', self.finishedTime)
     if not hasattr(self, 'startTime'):
       setattr(self, 'startTime', self.startedTime)
+    self.progress = 100
 
     super(KilledJob, self)._fixup()
 
@@ -335,7 +361,7 @@ class Task:
     setattr(self, 'execStartTimeFormatted', format_unixtime_ms(self.startTime))
     setattr(self, 'execFinishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
-    setattr(self, 'progress', self.progress / 100)
+    setattr(self, 'progress', self.progress)
 
   @property
   def attempts(self):
@@ -395,7 +421,7 @@ class Attempt:
   @property
   def counters(self):
     if not hasattr(self, '_counters'):
-      self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobCounters']
+      self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobTaskAttemptCounters']
     return self._counters
 
   def get_task_log(self, offset=0):

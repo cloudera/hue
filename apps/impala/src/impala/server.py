@@ -23,7 +23,7 @@ from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
 from beeswax.server.dbms import QueryServerException
-from beeswax.server.hive_server2_lib import HiveServerClient, HiveServerDataTable
+from beeswax.server.hive_server2_lib import HiveServerClient
 
 from ImpalaService import ImpalaHiveServer2Service
 

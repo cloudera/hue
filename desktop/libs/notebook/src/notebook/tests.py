@@ -33,6 +33,12 @@ import notebook.connectors.hiveserver2
 from notebook.api import _historify
 from notebook.connectors.base import Notebook, QueryError, Api
 from notebook.decorators import api_error_handler
+from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
+
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
 
 
 class TestNotebookApi(object):
@@ -223,6 +229,40 @@ class TestNotebookApi(object):
     trash_uuids = [doc['uuid'] for doc in data['children']]
     assert_true(notebook_doc.uuid in trash_uuids, data)
 
+    # Test that any errors are reported in the response
+    nonexistant_doc = {
+      "id": 12345,
+      "uuid": "ea22da5f-b69c-4843-b17d-dea5c74c41d1",
+      "selectedSnippet": "hive",
+      "showHistory": False,
+      "description": "Test Hive Query",
+      "name": "Test Hive Query",
+      "sessions": [
+        {
+          "type": "hive",
+          "properties": [],
+          "id": None,
+        }
+      ],
+      "type": "query-hive",
+      "snippets": [{
+        "id": "e069ef32-5c95-4507-b961-e79c090b5abf",
+        "type": "hive",
+        "status": "ready",
+        "database": "default",
+        "statement": "select * from web_logs",
+        "statement_raw": "select * from web_logs",
+         "properties": {"settings": [], "files": [], "functions": []},
+        "result": {}
+      }]
+    }
+    trash_notebooks = [nonexistant_doc]
+    response = self.client.post(reverse('notebook:delete'), {'notebooks': json.dumps(trash_notebooks)})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_equal('Trashed 0 notebook(s) and failed to delete 1 notebook(s).', data['message'], data)
+    assert_equal(['ea22da5f-b69c-4843-b17d-dea5c74c41d1'], data['errors'])
+
 
   def test_query_error_encoding(self):
     @api_error_handler
@@ -358,3 +398,52 @@ class TestNotebookApiMocked(object):
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
     assert_equal('/user/hue/path.csv', data['watch_url']['destination'], data)
+
+
+def test_get_interpreters_to_show():
+  default_interpreters = OrderedDict((
+      ('hive', {
+          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}
+      }),
+      ('spark', {
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}
+      }),
+      ('pig', {
+          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}
+      }),
+      ('java', {
+          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}
+      })
+    ))
+
+  expected_interpreters = OrderedDict((
+      ('java', {
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}
+      }),
+      ('pig', {
+        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}
+      }),
+      ('hive', {
+          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}
+      }),
+      ('spark', {
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}
+      })
+    ))
+
+  try:
+    resets = [INTERPRETERS.set_for_testing(default_interpreters)]
+
+    interpreters_shown_on_wheel_unset = get_ordered_interpreters()
+    assert_equal(default_interpreters.values(), interpreters_shown_on_wheel_unset,
+                 'get_interpreters_to_show should return the same as get_interpreters when '
+                 'interpreters_shown_on_wheel is unset. expected: %s, actual: %s'
+                 % (default_interpreters.values(), interpreters_shown_on_wheel_unset))
+
+    resets.append(INTERPRETERS_SHOWN_ON_WHEEL.set_for_testing('java,pig'))
+    assert_equal(expected_interpreters.values(), get_ordered_interpreters(),
+                 'get_interpreters_to_show did not return interpreters in the correct order expected: %s, actual: %s'
+                 % (expected_interpreters.values(), get_ordered_interpreters()))
+  finally:
+    for reset in resets:
+      reset()

@@ -39,7 +39,7 @@ body.open {
 }
 
 .navbar-inner {
-  background-color: #338BB8;
+  background-color: #0B7FAD;
 }
 
 .navbar .btn-navbar {
@@ -84,7 +84,7 @@ body.open {
 }
 
 .blue {
-  color: #338BB8!important;
+  color: #0B7FAD!important;
 }
 
 .inactive-action,
@@ -107,7 +107,7 @@ body.open {
 
 .inactive-action:not(.disabled):hover,
 .inactive-action:not(.disabled):hover > a {
-  color: #338bb8 !important;
+  color: #0B7FAD !important;
 }
 
 .inactive-action:focus {

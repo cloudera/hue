@@ -28,11 +28,10 @@ is a "job submission".  Submissions can be "watched".
 import logging
 import time as py_time
 
-from django.core import urlresolvers
-from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
 from desktop import appmanager
+from desktop.conf import IS_HUE_4
 from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
@@ -107,9 +106,12 @@ def list_designs(request):
       'currentuser': request.user,
       'owner': owner,
       'name': name,
-      'apps': appmanager.get_apps_dict()
+      'apps': appmanager.get_apps_dict(),
+      'is_hue_4': IS_HUE_4.get()
     })
 
+def not_available(request):
+  return render("not_available.mako", request, {})
 
 def _get_design(user, design_id):
   """Raise PopupException if design doesn't exist"""

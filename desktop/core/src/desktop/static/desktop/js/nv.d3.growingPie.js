@@ -28,7 +28,7 @@ nv.models.growingPie = function() {
     , getDescription = function(d) { return d.description }
     , id = Math.floor(Math.random() * 10000) //Create semi-unique ID in case user doesn't select one
     , color = nv.utils.defaultColor()
-    , valueFormat = d3.format(',.2f')
+    , valueFormat = d3v3.format(',.2f')
     , showLabels = true
     , pieLabelsOutside = true
     , donutLabelsOutside = false
@@ -40,7 +40,7 @@ nv.models.growingPie = function() {
     , endAngle = false
     , donutRatio = 0.5
     , selectSlices = null
-    , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout')
+    , dispatch = d3v3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout')
     ;
 
   //============================================================
@@ -52,7 +52,7 @@ nv.models.growingPie = function() {
           availableHeight = height - margin.top - margin.bottom,
           radius = Math.min(availableWidth, availableHeight) / 2,
           arcRadius = radius-(radius / 5),
-          container = d3.select(this);
+          container = d3v3.select(this);
 
 
       //------------------------------------------------------------
@@ -79,7 +79,7 @@ nv.models.growingPie = function() {
               dispatch.chartClick({
                   data: d,
                   index: i,
-                  pos: d3.event,
+                  pos: d3v3.event,
                   id: id
               });
           });
@@ -93,12 +93,12 @@ nv.models.growingPie = function() {
 
       var arcNormal = function() {
         updateVariables();
-        return d3.svg.arc().outerRadius(arcRadius);
+        return d3v3.svg.arc().outerRadius(arcRadius);
       }
 
       var arcOver = function() {
         updateVariables();
-        return d3.svg.arc().outerRadius(arcRadius + 10);
+        return d3v3.svg.arc().outerRadius(arcRadius + 10);
       }
 
       if (startAngle) arcNormal().startAngle(startAngle)
@@ -106,7 +106,7 @@ nv.models.growingPie = function() {
       if (donut) arcNormal().innerRadius(radius * donutRatio);
 
       // Setup the Pie chart and choose the data element
-      var pie = d3.layout.pie()
+      var pie = d3v3.layout.pie()
           .sort(null)
           .value(function(d) { return d.disabled ? 0 : getY(d) });
 
@@ -124,8 +124,8 @@ nv.models.growingPie = function() {
         $(selected).each(function(cnt, item){
           slices.each(function(d, i) {
             if ((typeof d.data.obj.from != "undefined" && d.data.obj.from == item) || d.data.obj.value == item) {
-              d3.select(this).classed('selected', true);
-              d3.select(this).select("path").transition().duration(100).attr("d", arcOver());
+              d3v3.select(this).classed('selected', true);
+              d3v3.select(this).select("path").transition().duration(100).attr("d", arcOver());
             }
           });
         });
@@ -134,22 +134,22 @@ nv.models.growingPie = function() {
       var ae = slices.enter().append('g')
               .attr('class', 'nv-slice')
               .on('mouseover', function(d,i){
-                d3.select(this).select("path").transition().duration(100).attr("d", arcOver());
-                d3.select(this).classed('hover', true);
+                d3v3.select(this).select("path").transition().duration(100).attr("d", arcOver());
+                d3v3.select(this).classed('hover', true);
                 dispatch.elementMouseover({
                     label: getX(d.data),
                     value: getY(d.data),
                     point: d.data,
                     pointIndex: i,
-                    pos: [d3.event.pageX, d3.event.pageY],
+                    pos: [d3v3.event.pageX, d3v3.event.pageY],
                     id: id
                 });
               })
               .on('mouseout', function(d,i){
-                if (!d3.select(this).classed('selected')){
-                  d3.select(this).select("path").transition().duration(100).attr("d", arcNormal());
+                if (!d3v3.select(this).classed('selected')){
+                  d3v3.select(this).select("path").transition().duration(100).attr("d", arcNormal());
                 }
-                d3.select(this).classed('hover', false);
+                d3v3.select(this).classed('hover', false);
                 dispatch.elementMouseout({
                     label: getX(d.data),
                     value: getY(d.data),
@@ -159,28 +159,28 @@ nv.models.growingPie = function() {
                 });
               })
               .on('click', function(d,i) {
-                d3.select(this).select("path").transition().duration(100).attr("d", arcOver());
+                d3v3.select(this).select("path").transition().duration(100).attr("d", arcOver());
                 dispatch.elementClick({
                     label: getX(d.data),
                     value: getY(d.data),
                     point: d.data,
                     index: i,
-                    pos: d3.event,
+                    pos: d3v3.event,
                     id: id
                 });
-                d3.event.stopPropagation();
+                d3v3.event.stopPropagation();
               })
               .on('dblclick', function(d,i) {
-                d3.select(this).select("path").transition().duration(100).attr("d", arcNormal());
+                d3v3.select(this).select("path").transition().duration(100).attr("d", arcNormal());
                 dispatch.elementDblClick({
                     label: getX(d.data),
                     value: getY(d.data),
                     point: d.data,
                     index: i,
-                    pos: d3.event,
+                    pos: d3v3.event,
                     id: id
                 });
-                d3.event.stopPropagation();
+                d3v3.event.stopPropagation();
               });
 
         slices
@@ -198,16 +198,16 @@ nv.models.growingPie = function() {
 
         if (showLabels) {
           // This does the normal label
-          var labelsArc = d3.svg.arc().innerRadius(0);
+          var labelsArc = d3v3.svg.arc().innerRadius(0);
 
           if (pieLabelsOutside){ labelsArc = arcNormal(); }
 
-          if (donutLabelsOutside) { labelsArc = d3.svg.arc().outerRadius(arc().outerRadius()); }
+          if (donutLabelsOutside) { labelsArc = d3v3.svg.arc().outerRadius(arc().outerRadius()); }
 
           pieLabels.enter().append("g").classed("nv-label",true)
             .each(function(d,i) {
                 if (d.value > 0) {
-                  var group = d3.select(this);
+                  var group = d3v3.select(this);
 
                   group
                     .attr('transform', function(d) {
@@ -297,7 +297,7 @@ nv.models.growingPie = function() {
                     var labelTypes = {
                       "key": getX(d.data),
                       "value": getY(d.data),
-                      "percent": d3.format('%')(percent)
+                      "percent": d3v3.format('%')(percent)
                     };
                     return (d.value && percent > labelThreshold) ? labelTypes[labelType] : '';
                   }
@@ -318,7 +318,7 @@ nv.models.growingPie = function() {
           a.endAngle = isNaN(a.endAngle) ? 0 : a.endAngle;
           a.startAngle = isNaN(a.startAngle) ? 0 : a.startAngle;
           if (!donut) a.innerRadius = 0;
-          var i = d3.interpolate(this._current, a);
+          var i = d3v3.interpolate(this._current, a);
           this._current = i(0);
           return function(t) {
             return arcNormal()(i(t));
@@ -327,7 +327,7 @@ nv.models.growingPie = function() {
 
         function tweenPie(b) {
           b.innerRadius = 0;
-          var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
+          var i = d3v3.interpolate({startAngle: 0, endAngle: 0}, b);
           return function(t) {
               return arcNormal()(i(t));
           };
@@ -380,7 +380,7 @@ nv.models.growingPie = function() {
 
   chart.y = function(_) {
     if (!arguments.length) return getY;
-    getY = d3.functor(_);
+    getY = d3v3.functor(_);
     return chart;
   };
 

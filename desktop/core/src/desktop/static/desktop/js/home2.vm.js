@@ -36,6 +36,7 @@ var HomeViewModel = (function () {
     self.activeEntry = ko.observable();
     self.trashEntry = ko.observable();
     self.activeEntry(new HueFileEntry({
+      serverTypeFilter: ko.observable(window.location.getParameter('type') !== '' ? window.location.getParameter('type') : null),
       activeEntry: self.activeEntry,
       trashEntry: self.trashEntry,
       apiHelper: self.apiHelper,
@@ -61,7 +62,7 @@ var HomeViewModel = (function () {
     var self = this;
     var entry = self.activeEntry().createNewEntry({
       definition: {
-        uuid: location.getParameter('uuid'),
+        uuid: uuid || location.getParameter('uuid'),
         name: 'unknown',
         type: 'directory',
         path: '/unknown'

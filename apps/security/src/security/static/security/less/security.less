@@ -1,0 +1,326 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.hue-tree {
+  width: 100%;
+  overflow-y: scroll;
+  min-height: 100px;
+}
+
+.hue-tree ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.tree {
+  margin-left: 0;
+}
+
+.node-row {
+  margin: 4px;
+  padding: 2px;
+  border: 1px dashed #FFFFFF;
+}
+
+.node-row:hover {
+  background: #F6F6F6;
+}
+
+.node-row a, .node-row i {
+  cursor: pointer;
+}
+
+.node-row a.striked {
+  text-decoration: line-through;
+  color: #b94a48;
+}
+
+.fa.striked {
+  color: #b94a48!important;
+}
+
+.node-row.selected {
+  background: #F6F6F6 !important;
+}
+
+.acl-panel {
+  border-left: 1px solid #e5e5e5;
+  padding-top: 6px;
+  padding-left: 12px;
+}
+
+.acl-panel .nav-tabs {
+  margin-bottom: 0;
+}
+
+.acl-panel h4:not(:first-child) {
+  margin-top: 20px;
+}
+
+.acl-panel-content {
+  padding: 6px;
+  overflow-y: scroll;
+}
+
+.acl-block-title {
+  background-color: #eeeeee;
+  font-weight: bold;
+  padding: 3px;
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+
+.acl-block {
+  background-color: #f6f6f6;
+  padding: 3px;
+  margin-bottom: 4px;
+}
+
+.acl-block .checkbox, .acl-block .radio {
+  margin-left: 6px;
+}
+
+.acl-block-airy {
+  padding: 6px;
+}
+
+.acl-block-airy input {
+  margin-bottom: 0;
+}
+
+.acl-block-section {
+  margin-top: 10px;
+}
+
+.acl-block-section input {
+  margin-left: 14px;
+}
+
+.span6 .acl-block input[type='text'] {
+  width: 25%;
+}
+
+.span6 .acl-block input[type='text'] {
+  width: 21%;
+}
+
+.acl-actions {
+  padding: 5px;
+  text-align: center;
+  color: #CCC;
+  font-size: 20px;
+}
+
+.acl-actions span:hover {
+  color: #999;
+}
+
+.path {
+  height: 34px!important;
+  font-size: 14px;
+}
+
+.path-container {
+  background-color: #FFF;
+  padding-top: 8px;
+}
+
+.path-container .btn-inverse {
+  height: 34px;
+  width: 34px;
+  font-size: 14px;
+  line-height: 34px;
+}
+
+.fake-pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 20px;
+  word-break: break-all;
+  word-wrap: break-word;
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+}
+
+.tree-toolbar {
+  padding: 3px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.tree-toolbar .fa {
+  margin-left: 5px;
+}
+
+.tree-toolbar .fa-spin {
+  color: #cccccc;
+  margin-right: 6px;
+}
+
+.tree-toolbar input {
+  margin-bottom: 0;
+  height: 25px;
+  min-height: 25px;
+}
+
+.tree-toolbar .pull-right {
+  margin-top: -5px;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.force-word-break {
+  word-break: break-all;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.rwx {
+  width: 90px;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.waiting {
+  font-size: 196px;
+  color: #DDD;
+}
+
+h1.emptyMessage {
+  margin-top: 50px;
+  color: #BBB;
+  line-height: 60px;
+}
+
+.acl-panel .waiting {
+  font-size: 130px;
+}
+
+.acl-panel h1.emptyMessage {
+  margin-top: 0;
+  line-height: 54px;
+}
+
+.fa-caret {
+  padding-top: 2px;
+}
+
+.select2-search-field .select2-input {
+  margin-bottom: 0;
+  min-height: 18px;
+  height: 18px;
+}
+
+#createRoleModal, #bulkActionsModal, #grantPrivilegeModal {
+  width: 800px;
+  left: 50%;
+  margin-left: -400px!important;
+}
+
+
+.big-btn {
+  background-color: #F0F0F0;
+  height: 100px;
+  width: 90%;
+  text-align: center;
+  display: inline-block;
+  margin-right: 10px;
+  padding: 10px;
+  padding-top: 20px;
+  cursor: pointer;
+  border: 1px solid #F0F0F0;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.big-btn:hover, .big-btn.selected {
+  background-color: #DDDDDD;
+}
+
+.big-btn.selected {
+  border-color: #CCCCCC;
+}
+
+.big-btn i{
+  font-size: 40px;
+  color: #666666;
+}
+
+.modal-panel {
+  max-height: 120px;
+  overflow-y: scroll;
+}
+
+.bulk-action-description {
+  display: none;
+}
+
+.big-btn:hover .bulk-action-description, .big-btn.selected .bulk-action-description {
+  display: block;
+}
+
+.fa-database-open:before {
+  content:"\f1c0"
+}
+
+.fa-database-open {
+  color: #666!important;
+}
+
+.actionbar-main {
+  padding: 0!important;
+  padding-bottom: 10px!important;
+}
+
+#grantPrivilegeModal .privilege-actions {
+  display: none;
+}
+
+@media (min-width: 1680px) {
+  .span6 .acl-block .with-grant-checkbox {
+    float: none;
+  }
+}
+.new-line-if-small {
+  height: 35px;
+  line-height: 35px;
+  vertical-align: middle;
+}
+
+.new-line-if-small label {
+  float: left;
+  margin-right: 6px;
+  margin-top: 7px;
+}
+
+.typeahead.dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+}
+

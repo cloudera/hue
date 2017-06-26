@@ -23,9 +23,13 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="tree" file="common_tree.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
-${ layout.menubar(section='hive1') }
+%endif
 
+${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
+
+<span id="securityHiveComponents">
 
 <script type="text/html" id="role">
   <div class="acl-block-title">
@@ -37,7 +41,7 @@ ${ layout.menubar(section='hive1') }
     <span class="pointer" data-bind="visible: privilegesForViewTo() < privileges().length, click: function(){ privilegesForViewTo(privilegesForViewTo() + 50) }" title="${ _('Show 50 more...') }"><i class="fa fa-ellipsis-h"></i></span>
     <span class="pointer" data-bind="click: addPrivilege, visible: $root.is_sentry_admin" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     <span class="pointer" data-bind="click: function() { $root.list_sentry_privileges_by_authorizable() }, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
-    <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+    <span class="pointer" data-bind="click: function() { $root.deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
   </div>
   <!-- /ko -->
 </script>
@@ -58,7 +62,7 @@ ${ layout.menubar(section='hive1') }
         <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'db' , 'fa-check-circle-o': privilegeType() == 'db'}"></i>
       </a>
     </div>
-    <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName <CTRL+SPACE>">
+    <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db', apiHelperUser: '${ user }', apiHelperType: 'hive'" placeholder="dbName.tableName <CTRL+SPACE>">
 
     <div class="inline-block" style="vertical-align: middle">
       <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('uri'); action('ALL'); }">
@@ -95,7 +99,7 @@ ${ layout.menubar(section='hive1') }
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
     <span data-bind="visible: metastorePath() != '' && privilegeType() == 'db'">
-      <a data-bind="attr: { href: metastorePath() }" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
+      <a data-bind="hueLink: metastorePath()" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Table Browser') }"><i class="fa fa-external-link"></i></a>
     </span>
     <br/>
 
@@ -114,7 +118,7 @@ ${ layout.menubar(section='hive1') }
     <!-- /ko -->
 
     <!-- ko if: privilegeType() == 'uri' -->
-      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="hueLink: '/filebrowser/view=/' + URI().split('/')[3]" target="_blank"><span data-bind="text: URI"></span></a>
     <!-- /ko -->
 
     <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
@@ -134,7 +138,7 @@ ${ layout.menubar(section='hive1') }
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             <div>
             <br/>
-             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, update: $data.action, type: 'action', allowClear: true }" style="width: 100%"></select>
+             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, update: $data.action, type: 'action', allowClear: true, vm: $root }" style="width: 100%"></select>
             </div>
           </li>
         </ul>
@@ -165,7 +169,7 @@ ${ layout.menubar(section='hive1') }
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" autocomplete="off" />
-                  <a data-bind="attr: { href: $root.assist.metastorePath() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
+                  <a data-bind="hueLink: $root.assist.metastorePath()" target="_blank" title="${ _('Open in Table Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
@@ -189,7 +193,7 @@ ${ layout.menubar(section='hive1') }
                         </li>
                       </ul>
                     </div>
-                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user', vm: $root }" style="width: 120px"></select>
                     % endif
                   </div>
                   <div>
@@ -211,7 +215,7 @@ ${ layout.menubar(section='hive1') }
                 </div>
               </div>
 
-              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
+              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender', component='hive') }
 
             </div>
             <div class="span6 acl-panel">
@@ -283,11 +287,13 @@ ${ layout.menubar(section='hive1') }
 
           <table class="card-marginbottom" data-bind="visible: $root.roles().length > 0 && ! $root.isLoadingRoles()">
             <thead>
-              <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
-              <th width="2%"></th>
-              <th width="20%" style="text-align:left">${ _('Name') }</th>
-              <th width="74%" style="text-align:left">${ _('Groups') }</th>
-              <th width="3%"></th>
+              <tr>
+                <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
+                <th width="2%"></th>
+                <th width="20%" style="text-align:left">${ _('Name') }</th>
+                <th width="74%" style="text-align:left">${ _('Groups') }</th>
+                <th width="3%"></th>
+              </tr>
             </thead>
             <tbody data-bind="foreach: $root.filteredRoles">
               <tr>
@@ -302,7 +308,7 @@ ${ layout.menubar(section='hive1') }
                 <td data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer">
                   <a data-bind="attr: {'href': name}"></a>
                   <i class="fa fa-cube muted"></i>
-                  <span data-bind="text: name"/>
+                  <span data-bind="text: name"></span>
                 </td>
                 <td>
                   <!-- ko if: $root.is_sentry_admin -->
@@ -321,7 +327,7 @@ ${ layout.menubar(section='hive1') }
                       </a>
                     <!-- /ko -->
                     <!-- ko if: showEditGroups() || (groupsChanged() && ! $root.isLoadingRoles()) -->
-                      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group' }" size="5" multiple="true" style="width: 400px"></select>
+                      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group', vm: $root }" size="5" multiple="true" style="width: 400px"></select>
                       <span data-bind="visible: groupsChanged() && !$root.isLoadingRoles()">
                         &nbsp;
                         <a class="pointer" data-bind="click: resetGroups"><i class="fa fa-undo"></i></a>
@@ -344,19 +350,19 @@ ${ layout.menubar(section='hive1') }
                 </td>
               </tr>
               <tr>
-                <td colspan="2"></td>
+                <td></td>
                 <td colspan="4">
                   <div data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
                   </div>
                 </td>
               </tr>
               <tr data-bind="visible: $data.showPrivileges">
-                <td colspan="2"></td>
+                <td></td>
                 <td colspan="4">
                   <div class="acl-block acl-actions" data-bind="click: privilegesChanged().length == 0 ? addPrivilege : void(0), visible: $root.is_sentry_admin">
                     <span class="pointer" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
                     <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
-                    <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0 && isValid()" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+                    <span class="pointer" data-bind="click: function() { $root.deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0 && isValid()" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
                   </div>
                 </td>
               </tr>
@@ -367,17 +373,17 @@ ${ layout.menubar(section='hive1') }
 
     </div> <!-- /span10 -->
 </div>
+</div>
 
 
 
 <div id="createRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 data-bind="visible: ! $root.role().isEditing()">${ _('Add or select a role') }</h3>
-    <h3 data-bind="visible: $root.role().isEditing()">${ _('Edit role') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title" data-bind="visible: !$root.role().isEditing()">${ _('Add or select a role') }</h2>
+    <h2 class="modal-title" data-bind="visible: $root.role().isEditing()">${ _('Edit role') }</h2>
   </div>
   <div class="modal-body" data-bind="with: $root.role, visible: showCreateRole">
-
     <div class="row-fluid">
       <div class="span6">
         <h4>${ _('Name') }</h4>
@@ -386,7 +392,7 @@ ${ layout.menubar(section='hive1') }
       </div>
       <div class="span6">
         <h4>${ _('Groups') }</h4>
-        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group', placeholder: '${ _ko("Optional") }' }" size="5" multiple="true" style="width: 360px"></select>
+        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group', placeholder: '${ _ko("Optional") }', vm: $root }" size="5" multiple="true" style="width: 360px"></select>
       </div>
     </div>
 
@@ -398,16 +404,16 @@ ${ layout.menubar(section='hive1') }
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().create, visible: ! $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}">${ _('Save') }</button>
-    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}"">${ _('Update') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().create, visible: ! $root.role().isEditing(), enable: ! $root.role().isLoading() && $root.role().isValid()">${ _('Save') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), enable: ! $root.role().isLoading() && $root.role().isValid()">${ _('Update') }</button>
   </div>
 </div>
 
 
 <div id="grantPrivilegeModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${ _('Grant privilege') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Grant privilege') }</h2>
   </div>
   <div class="modal-body">
 
@@ -417,7 +423,7 @@ ${ layout.menubar(section='hive1') }
 
     <br/>
     <span>${ _('To role') }&nbsp;&nbsp;</span>
-    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { dropdownAutoWidth: true, update: $root.grantToPrivilegeRole, placeholder: '${ _ko("Select a role") }', type: 'role' }" style="width: 360px"></select>
+    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { dropdownAutoWidth: true, update: $root.grantToPrivilegeRole, placeholder: '${ _ko("Select a role") }', type: 'role', vm: $root }" style="width: 360px"></select>
     <br/>
 
   </div>
@@ -430,8 +436,8 @@ ${ layout.menubar(section='hive1') }
 
 <div id="deleteRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Do you really want to delete the selected role(s)?') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Do you really want to delete the selected role(s)?') }</h2>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
@@ -442,8 +448,8 @@ ${ layout.menubar(section='hive1') }
 
 <div id="deletePrivilegeModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Confirm the deletion?') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Confirm the deletion?') }</h2>
   </div>
   <div class="modal-body">
     ${ _('Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.') }
@@ -457,8 +463,8 @@ ${ layout.menubar(section='hive1') }
 
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Select one operation') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${ _('Select one operation') }</h2>
   </div>
   <div class="modal-body" style="overflow-x: hidden">
 
@@ -524,20 +530,6 @@ ${ layout.menubar(section='hive1') }
   </div>
 </div>
 
-<div id="chooseFile" class="modal hide fade">
-  <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
-  </div>
-  <div class="modal-body">
-      <div id="filechooser">
-      </div>
-  </div>
-  <div class="modal-footer">
-  </div>
-</div>
-
-
 <%def name="treeIcons()">
   'fa-hdd-o': isServer(),
   'fa-database-open': isDb() && (nodes().length > 0 || isLoaded()),
@@ -548,44 +540,29 @@ ${ layout.menubar(section='hive1') }
 
 <%def name="withPrivilegesPullRight()">
   <div class="pull-right">
-    <i class="fa fa-shield" data-bind="visible: withPrivileges()" style="color: #338bb8" title="${ _('Has some privileges') }"></i>&nbsp;
+    <i class="fa fa-shield" data-bind="visible: withPrivileges()" style="color: #0B7FAD" title="${ _('Has some privileges') }"></i>&nbsp;
     <i class="fa fa-file-o muted" data-bind="click: $root.assist.showHdfs ,visible: isTable()"></i>
   </div>
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', styleModifier='withPrivileges', iconModifier=treeIcons, anchorProperty='path', itemChecked='isChecked', styleModifierPullRight=withPrivilegesPullRight) }
+${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', styleModifier='withPrivileges', iconModifier=treeIcons, anchorProperty='path', itemChecked='isChecked', styleModifierPullRight=withPrivilegesPullRight, component='hive') }
 
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('security/js/hive.ko.js') }" type="text/javascript" charset="utf-8"></script>
-
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.filechooser.js') }" type="text/javascript" charset="utf-8"></script>
 
-
-<script type="text/javascript" charset="utf-8">
-
+<script type="text/javascript">
+  (function () {
     ko.options.deferUpdates = true;
 
-    function deletePrivilegeModal(role) {
-      var cascadeDeletes = $.grep(role.privilegesChanged(), function(privilege) {
-          return privilege.status() == 'deleted' && (privilege.privilegeScope() == 'SERVER' || privilege.privilegeScope() == 'DATABASE'); }
-      );
-      if (cascadeDeletes.length > 0 ) {
-        viewModel.roleToUpdate(role);
-        $('#deletePrivilegeModal').modal('show');
-      } else {
-        viewModel.role().savePrivileges(role);
-      }
-    }
+    huePubSub.subscribe('show.delete.privilege.modal', function () {
+      $('#deletePrivilegeModal').modal('show');
+    });
 
     var viewModel = new HiveViewModel(${ initial | n,unicode });
-    ko.applyBindings(viewModel);
+    ko.cleanNode($('#securityHiveComponents')[0]);
+    ko.applyBindings(viewModel, $('#securityHiveComponents')[0]);
 
     $(document).ready(function () {
       var _initialPath = viewModel.getPathHash();
@@ -611,6 +588,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       $("#path").jHueGenericAutocomplete({
         skipColumns: true,
+        apiHelperUser: '${ user }',
+        apiHelperType: 'hive',
         home: viewModel.assist.path(),
         onPathChange: function (path) {
           setPathFromAutocomplete(path);
@@ -629,7 +608,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       resizeComponents();
 
-      $(document).on("rendered.tree", function() {
+      $(document).on("renderedTree", function() {
         var _path = viewModel.assist.path();
         if (_path[_path.length-1] == "/"){
           _path = _path.substr(0, _path.length - 1);
@@ -641,7 +620,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }
       });
 
-      $(document).on("created.role", function(){
+      $(document).on("createdRole", function(){
         $("#createRoleModal").modal("hide");
         $("#grantPrivilegeModal").modal("hide");
         $("#deletePrivilegeModal").modal("hide");
@@ -651,11 +630,11 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }, 500);
       });
 
-      $(document).on("deleted.role", function(){
+      $(document).on("deletedRole", function(){
         $("#deleteRoleModal").modal("hide");
       });
 
-      $(document).on("changed.path", function(){
+      $(document).on("changedPath", function(){
         if ($("#path").val() != viewModel.assist.path()){
           $("#path").val(viewModel.assist.path());
         }
@@ -668,7 +647,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
           highlightMainMenu(mainSection);
           viewModel.updateSectionHash(mainSection);
         }
-        logGA(mainSection);
+        hueAnalytics.log('security/hive', mainSection);
       }
 
       function highlightMainMenu(mainSection) {
@@ -682,11 +661,11 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       showMainSection(viewModel.getSectionHash());
 
-      $(document).on("show.mainSection", function(){
+      $(document).on("showMainSection", function(){
         showMainSection(viewModel.getSectionHash());
       });
 
-      $(document).on("show.role", function(e, role) {
+      $(document).on("showRole", function(e, role) {
         if (typeof role != "undefined" && role.name != null){
           $("#bulkActionsModal").modal("hide");
           showMainSection("roles");
@@ -702,8 +681,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         _resizeTimeout = window.setTimeout(resizeComponents, 100);
       });
 
-      window.onpopstate = function() {
-        viewModel.assist.path(viewModel.getPathHash());
+      window.onhashchange = function() {
+        if (window.location.pathname.indexOf('/security/hive') > -1) {
+          viewModel.assist.path(viewModel.getPathHash());
+        }
       };
 
       $("#createRoleModal").modal({
@@ -737,17 +718,17 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         viewModel.list_sentry_roles_by_group();
       });
 
-      $(document).on("added.bulk.privileges", function() {
+      $(document).on("addedBulkPrivileges", function() {
         $(document).trigger("info", "${ _('The current privileges have been successfully added to the checked items.') }");
         $("#bulkActionsModal").modal("hide");
       });
 
-      $(document).on("deleted.bulk.privileges", function() {
+      $(document).on("deletedBulkPrivileges", function() {
         $(document).trigger("info", "${ _('All the privileges have been successfully removed from the checked items.') }");
         $("#bulkActionsModal").modal("hide");
       });
 
-      $(document).on("syncd.bulk.privileges", function() {
+      $(document).on("syncdBulkPrivileges", function() {
         $(document).trigger("info", "${ _('All the privileges for the checked items have been replaced with the current selection.') }");
         $("#bulkActionsModal").modal("hide");
       });
@@ -760,7 +741,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         viewModel.isApplyingBulk(false);
       });
 
-      $(document).on("create.typeahead", function(){
+      $(document).on("createTypeahead", function(){
         $("#createRoleName").typeahead({
           source: function (query) {
             var _options = [];
@@ -782,17 +763,28 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
           $("#createRoleName").data('typeahead').lookup();
         }
       });
-      $(document).on("destroy.typeahead", function(){
+      $(document).on("destroyTypeahead", function(){
         $('.typeahead').unbind();
         $("ul.typeahead").hide();
       });
 
-      $(document).trigger("create.typeahead");
+      $(document).trigger("createTypeahead");
 
       $("#deletePrivilegeModal").modal({
         show: false
       });
-    });
-</script>
 
+      huePubSub.subscribe('app.gained.focus', function (app) {
+        if (app === 'security_hive') {
+          window.location.hash = viewModel.lastHash;
+          showMainSection(viewModel.getSectionHash());
+        }
+      }, 'security_hive');
+    });
+  })();
+</script>
+</span>
+
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

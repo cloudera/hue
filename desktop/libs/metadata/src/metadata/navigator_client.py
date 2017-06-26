@@ -20,17 +20,49 @@ import json
 import logging
 import re
 
+from itertools import islice
+
+from django.utils.translation import ugettext as _
+
+from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest import resource
-from desktop.lib.rest.http_client import HttpClient, RestException
+from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
+from desktop.lib.rest.http_client import RestException
 
 from hadoop.conf import HDFS_CLUSTERS
+from libsentry.privilege_checker import get_checker
+from libsentry.sentry_site import get_hive_sentry_provider
 
-from metadata.conf import NAVIGATOR
+from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
+from metadata.metadata_sites import get_navigator_hue_server_name
 
 
-_JSON_CONTENT_TYPE = 'application/json'
 LOG = logging.getLogger(__name__)
 VERSION = 'v9'
+_JSON_CONTENT_TYPE = 'application/json'
+CLUSTER_SOURCE_IDS = None
+
+
+def get_cluster_source_ids(api):
+  '''
+  ClusterName is handled by getting the list of sourceIds of a Cluster. We can't filter directly on a clusterName.
+  '''
+  global CLUSTER_SOURCE_IDS
+
+  if CLUSTER_SOURCE_IDS is None:
+    CLUSTER_SOURCE_IDS = ''
+    if get_navigator_hue_server_name():
+      sources = api.get_cluster_source_ids()
+      LOG.info('Navigator cluster source ids: %s' % (sources,))
+      if sources:
+        # Sometimes sourceId seems to be missing
+        source_ids = ['sourceId:%s' % (_id.get('sourceId') or _id.get('identity')) for _id in sources]
+        CLUSTER_SOURCE_IDS = '(' + ' OR '.join(source_ids) + ') AND '
+      else:
+        # 0 means always false
+        CLUSTER_SOURCE_IDS = 'sourceId:0 AND'
+
+  return CLUSTER_SOURCE_IDS
 
 
 def get_filesystem_host():
@@ -43,7 +75,36 @@ def get_filesystem_host():
 
 
 class NavigatorApiException(Exception):
-  pass
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __str__(self):
+    return str(self.message)
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
+
+
+class EntityDoesNotExistException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __str__(self):
+    return str(self.message)
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
+
+
+class NavigathorAuthException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __str__(self):
+    return str(self.message)
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
 
 
 class NavigatorApi(object):
@@ -51,12 +112,14 @@ class NavigatorApi(object):
   http://cloudera.github.io/navigator/apidocs/v3/index.html
   """
 
-  def __init__(self, api_url=None, user=None, password=None):
-    self._api_url = '%s/%s' % ((api_url or NAVIGATOR.API_URL.get()).strip('/'), VERSION)
-    self._username = user or NAVIGATOR.AUTH_USERNAME.get()
-    self._password = password or NAVIGATOR.AUTH_PASSWORD.get()
+  def __init__(self, user=None):
+    self._api_url = '%s/%s' % (NAVIGATOR.API_URL.get().strip('/'), VERSION)
+    self._username = get_navigator_auth_username()
+    self._password = get_navigator_auth_password()
 
-    self._client = HttpClient(self._api_url, logger=LOG)
+    self.user = user
+    # Navigator does not support Kerberos authentication while other components usually requires it
+    self._client = UnsecureHttpClient(self._api_url, logger=LOG)
     self._client.set_basic_auth(self._username, self._password)
     self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
 
@@ -65,14 +128,17 @@ class NavigatorApi(object):
 
 
   def _get_types_from_sources(self, sources):
-    default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'OPERATION', 'DIRECTORY')
+    default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'S3BUCKET', 'OPERATION', 'DIRECTORY')
 
     if 'sql' in sources or 'hive' in sources or 'impala' in sources:
-      default_entity_types = ('TABLE', 'VIEW')
       entity_types = ('TABLE', 'VIEW', 'DATABASE', 'PARTITION', 'FIELD')
+      default_entity_types = ('TABLE', 'VIEW')
     elif 'hdfs' in sources:
       entity_types = ('FILE', 'DIRECTORY')
       default_entity_types  = ('FILE', 'DIRECTORY')
+    elif 's3' in sources:
+      entity_types = ('FILE', 'DIRECTORY', 'S3BUCKET')
+      default_entity_types  = ('DIRECTORY', 'S3BUCKET')
 
     return default_entity_types, entity_types
 
@@ -91,14 +157,21 @@ class NavigatorApi(object):
     default_entity_types, entity_types = self._get_types_from_sources(sources)
 
     try:
+      query_s = query_s.replace('{', '\\{').replace('}', '\\}').replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
       params = self.__params
 
       search_terms = [term for term in query_s.strip().split()]
 
       query_clauses = []
       user_filters = []
+      source_type_filter = []
+
       for term in search_terms:
         if ':' not in term:
+          if ('sql' in sources or 'hive' in sources or 'impala' in sources):
+            if '.' in term:
+              parent, term = term.rsplit('.', 1)
+              user_filters.append('parentPath:"/%s"' % parent.replace('.', '/'))
           query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
         else:
           name, val = term.split(':')
@@ -113,32 +186,47 @@ class NavigatorApi(object):
       if query_clauses:
         filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
 
-      user_filter_clause = 'OR '.join(['(%s)' % f for f in user_filters]) or '*'
+      user_filter_clause = 'AND '.join(['(%s)' % f for f in user_filters]) or '*'
       source_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
 
+      if 's3' in sources:
+        source_type_filter.append('sourceType:s3')
+      elif 'sql' in sources or 'hive' in sources or 'impala' in sources:
+        source_type_filter.append('sourceType:HIVE OR sourceType:IMPALA')
+
       filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
+      if source_type_filter:
+        filter_query += ' AND (%s)' % 'OR '.join(source_type_filter)
+
+      source_ids = get_cluster_source_ids(self)
+      if source_ids:
+        filter_query = source_ids + '(' + filter_query + ')'
 
       params += (
         ('query', filter_query),
         ('offset', offset),
-        ('limit', limit),
+        ('limit', NAVIGATOR.FETCH_SIZE_SEARCH.get()),
       )
 
       LOG.info(params)
       response = self._root.get('entities', headers=self.__headers, params=params)
 
+      response = list(islice(self._secure_results(response), limit)) # Apply Sentry perms
+
       return response
     except RestException, e:
-      msg = 'Failed to search for entities with search query: %s' % query_s
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error('Failed to search for entities with search query: %s' % query_s)
+      if e.code == 401:
+        raise NavigathorAuthException(_('Failed to authenticate.'))
+      else:
+        raise NavigatorApiException(e)
 
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
     try:
       pagination = {
         'offset': offset,
-        'limit': limit,
+        'limit': NAVIGATOR.FETCH_SIZE_SEARCH_INTERACTIVE.get(),
       }
 
       entity_types = []
@@ -149,10 +237,14 @@ class NavigatorApi(object):
       if sources:
         default_entity_types, entity_types = self._get_types_from_sources(sources)
 
-        if 'hive' in sources or 'impala' in sources:
+        if 'sql' in sources or 'hive' in sources or 'impala' in sources:
           fq_type = default_entity_types
+          filterQueries.append('sourceType:HIVE OR sourceType:IMPALA')
         elif 'hdfs' in sources:
           fq_type = entity_types
+        elif 's3' in sources:
+          fq_type = default_entity_types
+          filterQueries.append('sourceType:s3')
 
         if query_s.strip().endswith('type:*'): # To list all available types
           fq_type = entity_types
@@ -174,6 +266,10 @@ class NavigatorApi(object):
       if fq_type:
         filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
+      source_ids = get_cluster_source_ids(self)
+      if source_ids:
+        body['query'] = source_ids + '(' + body['query'] + ')'
+
       body['facetFields'] = facetFields or [] # Currently mandatory in API
       if facetPrefix:
         body['facetPrefix'] = facetPrefix
@@ -188,11 +284,41 @@ class NavigatorApi(object):
       LOG.info(data)
       response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
 
+      response['results'] = list(islice(self._secure_results(response['results']), limit)) # Apply Sentry perms
+
       return response
-    except RestException:
-      msg = 'Failed to search for entities with search query %s' % json.dumps(body)
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+    except RestException, e:
+      LOG.error('Failed to search for entities with search query: %s' % json.dumps(body))
+      if e.code == 401:
+        raise NavigathorAuthException(_('Failed to authenticate.'))
+      else:
+        raise NavigatorApiException(e.message)
+
+
+  def _secure_results(self, results, checker=None):
+    if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
+      checker = get_checker(self.user, checker)
+      action = 'SELECT'
+
+      def getkey(result):
+        key = {u'server': get_hive_sentry_provider()}
+
+        if result['type'] == 'TABLE' or result['type'] == 'VIEW':
+          key['db'] = result.get('parentPath', '') and result.get('parentPath', '').strip('/')
+          key['table'] = result.get('originalName', '')
+        elif result['type'] == 'DATABASE':
+          key['db'] = result.get('originalName', '')
+        elif result['type'] == 'FIELD':
+          parents = result.get('parentPath', '').strip('/').split('/')
+          if len(parents) == 2:
+            key['db'], key['table'] = parents
+            key['column'] = result.get('originalName', '')
+
+        return key
+
+      return checker.filter_objects(results, action, key=getkey)
+    else:
+      return results
 
 
   def suggest(self, prefix=None):
@@ -200,8 +326,8 @@ class NavigatorApi(object):
       return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
     except RestException, e:
       msg = 'Failed to search for entities with search query: %s' % prefix
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def find_entity(self, source_type, type, name, **filters):
@@ -218,10 +344,15 @@ class NavigatorApi(object):
         'originalName': name,
         'deleted': 'false'
       }
+
       for key, value in filters.items():
         query_filters[key] = value
 
       filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
+
+      source_ids = get_cluster_source_ids(self)
+      if source_ids:
+        filter_query = source_ids + '(' + filter_query + ')'
 
       params += (
         ('query', filter_query),
@@ -232,15 +363,15 @@ class NavigatorApi(object):
       response = self._root.get('entities', headers=self.__headers, params=params)
 
       if not response:
-        raise NavigatorApiException('Could not find entity with query filters: %s' % str(query_filters))
+        raise EntityDoesNotExistException('Could not find entity with query filters: %s' % str(query_filters))
       elif len(response) > 1:
         raise NavigatorApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
 
       return response[0]
     except RestException, e:
       msg = 'Failed to find entity: %s' % str(e)
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def get_entity(self, entity_id):
@@ -252,8 +383,8 @@ class NavigatorApi(object):
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
     except RestException, e:
       msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def update_entity(self, entity_id, **metadata):
@@ -266,17 +397,27 @@ class NavigatorApi(object):
       return self._root.put('entities/%s' % entity_id, params=self.__params, data=data, allow_redirects=True, clear_cookies=True)
     except RestException, e:
       msg = 'Failed to update entity %s: %s' % (entity_id, str(e))
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
+
+
+  def get_cluster_source_ids(self):
+    params = (
+      ('query', 'clusterName:"%s"' % get_navigator_hue_server_name()),
+      ('limit', 200),
+    )
+
+    LOG.info(params)
+    return self._root.get('entities', headers=self.__headers, params=params)
 
 
   def get_database(self, name):
     return self.find_entity(source_type='HIVE', type='DATABASE', name=name)
 
 
-  def get_table(self, database_name, table_name):
+  def get_table(self, database_name, table_name, is_view=False):
     parent_path = '\/%s' % database_name
-    return self.find_entity(source_type='HIVE', type='TABLE', name=table_name, parentPath=parent_path)
+    return self.find_entity(source_type='HIVE', type='VIEW' if is_view else 'TABLE', name=table_name, parentPath=parent_path)
 
 
   def get_field(self, database_name, table_name, field_name):
@@ -345,9 +486,8 @@ class NavigatorApi(object):
       return self._root.get('lineage', headers=self.__headers, params=params)
     except RestException, e:
       msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
-
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def _clean_path(self, path):

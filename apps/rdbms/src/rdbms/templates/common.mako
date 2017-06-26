@@ -16,14 +16,14 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%def name="navbar()">
-  <div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar hue-title-bar">
     <div class="navbar-inner">
       <div class="container-fluid">
         <div class="nav-collapse">
           <ul class="nav">
-            <li class="currentApp">
+            <li class="app-header">
               <a href="/rdbms">
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 ${ _('DB Query') }
               </a>
             </li>

@@ -102,18 +102,22 @@ var CoordinatorEditorViewModel = (function () {
 
         // Append the new variables, reuse past variables in case of rename
         prev_variables = self.variables.slice();
-        $.each(data.parameters, function (index, param) {
-          if (prev_variables.filter(function(variable) { return param['name'] == variable.workflow_variable(); }).length == 0) {
-            var newVar;
-            if (removed_variables.length > 0) {
-              newVar = removed_variables.shift();
-              self.variables.push(newVar);
-            } else {
-              newVar = self.addVariable();
+        if (data.parameters) {
+          $.each(data.parameters, function (index, param) {
+            if (prev_variables.filter(function (variable) {
+                return param['name'] == variable.workflow_variable();
+              }).length == 0) {
+              var newVar;
+              if (removed_variables.length > 0) {
+                newVar = removed_variables.shift();
+                self.variables.push(newVar);
+              } else {
+                newVar = self.addVariable();
+              }
+              newVar.workflow_variable(param['name']);
             }
-            newVar.workflow_variable(param['name']);
-          }
-        });
+          });
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
@@ -239,7 +243,7 @@ var CoordinatorEditorViewModel = (function () {
             else {
               $(document).trigger("info", data.message);
             }
-            if (window.location.search.indexOf("coordinator") == -1) {
+            if (window.location.search.indexOf("coordinator") == -1 && !IS_HUE_4) {
               window.location.hash = '#coordinator=' + data.id;
             }
           }
@@ -256,7 +260,7 @@ var CoordinatorEditorViewModel = (function () {
 
     self.gen_xml = function () {
       $(".jHueNotify").hide();
-      logGA('gen_xml');
+      hueAnalytics.log('oozie/editor/coordinator', 'gen_xml');
 
       $.post("/oozie/editor/coordinator/gen_xml/", {
         "coordinator": ko.mapping.toJSON(self.coordinator, COORDINATOR_MAPPING)
@@ -276,8 +280,9 @@ var CoordinatorEditorViewModel = (function () {
       $(".jHueNotify").hide();
 
       if (!self.coordinator.isDirty()) {
-        logGA('submit');
+        hueAnalytics.log('oozie/editor/coordinator', 'submit');
         $.get("/oozie/editor/coordinator/submit/" + self.coordinator.id(), {
+          format: IS_HUE_4 ? 'json' : 'html'
         }, function (data) {
           $(document).trigger("showSubmitPopup", data);
         }).fail(function (xhr, textStatus, errorThrown) {
@@ -286,13 +291,6 @@ var CoordinatorEditorViewModel = (function () {
       }
     };
   };
-
-
-  function logGA(page) {
-    if (typeof trackOnGA == 'function') {
-      trackOnGA('oozie/editor/coordinator/' + page);
-    }
-  }
 
   return CoordinatorEditorViewModel;
 })();

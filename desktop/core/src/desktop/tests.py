@@ -281,35 +281,36 @@ def test_prefs():
   c = make_logged_in_client()
 
   # Get everything
-  response = c.get('/desktop/prefs/')
-  assert_equal('{}', response.content)
+  response = c.get('/desktop/api2/user_preferences/')
+  assert_equal({}, json.loads(response.content)['data'])
 
   # Set and get
-  response = c.get('/desktop/prefs/foo', dict(set="bar"))
-  assert_equal('true', response.content)
-  response = c.get('/desktop/prefs/foo')
-  assert_equal('"bar"', response.content)
+  response = c.post('/desktop/api2/user_preferences/foo', {'set': 'bar'})
+  assert_equal('bar', json.loads(response.content)['data']['foo'])
+  response = c.get('/desktop/api2/user_preferences/')
+  assert_equal('bar', json.loads(response.content)['data']['foo'])
 
   # Reset (use post this time)
-  c.post('/desktop/prefs/foo', dict(set="baz"))
-  response = c.get('/desktop/prefs/foo')
-  assert_equal('"baz"', response.content)
+  c.post('/desktop/api2/user_preferences/foo', {'set': 'baz'})
+  response = c.get('/desktop/api2/user_preferences/foo')
+  assert_equal('baz', json.loads(response.content)['data']['foo'])
 
   # Check multiple values
-  c.post('/desktop/prefs/elephant', dict(set="room"))
-  response = c.get('/desktop/prefs/')
-  assert_true("baz" in response.content)
-  assert_true("room" in response.content)
+  c.post('/desktop/api2/user_preferences/elephant', {'set': 'room'})
+  response = c.get('/desktop/api2/user_preferences/')
+  assert_true("baz" in json.loads(response.content)['data'].values(), response.content)
+  assert_true("room" in json.loads(response.content)['data'].values(), response.content)
 
   # Delete everything
-  c.get('/desktop/prefs/elephant', dict(delete=""))
-  c.get('/desktop/prefs/foo', dict(delete=""))
-  response = c.get('/desktop/prefs/')
-  assert_equal('{}', response.content)
+  c.post('/desktop/api2/user_preferences/elephant', {'delete': ''})
+  c.post('/desktop/api2/user_preferences/foo', {'delete': ''})
+  response = c.get('/desktop/api2/user_preferences/')
+  assert_equal({}, json.loads(response.content)['data'])
 
   # Check non-existent value
-  response = c.get('/desktop/prefs/doesNotExist')
-  assert_equal('null', response.content)
+  response = c.get('/desktop/api2/user_preferences/doesNotExist')
+  assert_equal(None, json.loads(response.content)['data'])
+
 
 def test_status_bar():
   """
@@ -646,7 +647,10 @@ def test_last_access_time():
 
 
 def test_ui_customizations():
-  custom_message = 'test ui customization'
+  if desktop.conf.is_lb_enabled():  # Assumed that live cluster connects to direct Hue
+    custom_message = 'You are accessing a non-optimized Hue, please switch to one of the available addresses'
+  else:
+    custom_message = 'test ui customization'
   reset = (
     desktop.conf.CUSTOM.BANNER_TOP_HTML.set_for_testing(custom_message),
     desktop.conf.CUSTOM.LOGIN_SPLASH_HTML.set_for_testing(custom_message),
@@ -895,28 +899,131 @@ class TestDocument(object):
     assert_equal(Document2.objects.get(name='Test Document2').id, self.document2.id)
     assert_equal(Document.objects.get(name='Test Document').id, self.document.id)
 
-  def test_document_trashed(self):
+  def test_document_trashed_and_restore(self):
     home_dir = Directory.objects.get_home_directory(self.user)
     test_dir, created = Directory.objects.get_or_create(
-          parent_directory=home_dir,
-          owner=self.user,
-          name='test_dir'
-        )
-    test_doc = Document2.objects.create(name='Test Document2',
-                                              type='search-dashboard',
-                                              owner=self.user,
-                                              description='Test Document2',
-                                              parent_directory=test_dir)
+        parent_directory=home_dir,
+        owner=self.user,
+        name='test_dir'
+    )
+    test_doc = Document2.objects.create(
+        name='Test Document2',
+        type='search-dashboard',
+        owner=self.user,
+        description='Test Document2',
+        parent_directory=test_dir
+    )
+
+    child_dir, created = Directory.objects.get_or_create(
+        parent_directory=test_dir,
+        owner=self.user,
+        name='child_dir'
+    )
+    test_doc1 = Document2.objects.create(
+        name='Test Document2',
+        type='search-dashboard',
+        owner=self.user,
+        description='Test Document2',
+        parent_directory=child_dir
+    )
 
     assert_false(test_dir.is_trashed)
     assert_false(test_doc.is_trashed)
+    assert_false(child_dir.is_trashed)
+    assert_false(test_doc1.is_trashed)
 
-    test_dir.trash()
-    assert_true(test_doc.is_trashed)
-    assert_true(test_dir.is_trashed)
+    try:
+      test_dir.trash()
+      test_dir = Document2.objects.get(id=test_dir.id)
+      test_doc = Document2.objects.get(id=test_doc.id)
+      child_dir = Document2.objects.get(id=child_dir.id)
+      test_doc1 = Document2.objects.get(id=test_doc1.id)
+      assert_true(test_doc.is_trashed)
+      assert_true(test_dir.is_trashed)
+      assert_true(child_dir.is_trashed)
+      assert_true(test_doc1.is_trashed)
 
-    test_doc.delete()
-    test_dir.delete()
+      # Test restore
+      test_dir.restore()
+      test_dir = Document2.objects.get(id=test_dir.id)
+      test_doc = Document2.objects.get(id=test_doc.id)
+      child_dir = Document2.objects.get(id=child_dir.id)
+      test_doc1 = Document2.objects.get(id=test_doc1.id)
+      assert_false(test_doc.is_trashed)
+      assert_false(test_dir.is_trashed)
+      assert_false(child_dir.is_trashed)
+      assert_false(test_doc1.is_trashed)
+    finally:
+      test_doc.delete()
+      test_dir.delete()
+      test_doc1.delete()
+      child_dir.delete()
+
+
+  def test_multiple_home_directories(self):
+    home_dir = Directory.objects.get_home_directory(self.user)
+    test_doc1 = Document2.objects.create(name='test-doc1',
+                                         type='query-hive',
+                                         owner=self.user,
+                                         description='',
+                                         parent_directory=home_dir)
+
+    assert_equal(home_dir.children.exclude(name='.Trash').count(), 2)
+
+    # Cannot create second home directory directly as it will fail in Document2.validate()
+    second_home_dir = Document2.objects.create(owner=self.user, parent_directory=None, name='second_home_dir', type='directory')
+    Document2.objects.filter(name='second_home_dir').update(name=Document2.HOME_DIR, parent_directory=None)
+    assert_equal(Document2.objects.filter(owner=self.user, name=Document2.HOME_DIR).count(), 2)
+
+    test_doc2 = Document2.objects.create(name='test-doc2',
+                                              type='query-hive',
+                                              owner=self.user,
+                                              description='',
+                                              parent_directory=second_home_dir)
+    assert_equal(second_home_dir.children.count(), 1)
+
+    merged_home_dir = Directory.objects.get_home_directory(self.user)
+    children = merged_home_dir.children.all()
+    assert_equal(children.exclude(name='.Trash').count(), 3)
+    children_names = [child.name for child in children]
+    assert_true(test_doc2.name in children_names)
+    assert_true(test_doc1.name in children_names)
+
+  def test_multiple_trash_directories(self):
+    home_dir = Directory.objects.get_home_directory(self.user)
+    test_doc1 = Document2.objects.create(name='test-doc1',
+                                         type='query-hive',
+                                         owner=self.user,
+                                         description='',
+                                         parent_directory=home_dir)
+
+    assert_equal(home_dir.children.count(), 3)
+
+    # Cannot create second trash directory directly as it will fail in Document2.validate()
+    Document2.objects.create(owner=self.user, parent_directory=home_dir, name='second_trash_dir', type='directory')
+    Document2.objects.filter(name='second_trash_dir').update(name=Document2.TRASH_DIR)
+    assert_equal(Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR).count(), 2)
+
+
+    test_doc2 = Document2.objects.create(name='test-doc2',
+                                              type='query-hive',
+                                              owner=self.user,
+                                              description='',
+                                              parent_directory=home_dir)
+    assert_equal(home_dir.children.count(), 5) # Including the second trash
+    assert_raises(Document2.MultipleObjectsReturned, Directory.objects.get, name=Document2.TRASH_DIR)
+
+    test_doc1.trash()
+    assert_equal(home_dir.children.count(), 3) # As trash documents are merged count is back to 3
+    merged_trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
+
+    test_doc2.trash()
+    children = merged_trash_dir.children.all()
+    assert_equal(children.count(), 2)
+    children_names = [child.name for child in children]
+    assert_true(test_doc2.name in children_names)
+    assert_true(test_doc1.name in children_names)
+
 
   def test_document_copy(self):
     name = 'Test Document2 Copy'
@@ -1101,3 +1208,13 @@ def test_get_data_link():
 
   assert_equal('/filebrowser/view=/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
   assert_equal('/metastore/table/default/sample_07', get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'}))
+
+def test_get_dn():
+  assert_equal(['*'], desktop.conf.get_dn(''))
+  assert_equal(['*'], desktop.conf.get_dn('localhost'))
+  assert_equal(['*'], desktop.conf.get_dn('localhost.localdomain'))
+  assert_equal(['*'], desktop.conf.get_dn('hue'))
+  assert_equal(['*'], desktop.conf.get_dn('hue.com'))
+  assert_equal(['.hue.com'], desktop.conf.get_dn('sql.hue.com'))
+  assert_equal(['.hue.com'], desktop.conf.get_dn('finance.sql.hue.com'))
+  assert_equal(['.hue.com'], desktop.conf.get_dn('bank.finance.sql.hue.com'))

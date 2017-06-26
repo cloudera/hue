@@ -16,7 +16,7 @@
 
 var AssistS3Entry = (function () {
 
-  var PAGE_SIZE = 50;
+  var PAGE_SIZE = 100;
 
   /**
    * @param {object} options
@@ -44,6 +44,20 @@ var AssistS3Entry = (function () {
     self.currentPage = 1;
     self.hasMorePages = true;
 
+    self.isFilterVisible = ko.observable(false);
+    self.editingSearch = ko.observable(false);
+    self.filter = ko.observable('').extend({ rateLimit: 400 });
+
+    self.isFilterVisible.subscribe(function (newValue) {
+      if (!newValue && self.filter()) {
+        self.filter('');
+      }
+    });
+
+    self.filter.subscribe(function () {
+      self.loadEntries();
+    });
+
     self.entries = ko.observableArray([]);
 
     self.loaded = false;
@@ -62,6 +76,12 @@ var AssistS3Entry = (function () {
       return self.entries().length > 0;
     });
   }
+
+  AssistS3Entry.prototype.toggleSearch = function () {
+    var self = this;
+    self.isFilterVisible(!self.isFilterVisible());
+    self.editingSearch(self.isFilterVisible());
+  };
 
   AssistS3Entry.prototype.dblClick = function () {
     var self = this;
@@ -106,6 +126,7 @@ var AssistS3Entry = (function () {
     self.apiHelper.fetchS3Path({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
+      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback
@@ -120,14 +141,25 @@ var AssistS3Entry = (function () {
       return;
     }
 
+    var nextName = folders.shift();
+    var loadedPages = 0;
     var findNextAndLoadDeep = function () {
-      var nextName = folders.shift();
+
       var foundEntry = $.grep(self.entries(), function (entry) {
         return entry.definition.name === nextName && entry.definition.type === 'dir';
       });
+      var passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
+
       if (foundEntry.length === 1) {
         foundEntry[0].loadDeep(folders, callback);
-      } else if (! self.hasErrors()) {
+      } else if (!passedAlphabetically && self.hasMorePages && loadedPages < 50) {
+        loadedPages++;
+        self.fetchMore(function () {
+          findNextAndLoadDeep();
+        }, function () {
+          callback(self);
+        });
+      } else {
         callback(self);
       }
     };
@@ -151,9 +183,18 @@ var AssistS3Entry = (function () {
     return parts;
   };
 
-  AssistS3Entry.prototype.toggleOpen = function () {
+  AssistS3Entry.prototype.toggleOpen = function (data, event) {
     var self = this;
     if (self.definition.type === 'file') {
+      if (IS_HUE_4) {
+        if (event.ctrlKey || event.metaKey || event.which === 2) {
+          window.open('/hue' + self.definition.url, '_blank');
+        } else {
+          huePubSub.publish('open.link', self.definition.url);
+        }
+      } else {
+        window.open(self.definition.url, '_blank');
+      }
       return;
     }
     self.open(!self.open());
@@ -166,7 +207,7 @@ var AssistS3Entry = (function () {
     }
   };
 
-  AssistS3Entry.prototype.fetchMore = function () {
+  AssistS3Entry.prototype.fetchMore = function (successCallback, errorCallback) {
     var self = this;
     if (!self.hasMorePages || self.loadingMore()) {
       return;
@@ -177,6 +218,7 @@ var AssistS3Entry = (function () {
     self.apiHelper.fetchS3Path({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
+      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: function (data) {
         self.hasMorePages = data.page.next_page_number > self.currentPage;
@@ -191,9 +233,15 @@ var AssistS3Entry = (function () {
           })
         })));
         self.loadingMore(false);
+        if (successCallback) {
+          successCallback();
+        }
       },
       errorCallback: function () {
         self.hasErrors(true);
+        if (errorCallback) {
+          errorCallback();
+        }
       }
     });
   };

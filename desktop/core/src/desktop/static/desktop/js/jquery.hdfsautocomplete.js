@@ -50,6 +50,7 @@
 
     var _this = this;
     var _el = $(_this.element);
+    _el.addClass("jHueAutocompleteElement");
     _el.attr("autocomplete", "off"); // prevents default browser behavior
 
     // creates autocomplete popover

@@ -1,0 +1,156 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+@import (reference) "cui/colors.less";
+
+/*
+
+
+  TODO: Replace with CUI equivalents where possible
+
+
+*/
+
+@hue-primary-color-dark: @cui-blue-700;
+@hue-primary-color-light: #DBE8F1;
+@hue-trunk: @cui-purple-300;
+
+@hue-disabled-color: @cui-gray-100;
+@hue-error-color: @cui-red-400;
+
+@hue-panel-border-radius: 2px;
+
+.hue-transform(@transform) {
+  -webkit-transform: @transform;
+  -moz-transform: @transform;
+  -ms-transform: @transform;
+  -o-transform: @transform;
+}
+
+.nowrap-ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+.hue-linear-transition(@attributes) {
+  -webkit-transition: @attributes 0.2s linear;
+  -moz-transition: @attributes 0.2s linear;
+  -ms-transition: @attributes 0.2s linear;
+  transition: @attributes 0.2s linear;
+}
+
+.hue-ease-transition(@attributes) {
+  -webkit-transition: @attributes 0.2s ease;
+  -moz-transition: @attributes 0.2s ease;
+  -ms-transition: @attributes 0.2s ease;
+  transition: @attributes 0.2s ease;
+}
+
+.hue-box-shadow-top {
+  .hue-box-shadow(0, -2px);
+}
+
+.hue-box-shadow-right {
+  .hue-box-shadow(2px, 0);
+}
+
+.hue-box-shadow-bottom {
+  .hue-box-shadow(0, 2px);
+}
+
+.hue-box-shadow-left {
+  .hue-box-shadow(-2px, 0);
+}
+
+.hue-box-shadow(@left: 2px, @top: 2px) {
+  -webkit-box-shadow: @left @top 8px rgba(0,0,0,.18);
+  -moz-box-shadow: @left @top 8px rgba(0,0,0,.18);
+  box-shadow: @left @top 6px 0 rgba(0, 0, 0, 0.18), @left @top 8px 0 rgba(0, 0, 0, 0.13);
+}
+
+.hue-inset-box-shadow {
+  -webkit-box-shadow: inset 1px 0 0 rgba(255,255,255,.125)!important;
+  -moz-box-shadow: inset 1px 0 0 rgba(255,255,255,.125)!important;
+  box-shadow: inset 1px 0 0 rgba(255,255,255,.125)!important;
+}
+
+.hue-no-box-shadow {
+  -webkit-box-shadow: none!important;
+  -moz-box-shadow: none!important;
+  box-shadow: none!important;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.hue-fade-in {
+  -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadein 2s; /* Firefox < 16 */
+  -ms-animation: fadein 2s; /* Internet Explorer */
+  -o-animation: fadein 2s; /* Opera < 12.1 */
+  animation: fadein 2s;
+}
+// Flexbox mixins
+
+.display-flex() {
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+}
+
+.flex(@flex: initial) {
+  -webkit-box-flex: @flex;
+  -moz-box-flex: @flex;
+  -ms-flex: @flex;
+  -webkit-flex: @flex;
+  flex: @flex;
+}
+
+.flex-align-items(@align: stretch) {
+  -webkit-align-items: @align;
+  -ms-align-items: @align;
+  align-items: @align;
+}
+
+.flex-basis(@basis) {
+  -webkit-flex-basis: @basis;
+  -ms-flex-basis: @basis;
+  flex-basis: @basis;
+}
+
+.flex-direction(@direction: row) {
+  -webkit-flex-direction: @direction;
+  -ms-flex-direction: @direction;
+  flex-direction: @direction;
+}
+
+.flex-flow(@flow) {
+  -webkit-flex-flow: @flow;
+  -ms-flex-flow: @flow;
+  flex-flow: @flow;
+}
+
+.flex-wrap(@wrap: nowrap) {
+  -webkit-flex-wrap: @wrap;
+  -ms-flex-wrap: @wrap;
+  flex-wrap: @wrap;
+}

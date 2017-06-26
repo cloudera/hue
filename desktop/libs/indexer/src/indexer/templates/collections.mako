@@ -21,23 +21,26 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unicode }
+%if not is_embeddable:
+${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unicode }
+%endif
 
+<div id="indexesComponents">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('indexer/css/admin.css') }">
 
 <style type="text/css">
-.hueBreadcrumb {
+.hue-breadcrumbs {
   padding: 12px 14px;
 }
 
-.hueBreadcrumbBar {
+.hue-breadcrumbs-bar {
   padding: 0;
   margin: 12px;
 }
 
-.hueBreadcrumbBar a {
-  color: #338BB8 !important;
+.hue-breadcrumbs-bar a {
+  color: #0B7FAD !important;
   display: inline !important;
 }
 
@@ -56,13 +59,27 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 </style>
 
 
-<div class="search-bar" style="height: 30px">
-  <div class="pull-right">
-    <a class="btn importBtn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-tags"></i> ${ _('Dashboards') }
-    </a>
+<div class="navbar hue-title-bar nokids">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '/home?type=search-dashboard')" or url('dashboard:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+          <i class="fa fa-tags"></i> ${ _('Dashboards') }
+        </a>
+      </div>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="app-header">
+            <a href="#manage">
+              <i class="fa fa-database app-icon"></i>
+              ${ _('Index Browser') if is_embeddable else _('Indexes') }
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <h4><a href="#manage"><i class="fa fa-database"></i> ${_('Indexes')}</a></h4>
 </div>
 
 <div class="container-fluid">
@@ -82,24 +99,10 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 </div>
 
 
-<div id="chooseFile" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a file')}</h3>
-  </div>
-  <div class="modal-body">
-    <div id="filechooser">
-    </div>
-  </div>
-  <div class="modal-footer">
-  </div>
-</div>
-
-
 <div data-bind="with: manage" id="deleteCollections" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Delete indexes')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Do you really want to delete the following index(es)?')}</h2>
   </div>
   <div class="modal-body">
     <ul data-bind="foreach: selectedCloudCollections">
@@ -108,27 +111,31 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: removeCollections" class="btn btn-info" data-dismiss="modal">${_('Confirm')}</button>
+    <button data-bind="click: removeCollections" class="btn btn-danger" data-dismiss="modal">${_('Yes')}</button>
   </div>
 </div>
 
 
 <div data-bind="with: edit" id="deleteCollection" class="modal hide fade">
-  <div data-bind="if: collection()" class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Delete index ')} <span data-bind="text: collection().name"></span></h3>
+  <!-- ko if: collection() -->
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Confirm Delete')}</h2>
   </div>
-  <div class="modal-body"></div>
-  <div data-bind="if: collection()" class="modal-footer">
+  <div class="modal-body">
+    ${ _('Are you sure you want to delete the index')} <strong data-bind="text: collection().name"></strong> ?
+  </div>
+  <div class="modal-footer">
     <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: removeCollection" class="btn btn-info" data-dismiss="modal">${_('Confirm')}</button>
+    <button data-bind="click: removeCollection" class="btn btn-danger" data-dismiss="modal">${_('Yes')}</button>
   </div>
+  <!-- /ko -->
 </div>
 
 
 <!-- breadcrumb component -->
 <script id="breadcrumb" type="text/html">
-<ul data-bind="foreach: breadcrumb.list" class="nav nav-pills hueBreadcrumbBar">
+<ul data-bind="foreach: breadcrumb.list" class="nav nav-pills hue-breadcrumbs-bar">
   <li class="nowrap">
     <!-- ko if: $index() == ( $root.breadcrumb.list().length - 1 ) -->
     <span data-bind="text: label" style="padding-left:12px"></span>
@@ -302,7 +309,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
       </tr>
     </thead>
     <tbody data-bind="foreach: collection.fields">
-      <tr data-bind="css: {'error': name.errors().length > 0}" class="editable">
+      <tr data-bind="css: {'error': name.errors().length > 0}">
         <td data-bind="editableText: name">
           <span class="pull-left fa fa-pencil"></span>
         </td>
@@ -358,7 +365,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
   <div data-bind="with: edit" class="sidebar-nav card-small">
     <ul class="nav nav-list">
       <li class="nav-header">${_('Actions')}</li>
-      <li><a data-bind="attr: { href: '/search/browse/' + collection().name() }"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
+      <li><a data-bind="hueLink: '/search/browse/' + collection().name()"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
       <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Index file')}</a></li>
       <li><a data-bind="visible: !collection().isCoreOnly()" href="#deleteCollection" data-toggle="modal"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
     </ul>
@@ -476,12 +483,14 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 <!--/ Wizard -->
 <!--/ Edit collection page -->
 
+</div>
 
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
+<script>
+  routie.setPathname('/indexer');
+</script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('indexer/js/lib.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('indexer/js/collections.js') }" type="text/javascript" charset="utf-8"></script>
@@ -582,7 +591,7 @@ routie({
     var _interval = window.setInterval(function(){
       if (vm.manage.hasLoadedOnce()){
         window.clearInterval(_interval);
-        routie("edit/"+name);
+        routie("edit/" + name);
       }
     }, 300);
   },
@@ -633,8 +642,10 @@ routie({
 });
 
 vm.manage.fetchCollections();
-ko.applyBindings(vm);
+ko.applyBindings(vm, $('#indexesComponents')[0]);
 
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

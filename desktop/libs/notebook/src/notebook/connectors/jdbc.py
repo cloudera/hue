@@ -20,7 +20,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import force_unicode
+from desktop.lib.i18n import force_unicode, smart_str
 from librdbms.jdbc import Jdbc, query_and_fetch
 
 from notebook.connectors.base import Api, QueryError, AuthenticationRequired
@@ -40,7 +40,7 @@ def query_error_handler(func):
     except AuthenticationRequired, e:
       raise e
     except Exception, e:
-      message = force_unicode(str(e))
+      message = force_unicode(smart_str(e))
       if 'error occurred while trying to connect to the Java server' in message:
         raise QueryError(_('%s: is the DB Proxy server running?') % message)
       else:

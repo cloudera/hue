@@ -98,7 +98,7 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 
   <!-- ko if: result -->
   <div class="table-container">
-    <table class="table table-condensed table-striped resultTable">
+    <table class="table table-condensed resultTable">
       <thead>
       <tr data-bind="foreach: result.meta">
         <th class="sorting" data-bind="text: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }, style:{'width': $index() == 0 ? '1%' : ''}, click: function(obj, e){ $(e.target).parents('table').trigger('sort', obj); }"></th>
@@ -151,7 +151,7 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
           <!-- /ko -->
         </td>
         <td class="muted" data-bind="ellipsis: {data: name(), length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
-        <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query(), flavor: $parent.type" class="history-item"></div></td>
+        <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: { value: query, dialect: $parent.type }"></div></td>
       </tr>
     <!-- /ko -->
     </tbody>
@@ -164,18 +164,10 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
-<script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
-<script src="${ static('desktop/js/ace/ace.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
-<script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-<script src="${ static('desktop/js/ace.extended.js') }"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
@@ -198,7 +190,7 @@ ${ assist.assistJSModels() }
     % if conf.USE_NEW_AUTOCOMPLETER.get():
       useNewAutocompleter: true,
     % endif
-    autocompleteTimeout: ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() },
+    autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
     snippetViewSettings: {
       default: {
         placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',

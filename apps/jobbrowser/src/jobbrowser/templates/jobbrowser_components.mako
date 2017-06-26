@@ -230,14 +230,14 @@
 </%def>
 
 <%def name="menubar(hiveserver2_impersonation_enabled=True)">
-  <div class="navbar navbar-inverse navbar-fixed-top nokids">
+  <div class="navbar hue-title-bar nokids">
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/${app_name}">
-                  <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon"/>
+                  <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
                   ${ _('Job Browser') }
                 </a>
               </li>

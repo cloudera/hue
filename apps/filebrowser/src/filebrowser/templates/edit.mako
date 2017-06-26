@@ -30,22 +30,22 @@
 <%namespace name="edit" file="editor_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user, request) | n,unicode }
 ${ fb_components.menubar() }
+%endif
+
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span2">
-      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats, show_download_button) }
-    </div>
-    <div class="span10">
+    <div class="span12">
       <div class="card card-small">
-      % if breadcrumbs:
+      % if breadcrumbs and not is_embeddable:
         ${fb_components.breadcrumbs(path, breadcrumbs)}
       %endif
         <div class="card-body">
           <p>
-            <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
+            <form id="saveForm" class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
               ${ csrf_token(request) | n,unicode }
               % if form.errors:
               <div class="alert-message">
@@ -71,18 +71,18 @@ ${ fb_components.menubar() }
 </div>
 
 
-<div id="saveAsModal" class="modal hide fade">
+<div id="saveAsModal" class="modal hide fade" style="width: 574px; margin-left: -287px">
     <form id="saveAsForm" action="${url('filebrowser.views.save_file')}" method="POST" class="form-stacked form-padding-fix">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Save as')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${ _('Save as') }</h2>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="max-height: 430px">
         <span class="help-block">${_("Enter the location where you would like to save the file.")}</span>
-        ${ edit.render_field(form["path"], notitle=True, nolabel=True, klass="pathChooser input-xxlarge") }
+        ${ edit.render_field(form["path"], notitle=True, nolabel=True, klass="pathChooser input-xxlarge", attrs={ 'style': 'margin-bottom: 0' }) }
         <br/>
-        <div id="fileChooserSaveModal" class="hide"></div>
+        <div id="fileChooserSaveModal" class="hide margin-top-10"></div>
     </div>
     <div class="modal-footer">
         <div id="saveAsNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
@@ -96,7 +96,7 @@ ${ fb_components.menubar() }
     </form>
 </div>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     $(document).ready(function () {
       $("#saveAsBtn").click(function () {
         $("#saveAsModal").modal({
@@ -110,14 +110,34 @@ ${ fb_components.menubar() }
         $("#saveAsModal").modal("hide");
       });
 
-      $("#saveAsForm").submit(function () {
-        if ($.trim($("#saveAsForm").find("input[name='path']").val()) == "") {
-          $("#saveAsForm").find("input[name='path']").addClass("fieldError");
-          $("#saveAsNameRequiredAlert").show();
-          resetPrimaryButtonsStatus(); //globally available
-          return false;
+      $('#saveForm').ajaxForm({
+        dataType: 'json',
+        success: function (data) {
+          if (data && data.exists) {
+            resetPrimaryButtonsStatus();
+            $.jHueNotify.info(data.path + " ${ _('saved correctly') }")
+          }
         }
-        return true;
+      });
+
+      $('#saveAsForm').ajaxForm({
+        dataType: 'json',
+        beforeSubmit: function() {
+          if ($.trim($("#saveAsForm").find("input[name='path']").val()) == "") {
+            $("#saveAsForm").find("input[name='path']").addClass("fieldError");
+            $("#saveAsNameRequiredAlert").show();
+            resetPrimaryButtonsStatus(); //globally available
+            return false;
+          }
+          return true;
+        },
+        success: function (data) {
+          if (data && data.exists) {
+            resetPrimaryButtonsStatus();
+            $("#saveAsModal").modal("hide");
+            $.jHueNotify.info(data.path + " ${ _('saved correctly') }")
+          }
+        }
       });
 
       $("#saveAsForm").find("input[name='path']").focus(function () {
@@ -125,25 +145,28 @@ ${ fb_components.menubar() }
         $("#saveAsNameRequiredAlert").hide();
       });
 
-      $(".pathChooser").click(function() {
-        var self = this;
-        $("#fileChooserSaveModal").jHueFileChooser({
-          initialPath:$(self).val(),
-          onFileChoose:function (filePath) {
-            $(self).val(filePath);
-          },
-          onFolderChange:function (folderPath) {
-            $(self).val(folderPath);
-          },
-          createFolder:false,
-          uploadFile:false
+      function getBrowseButton() {
+        var self = $('.pathChooser');
+        return $('<a>').addClass('btn').addClass('fileChooserBtn').text('..').click(function (e) {
+          e.preventDefault();
+          $('#fileChooserSaveModal').jHueFileChooser({
+            initialPath: $(self).val(),
+            onFileChoose: function (filePath) {
+              $(self).val(filePath);
+            },
+            onFolderChange: function (folderPath) {
+              $(self).val(folderPath);
+            },
+            createFolder: false,
+            uploadFile: false
+          });
+          $('#fileChooserSaveModal').slideDown();
         });
-        $("#fileChooserSaveModal").slideDown();
-      });
 
-      $("#refreshBtn").click(function(){
-        window.location.reload();
-      });
+      }
+
+      $('.pathChooser').after(getBrowseButton());
+
 
       function resizeTextarea() {
         var RESIZE_CORRECTION = 246;
@@ -163,4 +186,6 @@ ${ fb_components.menubar() }
     });
   </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

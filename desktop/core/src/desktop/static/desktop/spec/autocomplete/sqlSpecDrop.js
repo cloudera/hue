@@ -97,7 +97,6 @@
           dialect: 'hive',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -111,7 +110,6 @@
           dialect: 'hive',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -177,7 +175,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['WHERE']
@@ -191,7 +188,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           containsKeywords: ['EXISTS'],
           expectedResult: {
             lowerCase: false,
@@ -207,7 +203,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           containsKeywords: ['EXISTS'],
           expectedResult: {
             lowerCase: false,
@@ -462,7 +457,6 @@
           dialect: 'hive',
           noErrors: true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -540,7 +534,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -554,7 +547,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -648,7 +640,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION']
@@ -661,7 +652,6 @@
           beforeCursor: 'DROP INCREMENTAL STATS db.tbl PARTITION (',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
@@ -674,7 +664,6 @@
           beforeCursor: 'DROP INCREMENTAL STATS db.tbl PARTITION (bla = 1, ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
@@ -745,6 +734,7 @@
               lowerCase: false,
               suggestKeywords: ['PURGE'],
               locations: [
+                { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 15 } },
                 {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, identifierChain: [{ name: 'foo' }]}
               ]
             }
@@ -824,7 +814,6 @@
           afterCursor: '',
           containsKeywords: ['SELECT'],
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -837,7 +826,6 @@
           afterCursor: '',
           containsKeywords: ['SELECT'],
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -891,7 +879,6 @@
           dialect: 'generic',
           containsKeywords: ['SELECT'],
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -931,7 +918,6 @@
             dialect: 'hive',
             containsKeywords: ['SELECT'],
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false
             }
@@ -968,7 +954,6 @@
             beforeCursor: 'TRUNCATE TABLE boo ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['PARTITION']

@@ -71,7 +71,7 @@ def perform_krb181_workaround():
     LOG.error("Couldn't renew kerberos ticket in order to work around "
               "Kerberos 1.8.1 issue. Please check that the ticket for "
               "'%(princ)s' is still renewable:\n"
-              "  $ kinit -f -c %(ccache)s\n"
+              "  $ klist -f -c %(ccache)s\n"
               "If the 'renew until' date is the same as the 'valid starting' "
               "date, the ticket cannot be renewed. Please check your KDC "
               "configuration, and the ticket renewal policy (maxrenewlife) "

@@ -116,7 +116,7 @@ ${layout.menubar(section='my queries')}
     </div>
 
     <div class="tab-pane" id="recentRunQueries">
-      <table id="recentRunQueriesTable" class="table table-striped table-condensed datatables">
+      <table id="recentRunQueriesTable" class="table table-condensed datatables">
         <thead>
           <tr>
             <th width="1%"><div class="hueCheckbox selectAll" data-selectables="runCheck"></div></th>
@@ -167,8 +167,8 @@ ${layout.menubar(section='my queries')}
     ${ csrf_token(request) | n,unicode }
     <input type="hidden" name="skipTrash" id="skipTrash" value="false"/>
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteQueryMessage">${_('Confirm action')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 id="deleteQueryMessage" class="modal-title">${ _('Confirm action') }</h2>
     </div>
     <div class="modal-footer">
       <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}"/>
@@ -180,9 +180,7 @@ ${layout.menubar(section='my queries')}
   </form>
 </div>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     var viewModel = {
         availableSavedQueries : ko.observableArray(${ designs_json | n }),

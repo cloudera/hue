@@ -18,11 +18,14 @@
 from django.utils.translation import ugettext as _
 from desktop.views import commonheader, commonfooter
 %>
+
+%if not is_embeddable:
 ${ commonheader(_('403 - Access forbidden'), "", user, request) | n,unicode }
+%endif
 
 <link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
 
-<div class="container-fluid">
+<div id="httperror" class="container-fluid">
   <div class="row-fluid">
     <div class="span12 center">
       <div class="error-code">403</div>
@@ -34,10 +37,11 @@ ${ commonheader(_('403 - Access forbidden'), "", user, request) | n,unicode }
 
       <p>${_("Sorry, you don't have permissions to access the page, or your session has expired.")}</p>
       <br/>
-      <a href="/home">${ _('Go to My documents') }</a>
+      <a href="javascript:history.back();">${_('Try to go back')}</a> ${_('or')} <a href="/home">${ _('go to My documents') }</a>
     </div>
   </div>
 </div>
 
-
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

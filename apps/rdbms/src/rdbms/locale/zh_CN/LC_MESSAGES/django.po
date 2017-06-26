@@ -1,14 +1,14 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/rdbms/api.py:138 src/rdbms/api.py:183 src/rdbms/api.py:266
+#: src/rdbms/api.py:139 src/rdbms/api.py:184 src/rdbms/api.py:267
 msgid "A POST request is required."
 msgstr "需要 POST 请求。"
 
-#: src/rdbms/api.py:170 src/rdbms/api.py:208
+#: src/rdbms/api.py:171 src/rdbms/api.py:209
 msgid "There was an error with your query."
 msgstr "您的查询存在错误。"
 
-#: src/rdbms/api.py:293
+#: src/rdbms/api.py:294
 msgid "A GET request is required."
 msgstr "需要 GET 请求。"
 
-#: src/rdbms/api.py:334
+#: src/rdbms/api.py:335
 msgid "Server specified doesn't exist."
 msgstr "指定服务器不存在。"
 
-#: src/rdbms/api.py:340
+#: src/rdbms/api.py:341
 msgid "No databases are available. Permissions could be missing."
 msgstr "无可用数据库。可能缺少权限。"
 
@@ -45,6 +45,10 @@ msgstr "查询编辑器"
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr "无效设计类型 %(type)s"
+
+#: src/rdbms/templates/common.mako:26
+msgid "DBQuery icon"
+msgstr "DBQuery 图标"
 
 #: src/rdbms/templates/common.mako:27
 msgid "DB Query"
@@ -71,7 +75,9 @@ msgid "There are currently no databases configured."
 msgstr "当前没有已配置的数据库。"
 
 #: src/rdbms/templates/error.mako:35
-msgid "Please go to your Hue configuration and add a database under the \"rdbms\" section."
+msgid ""
+"Please go to your Hue configuration and add a database under the "
+"\"rdbms\" section."
 msgstr "请转到您的 Hue 配置并在“rdbms”部分下方添加数据库。"
 
 #: src/rdbms/templates/execute.mako:32
@@ -106,110 +112,110 @@ msgstr "表名..."
 msgid "The selected database has no tables."
 msgstr "所选数据库没有表。"
 
-#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:821
+#: src/rdbms/templates/execute.mako:95 src/rdbms/templates/execute.mako:815
 msgid "Query name"
 msgstr "查询名称"
 
-#: src/rdbms/templates/execute.mako:104
+#: src/rdbms/templates/execute.mako:103
 msgid "Query description"
 msgstr "查询描述"
 
-#: src/rdbms/templates/execute.mako:115
+#: src/rdbms/templates/execute.mako:114
 msgid "Your query has the following error(s):"
 msgstr "您的查询有下列错误："
 
-#: src/rdbms/templates/execute.mako:124
+#: src/rdbms/templates/execute.mako:123
 msgid "Execute"
 msgstr "执行"
 
-#: src/rdbms/templates/execute.mako:125 src/rdbms/templates/execute.mako:199
+#: src/rdbms/templates/execute.mako:124 src/rdbms/templates/execute.mako:196
 msgid "Save"
 msgstr "保存"
 
-#: src/rdbms/templates/execute.mako:126
+#: src/rdbms/templates/execute.mako:125
 msgid "Save as..."
 msgstr "另存为..."
 
-#: src/rdbms/templates/execute.mako:127
+#: src/rdbms/templates/execute.mako:126
 msgid "Explain"
 msgstr "解释"
 
-#: src/rdbms/templates/execute.mako:128
+#: src/rdbms/templates/execute.mako:127
 msgid "or create a"
 msgstr "或创建一个"
 
-#: src/rdbms/templates/execute.mako:128
+#: src/rdbms/templates/execute.mako:127
 msgid "New query"
 msgstr "新查询"
 
-#: src/rdbms/templates/execute.mako:154
+#: src/rdbms/templates/execute.mako:152
 msgid "The server returned no results."
 msgstr "服务器未返回结果。"
 
-#: src/rdbms/templates/execute.mako:179
+#: src/rdbms/templates/execute.mako:175
+msgid "Close"
+msgstr "关闭"
+
+#: src/rdbms/templates/execute.mako:176
 msgid "Save your query"
 msgstr "保存您的查询"
 
-#: src/rdbms/templates/execute.mako:184
+#: src/rdbms/templates/execute.mako:181
 msgid "Name"
 msgstr "名称"
 
-#: src/rdbms/templates/execute.mako:190
+#: src/rdbms/templates/execute.mako:187
 msgid "Description"
 msgstr "描述"
 
-#: src/rdbms/templates/execute.mako:198
+#: src/rdbms/templates/execute.mako:195
 msgid "Cancel"
 msgstr "取消"
 
-#: src/rdbms/templates/execute.mako:395
+#: src/rdbms/templates/execute.mako:389
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
 
-#: src/rdbms/templates/execute.mako:584
+#: src/rdbms/templates/execute.mako:578
 msgid "Did you know?"
 msgstr "您知道吗？"
 
-#: src/rdbms/templates/execute.mako:670
+#: src/rdbms/templates/execute.mako:664
 msgid "No query provided to save."
 msgstr "没有提供要保存的查询。"
 
-#: src/rdbms/templates/execute.mako:692
+#: src/rdbms/templates/execute.mako:686
 msgid "Oops, no server found!"
 msgstr "很抱歉，找不到服务器！"
 
-#: src/rdbms/templates/execute.mako:698
+#: src/rdbms/templates/execute.mako:692
 msgid "Oops, no database found!"
 msgstr "很抱歉，找不到数据库！"
 
-#: src/rdbms/templates/execute.mako:815
+#: src/rdbms/templates/execute.mako:809
 msgid "This field is required."
 msgstr "此字段为必填字段。"
 
-#: src/rdbms/templates/execute.mako:828
+#: src/rdbms/templates/execute.mako:822
 msgid "Empty description"
 msgstr "空描述"
 
-#: src/rdbms/templates/execute.mako:834
+#: src/rdbms/templates/execute.mako:828
 msgid "Query saved successfully!"
 msgstr "查询已成功保存！"
 
-#: src/rdbms/templates/execute.mako:880
+#: src/rdbms/templates/execute.mako:874
 msgid "No data available"
 msgstr "没有可用数据"
 
-#: src/rdbms/templates/execute.mako:881
+#: src/rdbms/templates/execute.mako:875
 msgid "No matching records"
 msgstr "没有匹配记录"
 
-#: src/rdbms/templates/execute.mako:919
+#: src/rdbms/templates/execute.mako:913
 msgid "Server error occured: "
 msgstr "出现服务器错误： "
 
-#: src/rdbms/templates/execute.mako:922
+#: src/rdbms/templates/execute.mako:916
 msgid "Unmanageable server error occured: "
 msgstr "出现无法管理的服务器错误： "
-
-#~ msgid "Share"
-#~ msgstr "共享"
-

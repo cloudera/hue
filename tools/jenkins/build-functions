@@ -38,7 +38,7 @@ check_mtime() {
 # If not specified, it uses the $CDH variable to select an archive location.
 #
 
-CDH_URL=${CDH_URL:-http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.5.0-cdh5.2.0.tar.gz}
+CDH_URL=${CDH_URL:-http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.11.0.tar.gz}
 
 CDH_TGZ=$(basename $CDH_URL)
 CDH_VERSION=${CDH_TGZ/.tar.gz/}
@@ -75,7 +75,7 @@ build_hadoop() {
 
 ##########
 
-HIVE_URL=${HIVE_URL:-http://archive.cloudera.com/cdh5/cdh/5/hive-0.13.1-cdh5.2.0.tar.gz}
+HIVE_URL=${HIVE_URL:-http://archive.cloudera.com/cdh5/cdh/5/hive-1.1.0-cdh5.11.0.tar.gz}
 
 HIVE_TGZ=$(basename $HIVE_URL)
 HIVE_VERSION=${HIVE_TGZ/.tar.gz/}
@@ -103,7 +103,7 @@ build_hive() {
 }
 
 ##########
-OOZIE_URL=${OOZIE_URL:-http://archive.cloudera.com/cdh5/cdh/5/oozie-4.0.0-cdh5.2.0.tar.gz}
+OOZIE_URL=${OOZIE_URL:-http://archive.cloudera.com/cdh5/cdh/5/oozie-4.1.0-cdh5.11.0.tar.gz}
 
 OOZIE_TGZ=$(basename $OOZIE_URL)
 OOZIE_VERSION=${OOZIE_TGZ/.tar.gz/}
@@ -141,7 +141,7 @@ build_oozie() {
 
 
 ##########
-SQOOP_URL=${SQOOP_URL:-http://archive.cloudera.com/cdh5/cdh/5/sqoop2-1.99.3-cdh5.2.0.tar.gz}
+SQOOP_URL=${SQOOP_URL:-http://archive.cloudera.com/cdh5/cdh/5/sqoop2-1.99.5-cdh5.11.0.tar.gz}
 
 SQOOP_TGZ=$(basename $SQOOP_URL)
 SQOOP_VERSION=${SQOOP_TGZ/.tar.gz/}

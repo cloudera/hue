@@ -22,20 +22,21 @@ from django.contrib.auth.models import Group
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
+%if not is_embeddable:
 ${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
+%endif
 ${layout.menubar(section='permissions')}
 
-<div class="container-fluid">
+<div id="permissionsComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Permissions')}</h1>
     <%actionbar:render>
       <%def name="search()">
-          <input id="filterInput" type="text" class="input-xlarge search-query"
-                 placeholder="${_('Search for application, group, etc...')}">
+          <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for application, group, etc...')}">
       </%def>
     </%actionbar:render>
 
-    <table class="table table-striped table-condensed datatables">
+    <table class="table table-condensed datatables">
       <thead>
       <tr>
         <th>${_('Application')}</th>
@@ -74,10 +75,10 @@ ${layout.menubar(section='permissions')}
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
-  var mainDataTable;
+<script type="text/javascript">
   $(document).ready(function () {
-    mainDataTable = $(".datatables").dataTable({
+    var $permissionsComponents = $('#permissionsComponents');
+    var dt = $permissionsComponents.find(".datatables").dataTable({
       "bPaginate": false,
       "bLengthChange": false,
       "bInfo": false,
@@ -93,13 +94,25 @@ ${layout.menubar(section='permissions')}
       }
     });
 
-    $(".dataTables_wrapper").css("min-height", "0");
-    $(".dataTables_filter").hide();
+    $permissionsComponents.find(".filter-input").jHueDelayedInput(function () {
+      if (dt) {
+        dt.fnFilter($permissionsComponents.find(".filter-input").val().toLowerCase());
+      }
+    });
 
-    $("a[data-row-selector='true']").jHueRowSelector();
+    $permissionsComponents.find('[data-rel="tooltip"]').tooltip({
+      placement: 'right'
+    });
+
+    $permissionsComponents.find(".dataTables_wrapper").css("min-height", "0");
+    $permissionsComponents.find(".dataTables_filter").hide();
+
+    $permissionsComponents.find("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
 
 ${layout.commons()}
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

@@ -14,48 +14,50 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter, antixss
 from django.template.defaultfilters import date, time
 from django.utils.translation import ugettext as _
+
+from desktop.views import commonheader, commonfooter, antixss
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
+
+%if not is_embeddable:
 ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
+%endif
+
 ${layout.menubar(section='users')}
 
-<div class="container-fluid">
+<div id="usersComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users')}</h1>
 
     <%actionbar:render>
       <%def name="search()">
-          <input id="filterInput" type="text" class="input-xlarge search-query"
-                 placeholder="${_('Search for name, group, etc...')}">
+          <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, group, etc...')}">
       </%def>
       <%def name="actions()">
         %if user.is_superuser:
-            <button id="deleteUserBtn" class="btn" title="${_('Delete')}" disabled="disabled"><i
-                class="fa fa-trash-o"></i> ${_('Delete')}</button>
+            <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
         %if user.is_superuser:
             % if not is_ldap_setup:
-                <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
+              <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
             %endif
 
             % if is_ldap_setup:
-            <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i
-                class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
+            <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
             <a href="javascript:void(0)" class="btn confirmationModal"
-               data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }"><i
+               data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}"><i
                 class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}</a>
             % endif
 
-            <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/" class="btn"
-              title="${ ('Learn how to integrate Hue with your company') }" target="_blank">
-              <i class="fa fa-question-circle"></i> LDAP
+            <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/"
+              title="${ _('Learn how to integrate Hue with your company LDAP') }" target="_blank">
+              <i class="fa fa-question-circle"></i>
             </a>
         %endif
       </%def>
@@ -66,7 +68,7 @@ ${layout.menubar(section='users')}
       <tr>
         %if user.is_superuser:
             <th width="1%">
-              <div id="selectAll" class="hueCheckbox fa"></div>
+              <div class="select-all hueCheckbox fa"></div>
             </th>
         %endif
         <th>${_('Username')}</th>
@@ -117,41 +119,47 @@ ${layout.menubar(section='users')}
 
   <div id="syncLdap" class="modal hide fade"></div>
 
-  <div id="deleteUser" class="modal hide fade">
-    <form id="dropTableForm" action="${ url('useradmin.views.delete_user') }" method="POST">
+  <div class="modal hide fade delete-user">
+    <form action="${ url('useradmin.views.delete_user') }" method="POST">
       ${ csrf_token(request) | n,unicode }
+      % if is_embeddable:
+        <input type="hidden" value="true" name="is_embeddable" />
+      % endif
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-
-        <h3 id="deleteUserMessage">${ _("Are you sure you want to delete the selected user(s)?") }</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+        <h2 class="modal-title">${ _("Are you sure you want to delete the selected user(s)?") }</h2>
       </div>
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
         <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
       <div class="hide">
-        <select name="user_ids" data-bind="options: availableUsers, selectedOptions: chosenUsers"
-                multiple="true"></select>
+        <select name="user_ids" data-bind="options: availableUsers, selectedOptions: chosenUsers" multiple="true"></select>
       </div>
     </form>
+  </div>
+
+  <div class="modal hide fade sync-ldap">
   </div>
 
 </div>
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
-  var viewModel = {
-    availableUsers: ko.observableArray(${ users_json | n,antixss }),
-    chosenUsers: ko.observableArray([])
-  };
-  var mainDataTable;
+<script type="text/javascript">
+
   $(document).ready(function () {
+    var $usersComponents = $('#usersComponents');
+    $(document).off('click', '#usersComponents .userCheck');
 
-    ko.applyBindings(viewModel);
+    var viewModel = {
+      availableUsers: ko.observableArray(${ users_json | n,antixss }),
+      chosenUsers: ko.observableArray([])
+    };
 
-    mainDataTable = $(".datatables").dataTable({
+    ko.applyBindings(viewModel, $usersComponents[0]);
+
+    var dt = $usersComponents.find('.datatables').dataTable({
       "sPaginationType":"bootstrap",
       "iDisplayLength":100,
       "bLengthChange":false,
@@ -175,10 +183,33 @@ ${layout.menubar(section='users')}
       }
     });
 
-    $(".dataTables_wrapper").css("min-height", "0");
-    $(".dataTables_filter").hide();
+    $usersComponents.find(".filter-input").jHueDelayedInput(function () {
+      if (dt) {
+        dt.fnFilter($usersComponents.find(".filter-input").val().toLowerCase());
+      }
+    });
 
-    $(".confirmationModal").click(function () {
+    $usersComponents.find('[data-rel="tooltip"]').tooltip({
+      placement: 'right'
+    });
+
+    % if is_embeddable:
+    $usersComponents.find('.delete-user form').ajaxForm({
+      dataType:  'json',
+      success: function(data) {
+        if (data && data.url){
+          huePubSub.publish('open.link', data.url);
+        }
+        $.jHueNotify.info("${ _('The users were deleted.') }")
+        $usersComponents.find(".delete-user").modal("hide");
+      }
+    });
+    % endif
+
+    $usersComponents.find(".dataTables_wrapper").css("min-height", "0");
+    $usersComponents.find(".dataTables_filter").hide();
+
+    $usersComponents.find(".confirmationModal").click(function () {
       var _this = $(this);
       $.ajax({
         url: _this.data("confirmation-url"),
@@ -187,25 +218,40 @@ ${layout.menubar(section='users')}
         },
         dataType: "html",
         success: function (data) {
-          $("#deleteUser").html(data);
-          $("#deleteUser").modal("show");
+          $usersComponents.find(".sync-ldap").html(data);
+          % if is_embeddable:
+          $usersComponents.find('.sync-ldap form').ajaxForm({
+            dataType:  'json',
+            success: function(data) {
+              if (data && data.status == -1) {
+                renderUseradminErrors(data.errors);
+              }
+              else if (data && data.url) {
+                huePubSub.publish('open.link', data.url);
+                $.jHueNotify.info("${ _('The users and groups were update correctly.') }")
+                $usersComponents.find(".sync-ldap").modal("hide");
+              }
+            }
+          });
+          % endif
+          $usersComponents.find(".sync-ldap").modal("show");
         }
       });
     });
 
-    $("#selectAll").click(function () {
+    $usersComponents.find(".select-all").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked").removeClass("fa-check");;
-        $(".userCheck").removeClass("fa-check").removeAttr("checked");
+        $usersComponents.find(".userCheck").removeClass("fa-check").removeAttr("checked");
       }
       else {
         $(this).attr("checked", "checked").addClass("fa-check");
-        $(".userCheck").addClass("fa-check").attr("checked", "checked");
+        $usersComponents.find(".userCheck").addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
-    $(".userCheck").click(function () {
+    $(document).on('click', '#usersComponents .userCheck', function () {
       if ($(this).attr("checked")) {
         $(this).removeClass("fa-check").removeAttr("checked");
       }
@@ -216,28 +262,30 @@ ${layout.menubar(section='users')}
     });
 
     function toggleActions() {
-      if ($(".userCheck[checked='checked']").length >= 1) {
-        $("#deleteUserBtn").removeAttr("disabled");
+      if ($usersComponents.find(".userCheck[checked='checked']").length >= 1) {
+        $usersComponents.find(".delete-user-btn").removeAttr("disabled");
       }
       else {
-        $("#deleteUserBtn").attr("disabled", "disabled");
+        $usersComponents.find(".delete-user-btn").attr("disabled", "disabled");
       }
     }
 
-    $("#deleteUserBtn").click(function () {
+    $usersComponents.find(".delete-user-btn").click(function () {
       viewModel.chosenUsers.removeAll();
 
-      $(".hueCheckbox[checked='checked']").each(function (index) {
+      $usersComponents.find(".hueCheckbox[checked='checked']").each(function (index) {
         viewModel.chosenUsers.push($(this).data("id"));
       });
 
-      $("#deleteUser").modal("show");
+      $usersComponents.find(".delete-user").modal("show");
     });
 
-    $("a[data-row-selector='true']").jHueRowSelector();
+    $usersComponents.find("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
 
 ${layout.commons()}
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

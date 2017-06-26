@@ -34,7 +34,6 @@
           dialect: 'hive',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -47,7 +46,7 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          containsKeywords: ['ANALYZE'],
+          containsKeywords: ['ANALYZE TABLE'],
           expectedResult: {
             lowerCase: false
           }
@@ -58,6 +57,32 @@
         assertAutoComplete({
           beforeCursor: 'analyze ',
           afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: true,
+            suggestKeywords: ['TABLE']
+          }
+        });
+      });
+
+      it('should suggest keywords for "analyze | tbl"', function() {
+        assertAutoComplete({
+          beforeCursor: 'analyze ',
+          afterCursor: ' tbl',
+          dialect: 'hive',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: true,
+            suggestKeywords: ['TABLE']
+          }
+        });
+      });
+
+      it('should suggest keywords for "analyze tab| tbl"', function() {
+        assertAutoComplete({
+          beforeCursor: 'analyze tab',
+          afterCursor: ' tbl',
           dialect: 'hive',
           noErrors:true,
           expectedResult: {
@@ -100,7 +125,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'COMPUTE STATISTICS']
@@ -114,7 +138,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['COMPUTE STATISTICS']
@@ -128,7 +151,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['STATISTICS']
@@ -142,7 +164,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FOR COLUMNS', 'CACHE METADATA', 'NOSCAN']
@@ -156,7 +177,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['COLUMNS']
@@ -170,7 +190,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['CACHE METADATA', 'NOSCAN']
@@ -184,7 +203,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['METADATA']
@@ -198,7 +216,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NOSCAN']
@@ -212,7 +229,6 @@
           afterCursor: ' NOSCAN',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FOR COLUMNS', 'CACHE METADATA']
@@ -226,7 +242,6 @@
           afterCursor: ' NOSCAN',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['METADATA']
@@ -240,7 +255,6 @@
           afterCursor: ' NOSCAN',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['CACHE METADATA']
@@ -256,7 +270,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -270,7 +283,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -284,7 +296,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -314,6 +325,45 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INCREMENTAL STATS', 'STATS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE | tbl"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE ',
+          afterCursor: ' tbl',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['INCREMENTAL STATS', 'STATS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE foo| tbl"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE foo',
+          afterCursor: ' tbl',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['INCREMENTAL STATS', 'STATS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "COMPUTE INCREMENTAL | tbl"', function() {
+        assertAutoComplete({
+          beforeCursor: 'COMPUTE INCREMENTAL ',
+          afterCursor: ' tbl',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['STATS']
           }
         });
       });
@@ -391,7 +441,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION']
@@ -404,7 +453,6 @@
           beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl PARTITION (',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
@@ -417,7 +465,6 @@
           beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl PARTITION (bla = 1, ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
@@ -447,7 +494,6 @@
           dialect: 'impala',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -460,7 +506,7 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors:true,
-          containsKeywords: ['INVALIDATE'],
+          containsKeywords: ['INVALIDATE METADATA'],
           expectedResult: {
             lowerCase: false
           }
@@ -471,6 +517,32 @@
         assertAutoComplete({
           beforeCursor: 'INVALIDATE ',
           afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['METADATA']
+          }
+        });
+      });
+
+      it('should suggest keywords for "INVALIDATE | tbl"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INVALIDATE ',
+          afterCursor: ' tbl',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['METADATA']
+          }
+        });
+      });
+
+      it('should suggest keywords for "INVALIDATE meta| tbl"', function() {
+        assertAutoComplete({
+          beforeCursor: 'INVALIDATE meta',
+          afterCursor: ' tbl',
           dialect: 'impala',
           noErrors:true,
           expectedResult: {
@@ -516,7 +588,6 @@
           dialect: 'impala',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }

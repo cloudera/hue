@@ -14,65 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function linkWidgets(fromId, toId) {
-  var _from = $("#wdg_" + (typeof fromId == "function" ? fromId() : fromId));
-  var _to = $("#wdg_" + (typeof toId == "function" ? toId() : toId));
-  if (_from.length > 0 && _to.length > 0) {
-    var _fromCenter = {
-      x: _from.position().left + _from.outerWidth() / 2,
-      y: _from.position().top + _from.outerHeight() + 3
-    }
-
-    var _toCenter = {
-      x: _to.position().left + _to.outerWidth() / 2,
-      y: _to.position().top - 5
-    }
-
-    var _curveCoords = {};
-
-    if (_fromCenter.x == _toCenter.x) {
-      _curveCoords.x = _fromCenter.x;
-      _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
-    } else {
-      if (_fromCenter.x > _toCenter.x) {
-        _fromCenter.x = _fromCenter.x - 5;
-        _toCenter.x = _toCenter.x + 5;
-      } else {
-        _fromCenter.x = _fromCenter.x + 5;
-        _toCenter.x = _toCenter.x - 5;
-      }
-      _curveCoords.x = _fromCenter.x - (_fromCenter.x - _toCenter.x) / 4;
-      _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
-    }
-
-    $(document.body).curvedArrow({
-      p0x: _fromCenter.x,
-      p0y: _fromCenter.y,
-      p1x: _curveCoords.x,
-      p1y: _curveCoords.y,
-      p2x: _toCenter.x,
-      p2y: _toCenter.y,
-      lineWidth: 2,
-      size: 10,
-      strokeStyle: viewModel.isEditing() ? '#e5e5e5' : '#dddddd'
-    });
-  }
-}
-
-function drawArrows() {
-  $("canvas").remove();
-  if (viewModel.oozieColumns()[0].rows().length > 3) {
-    var _links = viewModel.workflow.linkMapping();
-    Object.keys(_links).forEach(function (id) {
-      if (_links[id].length > 0) {
-        _links[id].forEach(function (nextId) {
-          linkWidgets(id, nextId);
-        });
-      }
-    });
-  }
-}
-
 function toggleProperties(widget) {
   if (widget.oozieMovable()) {
     var _el = $("#wdg_" + widget.id());

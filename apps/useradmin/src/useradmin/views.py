@@ -60,28 +60,39 @@ __groups_lock = threading.Lock()
 
 def list_users(request):
   is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
+
   return render("list_users.mako", request, {
       'users': User.objects.all(),
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
       'request': request,
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup
   })
 
 
 def list_groups(request):
   is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
+
   return render("list_groups.mako", request, {
       'groups': Group.objects.all(),
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup
   })
 
 
 def list_permissions(request):
-  return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
+  return render("list_permissions.mako", request, {
+    'permissions': HuePermission.objects.all(),
+    'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
 
 def list_configurations(request):
-  return render("list_configurations.mako", request, {})
+  return render("list_configurations.mako", request, {
+    'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
 
 def list_for_autocomplete(request):
   if request.ajax:
@@ -120,7 +131,9 @@ def massage_users_for_json(users, extended=False):
       'username': user.username,
       'first_name': user.first_name,
       'last_name': user.last_name,
-      'email': user.email
+      'email': user.email,
+      'last_login': user.last_login,
+      'editURL': reverse('useradmin.views.edit_user', kwargs={'username': user.username})
     }
     if extended:
       appendable['groups'] = massage_groups_for_json(user.groups.all())
@@ -173,8 +186,14 @@ def delete_user(request):
   finally:
     __users_lock.release()
 
-  request.info(_('The users were deleted.'))
-  return redirect(reverse(list_users))
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
+  if is_embeddable:
+    return JsonResponse({'url': '/hue' + reverse(list_users)})
+  else:
+    request.info(_('The users were deleted.'))
+    return redirect(reverse(list_users))
+
 
 
 def delete_group(request):
@@ -196,12 +215,17 @@ def delete_group(request):
         raise PopupException(_("The default user group may not be deleted."), error_code=401)
       Group.objects.filter(name__in=group_names).delete()
 
-      request.info(_('The groups were deleted.'))
       request.audit = {
         'operation': 'DELETE_GROUP',
         'operationText': 'Deleted Group(s): %s' % ', '.join(group_names)
       }
-      return redirect(reverse(list_groups))
+      is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
+      if is_embeddable:
+        return JsonResponse({'url': '/hue' + reverse(list_groups)})
+      else:
+        request.info(_('The groups were deleted.'))
+        return redirect(reverse(list_groups))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."), error_code=404)
   else:
@@ -235,6 +259,8 @@ def edit_user(request, username=None):
     raise PopupException(_("You must be a superuser to add or edit another user."), error_code=401)
 
   userprofile = get_profile(request.user)
+  updated = False
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if username is not None:
     instance = User.objects.get(username=username)
@@ -262,6 +288,9 @@ def edit_user(request, username=None):
         if request.user.username == username and not form.instance.is_active:
           raise PopupException(_("You cannot make yourself inactive."), error_code=401)
 
+        # user changing his own information, form.changed_data=['ensure_home_directory', 'language'] or changing information about another user, form.changed_data=['ensure_home_directory']
+        updated = (request.user.username == username and len(form.changed_data) > 2) or (request.user.username != username and len(form.changed_data) > 1)
+
         global __users_lock
         __users_lock.acquire()
         try:
@@ -276,7 +305,6 @@ def edit_user(request, username=None):
 
           # All ok
           form.save()
-          request.info(_('User information updated'))
 
           # Unlock account if selected
           if form.cleaned_data.get('unlock_account'):
@@ -294,13 +322,19 @@ def edit_user(request, username=None):
       # Ensure home directory is created, if necessary.
       if form.cleaned_data.get('ensure_home_directory'):
         try:
-          ensure_home_directory(request.fs, instance.username)
+          ensure_home_directory(request.fs, instance)
         except (IOError, WebHdfsException), e:
           request.error(_('Cannot make home directory for user %s.') % instance.username)
+        else:
+          updated = True
 
-      # Change langugage preference, if necessary
+      # Change language preference, if necessary
       if form.cleaned_data.get('language') and form.cleaned_data.get('language') != get_language():
         request.session['django_language'] = form.cleaned_data.get('language')
+        updated = True
+
+      if updated and not is_embeddable:
+        request.info(_('User information updated'))
 
       # Audit log
       if username is not None:
@@ -323,9 +357,15 @@ def edit_user(request, username=None):
         else:
           return redirect(reverse('desktop.views.home'))
       elif request.user.is_superuser:
-        return redirect(reverse(list_users))
+        if is_embeddable:
+          return JsonResponse({'url': '/hue' + reverse(list_users)})
+        else:
+          return redirect(reverse(list_users))
       else:
-        return redirect(reverse(edit_user, kwargs={'username': username}))
+        if is_embeddable:
+          return JsonResponse({'url': '/hue' + reverse(edit_user, kwargs={'username': username})})
+        else:
+          return redirect(reverse(edit_user, kwargs={'username': username}))
   else:
     # Initialize form values
     default_user_group = get_default_user_group()
@@ -340,9 +380,20 @@ def edit_user(request, username=None):
       form.fields.pop("password_old")
 
   if require_change_password(userprofile):
-    return render('change_password.mako', request, dict(form=form, username=username))
+    return render('change_password.mako', request, {
+      'form': form,
+      'username': username,
+      'is_embeddable': is_embeddable
+    })
   else:
-    return render('edit_user.mako', request, dict(form=form, username=username))
+    if request.method == 'POST' and is_embeddable:
+      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+    else:
+      return render('edit_user.mako', request, {
+        'form': form,
+        'username': username,
+        'is_embeddable': is_embeddable
+      })
 
 
 def view_user(request, username):  
@@ -379,11 +430,12 @@ def edit_group(request, name=None):
   else:
     instance = None
 
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
   if request.method == 'POST':
     form = GroupEditForm(request.POST, instance=instance)
     if form.is_valid():
       form.save()
-      request.info(_('Group information updated'))
 
       # Audit log
       if name is not None:
@@ -400,11 +452,24 @@ def edit_group(request, name=None):
           'operationText': 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
         }
 
-      return redirect(reverse(list_groups))
+      if is_embeddable:
+        return JsonResponse({'url': '/hue' + reverse(list_groups)})
+      else:
+        request.info(_('Group information updated'))
+        return redirect('/useradmin/groups')
   else:
     form = GroupEditForm(instance=instance)
 
-  return render('edit_group.mako', request, dict(form=form, action=request.path, name=name))
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render('edit_group.mako', request, {
+      'form': form,
+      'action': request.path,
+      'name': name,
+      'is_embeddable': is_embeddable,
+    })
 
 
 def edit_permission(request, app=None, priv=None):
@@ -429,22 +494,35 @@ def edit_permission(request, app=None, priv=None):
     raise PopupException(_("You must be a superuser to change permissions."), error_code=401)
 
   instance = HuePermission.objects.get(app=app, action=priv)
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = PermissionsEditForm(request.POST, instance=instance)
     if form.is_valid():
       form.save()
-      request.info(_('Permission information updated'))
       request.audit = {
         'operation': 'EDIT_PERMISSION',
         'operationText': 'Successfully edited permissions: %(app)s/%(priv)s' % {'app': app, 'priv': priv}
       }
 
-      return redirect(reverse(list_permissions))
+      if is_embeddable:
+        return JsonResponse({'url': '/hue' + reverse(list_permissions)})
+      else:
+        request.info(_('Permission information updated'))
+        return redirect(reverse(list_permissions))
   else:
     form = PermissionsEditForm(instance=instance)
-
-  return render('edit_permissions.mako', request, dict(form=form, action=request.path, app=app, priv=priv))
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render('edit_permissions.mako', request, {
+      'form': form,
+      'action': request.path,
+      'app': app,
+      'priv': priv,
+      'is_embeddable': is_embeddable,
+    })
 
 
 def add_ldap_users(request):
@@ -463,6 +541,8 @@ def add_ldap_users(request):
       'allowed': False,
     }
     raise PopupException(_("You must be a superuser to add another user."), error_code=401)
+
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = AddLdapUsersForm(request.POST)
@@ -483,7 +563,7 @@ def add_ldap_users(request):
       if users and form.cleaned_data['ensure_home_directory']:
         for user in users:
           try:
-            ensure_home_directory(request.fs, user.username)
+            ensure_home_directory(request.fs, user)
           except (IOError, WebHdfsException), e:
             request.error(_("Cannot make home directory for user %s.") % user.username)
 
@@ -500,11 +580,18 @@ def add_ldap_users(request):
           unique_users = set(failed_ldap_users)
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-        return redirect(reverse(list_users))
+        if is_embeddable:
+          return JsonResponse({'status': 0})
+        else:
+          return redirect(reverse(list_users))
   else:
     form = AddLdapUsersForm()
 
-  return render('add_ldap_users.mako', request, dict(form=form))
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render('add_ldap_users.mako', request, dict(form=form, is_embeddable=is_embeddable))
 
 
 def add_ldap_groups(request):
@@ -524,6 +611,8 @@ def add_ldap_groups(request):
       'allowed': False,
     }
     raise PopupException(_("You must be a superuser to add another group."), error_code=401)
+
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = AddLdapGroupsForm(request.POST)
@@ -554,7 +643,7 @@ def add_ldap_groups(request):
             unique_users.add(user)
         for user in unique_users:
           try:
-            ensure_home_directory(request.fs, user.username)
+            ensure_home_directory(request.fs, user)
           except (IOError, WebHdfsException), e:
             raise PopupException(_("Exception creating home directory for LDAP user %s in group %s.") % (user, group), detail=e)
 
@@ -576,7 +665,11 @@ def add_ldap_groups(request):
   else:
     form = AddLdapGroupsForm()
 
-  return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True))
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True, is_embeddable=is_embeddable))
 
 
 def sync_ldap_users_groups(request):
@@ -594,6 +687,8 @@ def sync_ldap_users_groups(request):
       'allowed': False
     }
     raise PopupException(_("You must be a superuser to sync the LDAP users/groups."), error_code=401)
+
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = SyncLdapUsersGroupsForm(request.POST)
@@ -616,11 +711,18 @@ def sync_ldap_users_groups(request):
         unique_users = set(failed_ldap_users)
         request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-      return redirect(reverse(list_users))
+      if is_embeddable:
+        return JsonResponse({'url': '/hue' + reverse(list_users)})
+      else:
+        return redirect(reverse(list_users))
   else:
     form = SyncLdapUsersGroupsForm()
 
-  return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form))
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form, is_embeddable=is_embeddable))
 
 
 def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=None, failed_users=None):
@@ -635,7 +737,7 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
   if is_ensuring_home_directory:
     for user in users:
       try:
-        ensure_home_directory(fs, user.username)
+        ensure_home_directory(fs, user)
       except (IOError, WebHdfsException), e:
         raise PopupException(_("The import may not be complete, sync again."), detail=e)
 
@@ -677,14 +779,18 @@ def sync_ldap_groups(connection, failed_users=None):
   return groups
 
 
-def ensure_home_directory(fs, username):
+def ensure_home_directory(fs, user):
   """
   Adds a users home directory if it doesn't already exist.
 
   Throws IOError, WebHdfsException.
   """
-  home_dir = '/user/%s' % username
-  fs.do_as_user(username, fs.create_home_dir, home_dir)
+  userprofile = get_profile(user)
+
+  if userprofile is not None and userprofile.home_directory:
+    fs.do_as_user(user.username, fs.create_home_dir, userprofile.home_directory)
+  else:
+    LOG.warn("Not creating home directory of %s as his profile is empty" % user)
 
 
 def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):

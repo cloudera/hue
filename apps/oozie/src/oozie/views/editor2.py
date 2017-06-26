@@ -64,7 +64,7 @@ def list_editor_workflows(request):
     workflows.extend(workflows_v1)
 
   return render('editor2/list_editor_workflows.mako', request, {
-      'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML)
+    'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
   })
 
 
@@ -118,12 +118,7 @@ def _edit_workflow(request, doc, workflow):
       'doc_uuid': doc.uuid if doc else '',
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
       'can_edit_json': json.dumps(can_edit_json),
-      'history_json': json.dumps([{
-          'history': hist.data_dict.get('history', {}),
-          'id': hist.id,
-          'expanded': False,
-          'date': hist.last_modified.strftime('%Y-%m-%dT%H:%M')
-        } for hist in doc.get_history()] if doc else [], cls=JSONEncoderForHTML)
+      'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
@@ -407,9 +402,13 @@ def _submit_workflow_helper(request, workflow, submit_action):
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
       except Exception, e:
-        raise PopupException(_('Workflow submission failed'), detail=smart_str(e))
-      request.info(_('Workflow submitted'))
-      return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+        raise PopupException(_('Workflow submission failed'), detail=smart_str(e), error_code=200)
+      jsonify = request.POST.get('format') == 'json'
+      if jsonify:
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'workflow'}, safe=False)
+      else:
+        request.info(_('Workflow submitted'))
+        return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
@@ -424,7 +423,8 @@ def _submit_workflow_helper(request, workflow, submit_action):
                      'action': submit_action,
                      'show_dryrun': True,
                      'email_id': request.user.email,
-                     'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user)
+                     'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user),
+                     'return_json': request.GET.get('format') == 'json'
                    }, force_template=True).content
     return JsonResponse(popup, safe=False)
 
@@ -464,7 +464,7 @@ def list_editor_coordinators(request):
     coordinators.extend(coordinators_v1)
 
   return render('editor2/list_editor_coordinators.mako', request, {
-      'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML)
+    'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
   })
 
 
@@ -518,12 +518,14 @@ def edit_coordinator(request):
     workflows = [dict([('uuid', d.uuid), ('name', d.name)])
                       for d in Document2.objects.documents(request.user, include_managed=False).search_documents(types=['oozie-workflow2'])]
 
+  can_edit_json = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
   if request.GET.get('format') == 'json': # For Editor
     return JsonResponse({
       'coordinator': coordinator.get_data_for_json(),
       'credentials': credentials.credentials.keys(),
       'workflows': workflows,
       'doc_uuid': doc.uuid if doc else '',
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'can_edit': doc is None or doc.doc.get().is_editable(request.user),
       'layout': django_mako.render_to_string('editor2/common_scheduler.mako', {'coordinator_json': coordinator.to_json_for_html()})
     })
@@ -533,7 +535,8 @@ def edit_coordinator(request):
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+      'is_embeddable': request.GET.get('is_embeddable', False),
+      'can_edit_json': json.dumps(can_edit_json)
   })
 
 
@@ -591,7 +594,13 @@ def save_coordinator(request):
   if coordinator_data.get('id'):
     coordinator_doc = Document2.objects.get(id=coordinator_data['id'])
   else:
-    coordinator_doc = Document2.objects.create(name=coordinator_data['name'], uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user, is_managed=coordinator_data.get('isManaged'))
+    coordinator_doc = Document2.objects.create(
+        name=coordinator_data['name'],
+        uuid=coordinator_data['uuid'],
+        type='oozie-coordinator2',
+        owner=request.user,
+        is_managed=coordinator_data.get('isManaged')
+    )
     Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
 
   scheduled_id = coordinator_data['properties']['workflow'] or coordinator_data['properties']['document']
@@ -664,7 +673,7 @@ def submit_coordinator(request, doc_id):
       jsonify = request.POST.get('format') == 'json'
       job_id = _submit_coordinator(request, coordinator, mapping)
       if jsonify:
-        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'schedule'}, safe=False)
       else:
         request.info(_('Coordinator submitted.'))
         return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
@@ -699,7 +708,7 @@ def _submit_coordinator(request, coordinator, mapping):
     return job_id
   except RestException, ex:
     LOG.exception('Error submitting coordinator')
-    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex))
+    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)
 
 
 @check_editor_access_permission
@@ -715,7 +724,7 @@ def list_editor_bundles(request):
     bundles.extend(bundles_v1)
 
   return render('editor2/list_editor_bundles.mako', request, {
-      'bundles_json': json.dumps(bundles, cls=JSONEncoderForHTML)
+    'bundles_json': json.dumps(bundles, cls=JSONEncoderForHTML),
   })
 
 
@@ -739,11 +748,13 @@ def edit_bundle(request):
     coordinators = [dict([('id', d.content_object.id), ('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
+  can_edit_json = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
   return render('editor2/bundle_editor.mako', request, {
       'bundle_json': bundle.to_json_for_html(),
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+      'is_embeddable': request.GET.get('is_embeddable', False),
+      'can_edit_json': json.dumps(can_edit_json)
   })
 
 
@@ -837,8 +848,12 @@ def submit_bundle(request, doc_id):
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       job_id = _submit_bundle(request, bundle, mapping)
 
-      request.info(_('Bundle submitted.'))
-      return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
+      jsonify = request.POST.get('format') == 'json'
+      if jsonify:
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'bundle'}, safe=False)
+      else:
+        request.info(_('Bundle submitted.'))
+        return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
@@ -850,6 +865,7 @@ def submit_bundle(request, doc_id):
                  'params_form': params_form,
                  'name': bundle.name,
                  'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
+                 'return_json': request.GET.get('format') == 'json',
                  'show_dryrun': False
                 }, force_template=True).content
   return JsonResponse(popup, safe=False)
@@ -884,4 +900,4 @@ def _submit_bundle(request, bundle, properties):
     return job_id
   except RestException, ex:
     LOG.exception('Error submitting bundle')
-    raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex))
+    raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)

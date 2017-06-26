@@ -1,0 +1,79 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+@import (reference) "hue-mixins.less";
+
+.dashboard-admin {
+  .search-bar {
+    background-color: @cui-gray-050;
+    border-bottom: 1px solid @cui-gray-200;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+    margin: 0;
+    margin-bottom: 20px;
+    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: left;
+  }
+
+  .search-bar h4 {
+    font-size: 20px !important;
+    color: @hue-primary-color-dark !important;
+    padding: 0 !important;
+    margin-top: 4px !important;
+    margin-left: 20px;
+    border: none !important;
+    max-width: none !important;
+  }
+
+  #collections {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  .coll-heading {
+    position: relative;
+    top: 10px;
+  }
+
+  .placeholder {
+    background-color: @cui-gray-050;
+    border: 1px solid @cui-gray-200;
+    height: 40px;
+  }
+
+  .collection-actions {
+    cursor: pointer;
+    margin: 10px 10px 0 0;
+  }
+
+  .waiting {
+    font-size: 196px;
+    color: @cui-gray-300;
+  }
+
+  h1.emptyMessage {
+    margin-top: 50px;
+    color: @cui-gray-500;
+    line-height: 60px;
+  }
+}

@@ -36,15 +36,24 @@ urlpatterns = patterns('metadata.navigator_api',
 
 # Optimizer API
 urlpatterns += patterns('metadata.optimizer_api',
-  url(r'^api/optimizer_api/upload_history/?$', 'upload_history', name='upload_history'),
-  url(r'^api/optimizer_api/popular_values/?$', 'popular_values', name='popular_values'),
-  url(r'^api/optimizer_api/similar_queries/?$', 'similar_queries', name='similar_queries'),
+  url(r'^api/optimizer/upload/history/?$', 'upload_history', name='upload_history'),
+  url(r'^api/optimizer/upload/query/?$', 'upload_query', name='upload_query'),
+  url(r'^api/optimizer/upload/table_stats/?$', 'upload_table_stats', name='upload_table_stats'),
+  url(r'^api/optimizer/upload/status/?$', 'upload_status', name='upload_status'),
 
   #v2
-  url(r'^api/optimizer_api/get_tenant/?$', 'get_tenant', name='get_tenant'),
+  url(r'^api/optimizer/get_tenant/?$', 'get_tenant', name='get_tenant'),
 
-  url(r'^api/optimizer_api/top_tables/?$', 'top_tables', name='top_tables'),
-  url(r'^api/optimizer_api/table_details/?$', 'table_details', name='table_details'),
-  url(r'^api/optimizer_api/query_risk/?$', 'query_risk', name='query_risk'),
-  url(r'^api/optimizer_api/query_compatibility/?$', 'query_compatibility', name='query_compatibility'),
+  url(r'^api/optimizer/top_databases/?$', 'top_databases', name='top_databases'),
+  url(r'^api/optimizer/top_tables/?$', 'top_tables', name='top_tables'),
+  url(r'^api/optimizer/top_columns/?$', 'top_columns', name='top_columns'),
+  url(r'^api/optimizer/top_joins/?$', 'top_joins', name='top_joins'),
+  url(r'^api/optimizer/top_filters/?$', 'top_filters', name='top_filters'),
+  url(r'^api/optimizer/top_aggs/?$', 'top_aggs', name='top_aggs'),
+
+  url(r'^api/optimizer/table_details/?$', 'table_details', name='table_details'),
+
+  url(r'^api/optimizer/query_risk/?$', 'query_risk', name='query_risk'),
+  url(r'^api/optimizer/query_compatibility/?$', 'query_compatibility', name='query_compatibility'),
+  url(r'^api/optimizer/similar_queries/?$', 'similar_queries', name='similar_queries'),
 )

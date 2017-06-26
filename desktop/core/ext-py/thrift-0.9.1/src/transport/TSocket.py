@@ -83,6 +83,10 @@ class TSocket(TSocketBase):
       res0 = self._resolveAddr()
       for res in res0:
         self.handle = socket.socket(res[0], res[1])
+        # check and turn on TCP Keepalive
+        sockprops = self.handle.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
+        if (sockprops == 0):
+          sockprops = self.handle.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         self.handle.settimeout(self._timeout)
         try:
           self.handle.connect(res[4])
@@ -167,6 +171,10 @@ class TServerSocket(TSocketBase, TServerTransportBase):
           os.unlink(res[4])
 
     self.handle = socket.socket(res[0], res[1])
+    # check and turn on TCP Keepalive
+    sockprops = self.handle.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
+    if (sockprops == 0):
+      sockprops = self.handle.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
     self.handle.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     if hasattr(self.handle, 'settimeout'):
       self.handle.settimeout(None)

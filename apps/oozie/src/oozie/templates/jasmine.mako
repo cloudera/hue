@@ -18,7 +18,7 @@
 <%inherit file="common_jasmine.mako"/>
 
 <%block name="specs">
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     require(['jasmine-boot', 'jasmine', 'knockout'], function (boot, jasmine, ko) {
       window.ko = ko;
       $.when(

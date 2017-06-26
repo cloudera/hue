@@ -20,9 +20,13 @@ import json
 
 from datetime import datetime
 
-from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal
+from nose.plugins.skip import SkipTest
+from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal, assert_raises
 from django.contrib.auth.models import User
+from django.core import management
+from django.db.utils import OperationalError
 
+from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document2
@@ -133,6 +137,7 @@ class TestDocument2(object):
     source_dir = Directory.objects.create(name='test_mv_file_src', owner=self.user, parent_directory=self.home_dir)
     target_dir = Directory.objects.create(name='test_mv_file_dst', owner=self.user, parent_directory=self.home_dir)
     doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=source_dir)
+    orig_last_modified = doc.last_modified
 
     # Verify original paths before move operation
     response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
@@ -158,6 +163,10 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
     assert_equal('/test_mv_file_dst/query1.sql', data['document']['path'])
+
+    # Verify that last_modified is intact
+    doc = Document2.objects.get(id = doc.id)
+    assert_equal(orig_last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
 
   def test_directory_move(self):
@@ -277,9 +286,11 @@ class TestDocument2(object):
     assert_equal(0, data['count'])
 
     # Delete query2.sql
+    assert_false(Document2.objects.get(uuid=query.uuid).is_trashed)
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(query.uuid)})
     data = json.loads(response.content)
     assert_equal(0, data['status'])
+    assert_true(Document2.objects.get(uuid=query.uuid).is_trashed)
 
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
@@ -287,9 +298,11 @@ class TestDocument2(object):
     assert_equal(data['children'][0]['uuid'], query.uuid)
 
     # Delete test_dir directory w/ contents
+    assert_false(Document2.objects.get(uuid=dir.uuid).is_trashed)
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(dir.uuid)})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
+    assert_true(Document2.objects.get(uuid=dir.uuid).is_trashed)
 
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
@@ -313,15 +326,6 @@ class TestDocument2(object):
     assert_true('children' in data)
     assert_equal(1, data['count'])
     assert_equal(Document2.TRASH_DIR, data['children'][0]['name'])
-
-
-  def test_validate_name(self):
-    # Test invalid names
-    invalid_name = '/invalid'
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps(invalid_name)})
-    data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_true("contains some special characters: [u'/']" in data['message'])
 
 
   def test_validate_immutable_user_directories(self):
@@ -398,6 +402,102 @@ class TestDocument2(object):
 
     assert_true('data' in data, data)
     assert_equal(data['data'], doc_data)
+
+  def test_is_trashed_migration(self):
+
+    # Skipping to prevent failing tests in TestOozieSubmissions
+    raise SkipTest
+
+    start_migration = '0024_auto__add_field_document2_is_managed'
+    mid_migration = '0025_auto__add_field_document2_is_trashed'
+    end_migration = '0026_change_is_trashed_default_to_false'
+    APP = 'desktop'
+
+    # Making sure Migration is up-to-date with fake migrations
+    management.call_command('migrate', 'desktop', fake=True, verbosity=0)
+
+    dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
+    query = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
+    trashed_query = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
+    trashed_query.trash()
+
+    try:
+      assert_false(dir.is_trashed)
+      assert_false(query.is_trashed)
+      assert_true(trashed_query.is_trashed)
+
+      # Reverse migrate to 0025
+      management.call_command('migrate', APP, mid_migration, verbosity=0)
+
+      dir = Document2.objects.get(uuid=dir.uuid)
+      query = Document2.objects.get(uuid=query.uuid)
+      trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
+      assert_false(dir.is_trashed)
+      assert_false(query.is_trashed)
+      assert_true(trashed_query.is_trashed)
+
+      # Reverse migrate to 0024. Deletes 'is_trashed' field from desktop_documents2
+      management.call_command('migrate', APP, start_migration, verbosity=0)
+
+      assert_raises(OperationalError, Document2.objects.get, uuid=dir.uuid)
+      assert_raises(OperationalError, Document2.objects.get, uuid=query.uuid)
+      assert_raises(OperationalError, Document2.objects.get, uuid=trashed_query.uuid)
+
+      # Forward migrate to 0025
+      management.call_command('migrate', APP, mid_migration, verbosity=0)
+      dir = Document2.objects.get(uuid=dir.uuid)
+      query = Document2.objects.get(uuid=query.uuid)
+      trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
+      assert_true(dir.is_trashed is None)
+      assert_true(query.is_trashed is None)
+      assert_true(trashed_query.is_trashed is None)
+
+      # Forward migrate to 0026
+      management.call_command('migrate', APP, end_migration, verbosity=0)
+      dir = Document2.objects.get(uuid=dir.uuid)
+      query = Document2.objects.get(uuid=query.uuid)
+      trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
+      assert_true(dir.is_trashed is None)
+      assert_true(query.is_trashed is None)
+      assert_true(trashed_query.is_trashed is None)
+
+      # New Documents should have is_trashed=False
+      query1 = Document2.objects.create(name='new_query.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
+      assert_true(query1.is_trashed is False)
+
+      # Create history doc
+      query1.is_history = True
+      query1.save()
+
+      query1 = Document2.objects.get(uuid=query1.uuid)
+      query1_last_modified = query1.last_modified
+      dir_last_modified = dir.last_modified
+      query_last_modified = query.last_modified
+      trashed_query_last_modified = trashed_query.last_modified
+
+      # Converter sets is_trashed=True for currently trashed docs
+      converter = DocumentConverter(self.user)
+      converter.convert()
+      trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
+      dir = Document2.objects.get(uuid=dir.uuid)
+      query = Document2.objects.get(uuid=query.uuid)
+      assert_true(trashed_query.is_trashed)
+      assert_true(dir.is_trashed is False)
+      assert_true(query.is_trashed is False)
+
+      # last_modified should be retained post conversion
+      assert_equal(dir_last_modified, dir.last_modified)
+      assert_equal(query_last_modified, query.last_modified)
+      assert_equal(trashed_query_last_modified, trashed_query.last_modified)
+
+      query1 = Document2.objects.get(uuid=query1.uuid)
+      assert_equal(query1_last_modified, query1.last_modified)
+    finally:
+      # Delete docs
+      dir.delete()
+      query.delete()
+      query1.delete()
+      trashed_query.delete()
 
 
 class TestDocument2Permissions(object):
@@ -802,6 +902,23 @@ class TestDocument2Permissions(object):
     assert_true('history.sql' in doc_names)
 
 
+  def test_unicode_name(self):
+    doc = Document2.objects.create(name='My Bundle a voté « non » à l’accord', type='oozie-workflow2', owner=self.user,
+                                   data={}, parent_directory=self.home_dir)
+
+    # Verify that home directory contents return correctly
+    response = self.client.get('/desktop/api2/doc/', {'uuid': self.home_dir.uuid})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+
+    # Verify that the doc's path is escaped
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+    path = data['document']['path']
+    assert_equal('/My%20Bundle%20a%20vot%C3%A9%20%C2%AB%20non%20%C2%BB%20%C3%A0%20l%E2%80%99accord', path)
+
+
 class TestDocument2ImportExport(object):
 
   def setUp(self):
@@ -880,6 +997,10 @@ class TestDocument2ImportExport(object):
     # Test that exporting to a file includes the date and number of documents in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id, workflow2.id])})
     assert_equal(response['Content-Disposition'], 'attachment; filename=hue-documents-%s-(4).json' % datetime.today().strftime('%Y-%m-%d'))
+
+    # Test that exporting single file gets the name of the document in the filename
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id])})
+    assert_equal(response['Content-Disposition'], 'attachment; filename=' + workflow.name + '.json')
 
 
   def test_export_directories_with_children(self):
@@ -987,5 +1108,35 @@ class TestDocument2ImportExport(object):
     assert_equal(1, data['count'])
     assert_true('created_count' in data)
     assert_equal(1, data['created_count'])
+    assert_true('updated_count' in data)
+    assert_equal(0, data['updated_count'])
+
+  def test_import_with_history_dependencies(self):
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},
+                                      parent_directory=self.home_dir)
+    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={},
+                                      parent_directory=self.home_dir, is_history=True)
+    workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={},
+                                        parent_directory=self.home_dir)
+    workflow.dependencies.add(query1)
+    workflow.dependencies.add(query2)
+
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id]), 'format': 'json'})
+    documents = response.content
+
+    # Delete previous entries from DB, so when you import it creates them
+    query1.delete()
+    query2.delete()
+    workflow.delete()
+
+    response = self.client_not_me.post('/desktop/api2/doc/import/', {'documents': documents})
+    assert_true(Document2.objects.filter(name='query1.sql').exists())
+    assert_false(Document2.objects.filter(name='query2.sql').exists())
+
+    data = json.loads(response.content)
+    assert_true('count' in data)
+    assert_equal(2, data['count'])
+    assert_true('created_count' in data)
+    assert_equal(2, data['created_count'])
     assert_true('updated_count' in data)
     assert_equal(0, data['updated_count'])

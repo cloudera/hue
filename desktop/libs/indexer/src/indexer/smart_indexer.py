@@ -20,14 +20,13 @@ import os
 from collections import deque
 
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
-from mako.template import Template
 
 from desktop.models import Document2
-from notebook.api import _execute_notebook
 from notebook.connectors.base import get_api
-from notebook.models import Notebook
+from notebook.models import Notebook, make_notebook
 
 from indexer.conf import CONFIG_INDEXING_TEMPLATES_PATH
 from indexer.conf import CONFIG_INDEXER_LIBS_PATH
@@ -67,11 +66,17 @@ class Indexer(object):
 
   def run_morphline(self, request, collection_name, morphline, input_path, query=None):
     workspace_path = self._upload_workspace(morphline)
-
-    notebook = Notebook(
+# 
+    task = Notebook(
         name='Indexer job for %s' % collection_name,
         isManaged=True
     )
+#     task = make_notebook(
+#       name=_('Indexer job for %s') % collection_name,
+#       editor_type='notebook',
+#       on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
+#       is_task=True
+#     )
 
     if query:
       q = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=query))
@@ -85,9 +90,9 @@ class Indexer(object):
       sql, success_url = api.export_data_as_table(notebook_data, snippet, destination, is_temporary=True, location=location)
       input_path = '${nameNode}%s' % location
 
-      notebook.add_hive_snippet(snippet['database'], sql)
+      task.add_hive_snippet(snippet['database'], sql)
 
-    notebook.add_java_snippet(
+    task.add_java_snippet(
       clazz='org.apache.solr.hadoop.MapReduceIndexerTool',
       app_jar=CONFIG_INDEXER_LIBS_PATH.get(),
       arguments=[
@@ -110,7 +115,7 @@ class Indexer(object):
       ]
     )
 
-    return notebook.execute(request, batch=True)
+    return task.execute(request, batch=True)
 
   def guess_format(self, data):
     file_format = get_file_format_instance(data['file'])

@@ -1,8 +1,0 @@
-For dev
-
-Install from this dir:
-
-npm install less recess
-
-If Ubuntu:
-sudo apt-get install nodejs-legacy

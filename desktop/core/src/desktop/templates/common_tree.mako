@@ -25,26 +25,26 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None, strikedProperty=None, itemChecked=None)">
+<%def name="import_templates(itemClick=None, iconClick=None, itemDblClick=None, itemSelected=None, iconModifier=None, styleModifier=None, styleModifierPullRight=None, showMore=None, anchorProperty=None, strikedProperty=None, itemChecked=None, component='')">
 
   <script src="${ static('desktop/js/ko.tree.js') }" type="text/javascript" charset="utf-8"></script>
 
-  <script type="text/html" id="tree-template">
+  <script type="text/html" id="tree-template${ component }">
     <!-- ko if: nodes != null -->
     <ul class="tree" data-bind="foreach: nodes">
       <li>
-        <span data-bind="template: { name: 'node-name-template', data: $data }"></span>
-        <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
+        <span data-bind="template: { name: 'node-name-template${ component }', data: $data }"></span>
+        <div data-bind="template: { name: 'folder-template${ component }', data: $data }, visible: isExpanded"></div>
       </li>
     </ul>
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="folder-template">
+  <script type="text/html" id="folder-template${ component }">
     <ul>
       <!-- ko foreach: nodes -->
       <li>
-        <div data-bind="template: { name: 'node-template', data: $data }"></div>
+        <div data-bind="template: { name: 'node-template${ component }', data: $data }"></div>
       </li>
       <!-- /ko -->
       %if showMore:
@@ -59,19 +59,19 @@
     </ul>
   </script>
 
-  <script type="text/html" id="node-template">
+  <script type="text/html" id="node-template${ component }">
     <!-- ko if: nodes != null -->
     <span data-bind="
-          template: { name: 'node-name-template', data: $data },
+          template: { name: 'node-name-template${ component }', data: $data },
           css: { 'pointer-icon': nodes().length > 0 }"></span>
     <!-- /ko -->
 
     <!-- ko if: nodes().length !== 0 -->
-    <div data-bind="template: { name: 'folder-template', data: $data }, visible: isExpanded"></div>
+    <div data-bind="template: { name: 'folder-template${ component }', data: $data }, visible: isExpanded"></div>
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="node-name-template">
+  <script type="text/html" id="node-name-template${ component }">
     <div class="node-row" data-bind="
     %if itemSelected:
      css: { selected: ${itemSelected}}
@@ -98,7 +98,7 @@
                   %endif
               },
               %if styleModifier:
-                style: { color: ${styleModifier}() ? '#338bb8': '#999999'}
+                style: { color: ${styleModifier}() ? '#0B7FAD': '#999999'}
               %else:
                 style: { color: '#999999'}
               %endif
@@ -132,7 +132,7 @@
 
 </%def>
 
-<%def name="render(id=None, data=None, afterRender='void(0)')">
-  <div id="${id}" class="hue-tree" data-bind="template: { name: 'tree-template', data: ${data}, afterRender: ${afterRender} }"></div>
+<%def name="render(id=None, data=None, afterRender='void(0)', component='')">
+  <div id="${id}" class="hue-tree" data-bind="template: { name: 'tree-template${ component }', data: ${data}, afterRender: ${afterRender} }"></div>
 </%def>
 

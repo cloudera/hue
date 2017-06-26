@@ -25,21 +25,21 @@ def is_selected(section, matcher):
 %>
 
 <%def name="menubar(section='')">
-  <div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/${app_name}">
                 % if app_name == 'impala':
-                  <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+                  <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }" />
                   Impala
                 % elif app_name == 'rdbms':
-                  <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                  <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                   DB Query
                 % else:
-                  <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+                  <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Beeswax icon') }" />
                   Hive Editor
                 % endif
                 </a>
@@ -56,14 +56,14 @@ def is_selected(section, matcher):
 </%def>
 
 <%def name="metastore_menubar()">
-  <div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/metastore">
-                  <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" />
+                  <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" alt="${ _('Metastore icon') }" />
                   ${ _('Metastore Manager') }
                 </a>
               </li>

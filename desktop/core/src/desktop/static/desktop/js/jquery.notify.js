@@ -48,9 +48,9 @@
     var _this = this;
     var MARGIN = 4;
 
-    _this.options.message = $("<span>").text(_this.options.message).html(); // escape HTML messages
+    _this.options.message = $.trim($("<span>").text(_this.options.message).html()); // escape HTML messages
 
-    if ($.trim(_this.options.message) !== '') {
+    if (_this.options.message !== '' && $(".jHueNotify .message").last().text() !== _this.options.message) {
 
       var el = $("#jHueNotify").clone();
       el.removeAttr("id");
@@ -72,22 +72,9 @@
       }
       else if (_this.options.level == TYPES.INFO) {
         el.addClass("alert-info");
-        scrollColor = '#338bb8';
+        scrollColor = '#0B7FAD';
       }
       el.find(".message").html("<strong>" + _this.options.message + "</strong>");
-
-      el.find(".message").niceScroll({
-        cursorcolor: scrollColor,
-        cursorborder: '1px solid ' + scrollColor,
-        cursoropacitymin: 0,
-        cursoropacitymax: 0.7,
-        scrollspeed: 100,
-        mousescrollstep: 60,
-        cursorminheight: 20,
-        horizrailenabled: false,
-        zindex: 14000,
-        railoffset: {left: 5}
-      });
 
       if (_this.options.css != null) {
         el.attr("style", _this.options.css);
@@ -95,7 +82,6 @@
 
       el.on('dblclick', function () {
         el.toggleClass('expanded');
-        el.find('.message').getNiceScroll().resize();
       });
 
       if (_this.options.sticky) {

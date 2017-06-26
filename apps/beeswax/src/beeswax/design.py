@@ -127,7 +127,7 @@ class HQLdesign(object):
   @property
   def statements(self):
     hql_query = strip_trailing_semicolon(self.hql_query)
-    return [strip_trailing_semicolon(statement.strip()) for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query)]
+    return [strip_trailing_semicolon(statement) for (start_row, start_col), (end_row, end_col), statement in split_statements(hql_query)]
 
   @staticmethod
   def get_default_data_dict():

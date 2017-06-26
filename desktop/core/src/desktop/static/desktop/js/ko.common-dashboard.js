@@ -24,7 +24,7 @@ function UUID() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
-var Column = function (size, rows) {
+var Column = function (size, rows, vm) {
   var self = this;
 
   self.rowPrototype = Row;
@@ -42,7 +42,7 @@ var Column = function (size, rows) {
   };
   self.addRow = function (row, atBeginning, atIndex) {
     if (typeof row == "undefined" || row == null) {
-      row = new self.rowPrototype([], viewModel); // Hacky but needed when a new row is deleted
+      row = new self.rowPrototype([], vm); // Hacky but needed when a new row is deleted
     }
 
     if (typeof atIndex != "undefined" && atIndex != null) {
@@ -69,7 +69,7 @@ var Row = function (widgets, vm, columns) {
   self.columns = ko.observableArray(columns ? columns : []);
   self.columns.subscribe(function (val) {
     self.columns().forEach(function (col) {
-      col.percWidth((100 - self.columns().length * 0.5) / self.columns().length);
+      col.percWidth((100 - self.columns().length * BOOTSTRAP_RATIOS.MARGIN()) / self.columns().length);
     });
   });
 
@@ -94,7 +94,7 @@ var Row = function (widgets, vm, columns) {
   self.addColumn = function (column, atBeginning) {
     if (typeof column == "undefined" || column == null) {
       var _size = Math.max(1, Math.floor(12 / (self.columns().length + 1)));
-      column = new self.columnPrototype(_size, []); // Hacky but needed when a new row is deleted
+      column = new self.columnPrototype(_size, [], vm); // Hacky but needed when a new row is deleted
       self.columns().forEach(function (col) {
         col.size(_size);
       });
@@ -264,7 +264,7 @@ function setLayout(colSizes, vm) {
     size: -1
   };
   $(colSizes).each(function (cnt, size) {
-    _cols.push(new Column(size, []));
+    _cols.push(new Column(size, [], vm));
     if (size > _highestCol.size) {
       _highestCol.idx = cnt;
       _highestCol.size = size;

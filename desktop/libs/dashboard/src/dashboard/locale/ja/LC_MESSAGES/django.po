@@ -1,0 +1,1172 @@
+# Japanese translations for Hue.
+# Copyright (C) 2012 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-05-16 08:40-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/dashboard/api.py:69
+msgid "Error while accessing Solr"
+msgstr "Solr へのアクセス中にエラーが発生しました"
+
+#: src/dashboard/api.py:73 src/dashboard/views.py:205
+msgid "There is no collection to search."
+msgstr "検索するコレクションがありません。"
+
+#: src/dashboard/api.py:83 src/dashboard/views.py:240
+#: src/dashboard/views.py:253
+msgid "POST request required."
+msgstr "POST 要求が必要です。"
+
+#: src/dashboard/api.py:163
+msgid "No document was returned by Solr."
+msgstr "Solr によってドキュメントが返されませんでした。"
+
+#: src/dashboard/api.py:165
+msgid "This document does not have any index id."
+msgstr "このドキュメントにはインデックス ID がありません。"
+
+#: src/dashboard/api.py:179
+msgid "Permission to edit the document denied"
+msgstr "ドキュメントを編集するパーミッションが拒否されました"
+
+#: src/dashboard/api.py:200
+msgid "Document successfully updated."
+msgstr "ドキュメントが正常に更新されました。"
+
+#: src/dashboard/api.py:204
+msgid "Document has no modifications to change."
+msgstr "ドキュメントには、変更すべき修正点がありません。"
+
+#: src/dashboard/api.py:238
+msgid "This field type does not support stats"
+msgstr "このフィールドタイプは統計をサポートしていません"
+
+#: src/dashboard/api.py:270 src/dashboard/templates/common_search.mako:2400
+msgid "This field does not support stats"
+msgstr "このフィールドは統計をサポートしていません"
+
+#: src/dashboard/api.py:290
+#, python-format
+msgid "Could not download search results: %s"
+msgstr "検索結果をダウンロードできませんでした：%s"
+
+#: src/dashboard/conf.py:36
+msgid "Activate the Dashboard link in the menu."
+msgstr "メニューのダッシュボードリンクをアクティブ化します。"
+
+#: src/dashboard/conf.py:43
+msgid "Activate the SQL Dashboard (beta)."
+msgstr "SQL ダッシュボード（ベータ）をアクティブ化します。"
+
+#: src/dashboard/conf.py:77
+msgid "index (Solr)"
+msgstr "インデックス（Solr）"
+
+#: src/dashboard/conf.py:85
+#, python-format
+msgid "table (%s)"
+msgstr "テーブル（%s）"
+
+#: src/dashboard/conf.py:102
+msgid ""
+"Name of the interface to use as query engine for the dashboard, e.g. "
+"solr, sql."
+msgstr ""
+"ダッシュボードのクエリエンジンとして使用するインターフェイスの名前、例: "
+"solr、sql"
+
+#: src/dashboard/conf.py:106
+msgid "Support analytics facets or not."
+msgstr "分析用ファセットをサポートするかどうか。"
+
+#: src/dashboard/conf.py:112
+msgid "Support nested documents or not."
+msgstr "ネストされたドキュメントをサポートするかどうか。"
+
+#: src/dashboard/decorators.py:45 src/dashboard/decorators.py:65
+#: src/dashboard/views.py:69
+msgid "Dashboard does not exist or you don't have the permission to access it."
+msgstr "ダッシュボードが存在しないか、ダッシュボードにアクセスするパーミッションがありません。"
+
+#: src/dashboard/models.py:610
+msgid ""
+"The Solr schema requires an id field for performing the result "
+"highlighting"
+msgstr "Solr スキーマには結果のハイライト表示を行うための ID フィールドが必要です"
+
+#: src/dashboard/views.py:203
+msgid "Page saved !"
+msgstr "ページが保存されました。"
+
+#: src/dashboard/templates/admin_collections.mako:25
+#: src/dashboard/templates/admin_collections_m.mako:24
+#: src/dashboard/templates/common_search.mako:56
+#: src/dashboard/templates/no_collections.mako:25
+#: src/dashboard/templates/search.mako:28
+#: src/dashboard/templates/search_m.mako:27
+msgid "Dashboard"
+msgstr "ダッシュボード"
+
+#: src/dashboard/templates/common_admin_collections.mako:30
+#: src/dashboard/templates/common_admin_collections.mako:43
+#: src/dashboard/templates/common_search.mako:92
+#: src/dashboard/templates/common_search.mako:97
+msgid "Dashboards"
+msgstr "ダッシュボード"
+
+#: src/dashboard/templates/common_admin_collections.mako:38
+#: src/dashboard/templates/common_admin_collections.mako:39
+msgid "Indexes"
+msgstr "インデックス"
+
+#: src/dashboard/templates/common_admin_collections.mako:51
+msgid "Filter dashboards..."
+msgstr "ダッシュボードのフィルタ処理..."
+
+#: src/dashboard/templates/common_admin_collections.mako:57
+msgid "Copy"
+msgstr "コピー"
+
+#: src/dashboard/templates/common_admin_collections.mako:61
+#: src/dashboard/templates/common_search.mako:2100
+#: src/dashboard/templates/common_search.mako:2109
+msgid "Delete"
+msgstr "削除"
+
+#: src/dashboard/templates/common_admin_collections.mako:67
+msgid "Share"
+msgstr "共有"
+
+#: src/dashboard/templates/common_admin_collections.mako:71
+msgid "Export"
+msgstr "エクスポート"
+
+#: src/dashboard/templates/common_admin_collections.mako:78
+msgid "Create a new dashboard"
+msgstr "新しいダッシュボードを作成"
+
+#: src/dashboard/templates/common_admin_collections.mako:79
+msgid "Create"
+msgstr "作成"
+
+#: src/dashboard/templates/common_admin_collections.mako:82
+msgid "Import"
+msgstr "インポート"
+
+#: src/dashboard/templates/common_admin_collections.mako:95
+msgid "There are currently no dashboards defined."
+msgstr "現在、定義されているダッシュボードはありません。"
+
+#: src/dashboard/templates/common_admin_collections.mako:96
+msgid "Click here to add"
+msgstr "ここをクリックして追加"
+
+#: src/dashboard/templates/common_admin_collections.mako:96
+msgid "one or more."
+msgstr "1 つまたは複数です。"
+
+#: src/dashboard/templates/common_admin_collections.mako:115
+msgid "Name"
+msgstr "名前"
+
+#: src/dashboard/templates/common_admin_collections.mako:116
+#: src/dashboard/templates/common_search.mako:2498
+msgid "Description"
+msgstr "説明"
+
+#: src/dashboard/templates/common_admin_collections.mako:117
+msgid "Owner"
+msgstr "所有者"
+
+#: src/dashboard/templates/common_admin_collections.mako:125
+msgid "Click to edit"
+msgstr "クリックして編集"
+
+#: src/dashboard/templates/common_admin_collections.mako:147
+msgid "Close"
+msgstr "閉じる"
+
+#: src/dashboard/templates/common_admin_collections.mako:148
+msgid "Confirm Delete"
+msgstr "削除を確認"
+
+#: src/dashboard/templates/common_admin_collections.mako:151
+msgid "Are you sure you want to delete the selected dashboards?"
+msgstr "選択したダッシュボードを削除してもよろしいですか？"
+
+#: src/dashboard/templates/common_admin_collections.mako:154
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/dashboard/templates/common_admin_collections.mako:155
+msgid "Yes"
+msgstr "はい"
+
+#: src/dashboard/templates/common_admin_collections.mako:223
+msgid "Dashboard(s) deleted successfully."
+msgstr "ダッシュボードが正常に削除されました。"
+
+#: src/dashboard/templates/common_admin_collections.mako:227
+msgid "Dashboard(s) copied successfully."
+msgstr "ダッシュボードが正常にコピーされました。"
+
+#: src/dashboard/templates/common_search.mako:30
+msgid "Increment"
+msgstr "増分"
+
+#: src/dashboard/templates/common_search.mako:63
+msgid "Edit"
+msgstr "編集"
+
+#: src/dashboard/templates/common_search.mako:67
+msgid "Save"
+msgstr "保存"
+
+#: src/dashboard/templates/common_search.mako:67
+msgid "Saving..."
+msgstr "保存中..."
+
+#: src/dashboard/templates/common_search.mako:72
+msgid "Player mode"
+msgstr "プレーヤーモード"
+
+#: src/dashboard/templates/common_search.mako:77
+msgid "General Settings"
+msgstr "全般設定"
+
+#: src/dashboard/templates/common_search.mako:81
+msgid "Query Definitions"
+msgstr "クエリの定義"
+
+#: src/dashboard/templates/common_search.mako:88
+msgid "New"
+msgstr "新規"
+
+#: src/dashboard/templates/common_search.mako:104
+msgid "Select one"
+msgstr "1 つ選択してください"
+
+#: src/dashboard/templates/common_search.mako:109
+msgid "index"
+msgstr "インデックス"
+
+#: src/dashboard/templates/common_search.mako:117
+msgid "Show cores"
+msgstr "コアを表示"
+
+#: src/dashboard/templates/common_search.mako:125
+#: src/dashboard/templates/common_search.mako:2492
+msgid "Table name or <database>.<table>"
+msgstr "テーブル名または <database>.<table>"
+
+#: src/dashboard/templates/common_search.mako:177
+#: src/dashboard/templates/common_search.mako:1407
+msgid "Grid"
+msgstr "グリッド"
+
+#: src/dashboard/templates/common_search.mako:194
+#: src/dashboard/templates/common_search.mako:1003
+msgid "HTML"
+msgstr "HTML"
+
+#: src/dashboard/templates/common_search.mako:204
+msgid "Filter Bar"
+msgstr "フィルタバー"
+
+#: src/dashboard/templates/common_search.mako:214
+#: src/dashboard/templates/common_search.mako:1463
+msgid "Marker Map"
+msgstr "Marker Map"
+
+#: src/dashboard/templates/common_search.mako:225
+msgid "Counter"
+msgstr "カウンター"
+
+#: src/dashboard/templates/common_search.mako:237
+#: src/dashboard/templates/common_search.mako:246
+msgid "Text Facet"
+msgstr "テキストファセット"
+
+#: src/dashboard/templates/common_search.mako:255
+#: src/dashboard/templates/common_search.mako:264
+msgid "Pie Chart"
+msgstr "円グラフ"
+
+#: src/dashboard/templates/common_search.mako:274
+msgid "Bar Chart"
+msgstr "棒グラフ"
+
+#: src/dashboard/templates/common_search.mako:284
+msgid "Chart"
+msgstr "チャート"
+
+#: src/dashboard/templates/common_search.mako:294
+msgid "Line Chart"
+msgstr "折れ線グラフ"
+
+#: src/dashboard/templates/common_search.mako:303
+#: src/dashboard/templates/common_search.mako:312
+msgid "Tree"
+msgstr "ツリー"
+
+#: src/dashboard/templates/common_search.mako:322
+msgid "Heatmap"
+msgstr "heatmap"
+
+#: src/dashboard/templates/common_search.mako:331
+#: src/dashboard/templates/common_search.mako:340
+#: src/dashboard/templates/common_search.mako:1451
+msgid "Timeline"
+msgstr "時系列"
+
+#: src/dashboard/templates/common_search.mako:349
+#: src/dashboard/templates/common_search.mako:358
+#: src/dashboard/templates/common_search.mako:1457
+msgid "Gradient Map"
+msgstr "Gradient Map"
+
+#: src/dashboard/templates/common_search.mako:368
+msgid "Hue logo"
+msgstr "Hue ロゴ"
+
+#: src/dashboard/templates/common_search.mako:387
+msgid "This is an empty widget."
+msgstr "これは空のウィジェットです。"
+
+#: src/dashboard/templates/common_search.mako:394
+msgid "Settings"
+msgstr "設定"
+
+#: src/dashboard/templates/common_search.mako:399
+#: src/dashboard/templates/common_search.mako:542
+#: src/dashboard/templates/common_search.mako:2665
+msgid "Type"
+msgstr "タイプ"
+
+#: src/dashboard/templates/common_search.mako:400
+#: src/dashboard/templates/common_search.mako:543
+msgid "Toggle how to group the values"
+msgstr "値をグループ化する方法を切り替え"
+
+#: src/dashboard/templates/common_search.mako:402
+#: src/dashboard/templates/common_search.mako:545
+msgid "range"
+msgstr "範囲"
+
+#: src/dashboard/templates/common_search.mako:403
+#: src/dashboard/templates/common_search.mako:546
+msgid "range & up"
+msgstr "範囲と上"
+
+#: src/dashboard/templates/common_search.mako:404
+#: src/dashboard/templates/common_search.mako:547
+msgid "field"
+msgstr "フィールド"
+
+#: src/dashboard/templates/common_search.mako:409
+#: src/dashboard/templates/common_search.mako:553
+#: src/dashboard/templates/common_search.mako:1005
+#: src/dashboard/templates/common_search.mako:1761
+msgid "Sorting"
+msgstr "ソート"
+
+#: src/dashboard/templates/common_search.mako:410
+#: src/dashboard/templates/common_search.mako:554
+#: src/dashboard/templates/common_search.mako:1762
+msgid "Toggle sort order"
+msgstr "ソート順を切り替え"
+
+#: src/dashboard/templates/common_search.mako:412
+#: src/dashboard/templates/common_search.mako:556
+#: src/dashboard/templates/common_search.mako:1764
+msgid "descending"
+msgstr "降順"
+
+#: src/dashboard/templates/common_search.mako:413
+#: src/dashboard/templates/common_search.mako:557
+#: src/dashboard/templates/common_search.mako:1765
+msgid "ascending"
+msgstr "昇順"
+
+#: src/dashboard/templates/common_search.mako:421
+#: src/dashboard/templates/common_search.mako:450
+#: src/dashboard/templates/common_search.mako:513
+#: src/dashboard/templates/common_search.mako:575
+#: src/dashboard/templates/common_search.mako:629
+#: src/dashboard/templates/common_search.mako:659
+#: src/dashboard/templates/common_search.mako:713
+#: src/dashboard/templates/common_search.mako:1924
+#: src/dashboard/templates/common_search.mako:2024
+#: src/dashboard/templates/common_search.mako:2253
+msgid "Limit"
+msgstr "制限"
+
+#: src/dashboard/templates/common_search.mako:430
+#: src/dashboard/templates/common_search.mako:522
+#: src/dashboard/templates/common_search.mako:584
+#: src/dashboard/templates/common_search.mako:638
+#: src/dashboard/templates/common_search.mako:722
+#: src/dashboard/templates/common_search.mako:1933
+#: src/dashboard/templates/common_search.mako:2032
+#: src/dashboard/templates/common_search.mako:2262
+msgid "Min Count"
+msgstr "最小カウント"
+
+#: src/dashboard/templates/common_search.mako:461
+#: src/dashboard/templates/common_search.mako:672
+msgid "Scope"
+msgstr "有効範囲"
+
+#: src/dashboard/templates/common_search.mako:464
+#: src/dashboard/templates/common_search.mako:675
+msgid "World"
+msgstr "世界"
+
+#: src/dashboard/templates/common_search.mako:465
+#: src/dashboard/templates/common_search.mako:676
+msgid "Europe"
+msgstr "欧州"
+
+#: src/dashboard/templates/common_search.mako:466
+#: src/dashboard/templates/common_search.mako:677
+msgid "Australia"
+msgstr "オーストラリア"
+
+#: src/dashboard/templates/common_search.mako:467
+#: src/dashboard/templates/common_search.mako:678
+msgid "Brazil"
+msgstr "ブラジル"
+
+#: src/dashboard/templates/common_search.mako:468
+#: src/dashboard/templates/common_search.mako:679
+msgid "Canada"
+msgstr "カナダ"
+
+#: src/dashboard/templates/common_search.mako:469
+#: src/dashboard/templates/common_search.mako:680
+msgid "China"
+msgstr "中国"
+
+#: src/dashboard/templates/common_search.mako:470
+#: src/dashboard/templates/common_search.mako:681
+msgid "France"
+msgstr "フランス"
+
+#: src/dashboard/templates/common_search.mako:471
+#: src/dashboard/templates/common_search.mako:682
+msgid "Germany"
+msgstr "ドイツ"
+
+#: src/dashboard/templates/common_search.mako:472
+#: src/dashboard/templates/common_search.mako:683
+msgid "Italy"
+msgstr "イタリア"
+
+#: src/dashboard/templates/common_search.mako:473
+#: src/dashboard/templates/common_search.mako:684
+msgid "Japan"
+msgstr "日本"
+
+#: src/dashboard/templates/common_search.mako:474
+#: src/dashboard/templates/common_search.mako:685
+msgid "UK"
+msgstr "英国"
+
+#: src/dashboard/templates/common_search.mako:475
+#: src/dashboard/templates/common_search.mako:686
+msgid "USA"
+msgstr "USA"
+
+#: src/dashboard/templates/common_search.mako:486
+msgid "Add a dimension"
+msgstr "寸法を追加"
+
+#: src/dashboard/templates/common_search.mako:493
+msgid "Field"
+msgstr "フィールド"
+
+#: src/dashboard/templates/common_search.mako:503
+#: src/dashboard/templates/common_search.mako:621
+#: src/dashboard/templates/common_search.mako:654
+#: src/dashboard/templates/common_search.mako:704
+#: src/dashboard/templates/common_search.mako:2074
+msgid "Metric"
+msgstr "測定値"
+
+#: src/dashboard/templates/common_search.mako:593
+msgid "Domain"
+msgstr "ドメイン"
+
+#: src/dashboard/templates/common_search.mako:595
+msgid "Parent"
+msgstr "親"
+
+#: src/dashboard/templates/common_search.mako:597
+msgid "Children"
+msgstr "子"
+
+#: src/dashboard/templates/common_search.mako:695
+#: src/dashboard/templates/common_search.mako:2098
+#: src/dashboard/templates/common_search.mako:2105
+#: src/dashboard/templates/common_search.mako:2811
+msgid "Add"
+msgstr "追加"
+
+#: src/dashboard/templates/common_search.mako:751
+#: src/dashboard/templates/common_search.mako:790
+#: src/dashboard/templates/common_search.mako:812
+#: src/dashboard/templates/common_search.mako:854
+#: src/dashboard/templates/common_search.mako:893
+#: src/dashboard/templates/common_search.mako:915
+#: src/dashboard/templates/common_search.mako:2384
+msgid "Exclude this value"
+msgstr "この値を除外"
+
+#: src/dashboard/templates/common_search.mako:770
+#: src/dashboard/templates/common_search.mako:873
+msgid "Show more..."
+msgstr "さらに表示..."
+
+#: src/dashboard/templates/common_search.mako:775
+#: src/dashboard/templates/common_search.mako:878
+msgid "Show more"
+msgstr "さらに表示"
+
+#: src/dashboard/templates/common_search.mako:779
+#: src/dashboard/templates/common_search.mako:882
+msgid "less..."
+msgstr "絞り込み..."
+
+#: src/dashboard/templates/common_search.mako:954
+msgid "x-axis"
+msgstr "X 軸"
+
+#: src/dashboard/templates/common_search.mako:955
+msgid "region"
+msgstr "地域"
+
+#: src/dashboard/templates/common_search.mako:956
+msgid "latitude"
+msgstr "緯度"
+
+#: src/dashboard/templates/common_search.mako:957
+msgid "legend"
+msgstr "凡例"
+
+#: src/dashboard/templates/common_search.mako:964
+msgid "y-axis"
+msgstr "Y 軸"
+
+#: src/dashboard/templates/common_search.mako:965
+msgid "longitude"
+msgstr "経度"
+
+#: src/dashboard/templates/common_search.mako:966
+msgid "value"
+msgstr "値"
+
+#: src/dashboard/templates/common_search.mako:979
+msgid "label"
+msgstr "ラベル"
+
+#: src/dashboard/templates/common_search.mako:987
+msgid "sorting"
+msgstr "ソート"
+
+#: src/dashboard/templates/common_search.mako:990
+msgid "No sorting"
+msgstr "ソートなし"
+
+#: src/dashboard/templates/common_search.mako:991
+msgid "Sort ascending"
+msgstr "昇順でソート"
+
+#: src/dashboard/templates/common_search.mako:992
+msgid "Sort descending"
+msgstr "降順でソート"
+
+#: src/dashboard/templates/common_search.mako:1002
+msgid "Editor"
+msgstr "エディターー"
+
+#: src/dashboard/templates/common_search.mako:1004
+msgid "CSS & JS"
+msgstr "CSS および JS"
+
+#: src/dashboard/templates/common_search.mako:1016
+#: src/dashboard/templates/common_search.mako:1050
+msgid "Available Fields"
+msgstr "使用可能なフィールド"
+
+#: src/dashboard/templates/common_search.mako:1018
+#: src/dashboard/templates/common_search.mako:1052
+msgid "Click on this button to add the field"
+msgstr "このボタンをクリックしてフィールドを追加"
+
+#: src/dashboard/templates/common_search.mako:1022
+#: src/dashboard/templates/common_search.mako:1056
+msgid "Available Functions"
+msgstr "使用可能な関数"
+
+#: src/dashboard/templates/common_search.mako:1024
+msgid "Formats date or timestamp in DD-MM-YYYY"
+msgstr "日付またはタイムスタンプを DD-MM-YYYY でフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1025
+msgid "Formats date or timestamp in HH:mm:ss"
+msgstr "日付またはタイムスタンプを HH:mm:ss でフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1026
+msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
+msgstr "日付またはタイムスタンプを DD-MM-YYYY HH:mm:ss でフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1027
+#: src/dashboard/templates/common_search.mako:1061
+msgid "Formats a date in the full format"
+msgstr "日付を完全な形式でフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1028
+#: src/dashboard/templates/common_search.mako:1062
+msgid "Formats a date as a Unix timestamp"
+msgstr "日付を UNIX タイムスタンプとしてフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1029
+msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
+msgstr "UNIX タイムスタンプを Ns、Nmin、Ndays... 前としてフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1030
+#: src/dashboard/templates/common_search.mako:1064
+msgid "Downloads and embed the file in the browser"
+msgstr "ブラウザでファイルをダウンロードして埋め込む"
+
+#: src/dashboard/templates/common_search.mako:1031
+#: src/dashboard/templates/common_search.mako:1065
+msgid "Downloads the linked file"
+msgstr "リンクされたファイルをダウンロード"
+
+#: src/dashboard/templates/common_search.mako:1032
+#: src/dashboard/templates/common_search.mako:1066
+msgid "Preview file in File Browser"
+msgstr "File Browser でファイルをプレビュー"
+
+#: src/dashboard/templates/common_search.mako:1033
+#: src/dashboard/templates/common_search.mako:1067
+msgid "Truncate a value after 100 characters"
+msgstr "値を 100 文字で切り捨てる"
+
+#: src/dashboard/templates/common_search.mako:1034
+#: src/dashboard/templates/common_search.mako:1068
+msgid "Truncate a value after 250 characters"
+msgstr "値を 250 文字で切り捨てる"
+
+#: src/dashboard/templates/common_search.mako:1035
+#: src/dashboard/templates/common_search.mako:1069
+msgid "Truncate a value after 500 characters"
+msgstr "値を 500 文字で切り捨てる"
+
+#: src/dashboard/templates/common_search.mako:1037
+#: src/dashboard/templates/common_search.mako:1071
+msgid "Click on this button to add the function"
+msgstr "このボタンをクリックして関数を追加"
+
+#: src/dashboard/templates/common_search.mako:1058
+msgid "Formats a date in the DD-MM-YYYY format"
+msgstr "日付を DD-MM-YYYY 形式でフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1059
+msgid "Formats a date in the HH:mm:ss format"
+msgstr "日付を HH:mm:ss 形式でフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1060
+msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
+msgstr "日付を DD-MM-YYYY HH:mm:ss 形式でフォーマット"
+
+#: src/dashboard/templates/common_search.mako:1063
+msgid "Shows the relative time"
+msgstr "相対時間を表示"
+
+#: src/dashboard/templates/common_search.mako:1095
+#: src/dashboard/templates/common_search.mako:1563
+msgid "Your search did not match any documents."
+msgstr "条件に一致するドキュメントは見つかりませんでした。"
+
+#: src/dashboard/templates/common_search.mako:1140
+msgid "Edit this document"
+msgstr "このドキュメントを編集"
+
+#: src/dashboard/templates/common_search.mako:1143
+msgid "Undo changes"
+msgstr "変更を取り消し"
+
+#: src/dashboard/templates/common_search.mako:1146
+msgid "Update this document"
+msgstr "このドキュメントを更新"
+
+#: src/dashboard/templates/common_search.mako:1149
+msgid "Show original document"
+msgstr "元のドキュメントを表示"
+
+#: src/dashboard/templates/common_search.mako:1179
+msgid "Child Documents"
+msgstr "子ドキュメント"
+
+#: src/dashboard/templates/common_search.mako:1212
+#: src/dashboard/templates/common_search.mako:1213
+msgid "Click to sort"
+msgstr "クリックしてソート"
+
+#: src/dashboard/templates/common_search.mako:1216
+msgid "Move to the left"
+msgstr "左に移動"
+
+#: src/dashboard/templates/common_search.mako:1219
+msgid "Move to the right"
+msgstr "右に移動"
+
+#: src/dashboard/templates/common_search.mako:1229
+msgid "Previous"
+msgstr "前"
+
+#: src/dashboard/templates/common_search.mako:1237
+msgid "Showing"
+msgstr "表示しています"
+
+#: src/dashboard/templates/common_search.mako:1239
+msgid "to"
+msgstr "先"
+
+#: src/dashboard/templates/common_search.mako:1241
+msgid "of"
+msgstr "／"
+
+#: src/dashboard/templates/common_search.mako:1243
+msgid " results"
+msgstr "結果"
+
+#: src/dashboard/templates/common_search.mako:1246
+msgid "Show"
+msgstr "表示"
+
+#: src/dashboard/templates/common_search.mako:1250
+msgid "results per page"
+msgstr "ページごとに表示する結果の数"
+
+#: src/dashboard/templates/common_search.mako:1253
+msgid "Next"
+msgstr "次ヘ"
+
+#: src/dashboard/templates/common_search.mako:1279
+#: src/dashboard/templates/common_search.mako:1327
+#: src/dashboard/templates/common_search.mako:1771
+msgid "Chart Type"
+msgstr "チャートタイプ"
+
+#: src/dashboard/templates/common_search.mako:1285
+#: src/dashboard/templates/common_search.mako:1333
+#: src/dashboard/templates/common_search.mako:1779
+#: src/dashboard/templates/common_search.mako:2672
+msgid "Interval"
+msgstr "間隔"
+
+#: src/dashboard/templates/common_search.mako:1292
+#: src/dashboard/templates/common_search.mako:1340
+#: src/dashboard/templates/common_search.mako:1368
+#: src/dashboard/templates/common_search.mako:1790
+#: src/dashboard/templates/common_search.mako:1819
+msgid "Zoom"
+msgstr "ズーム"
+
+#: src/dashboard/templates/common_search.mako:1293
+#: src/dashboard/templates/common_search.mako:1341
+#: src/dashboard/templates/common_search.mako:1369
+#: src/dashboard/templates/common_search.mako:1791
+#: src/dashboard/templates/common_search.mako:1820
+msgid "reset"
+msgstr "リセット"
+
+#: src/dashboard/templates/common_search.mako:1294
+#: src/dashboard/templates/common_search.mako:1342
+msgid "Group by"
+msgstr "グループ化"
+
+#: src/dashboard/templates/common_search.mako:1432
+#: src/dashboard/templates/common_search.mako:3473
+msgid "Bars"
+msgstr "棒"
+
+#: src/dashboard/templates/common_search.mako:1438
+#: src/dashboard/templates/common_search.mako:3469
+msgid "Lines"
+msgstr "折れ線"
+
+#: src/dashboard/templates/common_search.mako:1444
+msgid "Pie"
+msgstr "円グラフ"
+
+#: src/dashboard/templates/common_search.mako:1497
+#: src/dashboard/templates/common_search.mako:1507
+msgid "Download first rows as JSON"
+msgstr "最初の行を JSON としダウンロード"
+
+#: src/dashboard/templates/common_search.mako:1502
+msgid "Download first rows as XLS"
+msgstr "最初の行を XLS としてダウンロード"
+
+#: src/dashboard/templates/common_search.mako:1528
+#: src/dashboard/templates/common_search.mako:2452
+msgid "Filter fields"
+msgstr "フィルタフィールド"
+
+#: src/dashboard/templates/common_search.mako:1530
+#: src/dashboard/templates/common_search.mako:2631
+msgid "All"
+msgstr "すべて"
+
+#: src/dashboard/templates/common_search.mako:1530
+msgid "Current"
+msgstr "現行"
+
+#: src/dashboard/templates/common_search.mako:1538
+msgid "Field Name"
+msgstr "フィールド名"
+
+#: src/dashboard/templates/common_search.mako:1541
+msgid "No matches."
+msgstr "一致する名前がありません。"
+
+#: src/dashboard/templates/common_search.mako:1578
+msgid "Document"
+msgstr "ドキュメント"
+
+#: src/dashboard/templates/common_search.mako:1607
+msgid "Please select the chart parameters on the left."
+msgstr "左側でチャートパラメーターを選択してください。"
+
+#: src/dashboard/templates/common_search.mako:1908
+msgid "Selected dimensions"
+msgstr "選択した寸法"
+
+#: src/dashboard/templates/common_search.mako:2008
+#: src/dashboard/templates/common_search.mako:2237
+msgid "Selected dimension"
+msgstr "選択した寸法"
+
+#: src/dashboard/templates/common_search.mako:2116
+msgid "Add formula operation"
+msgstr "数式を追加"
+
+#: src/dashboard/templates/common_search.mako:2129
+msgid "There are currently no filters applied."
+msgstr "現在適用されているフィルタはありません。"
+
+#: src/dashboard/templates/common_search.mako:2142
+#: src/dashboard/templates/common_search.mako:2165
+#: src/dashboard/templates/common_search.mako:2204
+msgid "selected"
+msgstr "選択済み"
+
+#: src/dashboard/templates/common_search.mako:2147
+#: src/dashboard/templates/common_search.mako:2182
+msgid "excluded"
+msgstr "除外済み"
+
+#: src/dashboard/templates/common_search.mako:2174
+msgid "Until"
+msgstr "期限"
+
+#: src/dashboard/templates/common_search.mako:2210
+msgid "TO"
+msgstr "～"
+
+#: src/dashboard/templates/common_search.mako:2333
+msgid "Latitude"
+msgstr "緯度"
+
+#: src/dashboard/templates/common_search.mako:2337
+msgid "Longitude"
+msgstr "経度"
+
+#: src/dashboard/templates/common_search.mako:2341
+msgid "Label"
+msgstr "ラベル"
+
+#: src/dashboard/templates/common_search.mako:2363
+msgid "Prefix filter..."
+msgstr "プレフィックスフィルタ..."
+
+#: src/dashboard/templates/common_search.mako:2364
+msgid "Field name..."
+msgstr "フィールド名..."
+
+#: src/dashboard/templates/common_search.mako:2367
+msgid "Terms"
+msgstr "単語"
+
+#: src/dashboard/templates/common_search.mako:2368
+msgid "Stats"
+msgstr "統計"
+
+#: src/dashboard/templates/common_search.mako:2375
+msgid "There are no terms to be shown"
+msgstr "表示する単語はありません。"
+
+#: src/dashboard/templates/common_search.mako:2381
+msgid "Select this value"
+msgstr "この値を選択"
+
+#: src/dashboard/templates/common_search.mako:2401
+msgid "There are no stats to be shown"
+msgstr "表示する統計はありません。"
+
+#: src/dashboard/templates/common_search.mako:2419
+msgid "Not available"
+msgstr "利用できません"
+
+#: src/dashboard/templates/common_search.mako:2463
+msgid "There are no fields matching your search term."
+msgstr "検索条件に一致するフィールドはありません。"
+
+#: src/dashboard/templates/common_search.mako:2477
+msgid "General settings"
+msgstr "全般設定"
+
+#: src/dashboard/templates/common_search.mako:2482
+#: src/dashboard/templates/common_search.mako:2490
+msgid "Solr index"
+msgstr "Solr インデックス"
+
+#: src/dashboard/templates/common_search.mako:2506
+msgid "Autocomplete"
+msgstr "オートコンプリート"
+
+#: src/dashboard/templates/common_search.mako:2511
+msgid "Dictionary"
+msgstr "ディクショナリ"
+
+#: src/dashboard/templates/common_search.mako:2511
+msgid "Dictionary name or blank for default"
+msgstr "ディクショナリ名またはデフォルト値のための空白"
+
+#: src/dashboard/templates/common_search.mako:2518
+msgid "Nested documents"
+msgstr "ネストされたドキュメント"
+
+#: src/dashboard/templates/common_search.mako:2523
+msgid "Schema"
+msgstr "スキーマ"
+
+#: src/dashboard/templates/common_search.mako:2549
+msgid "Query definitions"
+msgstr "クエリ定義"
+
+#: src/dashboard/templates/common_search.mako:2551
+msgid "Add current query as..."
+msgstr "現在のクエリを次のアイテムとして追加..."
+
+#: src/dashboard/templates/common_search.mako:2552
+msgid "Click on this button to add the currenty query as a new definition"
+msgstr "このボタンをクリックして、現在のクエリを新しい定義として追加します"
+
+#: src/dashboard/templates/common_search.mako:2570
+msgid "There are currently no query definitions."
+msgstr "現在、クエリ定義はありません。"
+
+#: src/dashboard/templates/common_search.mako:2603
+msgid "Level"
+msgstr "レベル"
+
+#: src/dashboard/templates/common_search.mako:2612
+#: src/dashboard/templates/common_search.mako:2620
+msgid "Time Settings"
+msgstr "時刻設定"
+
+#: src/dashboard/templates/common_search.mako:2632
+msgid "Past 5 Minutes"
+msgstr "過去の 5 分"
+
+#: src/dashboard/templates/common_search.mako:2633
+msgid "Past 30 Minutes"
+msgstr "過去の 30 分"
+
+#: src/dashboard/templates/common_search.mako:2634
+msgid "Past 1 Hour"
+msgstr "過去 1 時間"
+
+#: src/dashboard/templates/common_search.mako:2635
+msgid "Past 12 Hours"
+msgstr "過去 12 時間"
+
+#: src/dashboard/templates/common_search.mako:2636
+msgid "Past day"
+msgstr "過去の日"
+
+#: src/dashboard/templates/common_search.mako:2637
+msgid "Past 2 days"
+msgstr "過去 2 日"
+
+#: src/dashboard/templates/common_search.mako:2638
+msgid "Past 7 days"
+msgstr "過去 7 日"
+
+#: src/dashboard/templates/common_search.mako:2639
+msgid "Past 1 Month"
+msgstr "過去 1 ヵ月"
+
+#: src/dashboard/templates/common_search.mako:2640
+msgid "Past 3 Months"
+msgstr "過去 3 ヵ月"
+
+#: src/dashboard/templates/common_search.mako:2641
+msgid "Past Year"
+msgstr "過去の年"
+
+#: src/dashboard/templates/common_search.mako:2642
+msgid "Past 2 Years"
+msgstr "過去 2 年"
+
+#: src/dashboard/templates/common_search.mako:2643
+msgid "Past 10 Years"
+msgstr "過去 10 年"
+
+#: src/dashboard/templates/common_search.mako:2655
+msgid "Time settings"
+msgstr "時刻設定"
+
+#: src/dashboard/templates/common_search.mako:2659
+msgid "Date/time field"
+msgstr "日付／時刻フィールド"
+
+#: src/dashboard/templates/common_search.mako:2667
+msgid "Rolling"
+msgstr "ローリング"
+
+#: src/dashboard/templates/common_search.mako:2668
+msgid "Fixed"
+msgstr "混合"
+
+#: src/dashboard/templates/common_search.mako:2678
+msgid "Start date/time"
+msgstr "開始日付／時刻"
+
+#: src/dashboard/templates/common_search.mako:2684
+msgid "End date/time"
+msgstr "終了日付／時刻"
+
+#: src/dashboard/templates/common_search.mako:2693
+#: src/dashboard/templates/common_search.mako:2702
+msgid "Auto-refresh every"
+msgstr "自動更新の間隔"
+
+#: src/dashboard/templates/common_search.mako:2693
+#: src/dashboard/templates/common_search.mako:2702
+msgid "seconds"
+msgstr "秒"
+
+#: src/dashboard/templates/common_search.mako:2719
+msgid "Nested schema"
+msgstr "ネストされたスキーマ"
+
+#: src/dashboard/templates/common_search.mako:2802
+msgid "Count"
+msgstr "カウント"
+
+#: src/dashboard/templates/common_search.mako:2803
+msgid "Unique Count"
+msgstr "一意のカウント"
+
+#: src/dashboard/templates/common_search.mako:2804
+msgid "Average"
+msgstr "平均"
+
+#: src/dashboard/templates/common_search.mako:2805
+msgid "Sum"
+msgstr "合計"
+
+#: src/dashboard/templates/common_search.mako:2806
+msgid "Min"
+msgstr "最小"
+
+#: src/dashboard/templates/common_search.mako:2807
+msgid "Max"
+msgstr "最大"
+
+#: src/dashboard/templates/common_search.mako:2808
+msgid "Median"
+msgstr "メジアン"
+
+#: src/dashboard/templates/common_search.mako:2809
+msgid "Percentiles"
+msgstr "パーセンタイル"
+
+#: src/dashboard/templates/common_search.mako:2810
+msgid "Multiply"
+msgstr "乗算"
+
+#: src/dashboard/templates/common_search.mako:2812
+msgid "Substract"
+msgstr "減算"
+
+#: src/dashboard/templates/common_search.mako:2813
+msgid "Substract dates"
+msgstr "日付の減算"
+
+#: src/dashboard/templates/common_search.mako:2936
+#: src/dashboard/templates/common_search.mako:2984
+msgid "Up"
+msgstr "上"
+
+#: src/dashboard/templates/common_search.mako:2936
+#: src/dashboard/templates/common_search.mako:2984
+msgid "Less"
+msgstr "絞り込み..."
+
+#: src/dashboard/templates/common_search.mako:3061
+msgid "Total"
+msgstr "合計"
+
+#: src/dashboard/templates/common_search.mako:3840
+msgid ""
+"Result highlighting is unavailable: the collection does not have an index"
+" field"
+msgstr "結果を強調表示できません。コレクションには、インデックスフィールドがありません"
+
+#: src/dashboard/templates/macros.mako:200
+#, python-format
+msgid "Retweeted %s times"
+msgstr "リツイート数 %s"
+
+#: src/dashboard/templates/macros.mako:210
+msgid "Reply"
+msgstr "リプライ"
+
+#: src/dashboard/templates/macros.mako:216
+msgid "Retweet"
+msgstr "リツイート"
+
+#: src/dashboard/templates/no_collections.mako:46
+msgid "It seems there is nothing to search on ..."
+msgstr "検索対象はないようです ..."
+
+#: src/dashboard/templates/no_collections.mako:49
+msgid "What about creating a"
+msgstr "新しいインデックスを"
+
+#: src/dashboard/templates/no_collections.mako:50
+msgid "new index"
+msgstr "作成することをお勧めします"
+
+#~ msgid "Search"
+#~ msgstr ""

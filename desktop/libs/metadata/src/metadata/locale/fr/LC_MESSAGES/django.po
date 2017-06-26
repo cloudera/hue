@@ -1,103 +1,278 @@
 # French translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: VERSION DU PROJET\n"
-"Report-Msgid-Bugs-To: ADRESSE@MAIL\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
-"Last-Translator: NOM COMPLET <ADRESSE@MAIL>\n"
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-05-16 08:40-0700\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/metadata/conf.py:53
+#: src/metadata/conf.py:73
 msgid "Configuration options for Optimizer API"
 msgstr "Options de configuration pour l'API Optimizer"
 
-#: src/metadata/conf.py:57
+#: src/metadata/conf.py:77
 msgid "Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)"
-msgstr "URL de base de l'API Optimizer (par ex. https://alpha.optimizer.cloudera.com/)"
+msgstr ""
+"URL de base de l'API Optimizer (par ex. "
+"https://alpha.optimizer.cloudera.com/)"
 
-#: src/metadata/conf.py:62
-msgid "The name of the product or group which will have API access to the emails associated with it."
-msgstr "Nom du produit ou du groupe qui a accès par l'API aux courriels qui lui sont associés."
+#: src/metadata/conf.py:82
+msgid "The name of the key of the service."
+msgstr "Nom de la clé du service."
 
-#: src/metadata/conf.py:67 src/metadata/conf.py:78
-msgid "A secret passphrase associated with the productName."
-msgstr "Phrase de passe secrète associée au productName."
+#: src/metadata/conf.py:87
+msgid "The private part of the key associated with the auth_key."
+msgstr "Partie privée de la clé associée à auth_key."
 
-#: src/metadata/conf.py:72 src/metadata/conf.py:83
-msgid "Execute this script to produce the product secret. This will be used when `product_secret` is not set."
-msgstr "Exécutez ce script pour générer la phrase secrète du produit. Elle sera utilisée si 'product_secret' n'est pas défini."
+#: src/metadata/conf.py:92
+msgid ""
+"Execute this script to produce the auth_key secret. This will be used "
+"when `auth_key_secret` is not set."
+msgstr ""
+"Exécutez ce script pour produire le secret auth_key. Cela sera utilisé "
+"si « auth_key_secret » n’est pas défini."
 
-#: src/metadata/conf.py:90
-msgid "The email of the Optimizer account you want to associate with the Product."
-msgstr "Adresse électronique du compte Optimizer que vous voulez associer au produit."
+#: src/metadata/conf.py:98
+msgid ""
+"The name of the workload where queries are uploaded and optimizations are"
+" calculated from. Automatically guessed from auth_key and cluster_id if "
+"not specified."
+msgstr ""
+"Nom de la charge de travail dans laquelle les requêtes sont chargées et à partir de laquelle les optimisations sont"
+" calculées. Déterminé automatiquement à partir de auth_key et cluster_id si "
+"n'est pas spécifié."
 
-#: src/metadata/conf.py:95
-msgid "The password associated with the Optimizer account you to associate with the Product."
-msgstr "Mot de passe du compte Optimizer que vous voulez associer au produit."
+#: src/metadata/conf.py:103
+msgid ""
+"The name of the cluster used to determine the tenant id when this one is "
+"not specified. Defaults to the cluster Id or 'default'."
+msgstr ""
+"Nom du cluster utilisé pour déterminer l’ID de locataire lorsque celui-ci n’est "
+"pas spécifié. Utilise par défaut l’ID de cluster ou « default »."
 
-#: src/metadata/conf.py:100
-msgid "Execute this script to produce the email password. This will be used when `email_password` is not set."
-msgstr "Exécutez ce script pour générer le mot de passe de courriel. Il sera utilisé si 'email_password' n'est pas défini."
+#: src/metadata/conf.py:108
+msgid "The email of the Optimizer account to use (deprecated)."
+msgstr "E-mail du compte Optimizer à utiliser (obsolète)."
 
-#: src/metadata/conf.py:107
-msgid "In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority"
-msgstr "En mode sécurisé (HTTPS), si les certificats SSL d'Optimizer doivent être vérifié par l'autorité de certification"
+#: src/metadata/conf.py:114 src/metadata/conf.py:249
+msgid ""
+"Perform Sentry privilege filtering. Default to true automatically if the "
+"cluster is secure."
+msgstr ""
+"Effectuez le filtrage des privilèges Sentry. La valeur par défaut True est automatiquement appliquée si le "
+"cluster est sécurisé."
 
-#: src/metadata/conf.py:114
-msgid "Use mock data"
-msgstr "Utiliser des données simulées"
+#: src/metadata/conf.py:121
+msgid ""
+"The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
+"to 0 to disable the cache."
+msgstr ""
+"TTL du cache, en millisecondes, pour les appels assist/autocomplete/etc. Réglez-le "
+"sur 0 pour désactiver le cache."
 
-#: src/metadata/conf.py:124
+#: src/metadata/conf.py:125
+msgid ""
+"Automatically upload queries after their execution in order to improve "
+"recommendations."
+msgstr ""
+"Charger automatiquement les requêtes après leur exécution pour améliorer "
+"les recommandations."
+
+#: src/metadata/conf.py:131
+msgid ""
+"Allow admins to upload the last N executed queries in the quick start "
+"wizard. Use 0 to disable."
+msgstr ""
+"Autoriser les administrateurs à charger les N dernières requêtes exécutées dans l’assistant de "
+"démarrage rapide. Utilisez la valeur 0 pour désactiver cette option."
+
+#: src/metadata/conf.py:183
 msgid "Configuration options for Navigator API"
 msgstr "Options de configuration pour l'API de navigateur"
 
-#: src/metadata/conf.py:128
-msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api)"
-msgstr "URL de base vers l'API de navigateur (par ex. http://localhost:7187/api)"
+#: src/metadata/conf.py:187
+msgid "Base URL to Navigator API."
+msgstr "URL de base vers l'API de navigateur."
 
-#: src/metadata/conf.py:132
-msgid "Auth username of the hue user used for authentications."
-msgstr "Nom d'authentification de l'utilisateur Hue utilisé pour les authentifications."
+#: src/metadata/conf.py:191
+msgid "Which authentication to use: CM or external via LDAP or SAML."
+msgstr "Authentification à utiliser : CM ou externe via LDAP ou SAML."
 
-#: src/metadata/conf.py:137
-msgid "LDAP/PAM/.. password of the hue user used for authentications."
-msgstr "Mot de passe LDAP/PAM.. de l'utilisateur Hue utilisé pour les authentifications."
+#: src/metadata/conf.py:196
+msgid "Username of the CM user used for authentication."
+msgstr "Nom de l’utilisateur CM utilisé pour l’authentification."
 
-#: src/metadata/conf.py:142
-msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
-msgstr "Exécutez ce script pour générer le mot de passe d'authentification. Il sera utilisé si 'auth_password' n'est pas défini."
+#: src/metadata/conf.py:200
+msgid "CM password of the user used for authentication."
+msgstr "Mot de passe CM de l’utilisateur utilisé pour l’authentification."
 
-#: src/metadata/navigator_api.py:162 src/metadata/navigator_api.py:180
-msgid "add_tags requires an 'id' parameter and 'tags' parameter that is a non-empty list of tags"
-msgstr "add_tags requiert un paramètre 'id' et un paramètre 'tags' constitué d'une liste d'étiquettes non vide"
+#: src/metadata/conf.py:205
+msgid ""
+"Execute this script to produce the CM password. This will be used when "
+"the plain password is not set."
+msgstr ""
+"Exécutez ce script pour générer le mot de passe CM. Il sera utilisé si "
+"le mot de passe normal n'est pas défini."
 
-#: src/metadata/navigator_api.py:198
-msgid "update_properties requires an 'id' parameter and 'properties' parameter that is a non-empty dict"
-msgstr "update_properties requiert un paramètre 'id' et un paramètre 'properties' constitué d'un dictionnaire non vide"
+#: src/metadata/conf.py:212
+msgid "Username of the LDAP user used for authentication."
+msgstr "Nom de l’utilisateur LDAP utilisé pour l’authentification."
 
-#: src/metadata/navigator_api.py:216
-msgid "update_properties requires an 'id' parameter and 'keys' parameter that is a non-empty list"
-msgstr "update_properties requiert un paramètre 'id' et un paramètre 'keys' constitué d'une liste non vide"
+#: src/metadata/conf.py:216
+msgid "LDAP password of the user used for authentication."
+msgstr "Mot de passe LDAP de l’utilisateur utilisé pour l’authentification."
 
-#: src/metadata/optimizer_client.py:80 src/metadata/optimizer_client.py:93
-#: src/metadata/optimizer_client.py:104 src/metadata/optimizer_client.py:115
-#: src/metadata/optimizer_client.py:126 src/metadata/optimizer_client.py:145
-#: src/metadata/optimizer_client.py:159 src/metadata/optimizer_client.py:174
-#: src/metadata/optimizer_client.py:191 src/metadata/optimizer_client.py:207
-#: src/metadata/optimizer_client.py:224
+#: src/metadata/conf.py:221
+msgid ""
+"Execute this script to produce the LDAP password. This will be used when "
+"the plain password is not set."
+msgstr ""
+"Exécutez ce script pour générer le mot de passe LDAP. Il sera utilisé si "
+"le mot de passe normal n'est pas défini."
+
+#: src/metadata/conf.py:228
+msgid "Username of the SAML user used for authentication."
+msgstr "Nom de l’utilisateur SAML utilisé pour l’authentification."
+
+#: src/metadata/conf.py:232
+msgid "SAML password of the user used for authentication."
+msgstr "Mot de passe SAML de l’utilisateur utilisé pour l’authentification."
+
+#: src/metadata/conf.py:237
+msgid ""
+"Execute this script to produce the SAML password. This will be used when "
+"the plain password  is not set."
+msgstr ""
+"Exécutez ce script pour générer le mot de passe SAML. Il sera utilisé si "
+"le mot de passe normal n'est pas défini."
+
+#: src/metadata/conf.py:244
+msgid ""
+"Navigator configuration directory, where navigator.client.properties is "
+"located."
+msgstr ""
+"Répertoire de configuration du navigateur, dans lequel se trouve "
+"navigator.client.properties."
+
+#: src/metadata/conf.py:255
+msgid "Max number of items to fetch in one call in object search."
+msgstr "Nombre maximal d'éléments à récupérer lors d'un appel de recherche d'objets."
+
+#: src/metadata/conf.py:261
+msgid "Max number of items to fetch in one call in object search autocomplete."
+msgstr "Nombre maximal d'éléments à récupérer lors d'un appel de remplissage automatique de recherche d'objets."
+
+#: src/metadata/conf.py:268
+msgid "Enable to search HDFS, S3 files."
+msgstr "Activez cette option pour rechercher des fichiers S3 HDFS."
+
+#: src/metadata/navigator_api.py:420 src/metadata/navigator_api.py:446
+msgid ""
+"add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
+"empty list of tags"
+msgstr ""
+"add_tags requiert un paramètre 'id' et un paramètre 'tags' constitué "
+"d'une liste d'étiquettes non vide"
+
+#: src/metadata/navigator_api.py:472
+msgid ""
+"update_properties requires an 'id' parameter and 'properties' parameter "
+"that is a non-empty dict"
+msgstr ""
+"update_properties requiert un paramètre 'id' et un paramètre 'properties'"
+" constitué d'un dictionnaire non vide"
+
+#: src/metadata/navigator_api.py:498
+msgid ""
+"update_properties requires an 'id' parameter and 'keys' parameter that is"
+" a non-empty list"
+msgstr ""
+"update_properties requiert un paramètre 'id' et un paramètre 'keys' "
+"constitué d'une liste non vide"
+
+#: src/metadata/navigator_client.py:79 src/metadata/navigator_client.py:90
+#: src/metadata/navigator_client.py:101 src/metadata/optimizer_client.py:51
+msgid "No error message, please check the logs."
+msgstr "Aucun message d'erreur. Consultez les fichiers journaux."
+
+#: src/metadata/navigator_client.py:220 src/metadata/navigator_client.py:293
+msgid "Failed to authenticate."
+msgstr "Echec de l’authentification."
+
+#: src/metadata/optimizer_api.py:348
+msgid "Query history upload requires Admin privileges or feature is disabled."
+msgstr "Le chargement de l’historique des requêtes nécessite des privilèges d’administrateur ou la fonctionnalité est désactivée."
+
+#: src/metadata/optimizer_api.py:371
+msgid "Skipped"
+msgstr "Ignoré"
+
+#: src/metadata/optimizer_client.py:180
 msgid "Error while accessing Optimizer"
 msgstr "Erreur lors de l'accès à Optimizer"
 
-#~ msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+#: src/metadata/optimizer_client.py:239
+msgid "Call not supported"
+msgstr "Appel non pris en charge"
+
+#~ msgid ""
+#~ "The name of the product or group"
+#~ " which will have API access to "
+#~ "the emails associated with it."
 #~ msgstr ""
 
+#~ msgid "A secret passphrase associated with the productName."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Execute this script to produce the "
+#~ "product secret. This will be used "
+#~ "when `product_secret` is not set."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The email of the Optimizer account "
+#~ "you want to associate with the "
+#~ "Product."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The password associated with the "
+#~ "Optimizer account you to associate with"
+#~ " the Product."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Execute this script to produce the "
+#~ "email password. This will be used "
+#~ "when `email_password` is not set."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In secure mode (HTTPS), if Optimizer "
+#~ "SSL certificates have to be verified "
+#~ "against certificate authority"
+#~ msgstr ""
+
+#~ msgid "Auth username of the hue user used for authentications."
+#~ msgstr ""
+
+#~ msgid "LDAP/PAM/.. password of the hue user used for authentications."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Execute this script to produce the "
+#~ "auth password. This will be used "
+#~ "when `auth_password` is not set."
+#~ msgstr ""
