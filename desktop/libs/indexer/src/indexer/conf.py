@@ -29,7 +29,8 @@ from libzookeeper import conf as libzookeeper_conf
 LOG = logging.getLogger(__name__)
 
 
-def get_solr_ensemble():  
+# Deprecated. Should be automatically guessed from Solr admin info API now.
+def get_solr_ensemble():
   return '%s%s' % (libzookeeper_conf.ENSEMBLE.get(), libsolr_conf.SOLR_ZK_PATH.get())
 
 
