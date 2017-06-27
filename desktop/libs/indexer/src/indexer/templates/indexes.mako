@@ -138,13 +138,12 @@ ${ assist.assistPanel() }
                 <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/default'">
                   <i class="fa fa-plus-circle"></i> ${ _('Create index') }
                 </a>
-                <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true); }">
+                <a href="#createAlias" data-toggle="modal" class="btn">
                   <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
                 </a>
               </%def>
             </%actionbar:render>
 
-            <!-- ko template: { if: alias.showCreateModal(), name: 'create-alias' }--><!-- /ko -->
             <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
             <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
           </div>
@@ -158,13 +157,50 @@ ${ assist.assistPanel() }
               ${ csrf_token(request) | n,unicode }
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-                <h2 id="deleteIndexMessage" class="modal-title">${ _('Delete the selected index(es)?') }</h2>
+                <h2 class="modal-title">${ _('Delete the selected index(es)?') }</h2>
               </div>
               <div class="modal-footer">
                 <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
                 <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
               </div>
             </form>
+          </div>
+
+          <div id="createAlias" class="modal hide fade">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+              <h2 class="modal-title">${ _('Create alias') }</h2>
+            </div>
+            <div class="modal-body">
+              <input type="text" data-bind="textInput: alias.name"/>
+
+              <table id="indexesChecksTable" class="table table-condensed table-nowrap">
+                <thead>
+                  <tr>
+                    <th style="width: 1%">
+                      <div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: alias.availableCollections, selectedValues: alias.chosenCollections }"></div>
+                    </th>
+                    <th>${_('Collection')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <!-- ko foreach: alias.availableCollections -->
+                <tr>
+                  <td>
+                    <div class="hueCheckbox fa" data-bind="multiCheck: '#indexesChecksTable', value: $data, hueChecked: $parent.alias.chosenCollections"></div>
+                  </td>
+                  <td data-bind="text: name"></td>
+                </tr>
+                <!-- /ko -->
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+              <button class="btn btn-primary disable-feedback" data-bind="click: alias.create, enable: alias.chosenCollections().length > 0 && alias.name() !== ''">
+                 ${ _('Create') }
+              </button>
+            </div>
           </div>
 
 
@@ -370,22 +406,6 @@ ${ assist.assistPanel() }
 </script>
 
 
-<script type="text/html" id="create-alias">
-  <div class="snippet-settings">
-
-    <input type="text" data-bind="value: alias.name"/>
-    <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name', optionsValue: 'name'" size="5" multiple="true"></select>
-
-    <a href="javascript:void(0)" class="btn" data-bind="click: alias.create, visible: alias.chosenCollections().length > 0">
-      <i class="fa fa-plus-circle"></i> ${ _('Create') }
-    </a>
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(false) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
-    </a>
-  </div>
-</script>
-
-
 
 <script type="text/javascript">
 
@@ -393,8 +413,6 @@ ${ assist.assistPanel() }
 
     var Alias = function (vm) {
       var self = this;
-
-      self.showCreateModal = ko.observable(false);
 
       self.name = ko.observable('');
       self.chosenCollections = ko.observableArray();
@@ -407,7 +425,9 @@ ${ assist.assistPanel() }
       self.create = function () {
         $.post("${ url('indexer:create_alias') }", {
           "alias": self.name,
-          "collections": ko.mapping.toJSON(self.chosenCollections)
+          "collections": ko.mapping.toJSON(ko.utils.arrayMap(self.chosenCollections, function(c) {
+              return new c.name();
+          }))
         }, function () {
           window.location.reload();
         }).fail(function (xhr, textStatus, errorThrown) {
@@ -419,8 +439,7 @@ ${ assist.assistPanel() }
       self.edit = function (alias) {
         self.name(alias.name());
         self.chosenCollections(alias.collections());
-
-        self.showCreateModal(true);
+        $('#createAlias').modal('show');
       }
     };
 
