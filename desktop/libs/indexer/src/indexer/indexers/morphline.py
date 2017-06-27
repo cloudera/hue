@@ -25,7 +25,6 @@ from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
 
 from desktop.models import Document2
-from libzookeeper.conf import ENSEMBLE
 from notebook.connectors.base import get_api
 from notebook.models import Notebook, make_notebook
 
@@ -42,11 +41,12 @@ LOG = logging.getLogger(__name__)
 
 class MorphlineIndexer(object):
 
-  def __init__(self, username, fs=None, jt=None):
+  def __init__(self, username, fs=None, jt=None, solr_client=None):
     self.fs = fs
     self.jt = jt
     self.username = username
     self.user = User.objects.get(username=username) # To clean
+    self.solr_client = solr_client if solr_client is not None else SolrClient(self.user)
 
   def _upload_workspace(self, morphline):
     from oozie.models2 import Job
@@ -173,7 +173,6 @@ class MorphlineIndexer(object):
   def generate_morphline_config(self, collection_name, data, uuid_name=None):
     geolite_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "GeoLite2-City.mmdb")
     grok_dicts_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "grok_dictionaries")
-    client = SolrClient(self.user)
 
     properties = {
       "collection_name": collection_name,
@@ -186,7 +185,7 @@ class MorphlineIndexer(object):
       "get_kept_args": get_checked_args,
       "grok_dictionaries_location" : grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
       "geolite_db_location" : geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
-      "zk_host": client.get_zookeeper_host()
+      "zk_host": self.solr_client.get_zookeeper_host() ## offline test?
     }
 
     oozie_workspace = CONFIG_INDEXING_TEMPLATES_PATH.get()
