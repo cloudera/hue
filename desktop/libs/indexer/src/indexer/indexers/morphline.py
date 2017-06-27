@@ -25,7 +25,6 @@ from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
 
 from desktop.models import Document2
-from libsolr.conf import SOLR_ZK_PATH
 from libzookeeper.conf import ENSEMBLE
 from notebook.connectors.base import get_api
 from notebook.models import Notebook, make_notebook
@@ -35,6 +34,7 @@ from indexer.conf import CONFIG_INDEXER_LIBS_PATH
 from indexer.fields import get_field_type
 from indexer.file_format import get_file_format_instance, get_file_format_class
 from indexer.indexers.morphline_operations import get_checked_args
+from indexer.solr_client import SolrClient
 
 
 LOG = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ class MorphlineIndexer(object):
     workspace_path = self._upload_workspace(morphline)
 
     task = make_notebook(
-      name=_('Indexing into %s %s') % (collection_name, input_path),
+      name=_('Indexing into %s') % collection_name,
       editor_type='notebook',
       on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
       is_task=True,
@@ -91,6 +91,8 @@ class MorphlineIndexer(object):
 
       task.add_hive_snippet(snippet['database'], sql)
 
+    client = SolrClient(self.user)
+
     task.add_java_snippet(
       clazz='org.apache.solr.hadoop.MapReduceIndexerTool',
       app_jar=lib_path if lib_path is not None else CONFIG_INDEXER_LIBS_PATH.get(),
@@ -103,7 +105,7 @@ class MorphlineIndexer(object):
           u'log4j.properties',
           u'--go-live',
           u'--zk-host',
-          ENSEMBLE.get() + SOLR_ZK_PATH.get(),
+          client.get_zookeeper_host(),
           u'--collection',
           collection_name,
           input_path,
@@ -144,7 +146,6 @@ class MorphlineIndexer(object):
     return [field for field in self.get_field_list(field_data) if field['keep']]
 
   def get_unique_field(self, format_):
-    # check for a unique field
     unique_fields = [column['name'] for column in format_['columns'] if column['unique']]
 
     if unique_fields:
@@ -172,6 +173,7 @@ class MorphlineIndexer(object):
   def generate_morphline_config(self, collection_name, data, uuid_name=None):
     geolite_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "GeoLite2-City.mmdb")
     grok_dicts_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "grok_dictionaries")
+    client = SolrClient(self.user)
 
     properties = {
       "collection_name": collection_name,
@@ -184,7 +186,7 @@ class MorphlineIndexer(object):
       "get_kept_args": get_checked_args,
       "grok_dictionaries_location" : grok_dicts_loc if self.fs and self.fs.exists(grok_dicts_loc) else None,
       "geolite_db_location" : geolite_loc if self.fs and self.fs.exists(geolite_loc) else None,
-      "zk_host": ENSEMBLE.get()
+      "zk_host": client.get_zookeeper_host()
     }
 
     oozie_workspace = CONFIG_INDEXING_TEMPLATES_PATH.get()
