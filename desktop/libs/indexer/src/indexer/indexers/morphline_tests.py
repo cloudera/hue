@@ -32,33 +32,11 @@ from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogForma
 from indexer.fields import Field
 from indexer.indexers.morphline_operations import get_operator
 from indexer.indexers.morphline import MorphlineIndexer
+from indexer.solr_client import SolrClient
+from indexer.solr_client_tests import MockSolrCdhCloudHdfsApi
 
 
 LOG = logging.getLogger(__name__)
-
-
-def _test_fixed_type_format_generate_morphline(format_):
-  indexer = MorphlineIndexer("test")
-  format_instance = format_()
-
-  morphline = indexer.generate_morphline_config("test_collection", {
-      "columns": [field.to_dict() for field in format_instance.fields],
-      "format": format_instance.get_format()
-    })
-
-  assert_true(isinstance(morphline, basestring))
-
-def _test_generate_field_operation_morphline(operation_format):
-  fields = TestIndexer.simpleCSVFields[:]
-  fields[0]['operations'].append(operation_format)
-
-  indexer = MorphlineIndexer("test")
-  morphline =indexer.generate_morphline_config("test_collection", {
-      "columns": fields,
-      "format": TestIndexer.simpleCSVFormat
-    })
-
-  assert_true(isinstance(morphline, basestring))
 
 
 class TestIndexer():
@@ -117,6 +95,8 @@ class TestIndexer():
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "indexer")
     add_to_group("test")
+    self.user = User.objects.get(username='test')
+    self.solr_client = SolrClient(self.user, api=MockSolrCdhCloudHdfsApi())
 
     self.finish = ENABLE_NEW_INDEXER.set_for_testing(True)
 
@@ -125,7 +105,7 @@ class TestIndexer():
 
   def test_guess_csv_format(self):
     stream = StringIO.StringIO(TestIndexer.simpleCSVString)
-    indexer = MorphlineIndexer("test")
+    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
@@ -143,7 +123,7 @@ class TestIndexer():
         assert_equal(expected[key], actual[key])
 
   def test_guess_format_invalid_csv_format(self):
-    indexer = MorphlineIndexer("test")
+    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
     stream = StringIO.StringIO(TestIndexer.simpleCSVString)
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
@@ -170,7 +150,7 @@ class TestIndexer():
     assert_equal(fields, [])
 
   def test_generate_csv_morphline(self):
-    indexer = MorphlineIndexer("test")
+    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
     morphline =indexer.generate_morphline_config("test_collection", {
         "columns": self.simpleCSVFields,
         "format": self.simpleCSVFormat
@@ -179,14 +159,14 @@ class TestIndexer():
     assert_true(isinstance(morphline, basestring))
 
   def test_generate_apache_combined_morphline(self):
-    _test_fixed_type_format_generate_morphline(ApacheCombinedFormat)
+    self._test_fixed_type_format_generate_morphline(ApacheCombinedFormat)
 
   def test_generate_ruby_logs_morphline(self):
     raise SkipTest
-    _test_fixed_type_format_generate_morphline(RubyLogFormat)
+    self._test_fixed_type_format_generate_morphline(RubyLogFormat)
 
   def test_generate_hue_log_morphline(self):
-    _test_fixed_type_format_generate_morphline(HueLogFormat)
+    self._test_fixed_type_format_generate_morphline(HueLogFormat)
 
   def test_generate_split_operation_morphline(self):
     split_dict = get_operator('split').get_default_operation()
@@ -196,7 +176,7 @@ class TestIndexer():
         Field("test_field_2", "string").to_dict()
       ]
 
-    _test_generate_field_operation_morphline(split_dict)
+    self._test_generate_field_operation_morphline(split_dict)
 
   def test_generate_extract_uri_components_operation_morphline(self):
     extract_uri_dict = get_operator('extract_uri_components').get_default_operation()
@@ -206,7 +186,7 @@ class TestIndexer():
         Field("test_field_2", "string").to_dict()
       ]
 
-    _test_generate_field_operation_morphline(extract_uri_dict)
+    self._test_generate_field_operation_morphline(extract_uri_dict)
 
   def test_generate_grok_operation_morphline(self):
     grok_dict = get_operator('grok').get_default_operation()
@@ -216,12 +196,12 @@ class TestIndexer():
         Field("test_field_2", "string").to_dict()
       ]
 
-    _test_generate_field_operation_morphline(grok_dict)
+    self._test_generate_field_operation_morphline(grok_dict)
 
   def test_generate_convert_date_morphline(self):
     convert_date_dict = get_operator('convert_date').get_default_operation()
 
-    _test_generate_field_operation_morphline(convert_date_dict)
+    self._test_generate_field_operation_morphline(convert_date_dict)
 
   def test_generate_geo_ip_morphline(self):
     geo_ip_dict = get_operator('geo_ip').get_default_operation()
@@ -231,7 +211,7 @@ class TestIndexer():
         Field("test_field_2", "string").to_dict()
       ]
 
-    _test_generate_field_operation_morphline(geo_ip_dict)
+    self._test_generate_field_operation_morphline(geo_ip_dict)
 
   def test_generate_translate_morphline(self):
     translate_dict = get_operator('translate').get_default_operation()
@@ -243,12 +223,12 @@ class TestIndexer():
 
     translate_dict['settings']['mapping'].append({"key":"key","value":"value"})
 
-    _test_generate_field_operation_morphline(translate_dict)
+    self._test_generate_field_operation_morphline(translate_dict)
 
   def test_generate_find_replace_morphline(self):
     find_replace_dict = get_operator('find_replace').get_default_operation()
 
-    _test_generate_field_operation_morphline(find_replace_dict)
+    self._test_generate_field_operation_morphline(find_replace_dict)
 
   def test_end_to_end(self):
     if not is_live_cluster() or True: # Skipping as requires morplines libs to be setup
@@ -259,7 +239,7 @@ class TestIndexer():
     make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
     user = User.objects.get(username="test")
     collection_name = "test_collection"
-    indexer = MorphlineIndexer("test", fs=fs, jt=cluster.jt)
+    indexer = MorphlineIndexer("test", fs=fs, jt=cluster.jt, solr_client=self.solr_client)
     input_loc = "/tmp/test.csv"
 
     # upload the test file to hdfs
@@ -296,6 +276,29 @@ class TestIndexer():
 
     # index the file
     indexer.run_morphline(MockedRequest(user=user, fs=cluster.fs, jt=cluster.jt), collection_name, morphline, input_loc)
+
+  def _test_fixed_type_format_generate_morphline(self, format_):
+    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
+    format_instance = format_()
+
+    morphline = indexer.generate_morphline_config("test_collection", {
+        "columns": [field.to_dict() for field in format_instance.fields],
+        "format": format_instance.get_format()
+      })
+
+    assert_true(isinstance(morphline, basestring))
+
+  def _test_generate_field_operation_morphline(self, operation_format):
+    fields = TestIndexer.simpleCSVFields[:]
+    fields[0]['operations'].append(operation_format)
+
+    indexer = MorphlineIndexer("test", solr_client=self.solr_client)
+    morphline =indexer.generate_morphline_config("test_collection", {
+        "columns": fields,
+        "format": TestIndexer.simpleCSVFormat
+      })
+
+    assert_true(isinstance(morphline, basestring))
 
 
 class MockedRequest():
