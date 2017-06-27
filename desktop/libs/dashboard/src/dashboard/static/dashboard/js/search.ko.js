@@ -718,7 +718,7 @@ var Collection = function (vm, collection) {
     }
     if (typeof facet.properties.facets != 'undefined') {
       $.each(facet.properties.facets(), function (index, pivotFacet) {
-        if (pivotFacet.aggregate) {
+        if (pivotFacet.aggregate && typeof facet.properties.aggregate == 'function') {
           pivotFacet.aggregate.function.subscribe(function () {
             vm.search();
           });
