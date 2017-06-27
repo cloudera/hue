@@ -4192,31 +4192,37 @@
               var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
               if (token !== null && !token.notFound && token.parseLocation && !disableTooltip) {
                 tooltipTimeout = window.setTimeout(function () {
-                  var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                  if (token.parseLocation) {
+                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
 
-                  var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
-                  if (token.parseLocation.identifierChain) {
-                    tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) {
-                        return identifier.name
-                      }).join('.') + ')';
-                  } else if (token.parseLocation.function) {
-                    tooltipText += ' (' + token.parseLocation.function + ')';
+                    var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
+                    if (token.parseLocation.identifierChain) {
+                      tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) {
+                          return identifier.name
+                        }).join('.') + ')';
+                    } else if (token.parseLocation.function) {
+                      tooltipText += ' (' + token.parseLocation.function + ')';
+                    }
+                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                   }
-                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                 }, 500);
               } else if (token !== null && token.notFound) {
                 tooltipTimeout = window.setTimeout(function () {
                   // TODO: i18n
-                  var tooltipText = 'Could not find ' + (token.qualifiedIdentifier || token.value) + '';
-                  var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                  if (token.notFound) {
+                    var tooltipText = 'Could not find ' + (token.qualifiedIdentifier || token.value) + '';
+                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                  }
                 }, 500);
               } else if (token !== null && token.syntaxError) {
                 tooltipTimeout = window.setTimeout(function () {
                   // TODO: i18n
-                  var tooltipText = 'Did you mean "' + token.syntaxError.expected[0].text + '"?';
-                  var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                  if (token.syntaxError) {
+                    var tooltipText = 'Did you mean "' + token.syntaxError.expected[0].text + '"?';
+                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                  }
                 }, 500);
               } else {
                 hideContextTooltip();
