@@ -181,16 +181,13 @@ def importer_submit(request):
         fields += [{"name": unique_key_field, "type": "string"}]
         kwargs['rowid'] = unique_key_field
 
-      try:
+      if not client.exists(index_name):
         client.create_index(
             name=index_name,
             fields=fields,
             unique_key_field=unique_key_field,
             df=df
         )
-      except Exception, e:
-        if not 'already exists' in str(e):
-          raise e
 
       data = request.fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
       client.index(name=index_name, data=data, **kwargs)
@@ -253,15 +250,13 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
     schema_fields += [{"name": unique_field, "type": "string"}]
 
   client = SolrClient(user=request.user)
-  try:
-    client.get_index_schema(collection_name)
-  except Exception, e:
-    if 'not available' in str(e):
-      client.create_index(
-        name=collection_name,
-        fields=request.POST.get('fields', schema_fields),
-        unique_key_field=unique_field
-      )
+
+  if not client.exists(collection_name):
+    client.create_index(
+      name=collection_name,
+      fields=request.POST.get('fields', schema_fields),
+      unique_key_field=unique_field
+    )
 
   if file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
