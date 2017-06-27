@@ -147,9 +147,8 @@ ${ assist.assistPanel() }
             <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
             <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
           </div>
-          <div class="hueOverlay" data-bind="visible: isLoading">
-            <i class="fa fa-spinner fa-spin big-spinner"></i>
-          </div>
+
+          <!-- ko hueSpinner: { spin: isLoading, center: true, size: 'xlarge' } --><!-- /ko -->
 
 
           <div id="deleteIndex" class="modal hide fade">
@@ -271,7 +270,7 @@ ${ assist.assistPanel() }
   <ul class="nav nav-pills margin-top-30">
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
-    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
+    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); $root.index().getSample(); }">${_('Sample')}</a></li>
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
@@ -377,32 +376,29 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="indexes-index-sample">
-  <div>
-    Sample
-
-    <a data-bind="click: $root.index().getSample">Load</a>
-
-    <table class="table table-condensed table-nowrap sample-table">
-      <thead>
+  <!-- ko hueSpinner: { spin: $root.index().loadingSample, center: true, size: 'xlarge' } --><!-- /ko -->
+  <!-- ko ifnot: $root.index().loadingSample -->
+  <table class="table table-condensed table-nowrap sample-table">
+    <thead>
+      <tr>
+        <th style="width: 1%">&nbsp;</th>
+        <!-- ko foreach: $root.index().fields() -->
+        <th data-bind="text: name"></th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: $data -->
         <tr>
-          <th style="width: 1%">&nbsp;</th>
+          <td data-bind="text: $index() + 1"></td>
           <!-- ko foreach: $root.index().fields() -->
-          <th data-bind="text: name"></th>
+            <td data-bind="text: $parent[name()]"></td>
           <!-- /ko -->
         </tr>
-      </thead>
-      <tbody>
-        <!-- ko foreach: $data -->
-          <tr>
-            <td data-bind="text: $index() + 1"></td>
-            <!-- ko foreach: $root.index().fields() -->
-              <td data-bind="text: $parent[name()]"></td>
-            <!-- /ko -->
-          </tr>
-        <!-- /ko -->
-      </tbody>
-    </table>
-  </div>
+      <!-- /ko -->
+    </tbody>
+  </table>
+  <!-- /ko -->
 </script>
 
 
@@ -461,18 +457,23 @@ ${ assist.assistPanel() }
         return self.sample().splice(0, 5)
       });
 
+      self.loadingSample = ko.observable(false);
+
       self.getSample = function () {
+        self.loadingSample(true);
         $.post("${ url('indexer:sample_index') }", {
           name: self.name(),
           rows: 100
         }, function (data) {
           if (data.status == 0) {
-            self.sample(data.sample)
+            self.sample(data.sample);
           } else {
             $(document).trigger("error", data.message);
           }
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          self.loadingSample(false);
         });
         hueAnalytics.log('indexes', 'sample_index');
       };
@@ -527,6 +528,7 @@ ${ assist.assistPanel() }
       self.datatable = null;
 
       self.fetchIndexes = function () {
+        self.isLoading(true);
         $.post("${ url('indexer:list_indexes') }", {}, function (data) {
           if (data.status == 0) {
             var indexes = []
@@ -540,6 +542,8 @@ ${ assist.assistPanel() }
           }
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          self.isLoading(false);
         });
         hueAnalytics.log('indexes', 'list_indexes');
       };
