@@ -2096,6 +2096,9 @@
         },
         drag: function (event, ui) {
           var currentHeight = ui.offset.top - $target.offset().top - 20;
+          if (options.minHeight && currentHeight < options.minHeight) {
+            currentHeight = options.minHeight;
+          }
           $.totalStorage('hue.editor.logs.size', currentHeight);
           $target.css("height", currentHeight + "px");
           ui.offset.top = 0;
