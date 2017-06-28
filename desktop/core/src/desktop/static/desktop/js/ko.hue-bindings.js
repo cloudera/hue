@@ -3629,7 +3629,7 @@
                     silenceErrors: true,
                     successCallback: function (data) {
                       try {
-                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name) !== -1) {
+                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
                           location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
                           delete location.tables;
                           token.parseLocation = location;
@@ -3644,8 +3644,14 @@
                   findIdentifierChainInTable(tablesToGo);
                 }
               };
-
-              findIdentifierChainInTable(location.tables.concat());
+              if (location.tables.length > 1) {
+                findIdentifierChainInTable(location.tables.concat());
+              } else if (location.tables.length == 1 && location.tables[0].identifierChain) {
+                location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
+                delete location.tables;
+                token.parseLocation = location;
+                activeTokens.push(token);
+              }
             } else {
               token.parseLocation = location;
               activeTokens.push(token);
