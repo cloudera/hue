@@ -1593,38 +1593,38 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
 
     tour.addStep('welcome', {
-      text: '<b>${ _ko('Welcome to Hue 4!') }</b><br><br>${ _ko('Before you start, we want you to familiarize with the new interface. Ready?') }',
+      text: '<b>${ _ko('Welcome to Hue 4!') }</b><br><br>${ _ko('We want to introduce you to the new interface. It takes less than a minute. Ready? ') }',
     });
 
     tour.addStep('topnav', {
-      text: '${ _ko('A brand new navigation bar!') }<br><br>${ _ko('The default app has its own blue button now, there is a global search available, and the notifications panels are on the right.') }',
+      text: '${ _ko('A new nav bar and big blue button!') }<br><br>${ _ko('Open Hue to your favorite app, select other apps from the blue button, do global search, and view notification panels at right.') }',
       attachTo: '.navbar-default bottom',
     });
 
     %if user.is_superuser:
       tour.addStep('admin', {
-        text: '${ _ko('Since you are a superuser, you can find the Check Configuration inside the user dropdown and install examples of data and jobs.') }',
+        text: '${ _ko('As a superuser, you can check system configuration from the username drop down and install sample data and jobs for your users.') }',
         attachTo: '.top-nav-right .dropdown bottom',
       });
     %endif
 
     tour.addStep('leftpanel', {
-      text: '${ _ko('The improved data panel will help you out with discovering your sources. Remember: you can right click on it!') }',
+      text: '${ _ko('Discover data sources with the improved data assist panel. Remember to right-click for more!') }',
       attachTo: '.left-panel right',
     });
 
     tour.addStep('pagecontent', {
-      text: '${ _ko('This is the main action spot, where the currently selected app runs.') }<br>${ _ko('Hover on the app name to star it as your favorite application.') }',
+      text: '${ _ko('This is the main attraction, where your selected app runs.') }<br>${ _ko('Hover on the app name to star it as your favorite application.') }',
       attachTo: '.page-content center',
     });
 
     tour.addStep('rightpanel', {
-      text: '${ _ko('Some of the apps have a right panel too with additional information to assist you out in your data discovery.') }',
+      text: '${ _ko('Some apps have a right panel with additional information to assist you in your data discovery.') }',
       attachTo: '.right-panel left',
     });
 
     tour.addStep('bye', {
-      text: '${ _ko('This tour will not be shown again, but you can always take it again by clicking on your username on top right.') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!',
+      text: '${ _ko('This ends the tour. To see it again, click Welcome Tour from the username drop down.') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!',
     });
 
     var closeTourOnEsc = function (e) {
