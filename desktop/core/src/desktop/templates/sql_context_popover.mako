@@ -735,18 +735,6 @@ from metadata.conf import has_navigator
 
           hueUtils.initNiceScroll($t.parents('.dataTables_wrapper'));
 
-          $t.parents('.dataTables_wrapper').niceScroll({
-            cursorcolor: "#C1C1C1",
-            cursorborder: "1px solid #C1C1C1",
-            cursoropacitymin: 0,
-            cursoropacitymax: 1,
-            scrollspeed: 100,
-            mousescrollstep: 60,
-            cursorminheight: 20,
-            horizrailenabled: true,
-            autohidemode: "leave"
-          });
-
           if (data && data.rows) {
             var _tempData = [];
             $.each(data.rows, function (index, row) {
