@@ -122,6 +122,7 @@
 .doc-browser-entries {
   list-style: none;
   margin: 0;
+  overflow-x: hidden;
 }
 
 .doc-browser-entries > li {
@@ -178,8 +179,10 @@
 .doc-browser-primary-col {
   .flex(1);
   .nowrap-ellipsis();
+  min-width: 200px;
   vertical-align: middle;
   padding-left: 8px;
+  padding-right: 20px;
 }
 
 .doc-browser-header .doc-browser-primary-col {
@@ -196,7 +199,7 @@
 }
 
 .doc-browser-attr-group {
-  .flex(0 0 770px);
+  .flex(0 1 770px);
   white-space: nowrap;
   float: right;
   display: inline-block;
