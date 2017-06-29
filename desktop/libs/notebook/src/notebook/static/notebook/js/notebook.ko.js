@@ -21,7 +21,7 @@ var EditorViewModel = (function() {
       'ace', 'aceMode', 'autocompleter', 'availableDatabases', 'availableSnippets', 'avoidClosing', 'canWrite',
       'cleanedDateTimeMeta', 'cleanedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
       'hasProperties', 'history', 'images', 'inFocus', 'queries', 'saveResultsModalVisible', 'selectedStatement',
-      'snippetImage', 'user', 'positionStatement'
+      'snippetImage', 'user', 'positionStatement', 'lastExecutedStatement'
     ]
   };
 
@@ -517,6 +517,7 @@ var EditorViewModel = (function() {
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
     self.positionStatement = ko.observable(null);
+    self.lastExecutedStatement = ko.observable(null);
 
     huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
       if (self.ace() && self.ace().container.id === statementDetails.id) {
@@ -968,7 +969,7 @@ var EditorViewModel = (function() {
     self.compatibilityTargetPlatform = ko.observable(self.type());
     self.compatibilityTargetPlatforms = ko.observableArray([
       {'name': 'Impala', 'value': 'impala'},
-      {'name': 'Hive', 'value': 'hive'},
+      {'name': 'Hive', 'value': 'hive'}
     ]);
 
     self.showOptimizer = ko.observable(self.getApiHelper().getFromTotalStorage('editor', 'show.optimizer', false));
@@ -977,7 +978,6 @@ var EditorViewModel = (function() {
         self.getApiHelper().setInTotalStorage('editor', 'show.optimizer', newValue);
       }
     });
-
 
     if (HAS_OPTIMIZER && ! vm.isNotificationManager()) {
       var lastComplexityRequest;
@@ -1168,6 +1168,12 @@ var EditorViewModel = (function() {
         self.statusForButtons('executed');
       }
 
+      if (self.isSqlDialect() && self.positionStatement()) {
+        self.lastExecutedStatement(self.positionStatement());
+      } else {
+        self.lastExecutedStatement(null);
+      }
+
       self.status('running');
       self.statusForButtons('executing');
       self.errors([]);
@@ -1233,7 +1239,7 @@ var EditorViewModel = (function() {
           } else {
             if (! notebook.unloaded()) {
               self.checkStatus();
-            };
+            }
           }
         } else {
           self._ajaxError(data, self.execute);
@@ -1420,6 +1426,7 @@ var EditorViewModel = (function() {
     };
 
     self.isFetchingData = false;
+
     self.fetchResultData = function (rows, startOver) {
       if (! self.isFetchingData) {
         if( self.status() == 'available') {
@@ -1489,7 +1496,7 @@ var EditorViewModel = (function() {
         } else {
           meta.cssClass = 'sort-string';
         }
-      })
+      });
 
       self.result.hasMore(result.has_more);
 
@@ -1557,22 +1564,31 @@ var EditorViewModel = (function() {
             self.getLogs();
           }
 
-          if (data.status == 0) {
+          if (data.status === 0) {
             self.status(data.query_status.status);
 
             if (self.status() == 'running' || self.status() == 'starting' || self.status() == 'waiting') {
               self.result.endTime(new Date());
               var delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
-              if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, delay); };
-            }
-            else if (self.status() == 'available') {
+              if (! notebook.unloaded()) {
+                self.checkStatusTimeout = setTimeout(self.checkStatus, delay);
+              }
+            } else if (self.status() === 'available') {
               self.fetchResult(100);
               self.progress(100);
               if (self.isSqlDialect()) {
                 if (self.result.handle().has_result_set) {
                   self.fetchResultSize();
                 } else { // Is DDL
-                  self.ddlNotification(Math.random());
+
+                  if (self.lastExecutedStatement()) {
+                    if (/CREATE|DROP|ALTER/i.test(self.lastExecutedStatement().firstToken)) {
+                      self.ddlNotification(Math.random());
+                    }
+                  } else {
+                    self.ddlNotification(Math.random());
+                  }
+
                   if (self.result.handle().has_more_statements) {
                     setTimeout(function () {
                       self.execute(); // Execute next, need to wait as we disabled fast click
@@ -1583,11 +1599,10 @@ var EditorViewModel = (function() {
               if (! self.result.handle().has_more_statements && vm.successUrl()) {
                 window.location.href = vm.successUrl(); // Not used anymore in Hue 4
               }
-            }
-            else if (self.status() == 'success') {
+            } else if (self.status() === 'success') {
               self.progress(99);
             }
-          } else if (data.status == -3) {
+          } else if (data.status === -3) {
             self.status('expired');
           } else {
             self._ajaxError(data);
