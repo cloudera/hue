@@ -138,12 +138,24 @@ case 6:
    
 break;
 case 7:
-this.$ = [{ type: 'statement', statement: $$[$0], location: _$[$0] }];
+
+     if (parser.yy.firstToken) {
+       this.$ = [{ type: 'statement', statement: $$[$0], location: _$[$0], firstToken: parser.yy.firstToken }];
+       parser.yy.firstToken = null;
+     } else {
+       this.$ = [{ type: 'statement', statement: $$[$0], location: _$[$0] }];
+     }
+   
 break;
 case 8:
 
      parser.handleTrailingStatements($$[$0-2], $$[$0-1]);
-     $$[$0-2].push({ type: 'statement', statement: $$[$0], location: _$[$0] });
+     if (parser.yy.firstToken) {
+       $$[$0-2].push({ type: 'statement', statement: $$[$0], location: _$[$0], firstToken: parser.yy.firstToken });
+       parser.yy.firstToken = null;
+     } else {
+       $$[$0-2].push({ type: 'statement', statement: $$[$0], location: _$[$0] });
+     }
    
 break;
 case 10:
@@ -710,7 +722,15 @@ case 19: this.popState(); return 5;
 break;
 case 20: this.popState(); return 8; 
 break;
-case 21: return 8; 
+case 21:
+                                                                        if (!parser.yy.firstToken) {
+                                                                          var firstWordMatch = yy_.yytext.match(/[a-zA-Z_]+/);
+                                                                          if (firstWordMatch) {
+                                                                            parser.yy.firstToken = firstWordMatch[0];
+                                                                          }
+                                                                        };
+                                                                        return 8;
+                                                                      
 break;
 case 22: return 8; 
 break;
