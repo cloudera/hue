@@ -2677,13 +2677,13 @@ ${ dashboard.layout_skeleton(suffix='search') }
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
                 <label class="control-label" for="settingstimestart">${ _('Start date/time') }</label>
                 <div class="controls">
-                  <input id="settingstimestart" type="text" data-bind="value: collection.timeFilter.from, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]'}" />
+                  <input id="settingstimestart" type="text" data-bind="value: collection.timeFilter.from, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]', disableUTC: true}" />
                 </div>
               </div>
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
                 <label class="control-label" for="settingstimeend">${ _('End date/time') }</label>
                 <div class="controls">
-                  <input id="settingstimeend" type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]'}" />
+                  <input id="settingstimeend" type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]', disableUTC: true}" />
                 </div>
               </div>
               <!-- ko if: collection.timeFilter.type() == 'rolling' -->
