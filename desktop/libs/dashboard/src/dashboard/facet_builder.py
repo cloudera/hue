@@ -145,6 +145,9 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
         gap = '+1YEARS'
       else:
         gap = '+10YEARS'
+    else:
+      stats_min = stat_facet['min']
+      stats_max = stat_facet['max']
 
     properties.update({
       'min': stats_min,
