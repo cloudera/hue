@@ -550,46 +550,55 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hue-global-search-template">
-    <input placeholder="${ _('Search data and saved documents...') }" type="text"
-           data-bind="autocomplete: {
-                source: searchAutocompleteSource,
-                itemTemplate: 'top-search-autocomp-item',
-                noMatchTemplate: 'top-search-autocomp-no-match',
-                classPrefix: 'nav-',
-                showOnFocus: true,
-                closeOnEnter: false,
-                onSelect: mainSearchSelect,
-                reopenPattern: /.*:$/
-              },
-              hasFocus: searchHasFocus,
-              clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
-              textInput: searchInput,
-              valueUpdate: 'afterkeydown'">
-  </script>
+    <input placeholder="${ _('Search data and saved documents...') }" type="text" data-bind="textInput: searchInput, hasFocus: searchHasFocus">
 
-  <script type="text/html" id="top-search-autocomp-item">
-    <a href="javascript:void(0);">
-      <div class="nav-autocomplete-item-link">
-        <div class="nav-search-result-icon"><i class="fa fa-fw" data-bind="css: icon"></i></div>
-        <div class="nav-search-result-text">
-          <div class="nav-search-result-header" data-bind="html: label, style: { 'padding-top': description ? 0 : '9px' }"></div>
-          <!-- ko if: description -->
-          <div class="nav-search-result-description" data-bind="html: description"></div>
-          <!-- /ko -->
+    <div class="global-search-results" data-bind="visible: searchResultVisible, onClickOutside: onResultClickOutside" style="display:none;">
+      <div class="global-search-alternatives">
+        <div class="global-search-category">
+          <div class="global-search-category-header">Category 1</div>
+          <ul>
+            <li>Alternative 1</li>
+            <li>Alternative 2</li>
+            <li>Alternative 3</li>
+            <li>Alternative 4</li>
+          </ul>
+        </div>
+        <div class="global-search-category">
+          <div class="global-search-category-header">Category 2</div>
+          <ul>
+            <li>Alternative 1</li>
+            <li>Alternative 2</li>
+            <li>Alternative 3</li>
+            <li>Alternative 4</li>
+          </ul>
+        </div>
+        <div class="global-search-category">
+          <div class="global-search-category-header">Category 3</div>
+          <ul>
+            <li>Alternative 1</li>
+            <li>Alternative 2</li>
+            <li>Alternative 3</li>
+            <li>Alternative 4</li>
+          </ul>
+        </div>
+        <div class="global-search-category">
+          <div class="global-search-category-header">Category 4</div>
+          <ul>
+            <li>Alternative 1</li>
+            <li>Alternative 2</li>
+            <li>Alternative 3</li>
+            <li>Alternative 4</li>
+          </ul>
         </div>
       </div>
-    </a>
-  </script>
-
-  <script type="text/html" id="top-search-autocomp-no-match">
-    <div class="nav-autocomplete-item-link" style="height: 30px;">
-      <div class="nav-autocomplete-empty">${ _('No match found') }</div>
+      <div class="global-search-preview">
+        Preview Area
+      </div>
     </div>
   </script>
 
   <script type="text/javascript">
     (function () {
-
       var SEARCH_FACET_ICON = 'fa-tags';
       var SEARCH_TYPE_ICONS = {
         'DATABASE': 'fa-database',
@@ -610,10 +619,26 @@ from desktop.views import _ko
 
       var GlobalSearch = function (params) {
         var self = this;
-        self.apiHelper = ApiHelper.getInstance();
         self.searchHasFocus = ko.observable(false);
-        self.searchInput = ko.observable();
+        self.searchInput = ko.observable('');
         self.searchActive = ko.observable(false);
+
+        self.searchResultVisible = ko.observable(false);
+
+        self.searchInput.subscribe(function (newValue) {
+          if (newValue.length > 0) {
+            self.searchResultVisible(true);
+          }
+        })
+      };
+
+      GlobalSearch.prototype.onResultClickOutside = function () {
+        var self = this;
+        console.log('on outside');
+        if (!self.searchResultVisible() || self.searchHasFocus()) {
+          return false;
+        }
+        self.searchResultVisible(false);
       };
 
       GlobalSearch.prototype.mainSearchSelect = function (entry) {

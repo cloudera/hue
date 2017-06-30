@@ -272,6 +272,7 @@ body {
 }
 
 .top-nav-middle .search-container-top {
+  position: relative;
   margin-left: auto;
   margin-right: auto;
   max-width: 600px;
@@ -931,4 +932,30 @@ a:visited {
   position: relative;
   z-index: 1010;
   background-color: @cui-gray-050;
+}
+
+.global-search-results {
+  .display-flex();
+  background-color: @cui-white;
+  position:absolute;
+  z-index: 1060;
+  top: 35px;
+  left: 0;
+  width: 100%;
+  .hue-box-shadow-bottom();
+
+  .global-search-alternatives {
+    .flex(0 0 175px);
+    border-right: 1px solid @cui-default-border-color;
+
+    .global-search-category {
+      .global-search-category-header {
+
+      }
+    }
+
+  }
+  .global-search-preview {
+    .flex(1);
+  }
 }
