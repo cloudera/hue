@@ -581,8 +581,8 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
       node = adj_list[node]
       if node['uuid'] not in nodes_uuid_set:
         properties = {}
-        if '%s-widget' % node['node_type'] in NODES:
-          properties = dict(NODES['%s-widget' % node['node_type']].get_fields())
+        if _get_widget_type(node['node_type']) in NODES:
+          properties = dict(NODES[_get_widget_type(node['node_type'])].get_fields())
 
         if node['node_type'] == 'pig':
           properties['script_path'] = node.get('pig').get('script_path')
@@ -638,7 +638,7 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
         wf_nodes.append({
             "id": node['uuid'],
             "name": '%s-%s' % (node['node_type'].split('-')[0], node['uuid'][:4]),
-            "type": "%s-widget" % node['node_type'],
+            "type": _get_widget_type(node['node_type']),
             "properties": properties,
             "children": children
         })
@@ -652,11 +652,11 @@ def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
       node = node[0]
     if type(node) != list:
       _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id=adj_list[node]['uuid'],
-        row={"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": "%s-widget" % adj_list[node]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+        row={"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": _get_widget_type(adj_list[node]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
     else:
       if adj_list[node[0]]['node_type'] in ('fork', 'decision'):
         _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id=adj_list[node[0]]['uuid'],
-          row={"widgets":[{"size":size, "name": adj_list[node[0]]['name'], "id":  adj_list[node[0]]['uuid'], "widgetType": "%s-widget" % adj_list[node[0]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+          row={"widgets":[{"size":size, "name": adj_list[node[0]]['name'], "id":  adj_list[node[0]]['uuid'], "widgetType": _get_widget_type(adj_list[node[0]]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
 
         wf_rows.append({
           "id": str(uuid.uuid4()),
@@ -679,10 +679,15 @@ def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
           ]
         })
         if adj_list[node[0]]['node_type'] == 'fork':
-          wf_rows.append({"widgets":[{"size":size, "name": adj_list[node[2]]['name'], "id":  adj_list[node[2]]['uuid'], "widgetType": "%s-widget" % adj_list[node[2]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+          wf_rows.append({"widgets":[{"size":size, "name": adj_list[node[2]]['name'], "id":  adj_list[node[2]]['uuid'], "widgetType": _get_widget_type(adj_list[node[2]]['node_type']), "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
       else:
         wf_rows.append(_create_workflow_layout(node, adj_list, nodes_uuid_set, size))
   return wf_rows
+
+
+def _get_widget_type(node_type):
+  widget_name = "%s-widget" % node_type
+  return widget_name if widget_name in NODES.keys() else 'generic-widget'
 
 # Prevent duplicate nodes in graph layout
 def _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id, row):
