@@ -714,7 +714,7 @@ from metadata.conf import has_navigator
             forceInvisible: 10
           });
 
-          $t.parents('.dataTables_wrapper').css('height', '100%');
+          $t.parents('.dataTables_wrapper').height($t.parents('.sample-scroll').parent().height());
 
           $t.jHueTableExtender2({
             fixedHeader: true,
@@ -731,6 +731,11 @@ from metadata.conf import has_navigator
             if ($t.data('plugin_jHueTableExtender2')) {
               $t.data('plugin_jHueTableExtender2').destroy();
             }
+            huePubSub.removeAll('sql.context.popover.resized');
+          });
+
+          huePubSub.subscribe('sql.context.popover.resized', function () {
+            $t.parent().height($t.parents('.context-sample-container').height());
           });
 
           hueUtils.initNiceScroll($t.parents('.dataTables_wrapper'));
@@ -962,6 +967,9 @@ from metadata.conf import has_navigator
             huePubSub.publish('table.extender.redraw', 'sampleTab');
             redrawHeaders = false;
           }
+
+          huePubSub.publish('sql.context.popover.resized');
+
           // Delay or it will close the popover when releasing at the window borders
           window.setTimeout(function () {
             preventHide = false;
