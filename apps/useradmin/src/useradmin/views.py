@@ -105,7 +105,7 @@ def list_for_autocomplete(request):
         groups = request.user.groups.all()
     else:
       usergroups = request.user.groups.all()
-      users = User.objects.filter(groups__in=usergroups).order_by('username')
+      users = User.objects.filter(groups__in=usergroups).order_by('username').distinct()
       groups = usergroups.order_by('name')
 
     if not request.GET.get('include_myself'):
