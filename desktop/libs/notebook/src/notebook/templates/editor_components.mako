@@ -2169,7 +2169,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
   function scrollToColumn(linkElement, index) {
     var $resultTable = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)");
-    var _text = $.trim($(linkElement).text().split(" ")[0]);
+    var _text = $.trim($(linkElement).text());
     var _col = $resultTable.find("th").filter(function () {
       return $.trim($(this).text()) == _text;
     });
