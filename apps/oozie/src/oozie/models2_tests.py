@@ -1164,12 +1164,12 @@ class TestExternalWorkflowGraph(object):
             <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
         </kill>
         <action name="email-0aaa">
-            <email xmlns="uri:oozie:email-action:0.2">
+            <generic_action xmlns="uri:oozie:email-action:0.2">
                 <to>test</to>
                 <subject>test</subject>
                 <body>test</body>
                 <content_type>text/plain</content_type>
-            </email>
+            </generic_action>
             <ok to="End"/>
             <error to="Kill"/>
               <sla:info>
@@ -1186,7 +1186,7 @@ class TestExternalWorkflowGraph(object):
 
     assert_true(len(workflow_data['layout'][0]['rows']) == 4)
     assert_true(len(workflow_data['workflow']['nodes']) == 4)
-    assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'email-widget')
+    assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'generic-widget')
     assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)
 
 class TestModelAPI(OozieMockBase):
