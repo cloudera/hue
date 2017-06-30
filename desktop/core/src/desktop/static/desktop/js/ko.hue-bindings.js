@@ -2436,14 +2436,25 @@
     }
   };
 
-  ko.bindingHandlers.clickOutside = {
-    init: function (element, valueAccessor) {
-      var func = valueAccessor();
+  ko.bindingHandlers.onClickOutside = {
+    update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var options = valueAccessor();
+      var func = (typeof options === 'function') ? options : options.onOutside;
 
-      $(document).on('click', function (event) {
+      var onDocumentClick = function (event) {
         if ($.contains(document, event.target) && !$.contains(element, event.target)) {
-          func();
+          var result = func.bind(viewModel)();
+          if (typeof result === 'undefined' || result) {
+            $(document).off('click', onDocumentClick);
+          }
         }
+      };
+
+      $(document).off('click', onDocumentClick);
+      $(document).on('click', onDocumentClick);
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        $(document).off('click', onDocumentClick);
       });
     }
   };
