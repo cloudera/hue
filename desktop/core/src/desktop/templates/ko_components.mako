@@ -550,8 +550,12 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hue-global-search-template">
-    <input placeholder="${ _('Search data and saved documents...') }" type="text" data-bind="textInput: searchInput, hasFocus: searchHasFocus">
-
+    <div class="global-search-input-container">
+      <div>
+        <input class="global-search-input" placeholder="${ _('Search data and saved documents...') }" type="text" data-bind="textInput: searchInput, hasFocus: searchHasFocus">
+        <input class="global-search-autocomplete" disabled type="text" data-bind="value: searchAutocomplete">
+      </div>
+    </div>
     <div class="global-search-results" data-bind="visible: searchResultVisible, onClickOutside: onResultClickOutside" style="display:none;">
       <div class="global-search-alternatives">
         <div class="global-search-category">
@@ -623,6 +627,11 @@ from desktop.views import _ko
         self.searchInput = ko.observable('');
         self.searchActive = ko.observable(false);
 
+        self.searchAutocomplete = ko.pureComputed(function () {
+          // TODO: Add autocomplete suggestions here
+          return self.searchInput() + '';
+        });
+
         self.searchResultVisible = ko.observable(false);
 
         self.searchInput.subscribe(function (newValue) {
@@ -634,7 +643,6 @@ from desktop.views import _ko
 
       GlobalSearch.prototype.onResultClickOutside = function () {
         var self = this;
-        console.log('on outside');
         if (!self.searchResultVisible() || self.searchHasFocus()) {
           return false;
         }
