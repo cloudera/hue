@@ -967,6 +967,14 @@ a:visited {
   background-color: @cui-gray-050;
 }
 
+.global-search-empty {
+  .assist-no-entries();
+  height: 30px !important;
+  > div {
+    margin: 5px 10px;
+  }
+}
+
 .global-search-results {
   .display-flex();
   background-color: @cui-white;
@@ -996,6 +1004,8 @@ a:visited {
         margin: 0;
 
         li {
+          .no-select();
+          .pointer();
           .nowrap-ellipsis();
           padding: 2px 0 2px 7px;
         }
