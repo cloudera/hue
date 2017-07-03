@@ -56,5 +56,11 @@ jison sqlStatementsParser.jison
 cat license.txt sqlStatementsParser.js > ../sqlStatementsParser.js
 rm sqlStatementsParser.js
 
+# === Global Search parser ===
+echo "Creating Global Search parser..."
+jison globalSearchParser.jison
+cat license.txt globalSearchParser.js > ../globalSearchParser.js
+rm globalSearchParser.js
+
 popd
 echo "Done!"
