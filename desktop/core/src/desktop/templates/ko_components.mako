@@ -556,13 +556,14 @@ from desktop.views import _ko
         <input class="global-search-autocomplete" disabled type="text" data-bind="value: searchAutocomplete">
       </div>
     </div>
-    <div class="global-search-results" data-bind="visible: searchResultVisible, onClickOutside: onResultClickOutside" style="display:none;">
+    <!-- ko if: searchResultVisible -->
+    <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside">
       <div class="global-search-alternatives">
         <div class="global-search-category">
           <div class="global-search-category-header">Category 1</div>
           <ul>
             <li>Alternative 1</li>
-            <li>Alternative 2</li>
+            <li class="selected">Alternative 2</li>
             <li>Alternative 3</li>
             <li>Alternative 4</li>
           </ul>
@@ -594,11 +595,30 @@ from desktop.views import _ko
             <li>Alternative 4</li>
           </ul>
         </div>
+        <div class="global-search-category">
+          <div class="global-search-category-header">Category 5</div>
+          <ul>
+            <li>Alternative 1</li>
+            <li>Alternative 2</li>
+            <li>Alternative 3</li>
+            <li>Alternative 4</li>
+          </ul>
+        </div>
+        <div class="global-search-category">
+          <div class="global-search-category-header">Category 6</div>
+          <ul>
+            <li>Alternative 1</li>
+            <li>Alternative 2</li>
+            <li>Alternative 3</li>
+            <li>Alternative 4</li>
+          </ul>
+        </div>
       </div>
       <div class="global-search-preview">
         Preview Area
       </div>
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/javascript">
