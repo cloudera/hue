@@ -556,67 +556,27 @@ from desktop.views import _ko
         <input class="global-search-autocomplete" disabled type="text" data-bind="value: searchAutocomplete">
       </div>
     </div>
-    <!-- ko if: searchResultVisible -->
-    <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside">
-      <div class="global-search-alternatives">
+    <!-- ko if: searchResultVisible-->
+    <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, css: { 'global-search-empty' : searchResultCategories().length === 0 }">
+      <!-- ko if: searchResultCategories().length === 0 -->
+        <div>${ _('No results found.') }</div>
+      <!-- /ko -->
+      <!-- ko if: searchResultCategories().length > 0 -->
+      <div class="global-search-alternatives" data-bind="foreach: searchResultCategories">
         <div class="global-search-category">
-          <div class="global-search-category-header">Category 1</div>
-          <ul>
-            <li>Alternative 1</li>
-            <li class="selected">Alternative 2</li>
-            <li>Alternative 3</li>
-            <li>Alternative 4</li>
-          </ul>
-        </div>
-        <div class="global-search-category">
-          <div class="global-search-category-header">Category 2</div>
-          <ul>
-            <li>Alternative 1</li>
-            <li>Alternative 2</li>
-            <li>Alternative 3</li>
-            <li>Alternative 4</li>
-          </ul>
-        </div>
-        <div class="global-search-category">
-          <div class="global-search-category-header">Category 3</div>
-          <ul>
-            <li>Alternative 1</li>
-            <li>Alternative 2</li>
-            <li>Alternative 3</li>
-            <li>Alternative 4</li>
-          </ul>
-        </div>
-        <div class="global-search-category">
-          <div class="global-search-category-header">Category 4</div>
-          <ul>
-            <li>Alternative 1</li>
-            <li>Alternative 2</li>
-            <li>Alternative 3</li>
-            <li>Alternative 4</li>
-          </ul>
-        </div>
-        <div class="global-search-category">
-          <div class="global-search-category-header">Category 5</div>
-          <ul>
-            <li>Alternative 1</li>
-            <li>Alternative 2</li>
-            <li>Alternative 3</li>
-            <li>Alternative 4</li>
-          </ul>
-        </div>
-        <div class="global-search-category">
-          <div class="global-search-category-header">Category 6</div>
-          <ul>
-            <li>Alternative 1</li>
-            <li>Alternative 2</li>
-            <li>Alternative 3</li>
-            <li>Alternative 4</li>
+          <div class="global-search-category-header" data-bind="text: label"></div>
+          <ul data-bind="foreach: result">
+            <li data-bind="multiClick: {
+                click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
+                dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
+              }, text: label, css: { 'selected': $parents[1].selectedResult() === $data }"></li>
           </ul>
         </div>
       </div>
       <div class="global-search-preview">
         Preview Area
       </div>
+      <!-- /ko -->
     </div>
     <!-- /ko -->
   </script>
@@ -647,6 +607,92 @@ from desktop.views import _ko
         self.searchInput = ko.observable('');
         self.searchActive = ko.observable(false);
 
+        self.searchResultCategories = ko.observableArray([]);
+        self.selectedIndex = ko.observable();
+
+        self.selectedResult = ko.pureComputed(function () {
+          if (self.selectedIndex()) {
+            return self.searchResultCategories()[self.selectedIndex().categoryIndex].result[self.selectedIndex().resultIndex]
+          }
+        });
+
+        self.searchResultCategories([
+          {
+            label: 'Top Hits',
+            result: [
+              {
+                label: 'Doc 1'
+              },{
+                label: 'File 1'
+              },{
+                label: 'Table 2'
+              },{
+                label: 'bla 4'
+              },{
+                label: 'bla 5'
+              }
+            ]
+          },{
+            label: 'Documents',
+            result: [
+              {
+                label: 'Doc 1'
+              },{
+                label: 'Doc 2'
+              },{
+                label: 'Doc 3'
+              },{
+                label: 'Doc 4'
+              },{
+                label: 'Doc 5'
+              }
+            ]
+          }
+        ]);
+
+        $(document).keydown(function (event) {
+          if (self.searchResultVisible() && self.searchResultCategories().length > 0) {
+            var currentIndex = self.selectedIndex();
+            if (event.keyCode === 40) { // Down
+              if (currentIndex && !(self.searchResultCategories()[currentIndex.categoryIndex].result.length <= currentIndex.resultIndex + 1 && self.searchResultCategories().length <= currentIndex.categoryIndex + 1)) {
+                if (self.searchResultCategories()[currentIndex.categoryIndex].result.length <= currentIndex.resultIndex + 1) {
+                  self.selectedIndex({ categoryIndex: currentIndex.categoryIndex + 1, resultIndex: 0 });
+                } else {
+                  self.selectedIndex({ categoryIndex: currentIndex.categoryIndex, resultIndex: currentIndex.resultIndex + 1})
+                }
+              } else {
+                self.selectedIndex({ categoryIndex: 0, resultIndex: 0 });
+              }
+              event.preventDefault();
+            } else if (event.keyCode === 38) { // Up
+              if (currentIndex && !(currentIndex.categoryIndex === 0 && currentIndex.resultIndex === 0)) {
+                if (currentIndex.resultIndex === 0) {
+                  self.selectedIndex({ categoryIndex: currentIndex.categoryIndex - 1, resultIndex: self.searchResultCategories()[currentIndex.categoryIndex - 1].result.length - 1 });
+                } else {
+                  self.selectedIndex({ categoryIndex: currentIndex.categoryIndex, resultIndex: currentIndex.resultIndex - 1 });
+                }
+              } else {
+                self.selectedIndex({ categoryIndex: self.searchResultCategories().length - 1, resultIndex: self.searchResultCategories()[self.searchResultCategories().length - 1].result.length - 1 });
+              }
+              event.preventDefault();
+            } else if (event.keyCode === 13) { // Enter
+              if (self.selectedIndex()) {
+                self.openResult();
+              }
+            } else if (event.keyCode === 9) { // Tab
+              if (self.searchAutocomplete() !== self.searchInput()) {
+                self.searchInput(self.searchAutocomplete());
+                event.preventDefault();
+              } else {
+                if (!self.selectedIndex()) {
+                  self.selectedIndex({categoryIndex: 0, resultIndex: 0});
+                  event.preventDefault();
+                }
+              }
+            }
+          }
+        });
+
         self.searchAutocomplete = ko.pureComputed(function () {
           // TODO: Add autocomplete suggestions here
           return self.searchInput() + '';
@@ -654,11 +700,28 @@ from desktop.views import _ko
 
         self.searchResultVisible = ko.observable(false);
 
+        self.searchResultVisible.subscribe(function (newVal) {
+          if (!newVal) {
+            self.selectedIndex(undefined);
+          }
+        });
+
         self.searchInput.subscribe(function (newValue) {
           if (newValue.length > 0) {
             self.searchResultVisible(true);
           }
         })
+      };
+
+      GlobalSearch.prototype.openResult = function () {
+        console.log('open... ');
+      };
+
+      GlobalSearch.prototype.resultSelected = function (categoryIndex, resultIndex) {
+        var self = this;
+        if (!self.selectedIndex() || !(self.selectedIndex().categoryIndex === categoryIndex && self.selectedIndex().resultIndex === resultIndex)) {
+          self.selectedIndex({ categoryIndex: categoryIndex, resultIndex: resultIndex });
+        }
       };
 
       GlobalSearch.prototype.onResultClickOutside = function () {
