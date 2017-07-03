@@ -1543,7 +1543,6 @@ var SqlParseSupport = (function () {
     };
   };
 
-
   var SYNTAX_PARSER_NOOP_FUNCTIONS = ['prepareNewStatement', 'addCommonTableExpressions', 'pushQueryState', 'popQueryState', 'suggestSelectListAliases',
     'isHive', 'isImpala', 'mergeSuggestKeywords', 'suggestValueExpressionKeywords', 'getValueExpressionKeywords', 'getTypeKeywords',
     'getColumnDataTypeKeywords', 'addColRefIfExists', 'selectListNoTableSuggest', 'suggestJoinConditions', 'suggestJoins', 'valueExpressionSuggest',
@@ -1664,9 +1663,47 @@ var SqlParseSupport = (function () {
     }
   };
 
+  var initGlobalSearchParser = function (parser) {
+
+    parser.identifyPartials = function (beforeCursor, afterCursor) {
+      var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
+      var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
+      return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
+    };
+
+    parser.parseGlobalSearch = function (beforeCursor, afterCursor, debug) {
+      delete parser.yy.cursorFound;
+
+      parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
+
+      if (parser.yy.partialLengths.left > 0) {
+        beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
+      }
+
+      if (parser.yy.partialLengths.right > 0) {
+        afterCursor = afterCursor.substring(parser.yy.partialLengths.right);
+      }
+
+      var result;
+      try {
+        // \u2020 represents the cursor, \u2021 represent partial
+        // TODO: Handle partial cursor
+        result = parser.parse(beforeCursor + '\u2020' + afterCursor);
+      } catch (err) {
+        if (debug) {
+          console.log(err);
+          console.error(err.stack);
+          console.log(parser.yy.error);
+        }
+      }
+      return result;
+    };
+  };
+
   return {
     initSqlParser: initSqlParser,
     initSyntaxParser: initSyntaxParser,
-    stringDistance: stringDistance
+    stringDistance: stringDistance,
+    initGlobalSearchParser: initGlobalSearchParser
   };
 })();
