@@ -1584,6 +1584,7 @@ class ClusterConfig():
       ('browser', self._get_browser()),
       ('scheduler', self._get_scheduler()),
       ('sdkapps', self._get_sdk_apps()),
+      ('home', self._get_home()),
     ] if app[1]])
 
     return apps
@@ -1614,6 +1615,15 @@ class ClusterConfig():
       return default_interpreter[0]
     else:
       return default_app
+
+
+  def _get_home(self):
+    return {
+      'name': 'home',
+      'displayName': _('Home'),
+      'interpreters': [],
+      'page': '/home'
+    }
 
 
   def _get_editor(self):
