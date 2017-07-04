@@ -74,6 +74,7 @@ else:
 
 dynamic_patterns += patterns('desktop.views',
   (r'^logs$','log_view'),
+  (r'^desktop/log_js_error$','log_js_error'),
   (r'^desktop/dump_config$','dump_config'),
   (r'^desktop/download_logs$','download_log_view'),
   (r'^desktop/get_debug_level','get_debug_level'),
