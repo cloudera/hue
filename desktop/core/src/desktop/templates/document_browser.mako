@@ -424,6 +424,7 @@ from desktop.views import _ko
             </ul>
             <!-- /ko -->
           </div>
+          <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'home' }} --><!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </div>
