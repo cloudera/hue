@@ -145,6 +145,9 @@ def path_forbidden(request):
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
+def log_js_error(request):
+  LOG.info('JS ERROR: ' + request.POST.get('jserror', 'Unspecified JS error'))
+  return JsonResponse({ 'status': 0 })
 
 @access_log_level(logging.WARN)
 def log_view(request):

@@ -32,6 +32,12 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
     var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
+    %if request and request.COOKIES and request.COOKIES.get('csrftoken','')!='':
+    window.CSRF_TOKEN = '${request.COOKIES.get('csrftoken')}';
+    %else:
+    window.CSRF_TOKEN = '';
+    %endif
+
     var BOOTSTRAP_RATIOS = {
       SPAN3: function () {
         var _w = $(window).width();
@@ -249,14 +255,10 @@ from metadata.conf import has_optimizer, OPTIMIZER
     //Add CSRF Token to all XHR Requests
     var xrhsend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function (data) {
-    %if request and request.COOKIES and request.COOKIES.get('csrftoken','')!='':
-      this.setRequestHeader('X-CSRFToken', "${request.COOKIES.get('csrftoken')}");
-    %else:
-      this.setRequestHeader('X-CSRFToken', "");
-    %endif
-
+      this.setRequestHeader('X-CSRFToken', window.CSRF_TOKEN);
       return xrhsend.apply(this, arguments);
     };
+    XMLHttpRequest.prototype.isAugmented = true;
 
     $.fn.dataTableExt.sErrMode = "throw";
 
