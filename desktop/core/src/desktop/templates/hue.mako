@@ -57,6 +57,7 @@
     var IS_HUE_4 = true;
   </script>
 
+  <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
 </head>
 
