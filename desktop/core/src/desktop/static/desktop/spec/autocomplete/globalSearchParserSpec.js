@@ -21,17 +21,24 @@
       expect(result).toEqual(expectedResult);
     };
 
-    it('should handle "|"', function () {
+    it('should suggest facets for "|"', function () {
       testParser('', '', {
         suggestFacets: true,
         facets: [ ]
       });
     });
 
-    it('should handle "TAGS: asdf |"', function () {
+    it('should suggest facets for "TAGS: asdf |"', function () {
       testParser('TAGS: asdf ', '', {
         suggestFacets: true,
         facets: [ 'TAGS' ]
+      });
+    });
+
+    it('should suggest facet values for "tags: |"', function () {
+      testParser('tags: ', '', {
+        suggestFacetValues: 'tags',
+        facets: []
       });
     });
   });
