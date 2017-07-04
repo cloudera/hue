@@ -1213,7 +1213,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (clusterConfig && clusterConfig['main_button_action']) {
             var topApp = clusterConfig['main_button_action'];
             self.mainQuickCreateAction({
-              displayName: topApp.type === 'hive' || topApp.type === 'impala' ? '${ _("Query") }' : topApp.displayName,
+              displayName: topApp.buttonName,
               icon: topApp.type,
               tooltip: topApp.tooltip,
               url: topApp.page

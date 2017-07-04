@@ -1621,6 +1621,7 @@ class ClusterConfig():
     return {
       'name': 'home',
       'displayName': _('Home'),
+      'buttonName': _('Documents'),
       'interpreters': [],
       'page': '/home'
     }
@@ -1634,6 +1635,7 @@ class ClusterConfig():
         'name': 'notebook',
         'type': 'notebook',
         'displayName': 'Notebook',
+        'buttonName': _('Notebook'),
         'tooltip': _('Notebook'),
         'page': '/notebook',
         'is_sql': False
@@ -1650,6 +1652,7 @@ class ClusterConfig():
         'name': interpreter['name'],
         'type': interpreter['type'],
         'displayName': interpreter['name'],
+        'buttonName': _('Query'),
         'tooltip': _('%s Query') % interpreter['type'].title(),
         'page': '/editor/?type=%(type)s' % interpreter,
         'is_sql': interpreter['is_sql']
@@ -1659,6 +1662,7 @@ class ClusterConfig():
       return {
         'name': 'editor',
         'displayName': _('Editor'),
+        'buttonName': _('Query'),
         'interpreters': interpreters,
         'interpreter_names': [interpreter['type'] for interpreter in interpreters],
         'page': interpreters[0]['page'],
@@ -1674,6 +1678,7 @@ class ClusterConfig():
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
+        'buttonName': _('Dashboard'),
         'interpreters': interpreters,
         'page': '/dashboard/new_search'
       }
@@ -1687,6 +1692,7 @@ class ClusterConfig():
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
+        'buttonName': _('Browse'),
         'tooltip': _('Files'),
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
       })
@@ -1695,6 +1701,7 @@ class ClusterConfig():
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
+        'buttonName': _('Browse'),
         'tooltip': _('S3'),
         'page': '/filebrowser/view=S3A://'
       })
@@ -1703,6 +1710,7 @@ class ClusterConfig():
       interpreters.append({
         'type': 'tables',
         'displayName': _('Tables'),
+        'buttonName': _('Browse'),
         'tooltip': _('Tables'),
         'page': '/metastore/tables'
       })
@@ -1711,6 +1719,7 @@ class ClusterConfig():
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
+        'buttonName': _('Dashboard'),
         'tooltip': _('Indexes'),
         'page': '/indexer/'
       })
@@ -1720,6 +1729,7 @@ class ClusterConfig():
         interpreters.append({
           'type': 'dataeng',
           'displayName': _('Jobs'),
+          'buttonName': _('Jobs'),
           'tooltip': _('Jobs'),
           'page': '/jobbrowser/'
         })
@@ -1729,6 +1739,7 @@ class ClusterConfig():
           interpreters.append({
             'type': 'yarn',
             'displayName': _('Jobs'),
+            'buttonName': _('Jobs'),
             'tooltip': _('Jobs'),
             'page': '/jobbrowser/'
           })
@@ -1737,6 +1748,7 @@ class ClusterConfig():
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
+        'buttonName': _('Browse'),
         'tooltip': _('HBase'),
         'page': '/hbase/'
       })
@@ -1745,6 +1757,7 @@ class ClusterConfig():
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
+        'buttonName': _('Browse'),
         'tooltip': _('Security'),
         'page': '/security/hive'
       })
@@ -1753,6 +1766,7 @@ class ClusterConfig():
       interpreters.append({
         'type': 'sqoop',
         'displayName': _('Sqoop'),
+        'buttonName': _('Browse'),
         'tooltip': _('Sqoop'),
         'page': '/sqoop'
       })
@@ -1761,6 +1775,7 @@ class ClusterConfig():
       return {
           'name': 'browser',
           'displayName': _('Browsers'),
+          'buttonName': _('Browse'),
           'interpreters': interpreters,
           'interpreter_names': [interpreter['type'] for interpreter in interpreters],
         }
@@ -1772,16 +1787,19 @@ class ClusterConfig():
     interpreters = [{
         'type': 'oozie-workflow',
         'displayName': _('Workflow'),
+        'buttonName': _('Schedule'),
         'tooltip': _('Workflow'),
         'page': '/oozie/editor/workflow/new/'
       }, {
         'type': 'oozie-coordinator',
         'displayName': _('Schedule'),
+        'buttonName': _('Schedule'),
         'tooltip': _('Schedule'),
         'page': '/oozie/editor/coordinator/new/'
       }, {
         'type': 'oozie-bundle',
         'displayName': _('Bundle'),
+        'buttonName': _('Schedule'),
         'tooltip': _('Bundle'),
         'page': '/oozie/editor/bundle/new/'
       }
@@ -1791,6 +1809,7 @@ class ClusterConfig():
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
+          'buttonName': _('Schedule'),
           'interpreters': interpreters,
           'page': interpreters[0]['page']
         }
@@ -1807,6 +1826,7 @@ class ClusterConfig():
       interpreters.push({
         'type': other.nice_name,
         'displayName': other.nice_name,
+        'buttonName': other.nice_name,
         'tooltip': other.nice_name,
         'page': '/%s' % other.nice_name
       })
@@ -1815,6 +1835,7 @@ class ClusterConfig():
       return {
           'name': 'other',
           'displayName': _('Other Apps'),
+          'buttonName': _('Other'),
           'interpreters': interpreters,
         }
     else:
