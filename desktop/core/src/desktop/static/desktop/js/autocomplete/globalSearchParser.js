@@ -111,9 +111,7 @@ case 2:
    
 break;
 case 4:
-
-     this.$ = { facets: $$[$0].facet ? [ $$[$0].facet ] : [] }
-   
+this.$ =  { facets: $$[$0].facet ? [ $$[$0].facet ] : [] };
 break;
 case 5:
 
@@ -140,9 +138,10 @@ case 9:
    
 break;
 case 14:
-
-     this.$ = { facet: $$[$0-1].substring(0, $$[$0-1].length - 1).trim() };
-   
+this.$ = { facet: $$[$0-1].substring(0, $$[$0-1].length - 1) };
+break;
+case 15:
+this.$ = { suggestFacetValues: $$[$0-1].substring(0, $$[$0-1].length - 1) };
 break;
 case 18:
 this.$ = { suggestFacets: true };
@@ -631,40 +630,42 @@ options: {},
 performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0: parser.yy.cursorFound = yy_.yylloc; return 14; 
+case 0: /* skip whitespace */ 
 break;
-case 1: return 13 
+case 1: parser.yy.cursorFound = yy_.yylloc; return 14; 
 break;
-case 2: this.begin('singleQuote'); return 18; 
+case 2: return 13 
 break;
-case 3:
+case 3: this.begin('singleQuote'); return 18; 
+break;
+case 4:
                                                   if (parser.handleQuotedValueWithCursor(this, yy_.yytext, yy_.yylloc, '\'')) {
                                                     return 20;
                                                   }
                                                   return 19;
                                                 
 break;
-case 4: this.popState(); return 18; 
+case 5: this.popState(); return 18; 
 break;
-case 5: this.begin('doubleQuote'); return 18; 
+case 6: this.begin('doubleQuote'); return 18; 
 break;
-case 6:
+case 7:
                                                   if (parser.handleQuotedValueWithCursor(this, yy_.yytext, yy_.yylloc, '"')) {
                                                     return 20;
                                                   }
                                                   return 19;
                                                 
 break;
-case 7: this.popState(); return 18; 
+case 8: this.popState(); return 18; 
 break;
-case 8: return 15; 
+case 9: return 15; 
 break;
-case 9: return 5; 
+case 10: return 5; 
 break;
 }
 },
-rules: [/^(?:\u2020)/,/^(?:[a-zA-Z]+\s*[:])/,/^(?:')/,/^(?:(?:\\[']|[^'])+)/,/^(?:')/,/^(?:")/,/^(?:(?:\\["]|[^"])+)/,/^(?:")/,/^(?:[^"'\u2020]+)/,/^(?:$)/],
-conditions: {"singleQuote":{"rules":[3,4],"inclusive":false},"doubleQuote":{"rules":[6,7],"inclusive":false},"INITIAL":{"rules":[0,1,2,5,8,9],"inclusive":true}}
+rules: [/^(?:\s)/,/^(?:\u2020)/,/^(?:[a-zA-Z]+[:])/,/^(?:')/,/^(?:(?:\\[']|[^'])+)/,/^(?:')/,/^(?:")/,/^(?:(?:\\["]|[^"])+)/,/^(?:")/,/^(?:[^"'\u2020]+)/,/^(?:$)/],
+conditions: {"singleQuote":{"rules":[4,5],"inclusive":false},"doubleQuote":{"rules":[7,8],"inclusive":false},"INITIAL":{"rules":[0,1,2,3,6,9,10],"inclusive":true}}
 });
 return lexer;
 })();
