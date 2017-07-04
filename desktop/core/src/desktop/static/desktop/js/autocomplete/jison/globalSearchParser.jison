@@ -18,9 +18,11 @@
 %x singleQuote doubleQuote
 %%
 
+\s                                              { /* skip whitespace */ }
+
 '\u2020'                                        { parser.yy.cursorFound = yylloc; return 'CURSOR'; }
 
-[a-zA-Z]+\s*[:]                                 { return 'FACET' }
+[a-zA-Z]+[:]                                    { return 'FACET' }
 
 \'                                              { this.begin('singleQuote'); return 'QUOTE'; }
 
@@ -73,10 +75,7 @@ GlobalSearchAutocomplete
  ;
 
 SearchParts
- : SearchPart
-   {
-     $$ = { facets: $1.facet ? [ $1.facet ] : [] }
-   }
+ : SearchPart                   -->  { facets: $1.facet ? [ $1.facet ] : [] }
  | SearchParts SearchPart
    {
      if ($2.facet) {
@@ -114,14 +113,11 @@ SearchPart_EDIT
  ;
 
 Facet
- : 'FACET' FreeText
-   {
-     $$ = { facet: $1.substring(0, $1.length - 1).trim() };
-   }
+ : 'FACET' FreeText     --> { facet: $1.substring(0, $1.length - 1) }
  ;
 
 Facet_EDIT
- : 'FACET' 'CURSOR'
+ : 'FACET' 'CURSOR'     --> { suggestFacetValues: $1.substring(0, $1.length - 1) }
  ;
 
 FreeText
