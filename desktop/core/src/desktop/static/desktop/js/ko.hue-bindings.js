@@ -2568,9 +2568,11 @@
 
   ko.bindingHandlers.tooltip = {
     after: ['attr'],
-    init: function (element, valueAccessor) {
+    update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
       var local = ko.utils.unwrapObservable(valueAccessor()),
           options = {};
+
+      $(element).tooltip("destroy");
 
       ko.utils.extend(options, local);
 
@@ -2584,11 +2586,6 @@
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         $(element).tooltip("destroy");
       });
-    },
-    update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-      var options = ko.utils.unwrapObservable(valueAccessor());
-      var self = $(element);
-      self.tooltip(options);
     }
   };
 
