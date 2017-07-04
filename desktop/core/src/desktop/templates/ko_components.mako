@@ -602,7 +602,7 @@ from desktop.views import _ko
       };
 
       var FACETS = [
-        'tags', 'type'
+        'type', 'tags'
       ];
 
       var GlobalSearch = function (params) {
@@ -611,9 +611,13 @@ from desktop.views import _ko
         self.searchInput = ko.observable('');
         self.inlineAutocomplete = ko.observable('');
         self.searchActive = ko.observable(false);
-
+        self.searchResultVisible = ko.observable(false);
         self.searchResultCategories = ko.observableArray([]);
         self.selectedIndex = ko.observable();
+
+        self.lastNonPartial = null;
+        self.lastResult = {};
+        self.autocompleteThrottle = -1;
 
         self.selectedResult = ko.pureComputed(function () {
           if (self.selectedIndex()) {
@@ -621,70 +625,19 @@ from desktop.views import _ko
           }
         });
 
-        var lastNonPartial = null;
-        var lastResult = {};
-
-        var updateInlineAutocomplete = function (partial) {
-          self.inlineAutocomplete('');
-          if (lastResult.suggestFacets) {
-            if (partial === '') {
-              self.inlineAutocomplete(lastNonPartial + FACETS[0] + ':');
-            } else {
-              var lowerCase = partial.length !== '' && partial[partial.length - 1].toLowerCase() === partial[partial.length - 1];
-              var suggestion = lastNonPartial + partial;
-              FACETS.every(function (facet) {
-                if (facet.indexOf(partial.toLowerCase()) === 0) {
-                  var remainder = facet.substring(partial.length);
-                  suggestion += lowerCase ? remainder : remainder.toUpperCase();
-                  suggestion += ':';
-                  self.inlineAutocomplete(suggestion);
-                  return false;
-                }
-                return true;
-              });
-            }
-          }
-        };
-
-        var triggerAutocomplete = function (newValue, direct) {
-          self.inlineAutocomplete(newValue);
-          var partial, nonPartial;
-          var partialMatch = newValue.match(/([a-z]+)$/i);
-          if (partialMatch) {
-            partial = partialMatch[0];
-            nonPartial = newValue.substring(0, newValue.length - partial.length);
-          } else {
-            partial = '';
-            nonPartial = newValue;
-          }
-
-          if (lastNonPartial && lastNonPartial === nonPartial) {
-            updateInlineAutocomplete(partial);
-            return;
-          }
-
-          window.clearTimeout(autocompleteThrottle);
-          autocompleteThrottle = window.setTimeout(function () {
-            lastNonPartial = nonPartial;
-
-            // TODO: Get cursor position and split to before and after
-            lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
-            if (hueDebug && hueDebug.showGlobalSearchParseResults) {
-              console.log(lastResult);
-            }
-            if (lastResult) {
-              updateInlineAutocomplete(partial);
-            } else {
-              lastNonPartial = null;
-            }
-          }, direct ? 0 : 200);
-        };
-
-        var autocompleteThrottle = -1;
         self.searchInput.subscribe(function (newValue) {
           self.inlineAutocomplete(newValue);
           if (newValue !== '') {
-            triggerAutocomplete(newValue);
+            self.triggerAutocomplete(newValue);
+          }
+          if (newValue.length > 0) {
+            self.searchResultVisible(true);
+          }
+        });
+
+        self.searchResultVisible.subscribe(function (newVal) {
+          if (!newVal) {
+            self.selectedIndex(undefined);
           }
         });
 
@@ -722,9 +675,13 @@ from desktop.views import _ko
           }
         ]);
 
+        // TODO: Consider attach/detach on focus
         $(document).keydown(function (event) {
+          if (!self.searchHasFocus() && !self.searchResultVisible()) {
+            return;
+          }
           if (event.keyCode === 32 && event.ctrlKey) {
-            triggerAutocomplete(self.searchInput(), true);
+            self.triggerAutocomplete(self.searchInput(), true);
             return;
           } else if (event.keyCode === 39 && self.inlineAutocomplete() !== self.searchInput()) {
             // TODO: Check that cursor is last
@@ -768,20 +725,80 @@ from desktop.views import _ko
             }
           }
         });
+      };
 
-        self.searchResultVisible = ko.observable(false);
-
-        self.searchResultVisible.subscribe(function (newVal) {
-          if (!newVal) {
-            self.selectedIndex(undefined);
+      GlobalSearch.prototype.updateInlineAutocomplete = function (partial) {
+        var self = this;
+        self.inlineAutocomplete('');
+        if (self.lastResult.suggestFacets) {
+          var existingFacetIndex = {};
+          if (self.lastResult.facets) {
+            self.lastResult.facets.forEach(function (facet) {
+              existingFacetIndex[facet.toLowerCase()] = true;
+            })
           }
-        });
 
-        self.searchInput.subscribe(function (newValue) {
-          if (newValue.length > 0) {
-            self.searchResultVisible(true);
+          if (partial === '') {
+            FACETS.every(function (facet) {
+              if (existingFacetIndex[facet]) {
+                return true;
+              }
+              self.inlineAutocomplete(self.lastNonPartial + facet + ':');
+              return false;
+            })
+          } else {
+            var lowerCase = partial.length !== '' && partial[partial.length - 1].toLowerCase() === partial[partial.length - 1];
+            var suggestion = self.lastNonPartial + partial;
+            FACETS.every(function (facet) {
+              if (existingFacetIndex[facet]) {
+                return true;
+              }
+              if (facet.indexOf(partial.toLowerCase()) === 0) {
+                var remainder = facet.substring(partial.length);
+                suggestion += lowerCase ? remainder : remainder.toUpperCase();
+                suggestion += ':';
+                self.inlineAutocomplete(suggestion);
+                return false;
+              }
+              return true;
+            });
           }
-        })
+        }
+      };
+
+      GlobalSearch.prototype.triggerAutocomplete = function (newValue, direct) {
+        var self = this;
+        self.inlineAutocomplete(newValue);
+        var partial, nonPartial;
+        var partialMatch = newValue.match(/([a-z]+)$/i);
+        if (partialMatch) {
+          partial = partialMatch[0];
+          nonPartial = newValue.substring(0, newValue.length - partial.length);
+        } else {
+          partial = '';
+          nonPartial = newValue;
+        }
+
+        if (self.lastNonPartial && self.lastNonPartial === nonPartial) {
+          self.updateInlineAutocomplete(partial);
+          return;
+        }
+
+        window.clearTimeout(self.autocompleteThrottle);
+        self.autocompleteThrottle = window.setTimeout(function () {
+          self.lastNonPartial = nonPartial;
+
+          // TODO: Get cursor position and split to before and after
+          self.lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
+          if (hueDebug && hueDebug.showGlobalSearchParseResults) {
+            console.log(self.lastResult);
+          }
+          if (self.lastResult) {
+            self.updateInlineAutocomplete(partial);
+          } else {
+            self.lastNonPartial = null;
+          }
+        }, direct ? 0 : 200);
       };
 
       GlobalSearch.prototype.openResult = function () {
