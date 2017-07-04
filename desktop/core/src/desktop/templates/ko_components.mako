@@ -552,8 +552,8 @@ from desktop.views import _ko
   <script type="text/html" id="hue-global-search-template">
     <div class="global-search-input-container">
       <div>
-        <input class="global-search-input" placeholder="${ _('Search data and saved documents...') }" type="text" data-bind="textInput: searchInput, hasFocus: searchHasFocus">
-        <input class="global-search-autocomplete" disabled type="text" data-bind="value: searchAutocomplete">
+        <input class="global-search-input" type="text" data-bind="attr: { 'placeHolder' : searchHasFocus() ? '' : '${ _ko('Search data and saved documents...') }' }, textInput: searchInput, hasFocus: searchHasFocus">
+        <input class="global-search-autocomplete" disabled type="text" data-bind="value: inlineAutocomplete">
       </div>
     </div>
     <!-- ko if: searchResultVisible-->
@@ -601,10 +601,15 @@ from desktop.views import _ko
         'HUE': 'fa-file-o'
       };
 
+      var FACETS = [
+        'tags', 'type'
+      ];
+
       var GlobalSearch = function (params) {
         var self = this;
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable('');
+        self.inlineAutocomplete = ko.observable('');
         self.searchActive = ko.observable(false);
 
         self.searchResultCategories = ko.observableArray([]);
@@ -613,6 +618,73 @@ from desktop.views import _ko
         self.selectedResult = ko.pureComputed(function () {
           if (self.selectedIndex()) {
             return self.searchResultCategories()[self.selectedIndex().categoryIndex].result[self.selectedIndex().resultIndex]
+          }
+        });
+
+        var lastNonPartial = null;
+        var lastResult = {};
+
+        var updateInlineAutocomplete = function (partial) {
+          self.inlineAutocomplete('');
+          if (lastResult.suggestFacets) {
+            if (partial === '') {
+              self.inlineAutocomplete(lastNonPartial + FACETS[0] + ':');
+            } else {
+              var lowerCase = partial.length !== '' && partial[partial.length - 1].toLowerCase() === partial[partial.length - 1];
+              var suggestion = lastNonPartial + partial;
+              FACETS.every(function (facet) {
+                if (facet.indexOf(partial.toLowerCase()) === 0) {
+                  var remainder = facet.substring(partial.length);
+                  suggestion += lowerCase ? remainder : remainder.toUpperCase();
+                  suggestion += ':';
+                  self.inlineAutocomplete(suggestion);
+                  return false;
+                }
+                return true;
+              });
+            }
+          }
+        };
+
+        var triggerAutocomplete = function (newValue, direct) {
+          self.inlineAutocomplete(newValue);
+          var partial, nonPartial;
+          var partialMatch = newValue.match(/([a-z]+)$/i);
+          if (partialMatch) {
+            partial = partialMatch[0];
+            nonPartial = newValue.substring(0, newValue.length - partial.length);
+          } else {
+            partial = '';
+            nonPartial = newValue;
+          }
+
+          if (lastNonPartial && lastNonPartial === nonPartial) {
+            updateInlineAutocomplete(partial);
+            return;
+          }
+
+          window.clearTimeout(autocompleteThrottle);
+          autocompleteThrottle = window.setTimeout(function () {
+            lastNonPartial = nonPartial;
+
+            // TODO: Get cursor position and split to before and after
+            lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
+            if (hueDebug && hueDebug.showGlobalSearchParseResults) {
+              console.log(lastResult);
+            }
+            if (lastResult) {
+              updateInlineAutocomplete(partial);
+            } else {
+              lastNonPartial = null;
+            }
+          }, direct ? 0 : 200);
+        };
+
+        var autocompleteThrottle = -1;
+        self.searchInput.subscribe(function (newValue) {
+          self.inlineAutocomplete(newValue);
+          if (newValue !== '') {
+            triggerAutocomplete(newValue);
           }
         });
 
@@ -651,6 +723,19 @@ from desktop.views import _ko
         ]);
 
         $(document).keydown(function (event) {
+          if (event.keyCode === 32 && event.ctrlKey) {
+            triggerAutocomplete(self.searchInput(), true);
+            return;
+          } else if (event.keyCode === 39 && self.inlineAutocomplete() !== self.searchInput()) {
+            // TODO: Check that cursor is last
+            self.searchInput(self.inlineAutocomplete());
+            return;
+          } else if (event.keyCode === 9 && self.inlineAutocomplete() !== self.searchInput()) { // Tab
+            self.searchInput(self.inlineAutocomplete());
+            event.preventDefault();
+            return;
+          }
+
           if (self.searchResultVisible() && self.searchResultCategories().length > 0) {
             var currentIndex = self.selectedIndex();
             if (event.keyCode === 40) { // Down
@@ -675,27 +760,13 @@ from desktop.views import _ko
                 self.selectedIndex({ categoryIndex: self.searchResultCategories().length - 1, resultIndex: self.searchResultCategories()[self.searchResultCategories().length - 1].result.length - 1 });
               }
               event.preventDefault();
-            } else if (event.keyCode === 13) { // Enter
-              if (self.selectedIndex()) {
-                self.openResult();
-              }
-            } else if (event.keyCode === 9) { // Tab
-              if (self.searchAutocomplete() !== self.searchInput()) {
-                self.searchInput(self.searchAutocomplete());
-                event.preventDefault();
-              } else {
-                if (!self.selectedIndex()) {
-                  self.selectedIndex({categoryIndex: 0, resultIndex: 0});
-                  event.preventDefault();
-                }
-              }
+            } else if (event.keyCode === 13 && self.selectedIndex()) { // Enter
+              self.openResult();
+            } else if (event.keyCode === 9 && !self.selectedIndex()) { // Tab
+              self.selectedIndex({categoryIndex: 0, resultIndex: 0});
+              event.preventDefault();
             }
           }
-        });
-
-        self.searchAutocomplete = ko.pureComputed(function () {
-          // TODO: Add autocomplete suggestions here
-          return self.searchInput() + '';
         });
 
         self.searchResultVisible = ko.observable(false);
