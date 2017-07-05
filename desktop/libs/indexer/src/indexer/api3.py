@@ -18,6 +18,7 @@
 import json
 import logging
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
@@ -163,6 +164,38 @@ def guess_field_types(request):
         ]
     }
 
+  return JsonResponse(format_)
+
+
+def get_databases(request):
+  source = json.loads(request.POST.get('source', '{}'))
+  username = DATABASES[source['rdbmsType']].USER.get()
+  user = User.objects.get(username=username)
+  query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  db = rdbms.get(user, query_server=query_server)
+  assist = Assist(db)
+  data = assist.get_databases() ##format of data ['abc','def','ghi',...,'xyz']
+  if data:
+    format_ = [{'\'value\':'+value, '\'name\':'+name} for value, name in zip(data, data)]
+  else:
+    format_ = []
+  print format_
+  return JsonResponse(format_)
+
+
+def get_tables(request):
+  source = json.loads(request.POST.get('source', '{}'))
+  username = DATABASES[source['rdbmsType']].USER.get()
+  user = User.objects.get(username=username)
+  query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  db = rdbms.get(user, query_server=query_server)
+  assist = Assist(db)
+  data = assist.get_tables(source['rdbmsDatabaseName']) ##format of data ['abc','def','ghi',...,'xyz']
+  if data:
+    format_ = [{'\'value\':'+value, '\'name\':'+name} for value, name in zip(data, data)]
+  else:
+    format_ = []
+  print format_
   return JsonResponse(format_)
 
 
@@ -459,7 +492,7 @@ def run_sqoop(request, source, destination, start_time):
   print rdbmsUserName
   print rdbmsPassword
   print targetDir
-  print 'import --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT a.* FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose'
+  print 'import --connect jdbc:'+rdbmsName+'://'+'127.0.0.1'+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT * FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose --split-by a.empid'
 
   task = make_notebook(
       name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
@@ -468,7 +501,7 @@ def run_sqoop(request, source, destination, start_time):
           'path': destination['name']
         },
       editor_type='sqoop1',
-      statement='import --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT a.* FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose',
+      statement='import --connect jdbc:mysql://172.31.114.131:3306/hue --username hue --password 12345678 --query SELECT * FROM employee WHERE $CONDITIONS --target-dir hdfs://nightly512-unsecure-1.gce.cloudera.com:8020/user/admin/test77 -m 1',
       files = [{"path": "/user/admin/mysql-connector-java.jar", "type": "jar"}],
       status='ready',
       on_success_url='/filebrowser/view/%s(name)s' % destination,

@@ -382,6 +382,16 @@ ${ assist.assistPanel() }
               <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
           </div>
+          <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
+            <label for="dbMode" class="control-label"><div>${ _('Database Mode') }</div>
+              <label class="radio inline-block">
+                <input type="radio" name="dbMode" value="customRdbms" data-bind="checked: createWizard.source.dbMode" /> ${_('Custom')}
+              </label>
+              <label class="radio inline-block">
+                <input type="radio" name="dbMode" value="configRdbms" data-bind="checked: createWizard.source.dbMode" /> ${_('Configured')}
+              </label>
+            </label>
+          </div>
 
           <div class="control-group" data-bind="visible: createWizard.prefill.target_type() == 'database'">
             <label for="sourceType" class="control-label">${ _('No source is needed for creating a database.') }</label>
@@ -398,15 +408,21 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           </div>
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsName" class="control-label"><div>${ _('Database') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsName" placeholder="${ _('Enter name of your database') }">
+          <div class="control-group" data-bind="visible: createWizard.source.dbMode() == 'configRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsType" class="control-label"><div>${ _('Database') }</div>
+              <select id="rdbmsType" data-bind="selectize: createWizard.source.rdbmsTypes, value: createWizard.source.rdbmsType, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
           </div>
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsTable" class="control-label"><div>${ _('Table') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsTable" placeholder="${ _('Enter name of your table') }">
+          <div class="control-group input-append" data-bind="visible: createWizard.source.dbMode() == 'configRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
+              <select id="rdbmsDatabaseName" data-bind="selectize: createWizard.source.rdbmsDatabaseNames, value: createWizard.source.rdbmsDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.dbMode() == 'configRdbms' && createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsTableName" class="control-label"><div>${ _('Table') }</div>
+              <select id="rdbmsTableName" data-bind="selectize: createWizard.source.rdbmsTableNames, value: createWizard.source.rdbmsTableName, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
           </div>
 
@@ -1203,21 +1219,43 @@ ${ assist.assistPanel() }
       });
 
       // Rdbms
-      self.rdbmsName = ko.observable('');
-      self.rdbmsTable = ko.observable('');
-      self.rdbmsTableName = ko.computed(function() {
-        return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[1] : self.rdbmsTable();
-      });
-      self.rdbmsTableName.subscribe(function(val) {
-        if (val) {
-          vm.createWizard.guessFormat();
-        }
+      self.rdbmsType = ko.observable('mysql');
+      self.rdbmsType.subscribe(function(val) {
+        self.path('');
         resizeElements();
       });
-      self.rdbmsDatabaseName = ko.computed(function() {
-        return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[0] : 'default';
+      self.rdbmsTypesAll = ko.observableArray([
+          {'value': 'mysql', 'name': 'Mysql'},
+          {'value': 'oracle', 'name': 'Oracle'},
+          {'value': 'postgresql', 'name': 'PostgreSQL'},
+          {'value': 'db2', 'name': 'DB2'}
+      ]);
+      self.rdbmsTypes = ko.pureComputed(function() {
+        return self.rdbmsTypesAll();
       });
-
+      self.dbMode = ko.observable('');
+      self.rdbmsDatabaseName = ko.observable('');
+      self.rdbmsDatabaseNamesAll = ko.observableArray(
+          $.post("indexer:get_databases", {
+              "source": ko.mapping.toJSON(self.source)
+          }, function (data) {
+            return data;
+        });
+      );
+      self.rdbmsDatabaseNames = ko.pureComputed(function() {
+        return self.rdbmsDatabaseNamesAll();
+      });
+      self.rdbmsTableName = ko.observable('');
+      self.rdbmsTableNamesAll = ko.observableArray(
+          $.post("indexer:get_tables", {
+              "source": ko.mapping.toJSON(self.source)
+          }, function (data) {
+            return data;
+        });
+      );
+      self.rdbmsTableNames = ko.pureComputed(function() {
+        return self.rdbmsTableNamesAll();
+      });
 
       // Table
       self.table = ko.observable('');
@@ -1263,8 +1301,8 @@ ${ assist.assistPanel() }
           return self.query();
         } else if (self.inputFormat() == 'manual') {
           return true;
-        }  else if (self.inputFormat() == 'rdbms') {
-          return self.rdbmsName().length > 0 && self.rdbmsTable().length > 0;
+        } else if (self.inputFormat() == 'rdbms') {
+          return self.rdbmsDatabaseName().length > 0 && self.rdbmsTableName().length > 0;
         }
       });
 
