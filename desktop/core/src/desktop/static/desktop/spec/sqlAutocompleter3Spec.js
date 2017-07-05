@@ -46,7 +46,6 @@
           AUTOCOMPLETE_TIMEOUT = 1;
           jasmine.Ajax.install();
 
-
           var failResponse = {
             status: 500
           };
@@ -385,6 +384,25 @@
         subject.autocomplete();
         expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
       });
+
+      it('should suggest columns from subqueries', function () {
+        var subject = createSubject('hive', 'SELECT ', ' FROM customers, (SELECT app FROM web_logs) AS subQ;');
+        expect(subject.suggestions.filtered().length).toBe(0);
+        subject.autocomplete();
+        expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
+
+        var appFound = false;
+
+        subject.suggestions.filtered().every(function (suggestion) {
+          if (suggestion.isColumn && suggestion.value === 'app') {
+            appFound = true;
+            return false;
+          }
+          return true;
+        });
+
+        expect(appFound).toBeTruthy();
+      })
     });
   });
 })();
