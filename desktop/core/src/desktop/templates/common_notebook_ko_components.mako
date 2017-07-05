@@ -325,7 +325,7 @@ except ImportError, e:
 
         self.saveTarget = ko.observable('hdfs-file');
         self.savePath = ko.observable('');
-        self.saveOverwrite = ko.observable(true);
+        self.saveOverwrite = ko.observable(false);
 
         self.isDownloading = ko.observable(false);
         self.downloadTruncated = ko.observable(false);
