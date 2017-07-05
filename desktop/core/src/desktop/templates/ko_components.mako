@@ -635,6 +635,14 @@ from desktop.views import _ko
           }
         });
 
+        self.searchHasFocus.subscribe(function (newVal) {
+          if (!newVal) {
+            self.inlineAutocomplete('');
+          } else if (self.searchInput() !== '') {
+            self.triggerAutocomplete(self.searchInput());
+          }
+        });
+
         self.searchResultVisible.subscribe(function (newVal) {
           if (!newVal) {
             self.selectedIndex(undefined);
