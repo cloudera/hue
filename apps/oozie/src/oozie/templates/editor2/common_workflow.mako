@@ -1344,9 +1344,9 @@
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
-      <a href="javascript:void(0)">
-        <span type="text" data-bind="text: properties.command().slice(0, 70), attr: { title: properties.command() }" />...
-      </a>
+      <div class="command-ellipsis">
+        <span data-bind="text: properties.command(), attr: { title: properties.command() }" />
+      </div>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
@@ -1758,7 +1758,9 @@
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
       <span data-bind="text: properties.host" />
-      <span data-bind="text: properties.ssh_command().slice(0, 75)" />
+      <div class="command-ellipsis">
+        <span data-bind="text: properties.ssh_command(), attr: { title: properties.ssh_command() }" />
+      </div>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
