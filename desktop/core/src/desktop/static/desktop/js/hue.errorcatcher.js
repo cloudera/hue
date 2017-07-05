@@ -50,7 +50,7 @@
       xmlHTTP.send('jserror=' + JSON.stringify(params));
     }
     catch (e) {}
-    return true;
+    return false;
   }
 
 })()
