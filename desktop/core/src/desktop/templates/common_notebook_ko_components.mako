@@ -293,7 +293,7 @@ except ImportError, e:
         <h2 class="modal-title">${_('Your downloaded results have been truncated')}</h2>
         <!-- /ko -->
       </div>
-      <div class="modal-body" style="padding: 4px">
+      <div class="modal-body">
         <!-- ko if: isDownloading -->
         ${ _('Please wait, it might take a while...') } <i class="fa fa-spinner fa-spin"></i>
         <!-- /ko -->
