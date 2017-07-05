@@ -1676,9 +1676,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               });
               var $scrollable = $(window);
               %if is_embeddable:
-                $scrollable = $('.page-content');
+              $scrollable = $('.page-content');
               %endif
-              $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
+              if ($('.row-deleted').length() > 0 && $('.row-deleted:eq(0)').offset()) {
+                $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
+              }
             }, 500);
             window.setTimeout(function(){
               $(self.selectedFiles()).each(function (index, file) {
