@@ -267,9 +267,9 @@ from desktop.views import _ko
             <span data-bind="text: $data.name"></span>
             <!-- ko if: $data.dependents.length > 0 -->
               (${_('used by')}
-              <a class="pointer" data-bind="hueLink: $data.dependents[0].absoluteUrl, text: $data.dependents[0].name" target="_blank" ></a>
+              <a class="pointer" data-bind="hueLink: $data.dependents[0].absoluteUrl, text: $data.dependents[0].name"></a>
               <!-- ko if: $data.dependents.length > 1 -->
-              ${_('and')} <a class="pointer" data-bind="hueLink: $data.dependents[1].absoluteUrl, text: $data.dependents[1].name" target="_blank" ></a>
+              ${_('and')} <a class="pointer" data-bind="hueLink: $data.dependents[1].absoluteUrl, text: $data.dependents[1].name"></a>
                 <!-- ko if: $data.dependents.length > 2 -->
                   ${_('and')} <span data-bind="text: $data.dependents.length - 2"></span> ${_('other')}
                 <!-- /ko -->

@@ -621,13 +621,13 @@
 <script type="text/html" id="common-fs-link">
  <!-- ko if: $data.path.length > 0 -->
    <!-- ko if: with_label -->
-     <a data-bind="hueLink: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path, attr: { title: '${ _ko('Open') } '+ $data.path }" target="_blank">
+     <a data-bind="hueLink: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path, attr: { title: '${ _ko('Open') } '+ $data.path }">
       <span data-bind="text: $data.path.lastIndexOf('/') == $data.path.length - 1 ? $data.path : $data.path.split('/').pop()"></span>
      </a>
    <!-- /ko -->
 
    <!-- ko if: ! with_label -->
-     <a data-bind="hueLink: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path" target="_blank" title="${ _('Open') }">
+     <a data-bind="hueLink: '/filebrowser/view=' + ($data.path[0] != '/' && $data.path.indexOf('s3a://') !== 0 ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path" title="${ _('Open') }">
        <i class="fa fa-external-link-square"></i>
      </a>
    <!-- /ko -->
@@ -641,7 +641,7 @@
         <i class="fa fa-spinner fa-spin muted"></i>
       <!-- /ko -->
       <!-- ko with: associatedDocument -->
-        <a data-bind="hueLink: absoluteUrl" target="_blank"><span data-bind='text: name'></span></a>
+        <a data-bind="hueLink: absoluteUrl"><span data-bind='text: name'></span></a>
         <br/>
         <span data-bind='text: description' class="muted"></span>
       <!-- /ko -->
@@ -653,7 +653,7 @@
           <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: type }"></select>
         </div>
         <!-- ko if: associatedDocument -->
-          <a href="#" data-bind="hueLink: associatedDocument().absoluteUrl" target="_blank" title="${ _('Open') }">
+          <a class="pointer" data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
           <div class="clearfix"></div>
@@ -670,7 +670,7 @@
 
 <script type="text/html" id="param-fs-link">
   <!-- ko if: path.split('=', 2)[1] && path.split('=', 2)[1].charAt(0) == '/' -->
-    <a data-bind="hueLink: '/filebrowser/view=' + $data.path.split('=', 2)[1]" target="_blank" title="${ _('Open') }">
+    <a data-bind="hueLink: '/filebrowser/view=' + $data.path.split('=', 2)[1]" title="${ _('Open') }">
       <i class="fa fa-external-link-square"></i>
     </a>
   <!-- /ko -->
@@ -1562,7 +1562,7 @@
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
         <select data-bind="valueAllowUnset: true, options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
         <span data-bind="visible: properties.workflow().length > 0">
-          <a href="#" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow()" target="_blank" title="${ _('Open') }">
+          <a class="pointer" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow()" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </span>
@@ -1593,7 +1593,7 @@
       <span data-bind="template: { name: 'logs-icon' }"></span>
       <!-- ko if: $root.getSubWorkflow(properties.workflow()) -->
         <span data-bind="with: $root.getSubWorkflow(properties.workflow())">
-          <a href="#" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value()" target="_blank" title="${ _('Open') }">
+          <a class="pointer" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value()" title="${ _('Open') }">
             <span data-bind="text: $data.name"></span>
           </a>
         </span>

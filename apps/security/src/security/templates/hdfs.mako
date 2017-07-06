@@ -149,7 +149,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
 
                   <div class="acl-panel-content">
                     <span class="fake-pre" data-bind="visible: $root.assist.showAclsAsText">
-                      # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
+                      # file: <a class="force-word-break" data-bind="hueLink: '/filebrowser/view=' + $root.assist.path(), text: $root.assist.path()"></a><br/>
                       # owner: <span data-bind="text: $root.assist.owner"></span><br/>
                       # group: <span data-bind="text: $root.assist.group"></span><br/>
                       <div data-bind="foreach: $root.assist.regularAcls">
@@ -246,7 +246,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
         <h4>${ _('ACLs to apply') }</h4>
 
         <span class="fake-pre modal-panel">
-          # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
+          # file: <a class="force-word-break" data-bind="hueLink: '/filebrowser/view=' + $root.assist.path(), text: $root.assist.path()"></a><br/>
           # owner: <span data-bind="text: $root.assist.owner"></span><br/>
           # group: <span data-bind="text: $root.assist.group"></span><br/>
           <div data-bind="foreach: $root.assist.regularAcls">

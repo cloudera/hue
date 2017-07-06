@@ -608,7 +608,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
-        <li data-bind="attr: {'id': $data.name.substr(4)}"><a data-bind="text: $.trim($data.name), hueLink: $data.url" target="_blank"></a>
+        <li data-bind="attr: {'id': $data.name.substr(4)}"><a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
           <!-- ko if: typeof percentJob !== 'undefined' && percentJob() > -1 -->
           <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
             <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
@@ -1085,7 +1085,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql') }"/>
           <!-- ko if: statementPath() -->
           <div class="inline-block" style="margin-top: 4px">
-            <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" target="_blank" title="${ _('Open in new tab') }">
+            <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
           </div>
@@ -1107,7 +1107,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           </div>
           <!-- ko if: associatedDocument() -->
             <div class="pull-left" style="margin-top: 4px">
-              <a data-bind="hueLink: associatedDocument().absoluteUrl" target="_blank" title="${ _('Open in new tab') }">
+              <a data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
               <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
