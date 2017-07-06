@@ -176,11 +176,13 @@ def get_databases(request):
   assist = Assist(db)
   data = assist.get_databases() ##format of data ['abc','def','ghi',...,'xyz']
   if data:
-    format_ = [{'\'value\':'+value, '\'name\':'+name} for value, name in zip(data, data)]
+    ##format_ = [{'\'value\':'+value, '\'name\':'+name} for value, name in zip(data, data)]
+    format_ = [{'value': 'mysql', 'name': 'Mysql'},{'value': 'oracle', 'name': 'Oracle'}]
   else:
     format_ = []
   print format_
-  return JsonResponse(format_)
+  ##return JsonResponse(format_)
+  return format_
 
 
 def get_tables(request):
