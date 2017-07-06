@@ -410,10 +410,13 @@ from desktop.views import _ko
           $('#jobsPanel').hide();
         });
 
-        huePubSub.subscribe('show.jobs.panel', function () {
+        huePubSub.subscribe('show.jobs.panel', function (id) {
           huePubSub.publish('hide.history.panel');
           $('#jobsPanel').show();
           huePubSub.publish('mini.jb.navigate');
+          if (id) {
+            huePubSub.publish('mini.jb.open.job', id);
+          }
         });
 
         huePubSub.subscribe('toggle.jobs.panel', function () {
