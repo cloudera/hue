@@ -2305,16 +2305,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     $(document).ready(function () {
       var jobBrowserViewModel = new JobBrowserViewModel();
+      function openJob(id) {
+        if (jobBrowserViewModel.job() == null) {
+          jobBrowserViewModel.job(new Job(jobBrowserViewModel, {}));
+        }
+        jobBrowserViewModel.job().id(id);
+        jobBrowserViewModel.job().fetchJob();
+      }
       % if not is_mini:
         ko.applyBindings(jobBrowserViewModel, $('#jobbrowserComponents')[0]);
-
-        function openJob(id) {
-          if (jobBrowserViewModel.job() == null) {
-            jobBrowserViewModel.job(new Job(jobBrowserViewModel, {}));
-          }
-          jobBrowserViewModel.job().id(id);
-          jobBrowserViewModel.job().fetchJob();
-        }
 
         huePubSub.subscribe('oozie.action.logs.click', function (widget) {
           var jobId = widget.logsURL().match(/jobbrowser\/jobs\/(.+?)\/single_logs$/i);
@@ -2374,6 +2373,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           $('#jobsPanel .nav-pills li[data-interface="' + interface + '"]').addClass('active');
           jobBrowserViewModel.selectInterface(interface);
         });
+        huePubSub.subscribe('mini.jb.open.job', openJob);
         huePubSub.subscribe('mini.jb.expand', function () {
           if (jobBrowserViewModel.job()) {
             huePubSub.publish('open.link', '/jobbrowser/#!id=' + jobBrowserViewModel.job().id());
