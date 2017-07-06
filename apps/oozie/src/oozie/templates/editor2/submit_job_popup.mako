@@ -88,9 +88,9 @@
           % endif
           />
         % if email_id:
-          ${_('Send completion email to ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${email_id} </a>
+          ${_('Send completion email to ')}<a href="/useradmin/users/edit/${user.username}#step2"> ${email_id} </a>
         % else:
-          ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${_('profile.')} </a>
+          ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2"> ${_('profile.')} </a>
         % endif
         </label>
         %endif       

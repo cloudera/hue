@@ -141,7 +141,7 @@ ${ hueIcons.symbols() }
               </a>
             <!-- /ko -->
             <!-- ko if: item.href -->
-              <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
+              <a data-bind="hueLink: item.href, text: item.displayName"></a>
             <!-- /ko -->
             <!-- ko if: item.isCategory -->
             <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
