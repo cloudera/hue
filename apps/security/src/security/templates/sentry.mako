@@ -110,7 +110,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 
     <span class="muted" data-bind="text: privilegeType, attr: {title: moment(timestamp()).fromNow()}"></span>
     <!-- ko if: $root.component() == 'solr' && authorizables().length > 0 && authorizables()[0].type() == 'COLLECTION'  && authorizables()[0].name_() != '*' -->
-      <a data-bind="attr: { href: indexerPath() }" target="_blank" title="${ _('Open in Indexer') }" class="muted">
+      <a data-bind="hueLink: indexerPath()" title="${ _('Open in Indexer') }" class="muted">
         <i class="fa fa-external-link"></i>
       </a>
     <!-- /ko -->
@@ -121,7 +121,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 
     <!-- ko if: $root.component() == 'hive' -->
       <span data-bind="visible: metastorePath() != '' && privilegeType() == 'DATABASE'">
-        <a data-bind="attr: { href: metastorePath() }" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
+        <a data-bind="hueLink: metastorePath()" class="muted" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
       </span>
       <br/>
 
@@ -141,7 +141,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
       <!-- /ko -->
 
       <!-- ko if: privilegeType() == 'URI' -->
-        <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+        <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="hueLink: '/filebrowser/view=/' + URI().split('/')[3]"><span data-bind="text: URI"></span></a>
       <!-- /ko -->
 
     <!-- /ko -->
@@ -216,12 +216,12 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" autocomplete="off" />
                   <!-- ko if: $root.component() == 'solr' -->
-                  <a data-bind="attr: { href: $root.assist.indexerPath() }" target="_blank" title="${ _('Open in Indexer') }" class="btn btn-inverse">
+                  <a data-bind="hueLink: $root.assist.indexerPath()" title="${ _('Open in Indexer') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                   <!-- /ko -->
                   <!-- ko ifnot: $root.component() == 'solr' -->
-                  <a data-bind="attr: { href: $root.assist.metastorePath() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
+                  <a data-bind="hueLink: $root.assist.metastorePath()" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                   <!-- /ko -->

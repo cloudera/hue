@@ -507,7 +507,7 @@ ${ assist.assistPanel() }
               <!-- ko if: outputFormat() != 'index' -->
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
               <!-- /ko -->
-              <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" target="_blank" title="${ _('Open') }"></a>
+              <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" title="${ _('Open') }"></a>
             </span>
           </div>
         </div>

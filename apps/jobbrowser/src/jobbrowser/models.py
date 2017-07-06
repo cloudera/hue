@@ -580,7 +580,7 @@ class LinkJobLogs(object):
   @classmethod
   def _replace_hdfs_link(self, match):
     try:
-      return '<a href="%s" target="_blank">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
+      return '<a href="%s">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
     except:
       LOG.exception('failed to replace hdfs links: %s' % (match.groups(),))
       return match.group(0)
@@ -588,7 +588,7 @@ class LinkJobLogs(object):
   @classmethod
   def _replace_mr_link(self, match):
     try:
-      return '<a href="%s" target="_blank">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
+      return '<a href="%s">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
     except:
       LOG.exception('failed to replace mr links: %s' % (match.groups(),))
       return match.group(0)

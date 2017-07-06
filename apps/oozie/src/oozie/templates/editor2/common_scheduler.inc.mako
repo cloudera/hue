@@ -43,13 +43,13 @@ from django.utils.translation import ugettext as _
             <!-- ko if: isEditing -->
             <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name"></a>
 
-            <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" title="${ _('Open') }">
              <i class="fa fa-external-link-square"></i>
             </a>
             <!-- /ko -->
             <!-- ko ifnot: isEditing -->
             <span data-bind="text: getWorkflowById(coordinator.properties.workflow()).name"></span>
-            <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
             <!-- /ko -->
@@ -263,7 +263,7 @@ from django.utils.translation import ugettext as _
                   </span>
                   <span data-bind="visible: dataset_variable().length > 0 && instance_choice() != 'range'">
                     ${ _('Will convert to') }
-                    <a target="_blank" data-bind="text: convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice(), $root), attr: {'href': '/filebrowser/view=' + convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice(), $root)}"></a>
+                    <a data-bind="text: convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice(), $root), hueLink: '/filebrowser/view=' + convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice(), $root)"></a>
                   </span>
                   </a>
                 </span>
@@ -408,7 +408,7 @@ from django.utils.translation import ugettext as _
           <span class="badge badge-info" data-bind="click: selectWorkflow">
             <span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
-          <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + uuid()" target="_blank" title="${ _('Open') }">
+          <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + uuid()" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </li>

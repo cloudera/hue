@@ -457,7 +457,7 @@ ${ workflow.render() }
               <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { value: value, document: $root.tempDocument, type: type }"></select>
             </div>
             <!-- ko if: $root.tempDocument -->
-              <a href="#" data-bind="hueLink: $root.tempDocument().absoluteUrl" target="_blank" title="${ _('Open') }">
+              <a class="pointer" data-bind="hueLink: $root.tempDocument().absoluteUrl" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
             <!-- /ko -->
@@ -482,7 +482,7 @@ ${ workflow.render() }
 
           <!-- ko if: name() == 'workflow' && $root.getSubWorkflow(value())-->
           <span data-bind="with: $root.getSubWorkflow(value())">
-            <a href="#" data-bind="hueLink: '${is_embeddable and '/hue' or ''}${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value()" target="_blank" title="${ _('Open') }">
+            <a href="#" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value()" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
           </span>
