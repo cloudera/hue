@@ -663,7 +663,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           </a>
         </li>
         % if ENABLE_QUERY_BUILDER.get():
+        <!-- ko if: isSqlDialect -->
         <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
+        <!-- /ko -->
         % endif
         <!-- ko if: result.hasSomeResults -->
         <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
