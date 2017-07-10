@@ -245,6 +245,7 @@
 <impala>'PREPARE_FN'                       { return '<impala>PREPARE_FN'; }
 <impala>'PRIMARY'                          { return '<impala>PRIMARY'; }
 <impala>'RCFILE'                           { return '<impala>RCFILE'; }
+<impala>'RANGE'                            { return '<impala>RANGE'; }
 <impala>'REAL'                             { return '<impala>REAL'; }
 <impala>'REFRESH'                          { parser.determineCase(yytext); return '<impala>REFRESH'; }
 <impala>'RENAME'                           { return '<impala>RENAME'; }
