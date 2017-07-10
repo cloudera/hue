@@ -281,6 +281,7 @@
 <impala>'DEFAULT'                          { return '<impala>DEFAULT'; }
 <impala>'ENCODING'                         { return '<impala>ENCODING'; }
 <impala>'GRANT'                            { return '<impala>GRANT'; }
+<impala>'RECOVER'                          { return '<impala>RECOVER'; }
 <impala>'ROLE'                             { return '<impala>ROLE'; }
 <impala>'ROLES'                            { return '<impala>ROLES'; }
 <impala>\[BROADCAST\]                      { return '<impala>BROADCAST'; }
