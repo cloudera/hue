@@ -100,6 +100,7 @@ STORE upper_case INTO '$output';
     fs = cluster.get_hdfs()
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
     remote_dir = REMOTE_SAMPLE_DIR.get()
+    sample_user = install_sample_user()
 
     # Copy examples binaries
     for name in os.listdir(LOCAL_SAMPLE_DIR.get()):
@@ -107,17 +108,14 @@ STORE upper_case INTO '$output';
       remote_data_dir = fs.join(remote_dir, name)
       LOG.info(_('Copying examples %(local_dir)s to %(remote_data_dir)s\n') % {
                   'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
-      fs.do_as_user(fs.DEFAULT_USER, fs.copyFromLocal, local_dir, remote_data_dir)
+      fs.do_as_user(sample_user.username, fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Copy sample data
     local_dir = paths.get_thirdparty_root("sample_data")
     remote_data_dir = fs.join(remote_dir, 'data')
     LOG.info(_('Copying data %(local_dir)s to %(remote_data_dir)s\n') % {
                 'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
-    fs.do_as_user(fs.DEFAULT_USER, fs.copyFromLocal, local_dir, remote_data_dir)
-
-    # Load jobs
-    sample_user = install_sample_user()
+    fs.do_as_user(sample_user.username, fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Initialize doc2, whether editor script or link
     doc2 = None

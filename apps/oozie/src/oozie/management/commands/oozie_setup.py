@@ -342,14 +342,14 @@ class Command(NoArgsCommand):
       remote_data_dir = self.fs.join(remote_dir, name)
       LOG.info(_('Copying examples %(local_dir)s to %(remote_data_dir)s\n') % {
                   'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
-      self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.copyFromLocal, local_dir, remote_data_dir)
+      self.fs.do_as_user(self.user.username, self.fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Copy sample data
     local_dir = LOCAL_SAMPLE_DATA_DIR.get()
     remote_data_dir = self.fs.join(remote_dir, 'data')
     LOG.info(_('Copying data %(local_dir)s to %(remote_data_dir)s\n') % {
                 'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
-    self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.copyFromLocal, local_dir, remote_data_dir)
+    self.fs.do_as_user(self.user.username, self.fs.copyFromLocal, local_dir, remote_data_dir)
 
     # Load jobs
     LOG.info(_("Installing examples..."))
