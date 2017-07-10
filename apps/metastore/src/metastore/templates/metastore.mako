@@ -199,7 +199,7 @@ ${ components.menubar(is_embeddable) }
     <table id="partitionsTable" class="table table-condensed table-nowrap">
       <thead>
         <tr>
-          <th style="width: 1%">
+          <th style="width: 1%" class="vertical-align-middle">
             <!-- ko ifnot: $data.withDrop -->
             &nbsp;
             <!-- /ko -->
@@ -399,7 +399,7 @@ ${ components.menubar(is_embeddable) }
   <table id="databasesTable" class="table table-condensed datatables" style="margin-bottom: 10px" data-bind="visible: filteredDatabases().length > 0">
     <thead>
     <tr>
-      <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
+      <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
@@ -483,7 +483,7 @@ ${ components.menubar(is_embeddable) }
         <table id="tablesTable" class="table table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
           <thead>
           <tr>
-            <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
+            <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
             <th>&nbsp;</th>
             <th width="30%">${ _('Table Name') }</th>
             <th width="48%">${ _('Comment') }</th>
