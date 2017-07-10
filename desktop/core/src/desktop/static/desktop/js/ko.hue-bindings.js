@@ -81,20 +81,22 @@
 
   ko.bindingHandlers.hueLink = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-      if (IS_HUE_4) {
-        ko.bindingHandlers.click.init(element, function() {
-          return function (data, event) {
-            var url = ko.unwrap(valueAccessor());
-            if ($(element).attr('target')) {
-              window.open('/hue' + (url.indexOf('/') === 0 ? url : '/' + url), $(element).attr('target'));
-            } else if (event.ctrlKey || event.metaKey || event.which === 2) {
-              window.open('/hue' + (url.indexOf('/') === 0 ? url : '/' + url), '_blank');
-            } else {
-              huePubSub.publish('open.link', url);
-            }
+      ko.bindingHandlers.click.init(element, function () {
+        return function (data, event) {
+          var url = ko.unwrap(valueAccessor());
+          var prefix = '';
+          if (IS_HUE_4) {
+            prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
           }
-        }, allBindings, viewModel, bindingContext);
-      }
+          if ($(element).attr('target')) {
+            window.open(prefix + url, $(element).attr('target'));
+          } else if (event.ctrlKey || event.metaKey || event.which === 2) {
+            window.open(prefix + url, '_blank');
+          } else {
+            huePubSub.publish('open.link', url);
+          }
+        }
+      }, allBindings, viewModel, bindingContext);
 
       ko.bindingHandlers.hueLink.update(element, valueAccessor);
     },
@@ -110,7 +112,6 @@
         $(element).attr('href', 'javascript: void(0);');
       }
     }
-
   };
 
   ko.bindingHandlers.clickToCopy = {
