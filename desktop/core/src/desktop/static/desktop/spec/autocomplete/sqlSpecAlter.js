@@ -1315,6 +1315,18 @@
       });
 
       describe('Impala specific', function () {
+        it('should suggest databases for "ALTER TABLE db.tbl RENAME TO |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE db.tbl RENAME TO  ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
         it('should handle "alter table d2.mobile rename to d3.mobile;|"', function() {
           assertAutoComplete({
             beforeCursor: 'alter table d2.mobile rename to d3.mobile;',
@@ -1382,7 +1394,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['COLUMNS', 'PARTITION']
+              suggestKeywords: ['IF NOT EXISTS', 'COLUMNS', 'PARTITION', 'RANGE PARTITION']
             }
           });
         });

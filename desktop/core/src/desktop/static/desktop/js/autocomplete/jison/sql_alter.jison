@@ -98,14 +98,14 @@ AlterTable_EDIT
  | AlterTableLeftSide_EDIT PartitionSpec OptionalPartitionOperations
  | AlterTableLeftSide AnyAdd OptionalIfNotExists 'CURSOR'
    {
-     if (parser.isHive()) {
-       if (!$3) {
-         parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
-       } else {
-         parser.suggestKeywords(['PARTITION']);
-       }
+     if (!$3 && parser.isImpala()) {
+       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 4 }, { value: 'COLUMNS', weight: 3 }, { value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
+     } else if (!$3 && parser.isHive()) {
+       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords([{ value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
+     } else if (parser.isHive()) {
+       parser.suggestKeywords(['PARTITION']);
      }
    }
  | AlterTableLeftSide AnyReplace 'CURSOR'
@@ -182,6 +182,10 @@ AlterTable_EDIT
  | AlterTableLeftSide AnyRename 'CURSOR'
    {
      parser.suggestKeywords(['TO']);
+   }
+ | AlterTableLeftSide AnyRename 'TO' 'CURSOR'
+   {
+     parser.suggestDatabases({ appendDot: true });
    }
  ;
 
