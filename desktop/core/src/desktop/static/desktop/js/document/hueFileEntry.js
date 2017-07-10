@@ -602,24 +602,6 @@ var HueFileEntry = (function () {
     }
   };
 
-  HueFileEntry.prototype.openExternalLink = function (entry, event) {
-    event.preventDefault();
-    var $target = $(event.target);
-    if (!$target.is('a')) {
-      $target = $target.closest('a');
-    }
-    location.href = $target.attr('href');
-  };
-
-  HueFileEntry.prototype.openHue4Link = function (entry, event) {
-    event.preventDefault();
-    var $target = $(event.target);
-    if (!$target.is('a')) {
-      $target = $target.closest('a');
-    }
-    huePubSub.publish('open.link', $target.attr('href'));
-  };
-
   HueFileEntry.prototype.showRestoreConfirmation = function () {
     var self = this;
     if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
