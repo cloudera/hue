@@ -2204,6 +2204,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           hueUtils.changeURL('#!' + interface);
         }
         % endif
+        self.jobs.selectedJobs([]);
         self.job(null);
         if (interface === 'slas'){
           % if not is_mini:
