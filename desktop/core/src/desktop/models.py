@@ -1794,7 +1794,7 @@ class ClusterConfig():
     interpreters = []
 
     for other in other_apps:
-      interpreters.push({
+      interpreters.append({
         'type': other.nice_name,
         'displayName': other.nice_name,
         'tooltip': other.nice_name,
