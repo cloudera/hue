@@ -201,13 +201,13 @@ except ImportError, e:
         </li>
         % endif
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
-            <i class="fa fa-fw fa-save"></i> ${ _('Save') }
+          <a data-bind="css: clipboardClass" title="${ _('Copy the displayed results in your clipboard') }">
+            <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
           </a>
         </li>
         <li>
-          <a data-bind="css: clipboardClass" title="${ _('Copy the displayed results in your clipboard') }">
-            <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
+            <i class="fa fa-fw fa-save"></i> ${ _('Save') }
           </a>
         </li>
       </ul>
