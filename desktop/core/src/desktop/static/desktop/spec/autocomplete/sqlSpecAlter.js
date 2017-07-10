@@ -1399,6 +1399,103 @@
           });
         });
 
+        it('should suggest keywords for "ALTER TABLE bar ADD IF NOT EXISTS |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITION', 'RANGE PARTITION']
+            }
+          });
+        });
+
+        it('should handle "ALTER TABLE bar ADD RANGE PARTITION VALUE = \'A\';|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD RANGE PARTITION VALUE = \'A\';',
+            afterCursor: '',
+            noErrors: true,
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD RANGE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD RANGE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITION']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD RANGE PARTITION |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD RANGE PARTITION ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VALUE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD RANGE PARTITION VALUE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD RANGE PARTITION VALUE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['=']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD RANGE PARTITION 1 |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD RANGE PARTITION 1 ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['<', '<=', '<>', '=', '>', '>=']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD RANGE PARTITION 1 < |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD RANGE PARTITION 1 < ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VALUES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD RANGE PARTITION 1 < VALUES |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD RANGE PARTITION 1 < VALUES ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['<', '<=', '<>', '=', '>', '>=']
+            }
+          });
+        });
+
         it('should suggest keywords for "ALTER TABLE bar ADD COLUMNS (a INT, b |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER TABLE bar ADD COLUMNS (a INT, b ',

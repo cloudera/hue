@@ -603,7 +603,7 @@ OptionalPartitionedBy
 
 PartitionedBy
  : HiveOrImpalaPartitioned 'BY' ParenthesizedColumnSpecificationList
- | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList
+ | 'PARTITION' 'BY' AnyRange ParenthesizedColumnList ParenthesizedPartitionValuesList
  | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList '<impala>PARTITIONS' UnsignedNumericLiteral
  ;
 
@@ -626,8 +626,8 @@ PartitionedBy_EDIT
    {
      parser.suggestKeywords(['HASH', 'RANGE']);
    }
- | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList_EDIT
- | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList_EDIT
+ | 'PARTITION' 'BY' AnyRange ParenthesizedColumnList_EDIT
+ | 'PARTITION' 'BY' AnyRange ParenthesizedColumnList ParenthesizedPartitionValuesList_EDIT
  | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList_EDIT
  | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList 'CURSOR'
    {

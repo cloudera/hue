@@ -81,6 +81,8 @@ AlterIndex_EDIT
 
 AlterTable
  : AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' RangePartitionSpec
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' '<impala>PARTITION_VALUE' '=' UnsignedValueSpecification
  | AlterTableLeftSide AnyRename 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide HiveSpecificOperations
  | AlterTableLeftSide DropOperations
@@ -130,6 +132,19 @@ AlterTable_EDIT
      }
    }
  | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec_EDIT OptionalHdfsLocation OptionalPartitionSpecs
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'CURSOR'
+   {
+     parser.suggestKeywords(['PARTITION']);
+   }
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' 'CURSOR'
+   {
+     parser.suggestKeywords(['VALUE']);
+   }
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' '<impala>PARTITION_VALUE' 'CURSOR'
+   {
+     parser.suggestKeywords(['=']);
+   }
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' RangePartitionSpec_EDIT
  | AlterTableLeftSide HiveSpecificOperations_EDIT
  | AlterTableLeftSide OptionalPartitionOperations_EDIT
  | AlterTableLeftSide DropOperations_EDIT
