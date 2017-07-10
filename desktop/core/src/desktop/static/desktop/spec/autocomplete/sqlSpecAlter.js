@@ -1382,7 +1382,10 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['ADD COLUMNS', 'ADD PARTITION', 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'PARTITION', 'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED' ]
+              suggestKeywords: ['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'CHANGE',
+                'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS',
+                'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION',
+                'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED' ]
             }
           });
         });
@@ -1553,7 +1556,7 @@
             expectedResult: {
               lowerCase: false,
               suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] },
-              suggestKeywords: ['COLUMN', 'PARTITION']
+              suggestKeywords: ['IF EXISTS', 'COLUMN', 'PARTITION', 'RANGE PARTITION']
             }
           });
         });
@@ -1567,6 +1570,102 @@
             expectedResult: {
               lowerCase: false,
               suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar DROP IF |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar DROP IF ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['EXISTS']
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar DROP IF EXISTS PARTITION (|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar DROP IF EXISTS PARTITION (',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar DROP RANGE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar DROP RANGE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITION']
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar DROP IF EXISTS RANGE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar DROP IF EXISTS RANGE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITION']
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar DROP IF EXISTS RANGE PARTITION |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar DROP IF EXISTS RANGE PARTITION ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VALUE']
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar DROP IF EXISTS RANGE PARTITION VALUE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar DROP IF EXISTS RANGE PARTITION VALUE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['=']
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar DROP IF EXISTS RANGE PARTITION "a" |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar DROP IF EXISTS RANGE PARTITION "a" ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['<', '<=', '<>', '=', '>', '>=']
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar DROP RANGE PARTITION "a" < |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar DROP RANGE PARTITION "a" < ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VALUES']
             }
           });
         });
@@ -1628,6 +1727,18 @@
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: '' }
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar RECOVER |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar RECOVER ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITIONS']
             }
           });
         });
