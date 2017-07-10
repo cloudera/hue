@@ -333,7 +333,7 @@ from desktop.views import _ko
                     % if is_embeddable:
                       data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'hive', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
                     % else:
-                      data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive') }, click: openExternalLink"
+                      data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')"
                     % endif
                     >
                       <img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}
@@ -346,7 +346,7 @@ from desktop.views import _ko
                     % if is_embeddable:
                       data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'impala', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
                     % else:
-                      data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala') }, click: openExternalLink"
+                      data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala')"
                     % endif
                     >
                       <img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}
@@ -358,38 +358,38 @@ from desktop.views import _ko
                 %>
                 % if SHOW_NOTEBOOKS.get():
                   <li>
-                    <a title="${_('Notebook')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:index') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Notebook')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:index') }')">
                       <i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #0B7FAD;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}
                     </a>
                   </li>
                 % endif
                 % if 'pig' in apps:
                   <li>
-                    <a title="${_('Pig Script')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('pig:index') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Pig Script')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('pig:index') }')">
                       <img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig Script')}
                     </a>
                   </li>
                 % endif
                 % if 'oozie' in apps:
                   <li>
-                    <a title="${_('Oozie Workflow')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_workflow') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
                       <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
                     </a>
                   </li>
                   <li>
-                    <a title="${_('Oozie Coordinator')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Oozie Coordinator')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
                       <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Coordinator') if is_embeddable else _('Oozie Coordinator')}
                     </a>
                   </li>
                   <li>
-                    <a title="${_('Oozie Bundle')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_bundle') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Oozie Bundle')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_bundle') }')">
                       <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
                     </a>
                   </li>
                 % endif
                 % if 'search' in apps:
                   <li>
-                    <a title="${_('Solr Search')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('search:new_search') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Solr Search')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('search:new_search') }')">
                       <img src="${ static('search/art/icon_search_48.png') }" class="app-icon" alt="${ _('Search icon') }"/> ${_('Dashboard')}
                     </a>
                   </li>
@@ -484,7 +484,7 @@ from desktop.views import _ko
               </ul>
               <div class="doc-browser-primary-col">
                 <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: true } } --><!-- /ko -->
-                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name, 'href': definition().type === 'directory' ? '#' : definition().absoluteUrl }" class="margin-left-5"></a>
+                <a href="javascript: void(0);" data-bind="text: definition().name, hueLink: definition().type === 'directory' ? '#' : definition().absoluteUrl, attr: { 'title': definition().name }" class="margin-left-5"></a>
               </div>
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
