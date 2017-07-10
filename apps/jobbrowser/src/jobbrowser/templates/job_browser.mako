@@ -187,7 +187,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <table id="jobsTable" class="datatables table table-condensed status-border-container">
                   <thead>
                   <tr>
-                    <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
+                    <th width="1%" class="vertical-align-middle"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
                     <th width="15%">${_('Id')}</th>
                     <th width="20%">${_('Name')}</th>
                     <th width="6%">${_('User')}</th>
