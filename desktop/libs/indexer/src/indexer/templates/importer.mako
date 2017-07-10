@@ -408,59 +408,72 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           </div>
 
-          <div class="control-group" data-bind="visible: (createWizard.source.rdbmsMode() == 'configRdbms' || createWizard.source.rdbmsMode() == 'customRdbms') && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsType" class="control-label"><div>${ _('Database') }</div>
-              <select id="rdbmsType" data-bind="selectize: createWizard.source.rdbmsTypes, value: createWizard.source.rdbmsType, optionsText: 'name', optionsValue: 'value'"></select>
-            </label>
-          </div>
+          <!-- ko if: createWizard.source.inputFormat() == 'rdbms' -->
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'configRdbms' && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
-              <select id="rdbmsDatabaseName" data-bind="selectize: createWizard.source.rdbmsDatabaseNames, value: createWizard.source.rdbmsDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
-            </label>
-          </div>
+            <!-- ko if: createWizard.source.rdbmsMode() -->
+            <div class="control-group">
+              <label for="rdbmsType" class="control-label"><div>${ _('Database') }</div>
+                <select id="rdbmsType" data-bind="selectize: createWizard.source.rdbmsTypes, value: createWizard.source.rdbmsType, optionsText: 'name', optionsValue: 'value'"></select>
+              </label>
+            </div>
+            <!-- /ko -->
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'configRdbms' && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsTableName" class="control-label"><div>${ _('Table Name') }</div>
-              <select id="rdbmsTableName" data-bind="selectize: createWizard.source.rdbmsTableNames, value: createWizard.source.rdbmsTableName, optionsText: 'name', optionsValue: 'value'"></select>
-            </label>
-          </div>
+            <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' -->
+              <!-- ko if: createWizard.source.rdbmsType -->
+              <div class="control-group input-append">
+                <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
+                  <select id="rdbmsDatabaseName" data-bind="selectize: createWizard.source.rdbmsDatabaseNames, value: createWizard.source.rdbmsDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
+                </label>
+              </div>
+              <!-- /ko -->
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsHostname" class="control-label"><div>${ _('Database Hostname') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.vpc.cloudera.com or 74.217.76.101') }">
-            </label>
-          </div>
+              <!-- ko if: createWizard.source.rdbmsDatabaseName -->
+              <div class="control-group input-append">
+                <label for="rdbmsTableName" class="control-label"><div>${ _('Table Name') }</div>
+                  <select id="rdbmsTableName" data-bind="selectize: createWizard.source.rdbmsTableNames, value: createWizard.source.rdbmsTableName, optionsText: 'name', optionsValue: 'value'"></select>
+                </label>
+              </div>
+              <!-- /ko -->
+            <!-- /ko -->
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsPort" class="control-label"><div>${ _('Database Port') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here eg. 3306') }">
-            </label>
-          </div>
+            <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
+              <div class="control-group input-append">
+                <label for="rdbmsHostname" class="control-label"><div>${ _('Database Hostname') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.vpc.cloudera.com or 74.217.76.101') }">
+                </label>
+              </div>
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsUsername" class="control-label"><div>${ _('Database Username') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsUsername" placeholder="${ _('Enter username here') }">
-            </label>
-          </div>
+              <div class="control-group input-append">
+                <label for="rdbmsPort" class="control-label"><div>${ _('Database Port') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here eg. 3306') }">
+                </label>
+              </div>
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsPassword" class="control-label"><div>${ _('Database Password') }</div>
-              <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPassword" placeholder="${ _('Enter password here') }">
-            </label>
-          </div>
+              <div class="control-group input-append">
+                <label for="rdbmsUsername" class="control-label"><div>${ _('Database Username') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsUsername" placeholder="${ _('Enter username here') }">
+                </label>
+              </div>
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsDatabaseName" placeholder="${ _('Enter database name here') }">
-            </label>
-          </div>
+              <div class="control-group input-append">
+                <label for="rdbmsPassword" class="control-label"><div>${ _('Database Password') }</div>
+                  <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPassword" placeholder="${ _('Enter password here') }">
+                </label>
+              </div>
 
-          <div class="control-group input-append" data-bind="visible: createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.inputFormat() == 'rdbms'">
-            <label for="rdbmsTableNames" class="control-label"><div>${ _('Table Name') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsTableNames" placeholder="${ _('Enter table name here') }">
-            </label>
-          </div>
+              <div class="control-group input-append">
+                <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsDatabaseName" placeholder="${ _('Enter database name here') }">
+                </label>
+              </div>
+
+              <div class="control-group input-append">
+                <label for="rdbmsTableNames" class="control-label"><div>${ _('Table Name') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsTableName" placeholder="${ _('Enter table name here') }">
+                </label>
+              </div>
+            <!-- /ko -->
+          <!-- /ko -->
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
             <label for="path" class="control-label"><div>${ _('Table') }</div>
@@ -1268,37 +1281,33 @@ ${ assist.assistPanel() }
       });
 
       self.rdbmsType = ko.observable('');
-      self.rdbmsType.subscribe(function(val) {
+      self.rdbmsType.subscribe(function (val) {
         self.path('');
         resizeElements();
         $.post("${ url('indexer:get_databases') }", {
           "source": ko.mapping.toJSON(self)
-        }, function(resp) {
-          console.log(resp);
-          // set rdbmsDatabaseNamesAll here
+        }, function (resp) {
+          if (resp.status == 0 && resp.data) {
+            self.rdbmsDatabaseNames(resp.data);
+          }
         });
       });
 
       self.rdbmsDatabaseName = ko.observable('');
-      self.rdbmsDatabaseName.subscribe(function(val) {
+      self.rdbmsDatabaseName.subscribe(function (val) {
         $.post("${ url('indexer:get_tables') }", {
           "source": ko.mapping.toJSON(self)
-        }, function(resp) {
-          console.log(resp);
-          // set rdbmsTableNamesAll here
+        }, function (resp) {
+          if (resp.status == 0 && resp.data) {
+            self.rdbmsTableNames(resp.data);
+          }
         });
       });
 
-      self.rdbmsDatabaseNamesAll = ko.observableArray([]);
-      self.rdbmsDatabaseNames = ko.pureComputed(function() {
-        return self.rdbmsDatabaseNamesAll();
-      });
+      self.rdbmsDatabaseNames = ko.observableArray([]);
 
       self.rdbmsTableName = ko.observable('');
-      self.rdbmsTableNamesAll = ko.observableArray([]);
-      self.rdbmsTableNames = ko.pureComputed(function() {
-        return self.rdbmsTableNamesAll();
-      });
+      self.rdbmsTableNames = ko.observableArray([]);
 
       // Table
       self.table = ko.observable('');
