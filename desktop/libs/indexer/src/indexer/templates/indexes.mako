@@ -128,7 +128,7 @@ ${ assist.assistPanel() }
 
               <%def name="actions()">
                 <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-                  <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndex').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+                  <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndexes').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
                     <i class="fa fa-times"></i> ${ _('Delete') }
                   </a>
                 </div>
@@ -151,12 +151,38 @@ ${ assist.assistPanel() }
           <!-- ko hueSpinner: { spin: isLoading, center: true, size: 'xlarge' } --><!-- /ko -->
 
 
-          <div id="deleteIndex" class="modal hide fade">
-            <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
+          <div id="deleteIndexes" class="modal hide fade">
+            <form id="deleteIndexesForm" method="POST" data-bind="submit: deleteIndexes">
               ${ csrf_token(request) | n,unicode }
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-                <h2 class="modal-title">${ _('Delete the selected index(es)?') }</h2>
+                <h2 class="modal-title">${ _('Delete the selection?') }</h2>
+              </div>
+              <div class="modal-body">
+                <ul data-bind="foreach: selectedIndexes">
+                  <li>
+                    <span data-bind="text: name"></span>
+                  </li>
+                </ul>
+              </div>
+              <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+                <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+              </div>
+            </form>
+          </div>
+
+          <div id="deleteIndex" class="modal hide fade">
+            <form id="deleteIndexForm" method="POST" data-bind="submit: function() { $root.index().delete() }">
+              ${ csrf_token(request) | n,unicode }
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title">${ _('Delete?') }</h2>
+              </div>
+              <div class="modal-body">
+                <!-- ko if: $root.index() -->
+                  <span data-bind="text: $root.index().name"></span>
+                <!-- /ko -->
               </div>
               <div class="modal-footer">
                 <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -231,7 +257,7 @@ ${ assist.assistPanel() }
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
           <div data-bind="css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
         </td>
-        <td data-bind="text: name, click: function() { $root.fetchIndex(name()); }"></td>
+        <td data-bind="text: name, click: function() { $root.fetchIndex($data); }"></td>
         <td data-bind="text: type"></td>
         <td>
           <span data-bind="text: collections"></span>
@@ -251,15 +277,11 @@ ${ assist.assistPanel() }
       <i class="fa fa-search fa-fw"></i>
     </a>
 
-    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Refresh')}" href="javascript:void(0)">
-      <i class="pointer fa fa-refresh fa-fw"></i>
-    </a>
-
     <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Index Data')}">
       <i class="fa fa-upload fa-fw"></i>
     </a>
 
-    <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }">
+    <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="click: function() { $('#deleteIndex').modal('show') }, tooltip: { placement: 'bottom', delay: 750 }">
       <i class="fa fa-times fa-fw"></i>
     </a>
   </div>
@@ -444,6 +466,7 @@ ${ assist.assistPanel() }
       var self = this;
 
       self.name = ko.observable(data.name);
+      self.type = ko.observable(data.type);
       self.uniqueKey = ko.observable(data.schema.uniqueKey);
       self.fields = ko.mapping.fromJS(data.schema.fields);
       self.fieldsPreview = ko.pureComputed(function () {
@@ -476,6 +499,22 @@ ${ assist.assistPanel() }
           self.loadingSample(false);
         });
         hueAnalytics.log('indexes', 'sample_index');
+      };
+
+      self.delete = function () {
+        $.post("${ url('indexer:delete_indexes') }", {
+          "indexes": ko.mapping.toJSON([{'name': self.name(), 'type': self.type()}])
+        }, function (data) {
+          if (data.status == 0) {
+            window.location.reload();
+          } else {
+            $(document).trigger("error", data.message);
+          }
+          $('#deleteIndex').modal('hide');
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'delete_index');
       };
     };
 
@@ -515,7 +554,7 @@ ${ assist.assistPanel() }
       self.allSelected = ko.observable(false);
 
       self.handleSelect = function (index) {
-        index.isSelected(!index.isSelected());
+        index.isSelected(! index.isSelected());
       }
 
       self.selectAll = function () {
@@ -548,12 +587,13 @@ ${ assist.assistPanel() }
         hueAnalytics.log('indexes', 'list_indexes');
       };
 
-      self.fetchIndex = function (name) {
+      self.fetchIndex = function (index) {
         $.post("${ url('indexer:list_index') }", {
-          name: name
+          name: index.name()
         }, function (data) {
           if (data.status == 0) {
             self.index(new Index(self, data));
+            self.index().type(index.type());
             self.section('list-index');
             self.tab('index-overview');
           } else {
@@ -574,7 +614,7 @@ ${ assist.assistPanel() }
           } else {
             $(document).trigger("error", data.message);
           }
-          $('#deleteIndex').modal('hide');
+          $('#deleteIndexes').modal('hide');
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
         });
