@@ -1169,13 +1169,33 @@ OptionalCachedIn
  ;
 
 CachedIn
- : '<impala>CACHED' 'IN' SingleQuotedValue
+ : '<impala>CACHED' 'IN' QuotedValue
  ;
 
 CachedIn_EDIT
  : '<impala>CACHED' 'CURSOR'
    {
      parser.suggestKeywords(['IN']);
+   }
+ ;
+
+OptionalWithReplication
+ :
+ | WithReplication
+ ;
+
+WithReplication
+ : 'WITH' '<impala>REPLICATION' '=' SignedInteger
+ ;
+
+WithReplication_EDIT
+ : 'WITH' 'CURSOR'
+   {
+     parser.suggestKeywords(['REPLICATION =']);
+   }
+ | 'WITH' '<impala>REPLICATION' 'CURSOR'
+   {
+     parser.suggestKeywords(['=']);
    }
  ;
 
