@@ -299,6 +299,9 @@ ${ components.menubar(is_embeddable) }
     <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(details.properties.create_time)"></span></div>
     <div title="${ _('Format') }">
       <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
+      <i class="fa fa-fw fa-archive muted"></i>
+      <span data-bind="visible: details.properties.table_type == 'MANAGED_TABLE'" style="display: none;">${_('Managed')}</span>
+      <span data-bind="visible: details.properties.table_type == 'EXTERNAL_TABLE'" style="display: none;">${_('External')}</span>
     </div>
   </div>
   <!-- /ko -->
