@@ -33,7 +33,7 @@ ${'<%'}def name="menubar(section='')">
           <ul class="nav">
             <li class="app-header">
               <a href="/${app_name}">
-                <img src="${"${"} static('${app_name}/art/icon_${app_name}_48.png') }" class="app-icon"  alt="${ _('App icon') }"/>
+                <img src="${"${"} static('${app_name}/art/icon_${app_name}_48.png') }" class="app-icon"  alt="${"${"} _('App icon') }"/>
                 ${" ".join(word.capitalize() for word in app_name.split("_"))}
               </a>
              </li>
