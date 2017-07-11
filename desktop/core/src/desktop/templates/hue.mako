@@ -1084,7 +1084,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-          page('/', function() {  page(clusterConfig['main_button_action'].page); });
+          page('/', function() { page(clusterConfig['main_button_action'].page); });
           page('*', function (ctx) {
             console.error('Route not found', ctx);
             self.loadApp('404');
