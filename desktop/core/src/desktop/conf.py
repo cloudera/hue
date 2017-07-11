@@ -249,6 +249,7 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
           "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
           "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
           "connect-src 'self';"+
+          "frame-src *;"+
           "child-src 'self' data: *.vimeo.com;"+
           "object-src 'none'")
 
