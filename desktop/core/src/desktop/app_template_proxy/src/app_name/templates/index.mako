@@ -19,7 +19,9 @@ ${'<'}%!from ${app_name}.conf import URL %>
 
 ${'<'}%namespace name="shared" file="shared_components.mako" />
 
+${'%'}if not is_embeddable:
 ${'$'}{commonheader("${" ".join(word.capitalize() for word in app_name.split("_"))}", "${app_name}", user, request, "28px") | n,unicode}
+${'%'}endif
 
 ${'#'}# Use double hashes for a mako template comment
 ${'#'}# Main body
@@ -42,11 +44,13 @@ ${'#'}# Main body
     });
 
     function resizeAppframe() {
-      $("#appframe").height($(window).height() - 34); // magic: navigator height + safety pixels
+      $("#appframe").height($(window).height() - (IS_HUE_4 ? 48 : 34)); // magic: navigator height + safety pixels
     }
 
     resizeAppframe();
   });
 </script>
 
+${'%'}if not is_embeddable:
 ${'$'}{commonfooter(request, messages) | n,unicode}
+${'%'}endif
