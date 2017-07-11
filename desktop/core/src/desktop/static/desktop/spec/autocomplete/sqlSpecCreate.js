@@ -1375,6 +1375,42 @@
           });
         });
 
+        it('should suggest keywords for "CREATE TABLE foo (id int) CACHED IN \'boo\' |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CACHED IN \'boo\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['WITH REPLICATION =', 'AS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CACHED IN \'boo\' WITH |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CACHED IN \'boo\' WITH ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['REPLICATION =']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) CACHED IN \'boo\' WITH REPLICATION |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) CACHED IN \'boo\' WITH REPLICATION ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['=']
+            }
+          });
+        });
+
         it('should suggest keywords for "CREATE ... TABLE ... PARTITIONED BY ... ROW FORMAT ... CACHED |"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName (id INT, col2 STRING COMMENT \'booo\', col3 BIGINT) ' +

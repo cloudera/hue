@@ -202,6 +202,8 @@ TableDefinitionRightPart_EDIT
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
    OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn_EDIT OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn WithReplication_EDIT OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
    OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement_EDIT
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
    OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn 'CURSOR'
@@ -251,6 +253,9 @@ TableDefinitionRightPart_EDIT
        }
        if (parser.isImpala() && !$10) {
          keywords.push({ value: 'CACHED IN', weight: 2 });
+       }
+       if (parser.isImpala() && $10 && $10.suggestKeywords) {
+         keywords = keywords.concat(parser.createWeightedKeywords($10.suggestKeywords, 2));
        }
        keywords.push({ value: 'AS', weight: 1 });
      }
@@ -1165,7 +1170,12 @@ CommitLocations
 
 OptionalCachedIn
  :
- | CachedIn
+ | CachedIn OptionalWithReplication
+   {
+     if (!$2) {
+       $$ = { suggestKeywords: ['WITH REPLICATION ='] };
+     }
+   }
  ;
 
 CachedIn
