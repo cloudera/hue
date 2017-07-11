@@ -1706,6 +1706,42 @@
           });
         });
 
+        it('should suggest keywords for "ALTER TABLE bar PARTITION (a=\'b\') SET CACHED IN \'boo\' |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') SET CACHED IN \'boo\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['WITH REPLICATION =']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar PARTITION (a=\'b\') SET CACHED IN \'boo\' WITH |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') SET CACHED IN \'boo\' WITH ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['REPLICATION =']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar PARTITION (a=\'b\') SET CACHED IN \'boo\' WITH REPLICATION |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') SET CACHED IN \'boo\' WITH REPLICATION ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['=']
+            }
+          });
+        });
+
         it('should suggest keywords for "ALTER TABLE bar PARTITION (a=\'b\') SET FILEFORMAT |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER TABLE bar PARTITION (a=\'b\') SET FILEFORMAT ',

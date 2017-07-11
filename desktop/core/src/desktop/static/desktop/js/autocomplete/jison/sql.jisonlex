@@ -250,6 +250,7 @@
 <impala>'REFRESH'                          { parser.determineCase(yytext); return '<impala>REFRESH'; }
 <impala>'RENAME'                           { return '<impala>RENAME'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
+<impala>'REPLICATION'                      { return '<impala>REPLICATION'; }
 <impala>'RETURNS'                          { return '<impala>RETURNS'; }
 <impala>'REVOKE'                           { return '<impala>REVOKE'; }
 <impala>'SEQUENCEFILE'                     { return '<impala>SEQUENCEFILE'; }
