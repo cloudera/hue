@@ -387,6 +387,11 @@ ${ hueIcons.symbols() }
       <div id="embeddable_500" class="embeddable"></div>
       <div id="embeddable_sqoop" class="embeddable"></div>
       <div id="embeddable_jobsub" class="embeddable"></div>
+      % if other_apps:
+        % for other in other_apps:
+          <div id="embeddable_${ other.display_name }" class="embeddable"></div>
+        % endfor
+      % endif
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
@@ -596,6 +601,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
         sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
         jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
+        % if other_apps:
+          % for other in other_apps:
+            ${ other.display_name }: { url: '/${ other.display_name }', title: '${ other.nice_name }' },
+          % endfor
+        % endif
       };
 
       var SKIP_CACHE = [
@@ -603,7 +613,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
           'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
-          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr'
+          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
+          % if other_apps:
+            % for other in other_apps:
+              '${ other.display_name }',
+            % endfor
+          % endif
       ];
 
       var OnePageViewModel = function () {
@@ -1051,6 +1066,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/useradmin/users/new', app: 'useradmin_newuser' },
           { url: '/useradmin/users/', app: 'useradmin_users' },
           { url: '/useradmin', app: 'useradmin_users' },
+          % if other_apps:
+            % for other in other_apps:
+              { url: '/${ other.display_name }', app: '${ other.display_name }' },
+            % endfor
+          % endif
         ];
 
         pageMapping.forEach(function (mapping) {

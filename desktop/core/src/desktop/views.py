@@ -68,10 +68,12 @@ def is_alive(request):
 
 def hue(request):
   apps = appmanager.get_apps_dict(request.user)
+  current_app, other_apps, apps_list = _get_apps(request.user, '')
   default_cluster_index, default_cluster_interface = Cluster(request.user).get_list_interface_indexes()
 
   return render('hue.mako', request, {
     'apps': apps,
+    'other_apps': other_apps,
     'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
     'leaflet': {
