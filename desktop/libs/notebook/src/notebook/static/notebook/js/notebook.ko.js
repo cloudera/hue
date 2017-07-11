@@ -1518,27 +1518,25 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.fetchResultSize = function(n) {
-      if (typeof n === 'undefined') {
-        n = 10;
-      }
-
+    self.fetchResultSize = function(n, query_id) {
       $.post("/notebook/api/fetch_result_size", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
-        if (data.status == 0) {
-          if (data.result.rows != null) {
-            self.result.rows(data.result.rows);
-          } else if (self.type() == 'impala' && n > 0) {
-            setTimeout(function () {
-              self.fetchResultSize(n - 1);
-            }, 1000);
+        if (query_id == notebook.id()) { // If still on the same result
+          if (data.status == 0) {
+            if (data.result.rows != null) {
+              self.result.rows(data.result.rows);
+            } else if (self.type() == 'impala' && n > 0) {
+              setTimeout(function () {
+                self.fetchResultSize(n - 1, query_id);
+              }, 1000);
+            }
+          } else if (data.status == 5) {
+            // No supported yet for this snippet
+          } else {
+            //$(document).trigger("error", data.message);
           }
-        } else if (data.status == 5) {
-          // No supported yet for this snippet
-        } else {
-          //$(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         //$(document).trigger("error", xhr.responseText);
@@ -1570,7 +1568,10 @@ var EditorViewModel = (function() {
               self.progress(100);
               if (self.isSqlDialect()) {
                 if (self.result.handle().has_result_set) {
-                  self.fetchResultSize();
+                  var _query_id = notebook.id();
+                  setTimeout(function () { // Delay until we get IMPALA-5555
+                    self.fetchResultSize(10, _query_id);
+                  }, 2000);
                 } else { // Is DDL
                   self.ddlNotification(Math.random());
                   if (self.result.handle().has_more_statements) {
