@@ -19,4 +19,7 @@ from desktop.lib.django_util import render
 import datetime
 
 def index(request):
-  return render('index.mako', request, dict(date=datetime.datetime.now()))
+  return render('index.mako', request, {
+    'date': datetime.datetime.now(),
+    'is_embeddable': request.GET.get('is_embeddable', False),
+  })

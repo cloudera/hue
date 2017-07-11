@@ -1795,7 +1795,7 @@ class ClusterConfig():
 
     for other in other_apps:
       interpreters.append({
-        'type': other.nice_name,
+        'type': other.display_name,
         'displayName': other.nice_name,
         'tooltip': other.nice_name,
         'page': '/%s' % other.nice_name
