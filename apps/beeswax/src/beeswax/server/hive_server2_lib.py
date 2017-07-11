@@ -190,7 +190,6 @@ class HiveServerTable(Table):
           'properties': {
             'owner': props.get('Owner:'),
             'create_time': props.get('CreateTime:'),
-            'compressed': props.get('Compressed:', 'No') != 'No' or self.is_impala_only,
             'format': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else ('kudu' if self.is_impala_only else serde.rsplit('.', 1)[-1])),
         }
       }
