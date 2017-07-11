@@ -292,7 +292,7 @@ OptionalPartitionOperations
  | 'SET' HiveOrImpalaTblproperties ParenthesizedPropertyAssignmentList
  | 'SET' '<hive>SERDE' QuotedValue OptionalWithSerdeproperties
  | 'SET' HiveOrImpalaSerdeproperties ParenthesizedPropertyAssignmentList
- | 'SET' CachedIn
+ | 'SET' CachedIn OptionalWithReplication
  | 'SET' '<impala>UNCACHED'
  | AddReplaceColumns
  | '<hive>CONCATENATE'
@@ -336,6 +336,13 @@ OptionalPartitionOperations_EDIT
    }
  | 'SET' HdfsLocation_EDIT
  | 'SET' CachedIn_EDIT
+ | 'SET' CachedIn OptionalWithReplication 'CURSOR'
+   {
+     if (!$3) {
+       parser.suggestKeywords(['WITH REPLICATION =']);
+     }
+   }
+ | 'SET' CachedIn WithReplication_EDIT
  | 'SET' '<hive>SERDE' QuotedValue OptionalWithSerdeproperties 'CURSOR'
    {
      if (!$4) {
