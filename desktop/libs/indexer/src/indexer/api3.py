@@ -153,7 +153,7 @@ def guess_field_types(request):
         ]
     }
   elif file_format['inputFormat'] == 'rdbms':
-    query_server = rdbms.get_query_server_config(server=file_format['rdbmsName'])
+    query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
     db = rdbms.get(request.user, query_server=query_server)
     assist = Assist(db)
     sample = assist.get_sample_data(database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
@@ -171,32 +171,45 @@ def guess_field_types(request):
 
 
 def get_databases(request):
-  #source = json.loads(request.POST.get('source', '{}'))
-  #username = DATABASES[source['rdbmsType']].USER.get()
-  #user = User.objects.get(username=username)
-  #query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
-  #db = rdbms.get(user, query_server=query_server)
-  #assist = Assist(db)
-  #data = assist.get_databases() #format of data ['abc','def','ghi',...,'xyz']
-  #if data:
-    #format_ = [{'\'value\':'+value, '\'name\':'+name} for value, name in zip(data, data)]
-  #else:
-    #format_ = []
-  format_ = {"data": [{"name": "db1", "value": "db1"},{"name": "db2", "value": "db2"}]}
-  format_['status'] = 0
+  source = json.loads(request.POST.get('source', '{}'))
+  user = User.objects.get(username=request.user)
+  query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  db = rdbms.get(user, query_server=query_server)
+  assist = Assist(db)
+  data = assist.get_databases() #format of data ['abc','def','ghi',...,'xyz']
+  format_ = {}
+  if data:
+    list = []
+    for element in data:
+      dict = {}
+      dict['name'] = element
+      dict['value'] = element
+      list.append(dict)
+    format_['data'] = list
+    format_['status'] = 0
+  else:
+    format_ = []
+  print format_
   return JsonResponse(format_)
 
 
 def get_tables(request):
   source = json.loads(request.POST.get('source', '{}'))
-  username = DATABASES[source['rdbmsType']].USER.get()
-  user = User.objects.get(username=username)
+  user = User.objects.get(username=request.user)
   query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
   db = rdbms.get(user, query_server=query_server)
   assist = Assist(db)
   data = assist.get_tables(source['rdbmsDatabaseName']) ##format of data ['abc','def','ghi',...,'xyz']
+  format_ = {}
   if data:
-    format_ = [{'\'value\':'+value, '\'name\':'+name} for value, name in zip(data, data)]
+    list = []
+    for element in data:
+      dict = {}
+      dict['name'] = element
+      dict['value'] = element
+      list.append(dict)
+    format_['data'] = list
+    format_['status'] = 0
   else:
     format_ = []
   print format_
