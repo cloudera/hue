@@ -190,6 +190,7 @@ class HiveServerTable(Table):
           'properties': {
             'owner': props.get('Owner:'),
             'create_time': props.get('CreateTime:'),
+            'table_type': props.get('Table Type:', 'MANAGED_TABLE'),
             'format': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else ('kudu' if self.is_impala_only else serde.rsplit('.', 1)[-1])),
         }
       }
