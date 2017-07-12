@@ -1561,10 +1561,16 @@ class ClusterConfig():
   def get_config(self):
     app_config = self.get_apps()
     editors = app_config.get('editor')
+    main_button_action = self.get_main_quick_action(app_config)
+
+    if main_button_action.get('is_sql'):
+      default_sql_interpreter = main_button_action
+    else:
+      default_sql_interpreter = editors and editors['default_sql_interpreter']
 
     return {
       'app_config': app_config,
-      'main_button_action': self.get_main_quick_action(app_config),
+      'main_button_action': main_button_action,
       'button_actions': [
         app for app in [
           editors,
@@ -1572,7 +1578,7 @@ class ClusterConfig():
           app_config.get('scheduler')
         ] if app is not None
       ],
-      'default_sql_interpreter': editors and editors['default_sql_interpreter'],
+      'default_sql_interpreter': default_sql_interpreter,
       'cluster_type': self.cluster_type
     }
 
