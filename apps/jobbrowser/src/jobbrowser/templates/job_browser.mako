@@ -829,7 +829,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Duration') } <span data-bind="text: duration().toHHMMSS()"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
-  <div data-bind="template: { name: 'render-properties${ SUFFIX }', data: properties['properties'] }"></div>
+  <br>
+
+  <span data-bind="text: ko.mapping.toJSON(properties['properties'])"></span>
+  ##<div data-bind="template: { name: 'render-properties${ SUFFIX }', data: properties['properties'] }"></div>
 </script>
 
 
@@ -1328,6 +1331,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </table>
   <!-- /ko -->
 </script>
+
 
 <script type="text/html" id="render-page-counters${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.id, center: true, size: 'xlarge' } --><!-- /ko -->
