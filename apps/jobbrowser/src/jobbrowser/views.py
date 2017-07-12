@@ -337,7 +337,9 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 
   if log_link:
     link = '/%s/' % name
-    params = {}
+    params = {
+      'doAs': request.user.username
+    }
     if offset != 0:
       params['start'] = offset
 

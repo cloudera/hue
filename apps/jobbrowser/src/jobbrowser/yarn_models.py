@@ -468,7 +468,9 @@ class Attempt:
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
-      params = {}
+      params = {
+        'doAs': user
+      }
       if int(offset) != 0:
         params['start'] = offset
 
