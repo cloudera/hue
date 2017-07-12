@@ -4267,7 +4267,7 @@
           editor.container.removeEventListener('mouseout', mouseoutListener);
         });
 
-        var contextmenuListener = function (e) {
+        var onContextMenu = function (e) {
           var selectionRange = editor.selection.getRange();
           huePubSub.publish('sql.context.popover.hide');
           huePubSub.publish('sql.syntax.dropdown.hide');
@@ -4310,7 +4310,7 @@
           }
         };
 
-        var contextmenuListener = editor.container.addEventListener('contextmenu', contextmenuListener);
+        var contextmenuListener = editor.container.addEventListener('contextmenu', onContextMenu);
 
         disposeFunctions.push(function () {
           editor.container.removeEventListener('contextmenu', contextmenuListener);
