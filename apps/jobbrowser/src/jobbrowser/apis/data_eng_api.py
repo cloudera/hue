@@ -110,9 +110,9 @@ class DataEngJobApi(Api):
     }
 
   def app(self, appid):
-    handle = DataEng(self.user).describe_jobs(job_ids=[appid])
+    handle = DataEng(self.user).describe_job(job_id=appid)
 
-    job = handle['jobs'][0]
+    job = handle['job']
 
     common = {
         'id': job['jobId'],
