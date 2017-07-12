@@ -394,24 +394,6 @@ ${ assist.assistPanel() }
             </div>
             <!-- /ko -->
 
-            <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' -->
-              <!-- ko if: createWizard.source.rdbmsType -->
-              <div class="control-group input-append">
-                <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
-                  <select id="rdbmsDatabaseName" data-bind="selectize: createWizard.source.rdbmsDatabaseNames, value: createWizard.source.rdbmsDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
-                </label>
-              </div>
-              <!-- /ko -->
-
-              <!-- ko if: createWizard.source.rdbmsDatabaseName -->
-              <div class="control-group input-append">
-                <label for="rdbmsTableName" class="control-label"><div>${ _('Table Name') }</div>
-                  <select id="rdbmsTableName" data-bind="selectize: createWizard.source.rdbmsTableNames, value: createWizard.source.rdbmsTableName, optionsText: 'name', optionsValue: 'value'"></select>
-                </label>
-              </div>
-              <!-- /ko -->
-            <!-- /ko -->
-
             <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
               <div class="control-group input-append">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Database Hostname') }</div>
@@ -437,18 +419,37 @@ ${ assist.assistPanel() }
                 </label>
               </div>
 
-              <div class="control-group input-append">
-                <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsDatabaseName" placeholder="${ _('Enter database name here') }">
+              <div class="control-group" data-bind="visible: $root.createWizard.source.rdbmsHostname().length > 0 && $root.createWizard.source.rdbmsPort().length > 0 && $root.createWizard.source.rdbmsUsername().length > 0 && $root.createWizard.source.rdbmsPassword().length > 0">
+                <label class="checkbox inline-block">
+                  <input type="checkbox" data-bind="checked: createWizard.source.isConnection"> ${_('Test Connection')}
                 </label>
               </div>
 
+            <!-- /ko -->
+
+            <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' || (createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.dbmsIsValid() == 'true') -->
+              <!-- ko if: createWizard.source.rdbmsType -->
               <div class="control-group input-append">
-                <label for="rdbmsTableNames" class="control-label"><div>${ _('Table Name') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsTableName" placeholder="${ _('Enter table name here') }">
+                <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
+                  <select id="rdbmsDatabaseName" data-bind="selectize: createWizard.source.rdbmsDatabaseNames, value: createWizard.source.rdbmsDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
                 </label>
               </div>
+              <!-- /ko -->
+
+              <!-- ko if: createWizard.source.rdbmsDatabaseName -->
+              <div class="control-group input-append">
+                <!-- ko if: createWizard.source.allTablesSelected() == 'false' -->
+                <label for="rdbmsTableName" class="control-label"><div>${ _('Table Name') }</div>
+                  <select id="rdbmsTableName" data-bind="selectize: createWizard.source.rdbmsTableNames, value: createWizard.source.rdbmsTableName, optionsText: 'name', optionsValue: 'value'"></select>
+                </label>
+                <!-- /ko -->
+                <label class="checkbox inline-block">
+                  <input type="checkbox" data-bind="checked: createWizard.source.isAllTables"> ${_('All Tables')}
+                </label>
+              </div>
+              <!-- /ko -->
             <!-- /ko -->
+
           <!-- /ko -->
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
@@ -1311,6 +1312,9 @@ ${ assist.assistPanel() }
       });
       self.rdbmsDatabaseNames = ko.observableArray([]);
       self.rdbmsTableName = ko.observable('');
+      self.rdbmsTableName.subscribe(function (val) {
+        wizard.guessFieldTypes();
+      });
       self.rdbmsTableNames = ko.observableArray([]);
       // Table
       self.table = ko.observable('');
@@ -1324,6 +1328,35 @@ ${ assist.assistPanel() }
         resizeElements();
       });
       self.apiHelperType = ko.observable('${ source_type }');
+      self.rdbmsHostname = ko.observable('');
+      self.rdbmsPort = ko.observable('');
+      self.rdbmsUsername = ko.observable('');
+      self.rdbmsPassword = ko.observable('');
+      self.dbmsIsValid = ko.observable('');
+      self.allTablesSelected = ko.observable('false');
+      self.isConnection = ko.observable(false);
+      self.isConnection.subscribe(function(newVal) {
+        if(newVal){
+          $.post("${ url('indexer:dbms_test_connection') }", {
+            "source": ko.mapping.toJSON(self)
+          }, function (resp) {
+            if (resp.status == 0 && resp.data) {
+              self.dbmsIsValid(resp.data);
+            }
+          });
+        }else{
+          self.dbmsIsValid('');
+        }
+      });
+      self.isAllTables = ko.observable(false);
+      self.isAllTables.subscribe(function(newVal) {
+        if(newVal){
+          self.allTablesSelected('true');
+        }else{
+          self.allTablesSelected('false');
+        }
+      });
+
 
       // Queries
       self.query = ko.observable('');
@@ -1354,7 +1387,7 @@ ${ assist.assistPanel() }
         } else if (self.inputFormat() == 'manual') {
           return true;
         } else if (self.inputFormat() == 'rdbms') {
-          return self.rdbmsDatabaseName().length > 0 && self.rdbmsTableName().length > 0;
+          return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.allTablesSelected() == 'true');
         }
       });
       self.defaultName = ko.computed(function() {
@@ -1471,6 +1504,8 @@ ${ assist.assistPanel() }
           % endif
           {'name': 'File', 'value': 'file'},
           {'name': 'Database', 'value': 'database'},
+          {'name': 'Hive Table', 'value': 'hive'},
+          {'name': 'Hbase Table', 'value': 'hbase'},
       ]);
       self.outputFormats = ko.computed(function() {
         return $.grep(self.outputFormatsList(), function(format) {
@@ -1484,6 +1519,12 @@ ${ assist.assistPanel() }
             return false;
           }
           else if (format.value == 'table' && wizard.source.inputFormat() == 'rdbms') {
+            return false;
+          }
+          else if (format.value == 'hive' && (wizard.source.inputFormat() == 'file' || wizard.source.inputFormat() == 'manual')) {
+            return false;
+          }
+          else if (format.value == 'hbase' && (wizard.source.inputFormat() == 'file' || wizard.source.inputFormat() == 'manual')) {
             return false;
           }
           return true;
