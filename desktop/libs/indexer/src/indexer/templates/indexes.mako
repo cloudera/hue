@@ -252,7 +252,7 @@ ${ assist.assistPanel() }
         <th>${ _('Collections') }</th>
       </tr>
     </thead>
-    <tbody data-bind="foreach: {data: indexes}">
+    <tbody data-bind="foreach: {data: filteredIndexes}">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
           <div data-bind="css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
@@ -539,6 +539,16 @@ ${ assist.assistPanel() }
 
       self.indexFilter = ko.observable('');
       self.columnFilter = ko.observable('');
+
+      self.filteredIndexes = ko.computed(function () {
+        var returned = self.indexes();
+        if (self.indexFilter() !== '') {
+          returned = $.grep(self.indexes(), function (idx) {
+            return idx.name().toLowerCase().indexOf(self.indexFilter()) > -1;
+          });
+        }
+        return returned;
+      });
 
       self.selectedIndexes = ko.computed(function () {
         return $.grep(self.indexes(), function (index) {
