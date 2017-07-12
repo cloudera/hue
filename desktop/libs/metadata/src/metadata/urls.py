@@ -57,3 +57,9 @@ urlpatterns += patterns('metadata.optimizer_api',
   url(r'^api/optimizer/query_compatibility/?$', 'query_compatibility', name='query_compatibility'),
   url(r'^api/optimizer/similar_queries/?$', 'similar_queries', name='similar_queries'),
 )
+
+
+# Workload Analytics API
+urlpatterns += patterns('metadata.workload_analytics_api',
+  url(r'^api/workload_analytics/get_operation_execution_details/?$', 'get_operation_execution_details', name='get_operation_execution_details'),
+)
