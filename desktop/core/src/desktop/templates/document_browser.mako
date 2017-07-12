@@ -26,8 +26,8 @@ from desktop.views import _ko
 
   <script src="${ static('desktop/ext/js/bootstrap-fileupload.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
-  <link rel="stylesheet" href="/static/desktop/css/home.css">
-  <link rel="stylesheet" href="/static/desktop/ext/css/bootstrap-fileupload.css">
+  <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/bootstrap-fileupload.css') }" rel="stylesheet">
 
   <script type="text/html" id="doc-browser-template">
     <div class="doc-browser-drag-helper">
