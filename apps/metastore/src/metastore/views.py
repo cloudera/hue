@@ -92,20 +92,20 @@ def databases(request):
 
 @check_has_write_access_permission
 def drop_database(request):
-  db = dbms.get(request.user)
+  source_type = request.POST.get('source_type', 'hive')
+  db = _get_db(user=request.user, source_type=source_type)
 
   if request.method == 'POST':
     databases = request.POST.getlist('database_selection')
 
     try:
-      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
-
       if request.POST.get('is_embeddable'):
+        design = SavedQuery.create_empty(app_name=source_type if source_type != 'hive' else 'beeswax', owner=request.user, data=hql_query('').dumps())
         last_executed = json.loads(request.POST.get('start_time'), '-1')
         sql = db.drop_databases(databases, design, generate_ddl_only=True)
         job = make_notebook(
             name=_('Drop database %s') % ', '.join(databases)[:100],
-            editor_type='hive',
+            editor_type=source_type,
             statement=sql.strip(),
             status='ready',
             database=None,
@@ -115,6 +115,7 @@ def drop_database(request):
         )
         return JsonResponse(job.execute(request))
       else:
+        design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
         query_history = db.drop_databases(databases, design)
         url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:databases')
         return redirect(url)
@@ -130,8 +131,11 @@ def drop_database(request):
 @check_has_write_access_permission
 @require_http_methods(["POST"])
 def alter_database(request, database):
-  db = dbms.get(request.user)
   response = {'status': -1, 'data': ''}
+
+  source_type = request.POST.get('source_type', 'hive')
+  db = _get_db(user=request.user, source_type=source_type)
+
   try:
     properties = request.POST.get('properties')
 
@@ -153,8 +157,10 @@ def alter_database(request, database):
 
 
 def get_database_metadata(request, database):
-  db = _get_db(user=request.user)
   response = {'status': -1, 'data': ''}
+  source_type = request.POST.get('source_type', 'hive')
+  db = _get_db(user=request.user, source_type=source_type)
+
   try:
     db_metadata = db.get_database(database)
     response['status'] = 0
@@ -316,8 +322,11 @@ def describe_table(request, database, table):
 @check_has_write_access_permission
 @require_http_methods(["POST"])
 def alter_table(request, database, table):
-  db = dbms.get(request.user)
   response = {'status': -1, 'data': ''}
+
+  source_type = request.POST.get('source_type', 'hive')
+  db = _get_db(user=request.user, source_type=source_type)
+
   try:
     new_table_name = request.POST.get('new_table_name', None)
     comment = request.POST.get('comment', None)
@@ -346,8 +355,11 @@ def alter_table(request, database, table):
 @check_has_write_access_permission
 @require_http_methods(["POST"])
 def alter_column(request, database, table):
-  db = dbms.get(request.user)
   response = {'status': -1, 'message': ''}
+
+  source_type = request.POST.get('source_type', 'hive')
+  db = _get_db(user=request.user, source_type=source_type)
+
   try:
     column = request.POST.get('column', None)
 
@@ -380,7 +392,8 @@ def alter_column(request, database, table):
 
 @check_has_write_access_permission
 def drop_table(request, database):
-  db = dbms.get(request.user)
+  source_type = request.POST.get('source_type', 'hive')
+  db = _get_db(user=request.user, source_type=source_type)
 
   if request.method == 'POST':
     try:
@@ -393,7 +406,7 @@ def drop_table(request, database):
         sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
         job = make_notebook(
             name=_('Drop table %s') % ', '.join([table.name for table in tables_objects])[:100],
-            editor_type=_get_servername(db),
+            editor_type=source_type,
             statement=sql.strip(),
             status='ready',
             database=database,
@@ -417,6 +430,7 @@ def drop_table(request, database):
     return render('confirm.mako', request, {'url': request.path, 'title': title})
 
 
+# Deprecated
 def read_table(request, database, table):
   db = dbms.get(request.user)
 
@@ -432,9 +446,12 @@ def read_table(request, database, table):
 
 @check_has_write_access_permission
 def load_table(request, database, table):
-  db = dbms.get(request.user)
-  table = db.get_table(database, table)
   response = {'status': -1, 'data': 'None'}
+
+  source_type = request.POST.get('source_type', 'hive')
+  db = _get_db(user=request.user, source_type=source_type)
+
+  table = db.get_table(database, table)
 
   if request.method == "POST":
     load_form = LoadDataForm(table, request.POST)
@@ -443,7 +460,7 @@ def load_table(request, database, table):
       on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
       generate_ddl_only = request.POST.get('is_embeddable', 'false') == 'true'
       try:
-        design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
+        design = SavedQuery.create_empty(app_name=source_type if source_type != 'hive' else 'beeswax', owner=request.user, data=hql_query('').dumps())
         form_data = {
           'path': load_form.cleaned_data['path'],
           'overwrite': load_form.cleaned_data['overwrite'],
@@ -454,7 +471,7 @@ def load_table(request, database, table):
           last_executed = json.loads(request.POST.get('start_time'), '-1')
           job = make_notebook(
             name=_('Load data in %s.%s') % (database, table.name),
-            editor_type=_get_servername(db),
+            editor_type=source_type,
             statement=query_history.strip(),
             status='ready',
             database=database,
@@ -585,6 +602,7 @@ def browse_partition(request, database, table, partition_spec):
     raise PopupException(_('Cannot browse partition'), detail=e.message)
 
 
+# Deprecated
 def read_partition(request, database, table, partition_spec):
   db = dbms.get(request.user)
   try:
@@ -599,7 +617,8 @@ def read_partition(request, database, table, partition_spec):
 @require_http_methods(["GET", "POST"])
 @check_has_write_access_permission
 def drop_partition(request, database, table):
-  db = dbms.get(request.user)
+  source_type = request.POST.get('source_type', 'hive')
+  db = _get_db(user=request.user, source_type=source_type)
 
   if request.method == 'POST':
     partition_specs = request.POST.getlist('partition_selection')
@@ -610,7 +629,7 @@ def drop_partition(request, database, table):
         sql = db.drop_partitions(database, table, partition_specs, design=None, generate_ddl_only=True)
         job = make_notebook(
             name=_('Drop partition %s') % ', '.join(partition_specs)[:100],
-            editor_type='hive',
+            editor_type=source_type,
             statement=sql.strip(),
             status='ready',
             database=None,
@@ -638,9 +657,13 @@ def has_write_access(user):
   return user.is_superuser or user.has_hue_permission(action="write", app=DJANGO_APPS[0])
 
 
-def _get_db(user):
-  default_sql_interpreter = ClusterConfig(user).get_config()['default_sql_interpreter']
-  query_server = get_query_server_config(name=default_sql_interpreter['type'] if default_sql_interpreter['type'] != 'hive' else 'beeswax')
+
+def _get_db(user, source_type=None):
+  if source_type is None:
+    default_sql_interpreter = ClusterConfig(user).get_config()['default_sql_interpreter']
+    source_type = default_sql_interpreter['type']
+
+  query_server = get_query_server_config(name=source_type if source_type != 'hive' else 'beeswax')
   return dbms.get(user, query_server)
 
 
