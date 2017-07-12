@@ -47,9 +47,11 @@
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
 
+
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 
