@@ -1769,14 +1769,14 @@ var EditorViewModel = (function() {
 
       $.post("/metadata/api/optimizer/upload/table_stats", {
         db_tables: ko.mapping.toJSON($.map(options.activeTables, function(table) {
-          return table.database.name + '.' + table.name;
+          return table.databaseName + '.' + table.tableName;
         })),
         sourcePlatform: ko.mapping.toJSON(self.type()),
         with_columns: ko.mapping.toJSON(true),
         with_ddl: ko.mapping.toJSON(true)
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", $.map(options.activeTables, function(table) { return table.name; }) + " stats sent to analyse");
+          $(document).trigger("info", $.map(options.activeTables, function(table) { return table.tableName; }) + " stats sent to analyse");
           if (data.upload_table_ddl) {
             self.watchUploadStatus(data.upload_table_ddl.status.workloadId);
           }
