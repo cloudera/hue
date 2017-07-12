@@ -366,6 +366,7 @@ ${ components.menubar(is_embeddable) }
         <form action="/metastore/databases/drop" data-bind="submit: dropAndWatch" method="POST">
           <input type="hidden" name="is_embeddable" value="true"/>
           <input type="hidden" name="start_time" value=""/>
+          <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
       % else:
         <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
       % endif
@@ -550,6 +551,7 @@ ${ components.menubar(is_embeddable) }
         <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }, submit: dropAndWatch" method="POST">
           <input type="hidden" name="is_embeddable" value="true"/>
           <input type="hidden" name="start_time" value=""/>
+          <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
       % else:
         <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
       % endif
@@ -778,6 +780,7 @@ ${ components.menubar(is_embeddable) }
         <input type="hidden" name="is_embeddable" value="true"/>
         <input type="hidden" name="format" value="json"/>
         <input type="hidden" name="start_time" value=""/>
+        <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
     % else:
       <form data-bind="attr: { 'action': '/metastore/table/' + $parent.database.name + '/' + $parent.name + '/partitions/drop' }" method="POST">
     % endif
@@ -1195,6 +1198,7 @@ ${ components.menubar(is_embeddable) }
     <form data-bind="submit: dropAndWatch" method="POST">
       <input type="hidden" name="is_embeddable" value="true"/>
       <input type="hidden" name="start_time" value=""/>
+      <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
     % else:
     <form method="POST">
     % endif
