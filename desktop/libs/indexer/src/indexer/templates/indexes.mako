@@ -257,11 +257,11 @@ ${ assist.assistPanel() }
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
           <div data-bind="css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
         </td>
-        <td data-bind="text: name, click: function() { $root.fetchIndex($data); }"></td>
+        <td><a class="pointer" data-bind="text: name, click: function() { $root.fetchIndex($data); }"></a></td>
         <td data-bind="text: type"></td>
         <td>
           <span data-bind="text: collections"></span>
-          <a data-bind="click: $root.alias.edit, visible: type() == 'alias'">
+          <a class="pointer" data-bind="click: $root.alias.edit, visible: type() == 'alias'">
             <i class="fa fa-pencil"></i> ${ _('Edit') }
           </a>
         </td>
