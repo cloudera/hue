@@ -28,6 +28,25 @@ importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
 
 (function () {
 
+  // TODO: Move to utils and re-use elsewhere
+  /**
+  * This function turns the relative nested location into an absolute location given the statement location.
+  *
+  * @param statementLocation
+  * @param nestedLocation
+  */
+  var toAbsoluteLocation = function (statementLocation, nestedLocation) {
+    if (nestedLocation.first_line === 1) {
+      nestedLocation.first_column += statementLocation.first_column;
+    }
+    if (nestedLocation.last_line === 1) {
+      nestedLocation.last_column += statementLocation.first_column;
+    }
+    var lineAdjust = statementLocation.first_line - 1;
+    nestedLocation.first_line += lineAdjust;
+    nestedLocation.last_line += lineAdjust;
+  };
+
   this.throttle = -1;
 
   this.onmessage = function (msg) {
@@ -37,10 +56,12 @@ importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
     }
     clearTimeout(this.throttle);
     this.throttle = setTimeout(function () {
-      var sqlParseResult = sqlSyntaxParser.parseSyntax(msg.data.beforeCursor, msg.data.afterCursor, msg.data.type, false);
+      var syntaxError = sqlSyntaxParser.parseSyntax(msg.data.beforeCursor, msg.data.afterCursor, msg.data.type, false);
+      if (syntaxError) {
+        toAbsoluteLocation(msg.data.statementLocation, syntaxError.loc);
+      }
       postMessage({
-        syntaxError: sqlParseResult,
-        statementLocation: msg.data.statementLocation
+        syntaxError: syntaxError
       });
     }, 400);
   }
