@@ -813,6 +813,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="dataeng-job-page${ SUFFIX }">
+  <button class="btn" title="${ _('Troubleshoot') }" data-bind="click: troubleshoot">
+    <i class="fa fa-tachometer"></i> ${ _('Troubleshoot') }
+  </button>
+
   <!-- ko if: type() == 'dataeng-job-HIVE' -->
     <div data-bind="template: { name: 'dataeng-job-hive-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
@@ -1770,6 +1774,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           });
         }
       }
+
+      self.troubleshoot = function (action) {
+        $.post('/metadata/api/workload_analytics/get_operation_execution_details', {
+          operation_id: ko.mapping.toJSON(self.id())
+        }, function(data) {
+          console.log(ko.mapping.toJSON(data));
+        });
+      }
+
 
       self.workflowGraphLoaded = false;
 
