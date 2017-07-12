@@ -48,6 +48,7 @@ class SQLIndexer(object):
     final_table_name = table_name
 
     table_format = destination['tableFormat']
+    source_type = source['apiHelperType']
 
     columns = destination['columns']
     partition_columns = destination['partitionColumns']
@@ -139,8 +140,8 @@ class SQLIndexer(object):
             'comment': comment,
             'row_format': row_format,
             'field_terminator': field_delimiter,
-            'collection_terminator': collection_delimiter, # Only if Hive
-            'map_key_terminator': map_delimiter, # Only if Hive
+            'collection_terminator': collection_delimiter if source_type == 'hive' else None,
+            'map_key_terminator': map_delimiter if source_type == 'hive' else None,
             'serde_name': serde_name,
             'serde_properties': serde_properties,
             'file_format': file_format,

@@ -29,11 +29,12 @@ from django.views.decorators.http import require_http_methods
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2, ClusterConfig
+from desktop.models import Document2, get_cluster_config
 
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery
 from beeswax.server import dbms
+from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
 from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
 from notebook.connectors.base import Notebook, QueryError
@@ -41,7 +42,6 @@ from notebook.models import make_notebook
 
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
-from beeswax.server.dbms import get_query_server_config
 
 
 LOG = logging.getLogger(__name__)
@@ -660,8 +660,7 @@ def has_write_access(user):
 
 def _get_db(user, source_type=None):
   if source_type is None:
-    default_sql_interpreter = ClusterConfig(user).get_config()['default_sql_interpreter']
-    source_type = default_sql_interpreter['type']
+    source_type = get_cluster_config(user)['default_sql_interpreter']
 
   query_server = get_query_server_config(name=source_type if source_type != 'hive' else 'beeswax')
   return dbms.get(user, query_server)
