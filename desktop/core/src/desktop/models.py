@@ -1564,7 +1564,7 @@ class ClusterConfig():
     main_button_action = self.get_main_quick_action(app_config)
 
     if main_button_action.get('is_sql'):
-      default_sql_interpreter = main_button_action
+      default_sql_interpreter = main_button_action['type']
     else:
       default_sql_interpreter = editors and editors['default_sql_interpreter']
 
