@@ -121,6 +121,7 @@ ${ assist.assistPanel() }
           <div class="indexer-main">
             <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
 
+            <!-- ko if: section() === 'list-indexes' -->
             <%actionbar:render>
               <%def name="search()">
                 <input data-bind="clearable: indexFilter, value: indexFilter, valueUpdate: 'afterkeydown'" type="text" class="input-xlarge search-query" placeholder="${_('Search for name...')}">
@@ -143,6 +144,7 @@ ${ assist.assistPanel() }
                 </a>
               </%def>
             </%actionbar:render>
+            <!-- /ko -->
 
             <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
             <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
