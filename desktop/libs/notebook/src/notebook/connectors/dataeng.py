@@ -173,33 +173,8 @@ class DataEng():
 
     return _exec(args)
 
-  def describe_jobs(self, submitter_crns=None, page_size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
-        creation_date_after=None, cluster_crn=None, order=None):
-    args = ['describe-jobs']
-
-    if creation_date_after is None:
-      creation_date_after = (datetime.today() - timedelta(days=7)).strftime(DATE_FORMAT)
-
-    if submitter_crns:
-      args.extend(['--submitter-crns', submitter_crns])
-    if page_size is not None:
-      args.extend(['--page-size', str(page_size)])
-    if starting_token:
-      args.extend(['--starting-token', starting_token])
-    if job_statuses:
-      args.extend(['--job-statuses', job_statuses])
-    if job_ids:
-      args.extend(['--job-ids'] + job_ids)
-    if job_types:
-      args.extend(['--job-types', job_types])
-    if creation_date_before:
-      args.extend(['--creation-date-before', creation_date_before])
-    if creation_date_after:
-      args.extend(['--creation-date-after', creation_date_after])
-    if cluster_crn:
-      args.extend(['--cluster-crn', cluster_crn])
-    if order:
-      args.extend(['--order', order])
+  def describe_job(self, job_id):
+    args = ['describe-job', '--job-id', job_id]
 
     return _exec(args)
 
