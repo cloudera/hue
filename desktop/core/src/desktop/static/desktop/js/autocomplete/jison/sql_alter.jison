@@ -681,12 +681,6 @@ OptionalStoredAsDirectories_EDIT
    }
  ;
 
-OptionalCascadeOrRestrict
- :
- | '<hive>CASCADE'
- | '<hive>RESTRICT'
- ;
-
 AlterView
  : AlterViewLeftSide 'SET' '<hive>TBLPROPERTIES' ParenthesizedPropertyAssignmentList
  | AlterViewLeftSide AnyAs QuerySpecification
