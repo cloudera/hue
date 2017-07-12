@@ -580,6 +580,7 @@ ${ assist.assistPanel() }
 
       self.showIndexes = function () {
         self.section('list-indexes');
+        self.index(null);
         hueUtils.changeURL(self.baseURL);
       }
 
