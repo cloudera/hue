@@ -580,7 +580,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         home: { url: '/home*', title: '${_('Home')}' },
         indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
         collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
-        indexes: { url: '/indexer/', title: '${_('Indexes')}' },
+        indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
         importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
         useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
         useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
@@ -808,7 +808,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               var route = new page.Route(baseURL);
               route.keys.forEach(function (key) {
                 if (key.name === 0){
-                  baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+                  if (typeof self.currentContextParams()[key.name] !== 'undefined') {
+                    baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+                  }
+                  else {
+                    baseURL = baseURL.replace('*', '');
+                  }
                 }
                 else {
                   baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
@@ -961,7 +966,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page(ctx.path.replace(/home2/gi, 'home'));
           }},
           { url: '/home*', app: 'home' },
-          { url: '/indexer/indexes', app: 'indexes' },
+          { url: '/indexer/indexes/*', app: 'indexes' },
           { url: '/indexer/', app: 'indexes' },
           { url: '/indexer/importer/', app: 'importer' },
           { url: '/indexer/importer/prefill/*', app: function (ctx) {
