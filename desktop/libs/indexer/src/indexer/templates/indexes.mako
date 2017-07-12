@@ -52,7 +52,7 @@ ${ assist.assistPanel() }
   <h1>
     <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
       <li>
-        <a href="javascript:void(0);" data-bind="click: function() { section('list-indexes'); }">${ _('Indexes') }
+        <a href="javascript:void(0);" data-bind="click: showIndexes">${ _('Indexes') }
           <!-- ko if: index -->
           <span class="divider">&gt;</span>
           <!-- /ko -->
@@ -60,7 +60,7 @@ ${ assist.assistPanel() }
       </li>
       <!-- ko with: index -->
       <li>
-        <a href="#index-overview" data-bind="text: name"></a>
+        <a href="javascript:void(0);" data-bind="text: name"></a>
       </li>
       <!-- /ko -->
     </ul>
@@ -443,8 +443,8 @@ ${ assist.assistPanel() }
       self.create = function () {
         $.post("${ url('indexer:create_alias') }", {
           "alias": self.name,
-          "collections": ko.mapping.toJSON(ko.utils.arrayMap(self.chosenCollections, function(c) {
-              return new c.name();
+          "collections": ko.mapping.toJSON(ko.utils.arrayMap(self.chosenCollections, function (c) {
+            return new c.name();
           }))
         }, function () {
           window.location.reload();
@@ -522,6 +522,8 @@ ${ assist.assistPanel() }
     var IndexesViewModel = function (options) {
       var self = this;
 
+      self.baseURL = IS_HUE_4 ? '/hue' : '' + '/indexer/indexes/';
+
       self.assistAvailable = ko.observable(true);
       self.apiHelper = ApiHelper.getInstance();
       self.isHue4 = ko.observable(options.hue4);
@@ -554,7 +556,7 @@ ${ assist.assistPanel() }
       self.allSelected = ko.observable(false);
 
       self.handleSelect = function (index) {
-        index.isSelected(! index.isSelected());
+        index.isSelected(!index.isSelected());
       }
 
       self.selectAll = function () {
@@ -566,7 +568,12 @@ ${ assist.assistPanel() }
 
       self.datatable = null;
 
-      self.fetchIndexes = function () {
+      self.showIndexes = function () {
+        self.section('list-indexes');
+        hueUtils.changeURL(self.baseURL);
+      }
+
+      self.fetchIndexes = function (callback) {
         self.isLoading(true);
         $.post("${ url('indexer:list_indexes') }", {}, function (data) {
           if (data.status == 0) {
@@ -576,6 +583,9 @@ ${ assist.assistPanel() }
               indexes.push(ko.mapping.fromJS(index));
             });
             self.indexes(indexes);
+            if (callback) {
+              callback();
+            }
           } else {
             $(document).trigger("error", data.message);
           }
@@ -587,6 +597,16 @@ ${ assist.assistPanel() }
         hueAnalytics.log('indexes', 'list_indexes');
       };
 
+      self.getIndexByName = function (name) {
+        var found = null;
+        self.indexes().forEach(function (idx) {
+          if (idx.name() === name) {
+            found = idx;
+          }
+        });
+        return found;
+      }
+
       self.fetchIndex = function (index) {
         $.post("${ url('indexer:list_index') }", {
           name: index.name()
@@ -594,6 +614,7 @@ ${ assist.assistPanel() }
           if (data.status == 0) {
             self.index(new Index(self, data));
             self.index().type(index.type());
+            hueUtils.changeURL(self.baseURL + self.index().name());
             self.section('list-index');
             self.tab('index-overview');
           } else {
@@ -632,11 +653,23 @@ ${ assist.assistPanel() }
         % if is_embeddable:
           hue4: true,
         % endif
+        index: '${ index }'
       };
       var viewModel = new IndexesViewModel(options);
       ko.applyBindings(viewModel, $('#indexesComponents')[0]);
 
-      viewModel.fetchIndexes();
+      viewModel.fetchIndexes(function () {
+        if (options.index) {
+          var foundIndex = viewModel.getIndexByName(options.index);
+          if (foundIndex) {
+            viewModel.fetchIndex(foundIndex);
+          }
+          else {
+            $.jHueNotify.error('${ _('The specified index has not been found') }')
+            viewModel.showIndexes();
+          }
+        }
+      });
     });
   })();
 </script>

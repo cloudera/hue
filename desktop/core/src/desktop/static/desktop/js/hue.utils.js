@@ -199,7 +199,9 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     if (window.location.hash !== '' && newURL.indexOf('#') === -1){
       newURL = newURL + window.location.hash;
     }
-    window.history.pushState(null, null, newURL);
+    if (newURL !== window.location.pathname) {
+      window.history.pushState(null, null, newURL);
+    }
   };
 
   hueUtils.replaceURL = function (newURL) {

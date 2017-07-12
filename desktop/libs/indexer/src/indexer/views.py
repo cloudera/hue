@@ -43,12 +43,13 @@ def collections(request, is_redirect=False):
   })
 
 
-def indexes(request):
+def indexes(request, index=''):
   if not request.user.has_hue_permission(action="access", app='search'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
   return render('indexes.mako', request, {
     'is_embeddable': request.GET.get('is_embeddable', False),
+    'index': index
   })
 
 
