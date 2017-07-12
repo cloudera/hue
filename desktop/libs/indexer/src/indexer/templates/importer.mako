@@ -1274,7 +1274,7 @@ ${ assist.assistPanel() }
       self.table.subscribe(function(val) {
         resizeElements();
       });
-      self.apiHelperType = ko.observable('${ sourceType }');
+      self.apiHelperType = ko.observable('${ source_type }');
 
       // Queries
       self.query = ko.observable('');
@@ -1385,7 +1385,7 @@ ${ assist.assistPanel() }
       };
       self.name.subscribe(self.nameChanged);
 
-      self.apiHelperType = ko.observable('${ sourceType }');
+      self.apiHelperType = ko.observable('${ source_type }');
 
       self.description = ko.observable('');
       self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');

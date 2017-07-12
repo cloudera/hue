@@ -34,7 +34,7 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.sql import SQLIndexer
-from indexer.solr_client import SolrClient, SolrClientException, MAX_UPLOAD_SIZE
+from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 
 
 LOG = logging.getLogger(__name__)
