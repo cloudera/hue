@@ -3484,10 +3484,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
       huePubSub.subscribe('submit.popup.return', function (data) {
         viewModel.selectedNotebook().viewSchedulerId(data.job_id);
-        $.jHueNotify.info('${_('Coordinator submitted.')}');
         $('.submit-modal-editor').modal('hide');
-
-        $('a[href=\'#scheduledJobsTab\']').click();
+        huePubSub.publish('show.jobs.panel', data.job_id);
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('jobbrowser.data', function (jobs) {
