@@ -50,6 +50,21 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="indexes-breadcrumbs">
   <h1>
+    <!-- ko with: index() -->
+    <div class="inline-block pull-right">
+      <a class="inactive-action" data-bind="hueLink: '/search/browse/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Search the index')}" href="javascript:void(0)">
+        <i class="fa fa-search fa-fw"></i>
+      </a>
+
+      <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Index Data')}">
+        <i class="fa fa-upload fa-fw"></i>
+      </a>
+
+      <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="click: function() { $('#deleteIndex').modal('show') }, tooltip: { placement: 'bottom', delay: 750 }">
+        <i class="fa fa-times fa-fw"></i>
+      </a>
+    </div>
+    <!-- /ko -->
     <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
       <li>
         <a href="javascript:void(0);" data-bind="click: showIndexes">${ _('Indexes') }
@@ -274,23 +289,6 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="list-index">
-  <div class="pull-right">
-    <a class="inactive-action" data-bind="hueLink: '/search/browse/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Search the index')}" href="javascript:void(0)">
-      <i class="fa fa-search fa-fw"></i>
-    </a>
-
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Index Data')}">
-      <i class="fa fa-upload fa-fw"></i>
-    </a>
-
-    <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="click: function() { $('#deleteIndex').modal('show') }, tooltip: { placement: 'bottom', delay: 750 }">
-      <i class="fa fa-times fa-fw"></i>
-    </a>
-  </div>
-
-
-  <div class="clearfix"></div>
-
   <ul class="nav nav-pills margin-top-30">
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
