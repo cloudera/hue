@@ -23,6 +23,7 @@
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
+  from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
@@ -580,7 +581,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         home: { url: '/home*', title: '${_('Home')}' },
         indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
         collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
+        % if ENABLE_NEW_INDEXER.get():
         indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
+        %else:
+        indexes: { url: '/indexer/', title: '${_('Indexes')}' },
+        %endif
         importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
         useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
         useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
