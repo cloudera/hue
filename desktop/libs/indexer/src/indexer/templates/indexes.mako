@@ -522,7 +522,7 @@ ${ assist.assistPanel() }
     var IndexesViewModel = function (options) {
       var self = this;
 
-      self.baseURL = IS_HUE_4 ? '/hue' : '' + '/indexer/indexes/';
+      self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/indexes/';
 
       self.assistAvailable = ko.observable(true);
       self.apiHelper = ApiHelper.getInstance();
