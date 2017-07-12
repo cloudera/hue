@@ -160,7 +160,7 @@ def guess_field_types(request):
     table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
 
     format_ = {
-        "sample": list(sample.rows()),
+        "sample": list(sample.rows())[:4],
         "columns": [
             Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
             for col in table_metadata
@@ -212,6 +212,56 @@ def get_tables(request):
     format_['status'] = 0
   else:
     format_ = []
+  print format_
+  return JsonResponse(format_)
+
+
+def dbms_test_connection(request):
+  source = json.loads(request.POST.get('source', '{}'))
+  user = User.objects.get(username=request.user)
+  name = source['rdbmsType']
+  if name:
+    query_server = {
+      'server_name': name,
+      'server_host': source['rdbmsHostname'],
+      'server_port': int(source['rdbmsPort']),
+      'username': source['rdbmsUsername'],
+      'password': source['rdbmsPassword'],
+      'options': {},
+      'alias': name,
+      'name': name
+    }
+  LOG.debug("Query Server: %s" % query_server)
+  db = rdbms.get(user, query_server=query_server)
+  assist = Assist(db)
+  data = assist.get_databases()  # format of data ['abc','def','ghi',...,'xyz']
+  print "ABCABCABC"
+  print data
+
+  '''
+  source = json.loads(request.POST.get('source', '{}'))
+  user = User.objects.get(username=request.user)
+  query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  db = rdbms.get(user, query_server=query_server)
+  assist = Assist(db)
+  data = assist.get_tables(source['rdbmsDatabaseName']) ##format of data ['abc','def','ghi',...,'xyz']
+  format_ = {}
+  if data:
+    list = []
+    for element in data:
+      dict = {}
+      dict['name'] = element
+      dict['value'] = element
+      list.append(dict)
+    format_['data'] = list
+    format_['status'] = 0
+  else:
+    format_ = []
+  '''
+  format_ = {}
+  format_['data'] = 'true'
+  format_['status'] = 0
+  print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   print format_
   return JsonResponse(format_)
 
