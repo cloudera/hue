@@ -29,7 +29,7 @@ from django.views.decorators.http import require_http_methods
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2
+from desktop.models import Document2, ClusterConfig
 
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery
@@ -41,6 +41,7 @@ from notebook.models import make_notebook
 
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
+from beeswax.server.dbms import get_query_server_config
 
 
 LOG = logging.getLogger(__name__)
@@ -71,7 +72,7 @@ Database Views
 def databases(request):
   search_filter = request.GET.get('filter', '')
 
-  db = dbms.get(request.user)
+  db = _get_db(user=request.user)
   databases = db.get_databases(search_filter)
 
   return render("metastore.mako", request, {
@@ -152,7 +153,7 @@ def alter_database(request, database):
 
 
 def get_database_metadata(request, database):
-  db = dbms.get(request.user)
+  db = _get_db(user=request.user)
   response = {'status': -1, 'data': ''}
   try:
     db_metadata = db.get_database(database)
@@ -186,7 +187,7 @@ def table_queries(request, database, table):
 Table Views
 """
 def show_tables(request, database=None):
-  db = dbms.get(request.user)
+  db = _get_db(user=request.user)
 
   if database is None:
     database = 'default' # Assume always 'default'
@@ -237,7 +238,7 @@ def show_tables(request, database=None):
 
 
 def get_table_metadata(request, database, table):
-  db = dbms.get(request.user)
+  db = _get_db(user=request.user)
   response = {'status': -1, 'data': ''}
   try:
     table_metadata = db.get_table(database, table)
@@ -258,7 +259,7 @@ def get_table_metadata(request, database, table):
 
 def describe_table(request, database, table):
   app_name = get_app_name(request)
-  db = dbms.get(request.user)
+  db = _get_db(user=request.user)
 
   try:
     table = db.get_table(database, table)
@@ -489,7 +490,7 @@ def load_table(request, database, table):
 
 
 def describe_partitions(request, database, table):
-  db = dbms.get(request.user)
+  db = _get_db(user=request.user)
 
   table_obj = db.get_table(database, table)
 
@@ -571,7 +572,7 @@ def _massage_partition(database, table, partition):
 
 
 def browse_partition(request, database, table, partition_spec):
-  db = dbms.get(request.user)
+  db = _get_db(user=request.user)
   try:
     decoded_spec = urllib.unquote(partition_spec)
     partition_table = db.describe_partition(database, table, decoded_spec)
@@ -635,6 +636,12 @@ def drop_partition(request, database, table):
 
 def has_write_access(user):
   return user.is_superuser or user.has_hue_permission(action="write", app=DJANGO_APPS[0])
+
+
+def _get_db(user):
+  default_sql_interpreter = ClusterConfig(user).get_config()['default_sql_interpreter']
+  query_server = get_query_server_config(name=default_sql_interpreter['type'] if default_sql_interpreter['type'] != 'hive' else 'beeswax')
+  return dbms.get(user, query_server)
 
 
 def _get_servername(db):
