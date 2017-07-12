@@ -204,6 +204,7 @@
 <impala>'CREATE'                           { parser.determineCase(yytext); return '<impala>CREATE'; }
 <impala>'DATA'                             { return '<impala>DATA'; }
 <impala>'DATABASES'                        { return '<impala>DATABASES'; }
+<impala>'DELETE'                           { return '<impala>DELETE'; }
 <impala>'DELIMITED'                        { return '<impala>DELIMITED'; }
 <impala>'DESCRIBE'                         { parser.determineCase(yytext); return '<impala>DESCRIBE'; }
 <impala>'ESCAPED'                          { return '<impala>ESCAPED'; }
