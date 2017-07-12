@@ -421,6 +421,20 @@
           });
         });
       });
+
+      describe('Impala specific', function () {
+        it('should suggest keywords for "DROP DATABASE foo |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DROP DATABASE foo ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['CASCADE', 'RESTRICT']
+            }
+          });
+        });
+      });
     });
 
     describe('DROP FUNCTION', function () {

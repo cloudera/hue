@@ -195,6 +195,7 @@
 <impala>'AGGREGATE'                        { return '<impala>AGGREGATE'; }
 <impala>'AVRO'                             { return '<impala>AVRO'; }
 <impala>'CACHED'                           { return '<impala>CACHED'; }
+<impala>'CASCADE'                          { return '<impala>CASCADE'; }
 <impala>'CHANGE'                           { return '<impala>CHANGE'; }
 <impala>'CLOSE_FN'                         { return '<impala>CLOSE_FN'; }
 <impala>'COLUMN'                           { return '<impala>COLUMN'; }
@@ -252,6 +253,7 @@
 <impala>'RENAME'                           { return '<impala>RENAME'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
 <impala>'REPLICATION'                      { return '<impala>REPLICATION'; }
+<impala>'RESTRICT'                         { return '<impala>RESTRICT'; }
 <impala>'RETURNS'                          { return '<impala>RETURNS'; }
 <impala>'REVOKE'                           { return '<impala>REVOKE'; }
 <impala>'SEQUENCEFILE'                     { return '<impala>SEQUENCEFILE'; }
