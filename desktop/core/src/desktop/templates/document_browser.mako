@@ -484,7 +484,7 @@ from desktop.views import _ko
               </ul>
               <div class="doc-browser-primary-col">
                 <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: true } } --><!-- /ko -->
-                <a href="javascript: void(0);" data-bind="text: definition().name, hueLink: definition().type === 'directory' ? '#' : definition().absoluteUrl, attr: { 'title': definition().name }" class="margin-left-5"></a>
+                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, hueLink: definition().type === 'directory' ? '' : definition().absoluteUrl, attr: { 'title': definition().name }" class="margin-left-5"></a>
               </div>
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
