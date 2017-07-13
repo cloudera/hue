@@ -26,6 +26,7 @@ from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2, Document
+from desktop.views import antixss
 
 from search.conf import LATEST
 
@@ -72,9 +73,9 @@ def index(request, is_mobile=False):
 
   if request.method == 'GET':
     if 'q' in request.GET:
-      query['qs'][0]['q'] = request.GET.get('q')
+      query['qs'][0]['q'] = antixss(request.GET.get('q', ''))
     if 'qd' in request.GET:
-      query['qd'] = request.GET.get('qd')
+      query['qd'] = antixss(request.GET.get('qd', ''))
 
   template = 'search.mako'
   if is_mobile:
@@ -89,7 +90,7 @@ def index(request, is_mobile=False):
         'is_latest': LATEST.get(),
         'engines': get_engines(request.user)
     }),
-    'is_owner': collection_doc.doc.get().can_write(request.user),
+    'is_owner': collection_doc.can_write(request.user) if USE_NEW_EDITOR.get() else collection_doc.doc.get().can_write(request.user),
     'can_edit_index': can_edit_index(request.user),
     'is_embeddable': request.GET.get('is_embeddable', False),
     'mobile': is_mobile,
