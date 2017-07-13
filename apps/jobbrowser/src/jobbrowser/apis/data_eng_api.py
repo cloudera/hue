@@ -21,8 +21,10 @@ from datetime import datetime,  timedelta
 
 from django.utils.translation import ugettext as _
 
-from jobbrowser.apis.base_api import Api
+from desktop.models import Cluster, DATAENG
 from notebook.connectors.dataeng import DataEng, DATE_FORMAT
+
+from jobbrowser.apis.base_api import Api
 
 
 LOG = logging.getLogger(__name__)
@@ -37,18 +39,18 @@ class DataEngClusterApi(Api):
 
     return {
       'apps': [{
-        'id': app['clusterName'],
-        'name': '%(workersGroupSize)s %(instanceType)s %(cdhVersion)s' % app,
+        'id': app['crn'],
+        'name': '%(clusterName)s' % app,
         'status': app['status'],
         'apiStatus': self._api_status(app['status']),
-        'type': app['serviceType'],
+        'type': '%(serviceType)s %(workersGroupSize)s %(instanceType)s %(cdhVersion)s' % app,
         'user': app['clusterName'].split('-', 1)[0],
         'progress': 100,
         'queue': 'group',
-        'duration': 10 * 3600,
+        'duration': 1,
         'submitted': app['creationDate']
       } for app in jobs['clusters']],
-      'total': None
+      'total': len(jobs)
     }
 
 
@@ -90,6 +92,11 @@ class DataEngJobApi(Api):
         delta = timedelta(days=int(filters['time']['time_value']))
       kwargs['creation_date_after'] = (datetime.today() - delta).strftime(DATE_FORMAT)
 
+    # Could also come from filters
+    cluster = Cluster(self.user)
+    if cluster.get_type() == DATAENG:
+      kwargs['cluster_crn'] = cluster.get_id()
+
     api = DataEng(self.user)
 
     jobs = api.list_jobs(**kwargs)
@@ -106,7 +113,7 @@ class DataEngJobApi(Api):
         'duration': 10 * 3600,
         'submitted': app['creationDate']
       } for app in jobs['jobs']],
-      'total': None
+      'total': len(jobs)
     }
 
   def app(self, appid):

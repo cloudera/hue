@@ -1343,7 +1343,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 var interfaces = [];
                 if (data && data.apps) {
                   data.apps.forEach(function(cluster) {
-                    interfaces.push(ko.mapping.fromJS({'name': dataEngCluster[0].name(), 'type': 'dataeng', 'interface': cluster.id}));
+                    interfaces.push(ko.mapping.fromJS({'name': dataEngCluster[0].name(), 'type': 'dataeng', 'interface': cluster.name, 'id': cluster.id}));
                   });
                 }
                 dataEngCluster[0]['interfaces'](interfaces);

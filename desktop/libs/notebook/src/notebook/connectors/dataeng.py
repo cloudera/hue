@@ -40,6 +40,7 @@ def _exec(args):
        ] +
        args
     )
+    print args
   except Exception, e:
     raise PopupException(e, title=_('Error accessing'))
 
@@ -56,6 +57,7 @@ class DataEngApi(Api):
   def __init__(self, user, cluster_name, interpreter=None, request=None):
     Api.__init__(self, user, interpreter=interpreter, request=request)
     self.cluster_name = cluster_name
+
 
   def execute(self, notebook, snippet):
     statement = snippet['statement']
