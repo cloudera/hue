@@ -30,7 +30,8 @@ LOG = logging.getLogger(__name__)
 try:
   from oozie.forms import ParameterForm
   from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_OOZIE_BACKEND_FILTERING
-  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, has_dashboard_jobs_access, massaged_oozie_jobs_for_json
+  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, has_dashboard_jobs_access, massaged_oozie_jobs_for_json, \
+      has_job_edition_permission
 except Exception, e:
   LOG.exception('Some applications are not enabled for Job Browser v2: %s' % e)
 
@@ -56,7 +57,8 @@ class WorkflowApi(Api):
         'progress': app['progress'],
         'queue': app['group'],
         'duration': app['durationInMillis'],
-        'submitted': app['startTimeInMillis'] * 1000
+        'submitted': app['startTimeInMillis'] * 1000,
+        'canWrite': app['canEdit']
       } for app in massaged_oozie_jobs_for_json(wf_list.jobs, self.user)['jobs']],
       'total': wf_list.total
     }
@@ -78,7 +80,8 @@ class WorkflowApi(Api):
         'type': 'workflow',
         'user': workflow.user,
         'duration': workflow.durationTime,
-        'submitted': workflow.submissionTime * 1000
+        'submitted': workflow.submissionTime * 1000,
+        'canWrite': has_job_edition_permission(workflow, self.user),
     }
 
     request = MockDjangoRequest(self.user)

@@ -527,6 +527,7 @@ def list_oozie_bundle(request, job_id):
       'actions': massaged_bundle_actions_for_json(oozie_bundle),
       'submitted': format_time(oozie_bundle.kickoffTime),
       'doc_url': bundle.get_absolute_url() if bundle else '',
+      'canEdit': has_job_edition_permission(oozie_bundle, request.user),
     }
     return HttpResponse(json.dumps(return_obj).replace('\\\\', '\\'), content_type="application/json")
 

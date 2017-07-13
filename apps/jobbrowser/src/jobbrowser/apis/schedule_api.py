@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
-  from oozie.views.dashboard import list_oozie_coordinator, get_oozie_job_log, massaged_oozie_jobs_for_json
+  from oozie.views.dashboard import list_oozie_coordinator, get_oozie_job_log, massaged_oozie_jobs_for_json, has_job_edition_permission
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -58,7 +58,8 @@ class ScheduleApi(Api):
         'progress': app['progress'],
         'queue': app['group'],
         'duration': app['durationInMillis'],
-        'submitted': app['startTimeInMillis'] * 1000
+        'submitted': app['startTimeInMillis'] * 1000,
+        'canWrite': app['canEdit']
       } for app in massaged_oozie_jobs_for_json(jobs.jobs, self.user)['jobs']],
       'total': jobs.total
     }
@@ -80,6 +81,7 @@ class ScheduleApi(Api):
         'type': 'schedule',
         'submitted': format_time(coordinator.startTime),
         'user': coordinator.user,
+        'canWrite': has_job_edition_permission(coordinator, self.user),
     }
     common['properties'] = json.loads(response.content)
     common['properties']['tasks'] = common['properties']['actions']
