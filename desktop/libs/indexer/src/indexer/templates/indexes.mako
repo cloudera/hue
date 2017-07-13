@@ -152,10 +152,10 @@ ${ assist.assistPanel() }
               </%def>
 
               <%def name="creation()">
-                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/default'">
+                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/'">
                   <i class="fa fa-plus-circle"></i> ${ _('Create index') }
                 </a>
-                <a href="#createAlias" data-toggle="modal" class="btn">
+                <a data-bind="click: function() { $root.alias.name(''); $root.alias.chosenCollections.removeAll(); $('#createAlias').modal('show'); }" class="btn">
                   <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
                 </a>
               </%def>
@@ -265,7 +265,7 @@ ${ assist.assistPanel() }
         <th>${ _('Collections') }</th>
       </tr>
     </thead>
-    <tbody data-bind="foreach: {data: filteredIndexes}">
+    <tbody data-bind="foreach: { data: filteredIndexes }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
           <div data-bind="css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
@@ -437,7 +437,7 @@ ${ assist.assistPanel() }
         });
       });
 
-      self.create = function () {console.log(vm.indexes());
+      self.create = function () {
         $.post("${ url('indexer:create_alias') }", {
           "name": self.name,
           "collections": ko.mapping.toJSON($.map(self.chosenCollections(), function (collection) {
@@ -458,7 +458,7 @@ ${ assist.assistPanel() }
 
       self.edit = function (alias) {
         self.name(alias.name());
-        self.chosenCollections(alias.collections());
+        self.chosenCollections($.grep(vm.indexes(), function(collection) { return alias.collections().indexOf(collection.name()) != -1; }));
         $('#createAlias').modal('show');
       }
     };
