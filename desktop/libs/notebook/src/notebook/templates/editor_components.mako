@@ -2845,6 +2845,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     huePubSub.subscribe('app.gained.focus', function (app) {
       if (app === 'editor') {
         huePubSub.publish('redraw.fixed.headers');
+        huePubSub.publish('hue.scrollleft.show');
       }
     }, HUE_PUB_SUB_EDITOR_ID);
 
