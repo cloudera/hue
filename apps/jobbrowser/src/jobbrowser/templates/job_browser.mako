@@ -1496,6 +1496,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.cluster = ko.observableDefault(job.cluster);
       self.duration = ko.observableDefault(job.duration);
       self.submitted = ko.observableDefault(job.submitted);
+      self.canWrite = ko.observableDefault(job.canWrite == true);
 
       self.logs = ko.observable('');
 
@@ -1561,35 +1562,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
       self.killEnabled = ko.pureComputed(function() {
-        return self.hasKill() && (self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED');
+        return self.hasKill() && self.canWrite() && (self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED');
       });
 
       self.hasResume = ko.pureComputed(function() {
         return ['workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
       self.resumeEnabled = ko.pureComputed(function() {
-        return self.hasResume() && self.apiStatus() == 'PAUSED';
+        return self.hasResume() && self.canWrite() && self.apiStatus() == 'PAUSED';
       });
 
       self.hasRerun = ko.pureComputed(function() {
         return ['workflow', 'schedule-task'].indexOf(self.type()) != -1;
       });
       self.rerunEnabled = ko.pureComputed(function() {
-        return self.hasRerun() && !self.isRunning();
+        return self.hasRerun() && self.canWrite() && ! self.isRunning();
       });
 
       self.hasPause = ko.pureComputed(function() {
         return ['workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
       self.pauseEnabled = ko.pureComputed(function() {
-        return self.hasPause() && self.apiStatus() == 'RUNNING';
+        return self.hasPause() && self.canWrite() && self.apiStatus() == 'RUNNING';
       });
 
       self.hasIgnore = ko.pureComputed(function() {
         return ['schedule-task'].indexOf(self.type()) != -1;
       });
       self.ignoreEnabled = ko.pureComputed(function() {
-        return self.hasIgnore() && !self.isRunning();
+        return self.hasIgnore() && self.canWrite() && ! self.isRunning();
       });
 
       self.loadingJob = ko.observable(false);

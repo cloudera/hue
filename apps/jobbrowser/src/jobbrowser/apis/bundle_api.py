@@ -59,7 +59,8 @@ class BundleApi(Api):
         'progress': app['progress'],
         'queue': app['group'],
         'duration': app['durationInMillis'],
-        'submitted': app['kickoffTimeInMillis'] * 1000
+        'submitted': app['kickoffTimeInMillis'] * 1000,
+        'canWrite': app['canEdit']
       } for app in massaged_oozie_jobs_for_json(jobs.jobs, self.user)['jobs']],
       'total': jobs.total
     }
@@ -79,6 +80,7 @@ class BundleApi(Api):
         'type': 'bundle',
         'user': bundle['user'],
         'submitted': bundle['submitted'],
+        'canWrite': bundle['canEdit'],
         'properties': {}
     }
     common['properties']['actions'] = bundle['actions']
