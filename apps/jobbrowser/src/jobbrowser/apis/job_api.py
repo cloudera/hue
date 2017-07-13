@@ -117,7 +117,8 @@ class YarnApi(Api):
         'progress': app['progress'],
         'queue': app['queueName'],
         'duration': app['durationMs'],
-        'submitted': app['startTimeMs']
+        'submitted': app['startTimeMs'],
+        'canWrite': app['canKill'],
       } for app in apps],
       'total': len(apps)
     }
@@ -151,7 +152,8 @@ class YarnApi(Api):
         'user': app['user'],
         'progress': app['progress'],
         'duration': app['durationMs'],
-        'submitted': app['startTimeMs']
+        'submitted': app['startTimeMs'],
+        'canWrite': app['canKill'],
     }
 
     if app['applicationType'] == 'MR2' or app['applicationType'] == 'MAPREDUCE':
