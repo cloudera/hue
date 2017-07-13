@@ -17,6 +17,7 @@
 
 import logging
 import json
+import re
 import subprocess
 
 from datetime import datetime,  timedelta
@@ -25,6 +26,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from metadata.workload_analytics_client import WorkfloadAnalyticsClient
 
 from notebook.connectors.base import Api, QueryError
 
@@ -40,7 +42,6 @@ def _exec(args):
        ] +
        args
     )
-    print args
   except Exception, e:
     raise PopupException(e, title=_('Error accessing'))
 
@@ -114,7 +115,12 @@ class DataEngApi(Api):
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
-    return ''
+    logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
+        operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
+        attempt_id='attempt_1499705340501_0045_m_000000_0'
+    )
+
+    return ''.join(re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
 
 
   def progress(self, snippet, logs):
