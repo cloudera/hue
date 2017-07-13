@@ -199,7 +199,7 @@ def _filter_oozie_jobs(user, filters, kwargs):
 
     if not has_dashboard_jobs_access(user):
       kwargs['filters'].append(('user', user.username))
-    elif 'user' in text_filters:
+    elif 'username' in text_filters:
       kwargs['filters'].append(('user', text_filters['username']))
 
     if 'time' in filters:
