@@ -149,13 +149,14 @@ def delete_indexes(request):
 def create_alias(request):
   response = {'status': -1}
 
-  alias = request.POST.get('alias', '')
+  name = request.POST.get('name', '')
   collections = json.loads(request.POST.get('collections', '[]'))
 
   client = SolrClient(request.user)
 
-  client.create_alias(alias, collections)
   response['status'] = 0
+  response['response'] = client.create_alias(name, collections)
+  response['alias'] = {'name': name, 'type': 'alias', 'collections': collections, 'isSelected': False}
   response['message'] = _('Alias created or modified!')
 
   return JsonResponse(response)
