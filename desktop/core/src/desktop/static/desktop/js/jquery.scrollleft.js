@@ -47,7 +47,8 @@
 
   Plugin.prototype.setupScrollLeft = function () {
     var _this = this,
-      link = null;
+      link = null,
+      isActive = true;
 
     if ($("#jHueScrollLeftAnchor").length > 0) { // just one scroll up per page
       link = $("#jHueScrollLeftAnchor");
@@ -86,7 +87,9 @@
         if (scrolled.scrollLeft() > _this.options.threshold) {
           if (link.is(":hidden")) {
             positionOtherAnchors();
-            link.fadeIn(200, positionOtherAnchors);
+            if (isActive) {
+              link.fadeIn(200, positionOtherAnchors);
+            }
           }
           if ($(_this.element).data("lastScrollLeft") == null || $(_this.element).data("lastScrollLeft") < scrolled.scrollLeft()) {
             $("#jHueScrollLeftAnchor").data("caller", scrollable);
@@ -116,7 +119,9 @@
         }
       });
       if (_allOk) {
-        link.fadeOut(200, positionOtherAnchors);
+        if (isActive) {
+          link.fadeOut(200, positionOtherAnchors);
+        }
         $("#jHueScrollLeftAnchor").data("caller", null);
       }
     }
@@ -134,6 +139,17 @@
         });
       }
       return false;
+    });
+
+    huePubSub.subscribe('hue.scrollleft.show', function () {
+      isActive = true;
+    });
+
+    huePubSub.subscribe('hue.scrollleft.hide', function () {
+      isActive = false;
+      if (link.is(":visible")) {
+        link.hide();
+      }
     });
   };
 
