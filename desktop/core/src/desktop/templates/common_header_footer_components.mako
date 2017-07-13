@@ -80,7 +80,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var DocumentTypeGlobals = {
       'all': '${_('All')}',
       'directory': '${ _('Directory') }',
-      'link-pigscript': '${_('Pig Script')}',
+      'link-pigscript': '${_('Pig Design')}',
       'link-workflow': '${_('Job Design')}',
       'notebook': '${_('Notebook')}',
       'oozie-bundle2': '${_('Oozie Bundle')}',
