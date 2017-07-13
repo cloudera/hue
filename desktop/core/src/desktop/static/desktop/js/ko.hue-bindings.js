@@ -84,16 +84,18 @@
       ko.bindingHandlers.click.init(element, function () {
         return function (data, event) {
           var url = ko.unwrap(valueAccessor());
-          var prefix = '';
-          if (IS_HUE_4) {
-            prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
-          }
-          if ($(element).attr('target')) {
-            window.open(prefix + url, $(element).attr('target'));
-          } else if (event.ctrlKey || event.metaKey || event.which === 2) {
-            window.open(prefix + url, '_blank');
-          } else {
-            huePubSub.publish('open.link', url);
+          if (url) {
+            var prefix = '';
+            if (IS_HUE_4) {
+              prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
+            }
+            if ($(element).attr('target')) {
+              window.open(prefix + url, $(element).attr('target'));
+            } else if (event.ctrlKey || event.metaKey || event.which === 2) {
+              window.open(prefix + url, '_blank');
+            } else {
+              huePubSub.publish('open.link', url);
+            }
           }
         }
       }, allBindings, viewModel, bindingContext);
