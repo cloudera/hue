@@ -1866,6 +1866,9 @@ class Cluster():
   def get_interface(self):
     return json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('interface')
 
+  def get_id(self):
+    return json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('id')
+
   def get_list_interface_indexes(self):
     default_cluster_index = 0
     default_cluster_interface = ''
