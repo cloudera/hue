@@ -43,10 +43,11 @@ ${ assist.assistJSModels() }
 </style>
 
 ${ assist.assistPanel() }
-
 %endif
+
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('indexer/css/indexes.css') }" type="text/css">
+
 
 <script type="text/html" id="indexes-breadcrumbs">
   <h1>
@@ -56,7 +57,7 @@ ${ assist.assistPanel() }
         <i class="fa fa-search fa-fw"></i>
       </a>
 
-      <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }" title="${_('Index Data')}">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="hueLink: '/indexer/importer/prefill/all/index/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Add Data')}">
         <i class="fa fa-upload fa-fw"></i>
       </a>
 
@@ -65,7 +66,7 @@ ${ assist.assistPanel() }
       </a>
     </div>
     <!-- /ko -->
-    <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
+    <ul class="nav nav-pills hue-breadcrumbs-bar">
       <li>
         <a href="javascript:void(0);" data-bind="click: showIndexes">${ _('Indexes') }
           <!-- ko if: index -->
@@ -292,7 +293,7 @@ ${ assist.assistPanel() }
   <ul class="nav nav-pills margin-top-30">
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
-    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); $root.index().getSample(); }">${_('Sample')}</a></li>
+    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
@@ -316,14 +317,14 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="indexes-index-overview">
   <div>
-    Overview
-
     <!-- ko template: 'indexes-index-properties' --><!-- /ko -->
 
     <!-- ko template: { name: 'indexes-index-fields-fields', data: fieldsPreview }--><!-- /ko -->
     <a class="pointer" data-bind="visible: fields().length > fieldsPreview().length, click: function() { $('li a[href=\'#index-columns\']').click(); }">
       ${_('View more...')}
     </a>
+
+    <br><br>
 
     <!-- ko template: { name: 'indexes-index-sample', data: samplePreview }--><!-- /ko -->
     <a class="pointer" data-bind="visible: sample().length > samplePreview().length, click: function() { $('li a[href=\'#index-sample\']').click(); }">
@@ -340,14 +341,15 @@ ${ assist.assistPanel() }
       <i class="fa fa-fw fa-key muted"></i> <span data-bind="text: uniqueKey"></span>
     </div>
   </div>
+  <br>
 </script>
 
 
 <script type="text/html" id="indexes-index-fields-fields">
   <div>
-    Fields
+    <h4>${ _('Fields') }</h4>
 
-    <table id="indexTable" class="table datatables">
+    <table class="table table-condensed table-nowrap">
       <thead>
         <tr>
           <th style="width: 1%">&nbsp;</th>
@@ -374,7 +376,7 @@ ${ assist.assistPanel() }
           <td data-bind="text: type"></td>
           <td><i data-bind="visible: $data.required" class="fa fa-check muted"></i></td>
           <td><i data-bind="visible: $data.stored" class="fa fa-check muted"></i></td>
-          <td><i data-bind="visible: indexed" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.indexed" class="fa fa-check muted"></i></td>
           <td><i data-bind="visible: $data.multiValued" class="fa fa-check muted"></i></td>
         </tr>
       </tbody>
@@ -387,11 +389,10 @@ ${ assist.assistPanel() }
   <div>
     <!-- ko template: { name: 'indexes-index-fields-fields', data: fields }--><!-- /ko -->
 
-    Copy Fields
+    <h4>${ _('Copy Fields') }</h4>
     <span data-bind="text: ko.mapping.toJSON(copyFields)"></span>
 
-
-    Dynamic Fields
+    <h4>${ _('Dynamic Fields') }</h4>
     <span data-bind="text: ko.mapping.toJSON(dynamicFields)"></span>
   </div>
 </script>
@@ -399,6 +400,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="indexes-index-sample">
   <!-- ko hueSpinner: { spin: $root.index().loadingSample, center: true, size: 'xlarge' } --><!-- /ko -->
+
   <!-- ko ifnot: $root.index().loadingSample -->
   <table class="table table-condensed table-nowrap sample-table">
     <thead>
@@ -498,7 +500,6 @@ ${ assist.assistPanel() }
         }).always(function () {
           self.loadingSample(false);
         });
-        hueAnalytics.log('indexes', 'sample_index');
       };
 
       self.delete = function () {
@@ -625,6 +626,7 @@ ${ assist.assistPanel() }
           if (data.status == 0) {
             self.index(new Index(self, data));
             self.index().type(index.type());
+            self.index().getSample();
             hueUtils.changeURL(self.baseURL + self.index().name());
             self.section('list-index');
             self.tab('index-overview');
