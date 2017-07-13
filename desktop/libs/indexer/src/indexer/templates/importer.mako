@@ -1434,7 +1434,7 @@ ${ assist.assistPanel() }
               name += '.' + wizard.source.path().split('/').pop().split('.')[0];
             }
           } else { // Index
-            name = wizard.source.path().split('/').pop().split('.')[0];
+            name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : wizard.source.path().split('/').pop().split('.')[0];
           }
         } else if (wizard.source.inputFormat() == 'table') {
           if (wizard.source.table().split('.', 2).length == 2) {
