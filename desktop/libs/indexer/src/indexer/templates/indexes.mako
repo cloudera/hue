@@ -246,15 +246,10 @@ ${ assist.assistPanel() }
             </div>
           </div>
 
-
         </div>
       </div>
     </div>
   </div>
-
-
-
-
 
 
 </div>
@@ -442,14 +437,19 @@ ${ assist.assistPanel() }
         });
       });
 
-      self.create = function () {
+      self.create = function () {console.log(vm.indexes());
         $.post("${ url('indexer:create_alias') }", {
-          "alias": self.name,
-          "collections": ko.mapping.toJSON(ko.utils.arrayMap(self.chosenCollections, function (c) {
-            return new c.name();
+          "name": self.name,
+          "collections": ko.mapping.toJSON($.map(self.chosenCollections(), function (collection) {
+            return collection.name();
           }))
-        }, function () {
-          window.location.reload();
+        }, function (data) {
+          if (data.status == 0) {
+            vm.indexes.push(ko.mapping.fromJS(data.alias));
+          } else {
+            $(document).trigger("error", data.message);
+          }
+          $('#createAlias').modal('hide');
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
         });
@@ -503,11 +503,12 @@ ${ assist.assistPanel() }
       };
 
       self.delete = function () {
+        var indexName = self.name();
         $.post("${ url('indexer:delete_indexes') }", {
-          "indexes": ko.mapping.toJSON([{'name': self.name(), 'type': self.type()}])
+          "indexes": ko.mapping.toJSON([{'name': indexName, 'type': self.type()}])
         }, function (data) {
           if (data.status == 0) {
-            window.location.reload();
+            vm.indexes.remove(function(index) { return index.name() == indexName; });
           } else {
             $(document).trigger("error", data.message);
           }
@@ -534,7 +535,7 @@ ${ assist.assistPanel() }
       self.section = ko.observable('list-indexes');
       self.tab = ko.observable('');
 
-      self.indexes = ko.observable([]);
+      self.indexes = ko.observableArray([]);
       self.alias = new Alias(self);
       self.index = ko.observable();
 
@@ -644,7 +645,7 @@ ${ assist.assistPanel() }
           "indexes": ko.mapping.toJSON(self.selectedIndexes)
         }, function (data) {
           if (data.status == 0) {
-            window.location.reload();
+            self.indexes.removeAll(self.selectedIndexes());
           } else {
             $(document).trigger("error", data.message);
           }

@@ -107,6 +107,10 @@ class SolrClient(object):
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
 
 
+  def create_alias(self, name, collections):
+    return self.api.create_alias(name, collections)
+
+
   def index(self, name, data, content_type='csv', version=None, **kwargs):
     """
     e.g. Parameters: separator = ',', fieldnames = 'a,b,c', header=true, skip 'a,b', encapsulator="
