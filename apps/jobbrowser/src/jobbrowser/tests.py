@@ -18,7 +18,6 @@
 
 import json
 import logging
-import Queue
 import re
 import time
 import unittest
@@ -405,6 +404,10 @@ class TestMapReduce2NoHadoop:
     grant_access("test2", "test2", "jobbrowser")
     self.user2 = User.objects.get(username='test2')
 
+    self.c3 = make_logged_in_client(is_superuser=False, username="test3")
+    grant_access("test3", "test3", "jobbrowser")
+    self.user3 = User.objects.get(username='test3')
+
     resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
     mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
     history_server_api.get_history_server_api = lambda username: HistoryServerApi(username)
@@ -488,11 +491,14 @@ class TestMapReduce2NoHadoop:
     assert_true(can_view_job('test', response.context['job']))
     assert_true(can_modify_job('test', response.context['job']))
 
-    response2 = self.c2.get('/jobbrowser/jobs/job_1356251510842_0054')
-    assert_true('don&#39;t have permission to access job' in response2.content, response2.content)
-
-    assert_false(can_view_job('test2', response.context['job']))
+    assert_true(can_view_job('test2', response.context['job']))
     assert_false(can_modify_job('test2', response.context['job']))
+
+    assert_false(can_view_job('test3', response.context['job']))
+    assert_false(can_modify_job('test3', response.context['job']))
+
+    response2 = self.c3.get('/jobbrowser/jobs/job_1356251510842_0054')
+    assert_true('don&#39;t have permission to access job' in response2.content, response2.content)
 
   def test_kill_job(self):
     job_id = 'application_1356251510842_0054'
@@ -501,6 +507,10 @@ class TestMapReduce2NoHadoop:
       assert_equal(json.loads(response.content), {"status": 0})
     finally:
       MockResourceManagerApi.APPS[job_id]['state'] = 'RUNNING'
+
+    response = self.c2.post('/jobbrowser/jobs/%s/kill?format=json' % job_id)
+    assert_true('Kill operation is forbidden.' in response.content, response.content)
+
 
 class MockResourceManagerApi:
   APPS = {
@@ -660,7 +670,7 @@ class MockMapreduce2Api(object):
               "value" : "test",
            }, {
               "name" : "mapreduce.job.acl-view-job",
-              "value" : "test",
+              "value" : "test,test2",
            }
          ]
       }

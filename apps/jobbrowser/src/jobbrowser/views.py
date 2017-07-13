@@ -271,6 +271,9 @@ def kill_job(request, job):
   if request.method != "POST":
     raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s).") % {'method': request.method})
 
+  if not can_kill_job(job, request.user):
+    raise PopupException(_("Kill operation is forbidden."))
+
   try:
     job.kill()
   except Exception, e:
