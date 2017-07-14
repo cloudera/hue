@@ -675,6 +675,8 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
         label = fq_values[0] if len(_fq_fields) >= 2 else agg_key.split(':', 2)[1]
         if agg_keys.index(agg_key) == 0: # One count by dimension
           dim_row.append(count)
+        if not agg_key in bucket: # No key if value is 0
+          bucket[agg_key] = 0
         dim_row.append(bucket[agg_key])
         augmented.append(_get_augmented(bucket[agg_key], val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
       else:
