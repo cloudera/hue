@@ -4615,7 +4615,7 @@ _handle_error:
                     text: lexer.match,
                     token: this.terminals_[symbol] || symbol,
                     line: lexer.yylineno,
-                    loc: lexer.yylloc,
+                    loc: lexer.yylloc, ruleId: stack.slice(stack.length - 2, stack.length).join(),
                     expected: expected,
                     recoverable: (error_rule_depth !== false)
                 });

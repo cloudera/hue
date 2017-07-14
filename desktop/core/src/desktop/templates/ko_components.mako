@@ -41,12 +41,22 @@ from desktop.views import _ko
       <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0" style="min-width: 190px; max-width: 250px; min-height: 34px; max-height: 200px;">
         <!-- ko if: foreachVisible -->
         <ul class="hue-inner-drop-down" style="overflow-x: hidden;" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
+          <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->
+          <li class="divider"></li>
+          <!-- /ko -->
+          <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
           <li><a href="javascript:void(0)" data-bind="text: typeof $data.label !== 'undefined' ? $data.label : $data, click: function () { $parent.value($data); }"></a></li>
+          <!-- /ko -->
         </ul>
         <!-- /ko -->
         <!-- ko ifnot: foreachVisible -->
         <ul class="hue-inner-drop-down" style="overflow-x: hidden;" data-bind="foreach: filteredEntries">
+          <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->
+          <li class="divider"></li>
+          <!-- /ko -->
+          <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
           <li><a href="javascript:void(0)" data-bind="text: typeof $data.label !== 'undefined' ? $data.label : $data, click: function () { $parent.value($data); }"></a></li>
+          <!-- /ko -->
         </ul>
         <!-- /ko -->
       </div>

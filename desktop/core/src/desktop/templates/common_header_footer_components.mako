@@ -101,7 +101,8 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var SyntaxCheckerGlobals = {
       i18n: {
         didYouMean: '${_('Did you mean')}',
-        expectedStatementEnd: '${_('Expected end of statement')}'
+        expectedStatementEnd: '${_('Expected end of statement')}',
+        suppressError: '${_('Ignore this type of error')}'
       }
     };
 
