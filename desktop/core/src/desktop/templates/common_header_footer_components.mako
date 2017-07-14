@@ -98,6 +98,13 @@ from metadata.conf import has_optimizer, OPTIMIZER
       'query-distcp': '${_('DistCp Job')}'
     };
 
+    var SyntaxCheckerGlobals = {
+      i18n: {
+        didYouMean: '${_('Did you mean')}',
+        expectedStatementEnd: '${_('Expected end of statement')}'
+      }
+    };
+
     // jHue plugins global configuration
     jHueFileChooserGlobals = {
       labels: {
@@ -149,7 +156,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       i18n: {
         cancelUpload: '${ _('Cancel upload') }',
         uploadCanceled: '${ _('The upload has been canceled') }',
-        uploadSucceeded: '${ _('uploaded successfully') }',
+        uploadSucceeded: '${ _('uploaded successfully') }'
       }
     };
 
@@ -159,7 +166,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
         errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
         errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
-      },
+      }
     };
 
     AutocompleterGlobals = {
