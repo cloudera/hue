@@ -1222,9 +1222,7 @@ var Collection = function (vm, collection) {
         collection: ko.mapping.toJSON(self),
         engine: self.engine()
       }, function (data) {
-        if (data.status == 0) {
-          self.nested.enabled(data.has_nested_documents);
-        }
+        self.nested.enabled(data.status == 0 && data.has_nested_documents);
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
 
