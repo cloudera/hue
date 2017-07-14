@@ -142,6 +142,7 @@ def nested_documents(request):
   except Exception, e:
     LOG.exception('Failed to list nested documents')
     result['message'] = force_unicode(e)
+    result['has_nested_documents'] = False
 
   return JsonResponse(result)
 
