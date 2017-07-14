@@ -1626,6 +1626,12 @@ var SqlParseSupport = (function () {
         var addedExpected = {};
 
         var isLowerCase = parser.yy.caseDetermined && parser.yy.lowerCase || parser.yy.error.text.toLowerCase() === parser.yy.error.text;
+
+        if (parser.yy.error.expected.length == 2 && parser.yy.error.expected.indexOf('\';\'') !== -1 && parser.yy.error.expected.indexOf('\'EOF\'') !== -1) {
+          parser.yy.error.expected = [];
+          parser.yy.error.expectedStatementEnd = true;
+          return parser.yy.error;
+        }
         parser.yy.error.expected.forEach(function (expected) {
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
