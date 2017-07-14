@@ -32,9 +32,9 @@ from search.conf import LATEST
 
 from dashboard.dashboard_api import get_engine
 from dashboard.decorators import allow_owner_only
-from dashboard.models import Collection2
 from dashboard.conf import get_engines
 from dashboard.controller import DashboardController, can_edit_index
+from dashboard.models import Collection2
 
 
 LOG = logging.getLogger(__name__)
