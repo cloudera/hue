@@ -4232,9 +4232,16 @@
                 tooltipTimeout = window.setTimeout(function () {
                   // TODO: i18n
                   if (token.syntaxError) {
-                    var tooltipText = 'Did you mean "' + token.syntaxError.expected[0].text + '"?';
-                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
-                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                    var tooltipText;
+                    if (token.syntaxError.expected.length > 0) {
+                      tooltipText = SyntaxCheckerGlobals.i18n.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                    } else if (token.syntaxError.expectedStatementEnd) {
+                      tooltipText = SyntaxCheckerGlobals.i18n.expectedStatementEnd;
+                    }
+                    if (tooltipText) {
+                      var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                      contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                    }
                   }
                 }, 500);
               } else {

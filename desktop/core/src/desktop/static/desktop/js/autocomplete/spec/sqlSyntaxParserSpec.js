@@ -99,6 +99,12 @@
       expect(expectedToStrings(result.expected)).toEqual(['select', 'set', 'alter', 'insert', 'create', 'show', 'use', 'drop', 'from', 'truncate', 'update', 'with']);
     });
 
+    it('should suggest expected that the statement should end for "use somedb extrastuff "', function() {
+      var result = sqlSyntaxParser.parseSyntax('use somedb extrastuff  ', '');
+      expect(result).toBeTruthy();
+      expect(result.expectedStatementEnd).toBeTruthy();
+    });
+
     it('should find errors for "select * from sample_07 where and\\n\\nselect unknownCol from sample_07;"', function () {
       var result = sqlSyntaxParser.parseSyntax('select * from sample_07 where and\n\nselect unknownCol from sample_07;', '', 'hive', false);
       expect(result).toBeTruthy();
