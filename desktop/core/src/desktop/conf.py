@@ -1300,6 +1300,13 @@ ENABLE_SQL_SYNTAX_CHECK = Config( # To remove when syntax check is ready
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
+USE_NEW_GLOBAL_SEARCH = Config( # To remove when the new global search is ready
+  key='use_new_global_search',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to use the new global search or not.')
+)
+
 USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
   key='use_new_autocompleter',
   default=True,
