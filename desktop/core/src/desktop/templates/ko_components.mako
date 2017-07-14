@@ -569,7 +569,7 @@ from desktop.views import _ko
             <li data-bind="multiClick: {
                 click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
                 dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
-              }, text: label, css: { 'selected': $parents[1].selectedResult() === $data }"></li>
+              }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }"></li>
           </ul>
         </div>
       </div>
@@ -607,6 +607,13 @@ from desktop.views import _ko
 
       var GlobalSearch = function (params) {
         var self = this;
+        self.apiHelper = ApiHelper.getInstance();
+        self.lastNonPartial = null;
+        self.lastResult = {};
+
+        self.autocompleteThrottle = -1;
+        self.fetchThrottle = -1;
+
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable('');
         self.inlineAutocomplete = ko.observable('');
@@ -614,10 +621,6 @@ from desktop.views import _ko
         self.searchResultVisible = ko.observable(false);
         self.searchResultCategories = ko.observableArray([]);
         self.selectedIndex = ko.observable();
-
-        self.lastNonPartial = null;
-        self.lastResult = {};
-        self.autocompleteThrottle = -1;
 
         self.selectedResult = ko.pureComputed(function () {
           if (self.selectedIndex()) {
@@ -630,6 +633,10 @@ from desktop.views import _ko
           if (newValue !== '') {
             self.triggerAutocomplete(newValue);
           }
+          window.clearTimeout(self.fetchThrottle);
+          self.fetchThrottle = window.setTimeout(function () {
+            self.fetchResults(newValue);
+          }, 500);
           if (newValue.length > 0) {
             self.searchResultVisible(true);
           }
@@ -649,61 +656,36 @@ from desktop.views import _ko
           }
         });
 
-        self.searchResultCategories([
-          {
-            label: 'Top Hits',
-            result: [
-              {
-                label: 'Doc 1'
-              },{
-                label: 'File 1'
-              },{
-                label: 'Table 2'
-              },{
-                label: 'bla 4'
-              },{
-                label: 'bla 5'
-              }
-            ]
-          },{
-            label: 'Documents',
-            result: [
-              {
-                label: 'Doc 1'
-              },{
-                label: 'Doc 2'
-              },{
-                label: 'Doc 3'
-              },{
-                label: 'Doc 4'
-              },{
-                label: 'Doc 5'
-              }
-            ]
-          }
-        ]);
-
         // TODO: Consider attach/detach on focus
         $(document).keydown(function (event) {
           if (!self.searchHasFocus() && !self.searchResultVisible()) {
             return;
           }
-          if (event.keyCode === 32 && event.ctrlKey) {
+          if (event.keyCode === 32 && event.ctrlKey) { // Ctrl-Space
             self.triggerAutocomplete(self.searchInput(), true);
             return;
-          } else if (event.keyCode === 39 && self.inlineAutocomplete() !== self.searchInput()) {
+          }
+          if (event.keyCode === 39 && self.inlineAutocomplete() !== '' && self.inlineAutocomplete() !== self.searchInput()) { // Right arrow
             // TODO: Check that cursor is last
             self.searchInput(self.inlineAutocomplete());
             return;
-          } else if (event.keyCode === 9 && self.inlineAutocomplete() !== self.searchInput()) { // Tab
+          }
+          if (event.keyCode === 9 && self.inlineAutocomplete() !== self.searchInput()) { // Tab
             self.searchInput(self.inlineAutocomplete());
             event.preventDefault();
+            return;
+          }
+
+          if (event.keyCode === 13 && self.searchHasFocus() && self.searchInput() !== '') {
+            window.clearTimeout(self.fetchThrottle);
+            self.fetchResults(self.searchInput());
             return;
           }
 
           if (self.searchResultVisible() && self.searchResultCategories().length > 0) {
             var currentIndex = self.selectedIndex();
             if (event.keyCode === 40) { // Down
+              self.searchHasFocus(false);
               if (currentIndex && !(self.searchResultCategories()[currentIndex.categoryIndex].result.length <= currentIndex.resultIndex + 1 && self.searchResultCategories().length <= currentIndex.categoryIndex + 1)) {
                 if (self.searchResultCategories()[currentIndex.categoryIndex].result.length <= currentIndex.resultIndex + 1) {
                   self.selectedIndex({ categoryIndex: currentIndex.categoryIndex + 1, resultIndex: 0 });
@@ -715,6 +697,7 @@ from desktop.views import _ko
               }
               event.preventDefault();
             } else if (event.keyCode === 38) { // Up
+              self.searchHasFocus(false);
               if (currentIndex && !(currentIndex.categoryIndex === 0 && currentIndex.resultIndex === 0)) {
                 if (currentIndex.resultIndex === 0) {
                   self.selectedIndex({ categoryIndex: currentIndex.categoryIndex - 1, resultIndex: self.searchResultCategories()[currentIndex.categoryIndex - 1].result.length - 1 });
@@ -725,11 +708,8 @@ from desktop.views import _ko
                 self.selectedIndex({ categoryIndex: self.searchResultCategories().length - 1, resultIndex: self.searchResultCategories()[self.searchResultCategories().length - 1].result.length - 1 });
               }
               event.preventDefault();
-            } else if (event.keyCode === 13 && self.selectedIndex()) { // Enter
+            } else if (event.keyCode === 13 && !self.searchHasFocus() && self.selectedIndex()) { // Enter
               self.openResult();
-            } else if (event.keyCode === 9 && !self.selectedIndex()) { // Tab
-              self.selectedIndex({categoryIndex: 0, resultIndex: 0});
-              event.preventDefault();
             }
           }
         });
@@ -826,6 +806,8 @@ from desktop.views import _ko
           return false;
         }
         self.searchResultVisible(false);
+        window.clearTimeout(self.fetchThrottle);
+        window.clearTimeout(self.autocompleteThrottle);
       };
 
       GlobalSearch.prototype.mainSearchSelect = function (entry) {
@@ -837,79 +819,64 @@ from desktop.views import _ko
         }
       };
 
-      GlobalSearch.prototype.searchAutocompleteSource = function (request, callback) {
-        var apiHelper = ApiHelper.getInstance();
-        // TODO: Extract complete contents to common module (shared with nav search autocomplete)
-        var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
-        var isFacet = facetMatch !== null;
-        var partialMatch = isFacet ? null : request.term.match(/\S+$/);
-        var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
-        var beforePartial = request.term.substring(0, request.term.length - partial.length);
+      var CATEGORIES = {
+        'table': '${ _('Tables') }',
+        'database': '${ _('Databases') }',
+        'field': '${ _('Columns') }',
+        'partition': '${ _('Partitions') }',
+        'view': '${ _('Views') }'
+      };
 
-        apiHelper.globalSearchAutocomplete({
-          query:  request.term,
+      GlobalSearch.prototype.fetchResults = function (query) {
+        var self = this;
+        self.apiHelper.globalSearchAutocomplete({
+          query:  query,
           successCallback: function (data) {
-            var values = [];
-            var facetPartialRe = new RegExp(partial.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i'); // Protect for 'tags:*axe'
-
-            if (typeof data.resultsHuedocuments !== 'undefined') {
-              data.resultsHuedocuments.forEach(function (result) {
-                values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description, link: result.link }, value: beforePartial + result.originalName });
+            var categories = [];
+            if (data.resultHuedocuments && data.resultHuedocuments.length) {
+              var docCategory = {
+                label: '${ _('Documents') }',
+                result: []
+              };
+              data.resultHuedocuments.forEach(function (doc) {
+                docCategory.result.push({
+                  label: doc.hue_name,
+                  data: doc
+                })
               });
-            }
-            if (values.length > 0) {
-              values.push({ divider: true });
+              categories.push(docCategory);
             }
 
-            if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
-              var facetInQuery = facetMatch[1];
-              if (typeof data.facets[facetInQuery] !== 'undefined') {
-                $.map(data.facets[facetInQuery], function (count, value) {
-                  if (facetPartialRe.test(value)) {
-                    values.push({ data: { label: facetInQuery + ':' + value, icon: SEARCH_FACET_ICON, description: count }, value: beforePartial + value})
-                  }
-                });
-              }
-            } else {
-              if (typeof data.facets !== 'undefined') {
-                Object.keys(data.facets).forEach(function (facet) {
-                  if (facetPartialRe.test(facet)) {
-                    if (Object.keys(data.facets[facet]).length > 0) {
-                      values.push({ data: { label: facet + ':', icon: SEARCH_FACET_ICON, description: $.map(data.facets[facet], function (key, value) { return value + ' (' + key + ')'; }).join(', ') }, value: beforePartial + facet + ':'});
-                    } else { // Potential facet from the list
-                      values.push({ data: { label: facet + ':', icon: SEARCH_FACET_ICON, description: '' }, value: beforePartial + facet + ':'});
-                    }
-                  } else if (partial.length > 0) {
-                    Object.keys(data.facets[facet]).forEach(function (facetValue) {
-                      if (facetValue.indexOf(partial) !== -1) {
-                        values.push({ data: { label: facet + ':' + facetValue, icon: SEARCH_FACET_ICON, description: facetValue }, value: beforePartial + facet + ':' + facetValue });
-                      }
-                    });
-                  }
-                });
-              }
-            }
-
-            if (values.length > 0) {
-              values.push({ divider: true });
-            }
-            if (typeof data.results !== 'undefined') {
+            if (data.results && data.results.length) {
+              var newCategories = {};
               data.results.forEach(function (result) {
-                values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
+                var typeLower = result.type.toLowerCase();
+                if (CATEGORIES[typeLower]) {
+                  var category = newCategories[typeLower];
+                  if (!category) {
+                    category = {
+                      label: CATEGORIES[typeLower],
+                      result: []
+                    };
+                    newCategories[typeLower] = category;
+                  }
+                  category.result.push({
+                    label: result.hue_name || result.originalName,
+                    data: result
+                  })
+                }
+              });
+
+              Object.keys(newCategories).forEach(function (key) {
+                categories.push(newCategories[key]);
               });
             }
 
-            if (values.length > 0 && values[values.length - 1].divider) {
-              values.pop();
-            }
-            if (values.length === 0) {
-              values.push({ noMatch: true });
-            }
-            callback(values);
+            self.searchResultCategories(categories);
           },
           silenceErrors: true,
           errorCallback: function () {
-            callback([]);
+            self.searchResultCategories([]);
           }
         });
       };
