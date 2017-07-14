@@ -1407,7 +1407,7 @@ var NewTemplate = function (vm, initial) {
     vm.isSyncingCollections(true);
     $.post("/dashboard/get_collections", {
         collection: ko.mapping.toJSON(vm.collection),
-        show_all: ko.mapping.toJSON(vm.showCores)
+        show_all: false
       }, function (data) {
         if (data.status == 0) {
           // Sync new and old names
@@ -1572,10 +1572,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
     });
 
-    self.showCores = ko.observable(false);
-    self.showCores.subscribe(function (newValue) {
-      self.initial.syncCollections();
-    });
     self.isSyncingCollections = ko.observable(false);
 
     self.isPlayerMode = ko.observable(false);
@@ -2400,7 +2396,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.isRetrievingResults(false);
     self.hasRetrievedResults(true);
     self.asyncSearchesCounter([]);
-    self.showCores(false);
     self.isSyncingCollections(false);
     self.isPlayerMode(false);
 

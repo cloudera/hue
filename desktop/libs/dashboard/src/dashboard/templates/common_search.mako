@@ -114,7 +114,6 @@ from desktop.views import commonheader, commonfooter, _ko
       <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections"></select>
 
         <label class="checkbox" style="display:inline-block; margin-left: 10px">
-          <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
           <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
         </label>
       <!-- /ko -->
