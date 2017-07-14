@@ -29,12 +29,12 @@ from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
 
+from dashboard.controller import can_edit_index
 from dashboard.dashboard_api import get_engine
 from dashboard.data_export import download as export_download
 from dashboard.decorators import allow_viewer_only
 from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
 from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception
-from dashboard.controller import can_edit_index
 
 
 LOG = logging.getLogger(__name__)
@@ -60,10 +60,11 @@ def search(request):
     except RestException, e:
       try:
         message = json.loads(e.message)
-        response['error'] = message['error'].get('msg', message['error']['trace'])
+        msg = message['error'].get('msg')
+        response['error'] = msg if msg else message['error']['trace']
       except Exception, e2:
-        LOG.exception('failed to extract json message: %s' % force_unicode(e2))
-        LOG.exception('failed to parse json response: %s' % force_unicode(e))
+        LOG.exception('Failed to extract json message: %s' % force_unicode(e2))
+        LOG.exception('Failed to parse json response: %s' % force_unicode(e))
         response['error'] = force_unicode(e)
     except Exception, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
