@@ -558,10 +558,11 @@ from desktop.views import _ko
     </div>
     <!-- ko if: searchResultVisible-->
     <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, css: { 'global-search-empty' : searchResultCategories().length === 0 }">
-      <!-- ko if: searchResultCategories().length === 0 -->
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+      <!-- ko if: !loading() && searchResultCategories().length === 0 -->
         <div>${ _('No results found.') }</div>
       <!-- /ko -->
-      <!-- ko if: searchResultCategories().length > 0 -->
+      <!-- ko if: !loading() && searchResultCategories().length > 0 -->
       <div class="global-search-alternatives" data-bind="foreach: searchResultCategories">
         <div class="global-search-category">
           <div class="global-search-category-header" data-bind="text: label"></div>
@@ -613,6 +614,7 @@ from desktop.views import _ko
         self.searchResultVisible = ko.observable(false);
         self.searchResultCategories = ko.observableArray([]);
         self.selectedIndex = ko.observable();
+        self.loading = ko.observable(false);
 
         self.selectedResult = ko.pureComputed(function () {
           if (self.selectedIndex()) {
@@ -629,9 +631,6 @@ from desktop.views import _ko
           self.fetchThrottle = window.setTimeout(function () {
             self.fetchResults(newValue);
           }, 500);
-          if (newValue.length > 0) {
-            self.searchResultVisible(true);
-          }
         });
 
         self.searchHasFocus.subscribe(function (newVal) {
@@ -821,6 +820,8 @@ from desktop.views import _ko
 
       GlobalSearch.prototype.fetchResults = function (query) {
         var self = this;
+        self.loading(true);
+        self.searchResultVisible(true);
         self.apiHelper.globalSearchAutocomplete({
           query:  query,
           successCallback: function (data) {
@@ -867,6 +868,7 @@ from desktop.views import _ko
             }
             self.selectedIndex(undefined);
             self.searchResultCategories(categories);
+            self.loading(false);
           },
           silenceErrors: true,
           errorCallback: function () {
