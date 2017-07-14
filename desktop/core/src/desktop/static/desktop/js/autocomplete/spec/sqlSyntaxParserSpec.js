@@ -110,6 +110,34 @@
       expect(result).toBeTruthy();
     });
 
+    var expectEqualIds = function (beforeA, afterA, beforeB, afterB) {
+      var resultA = sqlSyntaxParser.parseSyntax(beforeA, afterA);
+      var resultB = sqlSyntaxParser.parseSyntax(beforeB, afterB);
+      expect(resultA).toBeTruthy('"' + beforeA + '|' + afterA +'" was not reported as an error');
+      expect(resultB).toBeTruthy('"' + beforeB + '|' + afterB +'" was not reported as an error');
+      expect(resultA.ruleId).toEqual(resultB.ruleId);
+    };
+
+    var expectNonEqualIds = function (beforeA, afterA, beforeB, afterB) {
+      var resultA = sqlSyntaxParser.parseSyntax(beforeA, afterA);
+      var resultB = sqlSyntaxParser.parseSyntax(beforeB, afterB);
+      expect(resultA).toBeTruthy('"' + beforeA + '|' + afterA +'" was not reported as an error');
+      expect(resultB).toBeTruthy('"' + beforeB + '|' + afterB +'" was not reported as an error');
+      expect(resultA.ruleId).not.toEqual(resultB.ruleId);
+    };
+
+
+    it('should have unique rule IDs when the same rule is failing in different locations', function() {
+      expectEqualIds('SLELECT ', '', 'dlrop ', '');
+      expectEqualIds('SELECT * FORM ', '', 'SELECT * bla ', '');
+      expectEqualIds('DROP TABLE b.bla ERRROROR ', '', 'DROP TABLE c.cla OTHERERRRRORRR ', '');
+      expectEqualIds('SELECT * FROM a WHERE id = 1, a b SELECT ', '', 'SELECT id, foo FROM a WHERE a b SELECT', '');
+      expectEqualIds('SELECT * FROM a WHERE id = 1, a b SELECT ', '', 'SELECT id, foo FROM a WHERE a b SELECT', '');
+
+      expectNonEqualIds('slelect ', '', 'select * form ', '');
+    });
+
+
     describe('Hive specific', function () {
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'hive');

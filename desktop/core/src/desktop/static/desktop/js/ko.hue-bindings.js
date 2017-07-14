@@ -3606,7 +3606,9 @@
         self.aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?bust=' + Math.random());
 
         self.aceSqlSyntaxWorker.onmessage = function(e) {
-          if (e.data.syntaxError) {
+          var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+
+          if (e.data.syntaxError && !suppressedRules[self.snippet.id() + e.data.syntaxError.ruleId]) {
             if (hueDebug.showSyntaxParseResult) {
               console.log(e.data.syntaxError);
             }
@@ -4316,6 +4318,7 @@
                 });
               } else if (token.syntaxError) {
                 huePubSub.publish('sql.syntax.dropdown.show', {
+                  snippet: snippet,
                   data: token.syntaxError,
                   editor: editor,
                   range: range,
