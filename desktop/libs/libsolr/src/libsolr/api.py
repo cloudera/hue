@@ -785,8 +785,9 @@ class SolrApi(object):
       if f['function'] == 'median':
         f['function'] = 'percentile'
         fields.append('50')
-      elif f['function'] == 'percentiles':
+      elif f['function'] == 'percentile':
         fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
+        f['function'] = 'percentile'
       return '%s(%s)' % (f['function'], ','.join(fields))
 
   def _get_range_borders(self, collection, query):
