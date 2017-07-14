@@ -1351,6 +1351,48 @@ from metadata.conf import has_navigator
         ko.applyBindings(details, $sqlContextPopover[0]);
         huePubSub.publish('sql.context.popover.shown');
       });
+
+      var SqlContextContentsGlobalSearch = function (params) {
+        var self = this;
+        self.contents = undefined;
+
+
+        self.showInAssistEnabled = false; // TODO: enable show in assist and fix the pubsubs for metastore etc.
+
+        self.isDatabase = params.data.type.toLowerCase() === 'database';
+        self.isTable = params.data.type.toLowerCase() === 'table';
+        self.isColumn = params.data.type.toLowerCase() === 'field';
+        self.isView = params.data.type.toLowerCase() === 'view';
+
+        // TODO: Handle HDFS, Complex and Function ?
+        self.isHdfs = false;
+        self.isAsterisk = false;
+        self.isComplex = false;
+        self.isFunction = false;
+
+        var adaptedData = { identifierChain: [] };
+
+        params.data.originalName.split('.').forEach(function (part) {
+          adaptedData.identifierChain.push({ name: part });
+        });
+
+
+        if (self.isDatabase) {
+          self.contents = new DatabaseContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default');
+        } else if (self.isTable) {
+          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', false, false);
+        } else if (self.isView) {
+          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', false, false);
+        } else if (self.isColumn) {
+          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', true, false);
+        }
+
+      };
+
+      ko.components.register('sql-context-contents-global-search', {
+        viewModel: SqlContextContentsGlobalSearch,
+        template: { element: 'sql-context-contents' }
+      })
     })();
   </script>
 
