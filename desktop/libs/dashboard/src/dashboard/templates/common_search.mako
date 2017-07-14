@@ -692,7 +692,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15" style="opacity: 0.7">
     <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
-        <i class="fa fa-plus"></i> ${ _('Add') }
+        <i class="fa fa-fw fa-plus"></i> ${ _('Add') }
       </a>
       <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.fieldsNames" class="hit-options" style="margin-bottom: 0"></select>
       <div class="clearfix"></div>

@@ -683,10 +683,6 @@ var Collection = function (vm, collection) {
         return _fields;
       });
 
-      if (typeof facets_form != 'undefined' && typeof facets_form.aggregate != 'undefined') {
-        facet.properties.facets_form.aggregate.percentiles = ko.mapping.fromJS([{'value': 50}]);
-      }
-
       facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
         vm.getFacetFromQuery(facet.id()).resultHash('');
         vm.search();
@@ -916,7 +912,8 @@ var Collection = function (vm, collection) {
 
     facet.properties.facets_form.aggregate.function('count');
     facet.properties.facets_form.aggregate.ops.removeAll();
-    facet.properties.facets_form.aggregate.percentiles(ko.mapping.fromJS([{'value': 50}]));
+    facet.properties.facets_form.aggregate.percentiles.removeAll();
+    facet.properties.facets_form.aggregate.percentiles.push({'value': 50});
 
     if (pivot != null) {
       pivot.aggregate.function.subscribe(function() {
