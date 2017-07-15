@@ -441,7 +441,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Id') }</li>
           <li><span data-bind="text: id"></span></li>
           <li data-bind="visible: id() != name()" class="nav-header">${ _('Name') }</li>
-          <li data-bind="visible: id() != name()"><span data-bind="text: name"></span></li>
+          <li data-bind="visible: id() != name(), attr: { title: name }"><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Status') }</li>
