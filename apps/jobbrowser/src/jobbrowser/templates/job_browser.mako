@@ -1128,7 +1128,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a href="#schedule-page-task${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
+        <li class="active"><a href="#schedule-page-calendar${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a class="jb-logs-link" href="#schedule-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#schedule-page-metadata${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata${ SUFFIX }\']').tab('show'); }">${ _('Properties') }</a></li>
         <li><a href="#schedule-page-xml${ SUFFIX }" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml${ SUFFIX }\']').tab('show'); }">${ _('XML') }</a></li>
