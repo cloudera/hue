@@ -1654,6 +1654,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             if (/^task_/.test(vm.job().id())) {
               crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
             }
+            var oozieWorkflow = vm.job().name().match(/oozie:launcher:T=.+?:W=.+?:A=.+?:ID=(.+?-oozie-oozi-W)$/i);
+            if (oozieWorkflow) {
+              crumbs.push({'id': oozieWorkflow[1], 'name': oozieWorkflow[1], 'type': 'workflow'});
+            }
 
             if (/-oozie-oozi-W@/.test(vm.job().id())) {
               crumbs.push({'id': vm.job().properties['workflow_id'], 'name': vm.job().properties['workflow_id'], 'type': 'workflow'});
