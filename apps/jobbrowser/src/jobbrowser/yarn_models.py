@@ -221,6 +221,7 @@ class Job(object):
     jobid = self.id
 
     setattr(self, 'status', self.state)
+    setattr(self, 'jobName', self.name)
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', self.jobId.replace('job_', ''))
     setattr(self, 'is_retired', False)
