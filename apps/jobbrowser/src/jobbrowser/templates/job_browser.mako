@@ -596,7 +596,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="job-mapreduce-task-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
-            <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
 
@@ -696,7 +696,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
-            <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
           <pre data-bind="html: logs, logScroller: logs"></pre>
@@ -2340,7 +2340,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         huePubSub.subscribe('oozie.action.logs.click', function (widget) {
           $.get(widget.logsURL(), {
-              format: 'json'
+              format: 'link'
             },
             function(data) {
               if (data.attemptid) {
