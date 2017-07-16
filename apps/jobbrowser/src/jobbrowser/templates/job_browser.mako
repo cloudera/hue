@@ -1036,7 +1036,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </ul>
 
       <div class="tab-content">
-        <div class="tab-pane" id="workflow-action-page-metadata${ SUFFIX }">
+        <div class="tab-pane active" id="workflow-action-page-metadata${ SUFFIX }">
           <table class="datatables table table-condensed">
             <thead>
             <tr>
@@ -1054,6 +1054,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="workflow-action-page-tasks${ SUFFIX }">
+          <!-- ko if: properties['externalChildIDs'].length > 0 -->
           <table class="table table-condensed datatables">
             <thead>
               <tr>
@@ -1069,6 +1070,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               </tr>
             </tbody>
           </table>
+          <!-- /ko -->
+
+          <!-- ko if: properties['externalChildIDs'].length == 0 -->
+            ${ _('No external jobs') }
+          <!-- /ko -->
         </div>
 
         <div class="tab-pane" id="workflow-action-page-xml${ SUFFIX }">
