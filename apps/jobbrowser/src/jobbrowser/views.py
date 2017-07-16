@@ -399,7 +399,10 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
 
   params = {'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1], 'offset': offset}
 
-  return single_task_attempt_logs(request, **params)
+  if request.GET.get('format') == 'json':
+    return JsonResponse(params)
+  else:
+    return single_task_attempt_logs(request, **params)
 
 
 @check_job_permission
