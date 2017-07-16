@@ -493,7 +493,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         <div class="tab-pane" id="job-mapreduce-page-tasks${ SUFFIX }">
           <form class="form-inline">
-            <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+            <input data-bind="textFilter: textFilter, clearable: {value: textFilter}, valueUpdate: 'afterkeydown'" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
             <span data-bind="foreach: statesValuesFilter">
               <label class="checkbox">
@@ -1431,7 +1431,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="render-metadata${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.property, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko if: $data.property -->
-  <table class="table table-condensed">
+  <form class="form-search">
+    <input type="text" data-bind="clearable: $parent.metadataFilter, valueUpdate: 'afterkeydown'" class="input-xlarge search-query" placeholder="${_('Text Filter')}">
+  </form>
+  <table id="jobbrowserJobMetadataTable" class="table table-condensed">
     <thead>
     <tr>
       <th>${ _('Name') }</th>
@@ -1554,6 +1557,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.filters.subscribe(function(value) {
         self.fetchProfile('tasks');
+      });
+      self.metadataFilter = ko.observable('');
+      self.metadataFilter.subscribe(function(newValue) {
+        $("#jobbrowserJobMetadataTable tbody tr").removeClass("hide");
+        $("#jobbrowserJobMetadataTable tbody tr").each(function () {
+          if ($(this).text().toLowerCase().indexOf(newValue.toLowerCase()) == -1) {
+            $(this).addClass("hide");
+          }
+        });
       });
 
       self.rerunModalContent = ko.observable('');
@@ -2418,7 +2430,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           $(dest).find('pre').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $(dest).find('pre').offset().top - $('.page-content').scrollTop() - 30));
         }
       });
-
     });
   })();
 </script>
