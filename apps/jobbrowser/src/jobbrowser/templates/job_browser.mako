@@ -1317,7 +1317,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="render-properties${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.properties, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko if: $data.properties -->
-  <table class="table table-condensed">
+  <form class="form-search">
+    <input type="text" data-bind="clearable: $parent.propertiesFilter, valueUpdate: 'afterkeydown'" class="input-xlarge search-query" placeholder="${_('Text Filter')}">
+  </form>
+  <br>
+  <table id="jobbrowserJobPropertiesTable" class="table table-condensed">
     <thead>
     <tr>
       <th>${ _('Name') }</th>
@@ -1562,6 +1566,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.metadataFilter.subscribe(function(newValue) {
         $("#jobbrowserJobMetadataTable tbody tr").removeClass("hide");
         $("#jobbrowserJobMetadataTable tbody tr").each(function () {
+          if ($(this).text().toLowerCase().indexOf(newValue.toLowerCase()) == -1) {
+            $(this).addClass("hide");
+          }
+        });
+      });
+      self.propertiesFilter = ko.observable('');
+      self.propertiesFilter.subscribe(function(newValue) {
+        $("#jobbrowserJobPropertiesTable tbody tr").removeClass("hide");
+        $("#jobbrowserJobPropertiesTable tbody tr").each(function () {
           if ($(this).text().toLowerCase().indexOf(newValue.toLowerCase()) == -1) {
             $(this).addClass("hide");
           }
