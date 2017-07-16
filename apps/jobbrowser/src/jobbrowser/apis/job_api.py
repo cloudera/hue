@@ -203,7 +203,7 @@ class YarnApi(Api):
           response = job_single_logs(MockDjangoRequest(self.user), job=appid)
           logs = json.loads(response.content).get('logs')
           if logs and len(logs) == 4:
-            logs = logs[3]
+            logs = logs[1]
         else:
           response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
           logs = json.loads(response.content).get('log')
@@ -294,6 +294,9 @@ class YarnMapReduceTaskApi(Api):
 
 
   def logs(self, appid, app_type, log_name):
+    if log_name == 'default':
+      log_name = 'stdout'
+
     try:
       response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name)
       logs = json.loads(response.content)['log']
@@ -359,6 +362,9 @@ class YarnMapReduceTaskAttemptApi(Api):
 
 
   def logs(self, appid, app_type, log_name):
+    if log_name == 'default':
+      log_name = 'stdout'
+
     task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
     stdout, stderr, syslog = task.get_task_log()
 
