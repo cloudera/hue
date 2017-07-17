@@ -27,6 +27,7 @@ from desktop.views import _ko
 from metadata.conf import has_navigator, has_navigator_file_search
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
+from indexer.conf import ENABLE_NEW_INDEXER
 %>
 
 <%def name="assistJSModels()">
@@ -1353,6 +1354,21 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         };
 
         huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
+          % if ENABLE_NEW_INDEXER.get():
+          if (IS_HUE_4) {
+            huePubSub.subscribeOnce('app.gained.focus', function(app){
+              if (app === 'indexes'){
+                window.setTimeout(function(){
+                  huePubSub.publish('open.index', entry.definition.name);
+                }, 0)
+              }
+            });
+            huePubSub.publish('open.link', '/indexer/indexes/');
+          }
+          else {
+            window.open('/indexer/indexes/' + entry.definition.name);
+          }
+          % else:
           var hash = '#edit/' + entry.definition.name;
           if (IS_HUE_4) {
             if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
@@ -1372,6 +1388,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           else {
             window.open('/indexer/' + hash);
           }
+          % endif
         });
 
         huePubSub.subscribe('assist.collections.refresh', function () {
