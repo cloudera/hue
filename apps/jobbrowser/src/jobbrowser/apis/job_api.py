@@ -326,8 +326,17 @@ class YarnMapReduceTaskApi(Api):
         'state': task.state,
         'startTime': task.startTime,
         'successfulAttempt': task.successfulAttempt,
-        'finishTime': task.finishTime
+        'finishTime': task.finishTime,
+        'apiStatus': self._api_status(task.state),
     }
+
+  def _api_status(self, status):
+    if status in ['NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
+      return 'RUNNING'
+    elif status == 'SUCCEEDED':
+      return 'SUCCEEDED'
+    else:
+      return 'FAILED' # FAILED, KILLED
 
 
 class YarnMapReduceTaskAttemptApi(Api):
@@ -377,6 +386,16 @@ class YarnMapReduceTaskAttemptApi(Api):
 
     return {}
 
+
+  def _api_status(self, status):
+    if status in ['NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
+      return 'RUNNING'
+    elif status == 'SUCCEEDED':
+      return 'SUCCEEDED'
+    else:
+      return 'FAILED' # FAILED, KILLED
+
+
   def _massage_task(self, task):
     return {
         #"elapsedMergeTime" : task.elapsedMergeTime,
@@ -395,7 +414,8 @@ class YarnMapReduceTaskAttemptApi(Api):
         "id" : task.id,
         "finishTime" : task.finishTime,
         "app_id": self.app_id,
-        "task_id": self.task_id
+        "task_id": self.task_id,
+        'apiStatus': self._api_status(task.state),
     }
 
 
