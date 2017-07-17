@@ -173,7 +173,22 @@ def guess_field_types(request):
 def get_databases(request):
   source = json.loads(request.POST.get('source', '{}'))
   user = User.objects.get(username=request.user)
-  query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  if source['rdbmsMode'] == 'configRdbms':
+    query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  else:
+    name = source['rdbmsType']
+    if name:
+      query_server = {
+        'server_name': str(name),
+        'server_host': str(source['rdbmsHostname']),
+        'server_port': int(source['rdbmsPort']),
+        'username': str(source['rdbmsUsername']),
+        'password': str(source['rdbmsPassword']),
+        'options': {},
+        'alias': name
+      }
+    LOG.debug("Query Server: %s" % query_server)
+
   db = rdbms.get(user, query_server=query_server)
   assist = Assist(db)
   data = assist.get_databases() #format of data ['abc','def','ghi',...,'xyz']
@@ -188,7 +203,9 @@ def get_databases(request):
     format_['data'] = list
     format_['status'] = 0
   else:
-    format_ = []
+    format_ = {}
+    format_['data'] = []
+    format_['status'] = 1
   print format_
   return JsonResponse(format_)
 
@@ -196,7 +213,22 @@ def get_databases(request):
 def get_tables(request):
   source = json.loads(request.POST.get('source', '{}'))
   user = User.objects.get(username=request.user)
-  query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  if source['rdbmsMode'] == 'configRdbms':
+    query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+  else:
+    name = source['rdbmsType']
+    if name:
+      query_server = {
+        'server_name': str(name),
+        'server_host': str(source['rdbmsHostname']),
+        'server_port': int(source['rdbmsPort']),
+        'username': str(source['rdbmsUsername']),
+        'password': str(source['rdbmsPassword']),
+        'options': {},
+        'alias': name
+      }
+    LOG.debug("Query Server: %s" % query_server)
+
   db = rdbms.get(user, query_server=query_server)
   assist = Assist(db)
   data = assist.get_tables(source['rdbmsDatabaseName']) ##format of data ['abc','def','ghi',...,'xyz']
@@ -212,56 +244,6 @@ def get_tables(request):
     format_['status'] = 0
   else:
     format_ = []
-  print format_
-  return JsonResponse(format_)
-
-
-def dbms_test_connection(request):
-  source = json.loads(request.POST.get('source', '{}'))
-  user = User.objects.get(username=request.user)
-  name = source['rdbmsType']
-  if name:
-    query_server = {
-      'server_name': name,
-      'server_host': source['rdbmsHostname'],
-      'server_port': int(source['rdbmsPort']),
-      'username': source['rdbmsUsername'],
-      'password': source['rdbmsPassword'],
-      'options': {},
-      'alias': name,
-      'name': name
-    }
-  LOG.debug("Query Server: %s" % query_server)
-  db = rdbms.get(user, query_server=query_server)
-  assist = Assist(db)
-  data = assist.get_databases()  # format of data ['abc','def','ghi',...,'xyz']
-  print "ABCABCABC"
-  print data
-
-  '''
-  source = json.loads(request.POST.get('source', '{}'))
-  user = User.objects.get(username=request.user)
-  query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
-  db = rdbms.get(user, query_server=query_server)
-  assist = Assist(db)
-  data = assist.get_tables(source['rdbmsDatabaseName']) ##format of data ['abc','def','ghi',...,'xyz']
-  format_ = {}
-  if data:
-    list = []
-    for element in data:
-      dict = {}
-      dict['name'] = element
-      dict['value'] = element
-      list.append(dict)
-    format_['data'] = list
-    format_['status'] = 0
-  else:
-    format_ = []
-  '''
-  format_ = {}
-  format_['data'] = 'true'
-  format_['status'] = 0
-  print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
   print format_
   return JsonResponse(format_)
 
@@ -296,6 +278,10 @@ def importer_submit(request):
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
   elif destination['outputFormat'] == 'file' and source['inputFormat'] == 'rdbms':
+    job_handle = run_sqoop(request, source, destination, start_time)
+  elif destination['outputFormat'] == 'hive' and source['inputFormat'] == 'rdbms':
+    job_handle = run_sqoop(request, source, destination, start_time)
+  elif destination['outputFormat'] == 'hbase' and source['inputFormat'] == 'rdbms':
     job_handle = run_sqoop(request, source, destination, start_time)
   else:
     job_handle = _create_table(request, source, destination, start_time)
@@ -423,24 +409,50 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
   return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)
 
 def run_sqoop(request, source, destination, start_time):
-  rdbmsName = source['rdbmsName']
-  rdbmsHost = DATABASES[rdbmsName].HOST.get()
-  rdbmsPort = DATABASES[rdbmsName].PORT.get()
-  rdbmsDatabaseName = source['rdbmsDatabaseName']
-  rdbmsTableName = source['rdbmsTableName']
-  rdbmsUserName = DATABASES[rdbmsName].USER.get()
-  rdbmsPassword = get_database_password(rdbmsName)
-  targetDir = conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.get()+destination['name']
-  print rdbmsName
-  print rdbmsHost
-  print rdbmsPort
-  print rdbmsDatabaseName
-  print rdbmsTableName
-  print rdbmsUserName
-  print rdbmsPassword
-  print targetDir
-  print 'import --connect jdbc:'+rdbmsName+'://'+'127.0.0.1'+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT * FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose --split-by a.empid'
+  rdbmsMode = str(source['rdbmsMode'])
+  rdbmsName = str(source['rdbmsType'])
+  rdbmsDatabaseName = str(source['rdbmsDatabaseName'])
+  allTablesSelected = str(source['allTablesSelected'])
+  destinationType = str(destination['outputFormat'])
 
+  if not allTablesSelected:
+    rdbmsTableName = str(source['rdbmsTableName'])
+
+  if rdbmsMode == 'configRdbms':
+    rdbmsHost = str(DATABASES[rdbmsName].HOST.get())
+    rdbmsPort = str(DATABASES[rdbmsName].PORT.get())
+    rdbmsUserName = str(DATABASES[rdbmsName].USER.get())
+    rdbmsPassword = str(get_database_password(rdbmsName))
+  else:
+    rdbmsHost = str(source['rdbmsHostname'])
+    rdbmsPort = str(source['rdbmsPort'])
+    rdbmsUserName = str(source['rdbmsUsername'])
+    rdbmsPassword = str(source['rdbmsPassword'])
+
+  if destinationType == 'file':
+    targetDir = conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.get()+str(destination['name'])+'/test'
+
+  #print rdbmsName
+  #print rdbmsHost
+  #print rdbmsPort
+  #print rdbmsDatabaseName
+  #print rdbmsUserName
+  #print rdbmsPassword
+  #print targetDir
+  #print 'import --connect jdbc:'+rdbmsName+'://'+'127.0.0.1'+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT * FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose --split-by a.empid'
+
+  if destinationType == 'file':
+    if allTablesSelected:
+      statement='import-all-tables --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+rdbmsPort+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --warehouse-dir '+targetDir+' -m 1'
+    else:
+      statement = 'import --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+rdbmsPort+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --table '+rdbmsTableName+' --target-dir '+ targetDir+' -m 1'
+  elif destinationType == 'hive':
+    if allTablesSelected:
+      statement = 'import-all-tables --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+rdbmsPort+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --hive-import'
+    else:
+      statement = 'import --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+rdbmsPort+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --table '+rdbmsTableName+' --hive-import'
+
+  print statement
   task = make_notebook(
       name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
           'rdbmsDatabaseName': source['rdbmsDatabaseName'],
@@ -448,7 +460,7 @@ def run_sqoop(request, source, destination, start_time):
           'path': destination['name']
         },
       editor_type='sqoop1',
-      statement='import --connect jdbc:mysql://172.31.114.131:3306/hue --username hue --password 12345678 --query SELECT * FROM employee WHERE $CONDITIONS --target-dir hdfs://nightly512-unsecure-1.gce.cloudera.com:8020/user/admin/test77 -m 1',
+      statement=statement,
       files = [{"path": "/user/admin/mysql-connector-java.jar", "type": "jar"}],
       status='ready',
       on_success_url='/filebrowser/view/%s(name)s' % destination,
