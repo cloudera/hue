@@ -24,6 +24,10 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
+<%
+MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
+%>
+
 %if not is_embeddable:
 ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
@@ -304,7 +308,7 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="index-sample">
-      <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample() }--><!-- /ko -->
+      <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
     </div>
   </div>
 </script>
@@ -321,7 +325,9 @@ ${ assist.assistPanel() }
 
     <br><br>
 
-    <!-- ko template: { name: 'indexes-index-sample', data: samplePreview }--><!-- /ko -->
+    <div style="overflow: auto">
+      <!-- ko template: { name: 'indexes-index-sample', data: samplePreview, full: false }--><!-- /ko -->
+    </div>
     <a class="pointer" data-bind="visible: sample().length > samplePreview().length, click: function() { $('li a[href=\'#index-sample\']').click(); }">
       ${_('View more...')}
     </a>
@@ -534,6 +540,65 @@ ${ assist.assistPanel() }
 
       self.section = ko.observable('list-indexes');
       self.tab = ko.observable('');
+      self.tab.subscribe(function(tab){
+        if (tab === 'index-sample'){
+          var selector = '#index-sample .sample-table';
+          % if conf.CUSTOM.BANNER_TOP_HTML.get():
+            var bannerTopHeight = 30;
+          % else:
+            var bannerTopHeight = 0;
+          % endif
+          if ($(selector).parents('.dataTables_wrapper').length == 0){
+            hueUtils.waitForRendered(selector, function(el){ return el.find('td').length > 0 }, function(){
+              $(selector).dataTable({
+                "bPaginate": false,
+                "bLengthChange": false,
+                "bInfo": false,
+                "bDestroy": true,
+                "bFilter": false,
+                "bAutoWidth": false,
+                "oLanguage": {
+                  "sEmptyTable": "${_('No data available')}",
+                  "sZeroRecords": "${_('No matching records')}"
+                },
+                "fnDrawCallback": function (oSettings) {
+                  $(selector).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+                  $(selector).jHueTableExtender2({
+                    fixedHeader: true,
+                    fixedFirstColumn: true,
+                    includeNavigator: false,
+                    parentId: 'index-sample',
+                    classToRemove: 'sample-table',
+                    mainScrollable: '${ MAIN_SCROLLABLE }',
+                    % if is_embeddable:
+                      stickToTopPosition: 51 + bannerTopHeight,
+                    % else:
+                      stickToTopPosition: 76 + bannerTopHeight,
+                    % endif
+                    clonedContainerPosition: 'fixed',
+                    app: 'indexes'
+                  });
+                  $(selector).jHueHorizontalScrollbar();
+                },
+                "aoColumnDefs": [
+                  {
+                    "sType": "numeric",
+                    "aTargets": [ "sort-numeric" ]
+                  },
+                  {
+                    "sType": "string",
+                    "aTargets": [ "sort-string" ]
+                  },
+                  {
+                    "sType": "date",
+                    "aTargets": [ "sort-date" ]
+                  }
+                ]
+              });
+            });
+          }
+        }
+      });
 
       self.indexes = ko.observableArray([]);
       self.alias = new Alias(self);
