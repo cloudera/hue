@@ -427,7 +427,7 @@ ${ assist.assistPanel() }
 
             <!-- /ko -->
 
-            <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' || (createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.dbmsIsValid() == 'true') -->
+            <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' || (createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.dbmsIsValid() == true) -->
               <!-- ko if: createWizard.source.rdbmsType -->
               <div class="control-group input-append">
                 <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
@@ -438,7 +438,7 @@ ${ assist.assistPanel() }
 
               <!-- ko if: createWizard.source.rdbmsDatabaseName -->
               <div class="control-group input-append">
-                <!-- ko if: createWizard.source.allTablesSelected() == 'false' -->
+                <!-- ko if: createWizard.source.allTablesSelected() == false -->
                 <label for="rdbmsTableName" class="control-label"><div>${ _('Table Name') }</div>
                   <select id="rdbmsTableName" data-bind="selectize: createWizard.source.rdbmsTableNames, value: createWizard.source.rdbmsTableName, optionsText: 'name', optionsValue: 'value'"></select>
                 </label>
@@ -488,6 +488,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
 
+    <!-- ko if: createWizard.source.isAllTables() == false -->
     <div class="card step" style="min-height: 310px;">
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <!-- ko if: createWizard.isGuessingFieldTypes -->
@@ -517,6 +518,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
     <!-- /ko -->
+    <!-- /ko -->
 
     <!-- /ko -->
 
@@ -533,8 +535,10 @@ ${ assist.assistPanel() }
             </label>
           </div>
           <div class="control-group">
+            <!-- ko if: outputFormat() != 'hive' && outputFormat() != 'hbase' && outputFormat() != '' -->
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
-            <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
+            <!-- /ko -->
+            <!-- ko if: outputFormat() == 'file' -->
               <input type="text" class="form-control name input-xlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, uploadFile: false, uploadFolder: true}" placeholder="${ _('Name') }">
             <!-- /ko -->
 
@@ -544,7 +548,8 @@ ${ assist.assistPanel() }
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
               <i class="fa fa-spinner fa-spin"></i>
             </span>
-            <span class="help-inline muted" data-bind="visible: !$parent.createWizard.isValidDestination()">
+            <!-- ko if: outputFormat() != 'hive' && outputFormat() != 'hbase' && outputFormat.length > 0 -->
+            <span class="help-inline muted" data-bind="visible: ! $parent.createWizard.isValidDestination()">
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Empty name or invalid characters') }
             </span>
             <span class="help-inline muted" data-bind="visible: isTargetExisting()">
@@ -556,6 +561,7 @@ ${ assist.assistPanel() }
               <!-- /ko -->
               <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" title="${ _('Open') }"></a>
             </span>
+            <!-- /ko -->
           </div>
         </div>
       </div>
@@ -1239,6 +1245,7 @@ ${ assist.assistPanel() }
         self.sample.removeAll();
         self.path('');
         resizeElements();
+        self.rdbmsMode('');
       });
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
@@ -1279,6 +1286,18 @@ ${ assist.assistPanel() }
       });
       // Rdbms
       self.rdbmsMode = ko.observable('');
+      self.rdbmsMode.subscribe(function (val) {
+        self.rdbmsType('');
+        self.rdbmsDatabaseName('');
+        self.rdbmsTableName('');
+        self.isAllTables(false);
+        self.rdbmsHostname('');
+        self.rdbmsPort('');
+        self.rdbmsUsername('');
+        self.rdbmsPassword('');
+        self.dbmsIsValid(false);
+        self.isConnection(false);
+      });
       self.rdbmsTypesAll = ko.observableArray([
           {'value': 'mysql', 'name': 'Mysql'},
           {'value': 'oracle', 'name': 'Oracle'},
@@ -1291,31 +1310,85 @@ ${ assist.assistPanel() }
       self.rdbmsType = ko.observable('');
       self.rdbmsType.subscribe(function (val) {
         self.path('');
+        self.isConnection(false);
         resizeElements();
-        $.post("${ url('indexer:get_databases') }", {
-          "source": ko.mapping.toJSON(self)
-        }, function (resp) {
-          if (resp.status == 0 && resp.data) {
-            self.rdbmsDatabaseNames(resp.data);
-          }
-        });
+        if(self.rdbmsMode() == 'configRdbms'){
+          $.post("${ url('indexer:get_databases') }", {
+            "source": ko.mapping.toJSON(self)
+          }, function (resp) {
+            if (resp.status == 0 && resp.data) {
+              self.rdbmsDatabaseNames(resp.data);
+            }
+          });
+        }
       });
       self.rdbmsDatabaseName = ko.observable('');
       self.rdbmsDatabaseName.subscribe(function (val) {
-        $.post("${ url('indexer:get_tables') }", {
-          "source": ko.mapping.toJSON(self)
-        }, function (resp) {
-          if (resp.status == 0 && resp.data) {
-            self.rdbmsTableNames(resp.data);
-          }
-        });
+        if(val != ''){
+          $.post("${ url('indexer:get_tables') }", {
+            "source": ko.mapping.toJSON(self)
+          }, function (resp) {
+            if (resp.status == 0 && resp.data) {
+              self.rdbmsTableNames(resp.data);
+            }
+          });
+        }
       });
       self.rdbmsDatabaseNames = ko.observableArray([]);
       self.rdbmsTableName = ko.observable('');
       self.rdbmsTableName.subscribe(function (val) {
-        wizard.guessFieldTypes();
+        if(val != ''){
+          wizard.guessFieldTypes();
+        }
       });
       self.rdbmsTableNames = ko.observableArray([]);
+      self.rdbmsHostname = ko.observable('');
+      self.rdbmsHostname.subscribe(function (val) {
+        self.isConnection(false);
+      });
+      self.rdbmsPort = ko.observable('');
+      self.rdbmsPort.subscribe(function (val) {
+        self.isConnection(false);
+      });
+      self.rdbmsUsername = ko.observable('');
+      self.rdbmsUsername.subscribe(function (val) {
+        self.isConnection(false);
+      });
+      self.rdbmsPassword = ko.observable('');
+      self.rdbmsPassword.subscribe(function (val) {
+        self.isConnection(false);
+      });
+      self.allTablesSelected = ko.observable(false);
+      self.isAllTables = ko.observable(false);
+      self.isAllTables.subscribe(function(newVal) {
+        self.rdbmsTableName('');
+        if(newVal){
+          self.allTablesSelected(true);
+        }else{
+          self.allTablesSelected(false);
+        }
+      });
+      self.dbmsIsValid = ko.observable(false);
+      self.isConnection = ko.observable(false);
+      self.isConnection.subscribe(function(newVal) {
+        if(newVal){
+          $.post("${ url('indexer:get_databases') }", {
+            "source": ko.mapping.toJSON(self)
+          }, function (resp) {
+            if(resp.status == 0 && resp.data) {
+              console.log(resp.data)
+              self.dbmsIsValid(true);
+              self.rdbmsDatabaseNames(resp.data);
+            }
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", "Connection Failed.");
+            self.dbmsIsValid(false);
+            self.isConnection(false);
+          });
+        }else{
+          self.dbmsIsValid(false);
+        }
+      });
       // Table
       self.table = ko.observable('');
       self.tableName = ko.computed(function() {
@@ -1328,36 +1401,6 @@ ${ assist.assistPanel() }
         resizeElements();
       });
       self.apiHelperType = ko.observable('${ source_type }');
-      self.rdbmsHostname = ko.observable('');
-      self.rdbmsPort = ko.observable('');
-      self.rdbmsUsername = ko.observable('');
-      self.rdbmsPassword = ko.observable('');
-      self.dbmsIsValid = ko.observable('');
-      self.allTablesSelected = ko.observable('false');
-      self.isConnection = ko.observable(false);
-      self.isConnection.subscribe(function(newVal) {
-        if(newVal){
-          $.post("${ url('indexer:dbms_test_connection') }", {
-            "source": ko.mapping.toJSON(self)
-          }, function (resp) {
-            if (resp.status == 0 && resp.data) {
-              self.dbmsIsValid(resp.data);
-            }
-          });
-        }else{
-          self.dbmsIsValid('');
-        }
-      });
-      self.isAllTables = ko.observable(false);
-      self.isAllTables.subscribe(function(newVal) {
-        if(newVal){
-          self.allTablesSelected('true');
-        }else{
-          self.allTablesSelected('false');
-        }
-      });
-
-
       // Queries
       self.query = ko.observable('');
       self.draggedQuery = ko.observable();
@@ -1387,7 +1430,7 @@ ${ assist.assistPanel() }
         } else if (self.inputFormat() == 'manual') {
           return true;
         } else if (self.inputFormat() == 'rdbms') {
-          return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.allTablesSelected() == 'true');
+          return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.allTablesSelected() == true);
         }
       });
       self.defaultName = ko.computed(function() {
@@ -1721,7 +1764,7 @@ ${ assist.assistPanel() }
          );
       });
       self.readyToIndex = ko.computed(function () {
-        var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database' || self.destination.outputFormat() == 'file';
+        var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database' || self.destination.outputFormat() == 'file' || self.destination.outputFormat() == 'hive' || self.destination.outputFormat() == 'hbase';
         var validTableColumns = self.destination.outputFormat() != 'table' || ($.grep(self.destination.columns(), function(column) {
             return column.name().length == 0;
           }).length == 0
@@ -1729,7 +1772,7 @@ ${ assist.assistPanel() }
             return column.name().length == 0 || (self.source.inputFormat() != 'manual' && column.partitionValue().length == 0);
           }).length == 0
         );
-        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index' || self.destination.outputFormat() == 'file';
+        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index' || self.destination.outputFormat() == 'file' || self.destination.outputFormat() == 'hive' || self.destination.outputFormat() == 'hbase';
         var isValidTable = self.destination.outputFormat() != 'table' || (
           self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
