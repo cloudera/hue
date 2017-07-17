@@ -492,7 +492,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-favorite-app-template">
     <!-- ko if: isHue4 -->
-    <div class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp, tooltip: { placement: 'bottom', delay: 750, title: isFavorite() ? '${ _ko("Unset from default application") }' : '${ _ko("Set as default application") }' }">
+    <div class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp, tooltip: { placement: 'bottom', title: isFavorite() ? '${ _ko("Unset from default application") }' : '${ _ko("Set as default application") }' }">
       <i class="fa inactive-action" data-bind="css: { 'fa-star-o': !isFavorite(), 'fa-star': isFavorite }"></i>
     </div>
     <!-- /ko -->
