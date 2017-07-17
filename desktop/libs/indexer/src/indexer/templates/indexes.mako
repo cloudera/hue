@@ -672,6 +672,13 @@ ${ assist.assistPanel() }
       var viewModel = new IndexesViewModel(options);
       ko.applyBindings(viewModel, $('#indexesComponents')[0]);
 
+      huePubSub.subscribe('open.index', function (index) {
+        var foundIndex = viewModel.getIndexByName(index);
+        if (foundIndex) {
+          viewModel.fetchIndex(foundIndex);
+        }
+      }, 'indexes');
+
       viewModel.fetchIndexes(function () {
         if (options.index) {
           var foundIndex = viewModel.getIndexByName(options.index);
