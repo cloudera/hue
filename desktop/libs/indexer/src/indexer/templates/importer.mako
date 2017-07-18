@@ -1726,7 +1726,7 @@ ${ assist.assistPanel() }
         if (! self.readyToIndex()) {
           return;
         }
-        $(".jHueNotify").hide();
+        $(".jHueNotify").remove();
 
 %if not is_embeddable:
         self.indexingStarted(true);

@@ -1812,7 +1812,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
 
     self.search = function (callback) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       hueAnalytics.log('dashboard', 'search');
       self.isRetrievingResults(true);
 

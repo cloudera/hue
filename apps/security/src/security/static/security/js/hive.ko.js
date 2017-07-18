@@ -261,7 +261,7 @@ var HiveViewModel = (function () {
     }
 
     self.saveGroups = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       $.post("/security/api/hive/update_role_groups", {
         role: ko.mapping.toJSON(self)
       }, function (data) {
@@ -280,7 +280,7 @@ var HiveViewModel = (function () {
     }
 
     self.create = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       if (self.isValid()) {
         self.isLoading(true);
         $.post("/security/api/hive/create_role", {
@@ -307,7 +307,7 @@ var HiveViewModel = (function () {
     }
 
     self.update = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       if (self.isValid()) {
         self.isLoading(true);
         $.post("/security/api/hive/save_privileges", {
@@ -330,7 +330,7 @@ var HiveViewModel = (function () {
     }
 
     self.remove = function (role) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       self.isLoading(true);
       $.post("/security/api/hive/drop_sentry_role", {
         roleName: role.name
@@ -350,7 +350,7 @@ var HiveViewModel = (function () {
     }
 
     self.savePrivileges = function (role) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       $.post("/security/api/hive/save_privileges", {
         role: ko.mapping.toJSON(role)
       }, function (data) {
@@ -1106,7 +1106,7 @@ var HiveViewModel = (function () {
     }
 
     self.grant_privilege = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       $.ajax({
         type: "POST",
         url: "/security/api/hive/grant_privilege",
@@ -1222,7 +1222,7 @@ var HiveViewModel = (function () {
     }
 
     self.bulk_delete_privileges = function (norefresh) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       var checkedPaths = self.assist.checkedItems();
       $.post("/security/api/hive/bulk_delete_privileges", {
         'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
@@ -1243,7 +1243,7 @@ var HiveViewModel = (function () {
     }
 
     self.bulk_add_privileges = function (role) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       var checkedPaths = self.assist.checkedItems();
       $.post("/security/api/hive/bulk_add_privileges", {
         'privileges': ko.mapping.toJSON(self.assist.privileges),

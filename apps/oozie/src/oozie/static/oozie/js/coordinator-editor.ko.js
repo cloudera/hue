@@ -230,7 +230,7 @@ var CoordinatorEditorViewModel = (function () {
     self.save = function (cb) {
       if (!self.isSaving()) {
         self.isSaving(true);
-        $(".jHueNotify").hide();
+        $(".jHueNotify").remove();
         $.post("/oozie/editor/coordinator/save/", {
           "coordinator": ko.mapping.toJSON(self.coordinator, COORDINATOR_MAPPING)
         }, function (data) {
@@ -259,7 +259,7 @@ var CoordinatorEditorViewModel = (function () {
     };
 
     self.gen_xml = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       hueAnalytics.log('oozie/editor/coordinator', 'gen_xml');
 
       $.post("/oozie/editor/coordinator/gen_xml/", {
@@ -277,7 +277,7 @@ var CoordinatorEditorViewModel = (function () {
     };
 
     self.showSubmitPopup = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
 
       if (!self.coordinator.isDirty()) {
         hueAnalytics.log('oozie/editor/coordinator', 'submit');
