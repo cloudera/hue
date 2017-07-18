@@ -879,10 +879,10 @@ ${ components.menubar(is_embeddable) }
   <div class="clearfix"></div>
 
   % if has_write_access:
-  <div class="show-inactive-on-hover">
-    <a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a>
-    <div data-bind="toggleOverflow: {height: 24}">
-      <div data-bind="editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block margin-left-5">
+  <div style="position: relative;" class="show-inactive-on-hover">
+    <div style="position:absolute; left: 10px; top: 2px;"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a></div>
+    <div style="margin-left: 25px;" data-bind="toggleOverflow: { height: 24 }">
+      <div style="height: inherit" data-bind="editable: comment, editableOptions: { enabled: true, type: 'wysihtml5', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', forcePlacement: true, placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block">
         ${ _('Add a description...') }
       </div>
     </div>
