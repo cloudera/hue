@@ -359,7 +359,7 @@ class HiveServerTTableSchema:
     return filter(lambda (i, col): col.columnName == column_name, enumerate(self.schema.columns))[0][0]
 
 
-if beeswax_conf.THRIFT_VERSION.get() >= 7:
+if hasattr(beeswax_conf.THRIFT_VERSION, 'get') and beeswax_conf.THRIFT_VERSION.get() >= 7:
   HiveServerTRow = HiveServerTRow2
   HiveServerTRowSet = HiveServerTRowSet2
 else:
