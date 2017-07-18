@@ -33,10 +33,45 @@ var HomeViewModel = (function () {
     // Uncomment to enable the assist panel
     // self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
+    self.serverTypeFilter = ko.observable();
+    self.allDocumentTypes = ko.observableArray();
+
+    var initialType = window.location.getParameter('type') !== '' ? window.location.getParameter('type') : 'all';
+    var availableTypes = $.map(DocumentTypeGlobals, function (value, key) {
+      var type = {
+        type: key,
+        label: value
+      };
+      if (initialType === type.type) {
+        self.serverTypeFilter(type);
+      }
+      return type;
+    });
+
+    if (!self.serverTypeFilter()) {
+      var unknownType = {
+        type: initialType,
+        label: initialType
+      };
+      self.serverTypeFilter(unknownType);
+      availableTypes.push(unknownType);
+    }
+
+    availableTypes.sort(function (a, b) {
+      if (a.type === 'all') {
+        return -1;
+      }
+      if (b.type === 'all') {
+        return 1;
+      }
+      return a.label.localeCompare(b.label);
+    });
+    self.allDocumentTypes(availableTypes);
+
     self.activeEntry = ko.observable();
     self.trashEntry = ko.observable();
     self.activeEntry(new HueFileEntry({
-      serverTypeFilter: ko.observable(window.location.getParameter('type') !== '' ? window.location.getParameter('type') : null),
+      serverTypeFilter: self.serverTypeFilter,
       activeEntry: self.activeEntry,
       trashEntry: self.trashEntry,
       apiHelper: self.apiHelper,
@@ -48,6 +83,18 @@ var HomeViewModel = (function () {
         name: '/'
       }
     }));
+
+    self.serverTypeFilter.subscribe(function (newVal) {
+      if (self.activeEntry()) {
+        self.activeEntry().entries([]);
+        self.activeEntry().load();
+        if (!newVal || newVal.type === 'all') {
+          hueUtils.removeURLParameter('type');
+        } else {
+          hueUtils.changeURLParameter('type', newVal.type);
+        }
+      }
+    });
 
     self.shareFormDocId = ko.observable('');
     self.exportFormDocIds = ko.observable('');

@@ -114,7 +114,6 @@ from desktop.views import commonheader, commonfooter, _ko
       <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections"></select>
 
         <label class="checkbox" style="display:inline-block; margin-left: 10px">
-          <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
           <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
         </label>
       <!-- /ko -->
@@ -144,7 +143,7 @@ from desktop.views import commonheader, commonfooter, _ko
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4, 'flat-left': $index() === 0}" maxlength="4096" type="text" class="search-query">
+        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-almost-xxlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 3, 'input-small': $root.query.qs().length >= 3, 'flat-left': $index() === 0}" maxlength="4096" type="text" class="search-query">
         <!-- ko if: $index() >= 1 -->
         <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
@@ -692,7 +691,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15" style="opacity: 0.7">
     <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
-        <i class="fa fa-plus"></i> ${ _('Add') }
+        <i class="fa fa-fw fa-plus"></i> ${ _('Add') }
       </a>
       <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.fieldsNames" class="hit-options" style="margin-bottom: 0"></select>
       <div class="clearfix"></div>
@@ -2677,13 +2676,13 @@ ${ dashboard.layout_skeleton(suffix='search') }
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
                 <label class="control-label" for="settingstimestart">${ _('Start date/time') }</label>
                 <div class="controls">
-                  <input id="settingstimestart" type="text" data-bind="value: collection.timeFilter.from, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]'}" />
+                  <input id="settingstimestart" type="text" data-bind="value: collection.timeFilter.from, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]', disableUTC: true}" />
                 </div>
               </div>
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
                 <label class="control-label" for="settingstimeend">${ _('End date/time') }</label>
                 <div class="controls">
-                  <input id="settingstimeend" type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]'}" />
+                  <input id="settingstimeend" type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]', disableUTC: true}" />
                 </div>
               </div>
               <!-- ko if: collection.timeFilter.type() == 'rolling' -->

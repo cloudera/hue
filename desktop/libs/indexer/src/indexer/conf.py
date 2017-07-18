@@ -22,8 +22,16 @@ from urlparse import urlparse
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config
+from libsolr import conf as libsolr_conf
+from libzookeeper import conf as libzookeeper_conf
+
 
 LOG = logging.getLogger(__name__)
+
+
+# Deprecated. Should be automatically guessed from Solr admin info API now.
+def get_solr_ensemble():
+  return '%s%s' % (libzookeeper_conf.ENSEMBLE.get(), libsolr_conf.SOLR_ZK_PATH.get())
 
 
 def solrctl():
@@ -49,14 +57,14 @@ def zkensemble():
     if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
       return '%s/solr' % clusters['default'].HOST_PORTS.get()
   except:
-    LOG.exception('failed to get zookeeper ensemble')
+    LOG.warn('Failed to get Zookeeper ensemble')
 
   try:
     from search.conf import SOLR_URL
     parsed = urlparse(SOLR_URL.get())
     return "%s:2181/solr" % (parsed.hostname or 'localhost')
   except:
-    LOG.exception('failed to get solr url')
+    LOG.warn('Failed to get Solr url')
 
 
 ENABLE_NEW_IMPORTER = Config(

@@ -196,12 +196,17 @@ except ImportError, e:
         % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Explore result in a dashboard') }">
-            <i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }
+            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
           </a>
         </li>
         % endif
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
+          <a data-bind="css: clipboardClass" title="${ _('Copy the displayed results in your clipboard') }">
+            <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
+          </a>
+        </li>
+        <li>
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
             <i class="fa fa-fw fa-save"></i> ${ _('Save') }
           </a>
         </li>
@@ -267,7 +272,7 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="search-index">
-                  &nbsp;${ _('Dashboard') }
+                  &nbsp;${ _('Index') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
@@ -293,7 +298,7 @@ except ImportError, e:
         <h2 class="modal-title">${_('Your downloaded results have been truncated')}</h2>
         <!-- /ko -->
       </div>
-      <div class="modal-body" style="padding: 4px">
+      <div class="modal-body">
         <!-- ko if: isDownloading -->
         ${ _('Please wait, it might take a while...') } <i class="fa fa-spinner fa-spin"></i>
         <!-- /ko -->
@@ -325,7 +330,7 @@ except ImportError, e:
 
         self.saveTarget = ko.observable('hdfs-file');
         self.savePath = ko.observable('');
-        self.saveOverwrite = ko.observable(true);
+        self.saveOverwrite = ko.observable(false);
 
         self.isDownloading = ko.observable(false);
         self.downloadTruncated = ko.observable(false);
@@ -343,6 +348,34 @@ except ImportError, e:
 
         self.isValidDestination = ko.pureComputed(function () {
           return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.savePath()));
+        });
+
+        self.clipboardClass = ko.pureComputed(function () {
+          return 'download pointer clipboard' + self.snippet.id().split('-')[0];
+        });
+
+        var clipboard = new Clipboard('.clipboard' + self.snippet.id().split('-')[0], {
+          text: function () {
+            if (self.snippet.result && self.snippet.result.data()) {
+              var data = self.snippet.result.data();
+              var result = '';
+              data.forEach(function (row) {
+                for (var i = 1; i < row.length; i++) { // skip the row number column
+                  result += hueUtils.html2text(row[i]) + '\t';
+                }
+                result += '\n';
+              });
+              return result;
+            }
+            else {
+              return '${_('Error while copying results.') }';
+            }
+          }
+        });
+
+        clipboard.on('success', function (e) {
+          $.jHueNotify.info('${_('Results copied successfully to the clipboard') }')
+          e.clearSelection();
         });
 
         self.trySaveResults = function () {

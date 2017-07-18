@@ -24,7 +24,7 @@ from desktop.views import _ko
 
 <%def name="all()">
   <script type="text/html" id="hue-drop-down-template">
-    <!-- ko if: !dropDownVisible() || !searchable -->
+    <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
       <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
       <!-- ko if: value -->
@@ -33,7 +33,7 @@ from desktop.views import _ko
       <i class="fa fa-caret-down"></i>
     </a>
     <!-- /ko -->
-    <!-- ko if: dropDownVisible() && searchable -->
+    <!-- ko if: !menuOnly && (dropDownVisible() && searchable) -->
     <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': value }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
@@ -41,12 +41,22 @@ from desktop.views import _ko
       <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0" style="min-width: 190px; max-width: 250px; min-height: 34px; max-height: 200px;">
         <!-- ko if: foreachVisible -->
         <ul class="hue-inner-drop-down" style="overflow-x: hidden;" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
+          <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->
+          <li class="divider"></li>
+          <!-- /ko -->
+          <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
           <li><a href="javascript:void(0)" data-bind="text: typeof $data.label !== 'undefined' ? $data.label : $data, click: function () { $parent.value($data); }"></a></li>
+          <!-- /ko -->
         </ul>
         <!-- /ko -->
         <!-- ko ifnot: foreachVisible -->
         <ul class="hue-inner-drop-down" style="overflow-x: hidden;" data-bind="foreach: filteredEntries">
+          <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->
+          <li class="divider"></li>
+          <!-- /ko -->
+          <!-- ko if: typeof $data.divider === 'undefined' || !$data.divider -->
           <li><a href="javascript:void(0)" data-bind="text: typeof $data.label !== 'undefined' ? $data.label : $data, click: function () { $parent.value($data); }"></a></li>
+          <!-- /ko -->
         </ul>
         <!-- /ko -->
       </div>
@@ -57,7 +67,8 @@ from desktop.views import _ko
     (function () {
       var HueDropDown = function (params, element) {
         var self = this;
-        self.dropDownVisible = ko.observable(false);
+        self.dropDownVisible = ko.observable(!!params.showOnInit);
+        self.menuOnly = !!params.menuOnly;
         self.icon = params.icon;
         self.value = params.value;
         self.entries = params.entries;
@@ -410,10 +421,13 @@ from desktop.views import _ko
           $('#jobsPanel').hide();
         });
 
-        huePubSub.subscribe('show.jobs.panel', function () {
+        huePubSub.subscribe('show.jobs.panel', function (id) {
           huePubSub.publish('hide.history.panel');
           $('#jobsPanel').show();
           huePubSub.publish('mini.jb.navigate');
+          if (id) {
+            huePubSub.publish('mini.jb.open.job', id);
+          }
         });
 
         huePubSub.subscribe('toggle.jobs.panel', function () {
@@ -478,7 +492,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-favorite-app-template">
     <!-- ko if: isHue4 -->
-    <div class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp, attr: { title: isFavorite() ? '${ _ko("Unset from default application") }' : '${ _ko("Set as default application") }' }">
+    <div class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp, tooltip: { placement: 'bottom', title: isFavorite() ? '${ _ko("Unset from default application") }' : '${ _ko("Set as default application") }' }">
       <i class="fa inactive-action" data-bind="css: { 'fa-star-o': !isFavorite(), 'fa-star': isFavorite }"></i>
     </div>
     <!-- /ko -->
@@ -541,6 +555,501 @@ from desktop.views import _ko
       ko.components.register('hue-favorite-app', {
         viewModel: FavoriteApp,
         template: {element: 'hue-favorite-app-template'}
+      });
+    })();
+  </script>
+
+  <script type="text/html" id="hue-global-search-template">
+    <div class="global-search-input-container">
+      <div>
+        <input class="global-search-input" type="text" data-bind="attr: { 'placeHolder' : searchHasFocus() ? '' : '${ _ko('Search data and saved documents...') }' }, textInput: searchInput, hasFocus: searchHasFocus">
+        <input class="global-search-autocomplete" disabled type="text" data-bind="value: inlineAutocomplete">
+      </div>
+    </div>
+    <!-- ko if: searchResultVisible-->
+    <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, css: { 'global-search-empty' : searchResultCategories().length === 0 }">
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+      <!-- ko if: !loading() && searchResultCategories().length === 0 -->
+        <div>${ _('No results found.') }</div>
+      <!-- /ko -->
+      <!-- ko if: !loading() && searchResultCategories().length > 0 -->
+      <div class="global-search-alternatives" data-bind="foreach: searchResultCategories">
+        <div class="global-search-category">
+          <div class="global-search-category-header" data-bind="text: label"></div>
+          <ul data-bind="foreach: result">
+            <li data-bind="multiClick: {
+                click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
+                dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
+              }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }"></li>
+          </ul>
+        </div>
+      </div>
+      <div class="global-search-preview">
+        <!-- ko with: selectedResult -->
+          <!-- ko switch: type -->
+            <!-- ko case: ['database', 'table', 'view', 'field']  -->
+              <!-- ko component: { name: 'sql-context-contents-global-search', params: { data: data } } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- ko case: $default -->
+              <pre data-bind="text: ko.mapping.toJSON($data)"></pre>
+            <!-- /ko -->
+          <!-- /ko -->
+        <!--/ko -->
+      </div>
+      <!-- /ko -->
+    </div>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+
+      var FACETS = [
+        'type', 'tags'
+      ];
+
+      var GlobalSearch = function (params) {
+        var self = this;
+        self.apiHelper = ApiHelper.getInstance();
+        self.lastNonPartial = null;
+        self.lastResult = {};
+
+        self.autocompleteThrottle = -1;
+        self.fetchThrottle = -1;
+
+        self.searchHasFocus = ko.observable(false);
+        self.searchInput = ko.observable('');
+        self.inlineAutocomplete = ko.observable('');
+        self.searchActive = ko.observable(false);
+        self.searchResultVisible = ko.observable(false);
+        self.searchResultCategories = ko.observableArray([]);
+        self.selectedIndex = ko.observable();
+        self.loading = ko.observable(false);
+
+        self.selectedResult = ko.pureComputed(function () {
+          if (self.selectedIndex()) {
+            return self.searchResultCategories()[self.selectedIndex().categoryIndex].result[self.selectedIndex().resultIndex]
+          }
+        });
+
+        self.searchInput.subscribe(function (newValue) {
+          self.inlineAutocomplete(newValue);
+          if (newValue !== '') {
+            self.triggerAutocomplete(newValue);
+          }
+          window.clearTimeout(self.fetchThrottle);
+          self.fetchThrottle = window.setTimeout(function () {
+            self.fetchResults(newValue);
+          }, 500);
+        });
+
+        self.searchHasFocus.subscribe(function (newVal) {
+          if (!newVal) {
+            self.inlineAutocomplete('');
+          } else if (self.searchInput() !== '') {
+            self.triggerAutocomplete(self.searchInput());
+          }
+        });
+
+        self.searchResultVisible.subscribe(function (newVal) {
+          if (!newVal) {
+            self.selectedIndex(undefined);
+          }
+        });
+
+        // TODO: Consider attach/detach on focus
+        $(document).keydown(function (event) {
+          if (!self.searchHasFocus() && !self.searchResultVisible()) {
+            return;
+          }
+          if (event.keyCode === 32 && event.ctrlKey) { // Ctrl-Space
+            self.triggerAutocomplete(self.searchInput(), true);
+            return;
+          }
+          if (event.keyCode === 39 && self.inlineAutocomplete() !== '' && self.inlineAutocomplete() !== self.searchInput()) { // Right arrow
+            // TODO: Check that cursor is last
+            self.searchInput(self.inlineAutocomplete());
+            return;
+          }
+          if (event.keyCode === 9 && self.inlineAutocomplete() !== self.searchInput()) { // Tab
+            self.searchInput(self.inlineAutocomplete());
+            event.preventDefault();
+            return;
+          }
+
+          if (event.keyCode === 13 && self.searchHasFocus() && self.searchInput() !== '') {
+            window.clearTimeout(self.fetchThrottle);
+            self.fetchResults(self.searchInput());
+            return;
+          }
+
+          if (self.searchResultVisible() && self.searchResultCategories().length > 0) {
+            var currentIndex = self.selectedIndex();
+            if (event.keyCode === 40) { // Down
+              self.searchHasFocus(false);
+              if (currentIndex && !(self.searchResultCategories()[currentIndex.categoryIndex].result.length <= currentIndex.resultIndex + 1 && self.searchResultCategories().length <= currentIndex.categoryIndex + 1)) {
+                if (self.searchResultCategories()[currentIndex.categoryIndex].result.length <= currentIndex.resultIndex + 1) {
+                  self.selectedIndex({ categoryIndex: currentIndex.categoryIndex + 1, resultIndex: 0 });
+                } else {
+                  self.selectedIndex({ categoryIndex: currentIndex.categoryIndex, resultIndex: currentIndex.resultIndex + 1})
+                }
+              } else {
+                self.selectedIndex({ categoryIndex: 0, resultIndex: 0 });
+              }
+              event.preventDefault();
+            } else if (event.keyCode === 38) { // Up
+              self.searchHasFocus(false);
+              if (currentIndex && !(currentIndex.categoryIndex === 0 && currentIndex.resultIndex === 0)) {
+                if (currentIndex.resultIndex === 0) {
+                  self.selectedIndex({ categoryIndex: currentIndex.categoryIndex - 1, resultIndex: self.searchResultCategories()[currentIndex.categoryIndex - 1].result.length - 1 });
+                } else {
+                  self.selectedIndex({ categoryIndex: currentIndex.categoryIndex, resultIndex: currentIndex.resultIndex - 1 });
+                }
+              } else {
+                self.selectedIndex({ categoryIndex: self.searchResultCategories().length - 1, resultIndex: self.searchResultCategories()[self.searchResultCategories().length - 1].result.length - 1 });
+              }
+              event.preventDefault();
+            } else if (event.keyCode === 13 && !self.searchHasFocus() && self.selectedIndex()) { // Enter
+              self.openResult();
+            }
+          }
+        });
+      };
+
+      GlobalSearch.prototype.updateInlineAutocomplete = function (partial) {
+        var self = this;
+        self.inlineAutocomplete('');
+        if (self.lastResult.suggestFacets) {
+          var existingFacetIndex = {};
+          if (self.lastResult.facets) {
+            self.lastResult.facets.forEach(function (facet) {
+              existingFacetIndex[facet.toLowerCase()] = true;
+            })
+          }
+
+          if (partial === '') {
+            FACETS.every(function (facet) {
+              if (existingFacetIndex[facet]) {
+                return true;
+              }
+              self.inlineAutocomplete(self.lastNonPartial + facet + ':');
+              return false;
+            })
+          } else {
+            var lowerCase = partial.length !== '' && partial[partial.length - 1].toLowerCase() === partial[partial.length - 1];
+            var suggestion = self.lastNonPartial + partial;
+            FACETS.every(function (facet) {
+              if (existingFacetIndex[facet]) {
+                return true;
+              }
+              if (facet.indexOf(partial.toLowerCase()) === 0) {
+                var remainder = facet.substring(partial.length);
+                suggestion += lowerCase ? remainder : remainder.toUpperCase();
+                suggestion += ':';
+                self.inlineAutocomplete(suggestion);
+                return false;
+              }
+              return true;
+            });
+          }
+        }
+      };
+
+      GlobalSearch.prototype.triggerAutocomplete = function (newValue, direct) {
+        var self = this;
+        self.inlineAutocomplete(newValue);
+        var partial, nonPartial;
+        var partialMatch = newValue.match(/([a-z]+)$/i);
+        if (partialMatch) {
+          partial = partialMatch[0];
+          nonPartial = newValue.substring(0, newValue.length - partial.length);
+        } else {
+          partial = '';
+          nonPartial = newValue;
+        }
+
+        if (self.lastNonPartial && self.lastNonPartial === nonPartial) {
+          self.updateInlineAutocomplete(partial);
+          return;
+        }
+
+        window.clearTimeout(self.autocompleteThrottle);
+        self.autocompleteThrottle = window.setTimeout(function () {
+          self.lastNonPartial = nonPartial;
+
+          // TODO: Get cursor position and split to before and after
+          self.lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
+          if (hueDebug && hueDebug.showGlobalSearchParseResults) {
+            console.log(self.lastResult);
+          }
+          if (self.lastResult) {
+            self.updateInlineAutocomplete(partial);
+          } else {
+            self.lastNonPartial = null;
+          }
+        }, direct ? 0 : 200);
+      };
+
+      GlobalSearch.prototype.openResult = function () {
+        console.log('open... ');
+      };
+
+      GlobalSearch.prototype.resultSelected = function (categoryIndex, resultIndex) {
+        var self = this;
+        if (!self.selectedIndex() || !(self.selectedIndex().categoryIndex === categoryIndex && self.selectedIndex().resultIndex === resultIndex)) {
+          self.selectedIndex({ categoryIndex: categoryIndex, resultIndex: resultIndex });
+        }
+      };
+
+      GlobalSearch.prototype.onResultClickOutside = function () {
+        var self = this;
+        if (!self.searchResultVisible() || self.searchHasFocus()) {
+          return false;
+        }
+        self.searchResultVisible(false);
+        window.clearTimeout(self.fetchThrottle);
+        window.clearTimeout(self.autocompleteThrottle);
+      };
+
+      GlobalSearch.prototype.mainSearchSelect = function (entry) {
+        if (entry.data && entry.data.link) {
+          huePubSub.publish('open.link', entry.data.link);
+        } else if (!/:\s*$/.test(entry.value)) {
+          huePubSub.publish('assist.show.sql');
+          huePubSub.publish('assist.db.search', entry.value);
+        }
+      };
+
+      var CATEGORIES = {
+        'table': '${ _('Tables') }',
+        'database': '${ _('Databases') }',
+        'field': '${ _('Columns') }',
+        'partition': '${ _('Partitions') }',
+        'view': '${ _('Views') }'
+      };
+
+      GlobalSearch.prototype.fetchResults = function (query) {
+        var self = this;
+        self.loading(true);
+        self.searchResultVisible(true);
+        self.apiHelper.globalSearchAutocomplete({
+          query:  query,
+          successCallback: function (data) {
+            var categories = [];
+            if (data.resultHuedocuments && data.resultHuedocuments.length) {
+              var docCategory = {
+                label: '${ _('Documents') }',
+                result: []
+              };
+              data.resultHuedocuments.forEach(function (doc) {
+                docCategory.result.push({
+                  label: doc.hue_name,
+                  type: 'document',
+                  data: doc
+                })
+              });
+              categories.push(docCategory);
+            }
+
+            if (data.results && data.results.length) {
+              var newCategories = {};
+              data.results.forEach(function (result) {
+                var typeLower = result.type.toLowerCase();
+                if (CATEGORIES[typeLower]) {
+                  var category = newCategories[typeLower];
+                  if (!category) {
+                    category = {
+                      label: CATEGORIES[typeLower],
+                      result: []
+                    };
+                    newCategories[typeLower] = category;
+                  }
+                  category.result.push({
+                    label: result.hue_name || result.originalName,
+                    type: typeLower,
+                    data: result
+                  })
+                }
+              });
+
+              Object.keys(newCategories).forEach(function (key) {
+                categories.push(newCategories[key]);
+              });
+            }
+            self.selectedIndex(undefined);
+            self.searchResultCategories(categories);
+            self.loading(false);
+          },
+          silenceErrors: true,
+          errorCallback: function () {
+            self.searchResultCategories([]);
+          }
+        });
+      };
+
+      ko.components.register('hue-global-search', {
+        viewModel: GlobalSearch,
+        template: {element: 'hue-global-search-template'}
+      });
+    })();
+  </script>
+
+  <script type="text/html" id="hue-global-search-old-template">
+    <input placeholder="${ _('Search data and saved documents...') }" type="text"
+           data-bind="autocomplete: {
+                source: searchAutocompleteSource,
+                itemTemplate: 'top-search-autocomp-item',
+                noMatchTemplate: 'top-search-autocomp-no-match',
+                classPrefix: 'nav-',
+                showOnFocus: true,
+                closeOnEnter: false,
+                onSelect: mainSearchSelect,
+                reopenPattern: /.*:$/
+              },
+              hasFocus: searchHasFocus,
+              clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
+              textInput: searchInput,
+              valueUpdate: 'afterkeydown'">
+  </script>
+
+  <script type="text/html" id="top-search-autocomp-item">
+    <a href="javascript:void(0);">
+      <div class="nav-autocomplete-item-link">
+        <div class="nav-search-result-icon"><i class="fa fa-fw" data-bind="css: icon"></i></div>
+        <div class="nav-search-result-text">
+          <div class="nav-search-result-header" data-bind="html: label, style: { 'padding-top': description ? 0 : '9px' }"></div>
+          <!-- ko if: description -->
+          <div class="nav-search-result-description" data-bind="html: description"></div>
+          <!-- /ko -->
+        </div>
+      </div>
+    </a>
+  </script>
+
+  <script type="text/html" id="top-search-autocomp-no-match">
+    <div class="nav-autocomplete-item-link" style="height: 30px;">
+      <div class="nav-autocomplete-empty">${ _('No match found') }</div>
+    </div>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+
+      var SEARCH_FACET_ICON = 'fa-tags';
+      var SEARCH_TYPE_ICONS = {
+        'DATABASE': 'fa-database',
+        'TABLE': 'fa-table',
+        'VIEW': 'fa-eye',
+        'FIELD': 'fa-columns',
+        'PARTITION': 'fa-th',
+        'SOURCE': 'fa-server',
+        'OPERATION': 'fa-cogs',
+        'OPERATION_EXECUTION': 'fa-cog',
+        'DIRECTORY': 'fa-folder-o',
+        'FILE': 'fa-file-o',
+        'SUB_OPERATION': 'fa-code-fork',
+        'COLLECTION': 'fa-search',
+        'HBASE': 'fa-th-large',
+        'HUE': 'fa-file-o'
+      };
+
+      var GlobalSearchOld = function (params) {
+        var self = this;
+        self.apiHelper = ApiHelper.getInstance();
+        self.searchHasFocus = ko.observable(false);
+        self.searchInput = ko.observable();
+        self.searchActive = ko.observable(false);
+      };
+
+      GlobalSearchOld.prototype.mainSearchSelect = function (entry) {
+        if (entry.data && entry.data.link) {
+          huePubSub.publish('open.link', entry.data.link);
+        } else if (!/:\s*$/.test(entry.value)) {
+          huePubSub.publish('assist.show.sql');
+          huePubSub.publish('assist.db.search', entry.value);
+        }
+      };
+
+      GlobalSearchOld.prototype.searchAutocompleteSource = function (request, callback) {
+        var apiHelper = ApiHelper.getInstance();
+        // TODO: Extract complete contents to common module (shared with nav search autocomplete)
+        var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
+        var isFacet = facetMatch !== null;
+        var partialMatch = isFacet ? null : request.term.match(/\S+$/);
+        var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
+        var beforePartial = request.term.substring(0, request.term.length - partial.length);
+
+        apiHelper.globalSearchAutocomplete({
+          query:  request.term,
+          successCallback: function (data) {
+            var values = [];
+            var facetPartialRe = new RegExp(partial.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i'); // Protect for 'tags:*axe'
+
+            if (typeof data.resultsHuedocuments !== 'undefined') {
+              data.resultsHuedocuments.forEach(function (result) {
+                values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description, link: result.link }, value: beforePartial + result.originalName });
+              });
+            }
+            if (values.length > 0) {
+              values.push({ divider: true });
+            }
+
+            if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
+              var facetInQuery = facetMatch[1];
+              if (typeof data.facets[facetInQuery] !== 'undefined') {
+                $.map(data.facets[facetInQuery], function (count, value) {
+                  if (facetPartialRe.test(value)) {
+                    values.push({ data: { label: facetInQuery + ':' + value, icon: SEARCH_FACET_ICON, description: count }, value: beforePartial + value})
+                  }
+                });
+              }
+            } else {
+              if (typeof data.facets !== 'undefined') {
+                Object.keys(data.facets).forEach(function (facet) {
+                  if (facetPartialRe.test(facet)) {
+                    if (Object.keys(data.facets[facet]).length > 0) {
+                      values.push({ data: { label: facet + ':', icon: SEARCH_FACET_ICON, description: $.map(data.facets[facet], function (key, value) { return value + ' (' + key + ')'; }).join(', ') }, value: beforePartial + facet + ':'});
+                    } else { // Potential facet from the list
+                      values.push({ data: { label: facet + ':', icon: SEARCH_FACET_ICON, description: '' }, value: beforePartial + facet + ':'});
+                    }
+                  } else if (partial.length > 0) {
+                    Object.keys(data.facets[facet]).forEach(function (facetValue) {
+                      if (facetValue.indexOf(partial) !== -1) {
+                        values.push({ data: { label: facet + ':' + facetValue, icon: SEARCH_FACET_ICON, description: facetValue }, value: beforePartial + facet + ':' + facetValue });
+                      }
+                    });
+                  }
+                });
+              }
+            }
+
+            if (values.length > 0) {
+              values.push({ divider: true });
+            }
+            if (typeof data.results !== 'undefined') {
+              data.results.forEach(function (result) {
+                values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
+              });
+            }
+
+            if (values.length > 0 && values[values.length - 1].divider) {
+              values.pop();
+            }
+            if (values.length === 0) {
+              values.push({ noMatch: true });
+            }
+            callback(values);
+          },
+          silenceErrors: true,
+          errorCallback: function () {
+            callback([]);
+          }
+        });
+      };
+
+      ko.components.register('hue-global-search-old', {
+        viewModel: GlobalSearchOld,
+        template: {element: 'hue-global-search-old-template'}
       });
     })();
   </script>

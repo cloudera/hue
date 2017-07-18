@@ -68,10 +68,12 @@ def is_alive(request):
 
 def hue(request):
   apps = appmanager.get_apps_dict(request.user)
+  current_app, other_apps, apps_list = _get_apps(request.user, '')
   default_cluster_index, default_cluster_interface = Cluster(request.user).get_list_interface_indexes()
 
   return render('hue.mako', request, {
     'apps': apps,
+    'other_apps': other_apps,
     'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
     'leaflet': {
@@ -144,6 +146,10 @@ def path_forbidden(request):
   return render('403.mako', request, {
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
+
+def log_js_error(request):
+  LOG.error('JS ERROR: ' + request.POST.get('jserror', 'Unspecified JS error'))
+  return JsonResponse({'status': 0})
 
 
 @access_log_level(logging.WARN)
@@ -321,8 +327,11 @@ def jasmine(request):
   return render('jasmine.mako', request, None)
 
 
-def ace_sql_worker(request):
-  return HttpResponse(render('ace_sql_worker.mako', request, None), content_type="application/javascript")
+def ace_sql_location_worker(request):
+  return HttpResponse(render('ace_sql_location_worker.mako', request, None), content_type="application/javascript")
+
+def ace_sql_syntax_worker(request):
+  return HttpResponse(render('ace_sql_syntax_worker.mako', request, None), content_type="application/javascript")
 
 def assist_m(request):
   return render('assist_m.mako', request, None)

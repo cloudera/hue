@@ -114,6 +114,7 @@ if USE_NEW_EDITOR.get():
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 
+  <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   <script src="${ static('desktop/js/hue.utils.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.migration.js') }"></script>
@@ -480,12 +481,14 @@ ${ hueIcons.symbols() }
              <ul role="menu" class="dropdown-menu">
                <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a></li>
                <li><a href="${ url('search:admin_collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-tags" style="vertical-align: middle"></i>${ _('Dashboards') }</a></li>
-               <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
                <%!
                  from indexer.conf import ENABLE_NEW_INDEXER
                %>
                % if ENABLE_NEW_INDEXER.get():
-                 <li><a href="${ url('indexer:indexer') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Index') }</a></li>
+                 <li><a href="${ url('indexer:indexes') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
+                 <li><a href="${ url('indexer:indexes') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Index') }</a></li>
+               % else:
+                 <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
                % endif
                <li class="divider"></li>
                % for collection in collections:

@@ -62,7 +62,7 @@ var ApiHelper = (function () {
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
   var CONFIG_APPS_API = '/desktop/api/configurations';
-  var SOLR_COLLECTIONS_API = '/indexer/api/collections/';
+  var SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
   var HBASE_API_PREFIX = '/hbase/api/';
   var SAVE_TO_FILE = '/filebrowser/save';
 
@@ -541,7 +541,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchSolrCollections = function (options) {
     var self = this;
-    var url = SOLR_COLLECTIONS_API + '?format=json';
+    var url = SOLR_COLLECTIONS_API;
     var fetchFunction = function (storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
@@ -550,6 +550,7 @@ var ApiHelper = (function () {
       $.ajax({
         dataType: "json",
         url: url,
+        type: 'POST',
         timeout: options.timeout,
         success: function (data) {
           if (!data.error && !self.successResponseIsError(data) && typeof data.collections !== 'undefined' && data.collections !== null) {
@@ -679,7 +680,7 @@ var ApiHelper = (function () {
     if (options.uuid) {
       id += options.uuid;
     }
-    if (options.type) {
+    if (options.type && options.type !== 'all') {
       id += options.type;
     }
 
@@ -700,7 +701,7 @@ var ApiHelper = (function () {
       uuid: options.uuid
     };
 
-    if (options.type) {
+    if (options.type && options.type !== 'all') {
       data.type = ['directory', options.type];
     }
 
@@ -1314,7 +1315,7 @@ var ApiHelper = (function () {
     var self = this;
     var identifierChainClone = options.identifierChain.concat();
     var path = [];
-    if (! self.containsDatabase(options.sourceType, identifierChainClone[0].name)) {
+    if (identifierChainClone.length === 0 || ! self.containsDatabase(options.sourceType, identifierChainClone[0].name)) {
       path.push(options.defaultDatabase);
     } else {
       path.push(identifierChainClone.shift().name)

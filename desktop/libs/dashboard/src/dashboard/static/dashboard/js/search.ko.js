@@ -683,10 +683,6 @@ var Collection = function (vm, collection) {
         return _fields;
       });
 
-      if (typeof facets_form != 'undefined' && typeof facets_form.aggregate != 'undefined') {
-        facet.properties.facets_form.aggregate.percentiles = ko.mapping.fromJS([{'value': 50}]);
-      }
-
       facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
         vm.getFacetFromQuery(facet.id()).resultHash('');
         vm.search();
@@ -718,7 +714,7 @@ var Collection = function (vm, collection) {
     }
     if (typeof facet.properties.facets != 'undefined') {
       $.each(facet.properties.facets(), function (index, pivotFacet) {
-        if (pivotFacet.aggregate) {
+        if (pivotFacet.aggregate && pivotFacet.aggregate.function) {
           pivotFacet.aggregate.function.subscribe(function () {
             vm.search();
           });
@@ -916,7 +912,8 @@ var Collection = function (vm, collection) {
 
     facet.properties.facets_form.aggregate.function('count');
     facet.properties.facets_form.aggregate.ops.removeAll();
-    facet.properties.facets_form.aggregate.percentiles(ko.mapping.fromJS([{'value': 50}]));
+    facet.properties.facets_form.aggregate.percentiles.removeAll();
+    facet.properties.facets_form.aggregate.percentiles.push({'value': 50});
 
     if (pivot != null) {
       pivot.aggregate.function.subscribe(function() {
@@ -1225,9 +1222,7 @@ var Collection = function (vm, collection) {
         collection: ko.mapping.toJSON(self),
         engine: self.engine()
       }, function (data) {
-        if (data.status == 0) {
-          self.nested.enabled(data.has_nested_documents);
-        }
+        self.nested.enabled(data.status == 0 && data.has_nested_documents);
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
 
@@ -1410,7 +1405,7 @@ var NewTemplate = function (vm, initial) {
     vm.isSyncingCollections(true);
     $.post("/dashboard/get_collections", {
         collection: ko.mapping.toJSON(vm.collection),
-        show_all: ko.mapping.toJSON(vm.showCores)
+        show_all: false
       }, function (data) {
         if (data.status == 0) {
           // Sync new and old names
@@ -1575,10 +1570,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
     });
 
-    self.showCores = ko.observable(false);
-    self.showCores.subscribe(function (newValue) {
-      self.initial.syncCollections();
-    });
     self.isSyncingCollections = ko.observable(false);
 
     self.isPlayerMode = ko.observable(false);
@@ -2359,7 +2350,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
       if (typeof facet.properties.facets != 'undefined') {
         $.each(facet.properties.facets(), function (index, pivotFacet) {
-          if (pivotFacet.aggregate) {
+          if (pivotFacet.aggregate && pivotFacet.aggregate.function) {
             pivotFacet.aggregate.function.subscribe(function () {
               vm.search();
             });
@@ -2403,7 +2394,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.isRetrievingResults(false);
     self.hasRetrievedResults(true);
     self.asyncSearchesCounter([]);
-    self.showCores(false);
     self.isSyncingCollections(false);
     self.isPlayerMode(false);
 

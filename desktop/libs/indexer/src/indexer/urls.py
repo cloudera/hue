@@ -17,19 +17,50 @@
 
 from django.conf.urls import patterns, url
 
-urlpatterns = patterns('indexer.views',
-  url(r'^$', 'collections', name='collections'),
-  url(r'^install_examples$', 'install_examples', name='install_examples'),
-  
-  # V2
-  url(r'^indexes/$', 'indexes', name='indexes'),
+from indexer.conf import ENABLE_NEW_INDEXER
 
-  # V3
-  url(r'^indexer/$', 'indexer', name='indexer'),
+
+urlpatterns = patterns('indexer.views',
+  url(r'^install_examples$', 'install_examples', name='install_examples'),
+
   url(r'^importer/$', 'importer', name='importer'),
   url(r'^importer/prefill/(?P<source_type>[^/]+)/(?P<target_type>[^/]+)/(?P<target_path>[^/]+)?$', 'importer_prefill', name='importer_prefill'),
 )
 
+if ENABLE_NEW_INDEXER.get():
+  urlpatterns += patterns('indexer.views',
+    url(r'^$', 'indexes', name='indexes'),
+    url(r'^indexes/$', 'indexes', name='indexes'),
+    url(r'^indexes/(?P<index>\w+)/?$', 'indexes', name='indexes'),
+    url(r'^collections$', 'collections', name='collections'), # Old page
+  )
+else:
+  urlpatterns += patterns('indexer.views',
+    url(r'^$', 'collections', name='collections'),
+    url(r'^indexes/$', 'indexes', name='indexes'),
+  )
+
+urlpatterns += patterns('indexer.solr_api',
+  # V2
+  url(r'^api/aliases/create/$', 'create_alias', name='create_alias'),
+  url(r'^api/configs/list/$', 'list_configs', name='list_configs'),
+  url(r'^api/index/list/$', 'list_index', name='list_index'),
+  url(r'^api/indexes/list/$', 'list_indexes', name='list_indexes'),
+  url(r'^api/indexes/create/$', 'create_index', name='create_index'),
+  url(r'^api/indexes/sample/$', 'sample_index', name='sample_index'),
+  url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes'),
+)
+
+urlpatterns += patterns('indexer.api3',
+  # Importer
+  url(r'^api/indexer/guess_format/$', 'guess_format', name='guess_format'),
+  url(r'^api/indexer/guess_field_types/$', 'guess_field_types', name='guess_field_types'),
+
+  url(r'^api/importer/submit', 'importer_submit', name='importer_submit')
+)
+
+
+# Deprecated
 urlpatterns += patterns('indexer.api',
   url(r'^api/fields/parse/$', 'parse_fields', name='api_parse_fields'),
   url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete'),
@@ -40,24 +71,4 @@ urlpatterns += patterns('indexer.api',
   url(r'^api/collections/(?P<collection>[^/]+)/fields/$', 'collections_fields', name='api_collections_fields'),
   url(r'^api/collections/(?P<collection>[^/]+)/update/$', 'collections_update', name='api_collections_update'),
   url(r'^api/collections/(?P<collection>[^/]+)/data/$', 'collections_data', name='api_collections_data'),
-)
-
-
-urlpatterns += patterns('indexer.api2',
-  # V2
-  url(r'^api/aliases/create_or_edit/$', 'create_or_edit_alias', name='create_or_edit_alias'),
-  url(r'^api/indexes/create/$', 'create_index', name='create_index'),
-  url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes'),
-  url(r'^api/indexes/create_wizard_get_sample/$', 'create_wizard_get_sample', name='create_wizard_get_sample'),
-  url(r'^api/indexes/create_wizard_create/$', 'create_wizard_create', name='create_wizard_create'),
-  url(r'^api/indexes/(?P<index>\w+)/schema/$', 'design_schema', name='design_schema')
-)
-
-urlpatterns += patterns('indexer.api3',
-  # V3
-  url(r'^api/indexer/guess_format/$', 'guess_format', name='guess_format'),
-  url(r'^api/indexer/index_file/$', 'index_file', name='index_file'),
-  url(r'^api/indexer/guess_field_types/$', 'guess_field_types', name='guess_field_types'),
-
-  url(r'^api/importer/submit', 'importer_submit', name='importer_submit')
 )

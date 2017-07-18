@@ -221,6 +221,7 @@ class Job(object):
     jobid = self.id
 
     setattr(self, 'status', self.state)
+    setattr(self, 'jobName', self.name)
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', self.jobId.replace('job_', ''))
     setattr(self, 'is_retired', False)
@@ -468,7 +469,9 @@ class Attempt:
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
-      params = {}
+      params = {
+        'doAs': user
+      }
       if int(offset) != 0:
         params['start'] = offset
 

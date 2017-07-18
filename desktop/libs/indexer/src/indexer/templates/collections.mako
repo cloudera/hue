@@ -62,12 +62,6 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
 <div class="navbar hue-title-bar nokids">
   <div class="navbar-inner">
     <div class="container-fluid">
-      <div class="pull-right">
-        <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '/home?type=search-dashboard')" or url('dashboard:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-          <i class="fa fa-tags"></i> ${ _('Dashboards') }
-        </a>
-      </div>
-
       <div class="nav-collapse">
         <ul class="nav">
           <li class="app-header">
@@ -366,7 +360,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
     <ul class="nav nav-list">
       <li class="nav-header">${_('Actions')}</li>
       <li><a data-bind="hueLink: '/search/browse/' + collection().name()"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
-      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Index file')}</a></li>
+      <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Add data')}</a></li>
       <li><a data-bind="visible: !collection().isCoreOnly()" href="#deleteCollection" data-toggle="modal"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
     </ul>
   </div>

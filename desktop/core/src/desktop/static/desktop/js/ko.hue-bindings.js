@@ -81,20 +81,24 @@
 
   ko.bindingHandlers.hueLink = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-      if (IS_HUE_4) {
-        ko.bindingHandlers.click.init(element, function() {
-          return function (data, event) {
-            var url = ko.unwrap(valueAccessor());
+      ko.bindingHandlers.click.init(element, function () {
+        return function (data, event) {
+          var url = ko.unwrap(valueAccessor());
+          if (url) {
+            var prefix = '';
+            if (IS_HUE_4) {
+              prefix = '/hue' + (url.indexOf('/') === 0 ? '' : '/');
+            }
             if ($(element).attr('target')) {
-              window.open('/hue' + (url.indexOf('/') === 0 ? url : '/' + url), $(element).attr('target'));
+              window.open(prefix + url, $(element).attr('target'));
             } else if (event.ctrlKey || event.metaKey || event.which === 2) {
-              window.open('/hue' + (url.indexOf('/') === 0 ? url : '/' + url), '_blank');
+              window.open(prefix + url, '_blank');
             } else {
               huePubSub.publish('open.link', url);
             }
           }
-        }, allBindings, viewModel, bindingContext);
-      }
+        }
+      }, allBindings, viewModel, bindingContext);
 
       ko.bindingHandlers.hueLink.update(element, valueAccessor);
     },
@@ -110,7 +114,6 @@
         $(element).attr('href', 'javascript: void(0);');
       }
     }
-
   };
 
   ko.bindingHandlers.clickToCopy = {
@@ -2096,6 +2099,9 @@
         },
         drag: function (event, ui) {
           var currentHeight = ui.offset.top - $target.offset().top - 20;
+          if (options.minHeight && currentHeight < options.minHeight) {
+            currentHeight = options.minHeight;
+          }
           $.totalStorage('hue.editor.logs.size', currentHeight);
           $target.css("height", currentHeight + "px");
           ui.offset.top = 0;
@@ -2430,14 +2436,25 @@
     }
   };
 
-  ko.bindingHandlers.clickOutside = {
-    init: function (element, valueAccessor) {
-      var func = valueAccessor();
+  ko.bindingHandlers.onClickOutside = {
+    update: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var options = valueAccessor();
+      var func = (typeof options === 'function') ? options : options.onOutside;
 
-      $(document).on('click', function (event) {
+      var onDocumentClick = function (event) {
         if ($.contains(document, event.target) && !$.contains(element, event.target)) {
-          func();
+          var result = func.bind(viewModel)();
+          if (typeof result === 'undefined' || result) {
+            $(document).off('click', onDocumentClick);
+          }
         }
+      };
+
+      $(document).off('click', onDocumentClick);
+      $(document).on('click', onDocumentClick);
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        $(document).off('click', onDocumentClick);
       });
     }
   };
@@ -2565,9 +2582,11 @@
 
   ko.bindingHandlers.tooltip = {
     after: ['attr'],
-    init: function (element, valueAccessor) {
+    update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
       var local = ko.utils.unwrapObservable(valueAccessor()),
           options = {};
+
+      $(element).tooltip("destroy");
 
       ko.utils.extend(options, local);
 
@@ -2581,11 +2600,6 @@
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         $(element).tooltip("destroy");
       });
-    },
-    update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-      var options = ko.utils.unwrapObservable(valueAccessor());
-      var self = $(element);
-      self.tooltip(options);
     }
   };
 
@@ -3262,11 +3276,16 @@
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var _el = $(element);
       var _options = ko.unwrap(valueAccessor());
+      var disableUTC = _options.disableUTC || false;
       _el.datepicker({
         format: "yyyy-mm-dd"
       }).on("show", function (e) {
         if (_options.momentFormat) {
-          _el.datepicker("setValue", moment(_el.val()).utc().format("YYYY-MM-DD"));
+          var m = moment(_el.val());
+          if (!disableUTC) {
+            m = m.utc();
+          }
+          _el.datepicker("setValue", m.format("YYYY-MM-DD"));
         }
       }).on("changeDate", function (e) {
         setDate(e.date);
@@ -3276,7 +3295,11 @@
 
       function setDate(d) {
         if (_options.momentFormat) {
-          _el.val(moment(d).utc().format(_options.momentFormat));
+          var m = moment(d);
+          if (!disableUTC) {
+            m = m.utc();
+          }
+          _el.val(m.format(_options.momentFormat));
         }
         allBindings().value(_el.val());
       }
@@ -3367,6 +3390,7 @@
       self.editor = editor;
       self.editorId = editorId;
       self.snippet = snippet;
+      self.aceSqlSyntaxWorker = null;
 
       self.disposeFunctions = [];
 
@@ -3487,8 +3511,12 @@
           totalStatementCount: lastKnownStatements.length,
           precedingStatements: precedingStatements,
           activeStatement: activeStatement,
-          followingStatements: followingStatements,
+          followingStatements: followingStatements
         });
+
+        if (activeStatement) {
+          self.checkForSyntaxErrors(activeStatement.location, cursorPosition);
+        }
       };
 
       var parseForStatements = function () {
@@ -3550,12 +3578,117 @@
       });
     };
 
+    AceLocationHandler.prototype.clearMarkedErrors = function () {
+      var self = this;
+      for (var marker in self.editor.session.$backMarkers) {
+        if (self.editor.session.$backMarkers[marker].clazz.indexOf('hue-ace-syntax-') === 0) {
+          var token = self.editor.session.$backMarkers[marker].token;
+          delete token.syntaxError;
+          self.editor.session.removeMarker(self.editor.session.$backMarkers[marker].id);
+        }
+      }
+    };
+
+    AceLocationHandler.prototype.checkForSyntaxErrors = function (statementLocation, cursorPosition) {
+      var self = this;
+      if (self.aceSqlSyntaxWorker !== null) {
+        self.clearMarkedErrors();
+        var AceRange = ace.require('ace/range').Range;
+        var beforeCursor = self.editor.session.getTextRange(new AceRange(statementLocation.first_line - 1, statementLocation.first_column, cursorPosition.row, cursorPosition.column));
+        var afterCursor = self.editor.session.getTextRange(new AceRange(cursorPosition.row, cursorPosition.column, statementLocation.last_line - 1, statementLocation.last_column));
+        self.aceSqlSyntaxWorker.postMessage({ beforeCursor: beforeCursor, afterCursor: afterCursor, statementLocation: statementLocation, type: self.snippet.type() });
+      }
+    };
+
+    AceLocationHandler.prototype.attachSqlSyntaxWorker = function () {
+      var self = this;
+      if (window.Worker) {
+        self.aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?bust=' + Math.random());
+
+        self.aceSqlSyntaxWorker.onmessage = function(e) {
+          var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+
+          if (e.data.syntaxError && !suppressedRules[self.snippet.id() + e.data.syntaxError.ruleId]) {
+            if (hueDebug.showSyntaxParseResult) {
+              console.log(e.data.syntaxError);
+            }
+            var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
+            if (token) {
+              token.syntaxError = e.data.syntaxError;
+              var AceRange = ace.require('ace/range').Range;
+              var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
+              var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-error');
+              self.editor.session.$backMarkers[markerId].token = token;
+            } else {
+              console.warn("couldn't find a token at line: " + (e.data.syntaxError.loc.first_line - 1) + ", column: " + (e.data.syntaxError.loc.first_column + 1));
+            }
+          }
+        };
+        huePubSub.publish('editor.refresh.statement.locations', self.snippet);
+      }
+    };
+
+    AceLocationHandler.prototype.detachSqlSyntaxWorker = function () {
+      var self = this;
+      if (self.aceSqlSyntaxWorker) {
+        self.aceSqlSyntaxWorker.terminate();
+        self.aceSqlSyntaxWorker = null;
+      }
+      self.clearMarkedErrors();
+    };
+
+    AceLocationHandler.prototype.verifyExists = function (token) {
+      var self = this;
+
+      // the syntax worker is only defined when syntax check is on
+      // TODO: Only do this when browser caching is turned on
+      if (self.aceSqlSyntaxWorker && token.parseLocation && token.parseLocation.identifierChain) {
+        // We want to check the parent to see if it contains the entry for performance, as opposed to checking
+        // each entry with the API.
+        ApiHelper.getInstance().fetchAutocomplete({
+          sourceType: self.snippet.type(),
+          identifierChain: token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1),
+          defaultDatabase: self.snippet.database(),
+          silenceErrors: true,
+          errorCallback: function (data) {
+            console.log('error');
+            console.log(data);
+          },
+          successCallback: function (data) {
+            if (token.parseLocation.type === 'table' && data.tables_meta) {
+              var tableLowerCase = token.value.toLowerCase();
+              for (var i = 0; i < data.tables_meta.length; i++) {
+                if (data.tables_meta[i].name.toLowerCase() === tableLowerCase) {
+                  break;
+                }
+                if (i + 1 === data.tables_meta.length) {
+                  token.notFound = true;
+                  ApiHelper.getInstance().identifierChainToPath({
+                    identifierChain: token.parseLocation.identifierChain,
+                    sourceType: self.snippet.type(),
+                    defaultDatabase: self.snippet.database()
+                  }, function (path) {
+                    token.notFound = true;
+                    token.qualifiedIdentifier = path.join('.');
+                    var AceRange = ace.require('ace/range').Range;
+                    var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
+                    var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
+                    self.editor.session.$backMarkers[markerId].token = token;
+                  })
+                }
+              }
+            }
+          }
+        });
+      }
+    };
+
     AceLocationHandler.prototype.attachSqlWorker = function () {
       var self = this;
 
       var apiHelper = ApiHelper.getInstance();
       var activeTokens = [];
-      var aceSqlWorker = new Worker('/desktop/workers/aceSqlWorker.js');
+      var aceSqlWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?bust=' + Math.random());
       var workerIsReady = false;
 
       self.disposeFunctions.push(function () {
@@ -3626,11 +3759,12 @@
                     silenceErrors: true,
                     successCallback: function (data) {
                       try {
-                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name) !== -1) {
+                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
                           location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
                           delete location.tables;
                           token.parseLocation = location;
                           activeTokens.push(token);
+                          self.verifyExists(token);
                         } else if (tablesToGo.length > 0) {
                           findIdentifierChainInTable(tablesToGo);
                         }
@@ -3641,11 +3775,18 @@
                   findIdentifierChainInTable(tablesToGo);
                 }
               };
-
-              findIdentifierChainInTable(location.tables.concat());
+              if (location.tables.length > 1) {
+                findIdentifierChainInTable(location.tables.concat());
+              } else if (location.tables.length == 1 && location.tables[0].identifierChain) {
+                location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
+                delete location.tables;
+                token.parseLocation = location;
+                activeTokens.push(token);
+              }
             } else {
               token.parseLocation = location;
               activeTokens.push(token);
+              self.verifyExists(token);
             }
           }
         });
@@ -3680,6 +3821,7 @@
 
     AceLocationHandler.prototype.dispose = function () {
       var self = this;
+      self.detachSqlSyntaxWorker();
       self.disposeFunctions.forEach(function (dispose) {
         dispose();
       })
@@ -3808,8 +3950,6 @@
         setShowGutter: true
       };
 
-      var errorHighlightingEnabled = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'errorHighlightingEnabled', false);
-
       editor.customMenuOptions = {
         setEnableAutocompleter: function (enabled) {
           editor.setOption('enableBasicAutocompletion', enabled);
@@ -3849,12 +3989,23 @@
         }
       };
 
-      if (window.Worker) {
-        editor.customMenuOptions.setExperimentalErrorHighlighting = function (enabled) {
+      if (ENABLE_SQL_SYNTAX_CHECK && window.Worker) {
+        var errorHighlightingEnabled = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'errorHighlightingEnabled', true);
+
+        if (errorHighlightingEnabled) {
+          aceLocationHandler.attachSqlSyntaxWorker();
+        }
+
+        editor.customMenuOptions.setErrorHighlighting = function (enabled) {
           errorHighlightingEnabled = enabled;
           snippet.getApiHelper().setInTotalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
+          if (enabled) {
+            aceLocationHandler.attachSqlSyntaxWorker();
+          } else {
+            aceLocationHandler.detachSqlSyntaxWorker();
+          }
         };
-        editor.customMenuOptions.getExperimentalErrorHighlighting = function () {
+        editor.customMenuOptions.getErrorHighlighting = function () {
           return errorHighlightingEnabled;
         };
       }
@@ -4054,24 +4205,53 @@
             var endTestPosition = editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
             if (endTestPosition.column !== pointerPosition.column) {
               var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-              if (token !== null && token.parseLocation && !disableTooltip) {
+              if (token !== null && !token.notFound && token.parseLocation && !disableTooltip) {
                 tooltipTimeout = window.setTimeout(function () {
-                  var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                  if (token.parseLocation) {
+                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
 
-                  var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
-                  if (token.parseLocation.identifierChain) {
-                    tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) { return identifier.name }).join('.') + ')';
-                  } else if (token.parseLocation.function) {
-                    tooltipText += ' (' + token.parseLocation.function + ')';
+                    var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
+                    if (token.parseLocation.identifierChain) {
+                      tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) {
+                          return identifier.name
+                        }).join('.') + ')';
+                    } else if (token.parseLocation.function) {
+                      tooltipText += ' (' + token.parseLocation.function + ')';
+                    }
+                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                   }
-                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                }, 500);
+              } else if (token !== null && token.notFound) {
+                tooltipTimeout = window.setTimeout(function () {
+                  // TODO: i18n
+                  if (token.notFound) {
+                    var tooltipText = 'Could not find ' + (token.qualifiedIdentifier || token.value) + '';
+                    var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                    contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                  }
+                }, 500);
+              } else if (token !== null && token.syntaxError) {
+                tooltipTimeout = window.setTimeout(function () {
+                  // TODO: i18n
+                  if (token.syntaxError) {
+                    var tooltipText;
+                    if (token.syntaxError.expected.length > 0) {
+                      tooltipText = SyntaxCheckerGlobals.i18n.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                    } else if (token.syntaxError.expectedStatementEnd) {
+                      tooltipText = SyntaxCheckerGlobals.i18n.expectedStatementEnd;
+                    }
+                    if (tooltipText) {
+                      var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+                      contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                    }
+                  }
                 }, 500);
               } else {
                 hideContextTooltip();
               }
               if (lastHoveredToken !== token) {
                 clearActiveMarkers();
-                if (token !== null && token.parseLocation) {
+                if (token !== null && !token.notFound && token.parseLocation) {
                   markLocation(token.parseLocation);
                 }
                 lastHoveredToken = token;
@@ -4109,36 +4289,51 @@
           editor.container.removeEventListener('mouseout', mouseoutListener);
         });
 
-        var contextmenuListener = function (e) {
+        var onContextMenu = function (e) {
           var selectionRange = editor.selection.getRange();
           huePubSub.publish('sql.context.popover.hide');
+          huePubSub.publish('sql.syntax.dropdown.hide');
           if (selectionRange.isEmpty()) {
             var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
             var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-
-            if (token !== null && typeof token.parseLocation !== 'undefined') {
-              var range = markLocation(token.parseLocation);
+            if (token && (token.parseLocation || token.syntaxError)) {
+              var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
               var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
               var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
-              huePubSub.publish('sql.context.popover.show', {
-                data: token.parseLocation,
-                sourceType: snippet.type(),
-                defaultDatabase: snippet.database(),
-                pinEnabled: true,
-                source: {
-                  left: startCoordinates.pageX - 3,
-                  top: startCoordinates.pageY,
-                  right: endCoordinates.pageX - 3,
-                  bottom: endCoordinates.pageY + editor.renderer.lineHeight
-                }
-              });
+              var source = {
+                 // TODO: add element likely in the event
+                left: startCoordinates.pageX - 3,
+                top: startCoordinates.pageY,
+                right: endCoordinates.pageX - 3,
+                bottom: endCoordinates.pageY + editor.renderer.lineHeight
+              };
+
+              if (token.parseLocation && !token.notFound) {
+                huePubSub.publish('sql.context.popover.show', {
+                  data: token.parseLocation,
+                  sourceType: snippet.type(),
+                  defaultDatabase: snippet.database(),
+                  pinEnabled: true,
+                  source: source
+                });
+              } else if (token.syntaxError) {
+                huePubSub.publish('sql.syntax.dropdown.show', {
+                  snippet: snippet,
+                  data: token.syntaxError,
+                  editor: editor,
+                  range: range,
+                  sourceType: snippet.type(),
+                  defaultDatabase: snippet.database(),
+                  source: source
+                });
+              }
               e.preventDefault();
               return false;
             }
           }
         };
 
-        var contextmenuListener = editor.container.addEventListener('contextmenu', contextmenuListener);
+        var contextmenuListener = editor.container.addEventListener('contextmenu', onContextMenu);
 
         disposeFunctions.push(function () {
           editor.container.removeEventListener('contextmenu', contextmenuListener);

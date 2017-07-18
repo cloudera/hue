@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
-  from indexer.conf import ENABLE_NEW_INDEXER
+  from indexer.conf import ENABLE_NEW_INDEXER, CONFIG_INDEXER_LIBS_PATH
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -31,7 +31,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 ## TODO lot of those re-imported
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
@@ -453,14 +453,7 @@ ${ assist.assistPanel() }
             </thead>
             <tbody data-bind="foreach: createWizard.source.sample">
             <tr data-bind="foreach: $data">
-              ##<!-- ko if: $index() < $root.createWizard.source.columns().length -->
-              ##<td data-bind="visible: $root.createWizard.source.columns()[$index()].keep, text: $data"></td>
               <td data-bind="truncatedText: $data"></td>
-
-              ##<!-- ko with: $root.createWizard.source.columns()[$index()] -->
-              ##  <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
-              ##<!-- /ko -->
-              ##<!-- /ko -->
             </tr>
             </tbody>
           </table>
@@ -507,7 +500,7 @@ ${ assist.assistPanel() }
               <!-- ko if: outputFormat() != 'index' -->
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
               <!-- /ko -->
-              <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" target="_blank" title="${ _('Open') }"></a>
+              <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" title="${ _('Open') }"></a>
             </span>
           </div>
         </div>
@@ -652,6 +645,76 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             </label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: outputFormat() == 'index' -->
+        <div class="card step">
+          <h3 class="card-heading simple">${_('Properties')}</h3>
+          <div class="card-body">
+            <div class="control-group">
+              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }">
+                <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
+              </label>
+
+              <label for="path" class="control-label" data-bind="visible: indexerRunJob"><div>${ _('Libs') }</div>
+                <input type="text" class="form-control path input-xxlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+              </label>
+              <!-- ko if: indexerRunJob() && indexerJobLibPath().length > 0 -->
+                <a data-bind="hueLink: '/filebrowser/view=' + indexerJobLibPath()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
+                  <i class="fa fa-external-link-square"></i>
+                </a>
+              <!-- /ko -->
+            </div>
+
+            <div class="control-group">
+              <label for="kuduPks" class="control-label"><div>${ _('Primary key') }</div>
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: indexerPrimaryKey, selectedObjects: indexerPrimaryKeyObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label for="kuduPks" class="control-label"><div>${ _('Default field') }</div>
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: indexerDefaultField, selectedObjects: indexerDefaultFieldObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label"><div>${ _('Extras') }</div>
+                <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+                  <i class="fa fa-sliders fa-padding-top"></i>
+                </a>
+              </label>
+            </div>
+
+            <span data-bind="visible: showProperties">
+              <div class="control-group">
+                <label for="destinationFormat" class="control-label"><div>${ _('Config set') }</div>
+                  <select id="destinationFormat" data-bind="selectize: indexerConfigSets, value: indexerConfigSet, optionsValue: 'value', optionsText: 'name'"></select>
+                </label>
+              </div>
+
+              <div class="control-group">
+                <label for="indexerNumShards" class="control-label"><div>${ _('Num shards') }</div>
+                  <input type="number" class="input-small" placeholder="1" data-bind="value: indexerNumShards">
+                </label>
+              </div>
+
+              <div class="control-group">
+                <label for="indexerReplicationFactor" class="control-label"><div>${ _('Replication factor') }</div>
+                  <input type="number" class="input-small" placeholder="1" data-bind="value: indexerReplicationFactor">
+                </label>
+              </div>
+
+              ## Router, maxShardsPer, shards, routerField
+
+              <div class="control-group" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
+                <label class="checkbox inline-block">
+                  <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as header')}
+                </label>
+              </div>
+            </span>
           </div>
         </div>
         <!-- /ko -->
@@ -811,17 +874,8 @@ ${ assist.assistPanel() }
     <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
       <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
     <!-- /ko -->
-    <!-- ko if: $root.createWizard.source.inputFormat() != 'manual' && level() == 0 && (typeof isPartition === 'undefined' || !isPartition()) -->
-      <!-- ko if: $root.createWizard.source.sample() && $root.createWizard.source.sample().length > 0 -->
-        <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]"></div>
-        <!-- ko if: $root.createWizard.source.sample().length > 1 -->
-        <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]"></div>
-        <!-- /ko -->
-      <!-- /ko -->
-      <!-- ko if: !$root.createWizard.source.sample() || $root.createWizard.source.sample().length === 0 -->
-      <div class="inline-block muted field-content-preview">${ _("No sample to be shown") }</div>
-      <!-- /ko -->
-    <!-- /ko -->
+
+    <div class="inline-block" data-bind="template: { name:'field-column-example' }"></div>
 
     <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
       <div class="operation" data-bind="template: { name: 'table-field-template', foreach: nested }"></div>
@@ -852,8 +906,10 @@ ${ assist.assistPanel() }
   </span>
 
   <!-- ko if: operations().length == 0 -->
-  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
+  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation, visible: $root.createWizard.destination.indexerRunJob" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
   <!-- /ko -->
+
+  <div class="inline-block" data-bind="template: { name: 'field-column-example' }"></div>
 
   <div data-bind="foreach: operations">
     <div data-bind="template: { name:'operation-template',data:{operation: $data, list: $parent.operations}}"></div>
@@ -861,6 +917,22 @@ ${ assist.assistPanel() }
 
   <!-- ko if: operations().length > 0 -->
   <a class="pointer" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation to')} <span data-bind="text: name"></span></a>
+  <!-- /ko -->
+
+</script>
+
+
+<script type="text/html" id="field-column-example">
+  <!-- ko if: $root.createWizard.source.inputFormat() != 'manual' && level() == 0 && (typeof isPartition === 'undefined' || !isPartition()) -->
+    <!-- ko if: $root.createWizard.source.sample() && $root.createWizard.source.sample().length > 0 -->
+      <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]"></div>
+      <!-- ko if: $root.createWizard.source.sample().length > 1 -->
+      <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]"></div>
+      <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: !$root.createWizard.source.sample() || $root.createWizard.source.sample().length === 0 -->
+    <div class="inline-block muted field-content-preview">${ _("No sample to be shown") }</div>
+    <!-- /ko -->
   <!-- /ko -->
 </script>
 
@@ -876,7 +948,7 @@ ${ assist.assistPanel() }
     <!-- /ko -->
     <a class="pointer margin-left-20" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}" title="${ _('Remove') }"><i class="fa fa-times"></i></a>
     <div class="margin-left-20" data-bind="foreach: operation.fields">
-      <div data-bind="template: { name:'index-field-template', data:$data }" class="margin-top-10 field index-field"></div>
+      <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field index-field"></div>
     </div>
   </div>
 </script>
@@ -975,6 +1047,9 @@ ${ assist.assistPanel() }
         "long": "bigint",
         "double": "double",
         "date": "date"
+      },
+      HIVE_TO_SOLR: {
+        "bigint": "long"
       },
       get: function(type, key, defaultValue) {
         return type[key] || defaultValue
@@ -1199,7 +1274,7 @@ ${ assist.assistPanel() }
       self.table.subscribe(function(val) {
         resizeElements();
       });
-      self.apiHelperType = ko.observable('${ sourceType }');
+      self.apiHelperType = ko.observable('${ source_type }');
 
       // Queries
       self.query = ko.observable('');
@@ -1234,40 +1309,13 @@ ${ assist.assistPanel() }
           return true;
         }
       });
-
-      self.defaultName = ko.computed(function() {
-        var name = ''
-
-        if (self.inputFormat() == 'file') {
-          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
-
-          if (self.path()) {
-            name += '.' + self.path().split('/').pop().split('.')[0];
-          }
-        } else if (self.inputFormat() == 'table') {
-          if (self.table().split('.', 2).length == 2) {
-            name = self.table();
-          }
-        } else if (self.inputFormat() == 'query') {
-          if (self.query()) {
-            name = self.name();
-          }
-        } else if (self.inputFormat() == 'manual') {
-          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
-        }
-
-        return name.replace(/ /g, '_').toLowerCase();
-      });
-      self.defaultName.subscribe(function(newVal) {
-        vm.createWizard.destination.name(newVal);
-      });
     };
 
     var Destination = function (vm, wizard) {
       var self = this;
 
       self.name = ko.observable('').extend({throttle: 500});
-      self.name.subscribe(function(name) {
+      self.nameChanged = function(name) {
         var exists = false;
 
         if (name.length == 0) {
@@ -1285,7 +1333,10 @@ ${ assist.assistPanel() }
             $.get("/" + (self.apiHelperType() == 'hive' ? 'beeswax' : self.apiHelperType()) + "/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
               self.isTargetExisting(data.code != 500 && data.code != 404);
               self.isTargetChecking(false);
-            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
+            }).fail(function (xhr, textStatus, errorThrown) {
+              self.isTargetExisting(false);
+              self.isTargetChecking(false);
+            });
           }
           else {
             self.isTargetExisting(false);
@@ -1299,7 +1350,10 @@ ${ assist.assistPanel() }
             $.get("/" + (self.apiHelperType() == 'hive' ? 'beeswax' : self.apiHelperType()) + "/api/autocomplete/" + self.databaseName(), function (data) {
               self.isTargetExisting(data.tables_meta && data.tables_meta.length > 0);
               self.isTargetChecking(false);
-            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
+            }).fail(function (xhr, textStatus, errorThrown) {
+              self.isTargetExisting(false);
+              self.isTargetChecking(false);
+            });
           }
           else {
             self.isTargetExisting(false);
@@ -1308,21 +1362,36 @@ ${ assist.assistPanel() }
         }
         else if (self.outputFormat() == 'index') {
           $.post("/search/get_collection", {
-              name: self.name()
+              name: self.name(),
+              engine: 'solr'
           }, function (data) {
             self.isTargetExisting(data.status == 0);
             self.isTargetChecking(false);
-          }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
+          }).fail(function (xhr, textStatus, errorThrown) {
+            self.isTargetExisting(false);
+            self.isTargetChecking(false);
+          });
+          $.post("/indexer/api/configs/list/", function (data) {
+            if (data.status == 0) {
+              self.indexerConfigSets(data.configs.map(function (config) {
+                return {'name': config, 'value': config};
+              }));
+            } else {
+              $(document).trigger("error", data.message);
+            }
+          });
         }
         resizeElements();
-      });
+      };
+      self.name.subscribe(self.nameChanged);
 
-      self.apiHelperType = ko.observable('${ sourceType }');
+      self.apiHelperType = ko.observable('${ source_type }');
 
       self.description = ko.observable('');
       self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');
       self.outputFormat.subscribe(function (newValue) {
-        if (newValue && newValue != 'database' && (newValue == 'table' && wizard.source.path().length > 0)) {
+        if (newValue && newValue != 'database' && ((newValue == 'table' || newValue == 'index') && wizard.source.path().length > 0)) {
+          self.nameChanged(self.name());
           wizard.guessFieldTypes();
           resizeElements();
         }
@@ -1330,7 +1399,7 @@ ${ assist.assistPanel() }
       self.outputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
           % if ENABLE_NEW_INDEXER.get():
-          {'name': 'Solr index', 'value': 'index'},
+          {'name': 'Search index', 'value': 'index'},
           % endif
           {'name': 'File', 'value': 'file'},
           {'name': 'Database', 'value': 'database'},
@@ -1353,6 +1422,36 @@ ${ assist.assistPanel() }
         } else {
           vm.currentStep(1);
         }
+      });
+      self.defaultName = ko.computed(function() {
+        var name = ''
+
+        if (wizard.source.inputFormat() == 'file') {
+          if (self.outputFormat() == 'table') {
+            name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
+
+            if (wizard.source.path()) {
+              name += '.' + wizard.source.path().split('/').pop().split('.')[0];
+            }
+          } else { // Index
+            name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : wizard.source.path().split('/').pop().split('.')[0];
+          }
+        } else if (wizard.source.inputFormat() == 'table') {
+          if (wizard.source.table().split('.', 2).length == 2) {
+            name = wizard.source.table();
+          }
+        } else if (wizard.source.inputFormat() == 'query') {
+          if (wizard.source.query()) {
+            name = wizard.source.name();
+          }
+        } else if (wizard.source.inputFormat() == 'manual') {
+          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
+        }
+
+        return name.replace(/ /g, '_').toLowerCase();
+      });
+      self.defaultName.subscribe(function(newVal) {
+        self.name(newVal);
       });
 
       self.format = ko.observable();
@@ -1455,6 +1554,16 @@ ${ assist.assistPanel() }
       self.customRegexp = ko.observable('');
 
       // Index
+      self.indexerRunJob = ko.observable(false);
+      self.indexerJobLibPath = ko.observable('${ CONFIG_INDEXER_LIBS_PATH.get() }');
+      self.indexerConfigSet = ko.observable('');
+      self.indexerConfigSets = ko.observableArray([]);
+      self.indexerNumShards = ko.observable('');
+      self.indexerReplicationFactor = ko.observable(1);
+      self.indexerPrimaryKey = ko.observableArray();
+      self.indexerPrimaryKeyObject = ko.observableArray();
+      self.indexerDefaultField = ko.observableArray();
+      self.indexerDefaultFieldObject = ko.observableArray();
     };
 
     var CreateWizard = function (vm) {
@@ -1594,6 +1703,8 @@ ${ assist.assistPanel() }
           resp.columns.forEach(function (entry, i, arr) {
             if (self.destination.outputFormat() === 'table'){
               entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
+            } else if (self.destination.outputFormat() === 'index'){
+              entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);
             }
             arr[i] = loadField(entry, self.destination, i);
           });
@@ -1615,6 +1726,7 @@ ${ assist.assistPanel() }
         if (! self.readyToIndex()) {
           return;
         }
+        $(".jHueNotify").hide();
 
 %if not is_embeddable:
         self.indexingStarted(true);
@@ -1629,6 +1741,9 @@ ${ assist.assistPanel() }
             $(document).trigger("error", resp.message);
             self.indexingStarted(false);
             self.isIndexing(false);
+          } else if (resp.on_success_url) {
+            $.jHueNotify.info("${ _('Creation success.') }");
+            huePubSub.publish('open.link', resp.on_success_url);
           } else {
             self.showCreate(true);
             self.editorId(resp.history_id);
@@ -1708,9 +1823,14 @@ ${ assist.assistPanel() }
           "destination": ko.mapping.toJSON(self.destination),
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (resp) {
-          if (resp.status == 0 && resp.history_uuid) {
-            $.jHueNotify.info("${ _('Task submitted.') }");
-            huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          if (resp.status == 0) {
+            if (resp.history_uuid) {
+              $.jHueNotify.info("${ _('Task submitted.') }");
+              huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+            } else if (resp.on_success_url) {
+              $.jHueNotify.info("${ _('Creation success.') }");
+              huePubSub.publish('open.link', resp.on_success_url);
+            }
           } else {
             $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
           }

@@ -49,8 +49,8 @@ class OozieApi(Api):
   RESULTS_PATTERN_GENERIC = "(?P<results>>>> Invoking Main class now >>>.+<<< Invocation of Main class completed <<<)"
   RESULTS_PATTERN_MAPREDUCE = "(?P<results>.+)"
   RESULTS_PATTERN_PIG = "(?P<results>>>> Invoking Pig command line now >>>.+<<< Invocation of Pig command completed <<<)"
-  BATCH_JOB_PREFIX = 'Hue_Batch'
-  SCHEDULE_JOB_PREFIX = 'Hue_Schedule'
+  BATCH_JOB_PREFIX = 'Batch'
+  SCHEDULE_JOB_PREFIX = 'Schedule'
 
   def __init__(self, *args, **kwargs):
     Api.__init__(self, *args, **kwargs)

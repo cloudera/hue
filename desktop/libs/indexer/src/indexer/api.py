@@ -27,8 +27,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from search.models import Collection
 
 from indexer.controller import CollectionManagerController
-from indexer.utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, \
-  get_field_types
+from indexer.solr_client import SolrClient
+from indexer.utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, get_field_types
 
 
 LOG = logging.getLogger(__name__)
@@ -117,21 +117,11 @@ def autocomplete(request):
 
 
 def collections(request):
-  searcher = CollectionManagerController(request.user)
-  solr_collections = searcher.get_collections()
-  massaged_collections = []
-
-  for collection in solr_collections:
-    massaged_collections.append({
-      'name': collection,
-      'isCoreOnly': solr_collections[collection]['isCoreOnly'],
-      'isAlias': solr_collections[collection].get('isAlias', False),
-      'collections': solr_collections[collection].get('collections', []),
-    })
+  client = SolrClient(user=request.user)
 
   response = {
     'status': 0,
-    'collections': massaged_collections
+    'collections': client.get_indexes()
   }
 
   return JsonResponse(response)

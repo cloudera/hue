@@ -117,7 +117,8 @@ class YarnApi(Api):
         'progress': app['progress'],
         'queue': app['queueName'],
         'duration': app['durationMs'],
-        'submitted': app['startTimeMs']
+        'submitted': app['startTimeMs'],
+        'canWrite': app['canKill'],
       } for app in apps],
       'total': len(apps)
     }
@@ -151,19 +152,25 @@ class YarnApi(Api):
         'user': app['user'],
         'progress': app['progress'],
         'duration': app['durationMs'],
-        'submitted': app['startTimeMs']
+        'submitted': app['startTimeMs'],
+        'canWrite': app['canKill'],
     }
 
     if app['applicationType'] == 'MR2' or app['applicationType'] == 'MAPREDUCE':
       common['type'] = 'MAPREDUCE'
 
+      if app['desiredMaps'] is None or app['finishedMaps'] is None:
+        app['mapsPercentComplete'] = 100
+      if app['desiredReduces'] is None or app['finishedReduces'] is None:
+        app['reducesPercentComplete'] = 100
+
       common['properties'] = {
-          'maps_percent_complete': app['mapsPercentComplete'] or 100,
-          'reduces_percent_complete': app['reducesPercentComplete'] or 100,
-          'finishedMaps': app['finishedMaps'],
-          'finishedReduces': app['finishedReduces'],
-          'desiredMaps': app['desiredMaps'],
-          'desiredReduces': app['desiredReduces'],
+          'maps_percent_complete': app['mapsPercentComplete'] or 0,
+          'reduces_percent_complete': app['reducesPercentComplete'] or 0,
+          'finishedMaps': app['finishedMaps'] or 0,
+          'finishedReduces': app['finishedReduces'] or 0,
+          'desiredMaps': app['desiredMaps'] or 0,
+          'desiredReduces': app['desiredReduces'] or 0,
           'durationFormatted': app['durationFormatted'],
           'startTimeFormatted': app['startTimeFormatted'],
 
@@ -201,7 +208,7 @@ class YarnApi(Api):
           response = job_single_logs(MockDjangoRequest(self.user), job=appid)
           logs = json.loads(response.content).get('logs')
           if logs and len(logs) == 4:
-            logs = logs[3]
+            logs = logs[1]
         else:
           response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
           logs = json.loads(response.content).get('log')
@@ -292,6 +299,9 @@ class YarnMapReduceTaskApi(Api):
 
 
   def logs(self, appid, app_type, log_name):
+    if log_name == 'default':
+      log_name = 'stdout'
+
     try:
       response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name)
       logs = json.loads(response.content)['log']
@@ -321,8 +331,17 @@ class YarnMapReduceTaskApi(Api):
         'state': task.state,
         'startTime': task.startTime,
         'successfulAttempt': task.successfulAttempt,
-        'finishTime': task.finishTime
+        'finishTime': task.finishTime,
+        'apiStatus': self._api_status(task.state),
     }
+
+  def _api_status(self, status):
+    if status in ['NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
+      return 'RUNNING'
+    elif status == 'SUCCEEDED':
+      return 'SUCCEEDED'
+    else:
+      return 'FAILED' # FAILED, KILLED
 
 
 class YarnMapReduceTaskAttemptApi(Api):
@@ -357,6 +376,9 @@ class YarnMapReduceTaskAttemptApi(Api):
 
 
   def logs(self, appid, app_type, log_name):
+    if log_name == 'default':
+      log_name = 'stdout'
+
     task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
     stdout, stderr, syslog = task.get_task_log()
 
@@ -368,6 +390,16 @@ class YarnMapReduceTaskAttemptApi(Api):
       return NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id).counters
 
     return {}
+
+
+  def _api_status(self, status):
+    if status in ['NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
+      return 'RUNNING'
+    elif status == 'SUCCEEDED':
+      return 'SUCCEEDED'
+    else:
+      return 'FAILED' # FAILED, KILLED
+
 
   def _massage_task(self, task):
     return {
@@ -387,7 +419,8 @@ class YarnMapReduceTaskAttemptApi(Api):
         "id" : task.id,
         "finishTime" : task.finishTime,
         "app_id": self.app_id,
-        "task_id": self.task_id
+        "task_id": self.task_id,
+        'apiStatus': self._api_status(task.state),
     }
 
 

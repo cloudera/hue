@@ -32,11 +32,10 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode, smart_str
-from libsentry.conf import is_enabled
+from libsentry.conf import is_enabled as is_sentry_enabled
 
 from indexer import conf
-from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES,\
-                           DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
+from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES, DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
 
 
 LOG = logging.getLogger(__name__)
@@ -60,6 +59,7 @@ def get_config_template_path(solr_cloud_mode):
 
 
 class SchemaXml(object):
+
   def __init__(self, xml):
     self.xml = xml
     self.unique_key_field = None
@@ -80,14 +80,15 @@ class SchemaXml(object):
 
 
 class SolrConfigXml(object):
+
   def __init__(self, xml):
     self.xml = xml
 
-  def defaultField(self, df):
-    self.xml = force_unicode(force_unicode(self.xml).replace(u'<str name="df">text</str>', u'<str name="df">%s</str>' % force_unicode(df)))
+  def defaultField(self, df=None):
+    self.xml = force_unicode(force_unicode(self.xml).replace(u'<str name="df">text</str>', u'<str name="df">%s</str>' % force_unicode(df) if df is not None else ''))
 
 
-def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
+def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six_or_more=False, is_solr_hdfs_mode=True):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
 
@@ -108,18 +109,27 @@ def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
       with open(os.path.join(solr_config_path, 'conf/schema.xml'), 'w') as f:
         f.write(smart_str(schemaxml.xml))
 
-    if df:
-      # Use secure template
-      solrconfig = 'conf/solrconfig.xml%s' % ('.secure' if is_enabled() else '')
+    # Use template depending on type of Solr
+    solr_config_name = 'solrconfig.xml'
 
-      # Get complete solrconfig.xml
-      with open(os.path.join(config_template_path, solrconfig)) as f:
-        solrconfigxml = SolrConfigXml(f.read())
-        solrconfigxml.defaultField(df)
+    if is_solr_six_or_more:
+      if is_solr_hdfs_mode:
+        solr_config_name = 'solrconfig.xml.solr6'
+      else:
+        solr_config_name = 'solrconfig.xml.solr6NonHdfs'
 
-      # Write complete solrconfig.xml to copy
-      with open(os.path.join(solr_config_path, 'conf/solrconfig.xml'), 'w') as f:
-        f.write(smart_str(solrconfigxml.xml))
+    if is_sentry_enabled():
+      solr_config_name += '.secure'
+
+    solrconfig = 'conf/%s' % solr_config_name
+
+    # Get complete solrconfig.xml
+    with open(os.path.join(config_template_path, solrconfig)) as f:
+      solrconfigxml = SolrConfigXml(f.read())
+      solrconfigxml.defaultField(df)
+
+    with open(os.path.join(solr_config_path, 'conf/solrconfig.xml'), 'w') as f:
+      f.write(smart_str(solrconfigxml.xml))
     return tmp_path, solr_config_path
   except Exception:
     # Don't leak the tempdir if there was an exception.

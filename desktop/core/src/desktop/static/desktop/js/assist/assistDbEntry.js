@@ -36,13 +36,12 @@ var AssistDbEntry = (function () {
    * @param {Object} navigationSettings
    * @constructor
    */
-  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings, sortFunctions) {
+  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings) {
     var self = this;
     self.i18n = i18n;
     self.definition = definition;
-    self.sortFunctions = sortFunctions;
-
     self.assistDbSource = assistDbSource;
+    self.sortFunctions = assistDbSource.sortFunctions;
     self.parent = parent;
     self.filter = filter;
     self.isSearchVisible = assistDbSource.isSearchVisible;
@@ -192,7 +191,7 @@ var AssistDbEntry = (function () {
         identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
       },
       showInAssistEnabled: false,
-      orientation: 'right',
+      orientation: self.navigationSettings.rightAssist ? 'left' : 'right',
       sourceType: self.sourceType,
       defaultDatabase: self.databaseName,
       pinEnabled: self.navigationSettings.pinEnabled,
@@ -467,6 +466,11 @@ var AssistDbEntry = (function () {
     } else {
       huePubSub.publish('editor.insert.column.at.cursor', { name: self.getComplexName(), table: self.getTableName(), database: self.getDatabaseName() });
     }
+  };
+
+  AssistDbEntry.prototype.explore = function () {
+    var self = this;
+    huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbSource.sourceType);
   };
 
   AssistDbEntry.prototype.openInMetastore = function () {

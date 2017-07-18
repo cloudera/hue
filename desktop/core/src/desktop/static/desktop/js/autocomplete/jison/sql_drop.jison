@@ -23,11 +23,13 @@ DataDefinition_EDIT
  ;
 
 DataManipulation
- : DeleteStatement
+ : HiveDeleteStatement
+ | ImpalaDeleteStatement
  ;
 
 DataManipulation_EDIT
- : DeleteStatement_EDIT
+ : HiveDeleteStatement_EDIT
+ | ImpalaDeleteStatement_EDIT
  ;
 
 DropStatement
@@ -64,7 +66,7 @@ DropStatement_EDIT
  ;
 
 DropDatabaseStatement
- : 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
+ : 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier OptionalCascadeOrRestrict
  ;
 
 DropDatabaseStatement_EDIT
@@ -79,12 +81,12 @@ DropDatabaseStatement_EDIT
    }
  | 'DROP' DatabaseOrSchema OptionalIfExists RegularOrBacktickedIdentifier 'CURSOR'
    {
-     if (parser.isHive()) {
+     if (parser.isHive() || parser.isImpala()) {
        parser.suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    }
- | 'DROP' DatabaseOrSchema OptionalIfExists_EDIT RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
- | 'DROP' DatabaseOrSchema OptionalIfExists 'CURSOR' RegularOrBacktickedIdentifier OptionalHiveCascadeOrRestrict
+ | 'DROP' DatabaseOrSchema OptionalIfExists_EDIT RegularOrBacktickedIdentifier OptionalCascadeOrRestrict
+ | 'DROP' DatabaseOrSchema OptionalIfExists 'CURSOR' RegularOrBacktickedIdentifier OptionalCascadeOrRestrict
    {
      if (!$3) {
        parser.suggestKeywords(['IF EXISTS']);
@@ -372,14 +374,14 @@ TruncateTableStatement_EDIT
    }
  ;
 
-DeleteStatement
+HiveDeleteStatement
  : '<hive>DELETE' 'FROM' SchemaQualifiedTableIdentifier OptionalWhereClause
    {
      parser.addTablePrimary($3);
    }
  ;
 
-DeleteStatement_EDIT
+HiveDeleteStatement_EDIT
  : '<hive>DELETE' 'CURSOR'
    {
      parser.suggestKeywords(['FROM']);
@@ -401,4 +403,41 @@ DeleteStatement_EDIT
    {
      parser.addTablePrimary($3);
    }
+ ;
+
+ImpalaDeleteStatement
+ : '<impala>DELETE' 'FROM' TableReference OptionalWhereClause
+ ;
+
+ImpalaDeleteStatement_EDIT
+ : '<impala>DELETE' 'CURSOR'
+   {
+     parser.suggestKeywords(['FROM']);
+   }
+ | '<impala>DELETE' 'FROM' 'CURSOR'
+   {
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | '<impala>DELETE' 'FROM' TableReference 'CURSOR' OptionalWhereClause
+   {
+     var keywords = [{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'INNER JOIN', weight: 1 },  { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }];
+     if (!$5) {
+       keywords.push({ value: 'WHERE', weight: 3 });
+     }
+     if ($3.suggestJoinConditions) {
+       parser.suggestJoinConditions($3.suggestJoinConditions);
+     }
+     if ($3.suggestJoins) {
+       parser.suggestJoins($3.suggestJoins);
+     }
+     if ($3.suggestKeywords) {
+       keywords = keywords.concat(parser.createWeightedKeywords($3.suggestKeywords, 2));
+     }
+     if (keywords.length > 0) {
+       parser.suggestKeywords(keywords);
+     }
+   }
+ | '<impala>DELETE' 'FROM' TableReference_EDIT OptionalWhereClause
+ | '<impala>DELETE' 'FROM' TableReference WhereClause_EDIT
  ;

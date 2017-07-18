@@ -84,7 +84,7 @@ var HueFileEntry = (function () {
     self.user = options.user;
     self.userGroups = options.userGroups;
     self.superuser = options.superuser;
-    self.serverTypeFilter = options.serverTypeFilter;
+    self.serverTypeFilter = options.serverTypeFilter || ko.observable({ type: 'all' });
 
     self.document = ko.observable();
     self.selectedDocsWithDependents = ko.observable([]);
@@ -455,7 +455,7 @@ var HueFileEntry = (function () {
     self.apiHelper.searchDocuments({
       uuid: owner.uuid,
       query: query,
-      type: self.serverTypeFilter(),
+      type: self.serverTypeFilter().type,
       successCallback: function (data) {
         resultEntry.hasErrors(false);
         var newEntries = [];
@@ -526,7 +526,7 @@ var HueFileEntry = (function () {
     if (self.app === 'documents') {
       self.apiHelper.fetchDocuments({
         uuid: self.definition().uuid,
-        type: self.serverTypeFilter(),
+        type: self.serverTypeFilter().type,
         successCallback: function(data) {
           self.definition(data.document);
           self.hasErrors(false);
@@ -600,24 +600,6 @@ var HueFileEntry = (function () {
       self.removeDocuments(false);
       huePubSub.publish('assist.document.refresh');
     }
-  };
-
-  HueFileEntry.prototype.openExternalLink = function (entry, event) {
-    event.preventDefault();
-    var $target = $(event.target);
-    if (!$target.is('a')) {
-      $target = $target.closest('a');
-    }
-    location.href = $target.attr('href');
-  };
-
-  HueFileEntry.prototype.openHue4Link = function (entry, event) {
-    event.preventDefault();
-    var $target = $(event.target);
-    if (!$target.is('a')) {
-      $target = $target.closest('a');
-    }
-    huePubSub.publish('open.link', $target.attr('href'));
   };
 
   HueFileEntry.prototype.showRestoreConfirmation = function () {

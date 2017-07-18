@@ -202,6 +202,8 @@ TableDefinitionRightPart_EDIT
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
    OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn_EDIT OptionalAsSelectStatement
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
+   OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties CachedIn WithReplication_EDIT OptionalAsSelectStatement
+ | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
    OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn OptionalAsSelectStatement_EDIT
  | TableIdentifierAndOptionalColumnSpecification OptionalComment OptionalPartitionedBy OptionalWithSerdeproperties OptionalClusteredBy
    OptionalSkewedBy OptionalStoredAsOrBy OptionalHdfsLocation OptionalTblproperties OptionalCachedIn 'CURSOR'
@@ -251,6 +253,9 @@ TableDefinitionRightPart_EDIT
        }
        if (parser.isImpala() && !$10) {
          keywords.push({ value: 'CACHED IN', weight: 2 });
+       }
+       if (parser.isImpala() && $10 && $10.suggestKeywords) {
+         keywords = keywords.concat(parser.createWeightedKeywords($10.suggestKeywords, 2));
        }
        keywords.push({ value: 'AS', weight: 1 });
      }
@@ -603,7 +608,7 @@ OptionalPartitionedBy
 
 PartitionedBy
  : HiveOrImpalaPartitioned 'BY' ParenthesizedColumnSpecificationList
- | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList
+ | 'PARTITION' 'BY' AnyRange ParenthesizedColumnList ParenthesizedPartitionValuesList
  | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList '<impala>PARTITIONS' UnsignedNumericLiteral
  ;
 
@@ -626,8 +631,8 @@ PartitionedBy_EDIT
    {
      parser.suggestKeywords(['HASH', 'RANGE']);
    }
- | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList_EDIT
- | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList_EDIT
+ | 'PARTITION' 'BY' AnyRange ParenthesizedColumnList_EDIT
+ | 'PARTITION' 'BY' AnyRange ParenthesizedColumnList ParenthesizedPartitionValuesList_EDIT
  | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList_EDIT
  | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList 'CURSOR'
    {
@@ -1165,17 +1170,42 @@ CommitLocations
 
 OptionalCachedIn
  :
- | CachedIn
+ | CachedIn OptionalWithReplication
+   {
+     if (!$2) {
+       $$ = { suggestKeywords: ['WITH REPLICATION ='] };
+     }
+   }
  ;
 
 CachedIn
- : '<impala>CACHED' 'IN' SingleQuotedValue
+ : '<impala>CACHED' 'IN' QuotedValue
  ;
 
 CachedIn_EDIT
  : '<impala>CACHED' 'CURSOR'
    {
      parser.suggestKeywords(['IN']);
+   }
+ ;
+
+OptionalWithReplication
+ :
+ | WithReplication
+ ;
+
+WithReplication
+ : 'WITH' '<impala>REPLICATION' '=' SignedInteger
+ ;
+
+WithReplication_EDIT
+ : 'WITH' 'CURSOR'
+   {
+     parser.suggestKeywords(['REPLICATION =']);
+   }
+ | 'WITH' '<impala>REPLICATION' 'CURSOR'
+   {
+     parser.suggestKeywords(['=']);
    }
  ;
 

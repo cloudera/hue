@@ -130,6 +130,7 @@ table.display td.center {
 
 .sorting {
   cursor: pointer;
+  border-bottom: 1px solid transparent !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
 }
@@ -141,7 +142,7 @@ table.display td.center {
 .sorting_asc {
   cursor: pointer;
   background: url('../art/datatables/sort_asc.png') no-repeat center right;
-  border-top: 1px solid #DCDCDC !important;
+  border-bottom: 1px solid @cui-blue-500 !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
 }
@@ -153,7 +154,7 @@ table.display td.center {
 .sorting_desc {
   cursor: pointer;
   background: url('../art/datatables/sort_desc.png') no-repeat center right;
-  border-top: 1px solid #DCDCDC !important;
+  border-bottom: 1px solid @cui-blue-500 !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
 }
@@ -176,10 +177,6 @@ table.display td.center {
   }
 }
 
-.dataTables_wrapper table th {
-  border-top: 1px solid transparent!important;
-}
-
 .table-huedatatable td.stripe {
   background: url('../art/stripedbackground.png');
 }
@@ -189,7 +186,7 @@ table.display td.center {
 }
 
 .sorting:hover, .sorting_asc:hover, .sorting_desc:hover {
-  border-top: 1px solid #29A7DE !important;
+  border-bottom: 1px solid @cui-blue-500 !important;
 }
 
 .table-huedatatable th.sorting:hover {
@@ -547,4 +544,8 @@ div.box {
     margin-right: -14px;
     margin-top: -12px;
   }
+}
+
+.table-nowrap td, .table-nowrap th {
+  white-space: nowrap;
 }

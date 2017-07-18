@@ -18,7 +18,6 @@
 
 import json
 import logging
-import Queue
 import re
 import time
 import unittest
@@ -405,6 +404,10 @@ class TestMapReduce2NoHadoop:
     grant_access("test2", "test2", "jobbrowser")
     self.user2 = User.objects.get(username='test2')
 
+    self.c3 = make_logged_in_client(is_superuser=False, username="test3")
+    grant_access("test3", "test3", "jobbrowser")
+    self.user3 = User.objects.get(username='test3')
+
     resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
     mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
     history_server_api.get_history_server_api = lambda username: HistoryServerApi(username)
@@ -488,11 +491,14 @@ class TestMapReduce2NoHadoop:
     assert_true(can_view_job('test', response.context['job']))
     assert_true(can_modify_job('test', response.context['job']))
 
-    response2 = self.c2.get('/jobbrowser/jobs/job_1356251510842_0054')
-    assert_true('don&#39;t have permission to access job' in response2.content, response2.content)
-
-    assert_false(can_view_job('test2', response.context['job']))
+    assert_true(can_view_job('test2', response.context['job']))
     assert_false(can_modify_job('test2', response.context['job']))
+
+    assert_false(can_view_job('test3', response.context['job']))
+    assert_false(can_modify_job('test3', response.context['job']))
+
+    response2 = self.c3.get('/jobbrowser/jobs/job_1356251510842_0054')
+    assert_true('don&#39;t have permission to access job' in response2.content, response2.content)
 
   def test_kill_job(self):
     job_id = 'application_1356251510842_0054'
@@ -501,6 +507,10 @@ class TestMapReduce2NoHadoop:
       assert_equal(json.loads(response.content), {"status": 0})
     finally:
       MockResourceManagerApi.APPS[job_id]['state'] = 'RUNNING'
+
+    response = self.c2.post('/jobbrowser/jobs/%s/kill?format=json' % job_id)
+    assert_true('Kill operation is forbidden.' in response.content, response.content)
+
 
 class MockResourceManagerApi:
   APPS = {
@@ -660,7 +670,7 @@ class MockMapreduce2Api(object):
               "value" : "test",
            }, {
               "name" : "mapreduce.job.acl-view-job",
-              "value" : "test",
+              "value" : "test,test2",
            }
          ]
       }
@@ -808,64 +818,64 @@ def test_make_log_links():
 
   # FileBrowser
   assert_equal(
-      """<a href="/filebrowser/view=/user/romain/tmp" target="_blank">hdfs://localhost:8020/user/romain/tmp</a>  &lt;dir&gt;""",
+      """<a href="/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>  &lt;dir&gt;""",
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp  <dir>')
   )
   assert_equal(
-      """<a href="/filebrowser/view=/user/romain/tmp" target="_blank">hdfs://localhost:8020/user/romain/tmp</a>&lt;dir&gt;""",
+      """<a href="/filebrowser/view=/user/romain/tmp">hdfs://localhost:8020/user/romain/tmp</a>&lt;dir&gt;""",
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp<dir>')
   )
   assert_equal(
-      """output: <a href="/filebrowser/view=/user/romain/tmp" target="_blank">/user/romain/tmp</a>  &lt;dir&gt;""",
+      """output: <a href="/filebrowser/view=/user/romain/tmp">/user/romain/tmp</a>  &lt;dir&gt;""",
       LinkJobLogs._make_links('output: /user/romain/tmp  <dir>')
   )
   assert_equal(
-      'Successfully read 3760 records (112648 bytes) from: &quot;<a href="/filebrowser/view=/user/hue/pig/examples/data/midsummer.txt" target="_blank">/user/hue/pig/examples/data/midsummer.txt</a>&quot;',
+      'Successfully read 3760 records (112648 bytes) from: &quot;<a href="/filebrowser/view=/user/hue/pig/examples/data/midsummer.txt">/user/hue/pig/examples/data/midsummer.txt</a>&quot;',
       LinkJobLogs._make_links('Successfully read 3760 records (112648 bytes) from: "/user/hue/pig/examples/data/midsummer.txt"')
   )
   assert_equal(
-      'data,upper_case  MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff" target="_blank">hdfs://localhost:8020/user/romain/out/fffff</a>,',
+      'data,upper_case  MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>,',
       LinkJobLogs._make_links('data,upper_case  MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff,')
   )
   assert_equal(
-      'MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff" target="_blank">hdfs://localhost:8020/user/romain/out/fffff</a>\n2013',
+      'MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff">hdfs://localhost:8020/user/romain/out/fffff</a>\n2013',
       LinkJobLogs._make_links('MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff\n2013')
   )
   assert_equal(
-      ' <a href="/filebrowser/view=/jobs.tsv" target="_blank">/jobs.tsv</a> ',
+      ' <a href="/filebrowser/view=/jobs.tsv">/jobs.tsv</a> ',
       LinkJobLogs._make_links(' /jobs.tsv ')
   )
   assert_equal(
-      '<a href="/filebrowser/view=/user/romain/job_pos_2012.tsv" target="_blank">hdfs://localhost:8020/user/romain/job_pos_2012.tsv</a>',
+      '<a href="/filebrowser/view=/user/romain/job_pos_2012.tsv">hdfs://localhost:8020/user/romain/job_pos_2012.tsv</a>',
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/job_pos_2012.tsv')
   )
 
   # JobBrowser
   assert_equal(
-      """<a href="/jobbrowser/jobs/job_201306261521_0058" target="_blank">job_201306261521_0058</a>""",
+      """<a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('job_201306261521_0058')
   )
   assert_equal(
-      """Hadoop Job IDs executed by Pig: <a href="/jobbrowser/jobs/job_201306261521_0058" target="_blank">job_201306261521_0058</a>""",
+      """Hadoop Job IDs executed by Pig: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('Hadoop Job IDs executed by Pig: job_201306261521_0058')
   )
   assert_equal(
-      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058" target="_blank">job_201306261521_0058</a>""",
+      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058')
   )
   assert_equal(
-      """- More information at: http://localhost:50030/jobdetails.jsp?jobid=<a href="/jobbrowser/jobs/job_201306261521_0058" target="_blank">job_201306261521_0058</a>""",
+      """- More information at: http://localhost:50030/jobdetails.jsp?jobid=<a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>""",
       LinkJobLogs._make_links('- More information at: http://localhost:50030/jobdetails.jsp?jobid=job_201306261521_0058')
   )
   assert_equal(
-      """ Logging error messages to: <a href="/jobbrowser/jobs/job_201307091553_0028" target="_blank">job_201307091553_0028</a>/attempt_201307091553_002""",
+      """ Logging error messages to: <a href="/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>/attempt_201307091553_002""",
       LinkJobLogs._make_links(' Logging error messages to: job_201307091553_0028/attempt_201307091553_002')
   )
   assert_equal(
-      """ pig-<a href="/jobbrowser/jobs/job_201307091553_0028" target="_blank">job_201307091553_0028</a>.log""",
+      """ pig-<a href="/jobbrowser/jobs/job_201307091553_0028">job_201307091553_0028</a>.log""",
       LinkJobLogs._make_links(' pig-job_201307091553_0028.log')
   )
   assert_equal(
-      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058" target="_blank">job_201306261521_0058</a>. Look at the UI""",
+      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058">job_201306261521_0058</a>. Look at the UI""",
       LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058. Look at the UI')
   )

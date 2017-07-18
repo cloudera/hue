@@ -507,6 +507,15 @@ class TestWithMockedSolr(TestSearchBase):
     assert_equal('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', xls_response['Content-Type'])
     assert_equal('attachment; filename=query_result.xlsx', xls_response['Content-Disposition'])
 
+  def test_index_xss(self):
+    doc = Document2.objects.create(name='test_dashboard', type='search-dashboard', owner=self.user,
+                                   data=json.dumps(self.collection.data), parent_directory=self.home_dir)
+    try:
+      response = self.c.get(reverse('dashboard:index') + ('?collection=%s' % doc.id) + '&q=</script><script>alert(%27XSS%27)</script>')
+      assert_equal('{"fqs": [], "qs": [{"q": "alert(\'XSS\')"}], "start": 0}', response.context['query'])
+    finally:
+      doc.delete()
+
   def test_augment_response(self):
     collection = self._get_collection_param(self.collection)
     query = QUERY

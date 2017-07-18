@@ -25,15 +25,12 @@ from itertools import groupby
 
 from django.utils.translation import ugettext as _
 
+from dashboard.facet_builder import _compute_range_facet
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import SERVER_USER
-from desktop.lib.conf import BoundConfig
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
-from dashboard.facet_builder import _compute_range_facet
-
-from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 
 from libsolr.conf import SSL_CERT_CA_VERIFY
 
@@ -41,24 +38,27 @@ from libsolr.conf import SSL_CERT_CA_VERIFY
 LOG = logging.getLogger(__name__)
 
 
+try:
+  from search.conf import EMPTY_QUERY, SECURITY_ENABLED, SOLR_URL
+except ImportError, e:
+  LOG.warn('Solr Search is not enabled')
+
+
 def utf_quoter(what):
   return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
-
-def search_enabled():
-  return type(SECURITY_ENABLED) == BoundConfig
 
 
 class SolrApi(object):
   """
   http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
   """
-  def __init__(self, solr_url, user,
-               security_enabled=SECURITY_ENABLED.get() if search_enabled() else SECURITY_ENABLED.default,
-               ssl_cert_ca_verify=SSL_CERT_CA_VERIFY.get()):
+  def __init__(self, solr_url=None, user=None, security_enabled=False, ssl_cert_ca_verify=SSL_CERT_CA_VERIFY.get()):
+    if solr_url is None:
+      solr_url = SOLR_URL.get()
     self._url = solr_url
     self._user = user
     self._client = HttpClient(self._url, logger=LOG)
-    self.security_enabled = security_enabled
+    self.security_enabled = security_enabled or SECURITY_ENABLED.get()
 
     if self.security_enabled:
       self._client.set_kerberos_auth()
@@ -289,6 +289,21 @@ class SolrApi(object):
           break
 
 
+  def select(self, collection, query=None, rows=100, start=0):
+    if query is None:
+      query = EMPTY_QUERY.get()
+
+    params = self._get_params() + (
+        ('q', query),
+        ('wt', 'json'),
+        ('rows', rows),
+        ('start', start),
+    )
+
+    response = self._root.get('%s/select' % collection, params)
+    return self._get_json(response)
+
+
   def suggest(self, collection, query):
     try:
       params = self._get_params() + (
@@ -347,7 +362,7 @@ class SolrApi(object):
           ('detail', 'true'),
           ('path', '/aliases.json'),
       )
-      response = self._root.get('zookeeper', params=params)
+      response = self._root.get('admin/zookeeper', params=params)
       return json.loads(response['znode'].get('data', '{}')).get('collection', {})
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
@@ -367,25 +382,42 @@ class SolrApi(object):
     except Exception, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def create_collection(self, name, shards=1, replication=1):
+
+  def create_collection2(self, name, config_name=None, shards=1, replication=1, **kwargs):
     try:
       params = self._get_params() + (
         ('action', 'CREATE'),
         ('name', name),
         ('numShards', shards),
         ('replicationFactor', replication),
-        ('collection.configName', name),
         ('wt', 'json')
       )
+      if config_name:
+        params += (
+          ('collection.configName', config_name),
+        )
+      if kwargs:
+        params += tuple(((key, val) for key, val in kwargs.iteritems()))
 
       response = self._root.post('admin/collections', params=params, contenttype='application/json')
-      if 'success' in response:
-        return True
-      else:
-        LOG.error("Could not create collection. Check response:\n%s" % json.dumps(response, indent=2))
-        return False
+      return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def add_fields(self, name, fields):
+    try:
+      params = self._get_params() + (
+        ('wt', 'json'),
+      )
+
+      data = {'add-field': fields}
+
+      response = self._root.post('%(collection)s/schema' % {'collection': name}, params=params, data=json.dumps(data), contenttype='application/json')
+      return self._get_json(response)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
 
   def create_core(self, name, instance_dir, shards=1, replication=1):
     try:
@@ -409,7 +441,8 @@ class SolrApi(object):
       else:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def create_or_modify_alias(self, name, collections):
+
+  def create_alias(self, name, collections):
     try:
       params = self._get_params() + (
         ('action', 'CREATEALIAS'),
@@ -420,11 +453,12 @@ class SolrApi(object):
 
       response = self._root.post('admin/collections', params=params, contenttype='application/json')
       if response.get('responseHeader', {}).get('status', -1) != 0:
-        msg = _("Could not create or edit alias. Check response:\n%s") % json.dumps(response, indent=2)
-        LOG.error(msg)
-        raise PopupException(msg)
+        raise PopupException(_("Could not create or edit alias: %s") % response)
+      else:
+        return response
     except RestException, e:
-        raise PopupException(e, title=_('Error while accessing Solr'))
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
 
   def delete_alias(self, name):
     try:
@@ -442,23 +476,26 @@ class SolrApi(object):
     except RestException, e:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def remove_collection(self, name, replication=1):
+
+  def delete_collection(self, name):
+    response = {'status': -1, 'message': ''}
+
     try:
       params = self._get_params() + (
         ('action', 'DELETE'),
         ('name', name),
-        ('replicationFactor', replication),
         ('wt', 'json')
       )
 
-      response = self._root.post('admin/collections', params=params, contenttype='application/json')
-      if 'success' in response:
-        return True
+      data = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if data['responseHeader']['status'] == 0:
+        response['status'] = 0
       else:
-        LOG.error("Could not remove collection. Check response:\n%s" % json.dumps(response, indent=2))
-        return False
+        response['message'] = "Could not remove collection: %s" % data
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+    return response
+
 
   def remove_core(self, name):
     try:
@@ -478,12 +515,6 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def add_fields(self, collection, fields):
-    try:
-      params = self._get_params()
-      return self._root.post('%s/schema/fields' % collection, params=params, data=json.dumps(fields), contenttype='application/json')
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
 
   def cores(self):
     try:
@@ -504,6 +535,18 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+
+  def get_schema(self, collection):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+      )
+      response = self._root.get('%(core)s/schema' % {'core': collection}, params=params)
+      return self._get_json(response)['schema']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+  # Deprecated
   def schema(self, core):
     try:
       params = self._get_params() + (
@@ -585,6 +628,19 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+
+  def info_system(self):
+    try:
+      params = self._get_params() + (
+        ('wt', 'json'),
+      )
+
+      response = self._root.get('admin/info/system', params=params)
+      return self._get_json(response)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
   def sql(self, collection, statement):
     try:
       if 'limit' not in statement.lower(): # rows is not supported
@@ -614,6 +670,88 @@ class SolrApi(object):
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def export(self, name, query, fl, sort, rows=100):
+    try:
+      params = self._get_params() + (
+          ('q', query),
+          ('fl', fl),
+          ('sort', sort),
+          ('rows', rows),
+          ('wt', 'json'),
+      )
+      response = self._root.get('%(name)s/export' % {'name': name}, params=params)
+      return self._get_json(response)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def update(self, collection_or_core_name, data, content_type='csv', version=None, **kwargs):
+    if content_type == 'csv':
+      content_type = 'application/csv'
+    elif content_type == 'json':
+      content_type = 'application/json'
+    else:
+      LOG.error("Trying to update collection  %s with content type %s. Allowed content types: csv/json" % (collection_or_core_name, content_type))
+
+    params = self._get_params() + (
+        ('wt', 'json'),
+        ('overwrite', 'true'),
+        ('commit', 'true'),
+    )
+    if version is not None:
+      params += (
+        ('_version_', version),
+        ('versions', 'true')
+      )
+    if kwargs:
+      params += tuple(((key, val) for key, val in kwargs.iteritems()))
+
+    response = self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
+    return self._get_json(response)
+
+
+  # Deprecated
+  def create_collection(self, name, shards=1, replication=1):
+    try:
+      params = self._get_params() + (
+        ('action', 'CREATE'),
+        ('name', name),
+        ('numShards', shards),
+        ('replicationFactor', replication),
+        ('collection.configName', name),
+        ('wt', 'json')
+      )
+
+      response = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if 'success' in response:
+        return True
+      else:
+        LOG.error("Could not create collection. Check response:\n%s" % json.dumps(response, indent=2))
+        return False
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  # Deprecated
+  def remove_collection(self, name):
+    try:
+      params = self._get_params() + (
+        ('action', 'DELETE'),
+        ('name', name),
+        ('wt', 'json')
+      )
+
+      response = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if 'success' in response:
+        return True
+      else:
+        LOG.error("Could not remove collection. Check response:\n%s" % json.dumps(response, indent=2))
+        return False
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
 
   def _get_params(self):
     if self.security_enabled:
@@ -647,8 +785,9 @@ class SolrApi(object):
       if f['function'] == 'median':
         f['function'] = 'percentile'
         fields.append('50')
-      elif f['function'] == 'percentiles':
+      elif f['function'] == 'percentile':
         fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
+        f['function'] = 'percentile'
       return '%s(%s)' % (f['function'], ','.join(fields))
 
   def _get_range_borders(self, collection, query):
@@ -779,6 +918,7 @@ class SolrApi(object):
         response = json.loads(response.replace('\x00', ''))
     return response
 
+
   def uniquekey(self, collection):
     try:
       params = self._get_params() + (
@@ -788,27 +928,6 @@ class SolrApi(object):
       return self._get_json(response)['uniqueKey']
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def update(self, collection_or_core_name, data, content_type='csv', version=None):
-    if content_type == 'csv':
-      content_type = 'application/csv'
-    elif content_type == 'json':
-      content_type = 'application/json'
-    else:
-      LOG.error("Trying to update collection  %s with content type %s. Allowed content types: csv/json" % (collection_or_core_name, content_type))
-
-    params = self._get_params() + (
-        ('wt', 'json'),
-        ('overwrite', 'true'),
-        ('commit', 'true'),
-    )
-    if version is not None:
-      params += (
-        ('_version_', version),
-        ('versions', 'true')
-      )
-    response = self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
-    return self._get_json(response)
 
 
 GAPS = {

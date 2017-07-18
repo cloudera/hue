@@ -271,6 +271,9 @@ def kill_job(request, job):
   if request.method != "POST":
     raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s).") % {'method': request.method})
 
+  if not can_kill_job(job, request.user):
+    raise PopupException(_("Kill operation is forbidden."))
+
   try:
     job.kill()
   except Exception, e:
@@ -337,7 +340,9 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 
   if log_link:
     link = '/%s/' % name
-    params = {}
+    params = {
+      'doAs': request.user.username
+    }
     if offset != 0:
       params['start'] = offset
 
@@ -394,7 +399,10 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
 
   params = {'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1], 'offset': offset}
 
-  return single_task_attempt_logs(request, **params)
+  if request.GET.get('format') == 'link':
+    return JsonResponse(params)
+  else:
+    return single_task_attempt_logs(request, **params)
 
 
 @check_job_permission

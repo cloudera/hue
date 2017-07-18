@@ -32,6 +32,12 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
     var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
+    %if request and request.COOKIES and request.COOKIES.get('csrftoken','')!='':
+    window.CSRF_TOKEN = '${request.COOKIES.get('csrftoken')}';
+    %else:
+    window.CSRF_TOKEN = '';
+    %endif
+
     var BOOTSTRAP_RATIOS = {
       SPAN3: function () {
         var _w = $(window).width();
@@ -67,12 +73,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
       optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
     };
 
-    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() }
+    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
 
-    DocumentTypeGlobals = {
+    var ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
+
+    var DocumentTypeGlobals = {
       'all': '${_('All')}',
       'directory': '${ _('Directory') }',
-      'link-pigscript': '${_('Pig Script')}',
+      'link-pigscript': '${_('Pig Design')}',
       'link-workflow': '${_('Job Design')}',
       'notebook': '${_('Notebook')}',
       'oozie-bundle2': '${_('Oozie Bundle')}',
@@ -87,7 +95,15 @@ from metadata.conf import has_optimizer, OPTIMIZER
       'query-java': '${_('Java Job')}',
       'query-pig': '${_('Pig Script')}',
       'query-shell': '${_('Shell Script')}',
-      'query-distcp': '${_('DistCp Job')}',
+      'query-distcp': '${_('DistCp Job')}'
+    };
+
+    var SyntaxCheckerGlobals = {
+      i18n: {
+        didYouMean: '${_('Did you mean')}',
+        expectedStatementEnd: '${_('Expected end of statement')}',
+        suppressError: '${_('Ignore this type of error')}'
+      }
     };
 
     // jHue plugins global configuration
@@ -141,7 +157,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       i18n: {
         cancelUpload: '${ _('Cancel upload') }',
         uploadCanceled: '${ _('The upload has been canceled') }',
-        uploadSucceeded: '${ _('uploaded successfully') }',
+        uploadSucceeded: '${ _('uploaded successfully') }'
       }
     };
 
@@ -151,7 +167,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
         errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
         errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
-      },
+      }
     };
 
     AutocompleterGlobals = {
@@ -249,14 +265,10 @@ from metadata.conf import has_optimizer, OPTIMIZER
     //Add CSRF Token to all XHR Requests
     var xrhsend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function (data) {
-    %if request and request.COOKIES and request.COOKIES.get('csrftoken','')!='':
-      this.setRequestHeader('X-CSRFToken', "${request.COOKIES.get('csrftoken')}");
-    %else:
-      this.setRequestHeader('X-CSRFToken', "");
-    %endif
-
+      this.setRequestHeader('X-CSRFToken', window.CSRF_TOKEN);
       return xrhsend.apply(this, arguments);
     };
+    XMLHttpRequest.prototype.isAugmented = true;
 
     $.fn.dataTableExt.sErrMode = "throw";
 

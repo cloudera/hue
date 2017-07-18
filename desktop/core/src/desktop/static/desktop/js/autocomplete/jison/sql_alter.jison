@@ -81,11 +81,14 @@ AlterIndex_EDIT
 
 AlterTable
  : AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' RangePartitionSpec
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' '<impala>PARTITION_VALUE' '=' UnsignedValueSpecification
  | AlterTableLeftSide AnyRename 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide HiveSpecificOperations
  | AlterTableLeftSide DropOperations
  | AlterTableLeftSide OptionalPartitionOperations
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations
+ | AlterTableLeftSide '<impala>RECOVER' '<impala>PARTITIONS'
  ;
 
 AlterTable_EDIT
@@ -98,14 +101,14 @@ AlterTable_EDIT
  | AlterTableLeftSide_EDIT PartitionSpec OptionalPartitionOperations
  | AlterTableLeftSide AnyAdd OptionalIfNotExists 'CURSOR'
    {
-     if (parser.isHive()) {
-       if (!$3) {
-         parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
-       } else {
-         parser.suggestKeywords(['PARTITION']);
-       }
+     if (!$3 && parser.isImpala()) {
+       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 4 }, { value: 'COLUMNS', weight: 3 }, { value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
+     } else if (!$3 && parser.isHive()) {
+       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords([{ value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
+     } else if (parser.isHive()) {
+       parser.suggestKeywords(['PARTITION']);
      }
    }
  | AlterTableLeftSide AnyReplace 'CURSOR'
@@ -130,6 +133,19 @@ AlterTable_EDIT
      }
    }
  | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec_EDIT OptionalHdfsLocation OptionalPartitionSpecs
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'CURSOR'
+   {
+     parser.suggestKeywords(['PARTITION']);
+   }
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' 'CURSOR'
+   {
+     parser.suggestKeywords(['VALUE']);
+   }
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' '<impala>PARTITION_VALUE' 'CURSOR'
+   {
+     parser.suggestKeywords(['=']);
+   }
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' RangePartitionSpec_EDIT
  | AlterTableLeftSide HiveSpecificOperations_EDIT
  | AlterTableLeftSide OptionalPartitionOperations_EDIT
  | AlterTableLeftSide DropOperations_EDIT
@@ -142,9 +158,9 @@ AlterTable_EDIT
          'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDE',
          'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'PARTITION',
-         'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES',
-         'SET TBLPROPERTIES', 'SET UNCACHED']);
+       parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'CHANGE', 'DROP COLUMN',
+         'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS',
+         'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION','SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED']);
      }
    }
  | AlterTableLeftSide PartitionSpec 'CURSOR'
@@ -163,25 +179,33 @@ AlterTable_EDIT
      parser.suggestKeywords(['COLUMNS']);
    }
  | AlterTableLeftSide PartitionSpec 'SET' 'CURSOR'
-    {
-      if (parser.isHive()) {
-        parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES']);
-      } else if (parser.isImpala()) {
-        parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES','TBLPROPERTIES', 'UNCACHED']);
-      }
-    }
+   {
+     if (parser.isHive()) {
+       parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES','TBLPROPERTIES', 'UNCACHED']);
+     }
+   }
  | AlterTableLeftSide 'SET' 'CURSOR'
-    {
-      if (parser.isHive()) {
-        parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
-      } else if (parser.isImpala()) {
-        parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
-      }
-    }
+   {
+     if (parser.isHive()) {
+       parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
+     }
+   }
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations_EDIT
  | AlterTableLeftSide AnyRename 'CURSOR'
    {
      parser.suggestKeywords(['TO']);
+   }
+ | AlterTableLeftSide AnyRename 'TO' 'CURSOR'
+   {
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | AlterTableLeftSide '<impala>RECOVER' 'CURSOR'
+   {
+     parser.suggestKeywords(['PARTITIONS']);
    }
  ;
 
@@ -268,7 +292,7 @@ OptionalPartitionOperations
  | 'SET' HiveOrImpalaTblproperties ParenthesizedPropertyAssignmentList
  | 'SET' '<hive>SERDE' QuotedValue OptionalWithSerdeproperties
  | 'SET' HiveOrImpalaSerdeproperties ParenthesizedPropertyAssignmentList
- | 'SET' CachedIn
+ | 'SET' CachedIn OptionalWithReplication
  | 'SET' '<impala>UNCACHED'
  | AddReplaceColumns
  | '<hive>CONCATENATE'
@@ -312,6 +336,13 @@ OptionalPartitionOperations_EDIT
    }
  | 'SET' HdfsLocation_EDIT
  | 'SET' CachedIn_EDIT
+ | 'SET' CachedIn OptionalWithReplication 'CURSOR'
+   {
+     if (!$3) {
+       parser.suggestKeywords(['WITH REPLICATION =']);
+     }
+   }
+ | 'SET' CachedIn WithReplication_EDIT
  | 'SET' '<hive>SERDE' QuotedValue OptionalWithSerdeproperties 'CURSOR'
    {
      if (!$4) {
@@ -386,48 +417,48 @@ OneOrMorePartitionSpecLists_EDIT
  ;
 
 DropOperations
- : 'DROP' OneOrMorePartitionSpecs OptionalHivePurge
- | 'DROP' 'IF' 'EXISTS' OneOrMorePartitionSpecs OptionalHivePurge
- | 'DROP' ColumnIdentifier
+ : 'DROP' OptionalIfExists OneOrMorePartitionSpecs OptionalHivePurge
+ | 'DROP' OptionalIfExists '<impala>RANGE'
+ | 'DROP' OptionalIfExists '<impala>RANGE' 'PARTITION' RangePartitionSpec
+ | 'DROP' OptionalIfExists '<impala>RANGE' '<impala>PARTITION_VALUE' '=' UnsignedValueSpecification
  | 'DROP' '<impala>COLUMN' ColumnIdentifier
  ;
 
-DropOperations
- : 'DROP' 'CURSOR'
+DropOperations_EDIT
+ : 'DROP' OptionalIfExists 'CURSOR'
    {
-     if (parser.isHive()) {
+     if (parser.isHive() && !$2) {
        parser.suggestKeywords([{ value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
-     } else if (parser.isImpala()) {
-       parser.suggestKeywords(['COLUMN', 'PARTITION']);
-       parser.suggestColumns();
-     }
-   }
- | 'DROP' OneOrMorePartitionSpecs_EDIT OptionalHivePurge
- | 'DROP' OneOrMorePartitionSpecs OptionalHivePurge 'CURSOR'
-   {
-     if (parser.isHive() && !$3) {
-       parser.suggestKeywords(['PURGE']);
-     }
-   }
- | 'DROP' 'IF' 'CURSOR'
-   {
-     if (parser.isHive()) {
-       parser.suggestKeywords(['EXISTS']);
-     }
-   }
- | 'DROP' 'IF' 'EXISTS' 'CURSOR'
-    {
-      if (parser.isHive()) {
+     } else if (parser.isHive()) {
         parser.suggestKeywords(['PARTITION']);
-      }
-    }
- | 'DROP' 'IF' 'EXISTS' OneOrMorePartitionSpecs_EDIT OptionalHivePurge
- | 'DROP' 'IF' 'EXISTS' OneOrMorePartitionSpecs OptionalHivePurge 'CURSOR'
+     } else if (parser.isImpala() && !$2) {
+       parser.suggestKeywords([{ value: 'COLUMN', weight: 1 }, { value: 'PARTITION', weight: 1 }, { value: 'RANGE PARTITION', weight: 1 }, { value: 'IF EXISTS', weight: 2 }]);
+       parser.suggestColumns();
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['PARTITION', 'RANGE PARTITION']);
+     }
+   }
+ | 'DROP' OptionalIfExists OneOrMorePartitionSpecs_EDIT OptionalHivePurge
+ | 'DROP' OptionalIfExists OneOrMorePartitionSpecs OptionalHivePurge 'CURSOR'
    {
-     if (parser.isHive() && !$3) {
+     if (parser.isHive() && !$4) {
        parser.suggestKeywords(['PURGE']);
      }
    }
+ | 'DROP' OptionalIfExists_EDIT
+ | 'DROP' OptionalIfExists '<impala>RANGE' 'CURSOR'
+   {
+     parser.suggestKeywords(['PARTITION']);
+   }
+ | 'DROP' OptionalIfExists '<impala>RANGE' 'PARTITION' 'CURSOR'
+   {
+     parser.suggestKeywords(['VALUE']);
+   }
+ | 'DROP' OptionalIfExists '<impala>RANGE' '<impala>PARTITION_VALUE' 'CURSOR'
+   {
+     parser.suggestKeywords(['=']);
+   }
+ | 'DROP' OptionalIfExists '<impala>RANGE' 'PARTITION' RangePartitionSpec_EDIT
  | 'DROP' ColumnIdentifier_EDIT
  | 'DROP' '<impala>COLUMN' 'CURSOR'
    {
@@ -648,12 +679,6 @@ OptionalStoredAsDirectories_EDIT
    {
      parser.suggestKeywords(['DIRECTORIES']);
    }
- ;
-
-OptionalCascadeOrRestrict
- :
- | '<hive>CASCADE'
- | '<hive>RESTRICT'
  ;
 
 AlterView

@@ -50,6 +50,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 % endif
 
+<script src="${ static('desktop/ext/js/clipboard.min.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
@@ -62,7 +63,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
@@ -161,6 +162,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/download.min.js') }"></script>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
+<%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
 
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -189,6 +191,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 % endif
 </style>
 
+
+${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
+
 <div class="print-logo">
   <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }"  alt="${ _('Hue logo') }"/>
 </div>
@@ -196,7 +201,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="navbar-inner">
     <div class="container-fluid">
-      <div class="pull-right">
+      <div class="pull-right margin-right-10">
 
         <div class="btn-group">
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
@@ -607,7 +612,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
-        <li data-bind="attr: {'id': $data.name.substr(4)}"><a data-bind="text: $.trim($data.name), hueLink: $data.url" target="_blank"></a>
+        <li data-bind="attr: {'id': $data.name.substr(4)}">
+          %if is_embeddable:
+            <a class="pointer" data-bind="text: $.trim($data.name), click: function() { huePubSub.publish('show.jobs.panel', $data.name); }, clickBubble: false"></a>
+          %else:
+            <a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
+          %endif
           <!-- ko if: typeof percentJob !== 'undefined' && percentJob() > -1 -->
           <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
             <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
@@ -619,7 +629,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
       <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated"></pre>
     </div>
-    <div class="snippet-log-resizer" data-bind="visible: result.logs().length > 0, logResizer: {parent: '.snippet-log-container', target: '.logs-populated', mainScrollable: MAIN_SCROLLABLE, onStart: hideFixedHeaders, onResize: function(){ hideFixedHeaders(); redrawFixedHeaders(500); }}">
+    <div class="snippet-log-resizer" data-bind="visible: result.logs().length > 0, logResizer: {parent: '.snippet-log-container', target: '.logs-populated', mainScrollable: MAIN_SCROLLABLE, onStart: hideFixedHeaders, onResize: function(){ hideFixedHeaders(); redrawFixedHeaders(500); }, minHeight: 50}">
       <i class="fa fa-ellipsis-h"></i>
     </div>
   </div>
@@ -648,14 +658,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul class="nav nav-tabs">
-        <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, clickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
+        <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
             <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
-        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, clickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
+        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
           <a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
@@ -663,7 +673,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           </a>
         </li>
         % if ENABLE_QUERY_BUILDER.get():
+        <!-- ko if: isSqlDialect -->
         <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
+        <!-- /ko -->
         % endif
         <!-- ko if: result.hasSomeResults -->
         <li data-bind="click: function(){ currentQueryTab('queryResults'); }, css: {'active': currentQueryTab() == 'queryResults'}">
@@ -1082,7 +1094,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql') }"/>
           <!-- ko if: statementPath() -->
           <div class="inline-block" style="margin-top: 4px">
-            <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" target="_blank" title="${ _('Open in new tab') }">
+            <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
           </div>
@@ -1104,7 +1116,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           </div>
           <!-- ko if: associatedDocument() -->
             <div class="pull-left" style="margin-top: 4px">
-              <a data-bind="hueLink: associatedDocument().absoluteUrl" target="_blank" title="${ _('Open in new tab') }">
+              <a data-bind="hueLink: associatedDocument().absoluteUrl" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
               <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
@@ -2169,7 +2181,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
   function scrollToColumn(linkElement, index) {
     var $resultTable = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)");
-    var _text = $.trim($(linkElement).text().split(" ")[0]);
+    var _text = $.trim($(linkElement).text());
     var _col = $resultTable.find("th").filter(function () {
       return $.trim($(this).text()) == _text;
     });
@@ -2833,6 +2845,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     huePubSub.subscribe('app.gained.focus', function (app) {
       if (app === 'editor') {
         huePubSub.publish('redraw.fixed.headers');
+        huePubSub.publish('hue.scrollleft.show');
       }
     }, HUE_PUB_SUB_EDITOR_ID);
 
@@ -3471,10 +3484,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       huePubSub.subscribe('submit.popup.return', function (data) {
         viewModel.selectedNotebook().viewSchedulerId(data.job_id);
-        $.jHueNotify.info('${_('Coordinator submitted.')}');
         $('.submit-modal-editor').modal('hide');
-
-        $('a[href=\'#scheduledJobsTab\']').click();
+        huePubSub.publish('show.jobs.panel', data.job_id);
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('jobbrowser.data', function (jobs) {

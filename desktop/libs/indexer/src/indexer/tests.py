@@ -26,26 +26,32 @@ from django.core.urlresolvers import reverse
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
-from libzookeeper.conf import ENSEMBLE
+from libsolr import conf as libsolr_conf
+from libzookeeper import conf as libzookeeper_conf
 
-from indexer.controller import get_solr_ensemble, CollectionManagerController
+from indexer.conf import get_solr_ensemble
+from indexer.controller import CollectionManagerController
 
 
 def test_get_ensemble():
 
-  clear = ENSEMBLE.set_for_testing('zoo:2181')
+  clears = []
+  clears.append(libzookeeper_conf.ENSEMBLE.set_for_testing('zoo:2181'))
+  clears.append(libsolr_conf.SOLR_ZK_PATH.set_for_testing('/solr'))
   try:
     assert_equal('zoo:2181/solr', get_solr_ensemble())
   finally:
-    clear()
+    for clear in clears:
+      clear()
 
-
-  clear = ENSEMBLE.set_for_testing('zoo:2181,zoo2:2181')
+  clears = []
+  clears.append(libzookeeper_conf.ENSEMBLE.set_for_testing('zoo:2181,zoo2:2181'))
+  clears.append(libsolr_conf.SOLR_ZK_PATH.set_for_testing('/solr2'))
   try:
-    assert_equal('zoo:2181,zoo2:2181/solr', get_solr_ensemble())
+    assert_equal('zoo:2181,zoo2:2181/solr2', get_solr_ensemble())
   finally:
-    clear()
-
+    for clear in clears:
+      clear()
 
 
 class TestIndexerWithSolr:

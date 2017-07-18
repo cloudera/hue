@@ -249,6 +249,7 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
           "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
           "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
           "connect-src 'self';"+
+          "frame-src *;"+
           "child-src 'self' data: *.vimeo.com;"+
           "object-src 'none'")
 
@@ -1290,6 +1291,20 @@ DJANGO_EMAIL_BACKEND = Config(
   help=_("The email backend to use."),
   type=str,
   default="django.core.mail.backends.smtp.EmailBackend"
+)
+
+ENABLE_SQL_SYNTAX_CHECK = Config( # To remove when syntax check is ready
+  key='enable_sql_syntax_check',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to enable SQL syntax check or not.')
+)
+
+USE_NEW_GLOBAL_SEARCH = Config( # To remove when the new global search is ready
+  key='use_new_global_search',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to use the new global search or not.')
 )
 
 USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown

@@ -21,7 +21,7 @@ var EditorViewModel = (function() {
       'ace', 'aceMode', 'autocompleter', 'availableDatabases', 'availableSnippets', 'avoidClosing', 'canWrite',
       'cleanedDateTimeMeta', 'cleanedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
       'hasProperties', 'history', 'images', 'inFocus', 'queries', 'saveResultsModalVisible', 'selectedStatement',
-      'snippetImage', 'user', 'positionStatement'
+      'snippetImage', 'user', 'positionStatement', 'lastExecutedStatement'
     ]
   };
 
@@ -517,6 +517,7 @@ var EditorViewModel = (function() {
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
     self.positionStatement = ko.observable(null);
+    self.lastExecutedStatement = ko.observable(null);
 
     huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
       if (self.ace() && self.ace().container.id === statementDetails.id) {
@@ -968,7 +969,7 @@ var EditorViewModel = (function() {
     self.compatibilityTargetPlatform = ko.observable(self.type());
     self.compatibilityTargetPlatforms = ko.observableArray([
       {'name': 'Impala', 'value': 'impala'},
-      {'name': 'Hive', 'value': 'hive'},
+      {'name': 'Hive', 'value': 'hive'}
     ]);
 
     self.showOptimizer = ko.observable(self.getApiHelper().getFromTotalStorage('editor', 'show.optimizer', false));
@@ -977,7 +978,6 @@ var EditorViewModel = (function() {
         self.getApiHelper().setInTotalStorage('editor', 'show.optimizer', newValue);
       }
     });
-
 
     if (HAS_OPTIMIZER && ! vm.isNotificationManager()) {
       var lastComplexityRequest;
@@ -1168,6 +1168,12 @@ var EditorViewModel = (function() {
         self.statusForButtons('executed');
       }
 
+      if (self.isSqlDialect() && self.positionStatement()) {
+        self.lastExecutedStatement(self.positionStatement());
+      } else {
+        self.lastExecutedStatement(null);
+      }
+
       self.status('running');
       self.statusForButtons('executing');
       self.errors([]);
@@ -1233,7 +1239,7 @@ var EditorViewModel = (function() {
           } else {
             if (! notebook.unloaded()) {
               self.checkStatus();
-            };
+            }
           }
         } else {
           self._ajaxError(data, self.execute);
@@ -1420,6 +1426,7 @@ var EditorViewModel = (function() {
     };
 
     self.isFetchingData = false;
+
     self.fetchResultData = function (rows, startOver) {
       if (! self.isFetchingData) {
         if( self.status() == 'available') {
@@ -1489,7 +1496,7 @@ var EditorViewModel = (function() {
         } else {
           meta.cssClass = 'sort-string';
         }
-      })
+      });
 
       self.result.hasMore(result.has_more);
 
@@ -1518,27 +1525,25 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.fetchResultSize = function(n) {
-      if (typeof n === 'undefined') {
-        n = 10;
-      }
-
+    self.fetchResultSize = function(n, query_id) {
       $.post("/notebook/api/fetch_result_size", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
-        if (data.status == 0) {
-          if (data.result.rows != null) {
-            self.result.rows(data.result.rows);
-          } else if (self.type() == 'impala' && n > 0) {
-            setTimeout(function () {
-              self.fetchResultSize(n - 1);
-            }, 1000);
+        if (query_id == notebook.id()) { // If still on the same result
+          if (data.status == 0) {
+            if (data.result.rows != null) {
+              self.result.rows(data.result.rows);
+            } else if (self.type() == 'impala' && n > 0) {
+              setTimeout(function () {
+                self.fetchResultSize(n - 1, query_id);
+              }, 1000);
+            }
+          } else if (data.status == 5) {
+            // No supported yet for this snippet
+          } else {
+            //$(document).trigger("error", data.message);
           }
-        } else if (data.status == 5) {
-          // No supported yet for this snippet
-        } else {
-          //$(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         //$(document).trigger("error", xhr.responseText);
@@ -1557,22 +1562,34 @@ var EditorViewModel = (function() {
             self.getLogs();
           }
 
-          if (data.status == 0) {
+          if (data.status === 0) {
             self.status(data.query_status.status);
 
             if (self.status() == 'running' || self.status() == 'starting' || self.status() == 'waiting') {
               self.result.endTime(new Date());
               var delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
-              if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, delay); };
-            }
-            else if (self.status() == 'available') {
+              if (! notebook.unloaded()) {
+                self.checkStatusTimeout = setTimeout(self.checkStatus, delay);
+              }
+            } else if (self.status() === 'available') {
               self.fetchResult(100);
               self.progress(100);
               if (self.isSqlDialect()) {
                 if (self.result.handle().has_result_set) {
-                  self.fetchResultSize();
+                  var _query_id = notebook.id();
+                  setTimeout(function () { // Delay until we get IMPALA-5555
+                    self.fetchResultSize(10, _query_id);
+                  }, 2000);
                 } else { // Is DDL
-                  self.ddlNotification(Math.random());
+
+                  if (self.lastExecutedStatement()) {
+                    if (/CREATE|DROP|ALTER/i.test(self.lastExecutedStatement().firstToken)) {
+                      self.ddlNotification(Math.random());
+                    }
+                  } else {
+                    self.ddlNotification(Math.random());
+                  }
+
                   if (self.result.handle().has_more_statements) {
                     setTimeout(function () {
                       self.execute(); // Execute next, need to wait as we disabled fast click
@@ -1583,11 +1600,10 @@ var EditorViewModel = (function() {
               if (! self.result.handle().has_more_statements && vm.successUrl()) {
                 window.location.href = vm.successUrl(); // Not used anymore in Hue 4
               }
-            }
-            else if (self.status() == 'success') {
+            } else if (self.status() === 'success') {
               self.progress(99);
             }
-          } else if (data.status == -3) {
+          } else if (data.status === -3) {
             self.status('expired');
           } else {
             self._ajaxError(data);
@@ -1753,14 +1769,14 @@ var EditorViewModel = (function() {
 
       $.post("/metadata/api/optimizer/upload/table_stats", {
         db_tables: ko.mapping.toJSON($.map(options.activeTables, function(table) {
-          return table.database.name + '.' + table.name;
+          return table.databaseName + '.' + table.tableName;
         })),
         sourcePlatform: ko.mapping.toJSON(self.type()),
         with_columns: ko.mapping.toJSON(true),
         with_ddl: ko.mapping.toJSON(true)
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", $.map(options.activeTables, function(table) { return table.name; }) + " stats sent to analyse");
+          $(document).trigger("info", $.map(options.activeTables, function(table) { return table.tableName; }) + " stats sent to analyse");
           if (data.upload_table_ddl) {
             self.watchUploadStatus(data.upload_table_ddl.status.workloadId);
           }

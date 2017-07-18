@@ -31,6 +31,7 @@
 
 @hue-disabled-color: @cui-gray-100;
 @hue-error-color: @cui-red-400;
+@hue-warning-color: @cui-orange-400;
 
 @hue-panel-border-radius: 2px;
 
@@ -45,6 +46,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow-x: hidden;
+}
+
+.no-select {
+  // Every browser except IE 9
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .hue-linear-transition(@attributes) {
@@ -118,8 +129,6 @@
 }
 
 .flex(@flex: initial) {
-  -webkit-box-flex: @flex;
-  -moz-box-flex: @flex;
   -ms-flex: @flex;
   -webkit-flex: @flex;
   flex: @flex;

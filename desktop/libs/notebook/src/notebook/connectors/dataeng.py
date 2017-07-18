@@ -17,6 +17,7 @@
 
 import logging
 import json
+import re
 import subprocess
 
 from datetime import datetime,  timedelta
@@ -25,6 +26,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from metadata.workload_analytics_client import WorkfloadAnalyticsClient
 
 from notebook.connectors.base import Api, QueryError
 
@@ -56,6 +58,7 @@ class DataEngApi(Api):
   def __init__(self, user, cluster_name, interpreter=None, request=None):
     Api.__init__(self, user, interpreter=interpreter, request=request)
     self.cluster_name = cluster_name
+
 
   def execute(self, notebook, snippet):
     statement = snippet['statement']
@@ -112,7 +115,12 @@ class DataEngApi(Api):
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
-    return ''
+    logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
+        operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
+        attempt_id='attempt_1499705340501_0045_m_000000_0'
+    )
+
+    return ''.join(re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
 
 
   def progress(self, snippet, logs):
@@ -173,33 +181,8 @@ class DataEng():
 
     return _exec(args)
 
-  def describe_jobs(self, submitter_crns=None, page_size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
-        creation_date_after=None, cluster_crn=None, order=None):
-    args = ['describe-jobs']
-
-    if creation_date_after is None:
-      creation_date_after = (datetime.today() - timedelta(days=7)).strftime(DATE_FORMAT)
-
-    if submitter_crns:
-      args.extend(['--submitter-crns', submitter_crns])
-    if page_size is not None:
-      args.extend(['--page-size', str(page_size)])
-    if starting_token:
-      args.extend(['--starting-token', starting_token])
-    if job_statuses:
-      args.extend(['--job-statuses', job_statuses])
-    if job_ids:
-      args.extend(['--job-ids'] + job_ids)
-    if job_types:
-      args.extend(['--job-types', job_types])
-    if creation_date_before:
-      args.extend(['--creation-date-before', creation_date_before])
-    if creation_date_after:
-      args.extend(['--creation-date-after', creation_date_after])
-    if cluster_crn:
-      args.extend(['--cluster-crn', cluster_crn])
-    if order:
-      args.extend(['--order', order])
+  def describe_job(self, job_id):
+    args = ['describe-job', '--job-id', job_id]
 
     return _exec(args)
 

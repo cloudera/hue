@@ -263,7 +263,7 @@ ${ assist.assistPanel() }
               <span class="help-inline muted" data-bind="visible: createWizard.isNameAvailable()">${ _('A new collection will be created') }</span>
               <span class="help-inline muted" data-bind="visible: !createWizard.isNameAvailable() && createWizard.fileFormat().name().length > 0">
               ${ _('Adding data to this existing collection') }
-              <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+              <a href="javascript:void(0)" data-bind="hueLink: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name(), text: createWizard.fileFormat().name"></a>
               </span>
             </label>
           </div>
@@ -356,14 +356,14 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <span data-bind="visible: createWizard.editorId">
-        <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
+        <a href="javascript:void(0)" class="btn btn-success" data-bind="hueLink: '/oozie/list_oozie_workflow/' + createWizard.jobId()" title="${ _('Open') }">
           ${_('Oozie Status')}
          </a>
-        <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
+        <a href="javascript:void(0)" class="btn btn-success" data-bind="hueLink: '${ url('notebook:editor') }?editor=' + createWizard.editorId()" title="${ _('Open') }">
           ${_('View indexing status')}
         </a>
 
-        ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name() }, text: createWizard.fileFormat().name" target="_blank"></a>
+        ${ _('View collection') } <a href="javascript:void(0)" data-bind="hueLink: '${ url("indexer:collections") }' +'#edit/' + createWizard.fileFormat().name(), text: createWizard.fileFormat().name"></a>
       </span>
 
       <div id="notebook"></div>
@@ -455,6 +455,13 @@ ${ assist.assistPanel() }
   <!-- /ko -->
   <button class="btn" data-bind="click: function(){value.push({key: ko.observable(''), value: ko.observable('')})}">${_('Add Pair')}</button>
   <br>
+</script>
+
+<script type="text/html" id="arg-text-delimiter">
+  <label>
+    <div data-bind="text: description"></div>
+    <select data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: value, optionsValue: 'value', optionsText: 'name', attr: {placeholder: description}"></select>
+  </label>
 </script>
 
 <script type="text/html" id="field-preview-header-template">

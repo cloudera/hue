@@ -199,7 +199,7 @@ ${ components.menubar(is_embeddable) }
     <table id="partitionsTable" class="table table-condensed table-nowrap">
       <thead>
         <tr>
-          <th style="width: 1%">
+          <th style="width: 1%" class="vertical-align-middle">
             <!-- ko ifnot: $data.withDrop -->
             &nbsp;
             <!-- /ko -->
@@ -300,8 +300,8 @@ ${ components.menubar(is_embeddable) }
     <div title="${ _('Format') }">
       <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
       <i class="fa fa-fw fa-archive muted"></i>
-      <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span>
-      <span data-bind="visible: ! details.properties.compressed" style="display:none;">${_('Not compressed')}</span>
+      <span data-bind="visible: details.properties.table_type == 'MANAGED_TABLE'" style="display: none;">${_('Managed')}</span>
+      <span data-bind="visible: details.properties.table_type == 'EXTERNAL_TABLE'" style="display: none;">${_('External')}</span>
     </div>
   </div>
   <!-- /ko -->
@@ -366,6 +366,7 @@ ${ components.menubar(is_embeddable) }
         <form action="/metastore/databases/drop" data-bind="submit: dropAndWatch" method="POST">
           <input type="hidden" name="is_embeddable" value="true"/>
           <input type="hidden" name="start_time" value=""/>
+          <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
       % else:
         <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
       % endif
@@ -399,7 +400,7 @@ ${ components.menubar(is_embeddable) }
   <table id="databasesTable" class="table table-condensed datatables" style="margin-bottom: 10px" data-bind="visible: filteredDatabases().length > 0">
     <thead>
     <tr>
-      <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
+      <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
@@ -483,7 +484,7 @@ ${ components.menubar(is_embeddable) }
         <table id="tablesTable" class="table table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
           <thead>
           <tr>
-            <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
+            <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
             <th>&nbsp;</th>
             <th width="30%">${ _('Table Name') }</th>
             <th width="48%">${ _('Comment') }</th>
@@ -550,6 +551,7 @@ ${ components.menubar(is_embeddable) }
         <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }, submit: dropAndWatch" method="POST">
           <input type="hidden" name="is_embeddable" value="true"/>
           <input type="hidden" name="start_time" value=""/>
+          <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
       % else:
         <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
       % endif
@@ -643,11 +645,6 @@ ${ components.menubar(is_embeddable) }
     % if has_write_access:
       <a class="inactive-action" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i></a>
     % endif
-    <!-- ko if: tableDetails() -->
-      <!-- ko if: tableDetails().partition_keys.length -->
-      <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }" title="${_('Show Partitions')}"><i class="fa fa-sitemap fa-fw"></i></a>
-      <!-- /ko -->
-    <!-- /ko -->
     % if has_write_access:
       <a class="inactive-action" href="#dropSingleTable" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i></a>
     % endif
@@ -783,6 +780,7 @@ ${ components.menubar(is_embeddable) }
         <input type="hidden" name="is_embeddable" value="true"/>
         <input type="hidden" name="format" value="json"/>
         <input type="hidden" name="start_time" value=""/>
+        <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
     % else:
       <form data-bind="attr: { 'action': '/metastore/table/' + $parent.database.name + '/' + $parent.name + '/partitions/drop' }" method="POST">
     % endif
@@ -956,7 +954,7 @@ ${ components.menubar(is_embeddable) }
           <div class="acl-block acl-block-airy">
             <span class="muted" title="3 months ago">TABLE</span>
             <span>
-              <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
             </span>
             <br>
             server=<span>server1</span>
@@ -975,7 +973,7 @@ ${ components.menubar(is_embeddable) }
           <div class="acl-block acl-block-airy">
             <span class="muted" title="3 months ago">TABLE</span>
             <span>
-              <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
             </span>
             <br>
             server=server1
@@ -1008,7 +1006,7 @@ ${ components.menubar(is_embeddable) }
             <span class="muted" title="3 months ago">TABLE</span>
 
             <span>
-              <a class="muted" target="_blank" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
+              <a class="muted" style="margin-left: 4px" title="Open in Sentry" href="/security/hive"><i class="fa fa-external-link"></i></a>
             </span>
             <br>
 
@@ -1200,6 +1198,7 @@ ${ components.menubar(is_embeddable) }
     <form data-bind="submit: dropAndWatch" method="POST">
       <input type="hidden" name="is_embeddable" value="true"/>
       <input type="hidden" name="start_time" value=""/>
+      <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
     % else:
     <form method="POST">
     % endif

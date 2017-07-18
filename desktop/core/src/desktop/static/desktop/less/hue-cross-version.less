@@ -180,9 +180,15 @@ input[type='password']::-ms-reveal {
   filter: blur(5px);
 }
 
-.hue-ace-error {
+.hue-ace-syntax-error {
   position: absolute;
-  border-bottom: 1px dotted #FF0000;
+  border-bottom: 1px dotted @hue-error-color;
+  border-radius: 0 !important;
+}
+
+.hue-ace-syntax-warning {
+  position: absolute;
+  border-bottom: 1px dotted @hue-warning-color;
   border-radius: 0 !important;
 }
 
@@ -468,4 +474,16 @@ ul.errorlist {
 
 .toggle-overflow-gradient:hover {
   background-color: @cui-gray-100;
+}
+
+.nicescroll-rails {
+  display: none;
+}
+
+.datepicker {
+  z-index: 1051;
+}
+
+.input-almost-xxlarge {
+  width: 450px;
 }

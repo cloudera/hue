@@ -23,6 +23,7 @@
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
+  from indexer.conf import ENABLE_NEW_INDEXER
   from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
@@ -47,9 +48,11 @@
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
 
+
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 
@@ -57,6 +60,7 @@
     var IS_HUE_4 = true;
   </script>
 
+  <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
 </head>
 
@@ -112,9 +116,9 @@ ${ hueIcons.symbols() }
         <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
-          <button class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
+          <a class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
             <span data-bind="text: displayName"></span>
-          </button>
+          </a>
           <!-- /ko -->
           <!-- /ko -->
           <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1">
@@ -140,7 +144,7 @@ ${ hueIcons.symbols() }
               </a>
             <!-- /ko -->
             <!-- ko if: item.href -->
-              <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
+              <a data-bind="hueLink: item.href, text: item.displayName"></a>
             <!-- /ko -->
             <!-- ko if: item.isCategory -->
             <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
@@ -195,44 +199,11 @@ ${ hueIcons.symbols() }
         </div>
         <!-- /ko -->
 
-        <div class="search-container-top">
-          <input placeholder="${ _('Search data and saved documents...') }" type="text"
-            data-bind="autocomplete: {
-                source: searchAutocompleteSource,
-                itemTemplate: 'top-search-autocomp-item',
-                noMatchTemplate: 'top-search-autocomp-no-match',
-                classPrefix: 'nav-',
-                showOnFocus: true,
-                closeOnEnter: false,
-                onSelect: mainSearchSelect,
-                reopenPattern: /.*:$/
-              },
-              hasFocus: searchHasFocus,
-              clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
-              textInput: searchInput,
-              valueUpdate: 'afterkeydown'">
-        </div>
-
-        <script type="text/html" id="top-search-autocomp-item">
-          <a href="javascript:void(0);">
-            <div class="nav-autocomplete-item-link">
-              <div class="nav-search-result-icon"><i class="fa fa-fw" data-bind="css: icon"></i></div>
-              <div class="nav-search-result-text">
-                <div class="nav-search-result-header" data-bind="html: label, style: { 'padding-top': description ? 0 : '9px' }"></div>
-                <!-- ko if: description -->
-                <div class="nav-search-result-description" data-bind="html: description"></div>
-                <!-- /ko -->
-              </div>
-            </div>
-          </a>
-        </script>
-
-        <script type="text/html" id="top-search-autocomp-no-match">
-          <div class="nav-autocomplete-item-link" style="height: 30px;">
-            <div class="nav-autocomplete-empty">${ _('No match found') }</div>
-          </div>
-        </script>
-
+        % if conf.USE_NEW_GLOBAL_SEARCH.get():
+          <div class="search-container-top" data-bind="component: 'hue-global-search'"></div>
+        %else:
+          <div class="search-container-top-old" data-bind="component: 'hue-global-search-old'"></div>
+        % endif
       </div>
 
       <div class="top-nav-right">
@@ -276,7 +247,7 @@ ${ hueIcons.symbols() }
   <div id="jobsPanel" class="jobs-panel" style="display: none;">
     <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
     <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
-    <ul class="nav nav-pills" class="inline">
+    <ul class="nav nav-pills">
       <li class="active" data-interface="jobs"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'jobs')">${_('Jobs')}</a></li>
       <li data-interface="workflows"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'workflows')">${_('Workflows')}</a></li>
       <li data-interface="schedules"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'schedules')">${_('Schedules')}</a></li>
@@ -387,6 +358,11 @@ ${ hueIcons.symbols() }
       <div id="embeddable_500" class="embeddable"></div>
       <div id="embeddable_sqoop" class="embeddable"></div>
       <div id="embeddable_jobsub" class="embeddable"></div>
+      % if other_apps:
+        % for other in other_apps:
+          <div id="embeddable_${ other.display_name }" class="embeddable"></div>
+        % endfor
+      % endif
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
@@ -497,7 +473,8 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
@@ -572,7 +549,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         home: { url: '/home*', title: '${_('Home')}' },
         indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
         collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
+        % if ENABLE_NEW_INDEXER.get():
+        indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
+        %else:
         indexes: { url: '/indexer/', title: '${_('Indexes')}' },
+        %endif
         importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
         useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
         useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
@@ -596,6 +577,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
         sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
         jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
+        % if other_apps:
+          % for other in other_apps:
+            ${ other.display_name }: { url: '/${ other.display_name }', title: '${ other.nice_name }' },
+          % endfor
+        % endif
       };
 
       var SKIP_CACHE = [
@@ -603,7 +589,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
           'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
-          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs'
+          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
+          % if other_apps:
+            % for other in other_apps:
+              '${ other.display_name }',
+            % endfor
+          % endif
       ];
 
       var OnePageViewModel = function () {
@@ -768,6 +759,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $('.tooltip').hide();
           huePubSub.publish('hue.datatable.search.hide');
           huePubSub.publish('nicescroll.resize');
+          huePubSub.publish('hue.scrollleft.hide');
           huePubSub.publish('context.panel.visible.editor', false);
           if (app === 'filebrowser') {
             $(window).unbind('hashchange.fblist');
@@ -790,7 +782,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               var route = new page.Route(baseURL);
               route.keys.forEach(function (key) {
                 if (key.name === 0){
-                  baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+                  if (typeof self.currentContextParams()[key.name] !== 'undefined') {
+                    baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+                  }
+                  else {
+                    baseURL = baseURL.replace('*', '');
+                  }
                 }
                 else {
                   baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
@@ -943,6 +940,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page(ctx.path.replace(/home2/gi, 'home'));
           }},
           { url: '/home*', app: 'home' },
+          { url: '/indexer/indexes/*', app: 'indexes' },
           { url: '/indexer/', app: 'indexes' },
           { url: '/indexer/importer/', app: 'importer' },
           { url: '/indexer/importer/prefill/*', app: function (ctx) {
@@ -1051,6 +1049,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/useradmin/users/new', app: 'useradmin_newuser' },
           { url: '/useradmin/users/', app: 'useradmin_users' },
           { url: '/useradmin', app: 'useradmin_users' },
+          % if other_apps:
+            % for other in other_apps:
+              { url: '/${ other.display_name }', app: '${ other.display_name }' },
+            % endfor
+          % endif
         ];
 
         pageMapping.forEach(function (mapping) {
@@ -1062,7 +1065,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-          page('/', function() {  page(clusterConfig['main_button_action'].page); });
+          page('/', function() { page(clusterConfig['main_button_action'].page); });
           page('*', function (ctx) {
             console.error('Route not found', ctx);
             self.loadApp('404');
@@ -1167,25 +1170,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     var topNavViewModel = (function (onePageViewModel) {
 
-      // TODO: Extract to common module (shared with nav search autocomplete)
-      var SEARCH_FACET_ICON = 'fa-tags';
-      var SEARCH_TYPE_ICONS = {
-        'DATABASE': 'fa-database',
-        'TABLE': 'fa-table',
-        'VIEW': 'fa-eye',
-        'FIELD': 'fa-columns',
-        'PARTITION': 'fa-th',
-        'SOURCE': 'fa-server',
-        'OPERATION': 'fa-cogs',
-        'OPERATION_EXECUTION': 'fa-cog',
-        'DIRECTORY': 'fa-folder-o',
-        'FILE': 'fa-file-o',
-        'SUB_OPERATION': 'fa-code-fork',
-        'COLLECTION': 'fa-search',
-        'HBASE': 'fa-th-large',
-        'HUE': 'fa-file-o'
-      };
-
       function TopNavViewModel (onePageViewModel) {
         var self = this;
         self.onePageViewModel = onePageViewModel;
@@ -1198,11 +1182,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.leftNavVisible(false);
         });
 
-        self.apiHelper = ApiHelper.getInstance();
-        self.searchActive = ko.observable(false);
-        self.searchHasFocus = ko.observable(false);
-        self.searchInput = ko.observable();
-
         self.mainQuickCreateAction = ko.observable();
         self.quickCreateActions = ko.observableArray();
 
@@ -1212,7 +1191,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (clusterConfig && clusterConfig['main_button_action']) {
             var topApp = clusterConfig['main_button_action'];
             self.mainQuickCreateAction({
-              displayName: topApp.type === 'hive' || topApp.type === 'impala' ? '${ _("Query") }' : topApp.displayName,
+              displayName: topApp.buttonName,
               icon: topApp.type,
               tooltip: topApp.tooltip,
               url: topApp.page
@@ -1308,7 +1287,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 var interfaces = [];
                 if (data && data.apps) {
                   data.apps.forEach(function(cluster) {
-                    interfaces.push(ko.mapping.fromJS({'name': dataEngCluster[0].name(), 'type': 'dataeng', 'interface': cluster.id}));
+                    interfaces.push(ko.mapping.fromJS({'name': dataEngCluster[0].name(), 'type': 'dataeng', 'interface': cluster.name, 'id': cluster.id}));
                   });
                 }
                 dataEngCluster[0]['interfaces'](interfaces);
@@ -1326,92 +1305,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }
         };
         self.cluster = new ClusterPanelViewModel();
-
-        self.searchAutocompleteSource = function (request, callback) {
-          // TODO: Extract complete contents to common module (shared with nav search autocomplete)
-          var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
-          var isFacet = facetMatch !== null;
-          var partialMatch = isFacet ? null : request.term.match(/\S+$/);
-          var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
-          var beforePartial = request.term.substring(0, request.term.length - partial.length);
-
-          self.apiHelper.globalSearchAutocomplete({
-            query:  request.term,
-            successCallback: function (data) {
-              var values = [];
-              var facetPartialRe = new RegExp(partial.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i'); // Protect for 'tags:*axe'
-
-              if (typeof data.resultsHuedocuments !== 'undefined') {
-                data.resultsHuedocuments.forEach(function (result) {
-                  values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description, link: result.link }, value: beforePartial + result.originalName });
-                });
-              }
-              if (values.length > 0) {
-                values.push({ divider: true });
-              }
-
-              if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
-                var facetInQuery = facetMatch[1];
-                if (typeof data.facets[facetInQuery] !== 'undefined') {
-                  $.map(data.facets[facetInQuery], function (count, value) {
-                    if (facetPartialRe.test(value)) {
-                      values.push({ data: { label: facetInQuery + ':' + value, icon: SEARCH_FACET_ICON, description: count }, value: beforePartial + value})
-                    }
-                  });
-                }
-              } else {
-                if (typeof data.facets !== 'undefined') {
-                  Object.keys(data.facets).forEach(function (facet) {
-                    if (facetPartialRe.test(facet)) {
-                      if (Object.keys(data.facets[facet]).length > 0) {
-                        values.push({ data: { label: facet + ':', icon: SEARCH_FACET_ICON, description: $.map(data.facets[facet], function (key, value) { return value + ' (' + key + ')'; }).join(', ') }, value: beforePartial + facet + ':'});
-                      } else { // Potential facet from the list
-                        values.push({ data: { label: facet + ':', icon: SEARCH_FACET_ICON, description: '' }, value: beforePartial + facet + ':'});
-                      }
-                    } else if (partial.length > 0) {
-                      Object.keys(data.facets[facet]).forEach(function (facetValue) {
-                        if (facetValue.indexOf(partial) !== -1) {
-                          values.push({ data: { label: facet + ':' + facetValue, icon: SEARCH_FACET_ICON, description: facetValue }, value: beforePartial + facet + ':' + facetValue });
-                        }
-                      });
-                    }
-                  });
-                }
-              }
-
-              if (values.length > 0) {
-                values.push({ divider: true });
-              }
-              if (typeof data.results !== 'undefined') {
-                data.results.forEach(function (result) {
-                  values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
-                });
-              }
-
-              if (values.length > 0 && values[values.length - 1].divider) {
-                values.pop();
-              }
-              if (values.length === 0) {
-                values.push({ noMatch: true });
-              }
-              callback(values);
-            },
-            silenceErrors: true,
-            errorCallback: function () {
-              callback([]);
-            }
-          });
-        };
       }
-
-      TopNavViewModel.prototype.mainSearchSelect = function (entry) {
-        if (entry.data && entry.data.link) {
-          huePubSub.publish('open.link', entry.data.link);
-        } else if (!/:\s*$/.test(entry.value)) {
-          huePubSub.publish('assist.show.sql');
-          huePubSub.publish('assist.db.search', entry.value);
-        }
-      };
 
       var topNavViewModel = new TopNavViewModel(onePageViewModel);
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
@@ -1560,7 +1454,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
 
     var hideJobsPanels = function (e) {
-      if ($(e.target).closest('.jobs-panel').length === 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $('.jobs-panel').is(':visible')) {
+      if ($(e.target).parents('.navbar-default').length > 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $(e.target).closest('.hamburger-hue').length === 0 && $('.jobs-panel').is(':visible')) {
         huePubSub.publish('hide.jobs.panel');
         huePubSub.publish('hide.history.panel');
       }
@@ -1593,38 +1487,38 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
 
     tour.addStep('welcome', {
-      text: '<b>${ _ko('Welcome to Hue 4!') }</b><br><br>${ _ko('Before you start, we want you to familiarize with the new interface. Ready?') }',
+      text: '<b>${ _ko('Welcome to Hue 4!') }</b><br><br>${ _ko('We want to introduce you to the new interface. It takes less than a minute. Ready? ') }'
     });
 
     tour.addStep('topnav', {
-      text: '${ _ko('A brand new navigation bar!') }<br><br>${ _ko('The default app has its own blue button now, there is a global search available, and the notifications panels are on the right.') }',
-      attachTo: '.navbar-default bottom',
+      text: '${ _ko('A new nav bar and big blue button!') }<br><br>${ _ko('Open Hue to your favorite app, select other apps from the blue button, do global search, and view notification panels at right.') }',
+      attachTo: '.navbar-default bottom'
     });
 
     %if user.is_superuser:
       tour.addStep('admin', {
-        text: '${ _ko('Since you are a superuser, you can find the Check Configuration inside the user dropdown and install examples of data and jobs.') }',
-        attachTo: '.top-nav-right .dropdown bottom',
+        text: '${ _ko('As a superuser, you can check system configuration from the username drop down and install sample data and jobs for your users.') }',
+        attachTo: '.top-nav-right .dropdown bottom'
       });
     %endif
 
     tour.addStep('leftpanel', {
-      text: '${ _ko('The improved data panel will help you out with discovering your sources. Remember: you can right click on it!') }',
-      attachTo: '.left-panel right',
+      text: '${ _ko('Discover data sources with the improved data assist panel. Remember to right-click for more!') }',
+      attachTo: '.left-panel right'
     });
 
     tour.addStep('pagecontent', {
-      text: '${ _ko('This is the main action spot, where the currently selected app runs.') }<br>${ _ko('Hover on the app name to star it as your favorite application.') }',
-      attachTo: '.page-content center',
+      text: '${ _ko('This is the main attraction, where your selected app runs.') }<br>${ _ko('Hover on the app name to star it as your favorite application.') }',
+      attachTo: '.page-content center'
     });
 
     tour.addStep('rightpanel', {
-      text: '${ _ko('Some of the apps have a right panel too with additional information to assist you out in your data discovery.') }',
-      attachTo: '.right-panel left',
+      text: '${ _ko('Some apps have a right panel with additional information to assist you in your data discovery.') }',
+      attachTo: '.right-panel left'
     });
 
     tour.addStep('bye', {
-      text: '${ _ko('This tour will not be shown again, but you can always take it again by clicking on your username on top right.') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!',
+      text: '${ _ko('This ends the tour. To see it again, click Welcome Tour from the username drop down.') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!'
     });
 
     var closeTourOnEsc = function (e) {

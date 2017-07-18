@@ -15,422 +15,751 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
+  from desktop import conf
+
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
 %>
+
+<%namespace name="assist" file="/assist.mako" />
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
+<%
+MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
+%>
+
+%if not is_embeddable:
+${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
+
+${ assist.assistJSModels() }
+<link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .show-assist {
+    top: 110px!important;
+  }
+  .main-content {
+    top: 112px!important;
+  }
+% endif
+</style>
+
+${ assist.assistPanel() }
+%endif
+
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">
+<link rel="stylesheet" href="${ static('indexer/css/indexes.css') }" type="text/css">
 
 
-<div class="container-fluid">
-  <div class="card card-small">
-  <h1 class="card-heading simple">${ _('Solr Indexes') }</h1>
+<script type="text/html" id="indexes-breadcrumbs">
+  <h1>
+    <!-- ko with: index() -->
+    <div class="inline-block pull-right">
+      <a class="inactive-action" data-bind="hueLink: '/search/browse/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Search the index')}" href="javascript:void(0)">
+        <i class="fa fa-search fa-fw"></i>
+      </a>
 
-  <%actionbar:render>
-    <%def name="search()">
-      <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for name, description, etc...')}">
-    </%def>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="hueLink: '/indexer/importer/prefill/all/index/' + name(), tooltip: { placement: 'bottom', delay: 750 }" title="${_('Add Data')}">
+        <i class="fa fa-upload fa-fw"></i>
+      </a>
 
-    <%def name="actions()">
-      <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndex').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
-          <i class="fa fa-times"></i> ${ _('Delete') }
+      <a class="inactive-action" href="javascript:void(0)" data-toggle="modal" data-bind="click: function() { $('#deleteIndex').modal('show') }, tooltip: { placement: 'bottom', delay: 750 }">
+        <i class="fa fa-times fa-fw"></i>
+      </a>
+    </div>
+    <!-- /ko -->
+    <ul class="nav nav-pills hue-breadcrumbs-bar">
+      <li>
+        <a href="javascript:void(0);" data-bind="click: showIndexes">${ _('Indexes') }
+          <!-- ko if: index -->
+          <span class="divider">&gt;</span>
+          <!-- /ko -->
         </a>
+      </li>
+      <!-- ko with: index -->
+      <li>
+        <a href="javascript:void(0);" data-bind="text: name"></a>
+      </li>
+      <!-- /ko -->
+    </ul>
+  </h1>
+</script>
+
+<div class="navbar hue-title-bar nokids">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="app-header">
+              <a href="/${app_name}">
+                ${ _('Index Browser') }
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
-    </%def>
+    </div>
+</div>
 
-    <%def name="creation()">
-      <a href="javascript:void(0)" class="btn" data-bind="click: function() { index.showCreateModal(true) }">
-        <i class="fa fa-plus-circle"></i> ${ _('Create index') }
-      </a>
-      <a href="javascript:void(0)" class="btn" data-bind="click: function() { createWizard.show(true) }">
-        <i class="fa fa-plus-circle"></i> ${ _('Create index from a file') }
-      </a>      
-      <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
-        <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
-      </a>
-    </%def>
-  </%actionbar:render>
+<div id="indexesComponents" class="notebook">
+
+  % if not is_embeddable:
+  <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function () { $root.isLeftPanelVisible(true); }">
+    <i class="fa fa-chevron-right"></i>
+  </a>
+  % endif
+
+  <div class="main-content">
+    <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
+      <div class="vertical-full row-fluid panel-container">
+        % if not is_embeddable:
+        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+          <div class="assist" data-bind="component: {
+              name: 'assist-panel',
+              params: {
+                user: '${user.username}',
+                sql: {
+                  navigationSettings: {
+                    openItem: true,
+                    showStats: true
+                  }
+                },
+                visibleAssistPanels: ['sql']
+              }
+            }"></div>
+        </div>
+        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+        % endif
+        <div class="content-panel" ${ not is_embeddable and 'data-bind="niceScroll"' or ''}>
 
 
-  <table id="indexTable" class="table datatables">
+          <div class="indexer-main">
+            <!-- ko template: { name: 'indexes-breadcrumbs' }--><!-- /ko -->
+
+            <!-- ko if: section() === 'list-indexes' -->
+            <%actionbar:render>
+              <%def name="search()">
+                <input data-bind="clearable: indexFilter, value: indexFilter, valueUpdate: 'afterkeydown'" type="text" class="input-xlarge search-query" placeholder="${_('Search for name...')}">
+              </%def>
+
+              <%def name="actions()">
+                <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+                  <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndexes').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+                    <i class="fa fa-times"></i> ${ _('Delete') }
+                  </a>
+                </div>
+              </%def>
+
+              <%def name="creation()">
+                <a href="javascript:void(0)" class="btn" data-bind="hueLink: '/indexer/importer/prefill/all/index/'">
+                  <i class="fa fa-plus-circle"></i> ${ _('Create index') }
+                </a>
+                <a data-bind="click: function() { $root.alias.name(''); $root.alias.chosenCollections.removeAll(); $('#createAlias').modal('show'); }" class="btn">
+                  <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
+                </a>
+              </%def>
+            </%actionbar:render>
+            <!-- /ko -->
+
+            <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
+            <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
+          </div>
+
+          <!-- ko hueSpinner: { spin: isLoading, center: true, size: 'xlarge' } --><!-- /ko -->
+
+
+          <div id="deleteIndexes" class="modal hide fade">
+            <form id="deleteIndexesForm" method="POST" data-bind="submit: deleteIndexes">
+              ${ csrf_token(request) | n,unicode }
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title">${ _('Delete the selection?') }</h2>
+              </div>
+              <div class="modal-body">
+                <ul data-bind="foreach: selectedIndexes">
+                  <li>
+                    <span data-bind="text: name"></span>
+                  </li>
+                </ul>
+              </div>
+              <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+                <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+              </div>
+            </form>
+          </div>
+
+          <div id="deleteIndex" class="modal hide fade">
+            <form id="deleteIndexForm" method="POST" data-bind="submit: function() { $root.index().delete() }">
+              ${ csrf_token(request) | n,unicode }
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title">${ _('Delete?') }</h2>
+              </div>
+              <div class="modal-body">
+                <!-- ko if: $root.index() -->
+                  <span data-bind="text: $root.index().name"></span>
+                <!-- /ko -->
+              </div>
+              <div class="modal-footer">
+                <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+                <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
+              </div>
+            </form>
+          </div>
+
+          <div id="createAlias" class="modal hide fade">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+              <h2 class="modal-title">${ _('Create alias') }</h2>
+            </div>
+            <div class="modal-body">
+              <input type="text" data-bind="textInput: alias.name"/>
+
+              <table id="indexesChecksTable" class="table table-condensed table-nowrap">
+                <thead>
+                  <tr>
+                    <th style="width: 1%">
+                      <div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: alias.availableCollections, selectedValues: alias.chosenCollections }"></div>
+                    </th>
+                    <th>${_('Collection')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <!-- ko foreach: alias.availableCollections -->
+                <tr>
+                  <td>
+                    <div class="hueCheckbox fa" data-bind="multiCheck: '#indexesChecksTable', value: $data, hueChecked: $parent.alias.chosenCollections"></div>
+                  </td>
+                  <td data-bind="text: name"></td>
+                </tr>
+                <!-- /ko -->
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+              <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+              <button class="btn btn-primary disable-feedback" data-bind="click: alias.create, enable: alias.chosenCollections().length > 0 && alias.name() !== ''">
+                 ${ _('Create') }
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+
+<script type="text/html" id="list-indexes">
+  <table class="table datatables">
     <thead>
       <tr>
         <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Type') }</th>
         <th>${ _('Collections') }</th>
-        <th>${ _('Schema') }</th>
       </tr>
     </thead>
-    <tbody data-bind="foreach: { data: indexes }">
+    <tbody data-bind="foreach: { data: filteredIndexes }">
       <tr>
-        <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
-          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
-          ## <a data-bind="attr: { 'href': '${ url('search:index') }?index=' + id() }" data-row-selector="true"></a>
+        <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
+          <div data-bind="css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
         </td>
-        <td data-bind="text: name"></td>
+        <td><a class="pointer" data-bind="text: name, click: function() { $root.fetchIndex($data); }"></a></td>
         <td data-bind="text: type"></td>
         <td>
           <span data-bind="text: collections"></span>
-          <a data-bind="click: $root.alias.edit, visible: type() == 'alias'">
-            <i class="fa fa-pencil"></i> ${ _('Edit') }
-          </a>
-        </td>
-        <td>
-          <a data-bind="attr: { 'href': '/indexer/api/indexes/' + name() + '/schema/' }, visible: type() == 'collection'">
+          <a class="pointer" data-bind="click: $root.alias.edit, visible: type() == 'alias'">
             <i class="fa fa-pencil"></i> ${ _('Edit') }
           </a>
         </td>
       </tr>
     </tbody>
   </table>
-
-  </div>
-</div>
-
-<!-- ko template: 'create-index' --><!-- /ko -->
-
-<script type="text/html" id="create-index">
-  <div class="snippet-settings" data-bind="visible: index.showCreateModal">
-
-    <input type="text" data-bind="value: index.name"/>
-
-    <a href="javascript:void(0)" class="btn" data-bind="click: index.create">
-      <i class="fa fa-plus-circle"></i> ${ _('Create index') }
-    </a>
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { index.showCreateModal(false) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
-    </a>
-  </div>
 </script>
 
 
-<!-- ko template: 'create-alias' --><!-- /ko -->
+<script type="text/html" id="list-index">
+  <ul class="nav nav-pills margin-top-30">
+    <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
+    <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
+    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
+  </ul>
 
-<script type="text/html" id="create-alias">
-  <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
-
-    <input type="text" data-bind="value: alias.name"/>
-    <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name', optionsValue: 'name'" size="5" multiple="true"></select>
-
-    <a href="javascript:void(0)" class="btn" data-bind="click: alias.create, visible: alias.chosenCollections().length > 0">
-      <i class="fa fa-plus-circle"></i> ${ _('Create or edit') }
-    </a>
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(false) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
-    </a>
-  </div>
-</script>
-
-
-<!-- ko template: 'create-index-wizard' --><!-- /ko -->
-
-<script type="text/html" id="create-index-wizard">
-  <div class="snippet-settings" data-bind="visible: createWizard.show">
-
-    ${ _('Name') } <input type="text" data-bind="value: createWizard.name"/>
-    
-    <!-- ko if: createWizard.name() -->
-    <select data-bind="options: createWizard.availableWizards, value: createWizard.wizard, optionsText: 'name'" size="5"></select>
-
-    <span data-bind="template: { name: 'create-index-from-file', data: createWizard.wizard }"></span>
-    <span data-bind="template: { name: 'create-index-from-hive', data: createWizard.wizard }"></span>
-    
-    <ul data-bind="foreach: createWizard.wizard().sample">
-      <li>
-        <div data-bind="foreach: $data">
-          <span data-bind="text: $data"></span>
-        </div>
-        <a rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}" class="btn" data-original-title="Edit">
-          <i class="fa fa-pencil"></i>
-        </a>
-      </li>
-    </ul>
-
-    <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.getSample">
-      <i class="fa fa-list-alt"></i> ${ _('Get Sample') }
-    </a>
-
-    <!-- /ko -->
-
-    <br/>
-
-    <a href="javascript:void(0)" class="btn" data-bind="visible: createWizard.showCreate, click: createWizard.create">
-      <i class="fa fa-plus-circle"></i> ${ _('Create') }
-    </a>
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { createWizard.show(false) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
-    </a>
-  </div>
-</script>
-
-
-<script type="text/html" id="create-index-from-file">
-  <!-- ko if: name() == 'file' -->
-    <div class="snippet-settings" data-bind="visible: show">
-
-      ${ _('Path') } <input type="text" data-bind="value: path"/>
-      <select data-bind="visible: path, options: availableFormats, value: format" size="5"></select>
-
+  <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
+    <div class="tab-pane active" id="index-overview">
+      <!-- ko template: { if: $root.tab() == 'index-overview', name: 'indexes-index-overview' }--><!-- /ko -->
     </div>
+
+    <div class="tab-pane" id="index-columns">
+      <!-- ko if: $root.tab() == 'index-columns' -->
+        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a column...') }" data-bind="clearable: $root.columnFilter, value: $root.columnFilter, valueUpdate: 'afterkeydown'"/>
+        <!-- ko template: 'indexes-index-fields' --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    <div class="tab-pane" id="index-sample">
+      <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
+    </div>
+  </div>
+</script>
+
+
+<script type="text/html" id="indexes-index-overview">
+  <div>
+    <!-- ko template: 'indexes-index-properties' --><!-- /ko -->
+
+    <!-- ko template: { name: 'indexes-index-fields-fields', data: fieldsPreview }--><!-- /ko -->
+    <a class="pointer" data-bind="visible: fields().length > fieldsPreview().length, click: function() { $('li a[href=\'#index-columns\']').click(); }">
+      ${_('View more...')}
+    </a>
+
+    <br><br>
+
+    <div style="overflow: auto">
+      <!-- ko template: { name: 'indexes-index-sample', data: samplePreview, full: false }--><!-- /ko -->
+    </div>
+    <a class="pointer" data-bind="visible: sample().length > samplePreview().length, click: function() { $('li a[href=\'#index-sample\']').click(); }">
+      ${_('View more...')}
+    </a>
+  </div>
+</script>
+
+
+<script type="text/html" id="indexes-index-properties">
+  <h4>${ _('Properties') }</h4>
+  <div class="row-fluid">
+    <div title="${ _('Unique Key') }">
+      <i class="fa fa-fw fa-key muted"></i> <span data-bind="text: uniqueKey"></span>
+    </div>
+  </div>
+  <br>
+</script>
+
+
+<script type="text/html" id="indexes-index-fields-fields">
+  <div>
+    <h4>${ _('Fields') }</h4>
+
+    <table class="table table-condensed table-nowrap">
+      <thead>
+        <tr>
+          <th style="width: 1%">&nbsp;</th>
+          <th width="1%"></th>
+          <th></th>
+          <th>${ _('Name') }</th>
+          <th>${ _('Type') }</th>
+          <th>${ _('Required') }</th>
+          <th>${ _('Stored') }</th>
+          <th>${ _('Indexed') }</th>
+          <th>${ _('Multivalued') }</th>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: $data">
+        <tr>
+          <td data-bind="text: $index() + 1"></td>
+          <td>
+            <i class="fa fa-info muted pointer analysis"></i>
+          </td>
+          <td>
+            <div></div>
+          </td>
+          <td data-bind="text: name"></td>
+          <td data-bind="text: type"></td>
+          <td><i data-bind="visible: $data.required" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.stored" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.indexed" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.multiValued" class="fa fa-check muted"></i></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</script>
+
+
+<script type="text/html" id="indexes-index-fields">
+  <div>
+    <!-- ko template: { name: 'indexes-index-fields-fields', data: fields }--><!-- /ko -->
+
+    <h4>${ _('Copy Fields') }</h4>
+    <span data-bind="text: ko.mapping.toJSON(copyFields)"></span>
+
+    <h4>${ _('Dynamic Fields') }</h4>
+    <span data-bind="text: ko.mapping.toJSON(dynamicFields)"></span>
+  </div>
+</script>
+
+
+<script type="text/html" id="indexes-index-sample">
+  <!-- ko hueSpinner: { spin: $root.index().loadingSample, center: true, size: 'xlarge' } --><!-- /ko -->
+
+  <!-- ko ifnot: $root.index().loadingSample -->
+  <table class="table table-condensed table-nowrap sample-table">
+    <thead>
+      <tr>
+        <th style="width: 1%">&nbsp;</th>
+        <!-- ko foreach: $root.index().fields() -->
+        <th data-bind="text: name"></th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: $data -->
+        <tr>
+          <td data-bind="text: $index() + 1"></td>
+          <!-- ko foreach: $root.index().fields() -->
+            <td data-bind="text: $parent[name()]"></td>
+          <!-- /ko -->
+        </tr>
+      <!-- /ko -->
+    </tbody>
+  </table>
   <!-- /ko -->
 </script>
 
 
-<script type="text/html" id="create-index-from-hive">
-  <!-- ko if: name() == 'hive' -->
-    <div class="snippet-settings" data-bind="visible: show">
-
-      ${ _('Database') } <input type="text" data-bind="value: database"/>
-      ${ _('Table') } <input type="text" data-bind="value: table"/>
-
-    </div>
-  <!-- /ko -->
-</script>
-
-
-<div class="hueOverlay" data-bind="visible: isLoading">
-  <i class="fa fa-spinner fa-spin big-spinner"></i>
-</div>
-
-
-<div id="deleteIndex" class="modal hide fade">
-  <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
-    ${ csrf_token(request) | n,unicode }
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 id="deleteIndexMessage" class="modal-title">${ _('Delete the selected index(es)?') }</h2>
-    </div>
-    <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
-      <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
-    </div>
-  </form>
-</div>
-
-
-<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">
-  var Index = function () {
-    var self = this;
 
-    self.showCreateModal = ko.observable(false);
+  var IndexesViewModel = (function () {
 
-    self.name = ko.observable('');
+    var Alias = function (vm) {
+      var self = this;
 
-    self.create = function() {
-      $.post("${ url('indexer:create_index') }", {
-        "name": self.name
-      }, function() {
-        window.location.reload();
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+      self.name = ko.observable('');
+      self.chosenCollections = ko.observableArray();
+      self.availableCollections = ko.computed(function () {
+        return $.grep(vm.indexes(), function (index) {
+          return index.type() == 'collection';
+        });
       });
-    }
-  };
 
-  var Alias = function (vm) {
-    var self = this;
+      self.create = function () {
+        $.post("${ url('indexer:create_alias') }", {
+          "name": self.name,
+          "collections": ko.mapping.toJSON($.map(self.chosenCollections(), function (collection) {
+            return collection.name();
+          }))
+        }, function (data) {
+          if (data.status == 0) {
+            vm.indexes.push(ko.mapping.fromJS(data.alias));
+          } else {
+            $(document).trigger("error", data.message);
+          }
+          $('#createAlias').modal('hide');
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'create_alias');
+      }
 
-    self.showCreateModal = ko.observable(false);
-
-    self.name = ko.observable('');
-    self.chosenCollections = ko.observableArray();
-    self.availableCollections = ko.computed(function() {
-      return $.grep(vm.indexes(), function(index) { return index.type() == 'collection'; });
-    });
-
-    self.create = function() {
-      $.post("${ url('indexer:create_or_edit_alias') }", {
-        "alias": self.name,
-        "collections": ko.mapping.toJSON(self.chosenCollections)
-      }, function() {
-        window.location.reload();
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    }
-    
-    self.edit = function(alias) {
-      self.name(alias.name());
-      self.chosenCollections(alias.collections());
-
-      self.showCreateModal(true);
-    }
-  };
-
-  var FileWizard = function (vm) {
-    var self = this;
-
-    self.name = ko.observable('file');
-    self.sample = ko.observableArray();
-    self.show = ko.observable(false);
-
-    self.path = ko.observable('');
-    self.format = ko.observable('csv');
-    self.availableFormats = ko.observableArray(['csv', 'log', 'apache logs', 'mailbox']);
-  };
-
-  var HiveWizard = function (vm) {
-    var self = this;
-
-    self.name = ko.observable('hive');
-    self.show = ko.observable(false);
-
-    self.database = ko.observable('');
-    self.table = ko.observable('');
-  };
-
-  var CreateWizard = function (vm) {
-    var self = this;
-
-    self.show = ko.observable(false);
-    self.showCreate = ko.observable(false);
-    
-    self.fileWizard = new FileWizard(vm);
-    self.hiveWizard = new HiveWizard(vm);    
-
-    self.name = ko.observable('');
-    self.wizard = ko.observable();
-    self.wizard.subscribe(function(val) {
-      val.show(true);
-    });
-    self.wizard(self.fileWizard);
-    self.availableWizards = ko.observableArray([self.fileWizard, self.hiveWizard]);
-
-    self.getSample = function() {
-      $.post("${ url('indexer:create_wizard_get_sample') }", {
-        "wizard": ko.mapping.toJSON(self.wizard)
-      }, function(resp) {
-        self.wizard().sample(resp.data);
-        self.showCreate(true);
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    }
-
-    self.create = function() {
-      $.post("${ url('indexer:create_wizard_create') }", {
-        "wizard": ko.mapping.toJSON(self.wizard)
-      }, function(resp) {
-        self.wizard().sample(resp.data);
-        self.showCreate(true);
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    }
-
-    self.edit = function() {
-      self.show(true);
-    }
-  };
-
-  var Editor = function () {
-    var self = this;
-
-    self.indexes = ko.mapping.fromJS(${ indexes_json | n });
-
-    self.index = new Index(self);
-    self.alias = new Alias(self);
-    self.createWizard = new CreateWizard(self);
-
-    self.selectedIndexes = ko.computed(function() {
-      return $.grep(self.indexes(), function(index) { return index.isSelected(); });
-    });
-    self.isLoading = ko.observable(false);
-
-    self.oneSelected = ko.computed(function() {
-      return self.selectedIndexes().length == 1;
-    });
-    self.atLeastOneSelected = ko.computed(function() {
-      return self.selectedIndexes().length >= 1;
-    });
-    self.allSelected = ko.observable(false);
-
-    self.handleSelect = function(index) {
-      index.isSelected(! index.isSelected());
-    }
-
-    self.selectAll = function() {
-      self.allSelected(! self.allSelected());
-      ko.utils.arrayForEach(self.indexes(), function (index) {
-        index.isSelected(self.allSelected());
-      });
-    }
-
-    self.datatable = null;
-
-    self.deleteIndexes = function() {
-      $.post("${ url('indexer:delete_indexes') }", {
-        "indexes": ko.mapping.toJSON(self.selectedIndexes)
-      }, function() {
-        window.location.reload();
-        $('#deleteIndex').modal('hide');
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
+      self.edit = function (alias) {
+        self.name(alias.name());
+        self.chosenCollections($.grep(vm.indexes(), function(collection) { return alias.collections().indexOf(collection.name()) != -1; }));
+        $('#createAlias').modal('show');
+      }
     };
-  };
 
-  var viewModel;
 
-  $(document).ready(function () {
-    viewModel = new Editor();
-    ko.applyBindings(viewModel);
+    var Index = function (vm, data) {
+      var self = this;
 
-    var oTable = $("#indexTable").dataTable({
-      "sPaginationType":"bootstrap",
-      'iDisplayLength':50,
-      "bLengthChange":false,
-      "sDom": "<'row'r>t<'row-fluid'<'dt-pages'p><'dt-records'i>>",
-      "aoColumns":[
-        { "bSortable":false },
-        null,
-        null,
-        null,
-        { "bSortable":false },
-      ],
-      "aaSorting":[
-        [1, 'asc' ]
-      ],
-      "oLanguage":{
-        "sEmptyTable":"${_('No data available')}",
-        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords":"${_('No matching records')}",
-        "oPaginate":{
-          "sFirst":"${_('First')}",
-          "sLast":"${_('Last')}",
-          "sNext":"${_('Next')}",
-          "sPrevious":"${_('Previous')}"
-        },
-        "bDestroy": true
-      },
-      "fnDrawCallback":function (oSettings) {
-        $("a[data-row-selector='true']").jHueRowSelector();
+      self.name = ko.observable(data.name);
+      self.type = ko.observable(data.type);
+      self.uniqueKey = ko.observable(data.schema.uniqueKey);
+      self.fields = ko.mapping.fromJS(data.schema.fields);
+      self.fieldsPreview = ko.pureComputed(function () {
+        return self.fields().splice(0, 5)
+      });
+      self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
+      self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
+
+      self.sample = ko.observableArray();
+      self.samplePreview = ko.pureComputed(function () {
+        return self.sample().splice(0, 5)
+      });
+
+      self.loadingSample = ko.observable(false);
+
+      self.getSample = function () {
+        self.loadingSample(true);
+        $.post("${ url('indexer:sample_index') }", {
+          name: self.name(),
+          rows: 100
+        }, function (data) {
+          if (data.status == 0) {
+            self.sample(data.sample);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          self.loadingSample(false);
+        });
+      };
+
+      self.delete = function () {
+        var indexName = self.name();
+        $.post("${ url('indexer:delete_indexes') }", {
+          "indexes": ko.mapping.toJSON([{'name': indexName, 'type': self.type()}])
+        }, function (data) {
+          if (data.status == 0) {
+            vm.indexes.remove(function(index) { return index.name() == indexName; });
+          } else {
+            $(document).trigger("error", data.message);
+          }
+          $('#deleteIndex').modal('hide');
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'delete_index');
+      };
+    };
+
+
+    var IndexesViewModel = function (options) {
+      var self = this;
+
+      self.baseURL = (IS_HUE_4 ? '/hue' : '') + '/indexer/indexes/';
+
+      self.assistAvailable = ko.observable(true);
+      self.apiHelper = ApiHelper.getInstance();
+      self.isHue4 = ko.observable(options.hue4);
+      self.isLeftPanelVisible = ko.observable();
+      self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+
+      self.section = ko.observable('list-indexes');
+      self.tab = ko.observable('');
+      self.tab.subscribe(function(tab){
+        if (tab === 'index-sample'){
+          var selector = '#index-sample .sample-table';
+          % if conf.CUSTOM.BANNER_TOP_HTML.get():
+            var bannerTopHeight = 30;
+          % else:
+            var bannerTopHeight = 0;
+          % endif
+          if ($(selector).parents('.dataTables_wrapper').length == 0){
+            hueUtils.waitForRendered(selector, function(el){ return el.find('td').length > 0 }, function(){
+              $(selector).dataTable({
+                "bPaginate": false,
+                "bLengthChange": false,
+                "bInfo": false,
+                "bDestroy": true,
+                "bFilter": false,
+                "bAutoWidth": false,
+                "oLanguage": {
+                  "sEmptyTable": "${_('No data available')}",
+                  "sZeroRecords": "${_('No matching records')}"
+                },
+                "fnDrawCallback": function (oSettings) {
+                  $(selector).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+                  $(selector).jHueTableExtender2({
+                    fixedHeader: true,
+                    fixedFirstColumn: true,
+                    includeNavigator: false,
+                    parentId: 'index-sample',
+                    classToRemove: 'sample-table',
+                    mainScrollable: '${ MAIN_SCROLLABLE }',
+                    % if is_embeddable:
+                      stickToTopPosition: 51 + bannerTopHeight,
+                    % else:
+                      stickToTopPosition: 76 + bannerTopHeight,
+                    % endif
+                    clonedContainerPosition: 'fixed',
+                    app: 'indexes'
+                  });
+                  $(selector).jHueHorizontalScrollbar();
+                },
+                "aoColumnDefs": [
+                  {
+                    "sType": "numeric",
+                    "aTargets": [ "sort-numeric" ]
+                  },
+                  {
+                    "sType": "string",
+                    "aTargets": [ "sort-string" ]
+                  },
+                  {
+                    "sType": "date",
+                    "aTargets": [ "sort-date" ]
+                  }
+                ]
+              });
+            });
+          }
+        }
+      });
+
+      self.indexes = ko.observableArray([]);
+      self.alias = new Alias(self);
+      self.index = ko.observable();
+
+      self.indexFilter = ko.observable('');
+      self.columnFilter = ko.observable('');
+
+      self.filteredIndexes = ko.computed(function () {
+        var returned = self.indexes();
+        if (self.indexFilter() !== '') {
+          returned = $.grep(self.indexes(), function (idx) {
+            return idx.name().toLowerCase().indexOf(self.indexFilter()) > -1;
+          });
+        }
+        return returned;
+      });
+
+      self.selectedIndexes = ko.computed(function () {
+        return $.grep(self.indexes(), function (index) {
+          return index.isSelected();
+        });
+      });
+      self.isLoading = ko.observable(false);
+
+      self.oneSelected = ko.computed(function () {
+        return self.selectedIndexes().length == 1;
+      });
+      self.atLeastOneSelected = ko.computed(function () {
+        return self.selectedIndexes().length >= 1;
+      });
+      self.allSelected = ko.observable(false);
+
+      self.handleSelect = function (index) {
+        index.isSelected(!index.isSelected());
       }
-    });
 
-    viewModel.datatable = oTable;
-
-    $("#filterInput").keydown(function (e) {
-      if (e.which == 13) {
-        e.preventDefault();
-        return false;
+      self.selectAll = function () {
+        self.allSelected(!self.allSelected());
+        ko.utils.arrayForEach(self.indexes(), function (index) {
+          index.isSelected(self.allSelected());
+        });
       }
-    });
 
-    $("#filterInput").keyup(function () {
-      oTable.fnFilter($(this).val());
-    });
+      self.datatable = null;
 
-    $("a[data-row-selector='true']").jHueRowSelector();
-  });
+      self.showIndexes = function () {
+        self.section('list-indexes');
+        self.index(null);
+        hueUtils.changeURL(self.baseURL);
+      }
+
+      self.fetchIndexes = function (callback) {
+        self.isLoading(true);
+        $.post("${ url('indexer:list_indexes') }", {}, function (data) {
+          if (data.status == 0) {
+            var indexes = []
+            data.collections.forEach(function (index) {
+              index.isSelected = false;
+              indexes.push(ko.mapping.fromJS(index));
+            });
+            self.indexes(indexes);
+            if (callback) {
+              callback();
+            }
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          self.isLoading(false);
+        });
+        hueAnalytics.log('indexes', 'list_indexes');
+      };
+
+      self.getIndexByName = function (name) {
+        var found = null;
+        self.indexes().forEach(function (idx) {
+          if (idx.name() === name) {
+            found = idx;
+          }
+        });
+        return found;
+      }
+
+      self.fetchIndex = function (index) {
+        $.post("${ url('indexer:list_index') }", {
+          name: index.name()
+        }, function (data) {
+          if (data.status == 0) {
+            self.index(new Index(self, data));
+            self.index().type(index.type());
+            self.index().getSample();
+            hueUtils.changeURL(self.baseURL + self.index().name());
+            self.section('list-index');
+            self.tab('index-overview');
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'list_index');
+      };
+
+      self.deleteIndexes = function () {
+        $.post("${ url('indexer:delete_indexes') }", {
+          "indexes": ko.mapping.toJSON(self.selectedIndexes)
+        }, function (data) {
+          if (data.status == 0) {
+            self.indexes.removeAll(self.selectedIndexes());
+          } else {
+            $(document).trigger("error", data.message);
+          }
+          $('#deleteIndexes').modal('hide');
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+        hueAnalytics.log('indexes', 'delete_indexes');
+      };
+    };
+    return IndexesViewModel;
+  })();
+
+
+  (function () {
+    $(document).ready(function () {
+      var options = {
+        user: '${ user.username }',
+        % if is_embeddable:
+          hue4: true,
+        % endif
+        index: '${ index }'
+      };
+      var viewModel = new IndexesViewModel(options);
+      ko.applyBindings(viewModel, $('#indexesComponents')[0]);
+
+      huePubSub.subscribe('open.index', function (index) {
+        var foundIndex = viewModel.getIndexByName(index);
+        if (foundIndex) {
+          viewModel.fetchIndex(foundIndex);
+        }
+      }, 'indexes');
+
+      viewModel.fetchIndexes(function () {
+        if (options.index) {
+          var foundIndex = viewModel.getIndexByName(options.index);
+          if (foundIndex) {
+            viewModel.fetchIndex(foundIndex);
+          }
+          else {
+            $.jHueNotify.error('${ _('The specified index has not been found') }')
+            viewModel.showIndexes();
+          }
+        }
+      });
+    });
+  })();
 </script>
 
-
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

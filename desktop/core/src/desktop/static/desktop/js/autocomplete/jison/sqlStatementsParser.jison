@@ -45,7 +45,15 @@
 <backTick><<EOF>>                                                     { this.popState(); return 'EOF'; }
 <backTick>'`'                                                         { this.popState(); return 'PART_OF_STATEMENT'; }
 
-[^"\/;'`-]+                                                           { return 'PART_OF_STATEMENT'; }
+[^"\/;'`-]+                                                           {
+                                                                        if (!parser.yy.firstToken) {
+                                                                          var firstWordMatch = yytext.match(/[a-zA-Z_]+/);
+                                                                          if (firstWordMatch) {
+                                                                            parser.yy.firstToken = firstWordMatch[0];
+                                                                          }
+                                                                        };
+                                                                        return 'PART_OF_STATEMENT';
+                                                                      }
 [-][^;-]                                                              { return 'PART_OF_STATEMENT'; }
 [/][^;*]                                                              { return 'PART_OF_STATEMENT'; }
 
@@ -97,11 +105,24 @@ SqlStatementsParser
  ;
 
 Statements
- : StatementParts                                                  -> [{ type: 'statement', statement: $1, location: @1 }]
+ : StatementParts
+   {
+     if (parser.yy.firstToken) {
+       $$ = [{ type: 'statement', statement: $1, location: @1, firstToken: parser.yy.firstToken }];
+       parser.yy.firstToken = null;
+     } else {
+       $$ = [{ type: 'statement', statement: $1, location: @1 }];
+     }
+   }
  | Statements OneOrMoreSeparators StatementParts
    {
      parser.handleTrailingStatements($1, $2);
-     $1.push({ type: 'statement', statement: $3, location: @3 });
+     if (parser.yy.firstToken) {
+       $1.push({ type: 'statement', statement: $3, location: @3, firstToken: parser.yy.firstToken });
+       parser.yy.firstToken = null;
+     } else {
+       $1.push({ type: 'statement', statement: $3, location: @3 });
+     }
    }
  ;
 

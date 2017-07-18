@@ -106,7 +106,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
         <div class="card card-home" style="margin-bottom: 20px; padding-bottom: 10px">
           <h1 class="card-heading simple">
             <a class="pointer" data-bind="click: function() { showChooseCoordinator(this); }, text: $root.getCoordinatorById(coordinator()).name"></a>
-            <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id()" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id()" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
             <a class="pointer pull-right" data-bind="click: function() { $root.bundle.coordinators.remove(this); }, visible: $root.isEditing">
@@ -164,7 +164,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
         <li style="${ not is_embeddable and 'line-height: 30px' or ''}">
           <span data-bind="click: selectCoordinator" class="badge badge-info"><span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
-          <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?uuid=' + uuid()" target="_blank" title="${ _('Open') }">
+          <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?uuid=' + uuid()" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </li>

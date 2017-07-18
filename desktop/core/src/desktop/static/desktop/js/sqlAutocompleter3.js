@@ -746,7 +746,7 @@ var AutocompleteResults = (function () {
         addSubQueryColumns(foundSubQuery.columns);
       }
       addColumnsDeferred.resolve();
-    } else {
+    } else if (typeof table.identifierChain !== 'undefined') {
       var callback = function (data) {
         if (data.extended_columns) {
           data.extended_columns.forEach(function (column) {
@@ -954,15 +954,13 @@ var AutocompleteResults = (function () {
         addColumnsDeferred.resolve();
       };
 
-      try {
-        if (self.parseResult.suggestColumns && self.parseResult.suggestColumns.identifierChain) {
-          self.fetchFieldsForIdentifiers(table.identifierChain.concat(self.parseResult.suggestColumns.identifierChain), callback, addColumnsDeferred.resolve);
-        } else {
-          self.fetchFieldsForIdentifiers(table.identifierChain, callback, addColumnsDeferred.resolve);
-        }
-      } catch (e) {
-        addColumnsDeferred.resolve();
-      } // TODO: Ignore for subqueries
+      if (self.parseResult.suggestColumns && self.parseResult.suggestColumns.identifierChain) {
+        self.fetchFieldsForIdentifiers(table.identifierChain.concat(self.parseResult.suggestColumns.identifierChain), callback, addColumnsDeferred.resolve);
+      } else {
+        self.fetchFieldsForIdentifiers(table.identifierChain, callback, addColumnsDeferred.resolve);
+      }
+    } else {
+      addColumnsDeferred.resolve();
     }
     return addColumnsDeferred;
   };
@@ -1773,7 +1771,7 @@ var SqlAutocompleter3 = (function () {
   SqlAutocompleter3.prototype.autocomplete = function () {
     var self = this;
     try {
-      var parseResult = sql.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
+      var parseResult = sqlAutocompleteParser.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
 
       if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
         console.log(parseResult);

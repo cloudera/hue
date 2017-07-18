@@ -24,11 +24,11 @@ from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import get_cluster_config
 
-from indexer.controller2 import IndexController
+from indexer.solr_client import SolrClient
 from indexer.fields import FIELD_TYPES, Field
 from indexer.file_format import get_file_indexable_format_types
 from indexer.management.commands import indexer_setup
-from indexer.operations import OPERATORS
+from indexer.indexers.morphline_operations import OPERATORS
 
 
 LOG = logging.getLogger(__name__)
@@ -43,18 +43,13 @@ def collections(request, is_redirect=False):
   })
 
 
-def indexes(request):
+def indexes(request, index=''):
   if not request.user.has_hue_permission(action="access", app='search'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
-  searcher = IndexController(request.user)
-  indexes = searcher.get_indexes()
-
-  for index in indexes:
-    index['isSelected'] = False
-
   return render('indexes.mako', request, {
-      'indexes_json': json.dumps(indexes)
+    'is_embeddable': request.GET.get('is_embeddable', False),
+    'index': index
   })
 
 
@@ -62,7 +57,7 @@ def indexer(request):
   if not request.user.has_hue_permission(action="access", app='search'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
-  searcher = IndexController(request.user)
+  searcher = SolrClient(request.user)
   indexes = searcher.get_indexes()
 
   for index in indexes:
@@ -105,7 +100,7 @@ def importer_prefill(request, source_type, target_type, target_path=None):
 
 
 def _importer(request, prefill):
-  config = get_cluster_config(user=request.user)
+  source_type = get_cluster_config(request.user)['default_sql_interpreter']
 
   return render('importer.mako', request, {
       'is_embeddable': request.GET.get('is_embeddable', False),
@@ -114,7 +109,7 @@ def _importer(request, prefill):
       'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
       'default_field_type' : json.dumps(Field().to_dict()),
       'prefill' : json.dumps(prefill),
-      'sourceType': 'hive'  # TODO check Impala, config.get('default_sql_interpreter', 'hive')
+      'source_type': source_type
   })
 
 

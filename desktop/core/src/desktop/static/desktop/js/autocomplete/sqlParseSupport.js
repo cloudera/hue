@@ -16,6 +16,66 @@
 
 var SqlParseSupport = (function () {
 
+  /**
+   * Calculates the Optimal String Alignment distance between two strings. Returns 0 when the strings are equal and the
+   * distance when not, distances is less than or equal to the length of the longest string.
+   *
+   * @param strA
+   * @param strB
+   * @param [ignoreCase]
+   * @returns {number} The similarity
+   */
+  var stringDistance = function (strA, strB, ignoreCase) {
+    if (ignoreCase) {
+      strA = strA.toLowerCase();
+      strB = strB.toLowerCase();
+    }
+
+    // TODO: Consider other algorithms for performance
+    var strALength = strA.length;
+    var strBLength = strB.length;
+    if (strALength === 0) {
+      return strBLength;
+    }
+    if (strBLength === 0) {
+      return strALength;
+    }
+
+    var distances = new Array(strALength);
+
+    var cost, deletion, insertion, substitution, transposition;
+    for (var i = 0; i <= strALength; i++) {
+      distances[i] = new Array(strBLength);
+      distances[i][0] = i;
+      for (var j = 1; j <= strBLength; j++) {
+        if (!i){
+          distances[0][j] = j;
+        } else {
+          cost = strA[i-1] === strB[j-1] ? 0 : 1;
+          deletion = distances[i - 1][j] + 1;
+          insertion = distances[i][j - 1] + 1;
+          substitution = distances[i - 1][j - 1] + cost;
+          if (deletion <= insertion && deletion <= substitution) {
+            distances[i][j] = deletion;
+          } else if (insertion <= deletion && insertion <= substitution) {
+            distances[i][j] = insertion;
+          } else {
+            distances[i][j] = substitution;
+          }
+
+          if (i > 1 && j > 1 && strA[i] === strB[j - 1] && strA[i - 1] === strB[j]) {
+            transposition = distances[i - 2][j - 2] + cost;
+            if (transposition < distances[i][j]) {
+              distances[i][j] = transposition;
+            }
+          }
+        }
+      }
+    }
+
+    return distances[strALength][strBLength];
+  };
+
   var equalIgnoreCase = function (a, b) {
     return a && b && a.toLowerCase() === b.toLowerCase();
   };
@@ -35,11 +95,12 @@ var SqlParseSupport = (function () {
       parser.yy.selectListAliases = [];
       parser.yy.latestTablePrimaries = [];
 
-      parser.parseError = function (message, error) {
-        parser.yy.errors.push(error);
-        return message;
-      };
       prioritizeSuggestions();
+    };
+
+    parser.yy.parseError = function (message, error) {
+      parser.yy.errors.push(error);
+      return message;
     };
 
     parser.addCommonTableExpressions = function (identifiers) {
@@ -995,7 +1056,7 @@ var SqlParseSupport = (function () {
       }
 
       if (parser.isImpala()) {
-        keywords = keywords.concat(['COMPUTE', 'INVALIDATE METADATA', 'LOAD', 'REFRESH']);
+        keywords = keywords.concat(['COMPUTE', 'DELETE', 'INVALIDATE METADATA', 'LOAD', 'REFRESH']);
       }
 
       parser.suggestKeywords(keywords);
@@ -1482,7 +1543,173 @@ var SqlParseSupport = (function () {
     };
   };
 
+  var SYNTAX_PARSER_NOOP_FUNCTIONS = ['prepareNewStatement', 'addCommonTableExpressions', 'pushQueryState', 'popQueryState', 'suggestSelectListAliases',
+    'isHive', 'isImpala', 'mergeSuggestKeywords', 'suggestValueExpressionKeywords', 'getValueExpressionKeywords', 'getTypeKeywords',
+    'getColumnDataTypeKeywords', 'addColRefIfExists', 'selectListNoTableSuggest', 'suggestJoinConditions', 'suggestJoins', 'valueExpressionSuggest',
+    'applyTypeToSuggestions', 'findCaseType', 'findReturnTypes', 'applyArgumentTypesToSuggestions', 'commitLocations', 'expandImpalaIdentifierChain',
+    'identifyPartials', 'expandLateralViews', 'expandIdentifierChain', 'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'getKeywordsForOptionalsLR',
+    'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords', 'createWeightedKeywords', 'suggestKeywords', 'suggestColRefKeywords',
+    'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions', 'suggestColumns', 'suggestGroupBys',
+    'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation', 'addStatementLocation', 'addHdfsLocation',
+    'addDatabaseLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs',
+    'suggestValues', 'handleQuotedValueWithCursor'];
+
+  var SYNTAX_PARSER_NOOP = function () {};
+
+  var initSyntaxParser = function (parser) {
+
+    // Noop functions for compatibility with the autocomplete parser as the grammar is shared
+    SYNTAX_PARSER_NOOP_FUNCTIONS.forEach(function (noopFn) {
+      parser[noopFn] = SYNTAX_PARSER_NOOP
+    });
+
+    parser.yy.locations = [{}];
+
+    parser.determineCase = function (text) {
+      if (!parser.yy.caseDetermined) {
+        parser.yy.lowerCase = text.toLowerCase() === text;
+        parser.yy.caseDetermined = true;
+      }
+    };
+
+    var lexerModified = false;
+
+    parser.yy.parseError = function (str, hash) {
+      parser.yy.error = hash;
+    };
+
+    var IGNORED_EXPECTED = {
+      ';': true,
+      'EOF': true
+    };
+
+    parser.parseSyntax = function (beforeCursor, afterCursor, dialect, debug) {
+      parser.yy.caseDetermined = false;
+      parser.yy.error = undefined;
+
+      parser.yy.latestTablePrimaries = [];
+      parser.yy.subQueries = [];
+      parser.yy.selectListAliases = [];
+      parser.yy.latestTablePrimaries = [];
+
+      parser.yy.activeDialect = (dialect !== 'hive' && dialect !== 'impala') ? undefined : dialect;
+
+      // Hack to set the inital state of the lexer without first having to hit a token
+      // has to be done as the first token found can be dependant on dialect
+      if (!lexerModified) {
+        var originalSetInput = parser.lexer.setInput;
+        parser.lexer.setInput = function (input, yy) {
+          var lexer = originalSetInput.bind(parser.lexer)(input, yy);
+          if (typeof parser.yy.activeDialect !== 'undefined') {
+            lexer.begin(parser.yy.activeDialect);
+          }
+          return lexer;
+        };
+        lexerModified = true;
+      }
+
+      // TODO: Find a way around throwing an exception when the parser finds a syntax error
+      try {
+        parser.yy.error = false;
+        parser.parse(beforeCursor + afterCursor);
+      } catch (err) {
+        if (debug) {
+          console.log(err);
+          console.error(err.stack);
+          console.log(parser.yy.error);
+        }
+      }
+
+      if (parser.yy.error && (parser.yy.error.loc.last_column < beforeCursor.length || !beforeCursor.endsWith(parser.yy.error.text))) {
+        var weightedExpected = [];
+
+        var addedExpected = {};
+
+        var isLowerCase = parser.yy.caseDetermined && parser.yy.lowerCase || parser.yy.error.text.toLowerCase() === parser.yy.error.text;
+
+        if (parser.yy.error.expected.length == 2 && parser.yy.error.expected.indexOf('\';\'') !== -1 && parser.yy.error.expected.indexOf('\'EOF\'') !== -1) {
+          parser.yy.error.expected = [];
+          parser.yy.error.expectedStatementEnd = true;
+          return parser.yy.error;
+        }
+        parser.yy.error.expected.forEach(function (expected) {
+          // Strip away the surrounding ' chars
+          expected = expected.substring(1, expected.length - 1);
+          // TODO: Only suggest alphanumeric?
+          if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
+            var text = null;
+            if (expected.length > 0 && expected.indexOf('<') !== 0) {
+              text = isLowerCase ? expected.toLowerCase() : expected;
+            } else if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
+              var dialectTrimmed = expected.substring(dialect.length + 2);
+              text = isLowerCase ? dialectTrimmed.toLowerCase() : dialectTrimmed;
+            }
+            if (text && !addedExpected[text]) {
+              addedExpected[text] = true;
+              weightedExpected.push({
+                text: text,
+                distance: stringDistance(parser.yy.error.text, text, true)
+              });
+            }
+          }
+        });
+        if (weightedExpected.length === 0) {
+          return false; // Don't mark it as an error if there are not suggestions
+        }
+        weightedExpected.sort(function (a, b) {
+          if (a.distance === b.distance) {
+            return a.text.localeCompare(b.text);
+          }
+          return a.distance - b.distance
+        });
+        parser.yy.error.expected = weightedExpected;
+        return parser.yy.error;
+      }
+      return false;
+    }
+  };
+
+  var initGlobalSearchParser = function (parser) {
+
+    parser.identifyPartials = function (beforeCursor, afterCursor) {
+      var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
+      var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
+      return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
+    };
+
+    parser.parseGlobalSearch = function (beforeCursor, afterCursor, debug) {
+      delete parser.yy.cursorFound;
+
+      parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
+
+      if (parser.yy.partialLengths.left > 0) {
+        beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
+      }
+
+      if (parser.yy.partialLengths.right > 0) {
+        afterCursor = afterCursor.substring(parser.yy.partialLengths.right);
+      }
+
+      var result;
+      try {
+        // \u2020 represents the cursor, \u2021 represent partial
+        // TODO: Handle partial cursor
+        result = parser.parse(beforeCursor + '\u2020' + afterCursor);
+      } catch (err) {
+        if (debug) {
+          console.log(err);
+          console.error(err.stack);
+          console.log(parser.yy.error);
+        }
+      }
+      return result;
+    };
+  };
+
   return {
-    initSqlParser: initSqlParser
+    initSqlParser: initSqlParser,
+    initSyntaxParser: initSyntaxParser,
+    stringDistance: stringDistance,
+    initGlobalSearchParser: initGlobalSearchParser
   };
 })();

@@ -26,8 +26,8 @@ from desktop.views import _ko
 
   <script src="${ static('desktop/ext/js/bootstrap-fileupload.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
-  <link rel="stylesheet" href="/static/desktop/css/home.css">
-  <link rel="stylesheet" href="/static/desktop/ext/css/bootstrap-fileupload.css">
+  <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/bootstrap-fileupload.css') }" rel="stylesheet">
 
   <script type="text/html" id="doc-browser-template">
     <div class="doc-browser-drag-helper">
@@ -267,9 +267,9 @@ from desktop.views import _ko
             <span data-bind="text: $data.name"></span>
             <!-- ko if: $data.dependents.length > 0 -->
               (${_('used by')}
-              <a class="pointer" data-bind="hueLink: $data.dependents[0].absoluteUrl, text: $data.dependents[0].name" target="_blank" ></a>
+              <a class="pointer" data-bind="hueLink: $data.dependents[0].absoluteUrl, text: $data.dependents[0].name"></a>
               <!-- ko if: $data.dependents.length > 1 -->
-              ${_('and')} <a class="pointer" data-bind="hueLink: $data.dependents[1].absoluteUrl, text: $data.dependents[1].name" target="_blank" ></a>
+              ${_('and')} <a class="pointer" data-bind="hueLink: $data.dependents[1].absoluteUrl, text: $data.dependents[1].name"></a>
                 <!-- ko if: $data.dependents.length > 2 -->
                   ${_('and')} <span data-bind="text: $data.dependents.length - 2"></span> ${_('other')}
                 <!-- /ko -->
@@ -320,7 +320,8 @@ from desktop.views import _ko
           <div class="doc-browser-action doc-browser-search-container"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery"></div>
           <!-- /ko -->
           <!-- ko with: activeEntry -->
-          <div><a class="inactive-action doc-browser-action" title="${_('Search')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
+          <div class="doc-browser-action doc-browser-type-filter margin-right-10" data-bind="component: { name: 'hue-drop-down', params: { value: serverTypeFilter, entries: $root.allDocumentTypes, linkTitle: '${ _ko('Type filter') }' } }"><</div>
+          <div><a class="inactive-action doc-browser-action margin-right-20" title="${_('Search')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div>
             <span class="dropdown">
@@ -332,7 +333,7 @@ from desktop.views import _ko
                     % if is_embeddable:
                       data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'hive', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
                     % else:
-                      data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive') }, click: openExternalLink"
+                      data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')"
                     % endif
                     >
                       <img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}
@@ -345,7 +346,7 @@ from desktop.views import _ko
                     % if is_embeddable:
                       data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'impala', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
                     % else:
-                      data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala') }, click: openExternalLink"
+                      data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala')"
                     % endif
                     >
                       <img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}
@@ -357,38 +358,38 @@ from desktop.views import _ko
                 %>
                 % if SHOW_NOTEBOOKS.get():
                   <li>
-                    <a title="${_('Notebook')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:index') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Notebook')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:index') }')">
                       <i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #0B7FAD;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}
                     </a>
                   </li>
                 % endif
                 % if 'pig' in apps:
                   <li>
-                    <a title="${_('Pig Script')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('pig:index') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Pig Script')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('pig:index') }')">
                       <img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig Script')}
                     </a>
                   </li>
                 % endif
                 % if 'oozie' in apps:
                   <li>
-                    <a title="${_('Oozie Workflow')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_workflow') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
                       <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
                     </a>
                   </li>
                   <li>
-                    <a title="${_('Oozie Coordinator')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Oozie Coordinator')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
                       <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Coordinator') if is_embeddable else _('Oozie Coordinator')}
                     </a>
                   </li>
                   <li>
-                    <a title="${_('Oozie Bundle')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_bundle') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Oozie Bundle')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_bundle') }')">
                       <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
                     </a>
                   </li>
                 % endif
                 % if 'search' in apps:
                   <li>
-                    <a title="${_('Solr Search')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('search:new_search') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                    <a title="${_('Solr Search')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('search:new_search') }')">
                       <img src="${ static('search/art/icon_search_48.png') }" class="app-icon" alt="${ _('Search icon') }"/> ${_('Dashboard')}
                     </a>
                   </li>
@@ -423,6 +424,7 @@ from desktop.views import _ko
             </ul>
             <!-- /ko -->
           </div>
+          <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'home' }} --><!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </div>
@@ -482,7 +484,7 @@ from desktop.views import _ko
               </ul>
               <div class="doc-browser-primary-col">
                 <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: true } } --><!-- /ko -->
-                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name, 'href': definition().type === 'directory' ? '#' : definition().absoluteUrl }" class="margin-left-5"></a>
+                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, hueLink: definition().type === 'directory' ? '' : definition().absoluteUrl, attr: { 'title': definition().name }" class="margin-left-5"></a>
               </div>
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->

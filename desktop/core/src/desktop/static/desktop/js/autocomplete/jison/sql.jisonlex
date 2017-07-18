@@ -195,6 +195,7 @@
 <impala>'AGGREGATE'                        { return '<impala>AGGREGATE'; }
 <impala>'AVRO'                             { return '<impala>AVRO'; }
 <impala>'CACHED'                           { return '<impala>CACHED'; }
+<impala>'CASCADE'                          { return '<impala>CASCADE'; }
 <impala>'CHANGE'                           { return '<impala>CHANGE'; }
 <impala>'CLOSE_FN'                         { return '<impala>CLOSE_FN'; }
 <impala>'COLUMN'                           { return '<impala>COLUMN'; }
@@ -204,6 +205,7 @@
 <impala>'CREATE'                           { parser.determineCase(yytext); return '<impala>CREATE'; }
 <impala>'DATA'                             { return '<impala>DATA'; }
 <impala>'DATABASES'                        { return '<impala>DATABASES'; }
+<impala>'DELETE'                           { return '<impala>DELETE'; }
 <impala>'DELIMITED'                        { return '<impala>DELIMITED'; }
 <impala>'DESCRIBE'                         { parser.determineCase(yytext); return '<impala>DESCRIBE'; }
 <impala>'ESCAPED'                          { return '<impala>ESCAPED'; }
@@ -245,10 +247,13 @@
 <impala>'PREPARE_FN'                       { return '<impala>PREPARE_FN'; }
 <impala>'PRIMARY'                          { return '<impala>PRIMARY'; }
 <impala>'RCFILE'                           { return '<impala>RCFILE'; }
+<impala>'RANGE'                            { return '<impala>RANGE'; }
 <impala>'REAL'                             { return '<impala>REAL'; }
 <impala>'REFRESH'                          { parser.determineCase(yytext); return '<impala>REFRESH'; }
 <impala>'RENAME'                           { return '<impala>RENAME'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
+<impala>'REPLICATION'                      { return '<impala>REPLICATION'; }
+<impala>'RESTRICT'                         { return '<impala>RESTRICT'; }
 <impala>'RETURNS'                          { return '<impala>RETURNS'; }
 <impala>'REVOKE'                           { return '<impala>REVOKE'; }
 <impala>'SEQUENCEFILE'                     { return '<impala>SEQUENCEFILE'; }
@@ -280,6 +285,7 @@
 <impala>'DEFAULT'                          { return '<impala>DEFAULT'; }
 <impala>'ENCODING'                         { return '<impala>ENCODING'; }
 <impala>'GRANT'                            { return '<impala>GRANT'; }
+<impala>'RECOVER'                          { return '<impala>RECOVER'; }
 <impala>'ROLE'                             { return '<impala>ROLE'; }
 <impala>'ROLES'                            { return '<impala>ROLES'; }
 <impala>\[BROADCAST\]                      { return '<impala>BROADCAST'; }

@@ -17,16 +17,17 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from dashboard.conf import HAS_SQL_ENABLED
 from desktop import appmanager
 from desktop import conf
 from desktop.conf import USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
+from indexer.conf import ENABLE_NEW_INDEXER
 from metadata.conf import has_navigator, has_navigator_file_search
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
-from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
-from notebook.conf import get_ordered_interpreters
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
 %>
 
 <%def name="assistJSModels()">
@@ -97,7 +98,18 @@ from notebook.conf import get_ordered_interpreters
     <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
     <!-- /ko -->
     <!-- ko if: definition.isView || definition.isTable -->
-    <li><a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }"><i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }</a></li>
+    <li>
+      <a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }">
+        <i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }
+      </a>
+    </li>
+    % if HAS_SQL_ENABLED.get():
+    <li>
+      <a href="javascript: void(0);" data-bind="click: explore">
+        <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }
+      </a>
+    </li>
+    % endif
     <!-- /ko -->
     %if ENABLE_QUERY_BUILDER.get():
     <!-- ko if: definition.isColumn && $currentApp() === 'editor' -->
@@ -188,12 +200,12 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
-      <div class="assist-actions table-actions" style="opacity: 0">
+      <div class="assist-actions table-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }">
-        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView, 'fa-table': definition.isTable }"></i>
+        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView && !navigationSettings.rightAssist, 'fa-table': definition.isTable && !navigationSettings.rightAssist }"></i>
         <span class="highlightable" data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </a>
       <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
@@ -203,16 +215,16 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-column-entry">
     <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn || definition.isComplex }">
-      <div class="assist-actions column-actions" style="opacity: 0">
+      <div class="assist-actions column-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
       </div>
       <!-- ko if: expandable -->
-      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }">
+      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: definition.primary_key === 'true' --> <i class="fa fa-key"></i><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }">
+      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key === 'true'  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
@@ -577,7 +589,7 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="assist-collections-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.toggleSearch, css: { 'blue' : $parent.isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
-      <a class="inactive-action" data-bind="hueLink: '/indexer#create'" title="${_('Create index')}" href="javascript:void(0)">
+      <a class="inactive-action" data-bind="hueLink: '/indexer/importer/prefill/all/index/'" title="${_('Create index')}" href="javascript:void(0)">
         <i class="pointer fa fa-plus" title="${_('Create index')}"></i>
       </a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.collections.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
@@ -1131,7 +1143,6 @@ from notebook.conf import get_ordered_interpreters
         var root = new HueFileEntry({
           activeEntry: self.activeEntry,
           trashEntry: ko.observable(),
-          serverTypeFilter: ko.observable(),
           apiHelper: options.apiHelper,
           app: 'documents',
           user: options.user,
@@ -1343,6 +1354,21 @@ from notebook.conf import get_ordered_interpreters
         };
 
         huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
+          % if ENABLE_NEW_INDEXER.get():
+          if (IS_HUE_4) {
+            huePubSub.subscribeOnce('app.gained.focus', function(app){
+              if (app === 'indexes'){
+                window.setTimeout(function(){
+                  huePubSub.publish('open.index', entry.definition.name);
+                }, 0)
+              }
+            });
+            huePubSub.publish('open.link', '/indexer/indexes/');
+          }
+          else {
+            window.open('/indexer/indexes/' + entry.definition.name);
+          }
+          % else:
           var hash = '#edit/' + entry.definition.name;
           if (IS_HUE_4) {
             if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
@@ -1362,6 +1388,7 @@ from notebook.conf import get_ordered_interpreters
           else {
             window.open('/indexer/' + hash);
           }
+          % endif
         });
 
         huePubSub.subscribe('assist.collections.refresh', function () {
@@ -1672,16 +1699,32 @@ from notebook.conf import get_ordered_interpreters
           </div>
         </div>
         <div data-bind="css: { 'assist-flex-fill': !selectedFunction(), 'assist-flex-half': selectedFunction() }">
-          <ul class="assist-function-categories" data-bind="foreach: filteredCategories">
+          <!-- ko ifnot: query -->
+          <ul class="assist-function-categories" data-bind="foreach: activeCategories">
             <li>
               <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
-              <ul class="assist-functions" data-bind="slideVisible: open, foreach: filteredFunctions">
+              <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
                 <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
                   <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parents[1].selectedFunction() === $data }, multiClick: { click: function () { $parents[1].selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }, text: signature"></a>
                 </li>
               </ul>
             </li>
           </ul>
+          <!-- /ko -->
+          <!-- ko if: query -->
+          <!-- ko if: filteredFunctions().length > 0 -->
+          <ul class="assist-functions" data-bind="foreach: filteredFunctions">
+            <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
+              <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parent.selectedFunction() === $data }, multiClick: { click: function () { $parent.selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }, text: signature"></a>
+            </li>
+          </ul>
+          <!-- /ko -->
+          <!-- ko if: filteredFunctions().length === 0 -->
+          <ul class="assist-functions">
+            <li class="assist-no-entries">${ _('No functions found. ') }</li>
+          </ul>
+          <!-- /ko -->
+          <!-- /ko -->
         </div>
         <!-- ko if: selectedFunction -->
         <div class="assist-flex-half assist-function-details" data-bind="with: selectedFunction">
@@ -1717,18 +1760,38 @@ from notebook.conf import get_ordered_interpreters
         self.selectedFunction.subscribe(function (newFunction) {
           if (newFunction) {
             selectedFunctionPerType[self.activeType()] = newFunction;
+            if (!newFunction.category.open()) {
+              newFunction.category.open(true);
+            }
           }
         });
 
-        self.activeCategories = ko.observable();
+        self.activeCategories = ko.observableArray();
 
-        self.filteredCategories = ko.pureComputed(function () {
-          if (! self.activeCategories()) {
-            return [];
-          }
-          return self.activeCategories().filter(function (category) {
-            return category.filteredFunctions().length > 0;
-          })
+        self.filteredFunctions = ko.pureComputed(function () {
+          var result = [];
+          var lowerCaseQuery = self.query().toLowerCase();
+          self.activeCategories().forEach(function (category) {
+            category.functions.forEach(function (fn) {
+              if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) === 0) {
+                fn.weight = 2;
+                result.push(fn);
+              } else if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) !== -1) {
+                fn.weight = 1;
+                result.push(fn);
+              } else if ((fn.description && fn.description.toLowerCase().indexOf(lowerCaseQuery) !== -1)) {
+                fn.weight = 0;
+                result.push(fn);
+              }
+            });
+          });
+          result.sort(function (a, b) {
+            if (a.weight !== b.weight) {
+              return b.weight - a.weight;
+            }
+            return a.signature.localeCompare(b.signature);
+          });
+          return result;
         });
 
         var apiHelper = ApiHelper.getInstance();
@@ -1786,17 +1849,11 @@ from notebook.conf import get_ordered_interpreters
                 signature: fn.signature,
                 description: fn.description
               }
-            }),
-            filteredFunctions: ko.pureComputed(function () {
-              if (self.query()) {
-                return koCategory.functions.filter(function (fn) {
-                  return fn.signature.toLowerCase().indexOf(self.query().toLowerCase()) !== -1 || (fn.description && fn.description.toLowerCase().indexOf(self.query().toLowerCase()) !== -1);
-                });
-              } else {
-                return koCategory.functions;
-              }
             })
           };
+          koCategory.functions.forEach(function (fn) {
+            fn.category = koCategory;
+          });
           self.categories[dialect].push(koCategory)
         });
       };
@@ -1819,15 +1876,14 @@ from notebook.conf import get_ordered_interpreters
             <!-- /ko -->
           </div>
         </div>
-        <div class="assist-flex-half">
+        <div class="assist-flex-half assist-db-scrollable">
           <!-- ko if: activeTables().length === 0 -->
           <div class="assist-no-entries">${ _('No tables identified.') }</div>
           <!-- /ko -->
           <!-- ko if: activeTables().length > 0 -->
-          <ul class="assist-active-tables" data-bind="foreach: activeTables">
-            <li data-bind="event: { mouseover: function (data, event) { showContextPopoverDelayed(data, event, 'left'); }, mouseout: clearContextPopoverDelay },">
-              <a class="inactive-action-dark" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }, text: database.name + '.' + name"></a>
-            </li>
+          <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: activeTables, minHeight: 23, container: '.assist-db-scrollable' }">
+            <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
+            <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry' } --><!-- /ko -->
           </ul>
           <!-- /ko -->
         </div>
@@ -1899,10 +1955,32 @@ from notebook.conf import get_ordered_interpreters
         var createQualifiedIdentifier = function (identifierChain) {
           return $.map(identifierChain, function (identifier) {
             return identifier.name;
-          }).join('.');
+          }).join('.').toLowerCase();
         };
 
+        var databaseIndex = {};
+
+        var activeTableIndex = {};
+        var filter = {
+          query: ko.observable(''),
+          showViews: ko.observable(true),
+          showTables: ko.observable(true)
+        };
+        var navigationSettings = {
+          showStats: true,
+          rightAssist: true
+        };
+        var i18n = {};
+
+        var assistDbSource = new AssistDbSource({
+          i18n : i18n,
+          type: 'hive',
+          name: 'hive',
+          navigationSettings: navigationSettings
+        });
+
         var handleLocationUpdate = function (activeLocations) {
+          assistDbSource.sourceType = activeLocations.type;
           if (!activeLocations) {
             return;
           }
@@ -1910,26 +1988,65 @@ from notebook.conf import get_ordered_interpreters
           self.activeStatementIndex(activeLocations.activeStatementIndex);
 
           if (activeLocations.activeStatementLocations) {
-            var tableIndex = {};
+            var updateTables = false;
+            var tableQidIndex = {};
             activeLocations.activeStatementLocations.forEach(function (location) {
               if (location.type === 'table') {
-                tableIndex[createQualifiedIdentifier(location.identifierChain)] = {
-                  name: location.identifierChain[location.identifierChain.length - 1].name,
-                  identifierChain: location.identifierChain
-                };
+                var database = location.identifierChain.length === 2 ? location.identifierChain[0].name : activeLocations.defaultDatabase;
+                database = database.toLowerCase();
+                if (!databaseIndex[database]) {
+                  databaseIndex[database] = new AssistDbEntry(
+                    {
+                      name: database,
+                      type: 'database',
+                      isDatabase: true
+                    },
+                    null,
+                    assistDbSource,
+                    filter,
+                    i18n,
+                    navigationSettings,
+                    {}
+                  )
+                }
+                var qid = createQualifiedIdentifier(location.identifierChain);
+                tableQidIndex[qid] = true;
+                if (!activeTableIndex[qid]) {
+                  var tableName = location.identifierChain[location.identifierChain.length - 1].name;
+                  var displayName = database + '.' + tableName;
+
+                  activeTableIndex[createQualifiedIdentifier(location.identifierChain)] = new AssistDbEntry(
+                    {
+                      name: tableName,
+                      type: 'table',
+                      isTable: true,
+                      displayName: displayName.toLowerCase()
+                    },
+                    databaseIndex[database],
+                    assistDbSource,
+                    filter,
+                    {},
+                    navigationSettings,
+                    {}
+                  );
+                  updateTables = true;
+                }
+              }
+            });
+            Object.keys(activeTableIndex).forEach(function (key) {
+              if (!tableQidIndex[key]) {
+                delete activeTableIndex[key];
+                updateTables = true;
               }
             });
 
-            self.activeTables($.map(tableIndex, function (value) {
-              return new MetastoreTable({
-                database: {
-                  name: value.identifierChain.length === 2 ? value.identifierChain[0].name : activeLocations.defaultDatabase
-                },
-                type: 'table',
-                sourceType: activeLocations.type,
-                name: value.name
-              });
-            }));
+            if (updateTables) {
+              var tables = Object.values(activeTableIndex);
+              tables.sort(function (a, b) {
+                return a.definition.name.localeCompare(b.definition.name);
+              })
+              self.activeTables(tables);
+            }
           }
         };
 
@@ -1990,7 +2107,9 @@ from notebook.conf import get_ordered_interpreters
           <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${ _('Start') }</a>
           <!-- /ko -->
           <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
-          <a data-bind="click: function() { huePubSub.publish('show.jobs.panel'); huePubSub.publish('mini.jb.navigate', 'schedules') }" href="javascript: void(0);">${ _('View') }</a>
+          <a data-bind="click: function() { huePubSub.publish('show.jobs.panel', viewSchedulerId()) }, clickBubble: false" href="javascript: void(0);">
+            ${ _('View') }
+          </a>
           <!-- /ko -->
           <br>
           <br>

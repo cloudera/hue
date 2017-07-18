@@ -74,6 +74,7 @@ else:
 
 dynamic_patterns += patterns('desktop.views',
   (r'^logs$','log_view'),
+  (r'^desktop/log_js_error$','log_js_error'),
   (r'^desktop/dump_config$','dump_config'),
   (r'^desktop/download_logs$','download_log_view'),
   (r'^desktop/get_debug_level','get_debug_level'),
@@ -106,7 +107,8 @@ dynamic_patterns += patterns('desktop.views',
   (r'^jasmine', 'jasmine'),
 
   # Web workers
-  (r'^desktop/workers/aceSqlWorker.js', 'ace_sql_worker'),
+  (r'^desktop/workers/aceSqlLocationWorker.js', 'ace_sql_location_worker'),
+  (r'^desktop/workers/aceSqlSyntaxWorker.js', 'ace_sql_syntax_worker'),
 
   # Unsupported browsers
   (r'^boohoo$','unsupported'),
