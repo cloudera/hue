@@ -184,12 +184,12 @@ except ImportError, e:
       </a>
       <ul class="dropdown-menu less-padding">
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as CSV') % DOWNLOAD_ROW_LIMIT.get() }">
+          <a class="download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as CSV') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
           </a>
         </li>
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as XLS') % DOWNLOAD_ROW_LIMIT.get() }">
+          <a class="download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as XLS') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }">
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
@@ -231,7 +231,7 @@ except ImportError, e:
               <div class="controls">
                  <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  &nbsp;${ _('File (first %s rows)') % DOWNLOAD_ROW_LIMIT.get() }
+                  &nbsp;${ _('File (first %s rows)') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">

@@ -162,7 +162,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     };
 
     MetastoreGlobals = {
-      partitionsLimit: ${ LIST_PARTITIONS_LIMIT.get() },
+      partitionsLimit: ${ hasattr(LIST_PARTITIONS_LIMIT, 'get') and LIST_PARTITIONS_LIMIT.get() or 1000 },
       i18n: {
         errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
         errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
