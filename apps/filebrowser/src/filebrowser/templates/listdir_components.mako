@@ -42,7 +42,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     <i class="fa fa-spinner fa-spin hue-spinner-large hue-spinner-center muted"></i>
   </div>
 
-  <table id="fileBrowserTable" class="table table-condensed datatables tablescroller-disable" data-bind="style: {'opacity': isLoading() ? '.5': '1'}">
+  <table id="fileBrowserTable" class="table table-condensed table-huedatatable tablescroller-disable" data-bind="style: {'opacity': isLoading() ? '.5': '1'}">
     <thead>
       <tr>
         <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
@@ -2117,7 +2117,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       });
 
       $('body').on('contextmenu', function (e) {
-        if ($.inArray(e.toElement, $('.datatables *')) === -1) {
+        if ($.inArray(e.toElement, $('.table-huedatatable *')) === -1) {
           hideContextMenu();
         }
       });
