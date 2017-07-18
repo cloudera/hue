@@ -3111,7 +3111,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
       viewModel.isPlayerMode.subscribe(function (value) {
         if (value){
-          $(".jHueNotify").hide();
+          $(".jHueNotify").remove();
           huePubSub.publish('side.panels.hide');
           viewModel.assistAvailable(false);
           viewModel.isLeftPanelVisible(false);

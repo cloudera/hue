@@ -1160,7 +1160,7 @@ var EditorViewModel = (function() {
       };
       $(document).trigger("executeStarted", {vm: vm, snippet: self});
       self.lastExecuted(now);
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       hueAnalytics.log('notebook', 'execute/' + self.type());
 
       if (self.result.fetchedOnce()) {

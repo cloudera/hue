@@ -125,7 +125,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
 
   self.showSubmitPopup = function () {
     // If self.bundle.id() == null, need to save wf for now
-    $(".jHueNotify").hide();
+    $(".jHueNotify").remove();
     if (!self.bundle.isDirty()) {
       hueAnalytics.log('oozie/editor/bundle', 'submit');
       $.get("/oozie/editor/bundle/submit/" + self.bundle.id(), {
