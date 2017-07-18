@@ -3608,11 +3608,8 @@ $(document).ready(function () {
       addFacetDemiModalFieldCancel();
     }
   });
-
+  $(document).off("shownAnalysis");
   $(document).on("shownAnalysis", function (e, originalEvent) {
-    var _fieldElement = $(".field-selector").filter(function () {
-      return $(this).text().toLowerCase() === searchViewModel.fieldAnalysesName().toLowerCase();
-    }).parent();
     if (originalEvent.pageX == null && originalEvent.clientX != null) {
       var doc = document.documentElement, body = document.body;
       originalEvent.pageX = originalEvent.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
