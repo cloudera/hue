@@ -82,8 +82,8 @@ from metadata.conf import has_navigator
         <span style="margin-right: 5px;" title="${ _('Format') }">
           <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
         </span>
-        <span style="margin-right: 5px;" title="${ _('Format') }">
-          <i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span> <span data-bind="visible: !details.stats.compressed" style="display:none;">${_('Not compressed')}</span>
+        <span style="margin-right: 5px; white-space: nowrap" title="${ _('Type') }">
+          <i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.table_type === 'MANAGED_TABLE'" style="display:none;">${_('Managed')}</span><span data-bind="visible: !details.stats.table_type === 'EXTERNAL_TABLE'" style="display:none;">${_('External')}</span>
         </span>
       </div>
       <!-- /ko -->
