@@ -461,10 +461,17 @@ ul.errorlist {
   overflow: hidden;
 }
 
-.toggle-overflow-gradient {
+.toggle-overflow .editable {
+  padding: 0 5px;
+}
+
+.toggle-overflow .editable-click {
+  border-bottom: none !important;
+}
+
+.toggle-overflow-toggle {
   position: relative;
   z-index: 2;
-  top: -10px;
   height: 10px;
   line-height: 10px;
   background-color: @cui-gray-050;
@@ -472,7 +479,15 @@ ul.errorlist {
   text-align: center;
 }
 
-.toggle-overflow-gradient:hover {
+.toggle-overflow-toggle.toggle-hidden {
+  margin-top: -5px;
+}
+
+.toggle-overflow-toggle > i {
+  line-height: 10px;
+}
+
+.toggle-overflow-toggle:hover {
   background-color: @cui-gray-100;
 }
 

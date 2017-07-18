@@ -463,25 +463,25 @@
   ko.bindingHandlers.toggleOverflow = {
     render: function ($element, options) {
       if (hueUtils.isOverflowing($element.find('.toggle-overflow'))) {
-        $('<div>').addClass('toggle-overflow-gradient').html('<i class="fa fa-caret-down muted"></i>').appendTo($element);
+        $('<div>').addClass('toggle-overflow-toggle').html('<i class="fa fa-caret-down muted"></i>').appendTo($element);
         $element.on('click', function () {
-          if ($element.find('.toggle-overflow-gradient i').hasClass('fa-caret-down')){
+          if ($element.find('.toggle-overflow-toggle i').hasClass('fa-caret-down')){
             $element.find('.toggle-overflow').css('height', '');
             $element.css('cursor', 'n-resize');
-            $element.find('.toggle-overflow-gradient').css('cursor', 'n-resize');
-            $element.find('.toggle-overflow-gradient i').removeClass('fa-caret-down').addClass('fa-caret-up');
-          }
-          else {
+            $element.find('.toggle-overflow-toggle').removeClass('toggle-hidden').css('cursor', 'n-resize');
+            $element.find('.toggle-overflow-toggle i').removeClass('fa-caret-down').addClass('fa-caret-up');
+          } else {
             if (options.height) {
               $element.find('.toggle-overflow').height(options.height);
             }
             $element.css('cursor', 's-resize');
-            $element.find('.toggle-overflow-gradient').css('cursor', 's-resize');
-            $element.find('.toggle-overflow-gradient i').removeClass('fa-caret-up').addClass('fa-caret-down');
+            $element.find('.toggle-overflow-toggle').addClass('toggle-hidden').css('cursor', 's-resize');
+            $element.find('.toggle-overflow-toggle i').removeClass('fa-caret-up').addClass('fa-caret-down');
           }
         });
       }
     },
+
     init: function (element, valueAccessor) {
       var $element = $(element);
       var options = valueAccessor() || {};
@@ -493,6 +493,7 @@
         $element.find('.toggle-overflow').width(options.width);
       }
     },
+
     update: function (element, valueAccessor) {
       var $element = $(element);
       var options = valueAccessor() || {};
