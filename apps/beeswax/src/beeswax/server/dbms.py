@@ -230,7 +230,7 @@ class HiveServer2Dbms(object):
     if new_table_name:
       table_name = new_table_name
       hql += ' RENAME TO `%s`' % table_name
-    elif comment:
+    elif comment is not None:
       hql += " SET TBLPROPERTIES ('comment' = '%s')" % comment
     elif tblproperties:
       hql += " SET TBLPROPERTIES (%s)" % ' ,'.join("'%s' = '%s'" % (k, v) for k, v in tblproperties.items())
