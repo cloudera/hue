@@ -24,10 +24,10 @@ from desktop.conf import USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
+from indexer.conf import ENABLE_NEW_INDEXER
 from metadata.conf import has_navigator, has_navigator_file_search
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
-from indexer.conf import ENABLE_NEW_INDEXER
 %>
 
 <%def name="assistJSModels()">
