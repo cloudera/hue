@@ -406,11 +406,6 @@ HiveOrImpalaCreate
  | '<impala>CREATE'
  ;
 
-HiveOrImpalaCurrent
- : '<hive>CURRENT'
- | '<impala>CURRENT'
- ;
-
 HiveOrImpalaDatabasesOrSchemas
  : '<hive>DATABASES'
  | '<hive>SCHEMAS'
@@ -421,11 +416,6 @@ HiveOrImpalaDatabasesOrSchemas
 HiveOrImpalaEscaped
  : '<hive>ESCAPED'
  | '<impala>ESCAPED'
- ;
-
-HiveOrImpalaExternal
- : '<hive>EXTERNAL'
- | '<impala>EXTERNAL'
  ;
 
 HiveOrImpalaFields
@@ -1062,36 +1052,19 @@ DerivedColumnChain_EDIT
  ;
 
 ColumnIdentifier
- : RegularOrBacktickedIdentifier OptionalMapOrArrayKey
-   {
-     if ($2) {
-       $$ = { name: $1, keySet: true };
-     } else {
-       $$ = { name: $1 };
-     }
-   }
+ : RegularOrBacktickedIdentifier                                                                               -> { name: $1 };
+ | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket ValueExpression HiveOrImpalaRightSquareBracket  -> { name: $1, keySet: true }
+ | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket HiveOrImpalaRightSquareBracket                  -> { name: $1, keySet: true }
  ;
 
 ColumnIdentifier_EDIT
- : RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket AnyCursor HiveOrImpalaRightSquareBracketOrError
-   {
-     $$ = { name: $1, insideKey: true }
-   }
- | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket ValueExpression_EDIT HiveOrImpalaRightSquareBracketOrError
-   {
-     $$ = { name: $1 }
-   }
+ : RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket AnyCursor HiveOrImpalaRightSquareBracketOrError             -> { name: $1, insideKey: true }
+ | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket ValueExpression_EDIT HiveOrImpalaRightSquareBracketOrError  -> { name: $1 };
  ;
 
 PartialBacktickedIdentifierOrPartialCursor
  : PartialBacktickedIdentifier
  | 'PARTIAL_CURSOR'
- ;
-
-OptionalMapOrArrayKey
- :
- | HiveOrImpalaLeftSquareBracket ValueExpression HiveOrImpalaRightSquareBracket
- | HiveOrImpalaLeftSquareBracket HiveOrImpalaRightSquareBracket
  ;
 
 HiveOrImpalaRightSquareBracketOrError
@@ -1287,16 +1260,6 @@ QuerySpecification_EDIT
  | CommonTableExpression_EDIT
  | CommonTableExpression_EDIT '(' QuerySpecification ')'
  | CommonTableExpression_EDIT SelectStatement OptionalUnions
- ;
-
-OptionallyParenthesizedSelectStatement
- : SelectStatement
- | '(' SelectStatement ')' // Impala specific
- ;
-
-OptionallyParenthesizedSelectStatement_EDIT
- : SelectStatement_EDIT
- | '(' SelectStatement_EDIT RightParenthesisOrError
  ;
 
 SelectStatement
@@ -2273,17 +2236,42 @@ InValueList
  | InValueList ',' NonParenthesizedValueExpressionPrimary
  ;
 
-InValueList_EDIT
- : NonParenthesizedValueExpressionPrimary_EDIT
- | InValueList ',' AnyCursor
- | InValueList ',' NonParenthesizedValueExpressionPrimary_EDIT
- | InValueList ',' NonParenthesizedValueExpressionPrimary_EDIT ',' InValueList
- | NonParenthesizedValueExpressionPrimary_EDIT ',' InValueList
- ;
-
 NonParenthesizedValueExpressionPrimary
  : UnsignedValueSpecification
- | ColumnReference             -> { types: ['COLREF'], columnReference: $1 }
+ | ColumnOrArbitraryFunctionRef             -> { types: ['COLREF'], columnReference: $1.chain }
+ | ColumnOrArbitraryFunctionRef ArbitraryFunctionRightPart
+   {
+     // We need to handle arbitrary UDFs here instead of inside UserDefinedFunction or there will be a conflict
+     // with columnReference for functions like: db.udf(foo)
+     var fn = $1.chain[$1.chain.length - 1].name.toLowerCase();
+     $1.lastLoc.type = 'function';
+     $1.lastLoc.function = fn;
+     $1.lastLoc.location = {
+       first_line: $1.lastLoc.location.first_line,
+       last_line: $1.lastLoc.location.last_line,
+       first_column: $1.lastLoc.location.first_column,
+       last_column: $1.lastLoc.location.last_column - 1
+     }
+     if ($1.lastLoc !== $1.firstLoc) {
+        $1.firstLoc.type = 'database';
+     } else {
+       delete $1.lastLoc.identifierChain;
+     }
+     if ($2.expression) {
+       $$ = { function: fn, expression: $2.expression, types: parser.findReturnTypes(fn) }
+     } else {
+       $$ = { function: fn, types: parser.findReturnTypes(fn) }
+     }
+   }
+ | ArbitraryFunctionName ArbitraryFunctionRightPart
+  {
+    parser.addFunctionLocation(@1, $1);
+    if ($2.expression) {
+      $$ = { function: $1, expression: $2.expression, types: parser.findReturnTypes($1) }
+    } else {
+      $$ = { function: $1, types: parser.findReturnTypes($1) }
+    }
+  }
  | UserDefinedFunction
  | 'NULL'                      -> { types: [ 'NULL' ] }
  | ImpalaInterval              -> { types: [ 'TIMESTAMP' ] }
@@ -2291,7 +2279,7 @@ NonParenthesizedValueExpressionPrimary
 
 NonParenthesizedValueExpressionPrimary_EDIT
  : UnsignedValueSpecification_EDIT
- | ColumnReference_EDIT
+ | ColumnOrArbitraryFunctionRef_EDIT
    {
      if ($1.suggestKeywords) {
        $$ = { types: ['COLREF'], columnReference: $1, suggestKeywords: $1.suggestKeywords };
@@ -2299,8 +2287,56 @@ NonParenthesizedValueExpressionPrimary_EDIT
        $$ = { types: ['COLREF'], columnReference: $1 };
      }
    }
+ | ColumnOrArbitraryFunctionRef ArbitraryFunctionRightPart_EDIT
+   {
+     var fn = $1.chain[$1.chain.length - 1].name.toLowerCase();
+     $1.lastLoc.type = 'function';
+     $1.lastLoc.function = fn;
+     $1.lastLoc.location = {
+       first_line: $1.lastLoc.location.first_line,
+       last_line: $1.lastLoc.location.last_line,
+       first_column: $1.lastLoc.location.first_column,
+       last_column: $1.lastLoc.location.last_column - 1
+     }
+     if ($1.lastLoc !== $1.firstLoc) {
+        $1.firstLoc.type = 'database';
+     } else {
+       delete $1.lastLoc.identifierChain;
+     }
+     if ($2.position) {
+       parser.applyArgumentTypesToSuggestions(fn, $2.position);
+     }
+     $$ = { types: parser.findReturnTypes(fn) };
+   }
+ | ArbitraryFunctionName ArbitraryFunctionRightPart_EDIT
+   {
+     parser.addFunctionLocation(@1, $1);
+     if ($2.position) {
+       parser.applyArgumentTypesToSuggestions($1, $2.position);
+     }
+     $$ = { types: parser.findReturnTypes($1) };
+   }
  | UserDefinedFunction_EDIT
  | ImpalaInterval_EDIT
+ ;
+
+ColumnOrArbitraryFunctionRef
+ : BasicIdentifierChain
+   {
+     var lastLoc = parser.yy.locations[parser.yy.locations.length - 1];
+     lastLoc.type = 'column';
+     // used for function references with db prefix
+     var firstLoc = parser.yy.locations[parser.yy.locations.length - $1.length];
+     $$ = { chain: $1, firstLoc: firstLoc, lastLoc: lastLoc }
+   }
+ | BasicIdentifierChain AnyDot '*'
+   {
+     parser.addAsteriskLocation(@3, $1.concat({ asterisk: true }));
+   }
+ ;
+
+ColumnOrArbitraryFunctionRef_EDIT
+ : BasicIdentifierChain_EDIT
  ;
 
 ImpalaInterval
@@ -2462,48 +2498,6 @@ SelectList_EDIT
      $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' SelectSpecification_EDIT ',' SelectList  -> $3
- ;
-
-DerivedColumn_TWO
- : ColumnIdentifier
-   {
-     parser.addColumnLocation(@1, [$1]);
-   }
- | ColumnIdentifier AnyDot '*'
-   {
-     parser.addColumnLocation(@1, [$1]);
-   }
- | ColumnIdentifier AnyDot DerivedColumnChain
-   {
-     parser.addColumnLocation(@2, [$1].concat($3));
-   }
- ;
-
-DerivedColumn_EDIT_TWO
- : ColumnIdentifier AnyDot PartialBacktickedOrPartialCursor
-   {
-     // TODO: Check if valid: SELECT testMap["key"].* FROM foo
-     if (typeof $1.key === 'undefined') {
-       parser.yy.result.suggestStar = true;
-     }
-     parser.suggestColumns({
-       identifierChain: [ $1 ]
-     });
-   }
- | ColumnIdentifier AnyDot DerivedColumnChain '<impala>.' 'PARTIAL_CURSOR'
-   {
-      $3.unshift($1);
-      parser.suggestColumns({
-        identifierChain: $3
-      });
-    }
- | ColumnIdentifier AnyDot DerivedColumnChain '<hive>.' 'PARTIAL_CURSOR'
-   {
-      $3.unshift($1);
-      parser.suggestColumns({
-        identifierChain: $3
-      });
-    }
  ;
 
 TableReferenceList
@@ -2999,8 +2993,7 @@ OptionalLateralViews_EDIT
  ;
 
 UserDefinedFunction
- : ArbitraryFunction
- | AggregateFunction OptionalOverClause
+ : AggregateFunction OptionalOverClause
    {
      if (!$2) {
        $1.suggestKeywords = ['OVER'];
@@ -3013,8 +3006,7 @@ UserDefinedFunction
  ;
 
 UserDefinedFunction_EDIT
- : ArbitraryFunction_EDIT
- | AggregateFunction_EDIT
+ : AggregateFunction_EDIT
  | AggregateFunction OptionalOverClause_EDIT
  | AnalyticFunction_EDIT
  | AnalyticFunction_EDIT OverClause
@@ -3711,8 +3703,8 @@ SumFunction_EDIT
  ;
 
 LateralView
- : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularOrBacktickedIdentifier LateralViewColumnAliases  -> { lateralView: { udtf: $4, tableAlias: $5, columnAliases: $6 }}
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularOrBacktickedIdentifier
+ : '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction RegularOrBacktickedIdentifier LateralViewColumnAliases  -> { lateralView: { udtf: $4, tableAlias: $5, columnAliases: $6 }}
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction RegularOrBacktickedIdentifier
    {
      if ($4.function.toLowerCase() === 'explode') {
        $$ = { lateralView: { udtf: $4, tableAlias: $5, columnAliases: ['key', 'value'] }, suggestKeywords: ['AS'] };
@@ -3722,16 +3714,16 @@ LateralView
        $$ = { lateralView: { udtf: $4, tableAlias: $5, columnAliases: [] }, suggestKeywords: ['AS'] };
      }
    }
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction LateralViewColumnAliases                                -> { lateralView: { udtf: $4, columnAliases: $5 }}
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction LateralViewColumnAliases                                -> { lateralView: { udtf: $4, columnAliases: $5 }}
  ;
 
 LateralView_EDIT
- : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT RegularOrBacktickedIdentifier
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction_EDIT RegularOrBacktickedIdentifier LateralViewColumnAliases
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularOrBacktickedIdentifier LateralViewColumnAliases_EDIT
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction PartialBacktickedOrCursor
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction PartialBacktickedOrCursor LateralViewColumnAliases
+ : '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction_EDIT
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction_EDIT RegularOrBacktickedIdentifier
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction_EDIT RegularOrBacktickedIdentifier LateralViewColumnAliases
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction RegularOrBacktickedIdentifier LateralViewColumnAliases_EDIT
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction PartialBacktickedOrCursor
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction PartialBacktickedOrCursor LateralViewColumnAliases
  | '<hive>LATERAL' '<hive>VIEW' OptionalOuter 'CURSOR'
    {
      if (!$3) {

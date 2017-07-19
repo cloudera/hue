@@ -282,11 +282,6 @@ HiveOrImpalaCreate
  | '<impala>CREATE'
  ;
 
-HiveOrImpalaCurrent
- : '<hive>CURRENT'
- | '<impala>CURRENT'
- ;
-
 HiveOrImpalaDatabasesOrSchemas
  : '<hive>DATABASES'
  | '<hive>SCHEMAS'
@@ -297,11 +292,6 @@ HiveOrImpalaDatabasesOrSchemas
 HiveOrImpalaEscaped
  : '<hive>ESCAPED'
  | '<impala>ESCAPED'
- ;
-
-HiveOrImpalaExternal
- : '<hive>EXTERNAL'
- | '<impala>EXTERNAL'
  ;
 
 HiveOrImpalaFields
@@ -1758,14 +1748,6 @@ InValueList
  | InValueList ',' NonParenthesizedValueExpressionPrimary
  ;
 
-InValueList_EDIT
- : NonParenthesizedValueExpressionPrimary_EDIT
- | InValueList ',' AnyCursor
- | InValueList ',' NonParenthesizedValueExpressionPrimary_EDIT
- | InValueList ',' NonParenthesizedValueExpressionPrimary_EDIT ',' InValueList
- | NonParenthesizedValueExpressionPrimary_EDIT ',' InValueList
- ;
-
 NonParenthesizedValueExpressionPrimary
  : UnsignedValueSpecification
  | ColumnReference             -> { types: ['COLREF'], columnReference: $1 }
@@ -1946,48 +1928,6 @@ SelectList_EDIT
      $$ = { suggestKeywords: [{ value: '*', weight: 1000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' SelectSpecification_EDIT ',' SelectList  -> $3
- ;
-
-DerivedColumn_TWO
- : ColumnIdentifier
-   {
-     parser.addColumnLocation(@1, [$1]);
-   }
- | ColumnIdentifier AnyDot '*'
-   {
-     parser.addColumnLocation(@1, [$1]);
-   }
- | ColumnIdentifier AnyDot DerivedColumnChain
-   {
-     parser.addColumnLocation(@2, [$1].concat($3));
-   }
- ;
-
-DerivedColumn_EDIT_TWO
- : ColumnIdentifier AnyDot PartialBacktickedOrPartialCursor
-   {
-     // TODO: Check if valid: SELECT testMap["key"].* FROM foo
-     if (typeof $1.key === 'undefined') {
-       parser.yy.result.suggestStar = true;
-     }
-     parser.suggestColumns({
-       identifierChain: [ $1 ]
-     });
-   }
- | ColumnIdentifier AnyDot DerivedColumnChain '<impala>.' 'PARTIAL_CURSOR'
-   {
-      $3.unshift($1);
-      parser.suggestColumns({
-        identifierChain: $3
-      });
-    }
- | ColumnIdentifier AnyDot DerivedColumnChain '<hive>.' 'PARTIAL_CURSOR'
-   {
-      $3.unshift($1);
-      parser.suggestColumns({
-        identifierChain: $3
-      });
-    }
  ;
 
 TableReferenceList
