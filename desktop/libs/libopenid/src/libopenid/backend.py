@@ -21,13 +21,16 @@ from __future__ import absolute_import
 
 import logging
 import sys
+
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
 from django_openid_auth.auth import OpenIDBackend as _OpenIDBackend
+
 from desktop.auth.backend import rewrite_user
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
 from libopenid import metrics
+
 
 LOG = logging.getLogger(__name__)
 
@@ -75,7 +78,6 @@ class OpenIDBackend(_OpenIDBackend):
         user.save()
 
 
-
   def get_user(self, user_id):
     user = super(OpenIDBackend, self).get_user(user_id)
     user = rewrite_user(user)
@@ -89,4 +91,3 @@ class OpenIDBackend(_OpenIDBackend):
   def is_first_login_ever(cls):
     """ Return true if no external user has ever logged in to Desktop yet. """
     return not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists()
-

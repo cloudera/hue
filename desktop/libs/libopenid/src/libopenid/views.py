@@ -15,20 +15,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from django_openid_auth.views import login_begin as django_login_begin, login_complete
 
 from desktop.lib.django_util import render
 from django.core import urlresolvers
-import libopenid.conf
-from libopenid.backend import OpenIDBackend
-from libopenid.forms import OpenIDLoginFormExt
 from django.conf import settings
-import logging
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-__all__ = ['login_begin', 'login_complete']
+import libopenid.conf
+from libopenid.backend import OpenIDBackend
+from libopenid.forms import OpenIDLoginFormExt
 
+
+__all__ = ['login_begin', 'login_complete']
 
 
 def login_begin(request):
@@ -50,13 +52,7 @@ def login_begin(request):
           'hide_field': True
        }, context_instance=RequestContext(request))
 
-
-
   return django_login_begin(request, template_name='openid-login.html', form_class = OpenIDLoginFormExt)
-
-
-
-
 
 
 setattr(login_begin, 'login_notrequired', True)
