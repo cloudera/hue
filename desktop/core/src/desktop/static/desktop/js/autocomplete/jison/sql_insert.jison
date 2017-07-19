@@ -309,11 +309,6 @@ OptionalTable
  | 'TABLE'
  ;
 
-AnyInsert
- : '<hive>INSERT'
- | 'INSERT'
- ;
-
 OptionalInsertRowFormat
  :
  | 'ROW' '<hive>FORMAT' HiveDelimitedRowFormat

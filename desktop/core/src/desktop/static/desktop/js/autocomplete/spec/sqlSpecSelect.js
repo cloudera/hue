@@ -1798,6 +1798,51 @@
         });
       });
 
+      it('should suggest handle "SELECT db.customUdf(col) FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT db.customUdf(col) FROM bar;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            locations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 34 } },
+              { type: 'database', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'db' }] },
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 11, last_column: 19 }, identifierChain: [{ name: 'db' }, { name: 'customUdf' }], function: 'customudf' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 24 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'bar' }] }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 34 }, identifierChain: [{ name: 'bar' }] }
+            ]
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT db.customUdf(| FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT db.customUdf(',
+          afterCursor: ' FROM bar;',
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['T'] },
+            suggestColumns: { types: ['T'], source: 'select', tables: [{ identifierChain: [{ name: 'bar' }] }] }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT db.customUdf(1, | FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT db.customUdf(1, ',
+          afterCursor: ' FROM bar;',
+          containsKeywords: ['CASE'],
+          expectedResult: {
+            lowerCase: false,
+            suggestFunctions: { types: ['T'] },
+            suggestColumns: { types: ['T'], source: 'select', tables: [{ identifierChain: [{ name: 'bar' }] }] }
+          }
+        });
+      });
+
       it('should suggest keywords for "SELECT extract(| FROM bar;"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT extract( ',
