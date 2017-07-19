@@ -14,25 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import django_openid_auth
-import desktop.conf
+
 import libopenid.conf
 import logging
 
-from desktop.lib import security_util
+import django_openid_auth
+import desktop.conf
 
+from desktop.lib import security_util
 
 
 __all__ = ['OPENID_CONFIG', 'OPENID_CREATE_USERS', 'OPENID_SSO_SERVER_URL', 'OPENID_USE_EMAIL_FOR_USERNAME', 'OPENID_IDENTITY_URL_PREFIX']
 
 
-
-
-OPENID_CONFIG = {
-  
+OPENID_CONFIG = {  
   # set to 1 to output debugging information
   'debug': 1,
-
 }
 
 # openid sso endpoint url

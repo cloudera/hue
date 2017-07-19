@@ -1,4 +1,6 @@
 {% load i18n %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,10 +15,9 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <link href="/static/desktop/ext/css/bootplus.css" rel="stylesheet">
-  <link href="/static/desktop/ext/css/font-awesome.min.css" rel="stylesheet">
-  <link href="/static/desktop/css/hue3.css" rel="stylesheet">
-  <link href="/static/desktop/css/hue3-extra.css" rel="stylesheet">
+  <link href="{% static 'desktop/ext/css/font-awesome.min.css' %}" rel="stylesheet">
+  <link href="{% static 'desktop/css/hue3.css' %}" rel="stylesheet">
+  <link href="{% static 'desktop/css/hue3-extra.css' %}" rel="stylesheet">
 
   <style type="text/css">
     body {
@@ -98,12 +99,11 @@
 <div class="footer"></div>
 
 <div class="navigator">
-  <a class="brand nav-tooltip pull-left" href="#"><img src="/static/desktop/art/hue-logo-mini-white.png"
-                                                       data-orig="/static/desktop/art/hue-logo-mini-white.png"
-                                                       data-hover="/static/desktop/art/hue-logo-mini-white-hover.png"/></a>
-  <ul class="nav nav-pills pull-left hide" id="visit">
-    <li><a title="{% trans "Visit gethue.com" %}" href="http://gethue.com">{% trans "Fell asleep? Visit us on gethue.com instead!" %} <i class="fa fa-external-link-circle"></i></a></li>
-  </ul>
+  <a class="brand nav-tooltip pull-left" href="#">
+    <img src="{% static 'desktop/art/hue-logo-mini-white.png' %}"
+			data-orig="{% static 'desktop/art/hue-logo-mini-white.png' %}"
+			data-hover="{% static 'desktop/art/hue-logo-mini-white-hover.png' %}"/>
+  </a>
 </div>
 
 
@@ -112,8 +112,8 @@
     <div class="login-content">
       <form method="POST" action="{{ action }}" class="well">
         {% csrf_token %}
-        <img id="logo" src="/static/desktop/art/hue-login-logo.png" data-orig="/static/desktop/art/hue-login-logo.png"
-             data-hover="/static/desktop/art/hue-login-logo-skew.png"/>
+        <img id="logo" src="{% static 'desktop/art/hue-login-logo.png' %}" data-orig="{% static 'desktop/art/hue-login-logo.png' %}"
+             data-hover="{% static 'desktop/art/hue-login-logo-skew.png' %}"/>
 
         {% if login_errors %}
             <div class="alert alert-error" style="text-align: center">
@@ -144,7 +144,7 @@
   </div>
 </div>
 
-<script src="/static/desktop/ext/js/jquery/jquery-2.1.1.min.js"></script>
+<script src="{% static 'desktop/ext/js/jquery/jquery-2.1.1.min.js' %}"></script>
 <script>
   $(document).ready(function () {
     var _skew = -1;
@@ -168,5 +168,3 @@
 </script>
 </body>
 </html>
-
-
