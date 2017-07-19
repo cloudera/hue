@@ -108,27 +108,13 @@ ${ hueIcons.symbols() }
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
+        <a class="pull-left">
+          <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; ; margin-top: 4px">
+        </a>
+
         <a class="brand" data-bind="hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
-
-
-        <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
-          <!-- ko if: mainQuickCreateAction -->
-          <!-- ko with: mainQuickCreateAction -->
-          <a class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
-            <span data-bind="text: displayName"></span>
-          </a>
-          <!-- /ko -->
-          <!-- /ko -->
-          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1">
-            <!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko -->
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
-            <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
-          </ul>
-        </div>
 
         <script type="text/html" id="quick-create-item-template">
           <!-- ko if: item.dividerAbove -->
@@ -157,7 +143,23 @@ ${ hueIcons.symbols() }
 
 
       <div class="top-nav-middle">
-
+        <div class="btn-group pull-left" data-bind="visible: true" style="display:none; margin-top: 8px">
+          <!-- ko if: mainQuickCreateAction -->
+          <!-- ko with: mainQuickCreateAction -->
+          <a class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}, style: { borderBottomRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px', borderTopRightRadius: $parent.quickCreateActions().length > 1 ? '0px' : '4px' }">
+            <span data-bind="text: displayName"></span>
+          </a>
+          <!-- /ko -->
+          <!-- /ko -->
+          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1">
+            <!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko -->
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
+            <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
+          </ul>
+        </div>
+        
         <!-- ko if: cluster.clusters().length > 1 -->
         <div class="btn-group pull-right" style="display: none;" data-bind="visible: cluster.clusters().length > 1">
           <button class="btn" data-bind="text: cluster.cluster().name() + (cluster.cluster().interface ? ' ' + cluster.cluster().interface() : '')"></button>
