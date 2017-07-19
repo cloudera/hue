@@ -262,11 +262,26 @@ from metadata.conf import has_optimizer, OPTIMIZER
       return mTime;
     };
 
-    //Add CSRF Token to all XHR Requests
-    var xrhsend = XMLHttpRequest.prototype.send;
+    // catches HTTP 502 errors
+    function xhrOnreadystatechange() {
+      if (this.readyState === 4 && this.status === 502) {
+        $.jHueNotify.error($('<span>').html(this.responseText).text());
+      }
+      if (this._onreadystatechange) {
+        return this._onreadystatechange.apply(this, arguments);
+      }
+    }
+
+    var xhrSend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function (data) {
+      // Add CSRF Token to all XHR Requests
       this.setRequestHeader('X-CSRFToken', window.CSRF_TOKEN);
-      return xrhsend.apply(this, arguments);
+
+      if (this.onreadystatechange) {
+        this._onreadystatechange = this.onreadystatechange;
+      }
+      this.onreadystatechange = xhrOnreadystatechange;
+      return xhrSend.apply(this, arguments);
     };
     XMLHttpRequest.prototype.isAugmented = true;
 
