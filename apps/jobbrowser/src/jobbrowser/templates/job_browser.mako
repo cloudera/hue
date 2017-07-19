@@ -560,7 +560,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
@@ -654,7 +654,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
@@ -719,7 +719,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
@@ -755,7 +755,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
@@ -884,7 +884,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
@@ -1011,7 +1011,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
@@ -1095,7 +1095,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
@@ -1219,7 +1219,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
