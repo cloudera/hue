@@ -168,18 +168,22 @@ def _get_main_task_id(user, operation_execution_id):
 # >>> b['tree']['children'][0]['children'][0]['id']
 # u'6bc2b3e4-1a7d-4fb5-9371-df8d2a463b1d'
  
-  
-  
-  ops = client.get_operation_execution_details(operation_execution_id)
-  
-  job_id = ops['tree']['children'][0]['displayName']
-  task_attempt_id = job_id.replace('job_', 'attempt_') + '_m_000000_0'
-  operation_execution_id = ops['tree']['children'][0]['children'][0]['id']
-  
-  return WorkfloadAnalyticsClient(user).get_mr_task_attempt_log(
-      operation_execution_id=operation_execution_id,
-      attempt_id=task_attempt_id
-  )
+  try:
+    ops = client.get_operation_execution_details(operation_execution_id)
+    
+    job_id = ops['tree']['children'][0]['displayName']
+    task_attempt_id = job_id.replace('job_', 'attempt_') + '_m_000000_0'
+    operation_execution_id = ops['tree']['children'][0]['children'][0]['id']
+    
+    return WorkfloadAnalyticsClient(user).get_mr_task_attempt_log(
+        operation_execution_id=operation_execution_id,
+        attempt_id=task_attempt_id
+    )
+  except Exception, e:
+    print 'operation id maybe just not available yet'
+    print e
+    LOG.exception(e)
+    return ''
 
 
 class DataEng():
