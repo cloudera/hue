@@ -82,7 +82,9 @@ class DataEngApi(Api):
     job_id = snippet['result']['handle']['id']
 
     handle = DataEng(self.user).list_jobs(job_ids=[job_id])
-    job = handle['jobs'][0]
+
+    job = handle['jobs'][-1]
+    job['status'] = job['status'].lower()
 
     if job['status'] in RUNNING_STATES:
       return response
