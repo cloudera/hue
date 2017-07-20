@@ -116,6 +116,10 @@ ${ hueIcons.symbols() }
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
 
+        <a style="display: none;" class="brand" data-bind="visible: onPrem() === false, hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
+          <svg style="height: 20px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
+        </a>
+
         <script type="text/html" id="quick-create-item-template">
           <!-- ko if: item.dividerAbove -->
           <li class="divider"></li>
