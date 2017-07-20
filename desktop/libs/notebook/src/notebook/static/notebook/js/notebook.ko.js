@@ -1534,7 +1534,8 @@ var EditorViewModel = (function() {
         if (query_id == notebook.id()) { // If still on the same result
 
 
-          var sigmaId = '12345';
+          var sigmaId = '86966e07-1380-465f-81ee-d258cf37e6e2'; // Good
+          //var sigmaId = 'd880c65e-fd36-4602-9a58-cefd9c198604'; // Bad
 
 
           huePubSub.publish('assist.show.sigma.analysis', sigmaId);

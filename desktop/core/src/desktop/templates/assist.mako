@@ -2122,14 +2122,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var sigmaApiUrl = '/metadata/api/workload_analytics/get_operation_execution_details/';
 
         var data = {
-          operation_id: sigmaOperationId
+          operation_id: ko.mapping.toJSON(sigmaOperationId)
         };
 
-        $.get(sigmaApiUrl, data, function (data) {
+        $.post(sigmaApiUrl, data, function (data) {
           if (data && data.status === 0) {
-            var link= 'https://console.altus.cloudera.com/wa/index.html#/operations/' + data.id;
+            var link = 'https://altus.cloudera.com/wa/index.html#/operations/' + data.data.tree.id;
 
-            if (data.state === 'SUCCEEDED') {
+            if (data.data.tree.badHealthCheckIds.length === 0) {
               self.sigmaSuggestions([{
                 text: 'No issues found!',
                 risk: 'normal',
@@ -2137,7 +2137,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               }]);
             } else {
               var suggestions = [];
-              data.badHealthCheckIds.forEach(function (id) {
+              data.data.tree.badHealthCheckIds.forEach(function (id) {
                 suggestions.push({
                   text: SIGMA_INDEX[id] || id,
                   risk: 'high',

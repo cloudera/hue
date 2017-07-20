@@ -51,13 +51,19 @@ class WorkfloadAnalyticsClient():
   def get_operation_execution_details(self, operation_id):
     return WorkloadAnalytics(self.user).get_operation_execution_details(operation_id=operation_id, include_tree=True)
 
+
   def get_mr_task_attempt_log(self, operation_execution_id, attempt_id):
     return WorkloadAnalytics(self.user).get_mr_task_attempt_log(operation_execution_id=operation_execution_id, attempt_id=attempt_id)
+
+
+  def list_mr_tasks(self, operation_execution_id):
+    return WorkloadAnalytics(self.user).list_mr_tasks(operation_execution_id=operation_execution_id)
 
 
 class WorkloadAnalytics():
 
   def __init__(self, user): pass
+
 
   def get_operation_execution_details(self, operation_id, include_tree=False):
     args = ['get-operation-execution-details', '--id', operation_id]
@@ -67,7 +73,14 @@ class WorkloadAnalytics():
 
     return _exec(args)
 
+
   def get_mr_task_attempt_log(self, operation_execution_id, attempt_id):
     args = ['get-mr-task-attempt-log', '--operation-execution-id', operation_execution_id, '--attempt-id', attempt_id]
+
+    return _exec(args)
+
+
+  def list_mr_tasks(self, operation_execution_id):
+    args = ['list-mr-tasks', '--operation-execution-id', operation_execution_id]
 
     return _exec(args)
