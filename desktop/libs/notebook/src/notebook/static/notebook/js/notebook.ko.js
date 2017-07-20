@@ -1607,7 +1607,7 @@ var EditorViewModel = (function() {
                 }
                 
                 if (self.result.handle().id) {
-                  huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id);
+                  huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id); // Sigma
                 }
               }
               if (! self.result.handle().has_more_statements && vm.successUrl()) {
@@ -1619,7 +1619,7 @@ var EditorViewModel = (function() {
           } else if (data.status === -3) {
             self.status('expired');
             if (self.result.handle().id) {
-                huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id);
+                huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id); // Sigma
               }
           } else {
             self._ajaxError(data);

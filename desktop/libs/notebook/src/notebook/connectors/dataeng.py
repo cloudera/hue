@@ -86,9 +86,6 @@ class DataEngApi(Api):
     job = handle['jobs'][-1]
     job['status'] = job['status'].lower()
 
-    print job['status']
-    print '============='
-
     if job['status'] in RUNNING_STATES:
       return response
     elif job['status'] in ('failed', 'terminated'):
@@ -100,10 +97,12 @@ class DataEngApi(Api):
 
 
   def fetch_result(self, notebook, snippet, rows, start_over):
-    logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
-        operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
-        attempt_id='attempt_1499705340501_0045_m_000000_0'
-    )
+    operation_execution_id = snippet['result']['handle']['id']
+    logs = _get_main_task_id(self.user, operation_execution_id=operation_execution_id)
+#     logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
+#         operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
+#         attempt_id='attempt_1499705340501_0045_m_000000_0'
+#     )
     result_rows = re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL)
     if result_rows: 
       result_rows = [[row] for row in result_rows[0].splitlines()]
@@ -130,10 +129,9 @@ class DataEngApi(Api):
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
-    logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
-        operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
-        attempt_id='attempt_1499705340501_0045_m_000000_0'
-    )
+    operation_execution_id = snippet['result']['handle']['id']
+    logs = _get_main_task_id(self.user, operation_execution_id=operation_execution_id)
+
     return ''.join(re.findall('(?<=Oozie Launcher starts)(.*?)(?=Oozie Launcher ends)', logs['stdout'], re.DOTALL))
 
 
@@ -142,7 +140,6 @@ class DataEngApi(Api):
 
 
   def get_jobs(self, notebook, snippet, logs):
-    ## 50cf0e00-746b-4d86-b8e3-f2722296df71
     job_id = snippet['result']['handle']['id']
     return [{
         'name': job_id,
@@ -159,6 +156,30 @@ class DataEngApi(Api):
 
   def close_session(self, session):
     pass
+
+
+def _get_main_task_id(user, operation_execution_id):
+  client = WorkfloadAnalyticsClient(user)
+  # altus wa get-operation-execution-details --id 8d460694-01af-4aa5-be53-83fbf562019d --include-tree
+  # altus wa get-mr-task-attempt-log --operation-execution-id 6bc2b3e4-1a7d-4fb5-9371-df8d2a463b1d  --attempt-id attempt_1500482619800_0011_m_000000_0
+  
+#  >>> b['tree']['children'][0]['displayName']
+# u'job_1500482619800_0011'
+# >>> b['tree']['children'][0]['children'][0]['id']
+# u'6bc2b3e4-1a7d-4fb5-9371-df8d2a463b1d'
+ 
+  
+  
+  ops = client.get_operation_execution_details(operation_execution_id)
+  
+  job_id = ops['tree']['children'][0]['displayName']
+  task_attempt_id = job_id.replace('job_', 'attempt_') + '_m_000000_0'
+  operation_execution_id = ops['tree']['children'][0]['children'][0]['id']
+  
+  return WorkfloadAnalyticsClient(user).get_mr_task_attempt_log(
+      operation_execution_id=operation_execution_id,
+      attempt_id=task_attempt_id
+  )
 
 
 class DataEng():
