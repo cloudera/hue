@@ -95,8 +95,18 @@ class DataEngApi(Api):
 
 
   def fetch_result(self, notebook, snippet, rows, start_over):
+    logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
+        operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
+        attempt_id='attempt_1499705340501_0045_m_000000_0'
+    )
+    result_rows = re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL)
+    if result_rows: 
+      result_rows = [[row] for row in result_rows[0].splitlines()]
+    else:
+      result_rows = [[_('Job successfully completed.')]]
+
     return {
-        'data':  [[_('Job successfully completed.')]],
+        'data': result_rows,
         'meta': [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}],
         'type': 'table',
         'has_more': False,
@@ -119,8 +129,7 @@ class DataEngApi(Api):
         operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
         attempt_id='attempt_1499705340501_0045_m_000000_0'
     )
-
-    return ''.join(re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL))
+    return ''.join(re.findall('(?<=Oozie Launcher starts)(.*?)(?=Oozie Launcher ends)', logs['stdout'], re.DOTALL))
 
 
   def progress(self, snippet, logs):
