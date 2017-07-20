@@ -1139,6 +1139,7 @@ var EditorViewModel = (function() {
       if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
       }
+      huePubSub.publish('assist.clear.sigma.analysis');
       if (self.isSqlDialect()) {
         huePubSub.publish('editor.refresh.statement.locations', self);
       }
@@ -1531,6 +1532,12 @@ var EditorViewModel = (function() {
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         if (query_id == notebook.id()) { // If still on the same result
+
+
+          var sigmaId = '12345';
+
+
+          huePubSub.publish('assist.show.sigma.analysis', sigmaId);
           if (data.status == 0) {
             if (data.result.rows != null) {
               self.result.rows(data.result.rows);

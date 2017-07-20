@@ -1537,7 +1537,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             }
 
             if (self.tabsEnabled) {
-
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hdfs') != -1) {
                 panels.push(new AssistInnerPanel({
                   panelData: new AssistHdfsPanel({
@@ -1905,6 +1904,18 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             </li>
           </ul>
           <!-- /ko -->
+
+          <div class="assist-inner-header" style="margin-top: 15px;">${ _('Execution Analysis') }</div>
+          <!-- ko if: sigmaSuggestions().length === 0 -->
+          <div class="assist-no-entries">${ _('Execute a query to get query execution analysis.') }</div>
+          <!-- /ko -->
+          <ul class="risk-list" data-bind="foreach: sigmaSuggestions">
+##            <li class="pointer" data-bind="templatePopover : { placement: 'left', contentTemplate: 'sigma-details-content', titleTemplate: 'sigma-details-title', minWidth: '320px', trigger: 'click' }">
+            <li>
+              <a class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-green': risk === 'normal' }, attr: { 'href' : link }, text: text"></a>
+            </li>
+          </ul>
+
           <!-- ko if: hasMissingRisks() -->
           <div class="margin-top-20">
             <!-- ko hueSpinner: { spin: uploadingTableStats, inline: true} --><!-- /ko -->
@@ -1922,6 +1933,20 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     </div>
   </script>
 
+  <script type="text/html" id="sigma-details-content">
+    <div class="assist-details-wrap">
+      <div style="font-weight: bold">Issues:</div>
+      <div>Input outlier</div>
+      <div>Duration outlier</div>
+      <div>HDFS Read Speed no bueno</div>
+    </div>
+    <div style="margin-top:10px; "><a data-bind="attr: { 'href': link }"><i class="fa fa-external-link"></i> ${ _("More details...") }</a></div>
+  </script>
+
+  <script type="text/html" id="sigma-details-title">
+    <span data-bind="text: text"></span>
+  </script>
+
   <script type="text/javascript">
     (function () {
       function AssistantPanel(params) {
@@ -1935,6 +1960,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.activeRisks = ko.observable({});
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
+
+        self.sigmaSuggestions = ko.observableArray();
+
+        huePubSub.subscribe('assist.show.sigma.analysis', function (sigmaId) {
+          self.fetchSigmaAnalysis(sigmaId);
+        });
+
+        huePubSub.subscribe('assist.clear.sigma.analysis', function () {
+          self.sigmaSuggestions([]);
+        });
 
         self.hasActiveRisks = ko.pureComputed(function () {
            return self.activeRisks().hints && self.activeRisks().hints.length > 0;
@@ -2044,7 +2079,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               var tables = Object.values(activeTableIndex);
               tables.sort(function (a, b) {
                 return a.definition.name.localeCompare(b.definition.name);
-              })
+              });
               self.activeTables(tables);
             }
           }
@@ -2065,6 +2100,61 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         });
 
       }
+
+      var SIGMA_INDEX = {
+        'FAILED_TO_FINISH' : 'Failed To Finish',
+        'ABNORMAL_DURATION' : 'Abnormal Duration',
+        'ABNORMAL_INPUT_SIZE' : 'Abnormal Input Size',
+        'ABNORMAL_OUTUT_SIZE' : 'Abnormal Output Size',
+        'TASK_DURATION_OUTLIER' : 'Task Duration Skew',
+        'TASK_INPUT_OUTLIER' : 'Input Data Skew',
+        'TASK_SHUFFLE_INPUT_SIZE': 'Shuffle Input',
+        'TASK_OUTPUT_OUTLIER' : 'Output Data Skew',
+        'TASK_HDFS_READ_SPEED' : 'Data Processing Speed',
+        'TASK_WAIT_DURATION' : 'Task Wait Time',
+        'TASK_GC_DURATION' : 'Task GC Time',
+        'TASK_SPILLED_RECORD' : 'Disk Spillage',
+        'FAILED_TASK_ATTEMPTS' : 'Task Attempt Retries'
+      };
+
+      AssistantPanel.prototype.fetchSigmaAnalysis = function (sigmaOperationId) {
+        var self = this;
+        var sigmaApiUrl = '/metadata/api/workload_analytics/get_operation_execution_details/';
+
+        var data = {
+          operation_id: sigmaOperationId
+        };
+
+        $.get(sigmaApiUrl, data, function (data) {
+          if (data && data.status === 0) {
+            var link= 'https://console.altus.cloudera.com/wa/index.html#/operations/' + data.id;
+
+            if (data.state === 'SUCCEEDED') {
+              self.sigmaSuggestions([{
+                text: 'No issues found!',
+                risk: 'normal',
+                link: link
+              }]);
+            } else {
+              var suggestions = [];
+              data.badHealthCheckIds.forEach(function (id) {
+                suggestions.push({
+                  text: SIGMA_INDEX[id] || id,
+                  risk: 'high',
+                  link: link
+                })
+              })
+            }
+
+            self.sigmaSuggestions(data.suggestions);
+          } else {
+            console.warn(data);
+            self.sigmaSuggestions([]);
+          }
+        }).fail(function (err) {
+          console.warn(err);
+        });
+      };
 
       AssistantPanel.prototype.uploadTableStats = function () {
         var self = this;
