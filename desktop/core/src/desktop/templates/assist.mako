@@ -2181,46 +2181,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     })();
   </script>
 
-  <script type="text/html" id="altus-panel-template">
-    <div class="assist-inner-panel">
-      <div class="assist-flex-panel">
-        <div class="assist-flex-header"><div class="assist-inner-header">${ _('Cluster details') }</div></div>
-
-          ${ _('Contents TBD.') }
-
-        </div>
-      </div>
-    </div>
-  </script>
-
-  <script type="text/javascript">
-    (function () {
-      function AltusPanel(params) {
-        var self = this;
-        self.disposals = [];
-      }
-
-      AltusPanel.prototype.dispose = function () {
-        var self = this;
-        self.disposals.forEach(function (dispose) {
-          dispose();
-        })
-      };
-
-      ko.components.register('altus-panel', {
-        viewModel: AltusPanel,
-        template: { element: 'altus-panel-template' }
-      });
-    })();
-  </script>
-
   <script type="text/html" id="right-assist-panel-template">
     <div style="height: 100%; width: 100%; position: relative;">
       <ul class="right-panel-tabs nav nav-pills">
         <li data-bind="css: { 'active' : activeTab() === 'assistant' }, visible: assistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('assistant'); activeTab('assistant'); }">${ _('Assistant') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'functions' }, visible: functionsTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('functions'); activeTab('functions'); }">${ _('Functions') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('schedules'); activeTab('schedules'); }">${ _('Schedule') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'altus' }, visible: altusTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('altus'); activeTab('altus'); }">${ _('Cluster') }</a></li>
       </ul>
 
       <div class="right-panel-tab-content tab-content">
@@ -2234,10 +2200,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         ## TODO: Switch to if: when loadSchedules from notebook.ko.js has been moved to the schedule-panel component
         <div data-bind="component: { name: 'schedule-panel' }, visible: activeTab() === 'schedules'" style="display:none;"></div>
-
-        <!-- ko if: activeTab() === 'altus' && altusTabAvailable -->
-        <div data-bind="component: { name: 'altus-panel' }"></div>
-        <!-- /ko -->
       </div>
     </div>
   </script>
@@ -2249,7 +2211,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       var ASSISTANT_TAB = 'assistant';
       var FUNCTIONS_TAB = 'functions';
       var SCHEDULES_TAB = 'schedules';
-      var ALTUS_TAB = 'altus';
 
       function RightAssistPanel(params) {
         var self = this;
@@ -2260,22 +2221,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.assistantTabAvailable = ko.observable(false);
         self.functionsTabAvailable = ko.observable(false);
         self.schedulesTabAvailable = ko.observable(false);
-        self.altusTabAvailable = ko.observable(false);
 
         var apiHelper = ApiHelper.getInstance();
         self.lastActiveTab = apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), ASSISTANT_TAB);
 
         var assistEnabledApp = false;
-
-        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-          var previouslyAvailable = self.altusTabAvailable();
-          self.altusTabAvailable(clusterConfig.cluster_type !== 'ini');
-          if (self.altusTabAvailable() && (!previouslyAvailable || self.lastActiveTab() === ALTUS_TAB)) {
-            self.activeTab(ALTUS_TAB);
-          } else if (!self.altusTabAvailable() && self.activeTab() === ALTUS_TAB) {
-            self.activeTab(ASSISTANT_TAB);
-          }
-        });
 
         var updateTabs = function () {
           if (!assistEnabledApp) {
@@ -2287,8 +2237,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             self.activeTab(FUNCTIONS_TAB);
           } else if (self.lastActiveTab() === SCHEDULES_TAB && self.schedulesTabAvailable()) {
             self.activeTab(SCHEDULES_TAB);
-          } else if (self.lastActiveTab() === ALTUS_TAB && self.altusTabAvailable()) {
-            self.activeTab(ALTUS_TAB);
           } else if (self.assistantTabAvailable()) {
             self.activeTab(ASSISTANT_TAB);
           } else if (self.functionsTabAvailable()) {
