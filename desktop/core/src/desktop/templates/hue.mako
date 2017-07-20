@@ -657,14 +657,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         huePubSub.subscribe('open.editor.new.query', function (statementOptions) {
-          self.loadApp('editor');
+          self.loadApp('editor'); // Should open in Default
 
           self.getActiveAppViewModel(function (viewModel) {
             var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL
             viewModel.newNotebook(editorType, function() {
-              self.changeEditorType(statementOptions['statementType'] || editorType);
+              self.changeEditorType(editorType);
 
               if (statementOptions['statementPath']) {
+                viewModel.selectedNotebook().snippets()[0].statementType(statementOptions['statementType']);
                 viewModel.selectedNotebook().snippets()[0].statementPath(statementOptions['statementPath']);
               }
               if (statementOptions['directoryUuid']) {
