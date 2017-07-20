@@ -160,7 +160,7 @@ ${ hueIcons.symbols() }
           </ul>
         </div>
         
-        <!-- ko if: cluster.clusters().length > 1 -->
+        <!-- ko if: cluster.clusters().length > 1 && cluster.clusterSelectionVisible() -->
         <div class="btn-group pull-right" style="display: none;" data-bind="visible: cluster.clusters().length > 1">
           <button class="btn" data-bind="text: cluster.cluster().name() + (cluster.cluster().interface ? ' ' + cluster.cluster().interface() : '')"></button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -1263,6 +1263,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         var ClusterPanelViewModel = function() {
           var self = this;
           self.apiHelper = ApiHelper.getInstance();
+
+          self.clusterSelectionVisible = ko.observable(true);
+
+          huePubSub.subscribe('cluster.selection.visible', self.clusterSelectionVisible);
 
           self.clusters = ko.mapping.fromJS(${ clusters_config_json | n,unicode });
           self.cluster = ko.observable(self.clusters().length > 0 ? self.clusters()[${ default_cluster_index }] : self.clusters()[0]);
