@@ -108,11 +108,11 @@ ${ hueIcons.symbols() }
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
-        <a class="pull-left">
+        <a style="display: none;" class="pull-left" data-bind="visible: onPrem() === false">
           <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; ; margin-top: 4px">
         </a>
 
-        <a class="brand" data-bind="hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
+        <a style="display: none;" class="brand" data-bind="visible: onPrem() === true, hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
 
@@ -1168,8 +1168,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       return sidePanelViewModel;
     })();
 
-
-
     var topNavViewModel = (function (onePageViewModel) {
 
       function TopNavViewModel (onePageViewModel) {
@@ -1179,6 +1177,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.leftNavVisible.subscribe(function (val) {
           huePubSub.publish('left.nav.open.toggle', val);
         });
+
+        self.onPrem = ko.observable();
 
         self.onePageViewModel.currentApp.subscribe(function () {
           self.leftNavVisible(false);
@@ -1190,6 +1190,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.hasJobBrowser = ko.observable(true);
 
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+          self.onPrem(clusterConfig.cluster_type === 'ini');
           if (clusterConfig && clusterConfig['main_button_action']) {
             var topApp = clusterConfig['main_button_action'];
             self.mainQuickCreateAction({
