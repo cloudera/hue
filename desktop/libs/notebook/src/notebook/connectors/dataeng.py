@@ -41,16 +41,16 @@ def _exec(args):
         'dataeng',
        ] +
        args
-    )
+    )    
   except Exception, e:
-    raise PopupException(e, title=_('Error accessing'))
+    raise PopupException(e.output, title=_('Error accessing'))
 
   response = json.loads(data)
 
   return response
 
 DATE_FORMAT = "%Y-%m-%d"
-RUNNING_STATES = ('QUEUED', 'RUNNING')
+RUNNING_STATES = ('queued', 'running', 'QUEUED', 'RUNNING')
 
 
 class DataEngApi(Api):
@@ -85,6 +85,9 @@ class DataEngApi(Api):
 
     job = handle['jobs'][-1]
     job['status'] = job['status'].lower()
+
+    print job['status']
+    print '============='
 
     if job['status'] in RUNNING_STATES:
       return response

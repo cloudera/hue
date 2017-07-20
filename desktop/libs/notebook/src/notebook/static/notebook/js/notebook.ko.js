@@ -1534,11 +1534,12 @@ var EditorViewModel = (function() {
         if (query_id == notebook.id()) { // If still on the same result
 
 
-          var sigmaId = '86966e07-1380-465f-81ee-d258cf37e6e2'; // Good
+          //var sigmaId = self.result.handle().id;
+          // '86966e07-1380-465f-81ee-d258cf37e6e2'; // Good
           //var sigmaId = 'd880c65e-fd36-4602-9a58-cefd9c198604'; // Bad
 
+          //huePubSub.publish('assist.show.sigma.analysis', sigmaId);
 
-          huePubSub.publish('assist.show.sigma.analysis', sigmaId);
           if (data.status == 0) {
             if (data.result.rows != null) {
               self.result.rows(data.result.rows);
@@ -1604,6 +1605,10 @@ var EditorViewModel = (function() {
                     }, 1000);
                   }
                 }
+                
+                if (self.result.handle().id) {
+                  huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id);
+                }
               }
               if (! self.result.handle().has_more_statements && vm.successUrl()) {
                 window.location.href = vm.successUrl(); // Not used anymore in Hue 4
@@ -1613,6 +1618,9 @@ var EditorViewModel = (function() {
             }
           } else if (data.status === -3) {
             self.status('expired');
+            if (self.result.handle().id) {
+                huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id);
+              }
           } else {
             self._ajaxError(data);
           }
