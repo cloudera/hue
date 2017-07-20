@@ -36,6 +36,7 @@ from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties
+from notebook.connectors.dataeng import DataEngApi
 
 
 LOG = logging.getLogger(__name__)
@@ -303,7 +304,7 @@ def get_logs(request):
   response['logs'] = logs.strip()
   response['progress'] = min(db.progress(snippet, full_log), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
-  response['isFullLogs'] = isinstance(db, OozieApi)
+  response['isFullLogs'] = isinstance(db, (OozieApi, DataEngApi))
   response['status'] = 0
 
   return JsonResponse(response)
