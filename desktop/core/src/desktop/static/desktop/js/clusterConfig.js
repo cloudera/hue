@@ -15,7 +15,7 @@
 // limitations under the License.
 
 
-function ClusterConfig (params) {
+function ClusterConfig(params) {
   var self = this;
 
   self.clusterConfig = undefined;
@@ -40,10 +40,12 @@ function ClusterConfig (params) {
 
   huePubSub.subscribe('cluster.config.refresh.config', refreshConfig);
 
-  refreshConfig();
+  if (window.location.pathname.indexOf('/accounts/login') === -1) {
+    refreshConfig();
+  }
 
   huePubSub.subscribe('cluster.config.get.config', function () {
-    if (! self.loading) {
+    if (!self.loading) {
       huePubSub.publish('cluster.config.set.config', self.clusterConfig);
     }
   });
