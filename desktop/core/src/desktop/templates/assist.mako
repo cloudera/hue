@@ -2144,9 +2144,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                   link: link
                 })
               })
+              self.sigmaSuggestions(suggestions);
             }
-
-            self.sigmaSuggestions(data.suggestions);
           } else {
             console.warn(data);
             self.sigmaSuggestions([]);
