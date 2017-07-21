@@ -101,9 +101,9 @@ from desktop.views import _ko
       var AppSwitcher = function AppSwitcher(params) {
         var self = this;
 
-        self.links = [];
+        self.links = ko.observableArray([]);
 
-        var paramLinks = [{
+        var altusLinks = [{
           label: 'Home',
             icon: 'fa fa-home',
             link: '/'
@@ -141,17 +141,58 @@ from desktop.views import _ko
           }
         ];
 
-        paramLinks.forEach(function (link) {
-          if (link.product) {
-            var lookup = apps[link.product];
-            if (lookup) {
-              lookup.link = link.link;
-              self.links.push(lookup);
+        var onPremLinks = [{
+          label: 'Home',
+          icon: 'fa fa-home',
+          link: '/'
+        }, {
+          divider: true
+        }, {
+          product: 'hue',
+          link: '/'
+        }, {
+          product: 'cdsw',
+          link: '/'
+        }, {
+          product: 'navopt',
+          link: '/'
+        }, {
+          product: 'navigator',
+          link: '/'
+        }, {
+          product: 'cm',
+          link: '/'
+        }, {
+          divider: true
+        }, {
+          label: 'Documentation',
+          link: '/',
+          icon: 'fa fa-book'
+        }];
+
+        var applyLinks = function (links) {
+          var newLinks = [];
+          links.forEach(function (link) {
+            if (link.product) {
+              var lookup = apps[link.product];
+              if (lookup) {
+                lookup.link = link.link;
+                newLinks.push(lookup);
+              }
+            } else {
+              newLinks.push(link);
             }
+          });
+          self.links(newLinks);
+        };
+
+        params.onPrem.subscribe(function (newValue) {
+          if (newValue) {
+            applyLinks(onPremLinks);
           } else {
-            self.links.push(link);
+            applyLinks(altusLinks);
           }
-        });
+        })
       };
 
 ##       setTimeout(function () {

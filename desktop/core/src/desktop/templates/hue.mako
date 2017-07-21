@@ -110,7 +110,7 @@ ${ hueIcons.symbols() }
 ##         </a>
 ##         <!-- /ko -->
 ##         <!-- ko if: onPrem() === false -->
-        <!-- ko component: 'hue-app-switcher' --><!-- /ko -->
+        <!-- ko component: { name: 'hue-app-switcher', params: { onPrem: onPrem } } --><!-- /ko -->
 ##         <!-- /ko -->
 
         <a style="display: none;" class="pull-left" data-bind="visible: onPrem() === false">
