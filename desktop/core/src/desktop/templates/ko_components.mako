@@ -23,6 +23,124 @@ from desktop.views import _ko
 %>
 
 <%def name="all()">
+
+  <script type="text/html" id="hue-app-switcher-template">
+    <ul class="cui-app-switcher nav navbar-nav">
+      <li class="dropdown">
+        <a class="hamburger hamburger-hue dropdown-toggle" style="padding: 10px 5px 0 5px; margin: 8px 24px 0 -5px;" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
+          <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+        </a>
+
+        <ul class="dropdown-menu" style="margin: 7px 0 0 -5px;" role="menu">
+          <!-- ko foreach: links -->
+          <li class="nav-item">
+            <!-- ko if: $data.divider -->
+            <div class="divider"></div>
+            <!-- /ko -->
+            <!-- ko ifnot: $data.divider -->
+            <a role="button" class="nav-link" data-bind="attr: {href: link}">
+              <span class="app-switcher-app-icon">
+                <!-- ko if: $data.icon -->
+                <i data-bind="attr: {class: icon}"></i>
+                <!-- /ko -->
+                <!-- ko if: $data.img -->
+                <!-- ko template: 'app-switcher-icon-template' --><!-- /ko -->
+                <!-- /ko -->
+              </span>
+              <span class="app-switcher-app-name" data-bind="text: label, attr: {href: link}"></span>
+            </a>
+            <!-- /ko -->
+          </li>
+          <!-- /ko -->
+        </ul>
+      </li>
+    </ul>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      var apps = {
+        cm: {
+          label: 'Cloudera Manager',
+          img: 'hi-as-cm'
+        },
+        cdsw: {
+          label: 'Data Science',
+          img:'hi-as-cdsw'
+        },
+        navigator: {
+          label: 'Navigator',
+          img: 'hi-as-nav'
+        },
+        navopt: {
+          label: 'Navigator Optimizer',
+          img: 'hi-as-nav'
+        },
+        hue: {
+          label: 'Analytics (Hue)',
+          img: 'hi-as-hue'
+
+        }
+      };
+
+      var AppSwitcher = function AppSwitcher(params) {
+        var self = this;
+
+        self.links = [];
+
+        var paramLinks = [{
+          label: 'Dashboard',
+            icon: 'fa fa-home',
+            link: '/'
+          }, {
+            divider: true
+          }, {
+            product: 'hue',
+            link: '/'
+          }, {
+            product: 'cdsw',
+            link: '/'
+          }, {
+            product: 'navopt',
+            link: '/'
+          }, {
+            product: 'navigator',
+            link: '/'
+          }, {
+            product: 'cm',
+            link: '/'
+          }, {
+            divider: true
+          }, {
+            label: 'Documentation',
+            link: '/',
+            icon: 'fa fa-book'
+          }];
+
+        paramLinks.forEach(function (link) {
+          if (link.product) {
+            var lookup = apps[link.product];
+            if (lookup) {
+              lookup.link = link.link;
+              self.links.push(lookup);
+            }
+          } else {
+            self.links.push(link);
+          }
+        });
+      };
+
+##       setTimeout(function () {
+##         return $('.dropdown-toggle').click();
+##       }, 100);
+
+      ko.components.register('hue-app-switcher', {
+        viewModel: AppSwitcher,
+        template: { element: 'hue-app-switcher-template' }
+      });
+    })();
+  </script>
+
   <script type="text/html" id="hue-drop-down-template">
     <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">

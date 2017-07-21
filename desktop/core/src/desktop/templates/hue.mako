@@ -104,9 +104,14 @@ ${ hueIcons.symbols() }
   <nav class="navbar navbar-default">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
+        <!-- ko if: onPrem() === true -->
         <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
+        <!-- /ko -->
+        <!-- ko if: onPrem() === false -->
+        <!-- ko component: 'hue-app-switcher' --><!-- /ko -->
+        <!-- /ko -->
 
         <a style="display: none;" class="pull-left" data-bind="visible: onPrem() === false">
           <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; ; margin-top: 4px">
