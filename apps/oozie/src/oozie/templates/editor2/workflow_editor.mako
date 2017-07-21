@@ -239,7 +239,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     <!-- /ko -->
     % endif
 
-    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('hive') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveAction());}}}"
@@ -313,7 +313,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </div>
     <!-- /ko -->
 
-    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('subworkflow') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSubworkflowAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSubworkflowAction());}}}"
@@ -340,7 +340,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </div>
     <!-- /ko -->
 
-    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('fs') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableFsAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableFsAction());}}}"
@@ -349,7 +349,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </div>
     <!-- /ko -->
 
-    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('email') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableEmailAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableEmailAction());}}}"
@@ -358,7 +358,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </div>
     <!-- /ko -->
 
-    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('streaming') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableStreamingAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableStreamingAction());}}}"
@@ -376,7 +376,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </div>
     <!-- /ko -->
 
-    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('generic') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableGenericAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableGenericAction());}}}"
@@ -385,7 +385,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </div>
     <!-- /ko -->
 
-    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('stop') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableKillNode(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableKillNode());}}}"
@@ -908,6 +908,9 @@ ${ utils.submit_popup_event() }
       $.each(clusterConfig['app_config']['editor']['interpreters'], function(index, interpreter) {
         interpreters.push(interpreter.type);
       });
+      if (clusterConfig['cluster_type'] != 'dataeng') {
+        interpreters = interpreters.concat(['subworkflow', 'fs', 'email', 'streaming', 'generic', 'stop']);
+      }
       viewModel.availableActions(interpreters);
       resizeToolbar();
     }, 'oozie');
