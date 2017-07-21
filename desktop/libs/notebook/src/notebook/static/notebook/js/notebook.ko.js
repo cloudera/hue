@@ -1851,8 +1851,10 @@ var EditorViewModel = (function() {
 
     self.init = function () {console.log(self.status());
     	if (self.status() == 'failed') { //self.result.handle().id == '1ed48bc5-3f0e-4430-862d-57d71dfed35b') {console.log(3);
-    		self.getLogs();
-            huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id); // Sigma
+    		//self.getLogs();
+    		self.status('available');
+    		self.checkStatus();
+            //huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id); // Sigma
         }
     	else if (self.status() == 'running' || self.status() == 'available') {
         self.checkStatus();

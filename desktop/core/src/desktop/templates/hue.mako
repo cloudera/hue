@@ -101,7 +101,7 @@ ${ hueIcons.symbols() }
       ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
     </div>
   % endif
-  <nav class="navbar navbar-default">
+  <nav class="navbar navbar-default2">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
 ##         <!-- ko if: onPrem() === true -->
