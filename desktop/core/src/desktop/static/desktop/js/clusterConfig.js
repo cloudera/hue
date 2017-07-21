@@ -47,6 +47,22 @@ function ClusterConfig (params) {
       huePubSub.publish('cluster.config.set.config', self.clusterConfig);
     }
   });
+
+  var whenLoaded = function (callback) {
+    if (self.loading) {
+      window.setTimeout(function () {
+        whenLoaded(callback);
+      }, 200);
+    } else {
+      callback();
+    }
+  };
+
+  huePubSub.subscribe('cluster.config.get.config.callback', function (callback) {
+    whenLoaded(function () {
+      callback(self.clusterConfig);
+    })
+  })
 }
 
 new ClusterConfig();

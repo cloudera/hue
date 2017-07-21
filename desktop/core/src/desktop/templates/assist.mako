@@ -1905,6 +1905,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           </ul>
           <!-- /ko -->
 
+          <!-- ko if: onPrem() === false -->
           <div class="assist-inner-header" style="margin-top: 15px;">${ _('Execution Analysis') }</div>
           <!-- ko if: sigmaSuggestions().length === 0 -->
           <div class="assist-no-entries">${ _('Execute a query to get query execution analysis.') }</div>
@@ -1915,6 +1916,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               <a class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-green': risk === 'normal' }, attr: { 'href' : link }, text: text"></a>
             </li>
           </ul>
+          <!-- /ko -->
 
           <!-- ko if: hasMissingRisks() -->
           <div class="margin-top-20">
@@ -1962,9 +1964,20 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.activeStatementIndex = ko.observable(0);
 
         self.sigmaSuggestions = ko.observableArray();
+        self.onPrem = ko.observable(false);
+
+        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+          self.onPrem(clusterConfig.cluster_type === 'ini');
+        });
+
+        huePubSub.publish('cluster.config.get.config.callback', function (clusterConfig) {
+          self.onPrem(clusterConfig.cluster_type === 'ini');
+        });
 
         huePubSub.subscribe('assist.show.sigma.analysis', function (sigmaId) {
-          self.fetchSigmaAnalysis(sigmaId);
+          if (!self.onPrem()) {
+            self.fetchSigmaAnalysis(sigmaId);
+          }
         });
 
         huePubSub.subscribe('assist.clear.sigma.analysis', function () {
@@ -2143,7 +2156,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                   risk: 'high',
                   link: link
                 })
-              })
+              });
               self.sigmaSuggestions(suggestions);
             }
           } else {
