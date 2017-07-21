@@ -50,7 +50,7 @@ def _exec(args):
   return response
 
 DATE_FORMAT = "%Y-%m-%d"
-RUNNING_STATES = ('queued', 'running', 'QUEUED', 'RUNNING')
+RUNNING_STATES = ('queued', 'running', 'submitting', 'QUEUED', 'RUNNING', 'SUBMITTING')
 
 
 class DataEngApi(Api):
