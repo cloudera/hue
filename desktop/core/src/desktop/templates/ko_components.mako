@@ -60,13 +60,17 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
       var apps = {
-        cm: {
-          label: 'Cloudera Manager',
-          img: 'hi-as-cm'
-        },
         cdsw: {
           label: 'Data Science',
           img:'hi-as-cdsw'
+        },
+        hue: {
+          label: 'Data Analytics (Hue)',
+          img: 'hi-as-hue'
+        },
+        cm: {
+          label: 'Cloudera Manager',
+          img: 'hi-as-cm'
         },
         navigator: {
           label: 'Navigator',
@@ -76,11 +80,22 @@ from desktop.views import _ko
           label: 'Navigator Optimizer',
           img: 'hi-as-nav'
         },
-        hue: {
-          label: 'Analytics (Hue)',
-          img: 'hi-as-hue'
-
-        }
+        navopt: {
+          label: 'Data Engineering',
+          img: 'hi-as-nav'
+        },
+        navopt: {
+          label: 'Analytics Database',
+          img: 'hi-as-nav'
+        },
+        navopt: {
+          label: 'Metadata',
+          img: 'hi-as-nav'
+        },
+        navopt: {
+          label: 'IAM',
+          img: 'hi-as-nav'
+        },
       };
 
       var AppSwitcher = function AppSwitcher(params) {
@@ -89,7 +104,7 @@ from desktop.views import _ko
         self.links = [];
 
         var paramLinks = [{
-          label: 'Dashboard',
+          label: 'Home',
             icon: 'fa fa-home',
             link: '/'
           }, {
@@ -101,21 +116,30 @@ from desktop.views import _ko
             product: 'cdsw',
             link: '/'
           }, {
-            product: 'navopt',
-            link: '/'
-          }, {
             product: 'navigator',
             link: '/'
           }, {
-            product: 'cm',
-            link: '/'
+            label: 'Navigator Optimizer',
+            link: '/',
+            icon: 'fa fa-gear'
           }, {
             divider: true
           }, {
-            label: 'Documentation',
+            label: 'Data Engineering',
             link: '/',
-            icon: 'fa fa-book'
-          }];
+            icon: 'fa fa-gear'
+          },
+          {
+            label: 'Analytics DB',
+            link: '/',
+            icon: 'fa fa-database'
+          },
+          {
+            label: 'Operational DB',
+            link: '/',
+            icon: 'fa fa-database'
+          }
+        ];
 
         paramLinks.forEach(function (link) {
           if (link.product) {
