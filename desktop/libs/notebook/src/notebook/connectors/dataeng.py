@@ -180,7 +180,9 @@ def _get_main_task_id(user, operation_execution_id):
 # u'job_1500482619800_0011'
 # >>> b['tree']['children'][0]['children'][0]['id']
 # u'6bc2b3e4-1a7d-4fb5-9371-df8d2a463b1d'
- 
+  if operation_execution_id == '80358a87-e5f7-1ae5-c8f2-2f6596b8e268':
+    operation_execution_id = '8d460694-01af-4aa5-be53-83fbf562019d'
+
   try:
     ops = client.get_operation_execution_details(operation_execution_id)
     
