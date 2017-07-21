@@ -1907,9 +1907,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
           <!-- ko if: onPrem() === false -->
           <div class="assist-inner-header" style="margin-top: 15px;">${ _('Execution Analysis') }</div>
-          <!-- ko if: sigmaSuggestions().length === 0 -->
-          <div class="assist-no-entries">${ _('Execute a query to get query execution analysis.') }</div>
+          <!-- ko if: sigmaSuggestions().length === 0 && !loadingSigma() -->
+          <div class="assist-no-entries">${ _('Execution analysis will be shown once a query has been executed.') }</div>
           <!-- /ko -->
+          <div style="margin: 5px; display:none;" data-bind="visible: loadingSigma"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
           <ul class="risk-list" data-bind="foreach: sigmaSuggestions">
 ##            <li class="pointer" data-bind="templatePopover : { placement: 'left', contentTemplate: 'sigma-details-content', titleTemplate: 'sigma-details-title', minWidth: '320px', trigger: 'click' }">
             <li>
@@ -1963,6 +1964,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
 
+        self.loadingSigma = ko.observable(false);
         self.sigmaSuggestions = ko.observableArray();
         self.onPrem = ko.observable(false);
 
@@ -2134,38 +2136,67 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var self = this;
         var sigmaApiUrl = '/metadata/api/workload_analytics/get_operation_execution_details/';
 
+        if (self.loadingSigma()) {
+          return;
+        }
+        self.loadingSigma(true);
+
         var data = {
           operation_id: ko.mapping.toJSON(sigmaOperationId)
         };
 
-        $.post(sigmaApiUrl, data, function (data) {
-          if (data && data.status === 0) {
-            var link = 'https://altus.cloudera.com/wa/index.html#/operations/' + data.data.tree.id;
+        var retryCount = 0;
 
-            if (data.data.tree.badHealthCheckIds.length === 0) {
-              self.sigmaSuggestions([{
-                text: 'No issues found!',
-                risk: 'normal',
-                link: link
-              }]);
+        var performPost = function () {
+          $.post(sigmaApiUrl, data, function (data) {
+            if (data && data.status === 0) {
+              var link = 'https://altus.cloudera.com/wa/index.html#/operations/' + data.data.tree.id;
+              if (data.data.tree.badHealthCheckIds.length === 0) {
+                self.sigmaSuggestions([{
+                  text: 'No issues found!',
+                  risk: 'normal',
+                  link: link,
+                  details: data.data.tree
+                }]);
+              } else {
+                var suggestions = [];
+                data.data.tree.badHealthCheckIds.forEach(function (id) {
+                  suggestions.push({
+                    text: SIGMA_INDEX[id] || id,
+                    risk: 'high',
+                    link: link,
+                    details: data.data.tree
+                  })
+                });
+                self.sigmaSuggestions(suggestions);
+              }
+              self.loadingSigma(false);
+            } else if (retryCount <= 3 && data.status == -1 && data.message && data.message.indexOf('returned non-zero') !== -1) {
+              retryCount++;
+              window.setTimeout(function () {
+                performPost();
+              }, 1000 * retryCount);
             } else {
-              var suggestions = [];
-              data.data.tree.badHealthCheckIds.forEach(function (id) {
-                suggestions.push({
-                  text: SIGMA_INDEX[id] || id,
-                  risk: 'high',
-                  link: link
-                })
-              });
-              self.sigmaSuggestions(suggestions);
+              self.loadingSigma(false);
+              console.warn(data);
+              self.sigmaSuggestions([]);
             }
-          } else {
-            console.warn(data);
-            self.sigmaSuggestions([]);
-          }
-        }).fail(function (err) {
-          console.warn(err);
-        });
+          }).fail(function (err) {
+            if (retryCount <= 3 && err.responseText && err.responseText.indexOf('returned non-zero') !== -1) {
+              retryCount++;
+              window.setTimeout(function () {
+                performPost();
+              }, 1000 * retryCount);
+            } else {
+              self.loadingSigma(false);
+              self.sigmaSuggestions([]);
+              console.warn(err);
+            }
+          });
+        };
+
+        performPost();
+
       };
 
       AssistantPanel.prototype.uploadTableStats = function () {
