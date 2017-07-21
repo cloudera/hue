@@ -1912,9 +1912,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           <!-- /ko -->
           <div style="margin: 5px; display:none;" data-bind="visible: loadingSigma"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
           <ul class="risk-list" data-bind="foreach: sigmaSuggestions">
-##            <li class="pointer" data-bind="templatePopover : { placement: 'left', contentTemplate: 'sigma-details-content', titleTemplate: 'sigma-details-title', minWidth: '320px', trigger: 'click' }">
-            <li>
-              <a class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-green': risk === 'normal' }, attr: { 'href' : link }, text: text"></a>
+            <li data-bind="templatePopover : { placement: 'left', contentTemplate: 'sigma-details-content', titleTemplate: 'sigma-details-title', minWidth: '320px', trigger: 'hover' }">
+              <a class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-green': risk === 'normal' }, attr: { 'href' : link }, text: text" target="_blank"></a>
             </li>
           </ul>
           <!-- /ko -->
@@ -1937,13 +1936,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   </script>
 
   <script type="text/html" id="sigma-details-content">
+    <!-- ko with: details -->
     <div class="assist-details-wrap">
-      <div style="font-weight: bold">Issues:</div>
-      <div>Input outlier</div>
-      <div>Duration outlier</div>
-      <div>HDFS Read Speed no bueno</div>
+      <div><div class="assist-details-header">${ _('Health') }</div><div class="assist-details-value" data-bind="text: healthSummary"></div></div>
+      <div><div class="assist-details-header">${ _('Perf. Status') }</div><div class="assist-details-value" data-bind="text: performanceStatus"></div></div>
+      <div><div class="assist-details-header">${ _('Duration') }</div><div class="assist-details-value" data-bind="text: duration.toHHMMSS()"></div></div>
     </div>
-    <div style="margin-top:10px; "><a data-bind="attr: { 'href': link }"><i class="fa fa-external-link"></i> ${ _("More details...") }</a></div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="sigma-details-title">
