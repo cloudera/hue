@@ -561,7 +561,8 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested)
+    autocomplete_data = HS2Api(user=request.user, request=request).autocomplete(snippet, database, table, column, nested)
+    #autocomplete_data = get_api(request, snippet).autocomplete(snippet, database, table, column, nested)
     response.update(autocomplete_data)
   except QueryExpired:
     pass
