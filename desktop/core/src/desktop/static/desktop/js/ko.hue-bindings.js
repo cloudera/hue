@@ -5839,16 +5839,13 @@
       $element.empty();
 
       var value = typeof options.data === 'function' ? options.data() : options.data;
-      var protoMatch = options.path.match(/^[a-z0-9]+\:\//i);
-      var protocol = protoMatch ? protoMatch[0] : '';
-      var cleanPath = options.path.replace(/^[a-z0-9]+\:\//i, '');
       $element.jHueHdfsTree({
         home: '',
         isS3: !!options.isS3,
-        initialPath: cleanPath,
+        initialPath: options.path,
         withTopPadding: false,
         onPathChange: function (path) {
-          options.selectedPath(protocol + path);
+          options.selectedPath(path);
         }
       });
 
