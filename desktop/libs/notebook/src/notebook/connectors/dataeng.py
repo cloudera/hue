@@ -86,6 +86,10 @@ class DataEngApi(Api):
     job = handle['jobs'][-1]
     job['status'] = job['status'].lower()
 
+    print '================'
+    print job['status']
+    print handle
+
     if job['status'] in RUNNING_STATES:
       return response
     elif job['status'] in ('failed', 'terminated'):
@@ -123,7 +127,7 @@ class DataEngApi(Api):
       DataEng(self.user).terminate_jobs(job_ids=[job_id])
       response = {'status': 0}
     else:
-      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submition.')}
+      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submittion.')}
 
     return response
 
@@ -183,7 +187,7 @@ def _get_main_task_id(user, operation_execution_id):
     print 'operation id maybe just not available yet'
     print e
     LOG.exception(e)
-    return ''
+    return {'stdout': 'Job is running or logs are being uploaded...'}
 
 
 class DataEng():
