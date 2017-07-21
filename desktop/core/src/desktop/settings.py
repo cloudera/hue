@@ -200,7 +200,32 @@ INSTALLED_APPS = [
 
     # App that keeps track of failed logins.
     'axes',
+    'oidc_auth'
+    
 ]
+
+AUTHENTICATION_BACKENDS = (
+    'oidc_auth.auth.OpenIDConnectBackend', 'django.contrib.auth.backends.ModelBackend',
+)
+
+LOGIN_URL = '/oidc/login/'
+
+OIDC_AUTH = {
+    'SCOPES': ('openid', 'preferred_username', 'email', 'profile'),
+    'DEFAULT_PROVIDER': {
+        'issuer': 'http://auth-hackathon-1.gce.cloudera.com:8080/auth/realms/hackathon',
+        'authorization_endpoint': 'http://auth-hackathon-1.gce.cloudera.com:8080/auth/realms/hackathon/protocol/openid-connect/auth',
+        'token_endpoint': 'http://auth-hackathon-1.gce.cloudera.com:8080/auth/realms/hackathon/protocol/openid-connect/token',
+        'userinfo_endpoint': 'http://auth-hackathon-1.gce.cloudera.com:8080/auth/realms/hackathon/protocol/openid-connect/userinfo',
+        'client_id': 'hue',
+        'client_secret': '3634ad9d-dfa8-41fc-a563-e26813252e11'
+    }
+}
+
+
+oidc_auth_log = logging.getLogger('oidc_auth')
+oidc_auth_log.setLevel(logging.DEBUG)
+
 
 LOCALE_PATHS = [
   get_desktop_root('core/src/desktop/locale')

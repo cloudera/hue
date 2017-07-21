@@ -33,7 +33,7 @@ import desktop.lib.metrics.file_reporter
 desktop.lib.metrics.file_reporter.start_file_reporter()
 
 from django.conf import settings
-from django.conf.urls import include, patterns
+from django.conf.urls import include, patterns, url
 from django.contrib import admin
 
 from desktop import appmanager
@@ -57,6 +57,8 @@ dynamic_patterns = patterns('desktop.auth.views',
   (r'^profile$', 'profile'),
   (r'^login/oauth/?$', 'oauth_login'),
   (r'^login/oauth_authenticated/?$', 'oauth_authenticated'),
+  
+  url(r'oidc/', include('oidc_auth.urls')),
 )
 
 
