@@ -137,7 +137,7 @@ from desktop.views import _ko
         var onPremLinks = [{
             label: 'Dashboard',
             icon: 'fa fa-home',
-            link: '/'
+            link: 'http://localhost:3001'
           }, {
             divider: true
           }, {
@@ -152,7 +152,7 @@ from desktop.views import _ko
           }
           , {
             product: 'cm',
-            link: '/'
+            link: 'http://andyao-1.gce.cloudera.com:7180'
           }, {
             product: 'navigator',
             link: '/'
