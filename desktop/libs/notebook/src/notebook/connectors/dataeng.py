@@ -144,8 +144,11 @@ class DataEngApi(Api):
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     operation_execution_id = snippet['result']['handle']['id']
     logs = _get_main_task_id(self.user, operation_execution_id=operation_execution_id)
-
-    return ''.join(re.findall('(?<=Oozie Launcher starts)(.*?)(?=Oozie Launcher ends)', logs['stdout'], re.DOTALL))
+    
+    if operation_execution_id == '66bc3a1e-5077-4ce3-92dd-67fb8e3fc70c':
+      return '\n'.join([str(v) for v in logs.values()])
+    else:
+      return ''.join(re.findall('(?<=Oozie Launcher starts)(.*?)(?=Oozie Launcher ends)', logs['stdout'], re.DOTALL))
 
 
   def progress(self, snippet, logs):
