@@ -55,7 +55,7 @@ def is_selected(section, matcher):
           <div class="nav-collapse">
             <ul class="nav">
               <li class="app-header">
-                <a href="/${app_name}">
+                <a href="${ ('/' + app_name) if user.is_superuser else '' }">
                   <img src="${ static('useradmin/art/icon_useradmin_48.png') }" class="app-icon" alt="${ _('User admin icon') }" />
                   ${ _('User Admin') }
                 </a>
