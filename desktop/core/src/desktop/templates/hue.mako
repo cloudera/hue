@@ -117,6 +117,10 @@ ${ hueIcons.symbols() }
           <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; ; margin-top: 4px">
         </a>
 
+        <a style="display: none;" class="pull-left" data-bind="visible: onPrem()">
+          <img src="${ static('desktop/art/cloudera-enterprise.png') }" style="height: 34px; width: 140px; ; margin-top: 6px">
+        </a>
+
         <a style="display: none;" class="brand" data-bind="visible: onPrem() === true, hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>

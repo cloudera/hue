@@ -104,7 +104,7 @@ from desktop.views import _ko
         self.links = ko.observableArray([]);
 
         var altusLinks = [{
-          label: 'Home',
+          label: 'Dashboard',
             icon: 'fa fa-home',
             link: '/'
           }, {
@@ -142,33 +142,25 @@ from desktop.views import _ko
         ];
 
         var onPremLinks = [{
-          label: 'Home',
-          icon: 'fa fa-home',
-          link: '/'
-        }, {
-          divider: true
-        }, {
-          product: 'hue',
-          link: '/'
-        }, {
-          product: 'cdsw',
-          link: '/'
-        }, {
-          product: 'navopt',
-          link: '/'
-        }, {
-          product: 'navigator',
-          link: '/'
-        }, {
-          product: 'cm',
-          link: '/'
-        }, {
-          divider: true
-        }, {
-          label: 'Documentation',
-          link: '/',
-          icon: 'fa fa-book'
-        }];
+            label: 'Dashboard',
+            icon: 'fa fa-home',
+            link: '/'
+          }, {
+            divider: true
+          }, {
+            product: 'hue',
+            link: '/'
+          }, {
+            product: 'cdsw',
+            link: '/'
+          }, {
+            product: 'navigator',
+            link: '/'
+          }, {
+            product: 'cm',
+            link: '/'
+          }
+        ];
 
         var applyLinks = function (links) {
           var newLinks = [];
