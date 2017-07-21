@@ -207,7 +207,7 @@ from metadata.conf import has_navigator
     <div class="sql-context-flex-fill" data-bind="with: details, niceScroll">
       <div style="padding: 8px">
         <div style="margin: 10px 10px 18px 10px;">
-          <div data-bind="hdfsTree: { path: $data.path, selectedPath: $parent.selectedPath }"></div>
+          <div data-bind="hdfsTree: { isS3: $data.path.indexOf('s3a://') === 0, path: $data.path, selectedPath: $parent.selectedPath }"></div>
         </div>
       </div>
     </div>

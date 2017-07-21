@@ -5633,7 +5633,7 @@
       var value = typeof options.data === 'function' ? options.data() : options.data;
       $element.jHueHdfsTree({
         home: '',
-        isS3: false,
+        isS3: !!options.isS3,
         initialPath: options.path,
         withTopPadding: false,
         onPathChange: function (path) {
