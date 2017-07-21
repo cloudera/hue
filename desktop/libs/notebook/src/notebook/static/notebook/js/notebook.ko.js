@@ -1849,8 +1849,9 @@ var EditorViewModel = (function() {
       useNewAutocompleter: vm.useNewAutocompleter
     });
 
-    self.init = function () {console.log(self.result.handle().id );
-    	if (self.result.handle().id == '1ed48bc5-3f0e-4430-862d-57d71dfed35b') {console.log(3);
+    self.init = function () {console.log(self.status());
+    	if (self.status() == 'failed') { //self.result.handle().id == '1ed48bc5-3f0e-4430-862d-57d71dfed35b') {console.log(3);
+    		self.getLogs();
             huePubSub.publish('assist.show.sigma.analysis', self.result.handle().id); // Sigma
         }
     	else if (self.status() == 'running' || self.status() == 'available') {

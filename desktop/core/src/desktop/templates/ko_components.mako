@@ -95,7 +95,7 @@ from desktop.views import _ko
         navopt: {
           label: 'IAM',
           img: 'hi-as-nav'
-        },
+        }
       };
 
       var AppSwitcher = function AppSwitcher(params) {
@@ -185,6 +185,8 @@ from desktop.views import _ko
             applyLinks(altusLinks);
           }
         })
+                                                      
+        applyLinks(altusLinks);
       };
 
 ##       setTimeout(function () {
