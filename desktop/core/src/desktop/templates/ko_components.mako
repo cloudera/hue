@@ -106,22 +106,7 @@ from desktop.views import _ko
         var altusLinks = [{
           label: 'Dashboard',
             icon: 'fa fa-home',
-            link: '/'
-          }, {
-            divider: true
-          }, {
-            product: 'hue',
-            link: '/'
-          }, {
-            product: 'cdsw',
-            link: '/'
-          }, {
-            product: 'navigator',
-            link: '/'
-          }, {
-            label: 'Navigator Optimizer',
-            link: '/',
-            icon: 'fa fa-gear'
+            link: 'http://localhost:3001'
           }, {
             divider: true
           }, {
@@ -130,14 +115,22 @@ from desktop.views import _ko
             icon: 'fa fa-gear'
           },
           {
-            label: 'Analytics DB',
-            link: '/',
-            icon: 'fa fa-database'
+            product: 'cdsw',
+            link: '/'
+          }, {
+            product: 'hue',
+            link: '/'
           },
-          {
-            label: 'Operational DB',
+           {
+            divider: true
+          },
+                           {
+            product: 'navigator',
+            link: '/'
+          }, {
+            label: 'Navigator Optimizer',
             link: '/',
-            icon: 'fa fa-database'
+            icon: 'fa fa-gear'
           }
         ];
 
@@ -148,18 +141,23 @@ from desktop.views import _ko
           }, {
             divider: true
           }, {
-            product: 'hue',
+            product: 'cdsw',
             link: '/'
           }, {
-            product: 'cdsw',
+            product: 'hue',
+            link: '/'
+          }, 
+          {
+            divider: true
+          }
+          , {
+            product: 'cm',
             link: '/'
           }, {
             product: 'navigator',
             link: '/'
-          }, {
-            product: 'cm',
-            link: '/'
           }
+          
         ];
 
         var applyLinks = function (links) {
