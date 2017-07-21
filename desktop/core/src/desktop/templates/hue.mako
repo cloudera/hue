@@ -118,7 +118,7 @@ ${ hueIcons.symbols() }
         </a>
 
         <a style="display: none;" class="pull-left" data-bind="visible: onPrem()">
-          <img src="${ static('desktop/art/cloudera-enterprise.svg') }" style="height: 50px; width: 140px; ; margin-top: 0px">
+          <img src="${ static('desktop/art/cloudera-enterprise.svg') }" style="height: 50px; width: 144px; ; margin-top: 0px">
         </a>
 
         <a style="display: none;" class="brand" data-bind="visible: onPrem() === true, hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
