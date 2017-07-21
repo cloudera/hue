@@ -114,11 +114,11 @@ ${ hueIcons.symbols() }
 ##         <!-- /ko -->
 
         <a style="display: none;" class="pull-left" data-bind="visible: onPrem() === false">
-          <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; ; margin-top: 4px">
+          <img src="${ static('desktop/art/cloudera-altus.svg') }" style="height: 28px; width: 140px; margin-top: 4px">
         </a>
 
         <a style="display: none;" class="pull-left" data-bind="visible: onPrem()">
-          <img src="${ static('desktop/art/cloudera-enterprise.png') }" style="height: 34px; width: 140px; ; margin-top: 6px">
+          <img src="${ static('desktop/art/cloudera-enterprise.svg') }" style="height: 50px; width: 140px; ; margin-top: 0px">
         </a>
 
         <a style="display: none;" class="brand" data-bind="visible: onPrem() === true, hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
