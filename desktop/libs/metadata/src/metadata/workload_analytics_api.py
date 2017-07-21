@@ -17,6 +17,7 @@
 
 import logging
 import json
+import time
 
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
@@ -52,7 +53,16 @@ def get_operation_execution_details(request):
   operation_id = json.loads(request.POST.get('operation_id'))
 
   client = WorkfloadAnalyticsClient(request.user)
-  data = client.get_operation_execution_details(operation_id=operation_id)
+  data = None
+  
+  n = 20
+  while n > 0 and data is None:
+    try:
+      data = client.get_operation_execution_details(operation_id=operation_id)
+    except Exception, e:
+      LOG.warn(e)
+      n -= 1
+      time.sleep(3)
 
   if data:
     response['status'] = 0

@@ -19,6 +19,7 @@ import logging
 import json
 import re
 import subprocess
+import time
 
 from datetime import datetime,  timedelta
 
@@ -101,16 +102,24 @@ class DataEngApi(Api):
 
 
   def fetch_result(self, notebook, snippet, rows, start_over):
-    operation_execution_id = snippet['result']['handle']['id']
-    logs = _get_main_task_id(self.user, operation_execution_id=operation_execution_id)
-#     logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
-#         operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
-#         attempt_id='attempt_1499705340501_0045_m_000000_0'
-#     )
-    result_rows = re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL)
-    if result_rows: 
-      result_rows = [[row] for row in result_rows[0].splitlines()]
-    else:
+    n = 20
+    result_rows = None
+
+    while n > 0 and not result_rows:
+      operation_execution_id = snippet['result']['handle']['id']
+      logs = _get_main_task_id(self.user, operation_execution_id=operation_execution_id)
+  #     logs = WorkfloadAnalyticsClient(self.user).get_mr_task_attempt_log(
+  #         operation_execution_id='cedb71ae-0956-42e1-8578-87b9261d4a37',
+  #         attempt_id='attempt_1499705340501_0045_m_000000_0'
+  #     )
+      result_rows = re.findall('(?<=>>> Invoking Beeline command line now >>>)(.*?)(?=<<< Invocation of Beeline command completed <<<)', logs['stdout'], re.DOTALL)
+      if result_rows: 
+        result_rows = [[row] for row in result_rows[0].splitlines()]
+      else:
+        n -= 1
+        time.sleep(3)
+    
+    if not result_rows:
       result_rows = [[_('Job successfully completed.')]]
 
     return {
