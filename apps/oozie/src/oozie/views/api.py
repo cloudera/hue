@@ -444,16 +444,17 @@ def get_log(request, oozie_workflow, make_links=True, log_start_pattern=None, lo
             else:
               LOG.debug('Failed to find given start log pattern in logs: %s' % log_start_pattern)
 
-          if make_links:
-            action_logs = LinkJobLogs._make_links(action_logs)
-
-          logs[action.name] = action_logs
-
           if log_end_pattern:
             re_log_end = re.compile(log_end_pattern)
             is_really_done = re_log_end.search(action_logs) is not None or oozie_workflow.status == 'KILLED'
             if is_really_done and not action_logs:
               LOG.warn('Unable to scrape full logs, try increasing the jobbrowser log_offset configuration value.')
+
+          if make_links:
+            action_logs = LinkJobLogs._make_links(action_logs)
+
+          logs[action.name] = action_logs
+
     except Exception:
       LOG.exception('An error occurred while watching the job running')
       is_really_done = True
