@@ -205,7 +205,7 @@ var Design = (function($, ko, NodeFields) {
           }
         },
         success: function(data) {
-          $(document).trigger('reload.designs');
+          $(document).trigger('saved.design', [options, data]);
         }
       }, options);
       self.request((self['new']()) ? '/jobsub/designs/'+self.node_type()+'/new' : '/jobsub/designs/'+self.id()+'/save', options);
