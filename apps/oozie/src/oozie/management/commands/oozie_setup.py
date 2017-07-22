@@ -351,12 +351,6 @@ class Command(NoArgsCommand):
                 'local_dir': local_dir, 'remote_data_dir': remote_data_dir})
     self.fs.do_as_user(self.fs.DEFAULT_USER, self.fs.copyFromLocal, local_dir, remote_data_dir)
 
-    # Load jobs
-    LOG.info(_("Installing examples..."))
-
-    if ENABLE_V2.get():
-      management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
-
     # Get or create sample user directories
     home_dir = Directory.objects.get_home_directory(self.user)
     examples_dir, created = Directory.objects.get_or_create(
@@ -364,6 +358,12 @@ class Command(NoArgsCommand):
       owner=self.user,
       name=Document2.EXAMPLES_DIR
     )
+
+    # Load jobs
+    LOG.info(_("Installing examples..."))
+
+    if ENABLE_V2.get():
+      management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
 
     if IS_HUE_4.get():
       # Install editor oozie examples without doc1 link
