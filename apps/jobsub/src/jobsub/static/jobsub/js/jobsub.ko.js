@@ -206,6 +206,7 @@ var Design = (function($, ko, NodeFields) {
         },
         success: function(data) {
           $(document).trigger('saved.design', [options, data]);
+          $(document).trigger('reload.designs');
         }
       }, options);
       self.request((self['new']()) ? '/jobsub/designs/'+self.node_type()+'/new' : '/jobsub/designs/'+self.id()+'/save', options);
@@ -217,6 +218,7 @@ var Design = (function($, ko, NodeFields) {
         type: 'POST',
         success: function(data) {
           $(document).trigger('cloned.design', [options, data]);
+          $(document).trigger('reload.designs');
         }
       }, options);
       this.request('/jobsub/designs/' + self.id() + '/clone', options);
@@ -228,6 +230,7 @@ var Design = (function($, ko, NodeFields) {
         type: 'POST',
         success: function(data) {
           $(document).trigger('deleted.design', [options, data]);
+          $(document).trigger('reload.designs');
         }
       }, options);
       if (skip_trash) {
@@ -243,6 +246,7 @@ var Design = (function($, ko, NodeFields) {
         type: 'POST',
         success: function(data) {
           $(document).trigger('restored.design', [options, data]);
+          $(document).trigger('reload.designs');
         }
       }, options);
       this.request('/jobsub/designs/' + self.id() + '/restore', options);
