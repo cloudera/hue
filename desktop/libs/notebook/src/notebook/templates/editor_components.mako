@@ -578,16 +578,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </div>
       <div style="clear:both; padding-left: 120px;">
         <!-- ko if: availableNewProperties().length -->
-        <select data-bind="options: availableNewProperties,
-                          optionsText: 'nice_name',
-                          optionsValue: 'name',
-                          value: selectedSessionProperty,
-                          optionsCaption: '${ _ko('Choose a property...') }'"></select>
         <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
                     properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
                     selectedSessionProperty('');
                    }" style="margin-left:10px;vertical-align: text-top;">
-          <i class="fa fa-plus"></i>
         </a>
         <!-- /ko -->
       </div>
