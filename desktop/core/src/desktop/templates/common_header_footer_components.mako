@@ -262,7 +262,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       return mTime;
     };
 
-    // catches HTTP 502 errors
+    // Catches HTTP 502 errors
     function xhrOnreadystatechange() {
       if (this.readyState === 4 && this.status === 502) {
         $.jHueNotify.error($('<span>').html(this.responseText).text());
