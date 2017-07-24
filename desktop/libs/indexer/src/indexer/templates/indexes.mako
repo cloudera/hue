@@ -389,10 +389,25 @@ ${ assist.assistPanel() }
     <!-- ko template: { name: 'indexes-index-fields-fields', data: filteredFields }--><!-- /ko -->
 
     <h4>${ _('Copy Fields') }</h4>
-    <span data-bind="text: ko.mapping.toJSON(copyFields)"></span>
+    <table class="table table-condensed table-nowrap sample-table">
+      <thead>
+        <tr>
+          <th>${ _('Destination') }</th>
+          <th>${ _('Source') }</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ko foreach: copyFields() -->
+          <tr>
+            <td data-bind="text: dest"></td>
+            <td data-bind="text: source"></td>
+          </tr>
+        <!-- /ko -->
+      </tbody>
+    </table>
 
     <h4>${ _('Dynamic Fields') }</h4>
-    <span data-bind="text: ko.mapping.toJSON(dynamicFields)"></span>
+    <!-- ko template: { name: 'indexes-index-fields-fields', data: dynamicFields }--><!-- /ko -->
   </div>
 </script>
 
