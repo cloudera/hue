@@ -100,7 +100,7 @@ from desktop.views import commonheader, commonfooter, _ko
     <!-- /ko -->
   </div>
 
-  <form data-bind="visible: $root.isEditing() && columns().length == 0">
+  <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select one') }
     <!-- ko if: $root.initial.engines().length > 1 -->
       <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
