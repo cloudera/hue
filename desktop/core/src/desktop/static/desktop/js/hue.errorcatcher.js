@@ -24,6 +24,9 @@
    * @param {Object} [error] - available in some browsers, it contains the stack
    */
   window.onerror = function (msg, url, line, column, error) {
+    if (msg && msg.isTrigger === 3) {
+      return;
+    }
     try {
       console.error('Hue detected a Javascript error: ', url, line, column, msg);
       var xmlHTTP = new XMLHttpRequest();
