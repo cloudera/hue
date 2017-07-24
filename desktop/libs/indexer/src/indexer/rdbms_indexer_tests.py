@@ -16,62 +16,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 
 from django.contrib.auth.models import User
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
-from desktop.lib.django_test_util import make_logged_in_client
-from indexer.conf import ENABLE_SQOOP
 
-from indexer.rdbms_indexer import RdbmsIndexer
+from desktop.auth.backend import rewrite_user
+from desktop.lib.django_test_util import make_logged_in_client
+
+from indexer.conf import ENABLE_SQOOP
+from indexer.indexers.rdbms import RdbmsIndexer
+from librdbms.server import dbms as rdbms
 
 
 LOG = logging.getLogger(__name__)
 
-
 class TestRdbmsIndexer():
-  if not ENABLE_SQOOP.get():
-    raise SkipTest
-  '''
-  def test_get_databases(self):
-    self.client = make_logged_in_client()
-    self.user = User.objects.get(username='test')
 
-    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
+  @classmethod
+  def setup_class(cls):
+    if not ENABLE_SQOOP.get():
+      raise SkipTest
+    if not rdbms.get_query_server_config(server='mysql'):
+      raise SkipTest
+    cls.client = make_logged_in_client()
+    cls.user = User.objects.get(username='test')
+    cls.user = rewrite_user(cls.user)
+    cls.indexer = RdbmsIndexer(cls.user, db_conf_name='mysql')
 
-    data = indexer.get_databases()
-    assert_equal(1, data['status'], data)
+  @classmethod
+  def teardown_class(cls):
+    cls.user.is_superuser = False
+    cls.user.save()
 
-  '''
-  def test_get_sample_data(self):
-    self.client = make_logged_in_client()
-    self.user = User.objects.get(username='test')
-
-    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
-    data = indexer.get_sample_data(database='hue', table='employee', column='empname')
+  def test_get_sample_data(cls):
+    data = cls.indexer.get_sample_data(database='hue', table='employee', column='empname')
 
     assert_equal(0, data['status'], data)
-    assert_equal('',data['rows'], data)
-  '''
-  def test_columns(self):
-    self.client = make_logged_in_client()
-    self.user = User.objects.get(username='test')
+    assert_not_equal('', data['rows'], data)
 
-    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
-    data = indexer.get_columns(database='hue', table='employee')
+  def test_guess_format(cls):
+    data = cls.indexer.guess_format()
 
-    assert_not_equal([], data, data)
-    assert_true(data, data)
-
-  def test_get_tables(self):
-    self.client = make_logged_in_client()
-    self.user = User.objects.get(username='test')
-
-    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
-
-    data = indexer.get_tables('hue')
-    assert_equal(0, data['status'], data)
-  '''
+    assert_equal({"type": "csv"}, data)

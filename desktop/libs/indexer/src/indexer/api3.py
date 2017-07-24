@@ -18,7 +18,6 @@
 import json
 import logging
 
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
@@ -26,11 +25,8 @@ from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
-from hadoop import conf
 from librdbms.server import dbms as rdbms
-from librdbms.conf import DATABASES, get_database_password
 from notebook.connectors.base import get_api, Notebook
-from notebook.connectors.rdbms import Assist
 from notebook.decorators import api_error_handler
 from notebook.models import make_notebook
 
@@ -38,6 +34,7 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.morphline import MorphlineIndexer
+from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 
@@ -105,7 +102,7 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
   elif file_format['inputFormat'] == 'rdbms':
-    format_ = {"type": "csv"}
+    format_ = RdbmsIndexer(request.user, file_format['rdbmsType']).guess_format()
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -155,12 +152,11 @@ def guess_field_types(request):
   elif file_format['inputFormat'] == 'rdbms':
     query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
     db = rdbms.get(request.user, query_server=query_server)
-    assist = Assist(db)
-    sample = assist.get_sample_data(database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
+    sample = RdbmsIndexer(request.user, file_format['rdbmsType']).get_sample_data(database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
     table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
 
     format_ = {
-        "sample": list(sample.rows())[:4],
+        "sample": list(sample['rows'])[:4],
         "columns": [
             Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
             for col in table_metadata
@@ -168,93 +164,6 @@ def guess_field_types(request):
     }
 
   return JsonResponse(format_)
-
-
-def get_databases(request):
-  source = json.loads(request.POST.get('source', '{}'))
-  user = User.objects.get(username=request.user)
-  if source['rdbmsMode'] == 'configRdbms':
-    query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
-  else:
-    name = source['rdbmsType']
-    if name:
-      query_server = {
-        'server_name': str(name),
-        'server_host': str(source['rdbmsHostname']),
-        'server_port': int(source['rdbmsPort']),
-        'username': str(source['rdbmsUsername']),
-        'password': str(source['rdbmsPassword']),
-        'options': {},
-        'alias': name
-      }
-    LOG.debug("Query Server: %s" % query_server)
-
-  db = rdbms.get(user, query_server=query_server)
-  assist = Assist(db)
-  data = assist.get_databases() #format of data ['abc','def','ghi',...,'xyz']
-  format_ = {}
-  if data:
-    list = []
-    for element in data:
-      dict = {}
-      dict['name'] = element
-      dict['value'] = element
-      list.append(dict)
-    format_['data'] = list
-    format_['status'] = 0
-  else:
-    format_ = {}
-    format_['data'] = []
-    format_['status'] = 1
-  print format_
-  return JsonResponse(format_)
-
-
-def get_tables(request):
-  source = json.loads(request.POST.get('source', '{}'))
-  user = User.objects.get(username=request.user)
-  if source['rdbmsMode'] == 'configRdbms':
-    query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
-  else:
-    name = source['rdbmsType']
-    if name:
-      query_server = {
-        'server_name': str(name),
-        'server_host': str(source['rdbmsHostname']),
-        'server_port': int(source['rdbmsPort']),
-        'username': str(source['rdbmsUsername']),
-        'password': str(source['rdbmsPassword']),
-        'options': {},
-        'alias': name
-      }
-    LOG.debug("Query Server: %s" % query_server)
-
-  db = rdbms.get(user, query_server=query_server)
-  assist = Assist(db)
-  data = assist.get_tables(source['rdbmsDatabaseName']) ##format of data ['abc','def','ghi',...,'xyz']
-  format_ = {}
-  if data:
-    list = []
-    for element in data:
-      dict = {}
-      dict['name'] = element
-      dict['value'] = element
-      list.append(dict)
-    format_['data'] = list
-    format_['status'] = 0
-  else:
-    format_ = []
-  print format_
-  return JsonResponse(format_)
-
-
-def index_file(request):
-  file_format = json.loads(request.POST.get('fileFormat', '{}'))
-  _convert_format(file_format["format"], inverse=True)
-  collection_name = file_format["name"]
-
-  job_handle = _index(request, file_format, collection_name)
-  return JsonResponse(job_handle)
 
 
 @api_error_handler
@@ -277,15 +186,10 @@ def importer_submit(request):
       job_handle = _create_index(request.user, request.fs, client, source, destination, index_name)
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
-  elif destination['outputFormat'] == 'file' and source['inputFormat'] == 'rdbms':
-    job_handle = run_sqoop(request, source, destination, start_time)
-  elif destination['outputFormat'] == 'hive' and source['inputFormat'] == 'rdbms':
-    job_handle = run_sqoop(request, source, destination, start_time)
-  elif destination['outputFormat'] == 'hbase' and source['inputFormat'] == 'rdbms':
-    job_handle = run_sqoop(request, source, destination, start_time)
-  else:
-    job_handle = _create_table(request, source, destination, start_time)
-  print JsonResponse(job_handle)
+  elif source['inputFormat'] == 'rdbms':
+    if destination['outputFormat'] in ('file', 'table', 'hbase'):
+      job_handle = run_sqoop(request, source, destination, start_time)
+
   return JsonResponse(job_handle)
 
 
@@ -391,6 +295,7 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
       fields=request.POST.get('fields', schema_fields),
       unique_key_field=unique_field
     )
+
   if file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
@@ -407,65 +312,3 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
   morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
 
   return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)
-
-def run_sqoop(request, source, destination, start_time):
-  rdbmsMode = str(source['rdbmsMode'])
-  rdbmsName = str(source['rdbmsType'])
-  rdbmsDatabaseName = str(source['rdbmsDatabaseName'])
-  allTablesSelected = str(source['allTablesSelected'])
-  destinationType = str(destination['outputFormat'])
-
-  if not allTablesSelected:
-    rdbmsTableName = str(source['rdbmsTableName'])
-
-  if rdbmsMode == 'configRdbms':
-    rdbmsHost = str(DATABASES[rdbmsName].HOST.get())
-    rdbmsPort = str(DATABASES[rdbmsName].PORT.get())
-    rdbmsUserName = str(DATABASES[rdbmsName].USER.get())
-    rdbmsPassword = str(get_database_password(rdbmsName))
-  else:
-    rdbmsHost = str(source['rdbmsHostname'])
-    rdbmsPort = str(source['rdbmsPort'])
-    rdbmsUserName = str(source['rdbmsUsername'])
-    rdbmsPassword = str(source['rdbmsPassword'])
-
-  if destinationType == 'file':
-    targetDir = conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.get()+str(destination['name'])+'/test'
-
-  #print rdbmsName
-  #print rdbmsHost
-  #print rdbmsPort
-  #print rdbmsDatabaseName
-  #print rdbmsUserName
-  #print rdbmsPassword
-  #print targetDir
-  #print 'import --connect jdbc:'+rdbmsName+'://'+'127.0.0.1'+':'+str(rdbmsPort)+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --query \'SELECT * FROM '+rdbmsTableName+' as a WHERE $CONDITIONS\' --target-dir '+targetDir+' --verbose --split-by a.empid'
-
-  if destinationType == 'file':
-    if allTablesSelected:
-      statement='import-all-tables --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+rdbmsPort+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --warehouse-dir '+targetDir+' -m 1'
-    else:
-      statement = 'import --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+rdbmsPort+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --table '+rdbmsTableName+' --target-dir '+ targetDir+' -m 1'
-  elif destinationType == 'hive':
-    if allTablesSelected:
-      statement = 'import-all-tables --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+rdbmsPort+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --hive-import'
-    else:
-      statement = 'import --connect jdbc:'+rdbmsName+'://'+rdbmsHost+':'+rdbmsPort+'/'+rdbmsDatabaseName+' --username '+rdbmsUserName+' --password '+rdbmsPassword+' --table '+rdbmsTableName+' --hive-import'
-
-  print statement
-  task = make_notebook(
-      name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
-          'rdbmsDatabaseName': source['rdbmsDatabaseName'],
-          'rdbmsDatabaseName': source['rdbmsDatabaseName'],
-          'path': destination['name']
-        },
-      editor_type='sqoop1',
-      statement=statement,
-      files = [{"path": "/user/admin/mysql-connector-java.jar", "type": "jar"}],
-      status='ready',
-      on_success_url='/filebrowser/view/%s(name)s' % destination,
-      last_executed=start_time,
-      is_task=True
-  )
-
-  return task.execute(request, batch=True)
