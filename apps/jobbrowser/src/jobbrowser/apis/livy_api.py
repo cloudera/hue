@@ -17,8 +17,6 @@
 
 import logging
 
-from datetime import datetime,  timedelta
-
 from django.utils.translation import ugettext as _
 
 from spark.job_server_api import get_api
@@ -34,27 +32,46 @@ class LivySessionsApi(Api):
   def apps(self, filters):
     api = get_api(self.user)
 
-    jobs = api.list_clusters()
+    jobs = api.get_sessions()
 
     return {
       'apps': [{
-        'id': app['crn'],
-        'name': '%(clusterName)s' % app,
-        'status': app['status'],
-        'apiStatus': self._api_status(app['status']),
-        'type': '%(serviceType)s %(workersGroupSize)s %(instanceType)s %(cdhVersion)s' % app,
-        'user': app['clusterName'].split('-', 1)[0],
+        'id': 'livy-%(id)s' % app,
+        'name': '%(kind)s %(id)s' % app,
+        'status': app['state'],
+        'apiStatus': self._api_status(app['state']),
+        'type': 'livy-session',
+        'user': app['owner'],
         'progress': 100,
         'queue': 'group',
         'duration': 1,
-        'submitted': app['creationDate']
-      } for app in jobs['clusters']],
-      'total': len(jobs)
+        'submitted': ''
+      } for app in jobs['sessions']],
+      'total': jobs['total']
     }
 
 
   def app(self, appid):
-    return {}
+    appid = appid.rsplit('-')[-1]
+    api = get_api(self.user)
+
+    job = api.get_session(appid)
+
+    return {
+      'id': 'livy-%(id)s' % job,
+      'name': '%(kind)s %(id)s' % job,
+      'status': job['state'],
+      'apiStatus': self._api_status(job['state']),
+      'type': 'livy-session',
+      'user': job['owner'],
+      'progress': 100,
+      'queue': 'group',
+      'duration': 1,
+      'submitted': '',
+      'properties': {
+        'statements': []
+      }
+    }
 
 
   def action(self, appid, action):
@@ -65,8 +82,16 @@ class LivySessionsApi(Api):
     return {'logs': ''}
 
 
-  def profile(self, appid, app_type, app_property):
-    return {}
+  def profile(self, appid, app_type, app_property, app_filters):
+    appid = appid.rsplit('-')[-1]
+
+    if app_property == 'properties':
+      api = get_api(self.user)
+
+      return api.get_statements(appid)
+    else:
+      return {}
+
 
   def _api_status(self, status):
     if status in ['CREATING', 'CREATED', 'TERMINATING']:

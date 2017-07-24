@@ -110,6 +110,9 @@ class JobServerApi(object):
   def get_session(self, uuid):
     return self._root.get('sessions/%s' % uuid)
 
+  def get_statements(self, uuid):
+    return self._root.get('sessions/%s/statements' % uuid)
+
   def submit_statement(self, uuid, statement):
     data = {'code': statement}
     return self._root.post('sessions/%s/statements' % uuid, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
