@@ -55,11 +55,14 @@ urlpatterns += patterns('indexer.api3',
   # Importer
   url(r'^api/indexer/guess_format/$', 'guess_format', name='guess_format'),
   url(r'^api/indexer/guess_field_types/$', 'guess_field_types', name='guess_field_types'),
-  url(r'^api/indexer/get_databases/$', 'get_databases', name='get_databases'),
-  url(r'^api/indexer/get_tables/$', 'get_tables', name='get_tables'),
 
   url(r'^api/importer/submit', 'importer_submit', name='importer_submit')
 )
+
+urlpatterns += patterns('indexer.indexers.rdbms',
+  url(r'^api/indexer/indexers/get_db_component/$', 'get_db_component', name='get_db_component')
+)
+
 
 # Deprecated
 urlpatterns += patterns('indexer.api',
