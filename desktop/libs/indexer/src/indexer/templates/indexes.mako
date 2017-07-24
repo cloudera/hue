@@ -416,6 +416,7 @@ ${ assist.assistPanel() }
   <!-- ko hueSpinner: { spin: $root.index().loadingSample, center: true, size: 'xlarge' } --><!-- /ko -->
 
   <!-- ko ifnot: $root.index().loadingSample -->
+  <!-- ko if: $root.index().fields().length != 0 -->
   <table class="table table-condensed table-nowrap sample-table">
     <thead>
       <tr>
@@ -436,6 +437,32 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </tbody>
   </table>
+  <!-- /ko -->
+
+  ## Schemaless collections
+  <!-- ko if: $root.index().fields().length == 0 && $data.length > 0 -->
+  <table class="table table-condensed table-nowrap sample-table">
+    <thead>
+      <tr>
+        <th style="width: 1%">&nbsp;</th>
+        <!-- ko foreach: Object.keys($data[0]) -->
+        <th data-bind="text: $data"></th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: $data -->
+        <tr>
+          <td data-bind="text: $index() + 1"></td>
+          <!-- ko foreach: Object.keys($parent[0]) -->
+            <td data-bind="text: $parent[$data]"></td>
+          <!-- /ko -->
+        </tr>
+      <!-- /ko -->
+    </tbody>
+  </table>
+  <!-- /ko -->
+
   <!-- /ko -->
 </script>
 
