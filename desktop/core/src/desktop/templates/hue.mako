@@ -59,8 +59,9 @@
   <script type="text/javascript">
     var IS_HUE_4 = true;
   </script>
-
+  % if not conf.DJANGO_DEBUG_MODE.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
+  % endif
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
 </head>
 
