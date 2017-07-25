@@ -45,13 +45,13 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <table id="fileBrowserTable" class="table table-condensed table-huedatatable tablescroller-disable" data-bind="style: {'opacity': isLoading() ? '.5': '1'}">
     <thead>
       <tr>
-        <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th class="sorting_disabled" width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th class="sortable sorting" data-sort="type" width="1%" data-bind="click: sort">&nbsp;</th>
         <th class="sortable sorting_asc" data-sort="name" data-bind="click: sort">${_('Name')}</th>
         <th class="sortable sorting" data-sort="size" width="10%" data-bind="click: sort">${_('Size')}</th>
         <th class="sortable sorting" data-sort="user" width="10%" data-bind="click: sort">${_('User')}</th>
         <th class="sortable sorting" data-sort="group" width="10%" data-bind="click: sort">${_('Group')}</th>
-        <th width="10%">${_('Permissions')}</th>
+        <th class="sorting_disabled" width="10%">${_('Permissions')}</th>
         <th class="sortable sorting" data-sort="mtime" width="15%" data-bind="click: sort">${_('Date')}</th>
       </tr>
     </thead>
