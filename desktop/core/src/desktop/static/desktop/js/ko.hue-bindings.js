@@ -3670,26 +3670,41 @@
           successCallback: function (data) {
             if (token.parseLocation.type === 'table' && data.tables_meta) {
               var tableLowerCase = token.value.toLowerCase();
+              var isLowerCase = tableLowerCase === token.value;
               for (var i = 0; i < data.tables_meta.length; i++) {
                 if (data.tables_meta[i].name.toLowerCase() === tableLowerCase) {
-                  break;
-                }
-                if (i + 1 === data.tables_meta.length) {
-                  token.notFound = true;
-                  ApiHelper.getInstance().identifierChainToPath({
-                    identifierChain: token.parseLocation.identifierChain,
-                    sourceType: self.snippet.type(),
-                    defaultDatabase: self.snippet.database()
-                  }, function (path) {
-                    token.notFound = true;
-                    token.qualifiedIdentifier = path.join('.');
-                    var AceRange = ace.require('ace/range').Range;
-                    var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
-                    var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
-                    self.editor.session.$backMarkers[markerId].token = token;
-                  })
+                  return;
                 }
               }
+
+              var weightedExpected = $.map(data.tables_meta, function (val) {
+                return {
+                  text: isLowerCase ? val.name : val.name.toUpperCase(),
+                  distance: SqlParseSupport.stringDistance(token.value, val.name)
+                }
+              });
+              weightedExpected.sort(function (a, b) {
+                if (a.distance === b.distance) {
+                  return a.text.localeCompare(b.text);
+                }
+                return a.distance - b.distance
+              });
+              token.notFound = true;
+              token.syntaxError = {
+                expected: weightedExpected
+              };
+
+              ApiHelper.getInstance().identifierChainToPath({
+                identifierChain: token.parseLocation.identifierChain,
+                sourceType: self.snippet.type(),
+                defaultDatabase: self.snippet.database()
+              }, function (path) {
+                token.qualifiedIdentifier = path.join('.');
+                var AceRange = ace.require('ace/range').Range;
+                var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
+                var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
+                self.editor.session.$backMarkers[markerId].token = token;
+              })
             }
           }
         });
@@ -4238,7 +4253,12 @@
                 tooltipTimeout = window.setTimeout(function () {
                   // TODO: i18n
                   if (token.notFound) {
-                    var tooltipText = 'Could not find ' + (token.qualifiedIdentifier || token.value) + '';
+                    var tooltipText;
+                    if (token.syntaxError.expected.length > 0) {
+                      tooltipText = SyntaxCheckerGlobals.i18n.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                    } else {
+                      tooltipText = SyntaxCheckerGlobals.i18n.couldNotFind + ' "' + (token.qualifiedIdentifier || token.value) + '"';
+                    }
                     var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
                     contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                   }
