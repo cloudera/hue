@@ -1580,7 +1580,31 @@ var SqlParseSupport = (function () {
 
     var IGNORED_EXPECTED = {
       ';': true,
-      'EOF': true
+      'EOF': true,
+      'UNSIGNED_INTEGER': true,
+      'UNSIGNED_INTEGER_E': true,
+      'REGULAR_IDENTIFIER': true, // TODO: Indicate that an identifier was expected
+      'CURSOR': true,
+      'PARTIAL_CURSOR': true,
+      'HDFS_START_QUOTE': true,
+      'HDFS_PATH': true,
+      'HDFS_END_QUOTE' : true,
+      'COMPARISON_OPERATOR': true, // TODO: Expand in results when found
+      'ARITHMETIC_OPERATOR' : true, // TODO: Expand in results when found
+      'VARIABLE_REFERENCE': true,
+      'BACKTICK': true,
+      'VALUE': true,
+      'PARTIAL_VALUE': true,
+      'SINGLE_QUOTE': true,
+      'DOUBLE_QUOTE': true
+    };
+
+    var CLEAN_EXPECTED = {
+      'BETWEEN_AND': 'AND',
+      'OVERWRITE_DIRECTORY' : 'OVERWRITE',
+      'STORED_AS_DIRECTORIES' : 'STORED',
+      'LIKE_PARQUET' : 'LIKE',
+      'PARTITION_VALUE' : 'PARTITION'
     };
 
     parser.parseSyntax = function (beforeCursor, afterCursor, dialect, debug) {
@@ -1632,18 +1656,21 @@ var SqlParseSupport = (function () {
           parser.yy.error.expectedStatementEnd = true;
           return parser.yy.error;
         }
-        parser.yy.error.expected.forEach(function (expected) {
+        for (var i = 0; i < parser.yy.error.expected.length; i++) {
+          var expected = parser.yy.error.expected[i];
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
           // TODO: Only suggest alphanumeric?
           if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
-            var text = null;
-            if (expected.length > 0 && expected.indexOf('<') !== 0) {
-              text = isLowerCase ? expected.toLowerCase() : expected;
-            } else if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
-              var dialectTrimmed = expected.substring(dialect.length + 2);
-              text = isLowerCase ? dialectTrimmed.toLowerCase() : dialectTrimmed;
+            if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
+              expected = expected.substring(dialect.length + 2);
             }
+            expected = CLEAN_EXPECTED[expected] || expected;
+            if (expected === parser.yy.error.text.toUpperCase()) {
+              // Can happen when the lexer entry for a rule contains multiple words like 'stored' in 'stored as parquet'
+              return false;
+            }
+            var text = isLowerCase ? expected.toLowerCase() : expected;
             if (text && !addedExpected[text]) {
               addedExpected[text] = true;
               weightedExpected.push({
@@ -1652,7 +1679,7 @@ var SqlParseSupport = (function () {
               });
             }
           }
-        });
+        }
         if (weightedExpected.length === 0) {
           return false; // Don't mark it as an error if there are not suggestions
         }
