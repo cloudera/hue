@@ -379,7 +379,7 @@ class Workflow(Job):
     for param in find_dollar_braced_variables(self.name):
       params.add(param)
 
-    if self.sla_enabled:
+    if self.has_some_slas:
       for param in find_json_parameters(self.sla):
         params.add(param)
 

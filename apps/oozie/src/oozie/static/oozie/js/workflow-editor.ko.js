@@ -1176,7 +1176,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.save = function () {
     if (! self.isSaving()) {
       self.isSaving(true);
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       $.post("/oozie/editor/workflow/save/", {
         "layout": ko.mapping.toJSON(self.oozieColumns),
         "workflow": ko.mapping.toJSON(self.workflow)
@@ -1225,7 +1225,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.showSubmitPopup = function () {
-    $(".jHueNotify").hide();
+    $(".jHueNotify").remove();
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
       format: IS_HUE_4 ? 'json' : 'html'
     }, function (data) {
@@ -1236,7 +1236,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
 
   self.showSubmitActionPopup = function (w) {
-    $(".jHueNotify").hide();
+    $(".jHueNotify").remove();
     $.get("/oozie/editor/workflow/submit_single_action/" + self.workflow.id() + "/" + self.workflow.getNodeById(w.id()).id(), {
       format: IS_HUE_4 ? 'json' : 'html'
     }, function (data) {

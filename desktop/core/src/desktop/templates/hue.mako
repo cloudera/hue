@@ -59,8 +59,9 @@
   <script type="text/javascript">
     var IS_HUE_4 = true;
   </script>
-
+  % if not conf.DJANGO_DEBUG_MODE.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
+  % endif
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
 </head>
 
@@ -144,7 +145,7 @@ ${ hueIcons.symbols() }
               </a>
             <!-- /ko -->
             <!-- ko if: item.href -->
-              <a data-bind="hueLink: item.href, text: item.displayName"></a>
+              <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
             <!-- /ko -->
             <!-- ko if: item.isCategory -->
             <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
@@ -656,14 +657,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         huePubSub.subscribe('open.editor.new.query', function (statementOptions) {
-          self.loadApp('editor');
+          self.loadApp('editor'); // Should open in Default
 
           self.getActiveAppViewModel(function (viewModel) {
             var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL
             viewModel.newNotebook(editorType, function() {
-              self.changeEditorType(statementOptions['statementType'] || editorType);
+              self.changeEditorType(editorType);
 
               if (statementOptions['statementPath']) {
+                viewModel.selectedNotebook().snippets()[0].statementType(statementOptions['statementType']);
                 viewModel.selectedNotebook().snippets()[0].statementPath(statementOptions['statementPath']);
               }
               if (statementOptions['directoryUuid']) {

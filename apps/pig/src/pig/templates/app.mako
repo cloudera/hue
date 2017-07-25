@@ -107,7 +107,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
               <div data-bind="css: {hueCheckbox: true, 'fa': true, 'fa-check': selected}"></div>
             </td>
             <td data-bind="click: $root.confirmViewScript">
-              <strong><a href="#" data-bind="click: $root.confirmViewScript, text: name"></a></strong>
+              <strong><a data-bind="click: $root.confirmViewScript, text: name, attr: { href: '#edit/' + id() }"></a></strong>
             </td>
             <td data-bind="click: $root.confirmViewScript">
               <span data-bind="text: scriptSumup"></span>

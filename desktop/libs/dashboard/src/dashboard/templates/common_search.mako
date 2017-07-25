@@ -100,7 +100,7 @@ from desktop.views import commonheader, commonfooter, _ko
     <!-- /ko -->
   </div>
 
-  <form data-bind="visible: $root.isEditing() && columns().length == 0">
+  <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select one') }
     <!-- ko if: $root.initial.engines().length > 1 -->
       <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
@@ -3608,11 +3608,8 @@ $(document).ready(function () {
       addFacetDemiModalFieldCancel();
     }
   });
-
+  $(document).off("shownAnalysis");
   $(document).on("shownAnalysis", function (e, originalEvent) {
-    var _fieldElement = $(".field-selector").filter(function () {
-      return $(this).text().toLowerCase() === searchViewModel.fieldAnalysesName().toLowerCase();
-    }).parent();
     if (originalEvent.pageX == null && originalEvent.clientX != null) {
       var doc = document.documentElement, body = document.body;
       originalEvent.pageX = originalEvent.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);

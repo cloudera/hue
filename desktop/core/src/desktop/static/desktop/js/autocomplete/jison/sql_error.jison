@@ -81,8 +81,8 @@ ErrorList
  ;
 
 LateralView
- : '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction RegularOrBacktickedIdentifier '<hive>AS' error  -> { }
- | '<hive>LATERAL' '<hive>VIEW' OptionalOuter UserDefinedFunction error                                           -> { }
+ : '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction RegularOrBacktickedIdentifier '<hive>AS' error  -> { }
+ | '<hive>LATERAL' '<hive>VIEW' OptionalOuter ArbitraryFunction error                                           -> { }
  | '<hive>LATERAL' '<hive>VIEW' OptionalOuter error                                                               -> { }
  | '<hive>LATERAL' error                                                                                          -> { }
  ;

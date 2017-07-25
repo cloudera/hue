@@ -1160,7 +1160,7 @@ var EditorViewModel = (function() {
       };
       $(document).trigger("executeStarted", {vm: vm, snippet: self});
       self.lastExecuted(now);
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       hueAnalytics.log('notebook', 'execute/' + self.type());
 
       if (self.result.fetchedOnce()) {
@@ -1281,7 +1281,7 @@ var EditorViewModel = (function() {
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        if (self.statusForButtons() != 'canceled') { // No error when manually canceled
+        if (self.statusForButtons() != 'canceled' && xhr.status !== 502) { // No error when manually canceled
           $(document).trigger("error", xhr.responseText);
         }
         self.status('failed');
@@ -1411,7 +1411,9 @@ var EditorViewModel = (function() {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        if (xhr.status !== 502) {
+          $(document).trigger("error", xhr.responseText);
+        }
       }).always(function () {
         self.compatibilityCheckRunning(false);
       });
@@ -1448,7 +1450,9 @@ var EditorViewModel = (function() {
               $(document).trigger("renderDataError", {snippet: self});
             }
           }, 'text').fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
+            if (xhr.status !== 502) {
+              $(document).trigger("error", xhr.responseText);
+            }
           }).always(function () {
             self.isFetchingData = false;
           });
@@ -1520,7 +1524,9 @@ var EditorViewModel = (function() {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        if (xhr.status !== 502) {
+          $(document).trigger("error", xhr.responseText);
+        }
         self.status('failed');
       });
     };
@@ -1610,7 +1616,9 @@ var EditorViewModel = (function() {
           }
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText || textStatus);
+        if (xhr.status !== 502) {
+          $(document).trigger("error", xhr.responseText || textStatus);
+        }
         self.status('failed');
       });
     };
@@ -1646,7 +1654,9 @@ var EditorViewModel = (function() {
             self._ajaxError(data);
           }
         }).fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
+          if (xhr.status !== 502) {
+            $(document).trigger("error", xhr.responseText);
+          }
           self.statusForButtons('canceled');
           self.status('failed');
         }).always(function (){
@@ -1671,7 +1681,9 @@ var EditorViewModel = (function() {
           self._ajaxError(data);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        if (xhr.status !== 502) {
+          $(document).trigger("error", xhr.responseText);
+        }
         self.status('failed');
       });
     };
@@ -1735,7 +1747,9 @@ var EditorViewModel = (function() {
           self._ajaxError(data);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText || textStatus);
+        if (xhr.status !== 502) {
+          $(document).trigger("error", xhr.responseText || textStatus);
+        }
         self.status('failed');
       });
     };
@@ -2076,7 +2090,9 @@ var EditorViewModel = (function() {
           fail(data.message);
         }
       }).fail(function (xhr) {
-        fail(xhr.responseText);
+        if (xhr.status !== 502) {
+          fail(xhr.responseText);
+        }
       }).complete(function(xhr, status) {
         self.creatingSessionLocks.remove(session.type());
       })
@@ -2198,7 +2214,9 @@ var EditorViewModel = (function() {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        if (xhr.status !== 502) {
+          $(document).trigger("error", xhr.responseText);
+        }
       });
     };
 
@@ -2265,7 +2283,7 @@ var EditorViewModel = (function() {
           callback();
         }
       }).fail(function (xhr) {
-        if (! silent) {
+        if (!silent && xhr.status !== 502) {
           $(document).trigger("error", xhr.responseText);
         }
       });
@@ -2394,7 +2412,9 @@ var EditorViewModel = (function() {
           }
         }
       }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
+        if (xhr.status !== 502) {
+          $(document).trigger("error", xhr.responseText);
+        }
       });
       $(document).trigger("hideHistoryModal");
     };
@@ -2456,7 +2476,9 @@ var EditorViewModel = (function() {
 
             }
           }).fail(function (xhr) {
-            $(document).trigger("error", xhr.responseText);
+            if (xhr.status !== 502) {
+              $(document).trigger("error", xhr.responseText);
+            }
           });
         }
 
@@ -2487,7 +2509,9 @@ var EditorViewModel = (function() {
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        if (xhr.status !== 502) {
+          $(document).trigger("error", xhr.responseText);
+        }
       });
     };
 

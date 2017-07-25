@@ -276,7 +276,7 @@ var SentryViewModel = (function () {
     }
 
     self.saveGroups = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       $.post("/security/api/sentry/update_role_groups", {
         role: ko.mapping.toJSON(self),
         component: vm.component()
@@ -296,7 +296,7 @@ var SentryViewModel = (function () {
     }
 
     self.create = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       if (self.isValid()) {
         $.post("/security/api/sentry/create_role", {
           role: ko.mapping.toJSON(self),
@@ -321,7 +321,7 @@ var SentryViewModel = (function () {
     }
 
     self.update = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       if (self.isValid()) {
         $.post("/security/api/sentry/save_privileges", {
           role: ko.mapping.toJSON(self),
@@ -342,7 +342,7 @@ var SentryViewModel = (function () {
     }
 
     self.remove = function (role) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       $.post("/security/api/sentry/drop_sentry_role", {
         roleName: role.name,
         component: vm.component()
@@ -360,7 +360,7 @@ var SentryViewModel = (function () {
     }
 
     self.savePrivileges = function (role) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       $.post("/security/api/sentry/save_privileges", {
         role: ko.mapping.toJSON(role),
         component: vm.component()
@@ -1170,7 +1170,7 @@ var SentryViewModel = (function () {
     }
 
     self.grant_privilege = function () {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       $.ajax({
         type: "POST",
         url: "/security/api/sentry/grant_privilege",
@@ -1289,7 +1289,7 @@ var SentryViewModel = (function () {
     }
 
     self.bulk_delete_privileges = function (norefresh) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       var checkedPaths = self.assist.checkedItems();
       $.post("/security/api/sentry/bulk_delete_privileges", {
         'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
@@ -1311,7 +1311,7 @@ var SentryViewModel = (function () {
     }
 
     self.bulk_add_privileges = function (role) {
-      $(".jHueNotify").hide();
+      $(".jHueNotify").remove();
       var checkedPaths = self.assist.checkedItems();
       $.post("/security/api/sentry/bulk_add_privileges", {
         'privileges': ko.mapping.toJSON(self.assist.privileges),

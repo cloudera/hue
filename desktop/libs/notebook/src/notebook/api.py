@@ -31,6 +31,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
+from notebook.connectors.dataeng import DataEngApi
 from notebook.connectors.hiveserver2 import HS2Api
 from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
@@ -303,7 +304,7 @@ def get_logs(request):
   response['logs'] = logs.strip()
   response['progress'] = min(db.progress(snippet, full_log), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
-  response['isFullLogs'] = isinstance(db, OozieApi)
+  response['isFullLogs'] = isinstance(db, (OozieApi, DataEngApi))
   response['status'] = 0
 
   return JsonResponse(response)

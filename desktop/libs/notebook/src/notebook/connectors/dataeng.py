@@ -50,7 +50,7 @@ def _exec(args):
   return response
 
 DATE_FORMAT = "%Y-%m-%d"
-RUNNING_STATES = ('QUEUED', 'RUNNING')
+RUNNING_STATES = ('QUEUED', 'RUNNING', 'SUBMITTING')
 
 
 class DataEngApi(Api):
@@ -106,7 +106,7 @@ class DataEngApi(Api):
   def cancel(self, notebook, snippet):
     if snippet['result']['handle'].get('id'):
       job_id = snippet['result']['handle']['id']
-      DataEng(self.user).terminate_jobs(job_ids=[job_id])
+      DataEng(self.user).terminate_job(job_id=job_id)
       response = {'status': 0}
     else:
       response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submition.')}
@@ -205,8 +205,8 @@ class DataEng():
   def submit_jobs(self, cluster_name, jobs):
     return _exec(['submit-jobs', '--cluster-name', cluster_name, '--jobs', json.dumps(jobs)])
 
-  def terminate_jobs(self, job_ids):
-    return _exec(['terminate-jobs', '--job-ids', job_ids])
+  def terminate_job(self, job_id):
+    return _exec(['terminate-job', '--job-id', job_id])
 
 
   def list_clusters(self, names=None, page_size=None, starting_token=None):
