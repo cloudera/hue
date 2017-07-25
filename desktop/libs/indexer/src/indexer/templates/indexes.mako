@@ -699,6 +699,7 @@ ${ assist.assistPanel() }
         self.section('list-indexes');
         self.index(null);
         hueUtils.changeURL(self.baseURL);
+        self.fetchIndexes();
       }
 
       self.fetchIndexes = function (callback) {
