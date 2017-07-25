@@ -302,7 +302,7 @@ ${ assist.assistPanel() }
 
     <div class="tab-pane" id="index-columns">
       <!-- ko if: $root.tab() == 'index-columns' -->
-        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a field...') }" data-bind="clearable: $root.columnFilter, value: $root.columnFilter, valueUpdate: 'afterkeydown'"/>
+        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a field...') }" data-bind="clearable: $root.fieldFilter, value: $root.fieldFilter, valueUpdate: 'afterkeydown'"/>
         <div class="margin-top-10">
         <!-- ko template: 'indexes-index-fields' --><!-- /ko -->
         </div>
@@ -356,8 +356,7 @@ ${ assist.assistPanel() }
       <thead>
         <tr>
           <th style="width: 1%">&nbsp;</th>
-          <th width="1%"></th>
-          <th></th>
+          <th style="width: 2%"></th>
           <th>${ _('Name') }</th>
           <th>${ _('Type') }</th>
           <th>${ _('Required') }</th>
@@ -371,9 +370,6 @@ ${ assist.assistPanel() }
           <td data-bind="text: $index() + 1"></td>
           <td>
             <i class="fa fa-info muted pointer analysis"></i>
-          </td>
-          <td>
-            <div></div>
           </td>
           <td data-bind="text: name"></td>
           <td data-bind="text: type"></td>
@@ -390,7 +386,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="indexes-index-fields">
   <div>
-    <!-- ko template: { name: 'indexes-index-fields-fields', data: fields }--><!-- /ko -->
+    <!-- ko template: { name: 'indexes-index-fields-fields', data: filteredFields }--><!-- /ko -->
 
     <h4>${ _('Copy Fields') }</h4>
     <span data-bind="text: ko.mapping.toJSON(copyFields)"></span>
@@ -482,6 +478,16 @@ ${ assist.assistPanel() }
       self.fieldsPreview = ko.pureComputed(function () {
         return self.fields().splice(0, 5)
       });
+      self.filteredFields = ko.computed(function () {
+        var returned = self.fields();
+        if (vm.fieldFilter() !== '') {
+          returned = $.grep(self.fields(), function (fld) {
+            return fld.name().toLowerCase().indexOf(vm.fieldFilter().toLowerCase()) > -1;
+          });
+        }
+        return returned;
+      });
+
       self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
       self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
 
@@ -607,13 +613,13 @@ ${ assist.assistPanel() }
       self.index = ko.observable();
 
       self.indexFilter = ko.observable('');
-      self.columnFilter = ko.observable('');
+      self.fieldFilter = ko.observable('');
 
       self.filteredIndexes = ko.computed(function () {
         var returned = self.indexes();
         if (self.indexFilter() !== '') {
           returned = $.grep(self.indexes(), function (idx) {
-            return idx.name().toLowerCase().indexOf(self.indexFilter()) > -1;
+            return idx.name().toLowerCase().indexOf(self.indexFilter().toLowerCase()) > -1;
           });
         }
         return returned;
