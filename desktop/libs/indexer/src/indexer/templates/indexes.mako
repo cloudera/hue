@@ -492,6 +492,7 @@ ${ assist.assistPanel() }
         }, function (data) {
           if (data.status == 0) {
             vm.indexes.push(ko.mapping.fromJS(data.alias));
+            huePubSub.publish('assist.collections.refresh');
           } else {
             $(document).trigger("error", data.message);
           }
@@ -565,6 +566,7 @@ ${ assist.assistPanel() }
         }, function (data) {
           if (data.status == 0) {
             vm.indexes.remove(function(index) { return index.name() == indexName; });
+            huePubSub.publish('assist.collections.refresh');
           } else {
             $(document).trigger("error", data.message);
           }
@@ -762,6 +764,7 @@ ${ assist.assistPanel() }
         }, function (data) {
           if (data.status == 0) {
             self.indexes.removeAll(self.selectedIndexes());
+            huePubSub.publish('assist.collections.refresh');
           } else {
             $(document).trigger("error", data.message);
           }
