@@ -302,8 +302,10 @@ ${ assist.assistPanel() }
 
     <div class="tab-pane" id="index-columns">
       <!-- ko if: $root.tab() == 'index-columns' -->
-        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a column...') }" data-bind="clearable: $root.columnFilter, value: $root.columnFilter, valueUpdate: 'afterkeydown'"/>
+        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a field...') }" data-bind="clearable: $root.columnFilter, value: $root.columnFilter, valueUpdate: 'afterkeydown'"/>
+        <div class="margin-top-10">
         <!-- ko template: 'indexes-index-fields' --><!-- /ko -->
+        </div>
       <!-- /ko -->
     </div>
 
@@ -317,13 +319,15 @@ ${ assist.assistPanel() }
 <script type="text/html" id="indexes-index-overview">
   <div>
     <!-- ko template: 'indexes-index-properties' --><!-- /ko -->
-
+    <h4>${ _('Fields') }</h4>
     <!-- ko template: { name: 'indexes-index-fields-fields', data: fieldsPreview }--><!-- /ko -->
     <a class="pointer" data-bind="visible: fields().length > fieldsPreview().length, click: function() { $('li a[href=\'#index-columns\']').click(); }">
       ${_('View more...')}
     </a>
 
     <br><br>
+
+    <h4>${ _('Sample') }</h4>
 
     <div style="overflow: auto">
       <!-- ko template: { name: 'indexes-index-sample', data: samplePreview, full: false }--><!-- /ko -->
@@ -348,8 +352,6 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="indexes-index-fields-fields">
   <div>
-    <h4>${ _('Fields') }</h4>
-
     <table class="table table-condensed table-nowrap">
       <thead>
         <tr>
