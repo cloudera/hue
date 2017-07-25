@@ -1017,7 +1017,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.sortBy = ko.observable("name");
       self.sortDescending = ko.observable(false);
       self.searchQuery = ko.observable("");
-      self.searchQuery.extend({ rateLimit: 500 });
       self.skipTrash = ko.observable(false);
       self.enableFilterAfterSearch = true;
       self.isCurrentDirSentryManaged = ko.observable(false);
