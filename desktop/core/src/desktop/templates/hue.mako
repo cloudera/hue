@@ -591,6 +591,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
           'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
           'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
+          % if ENABLE_NEW_INDEXER.get():
+            'indexes',
+          % endif
           % if other_apps:
             % for other in other_apps:
               '${ other.display_name }',
