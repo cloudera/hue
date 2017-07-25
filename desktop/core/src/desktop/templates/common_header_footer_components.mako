@@ -102,7 +102,8 @@ from metadata.conf import has_optimizer, OPTIMIZER
       i18n: {
         didYouMean: '${_('Did you mean')}',
         expectedStatementEnd: '${_('Expected end of statement')}',
-        suppressError: '${_('Ignore this type of error')}'
+        suppressError: '${_('Ignore this type of error')}',
+        couldNotFind: '${_('Could not find')}'
       }
     };
 
