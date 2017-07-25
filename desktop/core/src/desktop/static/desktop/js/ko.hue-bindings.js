@@ -2420,6 +2420,18 @@
             valueObservable($element.val());
           });
         }
+
+        if (allBindingsAccessor()['valueUpdateDelay'] != null) {
+          var _timeout = -1;
+          $element.on("keyup", function (e) {
+            if (!([13, 37, 38, 39, 40].indexOf(e.keyCode) > -1)) {
+              window.clearTimeout(_timeout);
+              _timeout = window.setTimeout(function () {
+                valueObservable($element.val());
+              }, allBindingsAccessor()['valueUpdateDelay']);
+            }
+          });
+        }
       }
 
     },
