@@ -2044,7 +2044,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               var tables = Object.values(activeTableIndex);
               tables.sort(function (a, b) {
                 return a.definition.name.localeCompare(b.definition.name);
-              })
+              });
               self.activeTables(tables);
             }
           }
@@ -2055,8 +2055,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         var activeLocationsSub = huePubSub.subscribe('editor.active.locations', handleLocationUpdate);
 
-        var activeRisksSub = huePubSub.subscribe('editor.active.risks', function (activeRisks) {
-          self.activeRisks(activeRisks);
+        var activeRisksSub = huePubSub.subscribe('editor.active.risks', self.activeRisks);
+
+        huePubSub.publish('editor.get.active.risks', function (risks) {
+          self.activeRisks(risks || {});
         });
 
         self.disposals.push(function () {
@@ -2226,6 +2228,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.lastActiveTab = apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), ASSISTANT_TAB);
 
         var assistEnabledApp = false;
+
+        huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
+          if (self.assistantTabAvailable() && self.activeTab() !== ASSISTANT_TAB) {
+            self.activeTab(ASSISTANT_TAB);
+          }
+        });
 
         var updateTabs = function () {
           if (!assistEnabledApp) {

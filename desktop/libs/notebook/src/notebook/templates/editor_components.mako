@@ -1037,43 +1037,25 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- /ko -->
     <!-- ko if: ! hasSuggestion() && topRisk() -->
       <!-- ko if: topRisk().risk === 'low' -->
-        <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <div class="round-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some low risks were detected, see the assistant for details.') }">
           <i class="fa fa-check"></i>
         </div>
-        <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-info alert-neutral">
-          ${ _('Some low risks were detected.') }
-        </span>
-        <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: topRisk().risk == 'medium' -->
-        <div class="round-icon warning" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <div class="round-icon warning" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some medium risks were detected, see the assistant for details.') }">
           <i class="fa fa-exclamation"></i>
         </div>
-        <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-warning alert-neutral">
-          ${ _('Some medium risks were detected.') }
-        </span>
-        <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: topRisk().risk == 'high' -->
-        <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <div class="round-icon error" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some high risks were detected, see the assistant for details.') }">
           <i class="fa fa-exclamation"></i>
         </div>
-        <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-error alert-neutral">
-          ${ _('Some high risks were detected.') }
-        </span>
-        <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: hasSuggestion() == '' && ! topRisk() -->
-      <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+      <div class="round-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Query validated, no issues found.') }">
         <i class="fa fa-check"></i>
       </div>
-      <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
-      <!-- /ko -->
     <!-- /ko -->
   </div>
   <!-- /ko -->
@@ -3502,6 +3484,22 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           }
         }
       }, HUE_PUB_SUB_EDITOR_ID);
+
+      huePubSub.subscribe('editor.get.active.risks', function (callback) {
+        if (viewModel.selectedNotebook()) {
+          if (viewModel.selectedNotebook().snippets().length === 1) {
+            callback(viewModel.selectedNotebook().snippets()[0].complexity());
+          } else {
+            viewModel.selectedNotebook().snippets().every(function (snippet) {
+              if (snippet.inFocus()) {
+                callback(snippet.complexity());
+                return false;
+              }
+              return true;
+            });
+          }
+        }
+      });
 
       $(document).on("gridShown", function (e, snippet) {
         window.setTimeout(function () {
