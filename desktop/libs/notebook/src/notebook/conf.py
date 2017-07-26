@@ -148,6 +148,12 @@ ENABLE_BATCH_EXECUTE = Config(
   dynamic_default=is_oozie_enabled
 )
 
+ENABLE_SQL_INDEXER = Config(
+  key="enable_sql_indexer",
+  help=_t("Flag to turn on the SQL indexer."),
+  type=bool,
+  default=False
+)
 
 def _default_interpreters(user):
   interpreters = []
