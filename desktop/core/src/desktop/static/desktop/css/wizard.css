@@ -48,22 +48,6 @@
   width: 1%;
 }
 
-.step-indicator li:before {
-  background-color: #dddddd;
-  content: "";
-  display: block;
-  height: 1px;
-  position: relative;
-  top: 18px;
-}
-
-.step-indicator li:first-child:before {
-  /*left: 50%;*/
-}
-
-.step-indicator li:last-child:before {
-  /*right: 50%;*/
-}
 
 .step-indicator .active .step {
   border-color: #0B7FAD;

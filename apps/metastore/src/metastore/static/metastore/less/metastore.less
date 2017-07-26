@@ -17,6 +17,7 @@
 */
 
 @import (reference) "hue-mixins.less";
+@import (reference) "hue-helpers.less";
 
 .divider {
   padding-left: 12px;
@@ -85,13 +86,7 @@ h2.card-heading {
 
 .empty-header-col,
 .metastore-main h4 {
-  font-weight: bold;
-  color: #999;
-  font-size: 14px;
-  text-transform: uppercase;
-  padding-left: 4px;
-  border-bottom: 1px solid #DDD;
-  padding-bottom: 3px;
+  .section-h4-border;
 }
 
 .tile {
