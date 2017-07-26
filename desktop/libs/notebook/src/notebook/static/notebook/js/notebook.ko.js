@@ -2727,6 +2727,12 @@ var EditorViewModel = (function() {
     self.isRightPanelVisible = ko.observable();
     ApiHelper.getInstance().withTotalStorage('assist', 'right_assist_panel_visible', self.isRightPanelVisible, true);
 
+    huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
+      if (self.isRightPanelAvailable() && !self.isRightPanelVisible()) {
+        self.isRightPanelVisible(true);
+      }
+    });
+
     self.isContextPanelVisible = ko.observable(false);
     self.isContextPanelVisible.subscribe(function (newValue) {
       huePubSub.publish('context.panel.visible', newValue);
