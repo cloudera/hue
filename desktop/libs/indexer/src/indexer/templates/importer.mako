@@ -1453,7 +1453,10 @@ ${ assist.assistPanel() }
       self.indexingStarted = ko.observable(false);
 
       self.isValidDestination = ko.pureComputed(function() {
-         return self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name()));
+         return self.destination.name().length > 0 && (
+           (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
+           (['index'].indexOf(self.destination.outputFormat()) == -1 || /^[^\\/:]+$/.test(self.destination.name()))
+         );
       });
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
