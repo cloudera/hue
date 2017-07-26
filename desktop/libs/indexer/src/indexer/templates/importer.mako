@@ -21,6 +21,7 @@
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
   from indexer.conf import ENABLE_NEW_INDEXER, CONFIG_INDEXER_LIBS_PATH
+  from notebook.conf import ENABLE_SQL_INDEXER
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -1045,7 +1046,7 @@ ${ assist.assistPanel() }
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
           {'value': 'manual', 'name': 'Manually'},
-          % if ENABLE_NEW_INDEXER.get():
+          % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
           {'value': 'table', 'name': 'Table'},
           % endif
