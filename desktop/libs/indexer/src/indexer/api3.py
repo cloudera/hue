@@ -175,11 +175,18 @@ def importer_submit(request):
         raise PopupException(_('File size is too large to handle!'))
 
       indexer = MorphlineIndexer(request.user, request.fs)
-      fields = indexer.get_kept_field_list(source['columns'])
+      fields = indexer.get_kept_field_list(destination['columns'])
+      kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
+
       if not unique_key_field:
         unique_key_field = 'hue_id'
         fields += [{"name": unique_key_field, "type": "string"}]
         kwargs['rowid'] = unique_key_field
+
+      if not destination['hasHeader']:
+        kwargs['header'] = 'false'
+      else:
+        kwargs['skipLines'] = 1
 
       if not client.exists(index_name):
         client.create_index(
