@@ -180,9 +180,10 @@ def _create_index(user, fs, client, source, destination, index_name):
   df = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
   kwargs = {}
 
-  stats = fs.stats(source["path"])
-  if stats.size > MAX_UPLOAD_SIZE:
-    raise PopupException(_('File size is too large to handle!'))
+  if source['inputFormat'] != 'manual':
+    stats = fs.stats(source["path"])
+    if stats.size > MAX_UPLOAD_SIZE:
+      raise PopupException(_('File size is too large to handle!'))
 
   indexer = MorphlineIndexer(user, fs)
   fields = indexer.get_field_list(destination['columns'])
@@ -211,8 +212,9 @@ def _create_index(user, fs, client, source, destination, index_name):
         df=df
     )
 
-  data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
-  client.index(name=index_name, data=data, **kwargs)
+  if source['inputFormat'] != 'manual':
+    data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
+    client.index(name=index_name, data=data, **kwargs)
 
   return {'status': 0, 'on_success_url': reverse('search:browse', kwargs={'name': index_name})}
 
