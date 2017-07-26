@@ -466,6 +466,7 @@ class JsonResponse(HttpResponse):
       ``django.core.serializers.json.DjangoJSONEncoder``.
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
       to ``True``.
+    :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
     """
 
     def __init__(self, data, encoder=DjangoJSONEncoder, safe=True,
