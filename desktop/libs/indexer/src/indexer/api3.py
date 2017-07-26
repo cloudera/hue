@@ -166,46 +166,50 @@ def importer_submit(request):
       job_handle = _index(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'])
     else:
       client = SolrClient(request.user)
-      unique_key_field = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
-      df = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
-      kwargs = {}
-
-      stats = request.fs.stats(source["path"])
-      if stats.size > MAX_UPLOAD_SIZE:
-        raise PopupException(_('File size is too large to handle!'))
-
-      indexer = MorphlineIndexer(request.user, request.fs)
-      fields = indexer.get_kept_field_list(destination['columns'])
-      kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
-
-      if not unique_key_field:
-        unique_key_field = 'hue_id'
-        fields += [{"name": unique_key_field, "type": "string"}]
-        kwargs['rowid'] = unique_key_field
-
-      if not destination['hasHeader']:
-        kwargs['header'] = 'false'
-      else:
-        kwargs['skipLines'] = 1
-
-      if not client.exists(index_name):
-        client.create_index(
-            name=index_name,
-            fields=fields,
-            unique_key_field=unique_key_field,
-            df=df
-        )
-
-      data = request.fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
-      client.index(name=index_name, data=data, **kwargs)
-
-      job_handle = {'status': 0, 'on_success_url': reverse('search:browse', kwargs={'name': index_name})}
+      job_handle = _create_index(request.user, request.fs, client, source, destination, index_name)
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
   else:
     job_handle = _create_table(request, source, destination, start_time)
 
   return JsonResponse(job_handle)
+
+
+def _create_index(user, fs, client, source, destination, index_name):
+  unique_key_field = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
+  df = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
+  kwargs = {}
+
+  stats = fs.stats(source["path"])
+  if stats.size > MAX_UPLOAD_SIZE:
+    raise PopupException(_('File size is too large to handle!'))
+
+  indexer = MorphlineIndexer(user, fs)
+  fields = indexer.get_kept_field_list(destination['columns'])
+  kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
+
+  if not unique_key_field:
+    unique_key_field = 'hue_id'
+    fields += [{"name": unique_key_field, "type": "string"}]
+    kwargs['rowid'] = unique_key_field
+
+  if not destination['hasHeader']:
+    kwargs['header'] = 'false'
+  else:
+    kwargs['skipLines'] = 1
+
+  if not client.exists(index_name):
+    client.create_index(
+        name=index_name,
+        fields=fields,
+        unique_key_field=unique_key_field,
+        df=df
+    )
+
+  data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
+  client.index(name=index_name, data=data, **kwargs)
+
+  return {'status': 0, 'on_success_url': reverse('search:browse', kwargs={'name': index_name})}
 
 
 def _create_database(request, source, destination, start_time):
