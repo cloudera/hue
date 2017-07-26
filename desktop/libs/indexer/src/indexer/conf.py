@@ -78,7 +78,7 @@ ENABLE_NEW_INDEXER = Config(
   key="enable_new_indexer",
   help=_t("Flag to turn on the new Solr indexer."),
   type=bool,
-  default=False
+  default=True
 )
 
 CONFIG_INDEXER_LIBS_PATH = Config(
