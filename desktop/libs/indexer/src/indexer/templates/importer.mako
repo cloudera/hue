@@ -474,7 +474,7 @@ ${ assist.assistPanel() }
         <h3 class="card-heading simple">${_('Destination')}</h3>
         <div class="card-body">
           <div class="control-group">
-            <label for="destinationType" class="control-label" data-bind="visible: $parent.createWizard.prefill.target_type().length == 0"><div>${ _('Type') }</div>
+            <label for="destinationType" class="control-label"><div>${ _('Type') }</div>
               <select id="destinationType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
           </div>
