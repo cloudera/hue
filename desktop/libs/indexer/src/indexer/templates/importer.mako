@@ -61,6 +61,7 @@ ${ assist.assistPanel() }
 %endif
 
 <link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
+<link rel="stylesheet" href="${ static('indexer/css/importer.css') }" type="text/css">
 
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -71,194 +72,9 @@ ${ assist.assistPanel() }
     top: 112px!important;
   }
 % endif
-  .path {
-    margin-bottom: 0!important;
-    border-right: none!important;
-  }
-
-  .step .card-heading.simple {
-    font-size: 17px;
-  }
-
-  .step .card-body {
-    margin-top: 14px;
-  }
-
-  .step label > div:first-child {
-    width: 120px;
-    text-align: right;
-    padding-right: 8px;
-    display: inline-block;
-    vertical-align: top;
-    padding-top: 6px;
-  }
-
-  .step label.checkbox {
-    margin-left: 130px;
-  }
-
-  .step .index-field label.checkbox {
-    margin-left: 5px;
-  }
-
-  .step .index-field label > div:first-child {
-    width: initial;
-  }
-
-  .step .field-properties label.checkbox {
-    margin-left: 10px;
-  }
-
-  .step label:not(.checkbox) {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  .step input[type='text'] {
-    margin-bottom: 0;
-  }
-
-  .step .selectize-control {
-    display: inline-block;
-    vertical-align: middle;
-    width: 578px !important;
-  }
-
-  .step .form-inline .selectize-control {
-    width: 120px !important;
-    margin-bottom: -8px;
-  }
-
-  .step .inline-labels {
-    display: table;
-  }
-
-  .step .inline-labels .selectize-control {
-    width: 120px !important;
-    vertical-align: -12px;
-  }
-
-  .step .selectize-input {
-    max-height: 31px;
-  }
-
-  .step .selectize-control.multi .selectize-input {
-    padding-top: 3px!important;
-  }
-
-  .step .show-edit-on-hover a {
-    opacity: 0;
-    -webkit-transition: opacity 0.2s linear;
-    -moz-transition: opacity 0.2s linear;
-    -ms-transition: opacity 0.2s linear;
-    -o-transition: opacity 0.2s linear;
-    transition: opacity 0.2s linear;
-  }
-
-  .step .show-edit-on-hover:hover a {
-    opacity: 1;
-  }
-
-  .step .show-edit-on-hover .inactive-action {
-    margin-left: 6px;
-    vertical-align: middle;
-  }
-
-  .step .fa-padding-top {
-    padding-top: 8px;
-  }
-
-  .kudu-partitions li {
-    width: 578px !important;
-    padding: 5px;
-  }
-
-  .kudu-partitions li:hover {
-    background-color: #F7F7F7;
-  }
-
-  .kudu-partitions .range-partition {
-    padding: 5px;
-  }
-
-  .kudu-partitions .range-partition:hover {
-    background-color: #F1F1F1;
-  }
-
-  .step .kudu-partitions li .selectize-control {
-    width: 100px !important;
-    vertical-align: top;
-  }
-
-  .field {
-    padding: 4px;
-    padding-left: 10px;
-    border-left: 4px solid #DBE8F1;
-  }
-
-  .operation {
-    border-left: 4px solid #EEE;
-    padding-left: 10px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    margin-left: 10px;
-  }
-
-  .field-content-preview {
-    width: 180px;
-    margin-left: 20px;
-  }
-
-  .table-preview {
-    margin:auto;
-    text-align:left;
-  }
-
-  .table-preview td, .table-preview th {
-    white-space: nowrap;
-  }
-
-  .content-panel {
-    overflow-x: hidden;
-  }
-
-  .content-panel-inner {
-    margin: 10px;
-    margin-bottom: 100px;
-  }
-
-  .form-control.path {
-    vertical-align: top;
-  }
-
-  .form-actions {
-    position: fixed;
-    bottom: 0;
-    margin: 0;
-    z-index: 1000;
-    border-top: 1px solid #e5e5e5;
-  }
-
-  #importerNotebook {
-    height: 5px;
-    float: right;
-  }
-
-  #importerNotebook .snippet-error-container  {
-    background: transparent;
-  }
-
-  .inline-table {
-    display: inline-table;
-  }
-
-  .columns-form {
-    margin-bottom: 200px;
-  }
-
 </style>
 
-<span id="importerComponents" class="notebook" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
+<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
 <div class="dz-message" data-dz-message></div>
 <div class="navbar hue-title-bar">
   <div class="navbar-inner">
@@ -374,7 +190,7 @@ ${ assist.assistPanel() }
 
     <!-- ko if: currentStep() == 1 -->
     <div class="card step">
-      <h3 class="card-heading simple">${_('Source')}</h3>
+      <h4>${_('Source')}</h4>
       <div class="card-body">
         <div>
           <div class="control-group" data-bind="visible: createWizard.prefill.target_type().length == 0 || createWizard.prefill.source_type() == 'all'">
@@ -416,10 +232,10 @@ ${ assist.assistPanel() }
     <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
     <div class="card step">
       <!-- ko if: createWizard.isGuessingFormat -->
-      <h3 class="card-heading simple">${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h3>
+      <h4>${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h4>
       <!-- /ko -->
       <!-- ko ifnot: createWizard.isGuessingFormat -->
-      <h3 class="card-heading simple">${_('Format')}</h3>
+      <h4>${_('Format')}</h4>
       <div class="card-body">
         <label data-bind="visible: createWizard.prefill.source_type().length == 0 && createWizard.source.inputFormat() != 'table'">
           <div>${_('File Type')}</div>
@@ -437,10 +253,10 @@ ${ assist.assistPanel() }
     <div class="card step" style="min-height: 310px;">
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <!-- ko if: createWizard.isGuessingFieldTypes -->
-      <h3 class="card-heading simple">${_('Generating preview...')} <i class="fa fa-spinner fa-spin"></i></h3>
+      <h4>${_('Generating preview...')} <i class="fa fa-spinner fa-spin"></i></h4>
       <!-- /ko -->
       <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
-      <h3 class="card-heading simple">${_('Preview')}</h3>
+      <h4>${_('Preview')}</h4>
       <div class="card-body">
         <div style="overflow: auto">
           <table class="table table-condensed table-preview">
@@ -471,7 +287,7 @@ ${ assist.assistPanel() }
       <!-- ko with: createWizard.destination -->
 
       <div class="card step">
-        <h3 class="card-heading simple">${_('Destination')}</h3>
+        <h4>${_('Destination')}</h4>
         <div class="card-body">
           <div class="control-group">
             <label for="destinationType" class="control-label"><div>${ _('Type') }</div>
@@ -509,7 +325,7 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'table' -->
         <div class="card step">
-          <h3 class="card-heading simple">${_('Properties')}</h3>
+          <h4>${_('Properties')}</h4>
           <div class="card-body">
             <div class="control-group">
               <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
@@ -651,7 +467,7 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'index' -->
         <div class="card step">
-          <h3 class="card-heading simple">${_('Properties')}</h3>
+          <h4>${_('Properties')}</h4>
           <div class="card-body">
             <div class="control-group">
               <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }">
@@ -721,7 +537,7 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
           <div class="card step">
-            <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
+            <h4 class="show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h4>
             <div class="card-body no-margin-top columns-form">
               <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
                 <form class="form-inline inline-table" data-bind="foreach: columns">
@@ -767,7 +583,7 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'database' -->
           <div class="card step">
-            <h3 class="card-heading simple">${_('Properties')}</h3>
+            <h4>${_('Properties')}</h4>
             <div class="card-body">
               <label><div>${ _('Description') }</div>
               <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
