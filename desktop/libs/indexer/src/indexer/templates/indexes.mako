@@ -398,6 +398,7 @@ ${ assist.assistPanel() }
   <div>
     <!-- ko template: { name: 'indexes-index-fields-fields', data: filteredFields }--><!-- /ko -->
 
+    <!-- ko if: copyFields() && copyFields().length > 0 -->
     <h4>${ _('Copy Fields') }</h4>
     <table class="table table-condensed table-nowrap sample-table">
       <thead>
@@ -415,9 +416,12 @@ ${ assist.assistPanel() }
         <!-- /ko -->
       </tbody>
     </table>
+    <!-- /ko -->
 
+    <!-- ko if: dynamicFields() && dynamicFields().length > 0 -->
     <h4>${ _('Dynamic Fields') }</h4>
     <!-- ko template: { name: 'indexes-index-fields-fields', data: dynamicFields }--><!-- /ko -->
+    <!-- /ko -->
   </div>
 </script>
 
