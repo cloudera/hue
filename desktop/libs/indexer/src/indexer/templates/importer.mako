@@ -717,7 +717,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="index-field-template">
   <label>${ _('Name') }&nbsp;
-    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
+    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name" pattern="^(?!_version_)[a-zA-Z_][a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters and not _version_') }">
   </label>
   <label class="margin-left-5">${ _('Type') }&nbsp;
     <select class="input-small" data-bind="browserAwareSelectize: $root.createWizard.fieldTypes, value: type"></select>
@@ -1472,8 +1472,12 @@ ${ assist.assistPanel() }
           self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
         );
+        var validIndexFields = self.destination.outputFormat() != 'index' || ($.grep(self.destination.columns(), function(column) {
+            return ! (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(column.name()) && column.name() != '_version_');
+          }).length == 0
+        );
 
-        return self.isValidDestination() && validFields && validTableColumns && isTargetAlreadyExisting && isValidTable;
+        return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable;
       });
 
       self.formatTypeSubscribed = false;
