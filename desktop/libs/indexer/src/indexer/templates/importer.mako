@@ -490,7 +490,7 @@ ${ assist.assistPanel() }
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
               <i class="fa fa-spinner fa-spin"></i>
             </span>
-            <span class="help-inline muted" data-bind="visible: ! $parent.createWizard.isValidDestination()">
+            <span class="help-inline muted" data-bind="visible: !$parent.createWizard.isValidDestination()">
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Empty name or invalid characters') }
             </span>
             <span class="help-inline muted" data-bind="visible: isTargetExisting()">
@@ -523,7 +523,7 @@ ${ assist.assistPanel() }
               </label>
             </div>
 
-            <div class="control-group" data-bind="visible: ! useDefaultLocation()">
+            <div class="control-group" data-bind="visible: !useDefaultLocation()">
               <label for="path" class="control-label"><div>${ _('External location') }</div>
                 <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
               </label>
@@ -540,7 +540,7 @@ ${ assist.assistPanel() }
             <span data-bind="visible: showProperties">
               <div class="control-group">
                 <label class="checkbox inline-block" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
-                  <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
+                  <input type="checkbox" data-bind="checked: importData, disable: !useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
                 </label>
               </div>
               <div class="control-group">
@@ -776,7 +776,7 @@ ${ assist.assistPanel() }
               <label class="checkbox">
                 <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
               </label>
-              <span data-bind="visible: ! useDefaultLocation()">
+              <span data-bind="visible: !useDefaultLocation()">
                 <label for="path" class="control-label"><div>${ _('External location') }</div>
                   <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
                 </label>
@@ -802,7 +802,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 2 -->
-        <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && ! createWizard.indexingStarted()">
+        <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
       <!-- /ko -->
@@ -842,7 +842,7 @@ ${ assist.assistPanel() }
     </label>
 
     <label class="margin-left-5">${ _('Type') }&nbsp;
-    <!-- ko if: ! (level() > 0 && $parent.type() == 'map') -->
+    <!-- ko if: !(level() > 0 && $parent.type() == 'map') -->
       <select class="input-small" data-bind="browserAwareSelectize: $root.createWizard.hiveFieldTypes, value: type"></select>
     <!-- /ko -->
     <!-- ko if: level() > 0 && $parent.type() == 'map' -->
@@ -1260,7 +1260,7 @@ ${ assist.assistPanel() }
         return self.inputFormat() == 'file' && /^s3a:\/\/.*$/.test(self.path());
       });
       self.isObjectStore.subscribe(function(newVal) {
-        vm.createWizard.destination.useDefaultLocation(! newVal);
+        vm.createWizard.destination.useDefaultLocation(!newVal);
       });
 
       // Table
@@ -1326,7 +1326,7 @@ ${ assist.assistPanel() }
           // Todo
           // self.path()
         }
-        else if (self.outputFormat() == 'table') {
+        else if (self.outputFormat() == 'table' && wizard.isValidDestination()) {
           if (self.tableName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
@@ -1343,7 +1343,7 @@ ${ assist.assistPanel() }
             self.isTargetChecking(false);
           }
         }
-        else if (self.outputFormat() == 'database') {
+        else if (self.outputFormat() == 'database' && wizard.isValidDestination()) {
           if (self.databaseName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
@@ -1634,7 +1634,7 @@ ${ assist.assistPanel() }
             return column.name().length == 0 || (self.source.inputFormat() != 'manual' && column.partitionValue().length == 0);
           }).length == 0
         );
-        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
+        var isTargetAlreadyExisting = !self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
         var isValidTable = self.destination.outputFormat() != 'table' || (
           self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
@@ -1723,7 +1723,7 @@ ${ assist.assistPanel() }
       self.indexingError = ko.observable(false);
       self.indexingSuccess = ko.observable(false);
       self.indexFile = function () {
-        if (! self.readyToIndex()) {
+        if (!self.readyToIndex()) {
           return;
         }
         $(".jHueNotify").remove();
@@ -1792,7 +1792,7 @@ ${ assist.assistPanel() }
                   self.indexingError(true);
                 } else if (val == 'available') {
                   var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
-                  if (! snippet.result.handle().has_more_statements) {
+                  if (!snippet.result.handle().has_more_statements) {
                     if (self.editorVM.selectedNotebook().onSuccessUrl()) {
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
@@ -1870,7 +1870,7 @@ ${ assist.assistPanel() }
     };
 
     var loadDefaultField = function (options) {
-      if (! options.name) {
+      if (!options.name) {
         options.name = getNewFieldName();
       }
       return loadField($.extend({}, ${default_field_type | n}, options));
