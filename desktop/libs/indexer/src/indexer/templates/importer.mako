@@ -484,7 +484,7 @@ ${ assist.assistPanel() }
           <h4>${_('Properties')}</h4>
           <div class="card-body">
             <div class="control-group">
-              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }">
+              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
                 <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
               </label>
 
@@ -562,6 +562,7 @@ ${ assist.assistPanel() }
                   <!-- /ko -->
 
                   <!-- ko if: $parent.outputFormat() == 'index' -->
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
                     <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block index-field"></div>
                     <div class="clearfix"></div>
                   <!-- /ko -->
@@ -569,7 +570,7 @@ ${ assist.assistPanel() }
 
                 <div class="clearfix"></div>
 
-                <!-- ko if: outputFormat() == 'table' -->
+                <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
                   <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
                 <!-- /ko -->
               <!-- /ko -->
@@ -1475,7 +1476,7 @@ ${ assist.assistPanel() }
         var validIndexFields = self.destination.outputFormat() != 'index' || ($.grep(self.destination.columns(), function(column) {
             return ! (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(column.name()) && column.name() != '_version_');
           }).length == 0
-        );
+        ) || self.destination.indexerConfigSet();
 
         return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable;
       });
