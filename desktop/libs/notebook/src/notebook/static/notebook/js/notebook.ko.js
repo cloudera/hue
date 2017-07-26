@@ -998,6 +998,12 @@ var EditorViewModel = (function() {
         self.complexity({});
         huePubSub.publish('editor.active.risks', {});
 
+        var changeSubscription = self.statement.subscribe(function () {
+          changeSubscription.dispose();
+          self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
+          self.complexityCheckRunning(false);
+        });
+
         lastComplexityRequest = $.ajax({
           type: 'POST',
           url: '/notebook/api/optimizer/statement/risk',
@@ -1018,12 +1024,14 @@ var EditorViewModel = (function() {
             lastCheckedComplexityStatement = self.statement();
           },
           always: function(data) {
+            changeSubscription.dispose();
             self.complexityCheckRunning(false);
           },
           error: function(data) {
             self.complexityCheckRunning(false);
           }
         });
+
       };
 
       if (self.type() === 'hive' || self.type() === 'impala') {
