@@ -185,8 +185,13 @@ def _create_index(user, fs, client, source, destination, index_name):
     raise PopupException(_('File size is too large to handle!'))
 
   indexer = MorphlineIndexer(user, fs)
-  fields = indexer.get_kept_field_list(destination['columns'])
+  fields = indexer.get_field_list(destination['columns'])
+  skip_fields = [field['name'] for field in fields if not field['keep']]
+
   kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
+  if skip_fields:
+    kwargs['skip'] = ','.join(skip_fields)
+    fields = [field for field in fields if field['name'] not in skip_fields]
 
   if not unique_key_field:
     unique_key_field = 'hue_id'
