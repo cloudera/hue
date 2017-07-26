@@ -1664,6 +1664,8 @@ var SqlParseSupport = (function () {
           if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
             if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
               expected = expected.substring(dialect.length + 2);
+            } else if (/^<[a-z]+>/.test(expected)) {
+              continue;
             }
             expected = CLEAN_EXPECTED[expected] || expected;
             if (expected === parser.yy.error.text.toUpperCase()) {
