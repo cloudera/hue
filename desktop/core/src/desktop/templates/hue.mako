@@ -1128,6 +1128,13 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
         self.rightAssistAvailable = ko.observable(false);
+
+        huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
+          if (self.rightAssistAvailable() && !self.rightAssistVisible()) {
+            self.rightAssistVisible(true);
+          }
+        });
+
         self.activeAppViewModel = ko.observable();
         self.currentApp = ko.observable('');
         self.templateApp = ko.pureComputed(function(){
