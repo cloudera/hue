@@ -1117,12 +1117,12 @@ DescribeStatement_EDIT
  ;
 
 HiveDescribeStatement
- : '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain
+ : '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec
    {
      parser.addTablePrimary($3);
      parser.addColumnLocation(@4, $4);
    }
- | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier
+ | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($3);
    }
@@ -1134,28 +1134,40 @@ HiveDescribeStatement
  ;
 
 HiveDescribeStatement_EDIT
- : '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier_EDIT
- | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain_EDIT
+ : '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain_EDIT OptionalPartitionSpec
    {
      parser.addTablePrimary($3);
    }
- | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier DerivedColumnChain
+ | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec
    {
      if (!$2) {
        parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
      }
    }
- | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier
+ | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      if (!$2) {
        parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
      }
    }
- | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier 'CURSOR'
+ | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier 'CURSOR' OptionalPartitionSpec
    {
      parser.addTablePrimary($3);
      parser.suggestColumns();
+     if (!$5) {
+       parser.suggestKeywords(['PARTITION']);
+     }
    }
+ | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain 'CURSOR' OptionalPartitionSpec
+   {
+     if (!$6) {
+       parser.suggestKeywords(['PARTITION']);
+     }
+   }
+ | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier DerivedColumnChain OptionalPartitionSpec_EDIT
+ | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+
  | '<hive>DESCRIBE' OptionalHiveExtendedOrFormatted 'CURSOR'
    {
      if (!$2) {
