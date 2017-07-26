@@ -362,7 +362,7 @@ class SolrApi(object):
           ('detail', 'true'),
           ('path', '/aliases.json'),
       )
-      response = self._root.get('admin/zookeeper', params=params)
+      response = self._root.get('zookeeper', params=params)
       return json.loads(response['znode'].get('data', '{}')).get('collection', {})
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
