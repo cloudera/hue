@@ -310,7 +310,12 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="index-sample">
-      <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
+      <!-- ko if: sample() && sample().length > 0 -->
+        <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: !sample() || sample().length === 0 -->
+      <div class="margin-top-10 margin-left-10">${ _('The index does not contain any data.')}</div>
+      <!-- /ko -->
     </div>
   </div>
 </script>
@@ -329,12 +334,17 @@ ${ assist.assistPanel() }
 
     <h4>${ _('Sample') }</h4>
 
+    <!-- ko if: samplePreview() && samplePreview().length > 0 -->
     <div style="overflow: auto">
       <!-- ko template: { name: 'indexes-index-sample', data: samplePreview, full: false }--><!-- /ko -->
     </div>
     <a class="pointer" data-bind="visible: sample().length > samplePreview().length, click: function() { $('li a[href=\'#index-sample\']').click(); }">
       ${_('View more...')}
     </a>
+    <!-- /ko -->
+    <!-- ko if: !samplePreview() || samplePreview().length === 0 -->
+    <div class="margin-top-10 margin-bottom-30">${ _('The index does not contain any data.')}</div>
+    <!-- /ko -->
   </div>
 </script>
 
