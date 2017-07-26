@@ -475,7 +475,7 @@ ${ assist.assistPanel() }
               </label>
 
               <label for="path" class="control-label" data-bind="visible: indexerRunJob"><div>${ _('Libs') }</div>
-                <input type="text" class="form-control path input-xxlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+                <input type="text" class="form-control path input-xlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
               </label>
               <!-- ko if: indexerRunJob() && indexerJobLibPath().length > 0 -->
                 <a data-bind="hueLink: '/filebrowser/view=' + indexerJobLibPath()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
