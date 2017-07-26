@@ -533,13 +533,13 @@ ${ assist.assistPanel() }
       self.uniqueKey = ko.observable(data.schema.uniqueKey);
       self.fields = ko.mapping.fromJS(data.schema.fields);
       self.fieldsPreview = ko.pureComputed(function () {
-        return self.fields().splice(0, 5)
+        return self.fields().slice(0, 5)
       });
       self.filteredFields = ko.computed(function () {
         var returned = self.fields();
         if (vm.fieldFilter() !== '') {
-          returned = $.grep(self.fields(), function (fld) {
-            return fld.name().toLowerCase().indexOf(vm.fieldFilter().toLowerCase()) > -1;
+          returned = $.grep(self.fields(), function (field) {
+            return field.name().toLowerCase().indexOf(vm.fieldFilter().toLowerCase()) > -1;
           });
         }
         return returned;
