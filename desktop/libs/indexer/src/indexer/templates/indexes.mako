@@ -289,18 +289,18 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="list-index">
-  <ul class="nav nav-pills margin-top-30">
+  <ul class="nav nav-tabs nav-tabs-border">
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
   </ul>
 
-  <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
-    <div class="tab-pane active" id="index-overview">
+  <div class="tab-content" style="border: none; overflow: hidden">
+    <div class="tab-pane active margin-top-30" id="index-overview">
       <!-- ko template: { if: $root.tab() == 'index-overview', name: 'indexes-index-overview' }--><!-- /ko -->
     </div>
 
-    <div class="tab-pane" id="index-columns">
+    <div class="tab-pane margin-top-10" id="index-columns">
       <!-- ko if: $root.tab() == 'index-columns' -->
         <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a field...') }" data-bind="clearable: $root.fieldFilter, value: $root.fieldFilter, valueUpdate: 'afterkeydown'"/>
         <div class="margin-top-10">
