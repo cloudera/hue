@@ -916,7 +916,7 @@ def parse_out_jobs(log, engine='mr', with_state=False):
       if end_pattern in log:
         job = next((job for job in ret if job['job_id'] == job_id), None)
         if job is not None:
-           job['finished'] = True
+          job['finished'] = True
         else:
           ret.append({'job_id': job_id, 'started': True, 'finished': True})
     else:
