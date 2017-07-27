@@ -195,7 +195,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <th width="5%">${_('Status')}</th>
                     <th width="3%">${_('Progress')}</th>
                     <th width="5%">${_('Group')}</th>
-                    <th width="10%">${_('Started')}</th>
+                    <th width="10%" data-bind="text: interface() != 'schedules' ? '${_('Started')}' : '${_('Modified')}'"></th>
                     <th width="6%">${_('Duration')}</th>
                   </tr>
                   </thead>
