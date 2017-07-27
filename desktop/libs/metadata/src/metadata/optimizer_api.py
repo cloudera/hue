@@ -41,7 +41,8 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax.api import get_table_stats
   from beeswax.design import hql_query
-  from beeswax.server import dbms
+
+  from metastore.views import _get_db
 except ImportError, e:
   LOG.warn("Hive lib not enabled")
 
@@ -396,7 +397,7 @@ def upload_table_stats(request):
 
     try:
       if with_ddl:
-        db = dbms.get(request.user)
+        db = _get_db(request.user, source_type=source_platform)
         query = hql_query('SHOW CREATE TABLE `%(database)s`.`%(table)s`' % path)
         handle = db.execute_and_wait(query, timeout_sec=5.0)
 
@@ -405,7 +406,8 @@ def upload_table_stats(request):
           db.close(handle)
           table_ddls.append((0, 0, ' '.join([row[0] for row in result.rows()]), path['database']))
 
-      full_table_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table']).content)
+      mock_request = MockRequest(user=request.user, source_platform=source_platform)
+      full_table_stats = json.loads(get_table_stats(mock_request, database=path['database'], table=path['table']).content)
       stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
 
       table_stats.append({
@@ -468,3 +470,10 @@ def upload_status(request):
   response['status'] = 0
 
   return JsonResponse(response)
+
+
+class MockRequest():
+
+  def __init__(self, user, source_platform):
+    self.user = user
+    self.path = '/%s/' % source_platform if source_platform != 'hive' else 'beeswax'
