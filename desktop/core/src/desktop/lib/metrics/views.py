@@ -35,4 +35,4 @@ def index(request):
       'timestamp': datetime.datetime.utcnow().isoformat(),
       'metric': global_registry().dump_metrics(),
   }
-  return JsonResponse(rep, indent=indent)
+  return JsonResponse(rep, json_dumps_params={'indent': indent})
