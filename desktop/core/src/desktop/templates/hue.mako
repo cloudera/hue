@@ -1414,18 +1414,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 }
               }
 
-              if (values.length > 0) {
-                values.push({ divider: true });
-              }
-              if (typeof data.results !== 'undefined') {
+              if (!facetMatch && typeof data.results !== 'undefined' && data.results.length > 0) {
+                if (values.length > 0) {
+                  values.push({ divider: true });
+                }
                 data.results.forEach(function (result) {
                   values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
                 });
               }
 
-              if (values.length > 0 && values[values.length - 1].divider) {
-                values.pop();
-              }
               if (values.length === 0) {
                 values.push({ noMatch: true });
               }
