@@ -364,7 +364,7 @@ from desktop.views import _ko
         self.changeListener = function () {
           window.clearTimeout(changeTimeout);
           var cursor = self.editor().selection.lead;
-          if (cursor.row != self.base.row || cursor.column < self.base.column) {
+          if (cursor.row !== self.base.row || cursor.column < self.base.column) {
             self.detach();
           } else {
             changeTimeout = window.setTimeout(function () {
@@ -403,6 +403,7 @@ from desktop.views import _ko
         };
 
         self.detach = function () {
+          self.suggestions.cancelRequests();
           disposeEventHanders();
           if (!self.active()) {
             return;
