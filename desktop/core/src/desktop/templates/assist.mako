@@ -1356,14 +1356,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
           % if ENABLE_NEW_INDEXER.get():
           if (IS_HUE_4) {
-            huePubSub.subscribeOnce('app.gained.focus', function(app){
-              if (app === 'indexes'){
-                window.setTimeout(function(){
-                  huePubSub.publish('open.index', entry.definition.name);
-                }, 0)
-              }
-            });
-            huePubSub.publish('open.link', '/indexer/indexes/');
+            huePubSub.publish('open.link', '/indexer/indexes/' + entry.definition.name);
           }
           else {
             window.open('/indexer/indexes/' + entry.definition.name);
