@@ -1663,10 +1663,13 @@ ${ assist.assistPanel() }
         }, function (resp) {
           if (resp.status == 0) {
             if (resp.history_uuid) {
-              $.jHueNotify.info("${ _('Task submitted.') }");
+              $.jHueNotify.info("${ _('Task submitted') }");
               huePubSub.publish('notebook.task.submitted', resp.history_uuid);
             } else if (resp.on_success_url) {
-              $.jHueNotify.info("${ _('Creation success.') }");
+              if (resp.pub_sub_url) {
+                huePubSub.publish(resp.pub_sub_url);
+              }
+              $.jHueNotify.info("${ _('Creation success') }");
               huePubSub.publish('open.link', resp.on_success_url);
             }
           } else {
