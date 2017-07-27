@@ -438,7 +438,7 @@ ${ components.menubar(is_embeddable) }
               <!-- /ko -->
               <div title="${ _('Owner') }">
                 <i class="fa fa-fw fa-user muted"></i>
-                <span data-bind="text: owner_name"></span> (<span data-bind="text: owner_type"></span>)
+                <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
                 <br/>
                 <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
               </div>
