@@ -1389,7 +1389,7 @@ ${ assist.assistPanel() }
       self.indexerJobLibPath = ko.observable('${ CONFIG_INDEXER_LIBS_PATH.get() }');
       self.indexerConfigSet = ko.observable('');
       self.indexerConfigSets = ko.observableArray([]);
-      self.indexerNumShards = ko.observable('');
+      self.indexerNumShards = ko.observable(1);
       self.indexerReplicationFactor = ko.observable(1);
       self.indexerPrimaryKey = ko.observableArray();
       self.indexerPrimaryKeyObject = ko.observableArray();

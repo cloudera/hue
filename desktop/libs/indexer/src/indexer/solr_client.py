@@ -89,12 +89,12 @@ class SolrClient(object):
 
     return indexes
 
-  def create_index(self, name, fields, config_name=None, unique_key_field=None, df=None):
+  def create_index(self, name, fields, config_name=None, unique_key_field=None, df=None, shards=1, replication=1):
     if self.is_solr_cloud_mode():
       if config_name is None:
         self._create_cloud_config(name, fields, unique_key_field, df)
 
-      self.api.create_collection2(name, config_name=config_name)
+      self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
       fields = [{
           'name': field['name'],
           'type': field['type'],

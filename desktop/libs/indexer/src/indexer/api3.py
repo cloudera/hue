@@ -209,7 +209,9 @@ def _create_index(user, fs, client, source, destination, index_name):
         name=index_name,
         fields=fields,
         unique_key_field=unique_key_field,
-        df=df
+        df=df,
+        shards=destination['indexerNumShards'],
+        replication=destination['indexerReplicationFactor']
     )
 
   if source['inputFormat'] != 'manual':
