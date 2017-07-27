@@ -31,7 +31,7 @@ if ENABLE_NEW_INDEXER.get():
   urlpatterns += patterns('indexer.views',
     url(r'^$', 'indexes', name='indexes'),
     url(r'^indexes/$', 'indexes', name='indexes'),
-    url(r'^indexes/(?P<index>\w+)/?$', 'indexes', name='indexes'),
+    url(r'^indexes/(?P<index>[^/]+)/?$', 'indexes', name='indexes'),
     url(r'^collections$', 'collections', name='collections'), # Old page
   )
 else:
