@@ -216,7 +216,7 @@ def _create_index(user, fs, client, source, destination, index_name):
     data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
     client.index(name=index_name, data=data, **kwargs)
 
-  return {'status': 0, 'on_success_url': reverse('indexer:indexes', kwargs={'index': index_name})}
+  return {'status': 0, 'on_success_url': reverse('indexer:indexes', kwargs={'index': index_name}), 'pub_sub_url': 'assist.collections.refresh'}
 
 
 def _create_database(request, source, destination, start_time):
