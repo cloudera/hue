@@ -84,7 +84,20 @@ ${ assist.assistPanel() }
         <ul class="nav">
           <li class="app-header">
             <a href="${ url('indexer:importer') }">
-              <i class="fa fa-database app-icon"></i> ${_('Importer')}</a>
+              <!-- ko if: createWizard.prefill.target_type().length == 0 -->
+              <i class="fa fa-database app-icon"></i> ${_('Importer')}
+              <!-- /ko -->
+              <!-- ko ifnot: createWizard.prefill.target_type().length == 0 -->
+                <!-- ko if: createWizard.prefill.target_type() === 'index' -->
+                  <i class="fa fa-search app-icon"></i> ${_('Import to index')}
+                <!-- /ko -->
+                <!-- ko if: createWizard.prefill.target_type() === 'table' -->
+                  <i class="fa fa-database app-icon"></i> ${_('Import to table')}
+                <!-- /ko -->
+                <!-- ko if: createWizard.prefill.target_type() === 'database' -->
+                  <i class="fa fa-database app-icon"></i> ${_('Create a new database')}
+                <!-- /ko -->
+              <!-- /ko -->
             </a>
           </li>
         </ul>
@@ -291,7 +304,7 @@ ${ assist.assistPanel() }
         <h4>${_('Destination')}</h4>
         <div class="card-body">
           <div class="control-group">
-            <label for="destinationType" class="control-label"><div>${ _('Type') }</div>
+            <label for="destinationType" class="control-label" data-bind="visible: $parent.createWizard.prefill.target_type().length == 0"><div>${ _('Type') }</div>
               <select id="destinationType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
           </div>
