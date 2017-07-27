@@ -408,9 +408,9 @@ ${ assist.assistPanel() }
             </div>
 
             <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
-              <label for="kuduPks" class="control-label"><div>${ _('Primary keys') }</div>
+              <label for="kuduPksTable" class="control-label"><div>${ _('Primary keys') }</div>
                 ## At least one selected
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="3" multiple="true"></select>
+                <select id="kuduPksTable" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="3" multiple="true"></select>
               </label>
             </div>
 
@@ -499,14 +499,14 @@ ${ assist.assistPanel() }
             </div>
 
             <div class="control-group">
-              <label for="kuduPks" class="control-label"><div>${ _('Primary key') }</div>
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: indexerPrimaryKey, selectedObjects: indexerPrimaryKeyObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+              <label for="kuduPksIndex" class="control-label"><div>${ _('Primary key') }</div>
+                <select id="kuduPksIndex" data-bind="selectize: columns, selectedOptions: indexerPrimaryKey, selectedObjects: indexerPrimaryKeyObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
               </label>
             </div>
 
             <div class="control-group">
-              <label for="kuduPks" class="control-label"><div>${ _('Default field') }</div>
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: indexerDefaultField, selectedObjects: indexerDefaultFieldObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+              <label for="kuduDefaultField" class="control-label"><div>${ _('Default field') }</div>
+                <select id="kuduDefaultField" data-bind="selectize: columns, selectedOptions: indexerDefaultField, selectedObjects: indexerDefaultFieldObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
               </label>
             </div>
 
@@ -520,8 +520,8 @@ ${ assist.assistPanel() }
 
             <span data-bind="visible: showProperties">
               <div class="control-group">
-                <label for="destinationFormat" class="control-label"><div>${ _('Config set') }</div>
-                  <select id="destinationFormat" data-bind="selectize: indexerConfigSets, value: indexerConfigSet, optionsValue: 'value', optionsText: 'name'"></select>
+                <label for="destinationFormatIndex" class="control-label"><div>${ _('Config set') }</div>
+                  <select id="destinationFormatIndex" data-bind="selectize: indexerConfigSets, value: indexerConfigSet, optionsValue: 'value', optionsText: 'name'"></select>
                 </label>
               </div>
 
