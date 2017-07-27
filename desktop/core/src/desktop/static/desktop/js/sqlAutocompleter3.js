@@ -101,6 +101,7 @@ var AutocompleteResults = (function () {
 
     self.entries = ko.observableArray();
 
+    self.lastKnownRequests = {};
     self.activeDeferrals = [];
 
     self.loadingKeywords = ko.observable(false);
@@ -241,6 +242,14 @@ var AutocompleteResults = (function () {
       return result;
     }).extend({ rateLimit: 200 });
   }
+
+  AutocompleteResults.prototype.cancelRequests = function () {
+    var self = this;
+
+    Object.keys(self.lastKnownRequests).forEach(function (key) {
+      self.apiHelper.cancelActiveRequest(self.lastKnownRequests[key]);
+    });
+  };
 
   AutocompleteResults.prototype.update = function (parseResult) {
     var self = this;
@@ -558,7 +567,7 @@ var AutocompleteResults = (function () {
         }
 
         var database = suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.activeDatabase;
-        self.apiHelper.fetchTables({
+        self.lastKnownRequests.fetchTables = self.apiHelper.fetchTables({
           sourceType: self.snippet.type(),
           databaseName: database,
           successCallback: function (data) {
@@ -1050,7 +1059,7 @@ var AutocompleteResults = (function () {
       // Last one is either partial name or empty
       parts.pop();
 
-      self.apiHelper.fetchHdfsPath({
+      self.lastKnownRequests.fetchHdfsPath = self.apiHelper.fetchHdfsPath({
         pathParts: parts,
         successCallback: function (data) {
           if (!data.error) {
@@ -1088,7 +1097,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingJoins, joinsDeferred);
       joinsDeferred.done(self.appendEntries);
 
-      self.apiHelper.fetchNavOptPopularJoins({
+      self.lastKnownRequests.fetchNavOptPopularJoins = self.apiHelper.fetchNavOptPopularJoins({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1165,7 +1174,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingJoinConditions, joinConditionsDeferred);
       joinConditionsDeferred.done(self.appendEntries);
 
-      self.apiHelper.fetchNavOptPopularJoins({
+      self.lastKnownRequests.fetchNavOptPopularJoins = self.apiHelper.fetchNavOptPopularJoins({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1220,7 +1229,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingAggregateFunctions, aggregateFunctionsDeferred);
       aggregateFunctionsDeferred.done(self.appendEntries);
 
-      self.apiHelper.fetchNavOptTopAggs({
+      self.lastKnownRequests.fetchNavOptTopAggs = self.apiHelper.fetchNavOptTopAggs({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1301,7 +1310,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingGroupBys, groupBysDeferred);
       groupBysDeferred.done(self.appendEntries);
 
-      self.apiHelper.fetchNavOptTopColumns({
+      self.lastKnownRequests.fetchNavOptTopColumns = self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1343,7 +1352,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingOrderBys, orderBysDeferred);
       orderBysDeferred.done(self.appendEntries);
 
-      self.apiHelper.fetchNavOptTopColumns({
+      self.lastKnownRequests.fetchNavOptTopColumns = self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1384,7 +1393,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingFilters, filtersDeferred);
       filtersDeferred.done(self.appendEntries);
 
-      self.apiHelper.fetchNavOptTopFilters({
+      self.lastKnownRequests.fetchNavOptTopFilters = self.apiHelper.fetchNavOptTopFilters({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1446,7 +1455,7 @@ var AutocompleteResults = (function () {
         && self.parseResult.suggestTables.identifierChain.length === 1
         && self.parseResult.suggestTables.identifierChain[0].name ? self.parseResult.suggestTables.identifierChain[0].name : self.activeDatabase;
 
-      self.apiHelper.fetchNavOptTopTables({
+      self.lastKnownRequests.fetchNavOptTopTables = self.apiHelper.fetchNavOptTopTables({
         database: db,
         sourceType: self.snippet.type(),
         silenceErrors: true,
@@ -1498,7 +1507,7 @@ var AutocompleteResults = (function () {
     if (HAS_OPTIMIZER && suggestColumns && suggestColumns.source !== 'undefined') {
       initLoading(self.loadingPopularColumns, popularColumnsDeferred);
 
-      self.apiHelper.fetchNavOptTopColumns({
+      self.lastKnownRequests.fetchNavOptTopColumns = self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1676,7 +1685,7 @@ var AutocompleteResults = (function () {
         identifierChain = identifierChain.slice(1);
       }
 
-      self.apiHelper.fetchFields({
+      self.lastKnownRequests.fetchFields = self.apiHelper.fetchFields({
         sourceType: self.snippet.type(),
         databaseName: database,
         tableName: table,

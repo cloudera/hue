@@ -397,7 +397,7 @@ var ApiHelper = (function () {
         self.assistErrorCallback(options)({ status: -1 });
         return;
       }
-      $.ajax({
+      return $.ajax({
         dataType: "json",
         url: url,
         timeout: options.timeout,
@@ -420,7 +420,7 @@ var ApiHelper = (function () {
       });
     };
 
-    fetchCached.bind(self)($.extend({}, options, {
+    return fetchCached.bind(self)($.extend({}, options, {
       sourceType: 'hdfs',
       url: url,
       fetchFunction: fetchFunction
@@ -1206,7 +1206,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchTables = function (options) {
     var self = this;
-    fetchAssistData.bind(self)($.extend({}, options, {
+    return fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
       errorCallback: self.assistErrorCallback(options),
       cacheCondition: genericCacheCondition
@@ -1229,7 +1229,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchFields = function (options) {
     var self = this;
     var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
-    fetchAssistData.bind(self)($.extend({}, options, {
+    return fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart,
       errorCallback: self.assistErrorCallback(options),
       cacheCondition: genericCacheCondition
@@ -1596,7 +1596,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopTables = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_TABLES, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_TABLES, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1617,7 +1617,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_COLUMNS, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_COLUMNS, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1638,7 +1638,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_JOINS, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_JOINS, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1659,7 +1659,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_FILTERS, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_FILTERS, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1681,7 +1681,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopAggs = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_AGGS, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_AGGS, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1725,7 +1725,7 @@ var ApiHelper = (function () {
         return;
       }
 
-      $.ajax({
+      return $.ajax({
         type: 'post',
         url: url,
         data: data,
@@ -1744,7 +1744,7 @@ var ApiHelper = (function () {
       .fail(promise.reject);
     };
 
-    fetchCached.bind(self)($.extend({}, options, {
+    return fetchCached.bind(self)($.extend({}, options, {
       url: url,
       hash: hash,
       cacheType: 'optimizer',
@@ -1869,7 +1869,7 @@ var ApiHelper = (function () {
       return;
     }
 
-    $.ajax({
+    return $.ajax({
       type: 'POST',
       url: options.url,
       data: {
@@ -1925,7 +1925,7 @@ var ApiHelper = (function () {
       if (typeof options.editor !== 'undefined' && options.editor !== null) {
         options.editor.showSpinner();
       }
-      options.fetchFunction(function (data) {
+      return options.fetchFunction(function (data) {
         cachedData[cachedId] = {
           timestamp: (new Date()).getTime(),
           data: data
