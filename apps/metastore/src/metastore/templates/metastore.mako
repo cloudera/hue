@@ -118,7 +118,6 @@ ${ components.menubar(is_embeddable) }
 <script type="text/html" id="metastore-columns-table">
   <div style="overflow-x: auto; overflow-y: hidden">
     <table class="table table-condensed table-nowrap">
-      <br/>
       <thead>
       <tr>
         <th width="2%">&nbsp;</th>
@@ -891,7 +890,7 @@ ${ components.menubar(is_embeddable) }
     <div data-bind="html: comment, attr:{ title: comment }" class="table-description"></div>
   %endif
 
-  <ul class="nav nav-pills margin-top-30">
+  <ul class="nav nav-tabs nav-tabs-border margin-top-30">
     <li><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-overview'); }">${_('Overview')}</a></li>
     <li><a href="#columns" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-columns'); }">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
@@ -921,7 +920,9 @@ ${ components.menubar(is_embeddable) }
     <div class="tab-pane" id="columns">
       <!-- ko if: $root.currentTab() == 'table-columns' -->
         <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a column...') }" data-bind="clearable: columnQuery, value: columnQuery, valueUpdate: 'afterkeydown'"/>
+        <div class="margin-top-10">
         <!-- ko template: 'metastore-columns-tab' --><!-- /ko -->
+        </div>
       <!-- /ko -->
     </div>
 
