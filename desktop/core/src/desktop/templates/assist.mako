@@ -199,7 +199,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   </script>
 
   <script type="text/html" id="assist-table-entry">
-    <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
+    <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible() || navigationSettings.rightAssist, selector: '.table-actions' }">
       <div class="assist-actions table-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
@@ -1864,16 +1864,23 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         <div class="assist-flex-header">
           <div class="assist-inner-header">${ _('Tables') }
+            <a class="col-filter-toggle inactive-action" href="javascript:void(0)" data-bind="toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
             <!-- ko if: statementCount() > 1 -->
             <div class="statement-count">${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span></div>
             <!-- /ko -->
           </div>
         </div>
+        <div class="assist-flex-column-search" data-bind="visible: isFilterVisible">
+          <div class="assist-filter"><input id="searchInput" class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Search...') }" /></div>
+        </div>
         <div class="assist-flex-half assist-db-scrollable">
-          <!-- ko if: activeTables().length === 0 -->
+          <!-- ko if: filteredTables().length === 0 && filter.query() === '' -->
           <div class="assist-no-entries">${ _('No tables identified.') }</div>
           <!-- /ko -->
-          <!-- ko if: activeTables().length > 0 -->
+          <!-- ko if: filteredTables().length === 0 && filter.query() !== '' -->
+          <div class="assist-no-entries">${ _('No entries found.') }</div>
+          <!-- /ko -->
+          <!-- ko if: filteredTables().length > 0 -->
           <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: activeTables, minHeight: 23, container: '.assist-db-scrollable' }">
             <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
             <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry' } --><!-- /ko -->
@@ -1929,6 +1936,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
 
+        self.isFilterVisible = ko.observable(true);
+
         self.hasActiveRisks = ko.pureComputed(function () {
            return self.activeRisks().hints && self.activeRisks().hints.length > 0;
         });
@@ -1954,11 +1963,34 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var databaseIndex = {};
 
         var activeTableIndex = {};
-        var filter = {
+
+        self.filter = {
           query: ko.observable(''),
           showViews: ko.observable(true),
           showTables: ko.observable(true)
         };
+
+        var openedByFilter = [];
+
+        self.filteredTables = ko.pureComputed(function () {
+          if (self.filter.query() === '' || !self.isFilterVisible()) {
+            while (openedByFilter.length) {
+              openedByFilter.pop().open(false);
+            }
+            return self.activeTables();
+          }
+          return self.activeTables().filter(function (table) {
+            if (table.filteredEntries().length > 0) {
+              if (!table.open()) {
+                table.open(true);
+                openedByFilter.push(table);
+              }
+              return true;
+            }
+            return false;
+          });
+        });
+
         var navigationSettings = {
           showStats: true,
           rightAssist: true
@@ -1996,11 +2028,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                     },
                     null,
                     assistDbSource,
-                    filter,
+                    self.filter,
                     i18n,
                     navigationSettings,
                     {}
-                  )
+                  );
                 }
                 var qid = createQualifiedIdentifier(location.identifierChain);
                 tableQidIndex[qid] = true;
@@ -2017,7 +2049,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                     },
                     databaseIndex[database],
                     assistDbSource,
-                    filter,
+                    self.filter,
                     {},
                     navigationSettings,
                     {}
@@ -2030,6 +2062,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               if (!tableQidIndex[key]) {
                 delete activeTableIndex[key];
                 updateTables = true;
+              } else if (!activeTableIndex[key].loaded) {
+                activeTableIndex[key].loadEntries();
               }
             });
 
