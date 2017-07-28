@@ -1271,6 +1271,22 @@ var SqlParseSupport = (function () {
       });
     };
 
+    parser.firstDefined = function () {
+      for (var i = 0; i + 1 < arguments.length; i += 2) {
+        if (arguments[i]) {
+          return arguments[i + 1];
+        }
+      }
+    };
+
+    parser.addClauseLocation = function (type, precedingLocation, locationIfPresent) {
+      parser.yy.locations.push({
+        type: type,
+        missing: !locationIfPresent,
+        location: adjustLocationForCursor(locationIfPresent || { first_line: precedingLocation.last_line, first_column: precedingLocation.last_column, last_line: precedingLocation.last_line, last_column: precedingLocation.last_column })
+      })
+    };
+
     parser.addHdfsLocation = function (location, path) {
       parser.yy.locations.push({
         type: 'hdfs',
@@ -1550,9 +1566,9 @@ var SqlParseSupport = (function () {
     'identifyPartials', 'expandLateralViews', 'expandIdentifierChain', 'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'getKeywordsForOptionalsLR',
     'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords', 'createWeightedKeywords', 'suggestKeywords', 'suggestColRefKeywords',
     'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions', 'suggestColumns', 'suggestGroupBys',
-    'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation', 'addStatementLocation', 'addHdfsLocation',
-    'addDatabaseLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs',
-    'suggestValues', 'handleQuotedValueWithCursor'];
+    'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation', 'addStatementLocation', 'firstDefined',
+    'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation',
+    'suggestDatabases', 'suggestHdfs', 'suggestValues', 'handleQuotedValueWithCursor'];
 
   var SYNTAX_PARSER_NOOP = function () {};
 
