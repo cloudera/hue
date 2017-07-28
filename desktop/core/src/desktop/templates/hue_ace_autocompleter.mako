@@ -21,7 +21,7 @@ from desktop.views import _ko
 
 <%def name="hueAceAutocompleter()">
   <script type="text/html" id="hue-ace-autocompleter">
-    <!-- ko if: active() && suggestions.filtered().length !== 0 -->
+    <!-- ko if: active() && (suggestions.filtered().length !== 0 || suggestions.loading()) -->
     <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }, event: { mousewheel: function (data, event) { event.stopPropagation(); }}">
       <div class="autocompleter-suggestions">
         <!-- ko if: suggestions.availableCategories().length > 1 || suggestions.loading() -->
@@ -436,7 +436,7 @@ from desktop.views import _ko
 
         var autocompleterDoneSub = huePubSub.subscribe('hue.ace.autocompleter.done', function () {
           window.setTimeout(function () {
-            if (self.active() && self.suggestions.filtered().length === 0) {
+            if (self.active() && self.suggestions.filtered().length === 0 && !self.suggestions.loading()) {
               self.detach();
             }
           }, 0);
