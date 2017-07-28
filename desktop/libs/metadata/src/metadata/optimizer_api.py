@@ -424,13 +424,20 @@ def upload_table_stats(request):
       })
 
       if with_columns:
-        for col in full_table_stats['columns'][:25]:
-          col_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table'], column=col).content)['stats']
-          col_stats = dict([(key, val) for col_stat in col_stats for key, val in col_stat.iteritems()])
+        if source_platform == 'impala':
+          colum_stats = json.loads(get_table_stats(mock_request, database=path['database'], table=path['table'], column=-1).content)['stats']
+        else:
+          colum_stats = [
+              json.loads(get_table_stats(mock_request, database=path['database'], table=path['table'], column=col).content)['stats']
+              for col in full_table_stats['columns'][:25]
+          ]
 
+        raw_column_stats = [dict([(key, val if val is not None else '') for col_stat in col for key, val in col_stat.iteritems()]) for col in colum_stats]
+
+        for col_stats in raw_column_stats:
           column_stats.append({
             'table_name': '%(database)s.%(table)s' % path, # DB Prefix
-            'column_name': col,
+            'column_name': col_stats['col_name'],
             'data_type': col_stats['data_type'],
             "num_distinct": int(col_stats.get('distinct_count')) if col_stats.get('distinct_count') != '' else -1,
             "num_nulls": int(col_stats['num_nulls']) if col_stats['num_nulls'] != '' else -1,
