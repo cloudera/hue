@@ -461,15 +461,11 @@ class HiveServer2Dbms(object):
       data = list(result.rows())
 
       if self.server_name == 'impala':
-        data = [col for col in data if col[0] == column][0]
-        return [
-            {'col_name': data[0]},
-            {'data_type': data[1]},
-            {'distinct_count': data[2]},
-            {'num_nulls': data[3]},
-            {'max_col_len': data[4]},
-            {'avg_col_len': data[5]},
-        ]
+        if column == -1: # All the columns
+          return [self._extract_impala_column(col) for col in data]
+        else:
+          data = [col for col in data if col[0] == column][0]
+          return self._extract_impala_column(data)
       else:
         return [
             {'col_name': data[2][0]},
@@ -486,6 +482,15 @@ class HiveServer2Dbms(object):
     else:
       return []
 
+  def _extract_impala_column(self, col):
+    return [
+        {'col_name': col[0]},
+        {'data_type': col[1]},
+        {'distinct_count': col[2]},
+        {'num_nulls': col[3]},
+        {'max_col_len': col[4]},
+        {'avg_col_len': col[5]},
+    ]
 
   def get_table_properties(self, database, table, property_name=None):
     hql = 'SHOW TBLPROPERTIES `%s`.`%s`' % (database, table)
