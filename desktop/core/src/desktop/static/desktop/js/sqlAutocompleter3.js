@@ -636,38 +636,42 @@ var AutocompleteResults = (function () {
         // For multiple tables we need to merge and make sure identifiers are unique
         var columnDeferrals = [];
 
+        var waitForCols = function () {
+          $.when.apply($, columnDeferrals).always(function () {
+            self.mergeColumns(columnSuggestions);
+            if (self.snippet.type() === 'hive' && /[^\.]$/.test(self.editor().getTextBeforeCursor())) {
+              columnSuggestions.push({
+                value: 'BLOCK__OFFSET__INSIDE__FILE',
+                meta: AutocompleterGlobals.i18n.meta.virtual,
+                category: CATEGORIES.VIRTUAL_COLUMN,
+                popular: ko.observable(false),
+                details: null
+              });
+              columnSuggestions.push({
+                value: 'INPUT__FILE__NAME',
+                meta: AutocompleterGlobals.i18n.meta.virtual,
+                category: CATEGORIES.VIRTUAL_COLUMN,
+                popular: ko.observable(false),
+                details: null
+              });
+            }
+            columnsDeferred.resolve(columnSuggestions);
+          });
+        };
+
         if (suggestColumns.types && suggestColumns.types[0] === 'COLREF') {
           colRefDeferred.done(function (colRef) {
             suggestColumns.tables.forEach(function (table) {
               columnDeferrals.push(self.addColumns(table, [colRef.type.toUpperCase()], columnSuggestions));
             });
+            waitForCols();
           });
         } else {
           suggestColumns.tables.forEach(function (table) {
             columnDeferrals.push(self.addColumns(table, suggestColumns.types || ['T'], columnSuggestions));
           });
+          waitForCols();
         }
-
-        $.when.apply($, columnDeferrals).always(function () {
-          self.mergeColumns(columnSuggestions);
-          if (self.snippet.type() === 'hive' && /[^\.]$/.test(self.editor().getTextBeforeCursor())) {
-            columnSuggestions.push({
-              value: 'BLOCK__OFFSET__INSIDE__FILE',
-              meta: AutocompleterGlobals.i18n.meta.virtual,
-              category: CATEGORIES.VIRTUAL_COLUMN,
-              popular: ko.observable(false),
-              details: null
-            });
-            columnSuggestions.push({
-              value: 'INPUT__FILE__NAME',
-              meta: AutocompleterGlobals.i18n.meta.virtual,
-              category: CATEGORIES.VIRTUAL_COLUMN,
-              popular: ko.observable(false),
-              details: null
-            });
-          }
-          columnsDeferred.resolve(columnSuggestions);
-        });
       } else {
         columnsDeferred.reject();
       }
