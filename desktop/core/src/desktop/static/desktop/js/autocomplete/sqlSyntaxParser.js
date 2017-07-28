@@ -679,9 +679,18 @@ case 852: case 1277: case 1786: case 2182: case 2199:
      parser.suggestKeywords(['SELECT']);
    
 break;
+case 858: case 859:
+
+     parser.addClauseLocation('whereClause', _$[$0-1], $$[$0].whereClauseLocation);
+     parser.addClauseLocation('limitClause', $$[$0].limitClausePreceding || _$[$0-1], $$[$0].limitClauseLocation);
+   
+break;
 case 860:
 
      var keywords = [];
+
+     parser.addClauseLocation('whereClause', _$[$0-3], $$[$0-1].whereClauseLocation);
+     parser.addClauseLocation('limitClause', $$[$0-2].limitClausePreceding || _$[$0-3], $$[$0-2].limitClauseLocation);
 
      if ($$[$0-3]) {
        if (!$$[$0-3].hasLateralViews && typeof $$[$0-3].tableReferenceList.hasJoinCondition !== 'undefined' && !$$[$0-3].tableReferenceList.hasJoinCondition) {
@@ -772,8 +781,12 @@ case 861:
      //   or 'AND' based on type
 
      if (!$$[$0-1]) {
+       parser.addClauseLocation('whereClause', _$[$0-2]);
+       parser.addClauseLocation('limitClause', _$[$0-2]);
        return;
      }
+     parser.addClauseLocation('whereClause', _$[$0-2], $$[$0-1].whereClauseLocation);
+     parser.addClauseLocation('limitClause', $$[$0-1].limitClausePreceding || _$[$0-2], $$[$0-1].limitClauseLocation);
      var keywords = [];
 
      if ($$[$0-1].suggestColRefKeywords) {
@@ -833,6 +846,10 @@ case 869:
        this.$ = {};
      }
 
+     this.$.whereClauseLocation = $$[$0-7] ? _$[$0-7] : undefined;
+     this.$.limitClausePreceding = parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3], $$[$0-4], _$[$0-4], $$[$0-5], _$[$0-5], $$[$0-6], _$[$0-6], $$[$0-7], _$[$0-7]);
+     this.$.limitClauseLocation = $$[$0-1] ? _$[$0-1] : undefined;
+
      if (!$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
        this.$.suggestFilters = { prefix: 'WHERE', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
@@ -885,6 +902,9 @@ case 878:
      if (!$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3]) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
+     this.$.whereClauseLocation = $$[$0-8] ? _$[$0-8] : undefined;
+     this.$.limitClausePreceding = parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3], $$[$0-4], _$[$0-4], $$[$0-5], _$[$0-5], $$[$0-6], _$[$0-6], $$[$0-8], _$[$0-8]);
+     this.$.limitClauseLocation = $$[$0-1] ? _$[$0-1] : undefined;
    
 break;
 case 879:
@@ -904,6 +924,9 @@ case 879:
      if (!$$[$0-5] && !$$[$0-4] && !$$[$0-3]) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
+     this.$.whereClauseLocation = $$[$0-8] ? _$[$0-8] : undefined;
+     this.$.limitClausePreceding = parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3], $$[$0-4], _$[$0-4], $$[$0-5], _$[$0-5], $$[$0-7], _$[$0-7]);
+     this.$.limitClauseLocation = $$[$0-1] ? _$[$0-1] : undefined;
    
 break;
 case 880:
@@ -916,6 +939,9 @@ case 880:
      if (!$$[$0-4] && !$$[$0-3]) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
+     this.$.whereClauseLocation = $$[$0-8] ? _$[$0-8] : undefined;
+     this.$.limitClausePreceding = parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3], $$[$0-4], _$[$0-4], $$[$0-6], _$[$0-6]);
+     this.$.limitClauseLocation = $$[$0-1] ? _$[$0-1] : undefined;
    
 break;
 case 881:
@@ -925,7 +951,9 @@ case 881:
      if (!$$[$0-3]) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
-
+     this.$.whereClauseLocation = $$[$0-8] ? _$[$0-8] : undefined;
+     this.$.limitClausePreceding = parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-3], _$[$0-3], $$[$0-5], _$[$0-5]);
+     this.$.limitClauseLocation = $$[$0-1] ? _$[$0-1] : undefined;
    
 break;
 case 882:
@@ -935,6 +963,9 @@ case 882:
        keywords = keywords.concat(parser.createWeightedKeywords($$[$0-4].suggestKeywords, 5));
      }
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-2] && !$$[$0-1] && !$$[$0] };
+     this.$.whereClauseLocation = $$[$0-8] ? _$[$0-8] : undefined;
+     this.$.limitClausePreceding = parser.firstDefined($$[$0-2], _$[$0-2], $$[$0-4], _$[$0-4]);
+     this.$.limitClauseLocation = $$[$0-1] ? _$[$0-1] : undefined;
    
 break;
 case 883:
@@ -944,12 +975,18 @@ case 883:
        keywords = keywords.concat(parser.createWeightedKeywords($$[$0-3].suggestKeywords, 4));
      }
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-1] && !$$[$0] };
+     this.$.whereClauseLocation = $$[$0-8] ? _$[$0-8] : undefined;
+     this.$.limitClausePreceding = _$[$0-3];
+     this.$.limitClauseLocation = $$[$0-1] ? _$[$0-1] : undefined;
    
 break;
 case 884:
 
      var keywords = parser.getKeywordsForOptionalsLR([$$[$0]], [{ value: 'OFFSET', weight: 2 }], [parser.isImpala()]);
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0] };
+     this.$.whereClauseLocation = $$[$0-8] ? _$[$0-8] : undefined;
+     this.$.limitClausePreceding = parser.firstDefined($$[$0-3], _$[$0-3], $$[$0-4], _$[$0-4], $$[$0-5], _$[$0-5], $$[$0-6], _$[$0-6], $$[$0-7], _$[$0-7], $$[$0-8], _$[$0-8]);
+     this.$.limitClauseLocation = $$[$0-2] ? _$[$0-2] : undefined;
    
 break;
 case 888:

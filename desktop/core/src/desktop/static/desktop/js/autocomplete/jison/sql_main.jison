@@ -1483,13 +1483,24 @@ OptionalAllOrDistinct
 
 TableExpression
  : FromClause OptionalSelectConditions
+   {
+     parser.addClauseLocation('whereClause', @1, $2.whereClauseLocation);
+     parser.addClauseLocation('limitClause', $2.limitClausePreceding || @1, $2.limitClauseLocation);
+   }
  ;
 
 TableExpression_EDIT
  : FromClause_EDIT OptionalSelectConditions
+   {
+     parser.addClauseLocation('whereClause', @1, $2.whereClauseLocation);
+     parser.addClauseLocation('limitClause', $2.limitClausePreceding || @1, $2.limitClauseLocation);
+   }
  | FromClause 'CURSOR' OptionalSelectConditions OptionalJoins
    {
      var keywords = [];
+
+     parser.addClauseLocation('whereClause', @1, $3.whereClauseLocation);
+     parser.addClauseLocation('limitClause', $2.limitClausePreceding || @1, $2.limitClauseLocation);
 
      if ($1) {
        if (!$1.hasLateralViews && typeof $1.tableReferenceList.hasJoinCondition !== 'undefined' && !$1.tableReferenceList.hasJoinCondition) {
@@ -1579,8 +1590,12 @@ TableExpression_EDIT
      //   or 'AND' based on type
 
      if (!$2) {
+       parser.addClauseLocation('whereClause', @1);
+       parser.addClauseLocation('limitClause', @1);
        return;
      }
+     parser.addClauseLocation('whereClause', @1, $2.whereClauseLocation);
+     parser.addClauseLocation('limitClause', $2.limitClausePreceding || @1, $2.limitClauseLocation);
      var keywords = [];
 
      if ($2.suggestColRefKeywords) {
@@ -1652,6 +1667,10 @@ OptionalSelectConditions
        $$ = {};
      }
 
+     $$.whereClauseLocation = $1 ? @1 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($6, @6, $5, @5, $4, @4, $3, @3, $2, @2, $1, @1);
+     $$.limitClauseLocation = $7 ? @7 : undefined;
+
      if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
        $$.suggestFilters = { prefix: 'WHERE', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
@@ -1711,6 +1730,9 @@ OptionalSelectConditions_EDIT
      if (!$3 && !$4 && !$5 && !$6) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
+     $$.whereClauseLocation = $1 ? @1 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($7, @7, $6, @6, $5, @5, $4, @4, $3, @3, $1, @1);
+     $$.limitClauseLocation = $8 ? @8 : undefined;
    }
  | OptionalWhereClause GroupByClause 'CURSOR' OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
@@ -1729,6 +1751,9 @@ OptionalSelectConditions_EDIT
      if (!$4 && !$5 && !$6) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
+     $$.whereClauseLocation = $1 ? @1 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($7, @7, $6, @6, $5, @5, $4, @4, $2, @2);
+     $$.limitClauseLocation = $8 ? @8 : undefined;
    }
  | OptionalWhereClause OptionalGroupByClause HavingClause 'CURSOR' OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
@@ -1740,6 +1765,9 @@ OptionalSelectConditions_EDIT
      if (!$5 && !$6) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
+     $$.whereClauseLocation = $1 ? @1 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($7, @7, $6, @6, $5, @5, $3, @3);
+     $$.limitClauseLocation = $8 ? @8 : undefined;
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause 'CURSOR' OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
@@ -1748,7 +1776,9 @@ OptionalSelectConditions_EDIT
      if (!$6) {
        parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
-
+     $$.whereClauseLocation = $1 ? @1 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($7, @7, $6, @6, $4, @4);
+     $$.limitClauseLocation = $8 ? @8 : undefined;
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause 'CURSOR' OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
@@ -1757,6 +1787,9 @@ OptionalSelectConditions_EDIT
        keywords = keywords.concat(parser.createWeightedKeywords($5.suggestKeywords, 5));
      }
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$7 && !$8 && !$9 };
+     $$.whereClauseLocation = $1 ? @1 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($7, @7, $5, @5);
+     $$.limitClauseLocation = $8 ? @8 : undefined;
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy 'CURSOR' OptionalLimitClause OptionalOffsetClause
    {
@@ -1765,11 +1798,17 @@ OptionalSelectConditions_EDIT
        keywords = keywords.concat(parser.createWeightedKeywords($6.suggestKeywords, 4));
      }
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$8 && !$9 };
+     $$.whereClauseLocation = $1 ? @1 : undefined;
+     $$.limitClausePreceding = @6;
+     $$.limitClauseLocation = $8 ? @8 : undefined;
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause 'CURSOR' OptionalOffsetClause
    {
      var keywords = parser.getKeywordsForOptionalsLR([$9], [{ value: 'OFFSET', weight: 2 }], [parser.isImpala()]);
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$9 };
+     $$.whereClauseLocation = $1 ? @1 : undefined;
+     $$.limitClausePreceding = parser.firstDefined($6, @6, $5, @5, $4, @4, $3, @3, $2, @2, $1, @1);
+     $$.limitClauseLocation = $7 ? @7 : undefined;
    }
  ;
 
