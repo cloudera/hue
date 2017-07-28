@@ -66,6 +66,7 @@ variables.
 pytype = type
 
 from django.utils.encoding import smart_str
+from django.utils.translation import ugettext as _
 
 from desktop.lib.paths import get_desktop_root, get_build_dir
 
@@ -133,12 +134,18 @@ class BoundConfig(object):
     'present' is whether the data was found in self.bind_to
     'data' is the data itself, or None whenever present is False
     """
-    if self.grab_key is not _ANONYMOUS:
-      present = self.grab_key in self.bind_to
-      data = self.bind_to.get(self.grab_key)
-    else:
+    try:
+      if self.grab_key is not _ANONYMOUS:
+        present = self.grab_key in self.bind_to
+        data = self.bind_to.get(self.grab_key)
+      else:
+        present = True
+        data = self.bind_to
+    except AttributeError:
+      LOG.exception("Error value of key '%s' in configuration." % self.grab_key)
+      data = _("Possible misconfiguration")
       present = True
-      data = self.bind_to
+
     return data, present
 
   def get(self):
