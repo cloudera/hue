@@ -109,7 +109,7 @@ ${ hueIcons.symbols() }
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
-        <a class="brand" data-bind="hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
+        <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
 
@@ -902,7 +902,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             location.href = '/accounts/logout';
           }},
           { url: '/dashboard/admin/collections', app: function (ctx) {
-            page('/home?type=search-dashboard');
+            page('/home/?type=search-dashboard');
           }},
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
@@ -989,18 +989,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page('/notebook?' + ctx.querystring);
           }},
           { url: '/notebook/notebooks', app: function (ctx) {
-            page('/home?' + ctx.querystring);
+            page('/home/?' + ctx.querystring);
           }},
           { url: '/oozie/editor/bundle/list', app: function (ctx) {
-            page('/home?type=oozie-bundle');
+            page('/home/?type=oozie-bundle');
           }},
           { url: '/oozie/editor/bundle/*', app: 'oozie_bundle' },
           { url: '/oozie/editor/coordinator/list', app: function (ctx) {
-            page('/home?type=oozie-coordinator');
+            page('/home/?type=oozie-coordinator');
           }},
           { url: '/oozie/editor/coordinator/*', app: 'oozie_coordinator' },
           { url: '/oozie/editor/workflow/list', app: function (ctx) {
-            page('/home?type=oozie-workflow');
+            page('/home/?type=oozie-workflow');
           }},
           { url: '/oozie/editor/workflow/*', app: 'oozie_workflow' },
           { url: '/oozie/list_oozie_info', app: 'oozie_info' },
@@ -1395,7 +1395,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             var browserItems = [];
             browserItems.push({
               displayName: '${ _('Documents') }',
-              url: '/home',
+              url: '/home/',
               icon: 'documents'
             });
             if (appConfig['browser'] && appConfig['browser']['interpreters']) {
