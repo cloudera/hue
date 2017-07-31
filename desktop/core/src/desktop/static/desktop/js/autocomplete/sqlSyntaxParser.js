@@ -1902,6 +1902,7 @@ case 1251:
      if ($$[$0-2].identifierChain) {
        if ($$[$0]) {
          $$[$0-2].alias = $$[$0]
+         parser.addTableAliasLocation(_$[$0], $$[$0], $$[$0-2].identifierChain);
        }
        parser.addTablePrimary($$[$0-2]);
      }
@@ -1914,8 +1915,16 @@ case 1252:
      if ($$[$0]) {
        $$[$0-1].alias = $$[$0];
        parser.addTablePrimary({ subQueryAlias: $$[$0] });
+       parser.addSubqueryAliasLocation(_$[$0], $$[$0], $$[$0-1].identifierChain);
      } else {
        this.$.suggestKeywords = [{ value: 'AS', weight: 1 }];
+     }
+   
+break;
+case 1253:
+
+     if ($$[$0]) {
+       parser.addTableAliasLocation(_$[$0], $$[$0], $$[$0-2].identifierChain);
      }
    
 break;
@@ -1923,6 +1932,7 @@ case 1254:
 
      if ($$[$0]) {
        $$[$0-2].alias = $$[$0];
+       parser.addTableAliasLocation(_$[$0], $$[$0], $$[$0-2].identifierChain);
      }
      parser.addTablePrimary($$[$0-2]);
    
@@ -1931,6 +1941,7 @@ case 1255:
 
      if ($$[$0]) {
        parser.addTablePrimary({ subQueryAlias: $$[$0] });
+       parser.addSubqueryAliasLocation(_$[$0], $$[$0]);
      }
    
 break;

@@ -2816,6 +2816,7 @@ TablePrimary
      if ($1.identifierChain) {
        if ($3) {
          $1.alias = $3
+         parser.addTableAliasLocation(@3, $3, $1.identifierChain);
        }
        parser.addTablePrimary($1);
      }
@@ -2827,6 +2828,7 @@ TablePrimary
      if ($2) {
        $1.alias = $2;
        parser.addTablePrimary({ subQueryAlias: $2 });
+       parser.addSubqueryAliasLocation(@2, $2, $1.identifierChain);
      } else {
        $$.suggestKeywords = [{ value: 'AS', weight: 1 }];
      }
@@ -2835,10 +2837,16 @@ TablePrimary
 
 TablePrimary_EDIT
  : TableOrQueryName_EDIT OptionalTableSample OptionalCorrelationName
+   {
+     if ($3) {
+       parser.addTableAliasLocation(@3, $3, $1.identifierChain);
+     }
+   }
  | TableOrQueryName OptionalTableSample_EDIT OptionalCorrelationName
    {
      if ($3) {
        $1.alias = $3;
+       parser.addTableAliasLocation(@3, $3, $1.identifierChain);
      }
      parser.addTablePrimary($1);
    }
@@ -2846,6 +2854,7 @@ TablePrimary_EDIT
    {
      if ($2) {
        parser.addTablePrimary({ subQueryAlias: $2 });
+       parser.addSubqueryAliasLocation(@2, $2);
      }
    }
  | DerivedTable OptionalCorrelationName_EDIT
