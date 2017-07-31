@@ -400,7 +400,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-job-browser-links-template">
     <div class="btn-group pull-right">
-      <button class="btn btn-flat" style="padding-right: 2px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser', click: function(){ huePubSub.publish('hide.jobs.panel'); }">
+      <button class="btn btn-flat" style="padding-right: 2px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function(){ huePubSub.publish('hide.jobs.panel'); }">
         <span>${ _('Jobs') }</span>
       </button>
       <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Mini job browser')}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
