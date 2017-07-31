@@ -1311,6 +1311,25 @@ var SqlParseSupport = (function () {
       });
     };
 
+    parser.addTableAliasLocation = function (location, alias, identifierChain) {
+      parser.yy.locations.push({
+        type: 'alias',
+        source: 'table',
+        alias: alias,
+        location: adjustLocationForCursor(location),
+        identifierChain: identifierChain
+      });
+    };
+
+    parser.addSubqueryAliasLocation = function (location, alias) {
+      parser.yy.locations.push({
+        type: 'alias',
+        source: 'subquery',
+        alias: alias,
+        location: adjustLocationForCursor(location)
+      });
+    };
+
     parser.addAsteriskLocation = function (location, identifierChain) {
       parser.yy.locations.push({
         type: 'asterisk',
@@ -1567,8 +1586,8 @@ var SqlParseSupport = (function () {
     'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords', 'createWeightedKeywords', 'suggestKeywords', 'suggestColRefKeywords',
     'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions', 'suggestColumns', 'suggestGroupBys',
     'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation', 'addStatementLocation', 'firstDefined',
-    'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation',
-    'suggestDatabases', 'suggestHdfs', 'suggestValues', 'handleQuotedValueWithCursor'];
+    'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addTableAliasLocation', 'addSubqueryAliasLocation', 'addTableLocation',
+    'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs', 'suggestValues', 'handleQuotedValueWithCursor'];
 
   var SYNTAX_PARSER_NOOP = function () {};
 
