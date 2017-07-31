@@ -27,8 +27,17 @@ ${ commonheader(_("Oozie Information"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='oozie', dashboard=True) }
 %endif
 
+<style type="text/css">
+  .oozie-info .form-search {
+    margin: 0 0 20px !important;
+  }
+  .oozie-info .tab-content {
+    padding: 0 !important;
+  }
+</style>
 
-<div class="container-fluid">
+
+<div class="oozie-info container-fluid">
 
   <div class="card card-small">
   <div class="card-body">
@@ -40,7 +49,7 @@ ${ layout.menubar(section='oozie', dashboard=True) }
   </div>
   </h1>
 
-  <ul class="nav nav-tabs">
+  <ul class="nav nav-pills">
     % if instrumentation:
     <li class="active"><a href="#instrumentation" data-toggle="tab">${ _('Instrumentation') }</a></li>
     % else:
@@ -57,7 +66,7 @@ ${ layout.menubar(section='oozie', dashboard=True) }
         <input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
       </form>
       <div class="tabbable">
-        <ul class="nav nav-pills">
+        <ul class="nav nav-tabs nav-tabs-border">
             % for category in instrumentation.iterkeys():
             <li
             % if loop.first:
@@ -118,7 +127,7 @@ ${ layout.menubar(section='oozie', dashboard=True) }
         <form class="form-search">
           <input type="text" class="searchFilter input-xlarge search-query" placeholder="${_('Text Filter')}">
         </form>
-        <ul class="nav nav-pills">
+        <ul class="nav nav-tabs nav-tabs-border">
         % for obj in metrics:
           % if obj != 'version':
           <li
