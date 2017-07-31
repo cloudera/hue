@@ -214,7 +214,7 @@ ${ assist.assistPanel() }
           </div>
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
             <label for="rdbmsMode" class="control-label"><div>${ _('Mode') }</div>
-              <label class="radio inline-block">
+              <label class="radio inline-block margin-right-20">
                 <input type="radio" name="rdbmsMode" value="customRdbms" data-bind="checked: createWizard.source.rdbmsMode" /> ${_('Custom')}
               </label>
               <label class="radio inline-block">
@@ -634,11 +634,24 @@ ${ assist.assistPanel() }
         <div class="card step">
           <h4>${_('Properties')}</h4>
           <div class="card-body">
-            <div class="control-group">
-              <label for="path" class="control-label" data-bind="visible: true"><div>${ _('Libs') }</div>
-                <input type="text" class="form-control path input-xlarge" data-bind="value: sqoopJobLibPath">
-              </label>
-            </div>
+            <label class="control-label"><div>${ _('Libs') }</div>
+              <div class="inline-table">
+                <ul data-bind="sortable: { data: sqoopJobLibPaths, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: sqoopJobLibPaths().length" class="unstyled">
+                  <li>
+                    <div class="input-append" style="margin-bottom: 4px">
+                      <input type="text" class="filechooser-input input-xxlarge" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+                      <span class="add-on move-widget muted" data-bind="visible: $parent.sqoopJobLibPaths().length > 1"><i class="fa fa-arrows"></i></span>
+                      <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeSqoopJobLibPath($data); }"><i class="fa fa-minus"></i></a>
+                    </div>
+                  </li>
+                </ul>
+                <div class="config-property-add-value" style="margin-top: 5px;">
+                  <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addSqoopJobLibPath">
+                    <i class="fa fa-plus"></i>
+                  </a>
+                </div>
+              </div>
+            </label>
           </div>
         </div>
         <!-- /ko -->
@@ -1610,7 +1623,16 @@ ${ assist.assistPanel() }
       self.indexerDefaultFieldObject = ko.observableArray();
 
       // File, Table, HBase
-      self.sqoopJobLibPath = ko.observable('');
+      self.sqoopJobLibPaths = ko.observableArray([]);
+      self.addSqoopJobLibPath = function() {
+        var newValue = {
+          path: ko.observable('')
+        };
+        self.sqoopJobLibPaths.push(newValue);
+      }
+      self.removeSqoopJobLibPath = function (valueToRemove) {
+        self.sqoopJobLibPaths.remove(valueToRemove);
+      };
     };
 
     var CreateWizard = function (vm) {
