@@ -3650,8 +3650,23 @@
       self.clearMarkedErrors();
     };
 
-    AceLocationHandler.prototype.verifyExists = function (token) {
+    AceLocationHandler.prototype.verifyExists = function (token, allLocations) {
       var self = this;
+
+      var knownTableAliases = [];
+
+      if (token.parseLocation.type === 'table') {
+        for (var i = 0; i < allLocations.length; i++) {
+          var location = allLocations[i];
+          if (location.type === 'alias' && (location.source === 'table' || location.source === 'subquery')) {
+            knownTableAliases.push(location.alias.toLowerCase());
+            if (token.value.toLowerCase() === location.alias.toLowerCase()) {
+              console.log(token.value + ' return');
+              return;
+            }
+          }
+        }
+      }
 
       // the syntax worker is only defined when syntax check is on
       // TODO: Only do this when browser caching is turned on
@@ -3792,7 +3807,7 @@
                           delete location.tables;
                           token.parseLocation = location;
                           activeTokens.push(token);
-                          self.verifyExists(token);
+                          self.verifyExists(token, e.data.locations);
                         } else if (tablesToGo.length > 0) {
                           findIdentifierChainInTable(tablesToGo);
                         }
@@ -3814,7 +3829,7 @@
             } else {
               token.parseLocation = location;
               activeTokens.push(token);
-              self.verifyExists(token);
+              self.verifyExists(token, e.data.locations);
             }
           }
         });
