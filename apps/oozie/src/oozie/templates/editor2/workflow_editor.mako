@@ -752,9 +752,6 @@ ${ utils.submit_popup_event() }
           "width": "500px"
         }, 200, function(){
           widget.oozieExpanded(true);
-          if ($(document).width() > $(window).width()){
-            $("html, body").scrollLeft($(document).width() - $(window).width());
-          }
         });
       }
       else {
