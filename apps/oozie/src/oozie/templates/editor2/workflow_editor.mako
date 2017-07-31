@@ -760,9 +760,6 @@ ${ dashboard.import_bindings() }
           "width": "500px"
         }, 200, function(){
           widget.oozieExpanded(true);
-          if ($(document).width() > $(window).width()){
-            $("html, body").scrollLeft($(document).width() - $(window).width());
-          }
         });
       }
       else {
