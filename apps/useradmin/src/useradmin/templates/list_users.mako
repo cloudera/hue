@@ -202,6 +202,15 @@ ${layout.menubar(section='users')}
         }
         $.jHueNotify.info("${ _('The users were deleted.') }")
         $usersComponents.find(".delete-user").modal("hide");
+      },
+      error: function(response, status, err) {
+        if (response.responseJSON && response.responseJSON.message && response.status == 401) {
+          $.jHueNotify.error(response.responseJSON.message);
+        }
+        else {
+          $.jHueNotify.error("${ _('An unknown error has occurred while deleting the user. Please try again.') }");
+        }
+        $usersComponents.find(".delete-user").modal("hide");
       }
     });
     % endif
