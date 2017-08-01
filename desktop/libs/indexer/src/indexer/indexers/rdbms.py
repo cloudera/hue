@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from librdbms.server import dbms as rdbms
-from librdbms.conf import DATABASES, get_database_password
+from librdbms.conf import DATABASES, get_database_password, get_server_choices
 from notebook.connectors.rdbms import Assist
 from notebook.models import make_notebook
 
@@ -68,6 +68,14 @@ def get_db_component(request):
 
   return JsonResponse(format_)
 
+def get_drivers(request):
+  format_ = {'data': [], 'status': 1}
+  servers_dict = dict(get_server_choices())
+  format_['data'] = [{'value': key, 'name': servers_dict[key]} for key in servers_dict.keys()]
+  format_['data'].append({'value': 'jdbc', 'name': 'JDBC'})
+  format_['status'] = 0
+
+  return JsonResponse(format_)
 
 def run_sqoop(request, source, destination, start_time):
   rdbms_mode = source['rdbmsMode']
