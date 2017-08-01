@@ -105,6 +105,9 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
         "bundle": ko.mapping.toJSON(self.bundle)
       }, function (data) {
         if (data.status == 0) {
+          if (self.bundle.id() == null) {
+            shareViewModel.setDocUuid(data.uuid);
+          }
           self.bundle.id(data.id);
           self.bundle.tracker().markCurrentStateAsClean();
           $(document).trigger("info", data.message);
