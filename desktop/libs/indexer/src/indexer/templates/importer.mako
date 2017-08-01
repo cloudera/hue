@@ -1230,16 +1230,23 @@ ${ assist.assistPanel() }
         self.rdbmsUsername('');
         self.rdbmsPassword('');
         self.rdbmsDbIsValid(false);
+        if (val == 'configRdbms') {
+          $.post("${ url('indexer:get_drivers') }", {
+          }, function (resp) {
+            if (resp.data) {
+              self.rdbmsTypes(resp.data);
+            }
+          });
+        } else if (val == 'customRdbms') {
+          self.rdbmsTypes([
+              {'value': 'jdbc', 'name': 'JDBC'},
+              {'value': 'mysql', 'name': 'MySQL'},
+              {'value': 'oracle', 'name': 'Oracle'},
+              {'value': 'postgresql', 'name': 'PostgreSQL'}
+          ]);
+        }
       });
-      self.rdbmsTypesAll = ko.observableArray([
-          {'value': 'mysql', 'name': 'MySQL'},
-          {'value': 'oracle', 'name': 'Oracle'},
-          {'value': 'postgresql', 'name': 'PostgreSQL'},
-          {'value': 'db2', 'name': 'DB2'}
-      ]);
-      self.rdbmsTypes = ko.pureComputed(function() {
-        return self.rdbmsTypesAll();
-      });
+      self.rdbmsTypes = ko.observableArray();
       self.rdbmsType = ko.observable('');
       self.rdbmsType.subscribe(function (val) {
         self.path('');
@@ -1266,14 +1273,14 @@ ${ assist.assistPanel() }
           });
         }
       });
-      self.rdbmsDatabaseNames = ko.observableArray([]);
+      self.rdbmsDatabaseNames = ko.observableArray();
       self.rdbmsTableName = ko.observable('');
       self.rdbmsTableName.subscribe(function (val) {
         if (val != '') {
           wizard.guessFieldTypes();
         }
       });
-      self.rdbmsTableNames = ko.observableArray([]);
+      self.rdbmsTableNames = ko.observableArray();
       self.rdbmsHostname = ko.observable('');
       self.rdbmsHostname.subscribe(function (val) {
         self.rdbmsDatabaseNames([]);
