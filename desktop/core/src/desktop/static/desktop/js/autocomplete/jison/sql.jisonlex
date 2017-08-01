@@ -350,6 +350,7 @@
 'OUTER'                                    { return 'OUTER'; }
 'PARTITION'                                { return 'PARTITION'; }
 'PRECEDING'                                { return 'PRECEDING'; }
+'PURGE'                                    { return 'PURGE'; }
 'RANGE'                                    { return 'RANGE'; }
 'REGEXP'                                   { return 'REGEXP'; }
 'RIGHT'                                    { return 'RIGHT'; }
