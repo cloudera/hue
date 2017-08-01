@@ -1975,6 +1975,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.activeStatement = ko.observable();
         self.activeTables = ko.observableArray();
         self.activeRisks = ko.observable({});
+        self.activeRisks.subscribe(function() {
+          if (self.isMissingDDL()) {
+            self.uploadTableStats();
+          }
+        });
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
 
