@@ -35,6 +35,7 @@ cat autocomplete_header.jison sql_main.jison sql_valueExpression.jison sql_error
 
 echo "Creating SQL autocomplete parser..."
 jison sqlAutocompleteParser.jison sql.jisonlex
+grunt uglify:sqlAutocompleteParser
 cat license.txt sqlAutocompleteParser.js > ../sqlAutocompleteParser.js
 rm sqlAutocompleteParser.jison
 rm sqlAutocompleteParser.js
@@ -47,6 +48,7 @@ jison sqlSyntaxParser.jison sql.jisonlex
 # Workaround for a parser bug where it reports the location of the previous token on error (pull-request submitted for jison)
 # We're also adding a ruleId to the parser error composed of the last two stack ID's and used for suppressing errors in the UI
 sed -i '' 's/loc: yyloc,/loc: lexer.yylloc, ruleId: stack.slice(stack.length - 2, stack.length).join(''),/' sqlSyntaxParser.js
+grunt uglify:sqlSyntaxParser
 cat license.txt sqlSyntaxParser.js > ../sqlSyntaxParser.js
 rm sqlSyntaxParser.jison
 rm sqlSyntaxParser.js
@@ -54,12 +56,14 @@ rm sqlSyntaxParser.js
 # === Statement parser ===
 echo "Creating SQL statements parser..."
 jison sqlStatementsParser.jison
+grunt uglify:sqlStatementsParser
 cat license.txt sqlStatementsParser.js > ../sqlStatementsParser.js
 rm sqlStatementsParser.js
 
 # === Global Search parser ===
 echo "Creating Global Search parser..."
 jison globalSearchParser.jison
+grunt uglify:globalSearchParser
 cat license.txt globalSearchParser.js > ../globalSearchParser.js
 rm globalSearchParser.js
 
