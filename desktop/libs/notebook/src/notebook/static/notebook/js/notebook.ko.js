@@ -1787,7 +1787,9 @@ var EditorViewModel = (function() {
 
     self.uploadTableStats = function (options) {
       hueAnalytics.log('notebook', 'load_table_stats');
-      $(document).trigger("info", "Preparing table data...");
+      if (options.showProgress) {
+        $(document).trigger("info", "Preparing table data...");
+      }
 
       $.post("/metadata/api/optimizer/upload/table_stats", {
         db_tables: ko.mapping.toJSON($.map(options.activeTables, function(table) {
@@ -1798,12 +1800,16 @@ var EditorViewModel = (function() {
         with_ddl: ko.mapping.toJSON(true)
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", $.map(options.activeTables, function(table) { return table.tableName; }) + " stats sent to analyse");
+          if (options.showProgress) {
+            $(document).trigger("info", $.map(options.activeTables, function(table) { return table.tableName; }) + " stats sent to analyse");
+          }
           if (data.upload_table_ddl) {
-            self.watchUploadStatus(data.upload_table_ddl.status.workloadId);
+            self.watchUploadStatus(data.upload_table_ddl.status.workloadId, options.showProgress);
           }
         } else {
-          $(document).trigger("error", data.message);
+          if (options.showProgress) {
+            $(document).trigger("error", data.message);
+          }
         }
       }).always(function () {
         if (options.callback) {
@@ -1812,21 +1818,27 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.watchUploadStatus = function (workloadId) {
+    self.watchUploadStatus = function (workloadId, showProgress) {
       $.post("/metadata/api/optimizer/upload/status", {
         workloadId: workloadId
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", "Query processing: " + data.upload_status.status.state);
+          if (showProgress) {
+            $(document).trigger("info", "Query processing: " + data.upload_status.status.state);
+          }
           if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) != -1) {
             window.setTimeout(function () {
               self.watchUploadStatus(workloadId);
             }, 2000);
           } else {
-            $(document).trigger("warn", data.upload_status.status.statusMsg + (data.upload_status.status.failedQueries > 0 ? '. ' + data.upload_status.status.failQueryDetails.map(function(query) { return query.error; }) : ''));
+            if (showProgress) {
+              $(document).trigger("warn", data.upload_status.status.statusMsg + (data.upload_status.status.failedQueries > 0 ? '. ' + data.upload_status.status.failQueryDetails.map(function(query) { return query.error; }) : ''));
+            }
           }
         } else {
-          $(document).trigger("error", data.message);
+          if (showProgress) {
+            $(document).trigger("error", data.message);
+          }
         }
       });
     };
