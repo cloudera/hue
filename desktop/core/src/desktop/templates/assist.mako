@@ -1951,7 +1951,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           <div class="margin-top-20">
             <!-- ko hueSpinner: { spin: uploadingTableStats, inline: true} --><!-- /ko -->
             <!-- ko ifnot: uploadingTableStats -->
-            <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: uploadTableStats, attr: { 'title': ('${ _("Add table ") }'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${ _("and") } ' : '') + (isMissingStats() ? 'stats' : '')) }">
+            <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { uploadTableStats(true) }, attr: { 'title': ('${ _("Add table ") }'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${ _("and") } ' : '') + (isMissingStats() ? 'stats' : '')) }">
               <i class="fa fa-fw fa-plus-circle"></i> ${_('Improve Analysis')}
             </a>
             <!-- /ko -->
@@ -1977,7 +1977,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.activeRisks = ko.observable({});
         self.activeRisks.subscribe(function() {
           if (self.isMissingDDL()) {
-            self.uploadTableStats();
+            self.uploadTableStats(false);
           }
         });
         self.statementCount = ko.observable(0);
@@ -2142,13 +2142,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
       }
 
-      AssistantPanel.prototype.uploadTableStats = function () {
+      AssistantPanel.prototype.uploadTableStats = function (showProgress) {
         var self = this;
         if (self.uploadingTableStats()) {
           return;
         }
         self.uploadingTableStats(true);
-        huePubSub.publish('editor.upload.table.stats', { activeTables: self.activeTables(), callback: function () {
+        huePubSub.publish('editor.upload.table.stats', {
+          activeTables: self.activeTables(),
+          showProgress: showProgress,
+          callback: function () {
             self.uploadingTableStats(false);
           }
         });
