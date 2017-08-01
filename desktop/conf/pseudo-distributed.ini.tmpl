@@ -593,6 +593,10 @@
   # For more info, see https://docs.djangoproject.com/en/1.4/topics/http/sessions/
   # ------------------------------------------------------------------------
   [[session]]
+    # The name of the cookie to use for sessions.
+    # This can have any value that is not used by the other cookie names in your application.
+    ## cookie_name=sessionid
+
     # The cookie containing the users' session ID will expire after this amount of time in seconds.
     # Default is 2 weeks.
     ## ttl=1209600
