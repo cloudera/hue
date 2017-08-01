@@ -131,8 +131,8 @@ def run_sqoop(request, source, destination, start_time):
     # Todo
 
   lib_files = []
-  if destination['sqoopJobLibPath']:
-    lib_files.append({"path": destination['sqoopJobLibPath'], "type": "jar"})
+  if destination['sqoopJobLibPaths']:
+    lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths']]
 
   task = make_notebook(
     name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
