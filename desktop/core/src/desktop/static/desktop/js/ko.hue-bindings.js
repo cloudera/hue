@@ -3650,78 +3650,119 @@
       self.clearMarkedErrors();
     };
 
+    AceLocationHandler.prototype.fetchAutocompleteDeferred = function (identifierChain) {
+      var self = this;
+      var promise = $.Deferred();
+      ApiHelper.getInstance().fetchAutocomplete({
+        sourceType: self.snippet.type(),
+        identifierChain: identifierChain,
+        defaultDatabase: self.snippet.database(),
+        silenceErrors: true,
+        errorCallback: function (data) {
+          promise.reject([]);
+        },
+        successCallback: function (data) {
+          promise.resolve(data.extended_columns || data.tables_meta || []);
+        }
+      });
+      return promise;
+    };
+
+    AceLocationHandler.prototype.fetchPossibleValues = function (token) {
+      var self = this;
+      var promise = $.Deferred();
+      if (token.parseLocation.tables && token.parseLocation.tables.length > 0) {
+        var tablePromisses = [];
+        token.parseLocation.tables.forEach(function (table) {
+          tablePromisses.push(self.fetchAutocompleteDeferred(table.identifierChain));
+        });
+        $.when.apply($, tablePromisses).always(function () {
+          var joined = [];
+          for (var i = 0; i < arguments.length; i++) {
+            joined = joined.concat(arguments[i]);
+          }
+          promise.resolve(joined);
+        });
+      } else if (token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 0) {
+        // fetch the parent
+        // TODO: Fetch the parents parent first to see if it actually exists to prevent a bunch of failing calls when
+        // typing, i.e. SELECT * FROM c| -> SELECT * FROM cu| -> SELECT * FROM cus|
+        // Better yet, don't check tables next to cursor
+        return self.fetchAutocompleteDeferred(token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1));
+      } else {
+        promise.reject([]);
+      }
+      return promise;
+    };
+
     AceLocationHandler.prototype.verifyExists = function (token, allLocations) {
       var self = this;
+      delete token.notFound;
+      delete token.syntaxError;
 
-      var knownTableAliases = [];
+      if (self.aceSqlSyntaxWorker && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
+        var knownTableAliases = [];
 
-      if (token.parseLocation.type === 'table') {
-        for (var i = 0; i < allLocations.length; i++) {
-          var location = allLocations[i];
-          if (location.type === 'alias' && (location.source === 'table' || location.source === 'subquery')) {
-            knownTableAliases.push(location.alias.toLowerCase());
-            if (token.value.toLowerCase() === location.alias.toLowerCase()) {
-              console.log(token.value + ' return');
+        self.fetchPossibleValues(token).done(function (possibleValues) {
+          // Append table aliases
+          for (var i = 0; i < allLocations.length; i++) {
+            var location = allLocations[i];
+            if (location.type === 'alias' && (location.source === 'table' || location.source === 'subquery')) {
+              possibleValues.push({ name: location.alias.toLowerCase() });
+            }
+          }
+
+          var tokenValLower = token.value.toLowerCase();
+          // Break if found
+          for (var i = 0; i < possibleValues.length; i++) {
+            if (possibleValues[i].name.toLowerCase() === tokenValLower) {
               return;
             }
           }
-        }
-      }
 
-      // the syntax worker is only defined when syntax check is on
-      // TODO: Only do this when browser caching is turned on
-      if (self.aceSqlSyntaxWorker && token.parseLocation && token.parseLocation.identifierChain) {
-        // We want to check the parent to see if it contains the entry for performance, as opposed to checking
-        // each entry with the API.
-        ApiHelper.getInstance().fetchAutocomplete({
-          sourceType: self.snippet.type(),
-          identifierChain: token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1),
-          defaultDatabase: self.snippet.database(),
-          silenceErrors: true,
-          errorCallback: function (data) {
-            console.log('error');
-            console.log(data);
-          },
-          successCallback: function (data) {
-            if (token.parseLocation.type === 'table' && data.tables_meta) {
-              var tableLowerCase = token.value.toLowerCase();
-              var isLowerCase = tableLowerCase === token.value;
-              for (var i = 0; i < data.tables_meta.length; i++) {
-                if (data.tables_meta[i].name.toLowerCase() === tableLowerCase) {
-                  return;
-                }
-              }
-
-              var weightedExpected = $.map(data.tables_meta, function (val) {
-                return {
-                  text: isLowerCase ? val.name : val.name.toUpperCase(),
-                  distance: SqlParseSupport.stringDistance(token.value, val.name)
-                }
-              });
-              weightedExpected.sort(function (a, b) {
-                if (a.distance === b.distance) {
-                  return a.text.localeCompare(b.text);
-                }
-                return a.distance - b.distance
-              });
-              token.notFound = true;
-              token.syntaxError = {
-                expected: weightedExpected
-              };
-
-              ApiHelper.getInstance().identifierChainToPath({
-                identifierChain: token.parseLocation.identifierChain,
-                sourceType: self.snippet.type(),
-                defaultDatabase: self.snippet.database()
-              }, function (path) {
-                token.qualifiedIdentifier = path.join('.');
-                var AceRange = ace.require('ace/range').Range;
-                var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
-                var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
-                self.editor.session.$backMarkers[markerId].token = token;
-              })
+          var uniqueIndex = {};
+          possibleValues = possibleValues.filter(function (value) {
+            if (uniqueIndex[value.name.toLowerCase()]) {
+              return false;
             }
+            uniqueIndex[value.name.toLowerCase()] = true;
+            return true;
+          });
+
+          var isLowerCase = tokenValLower === token.value;
+
+          var weightedExpected = $.map(possibleValues, function (val) {
+            return {
+              text: isLowerCase ? val.name : val.name.toUpperCase(),
+              distance: SqlParseSupport.stringDistance(token.value, val.name)
+            }
+          });
+          weightedExpected.sort(function (a, b) {
+            if (a.distance === b.distance) {
+              return a.text.localeCompare(b.text);
+            }
+            return a.distance - b.distance
+          });
+          token.syntaxError = {
+            expected: weightedExpected
+          };
+          token.notFound = true;
+
+          if (token.parseLocation.type === 'table') {
+            ApiHelper.getInstance().identifierChainToPath({
+              identifierChain: token.parseLocation.identifierChain,
+              sourceType: self.snippet.type(),
+              defaultDatabase: self.snippet.database()
+            }, function (path) {
+              token.qualifiedIdentifier = path.join('.');
+            })
           }
+
+          var AceRange = ace.require('ace/range').Range;
+          var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
+          var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
+          self.editor.session.$backMarkers[markerId].token = token;
+
         });
       }
     };
@@ -3791,6 +3832,8 @@
             token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
           }
           if (token !== null) {
+            token.parseLocation = location;
+            activeTokens.push(token);
             if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
               var findIdentifierChainInTable = function (tablesToGo) {
                 var nextTable = tablesToGo.shift();
@@ -3801,21 +3844,21 @@
                     identifierChain: nextTable.identifierChain,
                     silenceErrors: true,
                     successCallback: function (data) {
-                      try {
-                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
-                          location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
-                          delete location.tables;
-                          token.parseLocation = location;
-                          activeTokens.push(token);
-                          self.verifyExists(token, e.data.locations);
-                        } else if (tablesToGo.length > 0) {
-                          findIdentifierChainInTable(tablesToGo);
-                        }
-                      } catch (e) {} // TODO: Ignore for subqueries
+                      if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
+                        location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
+                        delete location.tables;
+                        self.verifyExists(token, e.data.locations);
+                      } else if (tablesToGo.length > 0) {
+                        findIdentifierChainInTable(tablesToGo);
+                      } else {
+                        self.verifyExists(token, e.data.locations);
+                      }
                     }
                   })
                 } else if (tablesToGo.length > 0) {
                   findIdentifierChainInTable(tablesToGo);
+                } else {
+                  self.verifyExists(token, e.data.locations);
                 }
               };
               if (location.tables.length > 1) {
@@ -3823,12 +3866,9 @@
               } else if (location.tables.length == 1 && location.tables[0].identifierChain) {
                 location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
                 delete location.tables;
-                token.parseLocation = location;
-                activeTokens.push(token);
+                self.verifyExists(token, e.data.locations);
               }
             } else {
-              token.parseLocation = location;
-              activeTokens.push(token);
               self.verifyExists(token, e.data.locations);
             }
           }
@@ -4248,7 +4288,7 @@
             var endTestPosition = editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
             if (endTestPosition.column !== pointerPosition.column) {
               var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-              if (token !== null && !token.notFound && token.parseLocation && !disableTooltip) {
+              if (token !== null && !token.notFound && token.parseLocation && !disableTooltip && token.parseLocation.type !== 'alias') {
                 tooltipTimeout = window.setTimeout(function () {
                   if (token.parseLocation) {
                     var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
@@ -4299,7 +4339,7 @@
               }
               if (lastHoveredToken !== token) {
                 clearActiveMarkers();
-                if (token !== null && !token.notFound && token.parseLocation) {
+                if (token !== null && !token.notFound && token.parseLocation && token.parseLocation.type !== 'alias') {
                   markLocation(token.parseLocation);
                 }
                 lastHoveredToken = token;
@@ -4344,7 +4384,7 @@
           if (selectionRange.isEmpty()) {
             var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
             var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-            if (token && (token.parseLocation || token.syntaxError)) {
+            if (token && ((token.parseLocation && token.parseLocation.type !== 'alias') || token.syntaxError)) {
               var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
               var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
               var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
