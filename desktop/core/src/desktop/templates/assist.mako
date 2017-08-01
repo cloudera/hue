@@ -1415,8 +1415,25 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.selectedHBaseEntry = ko.observable();
         self.reload = function () {
           self.selectedHBaseEntry(root);
-          root.loadEntries();
+          root.loadEntries(function () {
+            var lastOpenendPath = self.apiHelper.getFromTotalStorage('assist', 'last.opened.hbase.entry', null);
+            if (lastOpenendPath) {
+              root.entries().every(function (entry) {
+                if (entry.path === lastOpenendPath) {
+                  entry.open();
+                  return false;
+                }
+                return true;
+              })
+            }
+          });
         };
+
+        self.selectedHBaseEntry.subscribe(function (newEntry) {
+          if (newEntry !== root || (newEntry === root && newEntry.loaded)) {
+            self.apiHelper.setInTotalStorage('assist', 'last.opened.hbase.entry', newEntry.path);
+          }
+        });
 
         huePubSub.subscribe('assist.clickHBaseItem', function (entry) {
           if (entry.definition.host) {
