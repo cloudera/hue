@@ -1432,13 +1432,38 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           self.reload();
         });
 
+        var delayChangeHash = function (hash) {
+          window.setTimeout(function () {
+            window.location.hash = hash;
+          }, 0);
+        }
+
+        self.lastClickeHBaseEntry = null;
+        self.HBaseLoaded = false;
+
+        huePubSub.subscribeOnce('hbase.app.loaded', function() {
+          delayChangeHash(self.selectedHBaseEntry().definition.name + '/' + self.lastClickeHBaseEntry.definition.name);
+          self.HBaseLoaded = true;
+        });
+
         huePubSub.subscribe('assist.dblClickHBaseItem', function (entry) {
-          var link = '/hbase/#' + self.selectedHBaseEntry().definition.name + '/' + entry.definition.name;
-          if (IS_HUE_4){
-            huePubSub.publish('open.link', link);
+          var hash = self.selectedHBaseEntry().definition.name + '/' + entry.definition.name;
+          if (IS_HUE_4) {
+            if (window.location.pathname.startsWith('/hue/hbase')) {
+              window.location.hash = hash;
+            }
+            else {
+              self.lastClickeHBaseEntry = entry;
+              huePubSub.subscribeOnce('app.gained.focus', function (app) {
+                if (app === 'hbase' && self.HBaseLoaded) {
+                  delayChangeHash(hash);
+                }
+              });
+              huePubSub.publish('open.link', '/hbase');
+            }
           }
           else {
-            window.open(link);
+            window.open('/hbase/#' + hash);
           }
         });
 
