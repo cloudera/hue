@@ -285,7 +285,11 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     ${smartview('views.tabledata')}
 
     <br/><br/><br/><br/>
-    <div class="subnav navbar-fixed-bottom well-small">
+    <div class="subnav
+    %if not is_embeddable:
+    navbar-fixed-bottom
+    %endif
+    well-small">
         <div class="hbase-subnav">
           <div class="footer-slider">
             <span data-bind="visible: !hbaseApp.views.tabledata.isLoading()">
@@ -2404,6 +2408,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           routed = false;
         }
       });
+      huePubSub.publish('hbase.app.loaded');
     });
 
 
