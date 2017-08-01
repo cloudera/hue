@@ -230,7 +230,7 @@ DropStatsStatement_EDIT
  ;
 
 DropTableStatement
- : 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier
+ : 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPurge
    {
      parser.addTablePrimary($4);
    }
@@ -248,21 +248,28 @@ DropTableStatement_EDIT
        appendDot: true
      });
    }
- | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier_EDIT
+ | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier_EDIT OptionalPurge
    {
      if (parser.yy.result.suggestTables) {
        parser.yy.result.suggestTables.onlyTables = true;
      }
    }
- | 'DROP' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier
- | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier 'CURSOR'
+ | 'DROP' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier OptionalPurge
+ | 'DROP' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPurge 'CURSOR'
    {
      parser.addTablePrimary($4);
-     if (parser.isHive()) {
+     if (!$5) {
        parser.suggestKeywords(['PURGE']);
      }
    }
  ;
+
+OptionalPurge
+ :
+ | 'PURGE'
+ | '<hive>PURGE'
+ ;
+
 
 DropIndexStatement
  : 'DROP' '<hive>INDEX' OptionalIfExists RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier
