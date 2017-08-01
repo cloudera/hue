@@ -684,6 +684,13 @@ SESSION = ConfigSection(
   help=_("""Configuration options for specifying the Desktop session.
           For more info, see https://docs.djangoproject.com/en/1.4/topics/http/sessions/"""),
   members=dict(
+    COOKIE_NAME=Config(
+      key='cookie_name',
+      help=_("The name of the cookie to use for sessions."
+            "This can have any value that is not used by the other cookie names in your application."),
+      type=str,
+      default="sessionid",
+    ),
     TTL=Config(
       key='ttl',
       help=_("The cookie containing the users' session ID will expire after this amount of time in seconds."),
