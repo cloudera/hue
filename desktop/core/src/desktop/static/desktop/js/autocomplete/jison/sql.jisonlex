@@ -35,7 +35,6 @@
 <hive>'COLUMN'                             { return '<hive>COLUMN'; }
 <hive>'CONF'                               { return '<hive>CONF'; }
 <hive>'CREATE'                             { parser.determineCase(yytext); return '<hive>CREATE'; }
-<hive>'CROSS'                              { return '<hive>CROSS'; }
 <hive>'CUBE'                               { return '<hive>CUBE'; }
 <hive>'CURRENT'                            { return '<hive>CURRENT'; }
 <hive>'DATE'                               { return '<hive>DATE'; }
@@ -313,6 +312,7 @@
 'CASE'                                     { return 'CASE'; }
 'CHAR'                                     { return 'CHAR'; }
 'CREATE'                                   { parser.determineCase(yytext); return 'CREATE'; }
+'CROSS'                                    { return 'CROSS'; }
 'CURRENT'                                  { return 'CURRENT'; }
 'DATABASE'                                 { return 'DATABASE'; }
 'DECIMAL'                                  { return 'DECIMAL'; }

@@ -97,7 +97,7 @@ JoinType_EDIT
      if (parser.isHive()) {
        parser.suggestKeywords(['JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+       parser.suggestKeywords(['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else {
        parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
      }
@@ -105,7 +105,7 @@ JoinType_EDIT
  | 'RIGHT' 'CURSOR' error
    {
      if (parser.isImpala()) {
-       parser.suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+       parser.suggestKeywords(['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else {
        parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
      }
