@@ -61,7 +61,8 @@ urlpatterns += patterns('indexer.api3',
 
 urlpatterns += patterns('indexer.indexers.rdbms',
   url(r'^api/indexer/indexers/get_db_component/$', 'get_db_component', name='get_db_component'),
-  url(r'^api/indexer/indexers/get_drivers/$', 'get_drivers', name='get_drivers')
+  url(r'^api/indexer/indexers/get_drivers/$', 'get_drivers', name='get_drivers'),
+  url(r'^api/indexer/indexers/jdbc_db_list/$', 'jdbc_db_list', name='jdbc_db_list')
 )
 
 

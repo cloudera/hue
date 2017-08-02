@@ -141,6 +141,7 @@ class JdbcApi(Api):
       response['databases'] = assist.get_databases()
     elif table is None:
       response['tables'] = assist.get_tables(database)
+      response['tables_meta'] = response['tables']
     else:
       columns = assist.get_columns(database, table)
       response['columns'] = [col[0] for col in columns]
@@ -183,17 +184,26 @@ class Assist():
     self.db = db
 
   def get_databases(self):
-    databases, description = query_and_fetch(self.db, 'SHOW DATABASES')
-    return databases
+    dbs, description = query_and_fetch(self.db, 'SELECT DatabaseName FROM DBC.Databases')
+    return [db[0] and db[0].strip() for db in dbs]
 
   def get_tables(self, database, table_names=[]):
-    tables, description = query_and_fetch(self.db, 'SHOW TABLES')
-    return tables
+    tables, description = query_and_fetch(self.db, "SELECT * FROM dbc.tables WHERE tablekind = 'T' and databasename='%s'" % database)
+    return [{"comment": table[7] and table[7].strip(), "type": "Table", "name": table[1] and table[1].strip()} for table in tables]
 
   def get_columns(self, database, table):
-    columns, description = query_and_fetch(self.db, 'SHOW COLUMNS FROM %s.%s' % (database, table))
-    return columns
+    columns, description = query_and_fetch(self.db, "SELECT ColumnName, ColumnType, CommentString FROM DBC.Columns WHERE DatabaseName='%s' AND TableName='%s'" % (database, table))
+    return [[col[0] and col[0].strip(), self._type_converter(col[1]), '', '', col[2], ''] for col in columns]
 
   def get_sample_data(self, database, table, column=None):
     column = column or '*'
     return query_and_fetch(self.db, 'SELECT %s FROM %s.%s' % (column, database, table))
+
+  def _type_converter(self, name):
+    return {
+        "I": "INT_TYPE",
+        "I2": "SMALLINT_TYPE",
+        "CF": "STRING_TYPE",
+        "CV": "CHAR_TYPE",
+        "DA": "DATE_TYPE",
+      }.get(name, 'STRING_TYPE')
