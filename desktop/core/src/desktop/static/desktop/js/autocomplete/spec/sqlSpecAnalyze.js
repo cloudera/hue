@@ -581,6 +581,33 @@
     });
 
     describe('REFRESH', function () {
+
+      it('should handle "REFRESH db.tbl PARTITION (id = 1);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'REFRESH db.tbl PARTITION (id = 1);',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "REFRESH FUNCTIONS db;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'REFRESH FUNCTIONS db;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should handle "REFRESH db.tbl;|"', function() {
         assertAutoComplete({
           beforeCursor: 'REFRESH db.tbl;',
@@ -616,7 +643,21 @@
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
-            suggestDatabases: { appendDot: true }
+            suggestDatabases: { appendDot: true },
+            suggestKeywords: ['FUNCTIONS']
+          }
+        });
+      });
+
+      it('should suggest databases for "REFRESH FUNCTIONS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'REFRESH FUNCTIONS ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: {}
           }
         });
       });
@@ -630,6 +671,19 @@
           expectedResult: {
             lowerCase: false,
             suggestTables: { identifierChain: [{ name: 'db' }]}
+          }
+        });
+      });
+
+      it('should suggest keywords for "REFRESH db.tbl |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'REFRESH db.tbl ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors:true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION']
           }
         });
       });

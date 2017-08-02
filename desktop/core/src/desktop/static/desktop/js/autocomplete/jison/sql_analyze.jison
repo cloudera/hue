@@ -138,9 +138,13 @@ OptionalNoscan
  ;
 
 RefreshStatement
- : '<impala>REFRESH' SchemaQualifiedTableIdentifier
+ : '<impala>REFRESH' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      parser.addTablePrimary($2);
+   }
+ | '<impala>REFRESH' '<impala>FUNCTIONS' DatabaseIdentifier
+   {
+     parser.addDatabaseLocation(@3, [{ name: $3 }]);
    }
  ;
 
@@ -149,8 +153,21 @@ RefreshStatement_EDIT
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
+     parser.suggestKeywords(['FUNCTIONS']);
    }
- | '<impala>REFRESH' SchemaQualifiedTableIdentifier_EDIT
+ | '<impala>REFRESH' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | '<impala>REFRESH' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+   {
+     parser.addTablePrimary($2);
+     if (!$3) {
+       parser.suggestKeywords(['PARTITION']);
+     }
+   }
+ | '<impala>REFRESH' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | '<impala>REFRESH' '<impala>FUNCTIONS' 'CURSOR'
+   {
+     parser.suggestDatabases();
+   }
  ;
 
 InvalidateStatement
