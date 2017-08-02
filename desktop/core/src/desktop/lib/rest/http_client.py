@@ -108,7 +108,7 @@ class HttpClient(object):
 
   def set_kerberos_auth(self):
     """Set up kerberos auth for the client, based on the current ticket."""
-    mutual_auth = conf.KERBEROS.MUTUAL_AUTHENTICATION.get()
+    mutual_auth = conf.KERBEROS.MUTUAL_AUTHENTICATION.get().upper()
     if mutual_auth == 'OPTIONAL':
       self._session.auth = HTTPKerberosAuth(mutual_authentication=OPTIONAL)
     elif mutual_auth == 'REQUIRED':
