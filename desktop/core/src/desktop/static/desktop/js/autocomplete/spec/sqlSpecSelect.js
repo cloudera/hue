@@ -3230,7 +3230,7 @@
             suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
             suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
             suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
-            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN']
+            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'ANTI JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT INNER JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'OUTER JOIN', 'RIGHT ANTI JOIN', 'RIGHT INNER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'SEMI JOIN']
           }
         });
       });
@@ -6391,7 +6391,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ANTI', 'OUTER', 'SEMI']
+            suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI']
           }
         });
       });
@@ -6643,7 +6643,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: [ 'ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN' ]
+              suggestKeywords: ['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']
             }
           });
         });
@@ -6655,7 +6655,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: [ 'ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN' ]
+              suggestKeywords: ['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']
             }
           });
         });
@@ -6696,7 +6696,7 @@
             expectedResult: {
               lowerCase: false,
               suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
-              suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT ANTI', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT ANTI', 'RIGHT OUTER', 'RIGHT SEMI']
+              suggestKeywords: ['ANTI', 'CROSS', 'FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT ANTI', 'LEFT INNER', 'LEFT OUTER', 'LEFT SEMI', 'OUTER', 'RIGHT', 'RIGHT ANTI', 'RIGHT INNER', 'RIGHT OUTER', 'RIGHT SEMI', 'SEMI']
             }
           });
         });
@@ -6720,7 +6720,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['ANTI', 'OUTER', 'SEMI']
+              suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI']
             }
           });
         });
@@ -6732,7 +6732,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['ANTI', 'OUTER', 'SEMI']
+              suggestKeywords: ['ANTI', 'INNER', 'OUTER', 'SEMI']
             }
           });
         });
@@ -6740,6 +6740,21 @@
         it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT OUTER JOIN table2 INNER JOIN table3 JOIN table4 t4 ON (| AND t1.c1 = t2.c2"', function() {
           assertAutoComplete({
             beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT OUTER JOIN table2 INNER JOIN table3 JOIN table4 t4 ON (',
+            afterCursor: ' AND t1.c1 = t2.c2',
+            dialect: 'impala',
+            containsKeywords: ['CASE'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: {},
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1'}, { identifierChain: [{ name: 'table2' }]}, { identifierChain: [{ name: 'table3' }]}, { identifierChain: [{ name: 'table4' }], alias: 't4'}] },
+              suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 'table2.', type: 'table' }, { name: 'table3.', type: 'table' }, { name: 't4.', type: 'alias' }]
+            }
+          });
+        });
+
+        it('should suggest tables for "SELECT t1.* FROM table1 t1 LEFT INNER JOIN table2 CROSS JOIN table3 SEMI JOIN table4 t4 ON (| AND t1.c1 = t2.c2"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT t1.* FROM table1 t1 LEFT INNER JOIN table2 CROSS JOIN table3 SEMI JOIN table4 t4 ON (',
             afterCursor: ' AND t1.c1 = t2.c2',
             dialect: 'impala',
             containsKeywords: ['CASE'],
