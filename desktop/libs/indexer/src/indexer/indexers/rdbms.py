@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from librdbms.conf import DATABASES, get_database_password, get_server_choices
+from librdbms.jdbc import Jdbc
 from librdbms.server import dbms as rdbms
 from notebook.conf import get_ordered_interpreters
 from notebook.connectors.jdbc import Assist as JdbcAssist
@@ -37,13 +38,14 @@ LOG = logging.getLogger(__name__)
 
 def get_db_component(request):
   format_ = {'data': [], 'status': 1, 'message': ''}
-  name = None
+  db = None
   try:
     source = json.loads(request.POST.get('source', '{}'))
     user = User.objects.get(username=request.user)
     if source['rdbmsMode'] == 'configRdbms':
       if source['rdbmsType'] != 'jdbc':
         query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+        db = rdbms.get(user, query_server=query_server)
       else:
         interpreters = get_ordered_interpreters(request.user)
         options = {}
@@ -51,54 +53,30 @@ def get_db_component(request):
         key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
         if key:
           options = key[0]['options']
-          name = options['url'].split(':')[1]
-          databaseName = options['url'].rsplit('/', 1)[1]
-          format_['data'].append({'value': databaseName, 'name': databaseName})
-        if name:
-          query_server = {
-            'server_name': name,
-            'server_host': '',
-            'server_port': '',
-            'username': '',
-            'password': '',
-            'options': options,
-            'alias': name
-          }
-    else:
-      if source['rdbmsType'] == 'jdbc':
-        name = source['rdbmsJdbcType']
-        options = {'url': source['rdbmsFullHostName'],'password': source['rdbmsPassword'], 'user': source['rdbmsUsername']}
-        if name:
-          query_server = {
-            'server_name': name,
-            'server_host': '',
-            'server_port': '',
-            'username': '',
-            'password': '',
-            'options': options,
-            'alias': name
-          }
-      else:
-        name = source['rdbmsType']
-        if name:
-          query_server = {
-            'server_name': name,
-            'server_host': source['rdbmsHostname'],
-            'server_port': int(source['rdbmsPort']),
-            'username': source['rdbmsUsername'],
-            'password': source['rdbmsPassword'],
-            'options': {},
-            'alias': name
-          }
 
-    db = rdbms.get(user, query_server=query_server)
-    if source['rdbmsMode'] == 'configRdbms' and source['rdbmsType'] != 'jdbc':
+          db = Jdbc(driver_name=options['driver'], url=options['url'], username=options['user'], password=options['password'])
+    else:
+      name = source['rdbmsType']
+      if name != 'jdbc':
+        query_server = {
+          'server_name': name,
+          'server_host': source['rdbmsHostname'],
+          'server_port': int(source['rdbmsPort']),
+          'username': source['rdbmsUsername'],
+          'password': source['rdbmsPassword'],
+          'options': {},
+          'alias': name
+        }
+        db = rdbms.get(user, query_server=query_server)
+      else:
+        db = Jdbc(driver_name=source['rdbmsJdbcDriver'], url=source['rdbmsHostname'], username=source['rdbmsUsername'], password=source['rdbmsPassword'])
+
+    if source['rdbmsType'] != 'jdbc':
       assist = Assist(db)
     else:
       assist = JdbcAssist(db)
-    if not source['rdbmsDatabaseName'] and source['rdbmsType'] != 'jdbc':
+    if not source['rdbmsDatabaseName']:
       data = assist.get_databases()
-      format_['data'] = [{'name': element, 'value': element} for element in data]
     elif source['rdbmsDatabaseName']:
       data = assist.get_tables(source['rdbmsDatabaseName'])
       format_['data'] = [{'name': element, 'value': element} for element in data]
@@ -107,15 +85,6 @@ def get_db_component(request):
     message = _('Error accessing the database %s: %s') % (name, e)
     LOG.warn(message)
     format['message'] = message
-
-  return JsonResponse(format_)
-
-def get_drivers(request):
-  format_ = {'data': [], 'status': 1}
-  servers_dict = dict(get_server_choices())
-  format_['data'] = [{'value': key, 'name': servers_dict[key]} for key in servers_dict.keys()]
-  format_['data'].append({'value': 'jdbc', 'name': 'JDBC'})
-  format_['status'] = 0
 
   return JsonResponse(format_)
 
@@ -137,7 +106,6 @@ def get_drivers(request):
   return JsonResponse(format_)
 
 def run_sqoop(request, source, destination, start_time):
-  password_file_path = request.fs.get_home_dir() + '/sqoop/'
   rdbms_mode = source['rdbmsMode']
   rdbms_name = source['rdbmsJdbcDriverName'] if source['rdbmsType'] == 'jdbc' else source['rdbmsType']
   rdbms_database_name = source['rdbmsDatabaseName']

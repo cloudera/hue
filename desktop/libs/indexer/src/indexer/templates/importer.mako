@@ -249,26 +249,21 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
-              <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
-              <div class="control-group input-append">
-                <label for="rdbmsJdbcType" class="control-label"><div>${ _('Database') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcType">
-                </label>
-              </div>
-
-              <div class="control-group input-append">
-                <label for="rdbmsFullHostName" class="control-label"><div>${ _('Full Host Name') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsFullHostName">
-                </label>
-              </div>
-              <!-- /ko -->
-              <!-- ko if: createWizard.source.rdbmsType() != 'jdbc' -->
               <div class="control-group input-append">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.domain.com or 123.123.123.123') }">
                 </label>
               </div>
 
+              <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
+              <div class="control-group input-append">
+                <label for="rdbmsJdbcDriver" class="control-label"><div>${ _('JDBC Driver') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcDriver">
+                </label>
+              </div>
+              <!-- /ko -->
+
+              <!-- ko if: createWizard.source.rdbmsType() != 'jdbc' -->
               <div class="control-group">
                 <label for="rdbmsPort" class="control-label"><div>${ _('Port') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here eg. 3306') }">
@@ -1262,8 +1257,7 @@ ${ assist.assistPanel() }
         self.rdbmsTableName('');
         self.rdbmsIsAllTables(false);
         self.rdbmsAllTablesSelected(false);
-        self.rdbmsJdbcType('')
-        self.rdbmsFullHostName('')
+        self.rdbmsJdbcDriver('')
         self.rdbmsJdbcDriverName('')
         self.rdbmsHostname('');
         self.rdbmsPort('');
@@ -1342,12 +1336,8 @@ ${ assist.assistPanel() }
           }
         });
       });
-      self.rdbmsFullHostName = ko.observable('');
-      self.rdbmsFullHostName.subscribe(function (val) {
-        self.rdbmsDatabaseNames([]);
-      });
-      self.rdbmsJdbcType = ko.observable('');
-      self.rdbmsJdbcType.subscribe(function (val) {
+      self.rdbmsJdbcDriver = ko.observable('');
+      self.rdbmsJdbcDriver.subscribe(function (val) {
         self.rdbmsDatabaseNames([]);
       });
       self.rdbmsTableNames = ko.observableArray();
