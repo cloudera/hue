@@ -540,6 +540,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               </tr>
             </tbody>
           </table>
+          
+          <!-- ko if: properties['tasks']()['task_list'] == null || properties['tasks']()['task_list'].length == 0 -->
+            <span class="muted">${ _('This job does not have any tasks.') }</span>
+          <!-- /ko -->
         </div>
 
         <div class="tab-pane" id="job-mapreduce-page-metadata${ SUFFIX }">
