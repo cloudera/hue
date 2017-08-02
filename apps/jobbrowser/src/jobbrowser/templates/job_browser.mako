@@ -531,7 +531,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }, css: {'completed': apiStatus == 'SUCCEEDED', 'running': apiStatus == 'RUNNING', 'failed': apiStatus == 'FAILED'}" class="status-border pointer">
                 <td data-bind="text: type"></td>
                 <td data-bind="text: id"></td>
-                <td data-bind="text: elapsedTime().toHHMMSS()"></td>
+                <td data-bind="text: elapsedTime.toHHMMSS()"></td>
                 <td data-bind="text: progress"></td>
                 <td data-bind="text: state"></td>
                 <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
@@ -628,7 +628,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <tr class="pointer" data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
                 <td data-bind="text: assignedContainerId"></td>
                 <td data-bind="text: progress"></td>
-                <td data-bind="text: elapsedTime().toHHMMSS()"></td>
+                <td data-bind="text: elapsedTime.toHHMMSS()"></td>
                 <td data-bind="text: state"></td>
                 <td data-bind="text: rack"></td>
                 <td data-bind="text: nodeHttpAddress"></td>
@@ -1067,8 +1067,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: errorCode"></td>
                 <td data-bind="text: externalId"></td>
                 <td data-bind="text: id"></td>
-                <td data-bind="text: moment: {data: startTime, format: 'LLL'}"></td>
-                <td data-bind="text: moment: {data: endTime, format: 'LLL'}"></td>
+                <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
+                <td data-bind="moment: {data: endTime, format: 'LLL'}"></td>
               </tr>
             </tbody>
           </table>
