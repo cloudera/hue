@@ -327,35 +327,32 @@ OptionalInsertRowFormat_EDIT
  ;
 
 SelectWithoutTableExpression
- : 'SELECT' OptionalAllOrDistinct SelectList  -> { selectList: $3 }
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList  -> { selectList: $4 }
  ;
 
 SelectWithoutTableExpression_EDIT
- : 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR'
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR'
    {
-     $$ = $3;
+     $$ = $4;
      $$.cursorAtEnd = true;
    }
- | 'SELECT' OptionalAllOrDistinct SelectList_EDIT
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_EDIT
    {
-     parser.selectListNoTableSuggest($3, $2);
+     parser.selectListNoTableSuggest($4, $2);
    }
- | 'SELECT' OptionalAllOrDistinct 'CURSOR'
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR'
    {
-     var keywords = [];
-     if ($2) {
-       keywords = [{ value: '*', weight: 1000 }];
-       if ($2 === 'ALL') {
-         parser.suggestAggregateFunctions();
-         parser.suggestAnalyticFunctions();
-       }
-     } else {
-       keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
+     var keywords = [{ value: '*', weight: 10000 }];
+     if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
-     if (parser.isImpala()) {
-       keywords.push('STRAIGHT_JOIN');
+     if (!$3 && !$2) {
+       keywords.push({ value: 'ALL', weight: 2 });
+       keywords.push({ value: 'DISTINCT', weight: 2 });
+     }
+     if (parser.isImpala() && !$3) {
+       keywords.push({ value: 'STRAIGHT_JOIN', weight: 1 });
      }
      parser.suggestKeywords(keywords);
      parser.suggestFunctions();

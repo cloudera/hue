@@ -515,6 +515,31 @@
         });
       });
 
+      it('should suggest tables for "SELECT STRAIGHT_JOIN |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT STRAIGHT_JOIN ',
+          afterCursor: '',
+          dialect: 'impala',
+          containsKeywords: ['*'],
+          doesNotContainKeywords: ['ALL', 'DISTINCT'],
+          expectedResult: {
+            lowerCase: false,
+            suggestAggregateFunctions: { tables: [] },
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+
       it('should suggest tables for "SELECT DISTINCT |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT DISTINCT ',

@@ -1278,8 +1278,8 @@ QuerySpecification_EDIT
  ;
 
 SelectStatement
- : 'SELECT' OptionalAllOrDistinct SelectList                  -> { selectList: $3 }
- | 'SELECT' OptionalAllOrDistinct SelectList TableExpression  -> { selectList: $3, tableExpression: $4 }
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList                  -> { selectList: $4 }
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression  -> { selectList: $4, tableExpression: $5 }
  ;
 
 OptionalUnions
@@ -1320,55 +1320,51 @@ UnionClause_EDIT
  ;
 
 SelectStatement_EDIT
- : 'SELECT' OptionalAllOrDistinct SelectList_EDIT
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_EDIT
    {
-     if ($3.cursorAtStart) {
-       var keywords = [];
-       if ($2) {
-         keywords = [{ value: '*', weight: 10000 }];
-       } else {
-         keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
+     if ($4.cursorAtStart) {
+       var keywords = [{ value: '*', weight: 10000 }];
+       if (!$3 && !$2) {
+         keywords.push({ value: 'ALL', weight: 2 });
+         keywords.push({ value: 'DISTINCT', weight: 2 });
        }
-       if (parser.isImpala()) {
-         keywords.push('STRAIGHT_JOIN');
+       if (parser.isImpala() && !$3) {
+         keywords.push({ value: 'STRAIGHT_JOIN', weight: 1 });
        }
        parser.suggestKeywords(keywords);
      } else {
-       parser.checkForSelectListKeywords($3);
+       parser.checkForSelectListKeywords($4);
      }
-     if ($3.suggestFunctions) {
+     if ($4.suggestFunctions) {
        parser.suggestFunctions();
      }
-     if ($3.suggestColumns) {
+     if ($4.suggestColumns) {
        parser.suggestColumns({ identifierChain: [], source: 'select' });
      }
-     if ($3.suggestTables) {
+     if ($4.suggestTables) {
        parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      }
-     if ($3.suggestDatabases) {
+     if ($4.suggestDatabases) {
        parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
      }
-     if ($3.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
+     if ($4.suggestAggregateFunctions && (!$2 || $2 === 'ALL')) {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
    }
- | 'SELECT' OptionalAllOrDistinct 'CURSOR'
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR'
    {
-     var keywords = [];
-     if ($2) {
-       keywords = [{ value: '*', weight: 10000 }];
-       if ($2 === 'ALL') {
-         parser.suggestAggregateFunctions();
-         parser.suggestAnalyticFunctions();
-       }
-     } else {
-       keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
+     var keywords = [{ value: '*', weight: 10000 }];
+     if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
-     if (parser.isImpala()) {
-       keywords.push('STRAIGHT_JOIN');
+     if (!$3 && !$2) {
+       keywords.push({ value: 'ALL', weight: 2 });
+       keywords.push({ value: 'DISTINCT', weight: 2 });
+     }
+     if (parser.isImpala() && !$3) {
+       keywords.push({ value: 'STRAIGHT_JOIN', weight: 1 });
      }
      parser.suggestKeywords(keywords);
      parser.suggestFunctions();
@@ -1376,30 +1372,27 @@ SelectStatement_EDIT
      parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
- | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_EDIT
- | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression_EDIT
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_EDIT TableExpression
    {
-     parser.selectListNoTableSuggest($3, $2);
+     parser.selectListNoTableSuggest($4, $2);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'select';
      }
    }
- | 'SELECT' OptionalAllOrDistinct 'CURSOR' TableExpression
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR' TableExpression
    {
-     var keywords = [];
-     if ($2) {
-       keywords = [{ value: '*', weight: 10000 }];
-       if ($2 === 'ALL') {
-         parser.suggestAggregateFunctions();
-         parser.suggestAnalyticFunctions();
-       }
-     } else {
-       keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
+     var keywords = [{ value: '*', weight: 10000 }];
+     if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
      }
-     if (parser.isImpala()) {
-       keywords.push('STRAIGHT_JOIN');
+     if (!$3 && !$2) {
+       keywords.push({ value: 'ALL', weight: 2 });
+       keywords.push({ value: 'DISTINCT', weight: 2 });
+     }
+     if (parser.isImpala() && !$3) {
+       keywords.push({ value: 'STRAIGHT_JOIN', weight: 1 });
      }
      parser.suggestKeywords(keywords);
      parser.suggestFunctions();
@@ -1407,17 +1400,17 @@ SelectStatement_EDIT
      parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
- | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' TableExpression
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR' TableExpression
    {
-     parser.checkForSelectListKeywords($3);
+     parser.checkForSelectListKeywords($4);
    }
- | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR' ',' TableExpression
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR' ',' TableExpression
    {
-     parser.checkForSelectListKeywords($3);
+     parser.checkForSelectListKeywords($4);
    }
- | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR'
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR'
    {
-     parser.checkForSelectListKeywords($3);
+     parser.checkForSelectListKeywords($4);
      var keywords = ['FROM'];
      if (parser.yy.result.suggestKeywords) {
        keywords = parser.yy.result.suggestKeywords.concat(keywords);
@@ -1426,6 +1419,11 @@ SelectStatement_EDIT
      parser.suggestTables({ prependFrom: true });
      parser.suggestDatabases({ prependFrom: true, appendDot: true });
    }
+ ;
+
+OptionalStraightJoin
+ :
+ | '<impala>STRAIGHT_JOIN'
  ;
 
 CommonTableExpression
