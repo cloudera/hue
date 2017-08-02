@@ -418,7 +418,7 @@ ${ assist.assistPanel() }
       </div>
 
 
-        <!-- ko if: outputFormat() == 'table' -->
+        <!-- ko if: outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
           <div class="card-body">
@@ -633,6 +633,11 @@ ${ assist.assistPanel() }
         <!-- ko if: $root.createWizard.source.inputFormat() == 'rdbms' && ['file', 'table', 'hbase'].indexOf(outputFormat()) != -1 -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
+          <div class="control-group">
+            <label><div>${ _('Mappers') }</div>
+              <input type="number" class="form-control input-small" data-bind="value: numMappers, valueUpdate: 'afterkeydown'">
+            </label>
+          </div>
           <div class="card-body">
             <label class="control-label"><div>${ _('Libs') }</div>
               <div class="inline-table">
@@ -1633,6 +1638,8 @@ ${ assist.assistPanel() }
       self.removeSqoopJobLibPath = function (valueToRemove) {
         self.sqoopJobLibPaths.remove(valueToRemove);
       };
+      self.numMappers = ko.observable(1);
+
     };
 
     var CreateWizard = function (vm) {
