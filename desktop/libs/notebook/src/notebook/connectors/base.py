@@ -265,7 +265,7 @@ def get_api(request, snippet):
     return RdbmsApi(request.user, interpreter=snippet['type'])
   elif interface == 'dataeng':
     return DataEngApi(user=request.user, request=request, cluster_name=cluster.get_interface())
-  elif interface == 'jdbc':
+  elif interface == 'jdbc' or interface == 'teradata':
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
     return SolrApi(request.user, interpreter=interpreter)

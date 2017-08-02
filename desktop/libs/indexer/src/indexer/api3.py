@@ -152,7 +152,7 @@ def guess_field_types(request):
   elif file_format['inputFormat'] == 'rdbms':
     query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
     db = rdbms.get(request.user, query_server=query_server)
-    sample = RdbmsIndexer(request.user, file_format['rdbmsType']).get_sample_data(database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
+    sample = RdbmsIndexer(request.user, file_format['rdbmsType']).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
     table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
 
     format_ = {
