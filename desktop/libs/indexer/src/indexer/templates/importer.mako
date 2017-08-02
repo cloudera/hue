@@ -249,7 +249,15 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
-              <div class="control-group">
+              <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
+              <div class="control-group input-append">
+                <label for="rdbmsJdbcType" class="control-label"><div>${ _('Database') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcType">
+                </label>
+              </div>
+              <!-- /ko -->
+
+              <div class="control-group input-append">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.domain.com or 123.123.123.123') }">
                 </label>
@@ -274,17 +282,23 @@ ${ assist.assistPanel() }
               </div>
 
               <div class="control-group">
-                <label class="control-label"><div></div>
-                  <button class="btn" data-bind="enable: $root.createWizard.source.rdbmsHostname().length > 0 && $root.createWizard.source.rdbmsPort().length > 0 && $root.createWizard.source.rdbmsUsername().length > 0, click: createWizard.source.rdbmsCheckConnection">
-                    ${_('Test Connection')}
-                  </button>
-                </label>
+                <button class="btn" data-bind="enable: $root.createWizard.source.rdbmsHostname().length > 0 && $root.createWizard.source.rdbmsPort().length > 0 && $root.createWizard.source.rdbmsUsername().length > 0 && $root.createWizard.source.rdbmsPassword().length > 0 && ($root.createWizard.source.rdbmsJdbcType().length > 0 || $root.createWizard.source.rdbmsType() != 'jdbc'), click: createWizard.source.rdbmsCheckConnection">
+                  ${_('Test Connection')}
+                </button>
               </div>
             <!-- /ko -->
 
             <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' || (createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.rdbmsDbIsValid()) -->
-              <!-- ko if: createWizard.source.rdbmsType -->
+              <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' && createWizard.source.rdbmsType() == 'jdbc' -->
               <div class="control-group">
+                <label for="rdbmsJdbcDriverName" class="control-label"><div>${ _('Options') }</div>
+                  <select id="rdbmsJdbcDriverName" data-bind="selectize: createWizard.source.rdbmsJdbcDriverNames, value: createWizard.source.rdbmsJdbcDriverName, optionsText: 'name', optionsValue: 'value'"></select>
+                </label>
+              </div>
+              <!-- /ko -->
+
+              <!-- ko if: createWizard.source.rdbmsTypes -->
+              <div class="control-group input-append">
                 <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
                   <select id="rdbmsDatabaseName" data-bind="selectize: createWizard.source.rdbmsDatabaseNames, value: createWizard.source.rdbmsDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
                 </label>
@@ -1241,6 +1255,8 @@ ${ assist.assistPanel() }
         self.rdbmsTableName('');
         self.rdbmsIsAllTables(false);
         self.rdbmsAllTablesSelected(false);
+        self.rdbmsJdbcType('')
+        self.rdbmsJdbcDriverName('')
         self.rdbmsHostname('');
         self.rdbmsPort('');
         self.rdbmsUsername('');
@@ -1267,12 +1283,20 @@ ${ assist.assistPanel() }
       self.rdbmsType.subscribe(function (val) {
         self.path('');
         resizeElements();
-        if(self.rdbmsMode() == 'configRdbms') {
+        if(self.rdbmsMode() == 'configRdbms' && val != 'jdbc') {
           $.post("${ url('indexer:get_db_component') }", {
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
             if (resp.data) {
               self.rdbmsDatabaseNames(resp.data);
+            }
+          });
+        } else if(self.rdbmsMode() == 'configRdbms' && val == 'jdbc') {
+          $.post("${ url('indexer:jdbc_db_list') }", {
+            "source": ko.mapping.toJSON(self)
+          }, function (resp) {
+            if (resp.data) {
+              self.rdbmsJdbcDriverNames(resp.data);
             }
           });
         }
@@ -1297,6 +1321,22 @@ ${ assist.assistPanel() }
           wizard.destination.rdbmsEditorContent('SELECT * FROM ' + val);
           wizard.destination.name(val.replace(/ /g, '_').toLowerCase());
         }
+      });
+      self.rdbmsJdbcDriverNames = ko.observableArray();
+      self.rdbmsJdbcDriverName = ko.observable('');
+      self.rdbmsJdbcDriverName.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+        $.post("${ url('indexer:get_db_component') }", {
+          "source": ko.mapping.toJSON(self)
+        }, function (resp) {
+          if (resp.data) {
+            self.rdbmsDatabaseNames(resp.data);
+          }
+        });
+      });
+      self.rdbmsJdbcType = ko.observable('');
+      self.rdbmsJdbcType.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
       });
       self.rdbmsTableNames = ko.observableArray();
       self.rdbmsHostname = ko.observable('');
