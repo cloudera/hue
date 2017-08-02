@@ -326,8 +326,8 @@ class HiveServer2Dbms(object):
     return self.client.close_operation(query_handle)
 
 
-  def open_session(self, user):
-    return self.client.open_session(user)
+  def open_session(self, user, store=True):
+    return self.client.open_session(user, store=store)
 
 
   def close_session(self, session):

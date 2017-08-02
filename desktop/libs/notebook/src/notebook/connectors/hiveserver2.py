@@ -59,7 +59,7 @@ except ImportError, e:
 
 try:
   from impala import api   # Force checking if Impala is enabled
-  from impala.conf import CONFIG_WHITELIST as impala_settings, SSL as impala_ssl_conf
+  from impala.conf import CONFIG_WHITELIST as impala_settings
   from impala.impala_flags import get_webserver_certificate_file
   from impala.server import get_api as get_impalad_api, ImpalaDaemonApiException
 except ImportError, e:
@@ -824,7 +824,8 @@ DROP TABLE IF EXISTS `%(table)s`;
     return guid
 
 
-  def _get_impala_server_url(self, session):
+  @classmethod
+  def _get_impala_server_url(cls, session):
     impala_settings = session.get_formatted_properties()
     http_addr = next((setting['value'] for setting in impala_settings if setting['key'].lower() == 'http_addr'), None)
     # Remove scheme if found

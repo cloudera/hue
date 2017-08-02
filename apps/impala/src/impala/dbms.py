@@ -16,7 +16,11 @@
 # limitations under the License.
 
 import logging
+import random
 
+from django.utils.translation import ugettext as _
+
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 
 from beeswax.design import hql_query
@@ -26,16 +30,24 @@ from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServ
   get_query_server_config as beeswax_query_server_config
 
 from impala import conf
-
+from impala.conf import AUTO_HA
+from impala.server import get_api as get_impalad_api
 
 LOG = logging.getLogger(__name__)
 
 
-def get_query_server_config():
+SERVER_HOST = None
+SERVER_PORT = None
+
+
+def get_query_server_config(server_host=None, server_port=None):
+  if server_host is None and server_port is None:
+    server_host, server_port = conf.SERVER_HOST.get(), conf.SERVER_PORT.get()
+
   query_server = {
         'server_name': 'impala',
-        'server_host': conf.SERVER_HOST.get(),
-        'server_port': conf.SERVER_PORT.get(),
+        'server_host': server_host,
+        'server_port': server_port,
         'principal': conf.IMPALA_PRINCIPAL.get(),
         'impersonation_enabled': conf.IMPERSONATION_ENABLED.get(),
         'querycache_rows': conf.QUERYCACHE_ROWS.get(),
@@ -51,6 +63,44 @@ def get_query_server_config():
 
   return query_server
 
+
+def get_impala_executor(user):
+  from notebook.connectors.hiveserver2 import HS2Api
+  global SERVER_HOST, SERVER_PORT
+
+  config = get_query_server_config(server_host=conf.SERVER_HOST.get(), server_port=conf.SERVER_PORT.get())
+  
+  session = dbms.get(user, query_server=config).open_session(user, store=False)
+  impalad_url = HS2Api._get_impala_server_url(session)
+  
+  api = get_impalad_api(user=user, url=impalad_url)
+
+  try:
+    response = api.get_backends()
+    backends = [backend for backend in response['backends'] if backend['is_coordinator']]
+  except Exception, e:
+    raise PopupException(_("Failed to get backend list from Impala Daemon server: %s") % e)
+    
+  random.shuffle(backends)
+
+  for backend in backends:
+    try:
+      server_host, server_port = backend['address'].split(':', 2)
+      config = get_query_server_config(server_host=server_host, server_port=server_port)  
+      session = dbms.get(user, query_server=config).open_session(user, store=False)
+      return server_host, server_port
+    except Exception, e:
+      print e
+  
+  raise PopupException(_("Failed to get backend list from Impala Daemon server: %s") % e)
+
+
+'''def get_impala_executor():
+  for host in random(request.get(conf.IMPALA_HOST.get(), {'/backends'}))
+    if host.is_coordinator:
+      client(host).execute_statement('SELECT 1')
+      return host
+'''
 
 class ImpalaDbms(HiveServer2Dbms):
 

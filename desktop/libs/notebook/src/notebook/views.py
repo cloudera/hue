@@ -38,6 +38,7 @@ from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook
+from impala.dbms import get_impala_executor
 
 
 LOG = logging.getLogger(__name__)
@@ -101,6 +102,8 @@ def notebook_embeddable(request):
 def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
+
+  print get_impala_executor(request.user)
 
   if editor_type == 'notebook' or request.GET.get('notebook'):
     return notebook(request)

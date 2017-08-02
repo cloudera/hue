@@ -168,10 +168,23 @@ class ImpalaDaemonApi(object):
       'query_id': query_id,
       'json': 'true'
     }
-    profile = None
+
     resp = self._root.get('query_profile', params=params)
+
     try:
-      profile = json.loads(resp)
+      return json.loads(resp)
     except ValueError, e:
-      raise ImpalaDaemonApiException('ImpalaDaemonApi query_profile did not return valid JSON.')
-    return profile
+      raise ImpalaDaemonApiException('ImpalaDaemonApi query_profile did not return valid JSON: %s' % e)
+
+
+  def get_backends(self):
+    params = {
+      'json': 'true'
+    }
+
+    resp = self._root.get('backends', params=params)
+
+    try:
+      return json.loads(resp)
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi get_backends did not return valid JSON: %s' % e)

@@ -573,8 +573,7 @@ class HiveServerClient:
     return use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password
 
 
-  def open_session(self, user):
-
+  def open_session(self, user, store=True):
     self.user = user
     kwargs = {
         'client_protocol': beeswax_conf.THRIFT_VERSION.get() - 1,
@@ -615,18 +614,26 @@ class HiveServerClient:
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
     properties = json.dumps(res.configuration)
 
-    session = Session.objects.create(owner=user,
-                                     application=self.query_server['server_name'],
-                                     status_code=res.status.statusCode,
-                                     secret=encoded_status,
-                                     guid=encoded_guid,
-                                     server_protocol_version=res.serverProtocolVersion,
-                                     properties=properties)
+    session_arguments = {
+      'owner': user,
+      'application': self.query_server['server_name'],
+      'status_code': res.status.statusCode,
+      'secret': encoded_status,
+      'guid': encoded_guid,
+      'server_protocol_version': res.serverProtocolVersion,
+      'properties': properties
+    }
+
+    if store:
+      session = Session.objects.create(**session_arguments)
+    else:
+      session = Session(**session_arguments)
 
     # HS2 does not return properties in TOpenSessionResp
     if not session.get_properties():
       session.properties = json.dumps(self.get_configuration())
-      session.save()
+      if store:
+        session.save()
 
     return session
 
@@ -1287,8 +1294,8 @@ class HiveServerClientCompatible(object):
   def alter_table(self, dbname, tbl_name, new_tbl): raise NotImplementedError()
 
 
-  def open_session(self, user):
-    return self._client.open_session(user)
+  def open_session(self, user, store=True):
+    return self._client.open_session(user, store=store)
 
 
   def add_partition(self, new_part): raise NotImplementedError()

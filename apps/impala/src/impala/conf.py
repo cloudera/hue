@@ -27,7 +27,7 @@ from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coe
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.paths import get_desktop_root
 
-from impala.impala_flags import get_ssl_server_certificate, get_max_result_cache_size, is_impersonation_enabled
+from impala.impala_flags import get_max_result_cache_size, is_impersonation_enabled
 from impala.settings import NICE_NAME
 
 
@@ -106,6 +106,14 @@ IMPALA_CONF_DIR = Config(
   key='impala_conf_dir',
   help=_t('Impala configuration directory, where impala_flags is located.'),
   default=os.environ.get("HUE_CONF_DIR", get_desktop_root("conf")) + '/impala-conf'
+)
+
+AUTO_HA = Config(
+  key="auto_ha",
+  help=_t("If Hue automatically selects a valid Impalad in case failure of the current Impalad. "
+          "This bypasses the Impala Load Balancer if there is one."),
+  type=coerce_bool,
+  default=False
 )
 
 SSL = ConfigSection(
@@ -206,7 +214,7 @@ def config_validator(user):
         LOG.exception(msg)
         res.append((NICE_NAME, _(msg)))
       else:
-       raise ex
+        raise ex
   except Exception, ex:
     msg = "No available Impalad to send queries to."
     LOG.exception(msg)
