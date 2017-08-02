@@ -743,7 +743,13 @@ KERBEROS = ConfigSection(
       help=_("Path to Kerberos 'kinit' command."),
       type=str,
       default="kinit", # use PATH!
-    )
+    ),
+    MUTUAL_AUTHENTICATION=Config(
+      key='mutual_authentication',
+      help=_('Mutual authentication from the server, attaches HTTP GSSAPI/Kerberos Authentication to the given Request object'),
+      type=str,
+      default="OPTIONAL",
+    ),
   )
 )
 
