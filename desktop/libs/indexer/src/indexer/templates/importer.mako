@@ -1809,8 +1809,8 @@ ${ assist.assistPanel() }
         }
         $(".jHueNotify").remove();
 
-%if not is_embeddable:
         self.indexingStarted(true);
+%if not is_embeddable:
         viewModel.isLoading(true);
         self.isIndexing(true);
 
@@ -1908,6 +1908,7 @@ ${ assist.assistPanel() }
           "destination": ko.mapping.toJSON(self.destination),
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (resp) {
+          self.indexingStarted(false);
           if (resp.status == 0) {
             if (resp.history_uuid) {
               $.jHueNotify.info("${ _('Task submitted') }");
@@ -1923,6 +1924,7 @@ ${ assist.assistPanel() }
             $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
           }
         }).fail(function (xhr, textStatus, errorThrown) {
+          self.indexingStarted(false);
           $(document).trigger("error", xhr.responseText);
         });
 % endif
