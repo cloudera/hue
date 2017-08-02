@@ -33,16 +33,16 @@ SqlStatement_EDIT
  ;
 
 SelectStatement
- : 'SELECT' OptionalAllOrDistinct SelectList_ERROR TableExpression
- | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_ERROR
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_ERROR TableExpression
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression_ERROR
  ;
 
 SelectStatement_EDIT
- : 'SELECT' OptionalAllOrDistinct SelectList_ERROR_EDIT TableExpression
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_ERROR_EDIT TableExpression
    {
-     parser.selectListNoTableSuggest($3, $2);
+     parser.selectListNoTableSuggest($4, $2);
    }
- | 'SELECT' OptionalAllOrDistinct SelectList_ERROR TableExpression_EDIT
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_ERROR TableExpression_EDIT
  ;
 
 SelectList_ERROR
