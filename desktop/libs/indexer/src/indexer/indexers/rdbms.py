@@ -78,6 +78,7 @@ def run_sqoop(request, source, destination, start_time):
   destination_name = destination['name']
   destination_table_name = destination['tableName']
   destination_database_name = destination['databaseName']
+  destination_mappers_num = destination['numMappers']
 
   if not rdbms_all_tables_selected:
     rdbms_table_name = source['rdbmsTableName']
@@ -105,12 +106,12 @@ def run_sqoop(request, source, destination, start_time):
     success_url = '/filebrowser/view/' + destination_name
     targetDir = request.fs.fs_defaultfs + destination_name
     if rdbms_all_tables_selected:
-      statement = 'import-all-tables %(statement)s --warehouse-dir %(targetDir)s -m 1' % {
+      statement = 'import-all-tables %(statement)s --warehouse-dir %(targetDir)s' % {
         'statement': statement,
         'targetDir': targetDir
       }
     else:
-      statement = 'import %(statement)s --table %(rdbmsTableName)s --delete-target-dir --target-dir %(targetDir)s -m 1' % {
+      statement = 'import %(statement)s --table %(rdbmsTableName)s --delete-target-dir --target-dir %(targetDir)s' % {
         'statement': statement,
         'rdbmsTableName': rdbms_table_name,
         'targetDir': targetDir
@@ -129,6 +130,10 @@ def run_sqoop(request, source, destination, start_time):
   elif destination_type == 'hbase':
     success_url = '/hbase/#HBase/' + destination_table_name
     # Todo
+  statement = '%(statement)s --num-mappers %(numMappers)s' % {
+    'statement': statement,
+    'numMappers': destination_mappers_num
+  }
 
   lib_files = []
   if destination['sqoopJobLibPaths']:
