@@ -1431,9 +1431,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="render-page-counters${ SUFFIX }">
-  <!-- ko hueSpinner: { spin: !$data.id, center: true, size: 'xlarge' } --><!-- /ko -->
+  <!-- ko hueSpinner: { spin: !$data, center: true, size: 'xlarge' } --><!-- /ko -->
 
-  <!-- ko if: $data.id -->
+  <!-- ko if: $data -->
     <!-- ko ifnot: $data.counterGroup -->
       <span class="muted">${ _('There are currently no counters to be displayed.') }</span>
     <!-- /ko -->
