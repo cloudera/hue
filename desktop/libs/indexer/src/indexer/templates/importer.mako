@@ -250,6 +250,14 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
+              <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
+              <div class="control-group input-append">
+                <label for="rdbmsJdbcType" class="control-label"><div>${ _('Database') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcType">
+                </label>
+              </div>
+              <!-- /ko -->
+
               <div class="control-group input-append">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.domain.com or 123.123.123.123') }">
@@ -1277,6 +1285,7 @@ ${ assist.assistPanel() }
         self.rdbmsIsAllTables(false);
         self.rdbmsAllTablesSelected(false);
         self.rdbmsJdbcDriver('')
+        self.rdbmsJdbcType('')
         self.rdbmsJdbcDriverName('')
         self.rdbmsHostname('');
         self.rdbmsPort('');
@@ -1356,6 +1365,8 @@ ${ assist.assistPanel() }
       });
       self.rdbmsJdbcDriver = ko.observable('');
       self.rdbmsJdbcDriver.subscribe(function (val) {
+      self.rdbmsJdbcType = ko.observable('');
+      self.rdbmsJdbcType.subscribe(function (val) {
         self.rdbmsDatabaseNames([]);
       });
       self.rdbmsTableNames = ko.observableArray();

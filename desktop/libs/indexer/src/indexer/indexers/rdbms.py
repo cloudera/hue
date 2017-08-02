@@ -80,12 +80,21 @@ def get_db_component(request):
       data = assist.get_databases()
     elif source['rdbmsDatabaseName']:
       data = assist.get_tables(source['rdbmsDatabaseName'])
-      format_['data'] = [{'name': element, 'value': element} for element in data]
+    format_['data'] = [{'name': element, 'value': element} for element in data]
     format_['status'] = 0
   except Exception, e:
     message = _('Error accessing the database %s: %s') % (name, e)
     LOG.warn(message)
     format['message'] = message
+
+  return JsonResponse(format_)
+
+def get_drivers(request):
+  format_ = {'data': [], 'status': 1}
+  servers_dict = dict(get_server_choices())
+  format_['data'] = [{'value': key, 'name': servers_dict[key]} for key in servers_dict.keys()]
+  format_['data'].append({'value': 'jdbc', 'name': 'JDBC'})
+  format_['status'] = 0
 
   return JsonResponse(format_)
 
