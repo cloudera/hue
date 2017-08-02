@@ -65,17 +65,31 @@ def get_db_component(request):
             'alias': name
           }
     else:
-      name = source['rdbmsType']
-      if name:
-        query_server = {
-          'server_name': name,
-          'server_host': source['rdbmsHostname'],
-          'server_port': int(source['rdbmsPort']),
-          'username': source['rdbmsUsername'],
-          'password': source['rdbmsPassword'],
-          'options': {},
-          'alias': name
-        }
+      if source['rdbmsType'] == 'jdbc':
+        name = source['rdbmsJdbcType']
+        options = {'url': source['rdbmsFullHostName'],'password': source['rdbmsPassword'], 'user': source['rdbmsUsername']}
+        if name:
+          query_server = {
+            'server_name': name,
+            'server_host': '',
+            'server_port': '',
+            'username': '',
+            'password': '',
+            'options': options,
+            'alias': name
+          }
+      else:
+        name = source['rdbmsType']
+        if name:
+          query_server = {
+            'server_name': name,
+            'server_host': source['rdbmsHostname'],
+            'server_port': int(source['rdbmsPort']),
+            'username': source['rdbmsUsername'],
+            'password': source['rdbmsPassword'],
+            'options': {},
+            'alias': name
+          }
 
     db = rdbms.get(user, query_server=query_server)
     if source['rdbmsMode'] == 'configRdbms' and source['rdbmsType'] != 'jdbc':

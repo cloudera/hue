@@ -255,8 +255,14 @@ ${ assist.assistPanel() }
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcType">
                 </label>
               </div>
-              <!-- /ko -->
 
+              <div class="control-group input-append">
+                <label for="rdbmsFullHostName" class="control-label"><div>${ _('Full Host Name') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsFullHostName">
+                </label>
+              </div>
+              <!-- /ko -->
+              <!-- ko if: createWizard.source.rdbmsType() != 'jdbc' -->
               <div class="control-group input-append">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.domain.com or 123.123.123.123') }">
@@ -268,7 +274,7 @@ ${ assist.assistPanel() }
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here eg. 3306') }">
                 </label>
               </div>
-
+              <!-- /ko -->
               <div class="control-group">
                 <label for="rdbmsUsername" class="control-label"><div>${ _('Username') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsUsername" placeholder="${ _('Enter username here') }">
@@ -281,8 +287,9 @@ ${ assist.assistPanel() }
                 </label>
               </div>
 
+
               <div class="control-group">
-                <button class="btn" data-bind="enable: $root.createWizard.source.rdbmsHostname().length > 0 && $root.createWizard.source.rdbmsPort().length > 0 && $root.createWizard.source.rdbmsUsername().length > 0 && $root.createWizard.source.rdbmsPassword().length > 0 && ($root.createWizard.source.rdbmsJdbcType().length > 0 || $root.createWizard.source.rdbmsType() != 'jdbc'), click: createWizard.source.rdbmsCheckConnection">
+                <button class="btn" data-bind="click: createWizard.source.rdbmsCheckConnection">
                   ${_('Test Connection')}
                 </button>
               </div>
@@ -1256,6 +1263,7 @@ ${ assist.assistPanel() }
         self.rdbmsIsAllTables(false);
         self.rdbmsAllTablesSelected(false);
         self.rdbmsJdbcType('')
+        self.rdbmsFullHostName('')
         self.rdbmsJdbcDriverName('')
         self.rdbmsHostname('');
         self.rdbmsPort('');
@@ -1333,6 +1341,10 @@ ${ assist.assistPanel() }
             self.rdbmsDatabaseNames(resp.data);
           }
         });
+      });
+      self.rdbmsFullHostName = ko.observable('');
+      self.rdbmsFullHostName.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
       });
       self.rdbmsJdbcType = ko.observable('');
       self.rdbmsJdbcType.subscribe(function (val) {
