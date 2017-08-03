@@ -170,9 +170,12 @@ class MorphlineIndexer(object):
 
     return field_type.regex.replace('\\', '\\\\')
 
-  def generate_morphline_config(self, collection_name, data, uuid_name=None):
-    geolite_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "GeoLite2-City.mmdb")
-    grok_dicts_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "grok_dictionaries")
+  def generate_morphline_config(self, collection_name, data, uuid_name=None, lib_path=None):
+    if lib_path is None:
+      lib_path = CONFIG_INDEXER_LIBS_PATH.get()
+
+    geolite_loc = os.path.join(lib_path, "GeoLite2-City.mmdb")
+    grok_dicts_loc = os.path.join(lib_path, "grok_dictionaries")
 
     properties = {
       "collection_name": collection_name,
