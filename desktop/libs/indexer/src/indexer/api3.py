@@ -309,6 +309,6 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
   else:
     input_path = None
 
-  morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
+  morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field, lib_path=lib_path)
 
   return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)
