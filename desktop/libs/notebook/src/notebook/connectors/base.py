@@ -224,16 +224,25 @@ def get_api(request, snippet):
     return OozieApi(user=request.user, request=request)
 
   interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
-  if snippet['type'] == 'hbase':
-    interpreter = [{
-      'name': 'hbase',
-      'type': 'hbase',
-      'interface': 'hbase',
-      'options': {},
-      'is_sql': False
-    }]
-  elif not interpreter:
-    raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
+  if not interpreter:
+    if snippet['type'] == 'hbase':
+      interpreter = [{
+        'name': 'hbase',
+        'type': 'hbase',
+        'interface': 'hbase',
+        'options': {},
+        'is_sql': False
+      }]
+    elif snippet['type'] == 'solr':
+      interpreter = [{
+        'name': 'solr',
+        'type': 'solr',
+        'interface': 'solr',
+        'options': {},
+        'is_sql': False
+      }]
+    else:
+      raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
