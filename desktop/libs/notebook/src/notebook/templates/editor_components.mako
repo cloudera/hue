@@ -3485,19 +3485,26 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('editor.get.active.risks', function (callback) {
+        var result = {
+          editor: undefined,
+          risks : {}
+        };
         if (viewModel.selectedNotebook()) {
           if (viewModel.selectedNotebook().snippets().length === 1) {
-            callback(viewModel.selectedNotebook().snippets()[0].complexity());
+            result.editor = viewModel.selectedNotebook().snippets()[0].ace();
+            result.risks = viewModel.selectedNotebook().snippets()[0].complexity() || {};
           } else {
-            viewModel.selectedNotebook().snippets().every(function (snippet) {
+            var notFound = viewModel.selectedNotebook().snippets().every(function (snippet) {
               if (snippet.inFocus()) {
-                callback(snippet.complexity());
+                result.editor = snippet.ace();
+                result.risks = snippet.complexity() || {};
                 return false;
               }
               return true;
             });
           }
         }
+        callback(result);
       });
 
       $(document).on("gridShown", function (e, snippet) {

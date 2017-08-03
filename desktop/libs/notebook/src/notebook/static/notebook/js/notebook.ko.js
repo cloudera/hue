@@ -996,7 +996,10 @@ var EditorViewModel = (function() {
         self.complexityCheckRunning(true);
         self.hasSuggestion(null);
         self.complexity({});
-        huePubSub.publish('editor.active.risks', {});
+        huePubSub.publish('editor.active.risks', {
+          editor: self.ace(),
+          risks: {}
+        });
 
         var changeSubscription = self.statement.subscribe(function () {
           changeSubscription.dispose();
@@ -1020,7 +1023,10 @@ var EditorViewModel = (function() {
               self.hasSuggestion('error');
               self.complexity({'hints': []});
             }
-            huePubSub.publish('editor.active.risks', self.complexity());
+            huePubSub.publish('editor.active.risks', {
+              editor: self.ace(),
+              risks: self.complexity() || {}
+            });
             lastCheckedComplexityStatement = self.statement();
           },
           always: function(data) {

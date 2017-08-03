@@ -1944,6 +1944,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             <li>
               <div class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-normal':  risk !== 'high' }, tooltip: { title: risk + ' ' + riskTables }"><span data-bind="text: riskAnalysis"></span></div>
               <div class="risk-list-description" data-bind="text: riskRecommendation"></div>
+              <div class="risk-quickfix" data-bind="visible: riskId === 17 && $parent.activeEditor() && $parent.activeLocations(), with: $parent" style="display:none;">
+                <a href="javascript:void(0);" data-bind="click: addFilter">${ _('Add filter') }</a>
+              </div>
             </li>
           </ul>
           <!-- /ko -->
@@ -1975,11 +1978,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.activeStatement = ko.observable();
         self.activeTables = ko.observableArray();
         self.activeRisks = ko.observable({});
+        self.activeEditor = ko.observable();
         self.activeRisks.subscribe(function() {
           if (self.isMissingDDL()) {
             self.uploadTableStats(false);
           }
         });
+        self.activeLocations = ko.observable();
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
 
@@ -2054,8 +2059,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var handleLocationUpdate = function (activeLocations) {
           assistDbSource.sourceType = activeLocations.type;
           if (!activeLocations) {
+            self.activeLocations(undefined);
             return;
           }
+          self.activeLocations(activeLocations);
           self.statementCount(activeLocations.totalStatementCount);
           self.activeStatementIndex(activeLocations.activeStatementIndex);
 
@@ -2129,10 +2136,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         var activeLocationsSub = huePubSub.subscribe('editor.active.locations', handleLocationUpdate);
 
-        var activeRisksSub = huePubSub.subscribe('editor.active.risks', self.activeRisks);
+        var activeRisksSub = huePubSub.subscribe('editor.active.risks', function (details) {
+          self.activeRisks(details.risks);
+          self.activeEditor(details.editor);
+        });
 
-        huePubSub.publish('editor.get.active.risks', function (risks) {
-          self.activeRisks(risks || {});
+        huePubSub.publish('editor.get.active.risks', function (details) {
+          self.activeRisks(details.risks);
+          self.activeEditor(details.editor);
         });
 
         self.disposals.push(function () {
@@ -2141,6 +2152,35 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         });
 
       }
+
+      AssistantPanel.prototype.addFilter = function () {
+        var self = this;
+        if (self.activeLocations() && self.activeEditor()) {
+          self.activeLocations().locations.every(function (location) {
+            if (location.type === 'whereClause' && location.missing) {
+
+              self.activeEditor().moveCursorToPosition({
+                row: location.location.last_line - 1,
+                column: location.location.last_column - 1
+              });
+              self.activeEditor().clearSelection();
+
+              if (/\S$/.test(self.activeEditor().getTextBeforeCursor())) {
+                self.activeEditor().session.insert(self.activeEditor().getCursorPosition(), ' ');
+              }
+              self.activeEditor().session.insert(self.activeEditor().getCursorPosition(), 'where ');
+              self.activeEditor().focus();
+
+              window.setTimeout(function () {
+                self.activeEditor().execCommand("startAutocomplete");
+              }, 1);
+
+              return false;
+            }
+            return true;
+          })
+        }
+      };
 
       AssistantPanel.prototype.uploadTableStats = function (showProgress) {
         var self = this;
