@@ -210,6 +210,7 @@ class Notebook(object):
 
 def get_api(request, snippet):
   from notebook.connectors.dataeng import DataEngApi
+  from notebook.connectors.hbase import HBaseApi
   from notebook.connectors.hiveserver2 import HS2Api
   from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.rdbms import RdbmsApi
@@ -223,7 +224,15 @@ def get_api(request, snippet):
     return OozieApi(user=request.user, request=request)
 
   interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
-  if not interpreter:
+  if snippet['type'] == 'hbase':
+    interpreter = [{
+      'name': 'hbase',
+      'type': 'hbase',
+      'interface': 'hbase',
+      'options': {},
+      'is_sql': False
+    }]
+  elif not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
   interpreter = interpreter[0]
   interface = interpreter['interface']
@@ -251,6 +260,8 @@ def get_api(request, snippet):
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
     return SolrApi(request.user, interpreter=interpreter)
+  elif interface == 'hbase':
+    return HBaseApi(request.user)
   elif interface == 'pig':
     return OozieApi(user=request.user, request=request) # Backward compatibility until Hue 4
   else:
