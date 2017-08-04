@@ -148,8 +148,8 @@ ${ scheduler.import_sla_cron(coordinator_json) }
   }
 
   var firstToggled = true;
-  $(document).on("editingToggled", function(){
-    if (firstToggled){
+  $(document).on("editingToggled", function () {
+    if (firstToggled && window.location.pathname.indexOf('/oozie/editor/coordinator') > -1) {
       firstToggled = false;
       viewModel.coordinator.tracker().markCurrentStateAsClean();
     }

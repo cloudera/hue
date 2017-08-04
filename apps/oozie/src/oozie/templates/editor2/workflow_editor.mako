@@ -810,33 +810,39 @@ ${ utils.submit_popup_event() }
     renderChangeables();
 
     $(document).on("editingToggled", function () {
-      $("canvas").remove();
-      exposeOverlayClickHandler();
-      if (viewModel.isEditing()) {
-        hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
-          return el.height() > 40 && el.height() < 200
-        }, function () {
-          renderChangeables();
-        });
-      }
-      else {
-        hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
-          return !el.is(':visible')
-        }, renderChangeables);
+      if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
+        $("canvas").remove();
+        exposeOverlayClickHandler();
+        if (viewModel.isEditing()) {
+          hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
+            return el.height() > 40 && el.height() < 200
+          }, function () {
+            renderChangeables();
+          });
+        }
+        else {
+          hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
+            return !el.is(':visible')
+          }, renderChangeables);
+        }
       }
     });
 
     $(document).on("blur", "[validate]", function() {
-      validateFields();
+      if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
+        validateFields();
+      }
     });
 
     $("#exposeOverlay").on("click", exposeOverlayClickHandler);
 
     $(document).keyup(function(e) {
-      if (e.keyCode == 27) {
-        exposeOverlayClickHandler();
-        addActionDemiModalFieldCancel();
-        $("#addActionDemiModal").modal("hide");
+      if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
+        if (e.keyCode == 27) {
+          exposeOverlayClickHandler();
+          addActionDemiModalFieldCancel();
+          $("#addActionDemiModal").modal("hide");
+        }
       }
     });
 
@@ -862,9 +868,11 @@ ${ utils.submit_popup_event() }
       apiHelper.setInTotalStorage('oozie', 'draggable_section', val);
     });
 
-    $(document).on("click", ".widget-main-section", function(e){
-      if (! $(e.target).is("a") && ! $(e.target).is("input") && ! $(e.target).is("i") && ! $(e.target).is("button")){
-        setLastExpandedWidget(ko.dataFor($(e.target).parents(".card-widget")[0]));
+    $(document).on("click", ".widget-main-section", function (e) {
+      if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
+        if (!$(e.target).is("a") && !$(e.target).is("input") && !$(e.target).is("i") && !$(e.target).is("button")) {
+          setLastExpandedWidget(ko.dataFor($(e.target).parents(".card-widget")[0]));
+        }
       }
     });
 
