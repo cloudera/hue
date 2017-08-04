@@ -17,12 +17,14 @@
 
 import json
 import logging
+import uuid
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.i18n import smart_str
 from librdbms.server import dbms as rdbms
 from librdbms.conf import DATABASES, get_database_password, get_server_choices
 from notebook.connectors.rdbms import Assist
@@ -78,6 +80,7 @@ def get_drivers(request):
   return JsonResponse(format_)
 
 def run_sqoop(request, source, destination, start_time):
+  password_file_path = request.fs.get_home_dir() + '/sqoop/'
   rdbms_mode = source['rdbmsMode']
   rdbms_name = source['rdbmsType']
   rdbms_database_name = source['rdbmsDatabaseName']
@@ -102,13 +105,20 @@ def run_sqoop(request, source, destination, start_time):
     rdbms_user_name = source['rdbmsUsername']
     rdbms_password = source['rdbmsPassword']
 
-  statement = '--connect jdbc:%(rdbmsName)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password %(rdbmsPassword)s' % {
+  password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
+  request.fs.do_as_user(request.user, request.fs.create, password_file_path, overwrite=True, permission=0700, data=smart_str(rdbms_password))
+
+  lib_files = []
+  if destination['sqoopJobLibPaths']:
+    lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths']]
+
+  statement = '--connect jdbc:%(rdbmsName)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
     'rdbmsName': rdbms_name,
     'rdbmsHost': rdbms_host,
     'rdbmsPort': rdbms_port,
     'rdbmsDatabaseName': rdbms_database_name,
     'rdbmsUserName': rdbms_user_name,
-    'rdbmsPassword': rdbms_password
+    'passwordFilePath': password_file_path
   }
   if destination_type == 'file':
     success_url = '/filebrowser/view/' + destination_name
@@ -142,10 +152,6 @@ def run_sqoop(request, source, destination, start_time):
     'statement': statement,
     'numMappers': destination_mappers_num
   }
-
-  lib_files = []
-  if destination['sqoopJobLibPaths']:
-    lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths']]
 
   task = make_notebook(
     name=_('Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s') % {
