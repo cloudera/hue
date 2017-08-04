@@ -55,10 +55,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
   <%namespace name="assistSearch" file="assist_search.mako" />
   <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
+  <%namespace name="contextPopover" file="/context_popover.mako" />
   <%namespace name="nav_components" file="/nav_components.mako" />
 
   ${ assistSearch.assistSearch() }
+  % if conf.USE_NEW_CONTEXT_POPOVER.get():
+  ${ contextPopover.contextPopover() }
+  % else:
   ${ sqlContextPopover.sqlContextPopover() }
+  %endif
   ${ nav_components.nav_tags(readOnly=not user.has_hue_permission(action="write", app="metadata")) }
 
   <script type="text/html" id="assist-no-database-entries">
