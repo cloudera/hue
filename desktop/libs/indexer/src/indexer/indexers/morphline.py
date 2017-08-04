@@ -93,10 +93,12 @@ class MorphlineIndexer(object):
 
     client = SolrClient(self.user)
 
+    extra_args = ['-Dmapreduce.job.user.classpath.first=true'] if client.is_solr_six_or_more() else []
+
     task.add_java_snippet(
       clazz='org.apache.solr.hadoop.MapReduceIndexerTool',
       app_jar=lib_path if lib_path is not None else CONFIG_INDEXER_LIBS_PATH.get(),
-      arguments=[
+      arguments=extra_args + [
           u'--morphline-file',
           u'morphline.conf',
           u'--output-dir',
