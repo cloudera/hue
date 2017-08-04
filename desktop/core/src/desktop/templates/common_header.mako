@@ -112,6 +112,10 @@ if USE_NEW_EDITOR.get():
     % endif
   </style>
 
+  <script type="text/javascript">
+    var IS_HUE_4 = false;
+  </script>
+
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 
   % if not conf.DJANGO_DEBUG_MODE.get():
@@ -180,8 +184,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/clusterConfig.js') }"></script>
 
   <script type="text/javascript">
-    var IS_HUE_4 = false;
-
     huePubSub.subscribe('get.current.app.name', function () {
       var appName = '';
       if ('${ 'metastore' in apps }' === 'True' && location.href.indexOf('${"metastore" in apps and apps["metastore"].display_name}') !== -1) {
