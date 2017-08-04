@@ -375,7 +375,7 @@ LIMIT $limit"""))
     coord_data = {
           'id': None,
           'uuid': None,
-          'name': 'My Coordinator',
+          'name': 'My Schedule',
           'variables': [], # Aka workflow parameters
           'properties': {
               'description': '',
