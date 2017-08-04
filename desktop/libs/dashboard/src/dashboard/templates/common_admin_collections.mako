@@ -40,7 +40,7 @@
     </a>
     % endif
   </div>
-  <h4><i class="fa fa-tags"></i> ${_('Dashboards')}</h4>
+  <h4><i class="fa fa-list"></i> ${_('Dashboards')}</h4>
 </div>
 %endif
 
