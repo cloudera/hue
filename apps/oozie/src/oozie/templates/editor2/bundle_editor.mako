@@ -298,40 +298,46 @@ ${ utils.submit_popup_event() }
       show: false
     });
     $(window).bind("keydown", "esc", function () {
-      if ($(".demi-modal.fade.in").length > 0) {
-        $(".demi-modal.fade.in .demi-modal-chevron").click();
+      if (window.location.pathname.indexOf('/oozie/editor/bundle') > -1) {
+        if ($(".demi-modal.fade.in").length > 0) {
+          $(".demi-modal.fade.in .demi-modal-chevron").click();
+        }
       }
     });
 
-    $(document).on("click", ".now-link", function(){
-      $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm[Z]"));
+    $(document).on("click", ".now-link", function () {
+      if (window.location.pathname.indexOf('/oozie/editor/bundle') > -1) {
+        $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm[Z]"));
+      }
     });
 
     $(document).on("click", ".calendar-link", function () {
-      var DATE_FORMAT = "YYYY-MM-DD";
-      var _el = $(this).parents(".controls").find("input[type='text']");
-      _el.off("keyup");
-      _el.on("keyup", function () {
+      if (window.location.pathname.indexOf('/oozie/editor/bundle') > -1) {
+        var DATE_FORMAT = "YYYY-MM-DD";
+        var _el = $(this).parents(".controls").find("input[type='text']");
+        _el.off("keyup");
+        _el.on("keyup", function () {
+          _el.data("lastValue", _el.val());
+        });
         _el.data("lastValue", _el.val());
-      });
-      _el.data("lastValue", _el.val());
-      _el.datepicker({
-        format: DATE_FORMAT.toLowerCase()
-      }).on("changeDate", function () {
-        _el.datepicker("hide");
-      }).on("hide", function () {
-        var _val = _el.data("lastValue") ? _el.data("lastValue") : _el.val();
-        if (_val.indexOf("T") == -1) {
-          _el.val(_el.val() + "T00:00Z");
-        }
-        else if (_el.val().indexOf("T") == "-1") {
-          _el.val(_el.val() + "T" + _val.split("T")[1]);
-        }
-      });
-      _el.datepicker('show');
-      huePubSub.subscribeOnce('hide.datepicker', function () {
-        _el.datepicker('hide');
-      });
+        _el.datepicker({
+          format: DATE_FORMAT.toLowerCase()
+        }).on("changeDate", function () {
+          _el.datepicker("hide");
+        }).on("hide", function () {
+          var _val = _el.data("lastValue") ? _el.data("lastValue") : _el.val();
+          if (_val.indexOf("T") == -1) {
+            _el.val(_el.val() + "T00:00Z");
+          }
+          else if (_el.val().indexOf("T") == "-1") {
+            _el.val(_el.val() + "T" + _val.split("T")[1]);
+          }
+        });
+        _el.datepicker('show');
+        huePubSub.subscribeOnce('hide.datepicker', function () {
+          _el.datepicker('hide');
+        });
+      }
     });
 
     huePubSub.subscribe('submit.popup.return', function (data) {
