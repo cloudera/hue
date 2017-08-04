@@ -574,14 +574,18 @@ ${ workflow.render() }
 
 ${ dashboard.import_layout() }
 
+%if not is_embeddable:
 ${ commonshare() | n,unicode }
+%endif
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/select2.full.patched.js') }" type="text/javascript" charset="utf-8"></script>
+% if not is_embeddable:
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
+%endif
 
 ${ dashboard.import_bindings() }
 
@@ -609,7 +613,9 @@ ${ utils.submit_popup_event() }
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#oozie_workflowComponents")[0]);
 
+  % if not is_embeddable:
   var shareViewModel = initSharing("#documentShareModal");
+  % endif
   shareViewModel.setDocUuid('${ doc_uuid }');
 
 
