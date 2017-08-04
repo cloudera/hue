@@ -1320,6 +1320,13 @@ USE_NEW_GLOBAL_SEARCH = Config( # To remove when the new global search is ready
   help=_('Choose whether to use the new global search or not.')
 )
 
+USE_NEW_CONTEXT_POPOVER = Config( # To remove when the new context popover is ready
+  key='use_new_context_popover',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to use the new context popover or not.')
+)
+
 USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
   key='use_new_autocompleter',
   default=True,
