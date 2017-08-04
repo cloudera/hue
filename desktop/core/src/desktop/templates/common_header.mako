@@ -393,7 +393,7 @@ ${ hueIcons.symbols() }
              </a>
              <ul role="menu" class="dropdown-menu">
                <li><a href="${ url('notebook:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
-               <li><a href="${ url('notebook:notebooks') }"><i class="fa fa-fw fa-tags" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
+               <li><a href="${ url('notebook:notebooks') }"><i class="fa fa-fw fa-list" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
                <li class="divider"></li>
                % for notebook in notebooks:
                  <li>
@@ -483,7 +483,7 @@ ${ hueIcons.symbols() }
              </a>
              <ul role="menu" class="dropdown-menu">
                <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a></li>
-               <li><a href="${ url('search:admin_collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-tags" style="vertical-align: middle"></i>${ _('Dashboards') }</a></li>
+               <li><a href="${ url('search:admin_collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-list" style="vertical-align: middle"></i>${ _('Dashboards') }</a></li>
                <%!
                  from indexer.conf import ENABLE_NEW_INDEXER
                %>
