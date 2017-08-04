@@ -57,6 +57,7 @@ from desktop.lib.fs import splitpath
 from desktop.lib.i18n import smart_str
 from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
+from desktop.views import serve_403_error
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_overwrite_save
@@ -133,6 +134,8 @@ def download(request, path):
     This is inspired by django.views.static.serve.
     ?disposition={attachment, inline}
     """
+    if not SHOW_DOWNLOAD_BUTTON.get():
+        return serve_403_error(request)
     if not request.fs.exists(path):
         raise Http404(_("File not found: %(path)s.") % {'path': escape(path)})
     if not request.fs.isfile(path):
