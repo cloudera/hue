@@ -54,11 +54,12 @@
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
 
-  ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
-
   <script type="text/javascript">
     var IS_HUE_4 = true;
   </script>
+
+  ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
+
   % if not conf.DJANGO_DEBUG_MODE.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
