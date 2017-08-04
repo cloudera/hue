@@ -816,7 +816,6 @@ ${ utils.submit_popup_event() }
         hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
           return el.height() > 40 && el.height() < 200
         }, function () {
-          resizeToolbar();
           renderChangeables();
         });
       }
@@ -826,26 +825,6 @@ ${ utils.submit_popup_event() }
         }, renderChangeables);
       }
     });
-
-    function resizeToolbar() {
-      $('#oozie_workflowComponents .card-toolbar-content').width(100).css('marginLeft', '0');
-      if ($('#oozie_workflowComponents .card-toolbar').height() > 60) {
-        var loops = 0;
-        while ($('#oozie_workflowComponents .card-toolbar').height() > 60) {
-          $('#oozie_workflowComponents .card-toolbar-content').width($('#oozie_workflowComponents .card-toolbar-content').width() + 10);
-          loops++;
-          if (loops > 120){
-            break;
-          }
-        }
-      }
-      var marginLeft = Math.max(0, $('#oozie_workflowComponents .card-toolbar').width() / 2 - $('#oozie_workflowComponents .card-toolbar-content').width() / 2);
-      $('#oozie_workflowComponents .card-toolbar-content').css('marginLeft', marginLeft + 'px');
-    }
-
-    if (viewModel.isEditing()){
-      hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar', function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
-    }
 
     $(document).on("blur", "[validate]", function() {
       validateFields();
@@ -866,7 +845,6 @@ ${ utils.submit_popup_event() }
       window.clearTimeout(resizeTimeout);
       resizeTimeout = window.setTimeout(function () {
         renderChangeables();
-        resizeToolbar();
       }, 200);
     });
 
@@ -882,12 +860,6 @@ ${ utils.submit_popup_event() }
 
     huePubSub.subscribe('oozie.draggable.section.change', function(val){
       apiHelper.setInTotalStorage('oozie', 'draggable_section', val);
-      if (val === 'actions'){
-        hueUtils.waitForRendered('.draggable-actions', function(el){ return el.length > 0 }, resizeToolbar);
-      }
-      if (val === 'documents'){
-        hueUtils.waitForRendered('.draggable-documents', function(el){ return el.length > 0 }, resizeToolbar);
-      }
     });
 
     $(document).on("click", ".widget-main-section", function(e){
@@ -909,7 +881,6 @@ ${ utils.submit_popup_event() }
         interpreters = interpreters.concat(['subworkflow', 'fs', 'email', 'streaming', 'generic', 'stop']);
       }
       viewModel.availableActions(interpreters);
-      resizeToolbar();
     }, 'oozie');
 
     huePubSub.publish('cluster.config.get.config');
