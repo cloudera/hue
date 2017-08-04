@@ -86,6 +86,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
     <a class="btn" href="javascript: void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '${ url('oozie:new_workflow') }'">
       <i class="fa fa-fw fa-file-o"></i>
     </a>
+    %if is_embeddable:
+    <a class="btn" href="javascript: void(0)" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '/home/?type=oozie-workflow2'">
+      <i class="fa fa-fw fa-list"></i>
+    </a>
+    %endif
   </div>
 </%def>
 
