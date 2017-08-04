@@ -888,6 +888,15 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
     }
 
+    var updateHash = function (hash) {
+      %if not is_embeddable:
+      window.location.hash = hash;
+      %else:
+      hueUtils.changeURL('#' + hash);
+      huePubSub.publish('fb.update.hash');
+      %endif
+    }
+
     var Page = function (page) {
       if (page != null) {
         return {
@@ -996,7 +1005,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
               viewModel.targetPageNum(1);
               viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
-              location.hash = this.url;
+              updateHash(this.url);
             }
             else {
               window.open($(e.target).attr('href'));
@@ -1206,7 +1215,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
 
           if (data.type != null && data.type == "file") {
-            location.href = data.url;
+            window.location.href = data.url;
             return false;
           }
 
@@ -1347,7 +1356,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             e.preventDefault();
             viewModel.targetPageNum(1);
             viewModel.targetPath("${url('filebrowser.views.view', path='')}?" + folderPath);
-            location.hash = '';
+            updateHash('');
             viewModel.retrieveData();
           }
           else {
@@ -1372,22 +1381,22 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           self.enableFilterAfterSearch = false;
           self.searchQuery("");
           self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
-          location.hash = stripHashes(file.path);
+          updateHash(stripHashes(file.path));
         } else {
           %if is_embeddable:
           huePubSub.publish('open.link', file.url);
           %else:
-          location.href = file.url;
+          window.location.href = file.url;
           %endif
         }
       };
 
       self.editFile = function () {
-        location.href = "${url('filebrowser.views.edit', path='')}" + self.selectedFile().path;
+        window.location.href = "${url('filebrowser.views.edit', path='')}" + self.selectedFile().path;
       };
 
       self.downloadFile = function () {
-        location.href = "${url('filebrowser.views.download', path='')}" + self.selectedFile().path;
+        window.location.href = "${url('filebrowser.views.download', path='')}" + self.selectedFile().path;
       };
 
       self.renameFile = function () {
@@ -2542,7 +2551,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
       }
 
-      if (location.hash != null && location.hash.length > 1) {
+      huePubSub.subscribe('fb.update.hash', hashchange, 'filebrowser');
+
+      if (window.location.hash != null && window.location.hash.length > 1) {
         hashchange();
       }
       else {
@@ -2565,10 +2576,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(el.val()));
           viewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
-              location.href = data.url;
+              window.location.href = data.url;
               return false;
             } else {
-              location.hash = stripHashes(el.val());
+              updateHash(stripHashes(el.val()));
             }
             $("#jHueHdfsAutocomplete").hide();
           });
