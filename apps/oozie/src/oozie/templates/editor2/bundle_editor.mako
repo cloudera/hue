@@ -254,13 +254,17 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
 
 ${ dashboard.import_layout() }
 
+%if not is_embeddable:
 ${ commonshare() | n,unicode }
+%endif
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
+% if not is_embeddable:
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
+%endif
 
 ${ dashboard.import_bindings() }
 
@@ -277,7 +281,9 @@ ${ utils.submit_popup_event() }
 
   viewModel.bundle.tracker().markCurrentStateAsClean();
 
+  % if not is_embeddable:
   var shareViewModel = initSharing("#documentShareModal");
+  % endif
   shareViewModel.setDocUuid('${ doc_uuid }');
 
   var tempCoordinator = null;

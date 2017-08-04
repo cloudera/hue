@@ -112,13 +112,18 @@ ${ scheduler.import_modals() }
 
 ${ dashboard.import_layout() }
 
+%if not is_embeddable:
 ${ commonshare() | n,unicode }
+%endif
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
+% if not is_embeddable:
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
+%endif
+
 
 ${ dashboard.import_bindings() }
 
@@ -140,8 +145,9 @@ ${ scheduler.import_sla_cron(coordinator_json) }
   viewModel.coordinator.tracker().markCurrentStateAsClean();
   viewModel.coordinator.refreshParameters();
 
-
+  % if not is_embeddable:
   var shareViewModel = initSharing("#documentShareModal");
+  % endif
   shareViewModel.setDocUuid('${ doc_uuid }');
 
   function showChooseWorkflow() {
