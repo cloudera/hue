@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.views import _ko, login_modal
+  from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
 
@@ -408,6 +408,8 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
+${ commonshare() | n,unicode }
+
 <script src="${ static('desktop/js/hue-bundle.js') }"></script>
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
@@ -484,6 +486,11 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 <script src="${ static('metastore/js/metastore.model.js') }"></script>
+
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
+<script>
+  var shareViewModel = initSharing("#documentShareModal");
+</script>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
