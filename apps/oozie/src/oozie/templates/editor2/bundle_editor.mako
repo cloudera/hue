@@ -61,6 +61,12 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
     <a class="btn" href="${ url('oozie:new_bundle') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
+
+    %if is_embeddable:
+    <a class="btn" href="javascript: void(0)" title="${ _('Bundles') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '/home/?type=oozie-bundle2'">
+      <i class="fa fa-fw fa-list"></i>
+    </a>
+    %endif
   </div>
 </%def>
 
