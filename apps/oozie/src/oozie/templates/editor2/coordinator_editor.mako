@@ -65,6 +65,12 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-file-o"></i>
     </a>
 
+    %if is_embeddable:
+    <a class="btn" href="javascript: void(0)" title="${ _('Schedules') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '/home/?type=oozie-coordinator2'">
+      <i class="fa fa-fw fa-list"></i>
+    </a>
+    %endif
+
   </div>
 </%def>
 
