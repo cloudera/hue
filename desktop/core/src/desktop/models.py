@@ -510,8 +510,10 @@ class DocumentManager(models.Manager):
 
             tag = DocumentTag.objects.get_example_tag(user=doc.owner)
             doc.tags.add(tag)
+            doc_last_modified = doc.last_modified
 
             doc.save()
+            Document.objects.filter(id=doc.id).update(last_modified=doc_last_modified)
       except Exception, e:
         LOG.exception('error sharing sample user documents')
 
