@@ -944,7 +944,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- /ko -->
 
     <!-- ko if: hasKill -->
-    <button class="btn btn-danger disable-feedback" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
+    <button class="btn btn-danger disable-feedback" title="${_('Stop selected')}" data-bind="visible: ! disableKillingJobs(), click: function() { control('kill'); }, enable: killEnabled">
       ## TODO confirmation
       <i class="fa fa-times"></i> <!-- ko ifnot: $root.isMini -->${_('Kill')}<!-- /ko -->
     </button>
@@ -1991,6 +1991,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.apps = ko.observableArray().extend({ rateLimit: 50 });
       self.totalApps = ko.observable(null);
+      self.disableKillingJobs = ko.observable(true);
       self.isCoordinator = ko.observable(false);
 
       self.loadingJobs = ko.observable(false);
@@ -2149,6 +2150,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }
           self.apps(apps);
           self.totalApps(data.total);
+          self.disableKillingJobs(data.disable_killing_jobs);
         }).always(function () {
           self.loadingJobs(false);
         });
