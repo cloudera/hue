@@ -185,7 +185,7 @@ var AssistDbEntry = (function () {
     }
 
     self.statsVisible(true);
-    huePubSub.publish('sql.context.popover.show', {
+    huePubSub.publish('context.popover.show', {
       data: {
         type: type,
         identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
@@ -203,7 +203,7 @@ var AssistDbEntry = (function () {
         bottom: offset.top + $source.height() - 3
       }
     });
-    huePubSub.subscribeOnce('sql.context.popover.hidden', function () {
+    huePubSub.subscribeOnce('context.popover.hidden', function () {
       self.statsVisible(false);
     });
   };
