@@ -663,7 +663,7 @@ var MetastoreTable = (function () {
     window.clearTimeout(contextPopoverTimeout);
     var $source = $(event.currentTarget || event.target);
     var offset = $source.offset();
-    huePubSub.publish('sql.context.popover.show', {
+    huePubSub.publish('context.popover.show', {
       data: {
         type: 'table',
         identifierChain: [{ name: entry.name }]
@@ -736,7 +736,7 @@ var MetastoreColumn = (function () {
   MetastoreColumn.prototype.showContextPopover = function (entry, event) {
     var $source = $(event.target);
     var offset = $source.offset();
-    huePubSub.publish('sql.context.popover.show', {
+    huePubSub.publish('context.popover.show', {
       data: {
         type: 'column',
         identifierChain: [{ name: entry.table.name }, { name: entry.name() }]
