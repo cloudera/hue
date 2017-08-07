@@ -376,7 +376,7 @@ COLLECT_USAGE = Config(
 LEAFLET_TILE_LAYER = Config(
   key="leaflet_tile_layer",
   help=_("Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile domain to the img-src section of the 'secure_content_security_policy' configuration parameter as well."),
-  type=coerce_str_lowercase,
+  type=str,
   default="http://{s}.tile.osm.org/{z}/{x}/{y}.png")
 
 LEAFLET_TILE_LAYER_ATTRIBUTION = Config(
