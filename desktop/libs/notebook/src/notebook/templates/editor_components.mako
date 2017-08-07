@@ -978,12 +978,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="code-editor-snippet-body${ suffix }">
   <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') -->
   <div class="optimizer-container" data-bind="css: { 'active': showOptimizer }">
-    <!-- ko if: hasSuggestion() == null -->
-    <div class="round-icon idle" title="${ _ko('Checking statement for potential risks...') }">
-      <i class="fa" data-bind="css: {'fa-spinner fa-spin': complexityCheckRunning}"></i>
-    </div>
-    <!-- /ko -->
-
     <!-- ko if: hasSuggestion() -->
       <!-- ko with: suggestion() -->
         <!-- ko if: parseError -->
