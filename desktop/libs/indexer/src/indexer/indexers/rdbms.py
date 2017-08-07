@@ -115,6 +115,10 @@ def run_sqoop(request, source, destination, start_time):
   destination_table_name = destination['tableName']
   destination_database_name = destination['databaseName']
   destination_mappers_num = destination['numMappers']
+  destination_file_output_format = destination['rdbmsFileOutputFormat']
+  destination_custom_fields_delimiter = destination['customFieldsDelimiter']
+  destination_custom_line_delimiter = destination['customLineDelimiter']
+  destination_custom_enclosed_by_delimiter = destination['customEnclosedByDelimiter']
 
   if not rdbms_all_tables_selected:
     rdbms_table_name = source['rdbmsTableName']
@@ -169,6 +173,21 @@ def run_sqoop(request, source, destination, start_time):
         'rdbmsTableName': rdbms_table_name,
         'targetDir': targetDir
       }
+      if destination_file_output_format == 'text':
+        statement = '%(statement)s --as-textfile --fields-terminated-by %(customFieldsDelimiter)s --lines-terminated-by %(customLineDelimiter)s --enclosed-by %(customEnclosedByDelimiter)s' % {
+          'statement': statement,
+          'customFieldsDelimiter': destination_custom_fields_delimiter,
+          'customLineDelimiter': destination_custom_line_delimiter,
+          'customEnclosedByDelimiter': destination_custom_enclosed_by_delimiter
+        }
+      elif destination_file_output_format == 'sequence':
+        statement = '%(statement)s --as-sequencefile' % {
+          'statement': statement
+        }
+      elif destination_file_output_format == 'avro':
+        statement = '%(statement)s --as-avrodatafile' % {
+          'statement': statement
+        }
   elif destination_type == 'table':
     success_url = reverse('metastore:describe_table', kwargs={'database': destination_database_name, 'table': destination_table_name})
     if rdbms_all_tables_selected:
