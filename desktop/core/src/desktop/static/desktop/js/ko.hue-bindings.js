@@ -6108,7 +6108,6 @@
           valueAccessor().callback();
         }
       });
-
     }
   };
 
@@ -6133,8 +6132,7 @@
 
       if (options.theme) {
         editor.setTheme('ace/theme/' + options.theme);
-      }
-      else {
+      } else {
         editor.setTheme('ace/theme/hue');
       }
       if (options.mode) {
