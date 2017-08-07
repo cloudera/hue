@@ -275,7 +275,7 @@ ${ assist.assistPanel() }
 
               <div class="control-group">
                 <label class="control-label"><div></div>
-                  <button class="btn" data-bind="enable: $root.createWizard.source.rdbmsHostname().length > 0 && $root.createWizard.source.rdbmsPort().length > 0 && $root.createWizard.source.rdbmsUsername().length > 0 && $root.createWizard.source.rdbmsPassword().length > 0, click: createWizard.source.rdbmsCheckConnection">
+                  <button class="btn" data-bind="enable: $root.createWizard.source.rdbmsHostname().length > 0 && $root.createWizard.source.rdbmsPort().length > 0 && $root.createWizard.source.rdbmsUsername().length > 0, click: createWizard.source.rdbmsCheckConnection">
                     ${_('Test Connection')}
                   </button>
                 </label>
@@ -1295,6 +1295,7 @@ ${ assist.assistPanel() }
         if (val != '') {
           wizard.guessFieldTypes();
           wizard.destination.rdbmsEditorContent('SELECT * FROM ' + val);
+          wizard.destination.name(val.replace(/ /g, '_').toLowerCase());
         }
       });
       self.rdbmsTableNames = ko.observableArray();
