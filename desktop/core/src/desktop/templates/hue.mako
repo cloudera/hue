@@ -973,7 +973,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             })
           }},
           { url: '/jobbrowser/jobs/job_*', app: function (ctx) {
-            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/'));
+            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]);
+          }},
+          { url: '/jobbrowser/jobs/application_*', app: function (ctx) {
+            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]);
           }},
           { url: '/jobbrowser*', app: 'jobbrowser'},
           { url: '/logs', app: 'logs' },
