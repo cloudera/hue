@@ -937,7 +937,6 @@ var EditorViewModel = (function() {
     self.suggestion = ko.observable('');
     self.hasSuggestion = ko.observable(null);
 
-    self.complexityCheckRunning = ko.observable(false);
     self.compatibilityCheckRunning = ko.observable(false);
     self.compatibilitySourcePlatform = ko.observable(self.type());
     self.compatibilitySourcePlatform.subscribe(function(newValue) {
@@ -993,7 +992,6 @@ var EditorViewModel = (function() {
         self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
 
         hueAnalytics.log('notebook', 'get_query_risk');
-        self.complexityCheckRunning(true);
         self.hasSuggestion(null);
         self.complexity({});
         huePubSub.publish('editor.active.risks', {});
@@ -1001,7 +999,6 @@ var EditorViewModel = (function() {
         var changeSubscription = self.statement.subscribe(function () {
           changeSubscription.dispose();
           self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
-          self.complexityCheckRunning(false);
         });
 
         lastComplexityRequest = $.ajax({
@@ -1025,10 +1022,6 @@ var EditorViewModel = (function() {
           },
           always: function(data) {
             changeSubscription.dispose();
-            self.complexityCheckRunning(false);
-          },
-          error: function(data) {
-            self.complexityCheckRunning(false);
           }
         });
 
