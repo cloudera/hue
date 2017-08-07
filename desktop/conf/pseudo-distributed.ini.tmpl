@@ -637,6 +637,10 @@
     ## hue_keytab=
     # Kerberos principal name for Hue
     ## hue_principal=hue/hostname.foo.com
+    # Frequency in seconds with which Hue will renew its keytab
+    ## keytab_reinit_frequency=3600
+    # Path to keep Kerberos credentials cached
+    ## ccache_path=/var/run/hue/hue_krb5_ccache
     # Path to kinit
     ## kinit_path=/path/to/kinit
 
