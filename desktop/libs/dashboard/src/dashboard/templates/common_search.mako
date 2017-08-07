@@ -604,9 +604,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
   ## Dimensions > 1 , visible: !$parents[1].isLoading()
   <!-- ko if: $root.isEditing -->
-  <span data-bind="foreach: properties.facets">
-    <div class="filter-box">
-      <div class="title">
+  <ul data-bind="sortable: { data: properties.facets, options: { axis: 'x', containment: 'parent', handle: '.title' }}" class="unstyled pull-left white">
+    <li class="filter-box">
+      <div class="title move">
         <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
           <i class="fa fa-times"></i>
         </a>
@@ -631,7 +631,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </span>
         </div>
 
-        <div class="facet-field-cnt hide"">
+        <div class="facet-field-cnt hide">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Min Count') }
@@ -640,8 +640,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </span>
         </div>
       </div>
-    </div>
-  </span>
+    </li>
+  </ul>
   <!-- /ko -->
 
   <!-- ko ifnot: $root.isEditing -->
