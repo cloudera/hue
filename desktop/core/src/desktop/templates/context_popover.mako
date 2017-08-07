@@ -20,8 +20,85 @@ from django.utils.translation import ugettext as _
 
 <%def name="contextPopover()">
 
+  <script type="text/html" id="context-contents-hive-template">
+    Hive: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  </script>
+
+  <script type="text/html" id="context-contents-impala-template">
+    Impala: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      function ContextContentsHive() {
+        var self = this;
+      }
+
+      function ContextContentsImpala() {
+        var self = this;
+      }
+
+      ko.components.register('context-contents-hive', {
+        viewModel: ContextContentsHive,
+        template: { element: 'context-contents-hive-template' }
+      });
+
+      ko.components.register('context-contents-impala', {
+        viewModel: ContextContentsImpala,
+        template: { element: 'context-contents-impala-template' }
+      });
+    })();
+  </script>
+
+  <script type="text/html" id="context-contents-hdfs-template">
+    HDFS: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  </script>
+
+  <script type="text/html" id="context-contents-s3-template">
+    S3: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      function ContextContentsHdfs() {
+        var self = this;
+      }
+
+      function ContextContentsS3() {
+        var self = this;
+      }
+
+      ko.components.register('context-contents-hdfs', {
+        viewModel: ContextContentsHdfs,
+        template: { element: 'context-contents-hdfs-template' }
+      });
+
+      ko.components.register('context-contents-s3', {
+        viewModel: ContextContentsS3,
+        template: { element: 'context-contents-s3-template' }
+      });
+    })();
+  </script>
+
+  <script type="text/html" id="context-contents-hue-template">
+    Hue: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      function ContextContentsHue() {
+        var self = this;
+      }
+
+      ko.components.register('context-contents-hue', {
+        viewModel: ContextContentsHue,
+        template: { element: 'context-contents-hue-template' }
+      });
+    })();
+  </script>
+
   <script type="text/html" id="context-popover-contents">
-    <div class="context-popover-content">Hola</div>
+    <div class="context-popover-content"><a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a></div>
   </script>
 
   <script type="text/html" id="context-popover-template">
@@ -33,7 +110,9 @@ from django.utils.translation import ugettext as _
           <a class="pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
         </div>
       </div>
-      <!-- ko template: 'context-popover-contents' --><!-- /ko -->
+      <!-- ko with: activeEntry -->
+      <!-- ko component: { name: 'context-contents-' + sourceType, params: { data: $data } } --><!-- /ko -->
+      <!-- /ko -->
     </div>
   </script>
 
@@ -216,6 +295,43 @@ from django.utils.translation import ugettext as _
         }
       }
 
+      var generateBreadcrumbs = function (params) {
+        if ((params.sourceType === 'hive' || params.sourceType === 'impala') && params.data.type !== 'hdfs') {
+          var breadcrumbs = [];
+          var currentPath = [];
+          params.data.identifierChain.forEach(function (identifier) {
+            currentPath.push(identifier.name);
+            breadcrumbs.push({
+              label: identifier.name,
+              sourceType: params.sourceType,
+              path: currentPath.concat(),
+              defaultDatabase: params.defaultDatabase
+            })
+          });
+          return breadcrumbs;
+        } else if (params.data && params.data.type === 'hdfs') {
+          var breadcrumbs = [];
+          var currentPath = [];
+          var type = 'hdfs';
+          if (/^s3a?:\/\//i.test(params.data.path)) {
+            type = 's3'
+          }
+          params.data.path.replace(/^[a-z0-9]+:\/\//i, '').split('/').forEach(function (pathPart) {
+            if (pathPart) {
+              currentPath.push(pathPart);
+              breadcrumbs.push({
+                label: pathPart,
+                sourceType: type,
+                path: currentPath.concat()
+              })
+            }
+          });
+          return breadcrumbs;
+        } else {
+          return [];
+        }
+      };
+
       function ContextPopoverViewModel(params) {
         var self = this;
         self.disposalFunctions = [];
@@ -225,41 +341,8 @@ from django.utils.translation import ugettext as _
         self.left = ko.observable(0);
         self.top = ko.observable(0);
 
-        self.activeEntry = ko.observable();
-
-        self.breadcrumbs = ko.observableArray([
-          {
-            label: 'root',
-            data: {}
-          }, {
-            label: 'level_one',
-            data: {}
-          }, {
-            label: 'level_two',
-            data: {}
-          }, {
-            label: 'level_three',
-            data: {}
-          }, {
-            label: 'level_four',
-            data: {}
-          }, {
-            label: 'level_five',
-            data: {}
-          }, {
-            label: 'level_six',
-            data: {}
-          }, {
-            label: 'level_seven',
-            data: {}
-          }, {
-            label: 'level_eight',
-            data: {}
-          }, {
-            label: 'level_nine',
-            data: {}
-          }
-        ]);
+        self.breadcrumbs = ko.observableArray(generateBreadcrumbs(params));
+        self.activeEntry = ko.observable(self.breadcrumbs()[self.breadcrumbs().length - 1]);
 
         self.onBreadcrumbSelect = function (breadcrumb) {
           var newBreadcrumbs = [];
