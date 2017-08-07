@@ -2764,9 +2764,7 @@ var EditorViewModel = (function() {
       huePubSub.publish('context.panel.visible', newValue);
     });
 
-    huePubSub.subscribe('context.panel.visible.editor', function (value) {
-      self.isContextPanelVisible(false);
-    }, self.huePubSubId);
+    huePubSub.subscribe('context.panel.visible.editor', self.isContextPanelVisible);
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
