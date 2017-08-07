@@ -24,6 +24,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.i18n import smart_str
 from librdbms.conf import DATABASES, get_database_password, get_server_choices
 from librdbms.jdbc import Jdbc
 from librdbms.server import dbms as rdbms
@@ -42,6 +43,7 @@ def get_db_component(request):
   try:
     source = json.loads(request.POST.get('source', '{}'))
     user = User.objects.get(username=request.user)
+    name = None
     if source['rdbmsMode'] == 'configRdbms':
       if source['rdbmsType'] != 'jdbc':
         query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
@@ -49,7 +51,6 @@ def get_db_component(request):
       else:
         interpreters = get_ordered_interpreters(request.user)
         options = {}
-        name = None
         key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
         if key:
           options = key[0]['options']
@@ -119,6 +120,7 @@ def run_sqoop(request, source, destination, start_time):
   destination_custom_fields_delimiter = destination['customFieldsDelimiter']
   destination_custom_line_delimiter = destination['customLineDelimiter']
   destination_custom_enclosed_by_delimiter = destination['customEnclosedByDelimiter']
+  destination_splitby_column = destination['rdbmsSplitByColumn']
 
   if not rdbms_all_tables_selected:
     rdbms_table_name = source['rdbmsTableName']
@@ -151,13 +153,20 @@ def run_sqoop(request, source, destination, start_time):
       rdbms_user_name = source['rdbmsUsername']
       rdbms_password = source['rdbmsPassword']
 
-    statement = '--connect jdbc:%(rdbmsName)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password %(rdbmsPassword)s' % {
+    password_file_path = request.fs.join(request.fs.get_home_dir() + '/sqoop/', uuid.uuid4().hex + '.password')
+    request.fs.do_as_user(request.user, request.fs.create, password_file_path, overwrite=True, permission=0700, data=smart_str(rdbms_password))
+
+    lib_files = []
+    if destination['sqoopJobLibPaths']:
+      lib_files = [{'path': f['path'], 'type': 'jar'} for f in destination['sqoopJobLibPaths']]
+
+    statement = '--connect jdbc:%(rdbmsName)s://%(rdbmsHost)s:%(rdbmsPort)s/%(rdbmsDatabaseName)s --username %(rdbmsUserName)s --password-file %(passwordFilePath)s' % {
       'rdbmsName': rdbms_name,
       'rdbmsHost': rdbms_host,
       'rdbmsPort': rdbms_port,
       'rdbmsDatabaseName': rdbms_database_name,
       'rdbmsUserName': rdbms_user_name,
-      'rdbmsPassword': rdbms_password
+      'passwordFilePath': password_file_path
     }
   if destination_type == 'file':
     success_url = '/filebrowser/view/' + destination_name
@@ -188,6 +197,7 @@ def run_sqoop(request, source, destination, start_time):
         statement = '%(statement)s --as-avrodatafile' % {
           'statement': statement
         }
+      statement = _splitby_column_check(statement, destination_splitby_column)
   elif destination_type == 'table':
     success_url = reverse('metastore:describe_table', kwargs={'database': destination_database_name, 'table': destination_table_name})
     if rdbms_all_tables_selected:
@@ -199,6 +209,7 @@ def run_sqoop(request, source, destination, start_time):
         'statement': statement,
         'rdbmsTableName': rdbms_table_name
       }
+      statement = _splitby_column_check(statement, destination_splitby_column)
   elif destination_type == 'hbase':
     success_url = '/hbase/#HBase/' + destination_table_name
     # Todo
@@ -223,6 +234,14 @@ def run_sqoop(request, source, destination, start_time):
   )
 
   return task.execute(request, batch=False)
+
+def _splitby_column_check(statement, destination_splitby_column):
+  if destination_splitby_column:
+    statement = '%(statement)s --split-by %(destinationSplitbyColumn)s' % {
+      'statement': statement,
+      'destinationSplitbyColumn': destination_splitby_column
+    }
+  return statement
 
 
 class RdbmsIndexer():

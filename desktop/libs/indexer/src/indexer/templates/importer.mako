@@ -688,6 +688,11 @@ ${ assist.assistPanel() }
           </div>
 
           <span data-bind="visible: showProperties">
+            <div class="control-group">
+              <label for="rdbmsSplitBy" class="control-label"><div>${ _('Split By') }</div>
+                <select id="rdbmsSplitBy" data-bind="selectize: columns, value: rdbmsSplitByColumn, optionsValue: 'name', optionsText: 'name'"></select>
+              </label>
+            </div>
             <div class="control-group" data-bind="visible: outputFormat() == 'file' && !$root.createWizard.source.rdbmsAllTablesSelected()">
               <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
                 <select id="destinationFormat" data-bind="selectize: rdbmsFileOutputFormats, value: rdbmsFileOutputFormat, optionsValue: 'value', optionsText: 'name'"></select>
@@ -1223,7 +1228,7 @@ ${ assist.assistPanel() }
         self.sample.removeAll();
         self.path('');
         resizeElements();
-        self.rdbmsMode('');
+        self.rdbmsMode('customRdbms');
       });
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
@@ -1734,6 +1739,7 @@ ${ assist.assistPanel() }
           {'value': 'sequence', 'name': 'sequence'},
           {'value': 'avro', 'name': 'avro'}
       ]);
+      self.rdbmsSplitByColumn = ko.observableArray();
 
     };
 
