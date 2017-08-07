@@ -25,11 +25,11 @@ from django.utils.translation import ugettext as _
   </script>
 
   <script type="text/html" id="context-popover-template">
-    <div class="hue-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
+    <div class="hue-popover hue-context-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
       <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
-      <div class="hue-popover-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 30px;">
-        <i class="fa muted" data-bind="css: iconClass" style="margin-top: 3px"></i> <span style="padding-left: 4px;" data-bind="text: title"></span>
-        <div style="position: absolute; right: 6px; top: 8px;">
+      <div class="hue-popover-title context-popover-title">
+        <div class="context-popover-breadcrumbs" data-bind="component: { name: 'hue-breadcrumbs', params: { breadcrumbs: breadcrumbs, onSelect: onBreadcrumbSelect } }"></div>
+        <div class="context-popover-close">
           <a class="pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
         </div>
       </div>
@@ -61,7 +61,7 @@ from django.utils.translation import ugettext as _
             }
             while (pubSubs.length > 0) {
               pubSubs.pop().remove();
-            };
+            }
             huePubSub.publish('context.popover.hidden');
           }
         }
@@ -225,8 +225,51 @@ from django.utils.translation import ugettext as _
         self.left = ko.observable(0);
         self.top = ko.observable(0);
 
-        self.iconClass = 'fa-info';
-        self.title = "title";
+        self.activeEntry = ko.observable();
+
+        self.breadcrumbs = ko.observableArray([
+          {
+            label: 'root',
+            data: {}
+          }, {
+            label: 'level_one',
+            data: {}
+          }, {
+            label: 'level_two',
+            data: {}
+          }, {
+            label: 'level_three',
+            data: {}
+          }, {
+            label: 'level_four',
+            data: {}
+          }, {
+            label: 'level_five',
+            data: {}
+          }, {
+            label: 'level_six',
+            data: {}
+          }, {
+            label: 'level_seven',
+            data: {}
+          }, {
+            label: 'level_eight',
+            data: {}
+          }, {
+            label: 'level_nine',
+            data: {}
+          }
+        ]);
+
+        self.onBreadcrumbSelect = function (breadcrumb) {
+          var newBreadcrumbs = [];
+          self.breadcrumbs().every(function (existingBreadcrumb) {
+            newBreadcrumbs.push(existingBreadcrumb);
+            return existingBreadcrumb !== breadcrumb;
+          });
+          self.activeEntry(newBreadcrumbs[newBreadcrumbs.length - 1]);
+          self.breadcrumbs(newBreadcrumbs);
+        };
 
         self.showInAssistEnabled = typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true;
 

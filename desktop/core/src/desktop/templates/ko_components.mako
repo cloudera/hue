@@ -23,11 +23,61 @@ from desktop.views import _ko
 %>
 
 <%def name="all()">
+
+  <script type="text/html" id="breadcrumbs-template">
+    <div class="hue-breadcrumb-container">
+      <!-- ko if: hiddenBreadcrumbs().length > 0 -->
+      ...
+      <!-- ko component: { name: 'hue-drop-down', params: { entries: hiddenBreadcrumbs, noLabel: true, searchable: false, value: hiddenValue } } --><!-- /ko -->
+      <div class="hue-breadcrumb-divider" data-bind="text: divider"></div>
+      <!-- /ko -->
+      <!-- ko foreach: lastTwoBreadcrumbs -->
+      <!-- ko if: $index() < $parent.lastTwoBreadcrumbs().length - 1 -->
+      <div class="hue-breadcrumb pointer" data-bind="text: $data.label || $data, click: $parent.onSelect"></div>
+      <div class="hue-breadcrumb-divider" data-bind="text: $parent.divider"></div>
+      <!-- /ko -->
+      <!-- ko if: $index() === $parent.lastTwoBreadcrumbs().length - 1 -->
+      <div class="hue-breadcrumb pointer" data-bind="text: $data.label || $data"></div>
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      function BreadcrumbViewModel(params) {
+        var self = this;
+        self.hiddenValue = ko.observable();
+        self.onSelect = params.onSelect || function () {};
+        self.hiddenValue.subscribe(function (newValue) {
+          if (newValue) {
+            self.onSelect(newValue);
+          }
+        });
+        self.hiddenBreadcrumbs = ko.pureComputed(function () {
+          if (params.breadcrumbs().length > 2) {
+            return params.breadcrumbs().slice(0, params.breadcrumbs().length - 2);
+          }
+          return [];
+        });
+        self.lastTwoBreadcrumbs = ko.pureComputed(function () {
+          return params.breadcrumbs().slice(params.breadcrumbs().length - 2, params.breadcrumbs().length);
+        });
+        self.divider  = params.divider || '>';
+      }
+
+      ko.components.register('hue-breadcrumbs', {
+        viewModel: BreadcrumbViewModel,
+        template: { element: 'breadcrumbs-template' }
+      });
+    })();
+  </script>
+
   <script type="text/html" id="hue-drop-down-template">
     <!-- ko if: !menuOnly && (!dropDownVisible() || !searchable) -->
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
       <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
-      <!-- ko if: value -->
+      <!-- ko if: !noLabel && value -->
       <span data-bind="text: typeof value().label !== 'undefined' ? value().label : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
       <!-- /ko -->
       <i class="fa fa-caret-down"></i>
@@ -69,6 +119,7 @@ from desktop.views import _ko
         var self = this;
         self.dropDownVisible = ko.observable(!!params.showOnInit);
         self.menuOnly = !!params.menuOnly;
+        self.noLabel = !!params.noLabel;
         self.icon = params.icon;
         self.value = params.value;
         self.entries = params.entries;
