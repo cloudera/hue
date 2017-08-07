@@ -657,6 +657,7 @@ ${ assist.assistPanel() }
               <input type="number" class="form-control input-small" data-bind="value: numMappers, valueUpdate: 'afterkeydown'">
             </label>
           </div>
+
           <div class="card-body">
             <label class="control-label"><div>${ _('Libs') }</div>
               <div class="inline-table">
@@ -677,6 +678,34 @@ ${ assist.assistPanel() }
               </div>
             </label>
           </div>
+
+          <div class="control-group">
+            <label class="control-label"><div>${ _('Extras') }</div>
+              <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+                <i class="fa fa-sliders fa-padding-top"></i>
+              </a>
+            </label>
+          </div>
+
+          <span data-bind="visible: showProperties">
+            <div class="control-group" data-bind="visible: outputFormat() == 'file' && !$root.createWizard.source.rdbmsAllTablesSelected()">
+              <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
+                <select id="destinationFormat" data-bind="selectize: rdbmsFileOutputFormats, value: rdbmsFileOutputFormat, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+            </div>
+            <span class="inline-labels" data-bind="visible: rdbmsFileOutputFormat() == 'text' && outputFormat() == 'file' && !$root.createWizard.source.rdbmsAllTablesSelected()">
+              <label for="fieldDelimiter" class="control-label"><div>${ _('Fields') }</div>
+                <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customFieldsDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+              <label for="collectionDelimiter" class="control-label"><div>${ _('Line') }</div>
+                <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customLineDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+              <label for="structDelimiter" class="control-label"><div>${ _('Optionally Enclosed By') }</div>
+                <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customEnclosedByDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+            </span>
+          </span>
+
         </div>
         <!-- /ko -->
 
@@ -1688,6 +1717,15 @@ ${ assist.assistPanel() }
         self.sqoopJobLibPaths.remove(valueToRemove);
       };
       self.numMappers = ko.observable(1);
+      self.customFieldsDelimiter = ko.observable(',');
+      self.customLineDelimiter = ko.observable('\\n');
+      self.customEnclosedByDelimiter = ko.observable('\'');
+      self.rdbmsFileOutputFormat = ko.observable('text');
+      self.rdbmsFileOutputFormats = ko.observableArray([
+          {'value': 'text', 'name': 'text'},
+          {'value': 'sequence', 'name': 'sequence'},
+          {'value': 'avro', 'name': 'avro'}
+      ]);
 
     };
 
@@ -1731,14 +1769,15 @@ ${ assist.assistPanel() }
       self.destination = new Destination(vm, self);
 
       self.customDelimiters = ko.observableArray([
-        {'value': ',', 'name': 'Comma (,)'},
-        {'value': '\\t', 'name': '^Tab (\\t)'},
-        {'value': '\\n', 'name': 'New line'},
-        {'value': ' ', 'name': 'Space'},
-        {'value': '"', 'name': 'Double Quote'},
-        {'value': '\\001', 'name': '^A (\\001)'},
-        {'value': '\\002', 'name': '^B (\\002)'},
-        {'value': '\\003', 'name': '^C (\\003)'},
+        {'value': ',', 'name': '${ _("Comma (,)") }'},
+        {'value': '\\t', 'name': '${ _("^Tab (\\t)") }'},
+        {'value': '\\n', 'name': '${ _("New line") }'},
+        {'value': '|', 'name': '${ _("Pipe") }'},
+        {'value': '\"', 'name': '${ _("Double Quote") }'},
+        {'value': '\'', 'name': '${ _("Single Quote") }'},
+        {'value': '\\001', 'name': '${ _("^A (\\001)") }'},
+        {'value': '\\002', 'name': '${ _("^B (\\002)") }'},
+        {'value': '\\003', 'name': '${ _("^C (\\003)") }'},
       ]);
 
       self.editorId = ko.observable();
