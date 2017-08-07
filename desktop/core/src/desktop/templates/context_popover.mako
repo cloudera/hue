@@ -116,7 +116,7 @@ from django.utils.translation import ugettext as _
             redrawHeaders = false;
           }
 
-          huePubSub.publish('sql.context.popover.resized');
+          huePubSub.publish('context.popover.resized');
 
           // Delay or it will close the popover when releasing at the window borders
           window.setTimeout(function () {
@@ -424,22 +424,6 @@ from django.utils.translation import ugettext as _
         $('body').append($contextPopover);
         ko.applyBindings(details, $contextPopover[0]);
         huePubSub.publish('context.popover.shown');
-      });
-
-
-      // TODO: Drop once sql context popover is replaced
-      huePubSub.subscribe('context.popover.dispose', function () {
-        huePubSub.publish('sql.context.popover.dispose');
-      });
-      huePubSub.subscribe('context.popover.hidden', function () {
-        huePubSub.publish('sql.context.popover.hidden');
-      });
-      huePubSub.subscribe('context.popover.shown', function () {
-        huePubSub.publish('sql.context.popover.shown');
-      });
-      huePubSub.subscribe('sql.context.popover.hide', hidePopover);
-      huePubSub.subscribe('sql.context.popover.show', function (details) {
-        huePubSub.publish('context.popover.show', details);
       });
     })();
   </script>

@@ -4260,7 +4260,7 @@
           return range;
         };
 
-        var popoverShownSub = huePubSub.subscribe('sql.context.popover.shown', function () {
+        var popoverShownSub = huePubSub.subscribe('context.popover.shown', function () {
           hideContextTooltip();
           keepLastMarker = true;
           disableTooltip = true;
@@ -4270,7 +4270,7 @@
           popoverShownSub.remove();
         });
 
-        var popoverHiddenSub = huePubSub.subscribe('sql.context.popover.hidden', function () {
+        var popoverHiddenSub = huePubSub.subscribe('context.popover.hidden', function () {
           disableTooltip = false;
           clearActiveMarkers();
           keepLastMarker = false;
@@ -4379,7 +4379,7 @@
 
         var onContextMenu = function (e) {
           var selectionRange = editor.selection.getRange();
-          huePubSub.publish('sql.context.popover.hide');
+          huePubSub.publish('context.popover.hide');
           huePubSub.publish('sql.syntax.dropdown.hide');
           if (selectionRange.isEmpty()) {
             var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
@@ -4397,7 +4397,7 @@
               };
 
               if (token.parseLocation && !token.notFound) {
-                huePubSub.publish('sql.context.popover.show', {
+                huePubSub.publish('context.popover.show', {
                   data: token.parseLocation,
                   sourceType: snippet.type(),
                   defaultDatabase: snippet.database(),

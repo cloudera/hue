@@ -1007,7 +1007,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         });
 
         huePubSub.subscribe('assist.db.highlight', function (location) {
-          huePubSub.publish('sql.context.popover.hide');
+          huePubSub.publish('context.popover.hide');
           huePubSub.publish('assist.hide.search');
           window.setTimeout(function () {
             var foundSource;

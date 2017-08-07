@@ -218,7 +218,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             self.searchHasFocus(false);
             var path = entry.parentPath.split('/').concat([entry.selectionName]).splice(1);
             window.setTimeout(function () {
-              huePubSub.publish('sql.context.popover.hide');
+              huePubSub.publish('context.popover.hide');
               huePubSub.publish('assist.db.highlight', { sourceType: entry.sourceType.toLowerCase(), path: path });
             }, 200); // For animation effect
           };
@@ -234,7 +234,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             if (identifierChain.length > 0 && identifierChain[0].name === '') {
               identifierChain.shift();
             }
-            huePubSub.publish('sql.context.popover.show', {
+            huePubSub.publish('context.popover.show', {
               data: {
                 type: entry.type === 'FIELD' ? 'column' : (entry.type === 'DATABASE' ? 'database' : 'table'),
                 identifierChain: identifierChain
@@ -252,7 +252,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
                 bottom: offset.top + $source.height() - 3
               }
             });
-            huePubSub.subscribeOnce('sql.context.popover.hidden', function () {
+            huePubSub.subscribeOnce('context.popover.hidden', function () {
               entry.statsVisible(false);
             });
           };
