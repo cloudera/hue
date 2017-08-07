@@ -687,7 +687,7 @@ ${ assist.assistPanel() }
 
                     <!-- ko if: $parent.outputFormat() == 'index' -->
                       <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
-                      <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block index-field"></div>
+                      <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
                       <div class="clearfix"></div>
                     <!-- /ko -->
                   </form>
@@ -706,7 +706,7 @@ ${ assist.assistPanel() }
                   <!-- /ko -->
 
                   <!-- ko if: ([file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') || $parent.outputFormat() == 'index' -->
-                    <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block index-field"></div>
+                    <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
                   <!-- /ko -->
                 </form>
 
@@ -844,7 +844,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="index-field-template">
   <label>${ _('Name') }&nbsp;
-    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name" pattern="^(?!_version_)[a-zA-Z_][a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters and not _version_') }">
+    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name, enable: keep" pattern="^(?!_version_)[a-zA-Z_][a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters and not _version_') }">
   </label>
   <!-- ko if: $root.createWizard.source.inputFormat() != 'rdbms' -->
   <label class="margin-left-5">${ _('Type') }&nbsp;
@@ -915,7 +915,7 @@ ${ assist.assistPanel() }
     <!-- /ko -->
     <a class="pointer margin-left-20" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}" title="${ _('Remove') }"><i class="fa fa-times"></i></a>
     <div class="margin-left-20" data-bind="foreach: operation.fields">
-      <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field index-field"></div>
+      <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
     </div>
   </div>
 </script>
