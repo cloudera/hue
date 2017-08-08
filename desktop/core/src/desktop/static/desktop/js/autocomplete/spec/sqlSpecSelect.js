@@ -6964,6 +6964,7 @@
         });
       });
 
+      // TODO: In this case the WHERE clause exists but isn't completely defined both for the query and the subquery
       it('should suggest columns for "SELECT "contains an even number" FROM t1, t2 AS ta2 WHERE EXISTS (SELECT t3.foo FROM t3 WHERE | % 2 = 0"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT "contains an even number" FROM t1, t2 AS ta2 WHERE EXISTS (SELECT t3.foo FROM t3 WHERE ',
@@ -6984,8 +6985,8 @@
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 74, last_column: 76}, identifierChain: [{ name: 't3' }]},
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 77, last_column: 80}, identifierChain: [{ name: 'foo'}], tables: [{ identifierChain: [{ name: 't3' }] }]},
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 86, last_column: 88}, identifierChain: [{ name: 't3' }] },
-              { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 88, last_column: 88 } },
-              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 88, last_column: 88 } }
+              { type: 'whereClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 88, last_column: 88 } },
+              { type: 'limitClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 88, last_column: 88 } }
             ]
           }
         });
@@ -7003,9 +7004,9 @@
               { type: 'alias', source: 'table', alias: 'tt', location: { first_line: 1, last_line: 1, first_column: 24, last_column: 26 }, identifierChain: [{ name: 'testTable' }] },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 36, last_column: 39}, identifierChain: [{ name: 'bla'}], tables: [{ identifierChain: [{ name: 'abc' }] }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 45, last_column: 48}, identifierChain: [{ name: 'abc' }] },
-              { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 49, last_column: 62 } },
+              { type: 'whereClause', subquery: true, missing: false, location: { first_line: 1, last_line: 1, first_column: 49, last_column: 62 } },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 55, last_column: 58}, identifierChain: [{ name: 'foo'}], tables: [{ identifierChain: [{ name: 'abc' }] }] },
-              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 62, last_column: 62 } },
+              { type: 'limitClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 62, last_column: 62 } },
               { type: 'alias', source: 'subquery', alias: 'bar', location: { first_line: 1, last_line: 1, first_column: 64, last_column: 67 } },
               { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 67, last_column: 67 } },
               { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 67, last_column: 67 } }
