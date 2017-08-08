@@ -18,7 +18,7 @@
 
   from desktop import conf
   from desktop.views import commonheader, commonfooter, _ko
-  from jobbrowser.conf import MAX_JOB_FETCH
+  from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH
 %>
 
 <%
@@ -943,12 +943,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </button>
     <!-- /ko -->
 
+    % if not DISABLE_KILLING_JOBS.get():
     <!-- ko if: hasKill -->
     <button class="btn btn-danger disable-feedback" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
       ## TODO confirmation
       <i class="fa fa-times"></i> <!-- ko ifnot: $root.isMini -->${_('Kill')}<!-- /ko -->
     </button>
     <!-- /ko -->
+    % endif
 
     <!-- ko if: hasIgnore -->
     <button class="btn btn-danger disable-feedback" title="${_('Ignore selected')}" data-bind="click: function() { control('ignore'); }, enable: ignoreEnabled">
