@@ -431,14 +431,14 @@ from desktop.views import _ko
         var self = this;
 
         self.values = ko.observableArray(params.values().filter(function (value) {
-          return value.key && value.key() && value.value && value.value();
-        }));
+          return value.key && value.key() && value.value && value.value();
+        }));
 
-        self.values.subscribe(function (newValues) {
-          params.values(self.values().filter(function (value) {
-            return value.key && value.key() && value.value && value.value();
-          }))
-        });
+        self.values.subscribe(function (newValues) {
+          params.values(self.values().filter(function (value) {
+            return value.key && value.key() && value.value && value.value();
+          }))
+        });
 
         self.options = typeof params.property.options !== 'undefined' ? $.map(params.property.options(), function (option) {
           return { value: option }
