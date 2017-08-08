@@ -2162,7 +2162,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var self = this;
         if (self.activeLocations() && self.activeEditor()) {
           self.activeLocations().activeStatementLocations.every(function (location) {
-            if (location.type === 'whereClause' && location.missing) {
+            if (location.type === 'whereClause' && location.missing && !location.subquery) {
 
               self.activeEditor().moveCursorToPosition({
                 row: location.location.last_line - 1,
