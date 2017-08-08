@@ -2161,7 +2161,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       AssistantPanel.prototype.addFilter = function () {
         var self = this;
         if (self.activeLocations() && self.activeEditor()) {
-          self.activeLocations().locations.every(function (location) {
+          self.activeLocations().activeStatementLocations.every(function (location) {
             if (location.type === 'whereClause' && location.missing) {
 
               self.activeEditor().moveCursorToPosition({
