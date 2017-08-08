@@ -249,14 +249,14 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
-              <div class="control-group input-append">
+              <div class="control-group">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.domain.com or 123.123.123.123') }">
                 </label>
               </div>
 
               <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
-              <div class="control-group input-append">
+              <div class="control-group">
                 <label for="rdbmsJdbcDriver" class="control-label"><div>${ _('JDBC Driver') }</div>
                   <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcDriver">
                 </label>

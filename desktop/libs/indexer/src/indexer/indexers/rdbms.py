@@ -215,22 +215,93 @@ class RdbmsIndexer():
   def guess_format(self):
     return {"type": "csv"}
 
-  def get_sample_data(self, mode=None, database=None, table=None, column=None):
-    query_server = rdbms.get_query_server_config(server=self.db_conf_name)
-    db = rdbms.get(self.user, query_server=query_server)
+  def get_sample_data(self, source=None):
+    format_ = {'data': [], 'status': 1, 'message': ''}
+    db = None
+    name = None
+    try:
+      if source['rdbmsMode'] == 'configRdbms':
+        if source['rdbmsType'] != 'jdbc':
+          query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+          db = rdbms.get(self.user, query_server=query_server)
+        else:
+          interpreters = get_ordered_interpreters(self.user)
+          key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
+          if key:
+            options = key[0]['options']
+            db = Jdbc(driver_name=options['driver'], url=options['url'], username=options['user'], password=options['password'])
+      else:
+        name = source['rdbmsType']
+        if name != 'jdbc':
+          query_server = {
+            'server_name': name,
+            'server_host': source['rdbmsHostname'],
+            'server_port': int(source['rdbmsPort']),
+            'username': source['rdbmsUsername'],
+            'password': source['rdbmsPassword'],
+            'options': {},
+            'alias': name
+          }
+          db = rdbms.get(self.user, query_server=query_server)
+        else:
+          db = Jdbc(driver_name=source['rdbmsJdbcDriver'], url=source['rdbmsHostname'], username=source['rdbmsUsername'], password=source['rdbmsPassword'])
 
-    if mode == 'configRdbms':
-      assist = Assist(db)
-    else:
-      assist = JdbcAssist(db)
-    response = {'status': -1}
-    sample_data = assist.get_sample_data(database, table, column)
+      if source['rdbmsType'] != 'jdbc':
+        assist = Assist(db)
+      else:
+        assist = JdbcAssist(db)
+      data = assist.get_sample_data(source['rdbmsDatabaseName'], source['rdbmsTableName'])
+      if data:
+        format_['status'] = 0
+        format_['headers'] = data.columns
+        format_['rows'] = list(data[0])
+    except Exception, e:
+      message = _('Error accessing the database %s: %s') % (name, e)
+      LOG.warn(message)
 
-    if sample_data:
-      response['status'] = 0
-      response['headers'] = sample_data.columns
-      response['rows'] = list(sample_data.rows())
-    else:
-      response['message'] = _('Failed to get sample data.')
+    return format_
 
-    return response
+  def get_columns(self, source=None):
+    format_ = {'data': [], 'status': 1, 'message': ''}
+    db = None
+    name = None
+    try:
+      if source['rdbmsMode'] == 'configRdbms':
+        if source['rdbmsType'] != 'jdbc':
+          query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
+          db = rdbms.get(self.user, query_server=query_server)
+        else:
+          interpreters = get_ordered_interpreters(self.user)
+          key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
+          if key:
+            options = key[0]['options']
+            db = Jdbc(driver_name=options['driver'], url=options['url'], username=options['user'], password=options['password'])
+      else:
+        name = source['rdbmsType']
+        if name != 'jdbc':
+          query_server = {
+            'server_name': name,
+            'server_host': source['rdbmsHostname'],
+            'server_port': int(source['rdbmsPort']),
+            'username': source['rdbmsUsername'],
+            'password': source['rdbmsPassword'],
+            'options': {},
+            'alias': name
+          }
+          db = rdbms.get(self.user, query_server=query_server)
+        else:
+          db = Jdbc(driver_name=source['rdbmsJdbcDriver'], url=source['rdbmsHostname'], username=source['rdbmsUsername'], password=source['rdbmsPassword'])
+
+      if source['rdbmsType'] != 'jdbc':
+        assist = Assist(db)
+      else:
+        assist = JdbcAssist(db)
+      data = assist.get_columns(source['rdbmsDatabaseName'], source['rdbmsTableName'])
+      if data:
+        format_['status'] = 0
+        format_['data'] = data
+    except Exception, e:
+      message = _('Error accessing the database %s: %s') % (name, e)
+      LOG.warn(message)
+
+    return format_

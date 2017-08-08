@@ -188,8 +188,8 @@ class Assist():
     return [db[0] and db[0].strip() for db in dbs]
 
   def get_tables(self, database, table_names=[]):
-    tables, description = query_and_fetch(self.db, "SELECT * FROM dbc.tables WHERE tablekind = 'T' and databasename='%s'" % database)
-    return [{"comment": table[7] and table[7].strip(), "type": "Table", "name": table[1] and table[1].strip()} for table in tables]
+    tables, description = query_and_fetch(self.db, "SELECT TableName FROM dbc.tables WHERE tablekind = 'T' and databasename='%s'" % database)
+    return [table[0] and table[0].strip() for table in tables]
 
   def get_columns(self, database, table):
     columns, description = query_and_fetch(self.db, "SELECT ColumnName, ColumnType, CommentString FROM DBC.Columns WHERE DatabaseName='%s' AND TableName='%s'" % (database, table))
