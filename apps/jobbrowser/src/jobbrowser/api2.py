@@ -23,7 +23,6 @@ from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
 
 from jobbrowser.apis.base_api import get_api
-from jobbrowser.conf import DISABLE_KILLING_JOBS
 
 
 LOG = logging.getLogger(__name__)
@@ -55,7 +54,6 @@ def jobs(request):
 
   jobs = get_api(request.user, interface).apps(filters)
 
-  response['disable_killing_jobs'] = DISABLE_KILLING_JOBS.get();
   response['apps'] = jobs['apps']
   response['total'] = jobs.get('total')
   response['status'] = 0
