@@ -1496,6 +1496,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     window.hueDebug = {
       viewModel: function (element) {
+        if (typeof element !== 'undefined' && typeof element === 'string') {
+          element = $(element)[0];
+        }
         return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
       },
       onePageViewModel: onePageViewModel,
