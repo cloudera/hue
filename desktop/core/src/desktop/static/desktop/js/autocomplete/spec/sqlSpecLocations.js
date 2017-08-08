@@ -242,8 +242,8 @@
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 25 }, identifierChain: [{ name: 'blablabla' }] },
           { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 40 }, tables: [{ identifierChain: [{ name: 'blablabla' }] }] },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 46, last_column: 55 }, identifierChain: [{ name: 'blablabla' }] },
-          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 55, last_column: 55 }}, // Subquery
-          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 55, last_column: 55 }}, // Subquery
+          { type: 'whereClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 55, last_column: 55 }},
+          { type: 'limitClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 55, last_column: 55 }},
           { type: 'alias', source: 'subquery', alias: 's1', location: { first_line: 1, last_line: 1, first_column: 57, last_column: 59 } },
           { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 59, last_column: 59 }},
           { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 59, last_column: 59 }}]
@@ -285,8 +285,8 @@
           { type: 'column', location: { first_line: 6, last_line: 6, first_column: 39, last_column: 42 }, identifierChain: [{ name: 'bla' }], tables: [{ identifierChain: [{ name: 'bar' }], alias: 'baa' }] },
           { type: 'column', location: { first_line: 6, last_line: 6, first_column: 54, last_column: 57 }, identifierChain: [{ name: 'ble' }], tables: [{ identifierChain: [{ name: 'bla' }] }] },
           { type: 'table', location: { first_line: 6, last_line: 6, first_column: 63, last_column: 66 }, identifierChain: [{ name: 'bla' }]},
-          { type: 'whereClause', missing: true, location: { first_line: 6, last_line: 6, first_column: 66, last_column: 66 } }, // Subquery
-          { type: 'limitClause', missing: true, location: { first_line: 6, last_line: 6, first_column: 66, last_column: 66 } }, // Subquery
+          { type: 'whereClause', subquery: true, missing: true, location: { first_line: 6, last_line: 6, first_column: 66, last_column: 66 } },
+          { type: 'limitClause', subquery: true, missing: true, location: { first_line: 6, last_line: 6, first_column: 66, last_column: 66 } },
           { type: 'limitClause', missing: true, location: { first_line: 6, last_line: 6, first_column: 67, last_column: 67 } }
         ]
       });
@@ -421,8 +421,8 @@
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain:[{ name: 'bar'}], tables: [{ identifierChain: [{ name: 'foo' }] }]},
             { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 }, tables: [{ identifierChain: [{ name: 'bla' }] }] },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 50 }, identifierChain: [{ name: 'bla' }]},
-            { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 }}, // Subquery
-            { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 }}, // Subquery
+            { type: 'whereClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 }},
+            { type: 'limitClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 }},
             { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 51, last_column: 51 }}
           ]
         });
@@ -669,11 +669,11 @@
             { type: 'function', location: { first_line: 1, last_line: 1, first_column: 178, last_column: 181 }, function: 'year' },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 183, last_column: 187 }, identifierChain: [{ name:'tran' }]},
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 188, last_column: 194 }, identifierChain: [{ name: 'tran_d' }], tables: [{ identifierChain: [{ name:'tran' }] }]},
-            { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 218, last_column: 218 }},
+            { type: 'whereClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 218, last_column: 218 }},
             { type: 'database', location: { first_line: 1, last_line: 1, first_column: 228, last_column: 234 }, identifierChain: [{ name: 'tstDb1' }]},
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 235, last_column: 237 }, identifierChain: [{ name:'tstDb1' },{ name: 'b1' }]},
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 238, last_column: 241 }, identifierChain: [{ name: 'cat' }], tables: [{ identifierChain: [{ name:'tstDb1' }, {name: 'b1' }] }]},
-            { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 241, last_column: 241 }},
+            { type: 'limitClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 241, last_column: 241 }},
             { type: 'alias', source: 'subquery', alias: 'tmp', location: { first_line: 1, last_line: 1, first_column: 243, last_column: 246 } },
             { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 246, last_column: 246 }},
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 256, last_column: 257 }, identifierChain: [{ name: 'r' }], tables: [{ subQuery: 'tmp' }]},

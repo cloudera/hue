@@ -108,6 +108,10 @@ var SqlParseSupport = (function () {
       parser.yy.latestCommonTableExpressions = identifiers;
     };
 
+    parser.isInSubquery = function () {
+      return !!parser.yy.primariesStack.length
+    };
+
     parser.pushQueryState = function () {
       parser.yy.resultStack.push(parser.yy.result);
       parser.yy.locationsStack.push(parser.yy.locations);
@@ -1280,11 +1284,15 @@ var SqlParseSupport = (function () {
     };
 
     parser.addClauseLocation = function (type, precedingLocation, locationIfPresent) {
-      parser.yy.locations.push({
+      var location = {
         type: type,
         missing: !locationIfPresent,
         location: adjustLocationForCursor(locationIfPresent || { first_line: precedingLocation.last_line, first_column: precedingLocation.last_column, last_line: precedingLocation.last_line, last_column: precedingLocation.last_column })
-      })
+      };
+      if (parser.isInSubquery()) {
+        location.subquery = true;
+      }
+      parser.yy.locations.push(location)
     };
 
     parser.addHdfsLocation = function (location, path) {
