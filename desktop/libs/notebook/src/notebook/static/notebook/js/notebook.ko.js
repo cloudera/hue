@@ -716,7 +716,7 @@ var EditorViewModel = (function() {
           var db = match[1];
           huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
         }
-        huePubSub.publish('assist.db.refresh', { sourceType: self.type() });
+        huePubSub.publish('assist.db.refresh', { sourceTypes: [self.type()] });
       });
     }, 0);
 
