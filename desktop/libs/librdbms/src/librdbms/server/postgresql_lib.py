@@ -106,25 +106,7 @@ class PostgreSQLClient(BaseRDMSClient):
 
   def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
-    query = """
-      SELECT
-          a.attname as "name",
-          pg_catalog.format_type(a.atttypid, a.atttypmod) as "datatype"
-      FROM
-          pg_catalog.pg_attribute a
-      WHERE
-          a.attnum > 0
-          AND NOT a.attisdropped
-          AND a.attrelid = (
-              SELECT c.oid
-              FROM pg_catalog.pg_class c
-                  LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-              WHERE c.relname ~ '^(%(table)s)$'
-                  AND n.nspname = '%(database)s'
-                  AND pg_catalog.pg_table_is_visible(c.oid)
-          )
-    """ % {'table': table, 'database': database}
-
+    query = 'SELECT column_name, data_type FROM information_schema.columns WHERE table_name = \'%(table)s\'' % {'table': table}
     cursor.execute(query)
     self.connection.commit()
     if names_only:

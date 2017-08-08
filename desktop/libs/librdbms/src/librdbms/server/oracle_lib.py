@@ -110,5 +110,5 @@ class OracleClient(BaseRDMSClient):
 
   def get_sample_data(self, database, table, column=None, limit=100):
     column = '"%s"' % column  if column else '*'
-    statement = 'SELECT %s FROM "%s"."%s" LIMIT %d' % (column, database, table, limit)
+    statement = 'SELECT %s FROM %s WHERE ROWNUM <= %d' % (column, table, limit)
     return self.execute_statement(statement)

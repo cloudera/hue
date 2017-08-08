@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import re
 
 from django.utils.translation import ugettext as _
 
@@ -183,27 +184,69 @@ class Assist():
   def __init__(self, db):
     self.db = db
 
-  def get_databases(self):
-    dbs, description = query_and_fetch(self.db, 'SELECT DatabaseName FROM DBC.Databases')
-    return [db[0] and db[0].strip() for db in dbs]
+  def get_databases(self, driver_name=None):
+    if driver_name == 'teradata':
+      dbs, description = query_and_fetch(self.db, 'SELECT DatabaseName FROM DBC.Databases')
+      return [db[0] and db[0].strip() for db in dbs]
+    elif driver_name == 'postgresql':
+      dbs, description = query_and_fetch(self.db, 'SELECT nspname from pg_catalog.pg_namespace')
+      return [db[0] and db[0].strip() for db in dbs]
+    elif driver_name == 'oracle':
+      pattern = re.compile(".+:.+:.*//.+/.+")
+      if pattern.match(self.db.db_url) and self.db.db_url.rsplit('/', 1)[1]:
+        return [self.db.db_url.rsplit('/', 1)[1]]
+      else:
+        return []
+    else:
+      databases, description = query_and_fetch(self.db, 'SHOW DATABASES')
+      return databases
 
-  def get_tables(self, database, table_names=[]):
-    tables, description = query_and_fetch(self.db, "SELECT * FROM dbc.tables WHERE tablekind = 'T' and databasename='%s'" % database)
-    return [{"comment": table[7] and table[7].strip(), "type": "Table", "name": table[1] and table[1].strip()} for table in tables]
+  def get_tables(self, database, table_names=[], driver_name=None):
+    if driver_name == 'teradata':
+      tables, description = query_and_fetch(self.db, "SELECT TableName FROM dbc.tables WHERE tablekind = 'T' and databasename='%s'" % database)
+      return [table[0] and table[0].strip() for table in tables]
+    elif driver_name == 'postgresql':
+      query = "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = '%s'" % database
+      if table_names:
+        clause = ' OR '.join(["tablename LIKE '%%%(table)s%%'" % {'table': table} for table in table_names])
+        query += ' AND (%s)' % clause
+      tables, description = query_and_fetch(self.db, query)
+      return [table[0] and table[0].strip() for table in tables]
+    elif driver_name == 'oracle':
+      query = "SELECT table_name FROM user_tables"
+      if table_names:
+        clause = ' OR '.join(["table_name LIKE '%%%(table)s%%'" % {'table': table} for table in table_names])
+        query += ' WHERE (%s)' % clause
+      tables, description = query_and_fetch(self.db, query)
+      return [table[0] and table[0].strip() for table in tables]
+    else:
+      tables, description = query_and_fetch(self.db, 'SHOW TABLES')
+      return tables
 
-  def get_columns(self, database, table):
-    columns, description = query_and_fetch(self.db, "SELECT ColumnName, ColumnType, CommentString FROM DBC.Columns WHERE DatabaseName='%s' AND TableName='%s'" % (database, table))
-    return [[col[0] and col[0].strip(), self._type_converter(col[1]), '', '', col[2], ''] for col in columns]
+  def get_columns(self, database, table, driver_name=None):
+    if driver_name == 'teradata':
+      columns, description = query_and_fetch(self.db, "SELECT ColumnName, ColumnType, CommentString FROM DBC.Columns WHERE DatabaseName='%s' AND TableName='%s'" % (database, table))
+      return [[col[0] and col[0].strip(), col[1], '', '', col[2], ''] for col in columns]
+    elif driver_name == 'postgresql':
+      query = 'SELECT column_name, data_type FROM information_schema.columns WHERE table_name = \'%(table)s\'' % {'table': table}
+      columns, description = query_and_fetch(self.db, query)
+      return [[col[0] and col[0].strip(), col[1]] for col in columns]
+    elif driver_name == 'oracle':
+      query = "SELECT column_name, data_type FROM user_tab_cols WHERE table_name = '%s'" % table
+      columns, description = query_and_fetch(self.db, query)
+      return [[col[0] and col[0].strip(), col[1]] for col in columns]
+    else:
+      columns, description = query_and_fetch(self.db, 'SHOW COLUMNS FROM %s.%s' % (database, table))
+      return columns
 
-  def get_sample_data(self, database, table, column=None):
+  def get_sample_data(self, database, table, column=None, driver_name=None, limit=100):
     column = column or '*'
-    return query_and_fetch(self.db, 'SELECT %s FROM %s.%s' % (column, database, table))
-
-  def _type_converter(self, name):
-    return {
-        "I": "INT_TYPE",
-        "I2": "SMALLINT_TYPE",
-        "CF": "STRING_TYPE",
-        "CV": "CHAR_TYPE",
-        "DA": "DATE_TYPE",
-      }.get(name, 'STRING_TYPE')
+    if driver_name == 'teradata':
+      query = 'SELECT %s FROM %s.%s SAMPLE %d' % (column, database, table, limit)
+    elif driver_name == 'oracle':
+      query = 'SELECT %s FROM %s WHERE ROWNUM <= %d' % (column, table, limit)
+    elif driver_name == 'postgresql':
+      query = 'SELECT %s FROM "%s"."%s" LIMIT %d' % (column, database, table, limit)
+    else:
+      query = 'SELECT %s FROM %s.%s LIMIT %d' % (column, database, table, limit)
+    return query_and_fetch(self.db, query)

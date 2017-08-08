@@ -43,6 +43,7 @@ class FieldType():
 class Field(object):
   def __init__(self, name="new_field", field_type_name="string", operations=None, multi_valued=False):
     self.name = name
+    self.new_name = name
     self.field_type_name = field_type_name
     self.keep = True
     self.operations = operations if operations else []
@@ -54,6 +55,7 @@ class Field(object):
   def to_dict(self):
     return {
       'name': self.name,
+      'newName': self.new_name,
       'type': self.field_type_name,
       'unique': self.unique,
       'keep': self.keep,

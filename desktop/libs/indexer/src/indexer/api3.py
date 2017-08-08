@@ -150,18 +150,32 @@ def guess_field_types(request):
         ]
     }
   elif file_format['inputFormat'] == 'rdbms':
-    query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
-    db = rdbms.get(request.user, query_server=query_server)
-    sample = RdbmsIndexer(request.user, file_format['rdbmsType']).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
-    table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
+    rdbms_indexer = RdbmsIndexer(request.user, file_format['rdbmsType'])
+    sample = rdbms_indexer.get_sample_data(file_format)
+    table_metadata = rdbms_indexer.get_columns(file_format)['data']
 
-    format_ = {
-        "sample": list(sample['rows'])[:4],
-        "columns": [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-            for col in table_metadata
-        ]
-    }
+    if file_format['rdbmsType'] != 'jdbc':
+      format_ = {
+          "sample": sample['rows'][:4],
+          "sample_cols": [
+              {'name': col} for col in sample['headers']
+          ],
+          "columns": [
+              Field(col['name'], col['type']).to_dict()
+              for col in table_metadata
+          ]
+      }
+    else:
+      format_ = {
+          "sample": sample['rows'],
+          "sample_cols": [
+              {'name': col} for col in sample['headers']
+          ],
+          "columns": [
+              Field(col[0], col[1]).to_dict()
+              for col in table_metadata
+          ]
+      }
 
   return JsonResponse(format_)
 

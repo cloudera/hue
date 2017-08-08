@@ -219,7 +219,7 @@ ${ assist.assistPanel() }
                 <input type="radio" name="rdbmsMode" value="customRdbms" data-bind="checked: createWizard.source.rdbmsMode" /> ${_('Custom')}
               </label>
               <label class="radio inline-block">
-                <input type="radio" name="rdbmsMode" value="configRdbms" data-bind="checked: createWizard.source.rdbmsMode" /> ${_('Configured')}
+                <input type="radio" name="rdbmsMode" value="configRdbms" data-bind="checked: createWizard.source.rdbmsMode" /> ${_('Pre-Configured')}
               </label>
             </label>
           </div>
@@ -230,7 +230,7 @@ ${ assist.assistPanel() }
 
           <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'file'">
             <label for="path" class="control-label"><div>${ _('Path') }</div>
-              <input type="text" class="form-control path filechooser-input input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: false }" placeholder="${ _('Click or drag from the assist') }">
+              <input type="text" class="form-control path filechooser-input input-xlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: false }" placeholder="${ _('Click or drag from the assist') }">
             </label>
             <!-- ko if: createWizard.source.path().length > 0 -->
               <a data-bind="hueLink: '/filebrowser/view=' + createWizard.source.path()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
@@ -251,23 +251,25 @@ ${ assist.assistPanel() }
 
             <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
               <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
-              <div class="control-group input-append">
-                <label for="rdbmsJdbcType" class="control-label"><div>${ _('Database') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcType">
+              <div class="control-group">
+                <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('e.g. jdbc:mysql://mysql.vpc.cloudera.com/test') }">
                 </label>
               </div>
               <!-- /ko -->
 
-              <div class="control-group input-append">
+              <!-- ko if: createWizard.source.rdbmsType() != 'jdbc' -->
+              <div class="control-group">
                 <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.domain.com or 123.123.123.123') }">
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('e.g. mysql.vpc.cloudera.com/test') }">
                 </label>
               </div>
+              <!-- /ko -->
 
               <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
-              <div class="control-group input-append">
+              <div class="control-group">
                 <label for="rdbmsJdbcDriver" class="control-label"><div>${ _('JDBC Driver') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcDriver">
+                  <input type="text" class="input-xlarge" data-bind="value: createWizard.source.rdbmsJdbcDriver" placeholder="${ _('e.g. com.mysql.jdbc.Driver') }">
                 </label>
               </div>
               <!-- /ko -->
@@ -275,19 +277,19 @@ ${ assist.assistPanel() }
               <!-- ko if: createWizard.source.rdbmsType() != 'jdbc' -->
               <div class="control-group">
                 <label for="rdbmsPort" class="control-label"><div>${ _('Port') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here eg. 3306') }">
+                  <input type="text" class="input-xlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('e.g. 3306') }">
                 </label>
               </div>
               <!-- /ko -->
               <div class="control-group">
                 <label for="rdbmsUsername" class="control-label"><div>${ _('Username') }</div>
-                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsUsername" placeholder="${ _('Enter username here') }">
+                  <input type="text" class="input-xlarge" data-bind="value: createWizard.source.rdbmsUsername" placeholder="${ _('e.g. admin') }">
                 </label>
               </div>
 
               <div class="control-group no-margin-bottom">
                 <label for="rdbmsPassword" class="control-label"><div>${ _('Password') }</div>
-                  <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPassword" placeholder="${ _('Enter password here') }">
+                  <input type="password" class="input-xlarge" data-bind="value: createWizard.source.rdbmsPassword" placeholder="${ _('e.g. 123') }">
                 </label>
               </div>
 
@@ -416,13 +418,13 @@ ${ assist.assistPanel() }
           </div>
           <div class="control-group">
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
-            <!-- ko if: outputFormat() == 'file' -->
+            <!-- ko if: outputFormat() == 'file' || $root.createWizard.source.rdbmsAllTablesSelected() -->
               <input type="text" class="form-control name input-xlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
             <!-- /ko -->
             <!-- ko if: outputFormat() == 'index' -->
               <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
-            <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
+            <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 && !$root.createWizard.source.rdbmsAllTablesSelected() -->
               <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
@@ -660,19 +662,13 @@ ${ assist.assistPanel() }
         <!-- ko if: $root.createWizard.source.inputFormat() == 'rdbms' && ['file', 'table', 'hbase'].indexOf(outputFormat()) != -1 -->
         <div class="card step">
           <h4>${_('Properties')}</h4>
-          <div class="control-group">
-            <label><div>${ _('Mappers') }</div>
-              <input type="number" class="form-control input-small" data-bind="value: numMappers, valueUpdate: 'afterkeydown'">
-            </label>
-          </div>
-
           <div class="card-body">
             <label class="control-label"><div>${ _('Libs') }</div>
               <div class="inline-table">
                 <ul data-bind="sortable: { data: sqoopJobLibPaths, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: sqoopJobLibPaths().length" class="unstyled">
                   <li>
                     <div class="input-append" style="margin-bottom: 4px">
-                      <input type="text" class="filechooser-input input-xxlarge" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+                      <input type="text" class="filechooser-input input-xlarge" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
                       <span class="add-on move-widget muted" data-bind="visible: $parent.sqoopJobLibPaths().length > 1"><i class="fa fa-arrows"></i></span>
                       <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeSqoopJobLibPath($data); }"><i class="fa fa-minus"></i></a>
                     </div>
@@ -697,11 +693,24 @@ ${ assist.assistPanel() }
 
           <span data-bind="visible: showProperties">
             <div class="control-group">
+              <label><div>${ _('Mappers') }</div>
+                <input type="number" class="form-control input-small" data-bind="value: numMappers, valueUpdate: 'afterkeydown'">
+              </label>
+            </div>
+            <div class="control-group" data-bind="visible: !$root.createWizard.source.rdbmsAllTablesSelected()">
               <label for="rdbmsSplitBy" class="control-label"><div>${ _('Split By') }</div>
                 <select id="rdbmsSplitBy" data-bind="selectize: columns, value: rdbmsSplitByColumn, optionsValue: 'name', optionsText: 'name'"></select>
               </label>
             </div>
-            <div class="control-group" data-bind="visible: outputFormat() == 'file' && !$root.createWizard.source.rdbmsAllTablesSelected()">
+            <div class="control-group">
+              <label class="checkbox inline-block">
+                <input type="checkbox" data-bind="checked: verboseMode"> ${_('Verbose Mode')}
+              </label>
+              <label class="checkbox inline-block">
+                <input type="checkbox" data-bind="checked: compressMode"> ${_('Compress Mode')}
+              </label>
+            </div>
+            <div class="control-group">
               <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
                 <select id="destinationFormat" data-bind="selectize: rdbmsFileOutputFormats, value: rdbmsFileOutputFormat, optionsValue: 'value', optionsText: 'name'"></select>
               </label>
@@ -722,7 +731,8 @@ ${ assist.assistPanel() }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: ['table', 'index', 'file', 'hbase'].indexOf(outputFormat()) != -1 -->
+
+        <!-- ko if: ['table', 'index', 'file', 'hbase'].indexOf(outputFormat()) != -1 && !$root.createWizard.source.rdbmsAllTablesSelected() -->
           <div class="card step">
             <h4 class="show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h4>
             <div class="card-body no-margin-top columns-form">
@@ -887,7 +897,8 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="index-field-template">
   <label>${ _('Name') }&nbsp;
-    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name, enable: keep" pattern="^(?!_version_)[a-zA-Z_][a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters and not _version_') }">
+    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: newName, enable: keep, visible: $root.createWizard.destination.outputFormat() != 'file'" pattern="^(?!_version_)[a-zA-Z_][a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters and not _version_') }">
+    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name, enable: false, visible: $root.createWizard.destination.outputFormat() == 'file'" pattern="^(?!_version_)[a-zA-Z_][a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters and not _version_') }">
   </label>
   <!-- ko if: $root.createWizard.source.inputFormat() != 'rdbms' -->
   <label class="margin-left-5">${ _('Type') }&nbsp;
@@ -1286,6 +1297,7 @@ ${ assist.assistPanel() }
         self.rdbmsAllTablesSelected(false);
         self.rdbmsJdbcDriver('')
         self.rdbmsJdbcType('')
+        self.rdbmsFullHostName('')
         self.rdbmsJdbcDriverName('')
         self.rdbmsHostname('');
         self.rdbmsPort('');
@@ -1348,7 +1360,6 @@ ${ assist.assistPanel() }
       self.rdbmsTableName.subscribe(function (val) {
         if (val != '') {
           wizard.guessFieldTypes();
-          wizard.destination.name(val.replace(/ /g, '_').toLowerCase());
         }
       });
       self.rdbmsJdbcDriverNames = ko.observableArray();
@@ -1365,6 +1376,12 @@ ${ assist.assistPanel() }
       });
       self.rdbmsJdbcDriver = ko.observable('');
       self.rdbmsJdbcDriver.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+      });
+      self.rdbmsFullHostName = ko.observable('');
+      self.rdbmsFullHostName.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+      });
       self.rdbmsJdbcType = ko.observable('');
       self.rdbmsJdbcType.subscribe(function (val) {
         self.rdbmsDatabaseNames([]);
@@ -1551,7 +1568,7 @@ ${ assist.assistPanel() }
           {'name': 'Database', 'value': 'database'},
           % if ENABLE_SQOOP.get():
           {'name': 'File', 'value': 'file'},
-          {'name': 'HBase Table', 'value': 'hbase'},
+          //{'name': 'HBase Table', 'value': 'hbase'},
           % endif
       ]);
       self.outputFormats = ko.computed(function() {
@@ -1722,6 +1739,8 @@ ${ assist.assistPanel() }
       self.indexerDefaultFieldObject = ko.observableArray();
 
       // File, Table, HBase
+      self.verboseMode = ko.observable(true);
+      self.compressMode = ko.observable(false);
       self.sqoopJobLibPaths = ko.observableArray([]);
       self.addSqoopJobLibPath = function() {
         var newValue = {
@@ -1805,7 +1824,7 @@ ${ assist.assistPanel() }
 
       self.isValidDestination = ko.pureComputed(function() {
          return self.destination.name().length > 0 && (
-           (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
+           (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || self.source.rdbmsAllTablesSelected() || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
            (['index'].indexOf(self.destination.outputFormat()) == -1 || /^[^\\/:]+$/.test(self.destination.name()))
          );
       });
@@ -1818,7 +1837,7 @@ ${ assist.assistPanel() }
             return column.name().length == 0 || (self.source.inputFormat() != 'manual' && column.partitionValue().length == 0);
           }).length == 0
         );
-        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
+        var isTargetAlreadyExisting = !self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
         var isValidTable = self.destination.outputFormat() != 'table' || (
           self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
@@ -1828,7 +1847,7 @@ ${ assist.assistPanel() }
           }).length == 0
         ) || self.destination.indexerConfigSet();
 
-        return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable;
+        return self.isValidDestination() && (self.source.rdbmsAllTablesSelected() || (validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable));
       });
 
       self.formatTypeSubscribed = false;
@@ -1889,7 +1908,7 @@ ${ assist.assistPanel() }
           "fileFormat": ko.mapping.toJSON(self.source)
         }, function (resp) {
           resp.columns.forEach(function (entry, i, arr) {
-            if (self.destination.outputFormat() === 'table') {
+            if (self.destination.outputFormat() === 'table' && self.source.inputFormat() != 'rdbms') {
               entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
             } else if (self.destination.outputFormat() === 'index') {
               entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);

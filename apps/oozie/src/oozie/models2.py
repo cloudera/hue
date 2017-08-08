@@ -826,10 +826,27 @@ class Node():
       command = action['statement']
       if command.startswith('sqoop '):
         _ignore, command = command.split('sqoop ', 1)
-      self.data['properties']['command'] = command
+      self.data['properties']['command'] = ''
 
       self.data['properties']['files'] = [{'value': f['path']} for f in action['properties']['files']]
-      self.data['properties']['arguments'] = []
+      command = command.replace(' -m ', ' --num-mappers ').replace(' -e ', ' --query ').replace(' -z ', ' --compress ')
+      query = re.findall(r'--query(.*?)--', command)
+      if query:
+        command = re.sub('--query(.*?)--', '--', command)
+        query = query[0][1:-1]
+      else:
+        query = re.findall(r'--query(.*?)$', command)
+        if query:
+          command = re.sub(r'--query(.*?)$', '', command)
+          query = query[0][1:]
+        else:
+          query = ''
+      self.data['properties']['arguments'] = [{'value': value} for value in command.split(' ')]
+      if query:
+        if query.startswith('\'') and query.endswith('\''):
+          query = query[1:-1]
+        self.data['properties']['arguments'].append({'value':'--query'})
+        self.data['properties']['arguments'].append({'value':query})
 
     elif self.data['type'] == DistCpDocumentAction.TYPE:
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
