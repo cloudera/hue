@@ -58,26 +58,27 @@ __users_lock = threading.Lock()
 __groups_lock = threading.Lock()
 
 
+def is_ldap_setup():
+  return bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
+
 def list_users(request):
-  is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
 
   return render("list_users.mako", request, {
       'users': User.objects.all(),
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
       'request': request,
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'is_ldap_setup': is_ldap_setup
+      'is_ldap_setup': is_ldap_setup()
   })
 
 
 def list_groups(request):
-  is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
 
   return render("list_groups.mako", request, {
       'groups': Group.objects.all(),
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'is_ldap_setup': is_ldap_setup
+      'is_ldap_setup': is_ldap_setup()
   })
 
 
@@ -779,9 +780,15 @@ def ensure_home_directory(fs, user):
   Throws IOError, WebHdfsException.
   """
   userprofile = get_profile(user)
+  username = user.username
+  home_directory = userprofile.home_directory
+
+  if is_ldap_setup():
+    username = user.username.split('@')[0]
+    home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
-    fs.do_as_user(user.username, fs.create_home_dir, userprofile.home_directory)
+    fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
     LOG.warn("Not creating home directory of %s as his profile is empty" % user)
 
