@@ -816,6 +816,25 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       assert_equal('test2', dir_stat.user)
       assert_equal('test2', dir_stat.group)
       assert_equal('40755', '%o' % dir_stat.mode)
+
+      # Ignore domain in username when importing LDAP users
+      # eg: Ignore '@ad.sec.cloudera.com' when importing 'test@ad.sec.cloudera.com'
+      resets.append(desktop.conf.LDAP.LDAP_URL.set_for_testing('default.example.com'))
+      if cluster.fs.exists('/user/test3@ad.sec.cloudera.com'):
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, '/user/test3@ad.sec.cloudera.com')
+      if cluster.fs.exists('/user/test3'):
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, '/user/test3')
+      assert_false(cluster.fs.exists('/user/test3'))
+      response = c.post('/useradmin/users/new', dict(username="test3@ad.sec.cloudera.com", password1='test', password2='test', ensure_home_directory=True))
+      assert_false(cluster.fs.exists('/user/test3@ad.sec.cloudera.com'))
+      assert_true(cluster.fs.exists('/user/test3'))
+
+      dir_stat = cluster.fs.stats('/user/test3')
+      assert_equal('test3', dir_stat.user)
+      assert_equal('test3', dir_stat.group)
+      assert_not_equal('test3@ad.sec.cloudera.com', dir_stat.user)
+      assert_not_equal('test3@ad.sec.cloudera.com', dir_stat.group)
+      assert_equal('40755', '%o' % dir_stat.mode)
     finally:
       for reset in resets:
         reset()
