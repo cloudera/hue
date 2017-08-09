@@ -396,13 +396,6 @@ def edit_user(request, username=None):
       })
 
 
-def view_user(request, username):  
-  instance = User.objects.get(username=username)
-
-  return render('view_user.mako', request, {'instance': instance})
-
-
-
 def edit_group(request, name=None):
   """
   edit_group(request, name = None) -> reply
