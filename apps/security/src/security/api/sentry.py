@@ -100,7 +100,7 @@ def list_sentry_roles_by_group(request):
   component = request.POST['component']
 
   try:
-    if request.POST['groupName']:
+    if request.POST.get('groupName'):
       groupName = request.POST['groupName']
     else:
       # Admins can see everything, other only the groups they belong too
