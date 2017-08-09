@@ -1478,7 +1478,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
 
     var hideJobsPanels = function (e) {
-      if ($(e.target).parents('.navbar-default').length > 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $(e.target).closest('.hamburger-hue').length === 0 && $('.jobs-panel').is(':visible')) {
+      if ($(e.target).parents('.navbar-default').length > 0 && $(e.target).closest('.history-panel').length === 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $(e.target).closest('.hamburger-hue').length === 0 && $('.jobs-panel').is(':visible')) {
         huePubSub.publish('hide.jobs.panel');
         huePubSub.publish('hide.history.panel');
       }
