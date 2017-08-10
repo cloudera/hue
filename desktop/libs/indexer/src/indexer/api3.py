@@ -189,6 +189,8 @@ def importer_submit(request):
   elif source['inputFormat'] == 'rdbms':
     if destination['outputFormat'] in ('file', 'table', 'hbase'):
       job_handle = run_sqoop(request, source, destination, start_time)
+  else:
+    job_handle = _create_table(request, source, destination, start_time)
 
   return JsonResponse(job_handle)
 
