@@ -702,11 +702,11 @@ ${ assist.assistPanel() }
                 <!-- ko ifnot: $root.createWizard.source.inputFormat() === 'manual' -->
                 <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 54, container: MAIN_SCROLLABLE, disableNiceScroll: true }">
                   <!-- ko if: $parent.outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
-                    <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
+                    <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
                   <!-- /ko -->
 
                   <!-- ko if: (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') || $parent.outputFormat() == 'index' -->
-                    <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
+                    <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
                   <!-- /ko -->
                 </form>
 
