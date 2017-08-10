@@ -153,10 +153,11 @@ def guess_field_types(request):
     rdbms_indexer = RdbmsIndexer(request.user, file_format['rdbmsType'])
     sample = rdbms_indexer.get_sample_data(file_format)
     table_metadata = rdbms_indexer.get_columns(file_format)['data']
+
     format_ = {
-        "sample": list(sample),
+        "sample": sample['rows'][:4],
         "columns": [
-            Field(col[0], HiveFormat.FIELD_TYPE_TRANSLATE.get(col[1], 'string')).to_dict()
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
             for col in table_metadata
         ]
     }

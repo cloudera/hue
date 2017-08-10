@@ -253,11 +253,12 @@ class RdbmsIndexer():
         assist = Assist(db)
       else:
         assist = JdbcAssist(db)
+
       data = assist.get_sample_data(source['rdbmsDatabaseName'], source['rdbmsTableName'])
       if data:
         format_['status'] = 0
         format_['headers'] = data.columns
-        format_['rows'] = list(data[0])
+        format_['rows'] = list(data.rows())
     except Exception, e:
       message = _('Error accessing the database %s: %s') % (name, e)
       LOG.warn(message)
