@@ -114,6 +114,9 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
           if (window.location.search.indexOf("bundle") == -1 && !IS_HUE_4) {
             window.location.hash = '#bundle=' + data.id;
           }
+          else if (IS_HUE_4) {
+            hueUtils.changeURL('/hue/oozie/editor/bundle/edit/?bundle=' + data.id);
+          }
         }
         else {
           $(document).trigger("error", data.message);
