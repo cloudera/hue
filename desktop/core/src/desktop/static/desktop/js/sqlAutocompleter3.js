@@ -761,6 +761,12 @@ var AutocompleteResults = (function () {
       addColumnsDeferred.resolve();
     } else if (typeof table.identifierChain !== 'undefined') {
       var callback = function (data) {
+        var partitionKeys = {};
+        if (data.partition_keys) {
+          data.partition_keys.forEach(function (partitionKey) {
+            partitionKeys[partitionKey.name] = true;
+          })
+        }
         if (data.extended_columns) {
           data.extended_columns.forEach(function (column) {
             column.database = data.database;
@@ -774,6 +780,7 @@ var AutocompleteResults = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[column.name],
                 details: column
               })
             } else if (column.type.indexOf('map') === 0) {
@@ -784,6 +791,7 @@ var AutocompleteResults = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[column.name],
                 details: column
               })
             } else if (column.type.indexOf('struct') === 0) {
@@ -794,6 +802,7 @@ var AutocompleteResults = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[column.name],
                 details: column
               })
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
@@ -804,6 +813,7 @@ var AutocompleteResults = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[column.name],
                 details: column
               })
             } else if (column.type.indexOf('array') === 0) {
@@ -814,6 +824,7 @@ var AutocompleteResults = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[column.name],
                 details: column
               })
             } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
@@ -825,6 +836,7 @@ var AutocompleteResults = (function () {
                 weightAdjust: 1,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[column.name],
                 details: column
               })
             } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
@@ -836,6 +848,7 @@ var AutocompleteResults = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[column.name],
                 details: column
               })
             }
@@ -852,6 +865,7 @@ var AutocompleteResults = (function () {
               category: CATEGORIES.COLUMN,
               table: table,
               popular: ko.observable(false),
+              partitionKey: !!partitionKeys[column],
               details: column
             })
           });
@@ -887,6 +901,7 @@ var AutocompleteResults = (function () {
               category: CATEGORIES.COLUMN,
               table: table,
               popular: ko.observable(false),
+              partitionKey: !!partitionKeys[field.name],
               details: field
             });
           });
@@ -905,6 +920,7 @@ var AutocompleteResults = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[field.name],
                 details: field
               });
             }
@@ -925,6 +941,7 @@ var AutocompleteResults = (function () {
                     category: CATEGORIES.COLUMN,
                     table: table,
                     popular: ko.observable(false),
+                    partitionKey: !!partitionKeys[field.name],
                     details: field
                   });
                 } else {
@@ -935,6 +952,7 @@ var AutocompleteResults = (function () {
                     category: CATEGORIES.COLUMN,
                     table: table,
                     popular: ko.observable(false),
+                    partitionKey: !!partitionKeys[field.name],
                     details: field
                   });
                 }
@@ -947,6 +965,7 @@ var AutocompleteResults = (function () {
                   category: CATEGORIES.COLUMN,
                   table: table,
                   popular: ko.observable(false),
+                  partitionKey: !!partitionKeys[field.name],
                   details: field
                 });
               }
@@ -959,6 +978,7 @@ var AutocompleteResults = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 popular: ko.observable(false),
+                partitionKey: !!partitionKeys[data.item.type],
                 details: data.item
               });
             }

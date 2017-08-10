@@ -98,6 +98,9 @@ from desktop.views import _ko
       <div class="autocompleter-details-contents">
         <div class="autocompleter-details-contents-inner">
           <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.database"></span>.<span data-bind="text: details.table"></span></div>
+          <!-- ko if: partitionKey -->
+          <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Partition key') }</div>
+          <!-- /ko -->
           <!-- ko if: typeof details.primary_key !== 'undefined' && details.primary_key === 'true' -->
           <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
           <!-- /ko -->
