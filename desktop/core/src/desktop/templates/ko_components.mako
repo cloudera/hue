@@ -245,9 +245,11 @@ from desktop.views import _ko
         <!-- ko if: onSuccessUrl() -->
         <div class="notification-history-title">
           <strong class="margin-left-5" data-bind="text: name"></strong>
+          <!-- ko if: onSuccessUrl() !== 'assist.db.refresh' -->
           <a class="pull-right margin-right-10" href="javascript:void(0)" data-bind="hueLink: onSuccessUrl()">
             ${ _('Output') }
           </a>
+          <!-- /ko -->
           <div class="clearfix"></div>
         </div>
         <!-- /ko -->
