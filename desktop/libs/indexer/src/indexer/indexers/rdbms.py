@@ -39,9 +39,11 @@ LOG = logging.getLogger(__name__)
 def get_db_component(request):
   format_ = {'data': [], 'status': 1, 'message': ''}
   db = None
+
   try:
     source = json.loads(request.POST.get('source', '{}'))
     user = User.objects.get(username=request.user)
+
     if source['rdbmsMode'] == 'configRdbms':
       if source['rdbmsType'] != 'jdbc':
         query_server = rdbms.get_query_server_config(server=source['rdbmsType'])
@@ -53,7 +55,6 @@ def get_db_component(request):
         key = [key for key in interpreters if key['name'] == source['rdbmsJdbcDriverName']]
         if key:
           options = key[0]['options']
-
           db = Jdbc(driver_name=options['driver'], url=options['url'], username=options['user'], password=options['password'])
     else:
       name = source['rdbmsType']
@@ -75,11 +76,13 @@ def get_db_component(request):
       assist = Assist(db)
     else:
       assist = JdbcAssist(db)
+
     if not source['rdbmsDatabaseName']:
       data = assist.get_databases()
     elif source['rdbmsDatabaseName']:
       data = assist.get_tables(source['rdbmsDatabaseName'])
-      format_['data'] = [{'name': element, 'value': element} for element in data]
+
+    format_['data'] = [{'name': element, 'value': element} for element in data]
     format_['status'] = 0
   except Exception, e:
     message = _('Error accessing the database %s: %s') % (name, e)
