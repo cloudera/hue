@@ -154,14 +154,14 @@
               self.navigateTo('S3A://');
             }
             else if (fs !== 's3a' && storedPath.toLowerCase().indexOf('s3a') > -1) {
-              self.navigateTo('');
+              self.navigateTo('/?default_to_home');
             }
             else {
               self.navigateTo(storedPath)
             }
           }
           else {
-            self.navigateTo(fs === 's3a' ? 'S3A://' : '');
+            self.navigateTo(fs === 's3a' ? 'S3A://' : '/?default_to_home');
           }
         });
         $li.appendTo($ul);
