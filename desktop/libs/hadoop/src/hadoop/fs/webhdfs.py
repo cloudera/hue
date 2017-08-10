@@ -172,7 +172,8 @@ class WebHdfs(Hdfs):
       json = self._root.get(path, params)
       trash_path = json['Path']
     except WebHdfsException, e:
-      if 'IllegalArgumentException' in e.message:
+      exceptions = ['IllegalArgumentException', 'UnsupportedOperationException']
+      if any(x in e.message for x in exceptions):
         LOG.warn('WebHDFS operation GETTRASHROOT is not implemented, returning default trash path: %s' % trash_path)
       else:
         raise e
