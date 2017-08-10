@@ -99,6 +99,12 @@ var AutocompleteResults = (function () {
     self.snippet = options.snippet;
     self.editor = options.editor;
 
+    self.sortOverride = null;
+
+    huePubSub.subscribe('editor.autocomplete.temporary.sort.override', function (sortOverride) {
+      self.sortOverride = sortOverride;
+    });
+
     self.entries = ko.observableArray();
 
     self.lastKnownRequests = {};
@@ -226,6 +232,14 @@ var AutocompleteResults = (function () {
             return 1;
           }
         }
+        if (self.sortOverride && self.sortOverride.partitionColumnsFirst) {
+          if (a.partitionKey && !b.partitionKey) {
+            return -1;
+          }
+          if (b.partitionKey && !a.partitionKey) {
+            return 1;
+          }
+        }
         var aWeight = a.category.weight + (a.weightAdjust || 0);
         var bWeight = b.category.weight + (b.weightAdjust || 0);
         if (typeof aWeight !== 'undefined' && typeof bWeight !== 'undefined' && bWeight !== aWeight) {
@@ -239,6 +253,7 @@ var AutocompleteResults = (function () {
         }
         return a.value.localeCompare(b.value);
       });
+      self.sortOverride = null;
       return result;
     }).extend({ rateLimit: 200 });
   }
