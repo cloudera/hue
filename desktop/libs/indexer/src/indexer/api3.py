@@ -154,13 +154,22 @@ def guess_field_types(request):
     sample = rdbms_indexer.get_sample_data(file_format)
     table_metadata = rdbms_indexer.get_columns(file_format)['data']
 
-    format_ = {
-        "sample": sample['rows'][:4],
-        "columns": [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-            for col in table_metadata
-        ]
-    }
+    if file_format['rdbmsType'] != 'jdbc':
+      format_ = {
+          "sample": sample['rows'][:4],
+          "columns": [
+              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+              for col in table_metadata
+          ]
+      }
+    else:
+      format_ = {
+          "sample": sample['rows'][:4],
+          "columns": [
+              Field(col[0], HiveFormat.FIELD_TYPE_TRANSLATE.get(col[1], 'string')).to_dict()
+              for col in table_metadata
+          ]
+      }
 
   return JsonResponse(format_)
 

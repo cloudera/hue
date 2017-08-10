@@ -222,6 +222,7 @@ class RdbmsIndexer():
     format_ = {'data': [], 'status': 1, 'message': ''}
     db = None
     name = None
+
     try:
       if source['rdbmsMode'] == 'configRdbms':
         if source['rdbmsType'] != 'jdbc':
@@ -251,14 +252,16 @@ class RdbmsIndexer():
 
       if source['rdbmsType'] != 'jdbc':
         assist = Assist(db)
+        data = assist.get_sample_data(source['rdbmsDatabaseName'], source['rdbmsTableName'])
+        if data:
+          format_['status'] = 0
+          format_['headers'] = data.columns
+          format_['rows'] = list(data.rows())
       else:
         assist = JdbcAssist(db)
-
-      data = assist.get_sample_data(source['rdbmsDatabaseName'], source['rdbmsTableName'])
-      if data:
+        data, meta = assist.get_sample_data(source['rdbmsDatabaseName'], source['rdbmsTableName'])
+        format_['rows'] = data
         format_['status'] = 0
-        format_['headers'] = data.columns
-        format_['rows'] = list(data.rows())
     except Exception, e:
       message = _('Error accessing the database %s: %s') % (name, e)
       LOG.warn(message)
