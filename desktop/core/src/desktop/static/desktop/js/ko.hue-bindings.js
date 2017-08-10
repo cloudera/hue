@@ -4339,7 +4339,7 @@
               }
               if (lastHoveredToken !== token) {
                 clearActiveMarkers();
-                if (token !== null && !token.notFound && token.parseLocation && ['alias', 'whereClause', 'limitClause'].indexOf(token.parseLocation.type) === -1) {
+                if (token !== null && !token.notFound && token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) {
                   markLocation(token.parseLocation);
                 }
                 lastHoveredToken = token;
@@ -4384,7 +4384,7 @@
           if (selectionRange.isEmpty()) {
             var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
             var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-            if (token && ((token.parseLocation && ['alias', 'whereClause', 'limitClause'].indexOf(token.parseLocation.type) === -1) || token.syntaxError)) {
+            if (token && ((token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) || token.syntaxError)) {
               var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
               var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
               var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);

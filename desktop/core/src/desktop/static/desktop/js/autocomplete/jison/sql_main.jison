@@ -1278,8 +1278,16 @@ QuerySpecification_EDIT
  ;
 
 SelectStatement
- : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList                  -> { selectList: $4 }
- | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression  -> { selectList: $4, tableExpression: $5 }
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList
+   {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
+     $$ = { selectList: $4 };
+   }
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression
+   {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
+     $$ = { selectList: $4, tableExpression: $5 }
+   }
  ;
 
 OptionalUnions
@@ -1322,6 +1330,7 @@ UnionClause_EDIT
 SelectStatement_EDIT
  : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_EDIT
    {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
      if ($4.cursorAtStart) {
        var keywords = [{ value: '*', weight: 10000 }];
        if (!$3 && !$2) {
@@ -1354,6 +1363,7 @@ SelectStatement_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR'
    {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4, true);
      var keywords = [{ value: '*', weight: 10000 }];
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
@@ -1373,8 +1383,12 @@ SelectStatement_EDIT
      parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression_EDIT
+   {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
+   }
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_EDIT TableExpression
    {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
      parser.selectListNoTableSuggest($4, $2);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'select';
@@ -1382,6 +1396,7 @@ SelectStatement_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR' TableExpression
    {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4, true);
      var keywords = [{ value: '*', weight: 10000 }];
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
@@ -1402,14 +1417,17 @@ SelectStatement_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR' TableExpression
    {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
      parser.checkForSelectListKeywords($4);
    }
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR' ',' TableExpression
    {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
      parser.checkForSelectListKeywords($4);
    }
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList 'CURSOR'
    {
+     parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
      parser.checkForSelectListKeywords($4);
      var keywords = ['FROM'];
      if (parser.yy.result.suggestKeywords) {
