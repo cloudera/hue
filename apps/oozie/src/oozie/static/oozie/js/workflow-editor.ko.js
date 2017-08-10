@@ -1190,11 +1190,14 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           }
           self.workflow.id(data.id);
           $(document).trigger("info", data.message);
+          self.workflow.tracker().markCurrentStateAsClean();
+
           if (window.location.search.indexOf("workflow") == -1 && !IS_HUE_4) {
             window.location.hash = '#workflow=' + data.id;
+            huePubSub.publish('assist.document.refresh');
+          } else if (IS_HUE_4) {
+            hueUtils.changeURL('/hue/oozie/editor/workflow/edit/?workflow=' + data.id);
           }
-          self.workflow.tracker().markCurrentStateAsClean();
-          huePubSub.publish('assist.document.refresh');
         }
         else {
           $(document).trigger("error", data.message);
