@@ -1949,8 +1949,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             <li>
               <div class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-normal':  risk !== 'high' }, tooltip: { title: risk + ' ' + riskTables }"><span data-bind="text: riskAnalysis"></span></div>
               <div class="risk-list-description" data-bind="text: riskRecommendation"></div>
-              <div class="risk-quickfix" data-bind="visible: riskId === 17 && $parent.activeEditor() && $parent.activeLocations(), with: $parent" style="display:none;">
-                <a href="javascript:void(0);" data-bind="click: addFilter">${ _('Add filter') }</a>
+              <div class="risk-quickfix" data-bind="visible: (riskId === 17 || riskId === 22) && $parent.activeEditor() && $parent.activeLocations()" style="display:none;">
+                <a href="javascript:void(0);" data-bind="click: function () { $parent.addFilter(riskId); }">${ _('Add filter') }</a>
               </div>
             </li>
           </ul>
@@ -2158,12 +2158,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
       }
 
-      AssistantPanel.prototype.addFilter = function () {
+      AssistantPanel.prototype.addFilter = function (riskId) {
         var self = this;
         if (self.activeLocations() && self.activeEditor()) {
           self.activeLocations().activeStatementLocations.every(function (location) {
-            if (location.type === 'whereClause' && location.missing && !location.subquery) {
-
+            if (location.type === 'whereClause' && !location.subquery && (location.missing || riskId === 22 )) {
               self.activeEditor().moveCursorToPosition({
                 row: location.location.last_line - 1,
                 column: location.location.last_column - 1
@@ -2173,8 +2172,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               if (/\S$/.test(self.activeEditor().getTextBeforeCursor())) {
                 self.activeEditor().session.insert(self.activeEditor().getCursorPosition(), ' ');
               }
-              self.activeEditor().session.insert(self.activeEditor().getCursorPosition(), 'where ');
+
+              self.activeEditor().session.insert(self.activeEditor().getCursorPosition(), location.missing ? 'where ' : 'and ');
               self.activeEditor().focus();
+
+              if (riskId === 22) {
+                huePubSub.publish('editor.autocomplete.temporary.sort.override', { partitionColumnsFirst: true });
+              }
 
               window.setTimeout(function () {
                 self.activeEditor().execCommand("startAutocomplete");
