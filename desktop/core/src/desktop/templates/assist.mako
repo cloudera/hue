@@ -2162,6 +2162,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var self = this;
         if (self.activeLocations() && self.activeEditor()) {
           self.activeLocations().activeStatementLocations.every(function (location) {
+            var isLowerCase = false;
+            if (self.activeLocations().activeStatementLocations && self.activeLocations().activeStatementLocations.length > 0) {
+              var firstToken = self.activeLocations().activeStatementLocations[0].firstToken;
+              isLowerCase = firstToken === firstToken.toLowerCase();
+            }
+
             if (location.type === 'whereClause' && !location.subquery && (location.missing || riskId === 22 )) {
               self.activeEditor().moveCursorToPosition({
                 row: location.location.last_line - 1,
@@ -2173,7 +2179,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                 self.activeEditor().session.insert(self.activeEditor().getCursorPosition(), ' ');
               }
 
-              self.activeEditor().session.insert(self.activeEditor().getCursorPosition(), location.missing ? 'where ' : 'and ');
+              var operation = location.missing ? 'WHERE ' : 'AND ';
+              self.activeEditor().session.insert(self.activeEditor().getCursorPosition(), isLowerCase ? operation.toLowerCase() : operation);
               self.activeEditor().focus();
 
               if (riskId === 22) {
