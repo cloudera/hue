@@ -1283,12 +1283,44 @@ var SqlParseSupport = (function () {
       }
     };
 
-    parser.addClauseLocation = function (type, precedingLocation, locationIfPresent) {
-      var location = {
-        type: type,
-        missing: !locationIfPresent,
-        location: adjustLocationForCursor(locationIfPresent || { first_line: precedingLocation.last_line, first_column: precedingLocation.last_column, last_line: precedingLocation.last_line, last_column: precedingLocation.last_column })
-      };
+    parser.addClauseLocation = function (type, precedingLocation, locationIfPresent, isCursor) {
+      var location;
+      if (isCursor) {
+        if (parser.yy.partialLengths.left === 0 && parser.yy.partialLengths.right === 0) {
+          location = {
+            type: type,
+            missing: true,
+            location: adjustLocationForCursor({
+              first_line: precedingLocation.last_line,
+              first_column: precedingLocation.last_column,
+              last_line: precedingLocation.last_line,
+              last_column: precedingLocation.last_column
+            })
+          }
+        } else {
+          location = {
+            type: type,
+            missing: false,
+            location: {
+              first_line: locationIfPresent.last_line,
+              first_column: locationIfPresent.last_column - 1,
+              last_line: locationIfPresent.last_line,
+              last_column: locationIfPresent.last_column - 1 + parser.yy.partialLengths.right + parser.yy.partialLengths.left
+            }
+          }
+        }
+      } else {
+        location = {
+          type: type,
+          missing: !locationIfPresent,
+          location: adjustLocationForCursor(locationIfPresent || {
+            first_line: precedingLocation.last_line,
+            first_column: precedingLocation.last_column,
+            last_line: precedingLocation.last_line,
+            last_column: precedingLocation.last_column
+          })
+        };
+      }
       if (parser.isInSubquery()) {
         location.subquery = true;
       }
@@ -1523,7 +1555,13 @@ var SqlParseSupport = (function () {
         if (a.location.first_line !== b.location.first_line) {
           return a.location.first_line - b.location.first_line;
         }
-        return a.location.first_column - b.location.first_column;
+        if (a.location.first_column !== b.location.first_column) {
+          return a.location.first_column - b.location.first_column;
+        }
+        if (a.location.last_column !== b.location.last_column) {
+          return b.location.last_column - a.location.last_column;
+        }
+        return b.type.localeCompare(a.type);
       });
       parser.yy.result.locations = parser.yy.allLocations;
 
