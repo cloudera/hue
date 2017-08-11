@@ -1013,7 +1013,7 @@ ${ assist.assistPanel() }
         "string": "string",
         "long": "bigint",
         "double": "double",
-        "date": "date"
+        "date": "timestamp"
       },
       HIVE_TO_SOLR: {
         "bigint": "long"
