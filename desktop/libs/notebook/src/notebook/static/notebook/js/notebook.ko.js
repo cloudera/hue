@@ -2621,43 +2621,6 @@ var EditorViewModel = (function() {
     self.loadingScheduler = ko.observable(false);
 
 
-    self.exportJupyterNotebook = function () {
-      function addCell(type, code) {
-        var cell = {
-          cell_type: type,
-          source: [
-            code
-          ],
-          metadata: {
-            collapsed: false
-          }
-        };
-        if (type == "code") {
-          cell.outputs = [];
-          cell.execution_count = 0;
-        }
-        return cell;
-      }
-
-      var jupyterNotebook = {
-        nbformat: 4,
-        nbformat_minor: 0,
-        cells: [],
-        metadata: {}
-      };
-
-      self.snippets().forEach(function (snippet) {
-        if (snippet.type() == "pyspark") {
-          jupyterNotebook.cells.push(addCell("code", snippet.statement_raw()));
-        }
-        if (snippet.type() == "markdown") {
-          jupyterNotebook.cells.push(addCell("markdown",snippet.statement_raw()));
-        }
-      });
-
-      download(JSON.stringify(jupyterNotebook), self.name() + ".ipynb", "text/plain");
-    };
-
     huePubSub.subscribeOnce('assist.db.panel.ready', function () {
       if (self.type().indexOf('query') === 0 && self.snippets().length == 1) {
         huePubSub.publish('assist.set.database', {

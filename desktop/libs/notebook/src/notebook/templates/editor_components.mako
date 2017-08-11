@@ -238,22 +238,17 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             </li>
             <li>
               <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
-                <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
+                <i class="fa fa-fw fa-play"></i> ${ _('Execute all') }
               </a>
             </li>
             <li>
               <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-                <i class="fa fa-fw fa-eraser"></i> ${ _('Clear all results') }
+                <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
               </a>
             </li>
             <li>
               <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
-                <i class="fa fa-fw fa-file-text-o"></i> ${ _('Display all Notebook content') }
-              </a>
-            </li>
-            <li>
-              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().exportJupyterNotebook() }">
-                <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
+                <i class="fa fa-fw fa-file-text-o"></i> ${ _('Show all content') }
               </a>
             </li>
           </ul>
