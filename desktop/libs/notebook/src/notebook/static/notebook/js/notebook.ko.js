@@ -521,6 +521,7 @@ var EditorViewModel = (function() {
     self.selectedStatement = ko.observable('');
     self.positionStatement = ko.observable(null);
     self.lastExecutedStatement = ko.observable(null);
+    self.statementsList = ko.observableArray();
 
     huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
       if (self.ace() && self.ace().container.id === statementDetails.id) {
@@ -528,6 +529,20 @@ var EditorViewModel = (function() {
           self.positionStatement(statementDetails.activeStatement);
         } else {
           self.positionStatement(null);
+        }
+
+        if (statementDetails.activeStatement) {
+          var _statements = [];
+           statementDetails.precedingStatements.forEach(function (statement) {
+             _statements.push(statement.statement);
+           });
+           _statements.push(statementDetails.activeStatement.statement);
+           statementDetails.followingStatements.forEach(function (statement) {
+             _statements.push(statement.statement);
+          });
+          self.statementsList(_statements); // Or fetch on demand via editor.refresh.statement.locations and remove observableArray?
+        } else {
+          self.statementsList([]);
         }
       }
     }, vm.huePubSubId);
@@ -2645,6 +2660,36 @@ var EditorViewModel = (function() {
         self.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
       }
     });
+    self.preEditorTogglingSnippet = null;
+    self.postEditorTogglingSnippets = {};
+    self.toggleEditorMode = function() {
+      var _notebook = self.selectedNotebook();
+      var _newSnippets = [];
+
+      if (self.editorType() != 'notebook') {
+        self.editorType('notebook');
+        self.preEditorTogglingSnippet = _notebook.snippets()[0];
+        // Split statements
+        _notebook.type('notebook');
+        _notebook.snippets()[0].statementsList().forEach(function (sql_statement) {
+          var _snippet;
+          if (sql_statement.hashCode() in self.postEditorTogglingSnippets) {
+            _snippet = self.postEditorTogglingSnippets[sql_statement.hashCode()]; // Persist result
+          } else {
+            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: sql_statement, result: {}}, skipSession=true);
+            _snippet.init();
+            self.postEditorTogglingSnippets[sql_statement.hashCode()] = _snippet;
+          }
+          _newSnippets.push(_snippet);
+        });
+      } else {
+        self.editorType(options.editor_type);
+        // Revert to one statement
+        _newSnippets.push(self.preEditorTogglingSnippet);
+        _notebook.type('query-' + options.editor_type);
+      }
+      _notebook.snippets(_newSnippets);
+    };
     self.editorTypeTitle = ko.pureComputed(function () {
       var foundInterpreter = $.grep(options.languages, function (interpreter) {
         return interpreter.type === self.editorType();
