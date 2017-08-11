@@ -189,6 +189,14 @@ class DesktopModuleInfo(object):
   def locale_path(self):
     return os.path.join(os.path.dirname(self.module.__file__), 'locale')
 
+  @property
+  def migrations_path(self):
+    path = os.path.join(os.path.dirname(self.module.__file__), 'migrations')
+    if path and os.path.exists(path):
+      return path
+    else:
+      return None
+
   def _submodule(self, name):
     return _import_module_or_none(self.module.__name__ + "." + name)
 
