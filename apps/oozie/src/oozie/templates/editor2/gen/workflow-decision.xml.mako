@@ -20,7 +20,7 @@
           % for child in node['children']:
             % if child['condition'] != 'default':
             <case to="${ node_mapping[child['to']].name }">
-              ${ child['condition'] }
+              ${ child['condition'] | n }
             </case>
             % endif
           % endfor
