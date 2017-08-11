@@ -612,6 +612,21 @@ from desktop.views import _ko
     })();
   </script>
 
+  <script type="text/html" id="search-document-context-template">
+    <div data-bind="with: data" style="width: 100%;">
+      <div style="width:100%; text-align: center; margin-top: 40px; font-size: 140px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: doc_type === 'directory', definition: function() { return { type: doc_type } } } } }"></div>
+      <div style="width: 100%; margin-top: 20px; text-align:center">
+        <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: hue_name, hueLink: link, click: function () { $parents[1].searchResultVisible(false); }"></a>
+        <br/>
+        <span data-bind="text: DocumentTypeGlobals[doc_type] || doc_type"></span>
+        <!-- ko if: hue_description -->
+        <br/><br/><span data-bind="text: hue_description"></span>
+        <!-- /ko -->
+      </div>
+
+    </div>
+  </script>
+
   <script type="text/html" id="hue-global-search-template">
     <div class="global-search-input-container">
       <div>
@@ -642,6 +657,9 @@ from desktop.views import _ko
           <!-- ko switch: type -->
             <!-- ko case: ['database', 'table', 'view', 'field']  -->
               <!-- ko component: { name: 'sql-context-contents-global-search', params: { data: data } } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- ko case: 'document'  -->
+              <!-- ko template: 'search-document-context-template' --><!-- /ko -->
             <!-- /ko -->
             <!-- ko case: $default -->
               <pre data-bind="text: ko.mapping.toJSON($data)"></pre>
