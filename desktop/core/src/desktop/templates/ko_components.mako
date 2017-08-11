@@ -616,7 +616,7 @@ from desktop.views import _ko
     <div data-bind="with: data" style="width: 100%;">
       <div style="width:100%; text-align: center; margin-top: 40px; font-size: 140px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: doc_type === 'directory', definition: function() { return { type: doc_type } } } } }"></div>
       <div style="width: 100%; margin-top: 20px; text-align:center">
-        <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: hue_name, hueLink: link, click: function () { $parents[1].searchResultVisible(false); }"></a>
+        <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: hue_name, hueLink: link, click: function () { $parents[1].close(); }"></a>
         <br/>
         <span data-bind="text: DocumentTypeGlobals[doc_type] || doc_type"></span>
         <!-- ko if: hue_description -->
@@ -656,7 +656,7 @@ from desktop.views import _ko
         <!-- ko with: selectedResult -->
           <!-- ko switch: type -->
             <!-- ko case: ['database', 'table', 'view', 'field']  -->
-              <!-- ko component: { name: 'sql-context-contents-global-search', params: { data: data } } --><!-- /ko -->
+              <!-- ko component: { name: 'sql-context-contents-global-search', params: { data: data, globalSearch: $parent } } --><!-- /ko -->
             <!-- /ko -->
             <!-- ko case: 'document'  -->
               <!-- ko template: 'search-document-context-template' --><!-- /ko -->
@@ -710,11 +710,13 @@ from desktop.views import _ko
           }
           if (newValue !== '') {
             self.triggerAutocomplete(newValue);
+            window.clearTimeout(self.fetchThrottle);
+            self.fetchThrottle = window.setTimeout(function () {
+              self.fetchResults(newValue);
+            }, 500);
+          } else {
+            self.searchResultCategories([]);
           }
-          window.clearTimeout(self.fetchThrottle);
-          self.fetchThrottle = window.setTimeout(function () {
-            self.fetchResults(newValue);
-          }, 500);
         });
 
         self.searchHasFocus.subscribe(function (newVal) {
@@ -788,6 +790,12 @@ from desktop.views import _ko
             }
           }
         });
+      };
+
+      GlobalSearch.prototype.close = function () {
+        var self = this;
+        self.searchResultVisible(false);
+        self.searchInput('');
       };
 
       GlobalSearch.prototype.updateInlineAutocomplete = function (partial) {
@@ -901,7 +909,14 @@ from desktop.views import _ko
       };
 
       GlobalSearch.prototype.openResult = function () {
-        console.log('open... ');
+        var self = this;
+        var selectedResult = self.selectedResult();
+        if (['database', 'table', 'field', 'view'].indexOf(selectedResult.type) !== -1) {
+          huePubSub.publish('context.popover.show.in.assist');
+        } else if (selectedResult.type === 'document') {
+          huePubSub.publish('open.link', '/hue' + selectedResult.data.link);
+        }
+        self.close();
       };
 
       GlobalSearch.prototype.resultSelected = function (categoryIndex, resultIndex) {
