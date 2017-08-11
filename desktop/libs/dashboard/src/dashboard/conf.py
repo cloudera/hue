@@ -68,7 +68,7 @@ def get_properties():
 
 def get_engines(user):
   engines = []
-  apps = get_apps_dict()
+  apps = get_apps_dict(user=user)
   settings = get_properties()
 
   if 'search' in apps:
