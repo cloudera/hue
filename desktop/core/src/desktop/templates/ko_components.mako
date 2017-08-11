@@ -621,11 +621,11 @@ from desktop.views import _ko
     </div>
     <!-- ko if: searchResultVisible-->
     <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, css: { 'global-search-empty' : searchResultCategories().length === 0 }">
-      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+      <!-- ko hueSpinner: { spin: loading() && searchResultCategories().length === 0 , center: true, size: 'large' } --><!-- /ko -->
       <!-- ko if: !loading() && searchResultCategories().length === 0 -->
         <div>${ _('No results found.') }</div>
       <!-- /ko -->
-      <!-- ko if: !loading() && searchResultCategories().length > 0 -->
+      <!-- ko if: searchResultCategories().length > 0 -->
       <div class="global-search-alternatives" data-bind="foreach: searchResultCategories">
         <div class="global-search-category">
           <div class="global-search-category-header" data-bind="text: label"></div>
@@ -666,6 +666,7 @@ from desktop.views import _ko
         self.apiHelper = ApiHelper.getInstance();
         self.lastNonPartial = null;
         self.lastResult = {};
+        self.knownFacetValues = {};
 
         self.autocompleteThrottle = -1;
         self.fetchThrottle = -1;
@@ -686,7 +687,9 @@ from desktop.views import _ko
         });
 
         self.searchInput.subscribe(function (newValue) {
-          self.inlineAutocomplete(newValue);
+          if (self.inlineAutocomplete().indexOf(newValue) !== 0 || newValue === '') {
+            self.inlineAutocomplete(newValue);
+          }
           if (newValue !== '') {
             self.triggerAutocomplete(newValue);
           }
@@ -771,7 +774,8 @@ from desktop.views import _ko
 
       GlobalSearch.prototype.updateInlineAutocomplete = function (partial) {
         var self = this;
-        self.inlineAutocomplete('');
+        var newAutocomplete = '';
+        var partialLower = partial.toLowerCase();
         if (self.lastResult.suggestFacets) {
           var existingFacetIndex = {};
           if (self.lastResult.facets) {
@@ -779,40 +783,75 @@ from desktop.views import _ko
               existingFacetIndex[facet.toLowerCase()] = true;
             })
           }
-
-          if (partial === '') {
-            FACETS.every(function (facet) {
-              if (existingFacetIndex[facet]) {
-                return true;
-              }
-              self.inlineAutocomplete(self.lastNonPartial + facet + ':');
-              return false;
-            })
-          } else {
-            var lowerCase = partial.length !== '' && partial[partial.length - 1].toLowerCase() === partial[partial.length - 1];
+          // TODO: Do we want to suggest facets on empty by default?
+##           if (partial === '') {
+##             FACETS.every(function (facet) {
+##               if (existingFacetIndex[facet]) {
+##                 return true;
+##               }
+##               newAutocomplete = self.lastNonPartial + facet + ':';
+##               return false;
+##             })
+##           } else
+          if (partial !== '') {
+            var lowerCase = partial.length !== '' && partialLower[partialLower.length - 1] === partial[partial.length - 1];
             var suggestion = self.lastNonPartial + partial;
             FACETS.every(function (facet) {
               if (existingFacetIndex[facet]) {
                 return true;
               }
-              if (facet.indexOf(partial.toLowerCase()) === 0) {
+              if (facet.indexOf(partialLower) === 0) {
                 var remainder = facet.substring(partial.length);
                 suggestion += lowerCase ? remainder : remainder.toUpperCase();
                 suggestion += ':';
-                self.inlineAutocomplete(suggestion);
+                newAutocomplete = suggestion;
                 return false;
               }
               return true;
             });
           }
         }
+
+        if (self.lastResult.suggestFacetValues && !newAutocomplete) {
+          if (self.knownFacetValues[self.lastResult.suggestFacetValues.toLowerCase()]) {
+            Object.keys(self.knownFacetValues[self.lastResult.suggestFacetValues.toLowerCase()]).every(function (value) {
+              if (value.toLowerCase().indexOf(partialLower) === 0) {
+                newAutocomplete = self.lastNonPartial + partial + value.substring(partial.length, value.length);
+                return false;
+              }
+              return true;
+            });
+          }
+        }
+
+        if (partial !== '' && self.lastResult.suggestResults && !newAutocomplete) {
+          self.searchResultCategories().every(function (category) {
+            return category.result.every(function (entry) {
+              if (category.type === 'documents' && entry.label.toLowerCase().indexOf(partialLower) === 0) {
+                newAutocomplete = self.lastNonPartial + partial + entry.label.substring(partial.length, entry.label.length);
+                return false;
+              } else if (entry.data.selectionName && entry.data.selectionName.toLowerCase().indexOf(partialLower) === 0) {
+                newAutocomplete = self.lastNonPartial + partial + entry.data.selectionName.substring(partial.length, entry.data.selectionName.length);
+                return false;
+              }
+              return true;
+            });
+          });
+        }
+
+        if (!newAutocomplete) {
+          if (self.inlineAutocomplete() !== '') {
+            self.inlineAutocomplete('');
+          }
+        } else if (newAutocomplete !== self.inlineAutocomplete()) {
+          self.inlineAutocomplete(newAutocomplete);
+        }
       };
 
       GlobalSearch.prototype.triggerAutocomplete = function (newValue, direct) {
         var self = this;
-        self.inlineAutocomplete(newValue);
         var partial, nonPartial;
-        var partialMatch = newValue.match(/([a-z]+)$/i);
+        var partialMatch = newValue.match(/([^:\s]+)$/i);
         if (partialMatch) {
           partial = partialMatch[0];
           nonPartial = newValue.substring(0, newValue.length - partial.length);
@@ -885,59 +924,76 @@ from desktop.views import _ko
         var self = this;
         self.loading(true);
         self.searchResultVisible(true);
-        self.apiHelper.globalSearchAutocomplete({
-          query:  query,
-          successCallback: function (data) {
-            var categories = [];
-            if (data.resultHuedocuments && data.resultHuedocuments.length) {
-              var docCategory = {
-                label: '${ _('Documents') }',
-                result: []
-              };
-              data.resultHuedocuments.forEach(function (doc) {
-                docCategory.result.push({
-                  label: doc.hue_name,
-                  type: 'document',
-                  data: doc
-                })
-              });
-              categories.push(docCategory);
-            }
+        var hueDocsPromise = self.apiHelper.fetchHueDocsInteractive(query);
+        var navPromise = self.apiHelper.fetchNavEntitiesInteractive(query);
+        hueDocsPromise.done(function (data) {
+          var categories = self.searchResultCategories().filter(function (category) {
+            return category.type !== 'documents';
+          });
+          var docCategory = {
+            label: '${ _('Documents') }',
+            result: [],
+            type: 'documents'
+          };
 
-            if (data.results && data.results.length) {
-              var newCategories = {};
-              data.results.forEach(function (result) {
-                var typeLower = result.type.toLowerCase();
-                if (CATEGORIES[typeLower]) {
-                  var category = newCategories[typeLower];
-                  if (!category) {
-                    category = {
-                      label: CATEGORIES[typeLower],
-                      result: []
-                    };
-                    newCategories[typeLower] = category;
-                  }
-                  category.result.push({
-                    label: result.hue_name || result.originalName,
-                    type: typeLower,
-                    data: result
-                  })
-                }
-              });
-
-              Object.keys(newCategories).forEach(function (key) {
-                categories.push(newCategories[key]);
-              });
-            }
-            self.selectedIndex(undefined);
-            self.searchResultCategories(categories);
-            self.loading(false);
-          },
-          silenceErrors: true,
-          errorCallback: function () {
-            self.searchResultCategories([]);
+          data.results.forEach(function (doc) {
+            docCategory.result.push({
+              label: doc.hue_name,
+              type: 'document',
+              data: doc
+            })
+          });
+          if (docCategory.result.length) {
+            categories.unshift(docCategory);
           }
+          self.selectedIndex(undefined);
+          self.searchResultCategories(categories);
+          self.triggerAutocomplete(query, true);
         });
+
+        navPromise.done(function (data) {
+          if (data.facets) {
+            Object.keys(data.facets).forEach(function (facet) {
+              if (!self.knownFacetValues[facet] && Object.keys(data.facets[facet]).length > 0) {
+                self.knownFacetValues[facet] = {};
+              }
+              Object.keys(data.facets[facet]).forEach(function (facetKey) {
+                self.knownFacetValues[facet][facetKey] = data.facets[facet][facetKey];
+              });
+            })
+          }
+          var categories = self.searchResultCategories().length > 0 && self.searchResultCategories()[0].type === 'documents' ? [self.searchResultCategories()[0]] : [];
+          var newCategories = {};
+          data.results.forEach(function (result) {
+            var typeLower = result.type.toLowerCase();
+            if (CATEGORIES[typeLower]) {
+              var category = newCategories[typeLower];
+              if (!category) {
+                category = {
+                  label: CATEGORIES[typeLower],
+                  result: []
+                };
+                newCategories[typeLower] = category;
+              }
+              category.result.push({
+                label: result.hue_name || result.originalName,
+                type: typeLower,
+                data: result
+              })
+            }
+          });
+
+          Object.keys(newCategories).forEach(function (key) {
+            categories.push(newCategories[key]);
+          });
+          self.selectedIndex(undefined);
+          self.searchResultCategories(categories);
+          self.triggerAutocomplete(query, true);
+        });
+
+        $.when.apply($, [navPromise, hueDocsPromise]).always(function () {
+          self.loading(false);
+        })
       };
 
       ko.components.register('hue-global-search', {

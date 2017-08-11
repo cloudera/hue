@@ -1753,6 +1753,38 @@ var ApiHelper = (function () {
     }));
   };
 
+  ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
+    var promise = $.Deferred();
+    $.post('/desktop/api/search/entities_interactive', {
+      query_s: ko.mapping.toJSON(query),
+      limit: 5,
+      sources: '["documents"]'
+    }).done(function (data) {
+      if (data.status === 0) {
+        promise.resolve(data);
+      } else {
+        promise.reject(data);
+      }
+    }).fail(promise.reject);
+    return promise;
+  };
+
+  ApiHelper.prototype.fetchNavEntitiesInteractive = function (query) {
+    var promise = $.Deferred();
+    $.post('/desktop/api/search/entities_interactive', {
+      query_s: ko.mapping.toJSON(query),
+      limit: 5,
+      sources: '["sql", "hdfs", "s3"]'
+    }).done(function (data) {
+      if (data.status === 0) {
+        promise.resolve(data);
+      } else {
+        promise.reject(data);
+      }
+    }).fail(promise.reject);
+    return promise;
+  };
+
   ApiHelper.prototype.globalSearchAutocomplete = function (options) {
     var self = this;
 
