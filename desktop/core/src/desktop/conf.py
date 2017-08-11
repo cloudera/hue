@@ -1316,7 +1316,7 @@ ENABLE_SQL_SYNTAX_CHECK = Config( # To remove when syntax check is ready
 
 USE_NEW_GLOBAL_SEARCH = Config( # To remove when the new global search is ready
   key='use_new_global_search',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_('Choose whether to use the new global search or not.')
 )
