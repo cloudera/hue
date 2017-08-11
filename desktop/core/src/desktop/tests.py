@@ -56,10 +56,13 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
-from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, HUE_VERSION
+from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, HUE_VERSION,\
+  ClusterConfig
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home
+from desktop.auth.backend import rewrite_user
+from dashboard.conf import HAS_SQL_ENABLED
 
 
 def setup_test_environment():
@@ -462,48 +465,141 @@ def test_desktop_permissions():
 def test_app_permissions():
   USERNAME = 'test_app_permissions'
   GROUPNAME = 'impala_only'
-  desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/testserver\/.*$')
+  resets = [
+    desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\/.*$,^http:\/\/testserver\/.*$'),
+    HAS_SQL_ENABLED.set_for_testing(False)
+  ]
 
-  c = make_logged_in_client(USERNAME, groupname=GROUPNAME, recreate=True, is_superuser=False)
+  try:
+    c = make_logged_in_client(USERNAME, groupname=GROUPNAME, recreate=True, is_superuser=False)
+    user = rewrite_user(User.objects.get(username=USERNAME))
 
-  # Reset all perms
-  GroupPermission.objects.filter(group__name=GROUPNAME).delete()
+    # Reset all perms
+    GroupPermission.objects.filter(group__name=GROUPNAME).delete()
 
-  def check_app(status_code, app_name):
-    if app_name in DESKTOP_APPS:
-      assert_equal(
-          status_code,
-          c.get('/' + app_name, follow=True).status_code,
-          'status_code=%s app_name=%s' % (status_code, app_name))
+    def check_app(status_code, app_name):
+      if app_name in DESKTOP_APPS:
+        assert_equal(
+            status_code,
+            c.get('/' + app_name, follow=True).status_code,
+            'status_code=%s app_name=%s' % (status_code, app_name))
 
-  # Access to nothing
-  check_app(401, 'beeswax')
-  check_app(401, 'impala')
-  check_app(401, 'hbase')
+    # Access to nothing
+    check_app(401, 'beeswax')
+    check_app(401, 'impala')
+    check_app(401, 'hbase')
+    check_app(401, 'pig')
+    check_app(401, 'oozie')
 
-  # Add access to beeswax
-  grant_access(USERNAME, GROUPNAME, "beeswax")
-  check_app(200, 'beeswax')
-  check_app(401, 'impala')
-  check_app(401, 'hbase')
+    apps = ClusterConfig(user=user).get_apps()
+    assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('browser' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('dashboard' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('sdkapps' in apps, apps)
 
-  # Add access to hbase
-  grant_access(USERNAME, GROUPNAME, "hbase")
-  check_app(200, 'beeswax')
-  check_app(401, 'impala')
-  check_app(200, 'hbase')
+    # Add access to beeswax
+    grant_access(USERNAME, GROUPNAME, "beeswax")
+    check_app(200, 'beeswax')
+    check_app(401, 'impala')
+    check_app(401, 'hbase')
+    check_app(401, 'pig')
+    check_app(401, 'oozie')
 
-  # Reset all perms
-  GroupPermission.objects.filter(group__name=GROUPNAME).delete()
-  check_app(401, 'beeswax')
-  check_app(401, 'impala')
-  check_app(401, 'hbase')
+    apps = ClusterConfig(user=user).get_apps()
+    assert_true('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('browser' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('dashboard' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('sdkapps' in apps, apps)
 
-  # Test only impala perm
-  grant_access(USERNAME, GROUPNAME, "impala")
-  check_app(401, 'beeswax')
-  check_app(200, 'impala')
-  check_app(401, 'hbase')
+    # Add access to hbase
+    grant_access(USERNAME, GROUPNAME, "hbase")
+    check_app(200, 'beeswax')
+    check_app(401, 'impala')
+    check_app(200, 'hbase')
+    check_app(401, 'pig')
+    check_app(401, 'oozie')
+
+    apps = ClusterConfig(user=user).get_apps()
+    assert_true('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_true('browser' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_true('hbase' in apps['browser']['interpreter_names'], apps['browser'])
+    assert_false('dashboard' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('sdkapps' in apps, apps)
+
+    # Reset all perms
+    GroupPermission.objects.filter(group__name=GROUPNAME).delete()
+    check_app(401, 'beeswax')
+    check_app(401, 'impala')
+    check_app(401, 'hbase')
+    check_app(401, 'pig')
+    check_app(401, 'oozie')
+
+    apps = ClusterConfig(user=user).get_apps()
+    assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('browser' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('dashboard' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('sdkapps' in apps, apps)
+
+    # Test only impala perm
+    grant_access(USERNAME, GROUPNAME, "impala")
+    check_app(401, 'beeswax')
+    check_app(200, 'impala')
+    check_app(401, 'hbase')
+    check_app(401, 'pig')
+    check_app(401, 'oozie')
+
+    apps = ClusterConfig(user=user).get_apps()
+    assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_true('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_false('browser' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('dashboard' in apps, apps)
+    assert_false('scheduler' in apps, apps)
+    assert_false('sdkapps' in apps, apps)
+
+    # Oozie Editor and Browser
+    grant_access(USERNAME, GROUPNAME, "oozie")
+    check_app(401, 'beeswax')
+    check_app(200, 'impala')
+    check_app(401, 'hbase')
+    check_app(401, 'pig')
+    check_app(200, 'oozie')
+
+    apps = ClusterConfig(user=user).get_apps()
+    assert_true('scheduler' in apps, apps)
+    assert_false('browser' in apps, apps) # Actually should be true, but logic not implemented
+
+    grant_access(USERNAME, GROUPNAME, "pig")
+    check_app(401, 'beeswax')
+    check_app(200, 'impala')
+    check_app(401, 'hbase')
+    check_app(200, 'pig')
+    check_app(200, 'oozie')
+
+    apps = ClusterConfig(user=user).get_apps()
+    assert_false('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_true('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
+    assert_true('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
+  finally:
+    for f in resets:
+      f()
 
 
 def test_error_handling_failure():
