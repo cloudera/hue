@@ -279,6 +279,9 @@ var EditorViewModel = (function() {
 
     // Ace stuff
     self.ace = ko.observable(null);
+    self.ace.subscribe(function () {
+      self.ace().focus();
+    });
     self.errors = ko.observableArray([]);
 
     self.aceErrorsHolder = ko.observableArray([]);
