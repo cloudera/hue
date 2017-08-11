@@ -24,6 +24,7 @@
     it('should suggest facets for "|"', function () {
       testParser('', '', {
         suggestFacets: true,
+        suggestResults: true,
         facets: [ ]
       });
     });
@@ -31,7 +32,15 @@
     it('should suggest facets for "TAGS: asdf |"', function () {
       testParser('TAGS: asdf ', '', {
         suggestFacets: true,
+        suggestResults: true,
         facets: [ 'TAGS' ]
+      });
+    });
+
+    it('should suggest facet values for "type:table tags:"', function() {
+      testParser('type:table tags: ', '', {
+        suggestFacetValues: 'tags',
+        facets: ['type']
       });
     });
 

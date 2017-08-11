@@ -46,7 +46,7 @@
 
 <doubleQuote>\"                                 { this.popState(); return 'QUOTE'; }
 
-[^"'\u2020]+                                    { return 'TEXT'; }
+[^"'\s\u2020]+                                    { return 'TEXT'; }
 
 <<EOF>>                                         { return 'EOF'; }
 
@@ -126,7 +126,7 @@ FreeText
  ;
 
 FreeText_EDIT
- : 'CURSOR'             --> { suggestFacets: true }
+ : 'CURSOR'             --> { suggestFacets: true, suggestResults: true }
  | QuotedValue_EDIT
  ;
 
