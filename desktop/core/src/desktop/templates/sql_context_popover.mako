@@ -1356,8 +1356,9 @@ from metadata.conf import has_navigator
         var self = this;
         self.contents = undefined;
 
+        self.disposals = [];
 
-        self.showInAssistEnabled = false; // TODO: enable show in assist and fix the pubsubs for metastore etc.
+        self.showInAssistEnabled = true;
 
         self.isDatabase = params.data.type.toLowerCase() === 'database';
         self.isTable = params.data.type.toLowerCase() === 'table';
@@ -1372,8 +1373,18 @@ from metadata.conf import has_navigator
 
         var adaptedData = { identifierChain: [] };
 
-        params.data.originalName.split('.').forEach(function (part) {
+        var path = params.data.originalName.split('.');
+        path.forEach(function (part) {
           adaptedData.identifierChain.push({ name: part });
+        });
+
+        var metastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function () {
+          huePubSub.publish('open.link', '/metastore/table' + (self.isTable ? '/' : 's/') + path.join('/'));
+          params.globalSearch.close();
+        });
+
+        self.disposals.push(function () {
+          metastorePubSub.remove();
         });
 
 
@@ -1387,6 +1398,13 @@ from metadata.conf import has_navigator
           self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', true, false);
         }
 
+      };
+
+      SqlContextContentsGlobalSearch.prototype.dispose = function () {
+        var self = this;
+        self.disposals.forEach(function (dispose) {
+          dispose();
+        })
       };
 
       ko.components.register('sql-context-contents-global-search', {
