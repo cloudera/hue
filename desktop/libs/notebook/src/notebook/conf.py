@@ -52,11 +52,22 @@ def get_ordered_interpreters(user=None):
   interpreters = INTERPRETERS.get()
   interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
 
-  unknown_interpreters = set(interpreters_shown_on_wheel) - set(interpreters)
-  if unknown_interpreters:
-      raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
+  user_apps = appmanager.get_apps_dict(user)
+  user_interpreters = []
+  for interpreter in interpreters:
+    if (interpreter == 'hive' and 'beeswax' not in user_apps) or \
+        (interpreter == 'impala' and 'impala' not in user_apps) or \
+        (interpreter == 'pig' and 'pig' not in user_apps) or \
+        (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps):
+      pass # Not allowed
+    else:
+      user_interpreters.append(interpreter)
 
-  reordered_interpreters = interpreters_shown_on_wheel + [i for i in interpreters if i not in interpreters_shown_on_wheel]
+  unknown_interpreters = set(interpreters_shown_on_wheel) - set(user_interpreters)
+  if unknown_interpreters:
+    raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
+
+  reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
 
   return [{
       "name": interpreters[i].NAME.get(),
