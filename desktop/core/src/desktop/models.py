@@ -42,7 +42,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from settings import HUE_DESKTOP_VERSION
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
+from dashboard.conf import get_engines
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
@@ -1680,9 +1680,9 @@ class ClusterConfig():
       return None
 
   def _get_dashboard(self):
-    interpreters = [] # TODO Integrate SQL Dashboards and Solr 6 configs
+    interpreters = get_engines(self.user)
 
-    if IS_DASHBOARD_ENABLED.get() and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if interpreters and (self.cluster_type not in (DATAENG, IMPALAUI)):
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),

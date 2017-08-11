@@ -123,7 +123,7 @@ ${ hueIcons.symbols() }
           </a>
           <!-- /ko -->
           <!-- /ko -->
-          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1">
+          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1 || (quickCreateActions().length == 1 && quickCreateActions()[0].children && quickCreateActions()[0].children.length > 1)">
             <!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko -->
             <span class="caret"></span>
           </button>
