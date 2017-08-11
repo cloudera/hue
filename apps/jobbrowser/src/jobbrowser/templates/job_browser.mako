@@ -1837,6 +1837,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.fetchLogs = function (name) {
+        self.logs('');
         $.post("/jobbrowser/api/job/logs", {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
