@@ -2142,8 +2142,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var activeLocationsSub = huePubSub.subscribe('editor.active.locations', handleLocationUpdate);
 
         var activeRisksSub = huePubSub.subscribe('editor.active.risks', function (details) {
-          self.activeRisks(details.risks);
-          self.activeEditor(details.editor);
+          if (details.risks !== self.activeRisks()) {
+            self.activeRisks(details.risks);
+            self.activeEditor(details.editor);
+          }
         });
 
         huePubSub.publish('editor.get.active.risks', function (details) {

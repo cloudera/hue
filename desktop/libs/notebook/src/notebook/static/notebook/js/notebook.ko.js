@@ -1012,8 +1012,58 @@ var EditorViewModel = (function() {
     if (HAS_OPTIMIZER && ! vm.isNotificationManager()) {
       var lastComplexityRequest;
       var lastCheckedComplexityStatement;
+      var knownResponses = [];
 
       self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 2000 } });
+
+      var handleRiskResponse = function(data) {
+        if (data.status == 0) {
+          self.hasSuggestion('');
+          self.complexity(data.query_complexity);
+        } else {
+          self.hasSuggestion('error');
+          self.complexity({'hints': []});
+        }
+        huePubSub.publish('editor.active.risks', {
+          editor: self.ace(),
+          risks: self.complexity() || {}
+        });
+        lastCheckedComplexityStatement = self.statement();
+      };
+
+      var clearActiveRisks = function () {
+        if (self.hasSuggestion() !== null && typeof self.hasSuggestion() !== 'undefined') {
+          self.hasSuggestion(null);
+        }
+
+        if (self.suggestion() !== '') {
+          self.suggestion('');
+        }
+
+        if (self.complexity() !== {}) {
+          self.complexity(undefined);
+          huePubSub.publish('editor.active.risks', {
+            editor: self.ace(),
+            risks: {}
+          });
+        }
+      };
+
+      self.positionStatement.subscribe(function (newStatement) {
+        if (newStatement) {
+          var hash = newStatement.statement.hashCode();
+          var unknownResponse = knownResponses.every(function (knownResponse) {
+            if (knownResponse.hash === hash) {
+              handleRiskResponse(knownResponse.data);
+              return false;
+            }
+            return true;
+          });
+          if (unknownResponse) {
+            clearActiveRisks();
+          }
+        }
+      });
 
       self.checkComplexity = function () {
         if (lastCheckedComplexityStatement === self.statement()) {
@@ -1023,45 +1073,46 @@ var EditorViewModel = (function() {
         self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
 
         hueAnalytics.log('notebook', 'get_query_risk');
-        self.hasSuggestion(null);
-        self.complexity({});
-        huePubSub.publish('editor.active.risks', {
-          editor: self.ace(),
-          risks: {}
-        });
+        clearActiveRisks();
 
         var changeSubscription = self.statement.subscribe(function () {
           changeSubscription.dispose();
           self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
         });
 
-        lastComplexityRequest = $.ajax({
-          type: 'POST',
-          url: '/notebook/api/optimizer/statement/risk',
-          timeout: 30000, // 30 seconds
-          data: {
-            notebook: ko.mapping.toJSON(notebook.getContext()),
-            snippet: ko.mapping.toJSON(self.getContext())
-          },
-          success: function(data) {
-            if (data.status == 0) {
-              self.hasSuggestion('');
-              self.complexity(data.query_complexity);
-            } else {
-              self.hasSuggestion('error');
-              self.complexity({'hints': []});
-            }
-            huePubSub.publish('editor.active.risks', {
-              editor: self.ace(),
-              risks: self.complexity() || {}
-            });
-            lastCheckedComplexityStatement = self.statement();
-          },
-          always: function(data) {
-            changeSubscription.dispose();
-          }
-        });
+        var hash = self.statement().hashCode();
 
+        var unknownResponse = knownResponses.every(function (knownResponse) {
+          if (knownResponse.hash === hash) {
+            handleRiskResponse(knownResponse.data);
+            return false;
+          }
+          return true;
+        });
+        if (unknownResponse) {
+          lastComplexityRequest = $.ajax({
+            type: 'POST',
+            url: '/notebook/api/optimizer/statement/risk',
+            timeout: 30000, // 30 seconds
+            data: {
+              notebook: ko.mapping.toJSON(notebook.getContext()),
+              snippet: ko.mapping.toJSON(self.getContext())
+            },
+            success: function (data) {
+              knownResponses.unshift({
+                hash: hash,
+                data: data
+              });
+              if (knownResponses.length > 50) {
+                knownResponses.pop();
+              }
+              handleRiskResponse(data);
+            },
+            always: function(data) {
+              changeSubscription.dispose();
+            }
+          });
+        }
       };
 
       if (self.type() === 'hive' || self.type() === 'impala') {
