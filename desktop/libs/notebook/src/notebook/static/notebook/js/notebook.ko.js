@@ -1415,6 +1415,7 @@ var EditorViewModel = (function() {
       hueAnalytics.log('notebook', 'compatibility');
       self.compatibilityCheckRunning(targetPlatform != self.type());
       self.hasSuggestion(null);
+      var positionStatement = self.positionStatement();
 
       lastCompatibilityRequest = $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
@@ -1428,9 +1429,17 @@ var EditorViewModel = (function() {
           self.suggestion(ko.mapping.fromJS(data.query_compatibility));
           if (self.suggestion().queryError.errorString()) {
             var match = ERROR_REGEX.exec(self.suggestion().queryError.errorString());
+            var line = null;
+            if (match) {
+              if (positionStatement) {
+                line = positionStatement.location.first_line + parseInt(match[1]) + 1;
+              } else {
+                line = parseInt(match[1]) - 1
+              }
+            }
             self.aceWarningsHolder.push({
               message: self.suggestion().queryError.errorString(),
-              line: match === null ? null : parseInt(match[1]) - 1,
+              line: line,
               col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
             });
             self.status('with-optimizer-report');
