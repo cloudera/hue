@@ -651,7 +651,11 @@ def add_ldap_groups(request):
           unique_users = set(failed_ldap_users)
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-        return redirect(reverse(list_groups))
+        if is_embeddable:
+          return JsonResponse({'url': '/hue' + reverse(list_groups)})
+        else:
+          return redirect(reverse(list_groups))
+
       else:
         errors = form._errors.setdefault('groupname_pattern', ErrorList())
         errors.append(_('Could not get LDAP details for groups in pattern %s') % groupname_pattern)
