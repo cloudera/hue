@@ -630,7 +630,7 @@ from desktop.views import _ko
   <script type="text/html" id="hue-global-search-template">
     <div class="global-search-input-container">
       <div>
-        <input class="global-search-input" type="text" data-bind="attr: { 'placeHolder' : searchHasFocus() ? '' : '${ _ko('Search data and saved documents...') }' }, textInput: searchInput, hasFocus: searchHasFocus">
+        <input class="global-search-input" type="text" data-bind="attr: { 'placeHolder' : searchHasFocus() ? '' : '${ _ko('Search data and saved documents...') }' }, textInput: searchInput, hasFocus: searchHasFocus, clearable: { value: searchInput, onClear: function () { inlineAutocomplete(''); searchResultVisible(false); } }">
         <input class="global-search-autocomplete" disabled type="text" data-bind="value: inlineAutocomplete">
       </div>
     </div>
