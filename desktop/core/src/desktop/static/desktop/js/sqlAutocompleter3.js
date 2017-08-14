@@ -1146,7 +1146,10 @@ var AutocompleteResults = (function () {
           var joinSuggestions = [];
           var totalCount = 0;
           data.values.forEach(function (value) {
-            var suggestionString = suggestJoins.prependJoin ? (self.parseResult.lowerCase ? 'join ' : 'JOIN ') : '';
+
+            var joinType = value.joinType || 'join';
+            joinType += ' ';
+            var suggestionString = suggestJoins.prependJoin ? (self.parseResult.lowerCase ? joinType.toLowerCase() : joinType.toUpperCase()) : '';
             var first = true;
 
             var existingTables = {};
