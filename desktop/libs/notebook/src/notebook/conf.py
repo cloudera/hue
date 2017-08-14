@@ -44,6 +44,14 @@ SHOW_NOTEBOOKS = Config(
 def _remove_duplications(a_list):
   return list(OrderedDict.fromkeys(a_list))
 
+def check_permissions(user, interpreter):
+  user_apps = appmanager.get_apps_dict(user)
+  return (interpreter == 'hive' and 'beeswax' not in user_apps) or \
+         (interpreter == 'impala' and 'impala' not in user_apps) or \
+         (interpreter == 'pig' and 'pig' not in user_apps) or \
+         (interpreter == 'solr' and 'search' not in user_apps) or \
+         (interpreter in ('spark', 'pyspark', 'r', 'jar', 'py') and 'spark' not in user_apps) or \
+         (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 def get_ordered_interpreters(user=None):
   if not INTERPRETERS.get():
@@ -52,13 +60,9 @@ def get_ordered_interpreters(user=None):
   interpreters = INTERPRETERS.get()
   interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
 
-  user_apps = appmanager.get_apps_dict(user)
   user_interpreters = []
   for interpreter in interpreters:
-    if (interpreter == 'hive' and 'beeswax' not in user_apps) or \
-        (interpreter == 'impala' and 'impala' not in user_apps) or \
-        (interpreter == 'pig' and 'pig' not in user_apps) or \
-        (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps):
+    if (check_permissions(user, interpreter)):
       pass # Not allowed
     else:
       user_interpreters.append(interpreter)
