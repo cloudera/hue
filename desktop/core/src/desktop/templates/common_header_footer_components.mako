@@ -108,7 +108,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     };
 
     // jHue plugins global configuration
-    jHueFileChooserGlobals = {
+    var jHueFileChooserGlobals = {
       labels: {
         BACK: "${_('Back')}",
         SELECT_FOLDER: "${_('Select this folder')}",
@@ -122,7 +122,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       user: "${ user.username }"
     };
 
-    jHueHdfsTreeGlobals = {
+    var jHueHdfsTreeGlobals = {
       labels: {
         CREATE_FOLDER: "${_('Create folder')}",
         FOLDER_NAME: "${_('Folder name')}",
@@ -130,7 +130,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    jHueTableExtenderGlobals = {
+    var jHueTableExtenderGlobals = {
       labels: {
         GO_TO_COLUMN: "${_('Go to column:')}",
         PLACEHOLDER: "${_('column name...')}",
@@ -140,12 +140,12 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    LeafletGlobals = {
+    var LeafletGlobals = {
       layer: '${ leaflet['layer'] |n,unicode }',
       attribution: '${ leaflet['attribution'] |n,unicode }'
     };
 
-    ApiHelperGlobals = {
+    var ApiHelperGlobals = {
       i18n: {
         errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
         errorLoadingTablePreview: '${ _('There was a problem loading the preview') }'
@@ -153,7 +153,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       user: '${ user.username }'
     };
 
-    DropzoneGlobals = {
+    var DropzoneGlobals = {
       homeDir: '${ user.get_home_directory() if not user.is_anonymous() else "" }',
       i18n: {
         cancelUpload: '${ _('Cancel upload') }',
@@ -162,7 +162,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    MetastoreGlobals = {
+    var MetastoreGlobals = {
       partitionsLimit: ${ hasattr(LIST_PARTITIONS_LIMIT, 'get') and LIST_PARTITIONS_LIMIT.get() or 1000 },
       i18n: {
         errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
@@ -171,7 +171,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    AutocompleterGlobals = {
+    var AutocompleterGlobals = {
       i18n: {
         category: {
           all: '${ _('All') }',
@@ -206,10 +206,17 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    QueryBuilderGlobals = {
+    var QueryBuilderGlobals = {
       i18n: {
         INSERT_VALUE_HERE: "${ _('Insert value here') }",
         QUERY_REQUIRE: "${ _('Query requires a select or aggregate.') }"
+      }
+    }
+
+    var CopyToClipboardGlobals = {
+      i18n: {
+        ERROR: "${ _('Error while copying results.') }",
+        SUCCESS: "${ _('Results copied successfully to the clipboard') }",
       }
     }
   </script>
