@@ -853,8 +853,8 @@ from desktop.views import _ko
         if (partial !== '' && self.lastResult.suggestResults && !newAutocomplete) {
           self.searchResultCategories().every(function (category) {
             return category.result.every(function (entry) {
-              if (category.type === 'documents' && entry.label.toLowerCase().indexOf(partialLower) === 0) {
-                newAutocomplete = self.lastNonPartial + partial + entry.label.substring(partial.length, entry.label.length);
+              if (category.type === 'documents' && entry.data.originalName.toLowerCase().indexOf(partialLower) === 0) {
+                newAutocomplete = self.lastNonPartial + partial + entry.data.originalName.substring(partial.length, entry.data.originalName.length);
                 return false;
               } else if (entry.data.selectionName && entry.data.selectionName.toLowerCase().indexOf(partialLower) === 0) {
                 newAutocomplete = self.lastNonPartial + partial + entry.data.selectionName.substring(partial.length, entry.data.selectionName.length);
