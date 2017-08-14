@@ -1178,7 +1178,7 @@ var AutocompleteResults = (function () {
                 if (!first) {
                   suggestionString += self.parseResult.lowerCase ? ' and ' : ' AND ';
                 }
-                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoins.tables) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoins.tables);
+                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoins.tables, self.snippet.type()) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoins.tables, self.snippet.type());
                 first = false;
               });
               totalCount += value.totalQueryCount;
@@ -1675,7 +1675,7 @@ var AutocompleteResults = (function () {
     return navOptColumn.columnName;
   };
 
-  AutocompleteResults.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, tables) {
+  AutocompleteResults.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, tables, type) {
     var self = this;
     var aliases = [];
     var tablesHasDefaultDatabase = false;
@@ -1694,7 +1694,17 @@ var AutocompleteResults = (function () {
       }
     }
 
-    return qualifiedIdentifier.toLowerCase().indexOf(self.activeDatabase.toLowerCase()) === 0 && !tablesHasDefaultDatabase ? qualifiedIdentifier.substring(self.activeDatabase.length + 1) : qualifiedIdentifier;
+    if (qualifiedIdentifier.toLowerCase().indexOf(self.activeDatabase.toLowerCase()) === 0 && !tablesHasDefaultDatabase) {
+      return qualifiedIdentifier.substring(self.activeDatabase.length + 1);
+    }
+    if (type === 'hive') {
+      // Remove DB reference if given for Hive
+      var parts = qualifiedIdentifier.split('.');
+      if (parts.length > 2) {
+        return parts.slice(1).join('.')
+      }
+    }
+    return qualifiedIdentifier;
   };
 
   /**
