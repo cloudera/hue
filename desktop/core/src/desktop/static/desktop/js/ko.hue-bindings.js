@@ -3748,7 +3748,7 @@
           };
           token.notFound = true;
 
-          if (token.parseLocation.type === 'table') {
+          if (token.parseLocation && token.parseLocation.type === 'table') {
             ApiHelper.getInstance().identifierChainToPath({
               identifierChain: token.parseLocation.identifierChain,
               sourceType: self.snippet.type(),
