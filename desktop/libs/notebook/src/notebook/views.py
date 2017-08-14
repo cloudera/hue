@@ -35,7 +35,7 @@ from metadata.conf import has_optimizer, has_navigator
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
 from notebook.connectors.base import Notebook, get_api, _get_snippet_name
 from notebook.connectors.spark_shell import SparkApi
-from notebook.decorators import check_document_access_permission, check_document_modify_permission
+from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook
 
@@ -96,7 +96,7 @@ def notebook(request, is_embeddable=False):
 def notebook_embeddable(request):
   return notebook(request, True)
 
-
+@check_editor_access_permission()
 @check_document_access_permission()
 def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
