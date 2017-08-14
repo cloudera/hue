@@ -146,7 +146,7 @@ ${ fb_components.menubar() }
             <!-- /ko -->
             <!-- ko hueSpinner: { spin: !$root.file() && isLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
             <!-- ko if: $root.isViewing -->
-            <div id="fileArea" data-bind="css: {'loading': isLoading}, visible: $root.file() && $root.file().stats.size()">
+            <div id="fileArea" data-bind="css: {'loading': isLoading}, visible: $root.file() && $root.file().stats.size()" class="monospace" >
               <!-- ko hueSpinner: { spin: isLoading, center: true, size: 'xlarge' } --><!-- /ko -->
               <pre></pre>
               <table class="binary">
