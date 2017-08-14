@@ -456,6 +456,34 @@ var EditorViewModel = (function() {
       }
     };
 
+    self.clipboardClass = ko.pureComputed(function () {
+      return 'snippet-side-btn clipboard' + self.id().split('-')[0];
+    });
+
+    var clipboard = new Clipboard('.clipboard' + self.id().split('-')[0], {
+      text: function () {
+        if (self.result && self.result.data()) {
+          var data = self.result.data();
+          var result = '';
+          data.forEach(function (row) {
+            for (var i = 1; i < row.length; i++) { // skip the row number column
+              result += hueUtils.html2text(row[i]) + '\t';
+            }
+            result += '\n';
+          });
+          return result;
+        }
+        else {
+          return CopyToClipboardGlobals.i18n.ERROR;
+        }
+      }
+    });
+
+    clipboard.on('success', function (e) {
+      $.jHueNotify.info(CopyToClipboardGlobals.i18n.SUCCESS)
+      e.clearSelection();
+    });
+
     self.isSqlDialect.subscribe(updateDatabases);
     updateDatabases();
 

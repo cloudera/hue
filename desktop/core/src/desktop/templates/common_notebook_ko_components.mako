@@ -197,11 +197,6 @@ except ImportError, e:
         </li>
         % endif
         <li>
-          <a data-bind="css: clipboardClass" title="${ _('Copy the displayed results in your clipboard') }">
-            <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
-          </a>
-        </li>
-        <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
             <i class="fa fa-fw fa-save"></i> ${ _('Save') }
           </a>
@@ -344,34 +339,6 @@ except ImportError, e:
 
         self.isValidDestination = ko.pureComputed(function () {
           return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.savePath()));
-        });
-
-        self.clipboardClass = ko.pureComputed(function () {
-          return 'download pointer clipboard' + self.snippet.id().split('-')[0];
-        });
-
-        var clipboard = new Clipboard('.clipboard' + self.snippet.id().split('-')[0], {
-          text: function () {
-            if (self.snippet.result && self.snippet.result.data()) {
-              var data = self.snippet.result.data();
-              var result = '';
-              data.forEach(function (row) {
-                for (var i = 1; i < row.length; i++) { // skip the row number column
-                  result += hueUtils.html2text(row[i]) + '\t';
-                }
-                result += '\n';
-              });
-              return result;
-            }
-            else {
-              return '${_('Error while copying results.') }';
-            }
-          }
-        });
-
-        clipboard.on('success', function (e) {
-          $.jHueNotify.info('${_('Results copied successfully to the clipboard') }')
-          e.clearSelection();
         });
 
         self.trySaveResults = function () {
