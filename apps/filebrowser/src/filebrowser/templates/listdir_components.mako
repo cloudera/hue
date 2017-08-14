@@ -1383,6 +1383,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
           updateHash(stripHashes(file.path));
         } else {
+          
           %if is_embeddable:
           huePubSub.publish('open.link', file.url);
           %else:
@@ -2573,10 +2574,15 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         home: "/user/${ user }/",
         skipKeydownEvents: true,
         onEnter: function (el) {
+          console.log("test");
           viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(el.val()));
           viewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
+              %if is_embeddable:
+              huePubSub.publish('open.link', data.url);
+              %else:
               window.location.href = data.url;
+              %endif
               return false;
             } else {
               updateHash(stripHashes(el.val()));
