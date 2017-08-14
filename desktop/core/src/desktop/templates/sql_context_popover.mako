@@ -235,7 +235,7 @@ from metadata.conf import has_navigator
     <!-- ko if: typeof details !== 'undefined' -->
     <div class="sql-context-flex-fill" data-bind="with: details, niceScroll">
       <div style="padding: 8px">
-        <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre; font-family: monospace;" data-bind="text: signature"></span></p>
+        <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre;" class="monospace" data-bind="text: signature"></span></p>
         <p><span data-bind="text: description"></span></p>
       </div>
     </div>
