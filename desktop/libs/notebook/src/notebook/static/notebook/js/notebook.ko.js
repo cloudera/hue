@@ -592,7 +592,11 @@ var EditorViewModel = (function() {
         }
       }, 100);
     });
-
+    if (snippet && snippet.variable) {
+      snippet.variables.forEach(function (variable) {
+        variable.defaultValue = variable.defaultValue || '';
+      });
+    }
     self.variables = ko.mapping.fromJS(typeof snippet.variables != "undefined" && snippet.variables != null ? snippet.variables : []);
     self.variables.subscribe(function (newValue) {
       $(document).trigger("updateResultHeaders", self);
@@ -658,53 +662,67 @@ var EditorViewModel = (function() {
 
       return params;
     };
+    self.updated = ko.observable(true);
     self.variableNames = ko.computed(function () {
       if (self.type() == 'pig') {
         return Object.keys(self.getPigParameters());
       } else {
-        var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
+        var re = /(?:^|\W)\${(\w*\=?\w*)(?!\w)}/g;
 
-        var match, matches = [];
+        var match, matches = {};
         while (match = re.exec(self.statement_raw())) {
-          if (matches.indexOf(match[1]) == -1) {
-            matches.push(match[1]);
-          }
+          if (match[1].indexOf('=') > -1) {
+              var splittedName = match[1].split('=');
+              matches[splittedName[0]] = matches[splittedName[0]] || splittedName[1];
+            }
+            else {
+              matches[match[1]] = '';
+            }
         }
-        return matches;
+        return Object.keys(matches).map(function(match){
+          return {name:match, defaultValue:matches[match]};
+        });
       }
     });
     self.variableNames.extend({ rateLimit: 150 });
     self.variableNames.subscribe(function (newVal) {
       var toDelete = [];
       var toAdd = [];
-
+      var toUpdate = [];
       if (newVal.length == self.variables().length) { // Just rename one of the variable
         $.each(newVal, function(i, item) {
-          self.variables()[i].name(newVal[i]);
+          self.variables()[i].name(item.name);
+          self.variables()[i].defaultValue(item.defaultValue);
         });
       } else {
-        $.each(newVal, function (key, name) {
+        $.each(newVal, function (key, item) {
+          var name = item.name;
           var match = ko.utils.arrayFirst(self.variables(), function (_var) {
             return _var.name() == name;
           });
           if (! match) {
-            toAdd.push(name);
+            toAdd.push(item);
+          } else {
+            toUpdate.push(item);
           }
         });
         $.each(self.variables(), function (key, _var) {
-          var match = ko.utils.arrayFirst(newVal, function (name) {
-            return _var.name() == name;
+          var match = ko.utils.arrayFirst(newVal, function (item) {
+            return _var.name() == item.name;
           });
           if (! match) {
             toDelete.push(_var);
           }
         });
-
+        $.each(toUpdate, function (i, item) {
+          self.variables()[i].name(item.name);
+          self.variables()[i].defaultValue(item.defaultValue);
+        });
         $.each(toDelete, function (index, item) {
-          self.variables.remove(item);
+          self.variables.remove(item.name);
         });
         $.each(toAdd, function (index, item) {
-          self.variables.push(ko.mapping.fromJS({'name': item, 'value': ''}));
+          self.variables.push(ko.mapping.fromJS({'name': item.name, 'value': '', defaultValue: item.defaultValue}));
         });
       }
 
@@ -719,7 +737,7 @@ var EditorViewModel = (function() {
     self.statement = ko.computed(function () {
       var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
       $.each(self.variables(), function (index, variable) {
-        statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{" : "") + variable.name() + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), "$1" + variable.value());
+        statement = statement.replace(RegExp("([^\\\\])?\\${" + variable.name() + "(=[^}]*)?}", "g"), "$1" + (variable.value() || variable.defaultValue()));
       });
       return statement;
     });
