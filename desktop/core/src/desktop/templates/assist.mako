@@ -322,10 +322,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <!-- ko with: selectedS3Entry -->
     <div class="assist-flex-header assist-breadcrumb" >
       <!-- ko if: parent !== null -->
-      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
+      <a href="javascript: void(0);" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-s3-scrollable' }, click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
-        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'bottom' }"></span>
+        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'top' }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
@@ -464,10 +464,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <!-- ko with: selectedHdfsEntry -->
     <div class="assist-flex-header assist-breadcrumb" >
       <!-- ko if: parent !== null -->
-      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
+      <a href="javascript: void(0);" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-hdfs-scrollable' }, click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
-        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'bottom' }"></span>
+        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'top' }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
@@ -605,10 +605,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <!-- ko with: selectedCollectionEntry -->
     <div class="assist-inner-header assist-breadcrumb">
       <!-- ko if: parent -->
-      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.clickCollectionItem', parent); }">
+      <a href="javascript: void(0);" data-bind="appAwareTemplateContextMenu: { template: 'collections-context-items', scrollContainer: '.assist-collections-scrollable' },click: function () { huePubSub.publish('assist.clickCollectionItem', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-search"></i>
-        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'bottom' }"></span>
+        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'top' }"></span>
       </a>
       <!-- /ko -->
       <!-- ko ifnot: parent -->
