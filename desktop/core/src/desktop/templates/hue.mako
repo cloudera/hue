@@ -1115,7 +1115,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.apiHelper = ApiHelper.getInstance();
         self.leftAssistVisible = ko.observable();
         self.leftAssistVisible.subscribe(function () {
-          huePubSub.publish('split.panel.resized');
+          window.setTimeout(function () {
+            huePubSub.publish('split.panel.resized');
+          }, 0);
         });
 
         self.rightAssistVisible = ko.observable();

@@ -2964,6 +2964,7 @@ var EditorViewModel = (function() {
 
       self.selectedNotebook(notebook);
       huePubSub.publish('check.job.browser');
+      huePubSub.publish('recalculate.name.description.width');
     };
 
     self.openNotebook = function (uuid, queryTab, skipUrlChange, callback) {

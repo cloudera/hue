@@ -349,12 +349,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
             <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
           </li>
-          <li class="query-name no-horiz-padding">
+          <li class="query-name no-horiz-padding skip-width-calculation">
             <a href="javascript:void(0)">
               <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
             </a>
           </li>
-          <li data-bind="tooltip: { placement: 'bottom', title: description }">
+          <li class="skip-width-calculation" data-bind="tooltip: { placement: 'bottom', title: description }">
             <a href="javascript:void(0)">
               <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
             </a>
@@ -1936,8 +1936,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 
   var isLeftNavOpen = false;
-  huePubSub.subscribe('left.nav.open.toggle', function(val) {
+  huePubSub.subscribe('left.nav.open.toggle', function (val) {
     isLeftNavOpen = val;
+  }, HUE_PUB_SUB_EDITOR_ID);
+
+  huePubSub.subscribe('split.panel.resized', function (val) {
+    huePubSub.publish('recalculate.name.description.width');
   }, HUE_PUB_SUB_EDITOR_ID);
 
   var showHoverMsg = function (e) {
@@ -3567,9 +3571,19 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
       forceChartDraws(true);
 
+      huePubSub.subscribe('recalculate.name.description.width', function () {
+        hueUtils.waitForRendered('.editorComponents .hue-title-bar .query-name', function(el){ return el.is(':visible') }, function(){
+          var cumulativeWidth = 0;
+          $('.editorComponents .hue-title-bar ul li:not(.skip-width-calculation)').each(function(){
+            cumulativeWidth += $(this).outerWidth();
+          });
+          $('.notebook-name-desc').css('max-width', (($('.editorComponents .hue-title-bar').width() - cumulativeWidth - $('.editorComponents .hue-title-bar .pull-right').width() - 120)/2) + 'px');
+        });
+      }, HUE_PUB_SUB_EDITOR_ID);
+
       var _resizeTimeout = -1;
       $(window).on("resize", function () {
-        $('.notebook-name-desc').css('max-width', ($('.snippet-container').width()/4) + 'px');
+        huePubSub.publish('recalculate.name.description.width');
         window.clearTimeout(_resizeTimeout);
         _resizeTimeout = window.setTimeout(function () {
           forceChartDraws();
