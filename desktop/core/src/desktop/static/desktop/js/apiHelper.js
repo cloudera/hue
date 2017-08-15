@@ -63,6 +63,8 @@ var ApiHelper = (function () {
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
   var CONFIG_APPS_API = '/desktop/api/configurations';
   var SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
+  var SOLR_FIELDS_API = '/indexer/api/index/list/';
+
   var HBASE_API_PREFIX = '/hbase/api/';
   var SAVE_TO_FILE = '/filebrowser/save';
 
@@ -554,6 +556,55 @@ var ApiHelper = (function () {
         timeout: options.timeout,
         success: function (data) {
           if (!data.error && !self.successResponseIsError(data) && typeof data.collections !== 'undefined' && data.collections !== null) {
+            storeInCache(data);
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      })
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
+    };
+
+    fetchCached.bind(self)($.extend({}, options, {
+      sourceType: 'collections',
+      url: url,
+      fetchFunction: fetchFunction
+    }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {String} options.collectionName
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   *
+   */
+  ApiHelper.prototype.fetchSolrCollection = function (options) {
+    var self = this;
+    var url = SOLR_FIELDS_API;
+    var fetchFunction = function (storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      $.ajax({
+        dataType: "json",
+        url: url,
+        data: {
+          name: options.collectionName
+        },
+        type: 'POST',
+        timeout: options.timeout,
+        success: function (data) {
+          if (!data.error && !self.successResponseIsError(data) && typeof data.schema !== 'undefined' && data.schema !== null) {
             storeInCache(data);
             options.successCallback(data);
           } else {
