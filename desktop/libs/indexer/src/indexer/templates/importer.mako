@@ -61,7 +61,6 @@ ${ assist.assistPanel() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
 %endif
 
-<link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 <link rel="stylesheet" href="${ static('indexer/css/importer.css') }" type="text/css">
 
 <style type="text/css">
@@ -175,6 +174,8 @@ ${ assist.assistPanel() }
           <!-- /ko -->
           </div>
         </li>
+
+        <li class="arrow muted"><i class="fa fa-fw fa-angle-double-right"></i></li>
 
         <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3, 'pointer': currentStep() == 1 && !createWizard.isGuessingFormat() && createWizard.source.show() }, click: function() { if (!createWizard.isGuessingFormat() && createWizard.source.show()){ currentStep(2); }}">
           <div class="step" title="${ _('Go to Step 2') }">

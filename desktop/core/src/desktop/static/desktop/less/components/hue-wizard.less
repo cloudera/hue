@@ -1,0 +1,100 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+@import (reference) "hue-mixins.less";
+@import (reference) "hue-helpers.less";
+
+.step-indicator-fixed {
+  position: fixed;
+  background-color: @cui-white;
+  margin-top: -10px;
+  z-index: 100;
+  padding-top: 10px;
+  ol {
+    margin: 0;
+  }
+}
+
+.step-indicator {
+  border-collapse: separate;
+  display: table;
+  margin-left: 0px;
+  position: relative;
+  table-layout: fixed;
+  vertical-align: middle;
+  width: 100%;
+  li {
+    display: table-cell;
+    float: none;
+    padding: 0;
+    width: 49%;
+  }
+  li.arrow {
+    width: 2%;
+    text-align: center;
+  }
+  .active .step {
+    border-color: @cui-blue-700;
+    color: @cui-blue-700;
+  }
+  .active .caption {
+    color: @cui-blue-700;
+  }
+  .complete .step {
+    border-color: @cui-green-500;
+    color: @cui-green-500;
+  }
+  .complete .caption {
+    color: @cui-green-500;
+  }
+  .error .step {
+    border-color: @cui-red-400;
+    color: @cui-red-400;
+  }
+  .error .caption {
+    color: @cui-red-400;
+  }
+  .active.complete .step {
+    border-color: @cui-blue-700;
+    color: @cui-blue-700;
+  }
+  .active.complete .caption {
+    color: @cui-blue-700;
+  }
+  .inactive .caption {
+    color: @cui-gray-300;
+  }
+  .step {
+    background-color: @cui-white;
+    border: 1px solid @cui-gray-300;
+    color: @cui-gray-300;
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    border-radius: 18px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .caption {
+    box-sizing: border-box;
+    color: @cui-gray-300;
+    padding: 11px 16px;
+  }
+}
+
