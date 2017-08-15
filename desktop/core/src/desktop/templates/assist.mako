@@ -192,8 +192,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   </script>
 
   <script type="text/html" id="collections-context-items">
-    <li><a href="javascript: void(0);" data-bind="click: open"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Browser') }</a></li>
-    <li><a href="javascript: void(0);" data-bind="click: browse"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: openInBrowser"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Browser') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: openInDashboard"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
   </script>
 
   <script type="text/html" id="assist-database-entry">
@@ -604,7 +604,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/html" id="assist-collections-inner-panel">
     <!-- ko with: selectedCollectionEntry -->
     <div class="assist-inner-header assist-breadcrumb">
+      <!-- ko if: parent -->
+      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.clickCollectionItem', parent); }">
+        <i class="fa fa-fw fa-chevron-left"></i>
+        <i class="fa fa-fw fa-search"></i>
+        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'bottom' }"></span>
+      </a>
+      <!-- /ko -->
+      <!-- ko ifnot: parent -->
       ${_('Collections')}
+      <!-- /ko -->
       <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
     </div>
     <div class="assist-flex-table-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0">
@@ -617,15 +626,37 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 22, container: '.assist-collections-scrollable' }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'collections-context-items', scrollContainer: '.assist-collections-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
-            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
-              <i class="fa fa-fw fa-search muted valign-middle"></i>
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name + (definition.type != 'collection' && definition.type != 'alias' ? ' - ' + definition.type : '') }">
+              <!-- ko switch: definition.type -->
+                <!-- ko case: 'collection' -->
+                <i class="fa fa-fw fa-search muted valign-middle"></i>
+                <!-- /ko -->
+                <!-- ko case: 'alias' -->
+                <i class="fa fa-fw fa-eye muted valign-middle"></i>
+                <!-- /ko -->
+                <!-- ko case: $default -->
+                  <!-- ko if: parent.key() === definition.name -->
+                    <i class="fa fa-fw fa-key muted valign-middle"></i>
+                  <!-- /ko -->
+                  <!-- ko ifnot: parent.key() === definition.name -->
+                    <i class="fa fa-fw fa-genderless muted valign-middle"></i>
+                  <!-- /ko -->
+                <!-- /ko -->
+              <!-- /ko -->
               <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
             </a>
           </li>
         </ul>
         <!-- ko if: !loading() && entries().length === 0 -->
         <ul class="assist-tables">
-          <li class="assist-entry"><span class="assist-no-entries">${_('No collections available.')}</span></li>
+          <li class="assist-entry"><span class="assist-no-entries">
+            <!-- ko if: parent -->
+            ${_('No available fields.')}
+            <!-- /ko -->
+            <!-- ko ifnot: parent -->
+            ${_('No available collections.')}
+            <!-- /ko -->
+          </span></li>
         </ul>
         <!-- /ko -->
       </div>
@@ -1359,33 +1390,47 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         };
 
         huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
-          % if ENABLE_NEW_INDEXER.get():
-          if (IS_HUE_4) {
-            huePubSub.publish('open.link', '/indexer/indexes/' + entry.definition.name);
+          if (entry.definition.type === 'collection' || entry.definition.type === 'alias') {
+            entry.loadEntries();
+            self.selectedCollectionEntry(entry);
           }
           else {
-            window.open('/indexer/indexes/' + entry.definition.name);
+            huePubSub.publish('assist.openCollectionItem', entry);
           }
-          % else:
-          var hash = '#edit/' + entry.definition.name;
-          if (IS_HUE_4) {
-            if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
-              window.location.hash = hash;
+        });
+
+        huePubSub.subscribe('assist.openCollectionItem', function (entry) {
+          var definitionName = entry.definition.name;
+          if (entry.parent && entry.parent.definition.name !== '/') {
+            definitionName = entry.parent.definition.name;
+          }
+          % if ENABLE_NEW_INDEXER.get():
+            if (IS_HUE_4) {
+              huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
             }
             else {
-              huePubSub.subscribeOnce('app.gained.focus', function(app){
-                if (app === 'indexes'){
-                  window.setTimeout(function(){
-                    window.location.hash = hash;
-                  }, 0)
-                }
-              });
-              huePubSub.publish('open.link', '/indexer');
+              window.open('/indexer/indexes/' + definitionName);
             }
-          }
-          else {
-            window.open('/indexer/' + hash);
-          }
+          % else:
+            var hash = '#edit/' + definitionName;
+            if (IS_HUE_4) {
+              if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
+                window.location.hash = hash;
+              }
+              else {
+                huePubSub.subscribeOnce('app.gained.focus', function (app) {
+                  if (app === 'indexes') {
+                    window.setTimeout(function () {
+                      window.location.hash = hash;
+                    }, 0)
+                  }
+                });
+                huePubSub.publish('open.link', '/indexer');
+              }
+            }
+            else {
+              window.open('/indexer/' + hash);
+            }
           % endif
         });
 

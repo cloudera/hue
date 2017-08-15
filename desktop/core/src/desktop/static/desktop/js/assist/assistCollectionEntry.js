@@ -29,6 +29,8 @@ var AssistCollectionEntry = (function () {
     self.definition = options.definition;
     self.apiHelper = options.apiHelper;
     self.path = self.definition.name;
+    self.parent = options.parent;
+    self.key = ko.observable(options.key);
     self.filter = filter;
     self.showCores = showCores;
 
@@ -69,12 +71,25 @@ var AssistCollectionEntry = (function () {
     self.hasErrors(false);
 
     var successCallback = function(data) {
-      self.entries($.map(data.collections, function (collection) {
-        return new AssistCollectionEntry({
-          definition: collection,
-          apiHelper: self.apiHelper
-        }, self.filter, self.showCores)
-      }));
+      if (data.collections) {
+        self.entries($.map(data.collections, function (collection) {
+          return new AssistCollectionEntry({
+            definition: collection,
+            parent: self,
+            apiHelper: self.apiHelper
+          }, self.filter, self.showCores)
+        }));
+      }
+      else if (data.schema && data.schema.fields) {
+        self.key(data.schema.uniqueKey);
+        self.entries($.map(data.schema.fields, function (field) {
+          return new AssistCollectionEntry({
+            definition: field,
+            parent: self,
+            apiHelper: self.apiHelper
+          }, self.filter, self.showCores)
+        }));
+      }
       self.loaded = true;
       self.loading(false);
       if (callback) {
@@ -90,18 +105,32 @@ var AssistCollectionEntry = (function () {
       }
     };
 
-    self.apiHelper.fetchSolrCollections({
-      successCallback: successCallback,
-      errorCallback: errorCallback
-    })
+    if (self.path === '/') {
+      self.apiHelper.fetchSolrCollections({
+        successCallback: successCallback,
+        errorCallback: errorCallback
+      });
+    }
+    else {
+      self.apiHelper.fetchSolrCollection({
+        collectionName: self.definition.name,
+        successCallback: successCallback,
+        errorCallback: errorCallback
+      });
+    }
+
   };
 
-  AssistCollectionEntry.prototype.open = function () {
-    huePubSub.publish('assist.clickCollectionItem', this);
+  AssistCollectionEntry.prototype.openInBrowser = function () {
+    huePubSub.publish('assist.openCollectionItem', this);
   };
 
-  AssistCollectionEntry.prototype.browse = function () {
-    huePubSub.publish('open.link', '/hue/search/browse/' + this.definition.name);
+  AssistCollectionEntry.prototype.openInDashboard = function () {
+    var definitionName = this.definition.name;
+    if (this.parent && this.parent.definition.name !== '/') {
+      definitionName = this.parent.definition.name;
+    }
+    huePubSub.publish('open.link', '/hue/search/browse/' + definitionName);
   };
 
   AssistCollectionEntry.prototype.click = function () {
