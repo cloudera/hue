@@ -688,7 +688,7 @@ var EditorViewModel = (function() {
     self.variableNames.subscribe(function (newVal) {
       var toDelete = [];
       var toAdd = [];
-
+      var toUpdate = [];
       if (newVal.length == self.variables().length) { // Just rename one of the variable
         $.each(newVal, function(i, item) {
           self.variables()[i].name(item.name);
@@ -702,6 +702,8 @@ var EditorViewModel = (function() {
           });
           if (! match) {
             toAdd.push(item);
+          } else {
+            toUpdate.push(item);
           }
         });
         $.each(self.variables(), function (key, _var) {
@@ -712,8 +714,12 @@ var EditorViewModel = (function() {
             toDelete.push(_var);
           }
         });
+        $.each(toUpdate, function (i, item) {
+          self.variables()[i].name(item.name);
+          self.variables()[i].defaultValue(item.defaultValue);
+        });
         $.each(toDelete, function (index, item) {
-          self.variables.remove(item);
+          self.variables.remove(item.name);
         });
         $.each(toAdd, function (index, item) {
           self.variables.push(ko.mapping.fromJS({'name': item.name, 'value': '', defaultValue: item.defaultValue}));
