@@ -531,9 +531,10 @@ def test_app_permissions():
     assert_true('hive' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('impala' in apps.get('editor', {}).get('interpreter_names', []), apps)
     assert_false('pig' in apps.get('editor', {}).get('interpreter_names', []), apps)
-    assert_true('browser' in apps, apps)
+    if 'hbase' not in desktop.conf.APP_BLACKLIST.get():
+      assert_true('browser' in apps, apps)
+      assert_true('hbase' in apps['browser']['interpreter_names'], apps['browser'])
     assert_false('scheduler' in apps, apps)
-    assert_true('hbase' in apps['browser']['interpreter_names'], apps['browser'])
     assert_false('dashboard' in apps, apps)
     assert_false('scheduler' in apps, apps)
     assert_false('sdkapps' in apps, apps)
