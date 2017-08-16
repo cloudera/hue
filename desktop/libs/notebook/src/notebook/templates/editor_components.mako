@@ -1129,7 +1129,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <li>
         <div class="input-prepend margin-top-10">
           <span class="muted add-on" data-bind="text: name"></span>
-          <input class="input-medium" type="text" data-bind="value: value, attr: { placeholder: defaultValue() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keypress': function (context, e){ if (e.ctrlKey && e.which === 13) { $parent.ace().commands.commands['execute'].exec(); } return true; } }">
+          <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="value: value, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keypress': function (context, e){ if (e.ctrlKey && e.which === 13) { $parent.ace().commands.commands['execute'].exec(); } return true; } }">
         </div>
       </li>
     </ul>
