@@ -24,6 +24,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import format_preserving_redirect
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.models import Cluster, IMPALAUI
 from filebrowser.views import location_to_url
@@ -225,7 +226,14 @@ class HiveServer2Dbms(object):
 
 
   def alter_table(self, database, table_name, new_table_name=None, comment=None, tblproperties=None):
-    hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
+    table_obj = self.get_table(database, table_name)
+    if table_obj is None:
+      raise PopupException(_("Failed to find the table: %s") % table_name)
+
+    if table_obj.is_view:
+      hql = 'ALTER VIEW `%s`.`%s`' % (database, table_name)
+    else:
+      hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
 
     if new_table_name:
       table_name = new_table_name

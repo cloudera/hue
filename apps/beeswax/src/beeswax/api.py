@@ -130,6 +130,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
       response['support_updates'] = table.is_impala_only
       response['columns'] = [column.name for column in table.cols]
       response['extended_columns'] = cols_extended
+      response['is_view'] = table.is_view
       response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in table.partition_keys]
     else:
       col = db.get_column(database, table, column)
