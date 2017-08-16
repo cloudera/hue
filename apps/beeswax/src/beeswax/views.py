@@ -32,7 +32,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
 from desktop.appmanager import get_apps_dict
-from desktop.conf import REDIRECT_WHITELIST
+from desktop.conf import ENABLE_DOWNLOAD, REDIRECT_WHITELIST
 from desktop.context_processors import get_app_name
 from desktop.lib.paginator import Paginator
 from desktop.lib.django_util import JsonResponse
@@ -41,6 +41,7 @@ from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document
 from desktop.lib.parameterization import find_variables
+from desktop.views import serve_403_error
 from notebook.models import escape_rows
 
 import beeswax.forms
@@ -369,6 +370,9 @@ def massage_query_history_for_json(app_name, query_history):
 
 
 def download(request, id, format):
+  if not ENABLE_DOWNLOAD.get():
+    return serve_403_error(request)
+
   try:
     query_history = authorized_get_query_history(request, id, must_exist=True)
     db = dbms.get(request.user, query_history.get_query_server_config())

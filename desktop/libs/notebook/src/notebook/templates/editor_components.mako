@@ -1769,7 +1769,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
     </div>
 
+    % if conf.ENABLE_DOWNLOAD.get():
     <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
+    % endif
   </div>
 </script>
 
