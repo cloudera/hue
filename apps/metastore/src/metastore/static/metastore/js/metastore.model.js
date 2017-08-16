@@ -384,6 +384,7 @@ var MetastoreTable = (function () {
     self.sourceType = options.sourceType;
     self.name = options.name;
     self.type = options.type;
+    self.isView = ko.observable(false);
 
     self.optimizerStats = ko.observable();
     self.optimizerDetails = ko.observable();
@@ -479,6 +480,7 @@ var MetastoreTable = (function () {
         fields: [],
         successCallback: function (data) {
           self.loadingColumns(false);
+          self.isView(data.is_view);
           self.columns($.map(data.extended_columns, function (column) {
             return new MetastoreColumn({
               extendedColumn: column,
