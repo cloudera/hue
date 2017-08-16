@@ -1237,6 +1237,7 @@ ${ assist.assistPanel() }
       // Rdbms
       self.rdbmsMode = ko.observable('');
       self.rdbmsMode.subscribe(function (val) {
+        self.rdbmsTypes(null);
         self.rdbmsType('');
         self.rdbmsDatabaseName('');
         self.rdbmsTableName('');
@@ -1248,27 +1249,34 @@ ${ assist.assistPanel() }
         self.rdbmsPassword('');
         self.rdbmsDbIsValid(false);
         if (val == 'configRdbms') {
-          $.post("${ url('indexer:get_drivers') }", {
-          }, function (resp) {
+          $.post("${ url('indexer:get_drivers') }", {}, function (resp) {
             if (resp.data) {
               self.rdbmsTypes(resp.data);
+              window.setTimeout(function(){
+                self.rdbmsType(self.rdbmsTypes()[0].value);
+              }, 0);
             }
           });
         } else if (val == 'customRdbms') {
           self.rdbmsTypes([
-              {'value': 'jdbc', 'name': 'JDBC'},
-              {'value': 'mysql', 'name': 'MySQL'},
-              {'value': 'oracle', 'name': 'Oracle'},
-              {'value': 'postgresql', 'name': 'PostgreSQL'}
+            {'value': 'jdbc', 'name': 'JDBC'},
+            {'value': 'mysql', 'name': 'MySQL'},
+            {'value': 'oracle', 'name': 'Oracle'},
+            {'value': 'postgresql', 'name': 'PostgreSQL'}
           ]);
+          window.setTimeout(function(){
+            self.rdbmsType(self.rdbmsTypes()[0].value);
+          }, 0);
+
         }
       });
       self.rdbmsTypes = ko.observableArray();
-      self.rdbmsType = ko.observable('');
+
+      self.rdbmsType = ko.observable(null);
       self.rdbmsType.subscribe(function (val) {
         self.path('');
         resizeElements();
-        if(self.rdbmsMode() == 'configRdbms') {
+        if (self.rdbmsMode() == 'configRdbms' && self.rdbmsType()) {
           $.post("${ url('indexer:get_db_component') }", {
             "source": ko.mapping.toJSON(self)
           }, function (resp) {
