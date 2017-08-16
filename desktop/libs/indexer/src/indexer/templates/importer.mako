@@ -2084,8 +2084,8 @@ ${ assist.assistPanel() }
 
     function resizeElements () {
       var $contentPanel = $('#importerComponents').find('.content-panel-inner');
-      $('.form-actions').width($contentPanel.width() - 50);
       $('.step-indicator-fixed').width($contentPanel.width());
+      document.styleSheets[0].addRule('.form-actions','margin-left: -11px !important');
       document.styleSheets[0].addRule('.step-indicator li:first-child:before','max-width: ' + ($contentPanel.find('.step-indicator li:first-child .caption').width()) + 'px');
       document.styleSheets[0].addRule('.step-indicator li:first-child:before','left: ' + ($contentPanel.find('.step-indicator li:first-child .caption').width()/2) + 'px');
       document.styleSheets[0].addRule('.step-indicator li:last-child:before','max-width: ' + ($contentPanel.find('.step-indicator li:last-child .caption').width()) + 'px');

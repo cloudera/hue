@@ -27,7 +27,7 @@ ${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
 %endif
 ${layout.menubar(section='permissions')}
 
-<div id="permissionsComponents" class="container-fluid">
+<div id="permissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Permissions')}</h1>
     <%actionbar:render>

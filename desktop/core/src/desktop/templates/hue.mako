@@ -667,6 +667,20 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           })
         });
 
+        huePubSub.subscribe('resize.form.actions', function () {
+          document.styleSheets[0].addRule('.form-actions','width: ' + $('.page-content').width() + 'px');
+          if ($('.content-panel:visible').length > 0) {
+            document.styleSheets[0].addRule('.form-actions','margin-left: -11px !important');
+          }
+        });
+
+        huePubSub.subscribe('split.panel.resized', function() {
+          huePubSub.publish('resize.form.actions');
+        });
+
+        huePubSub.publish('resize.form.actions');
+
+
         huePubSub.subscribe('open.editor.new.query', function (statementOptions) {
           self.loadApp('editor'); // Should open in Default
 
@@ -866,6 +880,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $('.embeddable').hide();
           $('#embeddable_' + app).show();
           huePubSub.publish('app.gained.focus', app);
+          huePubSub.publish('resize.form.actions');
         };
 
         self.dropzoneError = function (filename) {

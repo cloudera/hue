@@ -43,7 +43,7 @@ ${layout.menubar(section='groups')}
   %endif
 </%def>
 
-<div id="editGroupComponents" class="container-fluid">
+<div id="editGroupComponents" class="useradmin container-fluid">
   <div class="card card-small">
     % if name:
         <h1 class="card-heading simple">${_('Hue Groups - Edit group: %(name)s') % dict(name=name)}</h1>
