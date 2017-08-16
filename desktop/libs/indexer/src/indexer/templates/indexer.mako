@@ -95,12 +95,6 @@ ${ assist.assistPanel() }
     vertical-align: top;
   }
 
-  .form-actions {
-    position: fixed;
-    bottom: 0;
-    margin: 0;
-  }
-
   #notebook {
     height: 5px;
     margin-top: 10px;

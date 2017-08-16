@@ -43,7 +43,7 @@ ${layout.menubar(section='permissions')}
   %endif
 </%def>
 
-<div id="editPermissionsComponents" class="container-fluid">
+<div id="editPermissionsComponents" class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Permissions - Edit app: %(app)s') % dict(app=app)}</h1>
     <br/>

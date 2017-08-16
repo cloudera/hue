@@ -31,7 +31,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
 ${ layout.menubar(section='users') }
 
 
-<div id="editUserComponents" class="container-fluid">
+<div id="editUserComponents" class="useradmin container-fluid">
   <div class="card card-small title">
     % if username:
       <h1 class="card-heading simple">${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>

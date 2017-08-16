@@ -27,7 +27,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
 
 ${ layout.menubar(section='users') }
 
-<div id="addLdapUsersComponents" class="container-fluid">
+<div id="addLdapUsersComponents" class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>

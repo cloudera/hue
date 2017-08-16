@@ -29,7 +29,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
 
 ${layout.menubar(section='users')}
 
-<div id="usersComponents" class="container-fluid">
+<div id="usersComponents" class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users')}</h1>
 
