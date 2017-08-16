@@ -1349,6 +1349,12 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
   help=_('Choose whether to show the new SQL editor.')
 )
 
+ENABLE_DOWNLOAD = Config(
+  key="enable_download",
+  help=_('Global setting to allow or disable end user downloads in all Hue (e.g. Query result in editors and dashboard, file in File Browser browsers...).'),
+  type=coerce_bool,
+  default=True)
+
 def is_hue4():
   """Hue is configured to show version 4."""
   return IS_HUE_4.get()

@@ -23,7 +23,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR
+from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
@@ -306,6 +306,9 @@ def copy(request):
 
 @check_document_access_permission()
 def download(request):
+  if not ENABLE_DOWNLOAD.get():
+    return serve_403_error(request)
+
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
