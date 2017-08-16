@@ -155,11 +155,16 @@ ${ components.menubar(is_embeddable) }
           <!-- /ko -->
           <td>
             % if has_write_access:
+              <!-- ko ifnot: table.isView() -->
               <div class="show-inactive-on-hover">
               <a class="inactive-action pointer toggle-editable" title="${ _('Edit the comment') }"><i class="fa fa-pencil"></i></a>
               <span data-bind="editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', skipNewLines: true, toggleElement: '.toggle-editable', placement: 'left', placeholder: '${ _ko('Add a comment...') }', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}">
                 ${ _('Add a comment...') }</span>
               </div>
+              <!-- /ko -->
+              <!-- ko if: table.isView() -->
+                <span data-bind="text: comment"></span>
+              <!-- /ko -->
             % else:
               <span data-bind="text: comment"></span>
             % endif
