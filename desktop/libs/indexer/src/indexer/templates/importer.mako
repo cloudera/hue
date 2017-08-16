@@ -668,57 +668,41 @@ ${ assist.assistPanel() }
           <div class="card step">
             <h4 class="show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h4>
             <div class="card-body no-margin-top columns-form">
-              <!-- ko if: $root.createWizard.source.inputFormat() === 'rdbms' -->
-                <!-- ko ifnot: rdbmsEditor -->
-                <a href="javascript:void(0)" data-bind="click: toggleRdbmsEditor" class="inactive-action pointer margin-left-5">${ _('Define manually') }</a>
-                <!-- /ko -->
-                <!-- ko if: rdbmsEditor -->
-                <a href="javascript:void(0)" data-bind="click: toggleRdbmsEditor" class="inactive-action pointer margin-left-5">${ _('Show fields') }</a>
-                <!-- /ko -->
-              <!-- /ko -->
-
-              <!-- ko ifnot: rdbmsEditor -->
-                <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
-                  <form class="form-inline inline-table" data-bind="foreach: columns">
-                    <!-- ko if: $parent.outputFormat() == 'table' -->
-                      <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
-                      <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
-                      <div class="clearfix"></div>
-                    <!-- /ko -->
-
-                    <!-- ko if: $parent.outputFormat() == 'index' -->
-                      <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
-                      <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
-                      <div class="clearfix"></div>
-                    <!-- /ko -->
-                  </form>
-
-                  <div class="clearfix"></div>
-
-                  <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
-                    <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
-                  <!-- /ko -->
-                <!-- /ko -->
-
-                <!-- ko ifnot: $root.createWizard.source.inputFormat() === 'manual' -->
-                <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 54, container: MAIN_SCROLLABLE, disableNiceScroll: true }">
-                  <!-- ko if: $parent.outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
-                    <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
+              <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
+                <form class="form-inline inline-table" data-bind="foreach: columns">
+                  <!-- ko if: $parent.outputFormat() == 'table' -->
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
+                    <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
+                    <div class="clearfix"></div>
                   <!-- /ko -->
 
-                  <!-- ko if: (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') || $parent.outputFormat() == 'index' -->
-                    <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
+                  <!-- ko if: $parent.outputFormat() == 'index' -->
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
+                    <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
+                    <div class="clearfix"></div>
                   <!-- /ko -->
                 </form>
 
                 <div class="clearfix"></div>
+
+                <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
+                  <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
                 <!-- /ko -->
               <!-- /ko -->
 
-              <!-- ko if: rdbmsEditor -->
-                <div data-bind="ace: rdbmsEditorContent, aceOptions: { mode: 'sql' }" style="height: 200px" class="margin-top-30"></div>
-              <!-- /ko -->
+              <!-- ko ifnot: $root.createWizard.source.inputFormat() === 'manual' -->
+              <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 54, container: MAIN_SCROLLABLE, disableNiceScroll: true }">
+                <!-- ko if: $parent.outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
+                  <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
+                <!-- /ko -->
 
+                <!-- ko if: (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') || $parent.outputFormat() == 'index' -->
+                  <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
+                <!-- /ko -->
+              </form>
+
+              <div class="clearfix"></div>
+              <!-- /ko -->
             </div>
           </div>
         <!-- /ko -->
@@ -1295,7 +1279,6 @@ ${ assist.assistPanel() }
       self.rdbmsTableName.subscribe(function (val) {
         if (val != '') {
           wizard.guessFieldTypes();
-          wizard.destination.rdbmsEditorContent('SELECT * FROM ' + val);
           wizard.destination.name(val.replace(/ /g, '_').toLowerCase());
         }
       });
@@ -1544,12 +1527,6 @@ ${ assist.assistPanel() }
       self.columns = ko.observableArray();
 
       // UI
-      self.rdbmsEditor = ko.observable(false);
-      self.rdbmsEditorContent = ko.observable('');
-      self.toggleRdbmsEditor = function () {
-        self.rdbmsEditor(!self.rdbmsEditor());
-      }
-
       self.bulkColumnNames = ko.observable('');
       self.showProperties = ko.observable(false);
 
