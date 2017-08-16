@@ -44,7 +44,7 @@ ko.bindingHandlers.browserAwareSelectize = {
 ko.bindingHandlers.selectize = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
     if (typeof allBindingsAccessor.get('optionsCaption') == 'undefined')
-      allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsCaption', 'Choose...');
+      allBindingsAccessor = inject_binding(allBindingsAccessor, 'optionsCaption', SelectizeGlobals.i18n.CHOOSE);
 
     ko.bindingHandlers.options.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 
