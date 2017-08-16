@@ -248,16 +248,6 @@ ${ layout.menubar(section='quick_start') }
     margin-left: 50px;
   }
 
-  @media all and (max-height: 800px) {
-    .form-actions {
-      position:fixed;
-      bottom:0;
-      margin:0;
-      left:0;
-      right:0;
-    }
-  }
-
   ul.samples li {
     padding-bottom: 5px;
   }

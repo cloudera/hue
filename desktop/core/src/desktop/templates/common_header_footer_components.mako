@@ -690,6 +690,17 @@ from metadata.conf import has_optimizer, OPTIMIZER
         }
       }, 200);
     }
+
+    var pageWidth = $(window).width();
+    if ($('.page-content').length > 0) {
+      pageWidth = $('.page-content').width();
+    }
+    else if ($('.content-panel').length > 0) {
+      pageWidth = $('.content-panel').width();
+      document.styleSheets[0].addRule('.form-actions','margin-left: -11px !important');
+    }
+
+    document.styleSheets[0].addRule('.form-actions','width: ' + pageWidth + 'px');
   });
 
   function resetPrimaryButtonsStatus() {

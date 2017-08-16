@@ -30,7 +30,7 @@ ${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
 
 ${layout.menubar(section='groups')}
 
-<div id="groupsComponents" class="container-fluid">
+<div id="groupsComponents" class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Groups')}</h1>
 

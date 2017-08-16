@@ -24,7 +24,7 @@ from useradmin.password_policy import is_password_policy_enabled, get_password_h
 ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
 ${ layout.menubar(section='users') }
 
-<div class="container-fluid">
+<div class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users - Change password: %(username)s') % dict(username=username)}</h1>
 
