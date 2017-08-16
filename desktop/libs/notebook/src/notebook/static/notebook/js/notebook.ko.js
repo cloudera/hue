@@ -592,7 +592,11 @@ var EditorViewModel = (function() {
         }
       }, 100);
     });
-
+    if (snippet.variables) {
+      snippet.variables.forEach(function (variable) {
+        variable.defaultValue = variable.defaultValue || '';
+      });
+    }
     self.variables = ko.mapping.fromJS(typeof snippet.variables != "undefined" && snippet.variables != null ? snippet.variables : []);
     self.variables.subscribe(function (newValue) {
       $(document).trigger("updateResultHeaders", self);
@@ -659,67 +663,52 @@ var EditorViewModel = (function() {
       return params;
     };
     self.variableNames = ko.computed(function () {
+      var match, matches = {};
       if (self.type() == 'pig') {
-        return Object.keys(self.getPigParameters());
+        matches = self.getPigParameters();
       } else {
-        var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
-
-        var match, matches = [];
+        var re = /(?:^|\W)\${(\w*\=?\w*)(?!\w)}/g;
         while (match = re.exec(self.statement_raw())) {
-          if (matches.indexOf(match[1]) == -1) {
-            matches.push(match[1]);
-          }
+          if (match[1].indexOf('=') > -1) {
+              var splittedName = match[1].split('=');
+              matches[splittedName[0]] = matches[splittedName[0]] || splittedName[1];
+            }
+            else {
+              matches[match[1]] = '';
+            }
         }
-        return matches;
       }
+      return Object.keys(matches).map(function (match) {
+        return { name: match, defaultValue: matches[match] };
+      });
     });
     self.variableNames.extend({ rateLimit: 150 });
     self.variableNames.subscribe(function (newVal) {
-      var toDelete = [];
-      var toAdd = [];
-
-      if (newVal.length == self.variables().length) { // Just rename one of the variable
-        $.each(newVal, function(i, item) {
-          self.variables()[i].name(newVal[i]);
-        });
-      } else {
-        $.each(newVal, function (key, name) {
-          var match = ko.utils.arrayFirst(self.variables(), function (_var) {
-            return _var.name() == name;
-          });
-          if (! match) {
-            toAdd.push(name);
-          }
-        });
-        $.each(self.variables(), function (key, _var) {
-          var match = ko.utils.arrayFirst(newVal, function (name) {
-            return _var.name() == name;
-          });
-          if (! match) {
-            toDelete.push(_var);
-          }
-        });
-
-        $.each(toDelete, function (index, item) {
-          self.variables.remove(item);
-        });
-        $.each(toAdd, function (index, item) {
-          self.variables.push(ko.mapping.fromJS({'name': item, 'value': ''}));
-        });
+      var diffLengthVariables = self.variables().length - newVal.length;
+      var needsMore = diffLengthVariables < 0;
+      var needsLess = diffLengthVariables > 0;
+      if (needsMore) {
+        for (var i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
+          self.variables.push(ko.mapping.fromJS({ 'name': '', 'value': '', 'defaultValue': '' }));
+        }
+      } else if (needsLess) {
+        self.variables.splice(self.variables().length - diffLengthVariables, diffLengthVariables);
       }
-
-      if (toDelete.length > 0 || toAdd.length > 0) { // Only re-update observable when changed
-        self.variables.sort(function (left, right) {
-          var leftIndex = newVal.indexOf(left.name());
-          var rightIndex = newVal.indexOf(right.name());
-          return leftIndex == rightIndex ? 0 : (leftIndex < rightIndex ? -1 : 1);
-        });
-      }
+      var variableValues = self.variables().reduce(function (variableValues, variable) {
+        variableValues[variable.name()] = variable.value();
+        return variableValues;
+      },{});
+      newVal.forEach(function (item, index) {
+        var variable = self.variables()[index];
+        variable.name(item.name);
+        variable.defaultValue(item.defaultValue);
+        variable.value(variableValues[item.name] || "");
+      });
     });
     self.statement = ko.computed(function () {
       var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
       $.each(self.variables(), function (index, variable) {
-        statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{" : "") + variable.name() + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), "$1" + variable.value());
+        statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{" : "") + variable.name() + "(=[^}]*)?" + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), "$1" + (variable.value() || variable.defaultValue()));
       });
       return statement;
     });
