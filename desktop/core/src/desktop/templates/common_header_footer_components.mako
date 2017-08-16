@@ -219,6 +219,12 @@ from metadata.conf import has_optimizer, OPTIMIZER
         SUCCESS: "${ _('Results copied successfully to the clipboard') }",
       }
     }
+
+    var SelectizeGlobals = {
+      i18n: {
+        CHOOSE: "${ _('Choose...') }"
+      }
+    }
   </script>
 
   <!--[if lt IE 9]>
