@@ -6070,13 +6070,13 @@
 
   ko.bindingHandlers.parseArguments = {
     init: function (element, valueAccessor, allBindingsAccessor) {
-      $el = $(element);
+      var $el = $(element);
 
       function splitStrings(str) {
         var bits = [];
         var isInQuotes = false;
         var tempStr = '';
-        str.split('').forEach(function (char) {
+        str.replace(/<\/?arg>|<\/?command>/gi, ' ').replace(/\r?\n|\r/g, '').replace(/\s\s+/g, ' ').split('').forEach(function (char) {
           if (char == '"' || char == "'") {
             isInQuotes = !isInQuotes;
           }
@@ -6101,7 +6101,7 @@
           var newList = [];
           args.forEach(function (arg) {
             var obj = {};
-            obj[valueAccessor().objectKey] = arg;
+            obj[valueAccessor().objectKey] = $.trim(arg);
             newList.push(obj);
           });
           valueAccessor().list(ko.mapping.fromJS(newList)());
