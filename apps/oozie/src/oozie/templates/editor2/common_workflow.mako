@@ -523,7 +523,7 @@
       <span class="muted move-widget">
         <i class="fa fa-arrows"></i>
       </span>
-      <input type="text" class="span11" data-bind="value: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }, parseArguments: { list: $parent.properties.arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
+      <textarea rows="1" style="resize: vertical" class="span11" data-bind="value: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }, parseArguments: { list: $parent.properties.arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"></textarea>
       <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
