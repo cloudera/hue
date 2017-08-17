@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Sharing settings')}</h2>
   </div>
-  <div class="modal-body">
+  <div class="modal-body" style="overflow-y: visible; height: 240px">
     <div class="row-fluid">
       <div class="span6">
         <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>

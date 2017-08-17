@@ -48,6 +48,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
 % endif
 
 <script src="${ static('desktop/ext/js/clipboard.min.js') }"></script>
@@ -215,8 +216,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               </a>
             </li>
           </ul>
+          <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
+            attr: {'data-original-title': '${ _ko("Share") } ' + name},
+            css: {'isShared': isShared(), 'btn': true}">
+            <i class="fa fa-users"></i>
+          </a>
           <!-- /ko -->
         </div>
+
 
         <!-- ko ifnot: editorMode -->
         <div class="btn-group">
@@ -1933,6 +1940,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   % else:
   var MAIN_SCROLLABLE = '.content-panel';
   var HUE_PUB_SUB_EDITOR_ID = 'editor';
+  var shareViewModel = initSharing("#documentShareModal");
   % endif
 
 
@@ -1970,6 +1978,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     });
     return text;
   }
+
+  function prepareShareModal () {
+    var selectedNotebookUuid = this.selectedNotebook() && this.selectedNotebook().uuid();
+    shareViewModel.setDocUuid(this.selectedNotebook().uuid());
+    openShareModal();
+  };
 
   function createHueDatatable(el, snippet, vm) {
     var DATATABLES_MAX_HEIGHT = 330;

@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, commonshare
   from desktop import conf
   from django.utils.translation import ugettext as _
 %>
@@ -27,6 +27,7 @@
 
 %if not is_embeddable:
 ${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
+${ commonshare() | n,unicode }
 %endif
 
 <span id="editorComponents" class="editorComponents notebook">
