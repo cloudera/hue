@@ -382,7 +382,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </a>
 
     <!-- ko if: $root.selectedNotebook() -->
-      Title            | buttons
+      <span data-bind="text: $root.selectedNotebook().name"></span>
+      <span data-bind="text: $root.selectedNotebook().description"></span>
+      |
+      buttons
 
       <div class="clearfix"></div>
 
@@ -880,7 +883,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="notebook-snippet-header${ suffix }">
-  <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
+  <!-- ko if: $root.isPresentationMode() -->
+  <div class="inline">
+    <span data-bind="text: name"></span>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: ! $root.isPresentationMode() -->
+  <div class="inactive-action hover-actions inline">
+    <span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span>
+  </div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
     <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
@@ -893,6 +905,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
   </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="editor-snippet-header${ suffix }">
@@ -929,7 +942,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <div style="position: relative;">
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
-              <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
               <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
             </div>
             <div class="snippet-body" data-bind="clickForAceFocus: ace">
@@ -995,7 +1008,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="code-editor-snippet-body${ suffix }">
-  <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') -->
+  <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') && ! $root.isPresentationMode() -->
   <div class="optimizer-container" data-bind="css: { 'active': showOptimizer }">
     <!-- ko if: hasSuggestion() -->
       <!-- ko with: suggestion() -->
@@ -1654,7 +1667,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
       <!-- /ko -->
       % if ENABLE_BATCH_EXECUTE.get():
-      <!-- ko if: isBatchable() && status() != 'running' && status() != 'loading' -->
+      <!-- ko if: isBatchable() && status() != 'running' && status() != 'loading' && ! $root.isPresentationMode() -->
         <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': ! isReady(), 'blue': currentQueryTab() == 'queryExplain' }">
           <i class="fa fa-caret-down"></i>
         </a>
@@ -1674,7 +1687,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       % endif
     </div>
 
-    <!-- ko if: isSqlDialect -->
+    <!-- ko if: isSqlDialect && ! $root.isPresentationMode() -->
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
       <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px;" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
         <i class="fa fa-fw fa-map-o"></i>
