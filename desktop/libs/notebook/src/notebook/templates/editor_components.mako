@@ -383,8 +383,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
     <!-- ko if: $root.selectedNotebook() -->
       Title            | buttons
-      <br>
-      Variables
+
+      <div class="clearfix"></div>
+
+      <!-- ko if: $root.preEditorTogglingSnippet -->
+        <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: $root.preEditorTogglingSnippet }--><!-- /ko -->
+      <!-- /ko -->
+
     <!-- /ko -->
   </div>
 </%def>
@@ -1139,18 +1144,23 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </div>
 
     <div class="clearfix"></div>
-    <ul data-bind="foreach: variables" class="unstyled inline">
-      <li>
-        <div class="input-prepend margin-top-10">
-          <span class="muted add-on" data-bind="text: name"></span>
-          <input class="input-medium" type="text" data-bind="value: value, attr: { placeholder: defaultValue() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keypress': function (context, e){ if (e.ctrlKey && e.which === 13) { $parent.ace().commands.commands['execute'].exec(); } return true; } }">
-        </div>
-        </div>
-      </li>
-    </ul>
+    <!-- ko template: { if: ! $root.isPresentationMode(), name: 'snippet-variables' }--><!-- /ko -->
   </div>
   <div class="clearfix"></div>
 </script>
+
+
+<script type="text/html" id="snippet-variables">
+  <ul data-bind="foreach: variables" class="unstyled inline">
+    <li>
+      <div class="input-prepend margin-top-10">
+        <span class="muted add-on" data-bind="text: name"></span>
+        <input class="input-medium" type="text" data-bind="value: value, attr: { placeholder: defaultValue() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keypress': function (context, e){ if (e.ctrlKey && e.which === 13) { $parent.ace().commands.commands['execute'].exec(); } return true; } }">
+      </div>
+    </li>
+  </ul>
+</script>
+
 
 <script type="text/html" id="snippet-chart-settings${ suffix }">
   <div>
