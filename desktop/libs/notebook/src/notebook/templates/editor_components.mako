@@ -276,12 +276,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko if: IS_HUE_4 -->
         <a class="btn" data-bind="hueLink: '/home/?type=' + (editorMode() ? 'query-' : '') + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-list"></i>
+          <span>
+            <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
+          </span>
         </a>
         <!-- /ko -->
         <!-- ko ifnot: IS_HUE_4 -->
         <a class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-list"></i>
+          <span>
+            <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
+          </span>
         </a>
         <!-- /ko -->
       </div>
