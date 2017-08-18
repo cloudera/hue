@@ -209,33 +209,37 @@ def test_dump_config():
   # Depending on the order of the conf.initialize() in settings, the set_for_testing() are not seen in the global settings variable
   clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
 
-  response1 = c.get(reverse('desktop.views.dump_config'))
-  assert_true(CANARY in response1.content, response1.content)
+  try:
+    response1 = c.get(reverse('desktop.views.dump_config'))
+    assert_true(CANARY in response1.content, response1.content)
 
-  response2 = c.get(reverse('desktop.views.dump_config'), dict(private="true"))
-  assert_true(CANARY in response2.content)
+    response2 = c.get(reverse('desktop.views.dump_config'), dict(private="true"))
+    assert_true(CANARY in response2.content)
 
-  # There are more private variables...
-  assert_true(len(response1.content) < len(response2.content))
+    # There are more private variables...
+    assert_true(len(response1.content) < len(response2.content))
 
-  clear()
+  finally:
+    clear()
 
   CANARY = "(localhost|127\.0\.0\.1):(50030|50070|50060|50075)"
   clear = proxy.conf.WHITELIST.set_for_testing(CANARY)
 
-  response1 = c.get(reverse('desktop.views.dump_config'))
-  assert_true(CANARY in response1.content)
-
-  clear()
+  try:
+    response1 = c.get(reverse('desktop.views.dump_config'))
+    assert_true(CANARY in response1.content)
+  finally:
+    clear()
 
   # Malformed port per HUE-674
   CANARY = "asdfoijaoidfjaosdjffjfjaoojosjfiojdosjoidjfoa"
   clear = HIVE_SERVER_HOST.set_for_testing(CANARY)
 
-  response1 = c.get(reverse('desktop.views.dump_config'))
-  assert_true(CANARY in response1.content, response1.content)
-
-  clear()
+  try:
+    response1 = c.get(reverse('desktop.views.dump_config'))
+    assert_true(CANARY in response1.content, response1.content)
+  finally:
+    clear()
 
   CANARY = '/tmp/spacé.dat'
   finish = proxy.conf.WHITELIST.set_for_testing(CANARY)
