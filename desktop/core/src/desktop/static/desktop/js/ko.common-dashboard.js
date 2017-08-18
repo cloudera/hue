@@ -58,6 +58,42 @@ var Column = function (size, rows, vm) {
     }
     return row;
   };
+  self.shrinkColumn = function () {
+    if (self.size() > 1) {
+      self.size(self.size() - 1);
+      vm.columns().forEach(function (col) {
+        if (col.id() !== self.id()) {
+          col.size(col.size() + 1);
+        }
+      });
+    }
+  }
+  self.expandColumn = function () {
+    if (self.size() < 12) {
+      self.size(self.size() + 1);
+      vm.columns().forEach(function (col) {
+        if (col.id() !== self.id()) {
+          col.size(col.size() - 1);
+        }
+      });
+    }
+  }
+  self.addColumn = function () {
+    var col = new Column(0, [], vm);
+    vm.columns.push(col);
+    col.expandColumn();
+  }
+  self.removeColumn = function () {
+    vm.columns().forEach(function (col) {
+      if (col.id() !== self.id()) {
+        self.rows().forEach(function (row) {
+          col.rows.push(row);
+        });
+        col.size(col.size() + self.size());
+      }
+    });
+    vm.columns.remove(self);
+  }
 }
 
 var Row = function (widgets, vm, columns) {
