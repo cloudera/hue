@@ -1551,7 +1551,14 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
 
     self.previewColumns = ko.observable("");
-    self.columns = ko.observable([]);
+    self.columns = ko.observableArray([]);
+    self.columnsTotalSize = ko.pureComputed(function () {
+      var totalSize = 0;
+      self.columns().forEach(function (col) {
+        totalSize += col.size();
+      });
+      return totalSize;
+    });
     loadSearchLayout(self, self.collectionJson.layout);
 
     self.additionalMustache = null;
