@@ -88,7 +88,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
     </a>
     %if is_embeddable:
     <a class="btn" href="javascript: void(0)" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '/home/?type=oozie-workflow2'">
-      <i class="fa fa-fw fa-list"></i>
+      <span>
+        <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
+      </span>
     </a>
     %endif
   </div>
