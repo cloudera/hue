@@ -1000,11 +1000,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page('/metastore/tables');
           }},
           { url: '/metastore/*', app: 'metastore' },
-          { url: '/notebook', app: function () {
+          { url: '/notebook', app: function (ctx) {
             self.loadApp('notebook');
-            if (window.location.getParameter('notebook') !== '') {
+            var notebookId = hueUtils.getSearchParameter('?' + ctx.querystring, 'notebook');
+            if (notebookId !== '') {
               self.getActiveAppViewModel(function (viewModel) {
-                viewModel.openNotebook(window.location.getParameter('notebook'));
+                viewModel.openNotebook(notebookId);
               });
             } else {
               self.getActiveAppViewModel(function (viewModel) {
