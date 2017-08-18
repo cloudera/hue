@@ -2697,7 +2697,7 @@ var EditorViewModel = (function() {
 
       self.isEditing(! self.isEditing());
       //self.isFullscreenMode(! self.isFullscreenMode());
-      self.isPlayerMode(! self.isPlayerMode());
+      self.isPresentationMode(! self.isPresentationMode());
 
       if (options.editor_type != 'notebook') {
         self.toggleEditorMode();
@@ -2714,7 +2714,7 @@ var EditorViewModel = (function() {
     self.selectedNotebook = ko.observable();
 
     self.combinedContent = ko.observable();
-    self.isPlayerMode = ko.observable(false);
+    self.isPresentationMode = ko.observable(false);
     //self.isFullscreenMode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url); // Deprecated
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
