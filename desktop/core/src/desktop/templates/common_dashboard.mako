@@ -41,22 +41,17 @@
 
 <div class="card card-toolbar" data-bind="visible: isEditing">
   %if not hasattr(caller, "skipLayout"):
-  <div style="float: left">
+  <div style="float: left" data-bind="visible: columns().length == 0">
     <div class="toolbar-label">${_('LAYOUT')}</div>
-    <a href="javascript: oneSixthLeftLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('oneSixthLeft')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: magicSearchLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
-        <div class="layout-box" style="width: 72px; margin-left: 4px"></div>
+        <div class="layout-box" style="width: 72px; margin-left: 4px"><i class="fa fa-table"></i></div>
       </div>
     </a>
     <a href="javascript: fullLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
-      </div>
-    </a>
-    <a data-bind="visible: columns().length == 0" href="javascript: magicSearchLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
-      <div class="layout-container">
-        <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
       </div>
     </a>
   </div>
@@ -72,7 +67,7 @@
     %if hasattr(caller, "widgetSectionName"):
       <div class="toolbar-label">${caller.widgetSectionName()}</div>
     %else:
-      <div class="toolbar-label">${_('WIDGETS')}</div>
+      <div class="toolbar-label margin-left-20">${_('WIDGETS')}</div>
     %endif
     ${caller.widgets()}
   </div>
@@ -96,12 +91,6 @@
 
   <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
   <div class="container-fluid">
-    <div class="row-fluid" data-bind="visible: previewColumns() == 'oneSixthLeft'">
-      <div class="span2 preview-row"></div>
-      <div class="span10 preview-row">
-        <div style="font-size: 80px; padding-top: 120px">${ _('Two columns layout') }</div>
-      </div>
-    </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
       <div class="span12 preview-row">
         <div style="font-size: 80px; padding-top: 120px">${ _('One column layout') }</div>
