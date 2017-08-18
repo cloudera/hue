@@ -37,7 +37,6 @@ urlpatterns = patterns('filebrowser.views',
   # POST operations
   url(r'^save$', 'save_file'),
   url(r'^upload/file$', 'upload_file', name='upload_file'),
-  url(r'^upload/archive$', 'upload_archive', name='upload_archive'),
   url(r'^extract_archive', 'extract_archive_using_batch_job', name='extract_archive_using_batch_job'),
   url(r'^compress_files', 'compress_files_using_batch_job', name='compress_files_using_batch_job'),
   url(r'^trash/restore$', 'trash_restore', name='trash_restore'),
