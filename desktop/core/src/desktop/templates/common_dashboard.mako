@@ -136,6 +136,13 @@
 
 <script type="text/html" id="column-template${ suffix }">
   <div data-bind="css: klass">
+    <div class="pull-right margin-right-10" data-bind="visible: $root.isEditing()">
+      <a href="javascript:void(0)" data-bind="visible: size() > 2, click: shrinkColumn"><i class="fa fa-step-backward"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: size() < 12, click: expandColumn"><i class="fa fa-step-forward"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: $parent.columns().length < 2, click: addColumn"><i class="fa fa-plus"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: true, click: removeColumn"><i class="fa fa-times"></i></a>
+    </div>
+    <div class="clearfix"></div>
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
