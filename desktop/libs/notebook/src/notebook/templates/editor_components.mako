@@ -680,7 +680,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
             <!-- /ko -->
             <!-- ko if: showGrid -->
-            <div class="inline-block inactive-action pointer" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }"><i class="snippet-icon fa fa-search"></i></div>
+            <div class="inline-block inactive-action pointer margin-left-10" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }"><i class="snippet-icon fa fa-search"></i></div>
             <!-- /ko -->
             <div class="inline-block inactive-action pointer" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isFullscreenMode() && !$root.isPlayerMode(), click: function(){ $root.isPlayerMode(true); }"><i class="snippet-icon fa fa-expand"></i></div>
             <div class="inline-block inactive-action pointer" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="snippet-icon fa fa-compress"></i></div>
@@ -1768,12 +1768,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- ko ifnot: isResultSettingsVisible() -->
         <i class="fa fa-fw fa-columns"></i>
         <!-- /ko -->
-      </a>
-    </div>
-
-    <div>
-      <a data-bind="css: clipboardClass" title="${ _('Copy the displayed results in your clipboard') }">
-        <i class="fa fa-fw fa-clipboard"></i>
       </a>
     </div>
 
