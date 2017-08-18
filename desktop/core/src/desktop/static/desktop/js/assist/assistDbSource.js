@@ -304,11 +304,11 @@ var AssistDbSource = (function () {
     };
 
     huePubSub.subscribe('assist.db.refresh', function (options) {
-    //  if (['hive', 'impala'].indexOf(self.sourceType) !== -1) { // options.sourceTypes.
+      if (options.sourceTypes.indexOf(self.sourceType) !== -1) {
         window.setTimeout(function () {
           self.reload(options.allCacheTypes);
         }, 0);
-    //  }
+      }
     });
   }
 
