@@ -1666,7 +1666,14 @@ class ClusterConfig():
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
-        'interpreters': interpreters,
+        'buttonName': _('Dashboard'),
+        'interpreters': [{
+            'type': interpreter['type'],
+            'displayName': interpreter['type'].title(),
+            'buttonName': interpreter['type'].title(),
+            'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
+            'tooltip': _('%s Dashboard') % interpreter['type'].title()
+          } for interpreter in interpreters],
         'page': '/dashboard/new_search'
       }
     else:

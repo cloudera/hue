@@ -131,7 +131,7 @@ ${ hueIcons.symbols() }
           <!-- ko if: item.dividerAbove -->
           <li class="divider"></li>
           <!-- /ko -->
-          <li data-bind="css: { 'dropdown-submenu': item.isCategory }">
+          <li data-bind="css: { 'dropdown-submenu': item.isCategory && item.children.length > 1 }">
             <!-- ko if: item.url -->
              <a href="javascript: void(0);" data-bind="hueLink: item.url">
                 <!-- ko if: item.icon -->
@@ -143,7 +143,7 @@ ${ hueIcons.symbols() }
             <!-- ko if: item.href -->
               <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
             <!-- /ko -->
-            <!-- ko if: item.isCategory -->
+            <!-- ko if: item.isCategory && item.children.length > 1 -->
             <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
               <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
             </ul>
