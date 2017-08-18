@@ -90,12 +90,16 @@ from desktop.views import commonheader, commonfooter, _ko
     </a>
     <!-- ko if: IS_HUE_4 -->
     <a class="btn" href="/home/?type=search-dashboard" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-list"></i>
+      <span>
+        <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
+      </span>
     </a>
     <!-- /ko -->
     <!-- ko ifnot: IS_HUE_4 -->
     <a class="btn" href="${ url('dashboard:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-list"></i>
+      <span>
+        <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
+      </span>
     </a>
     <!-- /ko -->
   </div>
