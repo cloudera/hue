@@ -151,8 +151,8 @@ class SQLApi():
 
 
   def datasets(self, show_all=False):
-    # Implemented via Hive chooser
-    return []
+    snippet = {'type': self.engine}
+    return [table['name'] for table in get_api(MockRequest(self.user), snippet).autocomplete(snippet, database='default')['tables_meta']]
 
 
   def fields(self, dashboard):
