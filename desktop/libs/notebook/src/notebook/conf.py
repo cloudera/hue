@@ -167,6 +167,14 @@ ENABLE_SQL_INDEXER = Config(
   default=False
 )
 
+ENABLE_PRESENTATION = Config(
+  key="enable_presentation",
+  help=_t("Flag to turn on the Presentation mode of the editor."),
+  type=bool,
+  default=True
+)
+
+
 def _default_interpreters(user):
   interpreters = []
   apps = appmanager.get_apps_dict(user)
