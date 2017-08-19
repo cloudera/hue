@@ -2723,6 +2723,7 @@ var EditorViewModel = (function() {
 
     self.combinedContent = ko.observable();
     self.isPresentationMode = ko.observable(false);
+    self.isHidingCode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url); // Deprecated
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
