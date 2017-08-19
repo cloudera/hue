@@ -360,7 +360,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko if: $root.selectedNotebook() -->
       <span data-bind="text: $root.selectedNotebook().name"></span>
       <span data-bind="text: $root.selectedNotebook().description"></span>
-      |
 
       <!-- ko template: { name: 'notebook-actions' }--><!-- /ko -->
 
@@ -1065,7 +1064,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
   <div class="row-fluid" style="margin-bottom: 5px">
 
-    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace">
+    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace, visible:  ! ($root.isPresentationMode() && $root.isHidingCode())">
       <!-- ko if: statementType() == 'file' -->
         <div class="margin-top-10">
           <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
@@ -1163,9 +1162,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </ul>
   </div>
 
-  <a class="btn pointer" title="${ _('Hide code') }" rel="tooltip" data-placement="bottom">
-    <i class="fa fa-expand"></i>
-  </a>  
+  <a class="btn pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show code') }' : '${ _ko('Hide code') }' }">
+    <i class="fa" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
+  </a>
 </script>
 
 
@@ -3131,7 +3130,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       var wasRightPanelVisible = viewModel.isRightPanelVisible();
 
       function exitPlayerMode() {
-        //viewModel.isPresentationMode(false);
         viewModel.togglePresentationMode();
       }
 
