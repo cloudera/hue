@@ -1142,27 +1142,30 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="notebook-actions">
   <div class="btn-group">
-    <a class="btn dropdown-toggle" data-toggle="dropdown">
-      <i class="fa fa-bars"></i>
+    <a class="btn" rel="tooltip" data-placement="bottom" title="${ _("Execute all") }" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
+      <i class="fa fa-fw fa-play"></i>
     </a>
-    <ul class="dropdown-menu pull-right">
-      <li>
-        <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
-          <i class="fa fa-fw fa-play"></i> ${ _('Execute all') }
-        </a>
-      </li>
+
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
       <li>
         <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
           <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
         </a>
       </li>
       <li>
-        <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
+        <a href="javascript:void(0)" data-bind="click: displayCombinedContent, visible: ! $root.isPresentationMode() ">
           <i class="fa fa-fw fa-file-text-o"></i> ${ _('Show all content') }
         </a>
       </li>
     </ul>
   </div>
+
+  <a class="btn pointer" title="${ _('Hide code') }" rel="tooltip" data-placement="bottom">
+    <i class="fa fa-expand"></i>
+  </a>  
 </script>
 
 
