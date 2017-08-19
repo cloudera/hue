@@ -22,7 +22,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
 
 from metadata.conf import has_optimizer
-from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
 %>
 
 <%def name="includes(is_embeddable=False, suffix='')">
@@ -203,11 +203,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <div class="pull-right margin-right-10">
 
         <div class="btn-group">
+
+          % if ENABLE_PRESENTATION.get():
           <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: $root.togglePresentationMode,
             attr: {'data-original-title': '${ _ko("View as a report") } '},
             css: {'btn-inverse': $root.isPresentationMode(), 'btn': true}">
             <i class="fa fa-line-chart"></i>
           </a>
+          % endif
 
           <!-- ko if: $root.canSave -->
           <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
@@ -235,6 +238,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
 
+        <a class="btn pointer" title="${ _('Context') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+          <i class="fa fa-cogs"></i>
+        </a>
+
         <!-- ko if: editorMode -->
         <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
@@ -245,10 +252,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <i class="fa fa-file-o"></i>
         </a>
         <!-- /ko -->
-
-        <a class="btn pointer" title="${ _('Context') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-          <i class="fa fa-cogs"></i>
-        </a>
 
         <!-- ko if: IS_HUE_4 -->
         <a class="btn" data-bind="hueLink: '/home/?type=' + (editorMode() ? 'query-' : '') + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
@@ -676,10 +679,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
             <!-- /ko -->
             <!-- ko if: showGrid -->
-            <div class="inline-block inactive-action pointer margin-left-10" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }"><i class="snippet-icon fa fa-search"></i></div>
+            <div class="inline-block inactive-action pointer margin-left-10" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }">
+              <i class="snippet-icon fa fa-search"></i>
+            </div>
             <!-- /ko -->
-            <div class="inline-block inactive-action pointer" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isPresentationMode(), click: function(){ $root.isPresentationMode(true); }"><i class="snippet-icon fa fa-expand"></i></div>
-            <div class="inline-block inactive-action pointer" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: $root.isPresentationMode(), click: function(){ $root.isPresentationMode(false); }"><i class="snippet-icon fa fa-compress"></i></div>
+            <div class="inline-block inactive-action pointer" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isPresentationMode(), click: function(){ $root.isPresentationMode(true); }">
+              <i class="snippet-icon fa fa-expand"></i>
+            </div>
+            <div class="inline-block inactive-action pointer" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: $root.isPresentationMode(), click: function(){ $root.isPresentationMode(false); }">
+              <i class="snippet-icon fa fa-compress"></i>
+            </div>
           </a>
         </li>
         <!-- /ko -->
@@ -1155,16 +1164,19 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </a>
       </li>
       <li>
+        <a class="pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show code') }' : '${ _ko('Hide code') }' }">
+          <i class="fa" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
+          <span data-bind="visible: $root.isHidingCode">${ _('Show the code') }</span>
+          <span data-bind="visible: ! $root.isHidingCode()">${ _('Hide the code') }</span>
+        </a>
+      </li>
+      <li>
         <a href="javascript:void(0)" data-bind="click: displayCombinedContent, visible: ! $root.isPresentationMode() ">
           <i class="fa fa-fw fa-file-text-o"></i> ${ _('Show all content') }
         </a>
       </li>
     </ul>
   </div>
-
-  <a class="btn pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show code') }' : '${ _ko('Hide code') }' }">
-    <i class="fa" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
-  </a>
 </script>
 
 
