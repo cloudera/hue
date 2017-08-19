@@ -2677,7 +2677,16 @@ var EditorViewModel = (function() {
           if (sql_statement.hashCode() in self.postEditorTogglingSnippets) {
             _snippet = self.postEditorTogglingSnippets[sql_statement.hashCode()]; // Persist result
           } else {
-            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: sql_statement, result: {}}, skipSession=true);
+        	var _title = [];
+        	var _statement = [];
+        	sql_statement.trim().split('\n').forEach(function(line) {
+        		if (line.trim().startsWith('--') && _statement.length == 0) {
+                  _title.push(line.substr(2));
+        		} else {
+        		  _statement.push(line);
+        		}
+        	});
+            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n')}, skipSession=true);
             _snippet.init();
             self.postEditorTogglingSnippets[sql_statement.hashCode()] = _snippet;
           }
