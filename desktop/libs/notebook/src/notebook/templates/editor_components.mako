@@ -233,31 +233,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <!-- /ko -->
         </div>
 
-
-        <!-- ko ifnot: editorMode -->
-        <div class="btn-group">
-          <a class="btn dropdown-toggle" data-toggle="dropdown">
-            <i class="fa fa-bars"></i>
-          </a>
-          <ul class="dropdown-menu pull-right">
-            <li>
-              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
-                <i class="fa fa-fw fa-play"></i> ${ _('Execute all') }
-              </a>
-            </li>
-            <li>
-              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-                <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
-                <i class="fa fa-fw fa-file-text-o"></i> ${ _('Show all content') }
-              </a>
-            </li>
-          </ul>
-        </div>
-        <!-- /ko -->
+        <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
 
         <!-- ko if: editorMode -->
         <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }" rel="tooltip" data-placement="bottom">
@@ -385,7 +361,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <span data-bind="text: $root.selectedNotebook().name"></span>
       <span data-bind="text: $root.selectedNotebook().description"></span>
       |
-      buttons
+
+      <!-- ko template: { name: 'notebook-actions' }--><!-- /ko -->
 
       <div class="clearfix"></div>
 
@@ -1160,6 +1137,32 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- ko template: { if: ! $root.isPresentationMode(), name: 'snippet-variables' }--><!-- /ko -->
   </div>
   <div class="clearfix"></div>
+</script>
+
+
+<script type="text/html" id="notebook-actions">
+  <div class="btn-group">
+    <a class="btn dropdown-toggle" data-toggle="dropdown">
+      <i class="fa fa-bars"></i>
+    </a>
+    <ul class="dropdown-menu pull-right">
+      <li>
+        <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
+          <i class="fa fa-fw fa-play"></i> ${ _('Execute all') }
+        </a>
+      </li>
+      <li>
+        <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+          <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
+          <i class="fa fa-fw fa-file-text-o"></i> ${ _('Show all content') }
+        </a>
+      </li>
+    </ul>
+  </div>
 </script>
 
 
