@@ -639,7 +639,7 @@ var EditorViewModel = (function() {
       if (self.type() == 'pig') {
         matches = self.getPigParameters();
       } else {
-        var re = /(?:^|\W)\${(\w*\=?\w*)(?!\w)}/g;
+        var re = /(?:^|\W)\${(\w*\=?[\w\s]*)}/g;
         while (match = re.exec(self.statement_raw())) {
           if (match[1].indexOf('=') > -1) {
               var splittedName = match[1].split('=');
@@ -654,11 +654,16 @@ var EditorViewModel = (function() {
         return { name: match, defaultValue: matches[match] };
       });
     });
+    self.variableValues = {};
     self.variableNames.extend({ rateLimit: 150 });
     self.variableNames.subscribe(function (newVal) {
       var diffLengthVariables = self.variables().length - newVal.length;
       var needsMore = diffLengthVariables < 0;
       var needsLess = diffLengthVariables > 0;
+      self.variableValues = self.variables().reduce(function (variableValues, variable) {
+        variableValues[variable.name()] = variable.value();
+        return variableValues;
+      }, self.variableValues);
       if (needsMore) {
         for (var i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
           self.variables.push(ko.mapping.fromJS({ 'name': '', 'value': '', 'defaultValue': '' }));
@@ -666,15 +671,11 @@ var EditorViewModel = (function() {
       } else if (needsLess) {
         self.variables.splice(self.variables().length - diffLengthVariables, diffLengthVariables);
       }
-      var variableValues = self.variables().reduce(function (variableValues, variable) {
-        variableValues[variable.name()] = variable.value();
-        return variableValues;
-      },{});
       newVal.forEach(function (item, index) {
         var variable = self.variables()[index];
         variable.name(item.name);
         variable.defaultValue(item.defaultValue);
-        variable.value(variableValues[item.name] || "");
+        variable.value(self.variableValues[item.name] || variable.value() || "");
       });
     });
     self.statement = ko.computed(function () {
