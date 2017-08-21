@@ -1988,6 +1988,8 @@ var EditorViewModel = (function() {
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
+    self.presentationSnippets = ko.observable({});
+
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
     self.creatingSessionLocks = ko.observableArray();
@@ -2242,6 +2244,7 @@ var EditorViewModel = (function() {
       hueAnalytics.log('notebook', 'save');
 
       // Remove the result data from the snippets
+      // TODO presentation mode too
       var cp = ko.mapping.toJS(self, NOTEBOOK_MAPPING);
       $.each(cp.snippets, function(index, snippet) {
         snippet.result.data.length = 0; // snippet.result.clear() does not work for some reason
@@ -2625,6 +2628,13 @@ var EditorViewModel = (function() {
       $.each(notebook.snippets, function (index, snippet) {
         self.addSnippet(snippet);
       });
+      if (typeof notebook.presentationSnippets != "undefined" && notebook.presentationSnippets != null) { // Load
+        $.each(notebook.presentationSnippets, function(key, snippet) {
+          var _snippet = new Snippet(vm, self, snippet);
+          _snippet.init();
+          self.presentationSnippets()[key] = _snippet;
+        });	
+      }
       if (vm.editorMode() && self.history().length == 0) {
         self.fetchHistory(function() {
           self.updateHistory(['starting', 'running'], 30000);
@@ -2661,7 +2671,6 @@ var EditorViewModel = (function() {
       }
     });
     self.preEditorTogglingSnippet = ko.observable();
-    self.postEditorTogglingSnippets = {};
     self.toggleEditorMode = function() {
       var _notebook = self.selectedNotebook();
       var _newSnippets = [];
@@ -2673,8 +2682,8 @@ var EditorViewModel = (function() {
         _notebook.type('notebook');
         _notebook.snippets()[0].statementsList().forEach(function (sql_statement) {
           var _snippet;
-          if (sql_statement.hashCode() in self.postEditorTogglingSnippets) {
-            _snippet = self.postEditorTogglingSnippets[sql_statement.hashCode()]; // Persist result
+          if (sql_statement.hashCode() in _notebook.presentationSnippets()) {
+            _snippet = _notebook.presentationSnippets()[sql_statement.hashCode()]; // Persist result
           } else {
         	var _title = [];
         	var _statement = [];
@@ -2687,7 +2696,7 @@ var EditorViewModel = (function() {
         	});
             _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n')}, skipSession=true);
             _snippet.init();
-            self.postEditorTogglingSnippets[sql_statement.hashCode()] = _snippet;
+            _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
           }
           _newSnippets.push(_snippet);
         });
