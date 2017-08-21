@@ -1988,7 +1988,6 @@ var EditorViewModel = (function() {
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
-    self.isPresentation = ko.observable(typeof notebook.isPresentation != "undefined" && notebook.isPresentation != null ? notebook.isPresentation : false);
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
     self.creatingSessionLocks = ko.observableArray();
@@ -2701,12 +2700,6 @@ var EditorViewModel = (function() {
       _notebook.snippets(_newSnippets);
     };
     self.togglePresentationMode = function() {
-      var _notebook = self.selectedNotebook();
-      _notebook.isPresentation(! _notebook.isPresentation());
-
-      self.isEditing(! self.isEditing());
-      self.isPresentationMode(! self.isPresentationMode());
-
       if (options.editor_type != 'notebook') {
         self.toggleEditorMode();
       }
@@ -2723,6 +2716,7 @@ var EditorViewModel = (function() {
 
     self.combinedContent = ko.observable();
     self.isPresentationMode = ko.observable(false);
+    self.isResultFullScreenMode = ko.observable(false);
     self.isHidingCode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url); // Deprecated
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
