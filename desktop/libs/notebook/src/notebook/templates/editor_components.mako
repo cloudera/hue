@@ -3148,6 +3148,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       viewModel.isPresentationMode.subscribe(function (value) {
         if (value){
           $(".jHueNotify").remove();
+          isAssistAvailable = viewModel.assistAvailable();
+          wasLeftPanelVisible = viewModel.isLeftPanelVisible();
+          wasRightPanelVisible = viewModel.isRightPanelVisible();
           huePubSub.publish('side.panels.hide');
           viewModel.assistAvailable(false);
           viewModel.isLeftPanelVisible(false);
