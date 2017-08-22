@@ -3216,6 +3216,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         wasResultFullScreenMode = false;
         togglePresentation(newValue);
         viewModel.togglePresentationMode();
+        if (newValue) {
+          hueAnalytics.convert('editor', 'presentation');
+        }
       });
 
       huePubSub.subscribe('assist.set.manual.visibility', function () {
