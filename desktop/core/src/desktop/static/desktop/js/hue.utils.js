@@ -628,6 +628,11 @@ var hueAnalytics = (function () {
       if (typeof trackOnGA == 'function') {
         trackOnGA(app + '/' + page);
       }
+    },
+    convert: function (app, page) {
+      $.post("/desktop/log_analytics", {
+        page: app + '/' + page,
+      });
     }
   };
 })();
