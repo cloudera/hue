@@ -2815,12 +2815,22 @@ var EditorViewModel = (function() {
 
     self.assistAvailable = ko.observable(options.assistAvailable);
 
-    self.isLeftPanelVisible = ko.observable();
-    ApiHelper.getInstance().withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    self.assistWithoutStorage = ko.observable(false);
+
+    self.isLeftPanelVisible = ko.observable(ApiHelper.getInstance().getFromTotalStorage('assist', 'assist_panel_visible', true));
+    self.isLeftPanelVisible.subscribe(function (val) {
+      if (!self.assistWithoutStorage()){
+        ApiHelper.getInstance().setInTotalStorage('assist', 'assist_panel_visible', val);
+      }
+    });
 
     self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
-    self.isRightPanelVisible = ko.observable();
-    ApiHelper.getInstance().withTotalStorage('assist', 'right_assist_panel_visible', self.isRightPanelVisible, true);
+    self.isRightPanelVisible = ko.observable(ApiHelper.getInstance().getFromTotalStorage('assist', 'right_assist_panel_visible', true));
+    self.isRightPanelVisible.subscribe(function (val) {
+      if (!self.assistWithoutStorage()){
+        ApiHelper.getInstance().setInTotalStorage('assist', 'right_assist_panel_visible', val);
+      }
+    });
 
     huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
       if (self.isRightPanelAvailable() && !self.isRightPanelVisible()) {
