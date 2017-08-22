@@ -355,7 +355,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   </div>
 </div>
 
-<div class="player-toolbar" data-bind="visible: $root.isPresentationMode() || $root.isResultFullScreenMode()" style="display: none;">
+<div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode() || $root.isResultFullScreenMode()" style="display: none;">
   <!-- ko if: $root.isResultFullScreenMode() -->
     <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
       <i class="fa fa-times fa-fw"></i>
@@ -368,10 +368,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </a>
 
     <!-- ko if: $root.selectedNotebook() -->
-      <span data-bind="text: $root.selectedNotebook().name"></span>
-      <span data-bind="text: $root.selectedNotebook().description"></span>
-
+      <div class="inline margin-left-30">&nbsp;</div>
       <!-- ko template: { name: 'notebook-actions' }--><!-- /ko -->
+      <h3 class="margin-left-20 margin-right-10 inline" data-bind="text: $root.selectedNotebook().name"></h3>
+      <h4 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h4>
+
 
       <div class="clearfix"></div>
 
