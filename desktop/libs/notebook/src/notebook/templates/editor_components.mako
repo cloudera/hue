@@ -205,16 +205,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <div class="btn-group">
 
           % if ENABLE_PRESENTATION.get():
-          <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.isPresentationMode(true); },
-            attr: {'data-original-title': '${ _ko("View as a report") } '},
+          <a class="share-link btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
             css: {'btn-inverse': $root.isPresentationMode(), 'btn': true}">
             <i class="fa fa-line-chart"></i>
           </a>
           % endif
 
           <!-- ko if: $root.canSave -->
-          <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
-            attr: {'data-original-title': '${ _ko("Share") } ' + name},
+          <a class="share-link btn" title="${ _ko('Share') }" data-bind="click: prepareShareModal,
             css: {'isShared': isShared(), 'btn': true}">
             <i class="fa fa-users"></i>
           </a>
@@ -238,7 +236,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
 
-        <a class="btn pointer" title="${ _('Context') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+        <a class="btn pointer" title="${ _('Session') }" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
           <i class="fa fa-cogs"></i>
         </a>
 
