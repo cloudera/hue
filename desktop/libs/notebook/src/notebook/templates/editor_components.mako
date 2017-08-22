@@ -229,7 +229,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <ul class="dropdown-menu">
             <li>
               <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
-                <i class="fa fa-save"></i> ${ _('Save as...') }
+                <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
               </a>
             </li>
           </ul>
@@ -1178,7 +1178,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </li>
       <li>
         <a class="pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show code') }' : '${ _ko('Hide code') }' }">
-          <i class="fa" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
+          <i class="fa fa-fw" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
           <span data-bind="visible: $root.isHidingCode">${ _('Show the code') }</span>
           <span data-bind="visible: ! $root.isHidingCode()">${ _('Hide the code') }</span>
         </a>
