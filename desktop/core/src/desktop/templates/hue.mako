@@ -1129,15 +1129,22 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       function SidePanelViewModel () {
         var self = this;
         self.apiHelper = ApiHelper.getInstance();
-        self.leftAssistVisible = ko.observable();
-        self.leftAssistVisible.subscribe(function () {
+        self.assistWithoutStorage = ko.observable(false);
+        self.leftAssistVisible = ko.observable(self.apiHelper.getFromTotalStorage('assist', 'left_assist_panel_visible', true));
+        self.leftAssistVisible.subscribe(function (val) {
+          if (!self.assistWithoutStorage()){
+            self.apiHelper.setInTotalStorage('assist', 'left_assist_panel_visible', val);
+          }
           window.setTimeout(function () {
             huePubSub.publish('split.panel.resized');
           }, 0);
         });
 
-        self.rightAssistVisible = ko.observable();
-        self.rightAssistVisible.subscribe(function () {
+        self.rightAssistVisible = ko.observable(self.apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true));
+        self.rightAssistVisible.subscribe(function (val) {
+          if (!self.assistWithoutStorage()){
+            self.apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
+          }
           window.setTimeout(function () {
             huePubSub.publish('reposition.scroll.anchor.up');
             huePubSub.publish('nicescroll.resize');
@@ -1180,22 +1187,28 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.publish('get.current.app.view.model');
 
         var previousVisibilityValues = {};
-        huePubSub.subscribe('side.panels.hide', function(){
+        huePubSub.subscribe('side.panels.hide', function(withoutStorage){
           previousVisibilityValues = {
             left: self.leftAssistVisible(),
             right: self.rightAssistVisible()
           };
+          self.assistWithoutStorage(withoutStorage);
           self.leftAssistVisible(false);
           self.rightAssistVisible(false);
+          window.setTimeout(function(){
+            self.assistWithoutStorage(false);
+          }, 0);
         });
 
-        huePubSub.subscribe('side.panels.show', function(){
+        huePubSub.subscribe('side.panels.show', function(withoutStorage){
+          self.assistWithoutStorage(withoutStorage);
           self.leftAssistVisible(previousVisibilityValues.left);
           self.rightAssistVisible(previousVisibilityValues.right);
+          window.setTimeout(function(){
+            self.assistWithoutStorage(false);
+          }, 0);
         });
 
-        self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
-        self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
       }
 
       var sidePanelViewModel = new SidePanelViewModel();
