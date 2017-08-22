@@ -33,6 +33,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
 
+from desktop import appmanager
 from desktop.redaction.engine import parse_redaction_policy_from_file
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
@@ -43,6 +44,10 @@ from desktop.lib.paths import get_desktop_root
 
 LOG = logging.getLogger(__name__)
 
+
+def is_oozie_enabled():
+  """Oozie needs to be available as it is the backend."""
+  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0 and is_hue4()
 
 def coerce_database(database):
   if database == 'mysql':

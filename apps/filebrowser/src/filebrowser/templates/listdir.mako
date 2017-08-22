@@ -99,7 +99,7 @@ ${ fb_components.menubar() }
                   <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
                 </a>
               </li>
-              % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+              % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get() and 'oozie' in apps:
                 <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
                 </li>
