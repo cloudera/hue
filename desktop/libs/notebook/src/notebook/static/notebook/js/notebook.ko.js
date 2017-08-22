@@ -2244,9 +2244,11 @@ var EditorViewModel = (function() {
       hueAnalytics.log('notebook', 'save');
 
       // Remove the result data from the snippets
-      // TODO presentation mode too
+      // Also do it for presentation mode
       var cp = ko.mapping.toJS(self, NOTEBOOK_MAPPING);
-      $.each(cp.snippets, function(index, snippet) {
+      $.each(cp.snippets.concat(Object.keys(cp.presentationSnippets).map(function(key){
+          return cp.presentationSnippets[key];
+        })), function(index, snippet) {
         snippet.result.data.length = 0; // snippet.result.clear() does not work for some reason
         snippet.result.meta.length = 0;
         snippet.result.logs = '';
@@ -2633,7 +2635,7 @@ var EditorViewModel = (function() {
           var _snippet = new Snippet(vm, self, snippet);
           _snippet.init();
           self.presentationSnippets()[key] = _snippet;
-        });	
+        });
       }
       if (vm.editorMode() && self.history().length == 0) {
         self.fetchHistory(function() {
@@ -2685,15 +2687,15 @@ var EditorViewModel = (function() {
           if (sql_statement.hashCode() in _notebook.presentationSnippets()) {
             _snippet = _notebook.presentationSnippets()[sql_statement.hashCode()]; // Persist result
           } else {
-        	var _title = [];
-        	var _statement = [];
-        	sql_statement.trim().split('\n').forEach(function(line) {
-        		if (line.trim().startsWith('--') && _statement.length == 0) {
-                  _title.push(line.substr(2));
-        		} else {
-        		  _statement.push(line);
-        		}
-        	});
+            var _title = [];
+            var _statement = [];
+            sql_statement.trim().split('\n').forEach(function(line) {
+              if (line.trim().startsWith('--') && _statement.length == 0) {
+                _title.push(line.substr(2));
+              } else {
+                _statement.push(line);
+              }
+            });
             _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n')}, skipSession=true);
             _snippet.init();
             _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
