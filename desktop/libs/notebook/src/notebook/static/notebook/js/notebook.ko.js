@@ -1569,8 +1569,6 @@ var EditorViewModel = (function() {
         setTimeout(function () {
           self.fetchResultData(rows, false);
         }, 500);
-      } else if (! vm.editorMode() && notebook.snippets()[notebook.snippets().length - 1] == self) {
-        notebook.newSnippet();
       }
     };
 
