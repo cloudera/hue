@@ -1131,6 +1131,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
         useNewAutocompleter: $root.useNewAutocompleter,
+        readOnly: $root.isPresentationMode(),
         aceOptions: {
           showLineNumbers: $root.editorMode(),
           showGutter: $root.editorMode(),
