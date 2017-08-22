@@ -194,6 +194,14 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
+  def test_login_failure_for_bad_username(self):
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+
+    response = self.c.post('/accounts/login/', dict(username="test1*)(&(objectClass=*)", password="foo"))
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true('Invalid username or password' in response.content, response)
+
   def test_login_does_not_reset_groups(self):
     client = make_logged_in_client(username=self.test_username, password="test")
 
