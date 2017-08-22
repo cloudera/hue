@@ -2667,12 +2667,14 @@ var EditorViewModel = (function() {
       if (self.editorType() != 'notebook') {
         self.editorType('notebook');
         self.preEditorTogglingSnippet(_notebook.snippets()[0]);
+        var _variables = _notebook.snippets()[0].variables();
         // Split statements
         _notebook.type('notebook');
         _notebook.snippets()[0].statementsList().forEach(function (sql_statement) {
           var _snippet;
           if (sql_statement.hashCode() in _notebook.presentationSnippets()) {
             _snippet = _notebook.presentationSnippets()[sql_statement.hashCode()]; // Persist result
+            _snippet.variables(_variables);
           } else {
             var _title = [];
             var _statement = [];
@@ -2683,7 +2685,7 @@ var EditorViewModel = (function() {
                 _statement.push(line);
               }
             });
-            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n')}, skipSession=true);
+            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n'), variables: _variables}, skipSession=true);
             _snippet.init();
             _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
           }
