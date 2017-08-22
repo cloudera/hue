@@ -96,6 +96,9 @@ class LdapAuthenticationForm(AuthenticationForm):
     password = self.cleaned_data.get('password')
     server = self.cleaned_data.get('server')
 
+    if ('(' in username) or (')' in username) or ('*' in username):
+      raise ValidationError(self.error_messages['invalid_login'])
+
     if username and password:
       self.user_cache = authenticate(username=username,
                                      password=password,
