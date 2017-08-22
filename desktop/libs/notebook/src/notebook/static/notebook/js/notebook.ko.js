@@ -1209,21 +1209,7 @@ var EditorViewModel = (function() {
         huePubSub.publish('editor.refresh.statement.locations', self);
       }
 
-      self.previousChartOptions = {
-        chartScope: typeof self.chartScope() !== "undefined" ? self.chartScope() : self.previousChartOptions.chartScope,
-        chartTimelineType: typeof self.chartTimelineType() !== "undefined" ? self.chartTimelineType() : self.previousChartOptions.chartTimelineType,
-        chartLimit: typeof self.chartLimit() !== "undefined" ? self.chartLimit() : self.previousChartOptions.chartLimit,
-        chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
-        chartXPivot: typeof self.chartXPivot() !== "undefined" ? self.chartXPivot() : self.previousChartOptions.chartXPivot,
-        chartYSingle: typeof self.chartYSingle() !== "undefined" ? self.chartYSingle() : self.previousChartOptions.chartYSingle,
-        chartMapType: typeof self.chartMapType() !== "undefined" ? self.chartMapType() : self.previousChartOptions.chartMapType,
-        chartMapLabel: typeof self.chartMapLabel() !== "undefined" ? self.chartMapLabel() : self.previousChartOptions.chartMapLabel,
-        chartMapHeat: typeof self.chartMapHeat() !== "undefined" ? self.chartMapHeat() : self.previousChartOptions.chartMapHeat,
-        chartYMulti: typeof self.chartYMulti() !== "undefined" ? self.chartYMulti() : self.previousChartOptions.chartYMulti,
-        chartSorting: typeof self.chartSorting() !== "undefined" ? self.chartSorting() : self.previousChartOptions.chartSorting,
-        chartScatterGroup: typeof self.chartScatterGroup() !== "undefined" ? self.chartScatterGroup() : self.previousChartOptions.chartScatterGroup,
-        chartScatterSize: typeof self.chartScatterSize() !== "undefined" ? self.chartScatterSize() : self.previousChartOptions.chartScatterSize
-      };
+      self.previousChartOptions = vm._getPreviousChartOptions(self);
       $(document).trigger("executeStarted", {vm: vm, snippet: self});
       self.lastExecuted(now);
       $(".jHueNotify").remove();
@@ -2634,6 +2620,7 @@ var EditorViewModel = (function() {
         $.each(notebook.presentationSnippets, function(key, snippet) {
           var _snippet = new Snippet(vm, self, snippet);
           _snippet.init();
+          _snippet.previousChartOptions = vm._getPreviousChartOptions(_snippet);
           self.presentationSnippets()[key] = _snippet;
         });
       }
@@ -2927,21 +2914,7 @@ var EditorViewModel = (function() {
             snippet.result.statement_range.valueHasMutated();
           }
 
-          snippet.previousChartOptions = {
-            chartLimit: typeof snippet.chartLimit() !== "undefined" ? snippet.chartLimit() : snippet.previousChartOptions.chartLimit,
-            chartX: typeof snippet.chartX() !== "undefined" ? snippet.chartX() : snippet.previousChartOptions.chartX,
-            chartXPivot: typeof snippet.chartXPivot() !== "undefined" ? snippet.chartXPivot() : snippet.previousChartOptions.chartXPivot,
-            chartYSingle: typeof snippet.chartYSingle() !== "undefined" ? snippet.chartYSingle() : snippet.previousChartOptions.chartYSingle,
-            chartMapType: typeof snippet.chartMapType() !== "undefined" ? snippet.chartMapType() : snippet.previousChartOptions.chartMapType,
-            chartMapLabel: typeof snippet.chartMapLabel() !== "undefined" ? snippet.chartMapLabel() : snippet.previousChartOptions.chartMapLabel,
-            chartMapHeat: typeof snippet.chartMapHeat() !== "undefined" ? snippet.chartMapHeat() : snippet.previousChartOptions.chartMapHeat,
-            chartYMulti: typeof snippet.chartYMulti() !== "undefined" ? snippet.chartYMulti() : snippet.previousChartOptions.chartYMulti,
-            chartScope: typeof snippet.chartScope() !== "undefined" ? snippet.chartScope() : snippet.previousChartOptions.chartScope,
-            chartTimelineType: typeof snippet.chartTimelineType() !== "undefined" ? snippet.chartTimelineType() : snippet.previousChartOptions.chartTimelineType,
-            chartSorting: typeof snippet.chartSorting() !== "undefined" ? snippet.chartSorting() : snippet.previousChartOptions.chartSorting,
-            chartScatterGroup: typeof snippet.chartScatterGroup() !== "undefined" ? snippet.chartScatterGroup() : snippet.previousChartOptions.chartScatterGroup,
-            chartScatterSize: typeof snippet.chartScatterSize() !== "undefined" ? snippet.chartScatterSize() : snippet.previousChartOptions.chartScatterSize
-          };
+          snippet.previousChartOptions = self._getPreviousChartOptions(snippet);
         });
 
         if (notebook.snippets()[0].result.data().length > 0) {
@@ -2961,6 +2934,24 @@ var EditorViewModel = (function() {
       self.selectedNotebook(notebook);
       huePubSub.publish('check.job.browser');
       huePubSub.publish('recalculate.name.description.width');
+    };
+
+    self._getPreviousChartOptions = function(snippet) {
+      return {
+          chartLimit: typeof snippet.chartLimit() !== "undefined" ? snippet.chartLimit() : snippet.previousChartOptions.chartLimit,
+          chartX: typeof snippet.chartX() !== "undefined" ? snippet.chartX() : snippet.previousChartOptions.chartX,
+          chartXPivot: typeof snippet.chartXPivot() !== "undefined" ? snippet.chartXPivot() : snippet.previousChartOptions.chartXPivot,
+          chartYSingle: typeof snippet.chartYSingle() !== "undefined" ? snippet.chartYSingle() : snippet.previousChartOptions.chartYSingle,
+          chartMapType: typeof snippet.chartMapType() !== "undefined" ? snippet.chartMapType() : snippet.previousChartOptions.chartMapType,
+          chartMapLabel: typeof snippet.chartMapLabel() !== "undefined" ? snippet.chartMapLabel() : snippet.previousChartOptions.chartMapLabel,
+          chartMapHeat: typeof snippet.chartMapHeat() !== "undefined" ? snippet.chartMapHeat() : snippet.previousChartOptions.chartMapHeat,
+          chartYMulti: typeof snippet.chartYMulti() !== "undefined" ? snippet.chartYMulti() : snippet.previousChartOptions.chartYMulti,
+          chartScope: typeof snippet.chartScope() !== "undefined" ? snippet.chartScope() : snippet.previousChartOptions.chartScope,
+          chartTimelineType: typeof snippet.chartTimelineType() !== "undefined" ? snippet.chartTimelineType() : snippet.previousChartOptions.chartTimelineType,
+          chartSorting: typeof snippet.chartSorting() !== "undefined" ? snippet.chartSorting() : snippet.previousChartOptions.chartSorting,
+          chartScatterGroup: typeof snippet.chartScatterGroup() !== "undefined" ? snippet.chartScatterGroup() : snippet.previousChartOptions.chartScatterGroup,
+          chartScatterSize: typeof snippet.chartScatterSize() !== "undefined" ? snippet.chartScatterSize() : snippet.previousChartOptions.chartScatterSize
+        };
     };
 
     self.openNotebook = function (uuid, queryTab, skipUrlChange, callback) {
