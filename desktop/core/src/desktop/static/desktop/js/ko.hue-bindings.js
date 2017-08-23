@@ -6203,13 +6203,11 @@
         '</div>' +
         '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
         '</div>',
-        drop: function (e) {
+        sending: function (e) {
           $('.hoverMsg').addClass('hide');
-          if (e.dataTransfer.files.length > 0) {
-            $('#progressStatus').removeClass('hide');
-            $('#progressStatusBar').removeClass('hide');
-            $('#progressStatusBar div').css('width', '0');
-          }
+          $('#progressStatus').removeClass('hide');
+          $('#progressStatusBar').removeClass('hide');
+          $('#progressStatusBar div').css('width', '0');
         },
         uploadprogress: function (file, progress) {
           $('[data-dz-name]').each(function (cnt, item) {
