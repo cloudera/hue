@@ -1502,6 +1502,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     // Models
     self.initial = new NewTemplate(self, self.initialJson);
     self.collection = new Collection(self, self.collectionJson.collection);
+    self.isSaved = ko.computed(function() {
+      return !!self.collection.id();
+    });
     self.query = new Query(self, self.queryJson);
 
     // UI
