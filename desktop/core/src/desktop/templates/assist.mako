@@ -456,6 +456,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
+      <a class="inactive-action" data-bind="dropzone: {
+            url: '/filebrowser/upload/file?dest=' + path,
+            params: { dest: path },
+            paramName: 'hdfs_file',
+            onError: function(x, e){ $(document).trigger('error', e); },
+            onComplete: function () { huePubSub.publish('assist.hdfs.refresh'); } }" title="${_('Upload file')}" href="javascript:void(0)">
+        <div class="dz-message inline" data-dz-message><i class="pointer fa fa-plus" title="${_('Upload file')}"></i></div>
+      </a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
