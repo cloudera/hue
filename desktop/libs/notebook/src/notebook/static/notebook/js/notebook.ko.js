@@ -1544,7 +1544,7 @@ var EditorViewModel = (function() {
 
       self.result.images(typeof result.images != "undefined" && result.images != null ? result.images : []);
 
-      $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
+      huePubSub.publish('editor.render.data', {data: _tempData, snippet: self, initial: _initialIndex == 0});
 
       if (! self.result.fetchedOnce()) {
         result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
