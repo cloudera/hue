@@ -1998,6 +1998,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   var shareViewModel = initSharing("#documentShareModal");
   % endif
 
+  if (window.location.pathname.indexOf('notebook') > -1) {
+    HUE_PUB_SUB_EDITOR_ID = 'notebook';
+  }
+
 
   var isLeftNavOpen = false;
   huePubSub.subscribe('left.nav.open.toggle', function (val) {
@@ -3480,7 +3484,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         }
       }
 
-      $(document).on("renderData", function (e, options) {
+      huePubSub.subscribe('editor.render.data', function (options) {
         var _el = $("#snippet_" + options.snippet.id()).find(".resultTable");
         if (options.data.length > 0) {
           window.setTimeout(function () {
@@ -3514,7 +3518,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             scrollInertia: 0
           });
         }, 200)
-      });
+
+      }, HUE_PUB_SUB_EDITOR_ID);
+
 
       huePubSub.subscribe('editor.snippet.result.gray', function (snippet) {
         var $snippet = $("#snippet_" + snippet.id());
