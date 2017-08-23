@@ -899,7 +899,7 @@ ${ utils.submit_popup_event() }
         interpreters.push(interpreter.type);
       });
       if (clusterConfig['cluster_type'] != 'dataeng') {
-        interpreters = interpreters.concat(['subworkflow', 'fs', 'email', 'streaming', 'generic', 'stop']);
+        interpreters = interpreters.concat(['subworkflow', 'fs', 'email', 'ssh', 'streaming', 'generic', 'stop']);
       }
       viewModel.availableActions(interpreters);
     }, 'oozie');
