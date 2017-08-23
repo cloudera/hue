@@ -184,8 +184,10 @@ ${ commonimportexport(request) | n,unicode }
   var viewModel = new SearchCollectionsModel(appProperties);
   ko.applyBindings(viewModel, $("#collectionsComponents")[0]);
 
-  shareViewModel = initSharing("#documentShareModal");
-  shareViewModel.setDocUuid('');
+  if (!shareViewModel) {
+    shareViewModel = initSharing("#documentShareModal");
+    shareViewModel.setDocUuid('');
+  }
 
   $(document).ready(function () {
     viewModel.updateCollections();
