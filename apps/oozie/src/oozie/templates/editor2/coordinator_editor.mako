@@ -67,9 +67,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
 
     %if is_embeddable:
     <a class="btn" href="javascript: void(0)" title="${ _('Schedules') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '/home/?type=oozie-coordinator2'">
-      <span>
-        <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-      </span>
+      <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
     </a>
     %endif
 
