@@ -17,6 +17,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from desktop.views import commonheader, commonfooter
+from indexer.conf import ENABLE_NEW_INDEXER
 %>
 
 <%namespace name="macros" file="macros.mako" />
@@ -47,7 +48,11 @@ ${ commonheader(_('Dashboard'), "dashboard", user, request, "120px") | n,unicode
       % if user.is_superuser:
       <h1>
         ${ _('What about creating a') }
-        <a href="${ url('indexer:collections') }">${ _('new index') }</a> ?
+        % if ENABLE_NEW_INDEXER.get():
+          <a href="${ url('indexer:indexes') }">${ _('new index') }</a> ?
+        % else:
+          <a href="${ url('indexer:collections')  }">${ _('new index') }</a> ?
+        % endif
       </h1>
       % endif
     </div>

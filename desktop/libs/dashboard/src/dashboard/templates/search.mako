@@ -17,7 +17,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
-from desktop.views import commonheader, commonfooter, _ko
+from desktop.views import commonheader, commonfooter, _ko, commonshare
 from desktop import conf
 %>
 
@@ -26,6 +26,7 @@ from desktop import conf
 
 %if not is_embeddable:
 ${ commonheader(_('Dashboard'), "dashboard", user, request, "80px") | n,unicode }
+${ commonshare() | n,unicode }
 ${ notebookKoComponents.downloadSnippetResults() }
 %endif
 
