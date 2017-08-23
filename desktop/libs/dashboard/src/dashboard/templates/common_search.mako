@@ -18,7 +18,7 @@
 from django.utils.translation import ugettext as _
 
 from desktop import conf
-from desktop.views import commonheader, commonfooter, _ko
+from desktop.views import commonheader, commonfooter, _ko, commonshare
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
@@ -68,6 +68,12 @@ from desktop.views import commonheader, commonfooter, _ko
       <i class="fa fa-save"></i>
     </a>
     % endif
+    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
+      attr: {'data-original-title': '${ _ko("Share") } ' + name},
+      css: {'isShared': isShared(), 'btn': true},
+      visible: isSaved()">
+      <i class="fa fa-users"></i>
+    </a>
     %if not is_embeddable:
     <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
       <i class="fa fa-expand"></i>
@@ -2755,6 +2761,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 ${ dashboard.import_layout(True) }
 
+% if not is_embeddable:
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
+% endif
 <script src="${ static('dashboard/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -2811,6 +2820,11 @@ var HIT_OPTIONS = [
   { value: "sub", label: "${ _('Substract') }" },
   { value: "ms", label: "${ _('Substract dates') }" },
 ];
+
+function prepareShareModal () {
+  shareViewModel.setDocUuid(this.collection.uuid());
+  openShareModal();
+}
 
 function getHitOption(value){
   for (var i=0; i < HIT_OPTIONS.length; i++){
