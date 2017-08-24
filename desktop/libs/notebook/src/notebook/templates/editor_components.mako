@@ -1348,7 +1348,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="snippet-grid-settings${ suffix }">
   <div class="snippet-grid-settings" style="overflow: auto">
-    <table class="table table-condensed margin-top-10">
+    <table class="table table-condensed margin-top-10 no-border">
       <thead>
         <tr>
           <th width="16">
