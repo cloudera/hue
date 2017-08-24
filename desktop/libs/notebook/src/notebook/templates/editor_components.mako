@@ -362,17 +362,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </a>
 
     <!-- ko if: $root.selectedNotebook() -->
-      <div class="inline margin-left-30">&nbsp;</div>
-      <!-- ko template: { name: 'notebook-actions' }--><!-- /ko -->
-      <h3 class="margin-left-20 margin-right-10 inline" data-bind="text: $root.selectedNotebook().name"></h3>
-      <h4 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h4>
-
-
+      <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
+      <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
       <div class="clearfix"></div>
 
+      <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
+      <!-- ko template: { name: 'notebook-actions' }--><!-- /ko -->
       <!-- ko if: $root.preEditorTogglingSnippet -->
         <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: $root.preEditorTogglingSnippet }--><!-- /ko -->
       <!-- /ko -->
+      </div>
 
     <!-- /ko -->
   <!-- /ko -->
