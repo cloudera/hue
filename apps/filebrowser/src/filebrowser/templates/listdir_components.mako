@@ -1692,7 +1692,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               %if is_embeddable:
               $scrollable = $('.page-content');
               %endif
-              if ($('.row-deleted').length() > 0 && $('.row-deleted:eq(0)').offset()) {
+              if ($('.row-deleted').length > 0 && $('.row-deleted:eq(0)').offset()) {
                 $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
               }
             }, 500);
