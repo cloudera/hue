@@ -171,7 +171,6 @@ class TestLdapLogin(PseudoHdfsTestBase):
     self.c = Client()
     self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.LdapBackend']) )
     self.reset.append(conf.LDAP.LDAP_URL.set_for_testing('does not matter'))
-    self.reset.append(conf.LDAP.LDAP_SERVERS.set_for_testing(get_mocked_config()))
 
   def tearDown(self):
     User.objects.all().delete()
@@ -202,6 +201,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert_false(response.context['first_login_ever'])
 
   def test_login_failure_for_bad_username(self):
+    self.reset.append(conf.LDAP.LDAP_SERVERS.set_for_testing(get_mocked_config()))
+
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
 
