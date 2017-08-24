@@ -2698,6 +2698,9 @@ var EditorViewModel = (function() {
         _notebook.type('query-' + options.editor_type);
       }
       _notebook.snippets(_newSnippets);
+      if (_newSnippets.length > 0) {
+        huePubSub.publish('editor.redraw.data', {snippet: _newSnippets[0]});
+      }
     };
     self.togglePresentationMode = function() {
       if (options.editor_type != 'notebook') {
