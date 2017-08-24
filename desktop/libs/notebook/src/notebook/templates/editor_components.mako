@@ -3516,6 +3516,15 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
       }, HUE_PUB_SUB_EDITOR_ID);
 
+      huePubSub.subscribe('editor.redraw.data', function (options) {
+        hueUtils.waitForRendered("#snippet_" + options.snippet.id() + " .resultTable", function (el) {
+          return el.is(':visible')
+        }, function () {
+          var $el = $("#snippet_" + options.snippet.id()).find(".resultTable");
+          var dt = createDatatable($el, options.snippet, viewModel);
+          dt.fnAddData(options.snippet.result.data());
+        });
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('editor.snippet.result.gray', function (snippet) {
         var $snippet = $("#snippet_" + snippet.id());
