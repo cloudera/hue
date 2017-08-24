@@ -481,6 +481,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
     self.user = User.objects.get(username='test')
     add_to_group('test')
     grant_access("test", "test", "notebook")
+    grant_access("test", "default", "impala")
 
     self.db = dbms.get(self.user, get_query_server_config())
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
