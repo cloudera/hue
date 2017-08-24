@@ -236,10 +236,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
 
-        <a class="btn pointer" title="${ _('Session') }" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-          <i class="fa fa-cogs"></i>
-        </a>
-
         <!-- ko if: editorMode -->
         <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
@@ -250,6 +246,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <i class="fa fa-file-o"></i>
         </a>
         <!-- /ko -->
+
+        <a class="btn pointer" title="${ _('Session') }" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+          <i class="fa fa-cogs"></i>
+        </a>
 
         <!-- ko if: IS_HUE_4 -->
         <a class="btn" data-bind="hueLink: '/home/?type=' + (editorMode() ? 'query-' : '') + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
