@@ -15,9 +15,13 @@
 ## limitations under the License.
 
 <%!
+import logging
+
 from desktop.lib.conf import BoundContainer, is_anonymous
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+
+LOG = logging.getLogger(__name__)
 %>
 
 <%namespace name="layout" file="about_layout.mako" />
@@ -137,7 +141,14 @@ ${ layout.menubar(section='dump_config') }
             % else:
               ${ str(config_obj.get_raw()).decode('utf-8', 'replace') }
             % endif
-              %if str(config_obj.get_raw()).decode('utf-8', 'replace') == '':
+              <%
+                config_str = None
+                try:
+                  config_str = str(config_obj.get_raw()).decode('utf-8', 'replace')
+                except:
+                  LOG.exception("Potential misconfiguration. Error value of key '%s' in configuration." % config_obj.grab_key)
+              %>
+              %if config_str == '':
               &nbsp;
               %endif
             </code><br/>
