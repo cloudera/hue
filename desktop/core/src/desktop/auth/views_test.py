@@ -37,6 +37,12 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group
 
 
+def get_mocked_config():
+  return {'mocked_ldap': {
+    'users': {},
+    'groups': {}
+  }}
+
 class TestLoginWithHadoop(PseudoHdfsTestBase):
 
   reset = []
@@ -165,6 +171,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     self.c = Client()
     self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.LdapBackend']) )
     self.reset.append(conf.LDAP.LDAP_URL.set_for_testing('does not matter'))
+    self.reset.append(conf.LDAP.LDAP_SERVERS.set_for_testing(get_mocked_config()))
 
   def tearDown(self):
     User.objects.all().delete()
