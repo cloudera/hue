@@ -171,7 +171,6 @@ class TestLdapLogin(PseudoHdfsTestBase):
     self.c = Client()
     self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.LdapBackend']) )
     self.reset.append(conf.LDAP.LDAP_URL.set_for_testing('does not matter'))
-    self.reset.append(conf.LDAP.LDAP_SERVERS.set_for_testing(get_mocked_config()))
 
   def tearDown(self):
     User.objects.all().delete()
