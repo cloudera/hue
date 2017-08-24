@@ -35,6 +35,7 @@ DEFAULT_CALLING_FORMAT = 'boto.s3.connection.OrdinaryCallingFormat'
 SUBDOMAIN_ENDPOINT_RE = 's3.(?P<region>[a-z0-9-]+).amazonaws.com'
 HYPHEN_ENDPOINT_RE = 's3-(?P<region>[a-z0-9-]+).amazonaws.com'
 DUALSTACK_ENDPOINT_RE = 's3.dualstack.(?P<region>[a-z0-9-]+).amazonaws.com'
+AWS_ACCOUNT_REGION_DEFAULT = Location.USEast
 
 
 def get_locations():
@@ -127,7 +128,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ),
       REGION=Config(
         key='region',
-        default='us-east-1',
+        default=AWS_ACCOUNT_REGION_DEFAULT,
         type=str
       ),
       HOST=Config(
