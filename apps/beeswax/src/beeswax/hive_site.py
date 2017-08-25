@@ -185,3 +185,10 @@ def _parse_hive_site():
     data = ""
 
   _HIVE_SITE_DICT = confparse.ConfParse(data)
+
+def get_hive_site_content():
+  hive_site_path = os.path.join(beeswax.conf.HIVE_CONF_DIR.get(), 'hive-site.xml')
+  if not os.path.exists(hive_site_path):
+    return ''
+  else:
+    return file(hive_site_path, 'r').read()
