@@ -814,6 +814,7 @@ ${ assist.assistPanel() }
         self.index(null);
         hueUtils.changeURL(self.baseURL);
         self.fetchIndexes();
+        $('#fieldAnalysisIndexes').hide();
       }
 
       self.fetchIndexes = function (callback) {
