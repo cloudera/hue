@@ -58,6 +58,17 @@ var Column = function (size, rows, vm) {
     }
     return row;
   };
+
+  self.moveLeft = function (idx) {
+    vm.columns().move(idx, (idx > 0 ? idx - 1 : 0));
+    vm.columns.valueHasMutated();
+  }
+
+  self.moveRight = function (idx) {
+    vm.columns().move(idx, (idx == vm.columns().length ? 0 : idx + 1));
+    vm.columns.valueHasMutated();
+  }
+
   self.shrinkColumn = function () {
     if (self.size() > 1) {
       self.size(self.size() - 1);
@@ -68,6 +79,7 @@ var Column = function (size, rows, vm) {
       });
     }
   }
+
   self.expandColumn = function () {
     if (self.size() < 12) {
       self.size(self.size() + 1);
@@ -78,11 +90,13 @@ var Column = function (size, rows, vm) {
       });
     }
   }
+
   self.addColumn = function () {
     var col = new Column(0, [], vm);
     vm.columns.push(col);
     col.expandColumn();
   }
+
   self.removeColumn = function () {
     vm.columns().forEach(function (col) {
       if (col.id() !== self.id()) {
