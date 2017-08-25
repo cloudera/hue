@@ -302,7 +302,7 @@ ${ assist.assistPanel() }
               <h2 class="modal-title">${ _('Create alias') }</h2>
             </div>
             <div class="modal-body">
-              <input type="text" data-bind="textInput: alias.name"/>
+              <label class="margin-bottom-20">${ _('Alias name') } <input type="text" data-bind="textInput: alias.name" class="input-xlarge no-margin-bottom margin-left-10"></label>
 
               <table id="indexesChecksTable" class="table table-condensed table-nowrap">
                 <thead>
