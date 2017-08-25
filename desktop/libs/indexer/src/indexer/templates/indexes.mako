@@ -963,7 +963,7 @@ ${ assist.assistPanel() }
           top: Math.max(0, originalEvent.pageY + ${ is_embeddable and '48' or '-70'} - $("#fieldAnalysisIndexes").outerHeight() / 2),
           left: originalEvent.pageX
         });
-      });
+      }, 'indexes');
 
       viewModel.fetchIndexes(function () {
         if (options.index) {
