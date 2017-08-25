@@ -25,6 +25,7 @@ from string import Template
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
+from beeswax.hive_site import get_hive_site_content
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from desktop.lib.parameterization import find_variables
@@ -287,6 +288,12 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
           statements = notebook.get_data()['snippets'][0]['statement_raw']
 
           self._create_file(deployment_dir, action.data['name'] + '.pig', statements)
+        elif action.data['type'] == 'spark':
+          if not [f for f in action.data.get('properties').get('files', []) if f.get('value').endswith('hive-site.xml')]:
+            hive_site_lib = Hdfs.join(self.job.deployment_dir + '/lib/', 'hive-site.xml')
+            hive_site_content = get_hive_site_content()
+            if not self.fs.do_as_user(self.user, self.fs.exists, hive_site_lib) and hive_site_content:
+              self.fs.do_as_user(self.user, self.fs.create, hive_site_lib, overwrite=True, permission=0700, data=smart_str(hive_site_content))
 
     oozie_xml = self.job.to_xml(self.properties)
     self._do_as(self.user.username, self._copy_files, deployment_dir, oozie_xml, self.properties)
