@@ -4534,6 +4534,14 @@
         }
       });
 
+      editor.commands.addCommand({
+        name: "esc",
+        bindKey: {win: "Ctrl-Shift-p", mac: "Ctrl-Shift-p|Command-Shift-p"},
+        exec: function () {
+          huePubSub.publish('editor.presentation.toggle');
+        }
+      });
+
       editor.commands.bindKey("Ctrl-P", "golineup");
 
       editor.commands.addCommand({

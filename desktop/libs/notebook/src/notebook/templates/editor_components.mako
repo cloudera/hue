@@ -3279,6 +3279,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         return false;
       });
 
+      huePubSub.subscribe('editor.presentation.toggle', function () {
+        viewModel.isPresentationMode(!viewModel.isPresentationMode());
+      }, HUE_PUB_SUB_EDITOR_ID);
+
+      $(window).bind("keydown", "ctrl+shift+p alt+shift+p meta+shift+p", function (e) {
+        e.preventDefault();
+        huePubSub.publish('editor.presentation.toggle');
+        return false;
+      });
+
       huePubSub.subscribe('editor.save', saveKeyHandler, HUE_PUB_SUB_EDITOR_ID);
 
       $(document).bind('keyup', function (e) {
