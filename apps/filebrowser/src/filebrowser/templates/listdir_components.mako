@@ -750,95 +750,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       user: "${ user }"
     });
 
-    // migration to the new history
-    if ($.totalStorage('hue_fb_history')) {
-      var s3History = [],
-        hdfsHistory = [];
-      $.totalStorage('hue_fb_history').forEach(function(item) {
-        if (item.toLowerCase().indexOf('s3a://') === 0){
-          s3History.push(item);
-        }
-        else {
-          hdfsHistory.push(item);
-        }
-      });
-      $.totalStorage('hue_fb_history', null);
-      apiHelper.setInTotalStorage('fb', 'history_s3', s3History);
-      apiHelper.setInTotalStorage('fb', 'history_hdfs', hdfsHistory);
-    }
-
-    var getHistorySlug = function() {
-      var slug = 'history_';
-      if (viewModel && viewModel.isS3()){
-        slug += 's3';
-      }
-      else {
-        slug += 'hdfs';
-      }
-      return slug;
-    }
-
-    var getHistory = function () {
-      return apiHelper.getFromTotalStorage('fb', getHistorySlug(), [])
-    };
-
-    var showHistory = function () {
-      var history = getHistory().slice(0, 10),
-        frag = $('<ul/>', {
-                  'id': 'hashHistory',
-                  'class': 'dropdown-menu',
-                  'role': 'menu',
-                  'aria-labelledby': 'historyDropdown'
-                });
-
-      $('#hashHistory').remove();
-      if (history.length === 0){
-        $('.history').addClass('no-history');
-      }
-
-      history.forEach(function (item) {
-        var url = '#' + item,
-          list = $('<li><a href="' + url + '">' + item + '</a></li>');
-
-        $(list).appendTo(frag);
-      });
-
-      $('<li>', {
-        'class': 'divider'
-      }).appendTo(frag);
-
-      $('<li><a href="javascript:void(0)">${ _("Clear history...") }</a></li>')
-          .appendTo(frag)
-          .on('click', function(){
-            apiHelper.setInTotalStorage('fb', getHistorySlug(), []);
-            $('.history').addClass('no-history');
-          });
-
-      $(frag).appendTo('.history');
-
-      return this;
-    };
-
-    var addPathToHistory = function (path) {
-      $('.history').removeClass('no-history');
-      var history = getHistory();
-      if (path != '/filebrowser/') {
-        var _basePath = '${url('filebrowser.views.view', path='')}';
-        if (path.indexOf(_basePath) > -1) {
-          path = path.substr(_basePath.length);
-        }
-
-        // ensure no duplicates are pushed to $.totalStorage()
-        if (history.indexOf(path) === -1) {
-          history.unshift(path);
-          $('.history').removeClass('no-history');
-        } else {
-          history.unshift(history.splice(history.indexOf(path), 1)[0]);
-        }
-        apiHelper.setInTotalStorage('fb', getHistorySlug(), history.slice(0, 10));
-      }
-    };
-
     // ajax modal windows
     var openChownWindow = function (path, user, group, next) {
       $.ajax({
@@ -1163,7 +1074,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.isS3.subscribe(function (newVal) {
         if (newVal) {
           huePubSub.publish('update.autocompleters');
-          huePubSub.publish('update.history');
         }
       });
 
@@ -2116,15 +2026,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ko.applyBindings(viewModel, $('.filebrowser')[0]);
 
     $(document).ready(function () {
-      $('.historyLink').on('click', function (e) {
-        if(getHistory().length > 0) {
-          showHistory();
-        } else {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
-
       // hide context menu
       $('body').on('click', function (e) {
         hideContextMenu();
@@ -2453,16 +2354,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
       }, 'filebrowser');
 
-      huePubSub.subscribe('update.history', function(){
-        if (getHistory().length == 0) {
-          $('.history').addClass('no-history');
-        }
-        else {
-          $('.history').removeClass('no-history');
-        }
-      });
-
-
       $("#copyForm").on("submit", function () {
         if ($.trim($("#copyDestination").val()) == "") {
           $("#copyNameRequiredAlert").show();
@@ -2535,8 +2426,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             hash = encodeURI(hash);
           }
           if (hash != null && hash != "" && hash.indexOf('/') > -1) {
-            addPathToHistory(hash);
-
             targetPath = "${url('filebrowser.views.view', path='')}";
             if (hash.indexOf("!!") != 0) {
               targetPath += stripHashes(hash);
