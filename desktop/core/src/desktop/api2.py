@@ -28,6 +28,7 @@ from django.core import management
 
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.html import escape
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
@@ -600,11 +601,11 @@ def search_entities(request):
     entities = _search(user=request.user, search_text=search_text)
     response = {
       'entities': [{
-          'hue_name': e.name,
-          'hue_description': e.description,
+          'hue_name': escape(e.name),
+          'hue_description': escape(e.description),
           'type': 'HUE',
-          'doc_type': e.type,
-          'originalName': e.name,
+          'doc_type': escape(e.type),
+          'originalName': escape(e.name),
           'link': e.get_absolute_url()
         } for e in entities['documents']
       ],
@@ -629,12 +630,12 @@ def search_entities_interactive(request):
     entities = _search(user=request.user, search_text=search_text, limit=limit)
     response = {
       'results': [{
-          'hue_name': e.name,
-          'hue_description': e.description,
+          'hue_name': escape(e.name),
+          'hue_description': escape(e.description),
           'link': e.get_absolute_url(),
-          'doc_type': e.type,
+          'doc_type': escape(e.type),
           'type': 'HUE',
-          'originalName': e.name
+          'originalName': escape(e.name)
         } for e in entities['documents']
       ],
       'count': len(entities['documents']),
