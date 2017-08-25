@@ -54,13 +54,6 @@ from aws import get_client
           </a>
         </li>
         % endif
-        <li class="pull-right">
-          <div class="dropdown breadcrumb-link history">
-            <a href="javascript:void(0)" class="historyLink dropdown-toggle" title="${_('View History')}" data-toggle="dropdown" id="historyDropdown">
-              <i class="fa fa-caret-down"></i> ${_('History')}
-            </a>
-          </div>
-        </li>
       </ul>
     % else:
       <ul class="nav nav-pills hue-breadcrumbs-bar">
