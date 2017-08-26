@@ -835,6 +835,7 @@ class File(object):
     self._path = normpath(path)
     self._pos = 0
     self._mode = mode
+    self._data = ""
 
     try:
       self._stat = fs.stats(path)
@@ -859,6 +860,9 @@ class File(object):
     else:
       raise IOError(errno.EINVAL, _("Invalid argument to seek for whence"))
 
+    # Reset cached data on seek
+    self._data = ""
+
   def stat(self):
     self._stat = self._fs.stats(self._path)
     return self._stat
@@ -867,8 +871,20 @@ class File(object):
     return self._pos
 
   def read(self, length=DEFAULT_READ_SIZE):
-    data = self._fs.read(self._path, self._pos, length)
-    self._pos += len(data)
+    # Make sure to grab more data if there is none available
+    if length > len(self._data):
+      # Grab at minimum DEFAULT_READ_SIZE
+      self._data += self._fs.read(self._path, self._pos, max(length, DEFAULT_READ_SIZE))
+
+    # Make sure to increase the _pos by length of data or what length of requested
+    real_length = min(len(self._data), length)
+    self._pos += real_length
+
+    # Strip off real length from data set
+    data = self._data[:real_length]
+    self._data = self._data[real_length:]
+
+    # Return the requested length of data
     return data
 
   def write(self, data):
