@@ -1494,7 +1494,7 @@ var EditorViewModel = (function() {
 
     self.fetchResultData = function (rows, startOver) {
       if (! self.isFetchingData) {
-        if( self.status() == 'available') {
+        if (self.status() == 'available') {
           startLongOperationTimeout();
           self.isFetchingData = true;
           hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
@@ -2670,6 +2670,7 @@ var EditorViewModel = (function() {
         self.editorType('notebook');
         self.preEditorTogglingSnippet(_notebook.snippets()[0]);
         var _variables = _notebook.snippets()[0].variables();
+        var _statementKeys = [];
         // Split statements
         _notebook.type('notebook');
         _notebook.snippets()[0].statementsList().forEach(function (sql_statement) {
@@ -2691,7 +2692,13 @@ var EditorViewModel = (function() {
             _snippet.init();
             _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
           }
+          _statementKeys.push(sql_statement.hashCode());
           _newSnippets.push(_snippet);
+        });
+        $.each(_notebook.presentationSnippets(), function(key, statement) { // Dead statements
+          if (! key in _statementKeys) {
+            delete _notebook.presentationSnippets()[key];
+          }
         });
       } else {
         self.editorType(options.editor_type);
