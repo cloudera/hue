@@ -633,7 +633,37 @@ var Collection = function (vm, collection) {
     });
   }
 
+  self.getTemplateField = function (name, fields) {
+    var _field = null;
+    $.each(fields, function (index, field) {
+      if (field && field.name() == name) {
+        _field = field;
+        return false;
+      }
+    });
+    return _field;
+  };
+
+  self._get_field_operations = function(field, facet) {
+    if (! field) {
+      return HIT_OPTIONS;
+    }
+    else if (isNumericColumn(field.type())) {
+      return NUMERIC_HIT_OPTIONS;
+    } else if (isDateTimeColumn(field.type())) {
+      return DATETIME_HIT_OPTIONS;
+    } else {
+      facet.properties.facets_form.aggregate.function('count');
+      return ALPHA_HIT_OPTIONS;
+    }
+  }
+
   self._addObservablesToFacet = function(facet, vm) {
+    facet.properties.facets_form.metrics = ko.computed(function() {
+      var _field = self.getTemplateField(facet.properties.facets_form.field(), self.template.fieldsAttributes());
+      return self._get_field_operations(_field, facet);
+    });
+
     facet.properties.limit.subscribe(function () {
       vm.search();
     });
@@ -909,7 +939,11 @@ var Collection = function (vm, collection) {
       'field': ko.mapping.toJS(facet.properties.facets_form.field),
       'limit': ko.mapping.toJS(facet.properties.facets_form.limit),
       'mincount': ko.mapping.toJS(facet.properties.facets_form.mincount),
-      'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
+      'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate)
+    });
+    pivot.aggregate.metrics = ko.computed(function() {
+      var _field = self.getTemplateField(pivot.field(), self.template.fieldsAttributes());
+      return self._get_field_operations(_field, facet);
     });
 
     facet.properties.facets_form.field(null);
@@ -1061,17 +1095,6 @@ var Collection = function (vm, collection) {
     }
     return hasData;
   });
-
-  self.getTemplateField = function (name, fields) {
-    var _field = null;
-    $.each(fields, function (index, field) {
-      if (field && field.name() == name) {
-        _field = field;
-        return false;
-      }
-    });
-    return _field;
-  };
 
   self.template.fieldsModalFilter = ko.observable(""); // For UI
   self.template.fieldsModalType = ko.observable(""); // For UI

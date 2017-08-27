@@ -2092,8 +2092,12 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="metric-form">
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
-    <!-- ko if: $data.function() != 'field' -->
-      <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
+    <!-- ko if: $data.function() != 'field' && $parent.properties -->
+      <select data-bind="options: $parent.properties.facets_form.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
+    <!-- /ko -->
+
+    <!-- ko if: $data.function() != 'field' && $data.metrics -->
+      <select data-bind="options: $data.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
     <!-- /ko -->
 
     <!-- ko if: $data.function() == 'field' -->
@@ -2114,7 +2118,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <i class="fa fa-plus" title="${ _('Add') }"></i>
     <!-- /ko -->
 
-    <a href="javascript: void(0)" data-bind="click: function() { $parent.ops.pop($data); }">
+    <a href="javascript: void(0)" data-bind="visible: typeof $parent.ops != 'undefined', click: function() { $parent.ops.pop($data); }">
       <i class="fa fa-minus" title="${ _('Delete') }"></i>
     </a>
 
@@ -2810,20 +2814,33 @@ var searchViewModel;
 
 moment.suppressDeprecationWarnings = true;
 
-var HIT_OPTIONS = [
-  { value: "count", label: "${ _('Count') }" },
-  { value: "unique", label: "${ _('Unique Count') }" },
-  { value: "avg", label: "${ _('Average') }" },
-  { value: "sum", label: "${ _('Sum') }" },
-  { value: "min", label: "${ _('Min') }" },
-  { value: "max", label: "${ _('Max') }" },
-  { value: "median", label: "${ _('Median') }" },
-  { value: "percentile", label: "${ _('Percentiles') }" },
-  { value: "mul", label: "${ _('Multiply') }" },
-  { value: "add", label: "${ _('Add') }" },
-  { value: "sub", label: "${ _('Substract') }" },
-  { value: "ms", label: "${ _('Substract dates') }" },
+var NUMERIC_HIT_OPTIONS = [
+    // No count
+    { value: "unique", label: "${ _('Unique Count') }" },
+    { value: "avg", label: "${ _('Average') }" },
+    { value: "sum", label: "${ _('Sum') }" },
+    { value: "min", label: "${ _('Min') }" },
+    { value: "max", label: "${ _('Max') }" },
+    { value: "median", label: "${ _('Median') }" },
+    { value: "percentile", label: "${ _('Percentiles') }" },
+    { value: "mul", label: "${ _('Multiply') }" },
+    { value: "add", label: "${ _('Add') }" },
+    { value: "sub", label: "${ _('Substract') }" }
 ];
+var DATETIME_HIT_OPTIONS = [
+    { value: "unique", label: "${ _('Unique Count') }" },
+    { value: "ms", label: "${ _('Substract dates') }" }
+];
+var ALPHA_HIT_OPTIONS = [
+    { value: "count", label: "Count" },
+    { value: "unique", label: "${ _('Unique Count') }" }
+];
+var HIT_OPTIONS = [
+    { value: "count", label: "${ _('Count') }" }
+  ].concat(NUMERIC_HIT_OPTIONS)\
+  .concat([{ value: "ms", label: "${ _('Substract dates') }" }])
+;
+
 
 function prepareShareModal () {
   shareViewModel.setDocUuid(this.collection.uuid());
@@ -3475,7 +3492,7 @@ function newSearch() {
 }
 
 function loadSearch(collection, query, initial) {
-  
+
   searchViewModel = new SearchViewModel(collection, query, initial);
 
   ko.applyBindings(searchViewModel, $('#searchComponents')[0]);
