@@ -61,12 +61,11 @@ def list_indexes(request):
   return JsonResponse(response)
 
 
-@require_POST
 @api_error_handler
 def list_index(request):
   response = {'status': -1}
 
-  name = request.POST.get('name')
+  name = request.REQUEST.get('name')
 
   client = SolrClient(user=request.user)
 
