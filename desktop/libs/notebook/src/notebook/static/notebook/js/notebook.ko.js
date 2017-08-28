@@ -737,7 +737,7 @@ var EditorViewModel = (function() {
     self.showGrid.subscribe(function (val) {
       if (val) {
         self.showChart(false);
-        $(document).trigger("gridShown", self);
+        huePubSub.publish('editor.grid.shown', self);
       }
     });
 
@@ -790,7 +790,7 @@ var EditorViewModel = (function() {
         self.showGrid(false);
         self.isResultSettingsVisible(true);
         $(document).trigger("forceChartDraw", self);
-        $(document).trigger("chartShown", self);
+        huePubSub.publish('editor.chart.shown', self);
         prepopulateChart();
       }
     });

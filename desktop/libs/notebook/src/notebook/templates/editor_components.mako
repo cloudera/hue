@@ -3625,26 +3625,36 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           }
         }
         callback(result);
-      });
+      }, HUE_PUB_SUB_EDITOR_ID);
 
-      $(document).on("gridShown", function (e, snippet) {
-        window.setTimeout(function () {
+      huePubSub.subscribe('editor.grid.shown', function (snippet) {
+        hueUtils.waitForRendered('#snippet_' + snippet.id() + ' .dataTables_wrapper', function (el) {
+          return el.is(':visible')
+        }, function () {
           resizeToggleResultSettings(snippet, true);
           forceChartDraws();
-          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 10 }, scrollInertia: 0});
-          window.setTimeout(function(){
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({
+            axis: 'xy',
+            theme: 'minimal-dark',
+            scrollbarPosition: 'outside',
+            mouseWheel: {preventDefault: true, deltaFactor: 10},
+            scrollInertia: 0
+          });
+          window.setTimeout(function () {
             $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
               scrollInertia: 0
             });
           }, 200)
-        }, 50);
-      });
+        });
+      }, HUE_PUB_SUB_EDITOR_ID);
 
-      $(document).on("chartShown", function (e, snippet) {
-        window.setTimeout(function () {
+      huePubSub.subscribe('editor.chart.shown', function (snippet) {
+        hueUtils.waitForRendered('#snippet_' + snippet.id() + ' .chart:visible', function (el) {
+          return el.length > 0
+        }, function () {
           resizeToggleResultSettings(snippet, true);
-        }, 50);
-      });
+        });
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       $(document).on("forceChartDraw", function (e, snippet) {
         window.setTimeout(function () {
