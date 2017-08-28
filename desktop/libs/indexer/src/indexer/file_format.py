@@ -469,7 +469,9 @@ class CSVFormat(FileFormat):
     first_row = reader.next()
 
     if self._has_header:
-      header = first_row
+      header = []
+      for i, field in enumerate(first_row):
+        header.append(field if field not in header else '%s_%s' % (field, i))
     else:
       header = ["field_%d" % (i + 1) for i in range(self._num_columns)]
 
