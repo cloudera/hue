@@ -246,5 +246,9 @@ var AssistS3Entry = (function () {
     });
   };
 
+  AssistS3Entry.prototype.openInImporter = function () {
+    huePubSub.publish('open.in.importer', this.definition.path);
+  };
+
   return AssistS3Entry;
 })();
