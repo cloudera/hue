@@ -400,7 +400,11 @@ class SolrApi(object):
         params += tuple(((key, val) for key, val in kwargs.iteritems()))
 
       response = self._root.post('admin/collections', params=params, contenttype='application/json')
-      return self._get_json(response)
+      response_data = self._get_json(response)
+      if response_data.get('failure'):
+        raise PopupException(_('Collection could not be created: %(failure)s') % response_data)
+      else:
+        return response_data
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
