@@ -73,13 +73,14 @@ else:
   )
 
 dynamic_patterns += patterns('desktop.views',
-  (r'^logs$','log_view'),
-  (r'^desktop/log_js_error$','log_js_error'),
-  (r'^desktop/dump_config$','dump_config'),
-  (r'^desktop/download_logs$','download_log_view'),
-  (r'^desktop/get_debug_level','get_debug_level'),
-  (r'^desktop/set_all_debug','set_all_debug'),
-  (r'^desktop/reset_all_debug','reset_all_debug'),
+  (r'^logs$', 'log_view'),
+  (r'^desktop/log_analytics$', 'log_analytics'),
+  (r'^desktop/log_js_error$', 'log_js_error'),
+  (r'^desktop/dump_config$', 'dump_config'),
+  (r'^desktop/download_logs$', 'download_log_view'),
+  (r'^desktop/get_debug_level', 'get_debug_level'),
+  (r'^desktop/set_all_debug', 'set_all_debug'),
+  (r'^desktop/reset_all_debug', 'reset_all_debug'),
   (r'^bootstrap.js$', 'bootstrap'), # unused
 
   (r'^desktop/status_bar/?$', 'status_bar'),

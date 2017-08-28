@@ -40,7 +40,7 @@
     </a>
     % endif
   </div>
-  <h4><i class="fa fa-tags"></i> ${_('Dashboards')}</h4>
+  <h4><i class="fa fa-list"></i> ${_('Dashboards')}</h4>
 </div>
 %endif
 
@@ -184,8 +184,10 @@ ${ commonimportexport(request) | n,unicode }
   var viewModel = new SearchCollectionsModel(appProperties);
   ko.applyBindings(viewModel, $("#collectionsComponents")[0]);
 
-  shareViewModel = initSharing("#documentShareModal");
-  shareViewModel.setDocUuid('');
+  if (!shareViewModel) {
+    shareViewModel = initSharing("#documentShareModal");
+    shareViewModel.setDocUuid('');
+  }
 
   $(document).ready(function () {
     viewModel.updateCollections();

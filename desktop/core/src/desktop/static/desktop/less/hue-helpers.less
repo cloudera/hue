@@ -16,6 +16,7 @@
  limitations under the License.
 */
 @import (reference) "cui/colors.less";
+@import (reference) "cui/extra-variables.less";
 @import (reference) "hue-mixins.less";
 
 .vertical-align-top {
@@ -40,7 +41,7 @@ pre, .like-pre {
   line-height: 20px;
   background-color: @cui-gray-050;
   color: #444;
-  font-family: Monaco,Menlo,Consolas,"Courier New",monospace;
+  font-family: @font-family-monospace;
 }
 
 .blue {
@@ -123,10 +124,40 @@ pre, .like-pre {
   margin-bottom: 0 !important;
 }
 
+.padding-left-5 {
+  padding-left: 5px;
+}
+
+.padding-left-10 {
+  padding-left: 10px;
+}
+
+.padding-left-20 {
+  padding-left: 20px;
+}
+
+.padding-left-30 {
+  padding-left: 30px;
+}
+
 .default-cursor {
   cursor: default !important;
 }
 
 .pointer {
   cursor: pointer !important;
+}
+
+.section-h4-border {
+  font-weight: bold;
+  color: @cui-blue-700;
+  font-size: 14px;
+  text-transform: uppercase;
+  padding-left: 4px;
+  padding-bottom: 3px;
+  display: inline-block;
+}
+
+.no-border {
+  border: none !important;
 }

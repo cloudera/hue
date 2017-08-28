@@ -2420,6 +2420,18 @@
             valueObservable($element.val());
           });
         }
+
+        if (allBindingsAccessor()['valueUpdateDelay'] != null) {
+          var _timeout = -1;
+          $element.on("keyup", function (e) {
+            if (!([13, 37, 38, 39, 40].indexOf(e.keyCode) > -1)) {
+              window.clearTimeout(_timeout);
+              _timeout = window.setTimeout(function () {
+                valueObservable($element.val());
+              }, allBindingsAccessor()['valueUpdateDelay']);
+            }
+          });
+        }
       }
 
     },
@@ -3638,48 +3650,119 @@
       self.clearMarkedErrors();
     };
 
-    AceLocationHandler.prototype.verifyExists = function (token) {
+    AceLocationHandler.prototype.fetchAutocompleteDeferred = function (identifierChain) {
       var self = this;
+      var promise = $.Deferred();
+      ApiHelper.getInstance().fetchAutocomplete({
+        sourceType: self.snippet.type(),
+        identifierChain: identifierChain,
+        defaultDatabase: self.snippet.database(),
+        silenceErrors: true,
+        errorCallback: function (data) {
+          promise.reject([]);
+        },
+        successCallback: function (data) {
+          promise.resolve(data.extended_columns || data.tables_meta || []);
+        }
+      });
+      return promise;
+    };
 
-      // the syntax worker is only defined when syntax check is on
-      // TODO: Only do this when browser caching is turned on
-      if (self.aceSqlSyntaxWorker && token.parseLocation && token.parseLocation.identifierChain) {
-        // We want to check the parent to see if it contains the entry for performance, as opposed to checking
-        // each entry with the API.
-        ApiHelper.getInstance().fetchAutocomplete({
-          sourceType: self.snippet.type(),
-          identifierChain: token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1),
-          defaultDatabase: self.snippet.database(),
-          silenceErrors: true,
-          errorCallback: function (data) {
-            console.log('error');
-            console.log(data);
-          },
-          successCallback: function (data) {
-            if (token.parseLocation.type === 'table' && data.tables_meta) {
-              var tableLowerCase = token.value.toLowerCase();
-              for (var i = 0; i < data.tables_meta.length; i++) {
-                if (data.tables_meta[i].name.toLowerCase() === tableLowerCase) {
-                  break;
-                }
-                if (i + 1 === data.tables_meta.length) {
-                  token.notFound = true;
-                  ApiHelper.getInstance().identifierChainToPath({
-                    identifierChain: token.parseLocation.identifierChain,
-                    sourceType: self.snippet.type(),
-                    defaultDatabase: self.snippet.database()
-                  }, function (path) {
-                    token.notFound = true;
-                    token.qualifiedIdentifier = path.join('.');
-                    var AceRange = ace.require('ace/range').Range;
-                    var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
-                    var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
-                    self.editor.session.$backMarkers[markerId].token = token;
-                  })
-                }
-              }
+    AceLocationHandler.prototype.fetchPossibleValues = function (token) {
+      var self = this;
+      var promise = $.Deferred();
+      if (token.parseLocation.tables && token.parseLocation.tables.length > 0) {
+        var tablePromisses = [];
+        token.parseLocation.tables.forEach(function (table) {
+          tablePromisses.push(self.fetchAutocompleteDeferred(table.identifierChain));
+        });
+        $.when.apply($, tablePromisses).always(function () {
+          var joined = [];
+          for (var i = 0; i < arguments.length; i++) {
+            joined = joined.concat(arguments[i]);
+          }
+          promise.resolve(joined);
+        });
+      } else if (token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 0) {
+        // fetch the parent
+        // TODO: Fetch the parents parent first to see if it actually exists to prevent a bunch of failing calls when
+        // typing, i.e. SELECT * FROM c| -> SELECT * FROM cu| -> SELECT * FROM cus|
+        // Better yet, don't check tables next to cursor
+        return self.fetchAutocompleteDeferred(token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1));
+      } else {
+        promise.reject([]);
+      }
+      return promise;
+    };
+
+    AceLocationHandler.prototype.verifyExists = function (token, allLocations) {
+      var self = this;
+      delete token.notFound;
+      delete token.syntaxError;
+
+      if (self.aceSqlSyntaxWorker && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
+        var knownTableAliases = [];
+
+        self.fetchPossibleValues(token).done(function (possibleValues) {
+          // Append table aliases
+          for (var i = 0; i < allLocations.length; i++) {
+            var location = allLocations[i];
+            if (location.type === 'alias' && (location.source === 'table' || location.source === 'subquery')) {
+              possibleValues.push({ name: location.alias.toLowerCase() });
             }
           }
+
+          var tokenValLower = token.value.toLowerCase();
+          // Break if found
+          for (var i = 0; i < possibleValues.length; i++) {
+            if (possibleValues[i].name.toLowerCase() === tokenValLower) {
+              return;
+            }
+          }
+
+          var uniqueIndex = {};
+          possibleValues = possibleValues.filter(function (value) {
+            if (uniqueIndex[value.name.toLowerCase()]) {
+              return false;
+            }
+            uniqueIndex[value.name.toLowerCase()] = true;
+            return true;
+          });
+
+          var isLowerCase = tokenValLower === token.value;
+
+          var weightedExpected = $.map(possibleValues, function (val) {
+            return {
+              text: isLowerCase ? val.name : val.name.toUpperCase(),
+              distance: SqlParseSupport.stringDistance(token.value, val.name)
+            }
+          });
+          weightedExpected.sort(function (a, b) {
+            if (a.distance === b.distance) {
+              return a.text.localeCompare(b.text);
+            }
+            return a.distance - b.distance
+          });
+          token.syntaxError = {
+            expected: weightedExpected
+          };
+          token.notFound = true;
+
+          if (token.parseLocation && token.parseLocation.type === 'table') {
+            ApiHelper.getInstance().identifierChainToPath({
+              identifierChain: token.parseLocation.identifierChain,
+              sourceType: self.snippet.type(),
+              defaultDatabase: self.snippet.database()
+            }, function (path) {
+              token.qualifiedIdentifier = path.join('.');
+            })
+          }
+
+          var AceRange = ace.require('ace/range').Range;
+          var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
+          var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
+          self.editor.session.$backMarkers[markerId].token = token;
+
         });
       }
     };
@@ -3749,6 +3832,8 @@
             token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
           }
           if (token !== null) {
+            token.parseLocation = location;
+            activeTokens.push(token);
             if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
               var findIdentifierChainInTable = function (tablesToGo) {
                 var nextTable = tablesToGo.shift();
@@ -3759,21 +3844,21 @@
                     identifierChain: nextTable.identifierChain,
                     silenceErrors: true,
                     successCallback: function (data) {
-                      try {
-                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
-                          location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
-                          delete location.tables;
-                          token.parseLocation = location;
-                          activeTokens.push(token);
-                          self.verifyExists(token);
-                        } else if (tablesToGo.length > 0) {
-                          findIdentifierChainInTable(tablesToGo);
-                        }
-                      } catch (e) {} // TODO: Ignore for subqueries
+                      if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
+                        location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
+                        delete location.tables;
+                        self.verifyExists(token, e.data.locations);
+                      } else if (tablesToGo.length > 0) {
+                        findIdentifierChainInTable(tablesToGo);
+                      } else {
+                        self.verifyExists(token, e.data.locations);
+                      }
                     }
                   })
                 } else if (tablesToGo.length > 0) {
                   findIdentifierChainInTable(tablesToGo);
+                } else {
+                  self.verifyExists(token, e.data.locations);
                 }
               };
               if (location.tables.length > 1) {
@@ -3781,13 +3866,10 @@
               } else if (location.tables.length == 1 && location.tables[0].identifierChain) {
                 location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
                 delete location.tables;
-                token.parseLocation = location;
-                activeTokens.push(token);
+                self.verifyExists(token, e.data.locations);
               }
             } else {
-              token.parseLocation = location;
-              activeTokens.push(token);
-              self.verifyExists(token);
+              self.verifyExists(token, e.data.locations);
             }
           }
         });
@@ -4178,7 +4260,7 @@
           return range;
         };
 
-        var popoverShownSub = huePubSub.subscribe('sql.context.popover.shown', function () {
+        var popoverShownSub = huePubSub.subscribe('context.popover.shown', function () {
           hideContextTooltip();
           keepLastMarker = true;
           disableTooltip = true;
@@ -4188,7 +4270,7 @@
           popoverShownSub.remove();
         });
 
-        var popoverHiddenSub = huePubSub.subscribe('sql.context.popover.hidden', function () {
+        var popoverHiddenSub = huePubSub.subscribe('context.popover.hidden', function () {
           disableTooltip = false;
           clearActiveMarkers();
           keepLastMarker = false;
@@ -4206,7 +4288,7 @@
             var endTestPosition = editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
             if (endTestPosition.column !== pointerPosition.column) {
               var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-              if (token !== null && !token.notFound && token.parseLocation && !disableTooltip) {
+              if (token !== null && !token.notFound && token.parseLocation && !disableTooltip && token.parseLocation.type !== 'alias') {
                 tooltipTimeout = window.setTimeout(function () {
                   if (token.parseLocation) {
                     var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
@@ -4226,7 +4308,12 @@
                 tooltipTimeout = window.setTimeout(function () {
                   // TODO: i18n
                   if (token.notFound) {
-                    var tooltipText = 'Could not find ' + (token.qualifiedIdentifier || token.value) + '';
+                    var tooltipText;
+                    if (token.syntaxError.expected.length > 0) {
+                      tooltipText = SyntaxCheckerGlobals.i18n.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                    } else {
+                      tooltipText = SyntaxCheckerGlobals.i18n.couldNotFind + ' "' + (token.qualifiedIdentifier || token.value) + '"';
+                    }
                     var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
                     contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                   }
@@ -4252,7 +4339,7 @@
               }
               if (lastHoveredToken !== token) {
                 clearActiveMarkers();
-                if (token !== null && !token.notFound && token.parseLocation) {
+                if (token !== null && !token.notFound && token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) {
                   markLocation(token.parseLocation);
                 }
                 lastHoveredToken = token;
@@ -4292,12 +4379,12 @@
 
         var onContextMenu = function (e) {
           var selectionRange = editor.selection.getRange();
-          huePubSub.publish('sql.context.popover.hide');
+          huePubSub.publish('context.popover.hide');
           huePubSub.publish('sql.syntax.dropdown.hide');
           if (selectionRange.isEmpty()) {
             var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
             var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-            if (token && (token.parseLocation || token.syntaxError)) {
+            if (token && ((token.parseLocation && ['alias', 'whereClause', 'limitClause', 'selectList'].indexOf(token.parseLocation.type) === -1) || token.syntaxError)) {
               var range = token.parseLocation ? markLocation(token.parseLocation) : new AceRange(token.syntaxError.loc.first_line - 1, token.syntaxError.loc.first_column, token.syntaxError.loc.last_line - 1, token.syntaxError.loc.first_column + token.syntaxError.text.length);
               var startCoordinates = editor.renderer.textToScreenCoordinates(range.start.row, range.start.column);
               var endCoordinates = editor.renderer.textToScreenCoordinates(range.end.row, range.end.column);
@@ -4310,7 +4397,7 @@
               };
 
               if (token.parseLocation && !token.notFound) {
-                huePubSub.publish('sql.context.popover.show', {
+                huePubSub.publish('context.popover.show', {
                   data: token.parseLocation,
                   sourceType: snippet.type(),
                   defaultDatabase: snippet.database(),
@@ -4444,6 +4531,14 @@
         bindKey: {win: "Ctrl-s", mac: "Command-s|Ctrl-s"},
         exec: function () {
           huePubSub.publish('editor.save');
+        }
+      });
+
+      editor.commands.addCommand({
+        name: "esc",
+        bindKey: {win: "Ctrl-Shift-p", mac: "Ctrl-Shift-p|Command-Shift-p"},
+        exec: function () {
+          huePubSub.publish('editor.presentation.toggle');
         }
       });
 
@@ -5983,13 +6078,13 @@
 
   ko.bindingHandlers.parseArguments = {
     init: function (element, valueAccessor, allBindingsAccessor) {
-      $el = $(element);
+      var $el = $(element);
 
       function splitStrings(str) {
         var bits = [];
         var isInQuotes = false;
         var tempStr = '';
-        str.split('').forEach(function (char) {
+        str.replace(/<\/?arg>|<\/?command>/gi, ' ').replace(/\r?\n|\r/g, '').replace(/\s\s+/g, ' ').split('').forEach(function (char) {
           if (char == '"' || char == "'") {
             isInQuotes = !isInQuotes;
           }
@@ -6014,14 +6109,13 @@
           var newList = [];
           args.forEach(function (arg) {
             var obj = {};
-            obj[valueAccessor().objectKey] = arg;
+            obj[valueAccessor().objectKey] = $.trim(arg);
             newList.push(obj);
           });
           valueAccessor().list(ko.mapping.fromJS(newList)());
           valueAccessor().callback();
         }
       });
-
     }
   };
 
@@ -6046,8 +6140,7 @@
 
       if (options.theme) {
         editor.setTheme('ace/theme/' + options.theme);
-      }
-      else {
+      } else {
         editor.setTheme('ace/theme/hue');
       }
       if (options.mode) {
@@ -6118,13 +6211,11 @@
         '</div>' +
         '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
         '</div>',
-        drop: function (e) {
+        sending: function (e) {
           $('.hoverMsg').addClass('hide');
-          if (e.dataTransfer.files.length > 0) {
-            $('#progressStatus').removeClass('hide');
-            $('#progressStatusBar').removeClass('hide');
-            $('#progressStatusBar div').css('width', '0');
-          }
+          $('#progressStatus').removeClass('hide');
+          $('#progressStatusBar').removeClass('hide');
+          $('#progressStatusBar div').css('width', '0');
         },
         uploadprogress: function (file, progress) {
           $('[data-dz-name]').each(function (cnt, item) {

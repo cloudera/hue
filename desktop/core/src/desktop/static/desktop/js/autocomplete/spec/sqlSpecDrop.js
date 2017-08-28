@@ -830,6 +830,18 @@
     });
 
     describe('DROP TABLE', function () {
+      it('should handle "DROP TABLE db.tbl PURGE;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP TABLE db.tbl PURGE;',
+          afterCursor: '',
+          containsKeywords: ['SELECT'],
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest tables for "DROP TABLE |"', function() {
         assertAutoComplete({
           beforeCursor: 'DROP TABLE ',
@@ -881,21 +893,18 @@
         });
       });
 
-      describe('Hive specific', function () {
-        it('should suggest keywords for "DROP TABLE foo |"', function() {
-          assertAutoComplete({
-            beforeCursor: 'DROP TABLE foo ',
-            afterCursor: '',
-            dialect: 'hive',
-            expectedResult: {
-              lowerCase: false,
-              suggestKeywords: ['PURGE'],
-              locations: [
-                { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 15 } },
-                {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, identifierChain: [{ name: 'foo' }]}
-              ]
-            }
-          });
+      it('should suggest keywords for "DROP TABLE foo |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'DROP TABLE foo ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PURGE'],
+            locations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 15 } },
+              {type: 'table', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15}, identifierChain: [{ name: 'foo' }]}
+            ]
+          }
         });
       });
     });

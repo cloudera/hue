@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.views import _ko, login_modal
+  from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
 
@@ -54,11 +54,12 @@
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
 
-  ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
-
   <script type="text/javascript">
     var IS_HUE_4 = true;
   </script>
+
+  ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
+
   % if not conf.DJANGO_DEBUG_MODE.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
@@ -109,7 +110,7 @@ ${ hueIcons.symbols() }
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
-        <a class="brand" data-bind="hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
+        <a class="brand" data-bind="hueLink: '/home/'" href="javascript: void(0);" title="${_('Documents')}">
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
 
@@ -122,7 +123,7 @@ ${ hueIcons.symbols() }
           </a>
           <!-- /ko -->
           <!-- /ko -->
-          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1">
+          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" data-bind="visible: quickCreateActions().length > 1 || (quickCreateActions().length == 1 && quickCreateActions()[0].children && quickCreateActions()[0].children.length > 1)">
             <!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko -->
             <span class="caret"></span>
           </button>
@@ -135,7 +136,7 @@ ${ hueIcons.symbols() }
           <!-- ko if: item.dividerAbove -->
           <li class="divider"></li>
           <!-- /ko -->
-          <li data-bind="css: { 'dropdown-submenu': item.isCategory }">
+          <li data-bind="css: { 'dropdown-submenu': item.isCategory && item.children.length > 1 }">
             <!-- ko if: item.url -->
              <a href="javascript: void(0);" data-bind="hueLink: item.url">
                 <!-- ko if: item.icon -->
@@ -147,7 +148,7 @@ ${ hueIcons.symbols() }
             <!-- ko if: item.href -->
               <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
             <!-- /ko -->
-            <!-- ko if: item.isCategory -->
+            <!-- ko if: item.isCategory && item.children.length > 1 -->
             <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
               <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
             </ul>
@@ -407,6 +408,8 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
+${ commonshare() | n,unicode }
+
 <script src="${ static('desktop/js/hue-bundle.js') }"></script>
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
@@ -483,6 +486,11 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 <script src="${ static('metastore/js/metastore.model.js') }"></script>
+
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
+<script>
+  var shareViewModel = initSharing("#documentShareModal");
+</script>
 
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
@@ -591,6 +599,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
           'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
           'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
+          % if ENABLE_NEW_INDEXER.get():
+            'indexes',
+          % endif
           % if other_apps:
             % for other in other_apps:
               '${ other.display_name }',
@@ -655,6 +666,20 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             viewModel.openNotebook(uuid);
           })
         });
+
+        huePubSub.subscribe('resize.form.actions', function () {
+          document.styleSheets[0].addRule('.form-actions','width: ' + $('.page-content').width() + 'px');
+          if ($('.content-panel:visible').length > 0) {
+            document.styleSheets[0].addRule('.form-actions','margin-left: -11px !important');
+          }
+        });
+
+        huePubSub.subscribe('split.panel.resized', function() {
+          huePubSub.publish('resize.form.actions');
+        });
+
+        huePubSub.publish('resize.form.actions');
+
 
         huePubSub.subscribe('open.editor.new.query', function (statementOptions) {
           self.loadApp('editor'); // Should open in Default
@@ -762,6 +787,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           huePubSub.publish('hue.datatable.search.hide');
           huePubSub.publish('nicescroll.resize');
           huePubSub.publish('hue.scrollleft.hide');
+          huePubSub.publish('context.panel.visible', false);
           huePubSub.publish('context.panel.visible.editor', false);
           if (app === 'filebrowser') {
             $(window).unbind('hashchange.fblist');
@@ -854,6 +880,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $('.embeddable').hide();
           $('#embeddable_' + app).show();
           huePubSub.publish('app.gained.focus', app);
+          huePubSub.publish('resize.form.actions');
         };
 
         self.dropzoneError = function (filename) {
@@ -899,7 +926,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             location.href = '/accounts/logout';
           }},
           { url: '/dashboard/admin/collections', app: function (ctx) {
-            page('/home?type=search-dashboard');
+            page('/home/?type=search-dashboard');
           }},
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
@@ -962,7 +989,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             })
           }},
           { url: '/jobbrowser/jobs/job_*', app: function (ctx) {
-            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/'));
+            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]);
+          }},
+          { url: '/jobbrowser/jobs/application_*', app: function (ctx) {
+            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/').split('/')[0]);
           }},
           { url: '/jobbrowser*', app: 'jobbrowser'},
           { url: '/logs', app: 'logs' },
@@ -970,11 +1000,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page('/metastore/tables');
           }},
           { url: '/metastore/*', app: 'metastore' },
-          { url: '/notebook', app: function () {
+          { url: '/notebook', app: function (ctx) {
             self.loadApp('notebook');
-            if (window.location.getParameter('notebook') !== '') {
+            var notebookId = hueUtils.getSearchParameter('?' + ctx.querystring, 'notebook');
+            if (notebookId !== '') {
               self.getActiveAppViewModel(function (viewModel) {
-                viewModel.openNotebook(window.location.getParameter('notebook'));
+                viewModel.openNotebook(notebookId);
               });
             } else {
               self.getActiveAppViewModel(function (viewModel) {
@@ -986,18 +1017,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page('/notebook?' + ctx.querystring);
           }},
           { url: '/notebook/notebooks', app: function (ctx) {
-            page('/home?' + ctx.querystring);
+            page('/home/?' + ctx.querystring);
           }},
           { url: '/oozie/editor/bundle/list', app: function (ctx) {
-            page('/home?type=oozie-bundle');
+            page('/home/?type=oozie-bundle');
           }},
           { url: '/oozie/editor/bundle/*', app: 'oozie_bundle' },
           { url: '/oozie/editor/coordinator/list', app: function (ctx) {
-            page('/home?type=oozie-coordinator');
+            page('/home/?type=oozie-coordinator');
           }},
           { url: '/oozie/editor/coordinator/*', app: 'oozie_coordinator' },
           { url: '/oozie/editor/workflow/list', app: function (ctx) {
-            page('/home?type=oozie-workflow');
+            page('/home/?type=oozie-workflow');
           }},
           { url: '/oozie/editor/workflow/*', app: 'oozie_workflow' },
           { url: '/oozie/list_oozie_info', app: 'oozie_info' },
@@ -1098,13 +1129,22 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       function SidePanelViewModel () {
         var self = this;
         self.apiHelper = ApiHelper.getInstance();
-        self.leftAssistVisible = ko.observable();
-        self.leftAssistVisible.subscribe(function () {
-          huePubSub.publish('split.panel.resized');
+        self.assistWithoutStorage = ko.observable(false);
+        self.leftAssistVisible = ko.observable(self.apiHelper.getFromTotalStorage('assist', 'left_assist_panel_visible', true));
+        self.leftAssistVisible.subscribe(function (val) {
+          if (!self.assistWithoutStorage()){
+            self.apiHelper.setInTotalStorage('assist', 'left_assist_panel_visible', val);
+          }
+          window.setTimeout(function () {
+            huePubSub.publish('split.panel.resized');
+          }, 0);
         });
 
-        self.rightAssistVisible = ko.observable();
-        self.rightAssistVisible.subscribe(function () {
+        self.rightAssistVisible = ko.observable(self.apiHelper.getFromTotalStorage('assist', 'right_assist_panel_visible', true));
+        self.rightAssistVisible.subscribe(function (val) {
+          if (!self.assistWithoutStorage()){
+            self.apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
+          }
           window.setTimeout(function () {
             huePubSub.publish('reposition.scroll.anchor.up');
             huePubSub.publish('nicescroll.resize');
@@ -1112,6 +1152,13 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
         self.rightAssistAvailable = ko.observable(false);
+
+        huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
+          if (self.rightAssistAvailable() && !self.rightAssistVisible()) {
+            self.rightAssistVisible(true);
+          }
+        });
+
         self.activeAppViewModel = ko.observable();
         self.currentApp = ko.observable('');
         self.templateApp = ko.pureComputed(function(){
@@ -1140,22 +1187,28 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.publish('get.current.app.view.model');
 
         var previousVisibilityValues = {};
-        huePubSub.subscribe('side.panels.hide', function(){
+        huePubSub.subscribe('side.panels.hide', function(withoutStorage){
           previousVisibilityValues = {
             left: self.leftAssistVisible(),
             right: self.rightAssistVisible()
           };
+          self.assistWithoutStorage(withoutStorage);
           self.leftAssistVisible(false);
           self.rightAssistVisible(false);
+          window.setTimeout(function(){
+            self.assistWithoutStorage(false);
+          }, 0);
         });
 
-        huePubSub.subscribe('side.panels.show', function(){
+        huePubSub.subscribe('side.panels.show', function(withoutStorage){
+          self.assistWithoutStorage(withoutStorage);
           self.leftAssistVisible(previousVisibilityValues.left);
           self.rightAssistVisible(previousVisibilityValues.right);
+          window.setTimeout(function(){
+            self.assistWithoutStorage(false);
+          }, 0);
         });
 
-        self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
-        self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
       }
 
       var sidePanelViewModel = new SidePanelViewModel();
@@ -1385,7 +1438,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             var browserItems = [];
             browserItems.push({
               displayName: '${ _('Documents') }',
-              url: '/home',
+              url: '/home/',
               icon: 'documents'
             });
             if (appConfig['browser'] && appConfig['browser']['interpreters']) {
@@ -1456,7 +1509,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
 
     var hideJobsPanels = function (e) {
-      if ($(e.target).parents('.navbar-default').length > 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $(e.target).closest('.hamburger-hue').length === 0 && $('.jobs-panel').is(':visible')) {
+      if ($(e.target).parents('.navbar-default').length > 0 && $(e.target).closest('.history-panel').length === 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $(e.target).closest('.hamburger-hue').length === 0 && $('.jobs-panel').is(':visible')) {
         huePubSub.publish('hide.jobs.panel');
         huePubSub.publish('hide.history.panel');
       }
@@ -1474,6 +1527,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     window.hueDebug = {
       viewModel: function (element) {
+        if (typeof element !== 'undefined' && typeof element === 'string') {
+          element = $(element)[0];
+        }
         return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
       },
       onePageViewModel: onePageViewModel,
@@ -1531,8 +1587,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     % if is_demo or not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN):
       $(document).on('keyup', closeTourOnEsc);
+      $(document).on('click', '.shepherd-backdrop', tour.cancel);
       tour.start();
     % endif
+
 
     tour.on('complete', function () {
       $.post('/desktop/api2/user_preferences/${ PREFERENCE_IS_WELCOME_TOUR_SEEN }', {

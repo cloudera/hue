@@ -3187,7 +3187,7 @@ class Coordinator(Job):
       self._data = {
           'id': None,
           'uuid': None,
-          'name': 'My Coordinator',
+          'name': 'My Schedule',
           'variables': [], # Aka workflow parameters
           'properties': {
               'description': '',
@@ -3931,7 +3931,7 @@ class WorkflowBuilder():
         'name': 'sqoop-%s' % node_id[:4],
         "type": "sqoop-document-widget",
         "properties":{
-              "command": "",
+              "statement": "",
               "arguments": [],
               "retry_max": [],
               "retry_interval": [],

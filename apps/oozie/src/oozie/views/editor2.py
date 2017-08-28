@@ -799,6 +799,7 @@ def save_bundle(request):
 
   response['status'] = 0
   response['id'] = bundle_doc.id
+  response['uuid'] = bundle_doc.uuid
   response['message'] = _('Saved !')
 
   return JsonResponse(response)

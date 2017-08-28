@@ -153,6 +153,12 @@ def dt_login(request, from_modal=False):
   else:
     first_user_form = None
     auth_form = AuthenticationForm()
+    # SAML user is already authenticated in djangosaml2.views.login
+    if 'SAML2Backend' in backend_names and request.user.is_authenticated():
+      try:
+        ensure_home_directory(request.fs, request.user)
+      except (IOError, WebHdfsException), e:
+        LOG.error('Could not create home directory for SAML user %s.' % request.user)
 
   if DEMO_ENABLED.get() and not 'admin' in request.REQUEST and request.user.username != 'hdfs':
     user = authenticate(username=request.user.username, password='HueRocks')

@@ -26,14 +26,27 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
+from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2, Document, FilesystemException
+from dashboard.api import extract_solr_exception_message
 
+from notebook.conf import check_permissions
 from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout,\
   OperationNotSupported
 
 
 LOG = logging.getLogger(__name__)
 
+def check_editor_access_permission():
+  def inner(view_func):
+    def decorate(request, *args, **kwargs):
+      editor_id = request.GET.get('type', 'hive')
+
+      if check_permissions(request.user, editor_id):
+        raise PopupException(_('Missing permission to access the %s Editor' % editor_id), error_code=401)
+      return view_func(request, *args, **kwargs)
+    return wraps(view_func)(decorate)
+  return inner
 
 def check_document_access_permission():
   def inner(view_func):
@@ -108,6 +121,10 @@ def api_error_handler(func):
     except OperationNotSupported, e:
       response['status'] = 5
       response['message'] = e.message
+    except RestException, e:
+      message = extract_solr_exception_message(e)
+      response['status'] = 1
+      response['message'] = message.get('error')
     except Exception, e:
       LOG.exception('Error running %s' % func)
       response['status'] = -1

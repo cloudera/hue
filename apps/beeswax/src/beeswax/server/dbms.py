@@ -24,6 +24,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import format_preserving_redirect
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.models import Cluster, IMPALAUI
 from filebrowser.views import location_to_url
@@ -225,7 +226,14 @@ class HiveServer2Dbms(object):
 
 
   def alter_table(self, database, table_name, new_table_name=None, comment=None, tblproperties=None):
-    hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
+    table_obj = self.get_table(database, table_name)
+    if table_obj is None:
+      raise PopupException(_("Failed to find the table: %s") % table_name)
+
+    if table_obj.is_view:
+      hql = 'ALTER VIEW `%s`.`%s`' % (database, table_name)
+    else:
+      hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
 
     if new_table_name:
       table_name = new_table_name
@@ -461,15 +469,11 @@ class HiveServer2Dbms(object):
       data = list(result.rows())
 
       if self.server_name == 'impala':
-        data = [col for col in data if col[0] == column][0]
-        return [
-            {'col_name': data[0]},
-            {'data_type': data[1]},
-            {'distinct_count': data[2]},
-            {'num_nulls': data[3]},
-            {'max_col_len': data[4]},
-            {'avg_col_len': data[5]},
-        ]
+        if column == -1: # All the columns
+          return [self._extract_impala_column(col) for col in data]
+        else:
+          data = [col for col in data if col[0] == column][0]
+          return self._extract_impala_column(data)
       else:
         return [
             {'col_name': data[2][0]},
@@ -486,6 +490,15 @@ class HiveServer2Dbms(object):
     else:
       return []
 
+  def _extract_impala_column(self, col):
+    return [
+        {'col_name': col[0]},
+        {'data_type': col[1]},
+        {'distinct_count': col[2]},
+        {'num_nulls': col[3]},
+        {'max_col_len': col[4]},
+        {'avg_col_len': col[5]},
+    ]
 
   def get_table_properties(self, database, table, property_name=None):
     hql = 'SHOW TBLPROPERTIES `%s`.`%s`' % (database, table)

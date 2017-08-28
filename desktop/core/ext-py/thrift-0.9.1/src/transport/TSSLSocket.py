@@ -34,9 +34,9 @@ class TSSLSocket(TSocket.TSocket):
 
   The protocol used is set using the class variable
   SSL_VERSION, which must be one of ssl.PROTOCOL_* and
-  defaults to  ssl.PROTOCOL_TLSv1 for greatest security.
+  defaults to  ssl.PROTOCOL_SSLv23 for greatest security.
   """
-  SSL_VERSION = ssl.PROTOCOL_TLSv1
+  SSL_VERSION = ssl.PROTOCOL_SSLv23
 
   def __init__(self,
                host='localhost',
@@ -165,7 +165,7 @@ class TSSLServerSocket(TSocket.TServerSocket):
   This uses the ssl module's wrap_socket() method to provide SSL
   negotiated encryption.
   """
-  SSL_VERSION = ssl.PROTOCOL_TLSv1
+  SSL_VERSION = ssl.PROTOCOL_SSLv23
 
   def __init__(self,
                host=None,

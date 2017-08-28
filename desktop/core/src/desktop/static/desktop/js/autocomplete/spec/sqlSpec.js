@@ -439,8 +439,11 @@
         expectedResult: {
           locations: [
             { type: 'statement', location: { first_line: 1, last_line: 2, first_column: 1, last_column: 25 } },
+            { type: 'selectList', missing: false, location: { first_line: 2, last_line: 2, first_column: 8, last_column: 9 } },
             { type: 'asterisk', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
-            { type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }
+            { type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] },
+            { type: 'whereClause', missing: true, location: { first_line: 2, last_line: 2, first_column: 25, last_column: 25 } },
+            { type: 'limitClause', missing: true, location: { first_line: 2, last_line: 2, first_column: 25, last_column: 25 } }
           ],
           lowerCase: false
         }
@@ -455,8 +458,11 @@
         expectedResult: {
           locations: [
             { type: 'statement', location: { first_line: 1, last_line: 4, first_column: 1, last_column: 25 } },
+            { type: 'selectList', missing: false, location: { first_line: 4, last_line: 4, first_column: 8, last_column: 9 } },
             { type: 'asterisk', location: { first_line: 4, last_line: 4, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
-            { type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }
+            { type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] },
+            { type: 'whereClause', missing: true, location: { first_line: 4, last_line: 4, first_column: 25, last_column: 25 } },
+            { type: 'limitClause', missing: true, location: { first_line: 4, last_line: 4, first_column: 25, last_column: 25 } }
           ],
           lowerCase: false
         }

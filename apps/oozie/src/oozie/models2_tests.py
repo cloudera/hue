@@ -375,7 +375,7 @@ LIMIT $limit"""))
     coord_data = {
           'id': None,
           'uuid': None,
-          'name': 'My Coordinator',
+          'name': 'My Schedule',
           'variables': [], # Aka workflow parameters
           'properties': {
               'description': '',
@@ -1186,6 +1186,48 @@ class TestExternalWorkflowGraph(object):
 
     assert_true(len(workflow_data['layout'][0]['rows']) == 4)
     assert_true(len(workflow_data['workflow']['nodes']) == 4)
+    assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'generic-widget')
+    assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)
+
+  def test_gen_workflow_data_for_xml_with_multiple_generic_nodes(self):
+    self.wf.definition = """<workflow-app name="Test" xmlns="uri:oozie:workflow:0.5" xmlns:sla="uri:oozie:sla:0.2">
+        <start to="email-1"/>
+        <kill name="Kill">
+            <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        </kill>
+        <action name="email-1">
+            <generic_action xmlns="uri:oozie:email-action:0.2">
+                <to>test</to>
+                <subject>test</subject>
+                <body>test</body>
+                <content_type>text/plain</content_type>
+            </generic_action>
+            <ok to="email-2"/>
+            <error to="Kill"/>
+              <sla:info>
+                <sla:nominal-time>${nominal_time}</sla:nominal-time>
+                <sla:should-start>10</sla:should-start>
+                <sla:should-end>${30 * MINUTES}</sla:should-end>
+              </sla:info>
+        </action>
+        <action name="email-2">
+            <generic_action2 xmlns="uri:oozie:email-action:0.2">
+                <to>test</to>
+                <subject>test</subject>
+                <body>test</body>
+                <content_type>text/plain</content_type>
+            </generic_action2>
+            <ok to="End"/>
+            <error to="Kill"/>
+        </action>
+        <end name="End"/>
+    </workflow-app>
+    """
+
+    workflow_data = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
+
+    assert_true(len(workflow_data['layout'][0]['rows']) == 5)
+    assert_true(len(workflow_data['workflow']['nodes']) == 5)
     assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'generic-widget')
     assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)
 

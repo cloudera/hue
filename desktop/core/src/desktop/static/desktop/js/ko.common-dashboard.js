@@ -58,6 +58,56 @@ var Column = function (size, rows, vm) {
     }
     return row;
   };
+
+  self.moveLeft = function (idx) {
+    vm.columns().move(idx, (idx > 0 ? idx - 1 : 0));
+    vm.columns.valueHasMutated();
+  }
+
+  self.moveRight = function (idx) {
+    vm.columns().move(idx, (idx == vm.columns().length ? 0 : idx + 1));
+    vm.columns.valueHasMutated();
+  }
+
+  self.shrinkColumn = function () {
+    if (self.size() > 1) {
+      self.size(self.size() - 1);
+      vm.columns().forEach(function (col) {
+        if (col.id() !== self.id()) {
+          col.size(col.size() + 1);
+        }
+      });
+    }
+  }
+
+  self.expandColumn = function () {
+    if (self.size() < 12) {
+      self.size(self.size() + 1);
+      vm.columns().forEach(function (col) {
+        if (col.id() !== self.id()) {
+          col.size(col.size() - 1);
+        }
+      });
+    }
+  }
+
+  self.addColumn = function () {
+    var col = new Column(0, [], vm);
+    vm.columns.push(col);
+    col.expandColumn();
+  }
+
+  self.removeColumn = function () {
+    vm.columns().forEach(function (col) {
+      if (col.id() !== self.id()) {
+        self.rows().forEach(function (row) {
+          col.rows.push(row);
+        });
+        col.size(col.size() + self.size());
+      }
+    });
+    vm.columns.remove(self);
+  }
 }
 
 var Row = function (widgets, vm, columns) {
@@ -69,7 +119,7 @@ var Row = function (widgets, vm, columns) {
   self.columns = ko.observableArray(columns ? columns : []);
   self.columns.subscribe(function (val) {
     self.columns().forEach(function (col) {
-      col.percWidth((100 - self.columns().length * BOOTSTRAP_RATIOS.MARGIN()) / self.columns().length);
+      col.percWidth(Math.max(3, (100 - self.columns().length * BOOTSTRAP_RATIOS.MARGIN()) / self.columns().length));
     });
   });
 

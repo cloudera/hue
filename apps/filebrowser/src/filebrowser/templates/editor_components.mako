@@ -83,13 +83,13 @@
         ${unicode(field) | n}
       % else:
         % if tag == 'textarea':
-          <textarea name="${name or field.html_name | n}" ${make_attr_str(attrs) | n}>${extract_field_data(field) or ''}</textarea>
+          <textarea name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} class="${cls}">${extract_field_data(field) or ''}</textarea>
         % elif tag == 'button':
-          <button name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}">${button_text or field.name or ''}</button>
+          <button name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} value="${value}" class="${cls}">${button_text or field.name or ''}</button>
         % elif tag == 'checkbox':
-          <input type="checkbox" name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""}/>${button_text or field.name or ''}
+          <input type="checkbox" name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} ${value and "CHECKED" or ""} class="${cls}"/>${button_text or field.name or ''}
         % elif hidden:
-          <input type="hidden" name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} value="${extract_field_data(field)}" />
+          <input type="hidden" name="${name or field.html_name | n}" ${make_attr_str(attrs) | n} value="${extract_field_data(field)}" class="${cls}"/>
         % else:
           %if file_chooser:
             <${tag} type="text" name="${name or field.html_name | n}" value="${extract_field_data(field) or ''}" class="${cls}" ${make_attr_str(attrs) | n}/><a class="btn fileChooserBtn" href="#" data-filechooser-destination="${field.html_name | n}">..</a>

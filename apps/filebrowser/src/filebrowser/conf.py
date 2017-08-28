@@ -17,6 +17,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 
+from desktop.conf import ENABLE_DOWNLOAD
 from desktop.lib.conf import Config, coerce_bool
 
 
@@ -33,11 +34,15 @@ ARCHIVE_UPLOAD_TEMPDIR = Config(
   default=None,
   type=str)
 
+def get_desktop_enable_download():
+  """Get desktop enable_download default"""
+  return ENABLE_DOWNLOAD.get()
+
 SHOW_DOWNLOAD_BUTTON = Config(
   key="show_download_button",
   help=_("whether to show the download button in hdfs file browser."),
   type=coerce_bool,
-  default=True)
+  dynamic_default=get_desktop_enable_download)
 
 SHOW_UPLOAD_BUTTON = Config(
   key="show_upload_button",

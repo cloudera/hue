@@ -49,7 +49,7 @@ ${ fb_components.menubar() }
     <div class="actionbar">
     <%actionbar:render>
       <%def name="search()">
-        <input type="text" class="input-large search-query" placeholder="${_('Search for file name')}" data-bind="clearable: searchQuery, valueUpdate: 'afterkeydown'">
+        <input type="text" class="input-large search-query" placeholder="${_('Search for file name')}" data-bind="clearable: searchQuery, valueUpdateDelay: 500">
       </%def>
 
       <%def name="actions()">

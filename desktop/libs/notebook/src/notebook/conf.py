@@ -44,6 +44,14 @@ SHOW_NOTEBOOKS = Config(
 def _remove_duplications(a_list):
   return list(OrderedDict.fromkeys(a_list))
 
+def check_permissions(user, interpreter):
+  user_apps = appmanager.get_apps_dict(user)
+  return (interpreter == 'hive' and 'beeswax' not in user_apps) or \
+         (interpreter == 'impala' and 'impala' not in user_apps) or \
+         (interpreter == 'pig' and 'pig' not in user_apps) or \
+         (interpreter == 'solr' and 'search' not in user_apps) or \
+         (interpreter in ('spark', 'pyspark', 'r', 'jar', 'py') and 'spark' not in user_apps) or \
+         (interpreter in ('java', 'spark2', 'mapreduce', 'shell', 'sqoop1', 'distcp') and 'oozie' not in user_apps)
 
 def get_ordered_interpreters(user=None):
   if not INTERPRETERS.get():
@@ -52,11 +60,18 @@ def get_ordered_interpreters(user=None):
   interpreters = INTERPRETERS.get()
   interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
 
-  unknown_interpreters = set(interpreters_shown_on_wheel) - set(interpreters)
-  if unknown_interpreters:
-      raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
+  user_interpreters = []
+  for interpreter in interpreters:
+    if (check_permissions(user, interpreter)):
+      pass # Not allowed
+    else:
+      user_interpreters.append(interpreter)
 
-  reordered_interpreters = interpreters_shown_on_wheel + [i for i in interpreters if i not in interpreters_shown_on_wheel]
+  unknown_interpreters = set(interpreters_shown_on_wheel) - set(user_interpreters)
+  if unknown_interpreters:
+    raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
+
+  reordered_interpreters = interpreters_shown_on_wheel + [i for i in user_interpreters if i not in interpreters_shown_on_wheel]
 
   return [{
       "name": interpreters[i].NAME.get(),
@@ -146,6 +161,20 @@ ENABLE_BATCH_EXECUTE = Config(
   help=_t("Flag to enable the bulk submission of queries as a background task through Oozie."),
   type=bool,
   dynamic_default=is_oozie_enabled
+)
+
+ENABLE_SQL_INDEXER = Config(
+  key="enable_sql_indexer",
+  help=_t("Flag to turn on the SQL indexer."),
+  type=bool,
+  default=False
+)
+
+ENABLE_PRESENTATION = Config(
+  key="enable_presentation",
+  help=_t("Flag to turn on the Presentation mode of the editor."),
+  type=bool,
+  default=True
 )
 
 

@@ -63,6 +63,8 @@ var ApiHelper = (function () {
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
   var CONFIG_APPS_API = '/desktop/api/configurations';
   var SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
+  var SOLR_FIELDS_API = '/indexer/api/index/list/';
+
   var HBASE_API_PREFIX = '/hbase/api/';
   var SAVE_TO_FILE = '/filebrowser/save';
 
@@ -397,7 +399,7 @@ var ApiHelper = (function () {
         self.assistErrorCallback(options)({ status: -1 });
         return;
       }
-      $.ajax({
+      return $.ajax({
         dataType: "json",
         url: url,
         timeout: options.timeout,
@@ -420,7 +422,7 @@ var ApiHelper = (function () {
       });
     };
 
-    fetchCached.bind(self)($.extend({}, options, {
+    return fetchCached.bind(self)($.extend({}, options, {
       sourceType: 'hdfs',
       url: url,
       fetchFunction: fetchFunction
@@ -554,6 +556,55 @@ var ApiHelper = (function () {
         timeout: options.timeout,
         success: function (data) {
           if (!data.error && !self.successResponseIsError(data) && typeof data.collections !== 'undefined' && data.collections !== null) {
+            storeInCache(data);
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      })
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
+    };
+
+    fetchCached.bind(self)($.extend({}, options, {
+      sourceType: 'collections',
+      url: url,
+      fetchFunction: fetchFunction
+    }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {String} options.collectionName
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   *
+   */
+  ApiHelper.prototype.fetchSolrCollection = function (options) {
+    var self = this;
+    var url = SOLR_FIELDS_API;
+    var fetchFunction = function (storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      $.ajax({
+        dataType: "json",
+        url: url,
+        data: {
+          name: options.collectionName
+        },
+        type: 'POST',
+        timeout: options.timeout,
+        success: function (data) {
+          if (!data.error && !self.successResponseIsError(data) && typeof data.schema !== 'undefined' && data.schema !== null) {
             storeInCache(data);
             options.successCallback(data);
           } else {
@@ -1206,7 +1257,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchTables = function (options) {
     var self = this;
-    fetchAssistData.bind(self)($.extend({}, options, {
+    return fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
       errorCallback: self.assistErrorCallback(options),
       cacheCondition: genericCacheCondition
@@ -1229,7 +1280,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchFields = function (options) {
     var self = this;
     var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
-    fetchAssistData.bind(self)($.extend({}, options, {
+    return fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart,
       errorCallback: self.assistErrorCallback(options),
       cacheCondition: genericCacheCondition
@@ -1596,7 +1647,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopTables = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_TABLES, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_TABLES, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1617,7 +1668,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_COLUMNS, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_COLUMNS, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1638,7 +1689,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_JOINS, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_JOINS, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1659,7 +1710,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_FILTERS, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_FILTERS, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1681,7 +1732,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopAggs = function (options) {
     var self = this;
-    self.fetchNavOptCached(NAV_OPT_URLS.TOP_AGGS, options, function (data) {
+    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_AGGS, options, function (data) {
       return data.status === 0;
     });
   };
@@ -1725,7 +1776,7 @@ var ApiHelper = (function () {
         return;
       }
 
-      $.ajax({
+      return $.ajax({
         type: 'post',
         url: url,
         data: data,
@@ -1744,13 +1795,45 @@ var ApiHelper = (function () {
       .fail(promise.reject);
     };
 
-    fetchCached.bind(self)($.extend({}, options, {
+    return fetchCached.bind(self)($.extend({}, options, {
       url: url,
       hash: hash,
       cacheType: 'optimizer',
       fetchFunction: fetchFunction,
       promise: promise
     }));
+  };
+
+  ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
+    var promise = $.Deferred();
+    $.post('/desktop/api/search/entities_interactive', {
+      query_s: ko.mapping.toJSON(query),
+      limit: 5,
+      sources: '["documents"]'
+    }).done(function (data) {
+      if (data.status === 0) {
+        promise.resolve(data);
+      } else {
+        promise.reject(data);
+      }
+    }).fail(promise.reject);
+    return promise;
+  };
+
+  ApiHelper.prototype.fetchNavEntitiesInteractive = function (query) {
+    var promise = $.Deferred();
+    $.post('/desktop/api/search/entities_interactive', {
+      query_s: ko.mapping.toJSON(query),
+      limit: 5,
+      sources: '["sql", "hdfs", "s3"]'
+    }).done(function (data) {
+      if (data.status === 0) {
+        promise.resolve(data);
+      } else {
+        promise.reject(data);
+      }
+    }).fail(promise.reject);
+    return promise;
   };
 
   ApiHelper.prototype.globalSearchAutocomplete = function (options) {
@@ -1869,7 +1952,7 @@ var ApiHelper = (function () {
       return;
     }
 
-    $.ajax({
+    return $.ajax({
       type: 'POST',
       url: options.url,
       data: {
@@ -1925,7 +2008,7 @@ var ApiHelper = (function () {
       if (typeof options.editor !== 'undefined' && options.editor !== null) {
         options.editor.showSpinner();
       }
-      options.fetchFunction(function (data) {
+      return options.fetchFunction(function (data) {
         cachedData[cachedId] = {
           timestamp: (new Date()).getTime(),
           data: data

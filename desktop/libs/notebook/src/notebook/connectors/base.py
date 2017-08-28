@@ -137,6 +137,23 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
+  def add_sqoop_snippet(self, statement, arguments, files):
+    _data = json.loads(self.data)
+
+    _data['snippets'].append(self._make_snippet({
+        u'type': u'sqoop1',
+        u'status': u'running',
+        u'properties':  {
+          u'files': files,
+          u'arguments': arguments,
+          u'archives': [],
+          u'statement': statement
+        }
+    }))
+    self._add_session(_data, 'java')
+
+    self.data = json.dumps(_data)
+
   def add_shell_snippet(self, shell_command, arguments, archives, files, env_var):
     _data = json.loads(self.data)
 
@@ -193,6 +210,7 @@ class Notebook(object):
 
 def get_api(request, snippet):
   from notebook.connectors.dataeng import DataEngApi
+  from notebook.connectors.hbase import HBaseApi
   from notebook.connectors.hiveserver2 import HS2Api
   from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.rdbms import RdbmsApi
@@ -207,7 +225,24 @@ def get_api(request, snippet):
 
   interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
-    raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
+    if snippet['type'] == 'hbase':
+      interpreter = [{
+        'name': 'hbase',
+        'type': 'hbase',
+        'interface': 'hbase',
+        'options': {},
+        'is_sql': False
+      }]
+    elif snippet['type'] == 'solr':
+      interpreter = [{
+        'name': 'solr',
+        'type': 'solr',
+        'interface': 'solr',
+        'options': {},
+        'is_sql': False
+      }]
+    else:
+      raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
@@ -230,10 +265,12 @@ def get_api(request, snippet):
     return RdbmsApi(request.user, interpreter=snippet['type'])
   elif interface == 'dataeng':
     return DataEngApi(user=request.user, request=request, cluster_name=cluster.get_interface())
-  elif interface == 'jdbc':
+  elif interface == 'jdbc' or interface == 'teradata':
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
     return SolrApi(request.user, interpreter=interpreter)
+  elif interface == 'hbase':
+    return HBaseApi(request.user)
   elif interface == 'pig':
     return OozieApi(user=request.user, request=request) # Backward compatibility until Hue 4
   else:

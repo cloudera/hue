@@ -324,7 +324,7 @@ var HueFileEntry = (function () {
 
   HueFileEntry.prototype.showNewDirectoryModal = function () {
     var self = this;
-    if (! self.isTrash() && ! self.isTrashed()) {
+    if (! self.isTrash() && ! self.isTrashed() && self.canModify()) {
       $('#createDirectoryModal').modal('show');
     }
   };
@@ -334,7 +334,7 @@ var HueFileEntry = (function () {
     if (!self.selected()) {
       self = self.selectedEntry();
     }
-    if (! self.isTrash() && ! self.isTrashed()) {
+    if (! self.isTrash() && ! self.isTrashed() && self.canModify()) {
       $('#renameDirectoryName').val(self.definition().name);
       $('#renameDirectoryModal').modal('show');
     }

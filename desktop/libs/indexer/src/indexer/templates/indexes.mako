@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
   from desktop import conf
 
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 %>
 
 <%namespace name="assist" file="/assist.mako" />
@@ -51,7 +51,8 @@ ${ assist.assistPanel() }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('indexer/css/indexes.css') }" type="text/css">
-
+<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/html" id="indexes-breadcrumbs">
   <h1>
@@ -85,6 +86,75 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </ul>
   </h1>
+</script>
+
+<script type="text/html" id="analysis-popover">
+  <!-- ko if: $root.fieldAnalysesName() -->
+  <div data-bind="with: $root.getFieldAnalysis()">
+    <div class="pull-right">
+      <input type="text" data-bind="visible: section() == 'terms', clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Prefix filter...') }"/>
+    </div>
+    <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 20px">
+      <li class="active"><a href="#analysis-terms-index" role="tab" data-toggle="tab" data-bind="click: function() { section('terms'); }">${ _('Terms') }</a></li>
+      <li><a href="#analysis-stats-index" role="tab" data-toggle="tab" data-bind="click: function() { section('stats'); }">${ _('Stats') }</a></li>
+    </ul>
+    <div class="tab-content" style="max-height: 370px; height: 370px; border: none">
+      <div class="tab-pane active" id="analysis-terms-index" data-bind="with: terms">
+        <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
+          <i class="fa fa-spinner fa-spin"></i>
+        </div>
+        <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
+        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0" class="table table-condensed">
+          <tbody data-bind="foreach: $data.data">
+          <tr>
+            <td data-bind="text: val.value"></td>
+            <td style="width: 40px">
+              <div class="progress">
+                <div class="bar-label" data-bind="text:val.count"></div>
+                <div class="bar bar-info" style="margin-top:-20px;" data-bind="style: {'width': ((val.count / $parent.data()[0].val.count) * 100) + '%'}"></div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tab-pane" id="analysis-stats-index" data-bind="with: stats">
+        <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
+          <i class="fa fa-spinner fa-spin"></i>
+        </div>
+        <div class="alert" data-bind="visible: !$parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() == 'error'">${ _('This field does not support stats') }</div>
+        <div class="alert" data-bind="visible: !$parent.isLoading() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
+        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() != 'error'" class="table table-condensed">
+          <tbody data-bind="foreach: $data.data">
+          <tr>
+            <td style="vertical-align: top"><strong data-bind="text: key"></strong></td>
+            <!-- ko if: key == 'facets' -->
+            <td>
+              <!-- ko if: val[Object.keys(val)[0]] != null -->
+              <table style="width: 400px">
+                <tbody data-bind="foreach: Object.keys(val[Object.keys(val)[0]])">
+                  <tr>
+                    <td style="vertical-align: top; padding-left: 4px; padding-right: 4px"><strong data-bind="text: $data"></strong></td>
+                    <td data-bind="template: 'stats-facets'"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- /ko -->
+              <!-- ko ifnot: val[Object.keys(val)[0]] != null -->
+              ${ _('Not available') }
+              <!-- /ko -->
+            </td>
+            <!-- /ko -->
+            <!-- ko ifnot: key == 'facets' -->
+            <td data-bind="text: val"></td>
+            <!-- /ko -->
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
 </script>
 
 <div class="navbar hue-title-bar nokids">
@@ -168,6 +238,19 @@ ${ assist.assistPanel() }
 
             <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
             <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
+
+            <div id="fieldAnalysisIndexes" class="popover mega-popover right">
+              <div class="arrow"></div>
+              <h3 class="popover-title" style="text-align: left">
+                <a class="pull-right pointer" data-bind="click: function(){ $('#fieldAnalysisIndexes').hide(); $root.fieldAnalysesName(''); }"><i class="fa fa-times"></i></a>
+                <strong data-bind="text: $root.fieldAnalysesName"></strong>
+                <!-- ko if: $root.getFieldAnalysis() -->
+                  (<span data-bind="text: $root.getFieldAnalysis().type"></span>)
+                <!-- /ko -->
+              </h3>
+              <div class="popover-content" data-bind="template: { name: 'analysis-popover' }" style="text-align: left"></div>
+            </div>
+
           </div>
 
           <!-- ko hueSpinner: { spin: isLoading, center: true, size: 'xlarge' } --><!-- /ko -->
@@ -219,7 +302,7 @@ ${ assist.assistPanel() }
               <h2 class="modal-title">${ _('Create alias') }</h2>
             </div>
             <div class="modal-body">
-              <input type="text" data-bind="textInput: alias.name"/>
+              <label class="margin-bottom-20">${ _('Alias name') } <input type="text" data-bind="textInput: alias.name" class="input-xlarge no-margin-bottom margin-left-10"></label>
 
               <table id="indexesChecksTable" class="table table-condensed table-nowrap">
                 <thead>
@@ -260,10 +343,10 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="list-indexes">
-  <table class="table datatables">
+  <table class="table table-condensed datatables">
     <thead>
       <tr>
-        <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th class="vertical-align-middle" width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th>${ _('Name') }</th>
         <th>${ _('Type') }</th>
         <th>${ _('Collections') }</th>
@@ -289,26 +372,33 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="list-index">
-  <ul class="nav nav-pills margin-top-30">
+  <ul class="nav nav-tabs nav-tabs-border">
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
   </ul>
 
-  <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
-    <div class="tab-pane active" id="index-overview">
+  <div class="tab-content" style="border: none; overflow: hidden">
+    <div class="tab-pane active margin-top-30" id="index-overview">
       <!-- ko template: { if: $root.tab() == 'index-overview', name: 'indexes-index-overview' }--><!-- /ko -->
     </div>
 
-    <div class="tab-pane" id="index-columns">
+    <div class="tab-pane margin-top-10" id="index-columns">
       <!-- ko if: $root.tab() == 'index-columns' -->
-        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a column...') }" data-bind="clearable: $root.columnFilter, value: $root.columnFilter, valueUpdate: 'afterkeydown'"/>
+        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a field...') }" data-bind="clearable: $root.fieldFilter, value: $root.fieldFilter, valueUpdate: 'afterkeydown'"/>
+        <div class="margin-top-10">
         <!-- ko template: 'indexes-index-fields' --><!-- /ko -->
+        </div>
       <!-- /ko -->
     </div>
 
     <div class="tab-pane" id="index-sample">
-      <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
+      <!-- ko if: sample() && sample().length > 0 -->
+        <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: !sample() || sample().length === 0 -->
+      <div class="margin-top-10 margin-left-10">${ _('The index does not contain any data.')}</div>
+      <!-- /ko -->
     </div>
   </div>
 </script>
@@ -317,7 +407,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="indexes-index-overview">
   <div>
     <!-- ko template: 'indexes-index-properties' --><!-- /ko -->
-
+    <h4>${ _('Fields') }</h4>
     <!-- ko template: { name: 'indexes-index-fields-fields', data: fieldsPreview }--><!-- /ko -->
     <a class="pointer" data-bind="visible: fields().length > fieldsPreview().length, click: function() { $('li a[href=\'#index-columns\']').click(); }">
       ${_('View more...')}
@@ -325,12 +415,19 @@ ${ assist.assistPanel() }
 
     <br><br>
 
+    <h4>${ _('Sample') }</h4>
+
+    <!-- ko if: samplePreview() && samplePreview().length > 0 -->
     <div style="overflow: auto">
       <!-- ko template: { name: 'indexes-index-sample', data: samplePreview, full: false }--><!-- /ko -->
     </div>
     <a class="pointer" data-bind="visible: sample().length > samplePreview().length, click: function() { $('li a[href=\'#index-sample\']').click(); }">
       ${_('View more...')}
     </a>
+    <!-- /ko -->
+    <!-- ko if: !samplePreview() || samplePreview().length === 0 -->
+    <div class="margin-top-10 margin-bottom-30">${ _('The index does not contain any data.')}</div>
+    <!-- /ko -->
   </div>
 </script>
 
@@ -348,14 +445,11 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="indexes-index-fields-fields">
   <div>
-    <h4>${ _('Fields') }</h4>
-
     <table class="table table-condensed table-nowrap">
       <thead>
         <tr>
           <th style="width: 1%">&nbsp;</th>
-          <th width="1%"></th>
-          <th></th>
+          <th style="width: 2%"></th>
           <th>${ _('Name') }</th>
           <th>${ _('Type') }</th>
           <th>${ _('Required') }</th>
@@ -368,10 +462,7 @@ ${ assist.assistPanel() }
         <tr>
           <td data-bind="text: $index() + 1"></td>
           <td>
-            <i class="fa fa-info muted pointer analysis"></i>
-          </td>
-          <td>
-            <div></div>
+            <i class="fa fa-info muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze') }'}, visible: type() != 'aggr'"></i>
           </td>
           <td data-bind="text: name"></td>
           <td data-bind="text: type"></td>
@@ -388,13 +479,32 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="indexes-index-fields">
   <div>
-    <!-- ko template: { name: 'indexes-index-fields-fields', data: fields }--><!-- /ko -->
+    <!-- ko template: { name: 'indexes-index-fields-fields', data: filteredFields }--><!-- /ko -->
 
+    <!-- ko if: copyFields() && copyFields().length > 0 -->
     <h4>${ _('Copy Fields') }</h4>
-    <span data-bind="text: ko.mapping.toJSON(copyFields)"></span>
+    <table class="table table-condensed table-nowrap sample-table">
+      <thead>
+        <tr>
+          <th>${ _('Destination') }</th>
+          <th>${ _('Source') }</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ko foreach: copyFields() -->
+          <tr>
+            <td data-bind="text: dest"></td>
+            <td data-bind="text: source"></td>
+          </tr>
+        <!-- /ko -->
+      </tbody>
+    </table>
+    <!-- /ko -->
 
+    <!-- ko if: dynamicFields() && dynamicFields().length > 0 -->
     <h4>${ _('Dynamic Fields') }</h4>
-    <span data-bind="text: ko.mapping.toJSON(dynamicFields)"></span>
+    <!-- ko template: { name: 'indexes-index-fields-fields', data: dynamicFields }--><!-- /ko -->
+    <!-- /ko -->
   </div>
 </script>
 
@@ -403,6 +513,7 @@ ${ assist.assistPanel() }
   <!-- ko hueSpinner: { spin: $root.index().loadingSample, center: true, size: 'xlarge' } --><!-- /ko -->
 
   <!-- ko ifnot: $root.index().loadingSample -->
+  <!-- ko if: $root.index().fields().length != 0 -->
   <table class="table table-condensed table-nowrap sample-table">
     <thead>
       <tr>
@@ -423,6 +534,32 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </tbody>
   </table>
+  <!-- /ko -->
+
+  ## Schemaless collections
+  <!-- ko if: $root.index().fields().length == 0 && $data.length > 0 -->
+  <table class="table table-condensed table-nowrap sample-table">
+    <thead>
+      <tr>
+        <th style="width: 1%">&nbsp;</th>
+        <!-- ko foreach: Object.keys($data[0]) -->
+        <th data-bind="text: $data"></th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: $data -->
+        <tr>
+          <td data-bind="text: $index() + 1"></td>
+          <!-- ko foreach: Object.keys($parent[0]) -->
+            <td data-bind="text: $parent[$data]"></td>
+          <!-- /ko -->
+        </tr>
+      <!-- /ko -->
+    </tbody>
+  </table>
+  <!-- /ko -->
+
   <!-- /ko -->
 </script>
 
@@ -452,6 +589,7 @@ ${ assist.assistPanel() }
         }, function (data) {
           if (data.status == 0) {
             vm.indexes.push(ko.mapping.fromJS(data.alias));
+            huePubSub.publish('assist.collections.refresh');
           } else {
             $(document).trigger("error", data.message);
           }
@@ -478,8 +616,18 @@ ${ assist.assistPanel() }
       self.uniqueKey = ko.observable(data.schema.uniqueKey);
       self.fields = ko.mapping.fromJS(data.schema.fields);
       self.fieldsPreview = ko.pureComputed(function () {
-        return self.fields().splice(0, 5)
+        return self.fields().slice(0, 5)
       });
+      self.filteredFields = ko.computed(function () {
+        var returned = self.fields();
+        if (vm.fieldFilter() !== '') {
+          returned = $.grep(self.fields(), function (field) {
+            return field.name().toLowerCase().indexOf(vm.fieldFilter().toLowerCase()) > -1;
+          });
+        }
+        return returned;
+      });
+
       self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
       self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
 
@@ -515,6 +663,7 @@ ${ assist.assistPanel() }
         }, function (data) {
           if (data.status == 0) {
             vm.indexes.remove(function(index) { return index.name() == indexName; });
+            huePubSub.publish('assist.collections.refresh');
           } else {
             $(document).trigger("error", data.message);
           }
@@ -525,6 +674,21 @@ ${ assist.assistPanel() }
         hueAnalytics.log('indexes', 'delete_index');
       };
     };
+
+    var Collection = function () {
+      var self = this;
+
+      self.id = ko.observable('');
+      self.name = ko.observable('');
+      self.engine = 'solr';
+    }
+
+
+    var Query = function () {
+      var self = this;
+      self.qs = ko.observableArray([ ko.mapping.fromJS({q:''}) ]);
+      self.fqs = ko.observableArray([]);
+    }
 
 
     var IndexesViewModel = function (options) {
@@ -605,13 +769,13 @@ ${ assist.assistPanel() }
       self.index = ko.observable();
 
       self.indexFilter = ko.observable('');
-      self.columnFilter = ko.observable('');
+      self.fieldFilter = ko.observable('');
 
       self.filteredIndexes = ko.computed(function () {
         var returned = self.indexes();
         if (self.indexFilter() !== '') {
           returned = $.grep(self.indexes(), function (idx) {
-            return idx.name().toLowerCase().indexOf(self.indexFilter()) > -1;
+            return idx.name().toLowerCase().indexOf(self.indexFilter().toLowerCase()) > -1;
           });
         }
         return returned;
@@ -649,6 +813,8 @@ ${ assist.assistPanel() }
         self.section('list-indexes');
         self.index(null);
         hueUtils.changeURL(self.baseURL);
+        self.fetchIndexes();
+        $('#fieldAnalysisIndexes').hide();
       }
 
       self.fetchIndexes = function (callback) {
@@ -694,6 +860,7 @@ ${ assist.assistPanel() }
             self.index().type(index.type());
             self.index().getSample();
             hueUtils.changeURL(self.baseURL + self.index().name());
+            self.collection.name(self.index().name());
             self.section('list-index');
             self.tab('index-overview');
           } else {
@@ -711,6 +878,7 @@ ${ assist.assistPanel() }
         }, function (data) {
           if (data.status == 0) {
             self.indexes.removeAll(self.selectedIndexes());
+            huePubSub.publish('assist.collections.refresh');
           } else {
             $(document).trigger("error", data.message);
           }
@@ -720,6 +888,40 @@ ${ assist.assistPanel() }
         });
         hueAnalytics.log('indexes', 'delete_indexes');
       };
+
+      self.fieldAnalyses = ko.observableArray([]);
+      self.fieldAnalysesName = ko.observable('');
+      self.collection = new Collection();
+      self.query = new Query();
+
+      self.showFieldAnalysis = function (data, e) {
+        if (self.fieldAnalysesName()) {
+          var analyse = self.getFieldAnalysis();
+
+          if (analyse == null) {
+            analyse = new FieldAnalysis(self, self.fieldAnalysesName(), data.type());
+            self.fieldAnalyses.push(analyse);
+          }
+
+          analyse.update();
+          huePubSub.publish('show.analysis', e);
+        }
+      }
+
+      self.getFieldAnalysis = function () {
+        var fieldName = self.fieldAnalysesName();
+        var _analyse = null;
+
+        $.each(self.fieldAnalyses(), function (index, analyse) {
+          if (analyse.name() == fieldName) {
+            _analyse = analyse;
+            return false;
+          }
+        });
+
+        return _analyse;
+      };
+
     };
     return IndexesViewModel;
   })();
@@ -742,6 +944,26 @@ ${ assist.assistPanel() }
         if (foundIndex) {
           viewModel.fetchIndex(foundIndex);
         }
+      }, 'indexes');
+
+      huePubSub.subscribe('show.analysis', function (originalEvent) {
+        if (originalEvent.pageX == null && originalEvent.clientX != null) {
+          var doc = document.documentElement, body = document.body;
+          originalEvent.pageX = originalEvent.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
+          originalEvent.pageY = originalEvent.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc && doc.clientTop || body && body.clientTop || 0);
+        }
+        if ($('#indexesComponents').offset().left > 0) {
+          originalEvent.pageX = originalEvent.pageX - $('#indexesComponents').offset().left;
+          originalEvent.pageY = originalEvent.pageY - $('#indexesComponents').offset().top;
+        }
+        else {
+          originalEvent.pageX = originalEvent.pageX - $('.content-panel').position().left;
+          originalEvent.pageY = originalEvent.pageY + $('.content-panel').scrollTop();
+        }
+        $("#fieldAnalysisIndexes").show().css({
+          top: Math.max(0, originalEvent.pageY + ${ is_embeddable and '48' or '-70'} - $("#fieldAnalysisIndexes").outerHeight() / 2),
+          left: originalEvent.pageX
+        });
       }, 'indexes');
 
       viewModel.fetchIndexes(function () {

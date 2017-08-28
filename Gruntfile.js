@@ -22,6 +22,7 @@ module.exports = function(grunt) {
   var config = {};
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Project configuration.
   grunt.initConfig({
@@ -62,6 +63,7 @@ module.exports = function(grunt) {
           'apps/security/src/security/static/security/css/security.css': 'apps/security/src/security/static/security/less/security.less',
           'apps/sqoop/src/sqoop/static/sqoop/css/sqoop.css': 'apps/sqoop/src/sqoop/static/sqoop/less/sqoop.less',
           'desktop/libs/indexer/src/indexer/static/indexer/css/indexes.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/indexes.less',
+          'desktop/libs/indexer/src/indexer/static/indexer/css/importer.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/importer.less',
         }
       }
     },
@@ -95,6 +97,28 @@ module.exports = function(grunt) {
           'apps/sqoop/src/sqoop/static/sqoop/less/**/*.less',
         ],
         tasks: ['less']
+      }
+    },
+    uglify: {
+      sqlAutocompleteParser: {
+        files: {
+          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/sqlAutocompleteParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/sqlAutocompleteParser.js']
+        }
+      },
+      sqlSyntaxParser: {
+        files: {
+          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/sqlSyntaxParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/sqlSyntaxParser.js']
+        }
+      },
+      sqlStatementsParser: {
+        files: {
+          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/sqlStatementsParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/sqlStatementsParser.js']
+        }
+      },
+      globalSearchParser: {
+        files: {
+          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/globalSearchParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/globalSearchParser.js']
+        }
       }
     }
   });

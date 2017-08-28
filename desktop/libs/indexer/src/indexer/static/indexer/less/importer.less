@@ -1,0 +1,211 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+@import (reference) "hue-mixins.less";
+@import (reference) "hue-helpers.less";
+
+.importer-main {
+  .vertical-spacer {
+    height: 80px;
+  }
+
+  .path {
+    margin-bottom: 0!important;
+    border-right: none!important;
+  }
+
+  .step .card-body {
+    margin-top: 14px;
+  }
+
+  .step label > div:first-child {
+    width: 120px;
+    text-align: right;
+    padding-right: 8px;
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 6px;
+  }
+
+  .step label.checkbox {
+    margin-left: 130px;
+  }
+
+  .step .index-field label.checkbox {
+    margin-left: 5px;
+  }
+
+  .step .index-field label > div:first-child {
+    width: initial;
+  }
+
+  .step .field-properties label.checkbox {
+    margin-left: 10px;
+  }
+
+  .step label:not(.checkbox) {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .step input[type='text'] {
+    margin-bottom: 0;
+  }
+
+  .step .selectize-control {
+    display: inline-block;
+    vertical-align: middle;
+    width: 578px !important;
+  }
+
+  .step .form-inline .selectize-control {
+    width: 120px !important;
+    margin-bottom: -8px;
+  }
+
+  .step .inline-labels {
+    display: table;
+  }
+
+  .step .inline-labels .selectize-control {
+    width: 120px !important;
+    vertical-align: -12px;
+  }
+
+  .step .selectize-input {
+    max-height: 31px;
+  }
+
+  .step .selectize-control.multi .selectize-input {
+    padding-top: 3px!important;
+  }
+
+  .step .show-edit-on-hover a {
+    opacity: 0;
+    .hue-linear-transition(opacity);
+  }
+
+  .step .show-edit-on-hover:hover a {
+    opacity: 1;
+  }
+
+  .step .show-edit-on-hover .inactive-action {
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .step .fa-padding-top {
+    padding-top: 8px;
+  }
+
+  .kudu-partitions li {
+    width: 578px !important;
+    padding: 5px;
+  }
+
+  .kudu-partitions li:hover {
+    background-color: @cui-gray-100;
+  }
+
+  .kudu-partitions .range-partition {
+    padding: 5px;
+  }
+
+  .kudu-partitions .range-partition:hover {
+    background-color: @cui-gray-100;
+  }
+
+  .step .kudu-partitions li .selectize-control {
+    width: 100px !important;
+    vertical-align: top;
+  }
+
+  .field {
+    padding: 4px;
+    padding-left: 10px;
+    border-left: 4px solid @cui-blue-050;
+    &.disabled {
+      background-color: @cui-gray-050;
+      border-left: 4px solid @cui-gray-100;
+    }
+  }
+
+  .operation {
+    border-left: 4px solid @cui-gray-100;
+    padding-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+  }
+
+  .field-content-preview {
+    width: 180px;
+    margin-left: 20px;
+  }
+
+  .table-preview {
+    margin:auto;
+    text-align:left;
+  }
+
+  .table-preview td, .table-preview th {
+    white-space: nowrap;
+  }
+
+  .content-panel {
+    overflow-x: hidden;
+  }
+
+  .content-panel-inner {
+    margin: 10px;
+    margin-bottom: 100px;
+  }
+
+  .form-control.path {
+    vertical-align: top;
+  }
+
+  #importerNotebook {
+    height: 5px;
+    float: right;
+    .snippet-error-container  {
+      background: transparent;
+    }
+  }
+
+  .inline-table {
+    display: inline-table;
+  }
+
+  .columns-form {
+    margin-bottom: 200px;
+  }
+
+  h4 {
+    .section-h4-border;
+    margin-top: 30px;
+  }
+
+  .move-widget {
+    cursor: move;
+  }
+
+  .arrow {
+    font-size: 24px;
+  }
+}

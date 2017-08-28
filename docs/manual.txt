@@ -158,7 +158,7 @@ Depending on your setup, your `hdfs-site.xml` might be in `/etc/hadoop/conf`.
       <value>true</value>
     </property>
 
-You also need to add this to `core-site.html`.
+You also need to add this to `core-site.xml`.
 
     <property>
       <name>hadoop.proxyuser.hue.hosts</name>
@@ -555,8 +555,7 @@ default_user_group::
 Configuration Validation
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Hue can detect certain invalid configuration. It will show a red alert icon on
-the top navigation bar. image:images/val.png[]
+Hue can detect certain invalid configuration.
 
 To view the configuration of a running Hue instance, navigate to
 `http://myserver:8888/dump_config`, also accessible through the About

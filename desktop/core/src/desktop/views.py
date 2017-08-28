@@ -152,6 +152,11 @@ def log_js_error(request):
   return JsonResponse({'status': 0})
 
 
+def log_analytics(request):
+  LOG.info('PAGE: ' + request.POST.get('page'))
+  return JsonResponse({'status': 0})
+
+
 @access_log_level(logging.WARN)
 def log_view(request):
   """

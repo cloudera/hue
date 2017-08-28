@@ -511,6 +511,13 @@
   white-space: nowrap;
 }
 
+.assist-flex-column-search {
+  overflow: hidden;
+  position: relative;
+  .flex(0 0 30px);
+  white-space: nowrap;
+}
+
 .assist-flex-hdfs-search,
 .assist-flex-documents-search,
 .assist-flex-function-search {
@@ -641,7 +648,7 @@
 }
 
 .assist-function-signature {
-  font: 14px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font: 14px/normal @font-family-monospace;
   direction: ltr;
   line-height: 18px;
   margin-bottom: 10px;
@@ -929,6 +936,11 @@
     color: @cui-gray-600;
   }
 
+  .col-filter-toggle {
+    float: right;
+    margin-right: 20px;
+  }
+
   .assist-active-tables {
     list-style: none;
     margin: 0;
@@ -962,6 +974,10 @@
       margin-left:5px;
       white-space: normal;
       font-style: italic;
+    }
+
+    .risk-quickfix {
+      margin-left: 5px;
     }
   }
 }

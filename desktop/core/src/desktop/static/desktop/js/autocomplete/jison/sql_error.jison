@@ -33,16 +33,16 @@ SqlStatement_EDIT
  ;
 
 SelectStatement
- : 'SELECT' OptionalAllOrDistinct SelectList_ERROR TableExpression
- | 'SELECT' OptionalAllOrDistinct SelectList TableExpression_ERROR
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_ERROR TableExpression
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList TableExpression_ERROR
  ;
 
 SelectStatement_EDIT
- : 'SELECT' OptionalAllOrDistinct SelectList_ERROR_EDIT TableExpression
+ : 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_ERROR_EDIT TableExpression
    {
-     parser.selectListNoTableSuggest($3, $2);
+     parser.selectListNoTableSuggest($4, $2);
    }
- | 'SELECT' OptionalAllOrDistinct SelectList_ERROR TableExpression_EDIT
+ | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin SelectList_ERROR TableExpression_EDIT
  ;
 
 SelectList_ERROR
@@ -97,7 +97,7 @@ JoinType_EDIT
      if (parser.isHive()) {
        parser.suggestKeywords(['JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+       parser.suggestKeywords(['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else {
        parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
      }
@@ -105,7 +105,7 @@ JoinType_EDIT
  | 'RIGHT' 'CURSOR' error
    {
      if (parser.isImpala()) {
-       parser.suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+       parser.suggestKeywords(['ANTI JOIN', 'INNER JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else {
        parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
      }

@@ -24,7 +24,7 @@ from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.exceptions_renderable import PopupException
 
 from libsentry.client2 import SentryClient
-from libsentry.sentry_site import get_sentry_server, is_ha_enabled
+from libsentry.sentry_site import get_sentry_server
 
 
 LOG = logging.getLogger(__name__)

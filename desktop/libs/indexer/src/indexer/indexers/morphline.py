@@ -93,10 +93,12 @@ class MorphlineIndexer(object):
 
     client = SolrClient(self.user)
 
+    extra_args = ['-Dmapreduce.job.user.classpath.first=true'] if client.is_solr_six_or_more() else []
+
     task.add_java_snippet(
       clazz='org.apache.solr.hadoop.MapReduceIndexerTool',
       app_jar=lib_path if lib_path is not None else CONFIG_INDEXER_LIBS_PATH.get(),
-      arguments=[
+      arguments=extra_args + [
           u'--morphline-file',
           u'morphline.conf',
           u'--output-dir',
@@ -170,9 +172,12 @@ class MorphlineIndexer(object):
 
     return field_type.regex.replace('\\', '\\\\')
 
-  def generate_morphline_config(self, collection_name, data, uuid_name=None):
-    geolite_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "GeoLite2-City.mmdb")
-    grok_dicts_loc = os.path.join(CONFIG_INDEXER_LIBS_PATH.get(), "grok_dictionaries")
+  def generate_morphline_config(self, collection_name, data, uuid_name=None, lib_path=None):
+    if lib_path is None:
+      lib_path = CONFIG_INDEXER_LIBS_PATH.get()
+
+    geolite_loc = os.path.join(lib_path, "GeoLite2-City.mmdb")
+    grok_dicts_loc = os.path.join(lib_path, "grok_dictionaries")
 
     properties = {
       "collection_name": collection_name,

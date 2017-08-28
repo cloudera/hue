@@ -151,8 +151,8 @@ class SQLApi():
 
 
   def datasets(self, show_all=False):
-    # Implemented via Hive chooser
-    return []
+    snippet = {'type': self.engine}
+    return [table['name'] for table in get_api(MockRequest(self.user), snippet).autocomplete(snippet, database='default')['tables_meta']]
 
 
   def fields(self, dashboard):
@@ -190,7 +190,7 @@ class SQLApi():
     return {'fields': Collection2._make_luke_from_schema_fields(fields)}
 
 
-  def stats(self, dataset, fields):
+  def stats(self, dataset, fields, query, facet):
     database, table = self._get_database_table_names(dataset)
 
     # TODO: check column stats to go faster

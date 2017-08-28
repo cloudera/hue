@@ -369,3 +369,43 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
     finally:
       for f in finish:
         f()
+
+  def test_update_credentials_from_hive_action_when_jdbc_url_is_variable(self):
+
+    class TestJob():
+      XML_FILE_NAME = 'workflow.xml'
+
+      def __init__(self):
+        self.deployment_dir = '/tmp/test'
+        self.nodes = [
+            Node({'id': '1', 'type': 'hive-document', 'properties': {'jdbc_url': u"${wf:actionData('shell-31b5')['hiveserver']}", 'password': u'test'}})
+        ]
+
+    user = User.objects.get(username='test')
+    submission = Submission(user, job=TestJob(), fs=MockFs(logical_name='fsname'), jt=MockJt(logical_name='jtname'))
+
+    finish = (
+      beeswax.conf.HIVE_SERVER_HOST.set_for_testing('hue-koh-chang'),
+      beeswax.conf.HIVE_SERVER_PORT.set_for_testing(12345),
+    )
+
+    try:
+      creds = Credentials(credentials=TestCredentials.CREDENTIALS.copy())
+      hive_properties = {
+        'thrift_uri': 'thrift://first-url:9999',
+        'kerberos_principal': 'hive',
+        'hive2.server.principal': 'hive/hive2_host@test-realm.com',
+      }
+
+      submission.properties['credentials'] = creds.get_properties(hive_properties)
+      submission._update_credentials_from_hive_action(creds)
+
+      assert_equal(submission.properties['credentials'][creds.hiveserver2_name]['properties'], [
+            ('hive2.jdbc.url', u'jdbc:hive2://hue-koh-chang:12345/default'),
+            ('hive2.server.principal', u'hive/hive2_host@test-realm.com')
+          ]
+      )
+
+    finally:
+      for f in finish:
+        f()

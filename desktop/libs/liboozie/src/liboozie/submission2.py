@@ -356,7 +356,8 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
       for action in self.job.nodes:
         if action.data['type'] in ('hive2', 'hive-document') and \
                         credentials.hiveserver2_name in self.properties['credentials'] and \
-                        action.data['properties']['jdbc_url']:
+                        action.data['properties']['jdbc_url'] and \
+                        len(action.data['properties']['jdbc_url'].split('//')) > 1:
           try:
             hive_jdbc_url = action.data['properties']['jdbc_url']
             hive_host_from_action = hive_jdbc_url.split('//')[1].split(':')[0]

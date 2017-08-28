@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import datetime
+import glob
 import logging
 import os
 import socket
@@ -27,6 +28,7 @@ try:
 except ImportError:
   from ordereddict import OrderedDict # Python 2.6
 
+from django.db import connection
 from django.utils.translation import ugettext_lazy as _
 
 from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
@@ -38,7 +40,6 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
-
 
 LOG = logging.getLogger(__name__)
 
@@ -376,7 +377,7 @@ COLLECT_USAGE = Config(
 LEAFLET_TILE_LAYER = Config(
   key="leaflet_tile_layer",
   help=_("Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile domain to the img-src section of the 'secure_content_security_policy' configuration parameter as well."),
-  type=coerce_str_lowercase,
+  type=str,
   default="http://{s}.tile.osm.org/{z}/{x}/{y}.png")
 
 LEAFLET_TILE_LAYER_ATTRIBUTION = Config(
@@ -684,6 +685,13 @@ SESSION = ConfigSection(
   help=_("""Configuration options for specifying the Desktop session.
           For more info, see https://docs.djangoproject.com/en/1.4/topics/http/sessions/"""),
   members=dict(
+    COOKIE_NAME=Config(
+      key='cookie_name',
+      help=_("The name of the cookie to use for sessions."
+            "This can have any value that is not used by the other cookie names in your application."),
+      type=str,
+      default="sessionid",
+    ),
     TTL=Config(
       key='ttl',
       help=_("The cookie containing the users' session ID will expire after this amount of time in seconds."),
@@ -736,14 +744,20 @@ KERBEROS = ConfigSection(
       help=_("Path to keep Kerberos credentials cached."),
       private=True,
       type=str,
-      default="/tmp/hue_krb5_ccache",
+      default="/var/run/hue/hue_krb5_ccache",
     ),
     KINIT_PATH=Config(
       key='kinit_path',
       help=_("Path to Kerberos 'kinit' command."),
       type=str,
       default="kinit", # use PATH!
-    )
+    ),
+    MUTUAL_AUTHENTICATION=Config(
+      key='mutual_authentication',
+      help=_('Mutual authentication from the server, attaches HTTP GSSAPI/Kerberos Authentication to the given Request object'),
+      type=str,
+      default="OPTIONAL",
+    ),
   )
 )
 
@@ -1302,9 +1316,16 @@ ENABLE_SQL_SYNTAX_CHECK = Config( # To remove when syntax check is ready
 
 USE_NEW_GLOBAL_SEARCH = Config( # To remove when the new global search is ready
   key='use_new_global_search',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_('Choose whether to use the new global search or not.')
+)
+
+USE_NEW_CONTEXT_POPOVER = Config( # To remove when the new context popover is ready
+  key='use_new_context_popover',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to use the new context popover or not.')
 )
 
 USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
@@ -1327,6 +1348,12 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
   type=coerce_bool,
   help=_('Choose whether to show the new SQL editor.')
 )
+
+ENABLE_DOWNLOAD = Config(
+  key="enable_download",
+  help=_('Global setting to allow or disable end user downloads in all Hue (e.g. Query result in editors and dashboard, file in File Browser browsers...).'),
+  type=coerce_bool,
+  default=True)
 
 def is_hue4():
   """Hue is configured to show version 4."""
@@ -1435,41 +1462,60 @@ def validate_ldap(user, config):
 
   return res
 
-def validate_database():
-
-  from django.db import connection
-
+def validate_database(user):
   res = []
+  cursor = connection.cursor()
 
   if connection.vendor == 'mysql':
-      cursor = connection.cursor();
+    try:
+      innodb_table_count = cursor.execute('''
+        SELECT *
+        FROM information_schema.tables
+        WHERE table_schema=DATABASE() AND engine = "innodb"''')
 
-      try:
-        innodb_table_count = cursor.execute('''
-            SELECT *
-            FROM information_schema.tables
-            WHERE table_schema=DATABASE() AND engine = "innodb"''')
+      total_table_count = cursor.execute('''
+        SELECT *
+        FROM information_schema.tables
+        WHERE table_schema=DATABASE()''')
 
-        total_table_count = cursor.execute('''
-            SELECT *
-            FROM information_schema.tables
-            WHERE table_schema=DATABASE()''')
+      # Promote InnoDB storage engine
+      if innodb_table_count != total_table_count:
+        res.append(('PREFERRED_STORAGE_ENGINE', unicode(_('''We recommend MySQL InnoDB engine over
+                                                      MyISAM which does not support transactions.'''))))
 
-        # Promote InnoDB storage engine
-        if innodb_table_count != total_table_count:
-          res.append(('PREFERRED_STORAGE_ENGINE', unicode(_('''We recommend MySQL InnoDB engine over
-                                                        MyISAM which does not support transactions.'''))))
-
-        if innodb_table_count != 0 and innodb_table_count != total_table_count:
-          res.append(('MYSQL_STORAGE_ENGINE', unicode(_('''All tables in the database must be of the same
-                                                        storage engine type (preferably InnoDB).'''))))
-      except Exception, ex:
-        LOG.exception("Error in config validation of MYSQL_STORAGE_ENGINE: %s", ex)
+      if innodb_table_count != 0 and innodb_table_count != total_table_count:
+        res.append(('MYSQL_STORAGE_ENGINE', unicode(_('''All tables in the database must be of the same
+                                                      storage engine type (preferably InnoDB).'''))))
+    except Exception, ex:
+      LOG.exception("Error in config validation of MYSQL_STORAGE_ENGINE: %s", ex)
   elif 'sqlite' in connection.vendor:
     res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', unicode(_('SQLite is only recommended for development environments. '
         'It might cause the "Database is locked" error. Migrating to MySQL, Oracle or PostgreSQL is strongly recommended.'))))
-  return res
 
+  # Check if south_migrationhisotry table is up to date
+  try:
+    from desktop import appmanager
+
+    cursor.execute('''SELECT * from south_migrationhistory''')
+    migration_history_entries = [(entry[1], entry[2]) for entry in cursor.fetchall()]
+
+    apps = appmanager.get_apps(user)
+    apps.append(appmanager.get_desktop_module('desktop'))
+    missing_migration_entries = []
+    for app in apps:
+      if app.migrations_path:
+        for migration_file_name in glob.iglob(app.migrations_path + '/*.py'):
+          migration_name = os.path.splitext(os.path.basename(migration_file_name))[0]
+          if migration_name != "__init__" and (app.name, migration_name) not in migration_history_entries:
+              missing_migration_entries.append((app.name, migration_name))
+
+    if missing_migration_entries:
+      res.append(('SOUTH_MIGRATION_HISTORY', unicode(_('''south_migrationhistory table seems to be corrupted or incomplete.
+                                                        %s entries are missing in the table: %s''') % (len(missing_migration_entries), missing_migration_entries))))
+  except Exception:
+    LOG.exception("Error in config validation of SOUTH_MIGRATION_HISTORY")
+
+  return res
 
 def config_validator(user):
   """
@@ -1515,7 +1561,7 @@ def config_validator(user):
     res.extend(validate_ldap(user, LDAP))
 
   # Validate MYSQL storage engine of all tables
-  res.extend(validate_database())
+  res.extend(validate_database(user))
 
   # Validate if oozie email server is active
   from oozie.views.editor2 import _is_oozie_mail_enabled

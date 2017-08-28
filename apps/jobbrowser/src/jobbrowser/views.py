@@ -324,7 +324,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
       if app['finalStatus'] in ('SUCCEEDED', 'FAILED', 'KILLED'):
         attempt_index = int(attempt_index)
         if not job.job_attempts['jobAttempt']:
-          response = {'status': 0, 'log': _('Job has not tasks')}
+          response = {'status': 0, 'log': _('Job has no tasks')}
         else:
           attempt = job.job_attempts['jobAttempt'][attempt_index]
 

@@ -1,6 +1,7 @@
 import kerberos
 import re
 import logging
+import threading
 
 from requests.auth import AuthBase
 from requests.models import Response
@@ -97,8 +98,13 @@ class HTTPKerberosAuth(AuthBase):
         """
         host = urlparse(response.url).hostname
 
+        # Initialize uniq key for the self.context dictionary
+        host_port_thread = "%s_%s_%s" % (urlparse(response.url).hostname,
+                                         urlparse(response.url).port,
+                                         threading.current_thread().ident)
+
         try:
-            result, self.context[host] = kerberos.authGSSClientInit(
+            result, self.context[host_port_thread] = kerberos.authGSSClientInit(
                 "{0}@{1}".format(self.service, host))
         except kerberos.GSSError:
             log.exception("generate_request_header(): authGSSClientInit() failed:")
@@ -110,7 +116,7 @@ class HTTPKerberosAuth(AuthBase):
             return None
 
         try:
-            result = kerberos.authGSSClientStep(self.context[host],
+            result = kerberos.authGSSClientStep(self.context[host_port_thread],
                                                 _negotiate_value(response))
         except kerberos.GSSError:
             log.exception("generate_request_header(): authGSSClientStep() failed:")
@@ -122,7 +128,7 @@ class HTTPKerberosAuth(AuthBase):
             return None
 
         try:
-            gss_response = kerberos.authGSSClientResponse(self.context[host])
+            gss_response = kerberos.authGSSClientResponse(self.context[host_port_thread])
         except kerberos.GSSError:
             log.exception("generate_request_header(): authGSSClientResponse() "
                       "failed:")
@@ -222,10 +228,12 @@ class HTTPKerberosAuth(AuthBase):
         log.debug("authenticate_server(): Authenticate header: {0}".format(
             _negotiate_value(response)))
 
-        host = urlparse(response.url).hostname
+        host_port_thread = "%s_%s_%s" % (urlparse(response.url).hostname,
+                                         urlparse(response.url).port,
+                                         threading.current_thread().ident)
 
         try:
-            result = kerberos.authGSSClientStep(self.context[host],
+            result = kerberos.authGSSClientStep(self.context[host_port_thread],
                                                 _negotiate_value(response))
         except kerberos.GSSError:
             log.exception("authenticate_server(): authGSSClientStep() failed:")

@@ -35,7 +35,6 @@
 <hive>'COLUMN'                             { return '<hive>COLUMN'; }
 <hive>'CONF'                               { return '<hive>CONF'; }
 <hive>'CREATE'                             { parser.determineCase(yytext); return '<hive>CREATE'; }
-<hive>'CROSS'                              { return '<hive>CROSS'; }
 <hive>'CUBE'                               { return '<hive>CUBE'; }
 <hive>'CURRENT'                            { return '<hive>CURRENT'; }
 <hive>'DATE'                               { return '<hive>DATE'; }
@@ -59,6 +58,7 @@
 <hive>'REVOKE'                             { return '<hive>REVOKE'; }
 <hive>'ROLLUP'                             { return '<hive>ROLLUP'; }
 <hive>'TABLE'                              { return '<hive>TABLE'; }
+<hive>'TIMESTAMP'                          { return '<hive>TIMESTAMP'; }
 <hive>'USER'                               { return '<hive>USER'; }
 <hive>'USING'                              { return '<hive>USING'; }
 
@@ -312,6 +312,7 @@
 'CASE'                                     { return 'CASE'; }
 'CHAR'                                     { return 'CHAR'; }
 'CREATE'                                   { parser.determineCase(yytext); return 'CREATE'; }
+'CROSS'                                    { return 'CROSS'; }
 'CURRENT'                                  { return 'CURRENT'; }
 'DATABASE'                                 { return 'DATABASE'; }
 'DECIMAL'                                  { return 'DECIMAL'; }
@@ -349,6 +350,7 @@
 'OUTER'                                    { return 'OUTER'; }
 'PARTITION'                                { return 'PARTITION'; }
 'PRECEDING'                                { return 'PRECEDING'; }
+'PURGE'                                    { return 'PURGE'; }
 'RANGE'                                    { return 'RANGE'; }
 'REGEXP'                                   { return 'REGEXP'; }
 'RIGHT'                                    { return 'RIGHT'; }

@@ -23,7 +23,7 @@ import boto.s3
 import boto.s3.connection
 import boto.utils
 
-from aws.conf import get_default_region, has_iam_metadata, DEFAULT_CALLING_FORMAT
+from aws.conf import get_default_region, has_iam_metadata, DEFAULT_CALLING_FORMAT, AWS_ACCOUNT_REGION_DEFAULT
 from aws.s3.s3fs import S3FileSystemException
 
 
@@ -34,7 +34,7 @@ HTTP_SOCKET_TIMEOUT_S = 60
 
 
 class Client(object):
-  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, aws_security_token=None, region=None,
+  def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, aws_security_token=None, region=AWS_ACCOUNT_REGION_DEFAULT,
                timeout=HTTP_SOCKET_TIMEOUT_S, host=None, proxy_address=None, proxy_port=None, proxy_user=None,
                proxy_pass=None, calling_format=None, is_secure=True):
     self._access_key_id = aws_access_key_id

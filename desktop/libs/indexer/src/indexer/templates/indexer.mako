@@ -44,7 +44,6 @@ ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 %endif
 
-<link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -94,12 +93,6 @@ ${ assist.assistPanel() }
 
   .form-control.path {
     vertical-align: top;
-  }
-
-  .form-actions {
-    position: fixed;
-    bottom: 0;
-    margin: 0;
   }
 
   #notebook {

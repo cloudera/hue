@@ -85,32 +85,16 @@
                 <li class="${utils.is_selected(section, 'sla')}"><a href="${url('oozie:list_oozie_sla')}">${ _('SLA') }</a></li>
                 <li class="${utils.is_selected(section, 'oozie')}"><a href="${url('oozie:list_oozie_info')}">${ _('Oozie') }</a></li>
               % else:
-                % if is_editor:
-                  <li class="${utils.is_selected(section, 'workflows')}">
-                    % if is_embeddable:
-                    <a href="/home?type=oozie-workflow2">${ _('Workflows') }</a>
-                    % else:
-                    <a href="${url('oozie:list_editor_workflows')}">${ _('Workflows') }</a>
-                    % endif
-                  </li>
-                  <li class="${utils.is_selected(section, 'coordinators')}">
-                    % if is_embeddable:
-                    <a href="/home?type=oozie-coordinator2">${ _('Coordinators') }</a>
-                    % else:
-                    <a href="${url('oozie:list_editor_coordinators')}">${ _('Coordinators') }</a>
-                    % endif
-                  </li>
-                  <li class="${utils.is_selected(section, 'bundles')}">
-                    % if is_embeddable:
-                    <a href="/home?type=oozie-bundle2">${ _('Bundles') }</a>
-                    % else:
-                    <a href="${url('oozie:list_editor_bundles')}">${ _('Bundles') }</a>
-                    % endif
-                  </li>
-                % else:
-                  <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
-                  <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
-                  <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_bundles')}">${ _('Bundles') }</a></li>
+                % if not is_embeddable:
+                  % if is_editor:
+                    <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_editor_workflows')}">${ _('Workflows') }</a></li>
+                    <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_editor_coordinators')}">${ _('Coordinators') }</a></li>
+                    <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_editor_bundles')}">${ _('Bundles') }</a></li>
+                  % else:
+                    <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
+                    <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
+                    <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_bundles')}">${ _('Bundles') }</a></li>
+                  % endif
                 % endif
               % endif
             </ul>

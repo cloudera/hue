@@ -22,7 +22,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
 
 from metadata.conf import has_optimizer
-from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
 %>
 
 <%def name="includes(is_embeddable=False, suffix='')">
@@ -48,6 +48,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
 % endif
 
 <script src="${ static('desktop/ext/js/clipboard.min.js') }"></script>
@@ -159,8 +160,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <![endif]-->
 <script src="${ static('desktop/ext/js/medium-editor.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/ext/js/download.min.js') }"></script>
-
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
 
@@ -198,10 +197,27 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }"  alt="${ _('Hue logo') }"/>
 </div>
 
-<div class="navbar hue-title-bar" data-bind="visible: ! $root.isPlayerMode()">
+<div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="pull-right margin-right-10">
+
+        <div class="btn-group">
+
+          % if ENABLE_PRESENTATION.get():
+          <a class="share-link btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
+            css: {'btn-inverse': $root.isPresentationMode(), 'btn': true}">
+            <i class="fa fa-line-chart"></i>
+          </a>
+          % endif
+
+          <!-- ko if: $root.canSave -->
+          <a class="share-link btn" title="${ _ko('Share') }" data-bind="click: prepareShareModal,
+            css: {'isShared': isShared(), 'btn': true}">
+            <i class="fa fa-users"></i>
+          </a>
+          <!-- /ko -->
+        </div>
 
         <div class="btn-group">
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
@@ -211,47 +227,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <ul class="dropdown-menu">
             <li>
               <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
-                <i class="fa fa-save"></i> ${ _('Save as...') }
+                <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
               </a>
             </li>
           </ul>
           <!-- /ko -->
         </div>
 
-        <!-- ko ifnot: editorMode -->
-        <div class="btn-group">
-          <a class="btn dropdown-toggle" data-toggle="dropdown">
-            <i class="fa fa-bars"></i>
-          </a>
-          <ul class="dropdown-menu pull-right">
-            <li>
-              <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isFullscreenMode(true); $root.isPlayerMode(true);}">
-                <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
-              </a>
-            </li>
-            <li>
-              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
-                <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
-              </a>
-            </li>
-            <li>
-              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-                <i class="fa fa-fw fa-eraser"></i> ${ _('Clear all results') }
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
-                <i class="fa fa-fw fa-file-text-o"></i> ${ _('Display all Notebook content') }
-              </a>
-            </li>
-            <li>
-              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().exportJupyterNotebook() }">
-                <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
-              </a>
-            </li>
-          </ul>
-        </div>
-        <!-- /ko -->
+        <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
 
         <!-- ko if: editorMode -->
         <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }" rel="tooltip" data-placement="bottom">
@@ -264,20 +247,20 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </a>
         <!-- /ko -->
 
+        <a class="btn pointer" title="${ _('Session') }" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+          <i class="fa fa-cogs"></i>
+        </a>
+
         <!-- ko if: IS_HUE_4 -->
-        <a class="btn" data-bind="hueLink: '/home?type=' + (editorMode() ? 'query-' : '') + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-tags"></i>
+        <a class="btn" data-bind="hueLink: '/home/?type=' + (editorMode() ? 'query-' : '') + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
+          <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
         </a>
         <!-- /ko -->
         <!-- ko ifnot: IS_HUE_4 -->
         <a class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-tags"></i>
+          <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
         </a>
         <!-- /ko -->
-
-        <a class="btn pointer" title="${ _('Context') }" rel="tooltip" data-placement="bottom" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-          <i class="fa fa-cogs"></i>
-        </a>
       </div>
 
       <div class="nav-collapse">
@@ -337,7 +320,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <a title="${ _('This is a history query') }"><i class="fa fa-fw fa-history"></i></a>
           </li>
           <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('Open directory of this query') }" data-bind="hueLink: '/home?uuid=' + directoryUuid()"
+            <a title="${ _('Open directory of this query') }" data-bind="hueLink: '/home/?uuid=' + directoryUuid()"
               class="pointer inactive-action" href="javascript:void(0)"><i class="fa fa-fw fa-folder-o"></i>
             </a>
           </li>
@@ -349,12 +332,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
             <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
           </li>
-          <li class="query-name no-horiz-padding">
+          <li class="query-name no-horiz-padding skip-width-calculation">
             <a href="javascript:void(0)">
               <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
             </a>
           </li>
-          <li data-bind="tooltip: { placement: 'bottom', title: description }">
+          <li class="skip-width-calculation" data-bind="tooltip: { placement: 'bottom', title: description }">
             <a href="javascript:void(0)">
               <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
             </a>
@@ -366,13 +349,35 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   </div>
 </div>
 
- <div class="player-toolbar" data-bind="visible: $root.isPlayerMode() && $root.isFullscreenMode()" style="display: none;">
-    <div class="pull-right pointer" data-bind="click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); $root.isFullscreenMode(false);  }"><i class="fa fa-times"></i></div>
-    <img src="${ static('desktop/art/icon_hue_48.png') }"  alt="${ _('Hue logo') }"/>
+<div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode() || $root.isResultFullScreenMode()" style="display: none;">
+  <!-- ko if: $root.isResultFullScreenMode() -->
+    <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
+      <i class="fa fa-times fa-fw"></i>
+    </a>
+  <!-- /ko -->
+
+  <!-- ko if: $root.isPresentationMode() -->
+    <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.isPresentationMode(false); }">
+      <i class="fa fa-times fa-fw"></i>
+    </a>
+
     <!-- ko if: $root.selectedNotebook() -->
-    <h4 data-bind="text: $root.selectedNotebook().name"></h4>
+      <!-- ko if: $root.selectedNotebook().name() || $root.selectedNotebook().description() -->
+      <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
+      <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
+      <div class="clearfix"></div>
+      <!-- /ko -->
+
+      <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
+      <!-- ko template: { name: 'notebook-actions' }--><!-- /ko -->
+      <!-- ko if: $root.preEditorTogglingSnippet -->
+        <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: $root.preEditorTogglingSnippet }--><!-- /ko -->
+      <!-- /ko -->
+      </div>
+
     <!-- /ko -->
-  </div>
+  <!-- /ko -->
+</div>
 </%def>
 
 
@@ -430,7 +435,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">
-  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPlayerMode() ? '0' : '20px' }" >
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPresentationMode() || $root.isResultFullScreenMode() ? '0' : '20px' }" >
     <div class="vertical-full">
       <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook${ suffix }'}">
       </div>
@@ -565,7 +570,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }">
           <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
         </a>
-        <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
+        <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }">
+          <i class="fa fa-times"></i> ${ _('Close') }
+        </a>
         % if conf.USE_DEFAULT_CONFIGURATION.get():
           <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
         % endif
@@ -578,16 +585,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </div>
       <div style="clear:both; padding-left: 120px;">
         <!-- ko if: availableNewProperties().length -->
-        <select data-bind="options: availableNewProperties,
-                          optionsText: 'nice_name',
-                          optionsValue: 'name',
-                          value: selectedSessionProperty,
-                          optionsCaption: '${ _ko('Choose a property...') }'"></select>
         <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
                     properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
                     selectedSessionProperty('');
                    }" style="margin-left:10px;vertical-align: text-top;">
-          <i class="fa fa-plus"></i>
         </a>
         <!-- /ko -->
       </div>
@@ -684,10 +685,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               (<span data-bind="text: result.rows().toLocaleString() + (type() == 'impala' && result.rows() == 1024 ? '+' : '')" title="${ _('Number of rows') }"></span>)
             <!-- /ko -->
             <!-- ko if: showGrid -->
-            <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }"><i class="snippet-icon fa fa-search"></i></div>
+            <div class="inline-block inactive-action pointer margin-left-10" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }">
+              <i class="snippet-icon fa fa-search"></i>
+            </div>
             <!-- /ko -->
-            <div class="inline-block inactive-action pointer" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isFullscreenMode() && !$root.isPlayerMode(), click: function(){ $root.isPlayerMode(true); }"><i class="snippet-icon fa fa-expand"></i></div>
-            <div class="inline-block inactive-action pointer" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="snippet-icon fa fa-compress"></i></div>
+            <div class="inline-block inactive-action pointer" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(true); }">
+              <i class="snippet-icon fa fa-expand"></i>
+            </div>
+            <div class="inline-block inactive-action pointer" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: $root.isResultFullScreenMode(), click: function(){ $root.isResultFullScreenMode(false); }">
+              <i class="snippet-icon fa fa-compress"></i>
+            </div>
           </a>
         </li>
         <!-- /ko -->
@@ -698,7 +705,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <li data-bind="click: function() { $parent.currentQueryTab(tabId) }, css: { 'active': $parent.currentQueryTab() === tabId }">
           <a class="inactive-action" data-toggle="tab" data-bind="attr: { 'href': '#' + tabId }">
             <i class="snippet-icon fa" data-bind="css: iconClass"></i> <span data-bind="text: title"></span>
-            <div class="inline-block inactive-action margin-left-10 pointer" data-bind="click: function () { $parent.removeContextTab($data); }"><i class="snippet-icon fa fa-times"></i></div>
+            <div class="inline-block inactive-action margin-left-10 pointer" data-bind="click: function () { $parent.removeContextTab($data); }">
+              <i class="snippet-icon fa fa-times"></i>
+            </div>
           </a>
         </li>
         <!-- /ko -->
@@ -867,7 +876,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="notebook-snippet-header${ suffix }">
-  <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
+  <!-- ko if: $root.isPresentationMode() || $root.isResultFullScreenMode() -->
+  <div class="inline">
+    <span data-bind="text: name"></span>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
+  <div class="inactive-action hover-actions inline">
+    <span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span>
+  </div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
     <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
@@ -880,10 +898,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
   </div>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="editor-snippet-header${ suffix }">
-  <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" data-bind="style: { 'marginRight': $root.editorMode() && !$root.isFullscreenMode() && $root.isPlayerMode() ? '40px' : '0' }">
+  <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" data-bind="style: { 'marginRight': $root.isPresentationMode() || $root.isResultFullScreenMode() ? '40px' : '0' }">
     <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
     <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
@@ -897,7 +916,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
     <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor shortcuts') }" data-toggle="modal" data-target="#helpModal${ suffix }"><i class="fa fa-question"></i></a>
   </div>
-  <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="visible: $root.editorMode() && !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }" style="display: none;"><i class="fa fa-times fa-fw"></i></a>
 </script>
 
 
@@ -916,10 +934,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <div style="position: relative;">
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
-              <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
-              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: ! $root.editorMode() && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1 && ! $root.isResultFullScreenMode(), name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
             </div>
-            <div class="snippet-body" data-bind="clickForAceFocus: ace">
+            <div class="snippet-body" data-bind="clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode()">
               <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
               <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
@@ -936,14 +954,15 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             </div>
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode() && ! $root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
+          <!-- ko if: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
+            <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
+          <!-- /ko -->
           <!-- ko if: $root.editorMode() -->
-          <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
-          <!-- ko template: 'query-tabs${ suffix }' --><!-- /ko -->
+            <!-- ko template: 'query-tabs${ suffix }' --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: $root.editorMode() -->
-          <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
-          <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results${ suffix }' } --><!-- /ko -->
+            <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results${ suffix }' } --><!-- /ko -->
           <!-- /ko -->
 
           <div class="clearfix"></div>
@@ -982,15 +1001,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="code-editor-snippet-body${ suffix }">
-  <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') -->
+  <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') && ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
   <div class="optimizer-container" data-bind="css: { 'active': showOptimizer }">
-    <div class="round-icon empty">&nbsp;</div>
-    <!-- ko if: hasSuggestion() == null -->
-    <div class="round-icon idle">
-      <i class="fa" data-bind="css: {'fa-spinner fa-spin': complexityCheckRunning}"></i>
-    </div>
-    <!-- /ko -->
-
     <!-- ko if: hasSuggestion() -->
       <!-- ko with: suggestion() -->
         <!-- ko if: parseError -->
@@ -1043,43 +1055,25 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- /ko -->
     <!-- ko if: ! hasSuggestion() && topRisk() -->
       <!-- ko if: topRisk().risk === 'low' -->
-        <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <div class="round-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some low risks were detected, see the assistant for details.') }">
           <i class="fa fa-check"></i>
         </div>
-        <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-info alert-neutral">
-          ${ _('Some low risks were detected.') }
-        </span>
-        <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: topRisk().risk == 'medium' -->
-        <div class="round-icon warning" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <div class="round-icon warning" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some medium risks were detected, see the assistant for details.') }">
           <i class="fa fa-exclamation"></i>
         </div>
-        <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-warning alert-neutral">
-          ${ _('Some medium risks were detected.') }
-        </span>
-        <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: topRisk().risk == 'high' -->
-        <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <div class="round-icon error" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some high risks were detected, see the assistant for details.') }">
           <i class="fa fa-exclamation"></i>
         </div>
-        <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-error alert-neutral">
-          ${ _('Some high risks were detected.') }
-        </span>
-        <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: hasSuggestion() == '' && ! topRisk() -->
-      <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+      <div class="round-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Query validated, no issues found.') }">
         <i class="fa fa-check"></i>
       </div>
-      <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
-      <!-- /ko -->
     <!-- /ko -->
   </div>
   <!-- /ko -->
@@ -1087,7 +1081,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
   <div class="row-fluid" style="margin-bottom: 5px">
 
-    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace">
+    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode() && ! ($root.isPresentationMode() && $root.isHidingCode())">
       <!-- ko if: statementType() == 'file' -->
         <div class="margin-top-10">
           <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
@@ -1133,13 +1127,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
         useNewAutocompleter: $root.useNewAutocompleter,
+        readOnly: $root.isPresentationMode(),
         aceOptions: {
           showLineNumbers: $root.editorMode(),
           showGutter: $root.editorMode(),
           maxLines: $root.editorMode() ? null : 25,
           minLines: $root.editorMode() ? null : 3
         }
-      }, style: {opacity: statementType() !== 'text' ? '0.75' : '1', 'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'}"></div>
+      }, style: {opacity: statementType() !== 'text' || $root.isPresentationMode() ? '0.75' : '1', 'min-height': $root.editorMode() ? '0' : '48px', 'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'}"></div>
       % if conf.USE_NEW_AUTOCOMPLETER.get():
       <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace, snippet: $data } } --><!-- /ko -->
       % endif
@@ -1156,17 +1151,55 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </div>
 
     <div class="clearfix"></div>
-    <ul data-bind="foreach: variables" class="unstyled inline">
-      <li>
-        <div class="input-prepend margin-top-10">
-          <span class="muted add-on" data-bind="text: name"></span>
-          <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="value: value, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keypress': function (context, e){ if (e.ctrlKey && e.which === 13) { $parent.ace().commands.commands['execute'].exec(); } return true; } }">
-        </div>
-      </li>
-    </ul>
+    <!-- ko template: { if: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode(), name: 'snippet-variables' }--><!-- /ko -->
   </div>
   <div class="clearfix"></div>
 </script>
+
+
+<script type="text/html" id="notebook-actions">
+  <div class="btn-group">
+    <a class="btn" rel="tooltip" data-placement="bottom" title="${ _("Execute all") }" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
+      <i class="fa fa-fw fa-play"></i>
+    </a>
+
+    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+      <li>
+        <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+          <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
+        </a>
+      </li>
+      <li>
+        <a class="pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show code') }' : '${ _ko('Hide code') }' }">
+          <i class="fa fa-fw" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
+          <span data-bind="visible: $root.isHidingCode">${ _('Show the code') }</span>
+          <span data-bind="visible: ! $root.isHidingCode()">${ _('Hide the code') }</span>
+        </a>
+      </li>
+      <li>
+        <a href="javascript:void(0)" data-bind="click: displayCombinedContent, visible: ! $root.isPresentationMode() ">
+          <i class="fa fa-fw fa-file-text-o"></i> ${ _('Show all content') }
+        </a>
+      </li>
+    </ul>
+  </div>
+</script>
+
+
+<script type="text/html" id="snippet-variables">
+  <ul data-bind="foreach: variables" class="unstyled inline">
+    <li>
+      <div class="input-prepend margin-top-10">
+        <span class="muted add-on" data-bind="text: name"></span>
+        <input class="input-medium" type="text" data-bind="value: value, attr: { placeholder: defaultValue() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keypress': function (context, e){ if (e.ctrlKey && e.which === 13) { $parent.ace().commands.commands['execute'].exec(); } return true; } }">
+      </div>
+    </li>
+  </ul>
+</script>
+
 
 <script type="text/html" id="snippet-chart-settings${ suffix }">
   <div>
@@ -1316,7 +1349,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="snippet-grid-settings${ suffix }">
   <div class="snippet-grid-settings" style="overflow: auto">
-    <table class="table table-condensed margin-top-10">
+    <table class="table table-condensed margin-top-10 no-border">
       <thead>
         <tr>
           <th width="16">
@@ -1455,7 +1488,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 
 <script type="text/html" id="markdown-snippet-body${ suffix }">
-  <!-- ko ifnot: $root.isPlayerMode() -->
+  <!-- ko ifnot: $root.isPresentationMode() -->
   <div class="row-fluid">
     <div class="span6" data-bind="clickForAceFocus: ace">
       <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
@@ -1468,7 +1501,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </div>
   </div>
   <!-- /ko -->
-  <!-- ko if: $root.isPlayerMode() -->
+  <!-- ko if: $root.isPresentationMode() -->
   <div data-bind="html: renderMarkdown(statement_raw(), id())"></div>
   <!-- /ko -->
 </script>
@@ -1660,7 +1693,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
       <!-- /ko -->
       % if ENABLE_BATCH_EXECUTE.get():
-      <!-- ko if: isBatchable() && status() != 'running' && status() != 'loading' -->
+      <!-- ko if: isBatchable() && status() != 'running' && status() != 'loading' && ! $root.isPresentationMode() -->
         <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': ! isReady(), 'blue': currentQueryTab() == 'queryExplain' }">
           <i class="fa fa-caret-down"></i>
         </a>
@@ -1680,7 +1713,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       % endif
     </div>
 
-    <!-- ko if: isSqlDialect -->
+    <!-- ko if: isSqlDialect && ! $root.isPresentationMode() -->
     <div class="inactive-action dropdown hover-actions pointer" data-bind="css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading' }">
       <a class="snippet-side-btn" style="padding-right:0; padding-left: 2px;" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': ! isReady() || status() === 'running' || status() === 'loading', 'blue': currentQueryTab() == 'queryExplain' }" title="${ _('Explain the current SQL query') }">
         <i class="fa fa-fw fa-map-o"></i>
@@ -1799,7 +1832,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
     </div>
 
+    % if conf.ENABLE_DOWNLOAD.get():
     <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
+    % endif
   </div>
 </script>
 
@@ -1957,12 +1992,21 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   % else:
   var MAIN_SCROLLABLE = '.content-panel';
   var HUE_PUB_SUB_EDITOR_ID = 'editor';
+  var shareViewModel = initSharing("#documentShareModal");
   % endif
+
+  if (window.location.pathname.indexOf('notebook') > -1) {
+    HUE_PUB_SUB_EDITOR_ID = 'notebook';
+  }
 
 
   var isLeftNavOpen = false;
-  huePubSub.subscribe('left.nav.open.toggle', function(val) {
+  huePubSub.subscribe('left.nav.open.toggle', function (val) {
     isLeftNavOpen = val;
+  }, HUE_PUB_SUB_EDITOR_ID);
+
+  huePubSub.subscribe('split.panel.resized', function (val) {
+    huePubSub.publish('recalculate.name.description.width');
   }, HUE_PUB_SUB_EDITOR_ID);
 
   var showHoverMsg = function (e) {
@@ -1990,6 +2034,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     });
     return text;
   }
+
+  function prepareShareModal () {
+    var selectedNotebookUuid = this.selectedNotebook() && this.selectedNotebook().uuid();
+    shareViewModel.setDocUuid(this.selectedNotebook().uuid());
+    openShareModal();
+  };
 
   function createHueDatatable(el, snippet, vm) {
     var DATATABLES_MAX_HEIGHT = 330;
@@ -2033,7 +2083,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           % if is_embeddable:
           stickToTopPosition: 48 + bannerTopHeight + ${ conf.CUSTOM.BANNER_TOP_HTML.get() and '0' or '2' },
           % else:
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 + bannerTopHeight : 76 + bannerTopHeight },
+          stickToTopPosition: function() { return vm.isPresentationMode() || vm.isResultFullScreenMode() ? 1 + bannerTopHeight : 76 + bannerTopHeight },
           % endif
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: 'fixed',
@@ -2108,7 +2158,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         if (snippetEl.find('.dataTables_wrapper').length > 0 && snippet.showGrid()) {
           window.clearTimeout(resultFollowTimeout);
           resultFollowTimeout = window.setTimeout(function () {
-            var topCoord = vm.isPlayerMode() ? 1 : 73;
+            var topCoord = vm.isPresentationMode() || vm.isResultFullScreenMode() ? 1 : 73;
             var offsetTop = 0;
             if (snippetEl.find('.dataTables_wrapper').length > 0 && snippetEl.find('.dataTables_wrapper').offset()){
               offsetTop = (snippetEl.find('.dataTables_wrapper').offset().top - topCoord) * -1;
@@ -3100,40 +3150,51 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       }, HUE_PUB_SUB_EDITOR_ID);
 
 
+      var wasResultFullScreenMode = false;
       var isAssistAvailable = viewModel.assistAvailable();
       var wasLeftPanelVisible = viewModel.isLeftPanelVisible();
       var wasRightPanelVisible = viewModel.isRightPanelVisible();
 
       function exitPlayerMode() {
-        viewModel.isPlayerMode(false);
-        viewModel.isFullscreenMode(false);
+        if (! wasResultFullScreenMode) {
+          viewModel.isPresentationMode(false);
+        } else {
+          viewModel.isResultFullScreenMode(false);
+        }
       }
-
-      viewModel.isPlayerMode.subscribe(function (value) {
-        if (value){
+      function togglePresentation(value) {
+        viewModel.isEditing(! viewModel.isEditing());
+        if (value) {
           $(".jHueNotify").remove();
-          huePubSub.publish('side.panels.hide');
+          isAssistAvailable = viewModel.assistAvailable();
+          wasLeftPanelVisible = viewModel.isLeftPanelVisible();
+          wasRightPanelVisible = viewModel.isRightPanelVisible();
+          huePubSub.publish('side.panels.hide', true);
+          viewModel.assistWithoutStorage(true);
           viewModel.assistAvailable(false);
           viewModel.isLeftPanelVisible(false);
           viewModel.isRightPanelVisible(false);
+          window.setTimeout(function(){
+            viewModel.assistWithoutStorage(false);
+          }, 0);
           $(".navigator").hide();
           $(".add-snippet").hide();
-          if (viewModel.isFullscreenMode()){
-            $(".main-content").css("top", "50px");
-          } else {
-            % if conf.CUSTOM.BANNER_TOP_HTML.get():
+          % if conf.CUSTOM.BANNER_TOP_HTML.get():
             $(".main-content").attr("style", "top: 31px!important");
-            % else:
+          % else:
             $(".main-content").css("top", "1px");
-            % endif
-          }
+          % endif
           redrawFixedHeaders(200);
           $(window).bind("keydown", "esc", exitPlayerMode);
         } else {
-          huePubSub.publish('side.panels.show');
+          huePubSub.publish('side.panels.show', true);
+          viewModel.assistWithoutStorage(true);
           viewModel.isLeftPanelVisible(wasLeftPanelVisible);
           viewModel.isRightPanelVisible(wasRightPanelVisible);
           viewModel.assistAvailable(isAssistAvailable);
+          window.setTimeout(function(){
+            viewModel.assistWithoutStorage(false);
+          }, 0);
           $(".navigator").show();
           $(".add-snippet").show();
           % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -3143,6 +3204,19 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           % endif
           redrawFixedHeaders(200);
           $(window).unbind("keydown", exitPlayerMode);
+        }
+      }
+
+      viewModel.isResultFullScreenMode.subscribe(function(newValue) {
+        wasResultFullScreenMode = true;
+        togglePresentation(newValue);
+      });
+      viewModel.isPresentationMode.subscribe(function(newValue) {
+        wasResultFullScreenMode = false;
+        togglePresentation(newValue);
+        viewModel.togglePresentationMode();
+        if (newValue) {
+          hueAnalytics.convert('editor', 'presentation');
         }
       });
 
@@ -3202,6 +3276,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       $(window).bind("keydown", "ctrl+s alt+s meta+s", function (e) {
         e.preventDefault();
         saveKeyHandler();
+        return false;
+      });
+
+      huePubSub.subscribe('editor.presentation.toggle', function () {
+        viewModel.isPresentationMode(!viewModel.isPresentationMode());
+      }, HUE_PUB_SUB_EDITOR_ID);
+
+      $(window).bind("keydown", "ctrl+shift+p alt+shift+p meta+shift+p", function (e) {
+        e.preventDefault();
+        huePubSub.publish('editor.presentation.toggle');
         return false;
       });
 
@@ -3382,7 +3466,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         var _dtElement;
         if (snippet.showGrid()) {
           _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
-          var topCoord = viewModel.isPlayerMode() ? ${ conf.CUSTOM.BANNER_TOP_HTML.get() and '31' or '1' } : 73;
+          var topCoord = viewModel.isPresentationMode() || viewModel.isResultFullScreenMode() ? ${ conf.CUSTOM.BANNER_TOP_HTML.get() and '31' or '1' } : 73;
           $("#snippet_" + snippet.id()).find(".snippet-grid-settings").css({
             "height": Math.ceil($(window).height() - Math.max($('.result-settings').length > 0 ? $('.result-settings').offset().top : 0, topCoord)) + 'px'
           });
@@ -3407,7 +3491,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         }
       }
 
-      $(document).on("renderData", function (e, options) {
+      huePubSub.subscribe('editor.render.data', function (options) {
         var _el = $("#snippet_" + options.snippet.id()).find(".resultTable");
         if (options.data.length > 0) {
           window.setTimeout(function () {
@@ -3441,7 +3525,18 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             scrollInertia: 0
           });
         }, 200)
-      });
+
+      }, HUE_PUB_SUB_EDITOR_ID);
+
+      huePubSub.subscribe('editor.redraw.data', function (options) {
+        hueUtils.waitForRendered("#snippet_" + options.snippet.id() + " .resultTable", function (el) {
+          return el.is(':visible')
+        }, function () {
+          var $el = $("#snippet_" + options.snippet.id()).find(".resultTable");
+          var dt = createDatatable($el, options.snippet, viewModel);
+          dt.fnAddData(options.snippet.result.data());
+        });
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('editor.snippet.result.gray', function (snippet) {
         var $snippet = $("#snippet_" + snippet.id());
@@ -3509,6 +3604,29 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         }
       }, HUE_PUB_SUB_EDITOR_ID);
 
+      huePubSub.subscribe('editor.get.active.risks', function (callback) {
+        var result = {
+          editor: undefined,
+          risks : {}
+        };
+        if (viewModel.selectedNotebook()) {
+          if (viewModel.selectedNotebook().snippets().length === 1) {
+            result.editor = viewModel.selectedNotebook().snippets()[0].ace();
+            result.risks = viewModel.selectedNotebook().snippets()[0].complexity() || {};
+          } else {
+            var notFound = viewModel.selectedNotebook().snippets().every(function (snippet) {
+              if (snippet.inFocus()) {
+                result.editor = snippet.ace();
+                result.risks = snippet.complexity() || {};
+                return false;
+              }
+              return true;
+            });
+          }
+        }
+        callback(result);
+      });
+
       $(document).on("gridShown", function (e, snippet) {
         window.setTimeout(function () {
           resizeToggleResultSettings(snippet, true);
@@ -3569,9 +3687,19 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
       forceChartDraws(true);
 
+      huePubSub.subscribe('recalculate.name.description.width', function () {
+        hueUtils.waitForRendered('.editorComponents .hue-title-bar .query-name', function(el){ return el.is(':visible') }, function(){
+          var cumulativeWidth = 0;
+          $('.editorComponents .hue-title-bar ul li:not(.skip-width-calculation)').each(function(){
+            cumulativeWidth += $(this).outerWidth();
+          });
+          $('.notebook-name-desc').css('max-width', (($('.editorComponents .hue-title-bar').width() - cumulativeWidth - $('.editorComponents .hue-title-bar .pull-right').width() - 120)/2) + 'px');
+        });
+      }, HUE_PUB_SUB_EDITOR_ID);
+
       var _resizeTimeout = -1;
       $(window).on("resize", function () {
-        $('.notebook-name-desc').css('max-width', ($('.snippet-container').width()/4) + 'px');
+        huePubSub.publish('recalculate.name.description.width');
         window.clearTimeout(_resizeTimeout);
         _resizeTimeout = window.setTimeout(function () {
           forceChartDraws();

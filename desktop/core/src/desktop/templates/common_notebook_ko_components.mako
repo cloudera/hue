@@ -21,6 +21,8 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
+from notebook.conf import ENABLE_SQL_INDEXER
+
 
 LOG = logging.getLogger(__name__)
 
@@ -29,12 +31,6 @@ try:
 except ImportError, e:
   LOG.warn("Hive app is not enabled")
   DOWNLOAD_ROW_LIMIT = None
-
-try:
-  from indexer.conf import ENABLE_NEW_INDEXER
-except ImportError, e:
-  LOG.warn("Indexer app is not enabled")
-  ENABLE_NEW_INDEXER = None
 %>
 
 <%def name="addSnippetMenu()">
@@ -193,7 +189,7 @@ except ImportError, e:
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
-        % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+        % if ENABLE_SQL_INDEXER.get():
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Explore result in a dashboard') }">
             <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
@@ -267,7 +263,7 @@ except ImportError, e:
                 </div>
               </div>
             </div>
-            % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+            % if ENABLE_SQL_INDEXER.get():
             <div class="control-group">
               <div class="controls">
                 <label class="radio">
@@ -368,13 +364,13 @@ except ImportError, e:
               return result;
             }
             else {
-              return '${_('Error while copying results.') }';
+              return CopyToClipboardGlobals.i18n.ERROR;
             }
           }
         });
 
         clipboard.on('success', function (e) {
-          $.jHueNotify.info('${_('Results copied successfully to the clipboard') }')
+          $.jHueNotify.info(CopyToClipboardGlobals.i18n.SUCCESS)
           e.clearSelection();
         });
 

@@ -58,14 +58,7 @@ def search(request):
       else:
         response = get_engine(request.user, collection).query(collection, query, facet)
     except RestException, e:
-      try:
-        message = json.loads(e.message)
-        msg = message['error'].get('msg')
-        response['error'] = msg if msg else message['error']['trace']
-      except Exception, e2:
-        LOG.exception('Failed to extract json message: %s' % force_unicode(e2))
-        LOG.exception('Failed to parse json response: %s' % force_unicode(e))
-        response['error'] = force_unicode(e)
+      response.update(extract_solr_exception_message(e))
     except Exception, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
@@ -535,3 +528,18 @@ def get_collections(request):
       result['message'] = force_unicode(e)
 
   return JsonResponse(result)
+
+
+def extract_solr_exception_message(e):
+  response = {}
+
+  try:
+    message = json.loads(e.message)
+    msg = message['error'].get('msg')
+    response['error'] = msg if msg else message['error']['trace']
+  except Exception, e2:
+    LOG.exception('Failed to extract json message: %s' % force_unicode(e2))
+    LOG.exception('Failed to parse json response: %s' % force_unicode(e))
+    response['error'] = force_unicode(e)
+
+  return response

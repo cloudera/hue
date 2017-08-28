@@ -110,13 +110,24 @@ class S3FileSystem(object):
         kwargs = {}
         if self._get_location():
           kwargs['location'] = self._get_location()
-        bucket = self._s3_connection.create_bucket(name, **kwargs)
+        bucket = self._create_bucket(name, **kwargs)
         self._bucket_cache[name] = bucket
       elif e.status == 400:
         raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
       else:
         raise S3FileSystemException(e.message or e.reason)
     return bucket
+
+  def _create_bucket(self, name, **kwargs):
+    # S3 API throws an exception when using us-east-1 and specifying CreateBucketConfiguration
+    # Boto specifies CreateBucketConfiguration whenever the location is not default
+    # We change location to default to fix issue
+    # More information: https://github.com/boto/boto3/issues/125
+
+    if kwargs.get('location') == Location.USEast:
+      kwargs['location'] = Location.DEFAULT
+
+    return self._s3_connection.create_bucket(name, **kwargs)
 
   def _delete_bucket(self, name):
     try:

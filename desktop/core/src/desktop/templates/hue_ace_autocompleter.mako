@@ -21,7 +21,7 @@ from desktop.views import _ko
 
 <%def name="hueAceAutocompleter()">
   <script type="text/html" id="hue-ace-autocompleter">
-    <!-- ko if: active() && suggestions.filtered().length !== 0 -->
+    <!-- ko if: active() && (suggestions.filtered().length !== 0 || suggestions.loading()) -->
     <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }, event: { mousewheel: function (data, event) { event.stopPropagation(); }}">
       <div class="autocompleter-suggestions">
         <!-- ko if: suggestions.availableCategories().length > 1 || suggestions.loading() -->
@@ -98,6 +98,9 @@ from desktop.views import _ko
       <div class="autocompleter-details-contents">
         <div class="autocompleter-details-contents-inner">
           <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.database"></span>.<span data-bind="text: details.table"></span></div>
+          <!-- ko if: partitionKey -->
+          <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Partition key') }</div>
+          <!-- /ko -->
           <!-- ko if: typeof details.primary_key !== 'undefined' && details.primary_key === 'true' -->
           <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
           <!-- /ko -->
@@ -364,7 +367,7 @@ from desktop.views import _ko
         self.changeListener = function () {
           window.clearTimeout(changeTimeout);
           var cursor = self.editor().selection.lead;
-          if (cursor.row != self.base.row || cursor.column < self.base.column) {
+          if (cursor.row !== self.base.row || cursor.column < self.base.column) {
             self.detach();
           } else {
             changeTimeout = window.setTimeout(function () {
@@ -403,6 +406,7 @@ from desktop.views import _ko
         };
 
         self.detach = function () {
+          self.suggestions.cancelRequests();
           disposeEventHanders();
           if (!self.active()) {
             return;
@@ -435,7 +439,7 @@ from desktop.views import _ko
 
         var autocompleterDoneSub = huePubSub.subscribe('hue.ace.autocompleter.done', function () {
           window.setTimeout(function () {
-            if (self.active() && self.suggestions.filtered().length === 0) {
+            if (self.active() && self.suggestions.filtered().length === 0 && !self.suggestions.loading()) {
               self.detach();
             }
           }, 0);

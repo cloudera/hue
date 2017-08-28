@@ -45,13 +45,13 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <table id="fileBrowserTable" class="table table-condensed table-huedatatable tablescroller-disable" data-bind="style: {'opacity': isLoading() ? '.5': '1'}">
     <thead>
       <tr>
-        <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
+        <th class="sorting_disabled" width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
         <th class="sortable sorting" data-sort="type" width="1%" data-bind="click: sort">&nbsp;</th>
         <th class="sortable sorting_asc" data-sort="name" data-bind="click: sort">${_('Name')}</th>
         <th class="sortable sorting" data-sort="size" width="10%" data-bind="click: sort">${_('Size')}</th>
         <th class="sortable sorting" data-sort="user" width="10%" data-bind="click: sort">${_('User')}</th>
         <th class="sortable sorting" data-sort="group" width="10%" data-bind="click: sort">${_('Group')}</th>
-        <th width="10%">${_('Permissions')}</th>
+        <th class="sorting_disabled" width="10%">${_('Permissions')}</th>
         <th class="sortable sorting" data-sort="mtime" width="15%" data-bind="click: sort">${_('Date')}</th>
       </tr>
     </thead>
@@ -576,15 +576,17 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
-    <li data-bind="visible: !isS3() || (isS3() && !isS3Root())"><a href="#" title="${_('Rename')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1, click: $root.renameFile,
-    enable: $root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
+    <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
+    <a href="#" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
-    <li data-bind="visible: !isS3() || (isS3() && !isS3Root())"><a href="#" title="${_('Move')}" data-bind="click: $root.move, enable: $root.selectedFiles().length > 0 &&
-    isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-    <li data-bind="visible: !isS3() || (isS3() && !isS3Root())"><a href="#" title="${_('Copy')}" data-bind="click: $root.copy, enable: $root.selectedFiles().length > 0 &&
-    isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
+    <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <a href="#" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
+    <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <a href="#" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
-    <li><a href="#" title="${_('Download')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file', click: $root.downloadFile"><i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
+    <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
+    <a href="#" title="${_('Download')}" data-bind="click: (!$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file') ? $root.downloadFile: void(0)">
+    <i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
     % endif
     <li class="divider" data-bind="visible: !isS3()"></li>
     % if is_fs_superuser:
@@ -601,23 +603,27 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </li>
     <li class="divider" data-bind="visible: !isS3() || (isS3() && !isS3Root())"></li>
     % if is_trash_enabled:
-    <li><a href="#" data-bind="enable: $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: $root.trashSelected"><i class="fa fa-fw fa-times"></i> ${_('Move to trash')}</a></li>
+    <li data-bind="css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+    <a href="#" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.trashSelected: void(0)">
+    <i class="fa fa-fw fa-times"></i> ${_('Move to trash')}</a></li>
     %endif
     <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}</a></li>
     <li class="divider" data-bind="visible: !isS3()"></li>
     <li data-bind="css: {'disabled': selectedFiles().length > 1 }, visible: !isS3()">
       <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}"><i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}</a>
     </li>
-    <li>
-      <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
+    <li data-bind="css: {'disabled': inTrash() || isS3() || selectedFiles().length != 1 || selectedFile().type != 'file'}">
+      <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="click: (!inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file') ? setReplicationFactor: void(0)">
         <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
       </a>
     </li>
     % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-      <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
+      <li data-bind="css: {'disabled': ! showCompressButton}">
+        <a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { if(showCompressButton) { setCompressArchiveDefault(); confirmCompressFiles();}}">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
       </li>
-      <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive() && !isS3(), click: confirmExtractArchive">
+      <li data-bind="css: {'disabled': selectedFiles().length != 1 || !isArchive() || isS3()}">
+        <a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="click: (selectedFiles().length == 1 && isArchive() && !isS3()) ? confirmExtractArchive : void(0)">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
       </li>
     % endif
@@ -744,95 +750,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       user: "${ user }"
     });
 
-    // migration to the new history
-    if ($.totalStorage('hue_fb_history')) {
-      var s3History = [],
-        hdfsHistory = [];
-      $.totalStorage('hue_fb_history').forEach(function(item) {
-        if (item.toLowerCase().indexOf('s3a://') === 0){
-          s3History.push(item);
-        }
-        else {
-          hdfsHistory.push(item);
-        }
-      });
-      $.totalStorage('hue_fb_history', null);
-      apiHelper.setInTotalStorage('fb', 'history_s3', s3History);
-      apiHelper.setInTotalStorage('fb', 'history_hdfs', hdfsHistory);
-    }
-
-    var getHistorySlug = function() {
-      var slug = 'history_';
-      if (viewModel && viewModel.isS3()){
-        slug += 's3';
-      }
-      else {
-        slug += 'hdfs';
-      }
-      return slug;
-    }
-
-    var getHistory = function () {
-      return apiHelper.getFromTotalStorage('fb', getHistorySlug(), [])
-    };
-
-    var showHistory = function () {
-      var history = getHistory().slice(0, 10),
-        frag = $('<ul/>', {
-                  'id': 'hashHistory',
-                  'class': 'dropdown-menu',
-                  'role': 'menu',
-                  'aria-labelledby': 'historyDropdown'
-                });
-
-      $('#hashHistory').remove();
-      if (history.length === 0){
-        $('.history').addClass('no-history');
-      }
-
-      history.forEach(function (item) {
-        var url = '#' + item,
-          list = $('<li><a href="' + url + '">' + item + '</a></li>');
-
-        $(list).appendTo(frag);
-      });
-
-      $('<li>', {
-        'class': 'divider'
-      }).appendTo(frag);
-
-      $('<li><a href="javascript:void(0)">${ _("Clear history...") }</a></li>')
-          .appendTo(frag)
-          .on('click', function(){
-            apiHelper.setInTotalStorage('fb', getHistorySlug(), []);
-            $('.history').addClass('no-history');
-          });
-
-      $(frag).appendTo('.history');
-
-      return this;
-    };
-
-    var addPathToHistory = function (path) {
-      $('.history').removeClass('no-history');
-      var history = getHistory();
-      if (path != '/filebrowser/') {
-        var _basePath = '${url('filebrowser.views.view', path='')}';
-        if (path.indexOf(_basePath) > -1) {
-          path = path.substr(_basePath.length);
-        }
-
-        // ensure no duplicates are pushed to $.totalStorage()
-        if (history.indexOf(path) === -1) {
-          history.unshift(path);
-          $('.history').removeClass('no-history');
-        } else {
-          history.unshift(history.splice(history.indexOf(path), 1)[0]);
-        }
-        apiHelper.setInTotalStorage('fb', getHistorySlug(), history.slice(0, 10));
-      }
-    };
-
     // ajax modal windows
     var openChownWindow = function (path, user, group, next) {
       $.ajax({
@@ -886,6 +803,15 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       var sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
       var i = Math.floor(Math.log(bytes) / Math.log(k));
       return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
+    }
+
+    var updateHash = function (hash) {
+      %if not is_embeddable:
+      window.location.hash = hash;
+      %else:
+      hueUtils.changeURL('#' + hash);
+      huePubSub.publish('fb.update.hash');
+      %endif
     }
 
     var Page = function (page) {
@@ -996,7 +922,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
               viewModel.targetPageNum(1);
               viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
-              location.hash = this.url;
+              updateHash(this.url);
             }
             else {
               window.open($(e.target).attr('href'));
@@ -1017,7 +943,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.sortBy = ko.observable("name");
       self.sortDescending = ko.observable(false);
       self.searchQuery = ko.observable("");
-      self.searchQuery.extend({ rateLimit: 500 });
       self.skipTrash = ko.observable(false);
       self.enableFilterAfterSearch = true;
       self.isCurrentDirSentryManaged = ko.observable(false);
@@ -1149,7 +1074,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.isS3.subscribe(function (newVal) {
         if (newVal) {
           huePubSub.publish('update.autocompleters');
-          huePubSub.publish('update.history');
         }
       });
 
@@ -1207,7 +1131,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
 
           if (data.type != null && data.type == "file") {
-            location.href = data.url;
+            window.location.href = data.url;
             return false;
           }
 
@@ -1348,7 +1272,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             e.preventDefault();
             viewModel.targetPageNum(1);
             viewModel.targetPath("${url('filebrowser.views.view', path='')}?" + folderPath);
-            location.hash = '';
+            updateHash('');
             viewModel.retrieveData();
           }
           else {
@@ -1373,22 +1297,22 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           self.enableFilterAfterSearch = false;
           self.searchQuery("");
           self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
-          location.hash = stripHashes(file.path);
-        } else {
+          updateHash(stripHashes(file.path));
+        } else {   
           %if is_embeddable:
           huePubSub.publish('open.link', file.url);
           %else:
-          location.href = file.url;
+          window.location.href = file.url;
           %endif
         }
       };
 
       self.editFile = function () {
-        location.href = "${url('filebrowser.views.edit', path='')}" + self.selectedFile().path;
+        window.location.href = "${url('filebrowser.views.edit', path='')}" + self.selectedFile().path;
       };
 
       self.downloadFile = function () {
-        location.href = "${url('filebrowser.views.download', path='')}" + self.selectedFile().path;
+        window.location.href = "${url('filebrowser.views.download', path='')}" + self.selectedFile().path;
       };
 
       self.renameFile = function () {
@@ -1678,7 +1602,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               %if is_embeddable:
               $scrollable = $('.page-content');
               %endif
-              if ($('.row-deleted').length() > 0 && $('.row-deleted:eq(0)').offset()) {
+              if ($('.row-deleted').length > 0 && $('.row-deleted:eq(0)').offset()) {
                 $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
               }
             }, 500);
@@ -2102,15 +2026,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ko.applyBindings(viewModel, $('.filebrowser')[0]);
 
     $(document).ready(function () {
-      $('.historyLink').on('click', function (e) {
-        if(getHistory().length > 0) {
-          showHistory();
-        } else {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
-
       // hide context menu
       $('body').on('click', function (e) {
         hideContextMenu();
@@ -2439,16 +2354,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
       }, 'filebrowser');
 
-      huePubSub.subscribe('update.history', function(){
-        if (getHistory().length == 0) {
-          $('.history').addClass('no-history');
-        }
-        else {
-          $('.history').removeClass('no-history');
-        }
-      });
-
-
       $("#copyForm").on("submit", function () {
         if ($.trim($("#copyDestination").val()) == "") {
           $("#copyNameRequiredAlert").show();
@@ -2521,8 +2426,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             hash = encodeURI(hash);
           }
           if (hash != null && hash != "" && hash.indexOf('/') > -1) {
-            addPathToHistory(hash);
-
             targetPath = "${url('filebrowser.views.view', path='')}";
             if (hash.indexOf("!!") != 0) {
               targetPath += stripHashes(hash);
@@ -2543,7 +2446,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
       }
 
-      if (location.hash != null && location.hash.length > 1) {
+      huePubSub.subscribe('fb.update.hash', hashchange, 'filebrowser');
+
+      if (window.location.hash != null && window.location.hash.length > 1) {
         hashchange();
       }
       else {
@@ -2566,10 +2471,14 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(el.val()));
           viewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
-              location.href = data.url;
+              %if is_embeddable:
+              huePubSub.publish('open.link', data.url);
+              %else:
+              window.location.href = data.url;
+              %endif
               return false;
             } else {
-              location.hash = stripHashes(el.val());
+              updateHash(stripHashes(el.val()));
             }
             $("#jHueHdfsAutocomplete").hide();
           });

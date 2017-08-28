@@ -20,7 +20,8 @@
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
-  from indexer.conf import ENABLE_NEW_INDEXER, CONFIG_INDEXER_LIBS_PATH
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, CONFIG_INDEXER_LIBS_PATH
+  from notebook.conf import ENABLE_SQL_INDEXER
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -60,7 +61,7 @@ ${ assist.assistPanel() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
 %endif
 
-<link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
+<link rel="stylesheet" href="${ static('indexer/css/importer.css') }" type="text/css">
 
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -71,194 +72,9 @@ ${ assist.assistPanel() }
     top: 112px!important;
   }
 % endif
-  .path {
-    margin-bottom: 0!important;
-    border-right: none!important;
-  }
-
-  .step .card-heading.simple {
-    font-size: 17px;
-  }
-
-  .step .card-body {
-    margin-top: 14px;
-  }
-
-  .step label > div:first-child {
-    width: 120px;
-    text-align: right;
-    padding-right: 8px;
-    display: inline-block;
-    vertical-align: top;
-    padding-top: 6px;
-  }
-
-  .step label.checkbox {
-    margin-left: 130px;
-  }
-
-  .step .index-field label.checkbox {
-    margin-left: 5px;
-  }
-
-  .step .index-field label > div:first-child {
-    width: initial;
-  }
-
-  .step .field-properties label.checkbox {
-    margin-left: 10px;
-  }
-
-  .step label:not(.checkbox) {
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  .step input[type='text'] {
-    margin-bottom: 0;
-  }
-
-  .step .selectize-control {
-    display: inline-block;
-    vertical-align: middle;
-    width: 578px !important;
-  }
-
-  .step .form-inline .selectize-control {
-    width: 120px !important;
-    margin-bottom: -8px;
-  }
-
-  .step .inline-labels {
-    display: table;
-  }
-
-  .step .inline-labels .selectize-control {
-    width: 120px !important;
-    vertical-align: -12px;
-  }
-
-  .step .selectize-input {
-    max-height: 31px;
-  }
-
-  .step .selectize-control.multi .selectize-input {
-    padding-top: 3px!important;
-  }
-
-  .step .show-edit-on-hover a {
-    opacity: 0;
-    -webkit-transition: opacity 0.2s linear;
-    -moz-transition: opacity 0.2s linear;
-    -ms-transition: opacity 0.2s linear;
-    -o-transition: opacity 0.2s linear;
-    transition: opacity 0.2s linear;
-  }
-
-  .step .show-edit-on-hover:hover a {
-    opacity: 1;
-  }
-
-  .step .show-edit-on-hover .inactive-action {
-    margin-left: 6px;
-    vertical-align: middle;
-  }
-
-  .step .fa-padding-top {
-    padding-top: 8px;
-  }
-
-  .kudu-partitions li {
-    width: 578px !important;
-    padding: 5px;
-  }
-
-  .kudu-partitions li:hover {
-    background-color: #F7F7F7;
-  }
-
-  .kudu-partitions .range-partition {
-    padding: 5px;
-  }
-
-  .kudu-partitions .range-partition:hover {
-    background-color: #F1F1F1;
-  }
-
-  .step .kudu-partitions li .selectize-control {
-    width: 100px !important;
-    vertical-align: top;
-  }
-
-  .field {
-    padding: 4px;
-    padding-left: 10px;
-    border-left: 4px solid #DBE8F1;
-  }
-
-  .operation {
-    border-left: 4px solid #EEE;
-    padding-left: 10px;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    margin-left: 10px;
-  }
-
-  .field-content-preview {
-    width: 180px;
-    margin-left: 20px;
-  }
-
-  .table-preview {
-    margin:auto;
-    text-align:left;
-  }
-
-  .table-preview td, .table-preview th {
-    white-space: nowrap;
-  }
-
-  .content-panel {
-    overflow-x: hidden;
-  }
-
-  .content-panel-inner {
-    margin: 10px;
-    margin-bottom: 100px;
-  }
-
-  .form-control.path {
-    vertical-align: top;
-  }
-
-  .form-actions {
-    position: fixed;
-    bottom: 0;
-    margin: 0;
-    z-index: 1000;
-    border-top: 1px solid #e5e5e5;
-  }
-
-  #importerNotebook {
-    height: 5px;
-    float: right;
-  }
-
-  #importerNotebook .snippet-error-container  {
-    background: transparent;
-  }
-
-  .inline-table {
-    display: inline-table;
-  }
-
-  .columns-form {
-    margin-bottom: 200px;
-  }
-
 </style>
 
-<span id="importerComponents" class="notebook" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
+<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
 <div class="dz-message" data-dz-message></div>
 <div class="navbar hue-title-bar">
   <div class="navbar-inner">
@@ -267,7 +83,20 @@ ${ assist.assistPanel() }
         <ul class="nav">
           <li class="app-header">
             <a href="${ url('indexer:importer') }">
-              <i class="fa fa-database app-icon"></i> ${_('Importer')}</a>
+              <!-- ko if: createWizard.prefill.target_type().length == 0 -->
+              <i class="fa fa-database app-icon"></i> ${_('Importer')}
+              <!-- /ko -->
+              <!-- ko ifnot: createWizard.prefill.target_type().length == 0 -->
+                <!-- ko if: createWizard.prefill.target_type() === 'index' -->
+                  <i class="fa fa-search app-icon"></i> ${_('Import to index')}
+                <!-- /ko -->
+                <!-- ko if: createWizard.prefill.target_type() === 'table' -->
+                  <i class="fa fa-database app-icon"></i> ${_('Import to table')}
+                <!-- /ko -->
+                <!-- ko if: createWizard.prefill.target_type() === 'database' -->
+                  <i class="fa fa-database app-icon"></i> ${_('Create a new database')}
+                <!-- /ko -->
+              <!-- /ko -->
             </a>
           </li>
         </ul>
@@ -346,6 +175,8 @@ ${ assist.assistPanel() }
           </div>
         </li>
 
+        <li class="arrow muted"><i class="fa fa-fw fa-angle-double-right"></i></li>
+
         <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3, 'pointer': currentStep() == 1 && !createWizard.isGuessingFormat() && createWizard.source.show() }, click: function() { if (!createWizard.isGuessingFormat() && createWizard.source.show()){ currentStep(2); }}">
           <div class="step" title="${ _('Go to Step 2') }">
             <!-- ko if: currentStep() < 3 -->
@@ -374,12 +205,22 @@ ${ assist.assistPanel() }
 
     <!-- ko if: currentStep() == 1 -->
     <div class="card step">
-      <h3 class="card-heading simple">${_('Source')}</h3>
+      <h4>${_('Source')}</h4>
       <div class="card-body">
         <div>
           <div class="control-group" data-bind="visible: createWizard.prefill.target_type().length == 0 || createWizard.prefill.source_type() == 'all'">
             <label for="sourceType" class="control-label"><div>${ _('Type') }</div>
               <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
+            </label>
+          </div>
+          <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsMode" class="control-label"><div>${ _('Mode') }</div>
+              <label class="radio inline-block margin-right-20">
+                <input type="radio" name="rdbmsMode" value="customRdbms" data-bind="checked: createWizard.source.rdbmsMode" /> ${_('Custom')}
+              </label>
+              <label class="radio inline-block">
+                <input type="radio" name="rdbmsMode" value="configRdbms" data-bind="checked: createWizard.source.rdbmsMode" /> ${_('Configured')}
+              </label>
             </label>
           </div>
 
@@ -389,7 +230,7 @@ ${ assist.assistPanel() }
 
           <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'file'">
             <label for="path" class="control-label"><div>${ _('Path') }</div>
-              <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: false }" placeholder="${ _('Click or drag from the assist') }">
+              <input type="text" class="form-control path filechooser-input input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: false }" placeholder="${ _('Click or drag from the assist') }">
             </label>
             <!-- ko if: createWizard.source.path().length > 0 -->
               <a data-bind="hueLink: '/filebrowser/view=' + createWizard.source.path()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
@@ -397,6 +238,91 @@ ${ assist.assistPanel() }
               </a>
             <!-- /ko -->
           </div>
+
+          <!-- ko if: createWizard.source.inputFormat() == 'rdbms' -->
+
+            <!-- ko if: createWizard.source.rdbmsMode() -->
+            <div class="control-group">
+              <label for="rdbmsType" class="control-label"><div>${ _('Driver') }</div>
+                <select id="rdbmsType" data-bind="selectize: createWizard.source.rdbmsTypes, value: createWizard.source.rdbmsType, optionsText: 'name', optionsValue: 'value'"></select>
+              </label>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko if: createWizard.source.rdbmsMode() == 'customRdbms' -->
+              <div class="control-group input-append">
+                <label for="rdbmsHostname" class="control-label"><div>${ _('Hostname') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsHostname" placeholder="${ _('Enter host/ip here eg. mysql.domain.com or 123.123.123.123') }">
+                </label>
+              </div>
+
+              <!-- ko if: createWizard.source.rdbmsType() == 'jdbc' -->
+              <div class="control-group input-append">
+                <label for="rdbmsJdbcDriver" class="control-label"><div>${ _('JDBC Driver') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsJdbcDriver">
+                </label>
+              </div>
+              <!-- /ko -->
+
+              <!-- ko if: createWizard.source.rdbmsType() != 'jdbc' -->
+              <div class="control-group">
+                <label for="rdbmsPort" class="control-label"><div>${ _('Port') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPort" placeholder="${ _('Enter port number here eg. 3306') }">
+                </label>
+              </div>
+              <!-- /ko -->
+              <div class="control-group">
+                <label for="rdbmsUsername" class="control-label"><div>${ _('Username') }</div>
+                  <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsUsername" placeholder="${ _('Enter username here') }">
+                </label>
+              </div>
+
+              <div class="control-group no-margin-bottom">
+                <label for="rdbmsPassword" class="control-label"><div>${ _('Password') }</div>
+                  <input type="password" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsPassword" placeholder="${ _('Enter password here') }">
+                </label>
+              </div>
+
+
+              <div class="control-group">
+                <button class="btn" data-bind="click: createWizard.source.rdbmsCheckConnection">
+                  ${_('Test Connection')}
+                </button>
+              </div>
+            <!-- /ko -->
+
+            <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' || (createWizard.source.rdbmsMode() == 'customRdbms' && createWizard.source.rdbmsDbIsValid()) -->
+              <!-- ko if: createWizard.source.rdbmsMode() == 'configRdbms' && createWizard.source.rdbmsType() == 'jdbc' -->
+              <div class="control-group">
+                <label for="rdbmsJdbcDriverName" class="control-label"><div>${ _('Options') }</div>
+                  <select id="rdbmsJdbcDriverName" data-bind="selectize: createWizard.source.rdbmsJdbcDriverNames, value: createWizard.source.rdbmsJdbcDriverName, optionsText: 'name', optionsValue: 'value'"></select>
+                </label>
+              </div>
+              <!-- /ko -->
+
+              <!-- ko if: createWizard.source.rdbmsTypes -->
+              <div class="control-group input-append">
+                <label for="rdbmsDatabaseName" class="control-label"><div>${ _('Database Name') }</div>
+                  <select id="rdbmsDatabaseName" data-bind="selectize: createWizard.source.rdbmsDatabaseNames, value: createWizard.source.rdbmsDatabaseName, optionsText: 'name', optionsValue: 'value'"></select>
+                </label>
+              </div>
+              <!-- /ko -->
+
+              <!-- ko if: createWizard.source.rdbmsDatabaseName -->
+              <div class="control-group">
+                <!-- ko ifnot: createWizard.source.rdbmsAllTablesSelected() -->
+                <label for="rdbmsTableName" class="control-label"><div>${ _('Table Name') }</div>
+                  <select id="rdbmsTableName" data-bind="selectize: createWizard.source.rdbmsTableNames, value: createWizard.source.rdbmsTableName, optionsText: 'name', optionsValue: 'value'"></select>
+                </label>
+                <!-- /ko -->
+                <label class="checkbox inline-block">
+                  <input type="checkbox" data-bind="checked: createWizard.source.rdbmsIsAllTables"> ${_('All Tables')}
+                </label>
+              </div>
+              <!-- /ko -->
+            <!-- /ko -->
+
+          <!-- /ko -->
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
             <label for="path" class="control-label"><div>${ _('Table') }</div>
@@ -414,12 +340,12 @@ ${ assist.assistPanel() }
     </div>
 
     <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
-    <div class="card step">
+    <div class="card step" data-bind="visible: createWizard.source.inputFormat() == 'file'">
       <!-- ko if: createWizard.isGuessingFormat -->
-      <h3 class="card-heading simple">${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h3>
+      <h4>${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h4>
       <!-- /ko -->
       <!-- ko ifnot: createWizard.isGuessingFormat -->
-      <h3 class="card-heading simple">${_('Format')}</h3>
+      <h4>${_('Format')}</h4>
       <div class="card-body">
         <label data-bind="visible: createWizard.prefill.source_type().length == 0 && createWizard.source.inputFormat() != 'table'">
           <div>${_('File Type')}</div>
@@ -434,13 +360,14 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
 
+    <!-- ko ifnot: createWizard.source.inputFormat() == 'rdbms' && createWizard.source.rdbmsIsAllTables() -->
     <div class="card step" style="min-height: 310px;">
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <!-- ko if: createWizard.isGuessingFieldTypes -->
-      <h3 class="card-heading simple">${_('Generating preview...')} <i class="fa fa-spinner fa-spin"></i></h3>
+      <h4>${_('Generating preview...')} <i class="fa fa-spinner fa-spin"></i></h4>
       <!-- /ko -->
       <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
-      <h3 class="card-heading simple">${_('Preview')}</h3>
+      <h4>${_('Preview')}</h4>
       <div class="card-body">
         <div style="overflow: auto">
           <table class="table table-condensed table-preview">
@@ -463,6 +390,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
     <!-- /ko -->
+    <!-- /ko -->
 
     <!-- /ko -->
 
@@ -471,7 +399,7 @@ ${ assist.assistPanel() }
       <!-- ko with: createWizard.destination -->
 
       <div class="card step">
-        <h3 class="card-heading simple">${_('Destination')}</h3>
+        <h4>${_('Destination')}</h4>
         <div class="card-body">
           <div class="control-group">
             <label for="destinationType" class="control-label" data-bind="visible: $parent.createWizard.prefill.target_type().length == 0"><div>${ _('Type') }</div>
@@ -480,11 +408,13 @@ ${ assist.assistPanel() }
           </div>
           <div class="control-group">
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
-            <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
+            <!-- ko if: outputFormat() == 'file' -->
+              <input type="text" class="form-control name input-xlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, displayOnlyFolders: true, uploadFile: false}" placeholder="${ _('Name') }" title="${ _('Directory must not exist in the path') }">
+            <!-- /ko -->
+            <!-- ko if: outputFormat() == 'index' -->
               <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             <!-- /ko -->
-
-            <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
+            <!-- ko if: ['table', 'database'].indexOf(outputFormat()) != -1 -->
               <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
@@ -507,9 +437,9 @@ ${ assist.assistPanel() }
       </div>
 
 
-        <!-- ko if: outputFormat() == 'table' -->
+        <!-- ko if: outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
         <div class="card step">
-          <h3 class="card-heading simple">${_('Properties')}</h3>
+          <h4>${_('Properties')}</h4>
           <div class="card-body">
             <div class="control-group">
               <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
@@ -523,9 +453,9 @@ ${ assist.assistPanel() }
               </label>
             </div>
 
-            <div class="control-group" data-bind="visible: ! useDefaultLocation()">
+            <div class="control-group" data-bind="visible: !useDefaultLocation()">
               <label for="path" class="control-label"><div>${ _('External location') }</div>
-                <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+                <input type="text" class="form-control path filechooser-input input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
               </label>
             </div>
 
@@ -540,7 +470,7 @@ ${ assist.assistPanel() }
             <span data-bind="visible: showProperties">
               <div class="control-group">
                 <label class="checkbox inline-block" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
-                  <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
+                  <input type="checkbox" data-bind="checked: importData, disable: !useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
                 </label>
               </div>
               <div class="control-group">
@@ -578,15 +508,15 @@ ${ assist.assistPanel() }
             </div>
 
             <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
-              <label for="kuduPks" class="control-label"><div>${ _('Primary keys') }</div>
+              <label for="kuduPksTable" class="control-label"><div>${ _('Primary keys') }</div>
                 ## At least one selected
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="3" multiple="true"></select>
+                <select id="kuduPksTable" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="3" multiple="true"></select>
               </label>
             </div>
 
             <label class="control-label"><div>${ _('Partitions') }</div>
 
-              <!-- ko if: tableFormat() != 'kudu' -->
+              <!-- ko if: tableFormat() != 'kudu' && $root.createWizard.source.inputFormat() != 'rdbms' -->
               <div class="inline-table">
                 <div class="form-inline" data-bind="foreach: partitionColumns">
                   <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
@@ -651,15 +581,15 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'index' -->
         <div class="card step">
-          <h3 class="card-heading simple">${_('Properties')}</h3>
+          <h4>${_('Properties')}</h4>
           <div class="card-body">
             <div class="control-group">
-              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }">
+              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
                 <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
               </label>
 
               <label for="path" class="control-label" data-bind="visible: indexerRunJob"><div>${ _('Libs') }</div>
-                <input type="text" class="form-control path input-xxlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+                <input type="text" class="form-control path filechooser-input input-xlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
               </label>
               <!-- ko if: indexerRunJob() && indexerJobLibPath().length > 0 -->
                 <a data-bind="hueLink: '/filebrowser/view=' + indexerJobLibPath()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
@@ -669,14 +599,14 @@ ${ assist.assistPanel() }
             </div>
 
             <div class="control-group">
-              <label for="kuduPks" class="control-label"><div>${ _('Primary key') }</div>
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: indexerPrimaryKey, selectedObjects: indexerPrimaryKeyObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+              <label for="kuduPksIndex" class="control-label"><div>${ _('Primary key') }</div>
+                <select id="kuduPksIndex" data-bind="selectize: columns, selectedOptions: indexerPrimaryKey, selectedObjects: indexerPrimaryKeyObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
               </label>
             </div>
 
             <div class="control-group">
-              <label for="kuduPks" class="control-label"><div>${ _('Default field') }</div>
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: indexerDefaultField, selectedObjects: indexerDefaultFieldObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+              <label for="kuduDefaultField" class="control-label"><div>${ _('Default field') }</div>
+                <select id="kuduDefaultField" data-bind="selectize: columns, selectedOptions: indexerDefaultField, selectedObjects: indexerDefaultFieldObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
               </label>
             </div>
 
@@ -690,8 +620,8 @@ ${ assist.assistPanel() }
 
             <span data-bind="visible: showProperties">
               <div class="control-group">
-                <label for="destinationFormat" class="control-label"><div>${ _('Config set') }</div>
-                  <select id="destinationFormat" data-bind="selectize: indexerConfigSets, value: indexerConfigSet, optionsValue: 'value', optionsText: 'name'"></select>
+                <label for="destinationFormatIndex" class="control-label"><div>${ _('Config set') }</div>
+                  <select id="destinationFormatIndex" data-bind="selectize: indexerConfigSets, value: indexerConfigSet, optionsValue: 'value', optionsText: 'name'"></select>
                 </label>
               </div>
 
@@ -719,9 +649,74 @@ ${ assist.assistPanel() }
         </div>
         <!-- /ko -->
 
-        <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
+        <!-- ko if: $root.createWizard.source.inputFormat() == 'rdbms' && ['file', 'table', 'hbase'].indexOf(outputFormat()) != -1 -->
+        <div class="card step">
+          <h4>${_('Properties')}</h4>
+          <div class="control-group">
+            <label><div>${ _('Mappers') }</div>
+              <input type="number" class="form-control input-small" data-bind="value: numMappers, valueUpdate: 'afterkeydown'">
+            </label>
+          </div>
+
+          <div class="card-body">
+            <label class="control-label"><div>${ _('Libs') }</div>
+              <div class="inline-table">
+                <ul data-bind="sortable: { data: sqoopJobLibPaths, options: { axis: 'y', containment: 'parent', handle: '.move-widget' }}, visible: sqoopJobLibPaths().length" class="unstyled">
+                  <li>
+                    <div class="input-append" style="margin-bottom: 4px">
+                      <input type="text" class="filechooser-input input-xxlarge" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+                      <span class="add-on move-widget muted" data-bind="visible: $parent.sqoopJobLibPaths().length > 1"><i class="fa fa-arrows"></i></span>
+                      <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeSqoopJobLibPath($data); }"><i class="fa fa-minus"></i></a>
+                    </div>
+                  </li>
+                </ul>
+                <div class="config-property-add-value" style="margin-top: 5px;">
+                  <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addSqoopJobLibPath">
+                    <i class="fa fa-plus"></i>
+                  </a>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label"><div>${ _('Extras') }</div>
+              <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+                <i class="fa fa-sliders fa-padding-top"></i>
+              </a>
+            </label>
+          </div>
+
+          <span data-bind="visible: showProperties">
+            <div class="control-group">
+              <label for="rdbmsSplitBy" class="control-label"><div>${ _('Split By') }</div>
+                <select id="rdbmsSplitBy" data-bind="selectize: columns, value: rdbmsSplitByColumn, optionsValue: 'name', optionsText: 'name'"></select>
+              </label>
+            </div>
+            <div class="control-group" data-bind="visible: outputFormat() == 'file' && !$root.createWizard.source.rdbmsAllTablesSelected()">
+              <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
+                <select id="destinationFormat" data-bind="selectize: rdbmsFileOutputFormats, value: rdbmsFileOutputFormat, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+            </div>
+            <span class="inline-labels" data-bind="visible: rdbmsFileOutputFormat() == 'text' && outputFormat() == 'file' && !$root.createWizard.source.rdbmsAllTablesSelected()">
+              <label for="fieldDelimiter" class="control-label"><div>${ _('Fields') }</div>
+                <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customFieldsDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+              <label for="collectionDelimiter" class="control-label"><div>${ _('Line') }</div>
+                <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customLineDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+              <label for="structDelimiter" class="control-label"><div>${ _('Optionally Enclosed By') }</div>
+                <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customEnclosedByDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+            </span>
+          </span>
+
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: ['table', 'index', 'file', 'hbase'].indexOf(outputFormat()) != -1 -->
           <div class="card step">
-            <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
+            <h4 class="show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h4>
             <div class="card-body no-margin-top columns-form">
               <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
                 <form class="form-inline inline-table" data-bind="foreach: columns">
@@ -732,42 +727,39 @@ ${ assist.assistPanel() }
                   <!-- /ko -->
 
                   <!-- ko if: $parent.outputFormat() == 'index' -->
-                    <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block index-field"></div>
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
+                    <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field inline-block index-field"></div>
                     <div class="clearfix"></div>
                   <!-- /ko -->
                 </form>
 
                 <div class="clearfix"></div>
 
-                <!-- ko if: outputFormat() == 'table' -->
+                <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
                   <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
                 <!-- /ko -->
               <!-- /ko -->
 
               <!-- ko ifnot: $root.createWizard.source.inputFormat() === 'manual' -->
-              <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 44, container: MAIN_SCROLLABLE, disableNiceScroll: true }">
-                <!-- ko if: $parent.outputFormat() == 'table' -->
-                  <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
-                  <div class="clearfix"></div>
+              <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 54, container: MAIN_SCROLLABLE, disableNiceScroll: true }">
+                <!-- ko if: $parent.outputFormat() == 'table' && $root.createWizard.source.inputFormat() != 'rdbms' -->
+                  <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
                 <!-- /ko -->
 
-                <!-- ko if: $parent.outputFormat() == 'index' -->
-                  <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block index-field"></div>
-                  <div class="clearfix"></div>
+                <!-- ko if: (['file', 'table', 'hbase'].indexOf($parent.outputFormat()) != -1 && $root.createWizard.source.inputFormat() == 'rdbms') || $parent.outputFormat() == 'index' -->
+                  <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
                 <!-- /ko -->
               </form>
 
               <div class="clearfix"></div>
               <!-- /ko -->
-
-
             </div>
           </div>
         <!-- /ko -->
 
         <!-- ko if: outputFormat() == 'database' -->
           <div class="card step">
-            <h3 class="card-heading simple">${_('Properties')}</h3>
+            <h4>${_('Properties')}</h4>
             <div class="card-body">
               <label><div>${ _('Description') }</div>
               <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
@@ -776,9 +768,9 @@ ${ assist.assistPanel() }
               <label class="checkbox">
                 <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
               </label>
-              <span data-bind="visible: ! useDefaultLocation()">
+              <span data-bind="visible: !useDefaultLocation()">
                 <label for="path" class="control-label"><div>${ _('External location') }</div>
-                  <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+                  <input type="text" class="form-control path filechooser-input input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
                 </label>
               </span>
               </div>
@@ -802,7 +794,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 2 -->
-        <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && ! createWizard.indexingStarted()">
+        <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
       <!-- /ko -->
@@ -842,7 +834,7 @@ ${ assist.assistPanel() }
     </label>
 
     <label class="margin-left-5">${ _('Type') }&nbsp;
-    <!-- ko if: ! (level() > 0 && $parent.type() == 'map') -->
+    <!-- ko if: !(level() > 0 && $parent.type() == 'map') -->
       <select class="input-small" data-bind="browserAwareSelectize: $root.createWizard.hiveFieldTypes, value: type"></select>
     <!-- /ko -->
     <!-- ko if: level() > 0 && $parent.type() == 'map' -->
@@ -887,22 +879,32 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="index-field-template">
   <label>${ _('Name') }&nbsp;
-    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
+    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name, enable: keep" pattern="^(?!_version_)[a-zA-Z_][a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters and not _version_') }">
   </label>
+  <!-- ko if: $root.createWizard.source.inputFormat() != 'rdbms' -->
   <label class="margin-left-5">${ _('Type') }&nbsp;
     <select class="input-small" data-bind="browserAwareSelectize: $root.createWizard.fieldTypes, value: type"></select>
   </label>
+  <!-- /ko -->
+  <!-- ko if: $root.createWizard.source.inputFormat() == 'rdbms' -->
+  <label class="margin-left-5">${ _('Type') }&nbsp;
+    <input type="text" class="input-small" placeholder="${ _('Field Type') }" data-bind="value: type, enable:false">
+  </label>
+  <!-- /ko -->
   <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
   <span data-bind="visible: showProperties" class="field-properties">
+    <!-- ko if: $root.createWizard.source.inputFormat() != 'rdbms' -->
     <label class="checkbox">
       <input type="checkbox" data-bind="checked: unique"> ${_('Unique')}
     </label>
     <label class="checkbox">
-      <input type="checkbox" data-bind="checked: keep"> ${_('Keep in index')}
-    </label>
-    <label class="checkbox">
       <input type="checkbox" data-bind="checked: required"> ${_('Required')}
     </label>
+    <!-- /ko -->
+    <label class="checkbox">
+      <input type="checkbox" data-bind="checked: keep"> ${_('Keep')}
+    </label>
+
   </span>
 
   <!-- ko if: operations().length == 0 -->
@@ -948,7 +950,7 @@ ${ assist.assistPanel() }
     <!-- /ko -->
     <a class="pointer margin-left-20" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}" title="${ _('Remove') }"><i class="fa fa-times"></i></a>
     <div class="margin-left-20" data-bind="foreach: operation.fields">
-      <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field index-field"></div>
+      <div data-bind="template: { name: 'index-field-template', data: $data }, css:{ 'disabled': !keep() }" class="margin-top-10 field index-field"></div>
     </div>
   </div>
 </script>
@@ -1046,7 +1048,7 @@ ${ assist.assistPanel() }
         "string": "string",
         "long": "bigint",
         "double": "double",
-        "date": "date"
+        "date": "timestamp"
       },
       HIVE_TO_SOLR: {
         "bigint": "long"
@@ -1220,20 +1222,24 @@ ${ assist.assistPanel() }
       self.sampleCols = ko.observableArray();
 
       self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : 'file');
+
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
         self.sample.removeAll();
         self.path('');
         resizeElements();
+        self.rdbmsMode('customRdbms');
       });
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
           {'value': 'manual', 'name': 'Manually'},
-          % if ENABLE_NEW_INDEXER.get():
+          % if ENABLE_SQOOP.get():
+          {'value': 'rdbms', 'name': 'External Database'},
+          % endif
+          % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
           {'value': 'table', 'name': 'Table'},
           % endif
-          ##{'value': 'dbms', 'name': 'DBMS'},
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
       self.inputFormatsManual = ko.observableArray([
@@ -1260,9 +1266,143 @@ ${ assist.assistPanel() }
         return self.inputFormat() == 'file' && /^s3a:\/\/.*$/.test(self.path());
       });
       self.isObjectStore.subscribe(function(newVal) {
-        vm.createWizard.destination.useDefaultLocation(! newVal);
+        vm.createWizard.destination.useDefaultLocation(!newVal);
       });
+      // Rdbms
+      self.rdbmsMode = ko.observable('');
+      self.rdbmsMode.subscribe(function (val) {
+        self.rdbmsTypes(null);
+        self.rdbmsType('');
+        self.rdbmsDatabaseName('');
+        self.rdbmsTableName('');
+        self.rdbmsIsAllTables(false);
+        self.rdbmsAllTablesSelected(false);
+        self.rdbmsJdbcDriver('')
+        self.rdbmsJdbcDriverName('')
+        self.rdbmsHostname('');
+        self.rdbmsPort('');
+        self.rdbmsUsername('');
+        self.rdbmsPassword('');
+        self.rdbmsDbIsValid(false);
+        if (val == 'configRdbms') {
+          $.post("${ url('indexer:get_drivers') }", {}, function (resp) {
+            if (resp.data) {
+              self.rdbmsTypes(resp.data);
+              window.setTimeout(function(){
+                self.rdbmsType(self.rdbmsTypes()[0].value);
+              }, 0);
+            }
+          });
+        } else if (val == 'customRdbms') {
+          self.rdbmsTypes([
+            {'value': 'jdbc', 'name': 'JDBC'},
+            {'value': 'mysql', 'name': 'MySQL'},
+            {'value': 'oracle', 'name': 'Oracle'},
+            {'value': 'postgresql', 'name': 'PostgreSQL'}
+          ]);
+          window.setTimeout(function(){
+            self.rdbmsType(self.rdbmsTypes()[0].value);
+          }, 0);
 
+        }
+      });
+      self.rdbmsTypes = ko.observableArray();
+
+      self.rdbmsType = ko.observable(null);
+      self.rdbmsType.subscribe(function (val) {
+        self.path('');
+        resizeElements();
+        if(self.rdbmsMode() == 'configRdbms' && val != 'jdbc') {
+          $.post("${ url('indexer:get_db_component') }", {
+            "source": ko.mapping.toJSON(self)
+          }, function (resp) {
+            if (resp.data) {
+              self.rdbmsDatabaseNames(resp.data);
+            }
+          });
+        } else if(self.rdbmsMode() == 'configRdbms' && val == 'jdbc') {
+          $.post("${ url('indexer:jdbc_db_list') }", {
+            "source": ko.mapping.toJSON(self)
+          }, function (resp) {
+            if (resp.data) {
+              self.rdbmsJdbcDriverNames(resp.data);
+            }
+          });
+        }
+      });
+      self.rdbmsDatabaseName = ko.observable('');
+      self.rdbmsDatabaseName.subscribe(function (val) {
+        if (val != '') {
+          $.post("${ url('indexer:get_db_component') }", {
+            "source": ko.mapping.toJSON(self)
+          }, function (resp) {
+            if (resp.data) {
+              self.rdbmsTableNames(resp.data);
+            }
+          });
+        }
+      });
+      self.rdbmsDatabaseNames = ko.observableArray();
+      self.rdbmsTableName = ko.observable('');
+      self.rdbmsTableName.subscribe(function (val) {
+        if (val != '') {
+          wizard.guessFieldTypes();
+          wizard.destination.name(val.replace(/ /g, '_').toLowerCase());
+        }
+      });
+      self.rdbmsJdbcDriverNames = ko.observableArray();
+      self.rdbmsJdbcDriverName = ko.observable();
+      self.rdbmsJdbcDriverName.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+        $.post("${ url('indexer:get_db_component') }", {
+          "source": ko.mapping.toJSON(self)
+        }, function (resp) {
+          if (resp.data) {
+            self.rdbmsDatabaseNames(resp.data);
+          }
+        });
+      });
+      self.rdbmsJdbcDriver = ko.observable('');
+      self.rdbmsJdbcDriver.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+      });
+      self.rdbmsTableNames = ko.observableArray();
+      self.rdbmsHostname = ko.observable('');
+      self.rdbmsHostname.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+      });
+      self.rdbmsPort = ko.observable('');
+      self.rdbmsPort.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+      });
+      self.rdbmsUsername = ko.observable('');
+      self.rdbmsUsername.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+      });
+      self.rdbmsPassword = ko.observable('');
+      self.rdbmsPassword.subscribe(function (val) {
+        self.rdbmsDatabaseNames([]);
+      });
+      self.rdbmsAllTablesSelected = ko.observable(false);
+      self.rdbmsIsAllTables = ko.observable(false);
+      self.rdbmsIsAllTables.subscribe(function(newVal) {
+        self.rdbmsTableName('');
+        self.rdbmsAllTablesSelected(newVal);
+      });
+      self.rdbmsDbIsValid = ko.observable(false);
+      self.rdbmsCheckConnection = function() {
+        $.post("${ url('indexer:get_db_component') }", {
+          "source": ko.mapping.toJSON(self)
+        }, function (resp) {
+          if(resp.status == 0 && resp.data) {
+            self.rdbmsDbIsValid(true);
+            self.rdbmsDatabaseNames(resp.data);
+          } else if(resp.status == 1) {
+            $(document).trigger("error", "${ _('Connection Failed: ') }" + resp.message);
+            self.rdbmsDbIsValid(false);
+          }
+        });
+      };
       // Table
       self.table = ko.observable('');
       self.tableName = ko.computed(function() {
@@ -1307,6 +1447,8 @@ ${ assist.assistPanel() }
           return self.query();
         } else if (self.inputFormat() == 'manual') {
           return true;
+        } else if (self.inputFormat() == 'rdbms') {
+          return self.rdbmsDatabaseName().length > 0 && (self.rdbmsTableName().length > 0 || self.rdbmsAllTablesSelected());
         }
       });
     };
@@ -1323,10 +1465,9 @@ ${ assist.assistPanel() }
           self.isTargetChecking(false);
         }
         else if (self.outputFormat() == 'file') {
-          // Todo
           // self.path()
         }
-        else if (self.outputFormat() == 'table') {
+        else if (self.outputFormat() == 'table' && wizard.isValidDestination()) {
           if (self.tableName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
@@ -1343,7 +1484,10 @@ ${ assist.assistPanel() }
             self.isTargetChecking(false);
           }
         }
-        else if (self.outputFormat() == 'database') {
+        else if (self.outputFormat() == 'hbase') {
+          // Todo once autocomplete is implemented for hbase
+        }
+        else if (self.outputFormat() == 'database' && wizard.isValidDestination()) {
           if (self.databaseName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
@@ -1401,15 +1545,24 @@ ${ assist.assistPanel() }
           % if ENABLE_NEW_INDEXER.get():
           {'name': 'Search index', 'value': 'index'},
           % endif
-          {'name': 'File', 'value': 'file'},
           {'name': 'Database', 'value': 'database'},
+          % if ENABLE_SQOOP.get():
+          {'name': 'File', 'value': 'file'},
+          {'name': 'HBase Table', 'value': 'hbase'},
+          % endif
       ]);
       self.outputFormats = ko.computed(function() {
         return $.grep(self.outputFormatsList(), function(format) {
           if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
             return false;
           }
-          else if (format.value == 'file' && wizard.source.inputFormat() != 'manual') {
+          if (format.value == 'file' && ['manual', 'rdbms'].indexOf(wizard.source.inputFormat()) == -1) {
+            return false;
+          }
+          else if (format.value == 'index' && wizard.source.inputFormat() != 'file') {
+            return false;
+          }
+          if (format.value == 'hbase' && wizard.source.inputFormat() != 'rdbms') {
             return false;
           }
           return true;
@@ -1558,12 +1711,36 @@ ${ assist.assistPanel() }
       self.indexerJobLibPath = ko.observable('${ CONFIG_INDEXER_LIBS_PATH.get() }');
       self.indexerConfigSet = ko.observable('');
       self.indexerConfigSets = ko.observableArray([]);
-      self.indexerNumShards = ko.observable('');
+      self.indexerNumShards = ko.observable(1);
       self.indexerReplicationFactor = ko.observable(1);
       self.indexerPrimaryKey = ko.observableArray();
       self.indexerPrimaryKeyObject = ko.observableArray();
       self.indexerDefaultField = ko.observableArray();
       self.indexerDefaultFieldObject = ko.observableArray();
+
+      // File, Table, HBase
+      self.sqoopJobLibPaths = ko.observableArray([]);
+      self.addSqoopJobLibPath = function() {
+        var newValue = {
+          path: ko.observable('')
+        };
+        self.sqoopJobLibPaths.push(newValue);
+      }
+      self.removeSqoopJobLibPath = function (valueToRemove) {
+        self.sqoopJobLibPaths.remove(valueToRemove);
+      };
+      self.numMappers = ko.observable(1);
+      self.customFieldsDelimiter = ko.observable(',');
+      self.customLineDelimiter = ko.observable('\\n');
+      self.customEnclosedByDelimiter = ko.observable('\'');
+      self.rdbmsFileOutputFormat = ko.observable('text');
+      self.rdbmsFileOutputFormats = ko.observableArray([
+          {'value': 'text', 'name': 'text'},
+          {'value': 'sequence', 'name': 'sequence'},
+          {'value': 'avro', 'name': 'avro'}
+      ]);
+      self.rdbmsSplitByColumn = ko.observableArray();
+
     };
 
     var CreateWizard = function (vm) {
@@ -1606,14 +1783,15 @@ ${ assist.assistPanel() }
       self.destination = new Destination(vm, self);
 
       self.customDelimiters = ko.observableArray([
-        {'value': ',', 'name': 'Comma (,)'},
-        {'value': '\\t', 'name': '^Tab (\\t)'},
-        {'value': '\\n', 'name': 'New line'},
-        {'value': ' ', 'name': 'Space'},
-        {'value': '"', 'name': 'Double Quote'},
-        {'value': '\\001', 'name': '^A (\\001)'},
-        {'value': '\\002', 'name': '^B (\\002)'},
-        {'value': '\\003', 'name': '^C (\\003)'},
+        {'value': ',', 'name': '${ _("Comma (,)") }'},
+        {'value': '\\t', 'name': '${ _("^Tab (\\t)") }'},
+        {'value': '\\n', 'name': '${ _("New line") }'},
+        {'value': '|', 'name': '${ _("Pipe") }'},
+        {'value': '\"', 'name': '${ _("Double Quote") }'},
+        {'value': '\'', 'name': '${ _("Single Quote") }'},
+        {'value': '\\001', 'name': '${ _("^A (\\001)") }'},
+        {'value': '\\002', 'name': '${ _("^B (\\002)") }'},
+        {'value': '\\003', 'name': '${ _("^C (\\003)") }'},
       ]);
 
       self.editorId = ko.observable();
@@ -1623,7 +1801,10 @@ ${ assist.assistPanel() }
       self.indexingStarted = ko.observable(false);
 
       self.isValidDestination = ko.pureComputed(function() {
-         return self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name()));
+         return self.destination.name().length > 0 && (
+           (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name())) &&
+           (['index'].indexOf(self.destination.outputFormat()) == -1 || /^[^\\/:]+$/.test(self.destination.name()))
+         );
       });
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
@@ -1639,8 +1820,12 @@ ${ assist.assistPanel() }
           self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
         );
+        var validIndexFields = self.destination.outputFormat() != 'index' || ($.grep(self.destination.columns(), function(column) {
+            return ! (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(column.name()) && column.name() != '_version_');
+          }).length == 0
+        ) || self.destination.indexerConfigSet();
 
-        return self.isValidDestination() && validFields && validTableColumns && isTargetAlreadyExisting && isValidTable;
+        return self.isValidDestination() && validFields && validTableColumns && validIndexFields && isTargetAlreadyExisting && isValidTable;
       });
 
       self.formatTypeSubscribed = false;
@@ -1701,9 +1886,9 @@ ${ assist.assistPanel() }
           "fileFormat": ko.mapping.toJSON(self.source)
         }, function (resp) {
           resp.columns.forEach(function (entry, i, arr) {
-            if (self.destination.outputFormat() === 'table'){
+            if (self.destination.outputFormat() === 'table') {
               entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
-            } else if (self.destination.outputFormat() === 'index'){
+            } else if (self.destination.outputFormat() === 'index') {
               entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);
             }
             arr[i] = loadField(entry, self.destination, i);
@@ -1723,13 +1908,13 @@ ${ assist.assistPanel() }
       self.indexingError = ko.observable(false);
       self.indexingSuccess = ko.observable(false);
       self.indexFile = function () {
-        if (! self.readyToIndex()) {
+        if (!self.readyToIndex()) {
           return;
         }
         $(".jHueNotify").remove();
 
-%if not is_embeddable:
         self.indexingStarted(true);
+%if not is_embeddable:
         viewModel.isLoading(true);
         self.isIndexing(true);
 
@@ -1769,6 +1954,10 @@ ${ assist.assistPanel() }
                   aceMode: 'ace/mode/impala',
                   snippetImage: '${ static("impala/art/icon_impala_48.png") }',
                   sqlDialect: true
+                },
+                sqoop1: {
+                  placeHolder: '${ _("Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1") }',
+                  snippetImage: '${ static("sqoop/art/icon_sqoop_48.png") }'
                 }
               }
             });
@@ -1779,20 +1968,20 @@ ${ assist.assistPanel() }
 
             self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
               self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
-                if (val == 100){
+                if (val == 100) {
                   self.indexingStarted(false);
                   self.isIndexing(false);
                   self.indexingSuccess(true);
                 }
               });
               self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
-                if (val == 'failed'){
+                if (val == 'failed') {
                   self.isIndexing(false);
                   self.indexingStarted(false);
                   self.indexingError(true);
                 } else if (val == 'available') {
                   var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
-                  if (! snippet.result.handle().has_more_statements) {
+                  if (!snippet.result.handle().has_more_statements) {
                     if (self.editorVM.selectedNotebook().onSuccessUrl()) {
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
@@ -1823,18 +2012,23 @@ ${ assist.assistPanel() }
           "destination": ko.mapping.toJSON(self.destination),
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (resp) {
+          self.indexingStarted(false);
           if (resp.status == 0) {
             if (resp.history_uuid) {
-              $.jHueNotify.info("${ _('Task submitted.') }");
+              $.jHueNotify.info("${ _('Task submitted') }");
               huePubSub.publish('notebook.task.submitted', resp.history_uuid);
             } else if (resp.on_success_url) {
-              $.jHueNotify.info("${ _('Creation success.') }");
+              if (resp.pub_sub_url) {
+                huePubSub.publish(resp.pub_sub_url);
+              }
+              $.jHueNotify.info("${ _('Creation success') }");
               huePubSub.publish('open.link', resp.on_success_url);
             }
           } else {
             $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
           }
         }).fail(function (xhr, textStatus, errorThrown) {
+          self.indexingStarted(false);
           $(document).trigger("error", xhr.responseText);
         });
 % endif
@@ -1861,7 +2055,7 @@ ${ assist.assistPanel() }
           var koFormat = ko.mapping.fromJS(new FileType(state.format.type, state.format));
           self.source.format(koFormat);
         }
-        if (state.columns){
+        if (state.columns) {
           state.columns.forEach(function (currCol) {
             self.destination.columns.push(loadField(currCol));
           });
@@ -1870,7 +2064,7 @@ ${ assist.assistPanel() }
     };
 
     var loadDefaultField = function (options) {
-      if (! options.name) {
+      if (!options.name) {
         options.name = getNewFieldName();
       }
       return loadField($.extend({}, ${default_field_type | n}, options));
@@ -1942,13 +2136,13 @@ ${ assist.assistPanel() }
         return self.currentStep() < 3 && self.wizardEnabled();
       });
       self.nextStep = function () {
-        if (self.nextStepVisible()){
+        if (self.nextStepVisible()) {
           self.currentStep(self.currentStep() + 1);
           hueAnalytics.log('importer', 'step/' + self.currentStep());
         }
       };
       self.previousStep = function () {
-        if (self.previousStepVisible()){
+        if (self.previousStepVisible()) {
           self.currentStep(self.currentStep() - 1);
           hueAnalytics.log('importer', 'step/' + self.currentStep());
         }
@@ -1962,8 +2156,8 @@ ${ assist.assistPanel() }
 
     function resizeElements () {
       var $contentPanel = $('#importerComponents').find('.content-panel-inner');
-      $('.form-actions').width($contentPanel.width() - 50);
       $('.step-indicator-fixed').width($contentPanel.width());
+      document.styleSheets[0].addRule('.form-actions','margin-left: -11px !important');
       document.styleSheets[0].addRule('.step-indicator li:first-child:before','max-width: ' + ($contentPanel.find('.step-indicator li:first-child .caption').width()) + 'px');
       document.styleSheets[0].addRule('.step-indicator li:first-child:before','left: ' + ($contentPanel.find('.step-indicator li:first-child .caption').width()/2) + 'px');
       document.styleSheets[0].addRule('.step-indicator li:last-child:before','max-width: ' + ($contentPanel.find('.step-indicator li:last-child .caption').width()) + 'px');
@@ -1994,7 +2188,7 @@ ${ assist.assistPanel() }
           var generatedName = 'idx';
           switch (draggableMeta.type){
             case 'sql':
-              if (draggableMeta.table !== ''){
+              if (draggableMeta.table !== '') {
                 generatedName += draggableMeta.table;
                 viewModel.createWizard.source.inputFormat('table');
                 viewModel.createWizard.source.table(draggableMeta.table);
@@ -2006,14 +2200,14 @@ ${ assist.assistPanel() }
                 viewModel.createWizard.source.path(draggableMeta.definition.path);
               break;
             case 'document':
-              if (draggableMeta.definition.type === 'query-hive'){
+              if (draggableMeta.definition.type === 'query-hive') {
                 generatedName += draggableMeta.definition.name;
                 viewModel.createWizard.source.inputFormat('query');
                 viewModel.createWizard.source.draggedQuery(draggableMeta.definition.uuid);
               }
               break;
           }
-          if (generatedName !== 'idx' && viewModel.createWizard.source.name() === ''){
+          if (generatedName !== 'idx' && viewModel.createWizard.source.name() === '') {
             viewModel.createWizard.source.name(generatedName);
           }
         }

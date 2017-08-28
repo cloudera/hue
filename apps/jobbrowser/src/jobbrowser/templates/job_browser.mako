@@ -18,7 +18,7 @@
 
   from desktop import conf
   from desktop.views import commonheader, commonfooter, _ko
-  from jobbrowser.conf import MAX_JOB_FETCH
+  from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH
 %>
 
 <%
@@ -195,7 +195,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <th width="5%">${_('Status')}</th>
                     <th width="3%">${_('Progress')}</th>
                     <th width="5%">${_('Group')}</th>
-                    <th width="10%">${_('Started')}</th>
+                    <th width="10%" data-bind="text: interface() != 'schedules' ? '${_('Started')}' : '${_('Modified')}'"></th>
                     <th width="6%">${_('Duration')}</th>
                   </tr>
                   </thead>
@@ -247,6 +247,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
             <!-- ko if: mainType().startsWith('dataeng-job') -->
               <div data-bind="template: { name: 'dataeng-job-page${ SUFFIX }' }"></div>
+            <!-- /ko -->
+
+            <!-- ko if: mainType() == 'livy-sessions' -->
+              <div class="jb-panel" data-bind="template: { name: 'livy-session-page${ SUFFIX }' }"></div>
             <!-- /ko -->
 
           <!-- /ko -->
@@ -527,12 +531,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }, css: {'completed': apiStatus == 'SUCCEEDED', 'running': apiStatus == 'RUNNING', 'failed': apiStatus == 'FAILED'}" class="status-border pointer">
                 <td data-bind="text: type"></td>
                 <td data-bind="text: id"></td>
-                <td data-bind="text: elapsedTime"></td>
+                <td data-bind="text: elapsedTime.toHHMMSS()"></td>
                 <td data-bind="text: progress"></td>
                 <td data-bind="text: state"></td>
-                <td data-bind="text: startTime"></td>
+                <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="text: successfulAttempt"></td>
-                <td data-bind="text: finishTime"></td>
+                <td data-bind="moment: {data: finishTime, format: 'LLL'}"></td>
               </tr>
             </tbody>
           </table>
@@ -840,6 +844,85 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
+<script type="text/html" id="livy-session-page${ SUFFIX }">
+
+  <div class="row-fluid">
+    <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
+          <!-- ko if: doc_url -->
+          <li class="nav-header">${ _('Document') }</li>
+          <li>
+            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+              <span data-bind="text: name"></span>
+            </a>
+          </li>
+          <!-- /ko -->
+          <!-- ko ifnot: doc_url -->
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <!-- /ko -->
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('User') }</li>
+          <li><span data-bind="text: user"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span>%</li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
+
+      <ul class="nav nav-pills margin-top-20">
+        <li>
+          <a href="#livy-session-page-statements${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#livy-session-page-statements${ SUFFIX }\']').tab('show'); }">
+            ${ _('Properties') }</a>
+        </li>
+      </ul>
+
+      <div class="clearfix"></div>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="livy-session-page-statements${ SUFFIX }">
+          <table id="actionsTable" class="datatables table table-condensed">
+            <thead>
+            <tr>
+              <th>${_('Id')}</th>
+              <th>${_('State')}</th>
+              <th>${_('Output')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['statements']">
+              <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }" class="pointer">
+                <td>
+                  <a data-bind="hueLink: '/jobbrowser/jobs/' + id(), clickBubble: false">
+                    <i class="fa fa-tasks"></i>
+                  </a>
+                </td>
+                <td data-bind="text: state"></td>
+                <td data-bind="text: output"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</script>
+
+
 <script type="text/html" id="job-actions${ SUFFIX }">
   <div class="btn-group">
     <!-- ko if: hasResume -->
@@ -860,12 +943,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </button>
     <!-- /ko -->
 
+    % if not DISABLE_KILLING_JOBS.get():
     <!-- ko if: hasKill -->
     <button class="btn btn-danger disable-feedback" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
       ## TODO confirmation
       <i class="fa fa-times"></i> <!-- ko ifnot: $root.isMini -->${_('Kill')}<!-- /ko -->
     </button>
     <!-- /ko -->
+    % endif
 
     <!-- ko if: hasIgnore -->
     <button class="btn btn-danger disable-feedback" title="${_('Ignore selected')}" data-bind="click: function() { control('ignore'); }, enable: ignoreEnabled">
@@ -984,8 +1069,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: errorCode"></td>
                 <td data-bind="text: externalId"></td>
                 <td data-bind="text: id"></td>
-                <td data-bind="text: startTime"></td>
-                <td data-bind="text: endTime"></td>
+                <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
+                <td data-bind="moment: {data: endTime, format: 'LLL'}"></td>
               </tr>
             </tbody>
           </table>
@@ -1348,9 +1433,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="render-page-counters${ SUFFIX }">
-  <!-- ko hueSpinner: { spin: !$data.id, center: true, size: 'xlarge' } --><!-- /ko -->
+  <!-- ko hueSpinner: { spin: !$data, center: true, size: 'xlarge' } --><!-- /ko -->
 
-  <!-- ko if: $data.id -->
+  <!-- ko if: $data -->
     <!-- ko ifnot: $data.counterGroup -->
       <span class="muted">${ _('There are currently no counters to be displayed.') }</span>
     <!-- /ko -->
@@ -1665,6 +1750,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         else if (/[a-z0-9]{8}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{12}/.test(self.id())) {
           interface = 'dataeng-jobs';
         }
+        else if (/livy-[0-9]+/.test(self.id())) {
+          interface = 'livy-sessions';
+        }
 
         interface = vm.isValidInterface(interface);
         vm.interface(interface);
@@ -1749,6 +1837,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.fetchLogs = function (name) {
+        self.logs('');
         $.post("/jobbrowser/api/job/logs", {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -2183,6 +2272,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var schedulerInterfaceCondition = function () {
           return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreters'].length > 0;
         }
+        var livyInterfaceCondition = function () {
+          return self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1;
+        }
 
         var interfaces = [
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
@@ -2192,6 +2284,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
+          {'interface': 'livy-sessions', 'label': '${ _ko('Livy') }', 'condition': livyInterfaceCondition},
         ];
 
         return interfaces.filter(function (i) {
@@ -2343,6 +2436,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'bundles':
           case 'dataeng-clusters':
           case 'dataeng-jobs':
+          case 'livy-sessions':
             self.selectInterface(h);
             break;
           default:

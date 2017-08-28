@@ -29,7 +29,7 @@ ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
 
 ${layout.menubar(section='users')}
 
-<div id="usersComponents" class="container-fluid">
+<div id="usersComponents" class="useradmin container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users')}</h1>
 
@@ -201,6 +201,15 @@ ${layout.menubar(section='users')}
           huePubSub.publish('open.link', data.url);
         }
         $.jHueNotify.info("${ _('The users were deleted.') }")
+        $usersComponents.find(".delete-user").modal("hide");
+      },
+      error: function(response, status, err) {
+        if (response.responseJSON && response.responseJSON.message && response.status == 401) {
+          $.jHueNotify.error(response.responseJSON.message);
+        }
+        else {
+          $.jHueNotify.error("${ _('An unknown error has occurred while deleting the user. Please try again.') }");
+        }
         $usersComponents.find(".delete-user").modal("hide");
       }
     });

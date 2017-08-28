@@ -31,7 +31,7 @@ if ENABLE_NEW_INDEXER.get():
   urlpatterns += patterns('indexer.views',
     url(r'^$', 'indexes', name='indexes'),
     url(r'^indexes/$', 'indexes', name='indexes'),
-    url(r'^indexes/(?P<index>\w+)/?$', 'indexes', name='indexes'),
+    url(r'^indexes/(?P<index>[^/]+)/?$', 'indexes', name='indexes'),
     url(r'^collections$', 'collections', name='collections'), # Old page
   )
 else:
@@ -57,6 +57,12 @@ urlpatterns += patterns('indexer.api3',
   url(r'^api/indexer/guess_field_types/$', 'guess_field_types', name='guess_field_types'),
 
   url(r'^api/importer/submit', 'importer_submit', name='importer_submit')
+)
+
+urlpatterns += patterns('indexer.indexers.rdbms',
+  url(r'^api/indexer/indexers/get_db_component/$', 'get_db_component', name='get_db_component'),
+  url(r'^api/indexer/indexers/get_drivers/$', 'get_drivers', name='get_drivers'),
+  url(r'^api/indexer/indexers/jdbc_db_list/$', 'jdbc_db_list', name='jdbc_db_list')
 )
 
 

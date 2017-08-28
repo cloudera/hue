@@ -58,26 +58,27 @@ __users_lock = threading.Lock()
 __groups_lock = threading.Lock()
 
 
+def is_ldap_setup():
+  return bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
+
 def list_users(request):
-  is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
 
   return render("list_users.mako", request, {
       'users': User.objects.all(),
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
       'request': request,
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'is_ldap_setup': is_ldap_setup
+      'is_ldap_setup': is_ldap_setup()
   })
 
 
 def list_groups(request):
-  is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
 
   return render("list_groups.mako", request, {
       'groups': Group.objects.all(),
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'is_ldap_setup': is_ldap_setup
+      'is_ldap_setup': is_ldap_setup()
   })
 
 
@@ -396,13 +397,6 @@ def edit_user(request, username=None):
       })
 
 
-def view_user(request, username):  
-  instance = User.objects.get(username=username)
-
-  return render('view_user.mako', request, {'instance': instance})
-
-
-
 def edit_group(request, name=None):
   """
   edit_group(request, name = None) -> reply
@@ -657,7 +651,11 @@ def add_ldap_groups(request):
           unique_users = set(failed_ldap_users)
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-        return redirect(reverse(list_groups))
+        if is_embeddable:
+          return JsonResponse({'url': '/hue' + reverse(list_groups)})
+        else:
+          return redirect(reverse(list_groups))
+
       else:
         errors = form._errors.setdefault('groupname_pattern', ErrorList())
         errors.append(_('Could not get LDAP details for groups in pattern %s') % groupname_pattern)
@@ -786,9 +784,15 @@ def ensure_home_directory(fs, user):
   Throws IOError, WebHdfsException.
   """
   userprofile = get_profile(user)
+  username = user.username
+  home_directory = userprofile.home_directory
+
+  if is_ldap_setup():
+    username = user.username.split('@')[0]
+    home_directory = userprofile.home_directory.split('@')[0]
 
   if userprofile is not None and userprofile.home_directory:
-    fs.do_as_user(user.username, fs.create_home_dir, userprofile.home_directory)
+    fs.do_as_user(username, fs.create_home_dir, home_directory)
   else:
     LOG.warn("Not creating home directory of %s as his profile is empty" % user)
 

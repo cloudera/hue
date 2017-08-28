@@ -235,6 +235,9 @@ var CoordinatorEditorViewModel = (function () {
           "coordinator": ko.mapping.toJSON(self.coordinator, COORDINATOR_MAPPING)
         }, function (data) {
           if (data.status == 0) {
+            if (self.coordinator.id() == null) {
+              shareViewModel.setDocUuid(data.uuid);
+            }
             self.coordinator.id(data.id);
             self.coordinator.tracker().markCurrentStateAsClean();
             if (typeof cb === 'function') {
@@ -245,6 +248,8 @@ var CoordinatorEditorViewModel = (function () {
             }
             if (window.location.search.indexOf("coordinator") == -1 && !IS_HUE_4) {
               window.location.hash = '#coordinator=' + data.id;
+            } else if (IS_HUE_4) {
+              hueUtils.changeURL('/hue/oozie/editor/coordinator/edit/?coordinator=' + data.id);
             }
           }
           else {

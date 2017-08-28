@@ -33,6 +33,7 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE tbl;',
         afterCursor: '',
+        noErrors:true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false,
@@ -44,11 +45,13 @@
       });
     });
 
+
     it('should handle "DESCRIBE tbl col.field;|"', function() {
       assertAutoComplete({
         beforeCursor: 'DESCRIBE tbl col.field;',
         afterCursor: '',
         containsKeywords: ['SELECT'],
+        noErrors:true,
         expectedResult: {
           locations: [
             { type: 'statement', location: { 'first_line': 1, 'last_line': 1, 'first_column': 1, 'last_column': 23 } },
@@ -64,6 +67,7 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE EXTENDED tbl;',
         afterCursor: '',
+        noErrors:true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false,
@@ -79,6 +83,7 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE EXTENDED tbl col.field;',
         afterCursor: '',
+        noErrors:true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -86,7 +91,19 @@
       });
     });
 
-    it('should handle DESCRIBE | tbl;', function () {
+    it('should handle "DESCRIBE EXTENDED tbl col.field PARTITION (id = 1);|"', function() {
+      assertAutoComplete({
+        beforeCursor: 'DESCRIBE EXTENDED tbl col.field PARTITION (id = 1);',
+        afterCursor: '',
+        noErrors:true,
+        containsKeywords: ['SELECT'],
+        expectedResult: {
+          lowerCase: false
+        }
+      });
+    });
+
+    it('should suggest keywords for DESCRIBE | tbl;', function () {
       assertAutoComplete({
         beforeCursor: 'DESCRIBE ',
         afterCursor: ' tbl;',
@@ -97,7 +114,7 @@
       });
     });
 
-    it('should handle DESCRIBE ext| db.tbl;', function () {
+    it('should suggest keywords for DESCRIBE ext| db.tbl;', function () {
       assertAutoComplete({
         beforeCursor: 'DESCRIBE ext',
         afterCursor: ' db.tbl;',
@@ -112,6 +129,7 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE FORMATTED tbl;',
         afterCursor: '',
+        noErrors: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -239,7 +257,8 @@
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
+          suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] },
+          suggestKeywords: ['PARTITION']
         }
       });
     });
@@ -365,6 +384,18 @@
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
+          suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] },
+          suggestKeywords: ['PARTITION']
+        }
+      });
+    });
+
+    it('should suggest columns for "DESCRIBE EXTENDED db.tbl | PARTITION (id = 1);"', function() {
+      assertAutoComplete({
+        beforeCursor: 'DESCRIBE EXTENDED db.tbl ',
+        afterCursor: ' PARTITION (id = 1);',
+        expectedResult: {
+          lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
         }
       });
@@ -401,6 +432,7 @@
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
+          suggestKeywords: ['PARTITION'],
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
         }
       });

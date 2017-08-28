@@ -69,7 +69,7 @@ class TestIndexerWithSolr:
 
     cls.db = CollectionManagerController(cls.user)
 
-    resp = cls.client.post(reverse('indexer:install_examples'))
+    resp = cls.client.post(reverse('indexer:install_examples'), {'data': 'log_analytics_demo'})
     content = json.loads(resp.content)
 
     assert_equal(content.get('status'), 0)

@@ -37,6 +37,12 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group
 
 
+def get_mocked_config():
+  return {'mocked_ldap': {
+    'users': {},
+    'groups': {}
+  }}
+
 class TestLoginWithHadoop(PseudoHdfsTestBase):
 
   reset = []
@@ -193,6 +199,16 @@ class TestLdapLogin(PseudoHdfsTestBase):
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
+
+  def test_login_failure_for_bad_username(self):
+    self.reset.append(conf.LDAP.LDAP_SERVERS.set_for_testing(get_mocked_config()))
+
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+
+    response = self.c.post('/accounts/login/', dict(username="test1*)(&(objectClass=*)", password="foo"))
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true('Invalid username or password' in response.content, response)
 
   def test_login_does_not_reset_groups(self):
     client = make_logged_in_client(username=self.test_username, password="test")

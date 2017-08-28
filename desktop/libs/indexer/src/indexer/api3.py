@@ -25,6 +25,7 @@ from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
+from librdbms.server import dbms as rdbms
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
 from notebook.models import make_notebook
@@ -33,6 +34,7 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.indexers.morphline import MorphlineIndexer
+from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
 
@@ -99,6 +101,8 @@ def guess_format(request):
       raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
+  elif file_format['inputFormat'] == 'rdbms':
+    format_ = RdbmsIndexer(request.user, file_format['rdbmsType']).guess_format()
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -145,6 +149,19 @@ def guess_field_types(request):
             for col in sample.meta
         ]
     }
+  elif file_format['inputFormat'] == 'rdbms':
+    query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
+    db = rdbms.get(request.user, query_server=query_server)
+    sample = RdbmsIndexer(request.user, file_format['rdbmsType']).get_sample_data(mode=file_format['rdbmsMode'], database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
+    table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
+
+    format_ = {
+        "sample": list(sample['rows'])[:4],
+        "columns": [
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            for col in table_metadata
+        ]
+    }
 
   return JsonResponse(format_)
 
@@ -166,39 +183,62 @@ def importer_submit(request):
       job_handle = _index(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'])
     else:
       client = SolrClient(request.user)
-      unique_key_field = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
-      df = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
-      kwargs = {}
-
-      stats = request.fs.stats(source["path"])
-      if stats.size > MAX_UPLOAD_SIZE:
-        raise PopupException(_('File size is too large to handle!'))
-
-      indexer = MorphlineIndexer(request.user, request.fs)
-      fields = indexer.get_kept_field_list(source['columns'])
-      if not unique_key_field:
-        unique_key_field = 'hue_id'
-        fields += [{"name": unique_key_field, "type": "string"}]
-        kwargs['rowid'] = unique_key_field
-
-      if not client.exists(index_name):
-        client.create_index(
-            name=index_name,
-            fields=fields,
-            unique_key_field=unique_key_field,
-            df=df
-        )
-
-      data = request.fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
-      client.index(name=index_name, data=data, **kwargs)
-
-      job_handle = {'status': 0, 'on_success_url': reverse('search:browse', kwargs={'name': index_name})}
+      job_handle = _create_index(request.user, request.fs, client, source, destination, index_name)
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
+  elif source['inputFormat'] == 'rdbms':
+    if destination['outputFormat'] in ('file', 'table', 'hbase'):
+      job_handle = run_sqoop(request, source, destination, start_time)
   else:
     job_handle = _create_table(request, source, destination, start_time)
 
   return JsonResponse(job_handle)
+
+
+def _create_index(user, fs, client, source, destination, index_name):
+  unique_key_field = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
+  df = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
+  kwargs = {}
+
+  if source['inputFormat'] != 'manual':
+    stats = fs.stats(source["path"])
+    if stats.size > MAX_UPLOAD_SIZE:
+      raise PopupException(_('File size is too large to handle!'))
+
+  indexer = MorphlineIndexer(user, fs)
+  fields = indexer.get_field_list(destination['columns'])
+  skip_fields = [field['name'] for field in fields if not field['keep']]
+
+  kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
+  if skip_fields:
+    kwargs['skip'] = ','.join(skip_fields)
+    fields = [field for field in fields if field['name'] not in skip_fields]
+
+  if not unique_key_field:
+    unique_key_field = 'hue_id'
+    fields += [{"name": unique_key_field, "type": "string"}]
+    kwargs['rowid'] = unique_key_field
+
+  if not destination['hasHeader']:
+    kwargs['header'] = 'false'
+  else:
+    kwargs['skipLines'] = 1
+
+  if not client.exists(index_name):
+    client.create_index(
+        name=index_name,
+        fields=fields,
+        unique_key_field=unique_key_field,
+        df=df,
+        shards=destination['indexerNumShards'],
+        replication=destination['indexerReplicationFactor']
+    )
+
+  if source['inputFormat'] != 'manual':
+    data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
+    client.index(name=index_name, data=data, **kwargs)
+
+  return {'status': 0, 'on_success_url': reverse('indexer:indexes', kwargs={'index': index_name}), 'pub_sub_url': 'assist.collections.refresh'}
 
 
 def _create_database(request, source, destination, start_time):
@@ -271,6 +311,6 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
   else:
     input_path = None
 
-  morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
+  morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field, lib_path=lib_path)
 
   return indexer.run_morphline(request, collection_name, morphline, input_path, query, start_time=start_time, lib_path=lib_path)

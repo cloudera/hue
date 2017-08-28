@@ -20,6 +20,19 @@
 
 .oozie_workflowComponents {
 
+  .card-toolbar {
+    text-align: center;
+  }
+
+  .card-toolbar-content {
+    float: none !important;
+    display: inline-block;
+  }
+
+  .draggable-documents, .draggable-actions {
+    display: inline-block;
+  }
+
   .draggable-widget, .draggable-icon {
     cursor: move;
     background-color: #FFF;
@@ -281,10 +294,16 @@
 
   .toolbar-label {
     position: relative;
+    display: inline-block;
+    .caret {
+      vertical-align: middle;
+      margin-top: -4px;
+    }
   }
 
   .toolbar-dropdown {
     box-shadow: none;
+    text-align: left;
   }
 
   .command-ellipsis {

@@ -325,7 +325,7 @@ from desktop.views import _ko
           <!-- ko if: app === 'documents' -->
           <div>
             <span class="dropdown">
-              <a class="inactive-action doc-browser-action" title="${_('New document')}" data-toggle="dropdown" data-bind="tooltip: { placement: 'bottom', delay: 750 }, css: { 'disabled': isTrash() || isTrashed() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
+              <a class="inactive-action doc-browser-action" title="${_('New document')}" data-toggle="dropdown" data-bind="tooltip: { placement: 'bottom', delay: 750 }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
               <ul class="dropdown-menu less-padding document-types" style="margin-top:10px; width: 175px;" role="menu">
                 % if 'beeswax' in apps:
                   <li>
@@ -377,8 +377,8 @@ from desktop.views import _ko
                     </a>
                   </li>
                   <li>
-                    <a title="${_('Oozie Coordinator')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
-                      <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Coordinator') if is_embeddable else _('Oozie Coordinator')}
+                    <a title="${_('Oozie Schedule')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
+                      <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
                     </a>
                   </li>
                   <li>
@@ -398,8 +398,8 @@ from desktop.views import _ko
             </span>
           </div>
           <!-- /ko -->
-          <div><a class="inactive-action doc-browser-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a></div>
-          <div><a class="inactive-action doc-browser-action" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || (selectedEntry() != null && !selectedEntry().isDirectory()) }"><i class="fa fa-fw fa-edit"></i></a></div>
+          <div><a class="inactive-action doc-browser-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a></div>
+          <div><a class="inactive-action doc-browser-action" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || ! canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }"><i class="fa fa-fw fa-edit"></i></a></div>
           <!-- ko if: isTrash() -->
             <div><a class="inactive-action doc-browser-action" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showRestoreConfirmation(); }, css: { 'disabled': selectedEntries().length === 0 }, attr: { 'title' : '${ _('Restore to Home ') }' }">
               <i class="fa fa-fw fa-undo"></i></a>

@@ -118,7 +118,6 @@ ${ components.menubar(is_embeddable) }
 <script type="text/html" id="metastore-columns-table">
   <div style="overflow-x: auto; overflow-y: hidden">
     <table class="table table-condensed table-nowrap">
-      <br/>
       <thead>
       <tr>
         <th width="2%">&nbsp;</th>
@@ -156,11 +155,16 @@ ${ components.menubar(is_embeddable) }
           <!-- /ko -->
           <td>
             % if has_write_access:
+              <!-- ko ifnot: table.isView() -->
               <div class="show-inactive-on-hover">
               <a class="inactive-action pointer toggle-editable" title="${ _('Edit the comment') }"><i class="fa fa-pencil"></i></a>
               <span data-bind="editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', skipNewLines: true, toggleElement: '.toggle-editable', placement: 'left', placeholder: '${ _ko('Add a comment...') }', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}">
                 ${ _('Add a comment...') }</span>
               </div>
+              <!-- /ko -->
+              <!-- ko if: table.isView() -->
+                <span data-bind="text: comment"></span>
+              <!-- /ko -->
             % else:
               <span data-bind="text: comment"></span>
             % endif
@@ -439,7 +443,7 @@ ${ components.menubar(is_embeddable) }
               <!-- /ko -->
               <div title="${ _('Owner') }">
                 <i class="fa fa-fw fa-user muted"></i>
-                <span data-bind="text: owner_name"></span> (<span data-bind="text: owner_type"></span>)
+                <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
                 <br/>
                 <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
               </div>
@@ -891,7 +895,7 @@ ${ components.menubar(is_embeddable) }
     <div data-bind="html: comment, attr:{ title: comment }" class="table-description"></div>
   %endif
 
-  <ul class="nav nav-pills margin-top-30">
+  <ul class="nav nav-tabs nav-tabs-border margin-top-30">
     <li><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-overview'); }">${_('Overview')}</a></li>
     <li><a href="#columns" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-columns'); }">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
@@ -921,7 +925,9 @@ ${ components.menubar(is_embeddable) }
     <div class="tab-pane" id="columns">
       <!-- ko if: $root.currentTab() == 'table-columns' -->
         <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a column...') }" data-bind="clearable: columnQuery, value: columnQuery, valueUpdate: 'afterkeydown'"/>
+        <div class="margin-top-10">
         <!-- ko template: 'metastore-columns-tab' --><!-- /ko -->
+        </div>
       <!-- /ko -->
     </div>
 

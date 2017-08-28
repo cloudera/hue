@@ -108,6 +108,10 @@ var SqlParseSupport = (function () {
       parser.yy.latestCommonTableExpressions = identifiers;
     };
 
+    parser.isInSubquery = function () {
+      return !!parser.yy.primariesStack.length
+    };
+
     parser.pushQueryState = function () {
       parser.yy.resultStack.push(parser.yy.result);
       parser.yy.locationsStack.push(parser.yy.locations);
@@ -1271,6 +1275,58 @@ var SqlParseSupport = (function () {
       });
     };
 
+    parser.firstDefined = function () {
+      for (var i = 0; i + 1 < arguments.length; i += 2) {
+        if (arguments[i]) {
+          return arguments[i + 1];
+        }
+      }
+    };
+
+    parser.addClauseLocation = function (type, precedingLocation, locationIfPresent, isCursor) {
+      var location;
+      if (isCursor) {
+        if (parser.yy.partialLengths.left === 0 && parser.yy.partialLengths.right === 0) {
+          location = {
+            type: type,
+            missing: true,
+            location: adjustLocationForCursor({
+              first_line: precedingLocation.last_line,
+              first_column: precedingLocation.last_column,
+              last_line: precedingLocation.last_line,
+              last_column: precedingLocation.last_column
+            })
+          }
+        } else {
+          location = {
+            type: type,
+            missing: false,
+            location: {
+              first_line: locationIfPresent.last_line,
+              first_column: locationIfPresent.last_column - 1,
+              last_line: locationIfPresent.last_line,
+              last_column: locationIfPresent.last_column - 1 + parser.yy.partialLengths.right + parser.yy.partialLengths.left
+            }
+          }
+        }
+      } else {
+        location = {
+          type: type,
+          missing: !locationIfPresent,
+          location: adjustLocationForCursor(locationIfPresent || {
+            first_line: precedingLocation.last_line,
+            first_column: precedingLocation.last_column,
+            last_line: precedingLocation.last_line,
+            last_column: precedingLocation.last_column
+          })
+        };
+      }
+      if (parser.isInSubquery()) {
+        location.subquery = true;
+      }
+      parser.yy.locations.push(location)
+    };
+
     parser.addHdfsLocation = function (location, path) {
       parser.yy.locations.push({
         type: 'hdfs',
@@ -1292,6 +1348,25 @@ var SqlParseSupport = (function () {
         type: 'table',
         location: adjustLocationForCursor(location),
         identifierChain: identifierChain
+      });
+    };
+
+    parser.addTableAliasLocation = function (location, alias, identifierChain) {
+      parser.yy.locations.push({
+        type: 'alias',
+        source: 'table',
+        alias: alias,
+        location: adjustLocationForCursor(location),
+        identifierChain: identifierChain
+      });
+    };
+
+    parser.addSubqueryAliasLocation = function (location, alias) {
+      parser.yy.locations.push({
+        type: 'alias',
+        source: 'subquery',
+        alias: alias,
+        location: adjustLocationForCursor(location)
       });
     };
 
@@ -1480,7 +1555,13 @@ var SqlParseSupport = (function () {
         if (a.location.first_line !== b.location.first_line) {
           return a.location.first_line - b.location.first_line;
         }
-        return a.location.first_column - b.location.first_column;
+        if (a.location.first_column !== b.location.first_column) {
+          return a.location.first_column - b.location.first_column;
+        }
+        if (a.location.last_column !== b.location.last_column) {
+          return b.location.last_column - a.location.last_column;
+        }
+        return b.type.localeCompare(a.type);
       });
       parser.yy.result.locations = parser.yy.allLocations;
 
@@ -1550,9 +1631,9 @@ var SqlParseSupport = (function () {
     'identifyPartials', 'expandLateralViews', 'expandIdentifierChain', 'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'getKeywordsForOptionalsLR',
     'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords', 'createWeightedKeywords', 'suggestKeywords', 'suggestColRefKeywords',
     'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions', 'suggestColumns', 'suggestGroupBys',
-    'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation', 'addStatementLocation', 'addHdfsLocation',
-    'addDatabaseLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs',
-    'suggestValues', 'handleQuotedValueWithCursor'];
+    'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation', 'addStatementLocation', 'firstDefined',
+    'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addTableAliasLocation', 'addSubqueryAliasLocation', 'addTableLocation',
+    'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs', 'suggestValues', 'handleQuotedValueWithCursor'];
 
   var SYNTAX_PARSER_NOOP = function () {};
 
@@ -1580,7 +1661,31 @@ var SqlParseSupport = (function () {
 
     var IGNORED_EXPECTED = {
       ';': true,
-      'EOF': true
+      'EOF': true,
+      'UNSIGNED_INTEGER': true,
+      'UNSIGNED_INTEGER_E': true,
+      'REGULAR_IDENTIFIER': true, // TODO: Indicate that an identifier was expected
+      'CURSOR': true,
+      'PARTIAL_CURSOR': true,
+      'HDFS_START_QUOTE': true,
+      'HDFS_PATH': true,
+      'HDFS_END_QUOTE' : true,
+      'COMPARISON_OPERATOR': true, // TODO: Expand in results when found
+      'ARITHMETIC_OPERATOR' : true, // TODO: Expand in results when found
+      'VARIABLE_REFERENCE': true,
+      'BACKTICK': true,
+      'VALUE': true,
+      'PARTIAL_VALUE': true,
+      'SINGLE_QUOTE': true,
+      'DOUBLE_QUOTE': true
+    };
+
+    var CLEAN_EXPECTED = {
+      'BETWEEN_AND': 'AND',
+      'OVERWRITE_DIRECTORY' : 'OVERWRITE',
+      'STORED_AS_DIRECTORIES' : 'STORED',
+      'LIKE_PARQUET' : 'LIKE',
+      'PARTITION_VALUE' : 'PARTITION'
     };
 
     parser.parseSyntax = function (beforeCursor, afterCursor, dialect, debug) {
@@ -1632,18 +1737,23 @@ var SqlParseSupport = (function () {
           parser.yy.error.expectedStatementEnd = true;
           return parser.yy.error;
         }
-        parser.yy.error.expected.forEach(function (expected) {
+        for (var i = 0; i < parser.yy.error.expected.length; i++) {
+          var expected = parser.yy.error.expected[i];
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
           // TODO: Only suggest alphanumeric?
           if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
-            var text = null;
-            if (expected.length > 0 && expected.indexOf('<') !== 0) {
-              text = isLowerCase ? expected.toLowerCase() : expected;
-            } else if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
-              var dialectTrimmed = expected.substring(dialect.length + 2);
-              text = isLowerCase ? dialectTrimmed.toLowerCase() : dialectTrimmed;
+            if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
+              expected = expected.substring(dialect.length + 2);
+            } else if (/^<[a-z]+>/.test(expected)) {
+              continue;
             }
+            expected = CLEAN_EXPECTED[expected] || expected;
+            if (expected === parser.yy.error.text.toUpperCase()) {
+              // Can happen when the lexer entry for a rule contains multiple words like 'stored' in 'stored as parquet'
+              return false;
+            }
+            var text = isLowerCase ? expected.toLowerCase() : expected;
             if (text && !addedExpected[text]) {
               addedExpected[text] = true;
               weightedExpected.push({
@@ -1652,7 +1762,7 @@ var SqlParseSupport = (function () {
               });
             }
           }
-        });
+        }
         if (weightedExpected.length === 0) {
           return false; // Don't mark it as an error if there are not suggestions
         }

@@ -687,7 +687,7 @@
   .medium-editor-placeholder:after {
     padding-left: 5px;
     font-size: 13px !important;
-    font-family: 'Ubuntu Mono', Monaco, Consolas, monospace !important;
+    font-family: @font-family-monospace!important;
     color: #aaa !important;
     font-style: normal !important;
   }
@@ -1195,9 +1195,11 @@
     margin-bottom: 12px;
     &.empty {
       width: 1px;
+      cursor: default;
     }
     &.idle {
       color: #CCC;
+      cursor: default;
     }
     &:hover {
       opacity: 1;

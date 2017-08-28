@@ -86,6 +86,11 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
     <a class="btn" href="javascript: void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '${ url('oozie:new_workflow') }'">
       <i class="fa fa-fw fa-file-o"></i>
     </a>
+    %if is_embeddable:
+    <a class="btn" href="javascript: void(0)" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '/home/?type=oozie-workflow2'">
+      <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
+    </a>
+    %endif
   </div>
 </%def>
 
@@ -569,14 +574,18 @@ ${ workflow.render() }
 
 ${ dashboard.import_layout() }
 
+%if not is_embeddable:
 ${ commonshare() | n,unicode }
+%endif
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/select2.full.patched.js') }" type="text/javascript" charset="utf-8"></script>
+% if not is_embeddable:
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
+%endif
 
 ${ dashboard.import_bindings() }
 
@@ -604,7 +613,9 @@ ${ utils.submit_popup_event() }
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#oozie_workflowComponents")[0]);
 
+  % if not is_embeddable:
   var shareViewModel = initSharing("#documentShareModal");
+  % endif
   shareViewModel.setDocUuid('${ doc_uuid }');
 
 
@@ -752,9 +763,6 @@ ${ utils.submit_popup_event() }
           "width": "500px"
         }, 200, function(){
           widget.oozieExpanded(true);
-          if ($(document).width() > $(window).width()){
-            $("html, body").scrollLeft($(document).width() - $(window).width());
-          }
         });
       }
       else {
@@ -813,54 +821,39 @@ ${ utils.submit_popup_event() }
     renderChangeables();
 
     $(document).on("editingToggled", function () {
-      $("canvas").remove();
-      exposeOverlayClickHandler();
-      if (viewModel.isEditing()) {
-        hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
-          return el.height() > 40 && el.height() < 200
-        }, function () {
-          resizeToolbar();
-          renderChangeables();
-        });
-      }
-      else {
-        hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
-          return !el.is(':visible')
-        }, renderChangeables);
+      if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
+        $("canvas").remove();
+        exposeOverlayClickHandler();
+        if (viewModel.isEditing()) {
+          hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
+            return el.height() > 40 && el.height() < 200
+          }, function () {
+            renderChangeables();
+          });
+        }
+        else {
+          hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
+            return !el.is(':visible')
+          }, renderChangeables);
+        }
       }
     });
 
-    function resizeToolbar() {
-      $('#oozie_workflowComponents .card-toolbar-content').width(100).css('marginLeft', '0');
-      if ($('#oozie_workflowComponents .card-toolbar').height() > 60) {
-        var loops = 0;
-        while ($('#oozie_workflowComponents .card-toolbar').height() > 60) {
-          $('#oozie_workflowComponents .card-toolbar-content').width($('#oozie_workflowComponents .card-toolbar-content').width() + 10);
-          loops++;
-          if (loops > 120){
-            break;
-          }
-        }
-      }
-      var marginLeft = Math.max(0, $('#oozie_workflowComponents .card-toolbar').width() / 2 - $('#oozie_workflowComponents .card-toolbar-content').width() / 2);
-      $('#oozie_workflowComponents .card-toolbar-content').css('marginLeft', marginLeft + 'px');
-    }
-
-    if (viewModel.isEditing()){
-      hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar', function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
-    }
-
     $(document).on("blur", "[validate]", function() {
-      validateFields();
+      if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
+        validateFields();
+      }
     });
 
     $("#exposeOverlay").on("click", exposeOverlayClickHandler);
 
     $(document).keyup(function(e) {
-      if (e.keyCode == 27) {
-        exposeOverlayClickHandler();
-        addActionDemiModalFieldCancel();
-        $("#addActionDemiModal").modal("hide");
+      if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
+        if (e.keyCode == 27) {
+          exposeOverlayClickHandler();
+          addActionDemiModalFieldCancel();
+          $("#addActionDemiModal").modal("hide");
+        }
       }
     });
 
@@ -869,7 +862,6 @@ ${ utils.submit_popup_event() }
       window.clearTimeout(resizeTimeout);
       resizeTimeout = window.setTimeout(function () {
         renderChangeables();
-        resizeToolbar();
       }, 200);
     });
 
@@ -885,17 +877,13 @@ ${ utils.submit_popup_event() }
 
     huePubSub.subscribe('oozie.draggable.section.change', function(val){
       apiHelper.setInTotalStorage('oozie', 'draggable_section', val);
-      if (val === 'actions'){
-        hueUtils.waitForRendered('.draggable-actions', function(el){ return el.length > 0 }, resizeToolbar);
-      }
-      if (val === 'documents'){
-        hueUtils.waitForRendered('.draggable-documents', function(el){ return el.length > 0 }, resizeToolbar);
-      }
     });
 
-    $(document).on("click", ".widget-main-section", function(e){
-      if (! $(e.target).is("a") && ! $(e.target).is("input") && ! $(e.target).is("i") && ! $(e.target).is("button")){
-        setLastExpandedWidget(ko.dataFor($(e.target).parents(".card-widget")[0]));
+    $(document).on("click", ".widget-main-section", function (e) {
+      if (window.location.pathname.indexOf('/oozie/editor/workflow') > -1) {
+        if (!$(e.target).is("a") && !$(e.target).is("input") && !$(e.target).is("i") && !$(e.target).is("button")) {
+          setLastExpandedWidget(ko.dataFor($(e.target).parents(".card-widget")[0]));
+        }
       }
     });
 
@@ -909,10 +897,9 @@ ${ utils.submit_popup_event() }
         interpreters.push(interpreter.type);
       });
       if (clusterConfig['cluster_type'] != 'dataeng') {
-        interpreters = interpreters.concat(['subworkflow', 'fs', 'email', 'streaming', 'generic', 'stop']);
+        interpreters = interpreters.concat(['subworkflow', 'fs', 'email', 'ssh', 'streaming', 'generic', 'stop']);
       }
       viewModel.availableActions(interpreters);
-      resizeToolbar();
     }, 'oozie');
 
     huePubSub.publish('cluster.config.get.config');

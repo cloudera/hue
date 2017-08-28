@@ -21,8 +21,10 @@ import logging
 from django.utils.translation import ugettext as _
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.django_util import JsonResponse
+from desktop.views import serve_403_error
 
 from jobbrowser.apis.base_api import get_api
+from jobbrowser.conf import DISABLE_KILLING_JOBS
 
 
 LOG = logging.getLogger(__name__)
@@ -81,6 +83,9 @@ def action(request):
   interface = json.loads(request.POST.get('interface'))
   app_ids = json.loads(request.POST.get('app_ids'))
   operation = json.loads(request.POST.get('operation'))
+
+  if operation.get('action') == 'kill' and DISABLE_KILLING_JOBS.get():
+    return serve_403_error(request)
 
   response['operation'] = operation
   response.update(get_api(request.user, interface).action(app_ids, operation))

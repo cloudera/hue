@@ -89,9 +89,13 @@ var HomeViewModel = (function () {
         self.activeEntry().entries([]);
         self.activeEntry().load();
         if (!newVal || newVal.type === 'all') {
-          hueUtils.removeURLParameter('type');
+          if (location.getParameter('type')) {
+            hueUtils.removeURLParameter('type');
+          }
         } else {
-          hueUtils.changeURLParameter('type', newVal.type);
+          if (!location.getParameter('type') || location.getParameter('type') !== newVal.type) {
+            hueUtils.changeURLParameter('type', newVal.type);
+          }
         }
       }
     });

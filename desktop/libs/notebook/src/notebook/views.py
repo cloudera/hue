@@ -23,7 +23,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR
+from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
@@ -35,7 +35,7 @@ from metadata.conf import has_optimizer, has_navigator
 from notebook.conf import get_ordered_interpreters, SHOW_NOTEBOOKS
 from notebook.connectors.base import Notebook, get_api, _get_snippet_name
 from notebook.connectors.spark_shell import SparkApi
-from notebook.decorators import check_document_access_permission, check_document_modify_permission
+from notebook.decorators import check_editor_access_permission, check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook
 
@@ -96,7 +96,7 @@ def notebook(request, is_embeddable=False):
 def notebook_embeddable(request):
   return notebook(request, True)
 
-
+@check_editor_access_permission()
 @check_document_access_permission()
 def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
@@ -306,6 +306,9 @@ def copy(request):
 
 @check_document_access_permission()
 def download(request):
+  if not ENABLE_DOWNLOAD.get():
+    return serve_403_error(request)
+
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')

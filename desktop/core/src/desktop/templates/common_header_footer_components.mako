@@ -84,7 +84,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       'link-workflow': '${_('Job Design')}',
       'notebook': '${_('Notebook')}',
       'oozie-bundle2': '${_('Oozie Bundle')}',
-      'oozie-coordinator2': '${_('Oozie Coordinator')}',
+      'oozie-coordinator2': (IS_HUE_4 ? '${_('Oozie Schedule')}' : '${_('Oozie Coordinator')}'),
       'oozie-workflow2': '${_('Oozie Workflow')}',
       'query-hive': '${_('Hive Query')}',
       'query-impala': '${_('Impala Query')}',
@@ -102,12 +102,13 @@ from metadata.conf import has_optimizer, OPTIMIZER
       i18n: {
         didYouMean: '${_('Did you mean')}',
         expectedStatementEnd: '${_('Expected end of statement')}',
-        suppressError: '${_('Ignore this type of error')}'
+        suppressError: '${_('Ignore this type of error')}',
+        couldNotFind: '${_('Could not find')}'
       }
     };
 
     // jHue plugins global configuration
-    jHueFileChooserGlobals = {
+    var jHueFileChooserGlobals = {
       labels: {
         BACK: "${_('Back')}",
         SELECT_FOLDER: "${_('Select this folder')}",
@@ -121,7 +122,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       user: "${ user.username }"
     };
 
-    jHueHdfsTreeGlobals = {
+    var jHueHdfsTreeGlobals = {
       labels: {
         CREATE_FOLDER: "${_('Create folder')}",
         FOLDER_NAME: "${_('Folder name')}",
@@ -129,7 +130,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    jHueTableExtenderGlobals = {
+    var jHueTableExtenderGlobals = {
       labels: {
         GO_TO_COLUMN: "${_('Go to column:')}",
         PLACEHOLDER: "${_('column name...')}",
@@ -139,12 +140,12 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    LeafletGlobals = {
+    var LeafletGlobals = {
       layer: '${ leaflet['layer'] |n,unicode }',
       attribution: '${ leaflet['attribution'] |n,unicode }'
     };
 
-    ApiHelperGlobals = {
+    var ApiHelperGlobals = {
       i18n: {
         errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
         errorLoadingTablePreview: '${ _('There was a problem loading the preview') }'
@@ -152,7 +153,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       user: '${ user.username }'
     };
 
-    DropzoneGlobals = {
+    var DropzoneGlobals = {
       homeDir: '${ user.get_home_directory() if not user.is_anonymous() else "" }',
       i18n: {
         cancelUpload: '${ _('Cancel upload') }',
@@ -161,7 +162,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    MetastoreGlobals = {
+    var MetastoreGlobals = {
       partitionsLimit: ${ hasattr(LIST_PARTITIONS_LIMIT, 'get') and LIST_PARTITIONS_LIMIT.get() or 1000 },
       i18n: {
         errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
@@ -170,7 +171,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    AutocompleterGlobals = {
+    var AutocompleterGlobals = {
       i18n: {
         category: {
           all: '${ _('All') }',
@@ -205,10 +206,23 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    QueryBuilderGlobals = {
+    var QueryBuilderGlobals = {
       i18n: {
         INSERT_VALUE_HERE: "${ _('Insert value here') }",
         QUERY_REQUIRE: "${ _('Query requires a select or aggregate.') }"
+      }
+    }
+
+    var CopyToClipboardGlobals = {
+      i18n: {
+        ERROR: "${ _('Error while copying results.') }",
+        SUCCESS: "${ _('Results copied successfully to the clipboard') }",
+      }
+    }
+
+    var SelectizeGlobals = {
+      i18n: {
+        CHOOSE: "${ _('Choose...') }"
       }
     }
   </script>
@@ -682,6 +696,17 @@ from metadata.conf import has_optimizer, OPTIMIZER
         }
       }, 200);
     }
+
+    var pageWidth = $(window).width();
+    if ($('.page-content').length > 0) {
+      pageWidth = $('.page-content').width();
+    }
+    else if ($('.content-panel').length > 0) {
+      pageWidth = $('.content-panel').width();
+      document.styleSheets[0].addRule('.form-actions','margin-left: -11px !important');
+    }
+
+    document.styleSheets[0].addRule('.form-actions','width: ' + pageWidth + 'px');
   });
 
   function resetPrimaryButtonsStatus() {

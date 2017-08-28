@@ -201,7 +201,9 @@ var MetastoreDatabase = (function () {
       callback();
     }
     hueUtils.waitForRendered('a[href="#overview"]', function(el){ return el.is(':visible') }, function(){
-      $('a[href="#overview"]').click();
+      window.setTimeout(function(){
+        $('a[href="#overview"]').click();
+      }, 0);
     });
   };
 
@@ -384,6 +386,7 @@ var MetastoreTable = (function () {
     self.sourceType = options.sourceType;
     self.name = options.name;
     self.type = options.type;
+    self.isView = ko.observable(false);
 
     self.optimizerStats = ko.observable();
     self.optimizerDetails = ko.observable();
@@ -479,6 +482,7 @@ var MetastoreTable = (function () {
         fields: [],
         successCallback: function (data) {
           self.loadingColumns(false);
+          self.isView(data.is_view);
           self.columns($.map(data.extended_columns, function (column) {
             return new MetastoreColumn({
               extendedColumn: column,
@@ -663,7 +667,7 @@ var MetastoreTable = (function () {
     window.clearTimeout(contextPopoverTimeout);
     var $source = $(event.currentTarget || event.target);
     var offset = $source.offset();
-    huePubSub.publish('sql.context.popover.show', {
+    huePubSub.publish('context.popover.show', {
       data: {
         type: 'table',
         identifierChain: [{ name: entry.name }]
@@ -736,7 +740,7 @@ var MetastoreColumn = (function () {
   MetastoreColumn.prototype.showContextPopover = function (entry, event) {
     var $source = $(event.target);
     var offset = $source.offset();
-    huePubSub.publish('sql.context.popover.show', {
+    huePubSub.publish('context.popover.show', {
       data: {
         type: 'column',
         identifierChain: [{ name: entry.table.name }, { name: entry.name() }]

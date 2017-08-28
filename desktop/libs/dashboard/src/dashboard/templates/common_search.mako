@@ -18,7 +18,7 @@
 from django.utils.translation import ugettext as _
 
 from desktop import conf
-from desktop.views import commonheader, commonfooter, _ko
+from desktop.views import commonheader, commonfooter, _ko, commonshare
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
@@ -68,6 +68,12 @@ from desktop.views import commonheader, commonfooter, _ko
       <i class="fa fa-save"></i>
     </a>
     % endif
+    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
+      attr: {'data-original-title': '${ _ko("Share") } ' + name},
+      css: {'isShared': isShared(), 'btn': true},
+      visible: isSaved()">
+      <i class="fa fa-users"></i>
+    </a>
     %if not is_embeddable:
     <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
       <i class="fa fa-expand"></i>
@@ -89,13 +95,13 @@ from desktop.views import commonheader, commonfooter, _ko
       <i class="fa fa-file-o"></i>
     </a>
     <!-- ko if: IS_HUE_4 -->
-    <a class="btn" href="/home?type=search-dashboard" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-tags"></i>
+    <a class="btn" href="/home/?type=search-dashboard" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
     </a>
     <!-- /ko -->
     <!-- ko ifnot: IS_HUE_4 -->
     <a class="btn" href="${ url('dashboard:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-tags"></i>
+      <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
     </a>
     <!-- /ko -->
   </div>
@@ -604,9 +610,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
   ## Dimensions > 1 , visible: !$parents[1].isLoading()
   <!-- ko if: $root.isEditing -->
-  <span data-bind="foreach: properties.facets">
-    <div class="filter-box">
-      <div class="title">
+  <ul data-bind="sortable: { data: properties.facets, options: { axis: 'x', containment: 'parent', handle: '.title' }}" class="unstyled pull-left white">
+    <li class="filter-box">
+      <div class="title move">
         <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
           <i class="fa fa-times"></i>
         </a>
@@ -631,7 +637,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </span>
         </div>
 
-        <div class="facet-field-cnt hide"">
+        <div class="facet-field-cnt hide">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Min Count') }
@@ -640,8 +646,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </span>
         </div>
       </div>
-    </div>
-  </span>
+    </li>
+  </ul>
   <!-- /ko -->
 
   <!-- ko ifnot: $root.isEditing -->
@@ -2755,6 +2761,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 ${ dashboard.import_layout(True) }
 
+% if not is_embeddable:
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
+% endif
 <script src="${ static('dashboard/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -2811,6 +2820,11 @@ var HIT_OPTIONS = [
   { value: "sub", label: "${ _('Substract') }" },
   { value: "ms", label: "${ _('Substract dates') }" },
 ];
+
+function prepareShareModal () {
+  shareViewModel.setDocUuid(this.collection.uuid());
+  openShareModal();
+}
 
 function getHitOption(value){
   for (var i=0; i < HIT_OPTIONS.length; i++){

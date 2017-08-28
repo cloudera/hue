@@ -68,12 +68,12 @@ def get_properties():
 
 def get_engines(user):
   engines = []
-  apps = get_apps_dict()
+  apps = get_apps_dict(user=user)
   settings = get_properties()
 
   if 'search' in apps:
     engines.append({
-      'name': _('index (Solr)'),
+      'name': _('Index (Solr)'),
       'type': 'solr',
       'analytics': settings.get('solr') and settings['solr'].get('analytics'),
       'nesting': settings.get('solr') and settings['solr'].get('nesting'),
@@ -81,7 +81,7 @@ def get_engines(user):
 
   if HAS_SQL_ENABLED.get() and ('beeswax' in apps or 'rdbms' in apps):
     engines += [{
-          'name': _('table (%s)') % interpreter['name'],
+          'name': _('Table (%s)') % interpreter['name'],
           'type': interpreter['type'],
           'async': interpreter['interface'] == 'hiveserver2',
           'analytics': settings.get('sql') and settings['sql'].get('analytics'),

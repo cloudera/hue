@@ -72,12 +72,18 @@ function DefaultHandlers(mouseHandler) {
             var selectionRange = editor.getSelectionRange();
             var selectionEmpty = selectionRange.isEmpty();
             editor.$blockScrolling++;
-            if (selectionEmpty)
+            if (selectionEmpty || button == 1)
                 editor.selection.moveToPosition(pos);
             editor.$blockScrolling--;
             // 2: contextmenu, 1: linux paste
-            editor.textInput.onContextMenu(ev.domEvent);
-            return; // stopping event here breaks contextmenu on ff mac
+            if (button == 2) {
+                editor.textInput.onContextMenu(ev.domEvent);
+                if (!useragent.isMozilla)
+                    ev.preventDefault();
+            }
+            // stopping event here breaks contextmenu on ff mac
+            // not stopping breaks it on chrome mac
+            return;
         }
 
         this.mousedownEvent.time = Date.now();

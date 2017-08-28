@@ -128,14 +128,14 @@ table.display td.center {
   *border-collapse: collapsed;
 }
 
-.sorting {
-  cursor: pointer;
+.sorting, .sorting_disabled {
   border-bottom: 1px solid transparent !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
 }
 
 .sorting:hover {
+  cursor: pointer;
   background: url('../art/datatables/sort_both.png') no-repeat center right;
 }
 
@@ -172,6 +172,7 @@ table.display td.center {
     }
   }
   border: none;
+  border-collapse: separate;
   tbody tr:nth-child(odd) {
     background-color: @cui-gray-050;
   }

@@ -78,7 +78,7 @@ ENABLE_NEW_INDEXER = Config(
   key="enable_new_indexer",
   help=_t("Flag to turn on the new Solr indexer."),
   type=bool,
-  default=False
+  default=True
 )
 
 CONFIG_INDEXER_LIBS_PATH = Config(
@@ -86,8 +86,14 @@ CONFIG_INDEXER_LIBS_PATH = Config(
   help=_t("oozie workspace template for indexing:"),
   type=str,
   default='/tmp/smart_indexer_lib'
-  )
+)
 
+ENABLE_SQOOP = Config(
+  key="enable_sqoop",
+  help=_t("Flag to turn on Sqoop imports."),
+  type=bool,
+  default=False
+)
 
 # Unused
 BATCH_INDEXER_PATH = Config(

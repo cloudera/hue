@@ -34,7 +34,12 @@
 @import "components/hue-breadcrumbs.less";
 @import "components/hue-inputautocomplete.less";
 @import "components/hue-shepherd.less";
+@import "components/hue-wizard.less";
 @import "hue-helpers.less";
+
+body {
+  background-color: @cui-white;
+}
 
 input[type='password']::-ms-reveal {
   display: none;
@@ -402,8 +407,6 @@ ul.errorlist {
   input[type="text"] {
     border-radius: 20px;
     margin: 0;
-    min-height: 26px;
-    padding-left: 12px;
     width: 130px;
   }
 }
@@ -506,4 +509,42 @@ ul.errorlist {
 .break-word {
   word-break: break-all;
   white-space: initial !important;
+}
+
+.nav-pills-border, .nav-tabs-border {
+  border-bottom: 1px solid @cui-default-border-color;
+  li.active {
+    margin-bottom: -1px;
+  }
+}
+
+.move {
+  cursor: move;
+}
+
+.empty-wrapper {
+  margin-top: 50px;
+  color: @cui-gray-500;
+  line-height: 60px;
+  i {
+    font-size: 100px;
+  }
+}
+
+.monospace {
+  font-family: @font-family-monospace;
+}
+
+.form-actions {
+  position: fixed;
+  bottom: 0;
+  margin: 0;
+  margin-left: -24px;
+  z-index: 1000;
+  padding-left: 20px !important;
+  border-top: 1px solid @cui-gray-100;
+}
+
+.btn > svg.hi {
+  font-size: 16px;
 }

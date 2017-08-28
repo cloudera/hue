@@ -30,6 +30,8 @@
   <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/clipboard.min.js') }"></script>
+
   %if with_deferred:
   <script type="text/javascript">
     ko.options.deferUpdates = true;
@@ -41,22 +43,17 @@
 
 <div class="card card-toolbar" data-bind="visible: isEditing">
   %if not hasattr(caller, "skipLayout"):
-  <div style="float: left">
+  <div style="float: left" data-bind="visible: columns().length == 0">
     <div class="toolbar-label">${_('LAYOUT')}</div>
-    <a href="javascript: oneSixthLeftLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('oneSixthLeft')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: magicSearchLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
-        <div class="layout-box" style="width: 72px; margin-left: 4px"></div>
+        <div class="layout-box" style="width: 72px; margin-left: 4px"><i class="fa fa-table"></i></div>
       </div>
     </a>
     <a href="javascript: fullLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
-      </div>
-    </a>
-    <a data-bind="visible: columns().length == 0" href="javascript: magicSearchLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
-      <div class="layout-container">
-        <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
       </div>
     </a>
   </div>
@@ -72,7 +69,7 @@
     %if hasattr(caller, "widgetSectionName"):
       <div class="toolbar-label">${caller.widgetSectionName()}</div>
     %else:
-      <div class="toolbar-label">${_('WIDGETS')}</div>
+      <div class="toolbar-label margin-left-20">${_('WIDGETS')}</div>
     %endif
     ${caller.widgets()}
   </div>
@@ -96,12 +93,6 @@
 
   <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
   <div class="container-fluid">
-    <div class="row-fluid" data-bind="visible: previewColumns() == 'oneSixthLeft'">
-      <div class="span2 preview-row"></div>
-      <div class="span10 preview-row">
-        <div style="font-size: 80px; padding-top: 120px">${ _('Two columns layout') }</div>
-      </div>
-    </div>
     <div class="row-fluid" data-bind="visible: previewColumns() == 'full'">
       <div class="span12 preview-row">
         <div style="font-size: 80px; padding-top: 120px">${ _('One column layout') }</div>
@@ -145,6 +136,17 @@
 
 <script type="text/html" id="column-template${ suffix }">
   <div data-bind="css: klass">
+    <div class="pull-right margin-right-10" data-bind="visible: $root.isEditing()">
+      <a href="javascript:void(0)" data-bind="visible: size() > 2, click: shrinkColumn" title="${ _('Make column smaller') }"><i class="fa fa-step-backward"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: size() < 12, click: expandColumn" title="${ _('Make column larger') }"><i class="fa fa-step-forward"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: $parent.columns().length < 2, click: addColumn" title="${ _('Add a column') }"><i class="fa fa-plus"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: true, click: removeColumn" title="${ _('Remove this column') }"><i class="fa fa-times"></i></a>
+    </div>
+    <div class="pull-left margin-left-10" data-bind="visible: $root.isEditing()">
+      <a href="javascript:void(0)" data-bind="visible: $index() == 0, click: function() { moveRight($index()) }" title="${ _('Move column to the right') }"><i class="fa fa-arrow-right"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: $index() > 0, click: function() { moveLeft($index()) }" title="${ _('Move column to the left') }"><i class="fa fa-arrow-left"></i></a>
+    </div>
+    <div class="clearfix"></div>
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>

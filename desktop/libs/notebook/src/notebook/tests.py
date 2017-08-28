@@ -343,7 +343,9 @@ class TestNotebookApiMocked(object):
     originalCluster.FS_CACHE["default"] = MockFs()
 
     grant_access("test", "default", "notebook")
+    grant_access("test", "default", "beeswax")
     grant_access("not_perm_user", "default", "notebook")
+    grant_access("not_perm_user", "default", "beeswax")
 
   def tearDown(self):
     notebook.connectors.hiveserver2.HS2Api = notebook.connectors.hiveserver2.original_HS2Api
