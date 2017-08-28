@@ -402,7 +402,7 @@ var TextInput = function(parentNode, host) {
         inComposition = false;
         var timer = setTimeout(function() {
             timer = null;
-            var str = text.value.replace(/\x01/g, "");
+            var str = text.value.replace(/\u2028/g, "");
             // console.log(str, c.lastValue)
             if (inComposition)
                 return;
@@ -417,7 +417,7 @@ var TextInput = function(parentNode, host) {
             // console.log("onCompositionEnd", str, c.lastValue)
             if (timer)
                 clearTimeout(timer);
-            str = str.replace(/\x01/g, "");
+            str = str.replace(/\u2028/g, "");
             if (str == c.lastValue)
                 return "";
             if (c.lastValue && timer)
@@ -428,6 +428,14 @@ var TextInput = function(parentNode, host) {
         host.removeListener("mousedown", onCompositionEnd);
         if (e.type == "compositionend" && c.range) {
             host.selection.setRange(c.range);
+        }
+        // Workaround for #3027, #3045, #3097, #3100, #3249
+        var needsOnInput =
+            (!!useragent.isChrome && useragent.isChrome >= 53) ||
+            (!!useragent.isWebKit && useragent.isWebKit >= 603);
+
+        if (needsOnInput) {
+          onInput();
         }
     };
     
