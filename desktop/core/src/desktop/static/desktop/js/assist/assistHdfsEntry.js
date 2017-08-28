@@ -250,5 +250,9 @@ var AssistHdfsEntry = (function () {
     });
   };
 
+  AssistHdfsEntry.prototype.openInImporter = function () {
+    huePubSub.publish('open.in.importer', this.definition.path);
+  };
+
   return AssistHdfsEntry;
 })();
