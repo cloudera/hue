@@ -143,7 +143,7 @@
       <a href="javascript:void(0)" data-bind="visible: true, click: removeColumn" title="${ _('Remove this column') }"><i class="fa fa-times"></i></a>
     </div>
     <div class="pull-left margin-left-10" data-bind="visible: $root.isEditing()">
-      <a href="javascript:void(0)" data-bind="visible: $index() == 0, click: function() { moveRight($index()) }" title="${ _('Move column to the right') }"><i class="fa fa-arrow-right"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: $index() == 0 && $parent.columns().length > 1, click: function() { moveRight($index()) }" title="${ _('Move column to the right') }"><i class="fa fa-arrow-right"></i></a>
       <a href="javascript:void(0)" data-bind="visible: $index() > 0, click: function() { moveLeft($index()) }" title="${ _('Move column to the left') }"><i class="fa fa-arrow-left"></i></a>
     </div>
     <div class="clearfix"></div>
