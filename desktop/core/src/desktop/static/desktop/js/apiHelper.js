@@ -589,7 +589,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchSolrCollection = function (options) {
     var self = this;
-    var url = SOLR_FIELDS_API;
+    var url = SOLR_FIELDS_API  + '?name=' + options.collectionName;
     var fetchFunction = function (storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
@@ -598,10 +598,7 @@ var ApiHelper = (function () {
       $.ajax({
         dataType: "json",
         url: url,
-        data: {
-          name: options.collectionName
-        },
-        type: 'POST',
+        type: 'GET',
         timeout: options.timeout,
         success: function (data) {
           if (!data.error && !self.successResponseIsError(data) && typeof data.schema !== 'undefined' && data.schema !== null) {
