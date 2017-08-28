@@ -664,6 +664,7 @@ ${ assist.assistPanel() }
           if (data.status == 0) {
             vm.indexes.remove(function(index) { return index.name() == indexName; });
             huePubSub.publish('assist.collections.refresh');
+            vm.showIndexes(false);
           } else {
             $(document).trigger("error", data.message);
           }
@@ -809,11 +810,13 @@ ${ assist.assistPanel() }
 
       self.datatable = null;
 
-      self.showIndexes = function () {
+      self.showIndexes = function (reload) {
         self.section('list-indexes');
         self.index(null);
         hueUtils.changeURL(self.baseURL);
-        self.fetchIndexes();
+        if (typeof reload == 'undefined' || reload) {
+          self.fetchIndexes();
+        }
         $('#fieldAnalysisIndexes').hide();
       }
 
