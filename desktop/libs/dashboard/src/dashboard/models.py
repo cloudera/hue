@@ -682,10 +682,15 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
       else:
         augmented.append(_get_augmented(count, val, label, _fq_values, _fq_fields, fq_filter, _selected_values)) # Needed?
 
-        # Go rec
-        _agg_keys = [key for key, value in bucket[agg_key]['buckets'][0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
+        # List nested fields
+        _agg_keys = []
+        if bucket[agg_key]['buckets']:
+          for key, value in bucket[agg_key]['buckets'][0].items():
+            if key.lower().startswith('agg_') or key.lower().startswith('dim_'):
+              _agg_keys.append(key)
         _agg_keys.sort(key=lambda a: a[4:])
 
+        # Go rec
         if not _agg_keys or len(_agg_keys) == 1 and _agg_keys[0].lower().startswith('dim_'):
           _agg_keys.insert(0, 'count')
         next_dim = []
