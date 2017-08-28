@@ -891,18 +891,24 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $('.dz-drag-hover').removeClass('dz-drag-hover');
         };
 
+        var openImporter = function (path) {
+          self.loadApp('importer');
+          self.getActiveAppViewModel(function (vm) {
+            vm.createWizard.source.path(path);
+          });
+        };
+
         self.dropzoneComplete = function (path) {
           if (path.toLowerCase().endsWith('.csv')){
-            self.loadApp('importer');
-            self.getActiveAppViewModel(function (vm) {
-              vm.createWizard.source.path(path);
-            });
+            openImporter(path);
           }
           else {
             huePubSub.publish('open.link', '/filebrowser/view=' + path);
           }
           $('.dz-drag-hover').removeClass('dz-drag-hover');
         };
+
+        huePubSub.subscribe('open.in.importer', openImporter);
 
         // prepend /hue to all the link on this page
         $('a[href]').each(function () {
