@@ -126,7 +126,7 @@ class MorphlineIndexer(object):
 
   def guess_field_types(self, data):
     file_format = get_file_format_instance(data['file'], data['format'])
-    return file_format.get_fields() if file_format else {'columns':[]}
+    return file_format.get_fields() if file_format else {'columns': []}
 
   # Breadth first ordering of fields
   def get_field_list(self, field_data):
