@@ -185,7 +185,7 @@ exports.addMouseWheelListener = function(el, callback) {
     }
 };
 
-exports.addMultiMouseDownListener = function(el, timeouts, eventHandler, callbackName) {
+exports.addMultiMouseDownListener = function(elements, timeouts, eventHandler, callbackName) {
     var clicks = 0;
     var startX, startY, timer; 
     var eventNames = {
@@ -194,7 +194,7 @@ exports.addMultiMouseDownListener = function(el, timeouts, eventHandler, callbac
         4: "quadclick"
     };
 
-    exports.addListener(el, "mousedown", function(e) {
+    function onMousedown(e) {
         if (exports.getButton(e) !== 0) {
             clicks = 0;
         } else if (e.detail > 1) {
@@ -226,18 +226,22 @@ exports.addMultiMouseDownListener = function(el, timeouts, eventHandler, callbac
             clicks = 0;
         else if (clicks > 1)
             return eventHandler[callbackName](eventNames[clicks], e);
-    });
-
-    if (useragent.isOldIE) {
-        exports.addListener(el, "dblclick", function(e) {
-            clicks = 2;
-            if (timer)
-                clearTimeout(timer);
-            timer = setTimeout(function() {timer = null}, timeouts[clicks - 1] || 600);
-            eventHandler[callbackName]("mousedown", e);
-            eventHandler[callbackName](eventNames[clicks], e);
-        });
     }
+    function onDblclick(e) {
+        clicks = 2;
+        if (timer)
+            clearTimeout(timer);
+        timer = setTimeout(function() {timer = null}, timeouts[clicks - 1] || 600);
+        eventHandler[callbackName]("mousedown", e);
+        eventHandler[callbackName](eventNames[clicks], e);
+    }
+    if (!Array.isArray(elements))
+        elements = [elements];
+    elements.forEach(function(el) {
+        exports.addListener(el, "mousedown", onMousedown);
+        if (useragent.isOldIE)
+            exports.addListener(el, "dblclick", onDblclick);
+    });
 };
 
 var getModifierHash = useragent.isMac && useragent.isOpera && !("KeyboardEvent" in window)
@@ -256,7 +260,7 @@ function normalizeCommandKeys(callback, e, keyCode) {
     var hashId = getModifierHash(e);
 
     if (!useragent.isMac && pressedKeys) {
-        if (pressedKeys.OSKey)
+        if (e.getModifierState && (e.getModifierState("OS") || e.getModifierState("Win")))
             hashId |= 8;
         if (pressedKeys.altGr) {
             if ((3 & hashId) != 3)
@@ -335,19 +339,8 @@ exports.addCommandKeyListener = function(el, callback) {
         var lastDefaultPrevented = null;
 
         addListener(el, "keydown", function(e) {
-            var keyCode = e.keyCode;
-            pressedKeys[keyCode] = (pressedKeys[keyCode] || 0) + 1;
-            if (keyCode == 91 || keyCode == 92) {
-                pressedKeys.OSKey = true;
-            } else if (pressedKeys.OSKey) {
-                if (e.timeStamp - pressedKeys.lastT > 200 && pressedKeys.count == 1)
-                    resetPressedKeys();
-            }
-            if (pressedKeys[keyCode] == 1)
-                pressedKeys.count++;
-            // console.log(e.timeStamp - pressedKeys.lastT)
-            pressedKeys.lastT = e.timeStamp;
-            var result = normalizeCommandKeys(callback, e, keyCode);
+            pressedKeys[e.keyCode] = (pressedKeys[e.keyCode] || 0) + 1;
+            var result = normalizeCommandKeys(callback, e, e.keyCode);
             lastDefaultPrevented = e.defaultPrevented;
             return result;
         });
@@ -360,17 +353,7 @@ exports.addCommandKeyListener = function(el, callback) {
         });
 
         addListener(el, "keyup", function(e) {
-            var keyCode = e.keyCode;
-            if (!pressedKeys[keyCode]) {
-                // console.log("resetting", 1)
-                resetPressedKeys();
-            } else {
-                pressedKeys.count = Math.max(pressedKeys.count - 1, 0);
-            }
-            if (keyCode == 91 || keyCode == 92) {
-                pressedKeys.OSKey = false;
-            }
-            pressedKeys[keyCode] = null;
+            pressedKeys[e.keyCode] = null;
         });
 
         if (!pressedKeys) {
@@ -382,8 +365,6 @@ exports.addCommandKeyListener = function(el, callback) {
 function resetPressedKeys() {
     // console.log("resetting")
     pressedKeys = Object.create(null);
-    pressedKeys.count = 0;
-    pressedKeys.lastT = 0;
 }
 
 if (typeof window == "object" && window.postMessage && !useragent.isOldIE) {
