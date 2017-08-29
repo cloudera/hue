@@ -577,37 +577,37 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
     <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length != 1 || isCurrentDirSelected().length > 0}">
-    <a href="#" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
+    <a href="javascript: void(0)" title="${_('Rename')}" data-bind="click: ($root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0) ? $root.renameFile: void(0)"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
     <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
-    <a href="#" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
+    <a href="javascript: void(0)" title="${_('Move')}" data-bind="click: ( $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.move: void(0)"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
     <li data-bind="visible: !isS3() || (isS3() && !isS3Root()), css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
-    <a href="#" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
+    <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0)"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
     <li data-bind="css: {'disabled': $root.inTrash() || $root.selectedFiles().length != 1 || selectedFile().type != 'file'}">
-    <a href="#" title="${_('Download')}" data-bind="click: (!$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file') ? $root.downloadFile: void(0)">
+    <a href="javascript: void(0)" title="${_('Download')}" data-bind="click: (!$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file') ? $root.downloadFile: void(0)">
     <i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
     % endif
     <li class="divider" data-bind="visible: !isS3()"></li>
     % if is_fs_superuser:
     <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged || selectedSentryFiles().length > 0 }, visible: !isS3()">
-      <a href="#" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0">
+      <a href="javascript: void(0)" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0">
         <i class="fa fa-fw fa-user"></i> ${_('Change owner / group')}
       </a>
     </li>
     % endif
     <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }, visible: !isS3()">
-      <a href="#" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0">
+      <a href="javascript: void(0)" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0">
         <i class="fa fa-fw fa-list-alt"></i> ${_('Change permissions')}
       </a>
     </li>
     <li class="divider" data-bind="visible: !isS3() || (isS3() && !isS3Root())"></li>
     % if is_trash_enabled:
     <li data-bind="css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
-    <a href="#" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.trashSelected: void(0)">
+    <a href="javascript: void(0)" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.trashSelected: void(0)">
     <i class="fa fa-fw fa-times"></i> ${_('Move to trash')}</a></li>
     %endif
-    <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}</a></li>
+    <li><a href="javascript: void(0)" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}</a></li>
     <li class="divider" data-bind="visible: !isS3()"></li>
     <li data-bind="css: {'disabled': selectedFiles().length > 1 }, visible: !isS3()">
       <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}"><i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}</a>
