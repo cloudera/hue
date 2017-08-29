@@ -54,7 +54,7 @@ var TextInput = function(parentNode, host) {
     if (useragent.isOldIE) text.style.top = "-1000px";
     parentNode.insertBefore(text, parentNode.firstChild);
 
-    var PLACEHOLDER = "\x01\x01";
+    var PLACEHOLDER = "\u2028\u2028";
 
     var copied = false;
     var pasted = false;
@@ -378,7 +378,7 @@ var TextInput = function(parentNode, host) {
         // console.log("onCompositionUpdate", inComposition && JSON.stringify(text.value))
         if (!inComposition || !host.onCompositionUpdate || host.$readOnly)
             return;
-        var val = text.value.replace(/\x01/g, "");
+        var val = text.value.replace(/\u2028/g, "");
         if (inComposition.lastValue === val) return;
         
         host.onCompositionUpdate(val);
