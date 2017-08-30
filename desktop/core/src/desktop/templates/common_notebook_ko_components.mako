@@ -178,7 +178,7 @@ except ImportError, e:
         <i class="fa fa-fw fa-spinner fa-spin"></i>
         <!-- /ko -->
       </a>
-      <ul class="dropdown-menu less-padding">
+      <ul class="dropdown-menu less-padding" style="z-index: 1040">
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as CSV') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
