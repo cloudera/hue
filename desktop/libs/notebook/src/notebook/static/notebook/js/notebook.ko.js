@@ -657,7 +657,7 @@ var EditorViewModel = (function() {
         matches = self.getPigParameters();
       } else {
         var re = /(?:^|\W)\${(\w*\=?[\w\s]*)}/g;
-        while (match = re.exec(self.statement_raw())) {
+        while (match = re.exec(self.statement_raw().replace(/(--.*$|\/\*[\s\S]*?\*\/)/gm, ' '))) {
           if (match[1].indexOf('=') > -1) {
               var splittedName = match[1].split('=');
               matches[splittedName[0]] = matches[splittedName[0]] || splittedName[1];
