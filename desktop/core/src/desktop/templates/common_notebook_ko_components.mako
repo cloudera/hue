@@ -259,7 +259,7 @@ except ImportError, e:
                   &nbsp;${ _('Table') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hive-table'" class="inline">
-                  <input data-bind="hivechooser: savePath, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'" type="text" name="target_table" class="input-xlarge margin-left-10"  pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${_('Table name or <database>.<table>')}">
+                  <input data-bind="hivechooser: savePath, valueUpdate:'afterkeydown', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'" type="text" name="target_table" class="input-xlarge margin-left-10"  pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${_('Table name or <database>.<table>')}">
                 </div>
               </div>
             </div>
