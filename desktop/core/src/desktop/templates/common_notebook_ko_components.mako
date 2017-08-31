@@ -399,11 +399,11 @@ except ImportError, e:
               if (IS_HUE_4) {
                 $(".modal-backdrop").remove();
                 if (self.saveTarget() == 'hdfs-file' || (self.saveTarget() == 'search-index' && typeof resp.rowcount !== 'undefined')) {
-                  $("#saveResultsModal").hide();
+                  $("#saveResultsModal").modal("hide");
                   huePubSub.publish('open.link', resp.watch_url);
                 } else {
                   if (resp.history_uuid) {
-                    $("#saveResultsModal").hide();
+                    $("#saveResultsModal").modal("hide");
                     huePubSub.publish('notebook.task.submitted', resp.history_uuid);
                   } else if (resp && resp.message) {
                     $(document).trigger("error", resp.message);
