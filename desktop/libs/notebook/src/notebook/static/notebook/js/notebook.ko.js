@@ -544,7 +544,9 @@ var EditorViewModel = (function() {
     });
     if (snippet.variables) {
       snippet.variables.forEach(function (variable) {
-        variable.defaultValue = variable.defaultValue || '';
+        variable.meta = (typeof variable.defaultValue === "object" && variable.defaultValue) || {type: "text", placeholder: ""};
+        variable.value = variable.value || "";
+        delete variable.defaultValue;
       });
     }
     self.variables = ko.mapping.fromJS(typeof snippet.variables != "undefined" && snippet.variables != null ? snippet.variables : []);
@@ -612,6 +614,18 @@ var EditorViewModel = (function() {
 
       return params;
     };
+    function getJSONLength (index) {
+      //all bracket pairs
+      if (this.charAt(index) != "{") return 0;
+      var nOpenBracket = 1, start = index, i;
+      for (i = index + 1; i < this.length; i++) {
+        var currentChar = this.charAt(i);
+        if (currentChar === "{") nOpenBracket++;
+        else if (currentChar === "}") nOpenBracket--;
+        if (nOpenBracket <= 0) break;
+      }
+      return i - start + 1;
+    };
     self.variableNames = ko.computed(function () {
       var match, matches = {};
       if (self.type() == 'pig') {
@@ -633,7 +647,9 @@ var EditorViewModel = (function() {
         }
       }
       return Object.keys(matches).map(function (match) {
-        return { name: match, defaultValue: matches[match] };
+        var isMatchObject = typeof matches[match] === "object";
+        var meta = isMatchObject ? matches[match] : {type: "text", placeholder: matches[match]};
+        return {name: match, meta: meta};
       });
     });
     self.variableValues = {};
@@ -648,7 +664,7 @@ var EditorViewModel = (function() {
       }, self.variableValues);
       if (needsMore) {
         for (var i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
-          self.variables.push(ko.mapping.fromJS({ 'name': '', 'value': '', 'defaultValue': '' }));
+          self.variables.push(ko.mapping.fromJS({ "name": "", "value": "", "meta": {type: "text", placeholder: ""}}));
         }
       } else if (needsLess) {
         self.variables.splice(self.variables().length - diffLengthVariables, diffLengthVariables);
