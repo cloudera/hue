@@ -6361,7 +6361,8 @@
 
         // when the value is changed, write to the associated myValue observable
         function onNewValue(newVal) {
-          var dataItems = ko.unwrap(setup.options),
+          var setup = valueAccessor(),
+            dataItems = ko.unwrap(setup.options),
             selectedItem = findItem(dataItems, textProperty, newVal),
             newValue = selectedItem ? getVal(selectedItem, valueProperty) : newVal;
 
@@ -6373,7 +6374,10 @@
         // listen for value changes
         // - either via KO's value binding (preferred) or the change event
         if (ko.isSubscribable(koValue)) {
-          koValue.subscribe(onNewValue);
+          var onNewValueSubscription = koValue.subscribe(onNewValue);
+          ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+            onNewValueSubscription.remove();
+          });
         } else {
           var event = allBindingsAccessor().valueUpdate === "afterkeydown" ? "input" : "change";
           ko.utils.registerEventHandler(element, event, function () {
