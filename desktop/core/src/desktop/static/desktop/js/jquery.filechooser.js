@@ -232,7 +232,7 @@
     $.getJSON("/filebrowser/view=" + path + pageSize, function (data) {
       $(_parent.element).find('.filechooser-tree').empty();
 
-      path = data.current_dir_path; // use real path.
+      path = data.current_dir_path || path; // use real path.
       var _flist = $("<ul>").addClass("unstyled").css({
         'height': '260px',
         'overflow-y': 'auto'
@@ -261,9 +261,21 @@
         $("<div class='clearfix'>").appendTo($(_parent.element).find('.filechooser-tree'));
         var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message ? data.message : data.error);
         _errorMsg.appendTo($(_parent.element).find('.filechooser-tree'));
+        //TODO: allow user to user breadcrums when there is an error
         var _previousLink = $("<a>").addClass("btn").text(_parent.options.labels.BACK).click(function () {
-          _parent.options.onFolderChange(_parent.previousPath);
-          _parent.navigateTo(_parent.previousPath);
+          function getParentPath (path) {
+            if (!path) return path;
+            var indexFirst = path.indexOf("/");
+            var indexLast = path.lastIndexOf("/");
+            return indexLast - indexFirst > 1 && indexLast > 0 ? path.substring(0, indexLast + 1) : path;
+          }
+          function getScheme (path) {
+            var index = path.indexOf("://");
+            return index >= 0 ? path.substring(0, index) : "hdfs";
+          }
+          var next = path !== _parent.previousPath && getScheme(path) === getScheme(_parent.previousPath) ? _parent.previousPath : getParentPath(path);
+          _parent.options.onFolderChange(next);
+          _parent.navigateTo(next);
         });
         _previousLink.appendTo($(_parent.element).find('.filechooser-tree'));
       } else {
