@@ -167,7 +167,7 @@ class Command(NoArgsCommand):
 
   def _install_java_example(self):
     doc2 = None
-    name = _('Java Terasort Job')
+    name = _('Java TeraGen Job')
 
     if Document2.objects.filter(owner=self.user, name=name, type='query-java', is_history=False).exists():
       LOG.info("Sample Java editor job already installed.")
@@ -175,18 +175,18 @@ class Command(NoArgsCommand):
     else:
       snippet_properties = {
         'app_jar': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
-        'class': 'org.apache.hadoop.examples.terasort.TeraSort',
+        'class': 'org.apache.hadoop.examples.terasort.TeraGen',
         'java_opts': '',
         'hadoopProperties': [],
         'archives': [],
         'files': [],
-        'arguments': ['output_dir/teragen', 'output_dir/terasort'],
+        'arguments': ['10000', 'output_dir/teragen'],
         'capture_output': False
       }
 
       notebook = make_notebook(
         name=name,
-        description=_('Terasort: Example Java job'),
+        description=_('TeraGen: Generates N rows of random data to a directory.'),
         editor_type='java',
         statement='',
         status='ready',
