@@ -2183,7 +2183,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             });
 
             if (updateTables) {
-              var tables = Object.values(activeTableIndex);
+              var tables = [];
+              Object.keys(activeTableIndex).forEach(function (key) {
+                tables.push(activeTableIndex[key]);
+              });
+
               tables.sort(function (a, b) {
                 return a.definition.name.localeCompare(b.definition.name);
               });
