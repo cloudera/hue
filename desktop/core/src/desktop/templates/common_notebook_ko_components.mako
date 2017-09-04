@@ -392,6 +392,7 @@ except ImportError, e:
             destination: ko.mapping.toJSON(self.savePath()),
             overwrite: ko.mapping.toJSON(self.saveOverwrite()),
             is_embedded: ko.mapping.toJSON(IS_HUE_4),
+            start_time: ko.mapping.toJSON((new Date()).getTime())
           },
           function(resp) {
             if (resp.status == 0) {
