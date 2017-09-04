@@ -1625,15 +1625,14 @@ var SqlParseSupport = (function () {
   };
 
   var SYNTAX_PARSER_NOOP_FUNCTIONS = ['prepareNewStatement', 'addCommonTableExpressions', 'pushQueryState', 'popQueryState', 'suggestSelectListAliases',
-    'isHive', 'isImpala', 'mergeSuggestKeywords', 'suggestValueExpressionKeywords', 'getValueExpressionKeywords', 'getTypeKeywords',
-    'getColumnDataTypeKeywords', 'addColRefIfExists', 'selectListNoTableSuggest', 'suggestJoinConditions', 'suggestJoins', 'valueExpressionSuggest',
-    'applyTypeToSuggestions', 'findCaseType', 'findReturnTypes', 'applyArgumentTypesToSuggestions', 'commitLocations', 'expandImpalaIdentifierChain',
-    'identifyPartials', 'expandLateralViews', 'expandIdentifierChain', 'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'getKeywordsForOptionalsLR',
-    'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords', 'createWeightedKeywords', 'suggestKeywords', 'suggestColRefKeywords',
-    'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions', 'suggestColumns', 'suggestGroupBys',
-    'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation', 'addStatementLocation', 'firstDefined',
-    'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addTableAliasLocation', 'addSubqueryAliasLocation', 'addTableLocation',
-    'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs', 'suggestValues', 'handleQuotedValueWithCursor'];
+    'suggestValueExpressionKeywords', 'getValueExpressionKeywords', 'addColRefIfExists', 'selectListNoTableSuggest', 'suggestJoinConditions',
+    'suggestJoins', 'valueExpressionSuggest', 'applyTypeToSuggestions', 'applyArgumentTypesToSuggestions', 'commitLocations', 'identifyPartials',
+    'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords',
+    'suggestKeywords', 'suggestColRefKeywords', 'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions',
+    'suggestColumns', 'suggestGroupBys', 'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation',
+    'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addTableAliasLocation',
+    'addSubqueryAliasLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs',
+    'suggestValues'];
 
   var SYNTAX_PARSER_NOOP = function () {};
 
@@ -1651,6 +1650,79 @@ var SqlParseSupport = (function () {
         parser.yy.lowerCase = text.toLowerCase() === text;
         parser.yy.caseDetermined = true;
       }
+    };
+
+    parser.getKeywordsForOptionalsLR = function () {
+      return [];
+    };
+
+    parser.mergeSuggestKeywords = function () {
+      return {};
+    };
+
+    parser.getTypeKeywords = function () {
+      return [];
+    };
+
+    parser.getColumnDataTypeKeywords = function () {
+      return [];
+    };
+
+    parser.findCaseType = function () {
+      return {types: ['T']};
+    };
+
+    parser.findReturnTypes = function (functionName) {
+      return ['T'];
+    };
+
+    parser.isHive = function () {
+      return parser.yy.activeDialect === 'hive';
+    };
+
+    parser.isImpala = function () {
+      return parser.yy.activeDialect === 'impala';
+    };
+
+    parser.expandImpalaIdentifierChain = function () {
+      return [];
+    };
+
+    parser.expandIdentifierChain = function () {
+      return [];
+    };
+
+    parser.expandLateralViews = function () {
+      return [];
+    };
+
+    parser.createWeightedKeywords = function () {
+      return [];
+    };
+
+    parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
+      if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
+        parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
+        var cursorIndex = parser.yy.partialCursor ? yytext.indexOf('\u2021') : yytext.indexOf('\u2020');
+        parser.yy.cursorFound = {
+          first_line: yylloc.first_line,
+          last_line: yylloc.last_line,
+          first_column: yylloc.first_column + cursorIndex,
+          last_column: yylloc.first_column + cursorIndex + 1
+        };
+        var remainder = yytext.substring(cursorIndex + 1);
+        var remainingQuotes = (lexer.upcomingInput().match(new RegExp(quoteChar, 'g')) || []).length;
+        if (remainingQuotes > 0 && remainingQuotes & 1 != 0) {
+          parser.yy.missingEndQuote = false;
+          lexer.input();
+        } else {
+          parser.yy.missingEndQuote = true;
+          lexer.unput(remainder);
+        }
+        lexer.popState();
+        return true;
+      }
+      return false;
     };
 
     var lexerModified = false;
