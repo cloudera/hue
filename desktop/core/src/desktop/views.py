@@ -34,7 +34,7 @@ from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_POST
 
 import django.views.debug
 
@@ -61,7 +61,6 @@ from desktop.models import Settings, hue_version, _get_apps, UserPreferences, Cl
 LOG = logging.getLogger(__name__)
 
 
-@require_http_methods(['HEAD'])
 def is_alive(request):
   return HttpResponse('')
 
