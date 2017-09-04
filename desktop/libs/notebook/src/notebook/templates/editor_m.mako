@@ -77,7 +77,6 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',
-        onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
         useNewAutocompleter: $root.useNewAutocompleter,
         aceOptions: {
@@ -297,18 +296,6 @@ ${ assist.assistJSModels() }
       }
     }
   });
-
-  function saveTemporarySnippet($element, value) {
-    if ($element.data('last-active-editor')) {
-      try {
-        if (viewModel.editorType() != 'notebook') {
-          $.totalStorage('hue.notebook.lastWrittenSnippet.${user}.' + viewModel.editorType(), value);
-        }
-      }
-      catch (e) {
-      } // storage quota exceeded with enormous editor content
-    }
-  }
 
   var viewModel;
 
