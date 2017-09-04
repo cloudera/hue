@@ -1124,7 +1124,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Right-click to expand with columns") }',
-        onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
         useNewAutocompleter: $root.useNewAutocompleter,
         readOnly: $root.isPresentationMode(),
@@ -2662,17 +2661,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
     }
     return _datum;
-  }
-
-  function saveTemporarySnippet($element, value) {
-    if ($element.data('last-active-editor')) {
-      try {
-        if (viewModel.editorType() != 'notebook') {
-          $.totalStorage('hue.notebook.lastWrittenSnippet.${user}.' + viewModel.editorType(), value);
-        }
-      }
-      catch (e){} // storage quota exceeded with enormous editor content
-    }
   }
 
   (function () {
