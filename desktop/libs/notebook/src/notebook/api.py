@@ -627,6 +627,7 @@ def export_result(request):
   destination = json.loads(request.POST.get('destination', ''))
   overwrite = json.loads(request.POST.get('overwrite', 'false'))
   is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
+  start_time = json.loads(request.POST.get('start_time', '-1'))
 
   api = get_api(request, snippet)
 
@@ -657,6 +658,7 @@ def export_result(request):
         status='ready-execute',
         database=snippet['database'],
         on_success_url=success_url,
+        last_executed=start_time,
         is_task=True
       )
       response = task.execute(request)
@@ -681,6 +683,7 @@ def export_result(request):
         status='ready-execute',
         database=snippet['database'],
         on_success_url=success_url,
+        last_executed=start_time,
         is_task=True
       )
       response = task.execute(request)
