@@ -53,26 +53,28 @@ class SolrApi(object):
   http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
   """
   def __init__(self, solr_url=None, user=None, security_enabled=False, ssl_cert_ca_verify=SSL_CERT_CA_VERIFY.get()):
-    if solr_url is None:
+    if solr_url is None and hasattr(SOLR_URL, 'get'):
       solr_url = SOLR_URL.get()
-    self._url = solr_url
-    self._user = user
-    self._client = HttpClient(self._url, logger=LOG)
-    self.security_enabled = security_enabled or SECURITY_ENABLED.get()
 
-    if self.security_enabled:
-      self._client.set_kerberos_auth()
+    if solr_url:
+      self._url = solr_url
+      self._user = user
+      self._client = HttpClient(self._url, logger=LOG)
+      self.security_enabled = security_enabled or SECURITY_ENABLED.get()
 
-    self._client.set_verify(ssl_cert_ca_verify)
+      if self.security_enabled:
+        self._client.set_kerberos_auth()
 
-    self._root = resource.Resource(self._client)
+      self._client.set_verify(ssl_cert_ca_verify)
 
-    # The Kerberos handshake requires two requests in order to authenticate,
-    # but if our first request is a PUT/POST, it might flat-out reject the
-    # first request if the body is too large. So, connect here in order to get
-    # a cookie so future PUT/POSTs will be pre-authenticated.
-    if self.security_enabled:
-      self._root.invoke('HEAD', '/')
+      self._root = resource.Resource(self._client)
+
+      # The Kerberos handshake requires two requests in order to authenticate,
+      # but if our first request is a PUT/POST, it might flat-out reject the
+      # first request if the body is too large. So, connect here in order to get
+      # a cookie so future PUT/POSTs will be pre-authenticated.
+      if self.security_enabled:
+        self._root.invoke('HEAD', '/')
 
 
   def query(self, collection, query):
