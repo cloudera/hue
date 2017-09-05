@@ -271,11 +271,12 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     var $el = selector instanceof jQuery ? selector: $(selector);
     if (condition($el)) {
       callback($el);
-    }
-    else {
-      window.setTimeout(function () {
+    } else {
+      window.clearTimeout($el.data('waitForRenderTimeout'));
+      var waitForRenderTimeout = window.setTimeout(function () {
         hueUtils.waitForRendered(selector, condition, callback);
-      }, timeout || 100)
+      }, timeout || 100);
+      $el.data('waitForRenderTimeout', waitForRenderTimeout);
     }
   };
 

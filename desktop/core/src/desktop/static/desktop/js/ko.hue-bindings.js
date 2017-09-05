@@ -1025,9 +1025,12 @@
         allBindings().logScrollerVisibilityEvent.subscribe(function () {
           window.setTimeout(autoLogScroll, 0);
         });
+      } else {
+        hueUtils.waitForRendered(element, function(el) { return el.is(':visible') }, autoLogScroll, 300);
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+          window.clearTimeout($element.data('waitForRenderTimeout'));
+        });
       }
-
-      hueUtils.waitForRendered(element, function(el){ return el.is(':visible') }, autoLogScroll);
     }
   };
 
