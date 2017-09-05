@@ -3232,7 +3232,16 @@
           filterExtensions: allBindingsAccessor && allBindingsAccessor().filechooserFilter ? allBindingsAccessor().filechooserFilter : "",
           displayOnlyFolders: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.displayOnlyFolders
         });
-        $("#chooseFile").modal("show");
+        if (isIE11) {
+          var oldFocus = jQuery().modal.Constructor.prototype.enforceFocus;
+          jQuery().modal.Constructor.prototype.enforceFocus = function() {};
+          $("#chooseFile").modal("show");
+          window.setTimeout(function () {
+            jQuery().modal.Constructor.prototype.enforceFocus = oldFocus;
+          }, 5000);
+        } else {
+          $("#chooseFile").modal("show");
+        }
         if (!isNestedModal) {
           $("#chooseFile").on("hidden", function () {
             $("body").removeClass("modal-open");
