@@ -71,8 +71,7 @@
       if (options != null) {
         this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
       }
-    }
-    else {
+    } else {
       this.options = $.extend({}, defaults, options);
       if (options != null) {
         this.options.labels = $.extend({}, defaults.labels, options.labels);
@@ -93,8 +92,7 @@
       if (options != null) {
         self.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
       }
-    }
-    else {
+    } else {
       self.options = $.extend({}, defaults, options);
       if (options != null) {
         self.options.labels = $.extend({}, defaults.labels, options.labels);
@@ -112,19 +110,15 @@
     if (self.options.forceRefresh) {
       if (initialPath != "") {
         self.navigateTo(self.options.initialPath);
-      }
-      else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
+      } else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
         self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
-      }
-      else {
+      } else {
         self.navigateTo("/?default_to_home");
       }
-    }
-    else {
+    } else {
       if (initialPath != "") {
         self.navigateTo(self.options.initialPath);
-      }
-      else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
+      } else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
         self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
       }
     }
@@ -152,15 +146,12 @@
           if (storedPath !== null) {
             if (fs === 's3a' && storedPath.toLowerCase().indexOf('s3a') === -1) {
               self.navigateTo('S3A://');
-            }
-            else if (fs !== 's3a' && storedPath.toLowerCase().indexOf('s3a') > -1) {
+            } else if (fs !== 's3a' && storedPath.toLowerCase().indexOf('s3a') > -1) {
               self.navigateTo('/?default_to_home');
-            }
-            else {
+            } else {
               self.navigateTo(storedPath)
             }
-          }
-          else {
+          } else {
             self.navigateTo(fs === 's3a' ? 'S3A://' : '/?default_to_home');
           }
         });
@@ -219,8 +210,7 @@
           _parent.navigateTo(_parent.previousPath);
         });
         _previousLink.appendTo($(_parent.element).find('.filechooser-tree'));
-      }
-      else {
+      } else {
         if (data.type == "file") {
           _parent.navigateTo(data.view.dirname);
           return;
@@ -232,7 +222,7 @@
         var $search = $('<div>').html('<i class="fa fa-refresh inactive-action pointer" style="position: absolute; top: 3px; margin-left: -16px"></i> <i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding: 2px; padding-left: 20px">').css({
           'position': 'absolute',
           'right': '20px',
-          'background-color': '#FFF',
+          'background-color': '#FFF'
         });
 
         function slideOutInput() {
@@ -269,8 +259,7 @@
         $search.find('.fa-search').on('click', function(){
           if ($searchInput.is(':visible')){
             slideOutInput();
-          }
-          else {
+          } else {
             $search.find('.fa-refresh').hide();
             $searchInput.show().animate({
               'width': '100px'
@@ -331,8 +320,7 @@
             if (cnt < _bLength - 1) {
               if (cnt > 0) {
                 $("<span>").addClass("divider").text("/").appendTo(_crumb);
-              }
-              else {
+              } else {
                 $("<span>").html("&nbsp;").appendTo(_crumb);
               }
             }
@@ -394,8 +382,7 @@
               _flink.attr("href", "javascript:void(0)");
               if (file.path.toLowerCase().indexOf('s3a://') == 0 && (file.path.substr(6).indexOf('/') > -1 || file.path.substr(6) == '')) {
                 _flink.text(" " + (cnt > 0 ? file.name : ".."))
-              }
-              else {
+              } else {
                 _flink.text(" " + (file.name != "" ? file.name : ".."));
               }
               if (_flink.text() !== ' ..') {
@@ -404,8 +391,7 @@
               _flink.appendTo(_f);
               if (file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(5).indexOf('/') == -1) {
                 $("<i class='fa fa-cloud'></i>").prependTo(_flink);
-              }
-              else {
+              } else {
                 $("<i class='fa fa-folder'></i>").prependTo(_flink);
               }
               _flink.click(function () {
@@ -543,8 +529,7 @@
       }
       if (e.status === 404 || e.status === 500) {
         _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : (_parent.options.fsSelected === 's3a' ? 'S3A://' : '/?default_to_home'));
-      }
-      else {
+      } else {
         console.error(e);
         $(document).trigger("error", e.statusText);
       }
@@ -565,8 +550,7 @@
         num_of_pending_uploads--;
         if (responseJSON.status == -1) {
           $(document).trigger("error", responseJSON.data);
-        }
-        else if (num_of_pending_uploads == 0) {
+        } else if (num_of_pending_uploads == 0) {
           _parent.navigateTo(path);
         }
       },
@@ -602,11 +586,9 @@
       }
       if (initialPath != "") {
         self.navigateTo(self.options.initialPath);
-      }
-      else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
+      } else if ($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected) != null) {
         self.navigateTo($.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected));
-      }
-      else {
+      } else {
         self.navigateTo("/?default_to_home");
       }
     });
