@@ -249,12 +249,14 @@
           if (this.offsetWidth - 18 < e.clientX - this.getBoundingClientRect().left) {
             $searchInput.removeClass("x onX").val("");
           }
-        })
-        .on("blur", function (e) {
-          if ($searchInput.val() === ''){
-            slideOutInput();
-          }
         });
+        if (!isIE11) {
+          $searchInput.on("blur", function (e) {
+            if ($searchInput.val() === ''){
+              slideOutInput();
+            }
+          });
+        }
 
         $search.find('.fa-search').on('click', function(){
           if ($searchInput.is(':visible')){
@@ -421,8 +423,7 @@
             if ($(this).text().toLowerCase().indexOf(filter) > -1) {
               $(this).show();
               results++;
-            }
-            else {
+            } else {
               $(this).hide();
             }
           });
