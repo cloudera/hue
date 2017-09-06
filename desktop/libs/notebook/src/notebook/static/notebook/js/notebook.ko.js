@@ -690,7 +690,7 @@ var EditorViewModel = (function() {
         });
       }
       return statement;
-    });
+    }); 
 
     self.result = new Result(snippet, snippet.result);
     if (! self.result.hasSomeResults()) {
