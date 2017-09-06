@@ -1407,7 +1407,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
     <div class="grid-left-bar">
       <div>
-        <div style="margin-top:3px">
+        <div style="margin-top: 3px">
           <a class="grid-side-btn active" href="javascript: void(0)"
              data-bind="click: function(){ template.showChart(false); template.showGrid(true); }, css: {'active': template.showGrid() }" title="${_('Grid')}">
             <i class="fa fa-th fa-fw"></i>
@@ -1493,24 +1493,27 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
           <input type="hidden" name="download">
           <input type="hidden" name="type" value="">
+          <!-- ko if: widgetType() != 'resultset-widget' -->
+            <input type="hidden" name="facet" data-bind="value: ko.mapping.toJSON($data)">
+          <!-- /ko -->
           <div class="dropdown">
             <a class="grid-side-btn dropdown-toggle" style="padding-left:7px" data-toggle="dropdown">
               <i class="fa fa-download fa-fw"></i>
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a class="download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('csv'); $f.submit()}" title="${ _('Download first rows as JSON') }">
-                  <i class="hfo hfo-file-csv"></i> CSV
+                <a class="download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('csv'); $f.submit()}" title="${ _('Download first rows as CSV') }">
+                  <i class="hfo hfo-file-csv"></i> ${ _("CSV") }
                 </a>
               </li>
               <li>
                 <a class="download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('xls'); $f.submit()}" title="${ _('Download first rows as XLS') }">
-                  <i class="hfo hfo-file-xls"></i> Excel
+                  <i class="hfo hfo-file-xls"></i> ${ _("Excel") }
                 </a>
               </li>
               <li>
                 <a class="download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('json'); $f.submit()}" title="${ _('Download first rows as JSON') }">
-                  <i class="hfo hfo-file-json"></i> JSON
+                  <i class="hfo hfo-file-json"></i> ${ _("JSON") }
                 </a>
               </li>
               ##<li>
