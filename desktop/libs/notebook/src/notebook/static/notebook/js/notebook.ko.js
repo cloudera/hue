@@ -2229,7 +2229,7 @@ var EditorViewModel = (function() {
                 existingQuery[0].description(data.description);
                 existingQuery[0].last_modified(data.last_modified);
               }
-            } else {
+            } else if (self.snippets()[0].queries().length > 0) { // Saved queries tab already loaded
               self.snippets()[0].queries.unshift(ko.mapping.fromJS(data));
             }
 
