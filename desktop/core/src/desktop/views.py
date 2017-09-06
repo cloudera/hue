@@ -470,11 +470,21 @@ def get_banner_message(request):
   banner_message = None
   forwarded_host = request.META.get('HTTP_X_FORWARDED_HOST')
 
+  message = None;
+
+  if IS_HUE_4.get() and request.environ.get("PATH_INFO").find("/hue/") < 0:
+    url = request.build_absolute_uri("/hue")
+    link = '<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (url, url)
+    message = _('You are accessing an older version of Hue, please switch to latest version: %s.') % link
+
   if HUE_LOAD_BALANCER.get() and HUE_LOAD_BALANCER.get() != [''] and \
     (not forwarded_host or not any(forwarded_host in lb for lb in HUE_LOAD_BALANCER.get())):
-    banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s: %s</div>' % \
-      (_('You are accessing a non-optimized Hue, please switch to one of the available addresses'),
-      ", ".join(['<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
+    message = _('You are accessing a non-optimized Hue, please switch to one of the available addresses: %s') % \
+      (", ".join(['<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
+
+  if message:
+    banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s</div>' % message
+
   return banner_message
 
 def commonshare():
