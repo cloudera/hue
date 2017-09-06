@@ -3992,8 +3992,7 @@
             if (item.line !== null) {
               if (type === 'error') {
                 editor.addError(item.message, item.line + offset);
-              }
-              else {
+              } else {
                 editor.addWarning(item.message, item.line + offset);
               }
               if (cnt == 0) {
@@ -4881,7 +4880,8 @@
                 background-color: #E3F7FF;\
                 position: absolute;\
             }');
-            editor.scrollToLine(range.start.row, true, true, function () {});
+            var selectionRange = editor.getSelectionRange();
+            editor.scrollToLine(Math.min(selectionRange.start.row, selectionRange.end.row) + range.start.row, true, true, function () {});
           }
         }
         try {
