@@ -82,6 +82,9 @@ if USE_NEW_EDITOR.get():
         background-color: #F9F9F9;
         z-index: 1033;
       }
+      .main-content {
+        top: 106px!important;
+      }
       .navigator {
         top: 30px!important;
       }
