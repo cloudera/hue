@@ -619,7 +619,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-tables-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceTypes: [sourceType()] }); }" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: refresh" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     % if has_write_access:
       % if is_embeddable:
         <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().name ); }" title="${_('Create a new table')}" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
