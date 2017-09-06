@@ -71,7 +71,7 @@ var MetastoreViewModel = (function () {
     self.loadDatabases();
 
     huePubSub.subscribe('assist.db.refresh', function (options) {
-      if (['hive', 'impala'].indexOf(options.sourceType) == -1) {
+      if (typeof options.sourceTypes !== 'undefined' && options.sourceTypes.indexOf('hive') === -1 && options.sourceTypes.indexOf('impala') === -1 ) {
         return;
       }
       self.reloading(true);

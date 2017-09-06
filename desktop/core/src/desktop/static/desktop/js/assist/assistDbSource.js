@@ -304,7 +304,7 @@ var AssistDbSource = (function () {
     };
 
     huePubSub.subscribe('assist.db.refresh', function (options) {
-      if (options.sourceTypes.indexOf(self.sourceType) !== -1) {
+      if (typeof options.sourceTypes === 'undefined' || options.sourceTypes.indexOf(self.sourceType) !== -1) {
         window.setTimeout(function () {
           self.reload(options.allCacheTypes);
         }, 0);
