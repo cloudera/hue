@@ -303,6 +303,10 @@ var AssistDbSource = (function () {
       self.initDatabases();
     };
 
+    huePubSub.subscribe('assist.invalidate.on.refresh', function () {
+      self.invalidateOnRefresh('invalidate');
+    });
+
     huePubSub.subscribe('assist.db.refresh', function (options) {
       if (typeof options.sourceTypes === 'undefined' || options.sourceTypes.indexOf(self.sourceType) !== -1) {
         window.setTimeout(function () {
