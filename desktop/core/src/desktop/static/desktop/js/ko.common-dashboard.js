@@ -95,6 +95,7 @@ var Column = function (size, rows, vm) {
     var col = new Column(0, [], vm);
     vm.columns.push(col);
     col.expandColumn();
+    col.expandColumn(); // Twice
   }
 
   self.removeColumn = function () {
