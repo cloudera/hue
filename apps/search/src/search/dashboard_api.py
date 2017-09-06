@@ -35,6 +35,9 @@ class SearchApi(DashboardApi):
     self.api = SolrApi(SOLR_URL.get(), self.user)
 
   def query(self, collection, query, facet=None):
+    if facet:
+      collection['template']['rows'] = 0
+      collection['facets'] = [facet]
     response = self.api.query(collection, query)
     return augment_solr_response(response, collection, query)
 

@@ -271,10 +271,15 @@ def get_terms(request):
 def download(request):
   try:
     file_format = 'csv' if 'csv' == request.POST.get('type') else 'xls' if 'xls' == request.POST.get('type') else 'json'
+    facet = json.loads(request.POST.get('facet', '{}'))
+
     response = search(request)
 
     if file_format == 'json':
-      docs = json.loads(response.content)['response']['docs']
+      if facet:
+        docs = json.loads(response.content)['normalized_facets'][0]['docs']
+      else:
+        docs = json.loads(response.content)['response']['docs']
       resp = JsonResponse(docs, safe=False)
       resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
       return resp
