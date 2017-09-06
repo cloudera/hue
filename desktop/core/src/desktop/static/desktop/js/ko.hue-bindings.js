@@ -4875,13 +4875,15 @@
             }
           }
           if (!conflictingWithErrorMarkers) {
-            editor.session.addMarker(new AceRange(range.start.row, range.start.column, range.end.row, range.end.column), 'highlighted', 'line');
-            ace.require('ace/lib/dom').importCssString('.highlighted {\
-                background-color: #E3F7FF;\
-                position: absolute;\
-            }');
-            var selectionRange = editor.getSelectionRange();
-            editor.scrollToLine(Math.min(selectionRange.start.row, selectionRange.end.row) + range.start.row, true, true, function () {});
+            var lineOffset = snippet.lastAceSelectionRowOffset();
+            window.setTimeout(function () {
+              editor.session.addMarker(new AceRange(range.start.row + lineOffset, range.start.column, range.end.row + lineOffset, range.end.column), 'highlighted', 'line');
+              ace.require('ace/lib/dom').importCssString('.highlighted {\
+                  background-color: #E3F7FF;\
+                  position: absolute;\
+              }');
+              editor.scrollToLine(range.start.row + lineOffset, true, true, function () {});
+            }, 0);
           }
         }
         try {
