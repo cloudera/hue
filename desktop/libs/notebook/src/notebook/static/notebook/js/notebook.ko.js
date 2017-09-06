@@ -1141,6 +1141,7 @@ var EditorViewModel = (function() {
         (self.statementType() == 'document' && self.associatedDocumentUuid() && self.associatedDocumentUuid().length > 0);
     });
     self.lastExecuted = ko.observable(typeof snippet.lastExecuted != "undefined" && snippet.lastExecuted != null ? snippet.lastExecuted : 0);
+    self.lastAceSelectionRowOffset = ko.observable(snippet.lastAceSelectionRowOffset || 0);
 
     self.executingBlockingOperation = null; // A ExecuteStatement()
     self.showLongOperationWarning = ko.observable(false);
@@ -1165,6 +1166,11 @@ var EditorViewModel = (function() {
       }
       if (self.isSqlDialect()) {
         huePubSub.publish('editor.refresh.statement.locations', self);
+      }
+
+      if (self.ace()) {
+        var selectionRange = self.ace().getSelectionRange();
+        self.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
       }
 
       self.previousChartOptions = vm._getPreviousChartOptions(self);
@@ -2964,9 +2970,10 @@ var EditorViewModel = (function() {
         notebook.snippets().forEach(function (snippet) {
           snippet.statement_raw.valueHasMutated();
           if (snippet.result.handle().statements_count > 1 && snippet.result.handle().start != null && snippet.result.handle().end != null) {
+            var aceLineOffset = snippet.result.handle().aceLineOffset || 0;
             snippet.result.statement_range({
-              start: snippet.result.handle().start,
-              end: snippet.result.handle().end
+              start: { row: snippet.result.handle().start.row + aceLineOffset, column: snippet.result.handle().start.column },
+              end: { row: snippet.result.handle().end.row + aceLineOffset, column: snippet.result.handle().end.column }
             });
             snippet.result.statement_range.valueHasMutated();
           }
