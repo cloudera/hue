@@ -70,6 +70,13 @@ var MetastoreViewModel = (function () {
 
     self.loadDatabases();
 
+    self.refresh = function () {
+      if (self.sourceType() === 'impala') {
+        huePubSub.publish('assist.invalidate.on.refresh');
+      }
+      huePubSub.publish('assist.db.refresh', { sourceTypes: [ self.sourceType() ] });
+    };
+
     huePubSub.subscribe('assist.db.refresh', function (options) {
       if (typeof options.sourceTypes !== 'undefined' && options.sourceTypes.indexOf('hive') === -1 && options.sourceTypes.indexOf('impala') === -1 ) {
         return;
@@ -183,7 +190,7 @@ var MetastoreViewModel = (function () {
             name: name,
             optimizerEnabled: self.optimizerEnabled,
             navigatorEnabled: self.navigatorEnabled,
-            sourceType: self.sourceType,
+            sourceType: self.sourceType
           })
         }));
         self.loading(false);
