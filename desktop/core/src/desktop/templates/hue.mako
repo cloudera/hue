@@ -770,7 +770,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           opts.callback(self.processHeaders(opts.response));
         });
 
-        self.loadApp = function(app){
+        self.loadApp = function(app) {
+          if (self.currentApp() == 'editor') {
+           var vm = ko.dataFor($('#editorComponents')[0]);
+            if (vm.isPresentationMode()) {
+              vm.isPresentationMode(false);
+            }
+          }
+
           self.currentApp(app);
           if (!app.startsWith('security')) {
             self.lastContext = null;
