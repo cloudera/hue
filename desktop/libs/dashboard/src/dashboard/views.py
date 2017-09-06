@@ -87,7 +87,7 @@ def index(request, is_mobile=False):
     'initial': json.dumps({
         'collections': [],
         'layout': DEFAULT_LAYOUT,
-        'is_latest': LATEST.get(),
+        'is_latest': _get_latest(),
         'engines': get_engines(request.user)
     }),
     'is_owner': collection_doc.can_write(request.user) if USE_NEW_EDITOR.get() else collection_doc.doc.get().can_write(request.user),
@@ -115,7 +115,7 @@ def new_search(request):
       'initial': {
           'collections': collections,
           'layout': DEFAULT_LAYOUT,
-          'is_latest': LATEST.get(),
+          'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }
      })
@@ -126,7 +126,7 @@ def new_search(request):
       'initial': json.dumps({
           'collections': collections,
           'layout': DEFAULT_LAYOUT,
-          'is_latest': LATEST.get(),
+          'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }),
       'is_owner': True,
@@ -159,7 +159,7 @@ def browse(request, name, is_mobile=False):
                "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
           "drops":["temp"],"klass":"card card-home card-column span10"}
       ],
-      'is_latest': LATEST.get(),
+      'is_latest': _get_latest(),
       'engines': get_engines(request.user)
     }),
     'is_owner': True,
@@ -260,3 +260,7 @@ def admin_collection_copy(request):
   }
 
   return JsonResponse(response)
+
+
+def _get_latest():
+  return hasattr(LATEST, 'get') and LATEST.get() or True
