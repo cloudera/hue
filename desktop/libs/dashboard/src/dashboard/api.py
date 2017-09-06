@@ -273,19 +273,22 @@ def download(request):
     file_format = 'csv' if 'csv' == request.POST.get('type') else 'xls' if 'xls' == request.POST.get('type') else 'json'
     facet = json.loads(request.POST.get('facet', '{}'))
 
-    response = search(request)
+    json_response = search(request)
+    response = json.loads(json_response.content)
+
+    if facet:
+      response['response']['docs'] = response['normalized_facets'][0]['docs']
+      collection = facet
+    else:
+      collection = json.loads(request.POST.get('collection', '{}'))
 
     if file_format == 'json':
-      if facet:
-        docs = json.loads(response.content)['normalized_facets'][0]['docs']
-      else:
-        docs = json.loads(response.content)['response']['docs']
+      docs = response['response']['docs']
       resp = JsonResponse(docs, safe=False)
       resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
       return resp
     else:
-      collection = json.loads(request.POST.get('collection', '{}'))
-      return export_download(json.loads(response.content), file_format, collection)
+      return export_download(response, file_format, collection)
   except Exception, e:
     raise PopupException(_("Could not download search results: %s") % e)
 
