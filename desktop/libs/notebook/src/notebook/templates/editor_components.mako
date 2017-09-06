@@ -670,7 +670,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
-            <div class="inline-block inactive-action pointer" title="${_('Refresh')}" rel="tooltip" data-bind="click: fetchQueries"><i class="snippet-icon fa fa-refresh"></i></div>
           </a>
         </li>
         % if ENABLE_QUERY_BUILDER.get():
