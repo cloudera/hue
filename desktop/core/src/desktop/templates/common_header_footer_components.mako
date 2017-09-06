@@ -528,8 +528,10 @@ from metadata.conf import has_optimizer, OPTIMIZER
       $t.html('');
       var html = '';
       $el.find('thead th').each(function (colIdx, col) {
-        if (colIdx > 0){
-          html += '<tr><th width="10%">' + $(col).text() + '</th><td>' + $el.data('data')[data.idx][colIdx] + '</td></tr>';
+        if (colIdx > 0) {
+          var value = $el.data('data')[data.idx][colIdx];
+          var link = typeof value == 'string' && value.match(/^https?:\/\//i) ? '<a href="' + escapeOutput(value) + '" target="_blank">' + value + ' <i class="fa fa-external-link"></i></a>' : value;
+          html += '<tr><th width="10%">' + $(col).text() + '</th><td>' + link + '</td></tr>';
         }
       });
       $t.html(html);
