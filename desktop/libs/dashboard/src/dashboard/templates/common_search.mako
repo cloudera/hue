@@ -1493,6 +1493,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
           <input type="hidden" name="download">
           <input type="hidden" name="type" value="">
+          ## Similar to isGridLayout
           <!-- ko if: widgetType() != 'resultset-widget' -->
             <input type="hidden" name="facet" data-bind="value: ko.mapping.toJSON($data)">
           <!-- /ko -->
