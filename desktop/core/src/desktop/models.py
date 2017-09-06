@@ -1694,7 +1694,7 @@ class ClusterConfig():
             'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
             'tooltip': _('%s Dashboard') % interpreter['type'].title()
           } for interpreter in interpreters],
-        'page': '/dashboard/new_search'
+        'page': '/dashboard/new_search?engine=%(type)s' % interpreters[0]
       }
     else:
       return None

@@ -52,7 +52,7 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-left">
     <div class="app-header">
-      <a href="#" data-bind="hueLink: '${ url('search:new_search') }'">
+      <a href="#" data-bind="hueLink: '${ url('dashboard:new_search') }'">
         <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
         <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'dashboard' }} --><!-- /ko -->
       </a>
