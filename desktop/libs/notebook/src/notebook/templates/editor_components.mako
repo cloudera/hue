@@ -1157,8 +1157,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="notebook-actions">
   <div class="btn-group">
-    <a class="btn" rel="tooltip" data-placement="bottom" title="${ _("Execute all") }" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
+    <a class="btn" rel="tooltip" data-placement="bottom" title="${ _("Execute all") }" data-bind="visible: $root.selectedNotebook() && ! $root.selectedNotebook().isExecutingAll(), click: function() { $root.selectedNotebook().executeAll(); }">
       <i class="fa fa-fw fa-play"></i>
+    </a>
+    <a class="btn red" rel="tooltip" data-placement="bottom" title="${ _("Stop all") }" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().isExecutingAll(), click: function() { $root.selectedNotebook().cancelExecutingAll(); }">
+      <i class="fa fa-fw fa-stop"></i>
     </a>
 
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
