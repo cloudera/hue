@@ -226,31 +226,25 @@ var EditorViewModel = (function() {
       properties['app_jar'] = '';
       properties['class'] = '';
       properties['arguments'] = [];
-    }
-    else if (snippetType == 'distcp') {
+    } else if (snippetType == 'distcp') {
       properties['source_path'] = '';
       properties['destination_path'] = '';
-    }
-    else if (snippetType == 'shell') {
+    } else if (snippetType == 'shell') {
       properties['command_path'] = '';
       properties['arguments'] = [];
       properties['env_var'] = [];
       properties['capture_output'] = true;
-    }
-    else if (snippetType == 'py') {
+    } else if (snippetType == 'py') {
       properties['py_file'] = '';
       properties['arguments'] = [];
-    }
-    else if (snippetType == 'hive') {
+    } else if (snippetType == 'hive') {
       properties['settings'] = [];
       properties['files'] = [];
       properties['functions'] = [];
       properties['arguments'] = [];
-    }
-    else if (snippetType == 'impala') {
+    } else if (snippetType == 'impala') {
       properties['settings'] = [];
-    }
-    else if (snippetType == 'pig') {
+    } else if (snippetType == 'pig') {
       properties['parameters'] = [];
       properties['hadoopProperties'] = [];
       properties['resources'] = [];
@@ -305,13 +299,6 @@ var EditorViewModel = (function() {
       }
     });
 
-    // TODO: It should only publish if this belongs to the currently active app in Hue 4
-    huePubSub.subscribe('get.active.snippet.type', function () {
-      if (self.inFocus() || notebook.snippets().length === 1) {
-        huePubSub.publish('set.active.snippet.type', self.type());
-      }
-    }, vm.huePubSubId);
-
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;
     };
@@ -339,7 +326,7 @@ var EditorViewModel = (function() {
     self.database(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
     self.availableDatabases = ko.observableArray();
 
-    var updateDatabases = function () {
+    self.updateDatabases = function () {
       if (self.isSqlDialect()) {
         self.getApiHelper().loadDatabases({
           sourceType: self.type(),
@@ -351,39 +338,9 @@ var EditorViewModel = (function() {
       }
     };
 
-    huePubSub.subscribe('assist.db.refresh', function (options) {
-      if (['hive', 'impala'].indexOf(self.type()) !== -1) {
-        updateDatabases();
-      }
-    }, vm.huePubSubId);
-
-    huePubSub.subscribe('save.snippet.to.file', function() {
-      var data = {
-        path: self.statementPath(),
-        contents: self.statement()
-      };
-      var options = {
-        successCallback: function(result) {
-          if (result && result.exists) {
-            $(document).trigger("info", result.path + ' saved successfully.');
-          } else {
-            self._ajaxError(result);
-          }
-        }
-      };
-      var apiHelper = ApiHelper.getInstance();
-      apiHelper.saveSnippetToFile(data, options);
-    }, vm.huePubSubId);
-
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
     self.pinnedContextTabs = ko.observableArray(typeof snippet.pinnedContextTabs != "undefined" && snippet.pinnedContextTabs != null ? snippet.pinnedContextTabs : []);
-
-    huePubSub.subscribe('sql.context.pin', function (contextData) {
-      contextData.tabId = 'context' + self.pinnedContextTabs().length;
-      self.pinnedContextTabs.push(contextData);
-      self.currentQueryTab(contextData.tabId);
-    }, vm.huePubSubId);
 
     self.removeContextTab = function (context) {
       if (context.tabId === self.currentQueryTab()) {
@@ -458,8 +415,8 @@ var EditorViewModel = (function() {
       }
     };
 
-    self.isSqlDialect.subscribe(updateDatabases);
-    updateDatabases();
+    self.isSqlDialect.subscribe(self.updateDatabases);
+    self.updateDatabases();
 
     huePubSub.subscribeOnce('assist.source.set', function (source) {
       if (source !== self.type()) {
@@ -469,17 +426,16 @@ var EditorViewModel = (function() {
 
     huePubSub.publish('assist.get.source');
 
-    var handleAssistSelection = function (databaseDef) {
+    self.handleAssistSelection = function (databaseDef) {
       if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
         self.database(databaseDef.name);
       }
     };
 
-    huePubSub.subscribe("assist.database.set", handleAssistSelection, vm.huePubSubId);
-    huePubSub.subscribe("assist.database.selected", handleAssistSelection, vm.huePubSubId);
-
-    if (! self.database()) {
-      huePubSub.publish("assist.get.database", self.type());
+    if (!self.database()) {
+      huePubSub.publish("assist.get.database.callback", { source: self.type(), callback: function (databaseDef) {
+        self.handleAssistSelection(databaseDef);
+      }});
     }
 
     self.statementType = ko.observable(typeof snippet.statementType != "undefined" && snippet.statementType != null ? snippet.statementType : 'text');
@@ -2844,6 +2800,27 @@ var EditorViewModel = (function() {
       }
     });
 
+    var withActiveSnippet = function (callback) {
+      var notebook = self.selectedNotebook();
+      var foundSnippet;
+      if (notebook) {
+        if (notebook.snippets().length === 1) {
+          foundSnippet = notebook.snippets()[0];
+        } else {
+          notebook.snippets().every(function (snippet) {
+            if (snippet.inFocus()) {
+              foundSnippet = snippet;
+              return false;
+            }
+            return true;
+          });
+        }
+      }
+      if (foundSnippet) {
+        callback(foundSnippet);
+      }
+    };
+
     huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
       if (self.isRightPanelAvailable() && !self.isRightPanelVisible()) {
         self.isRightPanelVisible(true);
@@ -2856,6 +2833,62 @@ var EditorViewModel = (function() {
     });
 
     huePubSub.subscribe('context.panel.visible.editor', self.isContextPanelVisible);
+
+    huePubSub.subscribe('get.active.snippet.type', function () {
+      withActiveSnippet(function (activeSnippet) {
+        huePubSub.publish('set.active.snippet.type', activeSnippet.type());
+      })
+    }, self.huePubSubId);
+
+    huePubSub.subscribe('assist.db.refresh', function (options) {
+      var notebook = self.selectedNotebook();
+      if (notebook) {
+        notebook.snippets().forEach(function (snippet) {
+          if (['hive', 'impala'].indexOf(snippet.type()) !== -1) {
+            snippet.updateDatabases();
+          }
+        });
+      }
+    }, self.huePubSubId);
+
+    huePubSub.subscribe('save.snippet.to.file', function() {
+      withActiveSnippet(function (activeSnippet) {
+        var data = {
+          path: activeSnippet.statementPath(),
+          contents: activeSnippet.statement()
+        };
+        var options = {
+          successCallback: function (result) {
+            if (result && result.exists) {
+              $(document).trigger("info", result.path + ' saved successfully.');
+            } else {
+              self._ajaxError(result);
+            }
+          }
+        };
+        ApiHelper.getInstance().saveSnippetToFile(data, options);
+      });
+    }, self.huePubSubId);
+
+    huePubSub.subscribe('sql.context.pin', function (contextData) {
+      withActiveSnippet(function (activeSnippet) {
+        contextData.tabId = 'context' + activeSnippet.pinnedContextTabs().length;
+        activeSnippet.pinnedContextTabs.push(contextData);
+        activeSnippet.currentQueryTab(contextData.tabId);
+      });
+    }, self.huePubSubId);
+
+    huePubSub.subscribe("assist.database.set", function (databaseDef) {
+      withActiveSnippet(function (activeSnippet) {
+        activeSnippet.handleAssistSelection(databaseDef);
+      });
+    }, self.huePubSubId);
+
+    huePubSub.subscribe("assist.database.selected", function (databaseDef) {
+      withActiveSnippet(function (activeSnippet) {
+        activeSnippet.handleAssistSelection(databaseDef);
+      });
+    }, self.huePubSubId);
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 

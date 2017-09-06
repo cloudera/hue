@@ -1985,18 +1985,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <%def name="commonJS(is_embeddable=False, bindableElement='editorComponents', suffix='')">
 
 <script type="text/javascript">
+  var HUE_PUB_SUB_EDITOR_ID = (window.location.pathname.indexOf('notebook') > -1) ? 'notebook' : 'editor';
   % if is_embeddable:
   var MAIN_SCROLLABLE = '.page-content';
-  var HUE_PUB_SUB_EDITOR_ID = 'editor' + (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : '');
   % else:
   var MAIN_SCROLLABLE = '.content-panel';
-  var HUE_PUB_SUB_EDITOR_ID = 'editor';
   var shareViewModel = initSharing("#documentShareModal");
   % endif
 
-  if (window.location.pathname.indexOf('notebook') > -1) {
-    HUE_PUB_SUB_EDITOR_ID = 'notebook';
-  }
 
 
   var isLeftNavOpen = false;
@@ -3489,14 +3485,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               $("#snippet_" + options.snippet.id()).find("select").trigger("chosen:updated");
               _dt = createDatatable(_el, options.snippet, viewModel);
               resetResultsResizer(options.snippet);
-            }
-            else {
+            } else {
               _dt = _el.hueDataTable();
             }
             try {
               _dt.fnAddData(options.data);
-            }
-            catch (e) {}
+            } catch (e) {}
             var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
             huePubSub.publish('editor.snippet.result.normal', options.snippet);
             _dtElement.scrollTop(_dtElement.data("scrollPosition"));
@@ -3513,7 +3507,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             scrollInertia: 0
           });
         }, 200)
-
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('editor.redraw.data', function (options) {
