@@ -612,15 +612,19 @@ var EditorViewModel = (function() {
       if (self.type() == 'pig') {
         matches = self.getPigParameters();
       } else {
-        var re = /(?:^|\W)\${(\w*\=?[\w\s]*)}/g;
-        while (match = re.exec(self.statement_raw())) {
-          if (match[1].indexOf('=') > -1) {
-              var splittedName = match[1].split('=');
-              matches[splittedName[0]] = matches[splittedName[0]] || splittedName[1];
-            }
-            else {
-              matches[match[1]] = '';
-            }
+        var re = /(?:^|\W)\${(\w*)\=?([\w\s]*)}/g;
+        var reComment = /(^\s*--.*)|(\/\*[\s\S]*?\*\/)/gm;
+        var statement = self.statement_raw();
+        var matchComment = reComment.exec(statement);
+        //if re is n & reComment is m
+        //finding variables is O(n+m)
+        while (match = re.exec(statement)) {
+          while (matchComment && match.index > matchComment.index + matchComment[0].length) { //comments before our match
+            matchComment = reComment.exec(statement);
+          }
+          var isWithinComment = matchComment && match.index >= matchComment.index;
+          if (isWithinComment) continue;
+          matches[match[1]] = matches[match[1]] || match[2];
         }
       }
       return Object.keys(matches).map(function (match) {
@@ -653,9 +657,17 @@ var EditorViewModel = (function() {
     });
     self.statement = ko.computed(function () {
       var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
-      $.each(self.variables(), function (index, variable) {
-        statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{" : "") + variable.name() + "(=[^}]*)?" + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), "$1" + (variable.value() || variable.defaultValue()));
-      });
+      var variables = self.variables().reduce(function (variables, variable) {
+        variables[variable.name()] = variable;
+        return variables;
+      }, {});
+      if (self.variables().length) {
+        var variablesString = self.variables().map(function(variable) { return variable.name(); }).join("|");
+        statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{(" : "(") + variablesString + ")(=[^}]*)?" + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), function(match, p1, p2){
+          var variable = variables[p2];
+          return p1 + (variable && (variable.value() || variable.defaultValue()));
+        });
+      }
       return statement;
     });
 
