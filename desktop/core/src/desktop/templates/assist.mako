@@ -1115,6 +1115,20 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           }
         });
 
+        huePubSub.subscribe('assist.get.database.callback',  function (options) {
+          if (self.sourceIndex[options.source] && self.sourceIndex[options.source].selectedDatabase()) {
+            options.callback({
+              source: options.source,
+              name: self.sourceIndex[options.source].selectedDatabase().databaseName
+            });
+          } else {
+            options.callback({
+              source: options.source,
+              name: 'default'
+            });
+          }
+        });
+
         huePubSub.subscribe('assist.get.source', function () {
           huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
         });
