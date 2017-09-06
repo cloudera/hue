@@ -868,15 +868,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.isLoadingEmbeddable(false);
           }
           window.document.title = 'Hue - ' + EMBEDDABLE_PAGE_URLS[app].title;
-          if (app === 'editor'){
-            var affix = (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : '');
-            window.resumeAppIntervals(app + affix);
-            huePubSub.resumeAppSubscribers(app + affix);
-          }
-          else {
-            window.resumeAppIntervals(app);
-            huePubSub.resumeAppSubscribers(app);
-          }
+          window.resumeAppIntervals(app);
+          huePubSub.resumeAppSubscribers(app);
           $('.embeddable').hide();
           $('#embeddable_' + app).show();
           huePubSub.publish('app.gained.focus', app);
