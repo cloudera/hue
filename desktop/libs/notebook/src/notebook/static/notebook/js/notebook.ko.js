@@ -1157,6 +1157,11 @@ var EditorViewModel = (function() {
 
     self.executingBlockingOperation = null; // A ExecuteStatement()
     self.showLongOperationWarning = ko.observable(false);
+    self.showLongOperationWarning.subscribe(function(newValue) {
+      if (newValue) {
+        hueAnalytics.convert('editor', 'showLongOperationWarning');
+      }
+    });
 
     var longOperationTimeout = -1;
 
