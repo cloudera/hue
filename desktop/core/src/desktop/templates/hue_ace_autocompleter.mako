@@ -505,8 +505,11 @@ from desktop.views import _ko
           }
           return;
         }
-        var valueToInsert = self.suggestions.filtered()[self.selectedIndex()].value;
-
+        var selectedSuggestion = self.suggestions.filtered()[self.selectedIndex()];
+        var valueToInsert = selectedSuggestion.value;
+        if (selectedSuggestion.popular() && selectedSuggestion.category) {
+          hueAnalytics.convert('editor', 'popularAutocomplete/' + self.suggestions.filtered()[self.selectedIndex()].category.id)
+        }
         // Not always the case as we also match in comments
         if (valueToInsert.toLowerCase() === self.suggestions.filter().toLowerCase()) {
           // Close the autocompleter when the user has typed a complete suggestion
