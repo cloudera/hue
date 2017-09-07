@@ -83,7 +83,6 @@ var Autocompleter = (function () {
       }, editor);
     } catch (err) {
       editor.hideSpinner();
-      throw err;
     }
   };
 
