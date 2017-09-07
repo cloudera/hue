@@ -923,7 +923,7 @@ class Document2QueryMixin(object):
     """
     documents = self
 
-    if types and isinstance(types, list):
+    if types and isinstance(types, list) and types[0] != 'all':
       documents = documents.filter(type__in=types)
 
     if search_text:
