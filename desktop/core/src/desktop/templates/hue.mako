@@ -1141,6 +1141,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (!self.assistWithoutStorage()){
             self.apiHelper.setInTotalStorage('assist', 'left_assist_panel_visible', val);
           }
+          hueAnalytics.convert('hue', 'leftAssistVisible/' + val);
           window.setTimeout(function () {
             huePubSub.publish('split.panel.resized');
           }, 0);
@@ -1151,6 +1152,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (!self.assistWithoutStorage()){
             self.apiHelper.setInTotalStorage('assist', 'right_assist_panel_visible', val);
           }
+          hueAnalytics.convert('hue', 'rightAssistVisible/' + val)
           window.setTimeout(function () {
             huePubSub.publish('reposition.scroll.anchor.up');
             huePubSub.publish('nicescroll.resize');
@@ -1237,6 +1239,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.leftNavVisible = ko.observable(false);
         self.leftNavVisible.subscribe(function (val) {
           huePubSub.publish('left.nav.open.toggle', val);
+          hueAnalytics.convert('hue', 'leftNavVisible/' + val);
         });
 
         self.onePageViewModel.currentApp.subscribe(function () {
