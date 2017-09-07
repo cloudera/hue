@@ -507,9 +507,6 @@ from desktop.views import _ko
         if (valueToInsert.toLowerCase() === self.suggestions.filter().toLowerCase()) {
           // Close the autocompleter when the user has typed a complete suggestion
           self.detach();
-          if (emptyCallback) {
-            emptyCallback();
-          }
           return;
         }
         if (self.suggestions.filter()) {
