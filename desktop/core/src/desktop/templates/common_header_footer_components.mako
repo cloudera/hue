@@ -522,6 +522,10 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
   $(document).ready(function () {
 
+    if (window.performance && window.performance.navigation && window.performance.navigation.type === 1) {
+      hueAnalytics.convert('hue', 'pageReloaded' + window.location.pathname);
+    }
+
     huePubSub.subscribe('table.row.dblclick', function(data){
       var $el = $(data.table);
       var $t = $('#rowDetailsModal').find('table');
