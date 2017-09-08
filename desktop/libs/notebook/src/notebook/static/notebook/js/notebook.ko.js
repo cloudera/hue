@@ -648,7 +648,7 @@ var EditorViewModel = (function() {
         var variable = self.variables()[index];
         variable.name(item.name);
         variable.defaultValue(item.defaultValue);
-        variable.value(self.variableValues[item.name] || variable.value() || "");
+        variable.value(self.variableValues[item.name] || (!needsMore && variable.value()) || "");
       });
     });
     self.statement = ko.computed(function () {
