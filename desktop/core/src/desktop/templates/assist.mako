@@ -556,7 +556,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <!-- ko with: activeEntry -->
     <div class="assist-flex-header assist-breadcrumb">
       <!-- ko ifnot: isRoot -->
-      <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
+      <a href="javascript: void(0);" data-bind="click: function () { if (loaded()) { parent.makeActive(); } }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
         <span data-bind="text: definition().name, attr: {'title': definition().name }"></span>
@@ -1199,25 +1199,47 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
        **/
       function AssistDocumentsPanel (options) {
         var self = this;
+        self.apiHelper = options.apiHelper;
+        self.user = options.user;
 
         self.activeEntry = ko.observable();
-        var root = new HueFileEntry({
-          activeEntry: self.activeEntry,
-          trashEntry: ko.observable(),
-          apiHelper: options.apiHelper,
-          app: 'documents',
-          user: options.user,
-          activeSort: ko.observable('name'),
-          definition: {
-            name: '/',
-            type: 'directory'
+
+        var lastOpenedUuid = self.apiHelper.getFromTotalStorage('assist', 'last.opened.assist.doc.uuid');
+
+        if (lastOpenedUuid) {
+          self.activeEntry(new HueFileEntry({
+            activeEntry: self.activeEntry,
+            trashEntry: ko.observable(),
+            apiHelper: self.apiHelper,
+            app: 'documents',
+            user: self.user,
+            activeSort: ko.observable('name'),
+            definition: {
+              uuid: lastOpenedUuid,
+              type: 'directory'
+            }
+          }))
+        } else {
+          self.fallbackToRoot();
+        }
+
+        self.activeEntry.subscribe(function (newEntry) {
+          if (!newEntry.loaded()) {
+            var loadedSub = newEntry.loaded.subscribe(function (loaded) {
+              if (loaded && !newEntry.hasErrors() && newEntry.definition() && newEntry.definition().uuid) {
+                self.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', newEntry.definition().uuid);
+              }
+              loadedSub.dispose();
+            })
+          } else if (!newEntry.hasErrors() && newEntry.definition() && newEntry.definition().uuid) {
+            self.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', newEntry.definition().uuid);
           }
         });
-        self.activeEntry(root);
 
         self.reload = function () {
-          self.activeEntry(root);
-          self.activeEntry().load();
+          self.activeEntry().load(function () {}, function () {
+            self.fallbackToRoot();
+          });
         };
 
         huePubSub.subscribe('assist.document.refresh', function () {
@@ -1226,10 +1248,32 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         });
       }
 
+      AssistDocumentsPanel.prototype.fallbackToRoot = function () {
+        var self = this;
+        if (!self.activeEntry() || self.activeEntry().definition() && (self.activeEntry().definition().path !== '/' || self.activeEntry().definition().uuid)) {
+          self.apiHelper.setInTotalStorage('assist', 'last.opened.assist.doc.uuid', null);
+          self.activeEntry(new HueFileEntry({
+            activeEntry: self.activeEntry,
+            trashEntry: ko.observable(),
+            apiHelper: self.apiHelper,
+            app: 'documents',
+            user: self.user,
+            activeSort: ko.observable('name'),
+            definition: {
+              name: '/',
+              type: 'directory'
+            }
+          }));
+          self.activeEntry().load();
+        }
+      };
+
       AssistDocumentsPanel.prototype.init = function () {
         var self = this;
         if (! self.activeEntry().loaded()) {
-          self.activeEntry().load();
+          self.activeEntry().load(function () {}, function () {
+            self.fallbackToRoot();
+          }, true);
         }
       };
 
