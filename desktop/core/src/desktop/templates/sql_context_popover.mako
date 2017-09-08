@@ -342,22 +342,13 @@ from metadata.conf import has_navigator
       var HALF_ARROW = 6;
 
       var preventHide = false;
-      var intervals = [];
-      var pubSubs = [];
 
       var hidePopover = function () {
         if (! preventHide) {
           if ($('#sqlContextPopover').length > 0) {
             ko.cleanNode($('#sqlContextPopover')[0]);
-            huePubSub.publish('context.popover.dispose');
             $('#sqlContextPopover').remove();
             $(document).off('click', hideOnClickOutside);
-            while (intervals.length > 0) {
-              window.clearInterval(intervals.pop());
-            }
-            while (pubSubs.length > 0) {
-              pubSubs.pop().remove();
-            }
             huePubSub.publish('context.popover.hidden');
           }
         }
@@ -459,6 +450,7 @@ from metadata.conf import has_navigator
       function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn, isComplex) {
         var self = this;
         self.tabs = ko.observableArray();
+        self.disposals = [];
 
         var apiHelper = ApiHelper.getInstance();
 
@@ -601,7 +593,7 @@ from metadata.conf import has_navigator
           });
         }
 
-        intervals.push(window.setInterval(function () {
+        var sampleInterval = window.setInterval(function () {
           if (self.activeTab() !== 'sample') {
             return;
           }
@@ -611,7 +603,11 @@ from metadata.conf import has_navigator
           }
 
           $t.parents('.dataTables_wrapper').getNiceScroll().resize();
-        }, 300));
+        }, 300);
+
+        self.disposals.push(function () {
+          window.clearInterval(sampleInterval);
+        });
 
         var performScrollToColumn = function (colName) {
           self.activeTab('sample');
@@ -637,7 +633,7 @@ from metadata.conf import has_navigator
           }, 0);
         };
 
-        pubSubs.push(huePubSub.subscribe('context.popover.scroll.to.column', function (colName) {
+        var scrollPubSub = huePubSub.subscribe('context.popover.scroll.to.column', function (colName) {
           if (typeof self.sample.fetchedData() === 'undefined') {
             self.sample.fetch(function (data) {
               self.initializeSamplesTable(data);
@@ -648,21 +644,102 @@ from metadata.conf import has_navigator
           } else {
             performScrollToColumn(colName);
           }
-        }));
+        });
+        self.disposals.push(function () {
+          scrollPubSub.remove();
+        });
 
         apiHelper.identifierChainToPath({
           sourceType: sourceType,
           defaultDatabase: defaultDatabase,
           identifierChain: data.identifierChain
         }, function (path) {
-          pubSubs.push(huePubSub.subscribe('context.popover.show.in.assist', function () {
+          var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
             huePubSub.publish('assist.db.highlight', {
               sourceType: sourceType,
               path: path
             });
-          }));
+          });
+          self.disposals.push(function () {
+            showInAssistPubSub.remove();
+          })
         });
+
+        self.initializeSamplesTable = function (data) {
+          window.setTimeout(function () {
+            var $t = $('.samples-table');
+
+            if ($t.parent().hasClass('dataTables_wrapper')) {
+              if ($t.parent().data('scrollFnDt')) {
+                $t.parent().off('scroll', $t.parent().data('scrollFnDt'));
+              }
+              $t.unwrap();
+              if ($t.children('tbody').length > 0) {
+                $t.children('tbody').empty();
+              } else {
+                $t.children('tr').remove();
+              }
+              $t.data('isScrollAttached', null);
+              $t.data('data', []);
+            }
+            var dt = $t.hueDataTable({
+              i18n: {
+                NO_RESULTS: "${_('No results found.')}",
+                OF: "${_('of')}"
+              },
+              fnDrawCallback: function (oSettings) {
+              },
+              scrollable: '.dataTables_wrapper',
+              forceInvisible: 10
+            });
+
+            $t.parents('.dataTables_wrapper').height($t.parents('.sample-scroll').parent().height());
+
+            $t.jHueTableExtender2({
+              fixedHeader: true,
+              fixedFirstColumn: true,
+              fixedFirstColumnTopMargin: -2,
+              headerSorting: false,
+              includeNavigator: false,
+              parentId: 'sampleTab',
+              noSort: true,
+              mainScrollable: '.sample-scroll > .dataTables_wrapper'
+            });
+
+            huePubSub.subscribe('context.popover.resized', function () {
+              $t.parent().height($t.parents('.context-sample-container').height());
+            });
+
+            self.disposals.push(function () {
+              if ($t.data('plugin_jHueTableExtender2')) {
+                $t.data('plugin_jHueTableExtender2').destroy();
+              }
+              huePubSub.removeAll('context.popover.resized');
+            });
+
+            hueUtils.initNiceScroll($t.parents('.dataTables_wrapper'));
+
+            if (data && data.rows) {
+              var _tempData = [];
+              $.each(data.rows, function (index, row) {
+                var _row = row.slice(0); // need to clone the array otherwise it messes with the caches
+                _row.unshift(index + 1);
+                _tempData.push(_row);
+              });
+              if (_tempData.length > 0) {
+                dt.fnAddData(_tempData);
+              }
+            }
+          }, 0);
+        };
       }
+
+      TableAndColumnContextTabs.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
 
       TableAndColumnContextTabs.prototype.notFound = function (data) {
         var self = this;
@@ -690,75 +767,6 @@ from metadata.conf import has_navigator
       TableAndColumnContextTabs.prototype.refetchSamples = function () {
         var self = this;
         self.sample.fetch(self.initializeSamplesTable);
-      };
-
-      TableAndColumnContextTabs.prototype.initializeSamplesTable = function (data) {
-        window.setTimeout(function () {
-          var $t = $('.samples-table');
-
-          if ($t.parent().hasClass('dataTables_wrapper')) {
-            if ($t.parent().data('scrollFnDt')) {
-              $t.parent().off('scroll', $t.parent().data('scrollFnDt'));
-            }
-            $t.unwrap();
-            if ($t.children('tbody').length > 0) {
-              $t.children('tbody').empty();
-            }
-            else {
-              $t.children('tr').remove();
-            }
-            $t.data('isScrollAttached', null);
-            $t.data('data', []);
-          }
-          var dt = $t.hueDataTable({
-            i18n: {
-              NO_RESULTS: "${_('No results found.')}",
-              OF: "${_('of')}"
-            },
-            fnDrawCallback: function (oSettings) {
-            },
-            scrollable: '.dataTables_wrapper',
-            forceInvisible: 10
-          });
-
-          $t.parents('.dataTables_wrapper').height($t.parents('.sample-scroll').parent().height());
-
-          $t.jHueTableExtender2({
-            fixedHeader: true,
-            fixedFirstColumn: true,
-            fixedFirstColumnTopMargin: -2,
-            headerSorting: false,
-            includeNavigator: false,
-            parentId: 'sampleTab',
-            noSort: true,
-            mainScrollable: '.sample-scroll > .dataTables_wrapper'
-          });
-
-          huePubSub.subscribeOnce('context.popover.dispose', function () {
-            if ($t.data('plugin_jHueTableExtender2')) {
-              $t.data('plugin_jHueTableExtender2').destroy();
-            }
-            huePubSub.removeAll('context.popover.resized');
-          });
-
-          huePubSub.subscribe('context.popover.resized', function () {
-            $t.parent().height($t.parents('.context-sample-container').height());
-          });
-
-          hueUtils.initNiceScroll($t.parents('.dataTables_wrapper'));
-
-          if (data && data.rows) {
-            var _tempData = [];
-            $.each(data.rows, function (index, row) {
-              var _row = row.slice(0); // need to clone the array otherwise it messes with the caches
-              _row.unshift(index + 1);
-              _tempData.push(_row);
-            });
-            if (_tempData.length > 0) {
-              dt.fnAddData(_tempData);
-            }
-          }
-        }, 0);
       };
 
       function DatabaseContextTabs(data, sourceType, defaultDatabase) {
@@ -893,6 +901,8 @@ from metadata.conf import has_navigator
       function HdfsContextTabs(data) {
         var self = this;
 
+        self.disposals = [];
+
         // TODO: Update Ace token with selected path
         self.data = ko.observable({
           details: data,
@@ -901,22 +911,36 @@ from metadata.conf import has_navigator
           selectedPath: ko.observable(data.path)
         });
 
-        pubSubs.push(huePubSub.subscribe('context.popover.open.in.file.browser', function () {
+        var showInFileBrowserPubSub = huePubSub.subscribe('context.popover.open.in.file.browser', function () {
           window.open((data.path.indexOf('/') === 0 ? '/filebrowser/#' : '/filebrowser/#/') + data.path, '_blank');
-        }));
+        });
 
-        pubSubs.push(huePubSub.subscribe('context.popover.replace.in.editor', function () {
+        self.disposals.push(function () {
+          showInFileBrowserPubSub.remove();
+        });
+
+        var replaceInEditorPubSub = huePubSub.subscribe('context.popover.replace.in.editor', function () {
           huePubSub.publish('ace.replace', {
             location: data.location,
             text: self.data().selectedPath()
           });
-        }));
+        });
+        self.disposals.push(function () {
+          replaceInEditorPubSub.remove();
+        });
 
         self.tabs = [
           { id: 'details', label: '${ _("Details") }', template: 'sql-context-hdfs-details', templateData: self.data }
         ];
         self.activeTab = ko.observable('details');
       }
+
+      HdfsContextTabs.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
 
       function FunctionContextTabs(data, sourceType) {
         var self = this;
@@ -1077,7 +1101,7 @@ from metadata.conf import has_navigator
 
       function SqlContextPopoverViewModel(params) {
         var self = this;
-        self.disposalFunctions = [];
+        self.disposals = [];
 
         var apiHelper = ApiHelper.getInstance();
 
@@ -1109,12 +1133,17 @@ from metadata.conf import has_navigator
           var $source = $(params.source.element);
           var originalSourceOffset = $source.offset();
           var currentSourceOffset;
-          intervals.push(window.setInterval(function () {
+
+          var detectMoveInterval = window.setInterval(function () {
             currentSourceOffset = $source.offset();
             if (currentSourceOffset.left !== originalSourceOffset.left || currentSourceOffset.top !== originalSourceOffset.top) {
               hidePopover();
             }
-          }, 200));
+          }, 200);
+
+          self.disposals.push(function () {
+            window.clearInterval(detectMoveInterval);
+          });
         }
 
         var windowWidth = $(window).width();
@@ -1247,23 +1276,30 @@ from metadata.conf import has_navigator
             identifierChain: self.data.identifierChain,
             defaultDatabase: self.defaultDatabase
           }, function (path) {
-            pubSubs.push(huePubSub.subscribe('context.popover.open.in.metastore', function (type) {
+
+            var showInMetastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function (type) {
               if (IS_HUE_4) {
                 huePubSub.publish('open.link', '/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'));
                 huePubSub.publish('context.popover.hide');
               } else {
                 window.open('/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'), '_blank');
               }
-            }));
+            });
+            self.disposals.push(function () {
+              showInMetastorePubSub.remove();
+            });
             % if HAS_SQL_ENABLED.get():
-            pubSubs.push(huePubSub.subscribe('context.popover.open.in.dashboard', function () {
+            var openInDashboardPubSub = huePubSub.subscribe('context.popover.open.in.dashboard', function () {
               if (IS_HUE_4) {
                 huePubSub.publish('open.link', '/hue/dashboard/browse/' + path.join('.') + '?engine=' + self.sourceType);
                 huePubSub.publish('context.popover.hide');
               } else {
                 window.open('/hue/dashboard/browse/' + path.join('.') + '?engine=' + self.sourceType, '_blank');
               }
-            }));
+            });
+            self.disposals.push(function () {
+              openInDashboardPubSub.remove();
+            });
             % endif
           });
         }
@@ -1291,7 +1327,7 @@ from metadata.conf import has_navigator
 
           $('.hue-popover').on('click', keepPopoverOpenOnClick);
 
-          self.disposalFunctions.push(function () {
+          self.disposals.push(function () {
             $(params.delayedHide).add($('.hue-popover')).off('mouseleave', onLeave).off('mouseenter', onEnter);
             $('.hue-popover').off('click', keepPopoverOpenOnClick);
           });
@@ -1305,7 +1341,7 @@ from metadata.conf import has_navigator
 
         $(document).on('keyup', closeOnEsc);
 
-        self.disposalFunctions.push(function () {
+        self.disposals.push(function () {
           $(document).off('keyup', closeOnEsc);
         });
 
@@ -1313,16 +1349,21 @@ from metadata.conf import has_navigator
           $(document).on('click', hideOnClickOutside);
         }, 0);
 
-        self.disposalFunctions.push(function () {
+        self.disposals.push(function () {
           $(document).off('click', hideOnClickOutside);
         })
       }
 
       SqlContextPopoverViewModel.prototype.dispose = function() {
         var self = this;
-        self.disposalFunctions.forEach(function (fn) {
-          fn();
-        })
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+
+        if(self.contents && self.contents.dispose) {
+          self.contents.dispose();
+        }
+        huePubSub.publish('context.popover.dispose');
       };
 
       SqlContextPopoverViewModel.prototype.pin = function () {
@@ -1397,14 +1438,18 @@ from metadata.conf import has_navigator
         } else if (self.isColumn) {
           self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', true, false);
         }
-
       };
 
       SqlContextContentsGlobalSearch.prototype.dispose = function () {
         var self = this;
-        self.disposals.forEach(function (dispose) {
-          dispose();
-        })
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+        if (self.contents && self.contents.dispose) {
+          self.contents.dispose();
+        }
+
+        huePubSub.publish('context.popover.dispose');
       };
 
       ko.components.register('sql-context-contents-global-search', {
