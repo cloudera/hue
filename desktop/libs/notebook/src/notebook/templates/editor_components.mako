@@ -3133,6 +3133,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         huePubSub.publish('set.selected.notebook', viewModel.selectedNotebook());
       }, HUE_PUB_SUB_EDITOR_ID);
 
+      huePubSub.subscribe('left.assist.show', function () {
+        if (!viewModel.isLeftPanelVisible() && viewModel.assistAvailable()) {
+          viewModel.isLeftPanelVisible(true);
+        }
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       var wasResultFullScreenMode = false;
       var isAssistAvailable = viewModel.assistAvailable();
@@ -3146,6 +3151,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           viewModel.isResultFullScreenMode(false);
         }
       }
+
       function togglePresentation(value) {
         viewModel.isEditing(! viewModel.isEditing());
         if (value) {
