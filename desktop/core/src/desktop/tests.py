@@ -826,9 +826,9 @@ def test_ui_customizations():
 
   try:
     c = make_logged_in_client()
-    resp = c.get('/accounts/login/', follow=False)
+    resp = c.get('/hue/accounts/login/', follow=False)
     assert_true(custom_message in resp.content, resp)
-    resp = c.get('/about', follow=True)
+    resp = c.get('/hue/about', follow=True)
     assert_true(custom_message in resp.content, resp)
   finally:
     for old_conf in reset:
