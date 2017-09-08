@@ -18,6 +18,7 @@
 import logging
 import json
 import StringIO
+import re
 import tempfile
 import zipfile
 
@@ -34,7 +35,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from metadata.conf import has_navigator
-from metadata.navigator_api import search_entities as metadata_search_entities
+from metadata.navigator_api import search_entities as metadata_search_entities, _highlight
 from metadata.navigator_api import search_entities_interactive as metadata_search_entities_interactive
 from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties
@@ -601,8 +602,8 @@ def search_entities(request):
     entities = _search(user=request.user, search_text=search_text)
     response = {
       'entities': [{
-          'hue_name': escape(e.name),
-          'hue_description': escape(e.description),
+          'hue_name': _highlight(search_text, escape(e.name)),
+          'hue_description': _highlight(search_text, escape(e.description)),
           'type': 'HUE',
           'doc_type': escape(e.type),
           'originalName': escape(e.name),
@@ -630,8 +631,8 @@ def search_entities_interactive(request):
     entities = _search(user=request.user, search_text=search_text, limit=limit)
     response = {
       'results': [{
-          'hue_name': escape(e.name),
-          'hue_description': escape(e.description),
+          'hue_name': _highlight(search_text, escape(e.name)),
+          'hue_description': _highlight(search_text, escape(e.description)),
           'link': e.get_absolute_url(),
           'doc_type': escape(e.type),
           'type': 'HUE',
