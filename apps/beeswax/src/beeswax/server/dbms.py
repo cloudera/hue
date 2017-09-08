@@ -131,9 +131,6 @@ class QueryServerTimeoutException(Exception):
     self.message = message
 
 
-class NoSuchObjectException: pass
-
-
 class HiveServer2Dbms(object):
 
   def __init__(self, client, server_type):
@@ -839,7 +836,7 @@ class HiveServer2Dbms(object):
     partitions = self.get_partitions(db_name, table, partition_spec=partition_spec)
 
     if len(partitions) != 1:
-      raise NoSuchObjectException(_("Query did not return exactly one partition result"))
+      raise QueryServerException(_("Query did not return exactly one partition result: %s") % partitions)
 
     partition = partitions[0]
     partition_query = " AND ".join(partition.partition_spec.split(','))
