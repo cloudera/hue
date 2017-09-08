@@ -516,7 +516,7 @@ var HueFileEntry = (function () {
     }
   };
 
-  HueFileEntry.prototype.load = function (callback) {
+  HueFileEntry.prototype.load = function (successCallback, errorCallback, silenceErrors) {
     var self = this;
     if (self.loading()) {
       return;
@@ -527,6 +527,7 @@ var HueFileEntry = (function () {
       self.apiHelper.fetchDocuments({
         uuid: self.definition().uuid,
         type: self.serverTypeFilter().type,
+        silenceErrors: !!silenceErrors,
         successCallback: function(data) {
           self.definition(data.document);
           self.hasErrors(false);
@@ -557,15 +558,18 @@ var HueFileEntry = (function () {
 
           if (self.isRoot() && self.entries().length === 1 && self.entries()[0].definition().type === 'directory' && self.entries()[0].isSharedWithMe()) {
             self.activeEntry(self.entries()[0]);
-            self.activeEntry().load(callback);
-          } else if (callback && typeof callback === 'function') {
-            callback();
+            self.activeEntry().load(successCallback);
+          } else if (successCallback && typeof successCallback === 'function') {
+            successCallback();
           }
         },
         errorCallback: function () {
           self.hasErrors(true);
           self.loading(false);
           self.loaded(true);
+          if (errorCallback) {
+            errorCallback();
+          }
         }
       });
     }
@@ -713,6 +717,9 @@ var HueFileEntry = (function () {
 
   HueFileEntry.prototype.makeActive = function () {
     var self = this;
+    if (!self.loaded()) {
+      self.load();
+    }
     self.activeEntry(this);
   };
 
