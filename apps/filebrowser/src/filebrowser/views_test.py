@@ -921,7 +921,7 @@ alert("XSS")
         # StopFutureHandlers() does not seem to work in test mode as it continues to MemoryFileUploadHandler after perm issue and so fails.
         pass
 
-  def test_extract_zip(self):
+  def test_extract_uploaded_archive(self):
     ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
     prefix = self.cluster.fs_prefix + '/test_upload_zip'
     self.cluster.fs.mkdir(prefix)
@@ -975,9 +975,38 @@ alert("XSS")
       ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
       cleanup_tree(self.cluster, prefix)
 
+  def test_upload_zip(self):
+    prefix = self.cluster.fs_prefix + '/test_upload_zip'
+    self.cluster.fs.mkdir(prefix)
 
-  def test_extract_tgz(self):
-    ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
+    USER_NAME = 'test'
+    HDFS_DEST_DIR = prefix + "/tmp/fb-upload-test"
+    ZIP_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.zip')
+    HDFS_ZIP_FILE = HDFS_DEST_DIR + '/test.zip'
+    HDFS_UNZIPPED_FILE = HDFS_DEST_DIR + '/test'
+
+    self.cluster.fs.mkdir(HDFS_DEST_DIR)
+    self.cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
+    self.cluster.fs.chmod(HDFS_DEST_DIR, 0700)
+
+    # Upload and unzip archive
+    resp = self.c.post('/filebrowser/upload/archive?dest=%s' % HDFS_DEST_DIR,
+                       dict(dest=HDFS_DEST_DIR, archive=file(ZIP_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_false(self.cluster.fs.exists(HDFS_ZIP_FILE))
+    assert_true(self.cluster.fs.isdir(HDFS_UNZIPPED_FILE))
+    assert_true(self.cluster.fs.isfile(HDFS_UNZIPPED_FILE + '/test.txt'))
+
+    # Upload archive
+    resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(ZIP_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_true(self.cluster.fs.exists(HDFS_ZIP_FILE))
+
+
+  def test_upload_tgz(self):
     prefix = self.cluster.fs_prefix + '/test_upload_tgz'
     self.cluster.fs.mkdir(prefix)
 
@@ -985,55 +1014,57 @@ alert("XSS")
     HDFS_DEST_DIR = prefix + "/fb-upload-test"
     TGZ_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.tar.gz')
     HDFS_TGZ_FILE = HDFS_DEST_DIR + '/test.tar.gz'
+    HDFS_DECOMPRESSED_FILE = HDFS_DEST_DIR + '/test'
 
     self.cluster.fs.mkdir(HDFS_DEST_DIR)
     self.cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
     self.cluster.fs.chmod(HDFS_DEST_DIR, 0700)
 
-    try:
-      # Upload archive
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(TGZ_FILE)))
-      response = json.loads(resp.content)
-      assert_equal(0, response['status'], response)
-      assert_true(self.cluster.fs.exists(HDFS_TGZ_FILE))
+    # Upload and decompress archive
+    resp = self.c.post('/filebrowser/upload/archive?dest=%s' % HDFS_DEST_DIR,
+                       dict(dest=HDFS_DEST_DIR, archive=file(TGZ_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_false(self.cluster.fs.exists(HDFS_TGZ_FILE))
+    assert_true(self.cluster.fs.isdir(HDFS_DECOMPRESSED_FILE))
+    assert_true(self.cluster.fs.isfile(HDFS_DECOMPRESSED_FILE + '/test.txt'))
+    assert_equal(self.cluster.fs.read(HDFS_DECOMPRESSED_FILE + '/test.txt', 0, 4), "test")
 
-      resp = self.c.post('/filebrowser/extract_archive',
-                         dict(upload_path=HDFS_DEST_DIR, archive_name='test.tar.gz'))
-      response = json.loads(resp.content)
-      assert_equal(0, response['status'], response)
-      assert_true('handle' in response and response['handle']['id'], response)
-
-    finally:
-      cleanup_file(self.cluster, HDFS_TGZ_FILE)
+    # Upload archive
+    resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(TGZ_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_true(self.cluster.fs.exists(HDFS_TGZ_FILE))
 
 
-  def test_extract_bz2(self):
-    ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
+  def test_upload_bz2(self):
     prefix = self.cluster.fs_prefix + '/test_upload_bz2'
 
+    USER_NAME = 'test'
     HDFS_DEST_DIR = prefix + "/fb-upload-test"
     BZ2_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.txt.bz2')
     HDFS_BZ2_FILE = HDFS_DEST_DIR + '/test.txt.bz2'
+    HDFS_DECOMPRESSED_FILE = HDFS_DEST_DIR + '/test.txt'
 
     self.cluster.fs.mkdir(HDFS_DEST_DIR)
 
-    try:
-      # Upload archive
-      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(BZ2_FILE)))
-      response = json.loads(resp.content)
-      assert_equal(0, response['status'], response)
-      assert_true(self.cluster.fs.exists(HDFS_BZ2_FILE))
+    # Upload and decompress archive
+    resp = self.c.post('/filebrowser/upload/archive?dest=%s' % HDFS_DEST_DIR,
+                       dict(dest=HDFS_DEST_DIR, archive=file(BZ2_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_false(self.cluster.fs.exists(HDFS_BZ2_FILE))
+    assert_true(self.cluster.fs.isdir(HDFS_DECOMPRESSED_FILE))
+    assert_true(self.cluster.fs.isfile(HDFS_DECOMPRESSED_FILE + '/test.txt'))
+    assert_equal(self.cluster.fs.read(HDFS_DECOMPRESSED_FILE + '/test.txt', 0, 4), "test")
 
-      resp = self.c.post('/filebrowser/extract_archive',
-                         dict(upload_path=HDFS_DEST_DIR, archive_name='test.txt.bz2'))
-      response = json.loads(resp.content)
-      assert_equal(0, response['status'], response)
-      assert_true('handle' in response and response['handle']['id'], response)
-
-    finally:
-      cleanup_file(self.cluster, HDFS_BZ2_FILE)
+    # Upload archive
+    resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(BZ2_FILE)))
+    response = json.loads(resp.content)
+    assert_equal(0, response['status'], response)
+    assert_true(self.cluster.fs.exists(HDFS_BZ2_FILE))
 
 
   def test_trash(self):
