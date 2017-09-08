@@ -213,7 +213,7 @@ ${ components.menubar(is_embeddable) }
           </th>
           <th>${_('Values')}</th>
           <th>${_('Spec')}</th>
-          <th>${_('Browse')}</th>
+          <th data-bind="visible: $root.sourceType() != 'impala'">${_('Browse')}</th>
         </tr>
       </thead>
       <tbody>
@@ -236,7 +236,7 @@ ${ components.menubar(is_embeddable) }
           <!-- /ko -->
         </td>
         <td data-bind="text: partitionSpec"></td>
-        <td>
+        <td data-bind="visible: $root.sourceType() != 'impala'">
           <!-- ko if: IS_HUE_4 -->
             <a data-bind="click: function () { browsePartitionFolder(browseUrl); }" href="javascript:void(0)" title="${_('Browse partition files')}">
               ${_('Files')}
