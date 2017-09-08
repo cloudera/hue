@@ -1157,12 +1157,23 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="notebook-actions">
   <div class="btn-group">
-    <a class="btn" rel="tooltip" data-placement="bottom" title="${ _("Execute all") }" data-bind="visible: $root.selectedNotebook() && ! $root.selectedNotebook().isExecutingAll(), click: function() { $root.selectedNotebook().executeAll(); }">
-      <i class="fa fa-fw fa-play"></i>
-    </a>
-    <a class="btn red" rel="tooltip" data-placement="bottom" title="${ _("Stop all") }" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().isExecutingAll(), click: function() { $root.selectedNotebook().cancelExecutingAll(); }">
-      <i class="fa fa-fw fa-stop"></i>
-    </a>
+    <!-- ko if: $root.selectedNotebook() -->
+    <!-- ko with: $root.selectedNotebook() -->
+      <a class="btn" rel="tooltip" data-placement="bottom" title="${ _("Execute all") }" data-bind="visible: ! isExecutingAll(), click: function() { executeAll(); }">
+        <i class="fa fa-fw fa-play"></i>
+      </a>
+      <!-- ko if: ! (snippets()[executingAllIndex()] && snippets()[executingAllIndex()].isCanceling()) -->
+      <a class="btn red" rel="tooltip" data-placement="bottom" title="${ _("Stop all") }" data-bind="visible: isExecutingAll(), click: function() { cancelExecutingAll(); }">
+        <i class="fa fa-fw fa-stop"></i>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: snippets()[executingAllIndex()] && snippets()[executingAllIndex()].isCanceling() -->
+      <a class="btn" style="cursor: default;" title="${ _('Canceling operation...') }">
+        <i class="fa fa-fw fa-spinner snippet-side-single fa-spin"></i>
+      </a>
+      <!-- /ko -->
+    <!-- /ko -->
+    <!-- /ko -->
 
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
       <span class="caret"></span>
