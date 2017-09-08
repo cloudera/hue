@@ -2023,7 +2023,7 @@ var EditorViewModel = (function() {
     self.isExecutingAll = ko.observable(typeof notebook.isExecutingAll != "undefined" && notebook.isExecutingAll != null ? notebook.isExecutingAll : false);
     self.cancelExecutingAll = function() {
       var index = self.executingAllIndex();
-      if (self.snippets()[index]) {
+      if (self.isExecutingAll() && self.snippets()[index]) {
         self.snippets()[index].cancel();
       } else {
         self.isExecutingAll(false);
