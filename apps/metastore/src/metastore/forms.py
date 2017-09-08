@@ -23,7 +23,6 @@ from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
 from filebrowser.forms import PathField
 
 from beeswax import common
-from beeswax.server.dbms import NoSuchObjectException
 from beeswax.models import SavedQuery
 
 
