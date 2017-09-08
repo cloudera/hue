@@ -2190,7 +2190,7 @@ var EditorViewModel = (function() {
       };
     };
 
-    self.save = function () {
+    self.save = function (callback) {
       hueAnalytics.log('notebook', 'save');
 
       // Remove the result data from the snippets
@@ -2250,9 +2250,10 @@ var EditorViewModel = (function() {
               vm.changeURL('/notebook/notebook?notebook=' + data.id);
             }
           }
-          huePubSub.publish('assist.document.refresh');
-        }
-        else {
+          if (callback) {
+            callback();
+          }
+        } else {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
@@ -3089,7 +3090,9 @@ var EditorViewModel = (function() {
       self.selectedNotebook().id(null);
       self.selectedNotebook().uuid(UUID());
       self.selectedNotebook().parentSavedQueryUuid(null);
-      self.saveNotebook();
+      self.selectedNotebook().save(function () {
+        huePubSub.publish('assist.document.refresh');
+      });
     };
   }
 
