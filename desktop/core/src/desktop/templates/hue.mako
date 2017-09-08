@@ -1217,6 +1217,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
 
+        huePubSub.subscribe('left.assist.show', function () {
+          if (!self.leftAssistVisible()) {
+            self.leftAssistVisible(true);
+          }
+        })
       }
 
       var sidePanelViewModel = new SidePanelViewModel();
