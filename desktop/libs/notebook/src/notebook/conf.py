@@ -24,9 +24,14 @@ from django.utils.translation import ugettext_lazy as _t
 
 
 from desktop import appmanager
-from desktop.conf import is_hue4, is_oozie_enabled
+from desktop.conf import is_hue4
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
   coerce_json_dict, coerce_bool, coerce_csv
+
+
+def is_oozie_enabled():
+  """Oozie needs to be available as it is the backend."""
+  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0 and is_hue4()
 
 
 SHOW_NOTEBOOKS = Config(

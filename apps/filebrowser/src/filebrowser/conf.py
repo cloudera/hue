@@ -19,7 +19,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from desktop.conf import ENABLE_DOWNLOAD
 from desktop.lib.conf import Config, coerce_bool
-from desktop.conf import is_oozie_enabled
 
 
 MAX_SNAPPY_DECOMPRESSION_SIZE = Config(
@@ -56,5 +55,5 @@ ENABLE_EXTRACT_UPLOADED_ARCHIVE = Config(
   key="enable_extract_uploaded_archive",
   help=_("Flag to enable the extraction of a uploaded archive in HDFS."),
   type=bool,
-  dynamic_default=is_oozie_enabled
+  default=False
 )
