@@ -1012,7 +1012,7 @@ class HiveServerClient:
           partitions_formatted.append(['/'.join(['%s=%s' % (str(part[0]), str(part[1])) for part in zipped_parts if all(part)])])
 
         partitions = [PartitionValueCompatible(partition, table) for partition in partitions_formatted]
-      except Exception, e:
+      except Exception:
         raise ValueError(_('Failed to determine partition keys for Impala table: `%s`.`%s`') % (database, table_name))
     else:
       partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()]
