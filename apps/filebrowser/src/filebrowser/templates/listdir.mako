@@ -103,7 +103,7 @@ ${ fb_components.menubar() }
                 <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
                 </li>
-                <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3(), click: confirmExtractArchive">
+                <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive() && !isS3(), click: confirmExtractArchive">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
                 </li>
               % endif
@@ -134,7 +134,7 @@ ${ fb_components.menubar() }
             </button>
             % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
               <button class="btn extractArchiveBtn" title="${_('Extract')}"
-                data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3(), click: confirmExtractArchive">
+                data-bind="visible: selectedFiles().length == 1 && isArchive() && !isS3(), click: confirmExtractArchive">
                 <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}
               </button>
             % endif
@@ -157,9 +157,14 @@ ${ fb_components.menubar() }
           <!-- /ko -->
           <!-- ko ifnot: isS3 -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
-            <a href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-bind="click: uploadFile, visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
+            <a href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
+              <span class="caret"></span>
             </a>
+            <ul class="dropdown-menu">
+              <li><a href="javascript: void(0)" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="fa fa-file-o"></i> ${_('Files')}</a></li>
+              <li><a href="javascript: void(0)" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="fa fa-gift"></i> ${_('Zip/Tgz/Bz2 file')}</a></li>
+            </ul>
           </div>
           <!-- /ko -->
           % endif

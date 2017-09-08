@@ -449,6 +449,22 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     <div class="modal-footer"></div>
   </div>
 
+  <!-- upload archive modal -->
+  <div id="uploadArchiveModal" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Upload and extract in')} <span data-bind="text: currentPath"></span></h2>
+    </div>
+    <div class="modal-body form-inline">
+      <div id="archiveUploader" class="uploader">
+        <noscript>
+          <p>${_('Enable JavaScript to use the file uploader.')}</p>
+        </noscript>
+      </div>
+    </div>
+    <div class="modal-footer"></div>
+  </div>
+
   <!-- new directory modal -->
   <form id="createDirectoryForm" data-bind="submit: createDirectory" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
     ${ csrf_token(request) | n,unicode }
@@ -606,8 +622,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { if(showCompressButton) { setCompressArchiveDefault(); confirmCompressFiles();}}">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
       </li>
-      <li data-bind="css: {'disabled': selectedFiles().length != 1 || !isArchive(selectedFile().name) || isS3()}">
-        <a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="click: (selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3()) ? confirmExtractArchive : void(0)">
+      <li data-bind="css: {'disabled': selectedFiles().length != 1 || !isArchive() || isS3()}">
+        <a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="click: (selectedFiles().length == 1 && isArchive() && !isS3()) ? confirmExtractArchive : void(0)">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
       </li>
     % endif
@@ -842,7 +858,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         isBucket: ko.pureComputed(function(){
           return file.path.toLowerCase().indexOf('s3a://') == 0 && file.path.substr(5).indexOf('/') == -1
         }),
-        selected: ko.observable(file.highlighted && viewModel.isArchive(file.name) || false),
+        selected: ko.observable(false),
         highlighted: ko.observable(file.highlighted || false),
         deleted: ko.observable(file.deleted || false),
         handleSelect: function (row, e) {
@@ -937,6 +953,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             $('#uploadFileModal').data('modal').$element.off('keyup.dismiss.modal');
             if ($('#uploadFileModal').data('modal').$backdrop){
               $('#uploadFileModal').data('modal').$backdrop.off('click');
+            }
+          }
+          if ($('#uploadArchiveModal').data('modal')) {
+            $('#uploadArchiveModal').data('modal').$element.off('keyup.dismiss.modal');
+            if ($('#uploadArchiveModal').data('modal').$backdrop) {
+              $('#uploadArchiveModal').data('modal').$backdrop.off('click');
             }
           }
         }
@@ -1618,7 +1640,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         % endif
       };
 
-      self.isArchive = function(fileName) {
+      self.isArchive = function() {
+        var fileName = self.selectedFile().name;
         return fileName.endsWith('.zip') || fileName.endsWith('.tar.gz') || fileName.endsWith('.tgz') || fileName.endsWith('.bz2') || fileName.endsWith('.bzip2');
       };
 
@@ -1636,7 +1659,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         if (fileNames.indexOf('.') !== -1) {
           return false;
         }
-        return !self.isS3() && (self.selectedFiles().length > 1 || !(self.selectedFiles().length === 1 && self.isArchive(self.selectedFile().name)));
+        return !self.isS3() && (self.selectedFiles().length > 1 || !(self.selectedFiles().length === 1 && self.isArchive()));
       });
 
       self.setCompressArchiveDefault = function() {
@@ -1898,6 +1921,76 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         };
       })();
 
+      self.uploadArchive = (function () {
+        self.pendingUploads(0);
+        var uploader = new qq.FileUploader({
+          element: document.getElementById("archiveUploader"),
+          action: "/filebrowser/upload/archive",
+          template: '<div class="qq-uploader" style="margin-left: 10px">' +
+          '<div class="qq-upload-drop-area"><span>${_('Drop the archives here to upload and extract them')}</span></div>' +
+          '<div class="qq-upload-button">${_('Select ZIP, TGZ or BZ2 files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
+          '<ul class="qq-upload-list qq-upload-archives unstyled" style="margin-right: 0;"></ul>' +
+          '</div>',
+          fileTemplate: '<li><span class="qq-upload-file-extended" style="display:none"></span><span class="qq-upload-spinner hide" style="display:none"></span>' +
+          '<div class="progress-row dz-processing">' +
+          '<span class="break-word qq-upload-file"></span>' +
+          '<div class="pull-right">' +
+          '<span class="muted qq-upload-size"></span>&nbsp;&nbsp;' +
+          '<a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel"></i></a>' +
+          '<span class="qq-upload-done" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>' +
+          '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
+          '</div>' +
+          '<div class="progress-row-bar" style="width: 0%;"></div>' +
+          '</div></li>',
+          params: {
+            dest: self.currentPath(),
+            fileFieldLabel: "archive"
+          },
+          onProgress: function (id, fileName, loaded, total) {
+            $('.qq-upload-archives').find('li').each(function(){
+              var listItem = $(this);
+              if (listItem.find('.qq-upload-file-extended').text() == fileName){
+                listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
+              }
+            });
+          },
+          onComplete: function (id, fileName, response) {
+            self.pendingUploads(self.pendingUploads() - 1);
+            if (response.status != 0) {
+              $(document).trigger('error', "${ _('Error: ') }" + response.data);
+            }
+            else {
+              $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+              self.filesToHighlight.push(response.path);
+            }
+            if (self.pendingUploads() == 0) {
+              $('#uploadArchiveModal').modal('hide');
+              self.retrieveData(true);
+            }
+          },
+          onSubmit: function (id, fileName, responseJSON) {
+            self.pendingUploads(self.pendingUploads() + 1);
+          },
+          onCancel: function (id, fileName) {
+            self.pendingUploads(self.pendingUploads() - 1);
+          },
+          debug: false
+        });
+
+        $("#archiveUploader").on('fb:updatePath', function (e, options) {
+          uploader.setParams({
+            dest: options.dest,
+            fileFieldLabel: "archive"
+          });
+        });
+
+        return function () {
+          $("#uploadArchiveModal").modal({
+            show: true
+          });
+        };
+      })();
+
       // Place all values into hidden fields under parent element.
       // Looks for managed hidden fields and handles sizing appropriately.
       var hiddenFields = function (parentEl, name, values) {
@@ -1989,7 +2082,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $('.filebrowser').on('dragenter', function (e) {
           e.preventDefault();
 
-          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && (!viewModel.isS3() || (viewModel.isS3() && !viewModel.isS3Root()))) {
+          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && !($("#uploadArchiveModal").is(":visible")) && (!viewModel.isS3() || (viewModel.isS3() && !viewModel.isS3Root()))) {
             showHoverMsg("${_('Drop files here to upload')}");
           }
         });
@@ -2443,6 +2536,18 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
       });
       $("#uploadFileModal").on("hidden", function () {
+        if (typeof _dropzone != "undefined") {
+          _dropzone.enable();
+        }
+        $(".qq-upload-list").empty();
+        $(".qq-upload-drop-area").hide();
+      });
+      $("#uploadArchiveModal").on("shown", function () {
+        if (typeof _dropzone != "undefined") {
+          _dropzone.disable();
+        }
+      });
+      $("#uploadArchiveModal").on("hidden", function () {
         if (typeof _dropzone != "undefined") {
           _dropzone.enable();
         }
