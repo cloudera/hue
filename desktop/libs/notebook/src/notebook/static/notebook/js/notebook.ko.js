@@ -2025,8 +2025,6 @@ var EditorViewModel = (function() {
       var index = self.executingAllIndex();
       if (self.isExecutingAll() && self.snippets()[index]) {
         self.snippets()[index].cancel();
-      } else {
-        self.isExecutingAll(false);
       }
     };
     self.executingAllIndex = ko.observable(typeof notebook.executingAllIndex != "undefined" && notebook.executingAllIndex != null ? notebook.executingAllIndex : 0);
