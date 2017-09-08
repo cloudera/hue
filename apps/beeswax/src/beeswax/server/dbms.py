@@ -261,8 +261,7 @@ class HiveServer2Dbms(object):
     return None
 
 
-  def alter_column(self, database, table_name, column_name, new_column_name, column_type, comment=None,
-                   partition_spec=None, cascade=False):
+  def alter_column(self, database, table_name, column_name, new_column_name, column_type, comment=None, partition_spec=None, cascade=False):
     hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
 
     if partition_spec:
@@ -832,14 +831,17 @@ class HiveServer2Dbms(object):
 
 
   def get_partition(self, db_name, table_name, partition_spec, generate_ddl_only=False):
-    table = self.get_table(db_name, table_name)
-    partitions = self.get_partitions(db_name, table, partition_spec=partition_spec)
-
-    if len(partitions) != 1:
-      raise QueryServerException(_("Query did not return exactly one partition result: %s") % partitions)
-
-    partition = partitions[0]
-    partition_query = " AND ".join(partition.partition_spec.split(','))
+    if partition_spec and self.server_name == 'impala': # partition_spec not supported
+      partition_query = " AND ".join(partition_spec.split(','))
+    else:
+      table = self.get_table(db_name, table_name)
+      partitions = self.get_partitions(db_name, table, partition_spec=partition_spec)
+  
+      if len(partitions) != 1:
+        raise QueryServerException(_("Query did not return exactly one partition result: %s") % partitions)
+  
+      partition = partitions[0]
+      partition_query = " AND ".join(partition.partition_spec.split(','))
 
     hql = "SELECT * FROM `%s`.`%s` WHERE %s" % (db_name, table_name, partition_query)
 
