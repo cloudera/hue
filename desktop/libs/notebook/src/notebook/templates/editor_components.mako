@@ -3205,6 +3205,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       });
       viewModel.isPresentationMode.subscribe(function(newValue) {
         wasResultFullScreenMode = false;
+        if (! newValue) {
+          viewModel.selectedNotebook().cancelExecutingAll();
+        }
         togglePresentation(newValue);
         viewModel.togglePresentationMode();
         if (newValue) {
