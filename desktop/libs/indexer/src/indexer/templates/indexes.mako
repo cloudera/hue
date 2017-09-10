@@ -608,13 +608,13 @@ ${ assist.assistPanel() }
     };
 
 
-    var Index = function (vm, data) {
+    var Index = function (vm, index) {
       var self = this;
 
-      self.name = ko.observable(data.name);
-      self.type = ko.observable(data.type);
-      self.uniqueKey = ko.observable(data.schema.uniqueKey);
-      self.fields = ko.mapping.fromJS(data.schema.fields);
+      self.name = ko.observable(index.name);
+      self.type = ko.observable(index.type);
+      self.uniqueKey = ko.observable(index.schema.uniqueKey);
+      self.fields = ko.mapping.fromJS(index.schema.fields);
       self.fieldsPreview = ko.pureComputed(function () {
         return self.fields().slice(0, 5)
       });
@@ -628,12 +628,12 @@ ${ assist.assistPanel() }
         return returned;
       });
 
-      self.dynamicFields = ko.mapping.fromJS(data.schema.dynamicFields);
-      self.copyFields = ko.mapping.fromJS(data.schema.copyFields);
+      self.dynamicFields = ko.mapping.fromJS(index.schema.dynamicFields);
+      self.copyFields = ko.mapping.fromJS(index.schema.copyFields);
 
       self.sample = ko.observableArray();
       self.samplePreview = ko.pureComputed(function () {
-        return self.sample().splice(0, 5)
+        return self.sample().slice(0, 5)
       });
 
       self.loadingSample = ko.observable(false);
