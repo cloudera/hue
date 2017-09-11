@@ -305,7 +305,7 @@ var SqlParseSupport = (function () {
       }
       parser.suggestColumns();
       parser.suggestFunctions();
-      var keywords = ['CASE'];
+      var keywords = ['CASE', 'NULL'];
       if (parser.isHive() || typeof oppositeValueExpression === 'undefined' || typeof operator === 'undefined') {
         keywords = keywords.concat(['EXISTS', 'NOT']);
       }
