@@ -1071,7 +1071,7 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ${some_variable} + 1 = ',
           afterCursor: '',
-          containsKeywords: ['CASE'],
+          containsKeywords: ['CASE', 'NULL'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: { types: ['NUMBER']},
@@ -4744,7 +4744,7 @@
             lowerCase: false,
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT'],
+            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
@@ -4758,7 +4758,7 @@
             lowerCase: false,
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT'],
+            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
@@ -4772,7 +4772,7 @@
             lowerCase: false,
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT'],
+            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
@@ -4786,7 +4786,7 @@
             lowerCase: false,
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT'],
+            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
