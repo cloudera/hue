@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import json
+import re
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
@@ -46,9 +47,12 @@ class TestApi2():
       })
       results = json.loads(response.content)['results']
       assert_true(results)
-      assert_false('<' in json.dumps(results))
-      assert_false('>' in json.dumps(results))
-      assert_true('&lt;' in json.dumps(results))
-      assert_true('&gt;' in json.dumps(results))
+      result_json = json.dumps(results)
+      assert_false(re.match('<(?!em)', result_json), result_json)
+      assert_false(re.match('(?!em)>', result_json), result_json)
+      assert_false('<script>' in result_json, result_json)
+      assert_false('</script>' in result_json, result_json)
+      assert_true('&lt;' in result_json, result_json)
+      assert_true('&gt;' in result_json, result_json)
     finally:
       query.delete()
