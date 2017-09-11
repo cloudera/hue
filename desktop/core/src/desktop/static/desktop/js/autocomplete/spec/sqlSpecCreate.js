@@ -1081,6 +1081,19 @@
       });
 
       describe('Impala specific', function () {
+        it('should handle "CREATE TABLE foo (baa MAP <STRING, STRUCT<id: int>>, arr ARRAY<STRUCT<foo:STRUCT<bar: INT>>>, strc STRUCT<boo:STRING>);|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (baa MAP <STRING, STRUCT<id: int>>, arr ARRAY<STRUCT<foo:STRUCT<bar: INT>>>, strc STRUCT<boo:STRING>);',
+            noErrors: true,
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest keywords for "CREATE EXTERNAL |"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL ',
@@ -1139,6 +1152,67 @@
             expectedResult: {
               lowerCase: false,
               suggestHdfs: { path: ''}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (baa |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (baa ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['ARRAY<>', 'STRUCT<>', 'MAP<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (baa ARRAY <|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (baa ARRAY <',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['STRING', 'STRUCT<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (baa MAP <|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (baa MAP <',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['STRING'],
+            doesNotContainKeywords: ['MAP<>', 'STRUCT<>', 'ARRAY<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (baa MAP <STRING, |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (baa ARRAY <',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['STRING', 'MAP<>', 'STRUCT<>', 'ARRAY<>'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (baa STRUCT <id:|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (baa STRUCT <id:',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['INT', 'STRUCT<>'],
+            expectedResult: {
+              lowerCase: false
             }
           });
         });
