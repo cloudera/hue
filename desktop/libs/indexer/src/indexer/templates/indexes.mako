@@ -732,6 +732,7 @@ ${ assist.assistPanel() }
                     fixedHeader: true,
                     fixedFirstColumn: true,
                     includeNavigator: false,
+                    lockSelectedRow: false,
                     parentId: 'index-sample',
                     classToRemove: 'sample-table',
                     mainScrollable: '${ MAIN_SCROLLABLE }',
