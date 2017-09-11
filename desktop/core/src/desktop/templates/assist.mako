@@ -2352,30 +2352,28 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/html" id="schedule-panel-template">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
-        <div class="assist-flex-header"><div class="assist-inner-header">${ _('Schedule') }</div></div>
         <!-- ko if: selectedNotebook() && selectedNotebook().isBatchable() -->
         <!-- ko with: selectedNotebook() -->
         <div class="tab-pane" id="scheduleTab">
+          <!-- ko ifnot: isSaved() && ! isHistory() -->
+          ${ _('Query needs to be saved.') }
+          <!-- /ko -->
           <!-- ko if: isSaved() && ! isHistory() -->
-          <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
-          <a data-bind="click: save" href="javascript: void(0);">${ _('Save changes') }</a>
+            <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
+            <a data-bind="click: saveScheduler" href="javascript: void(0);">${ _('Save changes') }</a>
+            <!-- /ko -->
+            <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && ! viewSchedulerId()-->
+            <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${ _('Start') }</a>
+            <!-- /ko -->
+            <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
+            <a data-bind="click: function() { huePubSub.publish('show.jobs.panel', viewSchedulerId()) }, clickBubble: false" href="javascript: void(0);">
+              ${ _('View') }
+            </a>
           <!-- /ko -->
-          <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && ! viewSchedulerId()-->
-          <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${ _('Start') }</a>
-          <!-- /ko -->
-          <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
-          <a data-bind="click: function() { huePubSub.publish('show.jobs.panel', viewSchedulerId()) }, clickBubble: false" href="javascript: void(0);">
-            ${ _('View') }
-          </a>
           <!-- /ko -->
           <br>
           <br>
           <div id="schedulerEditor"></div>
-          <!-- /ko -->
-
-          <!-- ko ifnot: isSaved() && ! isHistory() -->
-          ${ _('Query needs to be saved first.') }
-          <!-- /ko -->
         </div>
         <!-- /ko -->
         <!-- /ko -->

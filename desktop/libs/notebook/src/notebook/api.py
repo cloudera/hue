@@ -311,7 +311,7 @@ def get_logs(request):
 
 def _save_notebook(notebook, user):
   notebook_type = notebook.get('type', 'notebook')
-  save_as = True
+  save_as = False
 
   if notebook.get('parentSavedQueryUuid'): # We save into the original saved query, not into the query history
     notebook_doc = Document2.objects.get_by_uuid(user=user, uuid=notebook['parentSavedQueryUuid'])
@@ -320,7 +320,7 @@ def _save_notebook(notebook, user):
   else:
     notebook_doc = Document2.objects.create(name=notebook['name'], uuid=notebook['uuid'], type=notebook_type, owner=user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra=notebook_type)
-    save_as = False
+    save_as = True
 
     if notebook.get('directoryUuid'):
       notebook_doc.parent_directory = Document2.objects.get_by_uuid(user=user, uuid=notebook.get('directoryUuid'), perm_type='write')
