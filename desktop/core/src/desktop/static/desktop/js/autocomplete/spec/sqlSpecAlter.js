@@ -1505,7 +1505,6 @@
             afterCursor: '',
             dialect: 'impala',
             containsKeywords: ['INT'],
-            doesNotContainKeywords: ['ARRAY<>'],
             expectedResult: {
               lowerCase: false
             }
