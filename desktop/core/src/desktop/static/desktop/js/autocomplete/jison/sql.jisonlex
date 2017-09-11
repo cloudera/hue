@@ -28,7 +28,7 @@
 
 // Reserved Keywords
 <hive>'ALL'                                { return '<hive>ALL'; }
-<hive>'ARRAY'                              { return '<hive>ARRAY'; }
+<hive>'ARRAY'                              { return 'ARRAY'; }
 <hive>'AS'                                 { return '<hive>AS'; }
 <hive>'AUTHORIZATION'                      { return '<hive>AUTHORIZATION'; }
 <hive>'BINARY'                             { return '<hive>BINARY'; }
@@ -51,7 +51,7 @@
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
 <hive>'LOCAL'                              { return '<hive>LOCAL'; }
 <hive>'MACRO'                              { return '<hive>MACRO'; }
-<hive>'MAP'                                { return '<hive>MAP'; }
+<hive>'MAP'                                { return 'MAP'; }
 <hive>'NONE'                               { return '<hive>NONE'; }
 <hive>'OF'                                 { return '<hive>OF'; }
 <hive>'OUT'                                { return '<hive>OUT'; }
@@ -168,7 +168,7 @@
 <hive>'STORED'                             { return '<hive>STORED'; }
 <hive>STORED\s+AS\s+DIRECTORIES            { return '<hive>STORED_AS_DIRECTORIES'; }
 <hive>'STRING'                             { return '<hive>STRING'; }
-<hive>'STRUCT'                             { return '<hive>STRUCT'; }
+<hive>'STRUCT'                             { return 'STRUCT'; }
 <hive>'TABLES'                             { return '<hive>TABLES'; }
 <hive>'TABLESAMPLE'                        { return '<hive>TABLESAMPLE'; }
 <hive>'TBLPROPERTIES'                      { return '<hive>TBLPROPERTIES'; }
@@ -279,15 +279,18 @@
 // Non-reserved Keywords
 <impala>'ANALYTIC'                         { return '<impala>ANALYTIC'; }
 <impala>'ANTI'                             { return '<impala>ANTI'; }
+<impala>'ARRAY'                            { return 'ARRAY'; }
 <impala>'BLOCK_SIZE'                       { return '<impala>BLOCK_SIZE'; }
 <impala>'COMPRESSION'                      { return '<impala>COMPRESSION'; }
 <impala>'CURRENT'                          { return '<impala>CURRENT'; }
 <impala>'DEFAULT'                          { return '<impala>DEFAULT'; }
 <impala>'ENCODING'                         { return '<impala>ENCODING'; }
 <impala>'GRANT'                            { return '<impala>GRANT'; }
+<impala>'MAP'                              { return 'MAP'; }
 <impala>'RECOVER'                          { return '<impala>RECOVER'; }
 <impala>'ROLE'                             { return '<impala>ROLE'; }
 <impala>'ROLES'                            { return '<impala>ROLES'; }
+<impala>'STRUCT'                           { return 'STRUCT'; }
 <impala>\[BROADCAST\]                      { return '<impala>BROADCAST'; }
 <impala>\[NOSHUFFLE\]                      { return '<impala>NOSHUFFLE'; }
 <impala>\[SHUFFLE\]                        { return '<impala>SHUFFLE'; }

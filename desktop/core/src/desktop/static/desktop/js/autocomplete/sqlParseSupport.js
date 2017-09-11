@@ -248,6 +248,9 @@ var SqlParseSupport = (function () {
       if (parser.isHive()) {
         return parser.getTypeKeywords().concat(['ARRAY<>', 'MAP<>', 'STRUCT<>', 'UNIONTYPE<>']);
       }
+      if (parser.isImpala()) {
+        return parser.getTypeKeywords().concat(['ARRAY<>', 'MAP<>', 'STRUCT<>']);
+      }
       return parser.getTypeKeywords();
     };
 
