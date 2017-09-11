@@ -518,7 +518,7 @@ def edit_coordinator(request):
     workflows = [dict([('uuid', d.uuid), ('name', d.name)])
                       for d in Document2.objects.documents(request.user, include_managed=False).search_documents(types=['oozie-workflow2'])]
 
-  can_edit_json = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
+  can_edit = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
   if request.GET.get('format') == 'json': # For Editor
     return JsonResponse({
       'coordinator': coordinator.get_data_for_json(),
@@ -526,7 +526,7 @@ def edit_coordinator(request):
       'workflows': workflows,
       'doc_uuid': doc.uuid if doc else '',
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'can_edit': doc is None or doc.doc.get().is_editable(request.user),
+      'can_edit': can_edit,
       'layout': django_mako.render_to_string('editor2/common_scheduler.mako', {'coordinator_json': coordinator.to_json_for_html()})
     })
   else:
@@ -536,7 +536,7 @@ def edit_coordinator(request):
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'can_edit_json': json.dumps(can_edit_json)
+      'can_edit_json': json.dumps(can_edit)
   })
 
 

@@ -2392,7 +2392,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         // TODO: Move all the scheduler logic out of the notebook to here.
 
-        var selectedNotebookSub = self.selectedNotebook.subscribe(function (notebook) {
+        var selectedNotebookSub = self.selectedNotebook.subscribe(function (notebook) { // Happening 4 times for each notebook loaded
           if (notebook && notebook.schedulerViewModel == null && notebook.isSaved() && ! notebook.isHistory()) {
             notebook.loadScheduler();
           }
