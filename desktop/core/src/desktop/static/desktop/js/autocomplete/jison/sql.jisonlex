@@ -222,6 +222,7 @@
 <impala>'FUNCTIONS'                        { return '<impala>FUNCTIONS'; }
 <impala>'GROUP'                            { return '<impala>GROUP'; }
 <impala>'HASH'                             { return '<impala>HASH'; }
+<impala>'ILIKE'                            { return '<impala>ILIKE'; }
 <impala>'INCREMENTAL'                      { return '<impala>INCREMENTAL'; }
 <impala>'INSERT'                           { parser.determineCase(yytext); return '<impala>INSERT'; }
 <impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
