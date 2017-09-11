@@ -87,7 +87,7 @@
       assertAutoComplete({
         beforeCursor: 'SELECT foo, bar ',
         afterCursor: '',
-        containsKeywords: ['AS', '+', 'FROM'],
+        containsKeywords: ['AS', '+', 'FROM', 'DIV'],
         expectedResult: {
           lowerCase: false,
           suggestTables:{
@@ -264,10 +264,35 @@
     });
 
     describe('Complete Statements', function () {
+      it('should handle "SELECT 4 / 2; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT 4 / 2; ',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SELECT 4 DIV 2; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT 4 DIV 2; ',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it ('should handle "SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; ',
           afterCursor: '',
+          noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -1086,6 +1111,7 @@
         assertAutoComplete({
           beforeCursor: 'SELECT row_number() OVER (PARTITION BY a) FROM testTable;',
           afterCursor: '',
+          noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -1097,6 +1123,7 @@
         assertAutoComplete({
           beforeCursor: 'SELECT COUNT(DISTINCT a) OVER (PARTITION by c) FROM testTable;',
           afterCursor: '',
+          noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false

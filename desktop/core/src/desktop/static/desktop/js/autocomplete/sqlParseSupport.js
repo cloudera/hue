@@ -217,7 +217,7 @@ var SqlParseSupport = (function () {
           suggestKeywords: keywords,
           suggestColRefKeywords: {
             BOOLEAN: ['AND', 'OR'],
-            NUMBER: ['+', '-', '*', '/', '%'],
+            NUMBER: ['+', '-', '*', '/', '%', 'DIV'],
             STRING: ['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']
           }
         }
@@ -226,7 +226,7 @@ var SqlParseSupport = (function () {
         keywords = keywords.concat(['AND', 'OR']);
       }
       if (SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
-        keywords = keywords.concat(['+', '-', '*', '/', '%']);
+        keywords = keywords.concat(['+', '-', '*', '/', '%', 'DIV']);
       }
       if (SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
         keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
