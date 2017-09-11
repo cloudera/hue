@@ -684,7 +684,7 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
 
         # List nested fields
         _agg_keys = []
-        if bucket[agg_key]['buckets']:
+        if agg_key in bucket and bucket[agg_key]['buckets']: # Protect against empty buckets
           for key, value in bucket[agg_key]['buckets'][0].items():
             if key.lower().startswith('agg_') or key.lower().startswith('dim_'):
               _agg_keys.append(key)
@@ -695,7 +695,8 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
           _agg_keys.insert(0, 'count')
         next_dim = []
         new_rows = []
-        augmented += __augment_stats_2d(bucket[agg_key]['buckets'], val, _fq_fields, _fq_values, fq_filter, _selected_values, _fields[1:], _agg_keys, next_dim)
+        if agg_key in bucket:
+          augmented += __augment_stats_2d(bucket[agg_key]['buckets'], val, _fq_fields, _fq_values, fq_filter, _selected_values, _fields[1:], _agg_keys, next_dim)
         for row in next_dim:
           new_rows.append(dim_row + row)
         dim_row = new_rows
