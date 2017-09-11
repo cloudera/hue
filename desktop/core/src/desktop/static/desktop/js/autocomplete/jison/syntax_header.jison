@@ -21,7 +21,7 @@
 %left '-' '*' 'ARITHMETIC_OPERATOR'
 
 %left ';' ','
-%nonassoc 'IN' 'IS' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS' NEGATION
+%nonassoc 'IN' 'IS' '<impala>ILIKE' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS' NEGATION
 
 %start SqlSyntax
 
