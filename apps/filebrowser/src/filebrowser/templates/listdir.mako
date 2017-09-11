@@ -99,7 +99,7 @@ ${ fb_components.menubar() }
                   <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
                 </a>
               </li>
-              % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get() and 'oozie' in apps:
+              % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
                 <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
                 </li>
@@ -133,7 +133,7 @@ ${ fb_components.menubar() }
               <i class="fa fa-fw fa-play"></i> ${_('Submit')}
             </button>
             % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-              <button class="btn extractArchiveBtn" title="${_('Extract')}"
+              <button class="btn extractArchiveBtn" title="${_('Extract zip, tar.gz, bz2 or bzip2')}"
                 data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3(), click: confirmExtractArchive">
                 <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}
               </button>

@@ -603,11 +603,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </li>
     % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
       <li data-bind="css: {'disabled': ! showCompressButton}">
-        <a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { if(showCompressButton) { setCompressArchiveDefault(); confirmCompressFiles();}}">
+        <a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
       </li>
       <li data-bind="css: {'disabled': selectedFiles().length != 1 || !isArchive(selectedFile().name) || isS3()}">
-        <a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="click: (selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3()) ? confirmExtractArchive : void(0)">
+        <a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3(), click: confirmExtractArchive">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
       </li>
     % endif
