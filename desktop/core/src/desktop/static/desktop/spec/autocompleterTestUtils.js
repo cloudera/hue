@@ -483,9 +483,25 @@ var SqlTestUtils = (function() {
                   '  Dialect: ' + testDefinition.dialect + '\n' +
                   '           No colRef keywords found'
                 }
-              } else {
-                delete actualResponse.suggestColRefKeywords;
+              } else if (testDefinition.containsColRefKeywords !== true) {
+                var contains = true;
+                testDefinition.containsColRefKeywords.forEach(function (keyword) {
+                  contains = contains && (actualResponse.suggestColRefKeywords.BOOLEAN.indexOf(keyword) !== -1 ||
+                    actualResponse.suggestColRefKeywords.NUMBER.indexOf(keyword) !== -1 ||
+                    actualResponse.suggestColRefKeywords.STRING.indexOf(keyword) !== -1);
+                });
+                if (!contains) {
+                  return {
+                    pass: false,
+                    message: '\nStatement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
+                               '  Dialect: ' + testDefinition.dialect + '\n' +
+                               '           Expected colRef keywords not found ' +
+                               'Expected keywords: ' + JSON.stringify(testDefinition.containsColRefKeywords) + '\n' +
+                               '  Parser keywords: ' + JSON.stringify(actualResponse.suggestColRefKeywords) +   '\n'
+                  }
+                }
               }
+              delete actualResponse.suggestColRefKeywords;
             }
 
             if (typeof testDefinition.containsKeywords !== 'undefined') {

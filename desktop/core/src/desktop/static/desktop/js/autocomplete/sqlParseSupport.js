@@ -218,7 +218,7 @@ var SqlParseSupport = (function () {
           suggestColRefKeywords: {
             BOOLEAN: ['AND', 'OR'],
             NUMBER: ['+', '-', '*', '/', '%', 'DIV'],
-            STRING: ['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']
+            STRING: parser.isImpala() ? ['ILIKE', 'LIKE', 'NOT LIKE', 'REGEX', 'RLIKE'] : ['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']
           }
         }
       }
@@ -229,7 +229,8 @@ var SqlParseSupport = (function () {
         keywords = keywords.concat(['+', '-', '*', '/', '%', 'DIV']);
       }
       if (SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
-        keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
+        keywords = keywords.concat(parser.isImpala() ? ['ILIKE', 'LIKE', 'NOT LIKE', 'REGEX', 'RLIKE'] : ['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
+
       }
       return {suggestKeywords: keywords};
     };

@@ -288,6 +288,19 @@
         });
       });
 
+      it('should handle "SELECT * FROM foo WHERE bar ILIKE \'bla\'; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE bar ILIKE \'bla\'; ',
+          afterCursor: '',
+          noErrors: true,
+          dialect: 'impala',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it ('should handle "SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; ',
@@ -4962,9 +4975,9 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE a NOT ',
           afterCursor: '',
+          containsKeywords: ['BETWEEN', 'EXISTS', 'IN', 'LIKE'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['BETWEEN', 'EXISTS', 'IN', 'LIKE']
+            lowerCase: false
           }
         });
       });
@@ -5250,6 +5263,22 @@
       });
 
       describe('Impala specific', function () {
+        it('should suggest keywords for "SELECT * FROM testTable WHERE a |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM testTable WHERE a ',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['HAVING'],
+            containsColRefKeywords: ['ILIKE', 'LIKE'],
+            expectedResult: {
+              lowerCase: false,
+              suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+              suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+              colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a' }] }
+            }
+          })
+        });
+
         it('should suggest keywords for "SELECT * FROM database_two.testTable ORDER BY foo |"', function() {
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM database_two.testTable ORDER BY foo ',
