@@ -320,6 +320,7 @@
 'DATABASE'                                 { return 'DATABASE'; }
 'DECIMAL'                                  { return 'DECIMAL'; }
 'DISTINCT'                                 { return 'DISTINCT'; }
+'DIV'                                      { return 'ARITHMETIC_OPERATOR'; }
 'DOUBLE'                                   { return 'DOUBLE'; }
 'DESC'                                     { return 'DESC'; }
 'DROP'                                     { parser.determineCase(yytext); return 'DROP'; }
@@ -455,15 +456,6 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 '>='                                       { return 'COMPARISON_OPERATOR'; }
 '<>'                                       { return 'COMPARISON_OPERATOR'; }
 '<=>'                                      { return 'COMPARISON_OPERATOR'; }
-
-'-'                                        { return '-'; }
-'*'                                        { return '*'; }
-'+'                                        { return 'ARITHMETIC_OPERATOR'; }
-'/'                                        { return 'ARITHMETIC_OPERATOR'; }
-'%'                                        { return 'ARITHMETIC_OPERATOR'; }
-'|'                                        { return 'ARITHMETIC_OPERATOR'; }
-'^'                                        { return 'ARITHMETIC_OPERATOR'; }
-'&'                                        { return 'ARITHMETIC_OPERATOR'; }
 
 '-'                                        { return '-'; }
 '*'                                        { return '*'; }
