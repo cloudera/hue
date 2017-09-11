@@ -1344,6 +1344,7 @@ ${ components.menubar(is_embeddable) }
                     fixedHeader: true,
                     fixedFirstColumn: true,
                     includeNavigator: false,
+                    lockSelectedRow: false,
                     parentId: 'sample',
                     classToRemove: 'sample-table',
                     mainScrollable: '${ MAIN_SCROLLABLE }',
