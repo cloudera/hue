@@ -544,6 +544,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     $('#rowDetailsModal').on('shown', function () {
       $('.modal-backdrop').css('z-index', '1070');
+      $('#rowDetailsModal .modal-body').scrollTop(0);
     });
 
     if ($.fn.editableform) {
