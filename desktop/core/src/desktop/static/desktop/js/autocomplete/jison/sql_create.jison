@@ -448,55 +448,55 @@ ColumnDataType_EDIT
  ;
 
 ArrayType
- : '<hive>ARRAY' '<' ColumnDataType '>'
+ : 'ARRAY' '<' ColumnDataType '>'
  ;
 
 ArrayType_INVALID
- : '<hive>ARRAY' '<' '>'
+ : 'ARRAY' '<' '>'
  ;
 
 ArrayType_EDIT
- : '<hive>ARRAY' '<' AnyCursor GreaterThanOrError
+ : 'ARRAY' '<' AnyCursor GreaterThanOrError
    {
      parser.suggestKeywords(parser.getColumnDataTypeKeywords());
    }
- | '<hive>ARRAY' '<' ColumnDataType_EDIT GreaterThanOrError
+ | 'ARRAY' '<' ColumnDataType_EDIT GreaterThanOrError
  ;
 
 MapType
- : '<hive>MAP' '<' PrimitiveType ',' ColumnDataType '>'
+ : 'MAP' '<' PrimitiveType ',' ColumnDataType '>'
  ;
 
 MapType_INVALID
- : '<hive>MAP' '<' '>'
+ : 'MAP' '<' '>'
  ;
 
 MapType_EDIT
- : '<hive>MAP' '<' PrimitiveType ',' ColumnDataType_EDIT GreaterThanOrError
- | '<hive>MAP' '<' AnyCursor GreaterThanOrError
+ : 'MAP' '<' PrimitiveType ',' ColumnDataType_EDIT GreaterThanOrError
+ | 'MAP' '<' AnyCursor GreaterThanOrError
    {
      parser.suggestKeywords(parser.getTypeKeywords());
    }
- | '<hive>MAP' '<' PrimitiveType ',' AnyCursor GreaterThanOrError
+ | 'MAP' '<' PrimitiveType ',' AnyCursor GreaterThanOrError
    {
      parser.suggestKeywords(parser.getColumnDataTypeKeywords());
    }
- | '<hive>MAP' '<' ',' AnyCursor GreaterThanOrError
+ | 'MAP' '<' ',' AnyCursor GreaterThanOrError
    {
      parser.suggestKeywords(parser.getColumnDataTypeKeywords());
    }
  ;
 
 StructType
- : '<hive>STRUCT' '<' StructDefinitionList '>'
+ : 'STRUCT' '<' StructDefinitionList '>'
  ;
 
 StructType_INVALID
- : '<hive>STRUCT' '<' '>'
+ : 'STRUCT' '<' '>'
  ;
 
 StructType_EDIT
- : '<hive>STRUCT' '<' StructDefinitionList_EDIT GreaterThanOrError
+ : 'STRUCT' '<' StructDefinitionList_EDIT GreaterThanOrError
  ;
 
 StructDefinitionList
@@ -1063,19 +1063,19 @@ OptionalCollectionItemsTerminatedBy_EDIT
 
 OptionalMapKeysTerminatedBy
  :
- | '<hive>MAP' '<hive>KEYS' '<hive>TERMINATED' 'BY' SingleQuotedValue
+ | 'MAP' '<hive>KEYS' '<hive>TERMINATED' 'BY' SingleQuotedValue
  ;
 
 OptionalMapKeysTerminatedBy_EDIT
- : '<hive>MAP' 'CURSOR'
+ : 'MAP' 'CURSOR'
    {
      parser.suggestKeywords(['KEYS TERMINATED BY']);
    }
- | '<hive>MAP' '<hive>KEYS' 'CURSOR'
+ | 'MAP' '<hive>KEYS' 'CURSOR'
    {
      parser.suggestKeywords(['TERMINATED BY']);
    }
- | '<hive>MAP' '<hive>KEYS' '<hive>TERMINATED' 'CURSOR'
+ | 'MAP' '<hive>KEYS' '<hive>TERMINATED' 'CURSOR'
    {
      parser.suggestKeywords(['BY']);
    }
