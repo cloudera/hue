@@ -248,7 +248,7 @@ var CoordinatorEditorViewModel = (function () {
             }
             if (window.location.search.indexOf("coordinator") == -1 && !IS_HUE_4) {
               window.location.hash = '#coordinator=' + data.id;
-            } else if (IS_HUE_4) {
+            } else if (IS_HUE_4 && ! cb) { // cb from integrated scheduler
               hueUtils.changeURL('/hue/oozie/editor/coordinator/edit/?coordinator=' + data.id);
             }
           }
