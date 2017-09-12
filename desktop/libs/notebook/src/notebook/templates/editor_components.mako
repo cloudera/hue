@@ -1219,7 +1219,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 
-<script type="text/html" id="snippet-variables">
+<script type="text/html" id="snippet-variables"> 
   <div class="variables">
     <ul data-bind="foreach: variables" class="unstyled inline">
       <li>
