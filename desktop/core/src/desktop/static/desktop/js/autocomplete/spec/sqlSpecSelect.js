@@ -4527,7 +4527,7 @@
             lowerCase: false,
             suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
+            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
       });
@@ -4541,7 +4541,7 @@
             lowerCase: false,
             suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
+            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
       });
