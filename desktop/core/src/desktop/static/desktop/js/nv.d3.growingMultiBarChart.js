@@ -187,10 +187,16 @@ nv.models.growingMultiBarChart = function() {
             .datum(data)
             .call(legend);
 
-        if ( margin.top != legend.height()) {
-          margin.top = legend.height();
-          availableHeight = (height || parseInt(container.style('height')) || 400)
-                             - margin.top - margin.bottom;
+        if (legend.height() > 50) {
+          g.select('.nv-legendWrap').style('visibility', 'hidden');
+        }
+        else {
+          g.select('.nv-legendWrap').style('visibility', 'visible');
+          if (margin.top != legend.height()) {
+            margin.top = legend.height();
+            availableHeight = (height || parseInt(container.style('height')) || 400)
+              - margin.top - margin.bottom;
+          }
         }
 
         g.select('.nv-legendWrap')
