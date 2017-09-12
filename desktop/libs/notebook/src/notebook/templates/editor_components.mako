@@ -2153,7 +2153,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         if (snippetEl.find('.dataTables_wrapper').length > 0 && snippet.showGrid()) {
           window.clearTimeout(resultFollowTimeout);
           resultFollowTimeout = window.setTimeout(function () {
-            var topCoord = vm.isPresentationMode() || vm.isResultFullScreenMode() ? 1 : 73;
+            var topCoord = vm.isPresentationMode() || vm.isResultFullScreenMode() ? 50 : 73;
             var offsetTop = 0;
             if (snippetEl.find('.dataTables_wrapper').length > 0 && snippetEl.find('.dataTables_wrapper').offset()){
               offsetTop = (snippetEl.find('.dataTables_wrapper').offset().top - topCoord) * -1;
