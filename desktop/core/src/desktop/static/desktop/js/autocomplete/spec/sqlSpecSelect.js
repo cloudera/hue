@@ -301,6 +301,19 @@
         });
       });
 
+      it('should handle "SELECT * FROM foo WHERE bar IREGEXP \'bla\'; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE bar IREGEXP \'bla\'; ',
+          afterCursor: '',
+          noErrors: true,
+          dialect: 'impala',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it ('should handle "SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; ',
@@ -5269,7 +5282,7 @@
             afterCursor: '',
             dialect: 'impala',
             containsKeywords: ['HAVING'],
-            containsColRefKeywords: ['ILIKE', 'LIKE', 'REGEXP'],
+            containsColRefKeywords: ['ILIKE', 'LIKE', 'REGEXP', 'IREGEXP'],
             expectedResult: {
               lowerCase: false,
               suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
