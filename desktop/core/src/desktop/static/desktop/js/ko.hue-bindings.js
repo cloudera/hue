@@ -2012,6 +2012,7 @@
       var $resizer = $(element);
       var $contentPanel = $(".content-panel");
       var $execStatus = $resizer.prev('.snippet-execution-status');
+      var $variables = $resizer.siblings('.snippet-row').find('.variables');
 
       var lastEditorSize = $.totalStorage('hue.editor.editor.size') || 131;
       var editorHeight = Math.floor(lastEditorSize / 16);
@@ -2062,7 +2063,7 @@
         start: options.onStart ? options.onStart : function(){},
         drag: function (event, ui) {
           autoExpand = false;
-          var currentHeight = ui.offset.top + $contentPanel.scrollTop() - (125 + $execStatus.outerHeight(true));
+          var currentHeight = ui.offset.top + $contentPanel.scrollTop() - (125 + $execStatus.outerHeight(true) + $variables.outerHeight(true));
           $target.css("height", currentHeight + "px");
           ace().resize();
           ui.offset.top = 0;
