@@ -229,6 +229,7 @@
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
 <impala>'INVALIDATE'                       { parser.determineCase(yytext); return '<impala>INVALIDATE'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
+<impala>'IREGEXP'                          { return '<impala>IREGEXP'; }
 <impala>'KEY'                              { return '<impala>KEY'; }
 <impala>'KUDU'                             { return '<impala>KUDU'; }
 <impala>'LAST'                             { return '<impala>LAST'; }
