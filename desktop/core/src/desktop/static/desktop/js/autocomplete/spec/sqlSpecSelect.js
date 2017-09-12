@@ -5269,7 +5269,7 @@
             afterCursor: '',
             dialect: 'impala',
             containsKeywords: ['HAVING'],
-            containsColRefKeywords: ['ILIKE', 'LIKE'],
+            containsColRefKeywords: ['ILIKE', 'LIKE', 'REGEXP'],
             expectedResult: {
               lowerCase: false,
               suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
