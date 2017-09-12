@@ -25,14 +25,15 @@ ValueExpression
      // verifyType($2, 'BOOLEAN');
      $$ = { types: [ 'BOOLEAN' ] };
    }
- | '~' ValueExpression                                                              -> $2
+ | '~' ValueExpression                                                 -> $2
  | '-' ValueExpression %prec NEGATION
    {
      // verifyType($2, 'NUMBER');
      $$ = $2;
      $2.types = ['NUMBER'];
    }
- | ValueExpression 'IS' OptionalNot 'NULL'              -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IS' OptionalNot 'NULL'                             -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IS' OptionalNot 'DISTINCT' 'FROM' ValueExpression  -> { types: [ 'BOOLEAN' ] }
  ;
 
 ValueExpression_EDIT
@@ -71,20 +72,44 @@ ValueExpression_EDIT
      parser.suggestColumns({ types: [ 'NUMBER' ] });
      $$ = { types: [ 'NUMBER' ] };
    }
- | ValueExpression 'IS' 'NOT' 'CURSOR'
-    {
-      parser.suggestKeywords(['NULL']);
-      $$ = { types: [ 'BOOLEAN' ] };
-    }
  | ValueExpression 'IS' 'CURSOR'
    {
-     parser.suggestKeywords(['NOT NULL', 'NULL']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT NULL', 'NULL']);
+     } else {
+       parser.suggestKeywords(['NOT NULL', 'NULL']);
+     }
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'IS' 'NOT' 'CURSOR'
+   {
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['DISTINCT FROM', 'NULL']);
+     } else {
+       parser.suggestKeywords(['NULL']);
+     }
+      $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'IS' OptionalNot 'DISTINCT' 'CURSOR'
+   {
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['FROM']);
+     }
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' 'CURSOR' 'NULL'
    {
      parser.suggestKeywords(['NOT']);
      $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'IS' OptionalNot 'DISTINCT' 'FROM' PartialBacktickedOrAnyCursor
+   {
+     parser.valueExpressionSuggest($1, $3 ? 'IS NOT DISTINCT FROM' : 'IS DISTINCT FROM');
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'IS' OptionalNot 'DISTINCT' 'FROM' ValueExpression_EDIT
+   {
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $6.suggestFilters }
    }
  ;
 

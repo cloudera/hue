@@ -203,6 +203,10 @@ var SqlParseSupport = (function () {
       var types = valueExpression.lastType ? valueExpression.lastType.types : valueExpression.types;
       // We could have valueExpression.columnReference to suggest based on column type
       var keywords = ['<', '<=', '<=>', '<>', '=', '>', '>=', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN'];
+      if (parser.isImpala()) {
+        keywords.push('IS DISTINCT FROM');
+        keywords.push('IS NOT DISTINCT FROM');
+      }
       if (extras) {
         keywords = keywords.concat(extras);
       }

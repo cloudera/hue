@@ -4550,9 +4550,9 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id IS ',
           afterCursor: '',
+          containsKeywords: ['NOT NULL', 'NULL'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['NOT NULL', 'NULL']
+            lowerCase: false
           }
         });
       });
@@ -4561,9 +4561,9 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id IS NOT ',
           afterCursor: '',
+          containsKeywords: ['NULL'],
           expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['NULL']
+            lowerCase: false
           }
         });
       });
@@ -4714,6 +4714,104 @@
             suggestColumns: { source: 'where',  types: ['BOOLEAN'], tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bar' }] },
             suggestIdentifiers: [{ name: 'bar.', type: 'alias' }]
           }
+        });
+      });
+
+      describe('Impala specific', function () {
+        it('should handle functions for "SELECT 1 IS DISTINCT FROM 2; |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 1 IS DISTINCT FROM 2; ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle functions for "SELECT 1 IS NOT DISTINCT FROM 2; |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 1 IS NOT DISTINCT FROM 2; ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT 1 |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 1 ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['IS DISTINCT FROM'],
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: { prependFrom: true },
+              suggestDatabases: { prependFrom: true, appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT 1 IS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 1 IS ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['DISTINCT FROM', 'NOT DISTINCT FROM'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT 1 IS NOT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 1 IS NOT ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['DISTINCT FROM'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT 1 IS DISTINCT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 1 IS DISTINCT ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FROM']
+            }
+          });
+        });
+
+        it('should suggest columns for "SELECT 1 IS DISTINCT FROM | FROM tbl"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT 1 IS DISTINCT FROM ',
+            afterCursor: ' FROM tbl',
+            dialect: 'impala',
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FROM'],
+              suggestColumns: { types: ['NUMBER'], source: 'select', tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+              suggestFunctions: { types: ['NUMBER'] },
+              suggestKeywords: ['CASE', 'NULL']
+            }
+          });
         });
       });
 
