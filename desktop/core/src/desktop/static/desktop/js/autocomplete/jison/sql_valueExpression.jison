@@ -537,15 +537,17 @@ ValueExpression
  ;
 
 LikeRightPart
- : 'LIKE' ValueExpression           -> { suggestKeywords: ['NOT'] }
- | '<impala>ILIKE' ValueExpression  -> { suggestKeywords: ['NOT'] }
- | 'RLIKE' ValueExpression          -> { suggestKeywords: ['NOT'] }
- | 'REGEXP' ValueExpression         -> { suggestKeywords: ['NOT'] }
+ : 'LIKE' ValueExpression             -> { suggestKeywords: ['NOT'] }
+ | '<impala>ILIKE' ValueExpression    -> { suggestKeywords: ['NOT'] }
+ | '<impala>IREGEXP' ValueExpression  -> { suggestKeywords: ['NOT'] }
+ | 'RLIKE' ValueExpression            -> { suggestKeywords: ['NOT'] }
+ | 'REGEXP' ValueExpression           -> { suggestKeywords: ['NOT'] }
  ;
 
 LikeRightPart_EDIT
  : 'LIKE' ValueExpression_EDIT
  | '<impala>ILIKE' ValueExpression_EDIT
+ | '<impala>IREGEXP' ValueExpression_EDIT
  | 'RLIKE' ValueExpression_EDIT
  | 'REGEXP' ValueExpression_EDIT
  | 'LIKE' PartialBacktickedOrCursor
@@ -555,6 +557,12 @@ LikeRightPart_EDIT
      $$ = { types: ['BOOLEAN'] }
    }
  | '<impala>ILIKE' PartialBacktickedOrCursor
+   {
+     parser.suggestFunctions({ types: [ 'STRING' ] });
+     parser.suggestColumns({ types: [ 'STRING' ] });
+     $$ = { types: ['BOOLEAN'] }
+   }
+ | '<impala>IREGEXP' PartialBacktickedOrCursor
    {
      parser.suggestFunctions({ types: [ 'STRING' ] });
      parser.suggestColumns({ types: [ 'STRING' ] });
