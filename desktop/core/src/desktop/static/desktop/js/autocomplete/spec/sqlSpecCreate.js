@@ -1110,6 +1110,24 @@
           });
         });
 
+        it('should handle "CREATE ... TABLE ... LIKE PARQUET ... PARTITIONED BY ... ROW FORMAT ... CACHED ...;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
+            'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
+            'SORT BY (baa, boo, ble) WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
+            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
+            'CACHED IN \'boo\';',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest keywords for "CREATE EXTERNAL |"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL ',
@@ -1313,6 +1331,18 @@
             containsKeywords: ['COMMENT'],
             expectedResult: {
               lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT, boo INT) SORT "', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT, boo INT) SORT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
             }
           });
         });
@@ -1522,7 +1552,7 @@
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
             'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
+            'SORT BY (baa, boo, ble) WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
             'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED ',
@@ -1809,7 +1839,7 @@
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
-            containsKeywords: ['PARTITION BY', 'PARTITIONED BY', 'STORED AS'],
+            containsKeywords: ['PARTITION BY', 'PARTITIONED BY', 'STORED AS', 'SORT BY'],
             expectedResult: {
               lowerCase: false
             }
