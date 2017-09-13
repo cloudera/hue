@@ -675,7 +675,6 @@ RangePartitionComparisonOperator
  | '>'
  ;
 
-
 ConfigurationName
  : RegularIdentifier
  | 'CURSOR'
@@ -883,6 +882,72 @@ PartitionExpression_EDIT
  | AnyCursor
    {
      parser.suggestColumns();
+   }
+ ;
+
+OptionalHdfsLocation
+ :
+ | HdfsLocation
+ ;
+
+HdfsLocation
+ : HiveOrImpalaLocation HdfsPath
+ ;
+
+HdfsLocation_EDIT
+ : HiveOrImpalaLocation HdfsPath_EDIT
+ ;
+
+OptionalCachedInOrUncached
+ :
+ | CachedIn OptionalWithReplication
+   {
+     if (!$2) {
+       $$ = { suggestKeywords: ['WITH REPLICATION ='] };
+     }
+   }
+ | '<impala>UNCACHED'
+ ;
+
+
+OptionalCachedIn
+ :
+ | CachedIn OptionalWithReplication
+   {
+     if (!$2) {
+       $$ = { suggestKeywords: ['WITH REPLICATION ='] };
+     }
+   }
+ ;
+
+CachedIn
+ : '<impala>CACHED' 'IN' QuotedValue
+ ;
+
+CachedIn_EDIT
+ : '<impala>CACHED' 'CURSOR'
+   {
+     parser.suggestKeywords(['IN']);
+   }
+ ;
+
+OptionalWithReplication
+ :
+ | WithReplication
+ ;
+
+WithReplication
+ : 'WITH' '<impala>REPLICATION' '=' SignedInteger
+ ;
+
+WithReplication_EDIT
+ : 'WITH' 'CURSOR'
+   {
+     parser.suggestKeywords(['REPLICATION =']);
+   }
+ | 'WITH' '<impala>REPLICATION' 'CURSOR'
+   {
+     parser.suggestKeywords(['=']);
    }
  ;
 
