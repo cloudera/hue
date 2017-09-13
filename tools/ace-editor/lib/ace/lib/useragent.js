@@ -85,7 +85,7 @@ exports.isOldIE = exports.isIE && exports.isIE < 9;
 exports.isGecko = exports.isMozilla = (window.Controllers || window.controllers) && window.navigator.product === "Gecko";
 
 // oldGecko == rev < 2.0 
-exports.isOldGecko = exports.isGecko && parseInt((ua.match(/rv\:(\d+)/)||[])[1], 10) < 4;
+exports.isOldGecko = exports.isGecko && parseInt((ua.match(/rv:(\d+)/)||[])[1], 10) < 4;
 
 // Is this Opera 
 exports.isOpera = window.opera && Object.prototype.toString.call(window.opera) == "[object Opera]";
@@ -99,8 +99,10 @@ exports.isAIR = ua.indexOf("AdobeAIR") >= 0;
 
 exports.isIPad = ua.indexOf("iPad") >= 0;
 
-exports.isTouchPad = ua.indexOf("TouchPad") >= 0;
-
 exports.isChromeOS = ua.indexOf(" CrOS ") >= 0;
+
+exports.isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+if (exports.isIOS) exports.isMac = true;
 
 });
