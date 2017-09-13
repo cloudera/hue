@@ -444,21 +444,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
           <li><span data-bind="text: id"></span></li>
-          <li data-bind="visible: id() != name()" class="nav-header">${ _('Name') }</li>
-          <li data-bind="visible: id() != name(), attr: { title: name }"><span data-bind="text: name"></span></li>
+          <li data-bind="visible: id() != name() && ! $root.isMini()" class="nav-header">${ _('Name') }</li>
+          <li data-bind="visible: id() != name() && ! $root.isMini(), attr: { title: name }"><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
-          <li class="nav-header">${ _('Status') }</li>
-          <li><span data-bind="text: status"></span></li>
+          <li data-bind="visible: ! $root.isMini()" class="nav-header">${ _('Status') }</li>
+          <li data-bind="visible: ! $root.isMini()"><span data-bind="text: status"></span></li>
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}, attr: {title: status}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
+          <!-- ko with: ! $root.isMini() -->
           <!-- ko with: properties -->
             <li class="nav-header">${ _('Map') }</li>
             <li><span data-bind="text: maps_percent_complete"></span>% <span data-bind="text: finishedMaps"></span> /<span data-bind="text: desiredMaps"></span></li>
@@ -468,6 +469,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <li><span data-bind="text: durationFormatted"></span></li>
             <li class="nav-header">${ _('Submitted') }</li>
             <li><span data-bind="text: startTimeFormatted"></span></li>
+          <!-- /ko -->
           <!-- /ko -->
         </ul>
       </div>
@@ -570,23 +572,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}, attr: {title: status}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
+          <!-- ko with: ! $root.isMini() -->
           <!-- ko with: properties -->
-          <li class="nav-header">${ _('State') }</li>
-          <li><span data-bind="text: state"></span></li>
-          <li class="nav-header">${ _('Start time') }</li>
-          <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
-          <li class="nav-header">${ _('Successful attempt') }</li>
-          <li><span data-bind="text: successfulAttempt"></span></li>
-          <li class="nav-header">${ _('Finish time') }</li>
-          <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
-          <li class="nav-header">${ _('Elapsed time') }</li>
-          <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
+            <li data-bind="visible: ! $root.isMini()" class="nav-header">${ _('State') }</li>
+            <li data-bind="visible: ! $root.isMini()"><span data-bind="text: state"></span></li>
+            <li class="nav-header">${ _('Start time') }</li>
+            <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
+            <li class="nav-header">${ _('Successful attempt') }</li>
+            <li><span data-bind="text: successfulAttempt"></span></li>
+            <li class="nav-header">${ _('Finish time') }</li>
+            <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
+            <li class="nav-header">${ _('Elapsed time') }</li>
+            <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
           <!-- /ko -->
-
+          <!-- /ko -->
         </ul>
       </div>
     </div>
@@ -664,27 +667,28 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() == 'RUNNING', 'progress-success': apiStatus() == 'SUCCEEDED', 'progress-danger': apiStatus() == 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() == 'RUNNING', 'progress-success': apiStatus() == 'SUCCEEDED', 'progress-danger': apiStatus() == 'FAILED'}, attr: {title: status}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
+          <!-- ko with: ! $root.isMini() -->
           <!-- ko with: properties -->
-          <li class="nav-header">${ _('State') }</li>
-          <li><span data-bind="text: state"></span></li>
-          <li class="nav-header">${ _('Assigned Container ID') }</li>
-          <li><span data-bind="text: assignedContainerId"></span></li>
-          <li class="nav-header">${ _('Rack') }</li>
-          <li><span data-bind="text: rack"></span></li>
-          <li class="nav-header">${ _('Node HTTP address') }</li>
-          <li><span data-bind="text: nodeHttpAddress"></span></li>
-          <li class="nav-header">${ _('Start time') }</li>
-          <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
-          <li class="nav-header">${ _('Finish time') }</li>
-          <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
-          <li class="nav-header">${ _('Elapsed time') }</li>
-          <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
+            <li class="nav-header">${ _('State') }</li>
+            <li><span data-bind="text: state"></span></li>
+            <li class="nav-header">${ _('Assigned Container ID') }</li>
+            <li><span data-bind="text: assignedContainerId"></span></li>
+            <li class="nav-header">${ _('Rack') }</li>
+            <li><span data-bind="text: rack"></span></li>
+            <li class="nav-header">${ _('Node HTTP address') }</li>
+            <li><span data-bind="text: nodeHttpAddress"></span></li>
+            <li class="nav-header">${ _('Start time') }</li>
+            <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
+            <li class="nav-header">${ _('Finish time') }</li>
+            <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
+            <li class="nav-header">${ _('Elapsed time') }</li>
+            <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
           <!-- /ko -->
-
+          <!-- /ko -->
         </ul>
       </div>
     </div>
@@ -968,8 +972,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Id') }</li>
-          <li class="break-word"><span data-bind="text: id"></span></li>
+          <li class="nav-header" data-bind="visible: ! $root.isMini()">${ _('Id') }</li>
+          <li class="break-word" data-bind="visible: ! $root.isMini()"><span data-bind="text: id"></span></li>
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
@@ -982,21 +986,21 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <!-- /ko -->
-          <li class="nav-header">${ _('Status') }</li>
-          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header" data-bind="visible: ! $root.isMini()">${ _('Status') }</li>
+          <li><span data-bind="text: status, visible: ! $root.isMini()"></span></li>
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }, attr: {title: status}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
+          <li data-bind="visible: ! $root.isMini()" class="nav-header">${ _('Duration') }</li>
+          <li data-bind="visible: ! $root.isMini()"><span data-bind="text: duration().toHHMMSS()"></span></li>
+          <li class="nav-header" data-bind="visible: ! $root.isMini()">${ _('Submitted') }</li>
+          <li data-bind="visible: ! $root.isMini()"><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
           <!-- ko if: properties['parameters'].length > 0 -->
           <li class="nav-header">${ _('Variables') }</li>
           <li>
@@ -1179,8 +1183,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Id') }</li>
-          <li class="break-word"><span data-bind="text: id"></span></li>
+          <li class="nav-header" data-bind="visible: ! $root.isMini()">${ _('Id') }</li>
+          <li class="break-word" data-bind="visible: ! $root.isMini()"><span data-bind="text: id"></span></li>
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
@@ -1193,27 +1197,29 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <!-- /ko -->
-          <li class="nav-header">${ _('Type') }</li>
-          <li><span data-bind="text: type"></span></li>
-          <li class="nav-header">${ _('Status') }</li>
-          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header" data-bind="visible: ! $root.isMini()">${ _('Type') }</li>
+          <li data-bind="visible: ! $root.isMini()"><span data-bind="text: type"></span></li>
+          <li class="nav-header" data-bind="visible: ! $root.isMini()">${ _('Status') }</li>
+          <li data-bind="visible: ! $root.isMini()"><span data-bind="text: status"></span></li>
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}, attr: {title: status}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="text: submitted"></span></li>
-          <li class="nav-header">${ _('Next Run') }</li>
-          <li><span data-bind="text: properties['nextTime']"></span></li>
-          <li class="nav-header">${ _('Total Actions') }</li>
-          <li><span data-bind="text: properties['total_actions']"></span></li>
-          <li class="nav-header">${ _('End time') }</li>
-          <li><span data-bind="text: properties['endTime']"></span></li>
+          <!-- ko with: ! $root.isMini() -->
+            <li class="nav-header">${ _('Submitted') }</li>
+            <li><span data-bind="text: submitted"></span></li>
+            <li class="nav-header">${ _('Next Run') }</li>
+            <li><span data-bind="text: properties['nextTime']"></span></li>
+            <li class="nav-header">${ _('Total Actions') }</li>
+            <li><span data-bind="text: properties['total_actions']"></span></li>
+            <li class="nav-header">${ _('End time') }</li>
+            <li><span data-bind="text: properties['endTime']"></span></li>
+          <!-- /ko -->
         </ul>
       </div>
     </div>
