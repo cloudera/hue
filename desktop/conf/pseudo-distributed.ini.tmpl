@@ -1434,6 +1434,29 @@
       # e.g. Use boto.s3.connection.OrdinaryCallingFormat for https://s3.amazonaws.com/<bucket-name>
       ## calling_format=boto.s3.connection.OrdinaryCallingFormat
 
+###########################################################################
+# Settings for the Azure lib
+###########################################################################
+[azure]
+  [[azure_accounts]]
+    # Default Azure account
+    [[[default]]]
+      # Azure credentials
+      ## client_id=
+      ## client_secret=
+      ## refresh_url=https://login.microsoftonline.com/<tenant_id>/oauth2/token
+
+      # Endpoint overrides
+      ## proxy_address=
+      ## proxy_port=8080
+      ## proxy_user=
+      ## proxy_pass=
+
+  [[adls_clusters]]
+    # Default ADLS cluster
+    [[[default]]]
+      # fs_defaultfs=adl://<account_name>.azuredatalakestore.net
+      # webhdfs_url=https://<account_name>.azuredatalakestore.net/webhdfs/v1
 
 ###########################################################################
 # Settings for the Sentry lib

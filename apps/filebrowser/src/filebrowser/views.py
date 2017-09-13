@@ -26,6 +26,7 @@ import re
 import shutil
 import stat as stat_module
 import urllib
+from urlparse import urlparse
 
 from bz2 import decompress
 from datetime import datetime
@@ -386,7 +387,7 @@ def listdir(request, path):
         parent_stat['path'] = parent_path
         stats.insert(0, parent_stat)
 
-    data['files'] = [_massage_stats(request, stat) for stat in stats]
+    data['files'] = [_massage_stats(request, stat_absolute_path(path, stat)) for stat in stats]
     return render('listdir.mako', request, data)
 
 def _massage_page(page):
@@ -482,7 +483,7 @@ def listdir_paged(request, path):
     shown_stats.insert(1, current_stat)
 
     if page:
-      page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
+      page.object_list = [ _massage_stats(request, stat_absolute_path(path, s)) for s in shown_stats ]
 
     is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and \
                        (request.fs.isdir(_home_trash_path(request.fs, request.user, path)) or
@@ -516,6 +517,16 @@ def listdir_paged(request, path):
     }
     return render('listdir.mako', request, data)
 
+def scheme_absolute_path(root, path):
+  splitPath = urlparse(path)
+  splitRoot = urlparse(root)
+  if splitRoot.scheme and not splitPath.scheme:
+    path = splitPath._replace(scheme=splitRoot.scheme).geturl()
+  return path
+
+def stat_absolute_path(path, stat):
+  stat["path"] = scheme_absolute_path(path, stat["path"])
+  return stat
 
 def _massage_stats(request, stats):
     """
@@ -548,7 +559,7 @@ def stat(request, path):
     if not request.fs.exists(path):
         raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
     stats = request.fs.stats(path)
-    return JsonResponse(_massage_stats(request, stats))
+    return JsonResponse(_massage_stats(request, stat_absolute_path(path, stats)))
 
 
 def content_summary(request, path):
@@ -649,7 +660,8 @@ def display(request, path):
 
     dirname = posixpath.dirname(path)
     # Start with index-like data:
-    data = _massage_stats(request, request.fs.stats(path))
+    stats = request.fs.stats(path)
+    data = _massage_stats(request, stat_absolute_path(path, stats))
     data["is_embeddable"] = request.GET.get('is_embeddable', False)
     # And add a view structure:
     data["success"] = True
@@ -1065,7 +1077,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
             try:
                 if piggyback:
                     piggy_path = form.cleaned_data[piggyback]
-                    ret["result"] = _massage_stats(request, request.fs.stats(piggy_path))
+                    ret["result"] = _massage_stats(request, stat_absolute_path(piggy_path ,request.fs.stats(piggy_path)))
             except Exception, e:
                 # Hard to report these more naturally here.  These happen either
                 # because of a bug in the piggy-back code or because of a
@@ -1264,7 +1276,7 @@ def _upload_file(request):
 
     if form.is_valid():
         uploaded_file = request.FILES['hdfs_file']
-        dest = form.cleaned_data['dest']
+        dest = scheme_absolute_path(request.GET['dest'], form.cleaned_data['dest'])
         filepath = request.fs.join(dest, uploaded_file.name)
 
         if request.fs.isdir(dest) and posixpath.sep in uploaded_file.name:
@@ -1288,7 +1300,7 @@ def _upload_file(request):
 
         response.update({
           'path': filepath,
-          'result': _massage_stats(request, request.fs.stats(filepath)),
+          'result': _massage_stats(request, stat_absolute_path(filepath, request.fs.stats(filepath))),
           'next': request.GET.get("next")
         })
 

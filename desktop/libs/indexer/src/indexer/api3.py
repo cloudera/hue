@@ -169,8 +169,10 @@ def guess_field_types(request):
 @api_error_handler
 def importer_submit(request):
   source = json.loads(request.POST.get('source', '{}'))
+  source['path'] = request.fs.netnormpath(source['path'])
   outputFormat = json.loads(request.POST.get('destination', '{}'))['outputFormat']
   destination = json.loads(request.POST.get('destination', '{}'))
+  destination['nonDefaultLocation'] = request.fs.netnormpath(destination['nonDefaultLocation'])
   destination['ouputFormat'] = outputFormat # Workaround a very weird bug
   start_time = json.loads(request.POST.get('start_time', '-1'))
 

@@ -41,6 +41,7 @@ include $(ROOT)/Makefile.vars.priv
 
 APPS := core \
 	libs/aws \
+	libs/azure \
 	libs/hadoop \
 	libs/indexer \
 	libs/liboauth \

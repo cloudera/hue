@@ -1,0 +1,40 @@
+# Portuguese (Brazil) translations for Hue.
+# Copyright (C) 2015 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-09-22 10:22-0700\n"
+"PO-Revision-Date: 2017-09-22 10:22-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: pt_BR <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/azure/conf.py:94
+msgid "Proxy address to use for the S3 connection."
+msgstr ""
+
+#: src/azure/conf.py:100
+msgid "Proxy port to use for the S3 connection."
+msgstr ""
+
+#: src/azure/conf.py:106
+msgid "Proxy user to use for the S3 connection."
+msgstr ""
+
+#: src/azure/conf.py:112
+msgid "Proxy password to use for the S3 connection."
+msgstr ""
+
+#: src/azure/conf.py:137
+msgid "Failed to connect to azure, check your azure credentials."
+msgstr ""
+
