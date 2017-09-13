@@ -1523,6 +1523,68 @@
           });
         });
 
+        it('should handle "ALTER TABLE bar ADD PARTITION (a=1) LOCATION \'/bla\' UNCACHED; |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD PARTITION (a=1) LOCATION \'/bla\' UNCACHED; ',
+            afterCursor: '',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "ALTER TABLE bar ADD IF NOT EXISTS PARTITION (a=1) LOCATION \'/bla\' CACHED IN \'boo\' WITH REPLICATION = 2; |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD IF NOT EXISTS PARTITION (a=1) LOCATION \'/bla\' CACHED IN \'boo\' WITH REPLICATION = 2; ',
+            afterCursor: '',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD PARTITION (a=1) |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD PARTITION (a=1) ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['CACHED IN', 'LOCATION', 'UNCACHED']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD PARTITION (a=1) CACHED |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD PARTITION (a=1) CACHED ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['IN']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD PARTITION (a=1) CACHED IN \'boo\' |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD PARTITION (a=1) CACHED IN \'boo\' ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['WITH REPLICATION =']
+            }
+          });
+        });
+
         it('should suggest columns for "ALTER TABLE bar CHANGE |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER TABLE bar CHANGE ',
