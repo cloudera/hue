@@ -154,7 +154,7 @@ class Notebook(object):
 
     self.data = json.dumps(_data)
 
-  def add_shell_snippet(self, shell_command, arguments, archives, files, env_var):
+  def add_shell_snippet(self, shell_command, arguments, archives, files, env_var, last_executed):
     _data = json.loads(self.data)
 
     _data['snippets'].append(self._make_snippet({
@@ -166,8 +166,9 @@ class Notebook(object):
           u'arguments': arguments,
           u'archives': archives,
           u'env_var': env_var,
-          'command_path': shell_command,
-        }
+          u'command_path': shell_command
+        },
+        u'lastExecuted': last_executed
     }))
     self._add_session(_data, 'shell')
 
@@ -184,7 +185,8 @@ class Notebook(object):
          'name': _snippet.get('name', '%(type)s snippet' % _snippet),
          'database': _snippet.get('database'),
          'result': {},
-         'variables': []
+         'variables': [],
+         'lastExecuted': _snippet.get('lastExecuted')
     }
 
   def _add_session(self, data, snippet_type):
