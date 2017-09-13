@@ -80,7 +80,7 @@ AlterIndex_EDIT
  ;
 
 AlterTable
- : AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
+ : AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs OptionalCachedInOrUncached
  | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' RangePartitionSpec
  | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' '<impala>PARTITION_VALUE' '=' UnsignedValueSpecification
  | AlterTableLeftSide AnyRename 'TO' RegularOrBackTickedSchemaQualifiedName
@@ -93,7 +93,7 @@ AlterTable
 
 AlterTable_EDIT
  : AlterTableLeftSide_EDIT
- | AlterTableLeftSide_EDIT AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs
+ | AlterTableLeftSide_EDIT AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs OptionalCachedInOrUncached
  | AlterTableLeftSide_EDIT AnyRename 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide_EDIT HiveSpecificOperations
  | AlterTableLeftSide_EDIT DropOperations
@@ -116,12 +116,13 @@ AlterTable_EDIT
      parser.suggestKeywords(['COLUMNS']);
    }
  | AlterTableLeftSide AnyAdd OptionalIfNotExists_EDIT
- | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec HdfsLocation_EDIT OptionalPartitionSpecs
- | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs_EDIT
- | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs 'CURSOR'
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec HdfsLocation_EDIT OptionalPartitionSpecs OptionalCachedInOrUncached
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs_EDIT OptionalCachedInOrUncached
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs CachedIn_EDIT
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs OptionalCachedInOrUncached 'CURSOR'
    {
      if (parser.isHive()) {
-       if (!$5 && !$6) {
+       if (!$5 && !$6 && !$7) {
          parser.suggestKeywords(['LOCATION', 'PARTITION']);
        } else if ($6 && $6.suggestKeywords) {
          var keywords = parser.createWeightedKeywords($6.suggestKeywords, 2);
@@ -130,9 +131,17 @@ AlterTable_EDIT
        } else {
          parser.suggestKeywords(['PARTITION']);
        }
+     } else if (parser.isImpala()) {
+       if (!$5 && !$6 && !$7) {
+         parser.suggestKeywords(['LOCATION', 'CACHED IN', 'UNCACHED']);
+       } else if (!$7) {
+         parser.suggestKeywords(['CACHED IN', 'UNCACHED']);
+       } else if ($7 && $7.suggestKeywords) {
+         parser.suggestKeywords($7.suggestKeywords);
+       }
      }
    }
- | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec_EDIT OptionalHdfsLocation OptionalPartitionSpecs
+ | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec_EDIT OptionalHdfsLocation OptionalPartitionSpecs OptionalCachedIn
  | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'CURSOR'
    {
      parser.suggestKeywords(['PARTITION']);
