@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import urllib
 
 from django.core.urlresolvers import reverse
@@ -30,9 +31,10 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
   _upload_extract_archive_script_to_hdfs(request.fs)
 
   output_path = upload_path + '/' + file_name.split('.')[0]
+  start_time = json.loads(request.POST.get('start_time', '-1'))
 
   shell_notebook = Notebook(
-      description=_('HDFS Extraction of %(upload_path)s/%(file_name)s') % {'upload_path': upload_path, 'file_name': file_name},
+      name=_('HDFS Extraction of %(upload_path)s/%(file_name)s') % {'upload_path': upload_path, 'file_name': file_name},
       isManaged=True,
       onSuccessUrl=reverse('filebrowser.views.view', kwargs={'path': output_path})
   )
@@ -42,7 +44,8 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
       arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + file_name}, {'value': '-o=' + output_path}],
       archives=[],
       files=[{'value': '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + urllib.quote(file_name)}],
-      env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}]
+      env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}],
+      last_executed=start_time
   )
 
   return shell_notebook.execute(request, batch=True)
