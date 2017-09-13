@@ -1268,7 +1268,7 @@
             beforeCursor: 'CREATE TABLE foo LIKE PARQUET \'/blabla/\' ',
             afterCursor: '',
             dialect: 'impala',
-            containsKeywords: ['COMMENT', 'CACHED IN'],
+            containsKeywords: ['COMMENT', 'CACHED IN', 'UNCACHED'],
             expectedResult: {
               lowerCase: false
             }
@@ -1282,7 +1282,7 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['TBLPROPERTIES', 'CACHED IN', 'AS']
+              suggestKeywords: ['TBLPROPERTIES', 'CACHED IN', 'UNCACHED', 'AS']
             }
           });
         });
