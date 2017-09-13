@@ -225,7 +225,7 @@ ShowFunctionsStatement
  : AnyShow '<hive>FUNCTIONS'
  | AnyShow '<hive>FUNCTIONS' DoubleQuotedValue
  | AnyShow OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase
- | AnyShow OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase 'LIKE' SingleQuoteValue
+ | AnyShow OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase 'LIKE' QuotedValue
  ;
 
 ShowFunctionsStatement_EDIT
@@ -245,15 +245,15 @@ ShowFunctionsStatement_EDIT
        parser.suggestKeywords(['LIKE']);
      }
    }
- | AnyShow AggregateOrAnalytic 'CURSOR' OptionalInDatabase 'LIKE' SingleQuoteValue
+ | AnyShow AggregateOrAnalytic 'CURSOR' OptionalInDatabase 'LIKE' QuotedValue
    {
      parser.suggestKeywords(['FUNCTIONS']);
    }
- | AnyShow 'CURSOR' '<impala>FUNCTIONS' OptionalInDatabase 'LIKE' SingleQuoteValue
+ | AnyShow 'CURSOR' '<impala>FUNCTIONS' OptionalInDatabase 'LIKE' QuotedValue
    {
      parser.suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
    }
- | AnyShow OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase 'CURSOR' SingleQuoteValue
+ | AnyShow OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase 'CURSOR' QuotedValue
    {
      if (!$4) {
        parser.suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'LIKE', weight: 1 }]);

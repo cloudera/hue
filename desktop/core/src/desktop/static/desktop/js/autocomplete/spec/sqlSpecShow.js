@@ -1331,6 +1331,32 @@
         });
       });
 
+      it('should handle "SHOW FUNCTIONS IN _impala_builtins like "*substring*"; |', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW FUNCTIONS IN _impala_builtins like "*substring*"; ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SHOW FUNCTIONS IN _impala_builtins like \'*substring*\'; |', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW FUNCTIONS IN _impala_builtins like \'*substring*\'; ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest keywords for "SHOW FUNCTIONS |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FUNCTIONS ',
