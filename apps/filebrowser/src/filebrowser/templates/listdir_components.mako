@@ -1664,6 +1664,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $.post("/filebrowser/extract_archive", {
           "archive_name": self.selectedFile().name,
           "upload_path": self.currentPath(),
+          "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (data) {
           if (data.status == 0) {
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
@@ -1698,7 +1699,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $.post("/filebrowser/compress_files", {
           "files": fileNames,
           "upload_path": self.currentPath(),
-          "archive_name": self.compressArchiveName()
+          "archive_name": self.compressArchiveName(),
+          "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (data) {
           if (data.status == 0) {
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
