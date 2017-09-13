@@ -471,8 +471,8 @@ def get_banner_message(request):
   forwarded_host = request.META.get('HTTP_X_FORWARDED_HOST')
 
   message = None;
-
-  if IS_HUE_4.get() and request.environ.get("PATH_INFO").find("/hue/") < 0:
+  path_info = request.environ.get("PATH_INFO")
+  if IS_HUE_4.get() and path_info.find("/hue/") < 0 and path_info.find("accounts/login") < 0:
     url = request.build_absolute_uri("/hue")
     link = '<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (url, url)
     message = _('You are accessing an older version of Hue, please switch to latest version: %s.') % link
