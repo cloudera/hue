@@ -90,10 +90,20 @@ set +x
 extracted_file_count=$(($(find $temp_output_dir/* -type d -maxdepth 0 | wc -l) + $(find $temp_output_dir/* -type f -maxdepth 0 | wc -l)))
 if [ $extracted_file_count != 0 ] && [ $exit_status == 0 ]
 then
+    if ! $(hadoop fs -test -d $OUTPUT_PATH)
+    then
+        echo "Creating output directory '$OUTPUT_PATH' in HDFS"
+        hadoop fs -mkdir $OUTPUT_PATH
+    fi
 	echo "Copying extracted files to '$OUTPUT_PATH' in HDFS"
-	hadoop fs -put $temp_output_dir "$OUTPUT_PATH"
+	hadoop fs -put $temp_output_dir/* "$OUTPUT_PATH"
 	exit_status=$(echo $?)
-	echo "Copy to HDFS directory '$OUTPUT_PATH' complete!!!"
+	if [ $exit_status != 0 ]
+	then
+	    echo "Failed to copy files to HDFS directory '$OUTPUT_PATH'."
+	else
+	    echo "Copy to HDFS directory '$OUTPUT_PATH' complete."
+	fi
 else
 	exit_status=1
 fi
