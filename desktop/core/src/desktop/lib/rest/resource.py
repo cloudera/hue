@@ -131,7 +131,7 @@ class Resource(object):
                        allow_redirects=allow_redirects, clear_cookies=clear_cookies)
 
 
-  def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False):
+  def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False, headers=None):
     """
     Invoke the PUT method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
@@ -143,7 +143,7 @@ class Resource(object):
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("PUT", relpath, params, data, headers=self._make_headers(contenttype),
+    return self.invoke("PUT", relpath, params, data, headers=self._make_headers(contenttype, headers),
                        allow_redirects=allow_redirects, clear_cookies=clear_cookies)
 
 

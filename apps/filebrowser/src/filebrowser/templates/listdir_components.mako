@@ -572,32 +572,32 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     <a href="javascript: void(0)" title="${_('Download')}" data-bind="click: (!$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file') ? $root.downloadFile: void(0)">
     <i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
     % endif
-    <li class="divider" data-bind="visible: !isS3()"></li>
+    <li class="divider" data-bind="visible: isPermissionEnabled()"></li>
     % if is_fs_superuser:
-    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged || selectedSentryFiles().length > 0 }, visible: !isS3()">
+    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged || selectedSentryFiles().length > 0 }, visible: isPermissionEnabled()">
       <a href="javascript: void(0)" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0">
         <i class="fa fa-fw fa-user"></i> ${_('Change owner / group')}
       </a>
     </li>
     % endif
-    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }, visible: !isS3()">
+    <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }, visible: isPermissionEnabled()">
       <a href="javascript: void(0)" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0">
         <i class="fa fa-fw fa-list-alt"></i> ${_('Change permissions')}
       </a>
     </li>
-    <li class="divider" data-bind="visible: !isS3() || (isS3() && !isS3Root())"></li>
+    <li class="divider" data-bind="visible: isCompressEnabled() || isReplicationEnabled() || isSummaryEnabled()"></li>
     % if is_trash_enabled:
     <li data-bind="css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
     <a href="javascript: void(0)" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.trashSelected: void(0)">
     <i class="fa fa-fw fa-times"></i> ${_('Move to trash')}</a></li>
-    %endif
+    % endif
     <li><a href="javascript: void(0)" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}</a></li>
-    <li class="divider" data-bind="visible: !isS3()"></li>
-    <li data-bind="css: {'disabled': selectedFiles().length > 1 }, visible: !isS3()">
+    <li class="divider" data-bind="visible: isSummaryEnabled()"></li>
+    <li data-bind="css: {'disabled': selectedFiles().length > 1 }, visible: isSummaryEnabled()">
       <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}"><i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}</a>
     </li>
-    <li data-bind="css: {'disabled': inTrash() || isS3() || selectedFiles().length != 1 || selectedFile().type != 'file'}">
-      <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="click: (!inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file') ? setReplicationFactor: void(0)">
+    <li data-bind="css: {'disabled': inTrash() || !isReplicationEnabled() || selectedFiles().length != 1 || selectedFile().type != 'file'}">
+      <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="click: (!inTrash() && isReplicationEnabled() && selectedFiles().length == 1 && selectedFile().type == 'file') ? setReplicationFactor: void(0)">
         <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
       </a>
     </li>
@@ -606,8 +606,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
       </li>
-      <li data-bind="css: {'disabled': selectedFiles().length != 1 || !isArchive(selectedFile().name) || isS3()}">
-        <a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3(), click: confirmExtractArchive">
+      <li data-bind="css: {'disabled': selectedFiles().length != 1 || !isArchive(selectedFile().name) || !isCompressEnabled()}">
+        <a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && isCompressEnabled(), click: confirmExtractArchive">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
       </li>
     % endif
@@ -1049,6 +1049,23 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
+      self.isHdfs = ko.pureComputed(function () {
+        var currentPath = self.currentPath().toLowerCase();
+        return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
+      });
+      self.isCompressEnabled = ko.pureComputed(function () {
+        return self.isHdfs();
+      });
+      self.isSummaryEnabled = ko.pureComputed(function () {
+        return self.isHdfs();
+      });
+      self.isPermissionEnabled = ko.pureComputed(function () {
+        return !self.isS3();
+      });
+      self.isReplicationEnabled = ko.pureComputed(function () {
+        return self.isHdfs();
+      });
+
       self.isS3.subscribe(function (newVal) {
         if (newVal) {
           huePubSub.publish('update.autocompleters');
@@ -1138,7 +1155,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         self.isCurrentDirSentryManaged(isSentryManaged);
 
         self.page(new Page(page));
-
         self.files(ko.utils.arrayMap(files, function (file) {
           file.highlighted = self.filesToHighlight.indexOf(file.path) > -1;
           var f = new File(file);
@@ -1636,7 +1652,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         if (fileNames.indexOf('.') !== -1) {
           return false;
         }
-        return !self.isS3() && (self.selectedFiles().length > 1 || !(self.selectedFiles().length === 1 && self.isArchive(self.selectedFile().name)));
+        return self.isHdfs() && (self.selectedFiles().length > 1 || !(self.selectedFiles().length === 1 && self.isArchive(self.selectedFile().name)));
       });
 
       self.setCompressArchiveDefault = function() {

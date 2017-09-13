@@ -23,4 +23,5 @@ MENU_INDEX = 20
 
 PERMISSION_ACTIONS = (
   ("s3_access", "Access to S3 from filebrowser and filepicker."),
+  ("adls_access", "Access to ADLS from filebrowser and filepicker.")
 )

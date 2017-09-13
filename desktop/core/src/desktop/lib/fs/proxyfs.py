@@ -126,6 +126,9 @@ class ProxyFS(object):
   def normpath(self, path):
     return self._get_fs(path).normpath(path)
 
+  def netnormpath(self, path):
+    return self._get_fs(path).netnormpath(path)
+
   def open(self, path, *args, **kwargs):
     return self._get_fs(path).open(path, *args, **kwargs)
 
@@ -232,3 +235,6 @@ class ProxyFS(object):
 
   def check_access(self, path, *args, **kwargs):
     self._get_fs(path).check_access(path, *args, **kwargs)
+
+  def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
+    return self._get_fs(basedir).mkswap(filename, subdir, suffix, basedir)

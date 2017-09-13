@@ -46,6 +46,64 @@
         HOME: "Home"
       },
       filesystems: ['hdfs'],
+      filesysteminfo: {
+        "": {
+          scheme: "",
+          root: "/",
+          home: "/?default_to_home",
+          icon: {
+            brand: "fa-files-o",
+            home: "fa-home",
+          },
+          label : {
+            home: "home",
+            name: "HDFS",
+          }
+        },
+        hdfs: {
+          scheme: "",
+          root: "/",
+          home: "/?default_to_home",
+          icon: {
+            brand: "fa-files-o",
+            home: "fa-home",
+          },
+          label : {
+            home: "home",
+            name: "HDFS",
+          }
+        },
+        s3a: {
+          scheme: "s3a",
+          root: "s3a://",
+          home: "s3a://",
+          icon: {
+            brand: "fa-cubes",
+            home: "fa-cubes",
+          },
+          label : {
+            home: "",
+            name: "S3"
+          }
+        },
+        adl: {
+          scheme: "adl",
+          root: "adl:/",
+          home: "adl:/",
+          icon: {
+            svg:{
+              brand: "#hi-adls",
+              home: "#hi-adls"
+            },
+            brand: "fa-windows",
+            home: "fa-windows"
+          },
+          label : {
+            home: "",
+            name: "ADLS"
+          }
+        }
+      },
       fsSelected: 'hdfs',
       user: "",
       onNavigate: function () {
@@ -100,8 +158,9 @@
     }
 
     var initialPath = $.trim(self.options.initialPath);
-    if (initialPath && initialPath.toLowerCase().indexOf('s3a') > -1 && $(self.element).data('fs').indexOf('s3a') > -1) {
-      self.options.fsSelected = 's3a';
+    var scheme = initialPath && initialPath.substring(0,initialPath.indexOf(":"));
+    if (scheme && scheme.length) {
+      self.options.fsSelected = scheme;
     }
 
     $(self.element).find('.filechooser-services li').removeClass('active');
@@ -137,22 +196,21 @@
     if (self.options.filesystems.length > 1) {
       var $ul = $('<ul>').addClass('nav nav-list').css('border', 'none');
       self.options.filesystems.forEach(function (fs) {
-        var $li = $('<li>').attr('data-fs', fs).addClass(self.options.fsSelected === fs ? 'active' : '').html('<a class="pointer" style="padding-left: 6px">' + (fs.toUpperCase() == 'S3A' ? 'S3' : fs.toUpperCase()) + '</a>');
+        var filesysteminfo = self.options.filesysteminfo;
+        var $li = $('<li>').attr('data-fs', fs).addClass(self.options.fsSelected === fs ? 'active' : '').html('<a class="pointer" style="padding-left: 6px">' + (filesysteminfo[fs] ? filesysteminfo[fs].label.name : fs.toUpperCase()) + '</a>');
         $li.on('click', function () {
           $(this).siblings().removeClass('active');
           $(this).addClass('active');
           self.options.fsSelected = fs;
           var storedPath = $.totalStorage(STORAGE_PREFIX + self.options.user + self.options.fsSelected);
           if (storedPath !== null) {
-            if (fs === 's3a' && storedPath.toLowerCase().indexOf('s3a') === -1) {
-              self.navigateTo('S3A://');
-            } else if (fs !== 's3a' && storedPath.toLowerCase().indexOf('s3a') > -1) {
-              self.navigateTo('/?default_to_home');
+            if (filesysteminfo[fs] && storedPath.toLowerCase().indexOf(fs) === -1) {
+              self.navigateTo(filesysteminfo[fs].home);
             } else {
-              self.navigateTo(storedPath)
+              self.navigateTo(storedPath);
             }
           } else {
-            self.navigateTo(fs === 's3a' ? 'S3A://' : '/?default_to_home');
+            self.navigateTo(filesysteminfo[fs] ? filesysteminfo[fs].home : '/?default_to_home');
           }
         });
         $li.appendTo($ul);
@@ -163,6 +221,7 @@
     }
   };
 
+  //TODO: refactor this method to template
   Plugin.prototype.navigateTo = function (path) {
     var _parent = this;
     $(_parent.element).find('.filechooser-tree').html("<i style=\"font-size: 24px; color: #DDD\" class=\"fa fa-spinner fa-spin\"></i>");
@@ -185,15 +244,12 @@
         'white-space': 'nowrap'
       });
       var _home = $("<li>");
-      var _homelink = $("<a>").addClass("nounderline").html('<i class="fa fa-home"></i> ' + _parent.options.labels.HOME).css("cursor", "pointer").click(function () {
-        _parent.navigateTo("/?default_to_home");
+      //var filesysteminfo = self.options.filesysteminfo;
+      var fs = _parent.options.filesysteminfo[_parent.options.fsSelected || "hdfs"];
+      var el = fs.icon.svg ? '<svg class="hi"><use xlink:href="'+fs.icon.svg.home+'"></use></svg>' : '<i class="fa '+fs.icon.home+'"></i> ' + fs.label.home;
+      var _homelink = $("<a>").addClass("nounderline").html(el).css("cursor", "pointer").click(function () {
+        _parent.navigateTo(fs.home);
       });
-
-      if (_parent.options.fsSelected === 's3a') {
-        _homelink = $("<a>").addClass("nounderline muted").html('<i class="fa fa-cubes"></i> ').css("cursor", "pointer").click(function () {
-          _parent.navigateTo("S3A://");
-        });
-      }
 
       _homelink.appendTo(_home);
       _home.appendTo($homeBreadcrumb);
@@ -529,7 +585,8 @@
         _parent.options.onError();
       }
       if (e.status === 404 || e.status === 500) {
-        _parent.navigateTo(_parent.options.errorRedirectPath != "" ? _parent.options.errorRedirectPath : (_parent.options.fsSelected === 's3a' ? 'S3A://' : '/?default_to_home'));
+        var fs = _parent.options.filesysteminfo[_parent.options.fsSelected || "hdfs"];
+        _parent.navigateTo(_parent.options.errorRedirectPath !== "" ? _parent.options.errorRedirectPath : fs.home);
       } else {
         console.error(e);
         $(document).trigger("error", e.statusText);
@@ -579,9 +636,10 @@
     $(self.element).empty().html('<div class="filechooser-container" style="position: relative"><div class="filechooser-services" style="position: absolute"></div><div class="filechooser-tree" style="width: 560px"></div></div>');
     $.post('/filebrowser/api/get_filesystems', function (data) {
       var initialPath = $.trim(self.options.initialPath);
-      if (data && data.status == 0) {
-        if (initialPath && initialPath.toLowerCase().indexOf('s3a') > -1 && data.filesystems['s3a']) {
-          self.options.fsSelected = 's3a';
+      var scheme = initialPath && initialPath.substring(0,initialPath.indexOf(":"));
+      if (data && data.status === 0) {
+        if (scheme && scheme.length && data.filesystems[scheme]) {
+          self.options.fsSelected = scheme;
         }
         self.setFileSystems(data.filesystems);
       }

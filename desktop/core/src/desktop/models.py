@@ -42,6 +42,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from settings import HUE_DESKTOP_VERSION
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
+from azure.conf import is_adls_enabled, has_adls_access
 from dashboard.conf import get_engines
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
@@ -1718,6 +1719,15 @@ class ClusterConfig():
         'buttonName': _('Browse'),
         'tooltip': _('S3'),
         'page': '/filebrowser/view=S3A://'
+      })
+
+    if is_adls_enabled() and has_adls_access(self.user):
+      interpreters.append({
+        'type': 'adls',
+        'displayName': _('ADLS'),
+        'buttonName': _('Browse'),
+        'tooltip': _('ADLS'),
+        'page': '/filebrowser/view=adl:/'
       })
 
     if 'metastore' in self.apps:

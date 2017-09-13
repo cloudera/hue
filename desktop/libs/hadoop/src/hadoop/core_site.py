@@ -33,6 +33,12 @@ _CNF_TRASH_INTERVAL = 'fs.trash.interval'
 _CNF_S3A_ACCESS_KEY = 'fs.s3a.access.key'
 _CNF_S3A_SECRET_KEY = 'fs.s3a.secret.key'
 
+_CNF_ADLS_CLIENT_ID = 'dfs.adls.oauth2.client.id'
+_CNF_ADLS_AUTHENTICATION_CODE = 'dfs.adls.oauth2.credential'
+_CNF_ADLS_SECRET_KEY = 'dfs.adls.oauth2.credential'
+_CNF_ADLS_REFRESH_URL = 'dfs.adls.oauth2.refresh.url'
+_CNF_ADLS_GRANT_TYPE = 'dfs.adls.oauth2.access.token.provider.type'
+
 def reset():
   """Reset the cached conf"""
   global _CORE_SITE_DICT
@@ -91,3 +97,31 @@ def get_s3a_secret_key():
   https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
   """
   return get_conf().get(_CNF_S3A_SECRET_KEY)
+
+def get_adls_client_id():
+  """
+  Get ADLS client id
+  https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
+  """
+  return get_conf().get(_CNF_ADLS_CLIENT_ID)
+
+def get_adls_authentication_code():
+  """
+  Get ADLS secret key
+  https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
+  """
+  return get_conf().get(_CNF_ADLS_AUTHENTICATION_CODE)
+
+def get_adls_refresh_url():
+  """
+  Get ADLS secret key
+  https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
+  """
+  return get_conf().get(_CNF_ADLS_REFRESH_URL)
+
+def get_adls_grant_type():
+  """
+  Get ADLS provider type
+  https://hadoop.apache.org/docs/stable/hadoop-aws/tools/hadoop-aws/index.html
+  """
+  return get_conf().get(_CNF_ADLS_GRANT_TYPE)

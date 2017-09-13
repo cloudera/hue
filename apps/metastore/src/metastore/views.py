@@ -36,6 +36,7 @@ from beeswax.models import SavedQuery
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
+from urlparse import urlparse
 from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
 from notebook.connectors.base import Notebook, QueryError
 from notebook.models import make_notebook
@@ -442,7 +443,6 @@ def read_table(request, database, table):
     return redirect(url)
   except Exception, e:
     raise PopupException(_('Cannot read table'), detail=e)
-
 
 @check_has_write_access_permission
 def load_table(request, database, table):
