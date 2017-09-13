@@ -226,6 +226,7 @@
 <impala>'INCREMENTAL'                      { return '<impala>INCREMENTAL'; }
 <impala>'INSERT'                           { parser.determineCase(yytext); return '<impala>INSERT'; }
 <impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
+<impala>'INTERMEDIATE'                     { return '<impala>INTERMEDIATE'; }
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
 <impala>'INVALIDATE'                       { parser.determineCase(yytext); return '<impala>INVALIDATE'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
