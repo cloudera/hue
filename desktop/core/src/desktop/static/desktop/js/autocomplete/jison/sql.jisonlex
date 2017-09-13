@@ -264,6 +264,7 @@
 <impala>'SCHEMAS'                          { return '<impala>SCHEMAS'; }
 <impala>'SERIALIZE_FN'                     { return '<impala>SERIALIZE_FN'; }
 <impala>'SERVER'                           { return '<impala>SERVER'; }
+<impala>'SORT'                             { return '<impala>SORT'; }
 <impala>'STATS'                            { return '<impala>STATS'; }
 <impala>'STORED'                           { return '<impala>STORED'; }
 <impala>'STRAIGHT_JOIN'                    { return '<impala>STRAIGHT_JOIN'; }
