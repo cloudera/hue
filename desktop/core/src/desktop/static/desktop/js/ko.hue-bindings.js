@@ -930,13 +930,15 @@
             $menu.css('left', (event.clientX + menuWidth > $(window).width()) ? $(window).width() - menuWidth : event.clientX);
             $menu.css('top', (event.clientY + menuHeight > $(window).height()) ? $(window).height() - menuHeight : event.clientY);
             $menu.css('opacity', 1);
-            $(options.scrollContainer).one('scroll', hideMenu);
+            if (options.scrollContainer) {
+              $(options.scrollContainer).one('scroll', hideMenu);
+            }
             window.setTimeout(function () {
               $menu.data('active', false);
               $(document).one('click', hideMenu);
             }, 100);
           },
-          viewModel: viewModel
+          viewModel: options.viewModel || viewModel
         }, $menu[0]);
 
         ko.contextFor($menu[0]).$contextSourceElement = element;

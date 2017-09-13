@@ -281,7 +281,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       </a>
       <!-- /ko -->
       <!-- ko if: selectedSource()  && selectedSource().selectedDatabase() -->
-      <a data-bind="click: back">
+      <a data-bind="click: back, appAwareTemplateContextMenu: { template: 'sql-context-items', viewModel: selectedSource().selectedDatabase() }">
         <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
         <i class="fa fa-database assist-breadcrumb-text"></i>
         <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb }"></span>
