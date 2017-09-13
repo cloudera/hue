@@ -75,7 +75,7 @@ ${ fb_components.menubar() }
                 </a>
               </li>
               % endif
-              <li class="divider" data-bind="visible: !isS3()"></li>
+              <li class="divider" data-bind="visible: isPermissionEnabled()"></li>
               % if is_fs_superuser:
               <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
                 <a href="javascript: void(0)" data-bind="visible: ! inTrash(), click: changeOwner, enable: selectedFiles().length > 0">
@@ -83,19 +83,19 @@ ${ fb_components.menubar() }
                 </a>
               </li>
               % endif
-              <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }, visible: !isS3()">
+              <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }, visible: isPermissionEnabled()">
                 <a href="javascript: void(0)" data-bind="visible: ! inTrash(), click: changePermissions, enable: selectedFiles().length > 0">
                   <i class="fa fa-fw fa-list-alt"></i> ${_('Change permissions')}
                 </a>
               </li>
-              <li class="divider" data-bind="visible: !isS3()"></li>
-              <li data-bind="css: {'disabled': inTrash() || selectedFiles().length > 1 }, visible: !isS3()">
+              <li class="divider" data-bind="visible: isCompressEnabled() || isReplicationEnabled() || isSummaryEnabled()"></li>
+              <li data-bind="css: {'disabled': inTrash() || selectedFiles().length > 1 }, visible: isSummaryEnabled()">
                 <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}">
                   <i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}
                 </a>
               </li>
               <li>
-                <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
+                <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && isReplicationEnabled() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
                   <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
                 </a>
               </li>
@@ -103,7 +103,7 @@ ${ fb_components.menubar() }
                 <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
                 </li>
-                <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3(), click: confirmExtractArchive">
+                <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && isCompressEnabled(), click: confirmExtractArchive">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
                 </li>
               % endif
@@ -112,10 +112,9 @@ ${ fb_components.menubar() }
 
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
-          <!-- ko if: $root.isS3 -->
+          % if not is_trash_enabled:
           <button class="btn fileToolbarBtn delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</button>
-          <!-- /ko -->
-          <!-- ko ifnot: $root.isS3 -->
+          % else:
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
             <button id="trash-btn" class="btn toolbarBtn" data-bind="enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</button>
             <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown" data-bind="enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0">
@@ -125,7 +124,7 @@ ${ fb_components.menubar() }
               <li><a href="javascript: void(0)" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
             </ul>
           </div>
-          <!-- /ko -->
+          % endif
           <!-- /ko -->
           % if 'oozie' in apps:
             <button class="btn fileToolbarBtn" title="${_('Submit')}"
@@ -134,7 +133,7 @@ ${ fb_components.menubar() }
             </button>
             % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
               <button class="btn extractArchiveBtn" title="${_('Extract zip, tar.gz, bz2 or bzip2')}"
-                data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && !isS3(), click: confirmExtractArchive">
+                data-bind="visible: selectedFiles().length == 1 && isArchive(selectedFile().name) && isCompressEnabled(), click: confirmExtractArchive">
                 <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}
               </button>
             % endif

@@ -4662,6 +4662,16 @@
         dblClickHdfsItemSub.remove();
       });
 
+      var dblClickAdlsItemSub = huePubSub.subscribe("assist.dblClickAdlsItem", function(assistHdfsEntry) {
+        if ($el.data("last-active-editor")) {
+          editor.session.insert(editor.getCursorPosition(), "adl:/" + assistHdfsEntry.path + "'");
+        }
+      });
+
+      disposeFunctions.push(function () {
+        dblClickAdlsItemSub.remove();
+      });
+
 
       var dblClickGitItemSub = huePubSub.subscribe("assist.dblClickGitItem", function(assistGitEntry) {
         if ($el.data("last-active-editor")) {
@@ -4767,7 +4777,7 @@
         drop: function (e, ui) {
           var position = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
           var text = ui.helper.text();
-          if (lastMeta.type === 's3' || lastMeta.type === 'hdfs'){
+          if (lastMeta.type === 's3' || lastMeta.type === 'hdfs' || lastMeta.type === 'adls'){
             text = "'" + lastMeta.definition.path + "'";
           }
           editor.moveCursorToPosition(position);

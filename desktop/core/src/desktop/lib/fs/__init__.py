@@ -24,8 +24,10 @@ from desktop.lib.fs.proxyfs import ProxyFS
 
 def splitpath(path):
   split = urlparse.urlparse(path)
-  if split.scheme:
+  if split.scheme and split.netloc:
     parts = [split.scheme + '://', split.netloc] + split.path.split('/')
+  elif split.scheme:
+    parts = [split.scheme + ':/'] + split.path.split('/')
   else:
     parts = ['/'] + posixpath.normpath(path).split('/')
   # Filter empty parts out

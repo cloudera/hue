@@ -223,6 +223,9 @@ class S3FileSystem(object):
   def normpath(path):
     return normpath(path)
 
+  def netnormpath(self, path):
+    return normpath(path)
+
   @staticmethod
   def parent_path(path):
     parent_dir = S3FileSystem._append_separator(path)

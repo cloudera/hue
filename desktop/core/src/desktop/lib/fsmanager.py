@@ -21,6 +21,8 @@ import sys
 import logging
 
 import aws
+import azure.client
+from azure.conf import is_adls_enabled
 from aws.conf import is_enabled as is_s3_enabled
 
 from desktop.lib.fs import ProxyFS
@@ -32,7 +34,8 @@ DEFAULT_SCHEMA = 'hdfs'
 
 FS_GETTERS = {
   "hdfs": cluster.get_hdfs,
-  "s3a": aws.get_s3fs if is_s3_enabled() else None
+  "s3a": aws.get_s3fs if is_s3_enabled() else None,
+  "adl": azure.client.get_client if is_adls_enabled() else None
 }
 
 

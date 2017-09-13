@@ -139,7 +139,6 @@ var AssistHdfsEntry = (function () {
 
   AssistHdfsEntry.prototype.loadDeep = function(folders, callback) {
     var self = this;
-
     if (folders.length === 0) {
       callback(self);
       return;
