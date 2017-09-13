@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:Response xmlns:ns0="urn:oasis:names:tc:SAML:2.0:protocol" Destination="http://lingon.catalogix.se:8087/" ID="_5271694c3be6883137377fb076355c4bc97f28b3c1" InResponseTo="bahigehogffohiphlfmplepdpcohkhhmheppcdie" IssueInstant="2016-09-04T09:59:39Z" Version="2.0">
+  <ns1:Issuer xmlns:ns1="urn:oasis:names:tc:SAML:2.0:assertion">urn:mace:example.com:saml:roland:idp</ns1:Issuer>
+  <ns0:Status>
+    <ns0:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </ns0:Status>
+  <ns1:Assertion xmlns:ns1="urn:oasis:names:tc:SAML:2.0:assertion" ID="pfx9e022535-4b38-cc7f-41ec-9a01bcd2936d" IssueInstant="2016-10-04T09:59:39Z" Version="2.0">
+    <ns1:Issuer>urn:mace:example.com:saml:roland:idp</ns1:Issuer>
+    <ns2:Signature xmlns:ns2="http://www.w3.org/2000/09/xmldsig#">
+      <ns2:SignedInfo>
+        <ns2:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        <ns2:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+        <ns2:Reference URI="#pfx9e022535-4b38-cc7f-41ec-9a01bcd2936d">
+          <ns2:Transforms>
+            <ns2:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+            <ns2:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          </ns2:Transforms>
+          <ns2:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+          <ns2:DigestValue>Ij7uELbswQDq4HN6MDTFlF39Z84=</ns2:DigestValue>
+        </ns2:Reference>
+      </ns2:SignedInfo>
+      <ns2:SignatureValue>UUs1oTjqM8hgDVIrSVRPQfT/KLXar0EfXEQ2OiR+BlYzAh/3q2DQtqWHhlkP9ehs
+cncSdBB3t1mZhD2v5B5qNwnsNSuHVwEEPe3tSJ+yICVN7REXPXlm0sOsU2zSooEy
+OmuMZY0K6ERY4fNVnGEAoUZeieehC6/ljmfk14xCAlE=</ns2:SignatureValue>
+      <ns2:KeyInfo>
+        <ns2:X509Data>
+          <ns2:X509Certificate>
+            AAAAAAAAAAhmgAwIBAgIJAJrzqSSwmDY9MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+            BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
+            aWRnaXRzIFB0eSBMdGQwHhcNMDkxMDA2MTk0OTQxWhcNMDkxMTA1MTk0OTQxWjBF
+            MQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50
+            ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKB
+            gQDJg2cms7MqjniT8Fi/XkNHZNPbNVQyMUMXE9tXOdqwYCA1cc8vQdzkihscQMXy
+            3iPw2cMggBu6gjMTOSOxECkuvX5ZCclKr8pXAJM5cY6gVOaVO2PdTZcvDBKGbiaN
+            efiEw5hnoZomqZGp8wHNLAUkwtH9vjqqvxyS/vclc6k2ewIDAQABo4GnMIGkMB0G
+            A1UdDgQWBBRePsKHKYJsiojE78ZWXccK9K4aJTB1BgNVHSMEbjBsgBRePsKHKYJs
+            iojE78ZWXccK9K4aJaFJpEcwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgTClNvbWUt
+            U3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAJrzqSSw
+            mDY9MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAJSrKOEzHO7TL5cy6
+            h3qh+3+JAk8HbGBW+cbX6KBCAw/mzU8flK25vnWwXS3dv2FF3Aod0/S7AWNfKib5
+            U/SA9nJaz/mWeF9S0farz9AQFc8/NSzAzaVq7YbM4F6f6N2FRl7GikdXRCed45j6
+            mrPzGzk3ECbupFnqyREH3+ZPSdk=
+          </ns2:X509Certificate>
+        </ns2:X509Data>
+      </ns2:KeyInfo>
+    </ns2:Signature>
+    <ns1:Subject>               
+      <ns1:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" SPNameQualifier="xenosmilus.umdc.umu.se">
+        _cddc88563d433f556d4cc70c3162deabddea3b5019
+      </ns1:NameID>
+      <ns1:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <ns1:SubjectConfirmationData InResponseTo="bahigehogffohiphlfmplepdpcohkhhmheppcdie" NotOnOrAfter="2024-10-04T09:59:39Z" Recipient="http://xenosmilus.umdc.umu.se:8087/login"/>
+      </ns1:SubjectConfirmation>
+    </ns1:Subject>
+    <ns1:Conditions NotBefore="2016-09-04T09:59:39Z" NotOnOrAfter="2024-05-04T09:59:39Z">
+      <ns1:AudienceRestriction>
+        <ns1:Audience>urn:mace:example.com:saml:roland:sp</ns1:Audience>
+      </ns1:AudienceRestriction>
+    </ns1:Conditions>
+    <ns1:AuthnStatement AuthnInstant="2016-09-04T09:59:39Z" SessionIndex="_788db107b9bb1b6ab94f00deebbfe3d92c999b3041">
+      <ns1:AuthnContext>                      
+        <ns1:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</ns1:AuthnContextClassRef>
+      </ns1:AuthnContext>
+    </ns1:AuthnStatement>
+    <ns1:AttributeStatement>
+      <ns1:Attribute Name="uid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <ns1:AttributeValue xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance" ns2:type="xs:string">
+          student
+        </ns1:AttributeValue>
+      </ns1:Attribute>
+      <ns1:Attribute Name="eduPersonAffiliation" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <ns1:AttributeValue xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance" ns2:type="xs:string">
+          member
+        </ns1:AttributeValue>
+        <ns1:AttributeValue xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance" ns2:type="xs:string">
+          student
+        </ns1:AttributeValue>
+      </ns1:Attribute>
+    </ns1:AttributeStatement>
+  </ns1:Assertion>
+</ns0:Response>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+      This file was automatically generated - do not edit 
+
+    -->
+<md:EntitiesDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" Name="http://md.swamid.se/md/swamid-testing-1.0.xml">
+    <ds:Signature>
+        <ds:SignedInfo>
+            <ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+            <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+            <ds:Reference URI="">
+                <ds:Transforms>
+                    <ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                    <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#WithComments"/>
+                </ds:Transforms>
+                <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                <ds:DigestValue>Kt7437JspP0BG6CqtrWIZuSs42o=</ds:DigestValue>
+            </ds:Reference>
+        </ds:SignedInfo>
+        <ds:SignatureValue>lneqzdMN82rjUwUE/kPDQQ1A3yX9ddVPF+3gRBtDg5UgwX5BJE1enkkKB7SRJ2vS
+CQChHbcFojcI5MvuBEYlGI1igI5U25LmndW3g//XkWP33ecXe2lPJyYAVOU8O3vB
+SnUFN7M/62OeVNGDDuS0iclC9Tjj9hRPTZF0FAhrsJ+OjIQUZgWm0Nv+tMt9rjc4
+fLe/DJIh+sqH/tAWatfcKQEMGo5MzFgHF8n6FD8WFVBAfRPLr/i+s0gu2lqFQimU
+jhuD/pwG9mOJi/3roX7jjEHCJRDX/+IP3o62UrBgUosvq9YNIvXyi4sTdOUNRf5i
+iUo8iSUst9nUqsrh5aUdzA==</ds:SignatureValue>
+        <ds:KeyInfo>
+            <ds:X509Data>
+                <X509Certificate xmlns="http://www.w3.org/2000/09/xmldsig#">MIIDdTCCAl0CBEY7EskwDQYJKoZIhvcNAQEEBQAwfzELMAkGA1UEBhMCU0UxEjAQ
+BgNVBAgTCVN0b2NraG9sbTESMBAGA1UEBxMJU3RvY2tob2xtMREwDwYDVQQKEwhT
+V0FNSS5zZTEPMA0GA1UECxMGU1dBTUlEMSQwIgYDVQQDExtTV0FNSUQgbWV0YWRh
+dGEgc2lnbmVyIHYxLjEwHhcNMDcwNTA0MTEwMjMzWhcNMTcwNTAxMTEwMjMzWjB/
+MQswCQYDVQQGEwJTRTESMBAGA1UECBMJU3RvY2tob2xtMRIwEAYDVQQHEwlTdG9j
+a2hvbG0xETAPBgNVBAoTCFNXQU1JLnNlMQ8wDQYDVQQLEwZTV0FNSUQxJDAiBgNV
+BAMTG1NXQU1JRCBtZXRhZGF0YSBzaWduZXIgdjEuMTCCASIwDQYJKoZIhvcNAQEB
+BQADggEPADCCAQoCggEBAM6wXN3pVCo98SACS6JCHjSlWj83oNL/Ct+a9hmAx1NZ
+SKg7lnEJYwWBvzJt5o/47jRQbGm94a45Yy5LVoXq4XyCKINhMxSwbRROvr8Hw6tg
+P1Z9dk5Jjejvus3gyaH3+EuEyP4aIjTlgmHDwW6HOv/m/4bOXSHB4Pisn7aocqU7
+kjpOn1f0cGodWOgGO4tP7KXs6ndcLhIkW+e/B80WEr0kocuc/pvx+aLuKSkttk/A
+fP1DFs5sqX31RXQKGrB/uEEYVv1Qvneig+RXGSbqk2Tab3BcLE/Cjnfi9Q9cH/jR
+eL/YSSafGtl+EBgXKszxjMtELhiEWsL9RrMu1HUkBusCAwEAATANBgkqhkiG9w0B
+AQQFAAOCAQEAkXaa61gp/lkEDNRFc0bzH3ZyoUFgol64F1zdAwBS3xnsCkTnAXt3
+p452daEyz+0UR5J/BruMOyvR57w1m7ckVnx/sAgRgaD6gQlUWehjKPEsx8o5iDfO
+5R1V5Rn2o7+0VuIJDDObEAtMwqn2Nk6TTzsUVfz5y9nUQAxBz3EqXnnSgRwqSwRF
+yiVkpVfwtUHIolAf6O2N9Fg1jqoqt4mQCOyRZpD0/5SRYESTY6TJjTmvoh+zOPlI
+yEiw+Zrl/FWjXtBnRnz8AVT5NRzYiMHdbTHs0Fh6elsb5b9gTBo7j6+t36m7oo2K
+DaWWpMWvuWHugEqvIAXDCI/HzTbbiWm9NQ==</X509Certificate>
+            </ds:X509Data>
+        </ds:KeyInfo>
+    </ds:Signature>
+    <md:EntityDescriptor entityID="https://coip-test.sunet.se/shibboleth" xml:base="swamid-1.0/coip-test.sunet.se-sp.xml">
+        <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+            <md:Extensions>
+                <DiscoveryResponse xmlns="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Binding="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Location="https://coip-test.sunet.se/Shibboleth.sso/DS/ds.sunet.se" index="1"/>
+            </md:Extensions>
+            <md:KeyDescriptor use="signing">
+                <ds:KeyInfo>
+                    <ds:KeyName>coip-test.sunet.se</ds:KeyName>
+                    <ds:X509Data>
+                        <ds:X509SubjectName>CN=coip-test.sunet.se</ds:X509SubjectName>
+                        <ds:X509Certificate>MIIC/TCCAeWgAwIBAgIJAMJwrBkmzHKJMA0GCSqGSIb3DQEBBQUAMB0xGzAZBgNV
+BAMTEmNvaXAtdGVzdC5zdW5ldC5zZTAeFw0xMDEyMDcwOTM0NTFaFw0yMDEyMDQw
+OTM0NTFaMB0xGzAZBgNVBAMTEmNvaXAtdGVzdC5zdW5ldC5zZTCCASIwDQYJKoZI
+hvcNAQEBBQADggEPADCCAQoCggEBAMR4JETtaGG+7n5+NksVT/7LnmveeNwbGuPS
+CyW1GY+7yYBwjMnnsFnnprl2curgER/HeOXf3bBxnoxbSVFdaZILPRVStLngzhYJ
+7qGOGWHWdukDDzgCDfdOVEOwLAiV4TXhCoKzaRKaUV63Ul9pEG2ogkQHlsW7zTmX
+4DJNdpBgmB/ohjuAceY3xUrKj9TBZf9KPKYE1D8xoig5qCUhWUqWrltxBBbNubsa
+UIXun9Hf1zemgViLuPI2s5/RD5uY3x6FpkXeNGRHvPT7+LnKrPNi4g41m1FZ+wvj
+xPkNVXBLJgEIsHtYTKvY8dXaA+k1xyFvqjWf1RjuG8TYIlvHoDkCAwEAAaNAMD4w
+HQYDVR0RBBYwFIISY29pcC10ZXN0LnN1bmV0LnNlMB0GA1UdDgQWBBR/jp1zUgjw
+rKZimB05qmprVJvYEDANBgkqhkiG9w0BAQUFAAOCAQEAeAYegf9tMG2Lg7AW2tIq
+5bTbaMwRzLtFkB1KZrh17RUSneiF1FrRD5Qo4O1/rh0PrxO9+R1M9VpYXrcEg48u
+TLOo7EEaJaF7+Eh9Z/UaJjY5zL6hhQSW+nxHHtluuIRCJwH26oF04v9Ty9TC+4Ax
+g6NuvysrzRWhdeWh4voY1lBi1po+/MqUWufXS/uxrHBT9XNSb6dvqWTvUEe09Sj9
+UTHOU967H8PfFKB6w8/lIqCd66P3PnZrNQVmfbjDkrASkmvhUKEMc//Nn/+MS02T
+uXfFMclNeY0vwkDmtQCDB2o8DGQS8H3hpXb2MmJtFgu/81yZRqX/0uRC3kGBQXyd
+cA==
+</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
+            <md:KeyDescriptor use="encryption">
+                <ds:KeyInfo>
+                    <ds:KeyName>coip-test.sunet.se</ds:KeyName>
+                    <ds:X509Data>
+                        <ds:X509SubjectName>CN=coip-test.sunet.se</ds:X509SubjectName>
+                        <ds:X509Certificate>MIIC/TCCAeWgAwIBAgIJAMJwrBkmzHKJMA0GCSqGSIb3DQEBBQUAMB0xGzAZBgNV
+BAMTEmNvaXAtdGVzdC5zdW5ldC5zZTAeFw0xMDEyMDcwOTM0NTFaFw0yMDEyMDQw
+OTM0NTFaMB0xGzAZBgNVBAMTEmNvaXAtdGVzdC5zdW5ldC5zZTCCASIwDQYJKoZI
+hvcNAQEBBQADggEPADCCAQoCggEBAMR4JETtaGG+7n5+NksVT/7LnmveeNwbGuPS
+CyW1GY+7yYBwjMnnsFnnprl2curgER/HeOXf3bBxnoxbSVFdaZILPRVStLngzhYJ
+7qGOGWHWdukDDzgCDfdOVEOwLAiV4TXhCoKzaRKaUV63Ul9pEG2ogkQHlsW7zTmX
+4DJNdpBgmB/ohjuAceY3xUrKj9TBZf9KPKYE1D8xoig5qCUhWUqWrltxBBbNubsa
+UIXun9Hf1zemgViLuPI2s5/RD5uY3x6FpkXeNGRHvPT7+LnKrPNi4g41m1FZ+wvj
+xPkNVXBLJgEIsHtYTKvY8dXaA+k1xyFvqjWf1RjuG8TYIlvHoDkCAwEAAaNAMD4w
+HQYDVR0RBBYwFIISY29pcC10ZXN0LnN1bmV0LnNlMB0GA1UdDgQWBBR/jp1zUgjw
+rKZimB05qmprVJvYEDANBgkqhkiG9w0BAQUFAAOCAQEAeAYegf9tMG2Lg7AW2tIq
+5bTbaMwRzLtFkB1KZrh17RUSneiF1FrRD5Qo4O1/rh0PrxO9+R1M9VpYXrcEg48u
+TLOo7EEaJaF7+Eh9Z/UaJjY5zL6hhQSW+nxHHtluuIRCJwH26oF04v9Ty9TC+4Ax
+g6NuvysrzRWhdeWh4voY1lBi1po+/MqUWufXS/uxrHBT9XNSb6dvqWTvUEe09Sj9
+UTHOU967H8PfFKB6w8/lIqCd66P3PnZrNQVmfbjDkrASkmvhUKEMc//Nn/+MS02T
+uXfFMclNeY0vwkDmtQCDB2o8DGQS8H3hpXb2MmJtFgu/81yZRqX/0uRC3kGBQXyd
+cA==
+</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
+            <md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://coip-test.sunet.se/Shibboleth.sso/Artifact/SOAP" index="1"/>
+            <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://coip-test.sunet.se/Shibboleth.sso/SLO/SOAP"/>
+            <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://coip-test.sunet.se/Shibboleth.sso/SLO/Redirect"/>
+            <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://coip-test.sunet.se/Shibboleth.sso/SLO/POST"/>
+            <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://coip-test.sunet.se/Shibboleth.sso/SLO/Artifact"/>
+            <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://coip-test.sunet.se/Shibboleth.sso/NIM/SOAP"/>
+            <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://coip-test.sunet.se/Shibboleth.sso/NIM/Redirect"/>
+            <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://coip-test.sunet.se/Shibboleth.sso/NIM/POST"/>
+            <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://coip-test.sunet.se/Shibboleth.sso/NIM/Artifact"/>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://coip-test.sunet.se/Shibboleth.sso/SAML2/POST" index="1"/>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://coip-test.sunet.se/Shibboleth.sso/SAML2/POST-SimpleSign" index="2"/>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://coip-test.sunet.se/Shibboleth.sso/SAML2/Artifact" index="3"/>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://coip-test.sunet.se/Shibboleth.sso/SAML2/ECP" index="4"/>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://coip-test.sunet.se/Shibboleth.sso/SAML/POST" index="5"/>
+            <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://coip-test.sunet.se/Shibboleth.sso/SAML/Artifact" index="6"/>
+        </md:SPSSODescriptor>
+    </md:EntityDescriptor>
+    <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="https://coip-test.sunet.se/idp/shibboleth" xml:base="swamid-1.0/coip-test.sunet.se.xml">
+        <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:2.0:protocol">
+            <Extensions>
+                <shibmd:Scope regexp="false">sunet.se</shibmd:Scope>
+            </Extensions>
+            <KeyDescriptor>
+                <ds:KeyInfo>
+                    <ds:X509Data>
+                        <ds:X509Certificate>
+MIIDNDCCAhygAwIBAgIVAIEijMHQfZuv/n/goQuJ0Q4JizX1MA0GCSqGSIb3DQEB
+BQUAMB0xGzAZBgNVBAMTEmNvaXAtdGVzdC5zdW5ldC5zZTAeFw0xMDEyMDYyMzI1
+MTNaFw0zMDEyMDYyMzI1MTNaMB0xGzAZBgNVBAMTEmNvaXAtdGVzdC5zdW5ldC5z
+ZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMZ3jfjgtkyfH1TJ/rQd
+ziYCIi9h1Rne9yFt83KrsykQVxRDoA/0AbBpQnKNl1sD14iAyj+xpHPUMPz5/MpK
+5b7f1pRXsL+8tEf+gmdPDiJ1rUecV3soyOVdOuOZcROyfx70iddHgkUYmKUbVeeE
+rvU8vKa8BjYEvzG3WRT4o6I2tkQyYEu6mJlw48EjcgCG8CYFbrhKhiTk8d/qMWrQ
+eRfdWaBqLfQnum3DJXPaZ35QvO6Qk+uWN2CcdWPKWyyvpUmNp5/LklPJ4XZC9JqO
+LBzV02EVsnNbNTKjYKjwtlKa5BPD7QoDLp+QJel0jtx8WH5LCmFtvSdwnUFV1oig
+DzcCAwEAAaNrMGkwSAYDVR0RBEEwP4ISY29pcC10ZXN0LnN1bmV0LnNlhilodHRw
+czovL2NvaXAtdGVzdC5zdW5ldC5zZS9pZHAvc2hpYmJvbGV0aDAdBgNVHQ4EFgQU
+eTW+lqHTyfngd7TOlml27LxY5H8wDQYJKoZIhvcNAQEFBQADggEBAJsa3va2XmyV
+9vt0MtXK7xetQc7YpCl8IPMTPqJyiwIOmRDahU0fOlsnyXgiVbgtBWEkdPU+mFJt
+ieUpQNmHMvNkGWHmBBkSX0ANyor+H54XNYYnaMcxa/dZHE3hCWO1N1Y5AOFRUauv
+qr0ECPqqiM8M/Ir/9iRivLkBpBgLa4SU9O13s/1dgsP7vvNoIbxMecLRhVVaTkwj
+v5OqkXDvlha9dI/NRxBYUsIpts6tU+20DvSmyZG1IbSu5tMSGn6jrDHsClXuig7w
+ZBkqgmTtNcDZXR2FaflUDmM7Xk1gw581bWdYCpQZHNQv7Kh7yAeQWjU2OoYFm3U9
+C2+Rm0cXr6U=
+
+                    </ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </KeyDescriptor>
+            <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://coip-test.sunet.se:8443/idp/profile/SAML1/SOAP/AttributeQuery"/>
+            <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://coip-test.sunet.se:8443/idp/profile/SAML2/SOAP/AttributeQuery"/>
+            <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+            <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+        </AttributeAuthorityDescriptor>
+    </EntityDescriptor>
+</md:EntitiesDescriptor>

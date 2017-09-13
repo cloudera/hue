@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    ID="_162f441d28cff78e3bb1d3c2bf3e48b5ed532605fd"
+    InResponseTo="_ae0216740b5baa4b13c79ffdb2baa82572788fd9a3" Version="2.0"
+    IssueInstant="2008-05-27T07:49:23Z"
+    Destination="https://foodle.feide.no/simplesaml/saml2/sp/AssertionConsumerService.php">
+    <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://openidp.feide.no</saml:Issuer>
+    <samlp:Status xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol">
+        <samlp:StatusCode xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+            Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+    </samlp:Status>
+    <saml:Assertion Version="2.0" ID="pfxb27555d8-8c06-a339-c7ae-f544b2fd1507"
+        IssueInstant="2008-05-27T07:49:23Z">
+        <saml:Issuer>https://openidp.feide.no</saml:Issuer>
+        <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+            <ds:SignedInfo>
+                <ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                <ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+                <ds:Reference URI="#pfxb27555d8-8c06-a339-c7ae-f544b2fd1507">
+                    <ds:Transforms>
+                        <ds:Transform
+                            Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                        <ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                    </ds:Transforms>
+                    <ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                    <ds:DigestValue>WUaqPW4nZ8uPyv+sf8qXsaKhHmk=</ds:DigestValue>
+                </ds:Reference>
+            </ds:SignedInfo>
+            <ds:SignatureValue>CRq1VvptjNHenZ5aWkyD6GqQX+XLgNiqElJnyLbMUgiwrFZ5J8IEGtC8h2YiwID15ScxVt6tjQc8R3gXkP967PIlemmhYQ4US7V3oPczu4MECamj+07wAg7BCp05UVU3RI3pvi/2dQGRRX4tlXgkzUMzx8+cBeyZaI/BXKjhKEY=</ds:SignatureValue>
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>MIICizCCAfQCCQCY8tKaMc0BMjANBgkqhkiG9w0BAQUFADCBiTELMAkGA1UEBhMCTk8xEjAQBgNVBAgTCVRyb25kaGVpbTEQMA4GA1UEChMHVU5JTkVUVDEOMAwGA1UECxMFRmVpZGUxGTAXBgNVBAMTEG9wZW5pZHAuZmVpZGUubm8xKTAnBgkqhkiG9w0BCQEWGmFuZHJlYXMuc29sYmVyZ0B1bmluZXR0Lm5vMB4XDTA4MDUwODA5MjI0OFoXDTM1MDkyMzA5MjI0OFowgYkxCzAJBgNVBAYTAk5PMRIwEAYDVQQIEwlUcm9uZGhlaW0xEDAOBgNVBAoTB1VOSU5FVFQxDjAMBgNVBAsTBUZlaWRlMRkwFwYDVQQDExBvcGVuaWRwLmZlaWRlLm5vMSkwJwYJKoZIhvcNAQkBFhphbmRyZWFzLnNvbGJlcmdAdW5pbmV0dC5ubzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAt8jLoqI1VTlxAZ2axiDIThWcAOXdu8KkVUWaN/SooO9O0QQ7KRUjSGKN9JK65AFRDXQkWPAu4HlnO4noYlFSLnYyDxI66LCr71x4lgFJjqLeAvB/GqBqFfIZ3YK/NrhnUqFwZu63nLrZjcUZxNaPjOOSRSDaXpv1kb5k3jOiSGECAwEAATANBgkqhkiG9w0BAQUFAAOBgQBQYj4cAafWaYfjBU2zi1ElwStIaJ5nyp/s/8B8SAPK2T79McMyccP3wSW13LHkmM1jwKe3ACFXBvqGQN0IbcH49hu0FKhYFM/GPDJcIHFBsiyMBXChpye9vBaTNEBCtU3KjjyG0hRT2mAQ9h+bkPmOvlEo/aH0xR68Z9hw4PF13w==</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </ds:Signature>
+        <saml:Subject>
+            <saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
+                SPNameQualifier="urn:mace:feide.no:services:no.feide.foodle"
+                >_242f88493449e639aab95dd9b92b1d04234ab84fd8</saml:NameID>
+            <saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+                <saml:SubjectConfirmationData NotOnOrAfter="2008-05-27T07:54:23Z"
+                    InResponseTo="_ae0216740b5baa4b13c79ffdb2baa82572788fd9a3"
+                    Recipient="https://foodle.feide.no/simplesaml/saml2/sp/AssertionConsumerService.php"
+                />
+            </saml:SubjectConfirmation>
+        </saml:Subject>
+        <saml:Conditions NotBefore="2008-05-27T07:48:53Z" NotOnOrAfter="2008-05-27T07:54:23Z">
+            <saml:AudienceRestriction>
+                <saml:Audience>urn:mace:feide.no:services:no.feide.foodle</saml:Audience>
+            </saml:AudienceRestriction>
+        </saml:Conditions>
+        <saml:AuthnStatement AuthnInstant="2008-05-27T07:49:23Z"
+            SessionIndex="_4f39c931b35a8dd4540b0a6929a361fa134ec8f7b5">
+            <saml:AuthnContext>
+                <saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef>
+            </saml:AuthnContext>
+        </saml:AuthnStatement>
+        <saml:AttributeStatement>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" Name="cn">
+                <saml:AttributeValue xsi:type="xs:string">Andreas Solberg</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" Name="sn">
+                <saml:AttributeValue xsi:type="xs:string">Solberg</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                Name="uid">
+                <saml:AttributeValue xsi:type="xs:string">andreas</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                Name="edupersonaffiliation">
+                <saml:AttributeValue xsi:type="xs:string">employee</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                Name="edupersonentitlement">
+                <saml:AttributeValue xsi:type="xs:string"
+                >urn:mace:feide.no:entitlement:test</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                Name="edupersonnickname">
+                <saml:AttributeValue xsi:type="xs:string">erlang</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                Name="eduPersonPrincipalName">
+                <saml:AttributeValue xsi:type="xs:string">andreas@rnd.feide.no</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                Name="mail">
+                <saml:AttributeValue xsi:type="xs:string">andreas@uninett.no</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+                Name="mobile">
+                <saml:AttributeValue xsi:type="xs:string">+4741107700</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" Name="o">
+                <saml:AttributeValue xsi:type="xs:string">Feide RnD</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" Name="ou">
+                <saml:AttributeValue xsi:type="xs:string">Guests</saml:AttributeValue>
+            </saml:Attribute>
+        </saml:AttributeStatement>
+    </saml:Assertion>
+</samlp:Response>

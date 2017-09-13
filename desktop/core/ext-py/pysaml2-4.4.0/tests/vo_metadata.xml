@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:EntitiesDescriptor 
+  name="urn:mace:example.com:votest" 
+  validUntil="2020-11-28T09:10:09Z"
+  xmlns:ns0="urn:oasis:names:tc:SAML:2.0:metadata">
+  <ns0:EntityDescriptor 
+    entityID="urn:mace:example.com:it:tek">
+    <ns0:AffiliationDescriptor 
+      affiliationOwnerID="http://vo.example.org/vo">
+      <ns0:AffiliateMember>
+        urn:mace:example.com:saml:aa
+      </ns0:AffiliateMember>
+      <ns0:AffiliateMember>
+        urn:mace:example.com:saml:idp
+      </ns0:AffiliateMember>
+    </ns0:AffiliationDescriptor>
+  </ns0:EntityDescriptor>
+</ns0:EntitiesDescriptor>

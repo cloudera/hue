@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:EntitiesDescriptor xmlns:ns0="urn:oasis:names:tc:SAML:2.0:metadata">
+    <ns0:EntityDescriptor entityID="urn:mace:example.com:saml:roland:idp">
+        <ns0:IDPSSODescriptor WantAuthnRequestsSigned="true"
+                              protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+            <ns0:KeyDescriptor>
+                <ns1:KeyInfo xmlns:ns1="http://www.w3.org/2000/09/xmldsig#">
+                    <ns1:X509Data>
+                        <ns1:X509Certificate>
+                            MIICsDCCAhmgAwIBAgIJAJrzqSSwmDY9MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+                            BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
+                            aWRnaXRzIFB0eSBMdGQwHhcNMDkxMDA2MTk0OTQxWhcNMDkxMTA1MTk0OTQxWjBF
+                            MQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50
+                            ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKB
+                            gQDJg2cms7MqjniT8Fi/XkNHZNPbNVQyMUMXE9tXOdqwYCA1cc8vQdzkihscQMXy
+                            3iPw2cMggBu6gjMTOSOxECkuvX5ZCclKr8pXAJM5cY6gVOaVO2PdTZcvDBKGbiaN
+                            efiEw5hnoZomqZGp8wHNLAUkwtH9vjqqvxyS/vclc6k2ewIDAQABo4GnMIGkMB0G
+                            A1UdDgQWBBRePsKHKYJsiojE78ZWXccK9K4aJTB1BgNVHSMEbjBsgBRePsKHKYJs
+                            iojE78ZWXccK9K4aJaFJpEcwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgTClNvbWUt
+                            U3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAJrzqSSw
+                            mDY9MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAJSrKOEzHO7TL5cy6
+                            h3qh+3+JAk8HbGBW+cbX6KBCAw/mzU8flK25vnWwXS3dv2FF3Aod0/S7AWNfKib5
+                            U/SA9nJaz/mWeF9S0farz9AQFc8/NSzAzaVq7YbM4F6f6N2FRl7GikdXRCed45j6
+                            mrPzGzk3ECbupFnqyREH3+ZPSdk=
+                        </ns1:X509Certificate>
+                    </ns1:X509Data>
+                </ns1:KeyInfo>
+            </ns0:KeyDescriptor>
+            <ns0:SingleLogoutService
+                    Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                    Location="http://localhost:8088/slo"/>
+            <ns0:SingleSignOnService
+                    Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                    Location="http://localhost:8088/sso"/>
+        </ns0:IDPSSODescriptor>
+        <ns0:Organization>
+            <ns0:OrganizationName xml:lang="en">Exempel AB
+            </ns0:OrganizationName>
+            <ns0:OrganizationDisplayName xml:lang="se">Exempel AB
+            </ns0:OrganizationDisplayName>
+            <ns0:OrganizationDisplayName xml:lang="en">Example Co.
+            </ns0:OrganizationDisplayName>
+            <ns0:OrganizationURL xml:lang="en">http://www.example.com/roland
+            </ns0:OrganizationURL>
+        </ns0:Organization>
+        <ns0:ContactPerson contactType="technical">
+            <ns0:GivenName>John</ns0:GivenName>
+            <ns0:SurName>Smith</ns0:SurName>
+            <ns0:EmailAddress>john.smith@example.com</ns0:EmailAddress>
+        </ns0:ContactPerson>
+    </ns0:EntityDescriptor>
+    <ns0:EntityDescriptor entityID="urn:mace:example.com:saml:roland:aa">
+        <ns0:AttributeAuthorityDescriptor
+                protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+            <ns0:KeyDescriptor>
+                <ns2:KeyInfo xmlns:ns2="http://www.w3.org/2000/09/xmldsig#">
+                    <ns2:X509Data>
+                        <ns2:X509Certificate>
+                            MIICsDCCAhmgAwIBAgIJAJrzqSSwmDY9MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+                            BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
+                            aWRnaXRzIFB0eSBMdGQwHhcNMDkxMDA2MTk0OTQxWhcNMDkxMTA1MTk0OTQxWjBF
+                            MQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50
+                            ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKB
+                            gQDJg2cms7MqjniT8Fi/XkNHZNPbNVQyMUMXE9tXOdqwYCA1cc8vQdzkihscQMXy
+                            3iPw2cMggBu6gjMTOSOxECkuvX5ZCclKr8pXAJM5cY6gVOaVO2PdTZcvDBKGbiaN
+                            efiEw5hnoZomqZGp8wHNLAUkwtH9vjqqvxyS/vclc6k2ewIDAQABo4GnMIGkMB0G
+                            A1UdDgQWBBRePsKHKYJsiojE78ZWXccK9K4aJTB1BgNVHSMEbjBsgBRePsKHKYJs
+                            iojE78ZWXccK9K4aJaFJpEcwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgTClNvbWUt
+                            U3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAJrzqSSw
+                            mDY9MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAJSrKOEzHO7TL5cy6
+                            h3qh+3+JAk8HbGBW+cbX6KBCAw/mzU8flK25vnWwXS3dv2FF3Aod0/S7AWNfKib5
+                            U/SA9nJaz/mWeF9S0farz9AQFc8/NSzAzaVq7YbM4F6f6N2FRl7GikdXRCed45j6
+                            mrPzGzk3ECbupFnqyREH3+ZPSdk=
+                        </ns2:X509Certificate>
+                    </ns2:X509Data>
+                </ns2:KeyInfo>
+            </ns0:KeyDescriptor>
+            <ns0:AttributeService
+                    Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                    Location="http://localhost:8089/as"/>
+        </ns0:AttributeAuthorityDescriptor>
+        <ns0:Organization>
+            <ns0:OrganizationName xml:lang="en">Exempel AB
+            </ns0:OrganizationName>
+            <ns0:OrganizationDisplayName xml:lang="se">Exempel AB
+            </ns0:OrganizationDisplayName>
+            <ns0:OrganizationDisplayName xml:lang="en">Example Co.
+            </ns0:OrganizationDisplayName>
+            <ns0:OrganizationURL xml:lang="en">http://www.example.com/roland
+            </ns0:OrganizationURL>
+        </ns0:Organization>
+        <ns0:ContactPerson contactType="technical">
+            <ns0:GivenName>John</ns0:GivenName>
+            <ns0:SurName>Smith</ns0:SurName>
+            <ns0:EmailAddress>john.smith@example.com</ns0:EmailAddress>
+        </ns0:ContactPerson>
+    </ns0:EntityDescriptor>
+</ns0:EntitiesDescriptor>
