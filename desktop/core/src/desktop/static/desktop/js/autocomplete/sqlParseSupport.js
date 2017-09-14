@@ -394,7 +394,13 @@ var SqlParseSupport = (function () {
             var found = parser.yy.latestTablePrimaries.filter(function (primary) {
               return equalIgnoreCase(primary.alias, location.identifierChain[0].name) || (primary.identifierChain && equalIgnoreCase(primary.identifierChain[0].name, location.identifierChain[0].name));
             });
-            if (found.length > 0) {
+            if (!found.length && location.firstInChain) {
+              found = parser.yy.latestTablePrimaries.filter(function (primary) {
+                return !primary.alias && primary.identifierChain && equalIgnoreCase(primary.identifierChain[primary.identifierChain.length - 1].name, location.identifierChain[0].name);
+              });
+            }
+
+            if (found.length) {
               if (found[0].identifierChain.length > 1 && location.identifierChain.length === 1 && equalIgnoreCase(found[0].identifierChain[0].name, location.identifierChain[0].name)) {
                 location.type = 'database';
               } else if (found[0].alias && equalIgnoreCase(location.identifierChain[0].name, found[0].alias) && location.identifierChain.length > 1) {
@@ -445,10 +451,15 @@ var SqlParseSupport = (function () {
           if (parser.isHive() && !location.linked) {
             location.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, location.identifierChain);
           }
+
+          var initialIdentifierChain = location.identifierChain ? location.identifierChain.concat() : undefined;
           parser.expandIdentifierChain(location, true, true, true);
 
           if (typeof location.identifierChain === 'undefined') {
             parser.yy.locations.splice(i, 1);
+          } else if (location.identifierChain.length === 0 && initialIdentifierChain && initialIdentifierChain.length === 1) {
+            // This is for the case "SELECT tblOrColName FROM db.tblOrColName";
+            location.identifierChain = initialIdentifierChain;
           }
         }
         if (location.type === 'column' && location.identifierChain) {
@@ -456,6 +467,7 @@ var SqlParseSupport = (function () {
             location.type = 'complex';
           }
         }
+        delete location.firstInChain;
       }
       if (parser.yy.locations.length > 0) {
         parser.yy.allLocations = parser.yy.allLocations.concat(parser.yy.locations);
@@ -781,7 +793,7 @@ var SqlParseSupport = (function () {
           } else if (!foundPrimary && equalIgnoreCase(tablePrimaries[i].identifierChain[0].name, identifierChain[0].name) && identifierChain.length > (isColumnLocation ? 1 : 0)) {
             foundPrimary = tablePrimaries[i];
             // No break as first two can still match.
-          } else if (!foundPrimary && tablePrimaries[i].identifierChain.length > 1
+          } else if (!foundPrimary && tablePrimaries[i].identifierChain.length > 1 && !tablePrimaries[i].alias
             && equalIgnoreCase(tablePrimaries[i].identifierChain[tablePrimaries[i].identifierChain.length - 1].name, identifierChain[0].name)) {
             // This is for the case SELECT baa. FROM bla.baa, blo.boo;
             foundPrimary = tablePrimaries[i];
@@ -1392,11 +1404,13 @@ var SqlParseSupport = (function () {
     };
 
     parser.addUnknownLocation = function (location, identifierChain) {
-      parser.yy.locations.push({
+      var unknownLoc = {
         type: 'unknown',
         location: adjustLocationForCursor(location),
         identifierChain: identifierChain
-      });
+      };
+      parser.yy.locations.push(unknownLoc);
+      return unknownLoc;
     };
 
     parser.suggestDatabases = function (details) {
