@@ -1014,10 +1014,14 @@ BasicIdentifierChain
  : ColumnIdentifier
    {
      $$ = [$1];
-     parser.addUnknownLocation(@1, [$1]);
+     parser.yy.firstChainLocation = parser.addUnknownLocation(@1, [$1]);
    }
  | BasicIdentifierChain AnyDot ColumnIdentifier
    {
+     if (parser.yy.firstChainLocation) {
+       parser.yy.firstChainLocation.firstInChain = true;
+       delete parser.yy.firstChainLocation;
+     }
      $1.push($3);
      parser.addUnknownLocation(@3, $1.concat());
    }
