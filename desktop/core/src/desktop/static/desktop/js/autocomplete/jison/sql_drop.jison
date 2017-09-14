@@ -413,38 +413,54 @@ HiveDeleteStatement_EDIT
  ;
 
 ImpalaDeleteStatement
- : '<impala>DELETE' 'FROM' TableReference OptionalWhereClause
+ : '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' TableReference OptionalWhereClause
  ;
 
 ImpalaDeleteStatement_EDIT
- : '<impala>DELETE' 'CURSOR'
+ : '<impala>DELETE' OptionalImpalaDeleteTableRef 'CURSOR'
    {
      parser.suggestKeywords(['FROM']);
+     if (parser.isImpala() && !$2) {
+       parser.suggestTables();
+       parser.suggestDatabases({ appendDot: true });
+     }
    }
- | '<impala>DELETE' 'FROM' 'CURSOR'
+ | '<impala>DELETE' ImpalaDeleteTableRef_EDIT
+ | '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' 'CURSOR'
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
    }
- | '<impala>DELETE' 'FROM' TableReference 'CURSOR' OptionalWhereClause
+ | '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' TableReference 'CURSOR' OptionalWhereClause
    {
      var keywords = [{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }, { value: 'INNER JOIN', weight: 1 },  { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }];
-     if (!$5) {
+     if (!$6) {
        keywords.push({ value: 'WHERE', weight: 3 });
      }
-     if ($3.suggestJoinConditions) {
-       parser.suggestJoinConditions($3.suggestJoinConditions);
+     if ($4.suggestJoinConditions) {
+       parser.suggestJoinConditions($4.suggestJoinConditions);
      }
-     if ($3.suggestJoins) {
-       parser.suggestJoins($3.suggestJoins);
+     if ($4.suggestJoins) {
+       parser.suggestJoins($4.suggestJoins);
      }
-     if ($3.suggestKeywords) {
-       keywords = keywords.concat(parser.createWeightedKeywords($3.suggestKeywords, 2));
+     if ($4.suggestKeywords) {
+       keywords = keywords.concat(parser.createWeightedKeywords($4.suggestKeywords, 2));
      }
      if (keywords.length > 0) {
        parser.suggestKeywords(keywords);
      }
    }
- | '<impala>DELETE' 'FROM' TableReference_EDIT OptionalWhereClause
- | '<impala>DELETE' 'FROM' TableReference WhereClause_EDIT
+ | '<impala>DELETE' ImpalaDeleteTableRef_EDIT 'FROM'
+ | '<impala>DELETE' ImpalaDeleteTableRef_EDIT 'FROM' TableReference OptionalWhereClause
+ | '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' TableReference_EDIT OptionalWhereClause
+ | '<impala>DELETE' OptionalImpalaDeleteTableRef 'FROM' TableReference WhereClause_EDIT
+ ;
+
+OptionalImpalaDeleteTableRef
+ :
+ | TableReference
+ ;
+
+ImpalaDeleteTableRef_EDIT
+ : TableReference_EDIT
  ;

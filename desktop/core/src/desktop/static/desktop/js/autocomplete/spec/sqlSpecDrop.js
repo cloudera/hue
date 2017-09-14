@@ -230,6 +230,45 @@
           });
         });
 
+        it('should handle "DELETE t1 FROM t1 JOIN t2 ON t1.x = t2.x;|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DELETE t1 FROM t1 JOIN t2 ON t1.x = t2.x;',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors:true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "DELETE t2 FROM non_kudu_table t1 JOIN kudu_table t2 ON t1.x = t2.x;|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DELETE t2 FROM non_kudu_table t1 JOIN kudu_table t2 ON t1.x = t2.x;',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors:true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "DELETE t1 FROM t1 JOIN t2 ON t1.x = t2.x WHERE t1.y = FALSE and t2.z > 100;|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DELETE t1 FROM t1 JOIN t2 ON t1.x = t2.x WHERE t1.y = FALSE and t2.z > 100;',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors:true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should handle "DELETE FROM boo.baa WHERE id < 1 AND bla IN (SELECT * FROM boo);|"', function() {
           assertAutoComplete({
             beforeCursor: 'DELETE FROM boo.baa WHERE id < 1 AND bla IN (SELECT * FROM boo);',
@@ -277,7 +316,9 @@
             noErrors:true,
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['FROM']
+              suggestKeywords: ['FROM'],
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
             }
           });
         });
@@ -309,6 +350,19 @@
           });
         });
 
+        it('should suggest tables for "DELETE t1 FROM db.|"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DELETE FROM db.',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors:true,
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: { identifierChain: [{ name: 'db' }]}
+            }
+          });
+        });
+
         it('should suggest keywords for "DELETE FROM boo.baa |"', function() {
           assertAutoComplete({
             beforeCursor: 'DELETE FROM boo.baa ',
@@ -319,6 +373,21 @@
             expectedResult: {
               lowerCase: false,
               suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
+            }
+          });
+        });
+
+        it('should suggst tables for "DELETE t1 FROM tbl t1 JOIN |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'DELETE t1 FROM tbl t1 JOIN ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['[BROADCAST]', '[SHUFFLE]'],
+              suggestJoins: { prependJoin: false, joinType: 'JOIN', tables: [{ identifierChain: [{ name: 'tbl' }], alias: 't1' }] },
+              suggestTables: {  },
+              suggestDatabases: { appendDot: true }
             }
           });
         });
