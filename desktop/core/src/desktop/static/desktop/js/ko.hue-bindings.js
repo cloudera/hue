@@ -3773,11 +3773,12 @@
             })
           }
 
-          var AceRange = ace.require('ace/range').Range;
-          var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
-          var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
-          self.editor.session.$backMarkers[markerId].token = token;
-
+          if (token.parseLocation) {
+            var AceRange = ace.require('ace/range').Range;
+            var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
+            var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
+            self.editor.session.$backMarkers[markerId].token = token;
+          }
         });
       }
     };
