@@ -1368,6 +1368,16 @@ var SqlParseSupport = (function () {
       });
     };
 
+    parser.addColumnAliasLocation = function (location, alias, parentLocation) {
+      parser.yy.locations.push({
+        type: 'alias',
+        source: 'column',
+        alias: alias,
+        location: adjustLocationForCursor(location),
+        parentLocation: adjustLocationForCursor(parentLocation)
+      });
+    };
+
     parser.addTableAliasLocation = function (location, alias, identifierChain) {
       parser.yy.locations.push({
         type: 'alias',
@@ -1649,7 +1659,7 @@ var SqlParseSupport = (function () {
     'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords',
     'suggestKeywords', 'suggestColRefKeywords', 'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions',
     'suggestColumns', 'suggestGroupBys', 'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation',
-    'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addTableAliasLocation',
+    'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addColumnAliasLocation', 'addTableAliasLocation',
     'addSubqueryAliasLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addUnknownLocation', 'suggestDatabases', 'suggestHdfs',
     'suggestValues'];
 
