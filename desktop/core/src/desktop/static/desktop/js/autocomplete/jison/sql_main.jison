@@ -2588,11 +2588,12 @@ SelectSpecification
  : ValueExpression OptionalCorrelationName
    {
      if ($2) {
-       $$ = { valueExpression: $1, alias: $2 };
+       parser.addColumnAliasLocation($2.location, $2.alias, @1);
+       $$ = { valueExpression: $1, alias: $2.alias };
        if (!parser.yy.selectListAliases) {
          parser.yy.selectListAliases = [];
        }
-       parser.yy.selectListAliases.push({ name: $2, types: $1.types || ['T'] });
+       parser.yy.selectListAliases.push({ name: $2.alias, types: $1.types || ['T'] });
      } else {
        $$ = { valueExpression: $1 }
      }
@@ -2606,10 +2607,17 @@ SelectSpecification
 
 SelectSpecification_EDIT
  : ValueExpression_EDIT OptionalCorrelationName
+   {
+     if ($2) {
+       parser.addColumnAliasLocation($2.location, $2.alias, @1);
+     }
+   }
+
  | AnyCursor AnyAs RegularOrBacktickedIdentifier
    {
      parser.suggestFunctions();
      parser.suggestColumns();
+     parser.addColumnAliasLocation(@3, $3, @1);
      $$ = { suggestAggregateFunctions: true };
    }
  | ValueExpression OptionalCorrelationName_EDIT  -> $2
@@ -2898,8 +2906,8 @@ TablePrimary
    {
      if ($1.identifierChain) {
        if ($3) {
-         $1.alias = $3
-         parser.addTableAliasLocation(@3, $3, $1.identifierChain);
+         $1.alias = $3.alias
+         parser.addTableAliasLocation($3.location, $3.alias, $1.identifierChain);
        }
        parser.addTablePrimary($1);
      }
@@ -2909,9 +2917,9 @@ TablePrimary
  | DerivedTable OptionalCorrelationName
    {
      if ($2) {
-       $1.alias = $2;
-       parser.addTablePrimary({ subQueryAlias: $2 });
-       parser.addSubqueryAliasLocation(@2, $2, $1.identifierChain);
+       $1.alias = $2.alias;
+       parser.addTablePrimary({ subQueryAlias: $2.alias });
+       parser.addSubqueryAliasLocation($2.location, $2.alias, $1.identifierChain);
      } else {
        $$.suggestKeywords = [{ value: 'AS', weight: 1 }];
      }
@@ -2922,22 +2930,22 @@ TablePrimary_EDIT
  : TableOrQueryName_EDIT OptionalTableSample OptionalCorrelationName
    {
      if ($3) {
-       parser.addTableAliasLocation(@3, $3, $1.identifierChain);
+       parser.addTableAliasLocation($3.location, $3.alias, $1.identifierChain);
      }
    }
  | TableOrQueryName OptionalTableSample_EDIT OptionalCorrelationName
    {
      if ($3) {
-       $1.alias = $3;
-       parser.addTableAliasLocation(@3, $3, $1.identifierChain);
+       $1.alias = $3.alias;
+       parser.addTableAliasLocation($3.location, $3.alias, $1.identifierChain);
      }
      parser.addTablePrimary($1);
    }
  | DerivedTable_EDIT OptionalCorrelationName
    {
      if ($2) {
-       parser.addTablePrimary({ subQueryAlias: $2 });
-       parser.addSubqueryAliasLocation(@2, $2);
+       parser.addTablePrimary({ subQueryAlias: $2.alias });
+       parser.addSubqueryAliasLocation($2.location, $2.alias);
      }
    }
  | DerivedTable OptionalCorrelationName_EDIT
@@ -3018,8 +3026,9 @@ TableSubQuery
  | '(' DerivedTable OptionalCorrelationName ')'
    {
      if ($3) {
-       $2.alias = $3;
-       parser.addTablePrimary({ subQueryAlias: $3 });
+       $2.alias = $3.alias;
+       parser.addTablePrimary({ subQueryAlias: $3.alias });
+       parser.addSubqueryAliasLocation($3.location, $3.alias, $2.identifierChain);
      }
      $$ = $2;
    }
@@ -3108,8 +3117,8 @@ SimpleTable_EDIT
 
 OptionalCorrelationName
  :
- | RegularOrBacktickedIdentifier
- | AnyAs RegularOrBacktickedIdentifier  -> $2
+ | RegularOrBacktickedIdentifier        -> { alias: $1, location: @1 }
+ | AnyAs RegularOrBacktickedIdentifier  -> { alias: $2, location: @2 }
  ;
 
 OptionalCorrelationName_EDIT
