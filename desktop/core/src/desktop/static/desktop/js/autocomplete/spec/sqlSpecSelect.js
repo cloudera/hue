@@ -314,9 +314,21 @@
         });
       });
 
-      it ('should handle "SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; |"', function () {
+      it('should handle "SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT bla NOT RLIKE \'ble\', ble NOT REGEXP \'b\' FROM tbl; ',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SELECT * FROM tbl limit ${limit=20}; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM tbl limit ${limit=20}; ',
           afterCursor: '',
           noErrors: true,
           containsKeywords: ['SELECT'],
