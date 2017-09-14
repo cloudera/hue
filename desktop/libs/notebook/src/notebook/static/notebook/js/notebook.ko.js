@@ -2612,6 +2612,7 @@ var EditorViewModel = (function() {
     self.viewSchedulerId.subscribe(function(newVal) {
       self.save();
     });
+    self.isSchedulerJobRunning = ko.observable();
     self.loadingScheduler = ko.observable(false);
 
 
