@@ -2552,13 +2552,19 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
             <a data-bind="click: saveScheduler" href="javascript: void(0);">${ _('Save changes') }</a>
             <!-- /ko -->
-            <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && ! viewSchedulerId()-->
+            <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && (! viewSchedulerId() || isSchedulerJobRunning() == false )-->
             <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${ _('Start') }</a>
             <!-- /ko -->
             <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
             <a data-bind="click: function() { huePubSub.publish('show.jobs.panel', viewSchedulerId()) }, clickBubble: false" href="javascript: void(0);">
               ${ _('View') }
             </a>
+            <!-- ko if: isSchedulerJobRunning() -->
+              ${ _("Running")}
+            <!-- /ko -->
+            <!-- ko if: isSchedulerJobRunning() == false -->
+              ${ _("Stopped")}
+            <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
           <br>
@@ -2583,9 +2589,22 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var selectedNotebookSub = self.selectedNotebook.subscribe(function (notebook) { // Happening 4 times for each notebook loaded
           if (notebook && notebook.schedulerViewModel == null && notebook.isSaved() && ! notebook.isHistory()) {
             notebook.loadScheduler();
+            if (notebook.viewSchedulerId()) {
+              huePubSub.publish('check.schedules.browser');
+            }
           }
         });
         self.disposals.push(selectedNotebookSub.dispose.bind(selectedNotebookSub));
+
+        var setSelectedNotebookSub = huePubSub.subscribe('jobbrowser.schedule.data', function (jobs) {
+          if (self.selectedNotebook() && self.selectedNotebook().viewSchedulerId()) {
+            var _job = $.grep(jobs, function (job) {
+              return self.selectedNotebook().viewSchedulerId() == job.id;
+            });
+            self.selectedNotebook().isSchedulerJobRunning(_job.length > 0 && _job[0].apiStatus == 'RUNNING');
+          }
+        });
+        self.disposals.push(setSelectedNotebookSub.remove.bind(setSelectedNotebookSub));
 
         // Hue 3
         var setSelectedNotebookSub = huePubSub.subscribe('set.selected.notebook', self.selectedNotebook);
@@ -2606,7 +2625,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               });
             }
           } else {
-            self.selectedNotebook(undefined);
+            self.selectedNotebook(null);
           }
         });
         self.disposals.push(currentAppSub.remove.bind(currentAppSub));
