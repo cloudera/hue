@@ -69,6 +69,73 @@
       });
     });
 
+    it('should report locations for "SELECT tbl FROM db.tbl; |"', function() {
+      assertLocations({
+        beforeCursor: 'SELECT tbl FROM db.tbl; ',
+        dialect: 'impala',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 23 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 } },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [ { name: 'tbl' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] },
+          { type: 'database', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 19 }, identifierChain: [{ name: 'db' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 23, last_column: 23 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 23, last_column: 23 } }
+        ]
+      });
+    });
+
+    it('should report locations for "SELECT tbl.col FROM db.tbl; |"', function() {
+      assertLocations({
+        beforeCursor: 'SELECT tbl.col FROM db.tbl; ',
+        dialect: 'impala',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 27 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 15 } },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] },
+          { type: 'database', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 23 }, identifierChain: [{ name: 'db' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 24, last_column: 27 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 27, last_column: 27 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 27, last_column: 27 } }
+        ]
+      });
+    });
+
+    it('should report locations for "SELECT a.col FROM db.tbl a; |"', function() {
+      assertLocations({
+        beforeCursor: 'SELECT a.col FROM db.tbl a; ',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 27 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 13 } },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }], alias: 'a' }] },
+          { type: 'database', location: { first_line: 1, last_line: 1, first_column: 19, last_column: 21 }, identifierChain: [{ name: 'db' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 25 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
+          { type: 'alias', source: 'table', alias: 'a', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 27 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 27, last_column: 27 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 27, last_column: 27 } }
+        ]
+      });
+    });
+
+    it('should report locations for "SELECT tbl.col FROM db.tbl a; |"', function() {
+      assertLocations({
+        beforeCursor: 'SELECT tbl.col FROM db.tbl a; ',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 29 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 15 } },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'tbl' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }], alias: 'a' }] },
+          { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'tbl' }, { name: 'col' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }], alias: 'a' }] },
+          { type: 'database', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 23 }, identifierChain: [{ name: 'db' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 24, last_column: 27 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
+          { type: 'alias', source: 'table', alias: 'a', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 29 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 29, last_column: 29 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 29, last_column: 29 } }
+        ]
+      });
+    });
+
     it('should report locations for "select x from x;"', function () {
       assertLocations({
         beforeCursor: 'select x from x;',
