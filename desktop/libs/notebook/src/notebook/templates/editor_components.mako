@@ -346,6 +346,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
             <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
           </li>
+          <li data-bind="visible: isSchedulerJobRunning" style="display: none" class="no-horiz-padding muted">
+            <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
+              ${ _("Scheduling on") }
+            </a>
+          </li>
           <li class="query-name no-horiz-padding skip-width-calculation">
             <a href="javascript:void(0)">
               <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
