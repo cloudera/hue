@@ -1312,14 +1312,14 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
-ENABLE_SQL_SYNTAX_CHECK = Config( # To remove when syntax check is ready
+ENABLE_SQL_SYNTAX_CHECK = Config(
   key='enable_sql_syntax_check',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
-USE_NEW_GLOBAL_SEARCH = Config( # To remove when the new global search is ready
+USE_NEW_GLOBAL_SEARCH = Config(
   key='use_new_global_search',
   default=True,
   type=coerce_bool,
