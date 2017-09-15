@@ -3307,7 +3307,7 @@
             suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
             suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
             suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
-            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'ANTI JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT INNER JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'OUTER JOIN', 'RIGHT ANTI JOIN', 'RIGHT INNER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'SEMI JOIN']
+            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'TABLESAMPLE', 'ANTI JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT INNER JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'OUTER JOIN', 'RIGHT ANTI JOIN', 'RIGHT INNER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN', 'SEMI JOIN']
           }
         });
       });
@@ -5863,111 +5863,195 @@
     });
 
     describe('TABLESAMPLE', function () {
-      it('should handle "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 32 ON baa) baa JOIN bla;|', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 32 ON baa) baa JOIN bla;',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['SELECT'],
-          expectedResult: {
-            lowerCase: false
-          }
+      describe('Impala specific', function () {
+        it('should handle "select distinct x from sample_demo tablesample system(50);|"', function (){
+          assertAutoComplete({
+            beforeCursor: 'select distinct x from sample_demo tablesample system(50);',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: true
+            }
+          });
+        });
+
+        it('should handle "select distinct sd.x from sample_demo as sd tablesample system(50) repeatable (12345);|"', function (){
+          assertAutoComplete({
+            beforeCursor: 'select distinct sd.x from sample_demo as sd tablesample system(50) repeatable (12345);',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: true
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM boo |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['TABLESAMPLE', 'AS'],
+            doesNotContainKeywords: ['REPEATABLE'],
+            expectedResult: {
+              lowerCase: false,
+              suggestJoins: {prependJoin: true, tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestFilters: {prefix: 'WHERE', tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestGroupBys: {prefix: 'GROUP BY', tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestOrderBys: {prefix: 'ORDER BY', tables: [{identifierChain: [{name: 'boo'}]}]}
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM boo as b |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo as b ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['TABLESAMPLE'],
+            doesNotContainKeywords: ['AS'],
+            expectedResult: {
+              lowerCase: false,
+              suggestJoins: {prependJoin: true, tables: [{identifierChain: [{name: 'boo'}], alias: 'b'}]},
+              suggestFilters: {prefix: 'WHERE', tables: [{identifierChain: [{name: 'boo'}], alias: 'b'}]},
+              suggestGroupBys: {prefix: 'GROUP BY', tables: [{identifierChain: [{name: 'boo'}], alias: 'b'}]},
+              suggestOrderBys: {prefix: 'ORDER BY', tables: [{identifierChain: [{name: 'boo'}], alias: 'b'}]}
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM boo as b TABLESAMPLE SYSTEM(50) |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo as b TABLESAMPLE SYSTEM(50) ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['REPEATABLE'],
+            doesNotContainKeywords: ['TABLESAMPLE'],
+            expectedResult: {
+              lowerCase: false,
+              suggestJoins: {prependJoin: true, tables: [{identifierChain: [{name: 'boo'}], alias: 'b'}]},
+              suggestFilters: {prefix: 'WHERE', tables: [{identifierChain: [{name: 'boo'}], alias: 'b'}]},
+              suggestGroupBys: {prefix: 'GROUP BY', tables: [{identifierChain: [{name: 'boo'}], alias: 'b'}]},
+              suggestOrderBys: {prefix: 'ORDER BY', tables: [{identifierChain: [{name: 'boo'}], alias: 'b'}]}
+            }
+          });
         });
       });
 
-      it('should suggest keywords for "SELECT * FROM boo |', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo ',
-          afterCursor: '',
-          dialect: 'hive',
-          noErrors: true,
-          containsKeywords: ['TABLESAMPLE', 'AS'],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'boo' }] }] }
-          }
+      describe('Hive specific', function () {
+        it('should handle "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 32 ON baa) baa JOIN bla;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 32 ON baa) baa JOIN bla;',
+            afterCursor: '',
+            dialect: 'hive',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
         });
-      });
 
-      it('should suggest keywords for "SELECT * FROM boo |, baa', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo ',
-          afterCursor: ', baa',
-          dialect: 'hive',
-          containsKeywords: ['TABLESAMPLE', 'AS'],
-          expectedResult: {
-            lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'boo' }] }] },
-            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'boo' }] }] }
-          }
+        it('should suggest keywords for "SELECT * FROM boo |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            noErrors: true,
+            containsKeywords: ['TABLESAMPLE', 'AS'],
+            expectedResult: {
+              lowerCase: false,
+              suggestJoins: {prependJoin: true, tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestFilters: {prefix: 'WHERE', tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestGroupBys: {prefix: 'GROUP BY', tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestOrderBys: {prefix: 'ORDER BY', tables: [{identifierChain: [{name: 'boo'}]}]}
+            }
+          });
         });
-      });
 
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (|', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['BUCKET']
-          }
+        it('should suggest keywords for "SELECT * FROM boo |, baa', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo ',
+            afterCursor: ', baa',
+            dialect: 'hive',
+            containsKeywords: ['TABLESAMPLE', 'AS'],
+            expectedResult: {
+              lowerCase: false,
+              suggestJoins: {prependJoin: true, tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestFilters: {prefix: 'WHERE', tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestGroupBys: {prefix: 'GROUP BY', tables: [{identifierChain: [{name: 'boo'}]}]},
+              suggestOrderBys: {prefix: 'ORDER BY', tables: [{identifierChain: [{name: 'boo'}]}]}
+            }
+          });
         });
-      });
 
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 |', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['OUT OF']
-          }
+        it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (|', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BUCKET']
+            }
+          });
         });
-      });
 
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT |', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['OF']
-          }
+        it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['OUT OF']
+            }
+          });
         });
-      });
 
-      it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 |', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ',
-          afterCursor: '',
-          dialect: 'hive',
-          expectedResult: {
-            lowerCase: false,
-            suggestKeywords: ['ON']
-          }
+        it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['OF']
+            }
+          });
         });
-      });
 
-      it('should suggest columns for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ON |', function () {
-        assertAutoComplete({
-          beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ON ',
-          afterCursor: '',
-          dialect: 'hive',
-          containsKeywords: ['CASE'],
-          expectedResult: {
-            lowerCase: false,
-            suggestFunctions: {},
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }] }] }
-          }
+        it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['ON']
+            }
+          });
+        });
+
+        it('should suggest columns for "SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ON |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (BUCKET 1 OUT OF 16 ON ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['CASE'],
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: {},
+              suggestColumns: {tables: [{identifierChain: [{name: 'boo'}]}]}
+            }
+          });
         });
       });
     });
@@ -6889,7 +6973,7 @@
             expectedResult: {
               lowerCase: false,
               suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
-              suggestKeywords: ['ANTI', 'CROSS', 'FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT ANTI', 'LEFT INNER', 'LEFT OUTER', 'LEFT SEMI', 'OUTER', 'RIGHT', 'RIGHT ANTI', 'RIGHT INNER', 'RIGHT OUTER', 'RIGHT SEMI', 'SEMI']
+              suggestKeywords: ['TABLESAMPLE', 'ANTI', 'CROSS', 'FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT ANTI', 'LEFT INNER', 'LEFT OUTER', 'LEFT SEMI', 'OUTER', 'RIGHT', 'RIGHT ANTI', 'RIGHT INNER', 'RIGHT OUTER', 'RIGHT SEMI', 'SEMI']
             }
           });
         });
