@@ -3481,17 +3481,18 @@ var SqlFunctions = (function () {
 
   var findFunction = function (dialect, functionName) {
     return BIT_FUNCTIONS[dialect][functionName] ||
-        COLLECTION_FUNCTIONS[dialect][functionName] ||
-        CONDITIONAL_FUNCTIONS[dialect][functionName] ||
-        COMPLEX_TYPE_CONSTRUCTS[dialect][functionName] ||
-        DATE_FUNCTIONS[dialect][functionName] ||
-        MATHEMATICAL_FUNCTIONS[dialect][functionName] ||
-        TYPE_CONVERSION_FUNCTIONS[dialect][functionName] ||
-        STRING_FUNCTIONS[dialect][functionName] ||
-        DATA_MASKING_FUNCTIONS[dialect][functionName] ||
-        MISC_FUNCTIONS[dialect][functionName] ||
-        TABLE_GENERATING_FUNCTIONS[dialect][functionName] ||
-        AGGREGATE_FUNCTIONS[dialect][functionName];
+      COLLECTION_FUNCTIONS[dialect][functionName] ||
+      CONDITIONAL_FUNCTIONS[dialect][functionName] ||
+      COMPLEX_TYPE_CONSTRUCTS[dialect][functionName] ||
+      DATE_FUNCTIONS[dialect][functionName] ||
+      MATHEMATICAL_FUNCTIONS[dialect][functionName] ||
+      TYPE_CONVERSION_FUNCTIONS[dialect][functionName] ||
+      STRING_FUNCTIONS[dialect][functionName] ||
+      DATA_MASKING_FUNCTIONS[dialect][functionName] ||
+      MISC_FUNCTIONS[dialect][functionName] ||
+      TABLE_GENERATING_FUNCTIONS[dialect][functionName] ||
+      AGGREGATE_FUNCTIONS[dialect][functionName] ||
+      ANALYTIC_FUNCTIONS[dialect][functionName];
   };
 
   var getArgumentTypes = function (dialect, functionName, argumentPosition) {
