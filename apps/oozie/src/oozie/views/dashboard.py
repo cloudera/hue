@@ -43,7 +43,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from liboozie.credentials import Credentials
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
-from liboozie.utils import catch_unicode_time
+from liboozie.utils import catch_unicode_time, parse_timestamp
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2, ENABLE_OOZIE_BACKEND_FILTERING
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateCoordinatorForm
@@ -1109,6 +1109,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'pauseTime': hasattr(job, 'pauseTime') and job.pauseTime and format_time(job.endTime) or None,
         'concurrency': hasattr(job, 'concurrency') and job.concurrency or None,
         'endTimeInMillis': job.endTime and time.mktime(job.endTime) or 0,
+        'lastActionInMillis': hasattr(job, 'lastAction') and job.lastAction and parse_timestamp(job.lastAction) or 0,
         'status': job.status,
         'group': job.group,
         'isRunning': job.is_running(),
