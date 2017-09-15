@@ -351,9 +351,9 @@ DropViewStatement_EDIT
  ;
 
 TruncateTableStatement
- : 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec
+ : 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
-     parser.addTablePrimary($3);
+     parser.addTablePrimary($4);
    }
  ;
 
@@ -362,23 +362,35 @@ TruncateTableStatement_EDIT
    {
      parser.suggestKeywords(['TABLE']);
    }
- | 'TRUNCATE' AnyTable 'CURSOR' OptionalPartitionSpec
+ | 'TRUNCATE' AnyTable OptionalIfExists 'CURSOR' OptionalPartitionSpec
    {
      parser.suggestTables();
      parser.suggestDatabases({ appendDot: true });
+     if (parser.isImpala() && !$3) {
+       parser.suggestKeywords(['IF EXISTS']);
+     }
    }
- | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
- | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+ | 'TRUNCATE' AnyTable OptionalIfExists_EDIT OptionalPartitionSpec
+ | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec
+ | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
    {
-     parser.addTablePrimary($3);
-     if (parser.isHive() && !$4) {
+     parser.addTablePrimary($4);
+     if (parser.isHive() && !$5) {
        parser.suggestKeywords(['PARTITION']);
      }
    }
- | 'TRUNCATE' AnyTable SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
+ | 'TRUNCATE' AnyTable OptionalIfExists SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
    {
-     parser.addTablePrimary($3);
+     parser.addTablePrimary($4);
    }
+ | 'TRUNCATE' AnyTable OptionalIfExists 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+   {
+     parser.addTablePrimary($4);
+     if (parser.isImpala() && !$3) {
+       parser.suggestKeywords(['IF EXISTS']);
+     }
+   }
+ | 'TRUNCATE' AnyTable OptionalIfExists_EDIT SchemaQualifiedTableIdentifier OptionalPartitionSpec
  ;
 
 HiveDeleteStatement
