@@ -2085,6 +2085,13 @@ var SqlFunctions = (function () {
 				draggable: 'nvl()',
         description: 'Alias for the isnull() function. Tests if an expression is NULL, and returns the expression result value if not. If the first argument is NULL, returns the second argument. Equivalent to the nvl() function from Oracle Database or ifnull() from MySQL.'
       },
+      nvl2: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}], [{type: 'T'}], [{type: 'T'}]],
+        signature: 'nvl2(T a, T ifNull, T ifNotNull)',
+        draggable: 'nvl2()',
+        description: 'Enhanced variant of the nvl() function. Tests an expression and returns different result values depending on whether it is NULL or not. If the first argument is NULL, returns the second argument. If the first argument is not NULL, returns the third argument. Equivalent to the nvl2() function from Oracle.'
+      },
       zeroifnull: {
         returnTypes: ['T'],
         arguments: [[{type: 'NUMBER'}]],
@@ -2596,6 +2603,13 @@ var SqlFunctions = (function () {
         signature: 'repeat(STRING str, INT n)',
 				draggable: 'repeat()',
         description: 'Returns the argument string repeated a specified number of times.'
+      },
+      replace: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'STRING'}]],
+        signature: 'replace(STRING initial, STRING target, STRING replacement)',
+        draggable: 'replace()',
+        description: 'Returns the initial argument with all occurrences of the target string replaced by the replacement string.'
       },
       reverse: {
         returnTypes: ['STRING'],
