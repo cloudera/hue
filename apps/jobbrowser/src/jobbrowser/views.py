@@ -175,7 +175,7 @@ def massage_job_for_json(job, request=None, user=None):
     'url': job.jobId and reverse('jobbrowser.views.single_job', kwargs={'job': job.jobId}) or '',
     'logs': job.jobId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': job.jobId}) or '',
     'queueName': hasattr(job, 'queueName') and job.queueName or _('N/A'),
-    'priority': hasattr(job, 'priority') and job.priority.lower() or _('N/A'),
+    'priority': hasattr(job, 'priority') and job.priority or _('N/A'),
     'user': job.user,
     'isRetired': job.is_retired,
     'isMR2': job.is_mr2,
