@@ -409,7 +409,7 @@
             lowerCase: false,
             suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DELETE', 'DESCRIBE',
               'DROP', 'EXPLAIN', 'GRANT', 'INSERT', 'INVALIDATE METADATA', 'LOAD', 'REFRESH',
-              'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
+              'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'UPSERT', 'USE', 'WITH']
           }
         });
       });

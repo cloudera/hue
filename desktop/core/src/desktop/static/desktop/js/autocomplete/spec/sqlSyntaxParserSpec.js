@@ -150,7 +150,7 @@
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'impala');
         expect(result).toBeTruthy();
-        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'CREATE', 'EXPLAIN', 'GRANT', 'LOAD', 'REFRESH', 'REVOKE', 'SHOW', 'USE', 'COMPUTE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE', 'INVALIDATE']);
+        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'UPSERT', 'CREATE', 'EXPLAIN', 'GRANT', 'LOAD', 'REFRESH', 'REVOKE', 'SHOW', 'USE', 'COMPUTE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE', 'INVALIDATE']);
       });
     })
 
