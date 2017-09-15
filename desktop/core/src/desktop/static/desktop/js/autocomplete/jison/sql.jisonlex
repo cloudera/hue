@@ -254,6 +254,7 @@
 <impala>'REAL'                             { return '<impala>REAL'; }
 <impala>'REFRESH'                          { parser.determineCase(yytext); return '<impala>REFRESH'; }
 <impala>'RENAME'                           { return '<impala>RENAME'; }
+<impala>'REPEATABLE'                       { return '<impala>REPEATABLE'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
 <impala>'REPLICATION'                      { return '<impala>REPLICATION'; }
 <impala>'RESTRICT'                         { return '<impala>RESTRICT'; }
@@ -271,6 +272,7 @@
 <impala>'SYMBOL'                           { return '<impala>SYMBOL'; }
 <impala>'TABLE'                            { return '<impala>TABLE'; }
 <impala>'TABLES'                           { return '<impala>TABLES'; }
+<impala>'TABLESAMPLE'                      { return '<impala>TABLESAMPLE'; }
 <impala>'TBLPROPERTIES'                    { return '<impala>TBLPROPERTIES'; }
 <impala>'TERMINATED'                       { return '<impala>TERMINATED'; }
 <impala>'TEXTFILE'                         { return '<impala>TEXTFILE'; }
@@ -437,6 +439,8 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 <hive>PERCENT_RANK\s*\(                    { yy.lexer.unput('('); yytext = 'percent_rank'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
 <impala>NTILE\s*\(                         { yy.lexer.unput('('); yytext = 'ntile'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
 <impala>PERCENT_RANK\s*\(                  { yy.lexer.unput('('); yytext = 'percent_rank'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+
+<impala>SYSTEM\s*\(                        { yy.lexer.unput('('); yytext = 'system'; return '<impala>SYSTEM'; }
 
 [0-9]+                                     { return 'UNSIGNED_INTEGER'; }
 [0-9]+(?:[YSL]|BD)?                        { return 'UNSIGNED_INTEGER'; }
