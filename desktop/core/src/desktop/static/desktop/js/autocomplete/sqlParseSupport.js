@@ -1077,7 +1077,7 @@ var SqlParseSupport = (function () {
       }
 
       if (parser.isImpala()) {
-        keywords = keywords.concat(['COMPUTE', 'DELETE', 'INVALIDATE METADATA', 'LOAD', 'REFRESH']);
+        keywords = keywords.concat(['COMPUTE', 'DELETE', 'INVALIDATE METADATA', 'LOAD', 'REFRESH', 'UPSERT']);
       }
 
       parser.suggestKeywords(keywords);
