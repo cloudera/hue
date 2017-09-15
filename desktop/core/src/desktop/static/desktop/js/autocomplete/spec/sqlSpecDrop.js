@@ -1196,6 +1196,72 @@
           });
         });
       });
+
+      describe('Impala specific', function () {
+        it('should handle "TRUNCATE TABLE IF EXISTS baa.boo;"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE TABLE IF EXISTS baa.boo;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest tables for "TRUNCATE TABLE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE TABLE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true },
+              suggestKeywords: ['IF EXISTS']
+            }
+          });
+        });
+
+        it('should suggest keywords for "TRUNCATE TABLE IF |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE TABLE IF ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['EXISTS']
+            }
+          });
+        });
+
+        it('should suggest tables for "TRUNCATE TABLE IF EXISTS |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE TABLE IF EXISTS ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "TRUNCATE TABLE | boo"', function() {
+          assertAutoComplete({
+            beforeCursor: 'TRUNCATE TABLE ',
+            afterCursor: ' boo',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['IF EXISTS']
+            }
+          });
+        });
+      })
     })
   });
 })();
