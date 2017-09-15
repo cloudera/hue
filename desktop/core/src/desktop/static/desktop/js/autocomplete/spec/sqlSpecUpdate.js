@@ -56,9 +56,9 @@
       assertAutoComplete({
         beforeCursor: 'UPDATE bar SET id=1, foo=2 ',
         afterCursor: '',
+        containsKeywords: ['WHERE'],
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['WHERE'],
           locations: [
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 27 } },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'bar'}] },
@@ -231,5 +231,75 @@
         }
       });
     });
+
+    describe('Impala specific', function () {
+      it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' ',
+          afterCursor: '',
+          dialect: 'impala',
+          containsKeywords: ['FROM', 'WHERE'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest tables for "UPDATE bar.foo SET bla = \'foo\' FROM |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' FROM ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: {
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' FROM boo ',
+          afterCursor: '',
+          dialect: 'impala',
+          containsKeywords: ['JOIN'],
+          expectedResult: {
+            lowerCase: false,
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] }
+          }
+        });
+      });
+
+      it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo JOIN |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' FROM boo JOIN ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['[BROADCAST]', '[SHUFFLE]'],
+            suggestJoins: { prependJoin: false, joinType: 'JOIN', tables: [{ identifierChain: [{ name: 'boo' }] }] },
+            suggestTables: {  },
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "UPDATE bar.foo SET bla = \'foo\' FROM boo JOIN blaa |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPDATE bar.foo SET bla = \'foo\' FROM boo JOIN blaa ',
+          afterCursor: '',
+          dialect: 'impala',
+          containsKeywords: ['ON', 'JOIN'],
+          expectedResult: {
+            lowerCase: false,
+            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'bar' }, { name: 'foo' }] }, { identifierChain: [{ name: 'boo' }] }, { identifierChain: [{ name: 'blaa' }] }] }
+          }
+        });
+      });
+    })
   });
 })();
