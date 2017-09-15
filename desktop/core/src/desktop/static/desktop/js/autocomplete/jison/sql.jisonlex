@@ -276,6 +276,7 @@
 <impala>'TEXTFILE'                         { return '<impala>TEXTFILE'; }
 <impala>'UNCACHED'                         { return '<impala>UNCACHED'; }
 <impala>'UPDATE_FN'                        { return '<impala>UPDATE_FN'; }
+<impala>'UPSERT'                           { parser.determineCase(yytext); return '<impala>UPSERT'; }
 <impala>'URI'                              { return '<impala>URI'; }
 <impala>'USING'                            { return '<impala>USING'; }
 <impala>PARTITION\s+VALUE\s                { return '<impala>PARTITION_VALUE'; }

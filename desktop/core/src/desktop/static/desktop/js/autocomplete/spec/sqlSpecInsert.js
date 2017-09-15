@@ -907,6 +907,58 @@
     });
 
     describe('Impala specific', function () {
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'impala',
+          containsKeywords: ['UPSERT'],
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "UPSERT INTO TABLE boo.baa (a, b) VALUES (1, 2);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT INTO TABLE boo.baa (a, b) VALUES (1, 2);',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "UPSERT INTO production_table SELECT * FROM staging_table WHERE c1 IS NOT NULL AND c2 > 0;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT INTO production_table SELECT * FROM staging_table WHERE c1 IS NOT NULL AND c2 > 0;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "UPSERT INTO boo.baa [SHUFFLE] SELECT * FROM bla;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT INTO boo.baa [SHUFFLE] SELECT * FROM bla;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should handle "INSERT INTO TABLE boo.baa (a, b) PARTITION (a=1) VALUES (1, 2);|"', function() {
         assertAutoComplete({
           beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) PARTITION (a=1) VALUES (1, 2);',
@@ -955,6 +1007,86 @@
           containsKeywords: ['INSERT'],
           expectedResult: {
             lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "UPSERT |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['INTO']
+          }
+        });
+      });
+
+      it('should suggest tables for "UPSERT INTO |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT INTO ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true },
+            suggestKeywords: ['TABLE' ]
+          }
+        });
+      });
+
+      it('should suggest tables for "UPSERT INTO boo.|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT INTO boo.',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: { identifierChain: [{ name: 'boo' }] }
+          }
+        });
+      });
+
+      it('should suggest keywords for "UPSERT INTO baa |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT INTO baa ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES']
+          }
+        });
+      });
+
+      it('should suggest tables for "UPSERT INTO baa [SHUFFLE] SELECT * FROM |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT INTO baa [SHUFFLE] SELECT * FROM ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest columns for "UPSERT INTO TABLE boo.baa (|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'UPSERT INTO boo.baa (',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
           }
         });
       });
@@ -1040,7 +1172,7 @@
         });
       });
 
-      it('should suggest tables for "INSERT INTO TABLE boo.baa (|"', function() {
+      it('should suggest columns for "INSERT INTO TABLE boo.baa (|"', function() {
         assertAutoComplete({
           beforeCursor: 'INSERT INTO boo.baa (',
           afterCursor: '',
@@ -1052,7 +1184,7 @@
         });
       });
 
-      it('should suggest tables for "INSERT INTO TABLE boo.baa (a, |"', function() {
+      it('should suggest columns for "INSERT INTO TABLE boo.baa (a, |"', function() {
         assertAutoComplete({
           beforeCursor: 'INSERT INTO boo.baa (a, ',
           afterCursor: '',
@@ -1092,7 +1224,7 @@
 
       it('should not suggest keywords for "INSERT INTO TABLE boo.baa (a, b) VALUES (1, 2) |"', function() {
         assertAutoComplete({
-          beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) VALUES (1, 2) |',
+          beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) VALUES (1, 2) ',
           afterCursor: '',
           dialect: 'impala',
           expectedResult: {
