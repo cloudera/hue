@@ -214,6 +214,7 @@
 <impala>'EXTENDED'                         { return '<impala>EXTENDED'; }
 <impala>'FIELDS'                           { return '<impala>FIELDS'; }
 <impala>'FILEFORMAT'                       { return '<impala>FILEFORMAT'; }
+<impala>'FILES'                            { return '<impala>FILES'; }
 <impala>'FINALIZE_FN'                      { return '<impala>FINALIZE_FN'; }
 <impala>'FIRST'                            { return '<impala>FIRST'; }
 <impala>'FORMAT'                           { return '<impala>FORMAT'; }

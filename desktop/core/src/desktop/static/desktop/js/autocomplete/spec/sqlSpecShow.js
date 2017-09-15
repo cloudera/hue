@@ -1097,7 +1097,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']
+            suggestKeywords: ['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FILES IN', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'RANGE PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']
           }
         });
       });
@@ -1331,6 +1331,58 @@
         });
       });
 
+      it('should handle "SHOW FILES IN bla.boo PARTITION (baa=1, boo=2);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW FILES IN bla.boo PARTITION (baa=1, boo=2);',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SHOW FILES |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW FILES ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IN']
+          }
+        });
+      });
+
+      it('should suggest tables for "SHOW FILES IN |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW FILES IN ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: {
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SHOW FILES IN boo |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW FILES IN boo ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION']
+          }
+        });
+      });
+
       it('should handle "SHOW FUNCTIONS IN _impala_builtins like "*substring*"; |', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW FUNCTIONS IN _impala_builtins like "*substring*"; ',
@@ -1393,6 +1445,19 @@
         });
       });
 
+      it('should handle "SHOW GRANT ROLE boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW GRANT ROLE boo;',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest keywords for "SHOW GRANT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW GRANT ',
@@ -1431,6 +1496,19 @@
             suggestDatabases: {
               appendDot: true
             }
+          }
+        });
+      });
+
+      it('should handle "SHOW RANGE PARTITIONS bla.foo; |', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW RANGE PARTITIONS bla.foo; ',
+          afterCursor: '',
+          dialect: 'impala',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
           }
         });
       });

@@ -30,6 +30,7 @@ ShowStatement
  | ShowCreateTableStatement
  | ShowCurrentRolesStatement
  | ShowDatabasesStatement
+ | ShowFilesStatement
  | ShowFunctionsStatement
  | ShowGrantStatement
  | ShowIndexStatement
@@ -54,7 +55,7 @@ ShowStatement_EDIT
      if (parser.isHive()) {
        parser.suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
+       parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FILES IN', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'RANGE PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
      } else {
        parser.suggestKeywords(['COLUMNS', 'DATABASES', 'TABLES']);
      }
@@ -68,7 +69,7 @@ ShowStatement_EDIT
      } else {
        parser.addTablePrimary($3);
        if (parser.isImpala()) {
-         parser.suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'PARTITIONS', 'TABLE STATS']);
+         parser.suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'FILES IN', 'PARTITIONS', 'RANGE PARTITIONS', 'TABLE STATS']);
        }
      }
    }
@@ -85,6 +86,7 @@ ShowStatement_EDIT
  | ShowCreateTableStatement_EDIT
  | ShowCurrentRolesStatement_EDIT
  | ShowDatabasesStatement_EDIT
+ | ShowFilesStatement_EDIT
  | ShowFunctionsStatement_EDIT
  | ShowGrantStatement_EDIT
  | ShowIndexStatement_EDIT
@@ -221,6 +223,41 @@ ShowDatabasesStatement_EDIT
    }
  ;
 
+ShowFilesStatement
+ : AnyShow '<impala>FILES' 'IN' RegularOrBackTickedSchemaQualifiedName OptionalPartitionSpec
+   {
+     parser.addTablePrimary($4);
+   }
+ ;
+
+ShowFilesStatement_EDIT
+ : AnyShow '<impala>FILES' 'CURSOR'
+   {
+     parser.suggestKeywords(['IN']);
+   }
+ | AnyShow '<impala>FILES' 'IN' 'CURSOR'
+   {
+     parser.suggestTables();
+     parser.suggestDatabases({
+       appendDot: true
+     });
+   }
+ | AnyShow '<impala>FILES' 'IN' RegularOrBackTickedSchemaQualifiedName_EDIT OptionalPartitionSpec
+ | AnyShow '<impala>FILES' 'IN' RegularOrBackTickedSchemaQualifiedName OptionalPartitionSpec 'CURSOR'
+   {
+     parser.addTablePrimary($4);
+     if (!$5) {
+       parser.suggestKeywords(['PARTITION']);
+     }
+   }
+ | AnyShow '<impala>FILES' 'IN' RegularOrBackTickedSchemaQualifiedName OptionalPartitionSpec_EDIT
+ | AnyShow '<impala>FILES' 'CURSOR' RegularOrBackTickedSchemaQualifiedName OptionalPartitionSpec
+   {
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['IN']);
+   }
+ ;
+
 ShowFunctionsStatement
  : AnyShow '<hive>FUNCTIONS'
  | AnyShow '<hive>FUNCTIONS' DoubleQuotedValue
@@ -268,6 +305,7 @@ ShowGrantStatement
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' '<hive>ALL'
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' RegularOrBacktickedIdentifier
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' AnyTable RegularOrBacktickedIdentifier
+ | AnyShow '<impala>GRANT' '<impala>ROLE' RegularOrBacktickedIdentifier
  ;
 
 ShowGrantStatement_EDIT
@@ -407,6 +445,10 @@ ShowPartitionsStatement
    {
      parser.addTablePrimary($3);
    }
+ | AnyShow '<impala>RANGE' '<impala>PARTITIONS' RegularOrBackTickedSchemaQualifiedName
+   {
+     parser.addTablePrimary($3);
+   }
  ;
 
 ShowPartitionsStatement_EDIT
@@ -432,6 +474,14 @@ ShowPartitionsStatement_EDIT
      });
    }
  | AnyShow '<impala>PARTITIONS' RegularOrBackTickedSchemaQualifiedName_EDIT
+ | AnyShow '<impala>RANGE' '<impala>PARTITIONS' 'CURSOR'
+   {
+     parser.suggestTables();
+     parser.suggestDatabases({
+       appendDot: true
+     });
+   }
+ | AnyShow '<impala>RANGE' '<impala>PARTITIONS' RegularOrBackTickedSchemaQualifiedName_EDIT
  ;
 
 ShowRoleStatement
