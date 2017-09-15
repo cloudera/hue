@@ -21,25 +21,25 @@ DataManipulation
 InsertStatement
  : HiveInsertStatement
  | InsertValuesStatement
- | ImpalaInsertStatement
+ | ImpalaInsertOrUpsertStatement
  | CommonTableExpression HiveInsertStatement
- | CommonTableExpression ImpalaInsertStatement
+ | CommonTableExpression ImpalaInsertOrUpsertStatement
  ;
 
 DataManipulation_EDIT
  : HiveInsertStatement_EDIT
  | InsertValuesStatement_EDIT
- | ImpalaInsertStatement_EDIT
+ | ImpalaInsertOrUpsertStatement_EDIT
  | CommonTableExpression HiveInsertStatement_EDIT
    {
      parser.addCommonTableExpressions($1);
    }
  | CommonTableExpression_EDIT HiveInsertStatement
- | CommonTableExpression ImpalaInsertStatement_EDIT
+ | CommonTableExpression ImpalaInsertOrUpsertStatement_EDIT
    {
      parser.addCommonTableExpressions($1);
    }
- | CommonTableExpression_EDIT ImpalaInsertStatement
+ | CommonTableExpression_EDIT ImpalaInsertOrUpsertStatement
  ;
 
 HiveInsertStatement
@@ -365,22 +365,22 @@ OptionalHiveTable
  | '<hive>TABLE'
  ;
 
-ImpalaInsertStatement
- : ImpalaInsertStatementWithoutCTE
+ImpalaInsertOrUpsertStatement
+ : ImpalaInsertOrUpsertStatementWithoutCTE
  ;
 
-ImpalaInsertStatement_EDIT
- : ImpalaInsertStatementWithoutCTE_EDIT
+ImpalaInsertOrUpsertStatement_EDIT
+ : ImpalaInsertOrUpsertStatementWithoutCTE_EDIT
  ;
 
-ImpalaInsertStatementWithoutCTE
- : ImpalaInsertLeftPart OptionalImpalaShuffleOrNoShuffle SelectStatement OptionalUnions
- | ImpalaInsertLeftPart 'VALUES' ImpalaRowValuesLists
+ImpalaInsertOrUpsertStatementWithoutCTE
+ : ImpalaInsertOrUpsertLeftPart OptionalImpalaShuffleOrNoShuffle SelectStatement OptionalUnions
+ | ImpalaInsertOrUpsertLeftPart 'VALUES' ImpalaRowValuesLists
  ;
 
-ImpalaInsertStatementWithoutCTE_EDIT
- : ImpalaInsertLeftPart_EDIT
- | ImpalaInsertLeftPart OptionalImpalaShuffleOrNoShuffle 'CURSOR'
+ImpalaInsertOrUpsertStatementWithoutCTE_EDIT
+ : ImpalaInsertOrUpsertLeftPart_EDIT
+ | ImpalaInsertOrUpsertLeftPart OptionalImpalaShuffleOrNoShuffle 'CURSOR'
    {
      var keywords = $1.suggestKeywords && !$2 ? parser.createWeightedKeywords($1.suggestKeywords, 2) : [];
      if (!$2) {
@@ -390,12 +390,63 @@ ImpalaInsertStatementWithoutCTE_EDIT
      }
      parser.suggestKeywords(keywords);
    }
- | ImpalaInsertLeftPart_EDIT OptionalImpalaShuffleOrNoShuffle SelectStatement OptionalUnions
- | ImpalaInsertLeftPart OptionalImpalaShuffleOrNoShuffle SelectStatement_EDIT OptionalUnions
- | ImpalaInsertLeftPart OptionalImpalaShuffleOrNoShuffle SelectStatement OptionalUnions_EDIT
- | ImpalaInsertLeftPart_EDIT 'VALUES' ImpalaRowValuesLists
- | ImpalaInsertLeftPart 'VALUES' ImpalaRowValuesLists_EDIT
+ | ImpalaInsertOrUpsertLeftPart_EDIT OptionalImpalaShuffleOrNoShuffle SelectStatement OptionalUnions
+ | ImpalaInsertOrUpsertLeftPart OptionalImpalaShuffleOrNoShuffle SelectStatement_EDIT OptionalUnions
+ | ImpalaInsertOrUpsertLeftPart OptionalImpalaShuffleOrNoShuffle SelectStatement OptionalUnions_EDIT
+ | ImpalaInsertOrUpsertLeftPart_EDIT 'VALUES' ImpalaRowValuesLists
+ | ImpalaInsertOrUpsertLeftPart 'VALUES' ImpalaRowValuesLists_EDIT
  ;
+
+ImpalaInsertOrUpsertLeftPart
+ : ImpalaUpsertStatementLeftPart
+ | ImpalaInsertLeftPart
+ ;
+
+ImpalaInsertOrUpsertLeftPart_EDIT
+ : ImpalaUpsertStatementLeftPart_EDIT
+ | ImpalaInsertLeftPart_EDIT
+ ;
+
+ImpalaUpsertStatementLeftPart
+ : '<impala>UPSERT' 'INTO' OptionalImpalaTable SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList
+   {
+     $4.owner = 'upsert';
+     parser.addTablePrimary($4);
+   }
+ ;
+
+ImpalaUpsertStatementLeftPart_EDIT
+ : '<impala>UPSERT' 'CURSOR'
+   {
+     parser.suggestKeywords(['INTO']);
+   }
+ | '<impala>UPSERT' 'INTO' OptionalImpalaTable 'CURSOR'
+   {
+     if (!$3) {
+       parser.suggestKeywords(['TABLE']);
+     }
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | '<impala>UPSERT' 'INTO' OptionalImpalaTable 'CURSOR' SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList
+   {
+     if (!$3) {
+       parser.suggestKeywords(['TABLE']);
+     }
+     $5.owner = 'upsert';
+     parser.addTablePrimary($5);
+   }
+ | '<impala>UPSERT' 'INTO' OptionalImpalaTable SchemaQualifiedTableIdentifier_EDIT OptionalParenthesizedColumnList
+ | '<impala>UPSERT' 'INTO' OptionalImpalaTable SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList_EDIT
+   {
+     $4.owner = 'upsert';
+     parser.addTablePrimary($4);
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.owner = 'upsert';
+     }
+   }
+ ;
+
 
 ImpalaInsertLeftPart
  : '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList OptionalPartitionSpec
@@ -426,6 +477,8 @@ ImpalaInsertLeftPart_EDIT
      if (!$3) {
        parser.suggestKeywords(['TABLE']);
      }
+     $5.owner = 'insert';
+     parser.addTablePrimary($5);
    }
  | '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable SchemaQualifiedTableIdentifier_EDIT OptionalParenthesizedColumnList OptionalPartitionSpec
  | '<impala>INSERT' IntoOrOverwrite OptionalImpalaTable SchemaQualifiedTableIdentifier OptionalParenthesizedColumnList_EDIT OptionalPartitionSpec
