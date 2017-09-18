@@ -475,7 +475,7 @@ def get_banner_message(request):
   if IS_HUE_4.get() and path_info.find("/hue/") < 0 and path_info.find("accounts/login") < 0:
     url = request.build_absolute_uri("/hue")
     link = '<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (url, url)
-    message = _('You are accessing an older version of Hue, please switch to latest version: %s.') % link
+    message = _('You are accessing an older version of Hue, please switch to the latest version: %s.') % link
 
   if HUE_LOAD_BALANCER.get() and HUE_LOAD_BALANCER.get() != [''] and \
     (not forwarded_host or not any(forwarded_host in lb for lb in HUE_LOAD_BALANCER.get())):
