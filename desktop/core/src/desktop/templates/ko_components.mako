@@ -1056,12 +1056,12 @@ from desktop.views import _ko
 
   <script type="text/html" id="top-search-autocomp-item">
     <a href="javascript:void(0);">
-      <div class="nav-autocomplete-item-link">
-        <div class="nav-search-result-icon"><i class="fa fa-fw" data-bind="css: icon"></i></div>
-        <div class="nav-search-result-text">
-          <div class="nav-search-result-header" data-bind="html: label, style: { 'padding-top': description ? 0 : '9px' }"></div>
+      <div>
+        <div><i class="fa fa-fw" data-bind="css: icon"></i></div>
+        <div>
+          <div data-bind="html: label, style: { 'padding-top': description ? 0 : '9px' }"></div>
           <!-- ko if: description -->
-          <div class="nav-search-result-description" data-bind="html: description"></div>
+          <div data-bind="html: description"></div>
           <!-- /ko -->
         </div>
       </div>
@@ -1069,8 +1069,8 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="top-search-autocomp-no-match">
-    <div class="nav-autocomplete-item-link" style="height: 30px;">
-      <div class="nav-autocomplete-empty">${ _('No match found') }</div>
+    <div style="height: 30px;">
+      <div>${ _('No match found') }</div>
     </div>
   </script>
 

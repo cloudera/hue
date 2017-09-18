@@ -25,7 +25,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
 from indexer.conf import ENABLE_NEW_INDEXER
-from metadata.conf import has_navigator, has_navigator_file_search
+from metadata.conf import has_navigator
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
 %>
@@ -53,12 +53,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       home_dir = '/'
   %>
 
-  <%namespace name="assistSearch" file="assist_search.mako" />
   <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
   <%namespace name="contextPopover" file="/context_popover.mako" />
   <%namespace name="nav_components" file="/nav_components.mako" />
 
-  ${ assistSearch.assistSearch() }
   % if conf.USE_NEW_CONTEXT_POPOVER.get():
   ${ contextPopover.contextPopover() }
   % else:
@@ -919,15 +917,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       </div>
       <!-- /ko -->
       <!-- ko with: visiblePanel -->
-      <!-- ko template: { if: showNavSearch && $parent.navigatorSearch.navigatorEnabled(), name: 'assist-panel-navigator-search', data: $parent }--><!-- /ko -->
       <div class="assist-panel-contents" data-bind="style: { 'padding-top': $parent.availablePanels().length > 1 ? '10px' : '5px' }">
         <div class="assist-inner-panel">
           <div class="assist-flex-panel">
             <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
           </div>
-          <!-- ko with: $parent.navigatorSearch -->
-          <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-          <!-- /ko -->
         </div>
       </div>
       <!-- /ko -->
@@ -972,7 +966,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
        * @param {string} options.icon
        * @param {boolean} [options.rightAlignIcon] - Default false
        * @param {boolean} options.visible
-       * @param {boolean} [options.showNavSearch] - Default true
        * @param {(AssistDbPanel|AssistHdfsPanel|AssistGitPanel|AssistDocumentsPanel|AssistS3Panel|AssistCollectionsPanel)} panelData
        * @constructor
        */
@@ -983,7 +976,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.type = options.type;
         self.name = options.name;
         self.panelData = options.panelData;
-        self.showNavSearch = typeof options.showNavSearch !== 'undefined' ? options.showNavSearch : true;
         self.rightAlignIcon = !!options.rightAlignIcon;
 
         self.visible = ko.observable(options.visible || true);
@@ -1052,7 +1044,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           huePubSub.publish('left.assist.show');
           huePubSub.publish('assist.show.sql');
           huePubSub.publish('context.popover.hide');
-          huePubSub.publish('assist.hide.search');
           window.setTimeout(function () {
             var foundSource;
             $.each(self.sources(), function (idx, source) {
@@ -1704,9 +1695,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                   type: 'hdfs',
                   icon: 'fa-files-o',
                   minHeight: 50
-                  % if not has_navigator_file_search(user):
-                    , showNavSearch: false
-                  % endif
                 }));
               }
 
@@ -1720,9 +1708,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                   type: 's3',
                   icon: 'fa-cubes',
                   minHeight: 50
-                  % if not has_navigator_file_search(user):
-                    , showNavSearch: false
-                  % endif
                 }));
               }
 
@@ -1735,8 +1720,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                   name: '${ _("Collections") }',
                   type: 'collections',
                   icon: 'fa-search-plus',
-                  minHeight: 50,
-                  showNavSearch: false
+                  minHeight: 50
                 }));
               }
 
@@ -1749,8 +1733,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                   name: '${ _("HBase") }',
                   type: 'hbase',
                   icon: 'fa-th-large',
-                  minHeight: 50,
-                  showNavSearch: false
+                  minHeight: 50
                 }));
               }
 
@@ -1779,7 +1762,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                   type: 'git',
                   icon: 'fa-github',
                   minHeight: 50,
-                  showNavSearch: false,
                   rightAlignIcon: true
                 }));
               }
@@ -1827,8 +1809,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             huePubSub.publish('cluster.config.get.config');
           }
         }, 0);
-
-        self.navigatorSearch = new NavigatorSearch(self, params.sql.navigationSettings);
       }
 
       ko.components.register('assist-panel', {

@@ -565,58 +565,6 @@
   padding-left: 15px;
 }
 
-.result-entry {
-  position: relative;
-  clear: both;
-  overflow: hidden;
-  margin: 0 10px 15px 10px;
-}
-
-.result-entry .doc-desc {
-  font-style: italic;
-  font-size: 12px;
-  line-height: 15px;
-  white-space: normal;
-  margin-left: 35px;
-}
-
-.nav-search-tags {
-  display: inline-block;
-  margin-left: 3px;
-}
-
-.nav-search-tags div {
-  display: inline-block;
-  margin: 0 1px;
-  line-height: 10px;
-  font-size: 11px;
-  padding: 3px 6px;
-  color: @cui-white;
-  background-color: @hue-primary-color-dark;
-  border-radius: 6px;
-}
-
-.result-entry .left-col {
-  width: 35px;
-  float:left;
-  vertical-align: top;
-  padding-top: 7px;
-  font-size: 20px;
-  color: @hue-primary-color-dark;
-}
-
-.result-entry .doc-col {
-  white-space: nowrap;
-}
-
-.doc-col-no-desc {
-  padding-top: 7px;
-}
-
-.result-entry .hue-icon {
-  font-size: 30px;
-}
-
 .function-dialect-dropdown a span {
   color: @cui-gray-800;
   font-size: 14px;
@@ -680,93 +628,9 @@
   font-size: 70%;
 }
 
-.nav-autocomplete {
-  max-height: 70%;
-  overflow-y: auto;
-
-  > li {
-    list-style-image: none !important;
-  }
-
-  .nav-autocomplete-item .ui-state-focus {
-    border: 1px solid @hue-primary-color-light;
-    background-color: @hue-primary-color-light !important;
-  }
-
-  .nav-autocomplete-item-link {
-    .display-flex();
-    width: 100%;
-    height: 40px;
-  }
-
-  .nav-search-result-icon {
-    .flex(0 0 35px);
-    line-height: 40px;
-    height: 40px;
-    font-size: 18px;
-    color: @hue-primary-color-dark;
-  }
-
-  .nav-search-result-text {
-    .flex(1);
-    width: 100%;
-    overflow: hidden;
-  }
-
-  .nav-search-result-description,
-  .nav-search-result-header {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow:ellipsis;
-  }
-
-  .nav-search-result-header {
-    color: @hue-primary-color-dark;
-    font-size: 14px;
-  }
-
-  .nav-search-result-description {
-    font-size: 12px;
-
-  }
-
-  .nav-autocomplete-item-link em, .result-entry em {
-    font-style: normal;
-    font-weight: bold;
-  }
-
-  .nav-autocomplete-divider {
-    height: 2px;
-    border-top: 1px solid @cui-default-border-color;
-  }
-
-  .nav-autocomplete-empty {
-    font-size: 12px;
-    margin: 6px 8px;
-    color: @cui-gray-700;
-    font-style: italic;
-  }
-
-  .nav-autocomplete-error {
-    height: inherit !important;
-  }
-}
-
-.nav-search-result {
-  position:absolute;
-  left:0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  overflow: hidden;
-  background-color: @cui-white;
-}
-
 .input-spinner {
   background: url(/static/desktop/art/spinner-input.gif) no-repeat right -8px center !important;
 }
-
-
 
 // --- Context Popover ---
 
