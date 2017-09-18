@@ -292,147 +292,155 @@ from desktop.views import _ko
     </div>
 
     <div class="doc-browser-container" data-bind="docSelect: activeEntry.entries, docDroppable: { entries: activeEntry.entries }">
-      <div class="doc-browser-action-bar">
-        <h4 class="doc-browser-main-header">
-          <div data-bind="with: activeEntry">
-            <ul class="doc-browser-breadcrumbs">
-              <!-- ko if: isRoot -->
-              <li class="active"><div class="doc-browser-drop-target">${ _('My documents') }</div></li>
-              <!-- /ko -->
+      <div class="navbar hue-title-bar">
+        <div class="navbar-inner">
+          <div class="container-fluid">
+            <div class="pull-right" style="padding-right: 10px">
+              <div class="doc-browser-folder-actions" data-bind="visible: activeEntry && activeEntry() && !activeEntry().hasErrors()">
+                <!-- ko if: searchVisible -->
+                <div class="doc-browser-action doc-browser-search-container pull-left"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery"></div>
+                <!-- /ko -->
+                <!-- ko with: activeEntry -->
+                <div class="doc-browser-action doc-browser-type-filter margin-right-10 pull-left" data-bind="component: { name: 'hue-drop-down', params: { value: serverTypeFilter, entries: $root.allDocumentTypes, linkTitle: '${ _ko('Type filter') }' } }"></div>
+                <a class="btn margin-right-20" title="${_('Search')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
+                <!-- ko if: app === 'documents' -->
+                <div class="inline">
+                  <span class="dropdown">
+                    <a class="btn" title="${_('New document')}" data-toggle="dropdown" data-bind="tooltip: { placement: 'bottom', delay: 750 }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" href="javascript:void(0);" style="height: 20px"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x" style="margin-top: -6px"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 12px; margin-left: 6px;"></i></span></a>
+                    <ul class="dropdown-menu less-padding document-types" style="margin-top:10px; width: 175px;" role="menu">
+                      % if 'beeswax' in apps:
+                        <li>
+                          <a title="${_('Hive Query')}"
+                          % if is_embeddable:
+                            data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'hive', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
+                          % else:
+                            data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')"
+                          % endif
+                          >
+                            <img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}
+                          </a>
+                        </li>
+                      % endif
+                      % if 'impala' in apps:
+                        <li>
+                          <a title="${_('Impala Query')}"
+                          % if is_embeddable:
+                            data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'impala', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
+                          % else:
+                            data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala')"
+                          % endif
+                          >
+                            <img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}
+                          </a>
+                      </li>
+                      % endif
+                      <%
+                      from notebook.conf import SHOW_NOTEBOOKS
+                      %>
+                      % if SHOW_NOTEBOOKS.get():
+                        <li>
+                          <a title="${_('Notebook')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:index') }')">
+                            <i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #0B7FAD;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}
+                          </a>
+                        </li>
+                      % endif
+                      % if 'pig' in apps:
+                        <li>
+                          <a title="${_('Pig Script')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('pig:index') }')">
+                            <img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig Script')}
+                          </a>
+                        </li>
+                      % endif
+                      % if 'oozie' in apps:
+                        <li>
+                          <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
+                            <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
+                          </a>
+                        </li>
+                        <li>
+                          <a title="${_('Oozie Schedule')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
+                            <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
+                          </a>
+                        </li>
+                        <li>
+                          <a title="${_('Oozie Bundle')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_bundle') }')">
+                            <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
+                          </a>
+                        </li>
+                      % endif
+                      % if 'search' in apps:
+                        <li>
+                          <a title="${_('Solr Search')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('search:new_search') }')">
+                            <img src="${ static('search/art/icon_search_48.png') }" class="app-icon" alt="${ _('Search icon') }"/> ${_('Dashboard')}
+                          </a>
+                        </li>
+                      % endif
+                    </ul>
+                  </span>
+                </div>
+                <!-- /ko -->
 
-              <!-- ko if: definition().isSearchResult -->
-              <li class="active"><div class="doc-browser-drop-target">${ _('Result for') }: <!-- ko text: definition().name --><!-- /ko --></div></li>
-              <!-- /ko -->
-              <!-- ko ifnot: definition().isSearchResult -->
-              <!-- ko foreach: breadcrumbs -->
-              <li><div class="doc-browser-drop-target" data-bind="docDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
-              <li class="divider">&gt;</li>
-              <!-- /ko -->
-              <!-- ko ifnot: isRoot -->
-              <li class="active"><div class="doc-browser-drop-target" data-bind="text: isTrash() ? '${ _('Trash') }' : definition().name"></div></li>
-              <!-- /ko -->
-              <!-- /ko -->
-            </ul>
-          </div>
-        </h4>
-        <div class="doc-browser-folder-actions" data-bind="visible: activeEntry && activeEntry() && !activeEntry().hasErrors()">
-          <!-- ko if: searchVisible -->
-          <div class="doc-browser-action doc-browser-search-container"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery"></div>
-          <!-- /ko -->
-          <!-- ko with: activeEntry -->
-          <div class="doc-browser-action doc-browser-type-filter margin-right-10" data-bind="component: { name: 'hue-drop-down', params: { value: serverTypeFilter, entries: $root.allDocumentTypes, linkTitle: '${ _ko('Type filter') }' } }"><</div>
-          <div><a class="inactive-action doc-browser-action margin-right-20" title="${_('Search')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
-          <!-- ko if: app === 'documents' -->
-          <div>
-            <span class="dropdown">
-              <a class="inactive-action doc-browser-action" title="${_('New document')}" data-toggle="dropdown" data-bind="tooltip: { placement: 'bottom', delay: 750 }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
-              <ul class="dropdown-menu less-padding document-types" style="margin-top:10px; width: 175px;" role="menu">
-                % if 'beeswax' in apps:
-                  <li>
-                    <a title="${_('Hive Query')}"
-                    % if is_embeddable:
-                      data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'hive', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
-                    % else:
-                      data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')"
-                    % endif
-                    >
-                      <img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}
-                    </a>
-                  </li>
-                % endif
-                % if 'impala' in apps:
-                  <li>
-                    <a title="${_('Impala Query')}"
-                    % if is_embeddable:
-                      data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'impala', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
-                    % else:
-                      data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala')"
-                    % endif
-                    >
-                      <img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}
-                    </a>
-                </li>
-                % endif
-                <%
-                from notebook.conf import SHOW_NOTEBOOKS
-                %>
-                % if SHOW_NOTEBOOKS.get():
-                  <li>
-                    <a title="${_('Notebook')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:index') }')">
-                      <i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #0B7FAD;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}
-                    </a>
-                  </li>
-                % endif
-                % if 'pig' in apps:
-                  <li>
-                    <a title="${_('Pig Script')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('pig:index') }')">
-                      <img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig Script')}
-                    </a>
-                  </li>
-                % endif
-                % if 'oozie' in apps:
-                  <li>
-                    <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
-                      <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
-                    </a>
-                  </li>
-                  <li>
-                    <a title="${_('Oozie Schedule')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
-                      <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
-                    </a>
-                  </li>
-                  <li>
-                    <a title="${_('Oozie Bundle')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_bundle') }')">
-                      <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
-                    </a>
-                  </li>
-                % endif
-                % if 'search' in apps:
-                  <li>
-                    <a title="${_('Solr Search')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('search:new_search') }')">
-                      <img src="${ static('search/art/icon_search_48.png') }" class="app-icon" alt="${ _('Search icon') }"/> ${_('Dashboard')}
-                    </a>
-                  </li>
-                % endif
-              </ul>
-            </span>
-          </div>
-          <!-- /ko -->
-          <div><a class="inactive-action doc-browser-action" title="${_('New folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a></div>
-          <div><a class="inactive-action doc-browser-action" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || ! canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }"><i class="fa fa-fw fa-edit"></i></a></div>
-          <!-- ko if: isTrash() -->
-            <div><a class="inactive-action doc-browser-action" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showRestoreConfirmation(); }, css: { 'disabled': selectedEntries().length === 0 }, attr: { 'title' : '${ _('Restore to Home ') }' }">
-              <i class="fa fa-fw fa-undo"></i></a>
+                <a class="btn" title="${_('New folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" style="height: 20px"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" style="margin-top: -6px"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 12px; margin-left: 7px;"></i></span></a>
+                <a class="btn" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || ! canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }"><i class="fa fa-fw fa-edit"></i></a>
+                <!-- ko if: isTrash() -->
+                  <a class="btn" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showRestoreConfirmation(); }, css: { 'disabled': selectedEntries().length === 0 }, attr: { 'title' : '${ _('Restore to Home ') }' }"><i class="fa fa-fw fa-undo"></i></a>
+                <!-- /ko -->
+                <a class="btn" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a>
+
+                <!-- ko if: app === 'documents' -->
+                <a class="btn" title="${_('Share')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
+                <!-- /ko -->
+                <a class="btn" title="${_('Export all or selected documents')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: download"><i class="fa fa-fw fa-download"></i></a>
+                <a class="btn" title="${_('Import documents')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a>
+                <!-- ko if: app === 'documents' -->
+                <div class="margin-left-20 pull-right" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
+                  <a class="btn" title="${_('Show trash')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
+                    <i class="fa fa-fw fa-trash-o"></i>
+                  </a>
+                  <!-- ko if: isTrash() || isTrashed() -->
+                  <ul class="hue-context-menu">
+                    <li><a href="javascript:void(0);" data-bind="click: emptyTrash"><i class="fa fa-fw fa-times"></i> ${ _('Empty trash') }</a></li>
+                  </ul>
+                  <!-- /ko -->
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+              </div>
             </div>
-          <!-- /ko -->
-          <div><a class="inactive-action doc-browser-action" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }">
-            <i class="fa fa-fw fa-times"></i></a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li class="app-header">
+                  <a href="/hue/useradmin">
+                    <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
+                    <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'home' }} --><!-- /ko -->
+                  </a>
+                </li>
+               <!-- ko with: activeEntry -->
+                  <!-- ko if: isRoot -->
+                    <li><div class="doc-browser-drop-target"><a href="javascript:void(0);" data-bind="click: open">${ _('My documents') }</a></div></li>
+                  <!-- /ko -->
+                  <!-- ko if: definition().isSearchResult -->
+                    <li class="active"><div class="doc-browser-drop-target">${ _('Result for') }: <!-- ko text: definition().name --><!-- /ko --></div></li>
+                  <!-- /ko -->
+                  <!-- ko ifnot: definition().isSearchResult -->
+                    <!-- ko foreach: breadcrumbs -->
+                      <li><div class="doc-browser-drop-target" data-bind="docDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
+                      <li class="divider">&gt;</li>
+                    <!-- /ko -->
+                    <!-- ko ifnot: isRoot -->
+                      <li class="active"><div class="doc-browser-drop-target" data-bind="text: isTrash() ? '${ _('Trash') }' : definition().name"></div></li>
+                    <!-- /ko -->
+                  <!-- /ko -->
+                <!-- /ko -->
+              </ul>
+            </div>
           </div>
-          <!-- ko if: app === 'documents' -->
-          <div><a class="inactive-action doc-browser-action" title="${_('Share')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a></div>
-          <!-- /ko -->
-          <div style="margin-top: 2px"><a class="inactive-action doc-browser-action" title="${_('Export all or selected documents')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: download"><i class="fa fa-fw fa-download"></i></a></div>
-          <div><a class="inactive-action doc-browser-action" title="${_('Import documents')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a></div>
-          <!-- ko if: app === 'documents' -->
-          <div class="margin-left-20" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
-            <a class="inactive-action doc-browser-action" title="${_('Show trash')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
-              <i class="fa fa-fw fa-trash-o"></i>
-            </a>
-            <!-- ko if: isTrash() || isTrashed() -->
-            <ul class="hue-context-menu">
-              <li><a href="javascript:void(0);" data-bind="click: emptyTrash"><i class="fa fa-fw fa-times"></i> ${ _('Empty trash') }</a></li>
-            </ul>
-            <!-- /ko -->
-          </div>
-          <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'home' }} --><!-- /ko -->
-          <!-- /ko -->
-          <!-- /ko -->
         </div>
       </div>
 
       <!-- ko with: activeEntry -->
       <!-- ko if: entries().length > 0 -->
-      <div class="doc-browser-header">
+      <div class="doc-browser-header margin-top-10">
         <div class="doc-browser-primary-col" data-bind="click: function () { setSort('name') }, css: { 'sorting_asc' : activeSort() === 'nameAsc', 'sorting_desc' : activeSort() === 'nameDesc', 'sorting' : activeSort().indexOf('name') !== 0 }">${ _('Name') }</div>
         <div class="doc-browser-attr-group">
           <div class="doc-browser-attr-col doc-browser-description" data-bind="click: function () { setSort('description') }, css: { 'sorting_asc' : activeSort() === 'descriptionAsc', 'sorting_desc' : activeSort() === 'descriptionDesc', 'sorting' : activeSort().indexOf('description') !== 0 }">${ _('Description') }</div>
