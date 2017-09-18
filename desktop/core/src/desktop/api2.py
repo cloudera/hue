@@ -636,6 +636,7 @@ def search_entities_interactive(request):
           'link': e.get_absolute_url(),
           'doc_type': escape(e.type),
           'type': 'HUE',
+          'uuid': e.uuid,
           'originalName': escape(e.name)
         } for e in entities['documents']
       ],
