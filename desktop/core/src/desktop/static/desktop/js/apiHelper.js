@@ -307,6 +307,7 @@ var ApiHelper = (function () {
       if (options.errorCallback) {
         options.errorCallback(errorMessage);
       }
+      return errorMessage;
     };
   };
 
@@ -807,25 +808,33 @@ var ApiHelper = (function () {
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.fetchContents]
    *
    * @param {number} options.uuid
    */
   ApiHelper.prototype.fetchDocument = function (options) {
     var self = this;
+    var promise = $.Deferred();
     $.ajax({
       url: DOCUMENTS_API,
       data: {
-        uuid: options.uuid
+        uuid: options.uuid,
+        data: !!options.fetchContents
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
-          options.successCallback(data);
+          promise.resolve(data)
         } else {
-          self.assistErrorCallback(options)(data);
+          promise.reject(self.assistErrorCallback({
+            silenceErrors: options.silenceErrors
+          }));
         }
       }
     })
-    .fail(self.assistErrorCallback(options));
+    .fail(function (errorResponse) {
+      promise.reject(self.assistErrorHandler(errorResponse))
+    });
+    return promise;
   };
 
   /**
@@ -839,7 +848,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.createDocumentsFolder = function (options) {
     var self = this;
-    self.simplePost("/desktop/api2/doc/mkdir", {
+    self.simplePost(DOCUMENTS_API + 'mkdir', {
       parent_uuid: ko.mapping.toJSON(options.parentUuid),
       name: ko.mapping.toJSON(options.name)
     }, options);
@@ -856,7 +865,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.updateDocument = function (options) {
     var self = this;
-    self.simplePost("/desktop/api2/doc/update", {
+    self.simplePost(DOCUMENTS_API + 'update', {
       uuid: ko.mapping.toJSON(options.uuid),
       name: options.name
     }, options);
@@ -874,7 +883,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.uploadDocument = function (options) {
     var self = this;
     $.ajax({
-      url: '/desktop/api2/doc/import',
+      url: DOCUMENTS_API + 'import',
       type: 'POST',
       success: function (data) {
         if (! self.successResponseIsError(data)) {
@@ -910,7 +919,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.moveDocument = function (options) {
     var self = this;
-    self.simplePost("/desktop/api2/doc/move", {
+    self.simplePost(DOCUMENTS_API + 'move', {
       source_doc_uuid: ko.mapping.toJSON(options.sourceId),
       destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
     }, options);
@@ -927,7 +936,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.deleteDocument = function (options) {
     var self = this;
-    self.simplePost("/desktop/api2/doc/delete", {
+    self.simplePost(DOCUMENTS_API + 'delete', {
       uuid: ko.mapping.toJSON(options.uuid),
       skip_trash: ko.mapping.toJSON(options.skipTrash || false)
     }, options);
@@ -943,7 +952,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.restoreDocument = function (options) {
     var self = this;
-    self.simplePost("/desktop/api2/doc/restore", {
+    self.simplePost(DOCUMENTS_API + 'restore', {
       uuids: ko.mapping.toJSON(options.uuids)
     }, options);
   };

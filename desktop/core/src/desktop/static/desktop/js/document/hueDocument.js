@@ -161,19 +161,17 @@ var HueDocument = (function() {
 
     var fetchFunction = function () {
       self.apiHelper.fetchDocument({
-        uuid: self.fileEntry.definition().uuid,
-        successCallback: function (data) {
-          self.prettifyUserNames(data.document.perms.write.users);
-          self.prettifyUserNames(data.document.perms.read.users);
-          self.definition(data.document);
-          self.loading(false);
-          self.loaded(true);
-        },
-        errorCallback: function () {
-          self.hasErrors(true);
-          self.loading(false);
-          self.loaded(true);
-        }
+        uuid: self.fileEntry.definition().uuid
+      }).done(function (data) {
+        self.prettifyUserNames(data.document.perms.write.users);
+        self.prettifyUserNames(data.document.perms.read.users);
+        self.definition(data.document);
+        self.loading(false);
+        self.loaded(true);
+      }).fail(function () {
+        self.hasErrors(true);
+        self.loading(false);
+        self.loaded(true);
       })
     };
 
