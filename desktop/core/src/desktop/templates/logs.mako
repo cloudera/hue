@@ -158,15 +158,17 @@ ${layout.menubar(section='log_view')}
 
     function resizeScrollingLogs() {
       var _el = $("#hue-logs");
-      if (!$.browser.msie) {
-        _el.css("overflow-y", "").css("height", "");
-      }
-      var heightAfter = 0;
-      _el.nextAll(":visible").each(function () {
-        heightAfter += $(this).outerHeight(true);
-      });
-      if (_el.height() > ($(window).height() - _el.offset().top - heightAfter)) {
-        _el.css("overflow-y", "auto").height($(window).height() - _el.offset().top - heightAfter - 30);
+      if (_el.length > 0) {
+        if (!$.browser.msie) {
+          _el.css("overflow-y", "").css("height", "");
+        }
+        var heightAfter = 0;
+        _el.nextAll(":visible").each(function () {
+          heightAfter += $(this).outerHeight(true);
+        });
+        if (_el.height() > ($(window).height() - _el.offset().top - heightAfter)) {
+          _el.css("overflow-y", "auto").height($(window).height() - _el.offset().top - heightAfter - 30);
+        }
       }
     }
 
