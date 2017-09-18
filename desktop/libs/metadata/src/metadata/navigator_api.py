@@ -292,7 +292,7 @@ def _augment_highlighting(query_s, records):
 
 def _highlight(pattern, string):
   pattern = re.escape(pattern)
-  return re.sub('(%s)' % pattern, '<em>\\1</em>', string, count=1, flags=re.IGNORECASE)
+  return re.compile('(%s)' % pattern, re.IGNORECASE).sub('<em>\\1</em>', string, count=1)
 
 
 def _highlight_tags(record, term):
