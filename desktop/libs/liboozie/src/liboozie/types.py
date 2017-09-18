@@ -525,6 +525,11 @@ class Coordinator(Job):
     else:
       self.nextMaterializedTime = self.startTime
 
+    if self.lastAction is not None:
+      self.lastAction = parse_timestamp(self.lastAction)
+    else:
+      self.lastAction = self.startTime
+
     if self.pauseTime:
       self.pauseTime = parse_timestamp(self.pauseTime)
 
