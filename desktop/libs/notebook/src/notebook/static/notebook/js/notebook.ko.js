@@ -1017,6 +1017,12 @@ var EditorViewModel = (function() {
           return;
         }
 
+        // The syntaxError property is only set if the syntax checker is active and has found an
+        // error, see AceLocationHandler.
+        if (self.positionStatement() && self.positionStatement().syntaxError) {
+          return;
+        }
+
         self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
 
         hueAnalytics.log('notebook', 'get_query_risk');

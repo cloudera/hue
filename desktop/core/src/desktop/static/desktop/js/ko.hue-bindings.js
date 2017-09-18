@@ -3637,6 +3637,9 @@
           var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
 
           if (e.data.syntaxError && !suppressedRules[self.snippet.id() + e.data.syntaxError.ruleId]) {
+            if (self.snippet.positionStatement() && SqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {
+              self.snippet.positionStatement().syntaxError = true;
+            }
             if (hueDebug.showSyntaxParseResult) {
               console.log(e.data.syntaxError);
             }

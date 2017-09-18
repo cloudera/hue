@@ -61,7 +61,8 @@ importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
         toAbsoluteLocation(msg.data.statementLocation, syntaxError.loc);
       }
       postMessage({
-        syntaxError: syntaxError
+        syntaxError: syntaxError,
+        statementLocation: msg.data.statementLocation
       });
     }, 400);
   }
