@@ -3202,7 +3202,7 @@
         }
 
         var supportSelectFolder = !!selectFolder;
-        if (typeof allBindingsAccessor().filechooserOptions !== 'undefined' && typeof allBindingsAccessor().filechooserOptions.selectFolder !== 'undefined') {
+        if (allBindingsAccessor && typeof allBindingsAccessor().filechooserOptions !== 'undefined' && typeof allBindingsAccessor().filechooserOptions.selectFolder !== 'undefined') {
           supportSelectFolder = allBindingsAccessor().filechooserOptions.selectFolder;
         }
 
