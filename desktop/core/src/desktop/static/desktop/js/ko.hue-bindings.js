@@ -3636,7 +3636,7 @@
         self.aceSqlSyntaxWorker.onmessage = function(e) {
           var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
 
-          if (e.data.syntaxError && !suppressedRules[self.snippet.id() + e.data.syntaxError.ruleId]) {
+          if (e.data.syntaxError && e.data.syntaxError.ruleId && !suppressedRules[e.data.syntaxError.ruleId.toString() + e.data.syntaxError.text.toLowerCase()]) {
             if (self.snippet.positionStatement() && SqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {
               self.snippet.positionStatement().syntaxError = true;
             }
@@ -4109,6 +4109,14 @@
         editor.customMenuOptions.getErrorHighlighting = function () {
           return errorHighlightingEnabled;
         };
+        editor.customMenuOptions.setClearIgnoredSyntaxChecks = function (flag) {
+          ApiHelper.getInstance().setInTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+          $('#setClearIgnoredSyntaxChecks').hide();
+          $('#setClearIgnoredSyntaxChecks').before('<div style="margin-top:5px;float:right;">done</div>');
+        };
+        editor.customMenuOptions.getClearIgnoredSyntaxChecks = function () {
+          return false;
+        }
       }
 
       $.extend(editorOptions, aceOptions);
