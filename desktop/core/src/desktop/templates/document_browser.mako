@@ -425,7 +425,7 @@ from desktop.views import _ko
                   <!-- ko ifnot: definition().isSearchResult -->
                     <!-- ko foreach: breadcrumbs -->
                       <li><div class="doc-browser-drop-target" data-bind="docDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
-                      <li class="divider">&gt;</li>
+                      <li class="breadcrumbs-divider">&gt;</li>
                     <!-- /ko -->
                     <!-- ko ifnot: isRoot -->
                       <li class="active"><div class="doc-browser-drop-target" data-bind="text: isTrash() ? '${ _('Trash') }' : definition().name"></div></li>
