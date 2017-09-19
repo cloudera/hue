@@ -3680,7 +3680,7 @@ class WorkflowBuilder():
     documents = [document]
 
     if name is None:
-      name = _('Schedule of ') + ','.join([document.name or document.type for document in documents])
+      name = _('Task of ') + ','.join([document.name or document.type for document in documents])
 
     for document in documents:
       if document.type == 'query-java':
@@ -3716,7 +3716,7 @@ class WorkflowBuilder():
     nodes = []
 
     if name is None:
-      name = _('Schedule of ') + ','.join([snippet['name'] or snippet['type'] for snippet in notebook['snippets']])
+      name = _('Task of ') + ','.join([snippet['name'] or snippet['type'] for snippet in notebook['snippets']])
 
     for snippet in notebook['snippets']:
       if snippet['type'] == 'java':
