@@ -152,9 +152,10 @@ var HueFileEntry = (function () {
       var typeFilter = self.typeFilter().type;
       if (filter || typeFilter !== 'all') {
         return self.entries().filter(function (entry) {
-          return (typeFilter === 'all' || entry.definition().type === typeFilter)
+          var entryType = entry.definition().type;
+          return (typeFilter === 'all' || entryType === typeFilter || entryType === 'directory')
             && (!filter || entry.definition().name.toLowerCase().indexOf(filter) !== -1 ||
-            (DocumentTypeGlobals[entry.definition().type] && DocumentTypeGlobals[entry.definition().type].toLowerCase().indexOf(filter) !== -1));
+            (DocumentTypeGlobals[entryType] && DocumentTypeGlobals[entryType].toLowerCase().indexOf(filter) !== -1));
         })
       }
       return self.entries();
