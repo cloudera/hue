@@ -34,20 +34,20 @@ from metadata.conf import has_navigator
           <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
         </a>
         % if HAS_SQL_ENABLED.get():
-        <a class="inactive-action pointer" data-bind="visible: isTable || isView || isDatabase, click: function() { huePubSub.publish('context.popover.open.in.dashboard') }">
+        <a class="inactive-action pointer" data-bind="visible: (typeof isTable !== 'undefined' && isTable) || (typeof isView !== 'undefined' && isView) || (typeof isDatabase !== 'undefined' && isDatabase), click: function() { huePubSub.publish('context.popover.open.in.dashboard') }">
           <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
         </a>
         % endif
-        <a class="inactive-action pointer" data-bind="visible: isTable || isView || isDatabase, click: function() { huePubSub.publish('context.popover.open.in.metastore', isTable ? 'table' : 'db') }">
+        <a class="inactive-action pointer" data-bind="visible: (typeof isTable !== 'undefined' && isTable) || (typeof isView !== 'undefined' && isView) || (typeof isDatabase !== 'undefined' && isDatabase), click: function() { huePubSub.publish('context.popover.open.in.metastore', isTable ? 'table' : 'db') }">
           <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
         </a>
-        <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('context.popover.replace.in.editor') }">
+        <a class="inactive-action pointer" data-bind="visible: typeof isHdfs !== 'undefined' && isHdfs, click: function() { huePubSub.publish('context.popover.replace.in.editor') }">
           <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
         </a>
-        <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('context.popover.open.in.file.browser') }">
+        <a class="inactive-action pointer" data-bind="visible: typeof isHdfs !== 'undefined' && isHdfs, click: function() { huePubSub.publish('context.popover.open.in.file.browser') }">
           <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }
         </a>
-        <!-- ko if: isAsterisk -->
+        <!-- ko if: typeof isAsterisk !== 'undefined' && isAsterisk -->
         <!-- ko with: contents.data -->
         <!-- ko if: selectedColumns().length > 0 -->
         <a class="inactive-action pointer" data-bind="click: expand">${ _("Expand to selected columns") }</a>
@@ -285,6 +285,21 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="context-document-details">
+    <div class="sql-context-flex-fill" data-bind="niceScroll">
+      <div style="padding: 8px">
+        <!-- ko with: documentContents -->
+        <!-- ko if: typeof snippets !== 'undefined' -->
+        <!-- ko foreach: snippets -->
+        <div data-bind="highlight: { value: statement, formatted: true, dialect: type }"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+  </script>
+
   <script type="text/html" id="sql-context-popover-template">
     <div class="hue-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
       <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
@@ -302,6 +317,7 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-contents">
     <div class="sql-context-popover-content">
       <!-- ko with: contents -->
+      <!-- ko if: typeof tabs !== 'undefined' -->
       <ul class="nav nav-tabs sql-context-tabs" data-bind="foreach: tabs">
         <li data-bind="click: function () { $parent.activeTab(id); }, css: { 'active' : $parent.activeTab() === id }">
           <a class="sql-context-tab" data-toggle="tab" data-bind="text: label, attr: { href: '#' + id }"></a>
@@ -330,6 +346,19 @@ from metadata.conf import has_navigator
           </div>
         </div>
       </div>
+      <!-- /ko -->
+      <!-- ko if: typeof tabs === 'undefined' -->
+      <div class="sql-context-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
+      <!-- ko if: !loading() && hasErrors() -->
+      <div class="sql-context-flex-fill">
+        <div class="alert" data-bind="text: errorText"></div>
+      </div>
+      <!-- /ko -->
+      <!-- ko if: !loading() && !hasErrors() -->
+      <!-- ko template: { name: template } --><!-- /ko -->
+      <!-- /ko -->
+      <!-- ko template: { name: 'sql-context-footer' } --><!-- /ko -->
+      <!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -785,7 +814,6 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('details');
       }
 
-
       function AsteriskData(data, sourceType, defaultDatabase) {
         var self = this;
         self.loading = ko.observable(true);
@@ -956,6 +984,36 @@ from metadata.conf import has_navigator
         ];
         self.activeTab = ko.observable('details');
       }
+
+      function DocumentContext(data) {
+        var self = this;
+        self.data = data;
+        self.loading = ko.observable(true);
+        self.hasErrors = ko.observable(false);
+        self.errorText = ko.observable();
+        self.showInAssistEnabled = false; // TODO: Enable for documents
+        self.template = 'context-document-details';
+
+        self.documentContents = ko.observable();
+        self.loadDocument();
+      }
+
+      DocumentContext.prototype.loadDocument = function () {
+        var self = this;
+        self.hasErrors(false);
+        self.loading(true);
+        ApiHelper.getInstance().fetchDocument({
+          uuid: self.data.uuid,
+          fetchContents: true,
+          silenceErrors: true
+        }).done(function (response) {
+          self.documentContents(response.data);
+          self.loading(false);
+        }).fail(function (errorMessage) {
+          self.hasErrors(true);
+          self.errorText(errorMessage || '${ _("Error loading document.") }');
+        })
+      };
 
       function ResizeHelper (orientation, leftAdjust, topAdjust) {
         var self = this;
@@ -1195,7 +1253,6 @@ from metadata.conf import has_navigator
             self.left(params.source.left - self.width());
         }
 
-
         self.isDatabase = params.data.type === 'database';
         self.isTable = params.data.type === 'table';
         self.isColumn = params.data.type === 'column';
@@ -1406,6 +1463,7 @@ from metadata.conf import has_navigator
         self.isTable = params.data.type.toLowerCase() === 'table';
         self.isColumn = params.data.type.toLowerCase() === 'field';
         self.isView = params.data.type.toLowerCase() === 'view';
+        self.isDocument = params.data.type.toLowerCase() === 'hue';
 
         // TODO: Handle HDFS, Complex and Function ?
         self.isHdfs = false;
@@ -1438,6 +1496,8 @@ from metadata.conf import has_navigator
           self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', false, false);
         } else if (self.isColumn) {
           self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', true, false);
+        } else if (self.isDocument) {
+          self.contents = new DocumentContext(params.data);
         }
       };
 
