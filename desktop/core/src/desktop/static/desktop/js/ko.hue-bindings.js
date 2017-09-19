@@ -3637,15 +3637,17 @@
             if (hueDebug.showSyntaxParseResult) {
               console.log(e.data.syntaxError);
             }
-            var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
-            if (token) {
-              token.syntaxError = e.data.syntaxError;
-              var AceRange = ace.require('ace/range').Range;
-              var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
-              var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-error');
-              self.editor.session.$backMarkers[markerId].token = token;
-            } else {
-              console.warn("couldn't find a token at line: " + (e.data.syntaxError.loc.first_line - 1) + ", column: " + (e.data.syntaxError.loc.first_column + 1));
+            if (!e.data.syntaxError.incompleteStatement) {
+              var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
+              if (token) {
+                token.syntaxError = e.data.syntaxError;
+                var AceRange = ace.require('ace/range').Range;
+                var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
+                var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-error');
+                self.editor.session.$backMarkers[markerId].token = token;
+              } else {
+                console.warn("couldn't find a token at line: " + (e.data.syntaxError.loc.first_line - 1) + ", column: " + (e.data.syntaxError.loc.first_column + 1));
+              }
             }
           }
         };
@@ -4329,7 +4331,7 @@
                     contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                   }
                 }, 500);
-              } else if (token !== null && token.syntaxError) {
+              } else if (token !== null && token.syntaxError && !token.syntaxError.incompleteStatement) {
                 tooltipTimeout = window.setTimeout(function () {
                   // TODO: i18n
                   if (token.syntaxError) {

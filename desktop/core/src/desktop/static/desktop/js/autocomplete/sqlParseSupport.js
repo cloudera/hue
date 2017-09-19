@@ -1841,7 +1841,9 @@ var SqlParseSupport = (function () {
           }
         }
         if (weightedExpected.length === 0) {
-          return false; // Don't mark it as an error if there are not suggestions
+          parser.yy.error.expected = [];
+          parser.yy.error.incompleteStatement = true;
+          return parser.yy.error;
         }
         weightedExpected.sort(function (a, b) {
           if (a.distance === b.distance) {
@@ -1850,6 +1852,10 @@ var SqlParseSupport = (function () {
           return a.distance - b.distance
         });
         parser.yy.error.expected = weightedExpected;
+        return parser.yy.error;
+      } else if (parser.yy.error) {
+        parser.yy.error.expected = [];
+        parser.yy.error.incompleteStatement = true;
         return parser.yy.error;
       }
       return false;
