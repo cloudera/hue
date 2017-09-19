@@ -1196,6 +1196,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.user = options.user;
 
         self.activeEntry = ko.observable();
+        self.typeFilter = ko.observable({
+          type: 'all',
+          label: DocumentTypeGlobals['all']
+        });
 
         var lastOpenedUuid = self.apiHelper.getFromTotalStorage('assist', 'last.opened.assist.doc.uuid');
 
@@ -1207,6 +1211,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             app: 'documents',
             user: self.user,
             activeSort: ko.observable('name'),
+            typeFilter: self.typeFilter,
             definition: {
               uuid: lastOpenedUuid,
               type: 'directory'
@@ -1252,6 +1257,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             app: 'documents',
             user: self.user,
             activeSort: ko.observable('name'),
+            typeFilter: self.typeFilter,
             definition: {
               name: '/',
               type: 'directory'

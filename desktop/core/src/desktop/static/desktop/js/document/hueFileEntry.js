@@ -139,7 +139,7 @@ var HueFileEntry = (function () {
       return result;
     });
 
-    self.typeFilter = ko.observable(self.availableTypeFilters()[0]); // First one is always 'all'
+    self.typeFilter = options.typeFilter || ko.observable(self.availableTypeFilters()[0]); // First one is always 'all'
 
     self.isFilterVisible.subscribe(function (newValue) {
       if (!newValue && self.filter()) {
@@ -423,6 +423,7 @@ var HueFileEntry = (function () {
       trashEntry: self.trashEntry,
       apiHelper: self.apiHelper,
       serverTypeFilter: self.serverTypeFilter,
+      typeFilter: self.typeFilter,
       app: self.app,
       user: self.user,
       superuser: self.superuser
