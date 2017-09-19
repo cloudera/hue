@@ -439,13 +439,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="job-mapreduce-page${ SUFFIX }">
 
   <div class="row-fluid">
-    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini()}">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
           <li><span data-bind="text: id"></span></li>
           <li data-bind="visible: id() != name() && ! $root.isMini()" class="nav-header">${ _('Name') }</li>
-          <li data-bind="visible: id() != name() && ! $root.isMini(), attr: { title: name }"><span data-bind="text: name"></span></li>
+          <li data-bind="visible: id() != name() && ! $root.isMini(), attr: {title: name}"><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li data-bind="visible: ! $root.isMini()" class="nav-header">${ _('Status') }</li>
