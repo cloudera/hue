@@ -655,11 +655,8 @@ from desktop.views import _ko
       <div class="global-search-preview">
         <!-- ko with: selectedResult -->
           <!-- ko switch: type -->
-            <!-- ko case: ['database', 'table', 'view', 'field']  -->
+            <!-- ko case: ['database', 'document', 'field', 'table', 'view']  -->
               <!-- ko component: { name: 'sql-context-contents-global-search', params: { data: data, globalSearch: $parent } } --><!-- /ko -->
-            <!-- /ko -->
-            <!-- ko case: 'document'  -->
-              <!-- ko template: 'search-document-context-template' --><!-- /ko -->
             <!-- /ko -->
             <!-- ko case: $default -->
               <pre data-bind="text: ko.mapping.toJSON($data)"></pre>
