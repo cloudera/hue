@@ -2075,8 +2075,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           }
         }
       },
-      scrollable: vm.editorMode() ? MAIN_SCROLLABLE : '.dataTables_wrapper',
-      contained: !vm.editorMode()
+      scrollable: vm.editorMode() && !vm.isPresentationMode() ? MAIN_SCROLLABLE : '.dataTables_wrapper',
+      contained: !vm.editorMode() || vm.isPresentationMode()
     });
 
     window.setTimeout(function () {
