@@ -2179,7 +2179,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             %endif
             if (snippet.isResultSettingsVisible()) {
               snippetEl.find('.snippet-grid-settings').css({
-                "height": vm.isPresentationMode() ? '330px' : Math.max(100, Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)))+ 'px'
+                "height": vm.isPresentationMode() || !vm.editorMode() ? '330px' : Math.max(100, Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)))+ 'px'
               });
               snippetEl.find('.result-settings').animate({
                 'marginTop': margin
@@ -3476,7 +3476,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
           var topCoord = viewModel.isPresentationMode() || viewModel.isResultFullScreenMode() ? ${ conf.CUSTOM.BANNER_TOP_HTML.get() and '31' or '1' } : 73;
           $("#snippet_" + snippet.id()).find(".snippet-grid-settings").css({
-            "height": viewModel.isPresentationMode() ? '330px' : Math.ceil($(window).height() - Math.max($('.result-settings').length > 0 ? $('.result-settings').offset().top : 0, topCoord)) + 'px'
+            "height": viewModel.isPresentationMode() || !viewModel.editorMode() ? '330px' : Math.ceil($(window).height() - Math.max($('.result-settings').length > 0 ? $('.result-settings').offset().top : 0, topCoord)) + 'px'
           });
         } else {
           _dtElement = $("#snippet_" + snippet.id()).find(".chart:visible");

@@ -107,6 +107,9 @@
         }
       }
     }
+    else if (fixedHeight > -1){
+      $(el).css("overflow-y", "auto").css("maxHeight", fixedHeight);
+    }
   }
 
   $.fn[pluginName] = function (options) {
