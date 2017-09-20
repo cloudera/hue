@@ -366,14 +366,21 @@
 
   .snippet-progress-container {
     height: 3px;
-    width: 100%;
     overflow: hidden;
+    margin-bottom: 2px;
+  }
+
+  .snippet-logs-btn {
+    margin-top: -9px;
+    margin-left: -3px;
+    font-size: 16px;
   }
 
   .snippet-execution-status {
-    margin-top: 2px;
+    margin-top: 10px;
     margin-left: 35px;
     margin-right: 20px;
+    margin-bottom: 4px;
   }
 
   .ace-container-resizable {
@@ -1244,12 +1251,24 @@
     z-index: 1030;
   }
 
+  .close-logs-overlay {
+    opacity: 0.8;
+    position: absolute;
+    top: 0;
+    right: 6px;
+    display: none;
+  }
+
+  .snippet-log-container:hover .close-logs-overlay {
+    display: block;
+  }
+
   .jobs-overlay {
     background-color: #FFF;
     opacity: 0.8;
     position: absolute;
     top: 10px;
-    right: 15px;
+    right: 20px;
 
     .progress-job {
       height: 2px;
