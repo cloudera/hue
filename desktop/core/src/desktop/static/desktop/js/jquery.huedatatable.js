@@ -593,8 +593,10 @@
             window.clearTimeout(drawTimeout);
             drawTimeout = window.setTimeout(self.fnDraw, Math.max(100, Math.min(self.$table.data('aoColumns') ? self.$table.data('aoColumns').length : 500, 500)));
           }
-          self.$table.parents(oInit['scrollable']).data('scrollFnDt', scrollFn);
-          self.$table.parents(oInit['scrollable']).on('scroll', scrollFn);
+          window.setTimeout(function () {
+            self.$table.parents(oInit['scrollable']).data('scrollFnDt', scrollFn);
+            self.$table.parents(oInit['scrollable']).on('scroll', scrollFn);
+          }, 1000);
         }
       }
       self.$table.addClass('table-huedatatable');
