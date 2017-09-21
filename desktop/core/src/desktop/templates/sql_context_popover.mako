@@ -285,19 +285,34 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+
+  <script type="text/html" id="generic-document-context-template">
+    <div style="width:100%; text-align: center; margin-top: 40px; font-size: 140px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
+    <div style="width: 100%; margin-top: 20px; text-align:center">
+      <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
+      <br/>
+      <span data-bind="text: DocumentTypeGlobals[type] || type"></span>
+      <!-- ko if: description -->
+      <br/><br/><span data-bind="text: description"></span>
+      <!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/html" id="context-document-details">
     <div class="sql-context-flex-fill" style="overflow: auto;" data-bind="niceScroll">
       <div style="padding: 8px">
+        <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
         <!-- ko with: documentContents -->
-        <!-- ko if: typeof snippets !== 'undefined' -->
         <!-- ko foreach: snippets -->
         <div data-bind="highlight: { value: statement, formatted: true, dialect: type }"></div>
         <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
+        <!-- ko if: typeof documentContents() === 'undefined' || typeof documentContents().snippets === 'undefined' -->
+        <div style="width: 100%;" data-bind="template: { name: 'generic-document-context-template', data: details }"></div>
+        <!-- /ko -->
       </div>
     </div>
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="sql-context-popover-template">
@@ -987,6 +1002,14 @@ from metadata.conf import has_navigator
 
       function DocumentContext(data) {
         var self = this;
+
+        // Adapt some details to a common format, the global search endpoint has different structure than the docs one
+        self.details = {
+          type: data.type || data.doc_type,
+          name: data.name || data.hue_name,
+          link: data.absoluteUrl || data.link,
+          description: data.description || data.hue_description
+        };
         self.data = data;
         self.loading = ko.observable(true);
         self.hasErrors = ko.observable(false);
@@ -1010,8 +1033,8 @@ from metadata.conf import has_navigator
           self.documentContents(response.data);
           self.loading(false);
         }).fail(function (errorMessage) {
-          self.hasErrors(true);
-          self.errorText(errorMessage || '${ _("Error loading document.") }');
+          self.loading(false);
+          self.hasErrors(false); // Allows us to revert to a generic document panel in case it can't fetch it.
         })
       };
 
