@@ -179,6 +179,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-folder-open-o"></i> ${ _('Open folder') }</a></li>
     <!-- /ko -->
     <!-- ko if: definition().type !== 'directory' -->
+    <li><a href="javascript: void(0);" data-bind="click: function(data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-edit"></i> ${ _('Open document') }</a></li>
     <!-- /ko -->
   </script>
@@ -526,20 +527,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="file-details-content">
-    <!-- ko with: definition -->
-    <div class="assist-details-wrap">
-      <div><div class="assist-details-header">${ _('Description') }</div><div class="assist-details-value" data-bind="text: description"></div></div>
-      <div><div class="assist-details-header">${ _('Modified') }</div><div class="assist-details-value" data-bind="text: localeFormat(last_modified)"></div></div>
-      <div><div class="assist-details-header">${ _('Owner') }</div><div class="assist-details-value" data-bind="text: owner"></div></div>
-    </div>
-    <!-- /ko -->
-  </script>
-
-  <script type="text/html" id="file-details-title">
-    <span data-bind="text: definition().name"></span>
-  </script>
-
   <script type="text/html" id="assist-document-header-actions">
     <div class="assist-db-header-actions">
       <!-- ko if: !loading() && availableTypeFilters().length > 1 -->
@@ -576,9 +563,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
          <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 27, container: '.assist-file-scrollable' }">
            <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable' }, assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
              <div class="assist-file-actions table-actions">
-               <a class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
-                 <i class='fa fa-info' title="${ _('Details') }"></i>
-               </a>
+               <a class="inactive-action" href="javascript:void(0)" data-bind="click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
              </div>
              <a href="javascript:void(0)" class="assist-entry assist-document-link" data-bind="click: open, attr: {'title': name }">
                <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko -->
