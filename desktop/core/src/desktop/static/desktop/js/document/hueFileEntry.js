@@ -85,6 +85,7 @@ var HueFileEntry = (function () {
     self.userGroups = options.userGroups;
     self.superuser = options.superuser;
     self.serverTypeFilter = options.serverTypeFilter || ko.observable({ type: 'all' });
+    self.statsVisible = ko.observable(false);
 
     self.document = ko.observable();
     self.selectedDocsWithDependents = ko.observable([]);
@@ -295,6 +296,37 @@ var HueFileEntry = (function () {
     else {
       return self.definition().uuid;
     }
+  };
+
+  HueFileEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
+    var self = this;
+    var $source = $(event.target);
+    var offset = $source.offset();
+    if (positionAdjustment) {
+      offset.left += positionAdjustment.left;
+      offset.top += positionAdjustment.top;
+    }
+
+    self.statsVisible(true);
+    huePubSub.publish('context.popover.show', {
+      data: {
+        type: 'hue',
+        definition: self.definition()
+      },
+      showInAssistEnabled: false,
+      orientation: 'right',
+      pinEnabled: false,
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 3,
+        right: offset.left + $source.width() + 1,
+        bottom: offset.top + $source.height() - 3
+      }
+    });
+    huePubSub.subscribeOnce('context.popover.hidden', function () {
+      self.statsVisible(false);
+    });
   };
 
   HueFileEntry.prototype.addDirectoryParamToUrl = function (url) {
