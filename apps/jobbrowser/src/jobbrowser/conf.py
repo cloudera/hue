@@ -43,7 +43,7 @@ ENABLE_V2 = Config(
     key="enable_v2",
     help=_("Show the version 2 of app which unifies all the past browsers into one."),
     type=coerce_bool,
-    default=False
+    default=True
 )
 
 MAX_JOB_FETCH = Config(
@@ -51,4 +51,11 @@ MAX_JOB_FETCH = Config(
   default=500,
   type=int,
   help=_('Maximum number of jobs to fetch and display when pagination is not supported for the type.')
+)
+
+ENABLE_QUERY_BROWSER = Config(
+    key="enable_query_browser",
+    help=_("Show the query section for listing and showing more troubleshooting information."),
+    type=coerce_bool,
+    default=False
 )

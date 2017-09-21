@@ -43,15 +43,11 @@ class JobApi(Api):
 
   def __init__(self, user):
     self.user = user
-    self.yarn_api = YarnApi(user) # TODO: actually long term move job aggregations to the frontend instead probably
-    self.impala_api = ImpalaApi(user)
+    self.yarn_api = YarnApi(user)
     self.request = None
 
   def apps(self, filters):
-    jobs = self.yarn_api.apps(filters)
-    # += Impala
-    # += Sqoop2
-    return jobs
+    return self.yarn_api.apps(filters)
 
   def app(self, appid):
     return self._get_api(appid).app(appid)
@@ -425,12 +421,4 @@ class YarnMapReduceTaskAttemptApi(Api):
 
 
 class YarnAtsApi(Api):
-  pass
-
-
-class ImpalaApi(Api):
-  pass
-
-
-class Sqoop2Api(Api):
   pass
