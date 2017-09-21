@@ -635,6 +635,7 @@ from metadata.conf import has_navigator
 
         var scrollPubSub = huePubSub.subscribe('context.popover.scroll.to.column', function (colName) {
           if (typeof self.sample.fetchedData() === 'undefined') {
+            self.activeTab('sample');
             self.sample.fetch(function (data) {
               self.initializeSamplesTable(data);
               window.setTimeout(function () {
