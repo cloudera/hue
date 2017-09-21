@@ -2895,6 +2895,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       if (app === 'editor') {
         huePubSub.publish('redraw.fixed.headers');
         huePubSub.publish('hue.scrollleft.show');
+        huePubSub.publish('active.snippet.type.changed', viewModel.editorType());
       }
     }, HUE_PUB_SUB_EDITOR_ID);
 
