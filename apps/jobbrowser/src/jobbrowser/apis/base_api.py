@@ -33,11 +33,14 @@ def get_api(user, interface):
   from jobbrowser.apis.data_eng_api import DataEngClusterApi, DataEngJobApi
   from jobbrowser.apis.livy_api import LivySessionsApi, LivyJobApi
   from jobbrowser.apis.job_api import JobApi
+  from jobbrowser.apis.query_api import QueryApi
   from jobbrowser.apis.schedule_api import ScheduleApi
   from jobbrowser.apis.workflow_api import WorkflowApi
 
   if interface == 'jobs':
     return JobApi(user)
+  elif interface == 'queries':
+    return QueryApi(user)
   elif interface == 'workflows':
     return WorkflowApi(user)
   elif interface == 'schedules':

@@ -26,6 +26,7 @@ from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient
 
 from ImpalaService import ImpalaHiveServer2Service
+from impala.impala_flags import get_webserver_certificate_file
 
 
 LOG = logging.getLogger(__name__)
@@ -45,6 +46,14 @@ def get_api(user, url):
       API_CACHE_LOCK.release()
   API_CACHE.set_user(user)
   return API_CACHE
+
+
+def _get_impala_server_url(session):
+  impala_settings = session.get_formatted_properties()
+  http_addr = next((setting['value'] for setting in impala_settings if setting['key'].lower() == 'http_addr'), None)
+  # Remove scheme if found
+  http_addr = http_addr.replace('http://', '').replace('https://', '')
+  return ('https://' if get_webserver_certificate_file() else 'http://') + http_addr
 
 
 class ImpalaServerClientException(Exception):
@@ -163,15 +172,29 @@ class ImpalaDaemonApi(object):
       self._thread_local.user = user
 
 
+  def get_queries(self):
+    params = {
+      'json': 'true'
+    }
+
+    resp = self._root.get('queries', params=params)
+    try:
+      return json.loads(resp)
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
+
+
+  def get_query(self, query_id): pass
+
+
   def get_query_profile(self, query_id):
     params = {
       'query_id': query_id,
       'json': 'true'
     }
-    profile = None
+
     resp = self._root.get('query_profile', params=params)
     try:
-      profile = json.loads(resp)
+      return json.loads(resp)
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_profile did not return valid JSON.')
-    return profile
