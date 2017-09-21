@@ -1992,7 +1992,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     })();
   </script>
 
-  <script type="text/html" id="assistant-panel-template">
+  <script type="text/html" id="editor-assistant-panel-template">
     <div class="assist-inner-panel assist-assistant-panel">
       <div class="assist-flex-panel">
 
@@ -2061,7 +2061,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
   <script type="text/javascript">
     (function () {
-      function AssistantPanel(params) {
+      function EditorAssistantPanel(params) {
         var self = this;
 
         self.disposals = [];
@@ -2251,7 +2251,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
       }
 
-      AssistantPanel.prototype.addFilter = function (riskId) {
+      EditorAssistantPanel.prototype.addFilter = function (riskId) {
         var self = this;
         if (self.activeLocations() && self.activeEditor()) {
           self.activeLocations().activeStatementLocations.every(function (location) {
@@ -2291,7 +2291,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         }
       };
 
-      AssistantPanel.prototype.uploadTableStats = function (showProgress) {
+      EditorAssistantPanel.prototype.uploadTableStats = function (showProgress) {
         var self = this;
         if (self.uploadingTableStats()) {
           return;
@@ -2306,16 +2306,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         });
       };
 
-      AssistantPanel.prototype.dispose = function () {
+      EditorAssistantPanel.prototype.dispose = function () {
         var self = this;
         self.disposals.forEach(function (dispose) {
           dispose();
         })
       };
 
-      ko.components.register('assistant-panel', {
-        viewModel: AssistantPanel,
-        template: { element: 'assistant-panel-template' }
+      ko.components.register('editor-assistant-panel', {
+        viewModel: EditorAssistantPanel,
+        template: { element: 'editor-assistant-panel-template' }
       });
     })();
   </script>
@@ -2407,21 +2407,61 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     })();
   </script>
 
+  <script type="text/html" id="dashboard-assistant-panel-template">
+    <div class="assist-inner-panel assist-assistant-panel">
+      <div class="assist-flex-panel">
+
+        <div class="assist-flex-header">
+          <div class="assist-inner-header"></div>
+        </div>
+        <div class="assist-flex-half assist-db-scrollable">
+        </div>
+
+      </div>
+    </div>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      function DashboardAssistantPanel(params) {
+        var self = this;
+        self.disposals = [];
+      }
+
+      DashboardAssistantPanel.prototype.dispose = function () {
+        var self = this;
+        self.disposals.forEach(function (dispose) {
+          dispose();
+        })
+      };
+
+      ko.components.register('dashboard-assistant-panel', {
+        viewModel: DashboardAssistantPanel,
+        template: { element: 'dashboard-assistant-panel-template' }
+      });
+    })();
+  </script>
+
   <script type="text/html" id="right-assist-panel-template">
     <div style="height: 100%; width: 100%; position: relative;">
       <ul class="right-panel-tabs nav nav-pills">
-        <li data-bind="css: { 'active' : activeTab() === 'assistant' }, visible: assistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('assistant'); activeTab('assistant'); }">${ _('Assistant') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'functions' }, visible: functionsTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('functions'); activeTab('functions'); }">${ _('Functions') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('schedules'); activeTab('schedules'); }">${ _('Schedule') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'editorAssistant' }, visible: editorAssistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('editorAssistant'); activeTab('editorAssistant'); }">${ _('Assistant') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'functions' }, visible: functionsTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('functions'); activeTab('functions'); }">${ _('Functions') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabEditor('schedules'); activeTab('schedules'); }">${ _('Schedule') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'dashboardAssistant' }, visible: dashboardAssistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTabDashboard('dashboardAssistant'); activeTab('dashboardAssistant'); }">${ _('Assistant') }</a></li>
       </ul>
 
       <div class="right-panel-tab-content tab-content">
-        <!-- ko if: activeTab() === 'assistant' && assistantTabAvailable()-->
-        <div data-bind="component: { name: 'assistant-panel' }"></div>
+        <!-- ko if: activeTab() === 'editorAssistant' && editorAssistantTabAvailable()-->
+        <div data-bind="component: { name: 'editor-assistant-panel' }"></div>
         <!-- /ko -->
 
         <!-- ko if: activeTab() === 'functions' && functionsTabAvailable -->
         <div data-bind="component: { name: 'functions-panel' }"></div>
+        <!-- /ko -->
+
+        <!-- ko if: activeTab() === 'dashboardAssistant' && dashboardAssistantTabAvailable()-->
+        <div data-bind="component: { name: 'dashboard-assistant-panel' }"></div>
         <!-- /ko -->
 
         ## TODO: Switch to if: when loadSchedules from notebook.ko.js has been moved to the schedule-panel component
@@ -2434,7 +2474,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/javascript">
     (function () {
 
-      var ASSISTANT_TAB = 'assistant';
+      var EDITOR_ASSISTANT_TAB = 'editorAssistant';
+      var DASHBOARD_ASSISTANT_TAB = 'dashboardAssistant';
       var FUNCTIONS_TAB = 'functions';
       var SCHEDULES_TAB = 'schedules';
 
@@ -2444,18 +2485,20 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         self.activeTab = ko.observable();
 
-        self.assistantTabAvailable = ko.observable(false);
+        self.editorAssistantTabAvailable = ko.observable(false);
+        self.dashboardAssistantTabAvailable = ko.observable(false);
         self.functionsTabAvailable = ko.observable(false);
         self.schedulesTabAvailable = ko.observable(false);
 
         var apiHelper = ApiHelper.getInstance();
-        self.lastActiveTab = apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), ASSISTANT_TAB);
+        self.lastActiveTabEditor = apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), EDITOR_ASSISTANT_TAB);
+        self.lastActiveTabDashboard = apiHelper.withTotalStorage('assist', 'last.open.right.panel.dashboard', ko.observable(), DASHBOARD_ASSISTANT_TAB);
 
         var assistEnabledApp = false;
 
         huePubSub.subscribe('assist.highlight.risk.suggestions', function () {
-          if (self.assistantTabAvailable() && self.activeTab() !== ASSISTANT_TAB) {
-            self.activeTab(ASSISTANT_TAB);
+          if (self.editorAssistantTabAvailable() && self.activeTab() !== EDITOR_ASSISTANT_TAB) {
+            self.activeTab(EDITOR_ASSISTANT_TAB);
           }
         });
 
@@ -2465,16 +2508,18 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             return;
           }
           var rightAssistAvailable = true;
-          if (self.lastActiveTab() === FUNCTIONS_TAB && self.functionsTabAvailable()) {
+          if (self.lastActiveTabEditor() === FUNCTIONS_TAB && self.functionsTabAvailable()) {
             self.activeTab(FUNCTIONS_TAB);
-          } else if (self.lastActiveTab() === SCHEDULES_TAB && self.schedulesTabAvailable()) {
+          } else if (self.lastActiveTabEditor() === SCHEDULES_TAB && self.schedulesTabAvailable()) {
             self.activeTab(SCHEDULES_TAB);
-          } else if (self.assistantTabAvailable()) {
-            self.activeTab(ASSISTANT_TAB);
+          } else if (self.editorAssistantTabAvailable()) {
+            self.activeTab(EDITOR_ASSISTANT_TAB);
           } else if (self.functionsTabAvailable()) {
             self.activeTab(FUNCTIONS_TAB);
           } else if (self.schedulesTabAvailable()) {
             self.activeTab(SCHEDULES_TAB);
+          } else if (self.dashboardAssistantTabAvailable()) {
+            self.activeTab(DASHBOARD_ASSISTANT_TAB);
           } else {
             self.activeTab(null);
             rightAssistAvailable = false;
@@ -2482,31 +2527,38 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           params.rightAssistAvailable(rightAssistAvailable);
         };
 
-        if ('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True' && IS_HUE_4) {
-          var currentAppSub = huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
-            // Async
-            self.schedulesTabAvailable(!!viewModel.selectedNotebook);
-            updateTabs();
-          });
-          self.disposals.push(currentAppSub.remove.bind(currentAppSub));
-          huePubSub.publish('get.current.app.view.model');
-        } else {
-          // Right assist is only available in the Hue 3 editor and notebook.
-          self.schedulesTabAvailable('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True');
+        var updateContentsForType = function (type) {
+          self.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
+          self.editorAssistantTabAvailable(type === 'hive' || type === 'impala');
+          self.dashboardAssistantTabAvailable(type === 'dashboard');
+          self.schedulesTabAvailable(false);
+          if (type !== 'dashboard') {
+            if ('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True' && IS_HUE_4) {
+              huePubSub.subscribeOnce('set.current.app.view.model', function (viewModel) {
+                // Async
+                self.schedulesTabAvailable(!!viewModel.selectedNotebook);
+                updateTabs();
+              });
+              huePubSub.publish('get.current.app.view.model');
+            } else {
+              // Right assist is only available in the Hue 3 editor and notebook.
+              self.schedulesTabAvailable('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True');
+            }
+          }
+          updateTabs();
         }
 
-        var snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', function (type) {
-          self.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
-          self.assistantTabAvailable(type === 'hive' || type === 'impala');
-          updateTabs();
-        });
+        var snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', updateContentsForType);
         self.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 
         if (IS_HUE_4) {
           huePubSub.subscribe('set.current.app.name', function (appName) {
-            assistEnabledApp = appName === 'editor' || appName === 'notebook';
+            assistEnabledApp = appName === 'editor' || appName === 'notebook' || appName === 'dashboard';
             if (!assistEnabledApp) {
               params.rightAssistAvailable(false);
+            }
+            if (appName === 'dashboard') {
+              updateContentsForType(appName);
             }
           });
           huePubSub.publish('get.current.app.name');
