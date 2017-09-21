@@ -459,7 +459,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <!-- ko with: ! $root.isMini() -->
+          <!-- ko if: !$root.isMini() -->
           <!-- ko with: properties -->
             <li class="nav-header">${ _('Map') }</li>
             <li><span data-bind="text: maps_percent_complete"></span>% <span data-bind="text: finishedMaps"></span> /<span data-bind="text: desiredMaps"></span></li>
@@ -576,7 +576,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <!-- ko with: ! $root.isMini() -->
+          <!-- ko if: !$root.isMini() -->
           <!-- ko with: properties -->
             <li data-bind="visible: ! $root.isMini()" class="nav-header">${ _('State') }</li>
             <li data-bind="visible: ! $root.isMini()"><span data-bind="text: state"></span></li>
@@ -671,7 +671,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <!-- ko with: ! $root.isMini() -->
+          <!-- ko if: !$root.isMini() -->
           <!-- ko with: properties -->
             <li class="nav-header">${ _('State') }</li>
             <li><span data-bind="text: state"></span></li>
@@ -1210,7 +1210,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <!-- ko with: ! $root.isMini() -->
+          <!-- ko if: !$root.isMini() -->
             <li class="nav-header">${ _('Submitted') }</li>
             <li><span data-bind="text: submitted"></span></li>
             <li class="nav-header">${ _('Next Run') }</li>
