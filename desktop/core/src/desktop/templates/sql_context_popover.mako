@@ -286,7 +286,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-document-details">
-    <div class="sql-context-flex-fill" data-bind="niceScroll">
+    <div class="sql-context-flex-fill" style="overflow: auto;" data-bind="niceScroll">
       <div style="padding: 8px">
         <!-- ko with: documentContents -->
         <!-- ko if: typeof snippets !== 'undefined' -->
@@ -1261,6 +1261,7 @@ from metadata.conf import has_navigator
         self.isHdfs = params.data.type === 'hdfs';
         self.isAsterisk = params.data.type === 'asterisk';
         self.isView = params.data.type === 'view';
+        self.isDocument = params.data.type.toLowerCase() === 'hue';
 
         if ((self.isColumn || self.isComplex) && self.data.tables && self.data.tables.length > 0) {
           var identifierChain = self.data.identifierChain;
@@ -1322,6 +1323,10 @@ from metadata.conf import has_navigator
           self.contents = new AsteriskContextTabs(self.data, self.sourceType, self.defaultDatabase);
           self.title = '*';
           self.iconClass = 'fa-table';
+        } else if (self.isDocument) {
+          self.contents = new DocumentContext(self.data.definition);
+          self.title = self.data.definition.name;
+          self.iconClass = 'fa-file-o';
         } else {
           self.title = '';
           self.iconClass = 'fa-info'
