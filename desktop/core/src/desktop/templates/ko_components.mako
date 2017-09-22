@@ -620,7 +620,7 @@ from desktop.views import _ko
       </div>
     </div>
     <!-- ko if: searchResultVisible-->
-    <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, css: { 'global-search-empty' : searchResultCategories().length === 0 }">
+    <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, css: { 'global-search-empty' : searchResultCategories().length === 0 }, style: { 'height' : heightWhenDragging }">
       <!-- ko hueSpinner: { spin: loading() && searchResultCategories().length === 0 , center: true, size: 'large' } --><!-- /ko -->
       <!-- ko if: !loading() && searchResultCategories().length === 0 -->
         <div>${ _('No results found.') }</div>
@@ -633,7 +633,7 @@ from desktop.views import _ko
             <li data-bind="multiClick: {
                 click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
                 dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
-              }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }"></li>
+              }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }, draggableText: { text: draggable, meta: draggableMeta }"></li>
           </ul>
         </div>
       </div>
@@ -676,6 +676,7 @@ from desktop.views import _ko
         self.inlineAutocomplete = ko.observable('');
         self.searchActive = ko.observable(false);
         self.searchResultVisible = ko.observable(false);
+        self.heightWhenDragging = ko.observable(null);
         self.searchResultCategories = ko.observableArray([]);
         self.selectedIndex = ko.observable();
         self.loading = ko.observable(false);
@@ -692,6 +693,18 @@ from desktop.views import _ko
               self.close();
             }
           }, 0);
+        });
+
+        huePubSub.subscribe('draggable.text.started', function (meta) {
+          // We have to set the height to 0 when dragging a text, just closing the results will break the
+          // jQuery draggable plugin
+          if (meta.source === 'globalSearch') {
+            huePubSub.subscribeOnce('draggable.text.stopped', function () {
+              self.heightWhenDragging(null);
+              self.close();
+            });
+            self.heightWhenDragging(0);
+          }
         });
 
         self.searchInput.subscribe(function (newValue) {
@@ -721,7 +734,9 @@ from desktop.views import _ko
         });
 
         self.searchResultVisible.subscribe(function (newVal) {
-          if (!newVal) {
+          if (newVal) {
+            self.heightWhenDragging(null);
+          } else {
             self.selectedIndex(undefined);
           }
         });
@@ -965,6 +980,10 @@ from desktop.views import _ko
           data.results.forEach(function (doc) {
             docCategory.result.push({
               label: doc.hue_name,
+              draggable: doc.originalName,
+              draggableMeta: {
+                source: 'globalSearch'
+              },
               type: 'document',
               data: doc
             })
@@ -1001,8 +1020,32 @@ from desktop.views import _ko
                 };
                 newCategories[typeLower] = category;
               }
+              var meta = {
+                source: 'globalSearch'
+              };
+              if (result.type.toLowerCase() === 'database') {
+                meta.type = 'sql';
+                meta.database = result.originalName
+              } else if (result.type.toLowerCase() === 'table') {
+                meta.type = 'sql';
+                var split = result.originalName.split('.');
+                if (split.length == 2) {
+                  meta.database = split[0];
+                  meta.table = split[1];
+                }
+              } else if (result.type.toLowerCase() === 'field') {
+                meta.type = 'sql';
+                var split = result.originalName.split('.');
+                if (split.length >= 3) {
+                  meta.database = split[0];
+                  meta.table = split[1];
+                  meta.column = split[2];
+                }
+              }
               category.result.push({
                 label: result.hue_name || result.originalName,
+                draggable: result.originalName,
+                draggableMeta: meta,
                 type: typeLower,
                 data: result
               })
