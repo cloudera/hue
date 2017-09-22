@@ -2045,8 +2045,18 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           <!-- /ko -->
           <!-- ko if: filteredTables().length > 0 -->
           <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: activeTables, minHeight: 23, container: '.assist-db-scrollable' }">
+            <!-- ko if: hasErrors -->
+            <li class="assist-table hue-warning" title="${ _('Error loading table details.') }">
+              <span class="assist-entry">
+                <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
+                <span data-bind="text: definition.displayName"></span>
+              </span>
+            </li>
+            <!-- /ko -->
+            <!-- ko ifnot: hasErrors -->
             <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
             <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry' } --><!-- /ko -->
+            <!-- /ko -->
           </ul>
           <!-- /ko -->
         </div>
@@ -2241,7 +2251,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                 delete activeTableIndex[key];
                 updateTables = true;
               } else if (!activeTableIndex[key].loaded) {
-                activeTableIndex[key].loadEntries();
+                activeTableIndex[key].loadEntries(function () {}, true);
               }
             });
 
