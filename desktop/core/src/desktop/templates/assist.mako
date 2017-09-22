@@ -243,7 +243,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/html" id="assist-db-entries">
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length == 0 -->
     <ul class="assist-tables">
-      <li class="assist-entry no-entries">${_('No results found')}</li>
+      <li class="assist-entry assist-no-entries"><!-- ko if: definition.isTable -->${_('No columns found')}<!--/ko--><!-- ko if: definition.isDatabase -->${_('No tables found')}<!--/ko--><!-- ko if: !definition.isTable && !definition.isDatabase -->${_('No results found')}<!--/ko--></li>
     </ul>
     <!-- /ko -->
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length > 0 -->
@@ -2015,7 +2015,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           <div class="assist-no-entries">${ _('No entries found.') }</div>
           <!-- /ko -->
           <!-- ko if: filteredTables().length > 0 -->
-          <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: activeTables, minHeight: 23, container: '.assist-db-scrollable' }">
+          <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: filteredTables, minHeight: 23, container: '.assist-db-scrollable' }">
             <!-- ko if: hasErrors -->
             <li class="assist-table hue-warning" title="${ _('Error loading table details.') }">
               <span class="assist-entry">
@@ -2133,16 +2133,19 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             }
             return self.activeTables();
           }
-          return self.activeTables().filter(function (table) {
+          var result = self.activeTables().filter(function (table) {
             if (table.filteredEntries().length > 0) {
               if (!table.open()) {
                 table.open(true);
                 openedByFilter.push(table);
               }
               return true;
+            } else if (table.definition.name.toLowerCase().indexOf(self.filter.query().toLowerCase()) > -1) {
+              return true;
             }
             return false;
           });
+          return result
         });
 
         var navigationSettings = {
