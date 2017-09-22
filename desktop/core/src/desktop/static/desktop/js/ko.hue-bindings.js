@@ -507,11 +507,15 @@
     init: function (element, valueAccessor) {
       var $element = $(element);
       var options = valueAccessor();
+      if ((ko.isObservable(options.text) && !options.text()) || !options.text) {
+        return;
+      }
       $element.addClass("draggableText");
 
       var $helper = $("<div>").text(ko.isObservable(options.text) ? options.text() : options.text).css("z-index", "99999");
       var dragStartX = -1;
       var dragStartY = -1;
+      var notifiedOnDragStarted = false;
       $element.draggable({
         helper: function () { return $helper },
         appendTo: "body",
@@ -519,6 +523,13 @@
           dragStartX = event.clientX;
           dragStartY = event.clientY;
           huePubSub.publish('draggable.text.meta', options.meta);
+          notifiedOnDragStarted = false;
+        },
+        drag: function (event) {
+          if (!notifiedOnDragStarted && Math.sqrt((dragStartX-event.clientX)*(dragStartX-event.clientX) + (dragStartY-event.clientY)*(dragStartY-event.clientY)) >= 10) {
+            huePubSub.publish('draggable.text.started', options.meta);
+            notifiedOnDragStarted = true;
+          }
         },
         stop: function (event) {
           if (Math.sqrt((dragStartX-event.clientX)*(dragStartX-event.clientX) + (dragStartY-event.clientY)*(dragStartY-event.clientY)) < 10) {
@@ -529,7 +540,9 @@
               $(elementAtStop).trigger('click');
             }
           }
-        },
+          notifiedOnDragStarted = false;
+          huePubSub.publish('draggable.text.stopped');
+        }
       });
     }
   };
