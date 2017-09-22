@@ -714,6 +714,9 @@ from desktop.views import _ko
             self.inlineAutocomplete('');
           } else if (self.searchInput() !== '') {
             self.triggerAutocomplete(self.searchInput());
+            if (!self.searchResultVisible()) {
+              self.searchResultVisible(true);
+            }
           }
         });
 
