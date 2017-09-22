@@ -268,7 +268,7 @@ var AssistDbEntry = (function () {
     }
   };
 
-  AssistDbEntry.prototype.loadEntries = function(callback) {
+  AssistDbEntry.prototype.loadEntries = function(callback, silenceErrors) {
     var self = this;
     if (!self.expandable || self.loading()) {
       return;
@@ -281,6 +281,11 @@ var AssistDbEntry = (function () {
       self.entries([]);
       self.hasErrors(false);
       self.loading(false);
+
+      if (data.status === 0 && data.code === 500 && !data.tables_meta) {
+        self.hasErrors(true);
+        return;
+      }
 
       var newEntries = [];
       var index = 0;
@@ -425,7 +430,8 @@ var AssistDbEntry = (function () {
       sourceType: self.assistDbSource.sourceType,
       hierarchy: self.getHierarchy(),
       successCallback: successCallback,
-      errorCallback: errorCallback
+      errorCallback: errorCallback,
+      silenceErrors: !!silenceErrors
     });
   };
 
