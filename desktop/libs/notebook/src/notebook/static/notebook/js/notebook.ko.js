@@ -1634,12 +1634,11 @@ var EditorViewModel = (function() {
                   setTimeout(function () { // Delay until we get IMPALA-5555
                     self.fetchResultSize(10, _query_id);
                   }, 2000);
-                } else { // Is DDL
-
+                  self.checkDdlNotification(); // DDL CTAS with Impala
+                } else {
+                  // Is DDL
                   if (self.lastExecutedStatement()) {
-                    if (/CREATE|DROP|ALTER/i.test(self.lastExecutedStatement().firstToken)) {
-                      self.ddlNotification(Math.random());
-                    }
+                    self.checkDdlNotification();
                   } else {
                     self.ddlNotification(Math.random());
                   }
@@ -1681,6 +1680,12 @@ var EditorViewModel = (function() {
         notebook.isExecutingAll(false);
       });
     };
+
+    self.checkDdlNotification = function() {
+      if (self.lastExecutedStatement() && /CREATE|DROP|ALTER/i.test(self.lastExecutedStatement().firstToken)) {
+        self.ddlNotification(Math.random());
+      }
+    }
 
     self.isCanceling = ko.observable(false);
 
