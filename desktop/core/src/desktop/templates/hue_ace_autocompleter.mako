@@ -97,8 +97,10 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span></div>
       <div class="autocompleter-details-contents">
         <div class="autocompleter-details-contents-inner">
+          <!-- ko if: typeof details.database !== 'undefined' && typeof details.table !== 'undefined' -->
           <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.database"></span>.<span data-bind="text: details.table"></span></div>
-          <!-- ko if: partitionKey -->
+          <!-- /ko -->
+          <!-- ko if: typeof partitionKey !== 'undefined' && partitionKey -->
           <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Partition key') }</div>
           <!-- /ko -->
           <!-- ko if: typeof details.primary_key !== 'undefined' && details.primary_key === 'true' -->
