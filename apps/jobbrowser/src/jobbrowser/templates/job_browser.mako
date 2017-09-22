@@ -2359,7 +2359,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('dataeng') != -1;
         }
         var schedulerInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreters'].length > 0;
+          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True';
         }
         var livyInterfaceCondition = function () {
           return self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1;
