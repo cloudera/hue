@@ -1314,7 +1314,7 @@ def extract_archive_using_batch_job(request):
 
   response = {'status': -1, 'data': ''}
   if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-    upload_path = request.POST.get('upload_path', None)
+    upload_path = request.fs.netnormpath(request.POST.get('upload_path', None))
     archive_name = request.POST.get('archive_name', None)
 
     if upload_path and archive_name:
@@ -1334,7 +1334,7 @@ def compress_files_using_batch_job(request):
 
   response = {'status': -1, 'data': ''}
   if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-    upload_path = request.POST.get('upload_path', None)
+    upload_path = request.fs.netnormpath(request.POST.get('upload_path', None))
     archive_name = request.POST.get('archive_name', None)
     file_names = request.POST.getlist('files[]')
 
