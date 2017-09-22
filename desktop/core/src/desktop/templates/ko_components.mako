@@ -686,6 +686,14 @@ from desktop.views import _ko
           }
         });
 
+        huePubSub.subscribe('context.popover.show.in.assist', function () {
+          window.setTimeout(function () {
+            if (self.searchResultVisible()) {
+              self.close();
+            }
+          }, 0);
+        });
+
         self.searchInput.subscribe(function (newValue) {
           if (self.inlineAutocomplete().indexOf(newValue) !== 0 || newValue === '') {
             self.inlineAutocomplete(newValue);
