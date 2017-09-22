@@ -1054,7 +1054,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
       });
       self.isCompressEnabled = ko.pureComputed(function () {
-        return self.isHdfs();
+        return !self.isS3();
       });
       self.isSummaryEnabled = ko.pureComputed(function () {
         return self.isHdfs();
@@ -1652,7 +1652,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         if (fileNames.indexOf('.') !== -1) {
           return false;
         }
-        return self.isHdfs() && (self.selectedFiles().length > 1 || !(self.selectedFiles().length === 1 && self.isArchive(self.selectedFile().name)));
+        return self.isCompressEnabled() && (self.selectedFiles().length > 1 || !(self.selectedFiles().length === 1 && self.isArchive(self.selectedFile().name)));
       });
 
       self.setCompressArchiveDefault = function() {
