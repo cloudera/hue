@@ -1263,7 +1263,7 @@ ${ assist.assistPanel() }
         resizeElements();
       });
       self.isObjectStore = ko.computed(function() {
-        return self.inputFormat() == 'file' && /^s3a:\/\/.*$/.test(self.path());
+        return self.inputFormat() == 'file' && /^(s3a|adl):\/.*$/.test(self.path());
       });
       self.isObjectStore.subscribe(function(newVal) {
         vm.createWizard.destination.useDefaultLocation(!newVal);
