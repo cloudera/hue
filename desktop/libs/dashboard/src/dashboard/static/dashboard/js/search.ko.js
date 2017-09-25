@@ -1643,7 +1643,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.draggableTree2 = ko.observable(bareWidgetBuilder("Tree", "tree2-widget"));
     self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget"));
 
-
+    self.hasAvailableFields = ko.pureComputed(function () {
+      return self.collection.availableFacetFields().length > 0;
+    });
     self.availableDateFields = ko.computed(function () {
       return $.grep(self.collection.availableFacetFields(), function (field) {
         return DATE_TYPES.indexOf(field.type()) != -1 && field.name() != '_version_';

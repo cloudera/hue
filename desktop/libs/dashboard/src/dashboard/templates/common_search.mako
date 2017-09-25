@@ -223,12 +223,12 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
     </div>
 
     <div data-bind="visible: $root.collection.supportAnalytics,
-                    css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
-                    draggable: {data: draggableCounter(), isEnabled: availableDraggableNumbers,
+                    css: { 'draggable-widget': true, 'disabled': !hasAvailableFields() },
+                    draggable: {data: draggableCounter(), isEnabled: hasAvailableFields,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Counter')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
+         <a data-bind="style: { cursor: $root.hasAvailableFields() ? 'move' : 'default' }">
                        <i class="fa fa-superscript" style="font-size: 110%"></i>
          </a>
     </div>
