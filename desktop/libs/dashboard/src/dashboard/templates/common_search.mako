@@ -554,6 +554,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     </div>
     <!-- /ko -->
 
+    <!-- ko if: widgetType() != 'hit-widget' -->
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
       <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet2">
@@ -562,6 +563,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
       </a>
     </div>
+    <!-- /ko -->
 
 
     <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'nested' && typeof properties.min != "undefined") -->
@@ -694,7 +696,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   </div>
   <!-- /ko -->
 
-  <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15" style="opacity: 0.7">
+  <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15 && widgetType() != 'hit-widget'" style="opacity: 0.7">
     <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-fw fa-plus"></i> ${ _('Add') }
