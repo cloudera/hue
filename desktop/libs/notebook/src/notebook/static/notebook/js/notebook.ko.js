@@ -318,9 +318,14 @@ var EditorViewModel = (function() {
     };
 
     self.database = ko.observable();
+    var previousDatabase = null;
     self.database.subscribe(function (newValue) {
       if (newValue !== null) {
         self.getApiHelper().setInTotalStorage('editor', 'last.selected.database', newValue);
+        if (previousDatabase !== null && previousDatabase !== newValue) {
+          huePubSub.publish('editor.refresh.statement.locations', self);
+        }
+        previousDatabase = newValue;
       }
     });
     self.database(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
