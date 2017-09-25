@@ -645,7 +645,9 @@ var Collection = function (vm, collection) {
   };
 
   self._get_field_operations = function(field, facet) {
-    if (isNumericColumn(field.type())) {
+	if (! field) {
+	  return HIT_OPTIONS;
+    } else if (isNumericColumn(field.type())) {
       return NUMERIC_HIT_OPTIONS;
     } else if (isDateTimeColumn(field.type())) {
       return DATETIME_HIT_OPTIONS;
@@ -657,7 +659,7 @@ var Collection = function (vm, collection) {
 
   self._addObservablesToFacet = function(facet, vm) {
     facet.properties.facets_form.metrics = ko.computed(function() {
-      var _field = self.getTemplateField(facet.properties.facets().length > 0 ? facet.properties.facets_form.field() : facet.field(), self.template.fieldsAttributes());
+      var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
       return self._get_field_operations(_field, facet);
     });
 
@@ -679,7 +681,9 @@ var Collection = function (vm, collection) {
     }
     if (facet.properties.facets) {
       facet.properties.facets.subscribe(function(newValue) {
-        vm.search();
+        if (newValue.length > 0) {
+          vm.search();
+        }
       });
     }
 
@@ -716,8 +720,10 @@ var Collection = function (vm, collection) {
       });
 
       facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
-        vm.getFacetFromQuery(facet.id()).resultHash('');
-        vm.search();
+        if (newValue.length > 0) {
+          vm.getFacetFromQuery(facet.id()).resultHash('');
+          vm.search();
+        }
       });
 
       facet.template.chartSettings.chartType.subscribe(function(newValue) {
