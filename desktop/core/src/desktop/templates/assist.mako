@@ -684,11 +684,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- /ko -->
       <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-table-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0">
+    <div class="assist-flex-table-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0, style: { 'flex': parent ? '0 0 28px' : '' }">
+      <!-- ko ifnot: parent -->
       <div>
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: $parent.showCores" />${_('Show cores')}</label>
       </div>
-      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Collection name...') }" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown'"/></div>
+      <!-- /ko -->
+      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown', attr: { placeholder: parent ? '${ _ko('Field name...') }' : '${ _ko('Collection name...') }'}"/></div>
     </div>
     <div class="assist-flex-fill assist-collections-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
