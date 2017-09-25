@@ -2127,7 +2127,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           return self.activeRisks().noStats && self.activeRisks().noStats.length > 0;
         });
 
-        var createQualifiedIdentifier = function (identifierChain) {
+        var createQualifiedIdentifier = function (identifierChain, defaultDatabase) {
+          if (identifierChain.length === 1) {
+            return defaultDatabase + '.' + identifierChain[0].name;
+          }
           return $.map(identifierChain, function (identifier) {
             return identifier.name;
           }).join('.').toLowerCase();
@@ -2209,13 +2212,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                     {}
                   );
                 }
-                var qid = createQualifiedIdentifier(location.identifierChain);
+                var qid = createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase);
                 tableQidIndex[qid] = true;
                 if (!activeTableIndex[qid]) {
                   var tableName = location.identifierChain[location.identifierChain.length - 1].name;
                   var displayName = database + '.' + tableName;
 
-                  activeTableIndex[createQualifiedIdentifier(location.identifierChain)] = new AssistDbEntry(
+                  activeTableIndex[createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase)] = new AssistDbEntry(
                     {
                       name: tableName,
                       type: 'table',
