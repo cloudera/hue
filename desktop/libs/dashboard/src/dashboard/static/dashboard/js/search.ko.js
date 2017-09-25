@@ -645,10 +645,7 @@ var Collection = function (vm, collection) {
   };
 
   self._get_field_operations = function(field, facet) {
-    if (! field) {
-      return HIT_OPTIONS;
-    }
-    else if (isNumericColumn(field.type())) {
+    if (isNumericColumn(field.type())) {
       return NUMERIC_HIT_OPTIONS;
     } else if (isDateTimeColumn(field.type())) {
       return DATETIME_HIT_OPTIONS;
@@ -660,7 +657,7 @@ var Collection = function (vm, collection) {
 
   self._addObservablesToFacet = function(facet, vm) {
     facet.properties.facets_form.metrics = ko.computed(function() {
-      var _field = self.getTemplateField(facet.properties.facets_form.field(), self.template.fieldsAttributes());
+      var _field = self.getTemplateField(facet.properties.facets().length > 0 ? facet.properties.facets_form.field() : facet.field(), self.template.fieldsAttributes());
       return self._get_field_operations(_field, facet);
     });
 
