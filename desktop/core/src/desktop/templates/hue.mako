@@ -417,6 +417,7 @@ ${ hueIcons.symbols() }
     </div>
 
     <div class="context-panel" data-bind="css: { 'visible': contextPanelVisible }">
+      <a href="javascript: void(0);" class="inactive-action" style="position: absolute; left: 6px; top: 4px;" data-bind="click: function () { huePubSub.publish('context.panel.visible.editor', false); }"><i class="fa fa-chevron-right"></i></a>
       <ul class="nav nav-tabs">
         <!-- ko if: sessionsAvailable -->
         <li class="active"><a href="#sessionsTab" data-toggle="tab" data-bind="visible: sessionsAvailable">${_('Sessions')}</a></li>
