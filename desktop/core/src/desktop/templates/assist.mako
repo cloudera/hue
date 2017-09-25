@@ -690,7 +690,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: $parent.showCores" />${_('Show cores')}</label>
       </div>
       <!-- /ko -->
-      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown', attr: { placeholder: parent ? '${ _ko('Field name...') }' : '${ _ko('Collection name...') }'}"/></div>
+      <div class="assist-filter"><input class="clearable" type="text" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown', attr: { placeholder: parent ? '${ _ko('Field name...') }' : '${ _ko('Collection name...') }'}"/></div>
     </div>
     <div class="assist-flex-fill assist-collections-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
@@ -875,7 +875,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       </div>
     </div>
     <div class="assist-flex-search" data-bind="visible: hasEntries() && isSearchVisible() && ! hasErrors()">
-      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Database name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries()">
       <!-- ko if: ! loading() && filteredEntries().length == 0 -->
@@ -943,7 +943,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         </ul>
         <!-- /ko -->
       </div>
-      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Table name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()">
       <!-- ko template: 'assist-db-entries' --><!-- /ko -->
@@ -2146,7 +2146,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           </div>
         </div>
         <div class="assist-flex-column-search" data-bind="visible: isFilterVisible">
-          <div class="assist-filter"><input id="searchInput" class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Search...') }" /></div>
+          <div class="assist-filter"><input class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Search...') }" /></div>
         </div>
         <div class="assist-flex-half assist-db-scrollable">
           <!-- ko if: filteredTables().length === 0 && filter.query() === '' -->
@@ -2566,9 +2566,35 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <div class="assist-flex-panel">
 
         <div class="assist-flex-header">
-          <div class="assist-inner-header"></div>
+          <div class="assist-inner-header">${ _('Fields') }
+            <a class="col-filter-toggle inactive-action" href="javascript:void(0)" data-bind="toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
+          </div>
+        </div>
+        <div class="assist-flex-column-search" data-bind="visible: isFilterVisible">
+          <div class="assist-filter"><input class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Search...') }" /></div>
         </div>
         <div class="assist-flex-half assist-db-scrollable">
+          <!-- ko if: filteredFields().length === 0 && filter.query() === '' -->
+          <div class="assist-no-entries">${ _('No fields available.') }</div>
+          <!-- /ko -->
+          <!-- ko if: filteredFields().length === 0 && filter.query() !== '' -->
+          <div class="assist-no-entries">${ _('No fields found.') }</div>
+          <!-- /ko -->
+          <!-- ko if: filteredFields().length > 0 -->
+          <ul class="assist-tables" data-bind="foreachVisible: { data: filteredFields, minHeight: 23, container: '.assist-db-scrollable' }">
+            <li class="assist-entry assist-table-link" style="position: relative;">
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="attr: {'title': name() + ' - ' + type() }">
+              <!-- ko if: isId -->
+                <i class="fa fa-fw fa-key muted valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko ifnot: isId -->
+                <i class="fa fa-fw fa-genderless muted valign-middle"></i>
+              <!-- /ko -->
+              <span data-bind="text: name"></span>
+            </a>
+          </li>
+          </ul>
+          <!-- /ko -->
         </div>
 
       </div>
@@ -2580,6 +2606,36 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       function DashboardAssistantPanel(params) {
         var self = this;
         self.disposals = [];
+        self.isFilterVisible = ko.observable(true);
+        self.activeCollection = ko.observable();
+
+        self.filter = {
+          query: ko.observable('')
+        };
+
+        var activeDashboardCollection = huePubSub.subscribe('set.active.dashboard.collection', function(collection) {
+          self.activeCollection(collection);
+        });
+
+        self.filteredFields = ko.pureComputed(function () {
+          if (!self.activeCollection()){
+            return [];
+          }
+          if (self.filter.query() === '' || !self.isFilterVisible()) {
+            return self.activeCollection().fields();
+          }
+          var result = self.activeCollection().fields().filter(function (field) {
+            if (field.name().toLowerCase().indexOf(self.filter.query().toLowerCase()) > -1) {
+              return true;
+            }
+            return false;
+          });
+          return result
+        });
+
+        self.disposals.push(function () {
+          activeDashboardCollection.remove();
+        });
       }
 
       DashboardAssistantPanel.prototype.dispose = function () {

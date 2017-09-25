@@ -1167,6 +1167,7 @@ var Collection = function (vm, collection) {
         $.each(data.collection.collection.fields, function(index, field) {
           self.fields.push(ko.mapping.fromJS(field));
         });
+        huePubSub.publish('set.active.dashboard.collection', self);
 
         self.syncDynamicFields();
       }
@@ -1398,6 +1399,8 @@ var Collection = function (vm, collection) {
 
     vm.search();
   };
+
+  huePubSub.publish('set.active.dashboard.collection', self);
 };
 
 var NewTemplate = function (vm, initial) {
