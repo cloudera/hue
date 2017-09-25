@@ -85,9 +85,9 @@ class TestFileBrowserWithHadoop(object):
   def test_remove(self):
     prefix = self.prefix + '/test-delete'
 
-    PATH_1 = '/%s/1' % prefix
-    PATH_2 = '/%s/2' % prefix
-    PATH_3 = '/%s/3' % prefix
+    PATH_1 = '%s/1' % prefix
+    PATH_2 = '%s/2' % prefix
+    PATH_3 = '%s/3' % prefix
     self.cluster.fs.mkdir(prefix)
     self.cluster.fs.mkdir(PATH_1)
     self.cluster.fs.mkdir(PATH_2)

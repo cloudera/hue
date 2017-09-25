@@ -26,8 +26,10 @@ def splitpath(path):
   split = urlparse.urlparse(path)
   if split.scheme and split.netloc:
     parts = [split.scheme + '://', split.netloc] + split.path.split('/')
-  elif split.scheme:
+  elif split.scheme and split.path:
     parts = [split.scheme + ':/'] + split.path.split('/')
+  elif split.scheme:
+    parts = [split.scheme + ("://" if path.find("://") >= 0 else ":/")]
   else:
     parts = ['/'] + posixpath.normpath(path).split('/')
   # Filter empty parts out
