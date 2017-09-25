@@ -281,6 +281,7 @@ var AssistDbEntry = (function () {
       self.entries([]);
       self.hasErrors(false);
       self.loading(false);
+      self.loaded = true;
 
       var newEntries = [];
       var index = 0;
@@ -388,6 +389,7 @@ var AssistDbEntry = (function () {
     var errorCallback = function () {
       self.hasErrors(true);
       self.loading(false);
+      self.loaded = true;
       loadEntriesDeferred.resolve([]);
     };
 
