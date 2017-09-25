@@ -139,11 +139,12 @@
     <div class="pull-right margin-right-10" data-bind="visible: $root.isEditing()">
       <a href="javascript:void(0)" data-bind="visible: size() > 2, click: shrinkColumn" title="${ _('Make column smaller') }"><i class="fa fa-step-backward"></i></a>
       <a href="javascript:void(0)" data-bind="visible: size() < 12, click: expandColumn" title="${ _('Make column larger') }"><i class="fa fa-step-forward"></i></a>
-      <a href="javascript:void(0)" data-bind="visible: $parent.columns().length < 2, click: addColumn" title="${ _('Add a column') }"><i class="fa fa-plus"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: $parent.columns().length < 2, click: addColumnRight" title="${ _('Add a column to the right') }"><i class="fa fa-plus"></i></a>
       <a href="javascript:void(0)" data-bind="visible: true, click: removeColumn" title="${ _('Remove this column') }"><i class="fa fa-times"></i></a>
     </div>
     <div class="pull-left margin-left-10" data-bind="visible: $root.isEditing()">
       <a href="javascript:void(0)" data-bind="visible: $index() == 0 && $parent.columns().length > 1, click: function() { moveRight($index()) }" title="${ _('Move column to the right') }"><i class="fa fa-arrow-right"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: $parent.columns().length < 2, click: addColumnLeft" title="${ _('Add a column to the left') }"><i class="fa fa-plus"></i></a>
       <a href="javascript:void(0)" data-bind="visible: $index() > 0, click: function() { moveLeft($index()) }" title="${ _('Move column to the left') }"><i class="fa fa-arrow-left"></i></a>
     </div>
     <div class="clearfix"></div>
