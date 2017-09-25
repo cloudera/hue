@@ -91,11 +91,24 @@ var Column = function (size, rows, vm) {
     }
   }
 
-  self.addColumn = function () {
+  self.addColumn = function (toTheRight) {
     var col = new Column(0, [], vm);
-    vm.columns.push(col);
+    if (toTheRight) {
+      vm.columns.push(col);
+    }
+    else {
+      vm.columns.unshift(col);
+    }
     col.expandColumn();
     col.expandColumn(); // Twice
+  }
+
+  self.addColumnRight = function () {
+    self.addColumn(true);
+  }
+
+  self.addColumnLeft = function () {
+    self.addColumn();
   }
 
   self.removeColumn = function () {
