@@ -3740,7 +3740,7 @@
           // Append table aliases
           for (var i = 0; i < allLocations.length; i++) {
             var location = allLocations[i];
-            if (location.type === 'alias' && (location.source === 'table' || location.source === 'subquery' || location.source === 'column')) {
+            if (location.type === 'alias' && (location.source === 'column' || location.source === 'table' || location.source === 'subquery' || location.source === 'cte')) {
               possibleValues.push({ name: location.alias.toLowerCase() });
             }
           }

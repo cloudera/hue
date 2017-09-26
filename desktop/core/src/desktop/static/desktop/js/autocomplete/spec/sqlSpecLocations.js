@@ -35,6 +35,26 @@
       });
     };
 
+    it('should report locations for "WITH boo AS (SELECT * FROM tbl) SELECT * FROM boo; |"', function() {
+      assertLocations({
+        beforeCursor: 'WITH boo AS (SELECT * FROM tbl) SELECT * FROM boo; ',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 50 } },
+          { type: 'alias', source: 'cte', alias: 'boo', location: { first_line: 1, last_line: 1, first_column: 6, last_column: 9 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 21, last_column: 22 }, subquery: true },
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 22 }, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 31 }, identifierChain: [{ name: 'tbl' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 31, last_column: 31 }, subquery: true },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 31, last_column: 31 }, subquery: true },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 } },
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 40, last_column: 41 }, tables: [{ identifierChain: [{ name: 'boo' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 47, last_column: 50 }, identifierChain: [{ name: 'boo' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 50, last_column: 50 } }
+        ]
+      });
+    });
+
     it('should report locations for "SELECT * FROM testTable1 JOIN db1.table2; |"', function() {
       assertLocations({
         beforeCursor: 'SELECT * FROM testTable1 JOIN db1.table2; ',

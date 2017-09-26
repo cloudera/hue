@@ -1542,6 +1542,7 @@ WithQueries_EDIT
 WithQuery
  : RegularOrBacktickedIdentifier AnyAs '(' TableSubQueryInner ')'
    {
+     parser.addCteAliasLocation(@1, $1);
      $4.alias = $1;
      $$ = $4;
    }
