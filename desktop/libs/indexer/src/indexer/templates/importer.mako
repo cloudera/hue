@@ -1269,7 +1269,7 @@ ${ assist.assistPanel() }
         vm.createWizard.destination.useDefaultLocation(!newVal);
       });
       // Rdbms
-      self.rdbmsMode = ko.observable('');
+      self.rdbmsMode = ko.observable('customRdbms');
       self.rdbmsMode.subscribe(function (val) {
         self.rdbmsTypes(null);
         self.rdbmsType('');
