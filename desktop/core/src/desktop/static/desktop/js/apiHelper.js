@@ -397,7 +397,9 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchHdfsPath = function (options) {
     var self = this;
-    options.pathParts.shift();
+    if (options.pathParts.length > 0 && options.pathParts[0] === '') {
+      options.pathParts.shift();
+    }
     var url = HDFS_API_PREFIX + options.pathParts.join("/") + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
     if (options.filter) {
       url += '&filter=' + options.filter;
