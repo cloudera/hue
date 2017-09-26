@@ -509,11 +509,10 @@ def augment_solr_response(response, collection, query):
           column = 'count'
           agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_')]
           if len(collection_facet['properties']['facets']) == 1 and agg_keys:
-            legend = agg_keys[0].split(':', 2)[1]
             column = agg_keys[0]
           else:
-            legend = facet['field']
             agg_keys = [column]
+          legend = facet['field']
 
           _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
 
