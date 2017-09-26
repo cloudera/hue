@@ -1412,6 +1412,10 @@ ${ assist.assistPanel() }
         return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[0] : 'default';
       });
       self.table.subscribe(function(val) {
+        if (val) {
+          vm.createWizard.guessFormat();
+          vm.createWizard.destination.nonDefaultLocation(val);
+        }
         resizeElements();
       });
       self.apiHelperType = ko.observable('${ source_type }');
@@ -1534,7 +1538,7 @@ ${ assist.assistPanel() }
       self.description = ko.observable('');
       self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');
       self.outputFormat.subscribe(function (newValue) {
-        if (newValue && newValue != 'database' && ((newValue == 'table' || newValue == 'index') && wizard.source.path().length > 0)) {
+        if (newValue && newValue != 'database' && ((newValue == 'table' || newValue == 'index') && wizard.source.table().length > 0)) {
           self.nameChanged(self.name());
           wizard.guessFieldTypes();
           resizeElements();
@@ -1559,7 +1563,7 @@ ${ assist.assistPanel() }
           if (format.value == 'file' && ['manual', 'rdbms'].indexOf(wizard.source.inputFormat()) == -1) {
             return false;
           }
-          else if (format.value == 'index' && wizard.source.inputFormat() != 'file') {
+          else if (format.value == 'index' && ['file', 'query', 'table'].indexOf(wizard.source.inputFormat()) == -1) {
             return false;
           }
           if (format.value == 'hbase' && wizard.source.inputFormat() != 'rdbms') {
@@ -1590,9 +1594,7 @@ ${ assist.assistPanel() }
             name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : wizard.source.path().split('/').pop().split('.')[0];
           }
         } else if (wizard.source.inputFormat() == 'table') {
-          if (wizard.source.table().split('.', 2).length == 2) {
-            name = wizard.source.table();
-          }
+           name = wizard.source.table();
         } else if (wizard.source.inputFormat() == 'query') {
           if (wizard.source.query()) {
             name = wizard.source.name();
