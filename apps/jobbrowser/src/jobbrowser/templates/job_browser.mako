@@ -2254,8 +2254,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             var i = 0, j = 0;
             var newJobs = [];
 
-            while (i < self.apps().length && j < data.apps.length) {
-              if (self.apps()[i].id() != data.apps[j].id) {
+            while ((self.apps().length == 0 || i < self.apps().length) && j < data.apps.length) { // Nothing displayed or compare existing
+              if (self.apps().length == 0 || self.apps()[i].id() != data.apps[j].id) {
                 // New Job
                 newJobs.push(new Job(vm, data.apps[j]));
                 j++;
