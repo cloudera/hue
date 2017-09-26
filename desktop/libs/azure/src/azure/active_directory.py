@@ -43,7 +43,7 @@ class ActiveDirectory(object):
         "client_id" : self._access_key_id,
         "client_secret" : self._secret_access_key
       }
-      self._token = self._root.post("/", data=data);
+      self._token = self._root.post("/", data=data, log_response=False);
       self._token["expires_on"] = int(self._token["expires_on"])
 
     return self._token["token_type"] + " " + self._token["access_token"]

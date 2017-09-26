@@ -662,6 +662,8 @@ class WebHdfs(Hdfs):
       else:
         raise ex
 
+  def get_upload_chuck_size(self):
+    return UPLOAD_CHUNK_SIZE.get()
 
   def copyfile(self, src, dst, skip_header=False):
     sb = self._stats(src)
@@ -675,7 +677,7 @@ class WebHdfs(Hdfs):
     offset = 0
 
     while True:
-      data = self.read(src, offset, UPLOAD_CHUNK_SIZE.get())
+      data = self.read(src, offset, self.get_upload_chuck_size())
 
       if skip_header:
         data = '\n'.join(data.splitlines())
@@ -696,7 +698,7 @@ class WebHdfs(Hdfs):
       else:
         self.append(dst, data)
 
-      if cnt < UPLOAD_CHUNK_SIZE.get():
+      if cnt < self.get_upload_chuck_size():
         break
 
       offset += cnt
