@@ -17,7 +17,6 @@ from __future__ import absolute_import
 
 import logging
 import re
-import azure
 
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
@@ -100,10 +99,12 @@ def has_adls_access(user):
 def config_validator(user):
   res = []
 
+  import azure.client # Avoid cyclic loop
+
   if is_adls_enabled():
     try:
-      headers = azure.get_client('default')._getheaders()
-      if len(headers['authorization']) <= 0:
+      headers = azure.client.get_client('default')._getheaders()
+      if not headers.get('Authorization'):
         raise ValueError('Failed to obtain Azure authorization token')
     except Exception, e:
       LOG.exception('Failed to obtain Azure authorization token.')

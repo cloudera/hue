@@ -63,7 +63,7 @@ class Resource(object):
     else:
       return resp.content
 
-  def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False):
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False, log_response=True):
     """
     Invoke an API method.
     @return: Raw body or JSON dictionary (if response content type is JSON).
@@ -79,7 +79,7 @@ class Resource(object):
                                 urlencode=self._urlencode,
                                 clear_cookies=clear_cookies)
 
-    if self._client.logger.isEnabledFor(logging.DEBUG):
+    if log_response and self._client.logger.isEnabledFor(logging.DEBUG):
       self._client.logger.debug(
           "%s Got response: %s%s" %
           (method,
@@ -114,7 +114,7 @@ class Resource(object):
 
 
   def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None, files=None, allow_redirects=False,
-           clear_cookies=False):
+           clear_cookies=False, log_response=True):
     """
     Invoke the POST method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
@@ -128,7 +128,7 @@ class Resource(object):
     @return: A dictionary of the JSON result.
     """
     return self.invoke("POST", relpath, params, data, headers=self._make_headers(contenttype, headers), files=files,
-                       allow_redirects=allow_redirects, clear_cookies=clear_cookies)
+                       allow_redirects=allow_redirects, clear_cookies=clear_cookies, log_response=log_response)
 
 
   def put(self, relpath=None, params=None, data=None, contenttype=None, allow_redirects=False, clear_cookies=False, headers=None):
