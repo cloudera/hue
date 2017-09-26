@@ -63,10 +63,7 @@ class ProxyFS(object):
         raise S3FileSystemException("Can't check permissions for %s on %s" % (self.user, path))
 
     split = urlparse(path)
-    if split.scheme:
-      return split.scheme
-    if path and path[0] == posixpath.sep:
-      return self._default_scheme
+    return split.scheme if split.scheme else self._default_scheme
 
   def _get_fs(self, path):
     scheme = self._get_scheme(path)
