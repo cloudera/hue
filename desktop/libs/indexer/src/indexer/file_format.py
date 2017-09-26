@@ -321,6 +321,7 @@ class CSVFormat(FileFormat):
     string = string.replace('\t', '\\t')
     string = string.replace('\n', '\\n')
     string = string.replace('\u0001', '\\u0001')
+    string = string.replace('\x01', '\\u0001')
 
     return string
 
