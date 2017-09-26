@@ -2293,12 +2293,14 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         layout: ko.mapping.toJSON(self.columns)
       }, function (data) {
         if (data.status == 0) {
+          if (! self.collection.id()) {
+            huePubSub.publish('assist.document.refresh');
+          }
           self.collection.id(data.id);
           $(document).trigger("info", data.message);
           if (window.location.search.indexOf("collection") == -1) {
             hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/?collection=' + data.id);
           }
-          huePubSub.publish('assist.document.refresh');
         }
         else {
           $(document).trigger("error", data.message);
