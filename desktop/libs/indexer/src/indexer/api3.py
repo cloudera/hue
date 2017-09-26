@@ -90,8 +90,10 @@ def guess_format(request):
     _convert_format(format_)
   elif file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
-    table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
-
+    try:
+      table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
+    except Exception, e:
+      raise PopupException(e.message if hasattr(e, 'message') and e.message else e)
     storage = dict([(delim['data_type'], delim['comment']) for delim in table_metadata.storage_details])
     if table_metadata.details['properties']['format'] == 'text':
       format_ = {"quoteChar": "\"", "recordSeparator": '\\n', "type": "csv", "hasHeader": False, "fieldSeparator": storage['serialization.format']}
