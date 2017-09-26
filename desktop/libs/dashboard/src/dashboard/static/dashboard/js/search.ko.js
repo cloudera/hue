@@ -653,7 +653,7 @@ var Collection = function (vm, collection) {
       return DATETIME_HIT_OPTIONS;
     } else {
       facet.properties.facets_form.aggregate.function('count');
-      return ALPHA_HIT_OPTIONS;
+      return facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : ALPHA_HIT_OPTIONS;
     }
   }
 

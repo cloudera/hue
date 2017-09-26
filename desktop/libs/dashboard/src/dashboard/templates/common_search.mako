@@ -2827,11 +2827,16 @@ var NUMERIC_HIT_OPTIONS = [
     { value: "percentile", label: "${ _('Percentiles') }" },
     { value: "mul", label: "${ _('Multiply') }" },
     { value: "add", label: "${ _('Add') }" },
-    { value: "sub", label: "${ _('Substract') }" }
+    { value: "sub", label: "${ _('Substract') }" },
+    { value: "stddev", label: "${ _('Stddev') }" },
+    { value: "variance", label: "${ _('Variance') }" }
 ];
 var DATETIME_HIT_OPTIONS = [
     { value: "unique", label: "${ _('Unique Count') }" },
     { value: "ms", label: "${ _('Substract dates') }" }
+];
+var ALPHA_HIT_COUNTER_OPTIONS = [
+    { value: "unique", label: "${ _('Unique Count') }" }
 ];
 var ALPHA_HIT_OPTIONS = [
     { value: "count", label: "Count" },
