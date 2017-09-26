@@ -2836,11 +2836,15 @@ var DATETIME_HIT_OPTIONS = [
     { value: "ms", label: "${ _('Substract dates') }" }
 ];
 var ALPHA_HIT_COUNTER_OPTIONS = [
-    { value: "unique", label: "${ _('Unique Count') }" }
+    { value: "unique", label: "${ _('Unique Count') }" },
+    { value: "min", label: "${ _('Min') }" },
+    { value: "max", label: "${ _('Max') }" }
 ];
 var ALPHA_HIT_OPTIONS = [
     { value: "count", label: "Count" },
-    { value: "unique", label: "${ _('Unique Count') }" }
+    { value: "unique", label: "${ _('Unique Count') }" },
+    { value: "min", label: "${ _('Min') }" },
+    { value: "max", label: "${ _('Max') }" }
 ];
 var HIT_OPTIONS = [
     { value: "count", label: "${ _('Count') }" }
