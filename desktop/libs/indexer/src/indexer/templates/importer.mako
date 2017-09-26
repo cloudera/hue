@@ -1193,7 +1193,11 @@ ${ assist.assistPanel() }
         }
 
         for (var i = 0; i < type.args.length; i++) {
-          self[type.args[i].name].subscribe(viewModel.createWizard.guessFieldTypes);
+          self[type.args[i].name].subscribe(function(newVal) {
+            if (newVal) { // Double call on non File selection otherwise
+              viewModel.createWizard.guessFieldTypes();
+            }
+          });
         }
       }
 
@@ -1257,8 +1261,8 @@ ${ assist.assistPanel() }
       self.path = ko.observable('');
       self.path.subscribe(function(val) {
         if (val) {
-          vm.createWizard.guessFormat();
-          vm.createWizard.destination.nonDefaultLocation(val);
+          wizard.guessFormat();
+          wizard.destination.nonDefaultLocation(val);
         }
         resizeElements();
       });
@@ -1266,7 +1270,7 @@ ${ assist.assistPanel() }
         return self.inputFormat() == 'file' && /^(s3a|adl):\/.*$/.test(self.path());
       });
       self.isObjectStore.subscribe(function(newVal) {
-        vm.createWizard.destination.useDefaultLocation(!newVal);
+        wizard.destination.useDefaultLocation(!newVal);
       });
       // Rdbms
       self.rdbmsMode = ko.observable('customRdbms');
@@ -1413,8 +1417,8 @@ ${ assist.assistPanel() }
       });
       self.table.subscribe(function(val) {
         if (val) {
-          vm.createWizard.guessFormat();
-          vm.createWizard.destination.nonDefaultLocation(val);
+          wizard.guessFormat();
+          wizard.destination.nonDefaultLocation(val);
         }
         resizeElements();
       });
@@ -1427,17 +1431,19 @@ ${ assist.assistPanel() }
       self.format = ko.observable();
       self.format.subscribe(function(newVal) {
         if (typeof newVal.hasHeader !== 'undefined') {
-          vm.createWizard.destination.hasHeader(newVal.hasHeader());
+          wizard.destination.hasHeader(newVal.hasHeader());
           newVal.hasHeader.subscribe(function(newVal) {
-            vm.createWizard.destination.hasHeader(newVal);
+            wizard.destination.hasHeader(newVal);
           });
         }
 
         if (typeof newVal.fieldSeparator !== 'undefined') {
-          vm.createWizard.destination.useCustomDelimiters(newVal.fieldSeparator() != ',');
-          vm.createWizard.destination.customFieldDelimiter(newVal.fieldSeparator());
+          wizard.destination.useCustomDelimiters(newVal.fieldSeparator() != ',');
+          wizard.destination.customFieldDelimiter(newVal.fieldSeparator());
           newVal.fieldSeparator.subscribe(function(newVal) {
-            vm.createWizard.destination.customFieldDelimiter(newVal);
+            if (newVal != '') {
+              wizard.destination.customFieldDelimiter(newVal);
+            }
           });
         }
       });
@@ -1794,6 +1800,7 @@ ${ assist.assistPanel() }
         {'value': '\\001', 'name': '${ _("^A (\\001)") }'},
         {'value': '\\002', 'name': '${ _("^B (\\002)") }'},
         {'value': '\\003', 'name': '${ _("^C (\\003)") }'},
+        {'value': '\x01', 'name': '${ _("^A (\\x01)") }'}
       ]);
 
       self.editorId = ko.observable();
@@ -1842,7 +1849,7 @@ ${ assist.assistPanel() }
         }
 
         if (self.source.format().type) {
-          if (!self.formatTypeSubscribed) {
+          if (! self.formatTypeSubscribed) {
             self.formatTypeSubscribed = true;
             self.source.format().type.subscribe(function (newType) {
               self.source.format(new FileType(newType));
