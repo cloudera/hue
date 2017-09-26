@@ -94,9 +94,16 @@ def guess_format(request):
       table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
     except Exception, e:
       raise PopupException(e.message if hasattr(e, 'message') and e.message else e)
-    storage = dict([(delim['data_type'], delim['comment']) for delim in table_metadata.storage_details])
+    storage = {}
+    for delim in table_metadata.storage_details:
+      if delim['data_type']:
+        if '=' in delim['data_type']:
+          key, val = delim['data_type'].split('=', 1)
+          storage[key] = val
+        else:
+          storage[delim['data_type']] = delim['comment']
     if table_metadata.details['properties']['format'] == 'text':
-      format_ = {"quoteChar": "\"", "recordSeparator": '\\n', "type": "csv", "hasHeader": False, "fieldSeparator": storage['serialization.format']}
+      format_ = {"quoteChar": "\"", "recordSeparator": '\\n', "type": "csv", "hasHeader": False, "fieldSeparator": storage.get('field.delim', ',')}
     elif table_metadata.details['properties']['format'] == 'parquet':
       format_ = {"type": "parquet", "hasHeader": False,}
     else:
