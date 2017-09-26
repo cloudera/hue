@@ -30,6 +30,8 @@ from urlparse import urlparse
 
 LOG = logging.getLogger(__name__)
 
+#Azure has a 30MB block limit on upload.
+UPLOAD_CHUCK_SIZE = 30 * 1000 * 1000
 
 class WebHdfs(HadoopWebHdfs):
   def __init__(self, url,
@@ -84,3 +86,6 @@ class WebHdfs(HadoopWebHdfs):
     return {
       "Authorization": self._auth_provider.get_token(),
     }
+
+  def get_upload_chuck_size(self):
+    return UPLOAD_CHUCK_SIZE

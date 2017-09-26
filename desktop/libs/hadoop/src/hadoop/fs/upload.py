@@ -142,7 +142,8 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self._activated = False
     self._destination = request.GET.get('dest', None) # GET param avoids infinite looping
     self.request = request
-    FileUploadHandler.chunk_size = UPLOAD_CHUNK_SIZE.get()
+    fs = fsmanager.get_filesystem('default')
+    FileUploadHandler.chunk_size = fs.get_upload_chuck_size(self._destination) if self._destination else UPLOAD_CHUNK_SIZE.get()
 
     LOG.debug("Chunk size = %d" % FileUploadHandler.chunk_size)
 

@@ -235,3 +235,6 @@ class ProxyFS(object):
 
   def mkswap(self, filename, subdir='', suffix='swp', basedir=None):
     return self._get_fs(basedir).mkswap(filename, subdir, suffix, basedir)
+
+  def get_upload_chuck_size(self, path):
+    return self._get_fs(path).get_upload_chuck_size()
