@@ -16,102 +16,364 @@
 
 <%!
 from django.utils.translation import ugettext as _
+
+from dashboard.conf import HAS_SQL_ENABLED
+from desktop import conf
+from desktop.conf import USE_NEW_SIDE_PANELS
+from desktop.lib.i18n import smart_unicode
+from desktop.views import _ko
+
+from metadata.conf import has_navigator
 %>
 
 <%def name="contextPopover()">
-
-  <script type="text/html" id="context-contents-hive-template">
-    Hive: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  <script type="text/html" id="context-popover-footer">
+    <div class="context-popover-flex-bottom-links">
+      <div class="context-popover-link-row">
+        <a class="inactive-action pointer" data-bind="visible: showInAssistEnabled && (isTable || isColumn), click: function() { huePubSub.publish('context.popover.show.in.assist') }">
+          <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
+        </a>
+        % if HAS_SQL_ENABLED.get():
+        <a class="inactive-action pointer" data-bind="visible: (typeof isTable !== 'undefined' && isTable) || (typeof isView !== 'undefined' && isView) || (typeof isDatabase !== 'undefined' && isDatabase), click: function() { huePubSub.publish('context.popover.open.in.dashboard') }">
+          <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
+        </a>
+        % endif
+        <a class="inactive-action pointer" data-bind="visible: (typeof isTable !== 'undefined' && isTable) || (typeof isView !== 'undefined' && isView) || (typeof isDatabase !== 'undefined' && isDatabase), click: function() { huePubSub.publish('context.popover.open.in.metastore', isTable ? 'table' : 'db') }">
+          <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
+        </a>
+        <a class="inactive-action pointer" data-bind="visible: typeof isHdfs !== 'undefined' && isHdfs, click: function() { huePubSub.publish('context.popover.replace.in.editor') }">
+          <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
+        </a>
+        <a class="inactive-action pointer" data-bind="visible: typeof isHdfs !== 'undefined' && isHdfs, click: function() { huePubSub.publish('context.popover.open.in.file.browser') }">
+          <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }
+        </a>
+        <!-- ko if: typeof isAsterisk !== 'undefined' && isAsterisk -->
+        <!-- ko with: contents.data -->
+        <!-- ko if: selectedColumns().length > 0 -->
+        <a class="inactive-action pointer" data-bind="click: expand">${ _("Expand to selected columns") }</a>
+        <!-- /ko -->
+        <!-- ko if: selectedColumns().length === 0 -->
+        <a class="inactive-action pointer" data-bind="click: expand">${ _("Expand to all columns") }</a>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
   </script>
 
-  <script type="text/html" id="context-contents-impala-template">
-    Impala: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  <script type="text/html" id="context-popover-columns">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData">
+      <!-- ko component: { name: 'sql-columns-table', params: { columns: extended_columns } } --><!-- /ko -->
+    </div>
   </script>
 
-  <script type="text/javascript">
-    (function () {
-      function ContextContentsHive() {
-        var self = this;
-      }
-
-      function ContextContentsImpala() {
-        var self = this;
-      }
-
-      ko.components.register('context-contents-hive', {
-        viewModel: ContextContentsHive,
-        template: { element: 'context-contents-hive-template' }
-      });
-
-      ko.components.register('context-contents-impala', {
-        viewModel: ContextContentsImpala,
-        template: { element: 'context-contents-impala-template' }
-      });
-    })();
+  <script type="text/html" id="context-popover-table-details">
+    <!-- ko with: fetchedData -->
+    <div class="context-popover-table-details">
+      <!-- ko if: details && details.properties -->
+      <div class="context-popover-header">${ _("Properties") }</div>
+      <div class="context-popover-section">
+        <span style="margin-right: 5px;" title="${ _('Owner') }">
+          <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
+        </span>
+        <span style="margin-right: 5px;" title="${ _('Created') }">
+          <i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(details.properties.create_time)"></span>
+        </span>
+        <span style="margin-right: 5px;" title="${ _('Format') }">
+          <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
+        </span>
+        <span style="margin-right: 5px; white-space: nowrap" title="${ _('Type') }">
+          <i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.table_type === 'MANAGED_TABLE'" style="display:none;">${_('Managed')}</span><span data-bind="visible: !details.stats.table_type === 'EXTERNAL_TABLE'" style="display:none;">${_('External')}</span>
+        </span>
+      </div>
+      <!-- /ko -->
+      <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
+      <div class="context-popover-header">${ _("Comment") }</div>
+      <div class="context-popover-section" style="font-style: italic;" data-bind="text: comment"></div>
+      <!-- /ko -->
+      %if has_navigator(user):
+        <!-- ko if: $parent.sourceType === 'hive' || $parent.sourceType === 'impala' -->
+        <div class="context-popover-header">${ _("Tags") }</div>
+        <div class="context-popover-section" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+        <!-- /ko -->
+      %endif
+      <!-- ko if: typeof viewSql !== 'undefined' -->
+      <div class="context-popover-header">${ _("View SQL") }</div>
+      <!-- ko hueSpinner: { spin: loadingViewSql, center: true, size: 'large' } --><!-- /ko -->
+      <!-- ko ifnot: loadingViewSql -->
+      <div class="context-popover-section" class="pointer" title="${ _("Click to copy") }" data-bind="tooltip: { placement: 'bottom' }, clickToCopy: viewSql, click: function () { huePubSub.publish('context.popover.hide'); }, highlight: { value: viewSql, formatted: true, dialect: $parent.sourceType }"></div>
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
+    <!-- /ko -->
   </script>
 
-  <script type="text/html" id="context-contents-hdfs-template">
-    HDFS: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  <script type="text/html" id="context-popover-column-details">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData, nicescroll">
+      <div>
+        <div style="margin: 0 0 5px 10px;"><a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('context.popover.scroll.to.column', name); }"></a> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko --></div>
+        <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
+        <div class="context-popover-header">${ _("Comment") }</div>
+        <div class="context-popover-section" data-bind="text: comment"></div>
+        <!-- /ko -->
+        %if has_navigator(user):
+          <!-- ko if: $parent.sourceType === 'hive' || $parent.sourceType === 'impala' -->
+          <div class="context-popover-header">${ _("Tags") }</div>
+          <div class="context-popover-section" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+          <!-- /ko -->
+        %endif
+      </div>
+    </div>
   </script>
 
-  <script type="text/html" id="context-contents-s3-template">
-    S3: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  <script type="text/html" id="context-popover-complex-details">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData, nicescroll">
+      <div style="margin: 15px;">
+        <a class="pointer" data-bind="visible: typeof sample !== 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }, click: function() { huePubSub.publish('context.popover.scroll.to.column', name || $parents[2].title); }"></a>
+        <span data-bind="visible: typeof sample === 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }"></span> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko -->
+      </div>
+    </div>
   </script>
 
-  <script type="text/javascript">
-    (function () {
-      function ContextContentsHdfs() {
-        var self = this;
-      }
-
-      function ContextContentsS3() {
-        var self = this;
-      }
-
-      ko.components.register('context-contents-hdfs', {
-        viewModel: ContextContentsHdfs,
-        template: { element: 'context-contents-hdfs-template' }
-      });
-
-      ko.components.register('context-contents-s3', {
-        viewModel: ContextContentsS3,
-        template: { element: 'context-contents-s3-template' }
-      });
-    })();
+  <script type="text/html" id="context-popover-table-and-column-unknown">
+    <div class="context-popover-flex-fill">
+      <div style="margin: 15px;">
+        <div class="alert" data-bind="text: message"></div>
+      </div>
+    </div>
   </script>
 
-  <script type="text/html" id="context-contents-hue-template">
-    Hue: <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+  <script type="text/html" id="context-popover-table-and-column-sample">
+    <div class="context-popover-flex-fill context-popover-sample-container" data-bind="with: fetchedData">
+      <div class="context-popover-sample sample-scroll">
+        <!-- ko if: rows.length == 0 -->
+        <div class="alert">${ _('The selected table has no data.') }</div>
+        <!-- /ko -->
+        <!-- ko if: rows.length > 0 -->
+        <table id="samples-table" class="samples-table table table-condensed">
+          <thead>
+          <tr>
+            <th style="width: 10px">&nbsp;</th>
+            <!-- ko foreach: headers -->
+            <th data-bind="text: $data"></th>
+            <!-- /ko -->
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        <!-- /ko -->
+      </div>
+    </div>
   </script>
 
-  <script type="text/javascript">
-    (function () {
-      function ContextContentsHue() {
-        var self = this;
-      }
-
-      ko.components.register('context-contents-hue', {
-        viewModel: ContextContentsHue,
-        template: { element: 'context-contents-hue-template' }
-      });
-    })();
+  <script type="text/html" id="context-popover-table-analysis">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData, niceScroll">
+      <!-- ko if: stats.length > 0 -->
+        <table class="table table-condensed">
+          <tbody data-bind="foreach: stats">
+            <tr>
+              <td><strong data-bind="text: data_type"></strong></td>
+              <td data-bind="text: $parents[1].formatAnalysisValue(data_type, comment)"></td>
+            </tr>
+          </tbody>
+        </table>
+      <!-- /ko -->
+    </div>
   </script>
 
-  <script type="text/html" id="context-popover-contents">
-    <div class="context-popover-content"><a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a></div>
+  <script type="text/html" id="context-popover-column-analysis">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData, niceScroll">
+      <table class="table table-condensed">
+        <tbody data-bind="foreach: stats">
+          <tr>
+            <td><strong data-bind="text: Object.keys($data)[0]"></strong></td>
+            <td data-bind="text: $data[Object.keys($data)[0]]"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </script>
+
+  <script type="text/html" id="context-popover-database-details">
+    <div class="context-popover-flex-fill">
+      <div class="context-popover-flex">
+        <div data-bind="if: $parent.comment">
+          <div class="context-popover-header">${ _("Comment") }</div>
+          <div class="context-popover-section" style="font-style: italic;" data-bind="text: $parent.comment"></div>
+        </div>
+        <div class="context-popover-header">${_('Tags')}</div>
+        <div class="context-popover-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
+          <div data-bind="component: { name: 'nav-tags', params: $data } "></div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="context-popover-hdfs-details">
+    <div class="context-popover-flex-fill" data-bind="with: details, niceScroll">
+      <div style="padding: 8px">
+        <div style="margin: 10px 10px 18px 10px;">
+          <div data-bind="hdfsTree: { isS3: $data.path.indexOf('s3a://') === 0, path: $data.path, selectedPath: $parent.selectedPath }"></div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="context-popover-asterisk-details">
+    <div class="context-popover-flex-fill">
+      <!-- ko component: { name: 'sql-columns-table', params: { columns: columns, scrollToColumns: false } } --><!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/html" id="context-popover-function-details">
+    <!-- ko if: typeof details === 'undefined' -->
+    <div class="context-popover-flex-fill">
+      <div class="alert">${_('Could not find details for the function')} <span data-bind="text: $parents[2].title"></span>()</div>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: typeof details !== 'undefined' -->
+    <div class="context-popover-flex-fill" data-bind="with: details, niceScroll">
+      <div style="padding: 8px">
+        <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre;" class="monospace" data-bind="text: signature"></span></p>
+        <p><span data-bind="text: description"></span></p>
+      </div>
+    </div>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="context-popover-table-partitions">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData, niceScroll">
+      <div class="context-popover-header">${_('Columns')}</div>
+      <div>
+        <table class="table table-condensed table-nowrap">
+          <thead>
+          <tr>
+            <th style="width: 1%">&nbsp;</th>
+            <th>${_('Name')}</th>
+          </tr>
+          </thead>
+          <tbody data-bind="foreach: partition_keys_json">
+          <tr>
+            <td data-bind="text: $index() + 1"></td>
+            <td><a href="#" data-bind="text: $data, click: function() { huePubSub.publish('context.popover.scroll.to.column', $data); }"></a></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="context-popover-header">${_('Partitions')}</div>
+      <table class="table table-condensed table-nowrap">
+        <thead>
+          <tr>
+            <th style="width: 1%">&nbsp;</th>
+            <th>${_('Values')}</th>
+            <th>${_('Spec')}</th>
+            <th>${_('Browse')}</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: partition_values_json">
+          <tr>
+            <td data-bind="text: $index() + 1"></td>
+            <td><a href="#" data-bind="click: function () { window.open(readUrl, '_blank'); return false; }, text: '[\'' + columns.join('\',\'') + '\']'"></a></td>
+            <td data-bind="text: partitionSpec"></td>
+            <td>
+              <a href="#" data-bind="click: function () { window.open(readUrl, '_blank'); return false; }" title="${_('Data')}"><i class="fa fa-th"></i></a> <a href="#" data-bind="click: function () { window.open(browseUrl, '_blank'); return false; }" title="${_('Files')}"><i class="fa fa-file-o"></i></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </script>
+
+
+  <script type="text/html" id="generic-document-context-template">
+    <div style="width:100%; text-align: center; margin-top: 40px; font-size: 140px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
+    <div style="width: 100%; margin-top: 20px; text-align:center">
+      <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
+      <br/>
+      <span data-bind="text: DocumentTypeGlobals[type] || type"></span>
+      <!-- ko if: description -->
+      <br/><br/><span data-bind="text: description"></span>
+      <!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/html" id="context-document-details">
+    <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="niceScroll">
+      <div style="padding: 8px">
+        <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
+        <!-- ko with: documentContents -->
+        <!-- ko foreach: snippets -->
+        <div data-bind="highlight: { value: statement, formatted: true, dialect: type }"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: typeof documentContents() === 'undefined' || typeof documentContents().snippets === 'undefined' -->
+        <div style="width: 100%;" data-bind="template: { name: 'generic-document-context-template', data: details }"></div>
+        <!-- /ko -->
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="context-popover-template">
-    <div class="hue-popover hue-context-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
+    <div class="hue-popover" data-bind="css: orientationClass, style: { 'left': left() + 'px', 'top': top() + 'px', 'width': width() + 'px', height: height() + 'px' }, resizable: { containment: 'document', handles: resizeHelper.resizableHandles, start: resizeHelper.resizeStart, stop: resizeHelper.resizeStop, resize: resizeHelper.resize }">
       <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
-      <div class="hue-popover-title context-popover-title">
-        <div class="context-popover-breadcrumbs" data-bind="component: { name: 'hue-breadcrumbs', params: { breadcrumbs: breadcrumbs, onSelect: onBreadcrumbSelect } }"></div>
-        <div class="context-popover-close">
+      <div class="hue-popover-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 30px;">
+        <i class="fa muted" data-bind="css: iconClass" style="margin-top: 3px"></i> <span style="padding-left: 4px;" data-bind="text: title"></span>
+        <div style="position: absolute; right: 6px; top: 8px;">
+          <a class="pointer inactive-action" data-bind="visible: pinEnabled, click: pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
           <a class="pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
         </div>
       </div>
-      <!-- ko with: activeEntry -->
-      <!-- ko component: { name: 'context-contents-' + sourceType, params: { data: $data } } --><!-- /ko -->
+      <!-- ko template: 'context-popover-contents' --><!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/html" id="context-popover-contents">
+    <div class="context-popover-content">
+      <!-- ko with: contents -->
+      <!-- ko if: typeof tabs !== 'undefined' -->
+      <ul class="nav nav-tabs context-popover-tabs" data-bind="foreach: tabs">
+        <li data-bind="click: function () { $parent.activeTab(id); }, css: { 'active' : $parent.activeTab() === id }">
+          <a class="context-popover-tab" data-toggle="tab" data-bind="text: label, attr: { href: '#' + id }"></a>
+        </li>
+      </ul>
+      <div class="context-popover-tab-container" data-bind="foreach: tabs">
+        <div class="context-popover-tab-pane tab-pane" data-bind="visible : $parent.activeTab() === id, attr: { id: id }, css: { 'active' : $parent.activeTab() === id }">
+          <div class="context-popover-flex">
+            <!-- ko with: templateData -->
+            <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
+            <!-- ko if: ! loading() && hasErrors() -->
+            <div class="context-popover-flex-fill">
+                <div class="alert">
+                <span data-bind="text: $parent.errorText"></span>
+                <!-- ko if: $parent.enableSampleError && $parent.activeTab() === 'sample' -->
+                <a href="javascript:void(0);" data-bind="click: function(){ huePubSub.publish('sample.error.insert.click', $data); huePubSub.publish('context.popover.hide');}">${_('Insert ')}<span data-bind="text:$parent.title"></span> ${_(' sample query')}</a> ${_('at cursor')}
+                <!-- /ko -->
+                </div>
+            </div>
+            <!-- /ko -->
+            <!-- ko if: ! loading() && ! hasErrors() -->
+            <!-- ko template: { name: $parent.template } --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko template: { name: 'context-popover-footer', data: $parents[1] } --><!-- /ko -->
+          </div>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- ko if: typeof tabs === 'undefined' -->
+      <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
+      <!-- ko if: !loading() && hasErrors() -->
+      <div class="context-popover-flex-fill">
+        <div class="alert" data-bind="text: errorText"></div>
+      </div>
+      <!-- /ko -->
+      <!-- ko if: !loading() && !hasErrors() -->
+      <!-- ko template: { name: template } --><!-- /ko -->
+      <!-- /ko -->
+      <!-- ko template: { name: 'context-popover-footer' } --><!-- /ko -->
+      <!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -119,40 +381,664 @@ from django.utils.translation import ugettext as _
   <script type="text/javascript">
     (function () {
 
-      var CONTEXT_POPOVER_ID = 'contextPopover';
       var HALF_SIZE_LIMIT_X = 130;
       var HALF_SIZE_LIMIT_Y = 100;
       var HALF_ARROW = 6;
 
       var preventHide = false;
-      var intervals = [];
-      var pubSubs = [];
 
       var hidePopover = function () {
         if (! preventHide) {
-          if ($('#' + CONTEXT_POPOVER_ID).length > 0) {
-            ko.cleanNode($('#' + CONTEXT_POPOVER_ID)[0]);
-            huePubSub.publish('context.popover.dispose');
-            $('#' + CONTEXT_POPOVER_ID).remove();
+          if ($('#contextPopover').length > 0) {
+            ko.cleanNode($('#contextPopover')[0]);
+            $('#contextPopover').remove();
             $(document).off('click', hideOnClickOutside);
-            while (intervals.length > 0) {
-              window.clearInterval(intervals.pop());
-            }
-            while (pubSubs.length > 0) {
-              pubSubs.pop().remove();
-            }
             huePubSub.publish('context.popover.hidden');
           }
         }
       };
 
       var hideOnClickOutside = function (event) {
-        if (jQuery.contains(document, event.target) && !$.contains($('#' + CONTEXT_POPOVER_ID)[0], event.target) && ($('.modal')[0].length === 0 || !$.contains($('.modal')[0], event.target))) {
+        if (jQuery.contains(document, event.target) && !$.contains($('#contextPopover')[0], event.target) && ($('.modal')[0].length === 0 || !$.contains($('.modal')[0], event.target))) {
           hidePopover();
         }
       };
 
-      function ResizeHelper(orientation, leftAdjust, topAdjust) {
+      function GenericTabContents(identifierChain, sourceType, defaultDatabase, apiFunction, parent) {
+        var self = this;
+        self.identifierChain = identifierChain;
+        self.sourceType = sourceType;
+        self.defaultDatabase = defaultDatabase;
+        self.apiHelper = ApiHelper.getInstance();
+        self.apiFunction = apiFunction;
+        self.parent = parent;
+
+        self.fetchedData = ko.observable();
+        self.loading = ko.observable(false);
+        self.hasErrors = ko.observable(false);
+      }
+
+      GenericTabContents.prototype.formatAnalysisValue = function (type, val) {
+        if (type === 'last_modified_time' || type === 'transient_lastDdlTime') {
+          return localeFormat(val * 1000);
+        }
+        if (type.toLowerCase().indexOf('size') > -1) {
+          return filesize(val);
+        }
+        return val;
+      };
+
+      GenericTabContents.prototype.fetch = function (callback) {
+        var self = this;
+        if (self.loading()) {
+          return;
+        }
+        self.loading(true);
+        self.hasErrors(false);
+
+        self.apiFunction.bind(self.apiHelper)({
+          sourceType: self.sourceType,
+          identifierChain: self.identifierChain,
+          defaultDatabase: self.defaultDatabase,
+          silenceErrors: true,
+          successCallback: function (data) {
+            if (data.code === 500) {
+              self.loading(false);
+              self.hasErrors(true);
+              if (data.notFound) {
+                self.parent.notFound(data);
+              }
+              return;
+            }
+            if (typeof data.extended_columns !== 'undefined') {
+              data.extended_columns.forEach(function (column) {
+                column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
+                if (column.type.indexOf('<') !== -1) {
+                  column.type = column.type.substring(0, column.type.indexOf('<'));
+                }
+              });
+            }
+            if (typeof data.properties !== 'undefined') {
+              data.properties.forEach(function (property) {
+                if (property.col_name.toLowerCase() === 'view original text:') {
+                  data.viewSql = ko.observable();
+                  data.loadingViewSql = ko.observable(true);
+                  ApiHelper.getInstance().formatSql(property.data_type).done(function (formatResponse) {
+                    if (formatResponse.status == 0) {
+                      data.viewSql(formatResponse.formatted_statements);
+                    } else {
+                      data.viewSql(property.data_type);
+                    }
+                  }).fail(function () {
+                    data.viewSql(property.data_type);
+                  }).always(function () {
+                    data.loadingViewSql(false);
+                  })
+                }
+              })
+            }
+            self.fetchedData(data);
+            self.loading(false);
+            if (typeof callback === 'function') {
+              callback(data);
+            }
+          },
+          errorCallback: function () {
+            self.loading(false);
+            self.hasErrors(true);
+          }
+        });
+      };
+
+
+      function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn, isComplex) {
+        var self = this;
+        self.tabs = ko.observableArray();
+        self.disposals = [];
+
+        var apiHelper = ApiHelper.getInstance();
+
+        self.columns = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete, self);
+        self.columnDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete, self);
+        self.tableDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis, self);
+        self.sample = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples, self);
+        self.analysis = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis, self);
+        self.partitions = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions, self);
+
+        self.hasErrors = false;
+        self.isTable = !isColumn && !isComplex;
+
+        self.title = data.identifierChain[data.identifierChain.length - 1].name;
+
+        self.activeTab = ko.observable();
+
+        self.activeTab.subscribe(function (newValue) {
+          if (newValue === 'sample') {
+            if (typeof self.sample.fetchedData() === 'undefined') {
+              if (!isComplex) {
+                self.sample.fetch(self.initializeSamplesTable);
+              } else {
+                var data = self.columnDetails.fetchedData();
+                var rows = [];
+                data.sample.forEach(function (sample) {
+                  rows.push([sample]);
+                });
+                self.sample.fetchedData({
+                  headers: [ data.name || self.title ],
+                  rows: rows
+                });
+                self.initializeSamplesTable(self.sample.fetchedData());
+              }
+            }
+          } else if (newValue === 'complexDetails') {
+            if (typeof self.columnDetails.fetchedData() === 'undefined') {
+              self.columnDetails.fetch(function (data) {
+                if (data.sample) {
+                  self.tabs.push({
+                    id: 'sample',
+                    label: '${ _("Sample") }',
+                    template: 'context-popover-table-and-column-sample',
+                    templateData: self.sample,
+                    errorText: '${ _("There was a problem loading the samples.") }'
+                  });
+                }
+              })
+            }
+          } else if (!self.hasErrors && typeof self[newValue].fetchedData() === 'undefined') {
+            self[newValue].fetch();
+          }
+        });
+
+        if (isColumn) {
+          self.tabs.push({
+            id: 'columnDetails',
+            label: '${ _("Details") }',
+            template: 'context-popover-column-details',
+            templateData: self.columnDetails,
+            errorText: '${ _("There was a problem loading the column details.") }',
+            isColumn: true
+          });
+          self.activeTab('columnDetails');
+        } else if (isComplex) {
+          self.tabs.push({
+            id: 'complexDetails',
+            label: '${ _("Details") }',
+            template: 'context-popover-complex-details',
+            templateData: self.columnDetails,
+            errorText: '${ _("There was a problem loading the details.") }',
+            isColumn: false
+          });
+          self.activeTab('complexDetails');
+        } else {
+          self.tabs.push({
+            id: 'columns',
+            label: '${ _("Columns") }',
+            template: 'context-popover-columns',
+            templateData: self.columns,
+            errorText: '${ _("There was a problem loading the columns.") }',
+            isColumn: false
+          });
+          self.tabs.push({
+            id: 'tableDetails',
+            label: '${ _("Details") }',
+            template: 'context-popover-table-details',
+            templateData: self.tableDetails,
+            errorText: '${ _("There was a problem loading the table details.") }',
+            isColumn: false
+          });
+          self.activeTab('columns');
+        }
+
+        if (!isComplex) {
+          self.tabs.push({
+            id: 'sample',
+            label: '${ _("Sample") }',
+            template: 'context-popover-table-and-column-sample',
+            templateData: self.sample,
+            errorText: '${ _("There was a problem loading the samples.") }',
+            isColumn: isColumn,
+            title: self.title,
+            enableSampleError: true
+          });
+        }
+
+        if (isColumn) {
+          self.columnDetails.fetch(function (data) {
+            self.tabs.push({
+              id: 'analysis',
+              label: '${ _("Analysis") }',
+              template: 'context-popover-column-analysis',
+              templateData: self.analysis,
+              errorText: '${ _("There was a problem loading the column analysis.") }',
+              isColumn: true
+            });
+          });
+        } else if (!isComplex) {
+          self.tableDetails.fetch(function (data) {
+            if (data.partition_keys.length === 0) {
+              self.tabs.push({
+                id: 'analysis',
+                label: '${ _("Analysis") }',
+                template: 'context-popover-table-analysis',
+                templateData: self.analysis,
+                errorText: '${ _("There was a problem loading the table analysis.") }',
+                isColumn: false
+              });
+            } else if (data.partition_keys.length > 0) {
+              self.tabs.push({
+                id: 'partitions',
+                label: '${ _("Partitions") }',
+                template: 'context-popover-table-partitions',
+                templateData: self.partitions,
+                errorText: '${ _("There was a problem loading the table partitions.") }',
+                isColumn: false
+              });
+            }
+          });
+        }
+
+        var sampleInterval = window.setInterval(function () {
+          if (self.activeTab() !== 'sample') {
+            return;
+          }
+          var $t = $('.samples-table');
+          if ($t.length === 0) {
+            return;
+          }
+
+          $t.parents('.dataTables_wrapper').getNiceScroll().resize();
+        }, 300);
+
+        self.disposals.push(function () {
+          window.clearInterval(sampleInterval);
+        });
+
+        var performScrollToColumn = function (colName) {
+          self.activeTab('sample');
+          window.setTimeout(function () {
+            var _t = $('.samples-table');
+            var _col = _t.find("th").filter(function () {
+              return $.trim($(this).text()).endsWith(colName);
+            });
+            _t.find(".columnSelected").removeClass("columnSelected");
+            var _colSel = _t.find("tr th:nth-child(" + (_col.index() + 1) + ")");
+            if (_colSel.length > 0) {
+              _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
+              _t.parent().animate({
+                scrollLeft: _colSel.position().left + _t.parent().scrollLeft() - _t.parent().offset().left - 30
+              }, 300, function(){
+                _t.data('scrollToCol', _col.index());
+                _t.data('scrollToRow', null);
+                _t.data('scrollAnimate', true);
+                _t.data('scrollInPopover', true);
+                _t.parent().trigger('scroll');
+              });
+            }
+          }, 0);
+        };
+
+        var scrollPubSub = huePubSub.subscribe('context.popover.scroll.to.column', function (colName) {
+          if (typeof self.sample.fetchedData() === 'undefined') {
+            self.activeTab('sample');
+            self.sample.fetch(function (data) {
+              self.initializeSamplesTable(data);
+              window.setTimeout(function () {
+                performScrollToColumn(colName);
+              }, 0);
+            });
+          } else {
+            performScrollToColumn(colName);
+          }
+        });
+        self.disposals.push(function () {
+          scrollPubSub.remove();
+        });
+
+        apiHelper.identifierChainToPath({
+          sourceType: sourceType,
+          defaultDatabase: defaultDatabase,
+          identifierChain: data.identifierChain
+        }, function (path) {
+          var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
+            huePubSub.publish('assist.db.highlight', {
+              sourceType: sourceType,
+              path: path
+            });
+          });
+          self.disposals.push(function () {
+            showInAssistPubSub.remove();
+          })
+        });
+
+        self.initializeSamplesTable = function (data) {
+          window.setTimeout(function () {
+            var $t = $('.samples-table');
+
+            if ($t.parent().hasClass('dataTables_wrapper')) {
+              if ($t.parent().data('scrollFnDt')) {
+                $t.parent().off('scroll', $t.parent().data('scrollFnDt'));
+              }
+              $t.unwrap();
+              if ($t.children('tbody').length > 0) {
+                $t.children('tbody').empty();
+              } else {
+                $t.children('tr').remove();
+              }
+              $t.data('isScrollAttached', null);
+              $t.data('data', []);
+            }
+            var dt = $t.hueDataTable({
+              i18n: {
+                NO_RESULTS: "${_('No results found.')}",
+                OF: "${_('of')}"
+              },
+              fnDrawCallback: function (oSettings) {
+              },
+              scrollable: '.dataTables_wrapper',
+              forceInvisible: 10
+            });
+
+            $t.parents('.dataTables_wrapper').height($t.parents('.sample-scroll').parent().height());
+
+            $t.jHueTableExtender2({
+              fixedHeader: true,
+              fixedFirstColumn: true,
+              fixedFirstColumnTopMargin: -2,
+              headerSorting: false,
+              includeNavigator: false,
+              parentId: 'sampleTab',
+              noSort: true,
+              mainScrollable: '.sample-scroll > .dataTables_wrapper'
+            });
+
+            huePubSub.subscribe('context.popover.resized', function () {
+              $t.parent().height($t.parents('.context-popover-sample-container').height());
+            });
+
+            self.disposals.push(function () {
+              if ($t.data('plugin_jHueTableExtender2')) {
+                $t.data('plugin_jHueTableExtender2').destroy();
+              }
+              huePubSub.removeAll('context.popover.resized');
+            });
+
+            hueUtils.initNiceScroll($t.parents('.dataTables_wrapper'));
+
+            if (data && data.rows) {
+              var _tempData = [];
+              $.each(data.rows, function (index, row) {
+                var _row = row.slice(0); // need to clone the array otherwise it messes with the caches
+                _row.unshift(index + 1);
+                _tempData.push(_row);
+              });
+              if (_tempData.length > 0) {
+                dt.fnAddData(_tempData);
+              }
+            }
+          }, 0);
+        };
+      }
+
+      TableAndColumnContextTabs.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
+
+      TableAndColumnContextTabs.prototype.notFound = function (data) {
+        var self = this;
+        self.hasErrors = true;
+        var message;
+        if (data.error && data.error.indexOf('10001]:') !== -1) {
+          message = data.error.substring(data.error.indexOf('10001]:') + 8);
+        } else {
+          message = '${ _("Could not load") }' + ': ' + self.title
+        }
+        self.tabs([{
+          id: 'notFound',
+          label: '${ _("Details") }',
+          templateData: {
+            loading: ko.observable(false),
+            hasErrors: ko.observable(false),
+            message: message
+          },
+          template: 'context-popover-table-and-column-unknown',
+          title: self.title
+        }]);
+        self.activeTab('notFound');
+      };
+
+      TableAndColumnContextTabs.prototype.refetchSamples = function () {
+        var self = this;
+        self.sample.fetch(self.initializeSamplesTable);
+      };
+
+      function DatabaseContextTabs(data, sourceType, defaultDatabase) {
+        var self = this;
+        self.dbComment = ko.observable('');
+        var dbName = data.identifierChain[data.identifierChain.length - 1].name;
+        $.getJSON('/metastore/databases/' + dbName + '/metadata', function (data) {
+          if (data && data.status == 0 && data.data.comment) {
+              self.dbComment(data.data.comment);
+          }
+        });
+        self.tabs = [
+          { id: 'details', label: '${ _("Details") }', comment : self.dbComment, template: 'context-popover-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, ApiHelper.getInstance().fetchAutocomplete) }
+        ];
+        self.activeTab = ko.observable('details');
+      }
+
+      function AsteriskData(data, sourceType, defaultDatabase) {
+        var self = this;
+        self.loading = ko.observable(true);
+        self.hasErrors = ko.observable(false);
+        self.columns = [];
+
+        self.selectedColumns = ko.pureComputed(function () {
+          return self.columns.filter(function (column) {
+            return column.selected();
+          });
+        });
+
+        self.expand = function () {
+          var colsToExpand = self.selectedColumns().length === 0 ? self.columns : self.selectedColumns();
+          var colIndex = {};
+          var colsTableMap = {};
+          self.columns.forEach(function (col) {
+            if (colsTableMap[col.name]) {
+              colsTableMap[col.name].push(col.table);
+            }
+            else {
+              colsTableMap[col.name] = [col.table];
+            }
+          });
+          colsToExpand.forEach(function (col) {
+            if (colIndex[col.name]) {
+              colIndex[col.name]++;
+            } else {
+              colIndex[col.name] = 1;
+            }
+          });
+          Object.keys(colIndex).forEach(function (name) {
+            if (colIndex[name] === 1 && colsTableMap[name].length === 1) {
+              delete colIndex[name];
+            }
+          });
+          var sqlAutocompleter = new SqlAutocompleter2({
+            snippet: {
+              type: function () {
+                return sourceType;
+              }
+            }
+          });
+          huePubSub.publish('ace.replace', {
+            location: data.location,
+            text: $.map(colsToExpand, function (column) {
+              if (column.tableAlias) {
+                return sqlAutocompleter.backTickIfNeeded(column.tableAlias) + '.' + sqlAutocompleter.backTickIfNeeded(column.name);
+              }
+              if (colIndex[column.name]) {
+                return sqlAutocompleter.backTickIfNeeded(column.table) + '.' + sqlAutocompleter.backTickIfNeeded(column.name);
+              }
+              return sqlAutocompleter.backTickIfNeeded(column.name)
+            }).join(', ')
+          });
+          huePubSub.publish('context.popover.hide');
+        };
+
+        var apiHelper = ApiHelper.getInstance();
+        var deferrals = [];
+        data.tables.forEach(function (table) {
+          if (table.identifierChain) {
+            var fetchDeferred = $.Deferred();
+            deferrals.push(fetchDeferred);
+            apiHelper.fetchAutocomplete({
+              sourceType: sourceType,
+              defaultDatabase: defaultDatabase,
+              identifierChain: table.identifierChain,
+              successCallback: function (data) {
+                if (typeof data.extended_columns !== 'undefined') {
+                  data.extended_columns.forEach(function (column) {
+                    column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
+                    if (column.type.indexOf('<') !== -1) {
+                      column.type = column.type.substring(0, column.type.indexOf('<'));
+                    }
+                    column.selected = ko.observable(false);
+                    column.table = table.identifierChain[table.identifierChain.length - 1].name;
+                    if (table.alias) {
+                      column.tableAlias = table.alias
+                    }
+                  });
+                }
+                self.columns = self.columns.concat(data.extended_columns);
+                fetchDeferred.resolve();
+              },
+              silenceErrors: true,
+              errorCallback: fetchDeferred.reject
+            })
+          }
+        });
+
+        if (deferrals.length === 0) {
+          self.loading(false);
+        }
+        $.when.apply($, deferrals).done(function () {
+          self.loading(false);
+        }, function () {
+          if (self.columns.length === 0) {
+            self.hasErrors(true);
+          }
+        });
+      }
+
+      function AsteriskContextTabs(data, sourceType, defaultDatabase) {
+        var self = this;
+        self.data = new AsteriskData(data, sourceType, defaultDatabase);
+
+        self.tabs = [
+          { id: 'details', label: '${ _("Details") }', template: 'context-popover-asterisk-details', templateData: self.data }
+        ];
+        self.activeTab = ko.observable('details');
+      }
+
+      function HdfsContextTabs(data) {
+        var self = this;
+
+        self.disposals = [];
+
+        // TODO: Update Ace token with selected path
+        self.data = ko.observable({
+          details: data,
+          loading: ko.observable(false),
+          hasErrors: ko.observable(false),
+          selectedPath: ko.observable(data.path)
+        });
+
+        var showInFileBrowserPubSub = huePubSub.subscribe('context.popover.open.in.file.browser', function () {
+          window.open((data.path.indexOf('/') === 0 ? '/filebrowser/#' : '/filebrowser/#/') + data.path, '_blank');
+        });
+
+        self.disposals.push(function () {
+          showInFileBrowserPubSub.remove();
+        });
+
+        var replaceInEditorPubSub = huePubSub.subscribe('context.popover.replace.in.editor', function () {
+          huePubSub.publish('ace.replace', {
+            location: data.location,
+            text: self.data().selectedPath()
+          });
+        });
+        self.disposals.push(function () {
+          replaceInEditorPubSub.remove();
+        });
+
+        self.tabs = [
+          { id: 'details', label: '${ _("Details") }', template: 'context-popover-hdfs-details', templateData: self.data }
+        ];
+        self.activeTab = ko.observable('details');
+      }
+
+      HdfsContextTabs.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
+
+      function FunctionContextTabs(data, sourceType) {
+        var self = this;
+        self.func = ko.observable({
+          details: SqlFunctions.findFunction(sourceType, data.function),
+          loading: ko.observable(false),
+          hasErrors: ko.observable(false)
+        });
+
+        self.tabs = [
+          { id: 'details', label: '${ _("Details") }', template: 'context-popover-function-details', templateData: self.func }
+        ];
+        self.activeTab = ko.observable('details');
+      }
+
+      function DocumentContext(data) {
+        var self = this;
+
+        // Adapt some details to a common format, the global search endpoint has different structure than the docs one
+        self.details = {
+          type: data.type || data.doc_type,
+          name: data.name || data.hue_name,
+          link: data.absoluteUrl || data.link,
+          description: data.description || data.hue_description
+        };
+        self.data = data;
+        self.loading = ko.observable(true);
+        self.hasErrors = ko.observable(false);
+        self.errorText = ko.observable();
+        self.showInAssistEnabled = false; // TODO: Enable for documents
+        self.template = 'context-document-details';
+
+        self.documentContents = ko.observable();
+        self.loadDocument();
+      }
+
+      DocumentContext.prototype.loadDocument = function () {
+        var self = this;
+        self.hasErrors(false);
+        self.loading(true);
+        ApiHelper.getInstance().fetchDocument({
+          uuid: self.data.uuid,
+          fetchContents: true,
+          silenceErrors: true
+        }).done(function (response) {
+          self.documentContents(response.data);
+          self.loading(false);
+        }).fail(function (errorMessage) {
+          self.loading(false);
+          self.hasErrors(false); // Allows us to revert to a generic document panel in case it can't fetch it.
+        })
+      };
+
+      function ResizeHelper (orientation, leftAdjust, topAdjust) {
         var self = this;
 
         var apiHelper = ApiHelper.getInstance();
@@ -295,64 +1181,14 @@ from django.utils.translation import ugettext as _
         }
       }
 
-      var generateBreadcrumbs = function (params) {
-        if ((params.sourceType === 'hive' || params.sourceType === 'impala') && params.data.type !== 'hdfs') {
-          var breadcrumbs = [];
-          var currentPath = [];
-          params.data.identifierChain.forEach(function (identifier) {
-            currentPath.push(identifier.name);
-            breadcrumbs.push({
-              label: identifier.name,
-              sourceType: params.sourceType,
-              path: currentPath.concat(),
-              defaultDatabase: params.defaultDatabase
-            })
-          });
-          return breadcrumbs;
-        } else if (params.data && params.data.type === 'hdfs') {
-          var breadcrumbs = [];
-          var currentPath = [];
-          var type = 'hdfs';
-          if (/^s3a?:\/\//i.test(params.data.path)) {
-            type = 's3'
-          }
-          params.data.path.replace(/^[a-z0-9]+:\/\//i, '').split('/').forEach(function (pathPart) {
-            if (pathPart) {
-              currentPath.push(pathPart);
-              breadcrumbs.push({
-                label: pathPart,
-                sourceType: type,
-                path: currentPath.concat()
-              })
-            }
-          });
-          return breadcrumbs;
-        } else {
-          return [];
-        }
-      };
-
       function ContextPopoverViewModel(params) {
         var self = this;
-        self.disposalFunctions = [];
+        self.disposals = [];
 
         var apiHelper = ApiHelper.getInstance();
 
         self.left = ko.observable(0);
         self.top = ko.observable(0);
-
-        self.breadcrumbs = ko.observableArray(generateBreadcrumbs(params));
-        self.activeEntry = ko.observable(self.breadcrumbs()[self.breadcrumbs().length - 1]);
-
-        self.onBreadcrumbSelect = function (breadcrumb) {
-          var newBreadcrumbs = [];
-          self.breadcrumbs().every(function (existingBreadcrumb) {
-            newBreadcrumbs.push(existingBreadcrumb);
-            return existingBreadcrumb !== breadcrumb;
-          });
-          self.activeEntry(newBreadcrumbs[newBreadcrumbs.length - 1]);
-          self.breadcrumbs(newBreadcrumbs);
-        };
 
         self.showInAssistEnabled = typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true;
 
@@ -379,12 +1215,17 @@ from django.utils.translation import ugettext as _
           var $source = $(params.source.element);
           var originalSourceOffset = $source.offset();
           var currentSourceOffset;
-          intervals.push(window.setInterval(function () {
+
+          var detectMoveInterval = window.setInterval(function () {
             currentSourceOffset = $source.offset();
             if (currentSourceOffset.left !== originalSourceOffset.left || currentSourceOffset.top !== originalSourceOffset.top) {
               hidePopover();
             }
-          }, 200));
+          }, 200);
+
+          self.disposals.push(function () {
+            window.clearInterval(detectMoveInterval);
+          });
         }
 
         var windowWidth = $(window).width();
@@ -435,7 +1276,119 @@ from django.utils.translation import ugettext as _
             self.left(params.source.left - self.width());
         }
 
+        self.isDatabase = params.data.type === 'database';
+        self.isTable = params.data.type === 'table';
+        self.isColumn = params.data.type === 'column';
+        self.isComplex = params.data.type === 'complex';
+        self.isFunction = params.data.type === 'function';
+        self.isHdfs = params.data.type === 'hdfs';
+        self.isAsterisk = params.data.type === 'asterisk';
+        self.isView = params.data.type === 'view';
+        self.isDocument = params.data.type.toLowerCase() === 'hue';
+
+        if ((self.isColumn || self.isComplex) && self.data.tables && self.data.tables.length > 0) {
+          var identifierChain = self.data.identifierChain;
+          var foundTable = $.grep(self.data.tables, function (table) {
+            return hueUtils.equalIgnoreCase(table.alias, identifierChain[0].name) ||
+                    (table.identifierChain && hueUtils.equalIgnoreCase(table.identifierChain[table.identifierChain.length - 1].name, identifierChain[0].name));
+          });
+          if (foundTable.length === 1 && foundTable.identifierChain) {
+            identifierChain.shift();
+            identifierChain = foundTable.identifierChain.concat(identifierChain);
+            delete self.data.tables;
+          } else if (self.data.tables.length === 1 && self.data.tables[0].identifierChain) {
+            identifierChain = self.data.tables[0].identifierChain.concat(identifierChain);
+            delete self.data.tables;
+          }
+          self.data.identifierChain = identifierChain
+        }
+
+        self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isHdfs;
+
+        if (self.isTable || self.isView) {
+          self.title = $.map(self.data.identifierChain, function (identifier) { return identifier.name; }).join('.');
+          if (self.title.indexOf('.') === -1) {
+            self.title = self.defaultDatabase + '.' + self.title;
+          }
+        }
+
+        if (self.isDatabase) {
+          self.contents = new DatabaseContextTabs(self.data, self.sourceType, self.defaultDatabase);
+          self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          self.iconClass = 'fa-database';
+        } else if (self.isTable) {
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, false);
+          self.iconClass = 'fa-table'
+        } else if (self.isView) {
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, false);
+          self.iconClass = 'fa-eye'
+        } else if (self.isComplex) {
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, true);
+          self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          self.iconClass = 'fa-columns'
+        } else if (self.isColumn) {
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, true, false);
+          if (self.data.identifierChain.length > 1) {
+            self.title = self.data.identifierChain[self.data.identifierChain.length - 2].name + '.' + self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          } else {
+            self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          }
+          self.iconClass = 'fa-columns'
+        } else if (self.isFunction) {
+          self.contents = new FunctionContextTabs(self.data, self.sourceType);
+          self.title = self.data.function;
+          self.iconClass = 'fa-superscript'
+        } else if (self.isHdfs) {
+          self.contents = new HdfsContextTabs(self.data);
+          self.title = self.data.path;
+          self.iconClass = 'fa-folder-o'
+        } else if (self.isAsterisk) {
+          self.contents = new AsteriskContextTabs(self.data, self.sourceType, self.defaultDatabase);
+          self.title = '*';
+          self.iconClass = 'fa-table';
+        } else if (self.isDocument) {
+          self.contents = new DocumentContext(self.data.definition);
+          self.title = self.data.definition.name;
+          self.iconClass = 'fa-file-o';
+        } else {
+          self.title = '';
+          self.iconClass = 'fa-info'
+        }
         self.orientationClass = 'hue-popover-' + orientation;
+
+        if ((self.isDatabase || self.isTable || self.isView) && self.data.identifierChain) {
+          apiHelper.identifierChainToPath({
+            sourceType: self.sourceType,
+            identifierChain: self.data.identifierChain,
+            defaultDatabase: self.defaultDatabase
+          }, function (path) {
+
+            var showInMetastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function (type) {
+              if (IS_HUE_4) {
+                huePubSub.publish('open.link', '/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'));
+                huePubSub.publish('context.popover.hide');
+              } else {
+                window.open('/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'), '_blank');
+              }
+            });
+            self.disposals.push(function () {
+              showInMetastorePubSub.remove();
+            });
+            % if HAS_SQL_ENABLED.get():
+            var openInDashboardPubSub = huePubSub.subscribe('context.popover.open.in.dashboard', function () {
+              if (IS_HUE_4) {
+                huePubSub.publish('open.link', '/hue/dashboard/browse/' + path.join('.') + '?engine=' + self.sourceType);
+                huePubSub.publish('context.popover.hide');
+              } else {
+                window.open('/hue/dashboard/browse/' + path.join('.') + '?engine=' + self.sourceType, '_blank');
+              }
+            });
+            self.disposals.push(function () {
+              openInDashboardPubSub.remove();
+            });
+            % endif
+          });
+        }
 
         if (params.delayedHide) {
           var hideTimeout = -1;
@@ -460,7 +1413,7 @@ from django.utils.translation import ugettext as _
 
           $('.hue-popover').on('click', keepPopoverOpenOnClick);
 
-          self.disposalFunctions.push(function () {
+          self.disposals.push(function () {
             $(params.delayedHide).add($('.hue-popover')).off('mouseleave', onLeave).off('mouseenter', onEnter);
             $('.hue-popover').off('click', keepPopoverOpenOnClick);
           });
@@ -474,7 +1427,7 @@ from django.utils.translation import ugettext as _
 
         $(document).on('keyup', closeOnEsc);
 
-        self.disposalFunctions.push(function () {
+        self.disposals.push(function () {
           $(document).off('keyup', closeOnEsc);
         });
 
@@ -482,16 +1435,33 @@ from django.utils.translation import ugettext as _
           $(document).on('click', hideOnClickOutside);
         }, 0);
 
-        self.disposalFunctions.push(function () {
+        self.disposals.push(function () {
           $(document).off('click', hideOnClickOutside);
         })
       }
 
       ContextPopoverViewModel.prototype.dispose = function() {
         var self = this;
-        self.disposalFunctions.forEach(function (fn) {
-          fn();
-        })
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+
+        if(self.contents && self.contents.dispose) {
+          self.contents.dispose();
+        }
+        huePubSub.publish('context.popover.dispose');
+      };
+
+      ContextPopoverViewModel.prototype.pin = function () {
+        var self = this;
+        hidePopover();
+        if (typeof self.contents.sample !== 'undefined') {
+          self.contents.sample.fetchedData(undefined);
+        }
+        huePubSub.publish('sql.context.pin', self);
+        if (self.contents.activeTab() === 'sample') {
+          self.contents.refetchSamples();
+        }
       };
 
       ko.components.register('context-popover', {
@@ -503,10 +1473,174 @@ from django.utils.translation import ugettext as _
 
       huePubSub.subscribe('context.popover.show', function (details) {
         hidePopover();
-        var $contextPopover = $('<div id="' + CONTEXT_POPOVER_ID + '" data-bind="component: { name: \'context-popover\', params: $data }" />');
+        var $contextPopover = $('<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />');
         $('body').append($contextPopover);
         ko.applyBindings(details, $contextPopover[0]);
         huePubSub.publish('context.popover.shown');
+      });
+
+      var SqlContextContentsGlobalSearch = function (params) {
+        var self = this;
+        self.contents = undefined;
+
+        self.disposals = [];
+
+        self.showInAssistEnabled = true;
+
+        self.isDatabase = params.data.type.toLowerCase() === 'database';
+        self.isTable = params.data.type.toLowerCase() === 'table';
+        self.isColumn = params.data.type.toLowerCase() === 'field';
+        self.isView = params.data.type.toLowerCase() === 'view';
+        self.isDocument = params.data.type.toLowerCase() === 'hue';
+
+        // TODO: Handle HDFS, Complex and Function ?
+        self.isHdfs = false;
+        self.isAsterisk = false;
+        self.isComplex = false;
+        self.isFunction = false;
+
+        var adaptedData = { identifierChain: [] };
+
+        var path = params.data.originalName.split('.');
+        path.forEach(function (part) {
+          adaptedData.identifierChain.push({ name: part });
+        });
+
+        var metastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function () {
+          huePubSub.publish('open.link', '/metastore/table' + (self.isTable ? '/' : 's/') + path.join('/'));
+          params.globalSearch.close();
+        });
+
+        self.disposals.push(function () {
+          metastorePubSub.remove();
+        });
+
+
+        if (self.isDatabase) {
+          self.contents = new DatabaseContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default');
+        } else if (self.isTable) {
+          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', false, false);
+        } else if (self.isView) {
+          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', false, false);
+        } else if (self.isColumn) {
+          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', true, false);
+        } else if (self.isDocument) {
+          self.contents = new DocumentContext(params.data);
+        }
+      };
+
+      SqlContextContentsGlobalSearch.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+        if (self.contents && self.contents.dispose) {
+          self.contents.dispose();
+        }
+
+        huePubSub.publish('context.popover.dispose');
+      };
+
+      ko.components.register('context-popover-contents-global-search', {
+        viewModel: SqlContextContentsGlobalSearch,
+        template: { element: 'context-popover-contents' }
+      })
+    })();
+  </script>
+
+  <script type="text/html" id="sql-columns-table-template">
+    <div class="context-popover-flex">
+      <div class="context-popover-flex-header">
+        <div style="margin: 10px 5px 0 10px;">
+          <span class="context-popover-header">${_('Columns')} (<span data-bind="text: filteredColumns().length"></span>)</span>
+          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
+          <input class="input-large context-popover-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
+        </div>
+      </div>
+      <div class="context-popover-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
+        <table id="sqlColumnsTable" style="width: 100%" class="table table-condensed table-nowrap">
+          <!-- ko if: filteredColumns().length !== 0 -->
+          <thead>
+          <tr>
+            <th width="6%">&nbsp;</th>
+            <!-- ko if: typeof filteredColumns()[0].table === 'undefined' -->
+            <th width="60%">${_('Name')}</th>
+            <!-- /ko -->
+            <!-- ko if: typeof filteredColumns()[0].table !== 'undefined' -->
+            <th width="40%">${_('Name')}</th>
+            <th width="20%">${_('Table')}</th>
+            <!-- /ko -->
+            <th width="34%">${_('Type')}</th>
+            <th width="6%">&nbsp;</th>
+          </tr>
+          </thead>
+          <!-- /ko -->
+          <tbody data-bind="foreachVisible: { data: filteredColumns, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'context.popover.dispose' }">
+          <tr>
+            <!-- ko if: typeof selected === 'undefined' -->
+            <td data-bind="text: $index()+$indexOffset()+1"></td>
+            <!-- /ko -->
+            <!-- ko if: typeof selected !== 'undefined' -->
+            <td data-bind="toggle: selected" class="center" style="cursor: default;">
+              <div class="hueCheckbox fa" data-bind="multiCheck: '#sqlColumnsTable', css: {'fa-check': selected }"></div>
+            </td>
+
+            <!-- /ko -->
+            <td style="overflow: hidden;">
+              <!-- ko if: $parent.scrollToColumns -->
+              <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: function() { huePubSub.publish('context.popover.scroll.to.column', name); }" title="${ _("Show sample") }"></a>
+              <!-- /ko -->
+              <!-- ko ifnot: $parent.scrollToColumns -->
+              <span data-bind="text: name"></span>
+              <!-- /ko -->
+            </td>
+            <!-- ko if: typeof table !== 'undefined' -->
+            <td><span data-bind="text: table"></span></td>
+            <!-- /ko -->
+            <td><span data-bind="text: type, attr: { 'title': extendedType }, tooltip: { placement: 'bottom' }"></span></td>
+            <td><i class="snippet-icon fa fa-question-circle" data-bind="visible: comment, attr: { 'title': comment }, tooltip: { placement: 'bottom' }"></i></td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="context-popover-empty-columns" data-bind="visible: filteredColumns().length === 0">${_('No columns found')}</div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+
+      function SqlColumnsTable(params) {
+        var self = this;
+        var columns = params.columns;
+        self.scrollToColumns = typeof params.scrollToColumns !== 'undefined' ?  params.scrollToColumns : true;
+        self.searchInput = ko.observable('');
+        self.searchVisible = ko.observable(false);
+        self.searchFocus = ko.observable(false);
+
+        self.searchVisible.subscribe(function (newValue) {
+          if (newValue) {
+            self.searchFocus(true);
+          }
+        });
+
+        self.filteredColumns = ko.pureComputed(function () {
+          if (self.searchInput() === '') {
+            return columns;
+          }
+          var query = self.searchInput().toLowerCase();
+          return columns.filter(function (column) {
+            return column.name.toLowerCase().indexOf(query) != -1
+                || column.type.toLowerCase().indexOf(query) != -1
+                || column.comment.toLowerCase().indexOf(query) != -1
+                || (typeof column.table !== 'undefined' && column.table.toLowerCase().indexOf(query) !== -1);
+          })
+        });
+      }
+
+      ko.components.register('sql-columns-table', {
+        viewModel: SqlColumnsTable,
+        template: { element: 'sql-columns-table-template' }
       });
     })();
   </script>

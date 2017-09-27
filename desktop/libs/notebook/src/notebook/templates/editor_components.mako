@@ -846,7 +846,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko foreach: pinnedContextTabs -->
         <div class="tab-pane" style="height: 300px; position: relative; overflow: hidden;" data-bind="attr: { 'id': tabId }, css: {'active': $parent.currentQueryTab() === tabId }">
-          <div style="display: flex; flex-direction: column; margin-top: 10px; overflow: hidden; height: 100%; position: relative;" data-bind="template: 'sql-context-contents'"></div>
+          <div style="display: flex; flex-direction: column; margin-top: 10px; overflow: hidden; height: 100%; position: relative;" data-bind="template: 'context-popover-contents'"></div>
         </div>
         <!-- /ko -->
       </div>
