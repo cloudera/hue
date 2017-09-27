@@ -30,7 +30,7 @@ from metadata.conf import has_navigator
   <script type="text/html" id="context-popover-footer">
     <div class="context-popover-flex-bottom-links">
       <div class="context-popover-link-row">
-        <a class="inactive-action pointer" data-bind="visible: showInAssistEnabled && (isTable || isColumn), click: function() { huePubSub.publish('context.popover.show.in.assist') }">
+        <a class="inactive-action pointer" data-bind="visible: showInAssistEnabled && (isDatabase || isTable || isColumn), click: function() { huePubSub.publish('context.popover.show.in.assist') }">
           <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
         </a>
         % if HAS_SQL_ENABLED.get():
@@ -816,6 +816,7 @@ from metadata.conf import has_navigator
 
       function DatabaseContextTabs(data, sourceType, defaultDatabase) {
         var self = this;
+        self.disposals = [];
         self.dbComment = ko.observable('');
         var dbName = data.identifierChain[data.identifierChain.length - 1].name;
         $.getJSON('/metastore/databases/' + dbName + '/metadata', function (data) {
@@ -827,7 +828,25 @@ from metadata.conf import has_navigator
           { id: 'details', label: '${ _("Details") }', comment : self.dbComment, template: 'context-popover-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, ApiHelper.getInstance().fetchAutocomplete) }
         ];
         self.activeTab = ko.observable('details');
+
+        var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
+          huePubSub.publish('assist.db.highlight', {
+            sourceType: sourceType,
+            path: [ dbName ]
+          });
+        });
+
+        self.disposals.push(function () {
+          showInAssistPubSub.remove();
+        })
       }
+
+      DatabaseContextTabs.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
 
       function AsteriskData(data, sourceType, defaultDatabase) {
         var self = this;
