@@ -201,11 +201,7 @@ ${ hueIcons.symbols() }
         </div>
         <!-- /ko -->
 
-        % if conf.USE_NEW_GLOBAL_SEARCH.get():
-          <div class="search-container-top" data-bind="component: 'hue-global-search'"></div>
-        %else:
-          <div class="search-container-top-old" data-bind="component: 'hue-global-search-old'"></div>
-        % endif
+        <div class="search-container-top" data-bind="component: 'hue-global-search'"></div>
       </div>
 
       <div class="top-nav-right">

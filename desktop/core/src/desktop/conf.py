@@ -1319,13 +1319,6 @@ ENABLE_SQL_SYNTAX_CHECK = Config(
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
-USE_NEW_GLOBAL_SEARCH = Config(
-  key='use_new_global_search',
-  default=True,
-  type=coerce_bool,
-  help=_('Choose whether to use the new global search or not.')
-)
-
 USE_NEW_CONTEXT_POPOVER = Config( # To remove when the new context popover is ready
   key='use_new_context_popover',
   default=False,
