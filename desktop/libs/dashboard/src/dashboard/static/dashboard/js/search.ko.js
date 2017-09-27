@@ -658,10 +658,12 @@ var Collection = function (vm, collection) {
   }
 
   self._addObservablesToFacet = function(facet, vm) {
-    facet.properties.facets_form.metrics = ko.computed(function() {
-      var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
-      return self._get_field_operations(_field, facet);
-    });
+    if (facet.properties.facets_form) { // Only Solr 5+
+	  facet.properties.facets_form.metrics = ko.computed(function() {
+        var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
+        return self._get_field_operations(_field, facet);
+      });
+    }
 
     facet.properties.limit.subscribe(function () {
       vm.search();
