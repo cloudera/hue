@@ -44,15 +44,7 @@ var AssistS3Entry = (function () {
     self.currentPage = 1;
     self.hasMorePages = true;
 
-    self.isFilterVisible = ko.observable(false);
-    self.editingSearch = ko.observable(false);
     self.filter = ko.observable('').extend({ rateLimit: 400 });
-
-    self.isFilterVisible.subscribe(function (newValue) {
-      if (!newValue && self.filter()) {
-        self.filter('');
-      }
-    });
 
     self.filter.subscribe(function () {
       self.loadEntries();
@@ -76,12 +68,6 @@ var AssistS3Entry = (function () {
       return self.entries().length > 0;
     });
   }
-
-  AssistS3Entry.prototype.toggleSearch = function () {
-    var self = this;
-    self.isFilterVisible(!self.isFilterVisible());
-    self.editingSearch(self.isFilterVisible());
-  };
 
   AssistS3Entry.prototype.dblClick = function () {
     var self = this;
@@ -126,7 +112,7 @@ var AssistS3Entry = (function () {
     self.apiHelper.fetchS3Path({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
-      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
+      filter: self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback
@@ -218,7 +204,7 @@ var AssistS3Entry = (function () {
     self.apiHelper.fetchS3Path({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
-      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
+      filter: self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: function (data) {
         self.hasMorePages = data.page.next_page_number > self.currentPage;

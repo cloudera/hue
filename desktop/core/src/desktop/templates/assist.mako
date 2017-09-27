@@ -320,7 +320,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
   <script type="text/html" id="assist-s3-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.s3.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -343,8 +342,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- /ko -->
       <!-- ko template: 'assist-s3-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-file-search" data-bind="visible: isFilterVisible()">
-      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, hasFocus: editingSearch, value: filter, valueUpdate: 'afterkeydown'"/></div>
+    <div class="assist-flex-search" data-bind="visible: !loading() && !hasErrors()">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-s3-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
@@ -462,7 +461,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/html" id="assist-hdfs-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=' + path,
             params: { dest: path },
@@ -478,7 +476,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/html" id="assist-adls-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" data-bind="dropzone: {
             url: '/filebrowser/upload/file?dest=adl:/' + path,
             params: { dest: path },
@@ -509,8 +506,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- /ko -->
       <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-hdfs-search" data-bind="visible: isFilterVisible()">
-      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, hasFocus: editingSearch, value: filter, valueUpdate: 'afterkeydown'"/></div>
+    <div class="assist-flex-search">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-hdfs-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
@@ -566,8 +563,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- /ko -->
       <!-- ko template: 'assist-adls-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-hdfs-search" data-bind="visible: isFilterVisible()">
-      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, hasFocus: editingSearch, value: filter, valueUpdate: 'afterkeydown'"/></div>
+    <div class="assist-flex-search">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-adls-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
@@ -610,7 +607,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- ko if: !loading() && availableTypeFilters().length > 1 -->
       <div data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: typeFilter, entries: availableTypeFilters, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: !loading(), toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -633,7 +629,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- /ko -->
       <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-documents-search" data-bind="visible: isFilterVisible()">
+    <div class="assist-flex-search">
       <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-file-scrollable">
@@ -665,7 +661,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
   <script type="text/html" id="assist-collections-header-actions">
     <div class="assist-db-header-actions">
+      <!-- ko ifnot: parent -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.toggleSearch, css: { 'blue' : $parent.isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
+      <!-- /ko -->
       <a class="inactive-action" data-bind="hueLink: '/indexer/importer/prefill/all/index/'" title="${_('Create index')}" href="javascript:void(0)">
         <i class="pointer fa fa-plus" title="${_('Create index')}"></i>
       </a>
@@ -688,13 +686,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- /ko -->
       <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-table-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0, style: { 'flex': parent ? '0 0 28px' : '' }">
-      <!-- ko ifnot: parent -->
+    <!-- ko ifnot: parent -->
+    <div class="assist-flex-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0">
       <div>
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: $parent.showCores" />${_('Show cores')}</label>
       </div>
-      <!-- /ko -->
-      <div class="assist-filter"><input class="clearable" type="text" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown', attr: { placeholder: parent ? '${ _ko('Field name...') }' : '${ _ko('Collection name...') }'}"/></div>
+    </div>
+    <!-- /ko -->
+    <div class="assist-flex-search" data-bind="visible: !loading() && !hasErrors() && entries().length > 0">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-collections-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
@@ -843,7 +843,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
+      <!-- ko if: typeof isSource === 'undefined' || !isSource -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
+      <!-- /ko -->
       % if ENABLE_NEW_CREATE_TABLE.get():
         <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
         <!-- ko if: typeof databaseName !== 'undefined' -->
@@ -872,14 +874,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <div class="assist-flex-header" data-bind="visibleOnHover: { selector: '.hover-actions', override: loading() || isSearchVisible() }">
+    <div class="assist-flex-header" data-bind="visibleOnHover: { selector: '.hover-actions', override: loading() }">
       <div class="assist-inner-header">
         ${_('Databases')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
     </div>
-    <div class="assist-flex-search" data-bind="visible: hasEntries() && isSearchVisible() && ! hasErrors()">
-      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Database name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+    <div class="assist-flex-search" data-bind="visible: hasEntries() && ! hasErrors()">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries()">
       <!-- ko if: ! loading() && filteredEntries().length == 0 -->
@@ -909,45 +911,45 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
     </div>
-    <div class="assist-flex-table-search" data-bind="visible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
-      <div>
-        <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />${_('Tables')}</label>
-        <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
-        <!-- ko if: $parent.activeSort -->
-        <a class="assist-sort inactive-action inactive-action-dark" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
-          <!-- ko if: $parent.activeSort() === 'creation' -->
-          <i class="pointer fa fa-sort" title="${_('Sort')}"></i>
-          <!-- /ko -->
-          <!-- ko if: $parent.activeSort() === 'popular' -->
-          <i class="pointer fa fa-star-o" title="${_('Sort')}"></i>
-          <!-- /ko -->
-          <!-- ko if: $parent.activeSort() === 'alpha' -->
-          <i class="pointer fa fa-sort-alpha-asc" title="${_('Sort')}"></i>
-          <!-- /ko -->
-          ${_('Sort')}
-        </a>
-        <ul class="dropdown-menu" style="top: initial; left: inherit; position: fixed; z-index:10000;">
-          <li>
-            <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }">
-              <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Default') }
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }">
-              <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }
-            </a>
-          </li>
-          <!-- ko if: HAS_OPTIMIZER -->
-          <li>
-            <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('popular'); }">
-              <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'popular' }"></i> ${ _('Popularity') }
-            </a>
-          </li>
-          <!-- /ko -->
-        </ul>
+    <div class="assist-flex-search" data-bind="visible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
+      <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />${_('Tables')}</label>
+      <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
+      <!-- ko if: $parent.activeSort -->
+      <a class="assist-sort inactive-action inactive-action-dark" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
+        <!-- ko if: $parent.activeSort() === 'creation' -->
+        <i class="pointer fa fa-sort" title="${_('Sort')}"></i>
         <!-- /ko -->
-      </div>
-      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Table name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+        <!-- ko if: $parent.activeSort() === 'popular' -->
+        <i class="pointer fa fa-star-o" title="${_('Sort')}"></i>
+        <!-- /ko -->
+        <!-- ko if: $parent.activeSort() === 'alpha' -->
+        <i class="pointer fa fa-sort-alpha-asc" title="${_('Sort')}"></i>
+        <!-- /ko -->
+        ${_('Sort')}
+      </a>
+      <ul class="dropdown-menu" style="top: initial; left: inherit; position: fixed; z-index:10000;">
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }">
+            <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Default') }
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }">
+            <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }
+          </a>
+        </li>
+        <!-- ko if: HAS_OPTIMIZER -->
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('popular'); }">
+            <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'popular' }"></i> ${ _('Popularity') }
+          </a>
+        </li>
+        <!-- /ko -->
+      </ul>
+      <!-- /ko -->
+    </div>
+    <div class="assist-flex-search" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()">
       <!-- ko template: 'assist-db-entries' --><!-- /ko -->
@@ -1490,7 +1492,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         this.reload();
       };
 
-
       /**
        * @param {Object} options
        * @param {ApiHelper} options.apiHelper
@@ -1546,11 +1547,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.apiHelper = options.apiHelper;
 
         self.isSearchVisible = ko.observable(false);
-        self.editingSearch = ko.observable(false);
 
         self.toggleSearch = function () {
           self.isSearchVisible(!self.isSearchVisible());
-          self.editingSearch(self.isSearchVisible());
         };
 
         self.showCores = ko.observable(false);
@@ -1978,14 +1977,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         <div class="assist-flex-header">
           <div class="assist-inner-header">
             <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
-            <div class="assist-db-header-actions" style="margin-right:10px;">
-              <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { searchVisible(!searchVisible()); query(''); }, css: { 'blue' : searchVisible }"><i class="pointer fa fa-filter" title="${ _('Filter') }"></i></a>
-            </div>
           </div>
         </div>
-        <div class="assist-flex-function-search" data-bind="visible: searchVisible">
+        <div class="assist-flex-search">
           <div class="assist-filter">
-            <input class="clearable" type="text" placeholder="Search..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+            <input class="clearable" type="text" placeholder="Filter..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
           </div>
         </div>
         <div data-bind="css: { 'assist-flex-fill': !selectedFunction(), 'assist-flex-half': selectedFunction() }">
@@ -2039,7 +2035,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.activeType = ko.observable();
         self.availableTypes = ko.observableArray(['Hive', 'Impala', 'Pig']);
         self.query = ko.observable();
-        self.searchVisible = ko.observable(true);
         self.selectedFunction = ko.observable();
 
         self.availableTypes().forEach(function (type) {
@@ -2161,14 +2156,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         <div class="assist-flex-header">
           <div class="assist-inner-header">${ _('Tables') }
-            <a class="col-filter-toggle inactive-action" href="javascript:void(0)" data-bind="toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
             <!-- ko if: statementCount() > 1 -->
             <div class="statement-count">${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span></div>
             <!-- /ko -->
           </div>
         </div>
-        <div class="assist-flex-column-search" data-bind="visible: isFilterVisible">
-          <div class="assist-filter"><input class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Search...') }" /></div>
+        <div class="assist-flex-search" data-bind="visible: activeTables().length > 0">
+          <div class="assist-filter"><input class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Filter...') }" /></div>
         </div>
         <div class="assist-flex-half assist-db-scrollable">
           <!-- ko if: filteredTables().length === 0 && filter.query() === '' -->
@@ -2226,7 +2220,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           </div>
           <!-- /ko -->
         </div>
-
         <!-- /ko -->
       </div>
     </div>
@@ -2252,8 +2245,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.activeLocations = ko.observable();
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
-
-        self.isFilterVisible = ko.observable(true);
 
         self.hasActiveRisks = ko.pureComputed(function () {
            return self.activeRisks().hints && self.activeRisks().hints.length > 0;
@@ -2293,7 +2284,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var openedByFilter = [];
 
         self.filteredTables = ko.pureComputed(function () {
-          if (self.filter.query() === '' || !self.isFilterVisible()) {
+          if (self.filter.query() === '') {
             while (openedByFilter.length) {
               openedByFilter.pop().open(false);
             }
@@ -2592,11 +2583,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         <div class="assist-flex-header">
           <div class="assist-inner-header">${ _('Fields') }
-            <a class="col-filter-toggle inactive-action" href="javascript:void(0)" data-bind="toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
           </div>
         </div>
-        <div class="assist-flex-column-search" data-bind="visible: isFilterVisible">
-          <div class="assist-filter"><input class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Search...') }" /></div>
+        <div class="assist-flex-search" data-bind="visible: activeCollection() && activeCollection().fields().length > 0">
+          <div class="assist-filter"><input class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Filter...') }" /></div>
         </div>
         <div class="assist-flex-half assist-db-scrollable">
           <!-- ko if: filteredFields().length === 0 && filter.query() === '' -->
@@ -2623,7 +2613,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           </ul>
           <!-- /ko -->
         </div>
-
       </div>
     </div>
   </script>
@@ -2633,7 +2622,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       function DashboardAssistantPanel(params) {
         var self = this;
         self.disposals = [];
-        self.isFilterVisible = ko.observable(true);
         self.activeCollection = ko.observable();
 
         self.filter = {
@@ -2648,7 +2636,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           if (!self.activeCollection()){
             return [];
           }
-          if (self.filter.query() === '' || !self.isFilterVisible()) {
+          if (self.filter.query() === '') {
             return self.activeCollection().fields();
           }
           var result = self.activeCollection().fields().filter(function (field) {

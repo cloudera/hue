@@ -44,15 +44,7 @@ var AssistAdlsEntry = (function () {
     self.currentPage = 1;
     self.hasMorePages = true;
 
-    self.isFilterVisible = ko.observable(false);
-    self.editingSearch = ko.observable(false);
     self.filter = ko.observable('').extend({ rateLimit: 400 });
-
-    self.isFilterVisible.subscribe(function (newValue) {
-      if (!newValue && self.filter()) {
-        self.filter('');
-      }
-    });
 
     self.filter.subscribe(function () {
       self.loadEntries();
@@ -80,12 +72,6 @@ var AssistAdlsEntry = (function () {
   AssistAdlsEntry.prototype.dblClick = function () {
     var self = this;
     huePubSub.publish('assist.dblClickAdlsItem', self);
-  };
-
-  AssistAdlsEntry.prototype.toggleSearch = function () {
-    var self = this;
-    self.isFilterVisible(!self.isFilterVisible());
-    self.editingSearch(self.isFilterVisible());
   };
 
   AssistAdlsEntry.prototype.loadEntries = function(callback) {
@@ -126,7 +112,7 @@ var AssistAdlsEntry = (function () {
     self.apiHelper.fetchAdlsPath({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
-      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
+      filter: self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback
@@ -222,7 +208,7 @@ var AssistAdlsEntry = (function () {
     self.apiHelper.fetchAdlsPath({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
-      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
+      filter: self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: function (data) {
         self.hasMorePages = data.page.next_page_number > self.currentPage;
