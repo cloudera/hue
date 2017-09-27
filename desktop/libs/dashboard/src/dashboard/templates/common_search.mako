@@ -68,42 +68,58 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
       <i class="fa fa-save"></i>
     </a>
     % endif
-    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
-      attr: {'data-original-title': '${ _ko("Share") } ' + name},
-      css: {'isShared': isShared(), 'btn': true},
-      visible: isSaved()">
-      <i class="fa fa-users"></i>
-    </a>
-    %if not is_embeddable:
-    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-      <i class="fa fa-expand"></i>
-    </a>
-    %endif
-    &nbsp;&nbsp;&nbsp;
-    <a class="btn pointer" title="${ _('General Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
-        data-bind="css: {'btn': true}, visible: columns().length != 0">
-      <i class="fa fa-cog"></i>
-    </a>
-    <a class="btn pointer" title="${ _('Query Definitions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#qdefinitionsDemiModal"
-        data-bind="css: {'btn': true}, visible: columns().length != 0">
-      <i class="fa fa-bookmark-o"></i>
-    </a>
 
-    <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;&nbsp;</span>
+    <div class="dropdown pull-right margin-left-10">
+      <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+        <i class="fa fa-fw fa-ellipsis-v"></i>
+      </a>
+      <ul class="dropdown-menu">
+        <li data-bind="visible: isSaved()">
+          <a class="share-link" data-bind="click: prepareShareModal, css: {'isShared': isShared()}">
+            <i class="fa fa-fw fa-users"></i> ${ _('Share') }
+          </a>
+        </li>
+        %if not is_embeddable:
+          <li>
+            <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
+              <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
+            </a>
+          </li>
+        %endif
 
-    <a class="btn" href="javascript:void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, click: newSearch">
-      <i class="fa fa-file-o"></i>
-    </a>
-    <!-- ko if: IS_HUE_4 -->
-    <a class="btn" href="/home/?type=search-dashboard" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-    </a>
-    <!-- /ko -->
-    <!-- ko ifnot: IS_HUE_4 -->
-    <a class="btn" href="${ url('dashboard:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-    </a>
-    <!-- /ko -->
+        <li data-bind="visible: columns().length != 0">
+          <a class="pointer" data-toggle="modal" data-target="#settingsDemiModal">
+            <i class="fa fa-fw fa-cog"></i> ${ _('General Settings') }
+          </a>
+        </li>
+        <li data-bind="visible: columns().length != 0">
+          <a class="pointer" data-toggle="modal" data-target="#qdefinitionsDemiModal">
+            <i class="fa fa-fw fa-bookmark-o"></i> ${ _('Query Definitions') }
+          </a>
+        </li>
+        <li data-bind="visible: columns().length != 0" class="divider"></li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: newSearch">
+            <i class="fa fa-fw fa-file-o"></i> ${ _('New Dashboard') }
+          </a>
+        </li>
+        <!-- ko if: IS_HUE_4 -->
+        <li>
+          <a href="/home/?type=search-dashboard">
+            <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Other Dashboards') }
+          </a>
+        </li>
+        <!-- /ko -->
+        <!-- ko ifnot: IS_HUE_4 -->
+        <li>
+          <a href="${ url('dashboard:admin_collections') }">
+            <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Other Dashboards') }
+          </a>
+        </li>
+        <!-- /ko -->
+      </ul>
+    </div>
+
   </div>
 
   <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0">
@@ -149,14 +165,14 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-almost-xxlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 3, 'input-small': $root.query.qs().length >= 3, 'flat-left': $index() === 0}" maxlength="4096" type="text" class="search-query">
+        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0}" maxlength="4096" type="text" class="search-query">
         <!-- ko if: $index() >= 1 -->
         <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
       </span>
       <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ, css: { 'flat-left': $root.query.qs().length === 1}, style: { 'margin-left': $root.query.qs().length > 1 ? '10px' : '0' }"><i class="fa fa-plus"></i></a>
 
-      <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px; margin-right:10px">
+      <button type="submit" id="search-btn" class="btn btn-primary disable-feedback" style="margin-left:10px; margin-right:10px">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
         <i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i>
         <!-- ko if: $root.collection.async() -->
