@@ -2593,7 +2593,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               <!-- ko ifnot: isId -->
                 <i class="fa fa-fw fa-genderless muted valign-middle"></i>
               <!-- /ko -->
-              <span data-bind="text: name"></span>
+              <div data-bind="text: name" class="inline-block"></div>
+              <div data-bind="text: type" class="pull-right muted margin-right-20"></div>
+              <div class="clearfix"></div>
             </a>
           </li>
           </ul>
