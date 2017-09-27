@@ -45,7 +45,6 @@ var AssistDbEntry = (function () {
     self.parent = parent;
     self.filter = filter;
     self.isSearchVisible = assistDbSource.isSearchVisible;
-    self.editingSearch = ko.observable(false);
     self.sourceType = self.assistDbSource.sourceType;
     self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
     self.highlight = ko.observable(false);
@@ -211,7 +210,6 @@ var AssistDbEntry = (function () {
   AssistDbEntry.prototype.toggleSearch = function () {
     var self = this;
     self.isSearchVisible(!self.isSearchVisible());
-    self.editingSearch(self.isSearchVisible());
   };
 
   AssistDbEntry.prototype.triggerRefresh = function (data, event) {
