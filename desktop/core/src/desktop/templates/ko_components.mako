@@ -718,6 +718,7 @@ from desktop.views import _ko
               self.fetchResults(newValue);
             }, 500);
           } else {
+            self.selectedIndex(undefined)
             self.searchResultCategories([]);
           }
         });
