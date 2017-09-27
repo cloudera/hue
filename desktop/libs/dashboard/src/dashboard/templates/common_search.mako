@@ -89,31 +89,31 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
 
         <li data-bind="visible: columns().length != 0">
           <a class="pointer" data-toggle="modal" data-target="#settingsDemiModal">
-            <i class="fa fa-fw fa-cog"></i> ${ _('General Settings') }
+            <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
           </a>
         </li>
         <li data-bind="visible: columns().length != 0">
           <a class="pointer" data-toggle="modal" data-target="#qdefinitionsDemiModal">
-            <i class="fa fa-fw fa-bookmark-o"></i> ${ _('Query Definitions') }
+            <i class="fa fa-fw fa-bookmark-o"></i> ${ _('Saved Queries') }
           </a>
         </li>
         <li data-bind="visible: columns().length != 0" class="divider"></li>
         <li>
           <a href="javascript:void(0)" data-bind="click: newSearch">
-            <i class="fa fa-fw fa-file-o"></i> ${ _('New Dashboard') }
+            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
           </a>
         </li>
         <!-- ko if: IS_HUE_4 -->
         <li>
           <a href="/home/?type=search-dashboard">
-            <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Other Dashboards') }
+            <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
           </a>
         </li>
         <!-- /ko -->
         <!-- ko ifnot: IS_HUE_4 -->
         <li>
           <a href="${ url('dashboard:admin_collections') }">
-            <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Other Dashboards') }
+            <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
           </a>
         </li>
         <!-- /ko -->
@@ -165,7 +165,7 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0}" maxlength="4096" type="text" class="search-query">
+        <input data-bind="clearable: q, valueUpdate:'afterkeydown', autogrowInput: { minWidth: $root.query.qs().length > 1 ? 90 : 206, maxWidth: 270, comfortZone: 15 }, typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0}" maxlength="4096" type="text" class="search-query">
         <!-- ko if: $index() >= 1 -->
         <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
