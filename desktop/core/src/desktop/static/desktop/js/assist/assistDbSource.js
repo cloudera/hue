@@ -45,6 +45,7 @@ var AssistDbSource = (function () {
   function AssistDbSource (options) {
 
     var self = this;
+    self.isSource = true;
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
     self.apiHelper = ApiHelper.getInstance();
@@ -54,7 +55,6 @@ var AssistDbSource = (function () {
     self.hasErrors = ko.observable(false);
     self.simpleStyles = ko.observable(false);
     self.isSearchVisible = ko.observable(false);
-    self.editingSearch = ko.observable(false);
     self.sortFunctions = sortFunctions;
 
     self.highlight = ko.observable(false);
@@ -373,7 +373,6 @@ var AssistDbSource = (function () {
   AssistDbSource.prototype.toggleSearch = function () {
     var self = this;
     self.isSearchVisible(!self.isSearchVisible());
-    self.editingSearch(self.isSearchVisible());
   };
 
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
