@@ -611,7 +611,7 @@
 
 // --- Context Popover ---
 
-.sql-context-popover-content {
+.context-popover-content {
   .display-flex();
   .flex(1 1 100%);
   .flex-direction(column);
@@ -619,14 +619,14 @@
   overflow: hidden;
 }
 
-.sql-context-tab-pane {
+.context-popover-tab-pane {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 100%;
 }
 
-.sql-context-tabs {
+.context-popover-tabs {
   .flex(0 1 auto);
   border-bottom: 1px solid @cui-default-border-color;
   margin-left: -1px;
@@ -634,20 +634,20 @@
   padding-left: 15px;
 }
 
-.sql-context-tab-container {
+.context-popover-tab-container {
   position: relative;
   .flex(1 1 100%);
   border: none;
   overflow: auto;
 }
 
-.sql-context-tab {
+.context-popover-tab {
   padding-top: 0 !important;
   padding-bottom: 5px !important;
   margin-bottom: -1px !important
 }
 
-.sql-context-flex {
+.context-popover-flex {
   .display-flex();
   .flex-flow(column nowrap);
   position: absolute;
@@ -656,11 +656,11 @@
   width: 100%;
 }
 
-.sql-context-flex-header {
+.context-popover-flex-header {
   .flex(0 0 35px);
 }
 
-.sql-context-flex-fill {
+.context-popover-flex-fill {
   overflow: hidden;
   position: relative;
   margin: 0 10px;
@@ -670,37 +670,38 @@
     margin: 0 5px;
   }
 }
-.sql-context-table-details {
+
+.context-popover-table-details {
   .flex(1);
   padding: 10px 10px 0 10px;
 }
 
-.sql-context-header {
+.context-popover-header {
   font-size: 15px;
   margin: 10px;
 }
 
-.sql-context-section {
+.context-popover-section {
   margin-left: 15px;
 }
 
-.sql-context-flex-bottom-links {
+.context-popover-flex-bottom-links {
   .flex(0 0 35px);
   border-top: 1px solid @cui-default-border-color;
   z-index: 100;
   background-color: @cui-white;
 }
 
-.sql-context-link-row {
+.context-popover-link-row {
   float: right;
   margin: 8px 15px 0 10px;
 }
 
-.sql-context-link-row a {
+.context-popover-link-row a {
   margin-left: 10px;
 }
 
-.sql-context-inline-search {
+.context-popover-inline-search {
   border-radius: 8px !important;
   min-height: 18px !important;
   height: 18px !important;
@@ -708,7 +709,7 @@
   padding-right: 18px !important;
 }
 
-.sql-context-empty-columns {
+.context-popover-empty-columns {
   letter-spacing: 0.035em;
   margin-top: 50px;
   font-size: 14px;
@@ -716,7 +717,7 @@
   text-align: center;
 }
 
-.context-sample {
+.context-popover-sample {
   text-align: left;
   padding: 3px;
   overflow: hidden;
@@ -752,7 +753,7 @@
   }
 }
 
-.sql-context-flex-fill.context-sample-container {
+.context-popover-flex-fill.context-popover-sample-container {
   margin: 0;
 }
 
