@@ -194,6 +194,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <!-- /ko -->
   </script>
 
+  <script type="text/html" id="collections-title-context-items">
+    <li><a href="javascript: void(0);" data-bind="click: function(){ huePubSub.publish('assist.openCollections'); }"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Browser') }</a></li>
+  </script>
+
   <script type="text/html" id="collections-context-items">
     <li><a href="javascript: void(0);" data-bind="click: openInBrowser"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Browser') }</a></li>
     <li><a href="javascript: void(0);" data-bind="click: openInDashboard"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
@@ -680,7 +684,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       </a>
       <!-- /ko -->
       <!-- ko ifnot: parent -->
-      ${_('Collections')}
+      <a href="javascript:void(0)" data-bind="appAwareTemplateContextMenu: { template: 'collections-title-context-items' }">${_('Collections')}</a>
       <!-- /ko -->
       <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
     </div>
@@ -1576,6 +1580,24 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           else {
             huePubSub.publish('assist.openCollectionItem', entry);
           }
+        });
+
+        huePubSub.subscribe('assist.openCollections', function () {
+          % if ENABLE_NEW_INDEXER.get():
+            if (IS_HUE_4) {
+              huePubSub.publish('open.link', '/indexer/indexes/');
+            }
+            else {
+              window.open('/indexer/indexes/');
+            }
+          % else:
+            if (IS_HUE_4) {
+              huePubSub.publish('open.link', '/indexer');
+            }
+            else {
+              window.open('/indexer');
+            }
+          % endif
         });
 
         huePubSub.subscribe('assist.openCollectionItem', function (entry) {
