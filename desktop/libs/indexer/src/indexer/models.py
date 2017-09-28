@@ -37,8 +37,6 @@ FIELD_TYPES = (
   "point",
   "random",
   "string",
-  "tdate",
-  "tdouble",
   "text_ar",
   "text_bg",
   "text_ca",
@@ -76,10 +74,7 @@ FIELD_TYPES = (
   "text_sv",
   "text_th",
   "text_tr",
-  "text_ws",
-  "tfloat",
-  "tint",
-  "tlong"
+  "text_ws"
 )
 
 TEXT_FIELD_TYPES = (
@@ -129,25 +124,20 @@ TEXT_FIELD_TYPES = (
 
 DATE_FIELD_TYPES = (
   "date",
-  "pdate",
-  "tdate"
+  "pdate"
 )
 
 INTEGER_FIELD_TYPES = (
   "int",
-  "tint",
   "pint",
   "long",
-  "tlong",
   "plong"
 )
 
 DECIMAL_FIELD_TYPES = (
   "float",
-  "tfloat",
   "pfloat",
   "double",
-  "tdouble",
   "pdouble",
   "currency"
 )
