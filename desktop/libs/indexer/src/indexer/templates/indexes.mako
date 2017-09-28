@@ -375,7 +375,7 @@ ${ assist.assistPanel() }
   <ul class="nav nav-tabs nav-tabs-border">
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
-    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')}</a></li>
+    <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')} (<span data-bind="text: sample().length"></span>)</a></li>
   </ul>
 
   <div class="tab-content" style="border: none; overflow: hidden">
@@ -407,7 +407,8 @@ ${ assist.assistPanel() }
 <script type="text/html" id="indexes-index-overview">
   <div>
     <!-- ko template: 'indexes-index-properties' --><!-- /ko -->
-    <h4>${ _('Fields') }</h4>
+
+    <h4>${ _('Fields') } (<span data-bind="text: fields().length"></span>)</h4>
     <!-- ko template: { name: 'indexes-index-fields-fields', data: fieldsPreview }--><!-- /ko -->
     <a class="pointer" data-bind="visible: fields().length > fieldsPreview().length, click: function() { $('li a[href=\'#index-columns\']').click(); }">
       ${_('View more...')}
@@ -415,8 +416,7 @@ ${ assist.assistPanel() }
 
     <br><br>
 
-    <h4>${ _('Sample') }</h4>
-
+    <h4>${ _('Sample') } (<span data-bind="text: sample().length"></span>)</h4>
     <!-- ko if: samplePreview() && samplePreview().length > 0 -->
     <div style="overflow: auto">
       <!-- ko template: { name: 'indexes-index-sample', data: samplePreview, full: false }--><!-- /ko -->
