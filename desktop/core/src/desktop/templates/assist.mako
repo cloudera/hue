@@ -33,10 +33,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 <%def name="assistJSModels()">
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
-<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistAdlsEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistStorageEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistGitEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistCollectionEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistHBaseEntry.js') }"></script>
 <script src="${ static('desktop/js/document/hueDocument.js') }"></script>
@@ -1399,7 +1397,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           var parts = path.split('/');
           parts.shift();
 
-          var currentEntry = new AssistHdfsEntry({
+          var currentEntry = new AssistStorageEntry({
+            type: 'hdfs',
             definition: {
               name: '/',
               type: 'dir'
@@ -1448,7 +1447,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           var parts = path.split('/');
           parts.shift();
 
-          var currentEntry = new AssistAdlsEntry({
+          var currentEntry = new AssistStorageEntry({
+            type: 'adls',
             definition: {
               name: '/',
               type: 'dir'
@@ -1547,7 +1547,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           var parts = lastKnownPath.split('/');
           parts.shift();
 
-          var currentEntry = new AssistS3Entry({
+          var currentEntry = new AssistStorageEntry({
+            type: 's3',
             definition: {
               name: '/',
               type: 'dir'
