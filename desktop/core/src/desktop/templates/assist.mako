@@ -636,7 +636,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
              </div>
              <a href="javascript:void(0)" class="assist-entry assist-document-link" data-bind="click: open, attr: {'title': name }">
                <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko -->
-               <span data-bind="draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
+               <span class="highlightable" data-bind="css: { 'highlight': highlight }, draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
              </a>
            </li>
          </ul>
@@ -1307,6 +1307,51 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           huePubSub.publish('assist.clear.document.cache');
           self.reload();
         });
+
+        huePubSub.subscribe('assist.doc.highlight', function (details) {
+          huePubSub.publish('left.assist.show');
+          huePubSub.publish('assist.show.documents');
+          huePubSub.publish('context.popover.hide');
+          var whenLoaded = $.Deferred().done(function () {
+            self.activeEntry().highlightInside(details.docUuid);
+          });
+          if (self.activeEntry() && self.activeEntry().definition() && self.activeEntry().definition().uuid === details.parentUuid) {
+            if (self.activeEntry().loaded() && !self.activeEntry().hasErrors()) {
+              whenLoaded.resolve();
+            } else {
+              var loadedSub = self.activeEntry().loaded.subscribe(function (newVal) {
+                if (newVal) {
+                  if (!self.activeEntry().hasErrors()) {
+                    whenLoaded.resolve();
+                  }
+                  whenLoaded.reject();
+                  loadedSub.remove();
+                }
+              })
+            }
+            self.activeEntry().highlight(details.docUuid);
+          } else {
+            self.activeEntry(new HueFileEntry({
+              activeEntry: self.activeEntry,
+              trashEntry: ko.observable(),
+              apiHelper: self.apiHelper,
+              app: 'documents',
+              user: self.user,
+              activeSort: ko.observable('name'),
+              typeFilter: self.typeFilter,
+              definition: {
+                uuid: details.parentUuid,
+                type: 'directory'
+              }
+            }));
+            self.activeEntry().load(function() {
+              whenLoaded.resolve();
+            }, function () {
+              whenLoaded.reject();
+              self.fallbackToRoot();
+            });
+          }
+        });
       }
 
       AssistDocumentsPanel.prototype.fallbackToRoot = function () {
@@ -1884,7 +1929,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                 }));
               }
 
-              panels.push(new AssistInnerPanel({
+              var documentsPanel = new AssistInnerPanel({
                 panelData: new AssistDocumentsPanel({
                   user: params.user,
                   apiHelper: self.apiHelper
@@ -1897,7 +1942,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                 minHeight: 50,
                 rightAlignIcon: true,
                 visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-              }));
+              });
+
+              panels.push(documentsPanel);
+
+              huePubSub.subscribe('assist.show.documents', function () {
+                if (self.visiblePanel !== documentsPanel) {
+                  self.visiblePanel(documentsPanel);
+                }
+              });
 
               var vcsKeysLength = ${ len(VCS.keys()) };
               if (vcsKeysLength > 0) {

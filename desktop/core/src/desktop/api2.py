@@ -637,6 +637,7 @@ def search_entities_interactive(request):
           'doc_type': escape(e.type),
           'type': 'HUE',
           'uuid': e.uuid,
+          'parentUuid': e.parent_directory.uuid,
           'originalName': escape(e.name)
         } for e in entities['documents']
       ],
