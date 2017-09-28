@@ -886,6 +886,9 @@ class WebHdfs(Hdfs):
 
     self.do_as_user(username, self.rename, tmp_file, dst)
 
+  def filebrowser_action(self):
+    return None
+
 
 class File(object):
   """
