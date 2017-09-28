@@ -86,13 +86,13 @@ var HueFileEntry = (function () {
     self.superuser = options.superuser;
     self.serverTypeFilter = options.serverTypeFilter || ko.observable({ type: 'all' });
     self.statsVisible = ko.observable(false);
+    self.highlight = ko.observable(false);
 
     self.document = ko.observable();
     self.selectedDocsWithDependents = ko.observable([]);
     self.importedDocSummary = ko.observable();
     self.showTable = ko.observable();
     self.entries = ko.observableArray([]);
-
 
     // Filter is only used in the assist panel at the moment
     self.isFilterVisible = ko.observable(false);
@@ -295,6 +295,30 @@ var HueFileEntry = (function () {
     }
     else {
       return self.definition().uuid;
+    }
+  };
+
+  HueFileEntry.prototype.highlightInside = function (uuid) {
+    var self = this;
+    self.typeFilter(self.availableTypeFilters()[0]);
+    var foundEntry;
+    self.entries().forEach(function (entry) {
+      entry.highlight(false);
+      if (entry.definition() && entry.definition().uuid === uuid) {
+        foundEntry = entry;
+      }
+    });
+    if (foundEntry) {
+      window.setTimeout(function () {
+        huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
+          foundEntry.highlight(true);
+          // Timeout is for animation effect
+          window.setTimeout(function () {
+            foundEntry.highlight(false);
+          }, 1800);
+        });
+        huePubSub.publish('assist.db.scrollTo', foundEntry);
+      }, 0);
     }
   };
 
