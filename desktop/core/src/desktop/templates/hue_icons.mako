@@ -198,10 +198,10 @@
     </symbol>
 
     <symbol id="hi-plus-addon" viewBox="0 0 640 640">
-      <circle style="fill:#FFF" cx="526.5" cy="526.5" r="132.5"></circle>
-      <circle cx="526.5" cy="526.5" r="113.5"></circle>
-      <rect style="fill:#FFF" x="510.5" y="449.97" width="32" height="153.07"></rect>
-      <rect style="fill:#FFF" x="510.5" y="449.97" width="32" height="153.07" transform="translate(1053) rotate(90)"></rect>
+      <circle style="fill:#FFF" cx="483.82" cy="484.82" r="170.68"></circle>
+      <circle cx="483.82" cy="484.82" r="155.31"></circle>
+      <rect style="fill:#FFF" x="456.92" y="374.09" width="43.79" height="209.46"></rect>
+      <rect style="fill:#FFF" x="461.92" y="380.09" width="43.79" height="209.46" transform="translate(968.64 1) rotate(90)"></rect>
     </symbol>
 
     <symbol id="hi-py" viewBox="0 0 640 640">
