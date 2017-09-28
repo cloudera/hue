@@ -306,7 +306,7 @@ from desktop.views import _ko
                 <!-- ko if: app === 'documents' -->
                 <div class="inline">
                   <span class="dropdown">
-                    <a class="btn" title="${_('New document')}" data-toggle="dropdown" data-bind="tooltip: { placement: 'bottom', delay: 750 }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" href="javascript:void(0);" style="height: 20px"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x" style="margin-top: -6px"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 12px; margin-left: 6px;"></i></span></a>
+                    <a class="btn" title="${_('New document')}" data-toggle="dropdown" data-bind="tooltip: { placement: 'bottom', delay: 750 }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" href="javascript:void(0);" style="height: 20px"><svg class="hi"><use xlink:href="#hi-file"></use><use xlink:href="#hi-plus-addon"></use></svg></a>
                     <ul class="dropdown-menu less-padding document-types" style="margin-top:10px; width: 175px;" role="menu">
                       % if 'beeswax' in apps:
                         <li>
@@ -380,7 +380,7 @@ from desktop.views import _ko
                 </div>
                 <!-- /ko -->
 
-                <a class="btn" title="${_('New folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" style="height: 20px"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" style="margin-top: -6px"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 12px; margin-left: 7px;"></i></span></a>
+                <a class="btn" title="${_('New folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" style="height: 20px"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg></a>
                 <a class="btn" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || ! canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }"><i class="fa fa-fw fa-edit"></i></a>
                 <!-- ko if: isTrash() -->
                   <a class="btn" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showRestoreConfirmation(); }, css: { 'disabled': selectedEntries().length === 0 }, attr: { 'title' : '${ _('Restore to Home ') }' }"><i class="fa fa-fw fa-undo"></i></a>
