@@ -14,22 +14,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var AssistHdfsEntry = (function () {
+var AssistStorageEntry = (function () {
 
   var PAGE_SIZE = 100;
+
+  var TYPE_SPECIFICS = {
+    'adls': {
+      apiHelperFetchFunction: 'fetchAdlsPath',
+      dblClickPubSubId: 'assist.dblClickAdlsItem',
+      goHomePubSubId: 'assist.adls.go.home',
+      selectEntryPubSubId: 'assist.selectAdlsEntry'
+    },
+    'hdfs': {
+      apiHelperFetchFunction: 'fetchHdfsPath',
+      dblClickPubSubId: 'assist.dblClickHdfsItem',
+      goHomePubSubId: 'assist.hdfs.go.home',
+      selectEntryPubSubId: 'assist.selectHdfsEntry'
+    },
+    's3': {
+      apiHelperFetchFunction: 'fetchS3Path',
+      dblClickPubSubId: 'assist.dblClickS3Item',
+      goHomePubSubId: 'assist.s3.go.home',
+      selectEntryPubSubId: 'assist.selectS3Entry'
+    }
+  };
 
   /**
    * @param {object} options
    * @param {object} options.definition
    * @param {string} options.definition.name
    * @param {string} options.definition.type (file, dir)
-   * @param {AssistHdfsEntry} options.parent
+   * @param {string} options.type - The storage type ('adls', 'hdfs', 's3')
+   * @param {AssistStorageEntry} options.parent
    * @param {ApiHelper} options.apiHelper
    * @constructor
    */
-  function AssistHdfsEntry (options) {
+  function AssistStorageEntry (options) {
     var self = this;
-
+    self.type = options.type;
     self.definition = options.definition;
     self.apiHelper = options.apiHelper;
     self.parent = options.parent;
@@ -69,12 +91,12 @@ var AssistHdfsEntry = (function () {
     });
   }
 
-  AssistHdfsEntry.prototype.dblClick = function () {
+  AssistStorageEntry.prototype.dblClick = function () {
     var self = this;
-    huePubSub.publish('assist.dblClickHdfsItem', self);
+    huePubSub.publish(TYPE_SPECIFICS[self.type].dblClickPubSubId, self);
   };
 
-  AssistHdfsEntry.prototype.loadEntries = function(callback) {
+  AssistStorageEntry.prototype.loadEntries = function(callback) {
     var self = this;
     if (self.loading()) {
       return;
@@ -88,7 +110,8 @@ var AssistHdfsEntry = (function () {
         return file.name !== '.' && file.name !== '..';
       });
       self.entries($.map(filteredFiles, function (file) {
-        return new AssistHdfsEntry({
+        return new AssistStorageEntry({
+          type: self.type,
           definition: file,
           parent: self,
           apiHelper: self.apiHelper
@@ -109,7 +132,7 @@ var AssistHdfsEntry = (function () {
       }
     };
 
-    self.apiHelper.fetchHdfsPath({
+    self.apiHelper[TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
       filter: self.filter().trim() ? self.filter() : undefined,
@@ -119,12 +142,14 @@ var AssistHdfsEntry = (function () {
     })
   };
 
-  AssistHdfsEntry.prototype.goHome = function () {
-    huePubSub.publish('assist.hdfs.go.home');
+  AssistStorageEntry.prototype.goHome = function () {
+    var self = this;
+    huePubSub.publish(TYPE_SPECIFICS[self.type].goHomePubSubId);
   };
 
-  AssistHdfsEntry.prototype.loadDeep = function(folders, callback) {
+  AssistStorageEntry.prototype.loadDeep = function(folders, callback) {
     var self = this;
+
     if (folders.length === 0) {
       callback(self);
       return;
@@ -160,7 +185,7 @@ var AssistHdfsEntry = (function () {
     }
   };
 
-  AssistHdfsEntry.prototype.getHierarchy = function () {
+  AssistStorageEntry.prototype.getHierarchy = function () {
     var self = this;
     var parts = [];
     var entry = self;
@@ -172,7 +197,7 @@ var AssistHdfsEntry = (function () {
     return parts;
   };
 
-  AssistHdfsEntry.prototype.toggleOpen = function (data, event) {
+  AssistStorageEntry.prototype.toggleOpen = function (data, event) {
     var self = this;
     if (self.definition.type === 'file') {
       if (IS_HUE_4) {
@@ -189,14 +214,14 @@ var AssistHdfsEntry = (function () {
     self.open(!self.open());
     if (self.definition.name === '..') {
       if (self.parent.parent) {
-        huePubSub.publish('assist.selectHdfsEntry', self.parent.parent);
+        huePubSub.publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self.parent.parent);
       }
     } else {
-      huePubSub.publish('assist.selectHdfsEntry', self);
+      huePubSub.publish(TYPE_SPECIFICS[self.type].selectEntryPubSubId, self);
     }
   };
 
-  AssistHdfsEntry.prototype.fetchMore = function (successCallback, errorCallback) {
+  AssistStorageEntry.prototype.fetchMore = function (successCallback, errorCallback) {
     var self = this;
     if (!self.hasMorePages || self.loadingMore()) {
       return;
@@ -215,7 +240,8 @@ var AssistHdfsEntry = (function () {
           return file.name !== '.' && file.name !== '..';
         });
         self.entries(self.entries().concat($.map(filteredFiles, function (file) {
-          return new AssistHdfsEntry({
+          return new AssistStorageEntry({
+            type: self.type,
             definition: file,
             parent: self,
             apiHelper: self.apiHelper
@@ -235,9 +261,9 @@ var AssistHdfsEntry = (function () {
     });
   };
 
-  AssistHdfsEntry.prototype.openInImporter = function () {
+  AssistStorageEntry.prototype.openInImporter = function () {
     huePubSub.publish('open.in.importer', this.definition.path);
   };
 
-  return AssistHdfsEntry;
+  return AssistStorageEntry;
 })();
