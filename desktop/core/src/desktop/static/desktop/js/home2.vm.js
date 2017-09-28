@@ -70,7 +70,8 @@ var HomeViewModel = (function () {
 
     self.activeEntry = ko.observable();
     self.trashEntry = ko.observable();
-    self.activeEntry(new HueFileEntry({
+
+    self.defaultFileEntry = new HueFileEntry({
       serverTypeFilter: self.serverTypeFilter,
       activeEntry: self.activeEntry,
       trashEntry: self.trashEntry,
@@ -82,7 +83,9 @@ var HomeViewModel = (function () {
       definition: {
         name: '/'
       }
-    }));
+    });
+
+    self.activeEntry(self.defaultFileEntry);
 
     self.serverTypeFilter.subscribe(function (newVal) {
       if (self.activeEntry()) {
@@ -124,16 +127,21 @@ var HomeViewModel = (function () {
 
     var lastParent = entry;
 
+    var openDefault = function () {
+      self.activeEntry(self.defaultFileEntry);
+      self.activeEntry().load();
+    }
+
     var loadParents = function () {
       if (lastParent.parent) {
         lastParent = lastParent.parent;
-        lastParent.load(loadParents);
+        lastParent.load(loadParents, openDefault);
       } else {
         self.activeEntry(entry);
       }
     };
 
-    entry.load(loadParents);
+    entry.load(loadParents, openDefault);
   };
 
   HomeViewModel.prototype.openPath = function (path) {
