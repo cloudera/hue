@@ -35,6 +35,8 @@ from aws.conf import get_default_region, get_locations
 from aws.s3 import normpath, s3file, translate_s3_error, S3A_ROOT
 from aws.s3.s3stat import S3Stat
 
+from filebrowser.settings import PERMISSION_ACTION_S3
+
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 
@@ -76,6 +78,7 @@ class S3FileSystem(object):
   def __init__(self, s3_connection):
     self._s3_connection = s3_connection
     self._bucket_cache = None
+    self._filebrowser_action = PERMISSION_ACTION_S3
 
   def _init_bucket_cache(self):
     if self._bucket_cache is None:
@@ -341,6 +344,10 @@ class S3FileSystem(object):
 
   def restore(self, *args, **kwargs):
     raise NotImplementedError(_('Moving to trash is not implemented for S3'))
+
+  def filebrowser_action(self):
+    return self._filebrowser_action
+
 
   @translate_s3_error
   @auth_error_handler
