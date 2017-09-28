@@ -100,6 +100,7 @@ class SolrClient(object):
         } for field in fields
       ]
       if self.is_solr_six_or_more():
+        self.api.update_config(name, {'set-user-property': {'update.autoCreateFields': 'false'}})
         self.api.add_fields(name, fields)
     else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
@@ -162,6 +163,10 @@ class SolrClient(object):
 
   def delete_alias(self, name):
     return self.api.delete_alias(name)
+
+
+  def update_config(self, name, properties):
+    return self.api.update_config(name, properties)
 
 
   def is_solr_cloud_mode(self):
