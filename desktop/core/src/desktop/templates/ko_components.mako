@@ -637,7 +637,7 @@ from desktop.views import _ko
           </ul>
         </div>
       </div>
-      <div class="global-search-preview">
+      <div class="global-search-preview" style="overflow: auto;">
         <!-- ko with: selectedResult -->
           <!-- ko switch: type -->
             <!-- ko case: ['database', 'document', 'field', 'table', 'view']  -->
