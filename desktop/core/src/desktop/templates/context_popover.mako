@@ -301,6 +301,15 @@ from metadata.conf import has_navigator
     <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="niceScroll">
       <div style="padding: 8px">
         <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
+
+        <!-- ko with: details -->
+        <div class="context-popover-doc-header-link" ><a href="javscript:void(0)" data-bind="hueLink: link, click: function () { $parents[2].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
+        <!-- ko if: description -->
+        <div class="context-popover-doc-description" data-bind="text: description"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+
+        <div class="context-popover-header" style="margin: 10px 0 5px 0">${_('Contents')}</div>
         <!-- ko with: documentContents -->
         <!-- ko foreach: snippets -->
         <div data-bind="highlight: { value: statement, formatted: true, dialect: type }"></div>
@@ -1024,10 +1033,14 @@ from metadata.conf import has_navigator
 
         // Adapt some details to a common format, the global search endpoint has different structure than the docs one
         self.details = {
-          type: data.type || data.doc_type,
-          name: data.name || data.hue_name,
+          type: data.doc_type || data.type,
+          name: data.originalName || data.name || data.hue_name,
           link: data.absoluteUrl || data.link,
-          description: data.description || data.hue_description
+          description: data.description || data.hue_description,
+          isDirectory: data.doc_type === 'directory' || data.type === 'directory',
+          definition: ko.observable({
+            type: data.doc_type || data.type
+          })
         };
         self.data = data;
         self.loading = ko.observable(true);
