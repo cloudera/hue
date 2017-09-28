@@ -18,6 +18,7 @@ import re
 
 
 class FieldType():
+
   def __init__(self, name, regex, heuristic_regex=None):
     self._name = name
     self._regex = regex
@@ -36,11 +37,13 @@ class FieldType():
     return self._regex
 
   def heuristic_match(self, field):
-    pattern = re.compile(self.heuristic_regex)
+    pattern = re.compile(self.heuristic_regex, flags=re.IGNORECASE)
 
     return pattern.match(field)
 
+
 class Field(object):
+
   def __init__(self, name="new_field", field_type_name="string", operations=None, multi_valued=False):
     self.name = name
     self.field_type_name = field_type_name
@@ -77,7 +80,8 @@ FIELD_TYPES = [
   FieldType('string', "^[\\s\\S]*$", heuristic_regex="^[\\s\\S]{1,100}$"),
   FieldType('double', "^([+-]?[0-9]+(\.[0-9]+)?(E[+-]?[0-9]+)?)$"),
   FieldType('long', "^(?:[+-]?(?:[0-9]+))$"),
-  FieldType('date', "^([0-9]+-[0-9]+-[0-9]+(\s+|T)[0-9]+:[0-9]+:[0-9]+(\.[0-9]*)?Z?)$")
+  FieldType('date', "^([0-9]+-[0-9]+-[0-9]+(\s+|T)[0-9]+:[0-9]+:[0-9]+(\.[0-9]*)?Z?)$"),
+  FieldType('boolean', "^(true|false|t|f|0|1)$")
 ]
 
 def get_field_type(type_name):
