@@ -542,7 +542,7 @@ class TextFileReader(object):
 
 class HiveFormat(CSVFormat):
   FIELD_TYPE_TRANSLATE = {
-    "BOOLEAN_TYPE": "string",
+    "BOOLEAN_TYPE": "boolean",
     "TINYINT_TYPE": "long",
     "SMALLINT_TYPE": "long",
     "INT_TYPE": "long",
