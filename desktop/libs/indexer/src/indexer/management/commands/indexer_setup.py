@@ -46,7 +46,10 @@ class Command(BaseCommand):
       path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_twitter_demo/index_data.csv'))
       self._setup_collection_from_csv({
           'name': 'twitter_demo',
-          'fields': self._parse_fields(path),
+          'fields': self._parse_fields(path, fieldtypes={
+            'source': 'string',
+            'username': 'string',
+          }),
           'uniqueKeyField': 'id',
           'df': 'text'
         },
@@ -59,7 +62,9 @@ class Command(BaseCommand):
       path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../../../apps/search/examples/collections/solr_configs_yelp_demo/index_data.csv'))
       self._setup_collection_from_csv({
           'name': 'yelp_demo',
-          'fields': self._parse_fields(path),
+          'fields': self._parse_fields(path, fieldtypes={
+            'name': 'string',
+          }),
           'uniqueKeyField': 'id',
           'df': 'text'
         },
@@ -74,7 +79,8 @@ class Command(BaseCommand):
           'name': 'log_analytics_demo',
           'fields': self._parse_fields(path, fieldtypes={
             'region_code': 'string',
-            'referer': 'string'
+            'referer': 'string',
+            'user_agent': 'string'
           }),
           'uniqueKeyField': 'id',
           'df': 'record'
