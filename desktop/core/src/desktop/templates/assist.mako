@@ -470,7 +470,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
       <a class="inactive-action" data-bind="dropzone: {
-            url: '/filebrowser/upload/file?dest=adl:/' + path,
+            url: '/filebrowser/upload/file?dest=adl:' + path,
             params: { dest: path },
             paramName: 'hdfs_file',
             onError: function(x, e){ $(document).trigger('error', e); },

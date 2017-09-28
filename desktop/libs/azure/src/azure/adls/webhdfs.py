@@ -21,6 +21,7 @@ Interfaces for ADLS via HttpFs/WebHDFS
 import logging
 import threading
 
+from filebrowser.settings import PERMISSION_ACTION_ADLS
 from hadoop.fs.webhdfs import WebHdfs as HadoopWebHdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.hdfs_site import get_umask_mode
@@ -59,6 +60,7 @@ class WebHdfs(HadoopWebHdfs):
     self._netloc = split.netloc
     self._is_remote = True
     self._has_trash_support = False
+    self._filebrowser_action = PERMISSION_ACTION_ADLS
 
     self._client = http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG)
     self._root = resource.Resource(self._client)
@@ -89,3 +91,6 @@ class WebHdfs(HadoopWebHdfs):
 
   def get_upload_chuck_size(self):
     return UPLOAD_CHUCK_SIZE
+
+  def filebrowser_action(self):
+    return self._filebrowser_action

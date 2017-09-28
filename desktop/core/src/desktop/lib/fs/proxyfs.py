@@ -16,17 +16,8 @@
 
 from __future__ import absolute_import
 
-import posixpath
-import errno
-
 from urlparse import urlparse
-
 from django.contrib.auth.models import User
-
-from aws.conf import has_s3_access
-from aws.s3 import S3A_ROOT
-from aws.s3.s3fs import S3FileSystemException
-
 
 class ProxyFS(object):
 
@@ -41,10 +32,7 @@ class ProxyFS(object):
     self._default_fs = self._fs_dict[self._default_scheme]
 
   def __getattr__(self, item):
-    if hasattr(self, "_default_fs"):
-      return getattr(object.__getattribute__(self, "_default_fs"), item)
-    else:
-      raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, item))
+    return getattr(object.__getattribute__(self, "_default_fs"), item)
 
   def __setattr__(self, key, value):
     if hasattr(self, "_default_fs") and hasattr(self._default_fs, key):
@@ -53,34 +41,40 @@ class ProxyFS(object):
       object.__setattr__(self, key, value)
 
   def _get_scheme(self, path):
-    if path.lower().startswith(S3A_ROOT):
-      from desktop.auth.backend import rewrite_user # Avoid cyclic loop
-      try:
-        user = User.objects.get(username=self.user)
-        if not has_s3_access(rewrite_user(user)):
-          raise S3FileSystemException("Missing permissions for %s on %s" % (self.user, path,))
-      except User.DoesNotExist:
-        raise S3FileSystemException("Can't check permissions for %s on %s" % (self.user, path))
-
     split = urlparse(path)
     return split.scheme if split.scheme else self._default_scheme
+
+  def _has_access(self, fs):
+    from desktop.auth.backend import rewrite_user  # Avoid cyclic loop
+    try:
+      user = rewrite_user(User.objects.get(username=self.user))
+      filebrowser_action = fs.filebrowser_action()
+      return user.is_authenticated() and user.is_active and (user.is_superuser or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser"))
+    except User.DoesNotExist:
+      LOG.exception('proxyfs.has_access()')
+      return False
 
   def _get_fs(self, path):
     scheme = self._get_scheme(path)
     if not scheme:
-      raise S3FileSystemException('Can not figure out scheme for path "%s"' % path)
+      raise IOError('Can not figure out scheme for path "%s"' % path)
     try:
-      return self._fs_dict[scheme]
+      fs = self._fs_dict[scheme]
+      if (self._has_access(fs)):
+        return fs
+      else:
+        raise IOError("Missing permissions for %s on %s" % (self.user, path))
     except KeyError:
-      raise S3FileSystemException('Unknown scheme %s, available schemes: %s' % (scheme, self._fs_dict.keys()))
+      raise IOError('Unknown scheme %s, available schemes: %s' % (scheme, self._fs_dict.keys()))
 
   def _get_fs_pair(self, src, dst):
     """
     Returns two FS for source and destination paths respectively.
     If `dst` is not self-contained path assumes it's relative path to `src`.
     """
+
     src_fs = self._get_fs(src)
-    dst_scheme = self._get_scheme(dst)
+    dst_scheme = urlparse(dst).scheme
     if not dst_scheme:
       return src_fs, src_fs
     return src_fs, self._get_fs(dst)
