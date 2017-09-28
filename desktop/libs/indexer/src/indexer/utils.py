@@ -168,10 +168,10 @@ def get_field_types(field_list, iterations=3):
       raise ValueError()
 
   test_fns = [('boolean', test_boolean),
-              ('tint', test_int),
-              ('tlong', int),
-              ('tdouble', float),
-              ('tdate', test_timestamp),
+              ('pint', test_int),
+              ('plong', int),
+              ('pdouble', float),
+              ('pdate', test_timestamp),
               ('string', test_string),
               ('text_general', any)]
   all_field_types = []
