@@ -1575,14 +1575,26 @@ from metadata.conf import has_navigator
         });
 
 
+        var sqlSourceType;
+        if (self.isDatabase || self.isTable || self.isView || self.isColumn || self.isComplex) {
+          huePubSub.publish('cluster.config.get.config', function (clusterConfig) {
+            if (clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['editor']) {
+              sqlSourceType = clusterConfig['app_config']['editor']['default_sql_interpreter'];
+            }
+          });
+          if (!sqlSourceType) {
+            sqlSourceType = params.data.sourceType.toLowerCase();
+          }
+        }
+
         if (self.isDatabase) {
-          self.contents = new DatabaseContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default');
+          self.contents = new DatabaseContextTabs(adaptedData, sqlSourceType, 'default');
         } else if (self.isTable) {
-          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', false, false);
+          self.contents = new TableAndColumnContextTabs(adaptedData, sqlSourceType, 'default', false, false);
         } else if (self.isView) {
-          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', false, false);
+          self.contents = new TableAndColumnContextTabs(adaptedData, sqlSourceType, 'default', false, false);
         } else if (self.isColumn) {
-          self.contents = new TableAndColumnContextTabs(adaptedData, params.data.sourceType.toLowerCase(), 'default', true, false);
+          self.contents = new TableAndColumnContextTabs(adaptedData, sqlSourceType, 'default', true, false);
         } else if (self.isDocument) {
           self.contents = new DocumentContext(params.data);
         }

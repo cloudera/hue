@@ -44,9 +44,13 @@ function ClusterConfig(params) {
     refreshConfig();
   }
 
-  huePubSub.subscribe('cluster.config.get.config', function () {
+  huePubSub.subscribe('cluster.config.get.config', function (callback) {
     if (!self.loading) {
-      huePubSub.publish('cluster.config.set.config', self.clusterConfig);
+      if (callback) {
+        callback(self.clusterConfig)
+      } else {
+        huePubSub.publish('cluster.config.set.config', self.clusterConfig);
+      }
     }
   });
 }
