@@ -26,6 +26,131 @@
 
     var assertAutoComplete = SqlTestUtils.assertAutocomplete;
 
+    describe('ALTER DATABASE', function () {
+      it('should handle "ALTER DATABASE baa SET DBPROPERTIES (\'boo\'=1, \'baa\'=2);|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER DATABASE baa SET DBPROPERTIES (\'boo\'=1, \'baa\'=2);',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "ALTER SCHEMA baa SET OWNER ROLE boo;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER SCHEMA baa SET OWNER ROLE boo;',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "ALTER DATABASE baa SET LOCATION \'/baa/boo\';|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER DATABASE baa SET LOCATION \'/baa/boo\';',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors:true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER ',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['DATABASE', 'SCHEMA'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest databases for "ALTER DATABASE |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER DATABASE ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: {}
+          }
+        });
+      });
+
+      it('should suggest databases for "ALTER SCHEMA |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER SCHEMA ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: {}
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER SCHEMA boo |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER SCHEMA boo ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['SET DBPROPERTIES', 'SET LOCATION', 'SET OWNER']
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER DATABASE boo SET |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER DATABASE boo SET ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DBPROPERTIES', 'LOCATION', 'OWNER']
+          }
+        });
+      });
+
+      it('should suggest keywords for "ALTER DATABASE boo SET OWNER |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER DATABASE boo SET OWNER ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['GROUP', 'ROLE', 'USER']
+          }
+        });
+      });
+
+      it('should suggest hdfs for "ALTER DATABASE boo SET LOCATION \'/|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER DATABASE boo SET LOCATION \'/',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '/' }
+          }
+        });
+      });
+    });
+
     describe('ALTER INDEX', function () {
       it('should handle "ALTER INDEX baa ON boo.ba PARTITION (bla=1) REBUILD;|"', function() {
         assertAutoComplete({

@@ -285,6 +285,12 @@ PrincipalSpecification
  | '<hive>ROLE' RegularOrBacktickedIdentifier
  ;
 
+PrincipalSpecification_EDIT
+ : '<hive>USER' 'CURSOR'
+ | 'GROUP' 'CURSOR'
+ | '<hive>ROLE' 'CURSOR'
+ ;
+
 UserOrRoleList
  : RegularOrBacktickedIdentifier
  | UserOrRoleList ',' RegularOrBacktickedIdentifier
