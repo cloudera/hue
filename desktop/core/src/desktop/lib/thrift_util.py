@@ -499,8 +499,8 @@ def _unpack_guid_secret_in_handle(str_args):
 
         str_args = str_args.replace(secret.group(1), "%x:%x" % struct.unpack(b"QQ", encoded_secret))
         str_args = str_args.replace(guid.group(1), "%x:%x" % struct.unpack(b"QQ", encoded_guid))
-      except Exception:
-        logging.warn("Unable to unpack the secret and guid in Thrift Handle.")
+      except Exception, e:
+        logging.warn("Unable to unpack the secret and guid in Thrift Handle: %s" % e)
 
   return str_args
 
