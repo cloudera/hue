@@ -189,7 +189,7 @@ var AssistDbEntry = (function () {
         type: type,
         identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
       },
-      showInAssistEnabled: false,
+      showInAssistEnabled: self.navigationSettings.rightAssist,
       orientation: self.navigationSettings.rightAssist ? 'left' : 'right',
       sourceType: self.sourceType,
       defaultDatabase: self.databaseName,
