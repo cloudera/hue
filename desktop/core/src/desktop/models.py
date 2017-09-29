@@ -1639,17 +1639,6 @@ class ClusterConfig():
   def _get_editor(self):
     interpreters = []
 
-    if SHOW_NOTEBOOKS.get() and (self.cluster_type not in (DATAENG, IMPALAUI)):
-      interpreters.append({
-        'name': 'notebook',
-        'type': 'notebook',
-        'displayName': 'Notebook',
-        'buttonName': _('Notebook'),
-        'tooltip': _('Notebook'),
-        'page': '/notebook',
-        'is_sql': False
-      })
-
     _interpreters = get_ordered_interpreters(self.user)
     if self.cluster_type == DATAENG:
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'mapreduce')]
@@ -1665,6 +1654,21 @@ class ClusterConfig():
         'tooltip': _('%s Query') % interpreter['type'].title(),
         'page': '/editor/?type=%(type)s' % interpreter,
         'is_sql': interpreter['is_sql']
+      })
+
+    if SHOW_NOTEBOOKS.get() and (self.cluster_type not in (DATAENG, IMPALAUI)):
+      try:
+        first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
+      except ValueError:
+        first_non_sql_index = 0
+      interpreters.insert(first_non_sql_index, {
+        'name': 'notebook',
+        'type': 'notebook',
+        'displayName': 'Notebook',
+        'buttonName': _('Notebook'),
+        'tooltip': _('Notebook'),
+        'page': '/notebook',
+        'is_sql': False
       })
 
     if interpreters:
