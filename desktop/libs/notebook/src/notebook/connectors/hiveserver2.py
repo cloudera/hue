@@ -68,6 +68,7 @@ except ImportError, e:
 
 try:
   from jobbrowser.views import get_job
+  from jobbrowser.conf import ENABLE_QUERY_BROWSER
 except (AttributeError, ImportError), e:
   LOG.warn("Job Browser app is not enabled")
 
@@ -413,6 +414,14 @@ class HS2Api(Api):
         'started': job.get('started', False),
         'finished': job.get('finished', False)
       } for job in jobs_with_state]
+    elif snippet['type'] == 'impala' and ENABLE_QUERY_BROWSER.get():
+      query_id = "%x:%x" % struct.unpack(b"QQ", snippet['result']['handle']['guid'])
+      jobs = [{
+        'name': query_id,
+        'url': '/hue/jobbrowser/api/job#id=%s' % query_id,
+        'started': True,
+        'finished': False
+      }]
 
     return jobs
 
