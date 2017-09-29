@@ -358,6 +358,9 @@ ColumnSpecification
      }
      if (!$3['comment']) {
        keywords.push('COMMENT');
+       if (parser.isHive() && $2.toLowerCase() === 'double') {
+         keywords.push({ value: 'PRECISION', weight: 2 });
+       }
      }
      if (keywords.length > 0) {
        $$ = { suggestKeywords: keywords };

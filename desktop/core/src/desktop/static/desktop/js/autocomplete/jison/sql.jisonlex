@@ -97,6 +97,7 @@
 <hive>'DIRECTORY'                          { this.begin('hdfs'); return '<hive>DIRECTORY'; }
 <hive>'DISABLE'                            { return '<hive>DISABLE'; }
 <hive>'DISTRIBUTE'                         { return '<hive>DISTRIBUTE'; }
+<hive>DOUBLE\s+PRECISION                   { return '<hive>DOUBLE_PRECISION'; }
 <hive>'ESCAPED'                            { return '<hive>ESCAPED'; }
 <hive>'ENABLE'                             { return '<hive>ENABLE'; }
 <hive>'EXCHANGE'                           { return '<hive>EXCHANGE'; }
