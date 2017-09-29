@@ -642,22 +642,22 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       <td>
         <span data-bind="visible: type == 'file', text: stats.size"></span>
       </td>
-      <td>
+      <td class="truncate-text" style="max-width: 150px">
         % if is_fs_superuser:
-        <span data-bind="text: stats.user, visible: !selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <span data-bind="text: stats.user, visible: !selected() || $root.isCurrentDirSentryManaged() || isSentryManaged, attr: { 'title':  stats.user }"></span>
         <a href="#" rel="tooltip" title="${_('Change owner')}" data-original-title="${_('Change owner')}"
-            data-bind="text: stats.user, visible: !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changeOwner, enable: $root.selectedFiles().length > 0"></a>
+            data-bind="text: stats.user, visible: !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changeOwner, enable: $root.selectedFiles().length > 0, attr: { 'title':  stats.user }"></a>
         % else:
-        <span data-bind="text: stats.user"></span>
+        <span data-bind="text: stats.user, attr: { 'title':  stats.user }"></span>
         % endif
       </td>
-      <td>
+      <td class="truncate-text" style="max-width: 150px">
         % if is_fs_superuser:
-        <span data-bind="text: stats.group, visible: ! selected() || $root.isCurrentDirSentryManaged() || isSentryManaged"></span>
+        <span data-bind="text: stats.group, visible: ! selected() || $root.isCurrentDirSentryManaged() || isSentryManaged, attr: { 'title':  stats.group }"></span>
         <a href="#" rel="tooltip" title="${_('Change group')}" data-original-title="${_('Change group')}"
-            data-bind="text: stats.group, visible: !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changeOwner"></a>
+            data-bind="text: stats.group, visible: !$root.inTrash() && selected() && !$root.isCurrentDirSentryManaged() && !isSentryManaged, click: $root.changeOwner, attr: { 'title':  stats.group }"></a>
         % else:
-        <span data-bind="text: stats.group"></span>
+        <span data-bind="text: stats.group, attr: { 'title':  stats.group }"></span>
         % endif
       </td>
       <td>
