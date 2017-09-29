@@ -184,7 +184,17 @@ class ImpalaDaemonApi(object):
       raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
 
-  def get_query(self, query_id): pass
+  def get_query(self, query_id):
+    params = {
+      'query_id': query_id,
+      'json': 'true'
+    }
+
+    resp = self._root.get('query_plan', params=params)
+    try:
+      return json.loads(resp)
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi did not return valid JSON: %s' % e)
 
 
   def get_query_profile(self, query_id):
