@@ -69,21 +69,21 @@ class QueryApi(Api):
   def app(self, appid):
     api = get_impalad_api(user=self.user, url=self.server_url)
 
-    job = api.get_query(query_id=appid) # TODO
+    query = api.get_query(query_id=appid)
 
     common = {
-        'id': job['jobId'],
-        'name': job['jobId'],
-        'status': job['status'],
-        'apiStatus': self._api_status(job['status']),
+        'id': appid,
+        'name': query['stmt'][:100] + ('...' if len(query['stmt']) > 100 else ''),
+        'status': query['status'],
+        'apiStatus': self._api_status(query['status']),
         'progress': 50,
         'duration': 10 * 3600,
-        'submitted': job['creationDate'],
-        'type': 'dataeng-job-%s' % job['jobType'],
+        'submitted': 0,
+        'type': 'NA',
     }
 
     common['properties'] = {
-      'properties': job
+      'properties': query
     }
 
     return common
