@@ -1010,6 +1010,41 @@ var Collection = function (vm, collection) {
     return _facets;
   }
 
+  self.dropOnWidget = function (id) {
+    if (vm.isEditing() && vm.lastDraggedMeta() && vm.lastDraggedMeta().type === 'solr') {
+      var facet = self.getFacetById(id);
+      if (facet && facet.properties && facet.properties.facets_form) {
+        facet.properties.facets_form.field(vm.lastDraggedMeta().field());
+      }
+      if (self.supportAnalytics()) {
+        self.addPivotFacetValue2(facet);
+      }
+      else {
+        self.addPivotFacetValue(facet);
+      }
+      vm.lastDraggedMeta(null);
+    }
+  }
+
+  self.dropOnEmpty = function (column, atBeginning) {
+    if (vm.isEditing() && vm.lastDraggedMeta() && vm.lastDraggedMeta().type === 'solr') {
+      var row = column.addEmptyRow(atBeginning);
+      if (self.supportAnalytics()) {
+        row.addWidget(vm.draggableBucket());
+      }
+      else {
+        row.addWidget(vm.draggableBar());
+      }
+      var widget = row.widgets()[0];
+      self.addFacet({
+        'name': vm.lastDraggedMeta().field(),
+        'widget_id': widget.id(),
+        'widgetType': widget.widgetType()
+      });
+      vm.lastDraggedMeta(null);
+    }
+  }
+
   self.template.fields = ko.computed(function () {
     var _fields = [];
     $.each(self.template.fieldsAttributes(), function (index, field) {
@@ -1709,8 +1744,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
     self.availableDraggableMap = ko.computed(function () {
       return self.availableStringFields().length > 0;
-    })
+    });
 
+    self.lastDraggedMeta = ko.observable();
+    huePubSub.subscribe('draggable.text.meta', function (meta) {
+      self.lastDraggedMeta(meta);
+    }, 'dashboard');
 
     self.init = function (callback) {
       self.isEditing(self.columns().length == 0);
