@@ -640,12 +640,6 @@ div.navigator > ul > li.oozie > ul.dropdown-menu {
   margin-bottom: 0;
 }
 
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .datatables-counter-col {
   width: 10px;
 }
