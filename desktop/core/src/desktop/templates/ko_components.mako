@@ -453,12 +453,12 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-job-browser-links-template">
     <div class="btn-group pull-right">
-      <a class="btn btn-flat" style="padding-right: 2px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function(){ huePubSub.publish('hide.jobs.panel'); }">
+      <a class="btn btn-flat" style="padding-right: 4px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function(){ huePubSub.publish('hide.jobs.panel'); }">
         <span>${ _('Jobs') }</span>
       </a>
-      <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Mini job browser')}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
+      <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Jobs quick look')}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
         <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
-        <i class="fa fa-sliders"></i>
+        <i class="fa fa-th"></i>
       </button>
     </div>
   </script>
