@@ -23,7 +23,8 @@ DataDefinition_EDIT
  ;
 
 AlterStatement
- : AlterIndex
+ : AlterDatabase
+ | AlterIndex
  | AlterTable
  | AlterView
  | Msck
@@ -31,7 +32,8 @@ AlterStatement
  ;
 
 AlterStatement_EDIT
- : AlterIndex_EDIT
+ : AlterDatabase_EDIT
+ | AlterIndex_EDIT
  | AlterTable_EDIT
  | AlterView_EDIT
  | Msck_EDIT
@@ -39,11 +41,44 @@ AlterStatement_EDIT
  | 'ALTER' 'CURSOR'
    {
      if (parser.isHive()) {
-       parser.suggestKeywords(['INDEX', 'TABLE', 'VIEW']);
+       parser.suggestKeywords(['DATABASE', 'INDEX', 'SCHEMA', 'TABLE', 'VIEW']);
      } else {
        parser.suggestKeywords(['TABLE', 'VIEW']);
      }
    }
+ ;
+
+AlterDatabase
+ : 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>DBPROPERTIES' ParenthesizedPropertyAssignmentList
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>OWNER' PrincipalSpecification
+ ;
+
+AlterDatabase_EDIT
+ : 'ALTER' DatabaseOrSchema 'CURSOR'
+   {
+     if (parser.isHive()) {
+      parser.suggestDatabases();
+     }
+   }
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'CURSOR'
+   {
+     if (parser.isHive()) {
+       parser.suggestKeywords(['SET DBPROPERTIES', 'SET LOCATION', 'SET OWNER']);
+     }
+   }
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'CURSOR'
+    {
+      if (parser.isHive()) {
+        parser.suggestKeywords(['DBPROPERTIES', 'LOCATION', 'OWNER']);
+      }
+    }
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation_EDIT
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>OWNER' 'CURSOR'
+   {
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
+   }
+ | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>OWNER' PrincipalSpecification_EDIT
  ;
 
 AlterIndex

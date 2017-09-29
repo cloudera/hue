@@ -130,8 +130,8 @@ OptionalHiveDbProperties
  ;
 
 HiveDbProperties
- : '<hive>WITH' 'DBPROPERTIES' ParenthesizedPropertyAssignmentList
- | '<hive>WITH' 'DBPROPERTIES'
+ : '<hive>WITH' '<hive>DBPROPERTIES' ParenthesizedPropertyAssignmentList
+ | '<hive>WITH' '<hive>DBPROPERTIES'
  | '<hive>WITH' 'CURSOR'
    {
      parser.suggestKeywords(['DBPROPERTIES']);
