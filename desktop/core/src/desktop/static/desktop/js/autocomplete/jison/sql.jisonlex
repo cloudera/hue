@@ -88,6 +88,7 @@
 <hive>'DATABASES'                          { return '<hive>DATABASES'; }
 <hive>'DAY'                                { return '<hive>DAY'; }
 <hive>'DAYOFWEEK'                          { return '<hive>DAYOFWEEK'; }
+<hive>'DBPROPERTIES'                       { return '<hive>DBPROPERTIES'; }
 <hive>'DEFERRED'                           { return '<hive>DEFERRED'; }
 <hive>'DEFINED'                            { return '<hive>DEFINED'; }
 <hive>'DELIMITED'                          { return '<hive>DELIMITED'; }
@@ -134,6 +135,7 @@
 <hive>'OUTPUTFORMAT'                       { return '<hive>OUTPUTFORMAT'; }
 <hive>'OVERWRITE'                          { return '<hive>OVERWRITE'; }
 <hive>OVERWRITE\s+DIRECTORY                { this.begin('hdfs'); return '<hive>OVERWRITE_DIRECTORY'; }
+<hive>'OWNER'                              { return '<hive>OWNER'; }
 <hive>'PARQUET'                            { return '<hive>PARQUET'; }
 <hive>'PARTITIONED'                        { return '<hive>PARTITIONED'; }
 <hive>'PARTITIONS'                         { return '<hive>PARTITIONS'; }
