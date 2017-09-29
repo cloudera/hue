@@ -107,9 +107,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('App ID')}</li>
-          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
+          <li class="white truncate-text" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white truncate" title="${job.applicationType}">${job.applicationType}</li>
+          <li class="white truncate-text" title="${job.applicationType}">${job.applicationType}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -228,9 +228,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Job ID')}</li>
-          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
+          <li class="white truncate-text" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white truncate" title="${job.applicationType or 'MR2'}">${job.applicationType or 'MR2'}</li>
+          <li class="white truncate-text" title="${job.applicationType or 'MR2'}">${job.applicationType or 'MR2'}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           % if job.conf_keys is not None and 'hive.server2.proxy.user' in job.conf_keys:
@@ -449,9 +449,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('App ID')}</li>
-          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
+          <li class="white truncate-text" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white truncate" title="${job.applicationType}">${job.applicationType}</li>
+          <li class="white truncate-text" title="${job.applicationType}">${job.applicationType}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>

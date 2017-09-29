@@ -29,7 +29,7 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Attempt ID') }</li>
-          <li class="white truncate" title="${ attempt_index }">${ attempt_index }</li>
+          <li class="white truncate-text" title="${ attempt_index }">${ attempt_index }</li>
         </ul>
       </div>
     </div>
