@@ -71,7 +71,7 @@ ${ fb_components.menubar() }
 </div>
 
 
-<div id="saveAsModal" class="modal hide fade" style="width: 574px; margin-left: -287px">
+<div id="saveAsModal" class="modal hide fade">
     <form id="saveAsForm" action="${url('filebrowser.views.save_file')}" method="POST" class="form-stacked form-padding-fix">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
@@ -80,9 +80,9 @@ ${ fb_components.menubar() }
     </div>
     <div class="modal-body" style="max-height: 430px">
         <span class="help-block">${_("Enter the location where you would like to save the file.")}</span>
-        ${ edit.render_field(form["path"], notitle=True, nolabel=True, klass="pathChooser input-xxlarge", attrs={ 'style': 'margin-bottom: 0' }) }
+        ${ edit.render_field(form["path"], notitle=True, nolabel=True, klass="pathChooser input-xxlarge", attrs={ 'style': 'margin-bottom: 0; width: 510px' }) }
         <br/>
-        <div id="fileChooserSaveModal" class="hide margin-top-10"></div>
+        <div id="fileChooserSaveModal" class="hide margin-top-20"></div>
     </div>
     <div class="modal-footer">
         <div id="saveAsNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10;">
