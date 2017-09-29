@@ -1839,6 +1839,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         else if (/[a-z0-9]{8}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{12}/.test(self.id())) {
           interface = 'dataeng-jobs';
         }
+        else if (/[a-z0-9]{16}:[a-z0-9]{16}/.test(self.id())) {
+          interface = 'queries';
+        }
         else if (/livy-[0-9]+/.test(self.id())) {
           interface = 'livy-sessions';
         }

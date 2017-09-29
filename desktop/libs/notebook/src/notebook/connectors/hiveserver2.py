@@ -418,7 +418,7 @@ class HS2Api(Api):
       query_id = "%x:%x" % struct.unpack(b"QQ", snippet['result']['handle']['guid'])
       jobs = [{
         'name': query_id,
-        'url': '/hue/jobbrowser/api/job#id=%s' % query_id,
+        'url': '/hue/jobbrowser#!id=%s' % query_id,
         'started': True,
         'finished': False
       }]
