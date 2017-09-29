@@ -6270,6 +6270,7 @@
           $('.hoverMsg').addClass('hide');
           $('#progressStatus').removeClass('hide');
           $('#progressStatusBar').removeClass('hide');
+          $('#progressStatus .progress-row').remove();
           $('#progressStatusBar div').css('width', '0');
         },
         uploadprogress: function (file, progress) {

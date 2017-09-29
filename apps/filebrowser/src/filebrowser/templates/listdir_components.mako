@@ -2064,6 +2064,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               if (e.dataTransfer.files.length > 0) {
                 $('#progressStatus').removeClass('hide');
                 $('#progressStatusBar').removeClass('hide');
+                $('#progressStatus .progress-row').remove();
                 $('#progressStatusBar div').css('width', '0');
               }
             },
