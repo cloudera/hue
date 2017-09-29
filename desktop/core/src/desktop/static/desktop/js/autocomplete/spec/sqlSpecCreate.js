@@ -2434,16 +2434,28 @@
             beforeCursor: 'CREATE TABLE foo (id ',
             afterCursor: '',
             dialect: 'hive',
-            containsKeywords: ['BIGINT', 'MAP<>'],
+            containsKeywords: ['BIGINT', 'MAP<>', 'DOUBLE PRECISION'],
             expectedResult: {
               lowerCase: false
             }
           });
         });
 
-        it('should suggest keywords for "CREATE TABLE foo(id |"', function () {
+        it('should suggest keywords for "CREATE TABLE foo (id DOUBLE |"', function () {
           assertAutoComplete({
-            beforeCursor: 'CREATE TABLE foo(id ',
+            beforeCursor: 'CREATE TABLE foo (id DOUBLE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PRECISION', 'COMMENT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo(baa DOUBLE PRECISION, id |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo(baa DOUBLE PRECISION, id ',
             afterCursor: '',
             dialect: 'hive',
             containsKeywords: ['BIGINT', 'MAP<>'],
