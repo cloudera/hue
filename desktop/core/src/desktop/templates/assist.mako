@@ -2647,7 +2647,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           <!-- ko if: filteredFields().length > 0 -->
           <ul class="assist-tables" data-bind="foreachVisible: { data: filteredFields, minHeight: 23, container: '.assist-db-scrollable' }">
             <li class="assist-entry assist-table-link" style="position: relative;">
-              <div class="assist-entry default-cursor assist-entry-left-action" href="javascript:void(0)" data-bind="attr: {'title':  name() + ' - ' + type() }, draggableText: { text: name, meta: {'type': 'solr', 'field': name, 'type': type} }">
+              <div class="assist-entry default-cursor assist-entry-left-action" href="javascript:void(0)" data-bind="attr: {'title':  name() + ' - ' + type() }, draggableText: { text: name, meta: {'type': 'solr', 'field': name, 'fieldType': type} }">
                 <span data-bind="text: type" class="muted pull-right margin-right-20"></span>
                 <span data-bind="text: name"></span><!-- ko if: isId  --> <i class="fa fa-key"></i><!-- /ko -->
               </div>
