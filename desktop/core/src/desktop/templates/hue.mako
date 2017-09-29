@@ -247,6 +247,12 @@ ${ hueIcons.symbols() }
     <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
     <ul class="nav nav-pills">
       <li class="active" data-interface="jobs"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'jobs')">${_('Jobs')}</a></li>
+      % if 'jobbrowser' in apps:
+      <% from jobbrowser.conf import ENABLE_QUERY_BROWSER %>
+      % if ENABLE_QUERY_BROWSER.get():
+        <li data-interface="queries"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'queries')">${_('Queries')}</a></li>
+      % endif
+      % endif
       <li data-interface="workflows"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'workflows')">${_('Workflows')}</a></li>
       <li data-interface="schedules"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'schedules')">${_('Schedules')}</a></li>
     </ul>
