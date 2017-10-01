@@ -831,22 +831,28 @@
 
 [dashboard]
 
-  ## Activate the Dashboard link in the menu.
-  # is_enabled=true
+  # Activate the Dashboard link in the menu.
+  ## is_enabled=true
 
-  ## Activate the SQL Dashboard (beta).
-  # has_sql_enabled=false
+  # Activate the SQL Dashboard (beta).
+  ## has_sql_enabled=false
+
+  # Activate the Query Builder (beta).
+  ## has_query_builder_enabled=false
+
+  # Activate the static report layout (beta).
+  ## has_report_enabled=false
 
   [[engines]]
 
     #  [[[solr]]]
-    ##  Requires Solr 6+
-    #  analytics=false
-    #  nesting=false
+    #  Requires Solr 6+
+    ##  analytics=false
+    ##  nesting=false
 
     #  [[[sql]]]
-    #  analytics=true
-    #  nesting=false
+    ##  analytics=true
+    ##  nesting=false
 
 
 ###########################################################################
