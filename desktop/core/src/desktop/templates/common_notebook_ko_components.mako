@@ -189,6 +189,11 @@ except ImportError, e:
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
+        <li>
+          <a data-bind="css: clipboardClass" title="${ _('Copy the displayed results to your clipboard') }">
+            <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
+          </a>
+        </li>
         % if ENABLE_SQL_INDEXER.get():
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Explore result in a dashboard') }">
@@ -196,11 +201,6 @@ except ImportError, e:
           </a>
         </li>
         % endif
-        <li>
-          <a data-bind="css: clipboardClass" title="${ _('Copy the displayed results in your clipboard') }">
-            <i class="fa fa-fw fa-clipboard"></i> ${ _('Clipboard') }
-          </a>
-        </li>
         <li>
           <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
             <i class="fa fa-fw fa-save"></i> ${ _('Save') }
@@ -370,7 +370,7 @@ except ImportError, e:
         });
 
         clipboard.on('success', function (e) {
-          $.jHueNotify.info(CopyToClipboardGlobals.i18n.SUCCESS)
+          $.jHueNotify.info(self.snippet.result.data().length + ' ' + CopyToClipboardGlobals.i18n.SUCCESS)
           e.clearSelection();
         });
 
