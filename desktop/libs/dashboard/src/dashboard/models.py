@@ -231,8 +231,12 @@ class Collection2(object):
       schema_fields = schema_fields['schema']['fields']
     except Exception, e:
       LOG.warn('/luke call did not succeed: %s' % e)
-      fields = api.schema_fields(name)
-      schema_fields = Collection2._make_luke_from_schema_fields(fields)
+      try:
+        fields = api.schema_fields(name)
+        schema_fields = Collection2._make_luke_from_schema_fields(fields)
+      except Exception, e:
+        LOG.error('Could not access collection: %s' % e)
+        return []
 
     return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.iteritems()])
 
