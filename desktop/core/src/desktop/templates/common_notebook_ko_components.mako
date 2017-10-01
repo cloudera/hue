@@ -355,6 +355,10 @@ except ImportError, e:
             if (self.snippet.result && self.snippet.result.data()) {
               var data = self.snippet.result.data();
               var result = '';
+              self.snippet.result.meta().forEach(function (row) {
+                result += hueUtils.html2text(row.name) + '\t';
+              });
+              result += '\n';
               data.forEach(function (row) {
                 for (var i = 1; i < row.length; i++) { // skip the row number column
                   result += hueUtils.html2text(row[i]) + '\t';
