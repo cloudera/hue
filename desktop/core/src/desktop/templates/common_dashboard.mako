@@ -23,6 +23,8 @@
 
 <%!
   from django.utils.translation import ugettext as _
+
+  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED
 %>
 
 <%def name="import_layout(with_deferred=False)">
@@ -51,11 +53,14 @@
         <div class="layout-box" style="width: 72px; margin-left: 4px"><i class="fa fa-line-chart"></i></div>
       </div>
     </a>
+    % if HAS_QUERY_BUILDER_ENABLED.get():
     <a href="javascript: fullLayout(searchViewModel)" title="${ _('Query Builder: Single widget for easily analysing data in multiple dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
       </div>
     </a>
+    % endif
+    % if HAS_REPORT_ENABLED.get():
     <a href="javascript: fullLayout(searchViewModel)" title="${ _('Report: static dashboard with multiple widgets executing independent queries') }" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;">
@@ -63,6 +68,7 @@
         </div>
       </div>
     </a>
+    % endif
     <a href="javascript: fullLayout(searchViewModel)" title="${ _('Empty dashboard that can be used as a starting point') }" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
