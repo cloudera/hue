@@ -216,7 +216,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var CopyToClipboardGlobals = {
       i18n: {
         ERROR: "${ _('Error while copying results.') }",
-        SUCCESS: "${ _('results copied to the clipboard') }",
+        SUCCESS: "${ _('result(s) copied to the clipboard') }",
       }
     }
 
