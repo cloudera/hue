@@ -557,6 +557,7 @@ qq.FileUploader = function(o){
     this._button = this._createUploadButton(this._find(this._element, 'button'));
 
     this._bindCancelEvent();
+    this._bindCancelAllEvent();
     this._setupDragDrop();
 };
 
@@ -696,6 +697,15 @@ qq.extend(qq.FileUploader.prototype, {
                 qq.remove(item);
             }
         });
+    },
+    _bindCancelAllEvent: function() {
+      var self = this,
+        list = this._listElement;
+      $('#uploadFileModal').on('hidden', function () {
+        for (var i = 0, l = list && list.childNodes.length; i < l; i++) {
+          self._handler.cancel(list.childNodes[i].qqFileId);
+        }
+      });
     }
 });
 

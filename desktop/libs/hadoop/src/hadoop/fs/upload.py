@@ -143,6 +143,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     self._destination = request.GET.get('dest', None) # GET param avoids infinite looping
     self.request = request
     fs = fsmanager.get_filesystem('default')
+    fs.setuser(request.user.username)
     FileUploadHandler.chunk_size = fs.get_upload_chuck_size(self._destination) if self._destination else UPLOAD_CHUNK_SIZE.get()
 
     LOG.debug("Chunk size = %d" % FileUploadHandler.chunk_size)
@@ -154,6 +155,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
       try:
         fs_ref = self.request.REQUEST.get('fs', 'default')
         self.request.fs = fsmanager.get_filesystem(fs_ref)
+        self.request.fs.setuser(self.request.user.username)
         self._file = HDFStemporaryUploadedFile(self.request, file_name, self._destination)
         LOG.debug('Upload attempt to %s' % (self._file.get_temp_path(),))
         self._activated = True
