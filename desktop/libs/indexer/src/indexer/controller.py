@@ -274,7 +274,7 @@ class CollectionManagerController(object):
     FETCH_BATCH = 1000
     has_more = True
 
-    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+    client = SolrClient(self.user)
 
     try:
       while ROW_COUNT < MAX_ROWS and has_more:
@@ -282,12 +282,13 @@ class CollectionManagerController(object):
         has_more = result['has_more']
 
         if result['data']:
+          kwargs = {'rowid': 'id'}
           dataset = tablib.Dataset()
           dataset.append(columns)
           for i, row in enumerate(result['data']):
             dataset.append([ROW_COUNT + i] + [cell if cell else (0 if isinstance(cell, numbers.Number) else '') for cell in row])
 
-          if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
+          if not client.index(name=collection_or_core_name, data=dataset.csv, **kwargs):
             raise PopupException(_('Could not update index. Check error logs for more info.'))
 
         ROW_COUNT += len(dataset)
