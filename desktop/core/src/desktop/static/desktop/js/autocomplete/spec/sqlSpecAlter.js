@@ -322,7 +322,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['IF NOT EXISTS', 'COLUMNS', 'PARTITION']
+              suggestKeywords: ['IF NOT EXISTS', 'COLUMNS', 'CONSTRAINT', 'PARTITION']
             }
           });
         });
@@ -359,6 +359,54 @@
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['CASCADE', 'RESTRICT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD CONSTRAINT boo FOREIGN |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD CONSTRAINT boo FOREIGN ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD CONSTRAINT boo FOREIGN KEY (bla) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD CONSTRAINT boo FOREIGN KEY (bla) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['REFERENCES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD CONSTRAINT boo FOREIGN KEY (bla) REFERENCES tbl(col) DISABLE NOVALIDATE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD CONSTRAINT boo FOREIGN KEY (bla) REFERENCES tbl(col) DISABLE NOVALIDATE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['NORELY', 'RELY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ADD CONSTRAINT boo PRIMARY KEY (id) |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ADD CONSTRAINT boo PRIMARY KEY (id) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DISABLE NOVALIDATE']
             }
           });
         });
@@ -695,7 +743,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['IF EXISTS', 'PARTITION']
+              suggestKeywords: ['IF EXISTS', 'CONSTRAINT', 'PARTITION']
             }
           });
         });
@@ -785,6 +833,18 @@
           });
         });
 
+        it('should suggest keywords for "ALTER TABLE bar EXCHANGE PARTITION (boo=\'baa\') |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar EXCHANGE PARTITION (boo=\'baa\') ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['WITH TABLE']
+            }
+          });
+        });
+
         it('should suggest keywords for "ALTER TABLE bar EXCHANGE PARTITION ((boo=\'baa\'), (baa=\'boo\')) |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER TABLE bar EXCHANGE PARTITION ((boo=\'baa\'), (baa=\'boo\')) ',
@@ -868,6 +928,54 @@
               suggestKeywords: ['ADD COLUMNS', 'CHANGE', 'COMPACT', 'CONCATENATE', 'DISABLE NO_DROP', 'DISABLE OFFLINE',
                 'ENABLE NO_DROP', 'ENABLE OFFLINE', 'RENAME TO PARTITION', 'REPLACE COLUMNS', 'SET FILEFORMAT',
                 'SET LOCATION', 'SET SERDE', 'SET SERDEPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar COMPACT \'boo\' |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar COMPACT \'boo\' ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['AND WAIT', 'WITH OVERWRITE TBLPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar COMPACT \'boo\' AND |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar COMPACT \'boo\' AND ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['WAIT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar COMPACT \'boo\' WITH |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar COMPACT \'boo\' WITH ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['OVERWRITE TBLPROPERTIES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar COMPACT \'boo\' WITH OVERWRITE |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar COMPACT \'boo\' WITH OVERWRITE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['TBLPROPERTIES']
             }
           });
         });
@@ -1037,6 +1145,18 @@
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['NO_DROP', 'OFFLINE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar PARTITION (col=\'val\') DISABLE NO_DROP |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar PARTITION (col=\'val\') DISABLE NO_DROP ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['CASCADE']
             }
           });
         });
