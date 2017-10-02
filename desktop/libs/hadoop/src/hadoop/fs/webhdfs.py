@@ -34,7 +34,6 @@ from hadoop.fs import normpath as fs_normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
-from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup
 
 
@@ -663,7 +662,7 @@ class WebHdfs(Hdfs):
         raise ex
 
   def get_upload_chuck_size(self):
-    return UPLOAD_CHUNK_SIZE.get()
+    return hadoop.conf.UPLOAD_CHUNK_SIZE.get()
 
   def copyfile(self, src, dst, skip_header=False):
     sb = self._stats(src)
