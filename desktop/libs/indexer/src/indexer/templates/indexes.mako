@@ -343,7 +343,7 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="list-indexes">
-  <table class="table table-condensed datatables">
+  <table class="table table-condensed datatables" id="list-indexes-table">
     <thead>
       <tr>
         <th class="vertical-align-middle" width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
@@ -355,7 +355,7 @@ ${ assist.assistPanel() }
     <tbody data-bind="foreach: { data: filteredIndexes }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default">
-          <div data-bind="css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
+          <div data-bind="multiCheck: '#list-indexes-table', css: {'hueCheckbox': true, 'fa': true, 'fa-check': isSelected}"></div>
         </td>
         <td><a class="pointer" data-bind="text: name, click: function() { $root.fetchIndex($data); }"></a></td>
         <td data-bind="text: type"></td>
