@@ -118,6 +118,8 @@ AlterTable
  : AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs OptionalCachedInOrUncached
  | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' RangePartitionSpec
  | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' '<impala>PARTITION_VALUE' '=' UnsignedValueSpecification
+ | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' RegularOrBacktickedIdentifier HivePrimaryKeySpecification
+ | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' RegularOrBacktickedIdentifier HiveForeignKeySpecification
  | AlterTableLeftSide AnyRename 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide HiveSpecificOperations
  | AlterTableLeftSide DropOperations
@@ -139,7 +141,7 @@ AlterTable_EDIT
      if (!$3 && parser.isImpala()) {
        parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 4 }, { value: 'COLUMNS', weight: 3 }, { value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
      } else if (!$3 && parser.isHive()) {
-       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'CONSTRAINT', weight: 1 }, {  value: 'PARTITION', weight: 1 }]);
      } else if (parser.isImpala()) {
        parser.suggestKeywords([{ value: 'PARTITION', weight: 2 }, { value: 'RANGE PARTITION', weight: 1 }]);
      } else if (parser.isHive()) {
@@ -190,6 +192,13 @@ AlterTable_EDIT
      parser.suggestKeywords(['=']);
    }
  | AlterTableLeftSide AnyAdd OptionalIfNotExists '<impala>RANGE' 'PARTITION' RangePartitionSpec_EDIT
+ | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' 'CURSOR'
+ | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
+   {
+     parser.suggestKeywords(['FOREIGN KEY', 'PRIMARY KEY']);
+   }
+ | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' RegularOrBacktickedIdentifier HivePrimaryKeySpecification_EDIT
+ | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' RegularOrBacktickedIdentifier HiveForeignKeySpecification_EDIT
  | AlterTableLeftSide HiveSpecificOperations_EDIT
  | AlterTableLeftSide OptionalPartitionOperations_EDIT
  | AlterTableLeftSide DropOperations_EDIT
@@ -340,7 +349,7 @@ OptionalPartitionOperations
  | 'SET' '<impala>UNCACHED'
  | AddReplaceColumns
  | '<hive>CONCATENATE'
- | '<hive>COMPACT' QuotedValue
+ | '<hive>COMPACT' QuotedValue OptionalAndWait OptionalWithOverwriteTblProperties
  | HiveEnableOrDisable HiveNoDropOrOffline
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification OptionalHiveFirstOrAfter OptionalHiveCascadeOrRestrict
  ;
@@ -370,10 +379,21 @@ OptionalPartitionOperations_EDIT
      }
    }
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification OptionalHiveFirstOrAfter_EDIT OptionalHiveCascadeOrRestrict
+ | '<hive>COMPACT' QuotedValue OptionalAndWait OptionalWithOverwriteTblProperties 'CURSOR'
+   {
+     if (!$3 && !$4) {
+       parser.suggestKeywords(['AND WAIT', 'WITH OVERWRITE TBLPROPERTIES']);
+     } else if (!$4) {
+       parser.suggestKeywords(['WITH OVERWRITE TBLPROPERTIES']);
+     }
+   }
+ | '<hive>COMPACT' QuotedValue AndWait_EDIT OptionalWithOverwriteTblProperties
+ | '<hive>COMPACT' QuotedValue OptionalAndWait WithOverwriteTblProperties_EDIT
  | HiveEnableOrDisable 'CURSOR'
    {
      parser.suggestKeywords(['NO_DROP', 'OFFLINE']);
    }
+ | HiveEnableOrDisable HiveNoDropOrOffline_EDIT
  | 'SET' AnyFileFormat 'CURSOR'
    {
      parser.suggestFileFormats();
@@ -394,6 +414,34 @@ OptionalPartitionOperations_EDIT
      }
    }
  | 'SET' '<hive>SERDE' QuotedValue WithSerdeproperties_EDIT
+ ;
+
+OptionalAndWait
+ :
+ | 'AND' '<hive>WAIT'
+ ;
+
+AndWait_EDIT
+ : 'AND' 'CURSOR'
+   {
+     parser.suggestKeywords(['WAIT']);
+   }
+ ;
+
+OptionalWithOverwriteTblProperties
+ :
+ | 'WITH' '<hive>OVERWRITE' '<hive>TBLPROPERTIES' ParenthesizedPropertyAssignmentList
+ ;
+
+WithOverwriteTblProperties_EDIT
+ : 'WITH' 'CURSOR'
+   {
+     parser.suggestKeywords(['OVERWRITE TBLPROPERTIES']);
+   }
+ | 'WITH' '<hive>OVERWRITE' 'CURSOR'
+   {
+     parser.suggestKeywords(['TBLPROPERTIES']);
+   }
  ;
 
 AddReplaceColumns
@@ -444,10 +492,12 @@ HiveExchange_EDIT
 
 ExchangePartitionSpec
  : 'PARTITION' '(' OneOrMorePartitionSpecLists ')'
+ | 'PARTITION' '(' PartitionSpecList ')'
  ;
 
 ExchangePartitionSpec_EDIT
  : 'PARTITION' '(' OneOrMorePartitionSpecLists_EDIT RightParenthesisOrError
+ | 'PARTITION' '(' PartitionSpecList_EDIT RightParenthesisOrError
  ;
 
 OneOrMorePartitionSpecLists
@@ -462,6 +512,7 @@ OneOrMorePartitionSpecLists_EDIT
 
 DropOperations
  : 'DROP' OptionalIfExists OneOrMorePartitionSpecs OptionalHivePurge
+ | 'DROP' '<hive>CONSTRAINT' RegularOrBacktickedIdentifier
  | 'DROP' OptionalIfExists '<impala>RANGE'
  | 'DROP' OptionalIfExists '<impala>RANGE' 'PARTITION' RangePartitionSpec
  | 'DROP' OptionalIfExists '<impala>RANGE' '<impala>PARTITION_VALUE' '=' UnsignedValueSpecification
@@ -472,7 +523,7 @@ DropOperations_EDIT
  : 'DROP' OptionalIfExists 'CURSOR'
    {
      if (parser.isHive() && !$2) {
-       parser.suggestKeywords([{ value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
+       parser.suggestKeywords([{ value: 'CONSTRAINT', weight: 1}, { value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
      } else if (parser.isHive()) {
         parser.suggestKeywords(['PARTITION']);
      } else if (parser.isImpala() && !$2) {
@@ -489,6 +540,7 @@ DropOperations_EDIT
        parser.suggestKeywords(['PURGE']);
      }
    }
+ | 'DROP' '<hive>CONSTRAINT' 'CURSOR'
  | 'DROP' OptionalIfExists_EDIT
  | 'DROP' OptionalIfExists '<impala>RANGE' 'CURSOR'
    {
@@ -591,8 +643,17 @@ HiveEnableOrDisable
  ;
 
 HiveNoDropOrOffline
- : '<hive>NO_DROP'
+ : '<hive>NO_DROP' OptionalCascade
  | '<hive>OFFLINE'
+ ;
+
+HiveNoDropOrOffline_EDIT
+ : '<hive>NO_DROP' OptionalCascade 'CURSOR'
+   {
+     if (!$2) {
+       parser.suggestKeywords(['CASCADE']);
+     }
+   }
  ;
 
 HiveOrImpalaSerdeproperties
