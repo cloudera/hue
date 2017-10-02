@@ -44,53 +44,58 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
       <i class="fa fa-fw fa-pencil"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a title="${ _('Submit') }" rel="tooltip" data-placement="bottom" data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': workflow.isDirty()}, visible: workflow.id() != null">
       <i class="fa fa-fw fa-play"></i>
     </a>
-
-    <a title="${ _('Schedule') }" rel="tooltip" data-placement="bottom" data-bind="click: schedule, css: {'btn': true, 'disabled': workflow.isDirty()}, visible: workflow.id() != null">
-      <i class="fa fa-fw fa-calendar"></i>
-    </a>
-
-    &nbsp;&nbsp;&nbsp;
-
-    <a title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}, visible: canEdit">
-      <i class="fa fa-fw fa-cog"></i>
-    </a>
-
-    <a title="${ _('Workspace') }" ${ not is_embeddable and 'target="_blank"' or ''} rel="tooltip" data-placement="right"
-        data-original-title="${ _('Go upload additional files and libraries to the deployment directory') }"
-        data-bind="css: {'btn': true}, hueLink: '/filebrowser/view=' + $root.workflow.properties.deployment_dir()"
-      >
-      <i class="fa fa-fw fa-folder-open"></i>
-    </a>
-
-    &nbsp;&nbsp;&nbsp;
 
     <a title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: validateAndSave, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit">
       <i class="fa fa-fw fa-save"></i>
     </a>
 
-    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
-        attr: {'data-original-title': '${ _ko("Share") } ' + name},
-        css: {'isShared': isShared(), 'btn': true},
-        visible: workflow.id() != null && canEdit()">
-      <i class="fa fa-users"></i>
-    </a>
+    <div class="dropdown pull-right margin-left-10">
+      <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+        <i class="fa fa-fw fa-ellipsis-v"></i>
+      </a>
+      <ul class="dropdown-menu">
+        <li data-bind="visible: workflow.id() != null, css: {'disabled': workflow.isDirty()}">
+          <a class="pointer" data-bind="click: schedule">
+            <i class="fa fa-fw fa-calendar"></i> ${ _('Schedule') }
+          </a>
+        </li>
+        <li data-bind="visible: canEdit">
+          <a class="pointer" data-toggle="modal" data-target="#settingsModal">
+            <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
+          </a>
+        </li>
+        <li>
+          <a ${ not is_embeddable and 'target="_blank"' or ''}
+              title="${ _('Go upload additional files and libraries to the deployment directory') }"
+              data-bind="hueLink: '/filebrowser/view=' + $root.workflow.properties.deployment_dir()"
+            >
+            <i class="fa fa-fw fa-folder-open"></i> ${ _('Workspace') }
+          </a>
+        </li>
+        <li data-bind="visible: workflow.id() != null && canEdit()">
+          <a class="pointer share-link" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal, css: {'isShared': isShared()}">
+            <i class="fa fa-fw fa-users"></i> ${ _("Share") }
+          </a>
+        </li>
+        <li class="divider"></li>
+        <li>
+          <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_workflow') }'">
+            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+          </a>
+        </li>
+        %if is_embeddable:
+          <li>
+            <a href="javascript: void(0)" data-bind="hueLink: '/home/?type=oozie-workflow2'">
+              <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Workflows') }
+            </a>
+          </li>
+        %endif
+      </ul>
+    </div>
 
-    &nbsp;&nbsp;&nbsp;
-
-
-    <a class="btn" href="javascript: void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '${ url('oozie:new_workflow') }'">
-      <i class="fa fa-fw fa-file-o"></i>
-    </a>
-    %if is_embeddable:
-    <a class="btn" href="javascript: void(0)" title="${ _('Workflows') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '/home/?type=oozie-workflow2'">
-      <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-    </a>
-    %endif
   </div>
 </%def>
 
