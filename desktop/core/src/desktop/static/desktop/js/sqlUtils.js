@@ -18,17 +18,17 @@
 var SqlUtils = (function () {
 
   var hiveReservedKeywords = {
-    ALL: true, ALTER: true, AND: true, ARRAY: true, AS: true, AUTHORIZATION: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BOTH: true, BY: true, CASE: true, CAST: true,
-    CHAR: true, COLUMN: true, CONF: true, CREATE: true, CROSS: true, CUBE: true, CURRENT: true, CURRENT_DATE: true, CURRENT_TIMESTAMP: true, CURSOR: true,
-    DATABASE: true, DATE: true, DECIMAL: true, DELETE: true, DESCRIBE: true, DISTINCT: true, DIV: true, DOUBLE: true, DROP: true, ELSE: true, END: true, EXCHANGE: true, EXISTS: true,
-    EXTENDED: true, EXTERNAL: true, FALSE: true, FETCH: true, FLOAT: true, FOLLOWING: true, FOR: true, FROM: true, FULL: true, FUNCTION: true, GRANT: true, GROUP: true,
-    GROUPING: true, HAVING: true, IF: true, IMPORT: true, IN: true, INNER: true, INSERT: true, INT: true, INTERSECT: true, INTERVAL: true, INTO: true, IS: true, JOIN: true, LATERAL: true,
-    LEFT: true, LESS: true, LIKE: true, LOCAL: true, MACRO: true, MAP: true, MORE: true, NONE: true, NOT: true, NULL: true, OF: true, ON: true, OR: true, ORDER: true, OUT: true, OUTER: true, OVER: true,
-    PARTIALSCAN: true, PARTITION: true, PERCENT: true, PRECEDING: true, PRESERVE: true, PROCEDURE: true, RANGE: true, READS: true, REDUCE: true,
-    REGEXP: true, REVOKE: true, RIGHT: true, RLIKE: true, ROLLUP: true, ROW: true, ROWS: true,
-    SELECT: true, SET: true, SMALLINT: true, TABLE: true, TABLESAMPLE: true, THEN: true, TIMESTAMP: true, TO: true, TRANSFORM: true, TRIGGER: true, TRUE: true,
-    TRUNCATE: true, UNBOUNDED: true, UNION: true, UNIQUEJOIN: true, UPDATE: true, USER: true, USING: true, VALUES: true, VARCHAR: true, WHEN: true, WHERE: true,
-    WINDOW: true, WITH: true
+    ALL: true, ALTER: true, AND: true, ARRAY: true, AS: true, AUTHORIZATION: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BOTH: true, BY: true, CACHE: true, CASE: true,
+    CAST: true, CHAR: true, COLUMN: true, COMMIT: true, CONF: true, CONSTRAINT: true, CREATE: true, CROSS: true, CUBE: true, CURRENT: true, CURRENT_DATE: true, CURRENT_TIMESTAMP: true,
+    CURSOR: true, DATABASE: true, DATE: true, DAYOFWEEK: true, DECIMAL: true, DELETE: true, DESCRIBE: true, DISTINCT: true, DIV: true, DOUBLE: true, DROP: true, ELSE: true, END: true,
+    EXCHANGE: true, EXTRACT: true, EXISTS: true, EXTENDED: true, EXTERNAL: true, FALSE: true, FETCH: true, FLOAT: true, FLOOR: true, FOLLOWING: true, FOR: true, FOREIGN: true,FROM: true,
+    FULL: true, FUNCTION: true, GRANT: true, GROUP: true, GROUPING: true, HAVING: true, IF: true, IMPORT: true, IN: true, INNER: true, INSERT: true, INT: true, INTEGER: true,
+    INTERSECT: true, INTERVAL: true, INTO: true, IS: true, JOIN: true, LATERAL: true, LEFT: true, LESS: true, LIKE: true, LOCAL: true, MACRO: true, MAP: true, MORE: true, NONE: true,
+    NOT: true, NULL: true, NUMERIC: true, OF: true, ON: true, ONLY: true, OR: true, ORDER: true, OUT: true, OUTER: true, OVER: true, PARTIALSCAN: true, PARTITION: true, PERCENT: true,
+    PRECEDING: true, PRECISION: true, PRESERVE: true, PRIMARY: true, PROCEDURE: true, RANGE: true, READS: true, REDUCE: true, REFERENCES: true, REGEXP: true, REVOKE: true, RIGHT: true,
+    RLIKE: true, ROLLBACK: true, ROLLUP: true, ROW: true, ROWS: true, SELECT: true, SET: true, SMALLINT: true, START: true, TABLE: true, TABLESAMPLE: true, THEN: true, TIME: true,
+    TIMESTAMP: true, TO: true, TRANSFORM: true, TRIGGER: true, TRUE: true, TRUNCATE: true, UNBOUNDED: true, UNION: true, UNIQUEJOIN: true, UPDATE: true, USER: true, USING: true,
+    VALUES: true, VARCHAR: true, VIEWS: true, WHEN: true, WHERE: true, WINDOW: true, WITH: true
   };
 
   var extraHiveReservedKeywords = {
