@@ -134,6 +134,7 @@
 <hive>'MINUTE'                             { return '<hive>MINUTE'; }
 <hive>'MONTH'                              { return '<hive>MONTH'; }
 <hive>'MSCK'                               { return '<hive>MSCK'; }
+<hive>'NORELY'                             { return '<hive>NORELY'; }
 <hive>'NOSCAN'                             { return '<hive>NOSCAN'; }
 <hive>'NOVALIDATE'                         { return '<hive>NOVALIDATE'; }
 <hive>'NO_DROP'                            { return '<hive>NO_DROP'; }
@@ -152,6 +153,7 @@
 <hive>'RCFILE'                             { return '<hive>RCFILE'; }
 <hive>'REBUILD'                            { return '<hive>REBUILD'; }
 <hive>'RELOAD'                             { parser.determineCase(yytext); return '<hive>RELOAD'; }
+<hive>'RELY'                               { return '<hive>RELY'; }
 <hive>'REPAIR'                             { return '<hive>REPAIR'; }
 <hive>'REPLICATION'                        { return '<hive>REPLICATION'; }
 <hive>'RECOVER'                            { return '<hive>RECOVER'; }
@@ -191,6 +193,7 @@
 <hive>'UNIONTYPE'                          { return '<hive>UNIONTYPE'; }
 <hive>'USE'                                { parser.determineCase(yytext); return '<hive>USE'; }
 <hive>'VIEW'                               { return '<hive>VIEW'; }
+<hive>'WAIT'                               { return '<hive>WAIT'; }
 <hive>'WEEK'                               { return '<hive>WEEK'; }
 <hive>'WINDOW'                             { return '<hive>WINDOW'; }
 <hive>'YEAR'                               { return '<hive>YEAR'; }
