@@ -506,3 +506,13 @@ if not desktop.conf.DATABASE_LOGGING.get():
     BaseDatabaseWrapper.make_debug_cursor = lambda self, cursor: CursorWrapper(cursor, self)
 
   disable_database_logging()
+
+############################################################
+# Searching saved documents in Oracle returns following error:
+#   DatabaseError: ORA-06502: PL/SQL: numeric or value error: character string buffer too small
+# This is caused by DBMS_LOB.SUBSTR(%s, 4000) in Django framework django/db/backends/oracle/base.py
+# Django has a ticket for this issue but unfixed: https://code.djangoproject.com/ticket/11580.
+# Buffer size 4000 limit the length of field equals or less than 2000 characters.
+#
+# For performance reasons and to avoid searching in huge fields, we also truncate to a max length
+DOCUMENT2_SEARCH_MAX_LENGTH = 2000
