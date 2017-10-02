@@ -289,30 +289,32 @@ OptionalColumnSpecificationsOrLike_EDIT
 
 ParenthesizedColumnSpecificationList
  : '(' ColumnSpecificationList ')'
+ | '(' ColumnSpecificationList ',' ConstraintSpecification ')'
  ;
 
 ParenthesizedColumnSpecificationList_EDIT
  : '(' ColumnSpecificationList_EDIT RightParenthesisOrError
+ | '(' ColumnSpecificationList ',' ConstraintSpecification_EDIT RightParenthesisOrError
+ | '(' ColumnSpecificationList ',' 'CURSOR' RightParenthesisOrError
+   {
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['PRIMARY KEY']);
+     } else if (parser.isHive()) {
+       parser.suggestKeywords([{ value: 'PRIMARY KEY', weight: 2 }, { value: 'CONSTRAINT', weight: 1 }]);
+     }
+   }
  ;
 
 ColumnSpecificationList
  : ColumnSpecification
- | ColumnSpecificationList ',' ImpalaPrimaryKeySpecification                              -> $3
  | ColumnSpecificationList ',' ColumnSpecification                                        -> $3
  ;
 
 ColumnSpecificationList_EDIT
  : ColumnSpecification_EDIT
  | ColumnSpecification_EDIT ',' ColumnSpecificationList
- | ColumnSpecificationList ',' ImpalaPrimaryKeySpecification_EDIT
  | ColumnSpecificationList ',' ColumnSpecification_EDIT
  | ColumnSpecificationList ',' ColumnSpecification_EDIT ',' ColumnSpecificationList
- | ColumnSpecificationList ',' 'CURSOR'
-   {
-     if (parser.isImpala()) {
-       parser.suggestKeywords(['PRIMARY KEY']);
-     }
-   }
  | ColumnSpecification 'CURSOR'
    {
      parser.checkForKeywords($1);
@@ -574,6 +576,90 @@ GreaterThanOrError
  | error
  ;
 
+ConstraintSpecification
+ : ImpalaPrimaryKeySpecification
+ | HivePrimaryKeySpecification
+ | HiveForeignKeySpecification
+ | HivePrimaryKeySpecification ',' HiveForeignKeySpecification
+ ;
+
+ConstraintSpecification_EDIT
+ : ImpalaPrimaryKeySpecification_EDIT
+ | HivePrimaryKeySpecification_EDIT
+ | HivePrimaryKeySpecification ',' 'CURSOR'
+   {
+     parser.suggestKeywords(['CONSTRAINT']);
+   }
+ | HivePrimaryKeySpecification ',' HiveForeignKeySpecification_EDIT
+ | HivePrimaryKeySpecification_EDIT ',' HiveForeignKeySpecification
+ | HiveForeignKeySpecification_EDIT
+ | 'CURSOR' HiveForeignKeySpecification
+   {
+     parser.suggestKeywords(['PRIMARY KEY']);
+   }
+ ;
+
+HivePrimaryKeySpecification
+ : HivePrimaryKey ParenthesizedColumnList '<hive>DISABLE' '<hive>NOVALIDATE'
+ ;
+
+HivePrimaryKeySpecification_EDIT
+ : HivePrimaryKey_EDIT
+ | HivePrimaryKey ParenthesizedColumnList_EDIT
+ | HivePrimaryKey ParenthesizedColumnList 'CURSOR'
+   {
+     parser.suggestKeywords(['DISABLE NOVALIDATE']);
+   }
+ | HivePrimaryKey ParenthesizedColumnList '<hive>DISABLE' 'CURSOR'
+   {
+     parser.suggestKeywords(['NOVALIDATE']);
+   }
+ | HivePrimaryKey ParenthesizedColumnList_EDIT '<hive>DISABLE' '<hive>NOVALIDATE'
+ ;
+
+HiveForeignKeySpecification
+ : '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' '<hive>KEY' ParenthesizedColumnList '<hive>REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList '<hive>DISABLE' '<hive>NOVALIDATE'
+   {
+     parser.addTablePrimary($7);
+   }
+ ;
+
+HiveForeignKeySpecification_EDIT
+ : '<hive>CONSTRAINT' RegularOrBacktickedIdentifier 'CURSOR'
+   {
+     parser.suggestKeywords(['FOREIGN KEY']);
+   }
+ | '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' 'CURSOR'
+   {
+     parser.suggestKeywords(['KEY']);
+   }
+ | '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' '<hive>KEY' ParenthesizedColumnList_EDIT
+ | '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' '<hive>KEY' ParenthesizedColumnList 'CURSOR'
+   {
+     parser.suggestKeywords(['REFERENCES']);
+   }
+ | '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' '<hive>KEY' ParenthesizedColumnList '<hive>REFERENCES' 'CURSOR'
+   {
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
+   }
+ | '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' '<hive>KEY' ParenthesizedColumnList '<hive>REFERENCES' SchemaQualifiedTableIdentifier_EDIT
+ | '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' '<hive>KEY' ParenthesizedColumnList '<hive>REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList_EDIT
+   {
+     parser.addTablePrimary($7);
+   }
+ | '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' '<hive>KEY' ParenthesizedColumnList '<hive>REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList 'CURSOR'
+   {
+     parser.addTablePrimary($7);
+     parser.suggestKeywords(['DISABLE NOVALIDATE']);
+   }
+ | '<hive>CONSTRAINT' RegularOrBacktickedIdentifier '<hive>FOREIGN' '<hive>KEY' ParenthesizedColumnList '<hive>REFERENCES' SchemaQualifiedTableIdentifier ParenthesizedColumnList '<hive>DISABLE' 'CURSOR'
+   {
+     parser.addTablePrimary($7);
+     parser.suggestKeywords(['NOVALIDATE']);
+   }
+ ;
+
 ImpalaPrimaryKeySpecification
  : ImpalaPrimaryKey ParenthesizedColumnList
  ;
@@ -590,6 +676,17 @@ ImpalaPrimaryKey
 
 ImpalaPrimaryKey_EDIT
  : '<impala>PRIMARY' 'CURSOR'
+   {
+     parser.suggestKeywords(['KEY']);
+   }
+ ;
+
+HivePrimaryKey
+ : '<hive>PRIMARY' '<hive>KEY'
+ ;
+
+HivePrimaryKey_EDIT
+ : '<hive>PRIMARY' 'CURSOR'
    {
      parser.suggestKeywords(['KEY']);
    }

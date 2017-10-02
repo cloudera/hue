@@ -1971,6 +1971,40 @@
       });
 
       describe('Hive specific', function () {
+        it('should handle "CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.tbl (id INT, col VARCHAR, ' +
+          'bla DOUBLE PRECISION, PRIMARY KEY (id, col) DISABLE NOVALIDATE, CONSTRAINT cnstrnt FOREIGN KEY (id, bla) ' +
+          'REFERENCES sometbl (id, ble) DISABLE NOVALIDATE) COMMENT \'table comment\';|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.tbl (id INT, col VARCHAR, ' +
+            'bla DOUBLE PRECISION, PRIMARY KEY (id, col) DISABLE NOVALIDATE, CONSTRAINT cnstrnt FOREIGN KEY (id, bla) ' +
+            'REFERENCES sometbl (id, ble) DISABLE NOVALIDATE) COMMENT \'table comment\';',
+            noErrors: true,
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.tbl (id INT, col VARCHAR, ' +
+          'bla DOUBLE PRECISION, CONSTRAINT cnstrnt FOREIGN KEY (id, bla) ' +
+          'REFERENCES sometbl (id, ble) DISABLE NOVALIDATE) COMMENT \'table comment\';|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.tbl (id INT, col VARCHAR, ' +
+            'bla DOUBLE PRECISION, CONSTRAINT cnstrnt FOREIGN KEY (id, bla) ' +
+            'REFERENCES sometbl (id, ble) DISABLE NOVALIDATE) COMMENT \'table comment\';',
+            noErrors: true,
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest keywords for "CREATE EXTERNAL |"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL ',
@@ -2039,6 +2073,151 @@
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['COMMENT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PRIMARY KEY', 'CONSTRAINT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DISABLE NOVALIDATE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['NOVALIDATE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['CONSTRAINT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['FOREIGN KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN KEY (bla) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN KEY (bla) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['REFERENCES']
+            }
+          });
+        });
+
+        it('should suggest tables for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN KEY (bla) REFERENCES |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN KEY (bla) REFERENCES ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestTables: {},
+              suggestDatabases: { appendDot: true }
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN KEY (bla) REFERENCES sometbl(boo) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN KEY (bla) REFERENCES sometbl(boo) ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DISABLE NOVALIDATE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN KEY (bla) REFERENCES sometbl(boo) DISABLE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, PRIMARY KEY (id) DISABLE NOVALIDATE, CONSTRAINT boo FOREIGN KEY (bla) REFERENCES sometbl(boo) DISABLE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['NOVALIDATE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE EXTERNAL TABLE foo (id int, CONSTRAINT boo FOREIGN KEY (bla) REFERENCES sometbl(boo) DISABLE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE EXTERNAL TABLE foo (id int, CONSTRAINT boo FOREIGN KEY (bla) REFERENCES sometbl(boo) DISABLE ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['NOVALIDATE']
             }
           });
         });
