@@ -1049,6 +1049,25 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
+      function root(path) {
+        var path = path && path.toLowerCase();
+        if (path.indexOf('s3a://') >= 0) {
+          return 's3a://';
+        } else if (path.indexOf('adl:/') >= 0) {
+          return 'adl:/';
+        } else {
+          return '/';
+        }
+      };
+
+      self.rootCurrent = ko.pureComputed(function () {
+        return root(self.currentPath());
+      });
+
+      self.rootTarget = ko.pureComputed(function () {
+        return root(self.targetPath());
+      });
+
       self.isHdfs = ko.pureComputed(function () {
         var currentPath = self.currentPath().toLowerCase();
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
@@ -2257,7 +2276,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
           },
-          isS3: viewModel.isS3()
+          isS3: viewModel.isS3(),
+          root: viewModel.rootCurrent()
         });
         $("#copyDestination").jHueHdfsAutocomplete({
           showOnFocus: true,
@@ -2266,7 +2286,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
           },
-          isS3: viewModel.isS3()
+          isS3: viewModel.isS3(),
+          root: viewModel.rootCurrent()
         });
       });
 
@@ -2392,6 +2413,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       $("#hueBreadcrumbText").jHueHdfsAutocomplete({
         home: "/user/${ user }/",
+        root: viewModel.rootTarget(),
         skipKeydownEvents: true,
         onEnter: function (el) {
           viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(el.val()));
