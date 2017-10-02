@@ -358,14 +358,13 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
-  def aliases(self):
+  def list_aliases(self):
     try:
-      params = self._get_params() + ( # Waiting for SOLR-4968
-          ('detail', 'true'),
-          ('path', '/aliases.json'),
+      params = self._get_params() + (
+          ('action', 'LISTALIASES'),
+          ('wt', 'json'),
       )
-      response = self._root.get('zookeeper', params=params)
-      return json.loads(response['znode'].get('data', '{}')).get('collection', {})
+      return self._root.get('admin/collections', params=params)['aliases']
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
@@ -728,6 +727,19 @@ class SolrApi(object):
 
     response = self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
     return self._get_json(response)
+
+
+  # Deprecated
+  def aliases(self):
+    try:
+      params = self._get_params() + ( # Waiting for SOLR-4968
+          ('detail', 'true'),
+          ('path', '/aliases.json'),
+      )
+      response = self._root.get('zookeeper', params=params)
+      return json.loads(response['znode'].get('data', '{}')).get('collection', {})
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
 
   # Deprecated
