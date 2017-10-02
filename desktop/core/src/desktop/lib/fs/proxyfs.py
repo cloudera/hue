@@ -16,8 +16,14 @@
 
 from __future__ import absolute_import
 
+import logging
+
 from urlparse import urlparse
 from django.contrib.auth.models import User
+
+
+LOG = logging.getLogger(__name__)
+
 
 class ProxyFS(object):
 
