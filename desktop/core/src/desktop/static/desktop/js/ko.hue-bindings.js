@@ -5992,6 +5992,7 @@
       $element.jHueHdfsTree({
         home: '',
         isS3: !!options.isS3,
+        root: options.root,
         initialPath: options.path,
         withTopPadding: false,
         onPathChange: function (path) {
