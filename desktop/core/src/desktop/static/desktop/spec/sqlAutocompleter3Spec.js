@@ -348,7 +348,13 @@
 
     describe('SqlAutocomplete3', function () {
 
-      var createSubject = function (dialect, textBeforeCursor, textAfterCursor) {
+      var createSubject = function (dialect, textBeforeCursor, textAfterCursor, positionStatement) {
+        var editor = ace.edit();
+        editor.setValue(textBeforeCursor);
+        var actualCursorPosition = editor.getCursorPosition();
+        editor.setValue(textBeforeCursor + textAfterCursor);
+        editor.moveCursorToPosition(actualCursorPosition);
+
         return new SqlAutocompleter3({
           snippet: {
             type: function () {
@@ -356,17 +362,11 @@
             },
             database: function () {
               'default'
-            }
+            },
+            positionStatement: ko.observable(positionStatement)
           },
-          editor: function() {
-            return {
-              getTextBeforeCursor: function () {
-                return textBeforeCursor;
-              },
-              getTextAfterCursor: function () {
-                return textAfterCursor;
-              }
-            }
+          editor: function () {
+            return editor
           }
         })
       };
@@ -383,6 +383,20 @@
         expect(subject.suggestions.filtered().length).toBe(0);
         subject.autocomplete();
         expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
+      });
+
+      it('should fallback to the active query when there are surrounding errors', function () {
+        var subject = createSubject('hive', 'SELECT FROMzzz bla LIMIT 1; SELECT ', ' FROM bla', { location: { first_line: 1, last_line: 1, first_column: 27, last_column: 52 }});
+        expect(subject.suggestions.filtered().length).toBe(0);
+        subject.autocomplete();
+        expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
+      });
+
+      it('should only fallback to the active query when there are surrounding errors if there\'s an active query', function () {
+        var subject = createSubject('hive', 'SELECT FROMzzz bla LIMIT 1; SELECT ', ' FROM bla');
+        expect(subject.suggestions.filtered().length).toBe(0);
+        subject.autocomplete();
+        expect(subject.suggestions.filtered().length).toBe(0);
       });
 
       it('should suggest columns from subqueries', function () {
