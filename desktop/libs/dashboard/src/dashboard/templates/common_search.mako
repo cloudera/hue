@@ -106,14 +106,14 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
         <!-- ko if: IS_HUE_4 -->
         <li>
           <a href="/home/?type=search-dashboard">
-            <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
+            <svg class="hi hi-fw" style="font-size:16px;"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
           </a>
         </li>
         <!-- /ko -->
         <!-- ko ifnot: IS_HUE_4 -->
         <li>
           <a href="${ url('dashboard:admin_collections') }">
-            <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
+            <svg class="hi hi-fw" style="font-size:16px;"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
           </a>
         </li>
         <!-- /ko -->

@@ -726,11 +726,11 @@ def export_result(request):
       if live_indexing:
         file_format['inputFormat'] = 'hs2_handle'
         file_format['fetch_handle'] = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
-        response['rowcount'] = _index(request, file_format, destination, query=notebook['uuid'])
+        response['rowcount'] = _index(request, file_format, destination, query=notebook['uuid'], start_time=start_time)
         response['watch_url'] = reverse('search:browse', kwargs={'name': destination})
         response['status'] = 0
       else:
-        response = _index(request, file_format, destination, query=notebook['uuid'])
+        response = _index(request, file_format, destination, query=notebook['uuid'], start_time=start_time)
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
