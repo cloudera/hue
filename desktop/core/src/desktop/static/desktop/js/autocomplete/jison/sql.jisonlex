@@ -32,8 +32,10 @@
 <hive>'AS'                                 { return '<hive>AS'; }
 <hive>'AUTHORIZATION'                      { return '<hive>AUTHORIZATION'; }
 <hive>'BINARY'                             { return '<hive>BINARY'; }
+<hive>'CACHE'                              { return '<hive>CACHE'; }
 <hive>'COLUMN'                             { return '<hive>COLUMN'; }
 <hive>'CONF'                               { return '<hive>CONF'; }
+<hive>'CONSTRAINT'                         { return '<hive>CONSTRAINT'; }
 <hive>'CREATE'                             { parser.determineCase(yytext); return '<hive>CREATE'; }
 <hive>'CUBE'                               { return '<hive>CUBE'; }
 <hive>'CURRENT'                            { return '<hive>CURRENT'; }
@@ -43,6 +45,7 @@
 <hive>'EXTENDED'                           { return '<hive>EXTENDED'; }
 <hive>'EXTERNAL'                           { return '<hive>EXTERNAL'; }
 <hive>'FOR'                                { return '<hive>FOR'; }
+<hive>'FOREIGN'                            { return '<hive>FOREIGN'; }
 <hive>'FUNCTION'                           { return '<hive>FUNCTION'; }
 <hive>'GRANT'                              { return '<hive>GRANT'; }
 <hive>'GROUPING'                           { return '<hive>GROUPING'; }
@@ -55,6 +58,8 @@
 <hive>'NONE'                               { return '<hive>NONE'; }
 <hive>'OF'                                 { return '<hive>OF'; }
 <hive>'OUT'                                { return '<hive>OUT'; }
+<hive>'PRIMARY'                            { return '<hive>PRIMARY'; }
+<hive>'REFERENCES'                         { return '<hive>REFERENCES'; }
 <hive>'REVOKE'                             { return '<hive>REVOKE'; }
 <hive>'ROLLUP'                             { return '<hive>ROLLUP'; }
 <hive>'TABLE'                              { return '<hive>TABLE'; }
@@ -72,7 +77,6 @@
 <hive>'AVRO'                               { return '<hive>AVRO'; }
 <hive>'BUCKET'                             { return '<hive>BUCKET'; }
 <hive>'BUCKETS'                            { return '<hive>BUCKETS'; }
-<hive>'CACHE'                              { return '<hive>CACHE'; }
 <hive>'CASCADE'                            { return '<hive>CASCADE'; }
 <hive>'CHANGE'                             { return '<hive>CHANGE'; }
 <hive>'CLUSTER'                            { return '<hive>CLUSTER'; }
@@ -119,6 +123,7 @@
 <hive>'INPUTFORMAT'                        { return '<hive>INPUTFORMAT'; }
 <hive>'ITEMS'                              { return '<hive>ITEMS'; }
 <hive>'JAR'                                { return '<hive>JAR'; }
+<hive>'KEY'                                { return '<hive>KEY'; }
 <hive>'KEYS'                               { return '<hive>KEYS'; }
 <hive>'LINES'                              { return '<hive>LINES'; }
 <hive>'LOAD'                               { parser.determineCase(yytext); return '<hive>LOAD'; }
@@ -130,6 +135,7 @@
 <hive>'MONTH'                              { return '<hive>MONTH'; }
 <hive>'MSCK'                               { return '<hive>MSCK'; }
 <hive>'NOSCAN'                             { return '<hive>NOSCAN'; }
+<hive>'NOVALIDATE'                         { return '<hive>NOVALIDATE'; }
 <hive>'NO_DROP'                            { return '<hive>NO_DROP'; }
 <hive>'OFFLINE'                            { return '<hive>OFFLINE'; }
 <hive>'ORC'                                { return '<hive>ORC'; }
