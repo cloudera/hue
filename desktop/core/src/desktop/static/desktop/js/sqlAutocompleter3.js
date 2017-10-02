@@ -1834,6 +1834,32 @@ var SqlAutocompleter3 = (function () {
     try {
       var parseResult = sqlAutocompleteParser.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
 
+      // Fall back to the active statement only on errors.
+      if (parseResult.errors && parseResult.errors.length > 0 && self.snippet.positionStatement() && self.snippet.positionStatement().location) {
+        var beforeCursor = self.editor().session.getTextRange({
+          start: {
+            row: self.snippet.positionStatement().location.first_line - 1,
+            column: self.snippet.positionStatement().location.first_column
+          },
+          end: {
+            row: self.editor().getCursorPosition().row,
+            column: self.editor().getCursorPosition().column
+          }
+        });
+
+        var afterCursor = self.editor().session.getTextRange({
+          start: {
+            row: self.editor().getCursorPosition().row,
+            column: self.editor().getCursorPosition().column
+          },
+          end: {
+            row: self.snippet.positionStatement().location.last_line - 1,
+            column: self.snippet.positionStatement().location.last_column
+          }
+        });
+        parseResult = sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), false);
+      }
+
       if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
         console.log(parseResult);
       }
