@@ -24,14 +24,14 @@
   .snippet-move-placeholder {
     margin: 10px;
     height: 100px;
-    background-color: #FAFAFA;
+    background-color: @cui-gray-050;
     border: 2px dotted @cui-default-border-color;
   }
 
   .snippet-move-helper {
     margin: 10px;
-    background-color: #FFF;
-    border: 1px solid #F1F1F1;
+    background-color: @cui-white;
+    border: 1px solid @cui-purple-gray-050;
   }
 
   .resizer {
@@ -102,7 +102,7 @@
   }
 
   .snippet-settings {
-    background-color: #FFF;
+    background-color: @cui-white;
     border-left: 1px solid @cui-default-border-color;
     border-right: 1px solid @cui-default-border-color;
     border-bottom: 1px solid @cui-default-border-color;
@@ -141,7 +141,7 @@
   }
 
   .add-snippet-button > i {
-    color: #CCC;
+    color: @cui-gray-400;
     cursor: pointer;
   }
 
@@ -153,10 +153,10 @@
     width: 23px;
     height: 18px;
     line-height: 12px;
-    background-color: #CCC;
+    background-color: @cui-gray-400;
     cursor: pointer;
-    border: 2px solid #FFF;
-    color: #FFF;
+    border: 2px solid @cui-white;
+    color: @cui-white;
     border-radius: 7px;
   }
 
@@ -164,7 +164,7 @@
     z-index: 400;
     position: absolute;
     background-color: @hue-primary-color-dark;
-    color: #C2CFD8;
+    color: @cui-blue-gray-100;
     height: 54px;
     width: 54px;
     border-radius: 28px;
@@ -191,13 +191,13 @@
   .snippet-list-alts > li {
     padding: 5px 0 5px 10px;
     cursor: pointer;
-    color: #464646;
+    color: @cui-gray-800;
     margin-bottom: 2px;
   }
 
   .snippet-list-alts > li:hover {
     padding: 5px 0 5px 10px;
-    background-color: #f0f0f0;
+    background-color: @cui-purple-gray-050;
   }
 
   .select-snippet-button,
@@ -210,7 +210,7 @@
   }
 
   .add-snippet-alt:hover {
-    color: #FFF;
+    color: @cui-white;
   }
 
   .select-snippet-button:hover,
@@ -271,7 +271,7 @@
   }
 
   .search-bar {
-    background-color: #F5F5F5;
+    background-color: @cui-gray-050;
     margin: 0;
     padding: 4px 20px 0;
     text-align: left;
@@ -295,7 +295,7 @@
   }
 
   .tab-content {
-    background-color: #FFFFFF;
+    background-color: @cui-white;
     border-left: 1px solid @cui-default-border-color;
     border-right: 1px solid @cui-default-border-color;
   }
@@ -326,7 +326,7 @@
   }
 
   .snippet-icon {
-    color: #aaa;
+    color: @cui-gray-500;
     height: 16px;
     width: 16px;
     -webkit-transition: color 0.2s ease;
@@ -344,7 +344,7 @@
   }
 
   .ui-sortable {
-    background-color: #FFF;
+    background-color: @cui-white;
     min-height: 0;
   }
 
@@ -404,7 +404,7 @@
     font-size: 12px;
     height: 8px;
     margin-bottom: 5px;
-    color: #E1E1E1;
+    color: @cui-gray-200;
   }
 
   .snippet-code-resizer {
@@ -427,7 +427,7 @@
   }
 
   .snippet-log-expander:hover {
-    background-color: #FFF;
+    background-color: @cui-white;
     opacity:.5;
   }
 
@@ -453,7 +453,7 @@
   .show-assist-right {
     position: fixed;
     top: 80px;
-    background-color: #FFF;
+    background-color: @cui-white;
     width: 16px;
     height: 24px;
     line-height: 24px;
@@ -498,7 +498,7 @@
     position: absolute;
     top: 2px;
     z-index: 1000;
-    color: #aaa;
+    color: @cui-gray-500;
     font-size: 12px;
   }
 
@@ -540,7 +540,7 @@
   h1.empty {
     margin-top: 50px;
     text-align: center;
-    color: #DDD;
+    color: @cui-gray-300;
   }
 
   .toggle-result-settings {
@@ -567,7 +567,7 @@
 
   .resize-panel a {
     cursor: ns-resize;
-    color: #666;
+    color: @cui-gray-700;
     position: absolute;
   }
 
@@ -585,11 +585,11 @@
   }
 
   .progress, .progress-neutral .bar {
-    background-color: #DDD;
+    background-color: @cui-gray-300;
   }
 
   .progress .bar {
-    background-color: #FFF;
+    background-color: @cui-white;
   }
 
   .progress .bar-info {
@@ -597,7 +597,7 @@
   }
 
   .progress-starting .bar {
-    background-color: #fdae6b;
+    background-color: @cui-orange-500;
   }
 
   @-webkit-keyframes pulsate {
@@ -695,7 +695,7 @@
     padding-left: 5px;
     font-size: 13px !important;
     font-family: @font-family-monospace!important;
-    color: #aaa !important;
+    color: @cui-gray-500 !important;
     font-style: normal !important;
   }
 
@@ -732,7 +732,7 @@
       overflow: visible;
     }
     .ace_scroller {
-      border-left: 4px solid #DDD !important;
+      border-left: 4px solid @cui-gray-300 !important;
       padding-left: 10px;
     }
     .print-logo {
@@ -761,7 +761,7 @@
     position: absolute;
     display: none;
     z-index: 20000;
-    background-color: #FFFFFF;
+    background-color: @cui-white;
     padding: 10px;
     min-width: 350px;
   }
@@ -779,13 +779,13 @@
     background: -o-linear-gradient(left, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
     background: -ms-linear-gradient(left, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
     background: linear-gradient(to right, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f2dede', endColorstr='#00ffffff', GradientType=1)
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@cui-pink-050', endColorstr='#00ffffff', GradientType=1)
   }
 
 
   .results-images {
     border-left: 5px solid @cui-default-border-color;
-    background-color: #f5f5f5;
+    background-color: @cui-gray-050;
     padding: 5px;
   }
 
@@ -797,11 +797,11 @@
     background: -o-linear-gradient(left, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
     background: -ms-linear-gradient(left, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
     background: linear-gradient(to right, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcf8e3', endColorstr='#00ffffff', GradientType=1)
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@cui-yellow-050', endColorstr='#00ffffff', GradientType=1)
   }
 
   .hoverMsg {
-    background: #000;
+    background: @cui-black;
     height: 100%;
     left: 0;
     opacity: .5;
@@ -812,7 +812,7 @@
   }
 
   .hoverText {
-    color: #fff;
+    color: @cui-white;
     font-size: 5em;
     position: relative;
     text-align: center;
@@ -852,7 +852,7 @@
   }
 
   .snippet-side-btn:focus {
-    color: #C2CFD8;
+    color: @cui-blue-gray-100;
   }
 
   .snippet-side-btn.active {
@@ -868,15 +868,15 @@
   }
 
   .execution-timer {
-    color: #aaa;
+    color: @cui-gray-500;
   }
 
   .resultTable th {
-    color: #FFF;
+    color: @cui-white;
   }
 
   .dataTables_wrapper .resultTable th {
-    color: #333;
+    color: @cui-gray-800;
   }
 
   .navbar .editor-nav > li > a {
@@ -884,7 +884,7 @@
   }
 
   .navbar .editor-nav > li > a, .navbar .editor-nav > li > a:hover {
-    color: #737373;
+    color: @cui-gray-700;
     cursor: default;
   }
 
@@ -893,7 +893,7 @@
   }
 
   .editor-nav .editable-click:hover {
-    border-bottom: dashed 1px #0088cc;
+    border-bottom: dashed 1px @cui-blue-700;
   }
 
   .editor-nav .editable-click, .editor-nav a.editable-click {
@@ -901,12 +901,12 @@
   }
 
   .editable-empty, .editable-empty:hover {
-    color: #737373 !important;
+    color: @cui-gray-700 !important;
   }
 
   h4.header {
     font-weight: bold;
-    color: #999;
+    color: @cui-gray-600;
     font-size: 14px;
     text-transform: uppercase;
     padding-left: 4px;
@@ -929,11 +929,11 @@
   }
 
   .history-table tbody tr:hover td, .history-table tbody tr:hover th {
-    background-color: #f7f7f9;
+    background-color: @cui-gray-050;
   }
 
   .history-table tbody tr.highlight {
-    background-color: #f7f7f9;
+    background-color: @cui-gray-050;
     border-left: 2px solid @hue-primary-color-light;
     border-right: 2px solid @hue-primary-color-light;
   }
@@ -965,15 +965,15 @@
   }
 
   .history-status .fa-check {
-    color: #b5cf6b;
+    color: @cui-lime-200;
   }
 
   .history-status .fa-fighter-jet {
-    color: #fdae6b;
+    color: @cui-orange-500;
   }
 
   .table-results table > thead > tr > td:first-child, .table-results table > tbody > tr > td:first-child {
-    background-color: #f9f9f9;
+    background-color: @cui-gray-050;
   }
 
   #helpModal th:first-child {
@@ -1024,7 +1024,7 @@
 
   #saveResultsModal i.fa-spinner {
     font-size: 60px;
-    color: #DDD;
+    color: @cui-gray-300;
   }
 
   .notebook-name-desc {
@@ -1056,7 +1056,7 @@
   }
 
   .no-horiz-padding.muted a {
-   color: #AAA !important;
+   color: @cui-gray-500 !important;
   }
 
   .no-horiz-padding:not(:first-child) a {
@@ -1104,11 +1104,11 @@
   }
 
   #schedulerEditor .workflow-parameter:hover {
-    background-color: #FAFAFA;
+    background-color: @cui-gray-050;
   }
 
   .warning {
-    color: #fdae6b;
+    color: @cui-orange-500;
   }
 
   .nav-header-like {
@@ -1120,7 +1120,7 @@
     color: @hue-primary-color-dark;
     text-overflow: ellipsis;
     text-shadow: none;
-    background-color: #fff;
+    background-color: @cui-white;
     border-left: 2px solid transparent;
     -webkit-transition: border .218s;
     -moz-transition: border .218s;
@@ -1147,41 +1147,41 @@
   .alert-info-gradient {
     border: none;
     margin-top: -3px;
-    background: -moz-linear-gradient(left, #d9edf7 0%, rgba(255, 255, 255, 0) 100%);
-    background: -webkit-linear-gradient(left, #d9edf7 0%, rgba(255, 255, 255, 0) 100%);
-    background: -o-linear-gradient(left, #d9edf7 0%, rgba(255, 255, 255, 0) 100%);
-    background: -ms-linear-gradient(left, #d9edf7 0%, rgba(255, 255, 255, 0) 100%);
-    background: linear-gradient(to right, #d9edf7 0%, rgba(255, 255, 255, 0) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#d9edf7', endColorstr='#00ffffff', GradientType=1);
+    background: -moz-linear-gradient(left, @cui-blue-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -webkit-linear-gradient(left, @cui-blue-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -o-linear-gradient(left, @cui-blue-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -ms-linear-gradient(left, @cui-blue-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to right, @cui-blue-050 0%, rgba(255, 255, 255, 0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@cui-blue-050', endColorstr='#00ffffff', GradientType=1);
   }
 
   .alert-success-gradient {
     border: none;
     margin-top: -3px;
-    background: -moz-linear-gradient(left, #dff0d8 0%, rgba(255, 255, 255, 0) 100%);
-    background: -webkit-linear-gradient(left, #dff0d8 0%, rgba(255, 255, 255, 0) 100%);
-    background: -o-linear-gradient(left, #dff0d8 0%, rgba(255, 255, 255, 0) 100%);
-    background: -ms-linear-gradient(left, #dff0d8 0%, rgba(255, 255, 255, 0) 100%);
-    background: linear-gradient(to right, #dff0d8 0%, rgba(255, 255, 255, 0) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#dff0d8', endColorstr='#00ffffff', GradientType=1);
+    background: -moz-linear-gradient(left, @cui-lime-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -webkit-linear-gradient(left, @cui-lime-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -o-linear-gradient(left, @cui-lime-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -ms-linear-gradient(left, @cui-lime-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to right, @cui-lime-050 0%, rgba(255, 255, 255, 0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@cui-lime-050', endColorstr='#00ffffff', GradientType=1);
   }
 
   .alert-neutral-gradient {
     border: none;
-    border-left: 1px solid #DBE8F1;
+    border-left: 1px solid @cui-blue-050;
     margin-top: -3px;
-    background: -moz-linear-gradient(left, #F1F1F1 0%, rgba(255, 255, 255, 0) 100%);
-    background: -webkit-linear-gradient(left, #F1F1F1 0%, rgba(255, 255, 255, 0) 100%);
-    background: -o-linear-gradient(left, #F1F1F1 0%, rgba(255, 255, 255, 0) 100%);
-    background: -ms-linear-gradient(left, #F1F1F1 0%, rgba(255, 255, 255, 0) 100%);
-    background: linear-gradient(to right, #F1F1F1 0%, rgba(255, 255, 255, 0) 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F1F1F1', endColorstr='#00ffffff', GradientType=1);
+    background: -moz-linear-gradient(left, @cui-purple-gray-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -webkit-linear-gradient(left, @cui-purple-gray-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -o-linear-gradient(left, @cui-purple-gray-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: -ms-linear-gradient(left, @cui-purple-gray-050 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(to right, @cui-purple-gray-050 0%, rgba(255, 255, 255, 0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@cui-purple-gray-050', endColorstr='#00ffffff', GradientType=1);
   }
 
   .alert-warning {
-    background-color: #fcf8e3;
-    border: 1px solid #f0c36d;
-    color: #c09853;
+    background-color: @cui-yellow-050;
+    border: 1px solid @cui-orange-200;
+    color: @cui-orange-600;
   }
 
   .optimizer-container {
@@ -1205,20 +1205,20 @@
       cursor: default;
     }
     &.idle {
-      color: #CCC;
+      color: @cui-gray-400;
       cursor: default;
     }
     &:hover {
       opacity: 1;
     }
     &.success {
-      color: #468847;
+      color: @cui-green-600;
     }
     &.warning {
-      color: #f0c36d;
+      color: @cui-orange-200;
     }
     &.error {
-      color: #b94a48;
+      color: @cui-red-400;
     }
   }
 
@@ -1264,7 +1264,7 @@
   }
 
   .jobs-overlay {
-    background-color: #FFF;
+    background-color: @cui-white;
     opacity: 0.8;
     position: absolute;
     top: 10px;
@@ -1276,7 +1276,7 @@
     }
 
     li {
-      background-color: #FFF;
+      background-color: @cui-white;
       padding: 5px;
 
       a {

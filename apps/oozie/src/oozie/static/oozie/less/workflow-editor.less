@@ -35,7 +35,7 @@
 
   .draggable-widget, .draggable-icon {
     cursor: move;
-    background-color: #FFF;
+    background-color: @cui-white;
     z-index: 100;
   }
 
@@ -44,16 +44,16 @@
   }
 
   .drop-target {
-    background-color: #F6F6F6;
+    background-color: @cui-gray-050;
     min-height: 20px;
-    border: 2px dotted #DDD;
+    border: 2px dotted @cui-gray-300;
     text-align: center;
     padding: 4px;
   }
 
   .drop-target-dragging {
-    background-color: #F0F0F0;
-    border-color: #DDD;
+    background-color: @cui-purple-gray-050;
+    border-color: @cui-gray-300;
   }
 
   .ui-sortable.drop-target {
@@ -62,13 +62,13 @@
 
   .drop-target-highlight {
     min-height: 20px;
-    background-color: #CCC;
-    border-color: #BBB;
+    background-color: @cui-gray-400;
+    border-color: @cui-gray-500;
   }
 
   .drop-target-disabled {
-    background-color: #FFFFFF;
-    border-color: #FFFFFF;
+    background-color: @cui-white;
+    border-color: @cui-white;
   }
 
   .drop-target-side {
@@ -87,14 +87,14 @@
   }
 
   .readonly .card-widget {
-    border: 1px solid #d8d8d8 !important;
+    border: 1px solid @cui-gray-300 !important;
   }
 
   .card-widget {
     position: relative;
     z-index: 11;
     overflow-x: auto;
-    border: 1px solid #d8d8d8 !important;
+    border: 1px solid @cui-gray-300 !important;
     min-height: 40px!important;
   }
 
@@ -103,7 +103,7 @@
   }
 
   .card-column-disabled {
-    background-color: #f1f1f1;
+    background-color: @cui-purple-gray-050;
   }
 
   .widget-icon {
@@ -129,7 +129,7 @@
   }
 
   .advanced-triangle a {
-    color: #FFFFFF;
+    color: @cui-white;
     padding-left: 20px;
     padding-top: 4px;
   }
@@ -169,7 +169,7 @@
   }
 
   .big-icon {
-    color: #DDD;
+    color: @cui-gray-300;
     font-size: 40px;
     text-align: center;
     padding: 5px;
@@ -210,7 +210,7 @@
 
   em {
     font-weight: normal;
-    background-color: #FFFFFF;
+    background-color: @cui-white;
   }
 
   .properties ul li {
@@ -252,15 +252,15 @@
   }
 
   .widget-statusbar-running {
-    background-color: #fbb450;
+    background-color: @cui-orange-300;
   }
 
   .widget-statusbar-failed {
-    background-color: #c13e2c;
+    background-color: @cui-red-500;
   }
 
   .widget-statusbar-success {
-    background-color: #2f973f;
+    background-color: @cui-green-500;
   }
 
   .widget-running {
@@ -315,7 +315,7 @@
 #addActionDemiModal {
   position: absolute;
   margin-left: 0;
-  border: 1px solid #d8d8d8;
+  border: 1px solid @cui-gray-300;
   border-top: none;
 }
 
@@ -324,7 +324,7 @@
 }
 
 #exposeOverlay {
-  background-color: #000;
+  background-color: @cui-black;
   opacity: 0.3;
   display: none;
   width: 100%;

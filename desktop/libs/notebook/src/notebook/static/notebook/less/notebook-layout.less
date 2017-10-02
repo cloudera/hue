@@ -16,6 +16,8 @@
  limitations under the License.
 */
 
+@import (reference) "cui/colors.less";
+
 html {
   height: 100%;
 }
@@ -23,7 +25,7 @@ body {
   height:100%;
   margin: 0;
   padding: 0;
-  background-color: #FFF;
+  background-color: @cui-white;
   overflow-y: hidden;
 }
 
@@ -39,7 +41,7 @@ body {
   position: absolute;
   top: 74px;
   bottom: 0;
-  background-color: #FFF;
+  background-color: @cui-white;
 }
 
 .panel-container {
@@ -63,7 +65,7 @@ body {
 
 .context-panel {
   position: fixed;
-  background: #fff;
+  background: @cui-white;
   height: calc(100% - 70px);
   top: 70px;
   transition: all;
