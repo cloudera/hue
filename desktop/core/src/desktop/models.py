@@ -51,6 +51,7 @@ from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
 from desktop.redaction import global_redaction_engine
+from desktop.settings import DOCUMENT2_SEARCH_MAX_LENGTH
 
 
 LOG = logging.getLogger(__name__)
@@ -1209,6 +1210,9 @@ class Document2(models.Model):
 
     # Redact query if needed
     self._redact_query()
+
+    if self.search:
+      self.search = self.search[:DOCUMENT2_SEARCH_MAX_LENGTH]
 
     super(Document2, self).save(*args, **kwargs)
 
