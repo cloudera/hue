@@ -44,7 +44,6 @@ from hadoop.api.common.ttypes import RequestContext, IOException
 import hadoop.conf
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
-from useradmin.conf import HOME_DIR_PERMISSIONS
 
 
 LOG = logging.getLogger(__name__)
@@ -243,6 +242,7 @@ class Hdfs(object):
     if home_path is None:
       home_path = self.get_home_dir()
 
+    from useradmin.conf import HOME_DIR_PERMISSIONS
     mode = int(HOME_DIR_PERMISSIONS.get(), 8)
     if not self.exists(home_path):
       user = self.user
