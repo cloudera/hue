@@ -205,18 +205,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <div class="btn-group">
 
           % if ENABLE_PRESENTATION.get():
-          <a class="share-link btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
+          <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
             css: {'btn-inverse': $root.isPresentationMode(), 'btn': true}">
             <i class="fa fa-line-chart"></i>
           </a>
           % endif
 
-          <!-- ko if: $root.canSave -->
-          <a class="share-link btn" title="${ _ko('Share') }" data-bind="click: prepareShareModal,
-            css: {'isShared': isShared(), 'btn': true}">
-            <i class="fa fa-users"></i>
-          </a>
-          <!-- /ko -->
         </div>
 
         <div class="btn-group">
@@ -236,31 +230,51 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
 
-        <!-- ko if: editorMode -->
-        <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-file-o"></i>
-        </a>
-        <!-- /ko -->
-        <!-- ko ifnot: editorMode -->
-        <a class="btn" href="javascript:void(0)" data-bind="click: newNotebook" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-file-o"></i>
-        </a>
-        <!-- /ko -->
-
-        <a class="btn pointer" title="${ _('Session') }" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-          <i class="fa fa-cogs"></i>
-        </a>
-
-        <!-- ko if: IS_HUE_4 -->
-        <a class="btn" data-bind="hueLink: '/home/?type=' + (editorMode() ? 'query-' : '') + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
-          <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-        </a>
-        <!-- /ko -->
-        <!-- ko ifnot: IS_HUE_4 -->
-        <a class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType(), attr: { 'title': editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
-          <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-        </a>
-        <!-- /ko -->
+        <div class="dropdown pull-right margin-left-10">
+          <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+            <i class="fa fa-fw fa-ellipsis-v"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <!-- ko if: $root.canSave -->
+            <li>
+              <a class="share-link" data-bind="click: prepareShareModal,
+                css: {'isShared': isShared()}">
+                <i class="fa fa-fw fa-users"></i> ${ _('Share') }
+              </a>
+            </li>
+            <!-- /ko -->
+            <li>
+              <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+                <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
+              </a>
+            </li>
+            <li class="divider"></li>
+            <li>
+            <!-- ko if: editorMode -->
+              <a href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+                <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+              </a>
+            <!-- /ko -->
+            <!-- ko ifnot: editorMode -->
+              <a href="javascript:void(0)" data-bind="click: newNotebook">
+                <i class="fa fa-file-o"></i> ${ _('New Notebook') }
+              </a>
+            <!-- /ko -->
+            </li>
+            <li>
+              <!-- ko if: IS_HUE_4 -->
+              <a data-bind="hueLink: '/home/?type=' + (editorMode() ? 'query-' : '') + editorType()">
+                <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
+              </a>
+              <!-- /ko -->
+              <!-- ko ifnot: IS_HUE_4 -->
+              <a class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType()">
+                <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
+              </a>
+              <!-- /ko -->
+            </li>
+          </ul>
+        </div>
       </div>
 
       <div class="nav-collapse">
