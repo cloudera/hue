@@ -39,15 +39,15 @@
   left: -5px;
   top: 15px;
   width: 120px;
-  background-color: #da4f49;
-  *background-color: #bd362f;
-  background-image: -moz-linear-gradient(top, #ee5f5b, #bd362f);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#bd362f));
-  background-image: -webkit-linear-gradient(top, #ee5f5b, #bd362f);
-  background-image: -o-linear-gradient(top, #ee5f5b, #bd362f);
-  background-image: linear-gradient(to bottom, #ee5f5b, #bd362f);
+  background-color: @cui-red-400;
+  *background-color: @cui-red-500;
+  background-image: -moz-linear-gradient(top, @cui-red-400, @cui-red-500);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@cui-red-400), to(@cui-red-500));
+  background-image: -webkit-linear-gradient(top, @cui-red-400, @cui-red-500);
+  background-image: -o-linear-gradient(top, @cui-red-400, @cui-red-500);
+  background-image: linear-gradient(to bottom, @cui-red-400, @cui-red-500);
   background-repeat: repeat-x;
-  color: #ffffff;
+  color: @cui-white;
   -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
@@ -55,7 +55,7 @@
 
 .ribbon:before, .ribbon:after {
   content: "";
-  border-top: 3px solid #c09853;
+  border-top: 3px solid @cui-orange-600;
   border-left: 3px solid transparent;
   border-right: 3px solid transparent;
   position: absolute;

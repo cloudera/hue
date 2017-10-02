@@ -35,22 +35,22 @@
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
-  color: #0B7FAD;
+  color: @cui-blue-700;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-  background-color: #ffffff;
-  background-image: -moz-linear-gradient(top, #FFFFFF, #FFFFFF);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FFFFFF), to(#FFFFFF));
-  background-image: -webkit-linear-gradient(top, #FFFFFF, #FFFFFF);
-  background-image: -o-linear-gradient(top, #FFFFFF, #FFFFFF);
-  background-image: linear-gradient(to bottom, #FFFFFF, #FFFFFF);
+  background-color: @cui-white;
+  background-image: -moz-linear-gradient(top, @cui-white, @cui-white);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@cui-white), to(@cui-white));
+  background-image: -webkit-linear-gradient(top, @cui-white, @cui-white);
+  background-image: -o-linear-gradient(top, @cui-white, @cui-white);
+  background-image: linear-gradient(to bottom, @cui-white, @cui-white);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffffffff', GradientType=0);
-  border-color: #FFFFFF #FFFFFF #d9d9d9;
+  border-color: @cui-white @cui-white @cui-gray-300;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-  *background-color: #FFFFFF;
+  *background-color: @cui-white;
   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
-  border: 1px solid #C8C8C8;
+  border: 1px solid @cui-gray-400;
   *border: 0;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -67,10 +67,10 @@
 }
 
 .qq-upload-button:hover, .qq-upload-button:focus {
-  color: #29A7DE;
-  border-color: #29A7DE;
-  background-color: #FFFFFF;
-  *background-color: #f2f2f2;
+  color: @cui-blue-500;
+  border-color: @cui-blue-500;
+  background-color: @cui-white;
+  *background-color: @cui-purple-gray-050;
   text-decoration: none;
   background-position: 0 -15px;
   -webkit-transition: background-position 0.1s linear;
@@ -87,8 +87,8 @@
   height: 100%;
   min-height: 40px;
   z-index: 2;
-  background: #FFFFFF;
-  border: 2px dashed #DDDDDD;
+  background: @cui-white;
+  border: 2px dashed @cui-gray-300;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
@@ -102,12 +102,12 @@
   width: 100%;
   margin-top: -8px;
   font-size: 16px;
-  color: #666666;
+  color: @cui-gray-700;
 }
 
 .qq-upload-drop-area-active {
-  border-color: #CCCCCC;
-  background-color: #EFEFEF;
+  border-color: @cui-gray-400;
+  background-color: @cui-purple-gray-050;
 }
 
 .qq-upload-list {

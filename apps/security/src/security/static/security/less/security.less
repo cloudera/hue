@@ -35,11 +35,11 @@
 .node-row {
   margin: 4px;
   padding: 2px;
-  border: 1px dashed #FFFFFF;
+  border: 1px dashed @cui-white;
 }
 
 .node-row:hover {
-  background: #F6F6F6;
+  background: @cui-gray-050;
 }
 
 .node-row a, .node-row i {
@@ -48,19 +48,19 @@
 
 .node-row a.striked {
   text-decoration: line-through;
-  color: #b94a48;
+  color: @cui-red-400;
 }
 
 .fa.striked {
-  color: #b94a48!important;
+  color: @cui-red-400!important;
 }
 
 .node-row.selected {
-  background: #F6F6F6 !important;
+  background: @cui-gray-050 !important;
 }
 
 .acl-panel {
-  border-left: 1px solid #e5e5e5;
+  border-left: 1px solid @cui-gray-100;
   padding-top: 6px;
   padding-left: 12px;
 }
@@ -79,7 +79,7 @@
 }
 
 .acl-block-title {
-  background-color: #eeeeee;
+  background-color: @cui-purple-gray-050;
   font-weight: bold;
   padding: 3px;
   margin-top: 14px;
@@ -87,7 +87,7 @@
 }
 
 .acl-block {
-  background-color: #f6f6f6;
+  background-color: @cui-gray-050;
   padding: 3px;
   margin-bottom: 4px;
 }
@@ -123,12 +123,12 @@
 .acl-actions {
   padding: 5px;
   text-align: center;
-  color: #CCC;
+  color: @cui-gray-400;
   font-size: 20px;
 }
 
 .acl-actions span:hover {
-  color: #999;
+  color: @cui-gray-600;
 }
 
 .path {
@@ -137,7 +137,7 @@
 }
 
 .path-container {
-  background-color: #FFF;
+  background-color: @cui-white;
   padding-top: 8px;
 }
 
@@ -157,8 +157,8 @@
   word-break: break-all;
   word-wrap: break-word;
   font-family: @font-family-monospace;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
+  background-color: @cui-gray-050;
+  border: 1px solid @cui-gray-400;
   border: 1px solid rgba(0, 0, 0, 0.15);
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
@@ -167,7 +167,7 @@
 
 .tree-toolbar {
   padding: 3px;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid @cui-gray-100;
 }
 
 .tree-toolbar .fa {
@@ -175,7 +175,7 @@
 }
 
 .tree-toolbar .fa-spin {
-  color: #cccccc;
+  color: @cui-gray-400;
   margin-right: 6px;
 }
 
@@ -209,12 +209,12 @@
 
 .waiting {
   font-size: 196px;
-  color: #DDD;
+  color: @cui-gray-300;
 }
 
 h1.emptyMessage {
   margin-top: 50px;
-  color: #BBB;
+  color: @cui-gray-500;
   line-height: 60px;
 }
 
@@ -245,7 +245,7 @@ h1.emptyMessage {
 
 
 .big-btn {
-  background-color: #F0F0F0;
+  background-color: @cui-purple-gray-050;
   height: 100px;
   width: 90%;
   text-align: center;
@@ -254,23 +254,23 @@ h1.emptyMessage {
   padding: 10px;
   padding-top: 20px;
   cursor: pointer;
-  border: 1px solid #F0F0F0;
+  border: 1px solid @cui-purple-gray-050;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
 
 .big-btn:hover, .big-btn.selected {
-  background-color: #DDDDDD;
+  background-color: @cui-gray-300;
 }
 
 .big-btn.selected {
-  border-color: #CCCCCC;
+  border-color: @cui-gray-400;
 }
 
 .big-btn i{
   font-size: 40px;
-  color: #666666;
+  color: @cui-gray-700;
 }
 
 .modal-panel {
@@ -291,7 +291,7 @@ h1.emptyMessage {
 }
 
 .fa-database-open {
-  color: #666!important;
+  color: @cui-gray-700!important;
 }
 
 .actionbar-main {

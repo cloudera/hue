@@ -16,6 +16,8 @@
  limitations under the License.
 */
 
+@import (reference) "cui/colors.less";
+
 .form-search {
   margin: 0;
   padding-top: 5px;
@@ -36,7 +38,7 @@
 }
 
 .editable-empty, .editable-empty:hover {
-  color: #666 !important;
+  color: @cui-gray-700 !important;
   opacity: .55;
 }
 
@@ -66,7 +68,7 @@ input[type="text"].thirty {
 }
 
 input[type="text"].with-errors, textarea.with-errors {
-  border: solid 1px #EE5F5B;
+  border: solid 1px @cui-red-400;
 }
 
 input[type="text"].filechooser-input.input-xlarge {
@@ -97,8 +99,8 @@ ul.with-margin li {
 }
 
 .search-bar {
-  background-color: #F5F5F5;
-  border-bottom: 1px solid #e3e3e3;
+  background-color: @cui-gray-050;
+  border-bottom: 1px solid @cui-gray-200;
   -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
   -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
