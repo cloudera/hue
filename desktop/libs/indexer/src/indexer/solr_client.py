@@ -68,7 +68,10 @@ class SolrClient(object):
 
       if self.is_solr_cloud_mode():
         try:
-          solr_aliases = self.api.aliases()
+          if self.is_solr_six_or_more():
+            solr_aliases = self.api.list_aliases()
+          else:
+            solr_aliases = self.api.aliases()
           for name in solr_aliases:
             collections = solr_aliases[name].split()
             indexes.append({'name': name, 'type': 'alias', 'collections': collections})

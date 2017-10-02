@@ -292,6 +292,6 @@ class CollectionManagerController(object):
 
         ROW_COUNT += len(dataset)
     except Exception, e:
-      raise PopupException(_('Could not update index.'), detail=e)
+      raise PopupException(_('Could not update index: %s') % e)
 
     return ROW_COUNT
