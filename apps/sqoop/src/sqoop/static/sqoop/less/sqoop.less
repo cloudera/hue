@@ -16,6 +16,8 @@
  limitations under the License.
 */
 
+@import (reference) "cui/colors.less";
+
 #sqoopComponents {
   .row-selectable tr {
     cursor: pointer;
@@ -30,10 +32,10 @@
 
   ul.major-list li {
     cursor: pointer;
-    border: 1px solid #E3E3E3;
+    border: 1px solid @cui-gray-200;
     height: 60px;
     margin-bottom: 10px;
-    background-color: #FFFFFF;
+    background-color: @cui-white;
   }
 
   ul.major-list li div.main {
@@ -46,23 +48,23 @@
   }
 
   .main i, .top-bar h4 i {
-    color: #999999;
+    color: @cui-gray-600;
   }
 
   .sqoop-progress {
     width: 0%;
-    background-color: #F89406;
+    background-color: @cui-orange-500;
     height: 3px;
     margin-top: -2px;
   }
 
   .waiting {
-    color: #DDDDDD;
+    color: @cui-gray-300;
     font-size: 196px;
   }
 
   h1.emptyMessage {
-    color: #BBBBBB;
+    color: @cui-gray-500;
     line-height: 60px;
     margin-top: 50px;
   }
@@ -76,8 +78,8 @@
     position: fixed;
     top: 28px;
     width: 100%;
-    background-color: #FAFAFA;
-    border-bottom: 1px solid #E3E3E3;
+    background-color: @cui-gray-050;
+    border-bottom: 1px solid @cui-gray-200;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
     margin: 0 0 20px;
     padding: 10px 20px;
@@ -101,7 +103,7 @@
   }
 
   .big-btn {
-    background-color: #F0F0F0;
+    background-color: @cui-purple-gray-050;
     width: 80px;
     height: 80px;
     text-align: center;
@@ -111,18 +113,18 @@
     padding-top: 20px;
     cursor: pointer;
     line-height: 32px;
-    border: 1px solid #F0F0F0;
+    border: 1px solid @cui-purple-gray-050;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
   }
 
   .big-btn:hover, .big-btn.selected {
-    background-color: #DDDDDD;
+    background-color: @cui-gray-300;
   }
 
   .big-btn.selected {
-    border-color: #CCCCCC;
+    border-color: @cui-gray-400;
   }
 
   .big-btn i {
