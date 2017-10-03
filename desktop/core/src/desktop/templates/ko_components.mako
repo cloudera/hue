@@ -474,12 +474,12 @@ from desktop.views import _ko
           $('#jobsPanel').hide();
         });
 
-        huePubSub.subscribe('show.jobs.panel', function (id) {
+        huePubSub.subscribe('show.jobs.panel', function (section) {
           huePubSub.publish('hide.history.panel');
           $('#jobsPanel').show();
-          huePubSub.publish('mini.jb.navigate');
-          if (id) {
-            huePubSub.publish('mini.jb.open.job', id);
+          huePubSub.publish('mini.jb.navigate', section && section.interface ? section.interface : 'jobs');
+          if (section && section.id) {
+            huePubSub.publish('mini.jb.open.job', section.id);
           }
         });
 
