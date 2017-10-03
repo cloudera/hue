@@ -1012,7 +1012,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['MACRO']
+            suggestKeywords: ['FUNCTION', 'MACRO']
           }
         });
       });
@@ -1032,6 +1032,32 @@
       it('should suggest keywords for "DROP TEMPORARY MACRO IF |', function () {
         assertAutoComplete({
           beforeCursor: 'DROP TEMPORARY MACRO IF ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['EXISTS']
+          }
+        });
+      });
+    });
+
+    describe('DROP TEMPORARY FUNCTION', function () {
+      it('should suggest keywords for "DROP TEMPORARY FUNCTION |', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP TEMPORARY FUNCTION ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['IF EXISTS']
+          }
+        });
+      });
+
+      it('should suggest keywords for "DROP TEMPORARY FUNCTION IF |', function () {
+        assertAutoComplete({
+          beforeCursor: 'DROP TEMPORARY FUNCTION IF ',
           afterCursor: '',
           dialect: 'hive',
           expectedResult: {
