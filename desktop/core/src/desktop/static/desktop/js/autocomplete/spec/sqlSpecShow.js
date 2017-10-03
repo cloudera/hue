@@ -58,7 +58,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS']
+            suggestKeywords: ['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS', 'VIEWS']
           }
         });
       });
@@ -1080,10 +1080,85 @@
         assertAutoComplete({
           beforeCursor: 'SHOW TRANSACTIONS;',
           afterCursor: '',
+          noErrors: true,
           dialect: 'hive',
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SHOW VIEWS;|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW VIEWS;',
+          afterCursor: '',
+          noErrors: true,
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "SHOW VIEWS IN boo LIKE \'asdf\';|"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW VIEWS IN boo LIKE \'asdf\';',
+          afterCursor: '',
+          noErrors: true,
+          dialect: 'hive',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SHOW VIEWS |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW VIEWS ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FROM', 'IN', 'LIKE']
+          }
+        });
+      });
+
+      it('should suggest databases for "SHOW VIEWS IN |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW VIEWS IN ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: { }
+          }
+        });
+      });
+
+      it('should suggest databases for "SHOW VIEWS FROM |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW VIEWS FROM ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestDatabases: { }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SHOW VIEWS IN boo |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW VIEWS IN boo ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['LIKE']
           }
         });
       });

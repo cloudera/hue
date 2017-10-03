@@ -66,6 +66,7 @@
 <hive>'TIMESTAMP'                          { return '<hive>TIMESTAMP'; }
 <hive>'USER'                               { return '<hive>USER'; }
 <hive>'USING'                              { return '<hive>USING'; }
+<hive>'VIEWS'                              { return '<hive>VIEWS'; }
 
 // Non-reserved Keywords
 <hive>'ADD'                                { return '<hive>ADD'; }

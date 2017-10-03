@@ -42,6 +42,7 @@ ShowStatement
  | ShowTablesStatement
  | ShowTblPropertiesStatement
  | ShowTransactionsStatement
+ | ShowViewsStatement
  ;
 
 AnyShow
@@ -53,7 +54,7 @@ ShowStatement_EDIT
  : AnyShow 'CURSOR'
    {
      if (parser.isHive()) {
-       parser.suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS']);
+       parser.suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS', 'VIEWS']);
      } else if (parser.isImpala()) {
        parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FILES IN', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'RANGE PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
      } else {
@@ -96,6 +97,7 @@ ShowStatement_EDIT
  | ShowTableStatement_EDIT
  | ShowTablesStatement_EDIT
  | ShowTblPropertiesStatement_EDIT
+ | ShowViewsStatement_EDIT
  ;
 
 ShowColumnStatsStatement
@@ -626,4 +628,53 @@ ShowTblPropertiesStatement_EDIT
 
 ShowTransactionsStatement
  : AnyShow '<hive>TRANSACTIONS'
+ ;
+
+ShowViewsStatement
+ : AnyShow '<hive>VIEWS' OptionalInOrFromDatabase OptionalLike
+ ;
+
+ShowViewsStatement_EDIT
+ : AnyShow '<hive>VIEWS' OptionalInOrFromDatabase OptionalLike 'CURSOR'
+   {
+     if (!$4 && !$3) {
+       parser.suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'FROM', weight: 2 }, { value: 'LIKE', weight: 1 }]);
+     } else if (!$4) {
+       parser.suggestKeywords(['LIKE']);
+     }
+   }
+ | AnyShow '<hive>VIEWS' InOrFromDatabase_EDIT OptionalLike
+ | AnyShow '<hive>VIEWS' OptionalInOrFromDatabase Like_EDIT
+ ;
+
+OptionalInOrFromDatabase
+ :
+ | 'IN' RegularOrBacktickedIdentifier
+   {
+     parser.addDatabaseLocation(@2, [ { name: $2 } ]);
+   }
+ | 'FROM' RegularOrBacktickedIdentifier
+   {
+     parser.addDatabaseLocation(@2, [ { name: $2 } ]);
+   }
+ ;
+
+InOrFromDatabase_EDIT
+ : 'IN' 'CURSOR'
+   {
+     parser.suggestDatabases();
+   }
+ | 'FROM' 'CURSOR'
+   {
+     parser.suggestDatabases();
+   }
+ ;
+
+OptionalLike
+ :
+ | 'LIKE' SingleQuotedValue
+ ;
+
+Like_EDIT
+ : 'LIKE' 'CURSOR'
  ;
