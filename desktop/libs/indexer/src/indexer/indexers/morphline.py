@@ -136,6 +136,7 @@ class MorphlineIndexer(object):
 
     while len(queue):
       curr_field = queue.popleft()
+      curr_field['type'] = curr_field['type'].replace('long', 'plong').replace('double', 'pdouble').replace('date', 'pdate')
       fields.append(curr_field)
 
       for operation in curr_field["operations"]:
