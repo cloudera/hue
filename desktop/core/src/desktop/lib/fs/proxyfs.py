@@ -53,8 +53,11 @@ class ProxyFS(object):
   def _has_access(self, fs):
     from desktop.auth.backend import rewrite_user  # Avoid cyclic loop
     try:
-      user = rewrite_user(User.objects.get(username=self.user))
       filebrowser_action = fs.filebrowser_action()
+      #if not filebrowser_action (hdfs) then handle permission via doas else check permission in hue
+      if not filebrowser_action:
+        return True
+      user = rewrite_user(User.objects.get(username=self.user))
       return user.is_authenticated() and user.is_active and (user.is_superuser or not filebrowser_action or user.has_hue_permission(action=filebrowser_action, app="filebrowser"))
     except User.DoesNotExist:
       LOG.exception('proxyfs.has_access()')
