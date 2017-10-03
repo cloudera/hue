@@ -99,9 +99,6 @@ class Command(BaseCommand):
           df=collection['df']
       )
 
-      if self.client.is_solr_six_or_more():
-        self.client.update_config(collection['name'], {'set-user-property': {'update.autoCreateFields': 'false'}})
-
       with open(path) as fh:
         self.client.index(collection['name'], fh.read())
 

@@ -94,6 +94,7 @@ class SolrClient(object):
     if self.is_solr_cloud_mode():
       if config_name is None:
         self._create_cloud_config(name, fields, unique_key_field, df)
+        config_name = name
 
       self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
       fields = [{
@@ -103,7 +104,6 @@ class SolrClient(object):
         } for field in fields
       ]
       if self.is_solr_six_or_more():
-        self.api.update_config(name, {'set-user-property': {'update.autoCreateFields': 'false'}})
         self.api.add_fields(name, fields)
     else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
