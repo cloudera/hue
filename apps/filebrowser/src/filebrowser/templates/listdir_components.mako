@@ -1420,9 +1420,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               $("#moveModal .modal-footer div").show();
               $("#moveFilechooser").remove();
               $("<div>").attr("id", "moveFilechooser").appendTo($("#moveModal .modal-body"));
-
+              var scheme = paths.reduce(function(scheme, path) {
+                return path.substring(0, path.indexOf(":/")) || scheme
+              }, '') || 'hdfs';
               $("#moveFilechooser").jHueFileChooser({
-                initialPath: $("#moveDestination").val(),
+                initialPath: paths[0] || '',
+                filesystemsFilter: [scheme],
                 onNavigate: function (filePath) {
                   $("#moveDestination").val(filePath);
                 },
@@ -1473,8 +1476,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           $("#copyModal .modal-footer div").show();
           $("#copyFilechooser").remove();
           $("<div>").attr("id", "copyFilechooser").appendTo($("#copyModal .modal-body"));
+          var scheme = paths.reduce(function(scheme, path) {
+            return path.substring(0, path.indexOf(":/")) || scheme
+          }, '') || 'hdfs';
           $("#copyFilechooser").jHueFileChooser({
-            initialPath: $("#copyDestination").val(),
+            initialPath: paths[0] || '',
+            filesystemsFilter: [scheme],
             onNavigate: function (filePath) {
               $("#copyDestination").val(filePath);
             },
