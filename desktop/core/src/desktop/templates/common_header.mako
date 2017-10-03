@@ -121,7 +121,7 @@ if USE_NEW_EDITOR.get():
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 
-  % if not conf.DJANGO_DEBUG_MODE.get():
+  % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
 

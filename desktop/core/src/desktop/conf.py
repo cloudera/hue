@@ -999,11 +999,6 @@ LDAP = ConfigSection(
       type=int,
       help=_("Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,"
              "2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls.")),
-    DEV = Config("dev",
-      type=coerce_bool,
-      default=False,
-      help=_("Enable development mode, where notably static files are not cached.")),
-
     LDAP_SERVERS = UnspecifiedConfigSection(
       key="ldap_servers",
       help=_("LDAP server record."),
@@ -1271,6 +1266,12 @@ DJANGO_DEBUG_MODE = Config(
   help=_("Enable or disable Django debug mode."),
   type=coerce_bool,
   default=True
+)
+
+DEV = Config("dev",
+   type=coerce_bool,
+   default=False,
+   help=_("Enable development mode, where notably static files are not cached.")
 )
 
 HTTP_500_DEBUG_MODE = Config(
