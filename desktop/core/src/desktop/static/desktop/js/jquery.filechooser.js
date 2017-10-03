@@ -184,7 +184,7 @@
   };
 
   Plugin.prototype.setFileSystems = function (filesystems) {
-    var self = this;
+    var self = this, filters, filesystemsFiltered;
     self.options.filesystems = [];
     Object.keys(filesystems).forEach(function (k) {
       if (filesystems[k]) {
@@ -192,10 +192,22 @@
       }
     });
     self.options.filesystems.sort();
-    $(self.element).data('fs', self.options.filesystems);
-    if (self.options.filesystems.length > 1) {
+    if (self.options.filesystemsFilter) {
+      filters = self.options.filesystemsFilter.reduce(function(filters, fs) {
+      filters[fs] = true;
+      return filters;
+    }, {});
+      filesystemsFiltered = self.options.filesystems.filter(function(fs) {
+        return filters[fs];
+      });
+    } else {
+      filesystemsFiltered = self.options.filesystems;
+    }
+
+    $(self.element).data('fs', filesystemsFiltered);
+    if (filesystemsFiltered.length > 1) {
       var $ul = $('<ul>').addClass('nav nav-list').css('border', 'none');
-      self.options.filesystems.forEach(function (fs) {
+      filesystemsFiltered.forEach(function (fs) {
         var filesysteminfo = self.options.filesysteminfo;
         var $li = $('<li>').attr('data-fs', fs).addClass(self.options.fsSelected === fs ? 'active' : '').html('<a class="pointer" style="padding-left: 6px">' + (filesysteminfo[fs] ? filesysteminfo[fs].label.name : fs.toUpperCase()) + '</a>');
         $li.on('click', function () {
