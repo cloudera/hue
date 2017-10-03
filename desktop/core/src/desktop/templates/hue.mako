@@ -60,7 +60,7 @@
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 
-  % if not conf.DJANGO_DEBUG_MODE.get():
+  % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
   % endif
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
@@ -738,7 +738,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         // Only load CSS and JS files that are not loaded before
         self.processHeaders = function(response){
           var r = $('<span>').html(response);
-          % if conf.DJANGO_DEBUG_MODE.get():
+          % if conf.DEV.get():
           r.find('link').each(function () {
             $(this).attr('href', $(this).attr('href') + '?' + Math.random())
           });
