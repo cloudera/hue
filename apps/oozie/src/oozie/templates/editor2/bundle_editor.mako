@@ -43,30 +43,41 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-pencil"></i>
     </a>
 
-    <a title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}, visible: canEdit">
-      <i class="fa fa-cog"></i>
-    </a>
-
     <a type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit() && bundle.coordinators().length > 0">
       <i class="fa fa-save"></i>
     </a>
 
-    <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
-        attr: {'data-original-title': '${ _ko("Share") } ' + name},
-        css: {'isShared': isShared(), 'btn': true},
-        visible: bundle.id() != null && canEdit()">
-      <i class="fa fa-users"></i>
-    </a>
 
-    <a class="btn" href="${ url('oozie:new_bundle') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-file-o"></i>
-    </a>
-
-    %if is_embeddable:
-    <a class="btn" href="javascript: void(0)" title="${ _('Bundles') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '/home/?type=oozie-bundle2'">
-      <svg class="hi"><use xlink:href="#hi-documents"></use></svg>
-    </a>
-    %endif
+    <div class="dropdown pull-right margin-left-10">
+      <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+        <i class="fa fa-fw fa-ellipsis-v"></i>
+      </a>
+      <ul class="dropdown-menu">
+        <li data-bind="visible: canEdit">
+          <a class="pointer" data-toggle="modal" data-target="#settingsModal">
+            <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
+          </a>
+        </li>
+        <li data-bind="visible: bundle.id() != null && canEdit()">
+          <a class="pointer share-link" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal, css: {'isShared': isShared()}">
+            <i class="fa fa-fw fa-users"></i> ${ _("Share") }
+          </a>
+        </li>
+        <li class="divider"></li>
+        <li>
+          <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_bundle') }'">
+            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+          </a>
+        </li>
+        %if is_embeddable:
+          <li>
+            <a href="javascript: void(0)" data-bind="hueLink: '/home/?type=oozie-bundle2'">
+              <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Bundles') }
+            </a>
+          </li>
+        %endif
+      </ul>
+    </div>
   </div>
 </%def>
 
