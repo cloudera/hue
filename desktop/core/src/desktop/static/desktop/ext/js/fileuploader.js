@@ -1216,11 +1216,11 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
     getName: function(id){
         var file = this._files[id];
         // fix missing name in Safari 4
-        return file.fileName != null ? file.fileName : file.name;
+        return file && (file.fileName || file.name);
     },
     getSize: function(id){
         var file = this._files[id];
-        return file.fileSize != null ? file.fileSize : file.size;
+        return file && (file.fileSize || file.size);
     },
     /**
      * Returns uploaded bytes for file identified by id
