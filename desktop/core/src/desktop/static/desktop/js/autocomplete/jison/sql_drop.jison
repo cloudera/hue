@@ -155,6 +155,7 @@ DropImpalaFunction_EDIT
 
 DropHiveFunction
  : 'DROP' '<hive>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier
+ | 'DROP' '<hive>TEMPORARY' '<hive>FUNCTION' OptionalIfExists RegularIdentifier
  ;
 
 DropHiveFunction_EDIT
@@ -173,6 +174,13 @@ DropHiveFunction_EDIT
  | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT
  | 'DROP' '<hive>FUNCTION' OptionalIfExists_EDIT SchemaQualifiedIdentifier
  | 'DROP' '<hive>FUNCTION' OptionalIfExists SchemaQualifiedIdentifier_EDIT
+ | 'DROP' '<hive>TEMPORARY' '<hive>FUNCTION' OptionalIfExists 'CURSOR'
+   {
+     if (!$4) {
+       parser.suggestKeywords(['IF EXISTS']);
+     }
+   }
+ | 'DROP' '<hive>TEMPORARY' '<hive>FUNCTION' OptionalIfExists_EDIT
  ;
 
 DropRoleStatement
@@ -303,7 +311,7 @@ DropMacroStatement
 DropMacroStatement_EDIT
  : 'DROP' '<hive>TEMPORARY' 'CURSOR'
    {
-     parser.suggestKeywords(['MACRO']);
+     parser.suggestKeywords(['FUNCTION', 'MACRO']);
    }
  | 'DROP' '<hive>TEMPORARY' '<hive>MACRO' OptionalIfExists 'CURSOR'
    {
