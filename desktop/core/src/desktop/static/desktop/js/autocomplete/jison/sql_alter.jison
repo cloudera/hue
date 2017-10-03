@@ -50,35 +50,53 @@ AlterStatement_EDIT
 
 AlterDatabase
  : 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>DBPROPERTIES' ParenthesizedPropertyAssignmentList
+    {
+      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+    }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation
+    {
+      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+    }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>OWNER' PrincipalSpecification
+    {
+      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+    }
  ;
 
 AlterDatabase_EDIT
  : 'ALTER' DatabaseOrSchema 'CURSOR'
    {
      if (parser.isHive()) {
-      parser.suggestDatabases();
+       parser.suggestDatabases();
      }
    }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'CURSOR'
    {
+     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
      if (parser.isHive()) {
        parser.suggestKeywords(['SET DBPROPERTIES', 'SET LOCATION', 'SET OWNER']);
      }
    }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' 'CURSOR'
     {
+      parser.addDatabaseLocation(@3, [ { name: $3 } ]);
       if (parser.isHive()) {
         parser.suggestKeywords(['DBPROPERTIES', 'LOCATION', 'OWNER']);
       }
     }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' HdfsLocation_EDIT
+   {
+     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+   }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>OWNER' 'CURSOR'
    {
+     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
      parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | 'ALTER' DatabaseOrSchema RegularOrBacktickedIdentifier 'SET' '<hive>OWNER' PrincipalSpecification_EDIT
+   {
+     parser.addDatabaseLocation(@3, [ { name: $3 } ]);
+   }
  ;
 
 AlterIndex
