@@ -15,7 +15,7 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 # from django.utils.module_loading import import_string
-from djangosaml2.acs_failures import exception_failure
+# from djangosaml2.acs_failures import exception_failure
 from saml2.s_utils import UnknownSystemEntity
 
 
@@ -81,4 +81,5 @@ def fail_acs_response(request, *args, **kwargs):
     # failure_function = import_string(get_custom_setting('SAML_ACS_FAILURE_RESPONSE_FUNCTION',
     #                                                    'djangosaml2.acs_failures.template_failure'))
     from djangosaml2.acs_failures import exception_failure
+    failure_function = exception_failure
     return failure_function(request, *args, **kwargs)
