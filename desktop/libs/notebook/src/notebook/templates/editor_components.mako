@@ -635,7 +635,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
           %if is_embeddable:
-            <a class="pointer" data-bind="text: $.trim($data.name), click: function() { huePubSub.publish('show.jobs.panel', $data.name); }, clickBubble: false"></a>
+            <a class="pointer" data-bind="text: $.trim($data.name), click: function() { huePubSub.publish('show.jobs.panel', {id: $data.name, interface: 'queries'}); }, clickBubble: false"></a>
           %else:
             <a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
           %endif
@@ -3605,7 +3605,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       huePubSub.subscribe('submit.popup.return', function (data) {
         viewModel.selectedNotebook().viewSchedulerId(data.job_id);
         $('.submit-modal-editor').modal('hide');
-        huePubSub.publish('show.jobs.panel', data.job_id);
+        huePubSub.publish('show.jobs.panel', {id: data.job_id, interface: 'workflows'});
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('jobbrowser.data', function (jobs) {

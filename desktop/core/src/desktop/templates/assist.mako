@@ -2556,7 +2556,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${ _('Start') }</a>
             <!-- /ko -->
             <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
-            <a data-bind="click: function() { huePubSub.publish('show.jobs.panel', viewSchedulerId()) }, clickBubble: false" href="javascript: void(0);">
+            <a data-bind="click: function() { huePubSub.publish('show.jobs.panel', {id: viewSchedulerId(), interface: 'schedules'}) }, clickBubble: false" href="javascript: void(0);">
               ${ _('View') }
             </a>
             <!-- ko if: isSchedulerJobRunning() -->
