@@ -5,7 +5,7 @@ server_port: 4000
 
 source:      .
 destination: ./_site
-plugins:     ./_plugins
+#plugins:     plugins_dir
 
 future:      true
 lsi:         false
