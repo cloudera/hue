@@ -153,6 +153,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
+  <script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/js/hue.colors.js') }"></script>
   <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
