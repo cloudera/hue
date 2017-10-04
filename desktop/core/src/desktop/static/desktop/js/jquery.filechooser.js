@@ -183,6 +183,23 @@
     }
   };
 
+  function getScheme (path) {
+    var index = path.indexOf("://");
+    return index >= 0 ? path.substring(0, index) : "hdfs";
+  }
+
+  function getFs (scheme) {
+    if (scheme === 'adl') {
+      return 'adls';
+    } else if (scheme === 's3a' ){
+      return 's3';
+    } else if (!scheme || scheme === 'hdfs') {
+      return 'hdfs';
+    } else {
+      return scheme;
+    }
+  }
+
   Plugin.prototype.setFileSystems = function (filesystems) {
     var self = this, filters, filesystemsFiltered;
     self.options.filesystems = [];
@@ -280,10 +297,6 @@
             var indexFirst = path.indexOf("/");
             var indexLast = path.lastIndexOf("/");
             return indexLast - indexFirst > 1 && indexLast > 0 ? path.substring(0, indexLast + 1) : path;
-          }
-          function getScheme (path) {
-            var index = path.indexOf("://");
-            return index >= 0 ? path.substring(0, index) : "hdfs";
           }
           var next = path !== _parent.previousPath && getScheme(path) === getScheme(_parent.previousPath) ? _parent.previousPath : getParentPath(path);
           _parent.options.onFolderChange(next);
@@ -632,8 +645,9 @@
         num_of_pending_uploads--;
         if (responseJSON.status == -1) {
           $(document).trigger("error", responseJSON.data);
-        } else if (num_of_pending_uploads == 0) {
+        } else if (!num_of_pending_uploads) {
           _parent.navigateTo(path);
+          window.huePubSub.publish('assist.' + getFs(getScheme(path)) + '.refresh');
         }
       },
       onSubmit: function (id, fileName) {

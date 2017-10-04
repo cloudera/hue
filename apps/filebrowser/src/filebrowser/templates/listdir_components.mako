@@ -1049,6 +1049,24 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
+      self.scheme = ko.pureComputed(function () {
+        var path = self.currentPath();
+        return path.substring(0, path.indexOf(':/')) || "hdfs";
+      });
+
+      self.fs = ko.pureComputed(function () {
+        var scheme = self.scheme();
+        if (scheme === 'adl') {
+          return 'adls';
+        } else if (scheme === 's3a' ){
+          return 's3';
+        } else if (!scheme || scheme == 'hdfs') {
+          return 'hdfs';
+        } else {
+          return scheme;
+        }
+      });
+
       function root(path) {
         var path = path && path.toLowerCase();
         if (path.indexOf('s3a://') >= 0) {
@@ -1152,12 +1170,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           self.updateFileList(data.files, data.page, data.breadcrumbs, data.current_dir_path, data.is_sentry_managed);
 
           if (clearAssistCache) {
-            if (self.isS3()) {
-              huePubSub.publish('assist.clear.s3.cache');
-            }
-            else {
-              huePubSub.publish('assist.clear.hdfs.cache');
-            }
+            huePubSub.publish('assist.'+self.fs()+'.refresh');
           }
 
           if ($("#hueBreadcrumbText").is(":visible")) {
@@ -1420,12 +1433,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               $("#moveModal .modal-footer div").show();
               $("#moveFilechooser").remove();
               $("<div>").attr("id", "moveFilechooser").appendTo($("#moveModal .modal-body"));
-              var scheme = paths.reduce(function(scheme, path) {
-                return path.substring(0, path.indexOf(":/")) || scheme
-              }, '') || 'hdfs';
               $("#moveFilechooser").jHueFileChooser({
                 initialPath: paths[0] || '',
-                filesystemsFilter: [scheme],
+                filesystemsFilter: [self.scheme()],
                 onNavigate: function (filePath) {
                   $("#moveDestination").val(filePath);
                 },
@@ -1476,12 +1486,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           $("#copyModal .modal-footer div").show();
           $("#copyFilechooser").remove();
           $("<div>").attr("id", "copyFilechooser").appendTo($("#copyModal .modal-body"));
-          var scheme = paths.reduce(function(scheme, path) {
-            return path.substring(0, path.indexOf(":/")) || scheme
-          }, '') || 'hdfs';
           $("#copyFilechooser").jHueFileChooser({
             initialPath: paths[0] || '',
-            filesystemsFilter: [scheme],
+            filesystemsFilter: [self.scheme()],
             onNavigate: function (filePath) {
               $("#copyDestination").val(filePath);
             },
@@ -1489,6 +1496,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             uploadFile: false
           });
         });
+
       };
 
       self.changeOwner = function (data, event) {
@@ -1614,23 +1622,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           dataType:  'json',
           success: function() {
             $("#deleteModal").modal('hide');
-            window.setTimeout(function(){
-              $(self.selectedFiles()).each(function (index, file) {
-                file.deleted(true);
-              });
-              var $scrollable = $(window);
-              %if is_embeddable:
-              $scrollable = $('.page-content');
-              %endif
-              if ($('.row-deleted').length > 0 && $('.row-deleted:eq(0)').offset()) {
-                $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
-              }
-            }, 500);
-            window.setTimeout(function(){
-              $(self.selectedFiles()).each(function (index, file) {
-                self.files.remove(file);
-              });
-            }, 1000);
+            self.retrieveData(true);
           },
           error: function(xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -2273,6 +2265,13 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       $("#newRepFactorInput").focus(function () {
         $("#replicationFactorRequiredAlert").hide();
         $("#newRepFactorInput").removeClass("fieldError");
+      });
+
+      viewModel.currentPath.subscribe(function (path) {
+        if (!path) return;
+        huePubSub.subscribe('assist.' + viewModel.fs() + '.refresh', function () {
+          viewModel.retrieveData();
+        });
       });
 
       huePubSub.subscribe('update.autocompleters', function(){
