@@ -421,6 +421,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/tether.js') }"></script>
 <script src="${ static('desktop/ext/js/shepherd.min.js') }"></script>
 <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
+<script src="${ static('desktop/js/bootstrap-typeahead-touchscreen.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
 <script src="${ static('desktop/ext/js/filesize.min.js') }"></script>
