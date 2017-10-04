@@ -525,7 +525,7 @@ ALTER TABLE `%(table)s` SET TBLPROPERTIES('EXTERNAL'='TRUE');
 DROP TABLE IF EXISTS `%(table)s`;
     ''' % {
       'table': _get_snippet_name(notebook, unique=True, table_format=True),
-      'location': destination,
+      'location': self.request.fs.netnormpath(destination),
       'hql': query.hql_query
     }
     success_url = '/filebrowser/view=%s' % destination
