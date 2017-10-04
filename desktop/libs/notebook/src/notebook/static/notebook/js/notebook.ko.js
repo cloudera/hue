@@ -617,7 +617,7 @@ var EditorViewModel = (function() {
       if (self.type() == 'pig') {
         matches = self.getPigParameters();
       } else {
-        var re = /(?:^|\W)\${(\w*)\=?([\w\s]*)}/g;
+        var re = /(?:^|\W)\${(\w*)\=?([^}]*)}/g;
         var reComment = /(^\s*--.*)|(\/\*[\s\S]*?\*\/)/gm;
         var statement = self.statement_raw();
         var matchComment = reComment.exec(statement);
