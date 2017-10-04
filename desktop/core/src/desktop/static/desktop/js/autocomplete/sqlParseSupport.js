@@ -1915,23 +1915,35 @@ var SqlParseSupport = (function () {
       }
     };
 
+    parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
+      if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
+        var cursorIndex = yytext.indexOf('\u2020');
+        parser.yy.cursorFound = {
+          first_line: yylloc.first_line,
+          last_line: yylloc.last_line,
+          first_column: yylloc.first_column + cursorIndex,
+          last_column: yylloc.first_column + cursorIndex + 1
+        };
+        var remainder = yytext.substring(cursorIndex + 1);
+        var remainingQuotes = (lexer.upcomingInput().match(new RegExp(quoteChar, 'g')) || []).length;
+        if (remainingQuotes > 0 && remainingQuotes & 1 != 0) {
+          parser.yy.missingEndQuote = false;
+          lexer.input();
+        } else {
+          parser.yy.missingEndQuote = true;
+          lexer.unput(remainder);
+        }
+        lexer.popState();
+        return true;
+      }
+      return false;
+    };
+
     parser.parseGlobalSearch = function (beforeCursor, afterCursor, debug) {
       delete parser.yy.cursorFound;
 
-      parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
-
-      if (parser.yy.partialLengths.left > 0) {
-        beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
-      }
-
-      if (parser.yy.partialLengths.right > 0) {
-        afterCursor = afterCursor.substring(parser.yy.partialLengths.right);
-      }
-
       var result;
       try {
-        // \u2020 represents the cursor, \u2021 represent partial
-        // TODO: Handle partial cursor
         result = parser.parse(beforeCursor + '\u2020' + afterCursor);
       } catch (err) {
         if (debug) {

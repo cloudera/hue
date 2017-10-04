@@ -25,7 +25,8 @@
       testParser('', '', {
         suggestFacets: true,
         suggestResults: true,
-        facets: {}
+        facets: {},
+        text: []
       });
     });
 
@@ -35,7 +36,8 @@
         suggestResults: true,
         facets: {
           'TAGS' : ['asdf']
-        }
+        },
+        text: []
       });
     });
 
@@ -44,7 +46,8 @@
         suggestFacetValues: 'tags',
         facets: {
           'type': ['table']
-        }
+        },
+        text: []
       });
     });
 
@@ -54,14 +57,48 @@
         suggestResults: true,
         facets: {
           'type': ['table', 'column']
-        }
+        },
+        text: []
+      });
+    });
+
+    it('should give correct text values for "some text goes |here \'quoted value\'"', function() {
+      testParser('some text goes ', 'here \'quoted value\'', {
+        suggestFacets: true,
+        suggestResults: true,
+        facets: {},
+        text: ['some', 'text', 'goes', 'here', 'quoted value']
+      });
+    });
+
+    it('should give correct text and values for "some boo:\'asdfa adsf\' text goes |here \'quoted value\' foo:bar"', function() {
+      testParser('some boo:\'asdfa adsf\' text goes ', 'here \'quoted value\' foo:bar', {
+        suggestFacets: true,
+        suggestResults: true,
+        facets: {
+          boo: ['asdfa adsf'],
+          foo: ['bar']
+        },
+        text: ['some', 'text', 'goes', 'here', 'quoted value']
+      });
+    });
+
+    it('should give correct text and values for "type:foo bar|"', function() {
+      testParser('type:foo bar', '', {
+        suggestFacets: true,
+        suggestResults: true,
+        facets: {
+          type: ['foo']
+        },
+        text: ['bar']
       });
     });
 
     it('should suggest facet values for "tags: |"', function () {
       testParser('tags: ', '', {
         suggestFacetValues: 'tags',
-        facets: {}
+        facets: {},
+        text: []
       });
     });
   });

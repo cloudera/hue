@@ -46,7 +46,7 @@
 
 <doubleQuote>\"                                 { this.popState(); return 'QUOTE'; }
 
-[^"'\s\u2020]+                                    { return 'TEXT'; }
+[^"'\s\u2020]+                                  { return 'TEXT'; }
 
 <<EOF>>                                         { return 'EOF'; }
 
@@ -59,27 +59,43 @@
 GlobalSearchAutocomplete
  : SearchParts 'EOF'
    {
-     return {};
+     return $1;
    }
  | SearchParts_EDIT 'EOF'
    {
      if (!$1.facets) {
        $1.facets = {};
      }
+     if (!$1.text) {
+       $1.text = [];
+     }
      return $1;
    }
  | 'EOF'
    {
-     return {};
+     return { facets: {}, text: [] };
    }
  ;
 
 SearchParts
- : SearchPart                   -->  { facets: $1.facets ? $1.facets : {} }
+ : SearchPart
+   {
+     $$ = {
+       facets: $1.facets ? $1.facets : {},
+       text: $1.text ? $1.text : []
+     };
+   }
  | SearchParts SearchPart
    {
+     $$ = {
+       facets: $1.facets ? $1.facets : {},
+       text: $1.text ? $1.text : []
+     };
      if ($2.facets) {
-       parser.mergeFacets($1.facets, $2.facets);
+       parser.mergeFacets($$.facets, $2.facets);
+     }
+     if ($2.text && $2.text.length) {
+       $$.text = $$.text.concat($2.text);
      }
    }
  ;
@@ -88,24 +104,29 @@ SearchParts_EDIT
  : SearchPart_EDIT
  | SearchParts SearchPart_EDIT
    {
-     $2.facets = $1.facets;
      $$ = $2;
+     $$.facets = $1.facets;
+     $$.text = $1.text;
    }
  | SearchPart_EDIT SearchParts
    {
-     $1.facets = $2.facets;
+     $$ = $1;
+     $$.facets = $2.facets;
+     $$.text = $2.text;
    }
  | SearchParts SearchPart_EDIT SearchParts
    {
-     $2.facets = $1.facets;
-     parser.mergeFacets($2.facets, $3.facets);
      $$ = $2;
+     $$.facets = $1.facets;
+     $$.text = $1.text;
+     parser.mergeFacets($$.facets, $3.facets);
+     $$.text = $$.text.concat($3.text);
    }
  ;
 
 SearchPart
  : Facet
- | FreeText
+ | FreeText  --> { text: [ $1 ] }
  ;
 
 SearchPart_EDIT
@@ -137,12 +158,12 @@ FreeText_EDIT
  ;
 
 QuotedValue
- : 'QUOTE' 'VALUE' 'QUOTE'
- | 'QUOTE' 'QUOTE'
+ : 'QUOTE' 'VALUE' 'QUOTE'  --> $2
+ | 'QUOTE' 'QUOTE'          --> ''
  ;
 
 QuotedValue_EDIT
- : 'QUOTE' 'PARTIAL_VALUE'
+ : 'QUOTE' 'PARTIAL_VALUE'  --> $2
  ;
 
 %%
