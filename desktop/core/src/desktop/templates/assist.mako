@@ -335,7 +335,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- /ko -->
       <!-- ko template: 'assist-s3-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-search" data-bind="visible: !loading() && !hasErrors()">
+    <div class="assist-flex-search">
       <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-s3-scrollable">
