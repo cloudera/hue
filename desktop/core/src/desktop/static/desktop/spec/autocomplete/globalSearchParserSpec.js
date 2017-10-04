@@ -25,7 +25,7 @@
       testParser('', '', {
         suggestFacets: true,
         suggestResults: true,
-        facets: [ ]
+        facets: {}
       });
     });
 
@@ -33,21 +33,35 @@
       testParser('TAGS: asdf ', '', {
         suggestFacets: true,
         suggestResults: true,
-        facets: [ 'TAGS' ]
+        facets: {
+          'TAGS' : ['asdf']
+        }
       });
     });
 
     it('should suggest facet values for "type:table tags:"', function() {
       testParser('type:table tags: ', '', {
         suggestFacetValues: 'tags',
-        facets: ['type']
+        facets: {
+          'type': ['table']
+        }
+      });
+    });
+
+    it('should give correct facet values for "type:table type:column"', function() {
+      testParser('type:table type:column ', '', {
+        suggestFacets: true,
+        suggestResults: true,
+        facets: {
+          'type': ['table', 'column']
+        }
       });
     });
 
     it('should suggest facet values for "tags: |"', function () {
       testParser('tags: ', '', {
         suggestFacetValues: 'tags',
-        facets: []
+        facets: {}
       });
     });
   });
