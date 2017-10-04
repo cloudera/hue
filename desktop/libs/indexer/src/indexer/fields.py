@@ -85,7 +85,7 @@ FIELD_TYPES = [
 ]
 
 def get_field_type(type_name):
-  return [file_type for file_type in FIELD_TYPES if file_type.name == type_name][0]
+  return [file_type for file_type in FIELD_TYPES if file_type.name in type_name][0]
 
 def guess_field_type_from_samples(samples):
   guesses = [_guess_field_type(sample) for sample in samples]
