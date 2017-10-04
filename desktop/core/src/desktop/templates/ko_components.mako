@@ -649,7 +649,7 @@ from desktop.views import _ko
   <script type="text/html" id="inline-autocomplete-template">
     <div class="inline-autocomplete-container">
       <div>
-        <input class="inline-autocomplete-input" type="text" data-bind="attr: { 'placeHolder' : hasFocus() ? '' : placeHolder }, textInput: value, hasFocus: hasFocus, clearable: { value: value, onClear: onClear }">
+        <input class="inline-autocomplete-input" type="text" data-bind="attr: { 'placeHolder' : hasFocus() ? '' : placeHolder }, textInput: searchInput, hasFocus: hasFocus, clearable: { value: searchInput, onClear: onClear }">
         <input class="inline-autocomplete-autocomplete" disabled type="text" data-bind="value: inlineAutocomplete">
       </div>
     </div>
@@ -662,7 +662,8 @@ from desktop.views import _ko
         var self = this;
         self.placeHolder = params.placeHolder;
         self.hasFocus = params.hasFocus || ko.observable();
-        self.value = params.value;
+        self.searchInput = ko.observable('');
+        self.querySpec = params.querySpec;
         self.inlineAutocomplete = ko.observable('');
         self.lastNonPartial = null;
         self.lastResult = {};
@@ -681,14 +682,14 @@ from desktop.views import _ko
 
         if (params.triggerObservable) {
           var triggerSub = params.triggerObservable.subscribe(function () {
-            self.triggerAutocomplete(self.value(), true);
+            self.triggerAutocomplete(self.searchInput(), true);
           });
           self.disposals.push(function () {
             triggerSub.remove();
           })
         }
 
-        var valueSub = self.value.subscribe(function (newValue) {
+        var inputSub = self.searchInput.subscribe(function (newValue) {
           if (self.inlineAutocomplete().indexOf(newValue) !== 0 || newValue === '') {
             self.inlineAutocomplete(newValue);
           }
@@ -698,7 +699,7 @@ from desktop.views import _ko
         });
 
         self.disposals.push(function () {
-          valueSub.remove();
+          inputSub.remove();
         });
 
         var onKeyDown = function (event) {
@@ -706,16 +707,16 @@ from desktop.views import _ko
             return;
           }
           if (event.keyCode === 32 && event.ctrlKey) { // Ctrl-Space
-            self.triggerAutocomplete(self.value(), true);
+            self.triggerAutocomplete(self.searchInput(), true);
             return;
           }
-          if (event.keyCode === 39 && self.inlineAutocomplete() !== '' && self.inlineAutocomplete() !== self.value()) { // Right arrow
+          if (event.keyCode === 39 && self.inlineAutocomplete() !== '' && self.inlineAutocomplete() !== self.searchInput()) { // Right arrow
             // TODO: Check that cursor is last
-            self.value(self.inlineAutocomplete());
+            self.searchInput(self.inlineAutocomplete());
             return;
           }
-          if (event.keyCode === 9 && self.inlineAutocomplete() !== self.value()) { // Tab
-            self.value(self.inlineAutocomplete());
+          if (event.keyCode === 9 && self.inlineAutocomplete() !== self.searchInput()) { // Tab
+            self.searchInput(self.inlineAutocomplete());
             event.preventDefault();
           }
         };
@@ -728,8 +729,8 @@ from desktop.views import _ko
           if (!newVal) {
             self.inlineAutocomplete('');
             $(document).off('keydown', onKeyDown);
-          } else if (self.value() !== '') {
-            self.triggerAutocomplete(self.value());
+          } else if (self.searchInput() !== '') {
+            self.triggerAutocomplete(self.searchInput());
             $(document).on('keydown', onKeyDown);
           } else {
             $(document).on('keydown', onKeyDown);
@@ -831,6 +832,14 @@ from desktop.views import _ko
             console.log(self.lastResult);
           }
           if (self.lastResult) {
+            var querySpec = { query: newValue };
+            if (self.lastResult.facets) {
+              querySpec.facets = self.lastResult.facets
+            }
+            if (self.lastResult.text) {
+              querySpec.text = self.lastResult.text;
+            }
+            self.querySpec(querySpec);
             self.updateInlineAutocomplete(partial);
           } else {
             self.lastNonPartial = null;
@@ -851,7 +860,7 @@ from desktop.views import _ko
       params: {
         hasFocus: searchHasFocus,
         placeHolder: '${ _ko('Search data and saved documents...') }',
-        value: searchInput,
+        querySpec: querySpec,
         onClear: function () { selectedIndex(null); searchResultVisible(false); },
         facets: ['type', 'tags'],
         knownFacetValues: knownFacetValues,
@@ -906,7 +915,7 @@ from desktop.views import _ko
         self.fetchThrottle = -1;
 
         self.searchHasFocus = ko.observable(false);
-        self.searchInput = ko.observable('');
+        self.querySpec = ko.observable();
         self.searchActive = ko.observable(false);
         self.searchResultVisible = ko.observable(false);
         self.heightWhenDragging = ko.observable(null);
@@ -940,11 +949,11 @@ from desktop.views import _ko
           }
         });
 
-        self.searchInput.subscribe(function (newValue) {
-          if (newValue !== '') {
+        self.querySpec.subscribe(function (newValue) {
+          if (newValue && newValue.query !== '') {
             window.clearTimeout(self.fetchThrottle);
             self.fetchThrottle = window.setTimeout(function () {
-              self.fetchResults(newValue);
+              self.fetchResults(newValue.query);
             }, 500);
           } else {
             self.selectedIndex(undefined);
@@ -971,7 +980,7 @@ from desktop.views import _ko
         };
 
         self.searchHasFocus.subscribe(function (newVal) {
-          if (newVal && self.searchInput() !== '') {
+          if (newVal && self.querySpec() && self.querySpec().query !== '') {
             if (!self.searchResultVisible()) {
               self.searchResultVisible(true);
             }
@@ -992,9 +1001,9 @@ from desktop.views import _ko
             return;
           }
 
-          if (event.keyCode === 13 && self.searchHasFocus() && self.searchInput() !== '') {
+          if (event.keyCode === 13 && self.searchHasFocus() && self.querySpec() && self.querySpec().query !== '') {
             window.clearTimeout(self.fetchThrottle);
-            self.fetchResults(self.searchInput());
+            self.fetchResults(self.querySpec().query);
             return;
           }
 
@@ -1034,7 +1043,7 @@ from desktop.views import _ko
       GlobalSearch.prototype.close = function () {
         var self = this;
         self.searchResultVisible(false);
-        self.searchInput('');
+        self.querySpec({});
       };
 
       GlobalSearch.prototype.openResult = function () {
