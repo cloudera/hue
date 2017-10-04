@@ -1,0 +1,3567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Hue v3.12.0, released Feb 6th 2017</title><link rel="stylesheet" type="text/css" href="docbook.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.78.1" /></head><body><div xml:lang="en" class="article" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idp51178992"></a>Hue v3.12.0, released Feb 6th 2017</h2></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl class="toc"><dt><span class="section"><a href="#_notable_features">1. Notable Features</a></span></dt><dt><span class="section"><a href="#_compatibility">2. Compatibility</a></span></dt><dt><span class="section"><a href="#_list_of_1570_commits">3. List of 1570 Commits</a></span></dt><dt><span class="section"><a href="#_contributors">4. Contributors</a></span></dt></dl></div><p>Hue, <a class="ulink" href="http://gethue.com" target="_top">http://gethue.com</a>, is an open source Web interface for analyzing data with Hadoop.</p><p>Its main features:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+SQL editors for Hive, Impala, MySQL, Oracle, PostGresl, SparkSQL, Solr SQL, Phoenix…
+</li><li class="listitem">
+Dynamic Search dashboards with Solr
+</li><li class="listitem">
+Spark and Hadoop notebooks
+</li><li class="listitem">
+Scheduling of jobs and workflows through an Oozie Editor and Dashboard
+</li></ul></div><p>More user and developer documentation is available at <a class="ulink" href="http://gethue.com" target="_top">http://gethue.com</a>.</p><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_notable_features"></a>1. Notable Features</h2></div></div></div><p>The complete list is on <a class="ulink" href="http://gethue.com/hue-3-12-the-improved-editor-for-sql-developers-and-analysts-is-out/" target="_top">http://gethue.com/hue-3-12-the-improved-editor-for-sql-developers-and-analysts-is-out</a>.
+Hundreds of bug fixes are included as well as:</p><p>SQL Improvements</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Row Count
+</li><li class="listitem">
+Sample Popup
+</li><li class="listitem">
+New autocomplete popup
+</li><li class="listitem">
+SQL Formatter
+</li><li class="listitem">
+Timeline and Pivot Graphing
+</li><li class="listitem">
+Creating an External Table
+</li></ul></div><p>New Security Improvements</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Fixed sessionid and csrftoken with HttpOnly Flag
+</li><li class="listitem">
+Introducing Request HTTP Pool in Hue
+</li><li class="listitem">
+Content-Security-Policy: header
+</li></ul></div><p>Oozie Improvements</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Email Notifications
+</li><li class="listitem">
+Extended Dashboard Filtering
+</li></ul></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_compatibility"></a>2. Compatibility</h2></div></div></div><p>Runs on CentOS versions 5 to 6, Red Hat Enterprise Linux (RHEL 5 and 6), and Ubuntu 12.04 and 14.04.</p><p>Tested with CDH5. Specifically:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Hadoop 2.6.0
+</li><li class="listitem">
+Hive 1.1
+</li><li class="listitem">
+Oozie 4.1
+</li><li class="listitem">
+HBase 1.2
+</li><li class="listitem">
+Pig 0.12
+</li><li class="listitem">
+Impala 2.5
+</li><li class="listitem">
+Solr 4.10
+</li><li class="listitem">
+Sqoop2 1.99.5
+</li><li class="listitem">
+Spark 1.6
+</li></ul></div><p>These minimum versions should work (not tested):</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Hadoop 0.20 / 1.2.0 / 2.0.0
+</li><li class="listitem">
+Hive 0.12.0
+</li><li class="listitem">
+Oozie 3.2
+</li><li class="listitem">
+HBase 0.92
+</li><li class="listitem">
+Pig 0.8
+</li><li class="listitem">
+Impala 1.0
+</li><li class="listitem">
+Solr 3.6
+</li><li class="listitem">
+Sqoop2 1.99.3
+</li><li class="listitem">
+Spark 1.4
+</li></ul></div><p>Supported Browsers:</p><p>Hue works with the two most recent versions of the following browsers. Make sure cookies and JavaScript are turned on for the browser.</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Chrome
+</li><li class="listitem">
+Firefox LTS
+</li><li class="listitem">
+Safari (not supported on Windows)
+</li><li class="listitem">
+Internet Explorer
+</li></ul></div><p>Hue might work with Chrome 23, Firefox 23, IE8, Safari 6, or older browser version, but you might not be able to use all of the features.</p><p>Runs with Python 2.6.5+</p><p>Note: CentOS 5 and RHEL 5 requires EPEL python 2.6 package.</p></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_list_of_1570_commits"></a>3. List of 1570 Commits</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+5030c88 HUE-4969 [core] Rename ini properties for sasl buffer to be standard
+</li><li class="listitem">
+37aa76d HUE-5406 [editor] Do not restart at zero when adding or removing a multi query
+</li><li class="listitem">
+10410e0 HUE-5406 [editor] Support editing last statement of a multi query without restarting
+</li><li class="listitem">
+04ceb5d HUE-5775 [editor] Show grid sort icon just on hover
+</li><li class="listitem">
+59e7bc0 HUE-5774 [editor] Fix JS null pointer on data.jobs
+</li><li class="listitem">
+83ee79c HUE-5773 [assist] On certain cases a JS error is shown on the db panel
+</li><li class="listitem">
+66db8a0 HUE-5772 [search] Show Auto refresh option only when it’s a rolling time window
+</li><li class="listitem">
+4786d36 HUE-5770 [search] Extended property to numeric and changed binding to textInput
+</li><li class="listitem">
+ba1a30e HUE-5770 [search] Auto refresh option is only triggered once
+</li><li class="listitem">
+beda97b HUE-1176 [jb2] Remove graph arrows on tab hide
+</li><li class="listitem">
+29493d5 HUE-5771 [useradmin] Checkbox click binding should work also after a pagination event
+</li><li class="listitem">
+841f7ef HUE-5769 [oozie] Remove mandatory inclusion of Kill row in the workflow dashobard graph
+</li><li class="listitem">
+d6e3148 HUE-5406 [editor] Stay on statement of a multiquery when editing and re-executing
+</li><li class="listitem">
+37f064d HUE-4715 [editor] Formatter does not put LIMIT on a new line
+</li><li class="listitem">
+67c1444 HUE-5764 [metadata] Style syntax check and complexity results
+</li><li class="listitem">
+6c8d1bd HUE-3228 [dashboard] Select date range on timeline widget
+</li><li class="listitem">
+9c30829 HUE-3228 [dashboard] Add timeline with timestamp type
+</li><li class="listitem">
+49879cf HUE-3281 [core] Unify some test config flags
+</li><li class="listitem">
+6d3df45 HUE-3228 [dashboard] Support number range facet display
+</li><li class="listitem">
+6c6f985 HUE-3228 [dashboard] Support number range filtering in fq
+</li><li class="listitem">
+599e5df HUE-3228 [dashboard] Support number instance in fq
+</li><li class="listitem">
+05bd007 HUE-3228 [dashboard] Compatibility with Hive group by syntax
+</li><li class="listitem">
+b8844b5 HUE-3228 [dashboard] Support range number in facets skeleton
+</li><li class="listitem">
+2291d6b HUE-5766 [openid] Declare module to avoid import error
+</li><li class="listitem">
+9d243e7 HUE-5757 [importer] Add CSV Table format
+</li><li class="listitem">
+043d790 HUE-5759 [metastore] Jump to column on table page does not update the horizontall scroll bar position
+</li><li class="listitem">
+bde6bbf HUE-7 [importer] Improved vertical alignment of some checkboxes
+</li><li class="listitem">
+a097496 HUE-7 [importer] Better vertical alignment of selectize components and restyle of Index fields
+</li><li class="listitem">
+ef8f2d4 HUE-7 [importer] Restyle of bottom bar and correctly enabled the wizard circle step 2 click
+</li><li class="listitem">
+e2730b7 HUE-7 [importer] Restyle manual field list
+</li><li class="listitem">
+41eaecf HUE-7 [importer] Harmonize vertical spacing of step 2 properties
+</li><li class="listitem">
+29d7d1a HUE-7 [importer] Change label extra to extras
+</li><li class="listitem">
+cecd7a5 HUE-7 [importer] Add CSSStyleSheet.prototype.addRule polyfill
+</li><li class="listitem">
+acded61 HUE-5762 [security] Reverting X-Content-Type-Options default option from False to True
+</li><li class="listitem">
+34388da HUE-5717 [backend] Some operating system incorrectly detect javascript mime-type as text/x-js instead of application/javascript
+</li><li class="listitem">
+b98e1dc HUE-5670 [doc2] Prevent exception when doc2 object is not linked to doc1
+</li><li class="listitem">
+e907c94 HUE-5504 [oozie] JDBC URL specified in Hive2 action should override credential properties
+</li><li class="listitem">
+d717ee8 HUE-5742 [core] Allow user to provide schema name for database via ini
+</li><li class="listitem">
+2692490 HUE-5758 [oozie] Fix parsing nodes from XML definition
+</li><li class="listitem">
+3eba751 HUE-5712 [metadata] Add extra table and column stats to the upload
+</li><li class="listitem">
+cc5f8c9 HUE-5755 [jb2] Remove debug div
+</li><li class="listitem">
+de2d2f2 HUE-5743 [core] Add D3 v4 to Hue
+</li><li class="listitem">
+5ef998c HUE-5751 [core] Make HiveChooser binding and plugin updatable
+</li><li class="listitem">
+d05191f HUE-5752 [sentry] Make Hivechooser use the new apiHelper calls
+</li><li class="listitem">
+9acaf04 HUE-5753 [metastore] Make Hivechooser use the new apiHelper calls
+</li><li class="listitem">
+a6a24d3 HUE-5754 [core] Create a generic Ace editor binding
+</li><li class="listitem">
+450d9a1 HUE-5750 [importer] Better UX when creating a table manually
+</li><li class="listitem">
+cdb1300 HUE-5749 [metadata] Add audit call when editing metadata
+</li><li class="listitem">
+0e46b95 HUE-5748 [libdbms] Add _TYPE suffix to JDBC connector
+</li><li class="listitem">
+6fff643 HUE-5747 [librdms] Add column types to MySQL queries
+</li><li class="listitem">
+3eb397b HUE-5660 [home] Restore documents from Trash to /home
+</li><li class="listitem">
+06e237f HUE-5736 [core] Queue all the nav opt calls in the ApiHelper
+</li><li class="listitem">
+5bede4f HUE-5736 [core] Extract the ApiHelper queue logic to a separate object
+</li><li class="listitem">
+351a091 HUE-3228 [dashboard] Save new status of batch/task jobs if it changed
+</li><li class="listitem">
+acb9a24 HUE-3228 [dashboard] Do not historify the dashboard queries
+</li><li class="listitem">
+11276c7 HUE-7 [metastore] Avoid js error when DB is not loaded directly
+</li><li class="listitem">
+c9591bb HUE-7 [importer] Support creating a kudu table from a text file
+</li><li class="listitem">
+a3c82ae HUE-5734 [editor] Fix issue where the context popover highlighter marks invalid locations after a syntax error is introduced
+</li><li class="listitem">
+3d36b08 HUE-5733 [editor] Fix js errors related to typed keywords
+</li><li class="listitem">
+b6a5a9f HUE-5732 [editor] Fix js error in the sql context highlighter
+</li><li class="listitem">
+abd6970 HUE-5731 [editor] Enable the new autocomplete dropdown by default
+</li><li class="listitem">
+7c59698 HUE-5730 [editor] Fix issue where the autocomplete dropdown doesn’t show after page zoom
+</li><li class="listitem">
+9d0f0e2 HUE-5729 [editor] Move the * to the top in the autocomplete suggestions
+</li><li class="listitem">
+21eeeee HUE-5728 [editor] Update Ace highlighting for Impala DESCRIBE statements
+</li><li class="listitem">
+e3ae944 HUE-5728 [editor] Update the autocompleter for Impala DESCRIBE statements
+</li><li class="listitem">
+a874fa1 HUE-5659 [home] Ignore history dependencies when importing document from different cluster
+</li><li class="listitem">
+f315761 HUE-5722 [core] Avoid query redaction when string is None
+</li><li class="listitem">
+52055f6 HUE-5506 [fb] Add Compress action to right click menu
+</li><li class="listitem">
+bc7eb25 HUE-5727 [assist] Add column popularity to the assist
+</li><li class="listitem">
+9a9b266 HUE-5699 [assist] Show a star next to popular tables in the assist
+</li><li class="listitem">
+e120983 HUE-5715 [responsive] Keep left and right panel widths in total storage
+</li><li class="listitem">
+b82c2d6 HUE-5725 [core] Add the generated cui-bundle
+</li><li class="listitem">
+33e78a3 HUE-5725 [core] Add webpack
+</li><li class="listitem">
+1b9db6a HUE-5708 [editor] Add highlighting of UPDATE for Impala
+</li><li class="listitem">
+07a7ed4 HUE-5712 [metadata] Upload DDL and available stats of active tables and their columns
+</li><li class="listitem">
+4bef9a6 HUE-5712 [metadata] Upload table and column stats in the new json format
+</li><li class="listitem">
+d0bcf72 HUE-5726 [core] Sandbox the old D3 with nvd3 to support the new d3 v4
+</li><li class="listitem">
+2378602 HUE-5563 [responsive] Add the context panel and display sessions for the editor
+</li><li class="listitem">
+ca18e91 HUE-5694 [editor] Improve re-open timings for autocompletion of ‘? FROM db.table’
+</li><li class="listitem">
+8299802 HUE-5710 [core] Move the notebook styles to less
+</li><li class="listitem">
+fedb015 HUE-5402 [oozie] Allow user to enter local time for SLA nominal time
+</li><li class="listitem">
+faaa0d5 HUE-3228 [dashboard] Migrate get document call to common API
+</li><li class="listitem">
+882f50b  HUE-3228 [dashboard] Support adding old timeline in current mode
+</li><li class="listitem">
+996a1be HUE-5720 [indexer] Pickup the Solr default solr.ulog.tlogDfsReplication replication when creating examples
+</li><li class="listitem">
+ea6b52a HUE-3228 [dashboard] Add saveResultsModalVisible to allow to show the export data modal
+</li><li class="listitem">
+b243944 HUE-3228 [dashboard] Only return the selected fields in a grid widget
+</li><li class="listitem">
+e8555ec HUE-5216 [filebrowser] Support folder upload from desktop
+</li><li class="listitem">
+358d939 HUE-1176 [jb2] Use the new HiveChooser ApiHelper integration
+</li><li class="listitem">
+4c75fba HUE-5718 [core] HiveChooser should re-use the assist caches for autocomplete
+</li><li class="listitem">
+6f70584 HUE-5716 [impala] Add impalad_flag file format reader
+</li><li class="listitem">
+b619c52 HUE-5719  [notebook] Recheck status when received status "waiting" (#475)
+</li><li class="listitem">
+bbe6acb HUE-5713 [assist] Fix default sort order of columns
+</li><li class="listitem">
+98d3d1f HUE-1176 [jb] Shortened breadcrumbs
+</li><li class="listitem">
+b062f30 HUE-1176 [jb] Remove curved arrows at any job fetch
+</li><li class="listitem">
+e971f62 HUE-1176 [jb] The graph actions shouldn’t link away from JB2
+</li><li class="listitem">
+ac7bbaf HUE-1176 [jb] Update action statuses on the imported workflow graph
+</li><li class="listitem">
+204d0c4 HUE-3228 [dashboard] Support other SQL that have a sync API
+</li><li class="listitem">
+4cdbd4b HUE-7 [importer] Avoid moving of elements next to the HiveChoosers
+</li><li class="listitem">
+7065edb HUE-5714 [hive] Close SQL canary query "Select "Hello World""
+</li><li class="listitem">
+6e61c7b HUE-5712 [metadata] Update API that now contains stat upload
+</li><li class="listitem">
+a97fb84 HUE-5712 [metadata] Filter popular tables by database name
+</li><li class="listitem">
+1d10831 HUE-5408 [oozie] Support old docs while saving shared workflow
+</li><li class="listitem">
+bdd6514 HUE-5685 [editor] Indicate primary keys with an icon in assist and the autocomplete dropdown
+</li><li class="listitem">
+8010552 HUE-5709 [core] Move the metastore styles to less
+</li><li class="listitem">
+50eb1c4 HUE-5708 [editor] Add ace highlighting rules for kudu create table statements
+</li><li class="listitem">
+cc725a9 HUE-1176 [jb2] Support more than a graph at a time
+</li><li class="listitem">
+bb66828 HUE-5645 [notebook] Fix issue where the save results dialog disappears on mouse movements
+</li><li class="listitem">
+e837ecf HUE-1176 [jb2] Plugged in Workflow graph
+</li><li class="listitem">
+b1295f0 HUE-7 [importer] Restyle table existing alert
+</li><li class="listitem">
+413854e HUE-7 [importer] Show invalid field as red
+</li><li class="listitem">
+5afe4d6 HUE-7 [importer] Enable all File formats when running indexer tests
+</li><li class="listitem">
+50f1ffc HUE-7 [importer] Accept to read gzip files in source
+</li><li class="listitem">
+b8e0fea HUE-7 [importer] Disable loading data in S3 tables
+</li><li class="listitem">
+7df0908  HUE-7 [importer] Automatically sync output field delimiter value based on input
+</li><li class="listitem">
+2111e29 HUE-7 [importer] Automatically sync output header default value based on input header value
+</li><li class="listitem">
+e5c688a HUE-7 [importer] Combine extra properties in a show toggle on/off
+</li><li class="listitem">
+46e2faa HUE-7 [importer] Adding a warning and preventing submission if table already exists
+</li><li class="listitem">
+410d65f HUE-7 [importer] Properly detect TSV input files
+</li><li class="listitem">
+6793ea6 HUE-7 [importer] Prevent creating table with names already existing
+</li><li class="listitem">
+c240915 HUE-3228 [dashboard] Add automatic close statement of previous queries
+</li><li class="listitem">
+769d3a3  HUE-3228 [dashboard] Add manual WHERE filters into the queries
+</li><li class="listitem">
+a5b282d HUE-3228 [dashboard] Offer to cancel all non finished queries
+</li><li class="listitem">
+16d2c91 HUE-3228 [dashboard] Unify progress button to wait for all facets to finish
+</li><li class="listitem">
+9ef6c58 HUE-3228 [dashboard] Split APIs in sync and async
+</li><li class="listitem">
+e3f0fe3 HUE-3228 [dashboard] Integrate with Notebook result download
+</li><li class="listitem">
+a5c675a HUE-3228 [dashboard] Only apply aggregates that are after the last dimension
+</li><li class="listitem">
+393fd0c HUE-3228 [dashboard] Support dimension 2 facet graph
+</li><li class="listitem">
+ec31016 HUE-3228 [dashboard] Support aggregates in facets
+</li><li class="listitem">
+0bfd644 HUE-3228 [dashboard] First version of total number of rows
+</li><li class="listitem">
+9f8cd89 HUE-3228 [dashboard] Fix logic of distinct count function
+</li><li class="listitem">
+bdb29d0 HUE-3228 [dashboard] Async submission and status fetching
+</li><li class="listitem">
+0f0121e HUE-3228 [dashboard] Migrate to Notebook API
+</li><li class="listitem">
+0159b68 HUE-5707 [editor] Extract autocomplete styles into less
+</li><li class="listitem">
+1fa3978 HUE-5696 [editor] Fix issue where the popularity star is sometimes missing in the autocomplete dropdown
+</li><li class="listitem">
+8092d22 HUE-5698 [editor] Lower the autocomplete weights for TABLESAMPLE and LATERAL VIEW
+</li><li class="listitem">
+e595303 HUE-1176 [editor] Fix highlighter error
+</li><li class="listitem">
+875685e HUE-5450 [responsive] Extract embedded assist styles to separate less file
+</li><li class="listitem">
+e110f76 HUE-5450 [responsive] Extract common less values and attributes
+</li><li class="listitem">
+19ae535 HUE-5450 [responsive] Extract less for assist panel
+</li><li class="listitem">
+07ea737 HUE-1176 [jb2] Fixed hide/show assist panel
+</li><li class="listitem">
+c961087 HUE-1176 [jb2] Harmonized breadcrumbs
+</li><li class="listitem">
+09cc26f HUE-1176 [jb2] Restyled top bar
+</li><li class="listitem">
+455453a HUE-1176 [jb2] XML display binding and clean up of load links
+</li><li class="listitem">
+6a7a5bd HUE-7 [importer] Fixed resize elements
+</li><li class="listitem">
+4426bf3 HUE-7 [importer] Set visual clue that hiveChooser is loading tables
+</li><li class="listitem">
+8270bcc HUE-7 [importer] Set source.show when a table name is present
+</li><li class="listitem">
+fa7e730 HUE-7 [importer] Prefill assist database into hivechooser
+</li><li class="listitem">
+3567552 HUE-7 [importer] Made table field longer
+</li><li class="listitem">
+53e232f HUE-7 [importer] Fix wizard header line overflow
+</li><li class="listitem">
+1bce27a HUE-7 [importer] Show edit fields bulk icon on hover
+</li><li class="listitem">
+1309391 HUE-7 [importer] Changed headers style and make the page a bit more compact vertically
+</li><li class="listitem">
+61ec98c HUE-7 [importer] Put separators on one line
+</li><li class="listitem">
+251c94e HUE-5706 [core] Put back responsive.css for development purposes
+</li><li class="listitem">
+f4c10e7 HUE-5706 [core] Updated package.json
+</li><li class="listitem">
+e5bef4c HUE-5706 [core] Use grunt watch to listen to less file changes and recompile automatically.
+</li><li class="listitem">
+9191522 HUE-5706 [core] Use Grunt to build less.
+</li><li class="listitem">
+eca7da9 HUE-5661 [fb] Filechooser seems to truncate the file list
+</li><li class="listitem">
+e20d91a HUE-5703 [security] Upgrade totalStorage and pass along a secure cookie fallback in apiHelper
+</li><li class="listitem">
+90096b2 HUE-5702 [security] Mark as secure the hueLandingPage cookie if on https
+</li><li class="listitem">
+ea465af HUE-5701 [security] Remove last references to $.cookie and migrate to $.totalStorage from FB
+</li><li class="listitem">
+0cc2b4d HUE-5689 [importer] Top progress section is small in FF
+</li><li class="listitem">
+ef8812c HUE-7 [importer] Tweak the UX and add flags to enable the new version
+</li><li class="listitem">
+c00bd21 HUE-5700 [security] Reverting X-Content-Type-Options default option from True to False
+</li><li class="listitem">
+7330730 HUE-1176 [jb2] Add check app status and progress to the API
+</li><li class="listitem">
+df2d781 HUE-5691 [metadata] Parameterize search fetch call limits
+</li><li class="listitem">
+c530a1d HUE-5690 [metadata] Need to filter data to the current Hue cluster only
+</li><li class="listitem">
+74150a8 HUE-5688 [metadata] Filter out facet values when Sentry filtering is on
+</li><li class="listitem">
+f2470d1 HUE-5115 [dashboard] Add support for function widget
+</li><li class="listitem">
+18f996a HUE-5646 [editor] Include table and column comments in the autocomplete filter
+</li><li class="listitem">
+4025eb2 HUE-5687 [editor] Show HDFS details in the autocomplete dropdown
+</li><li class="listitem">
+eb81662 HUE-5683 [editor] Show details for popular aggregate functions in the autocomplete dropdown
+</li><li class="listitem">
+eb16823 HUE-5682 [editor] Show details about joins and join conditions in the autocomplete dropdown
+</li><li class="listitem">
+e4ac796 HUE-5681 [editor] Add details for popular order by, group by and filter to the autocomplete dropdown
+</li><li class="listitem">
+8734f5f HUE-5693 [editor] Set autocompletion argument types for avg() to numeric for Impala
+</li><li class="listitem">
+f779c81 HUE-7 [importer] Varchar numbers do not need to casted to numbers
+</li><li class="listitem">
+b77b410 HUE-5115 [dashboard] Support merging multiple filter facets from different widgets
+</li><li class="listitem">
+a0a5264 HUE-5115 [dashboard] Add field facet selection filtering
+</li><li class="listitem">
+19ddf1c HUE-1176 [jb] Add new coordinator page
+</li><li class="listitem">
+2d7fe5c HUE-5680 [editor] Update autocomplete dropdown categories based on active filter
+</li><li class="listitem">
+763b1d3 HUE-5674 [editor] Detach the autocomplete dropdown details panel
+</li><li class="listitem">
+6d0b750 HUE-5673 [editor] Don’t wrap long suggestions in the autocomplete dropdown
+</li><li class="listitem">
+c04dc70 HUE-5676 [editor] Improve filtered prefixed suggestion weights
+</li><li class="listitem">
+3cc72e5 HUE-5633 [editor] Show column details in the autocomplete dropdown
+</li><li class="listitem">
+24016d2 HUE-5506 [fb] Update arguments in Notebook() initialization
+</li><li class="listitem">
+6afaf31 HUE-5506 [fb] Update message in submission notification popup
+</li><li class="listitem">
+7f87b14 HUE-5506 [fb] Add unit test and small nits
+</li><li class="listitem">
+0306081 HUE-5506 [fb] Add script to compress hdfs files
+</li><li class="listitem">
+c5adc71 HUE-5506 [fb] Add compress utils API that submits batch job
+</li><li class="listitem">
+e068c40 HUE-5506 [fb] Add backend API
+</li><li class="listitem">
+cd6cbdb HUE-5506 [fb] Frontend to submit file compression as batch job
+</li><li class="listitem">
+64aa36f HUE-5684 [oozie] Hide workflow graph when node count &gt; 30
+</li><li class="listitem">
+83da46a HUE-5684 Prevent duplicate nodes in the workflow graph layout
+</li><li class="listitem">
+36f1637 HUE-3228 [search] Fix import that was not properly renamed
+</li><li class="listitem">
+44cbbb3 HUE-5679 [impala] Do not truncate the last part of rows in result downloads
+</li><li class="listitem">
+98e182e HUE-5677 [metadata] More robust and friendly check upload status
+</li><li class="listitem">
+d946b54 HUE-5632 [editor] Add popularity to table details in the autocomplete dropdown
+</li><li class="listitem">
+a870101 HUE-5647 [editor] Improved colors in the autocomplete dropdown
+</li><li class="listitem">
+78b6d9c HUE-5675 [editor] Fix js error from complex type completion in the new autocomplete dropdown
+</li><li class="listitem">
+3707710 HUE-5672 [editor] Fix issue with empty autocomplete dropdown
+</li><li class="listitem">
+01c3947 HUE-5661 [editor] Add skeleton of SQL assistant
+</li><li class="listitem">
+9ea372b HUE-1176 [jb2] Do not trigger a fetch job when none are selected on page load
+</li><li class="listitem">
+e0ce7a9 HUE-3228 [dashboard] On/off flag to allow SQL in dashboards
+</li><li class="listitem">
+16ad708 HUE-4908 [editor] Support sample popup on Kudu tables
+</li><li class="listitem">
+f9c711d HUE-4908 [editor] Add metadata flag when the table supports updates
+</li><li class="listitem">
+f94965f HUE-3228 [dashboard] Create a new dashboard by selecting a table or and index
+</li><li class="listitem">
+3376fca HUE-4908 [metastore] Add primiary key icons to the Kudu columns
+</li><li class="listitem">
+f44a9d8 HUE-4908 [importer] Update Kudu table creation format
+</li><li class="listitem">
+535bf62 HUE-3228 [search] Adding more than one aggregation dimension to facets
+</li><li class="listitem">
+6ede306 HUE-3228 [search] Add column metadata to grid facet
+</li><li class="listitem">
+5c4eb5d HUE-3228 [search] Support listing tables
+</li><li class="listitem">
+14ab43c HUE-3228 [search] Add SQL facet logic
+</li><li class="listitem">
+9d4b9f9 HUE-3228 [search] Skeleton of common API
+</li><li class="listitem">
+308ca58 HUE-1176 [jb] Reload job via URL hash
+</li><li class="listitem">
+585bc48 HUE-1176 [jb] Add workflow action page
+</li><li class="listitem">
+0c54762 HUE-1176 [jb] Add tasks to the workflow page
+</li><li class="listitem">
+f793c23 HUE-1176 [jb] Add configuration to the workflow page
+</li><li class="listitem">
+a3e423d HUE-1176 [jb] Add XML definition to the workflow page
+</li><li class="listitem">
+b767dde HUE-1176 [jb] Add basic job operation API to workflows
+</li><li class="listitem">
+c663b7b HUE-5116 [search] Add base API
+</li><li class="listitem">
+31a87c5 HUE-5116 [search] Split the API outside of the views
+</li><li class="listitem">
+0b726dd HUE-5670 [editor] Add autocompletion support for Kudu
+</li><li class="listitem">
+cb5c5ef HUE-5669 [responsive] Move search autocompletion to the front
+</li><li class="listitem">
+657ded9 HUE-5668 [metadata] Hide the search result when show in assist is clicked
+</li><li class="listitem">
+3c2021e HUE-5667 [metadata] Show assist search results on click
+</li><li class="listitem">
+588d78b HUE-5666 [editor] Fix JS errors related to popularity in the new autocomplete dropdown
+</li><li class="listitem">
+2da58fe HUE-5652 [responsive] Only show the assistant for Hive and Impala
+</li><li class="listitem">
+38d997b HUE-5651 [responsive] Add skeleton for statement details in the right assist panel
+</li><li class="listitem">
+1f0c41b HUE-5648 [editor] Set focus on the editor after category change in the autocomplete dropdown
+</li><li class="listitem">
+65bce31 HUE-5662 [assist] Show the selected function description below the functions in the assist panel
+</li><li class="listitem">
+09369d1 HUE-5631 [editor] Show details about the UDFs in the autocomplete dropdown
+</li><li class="listitem">
+df045ca HUE-5658 [metastore] Ignore error popup when the table is not associated to metadata
+</li><li class="listitem">
+004c39c HUE-5658 [libsentry] Perm checker returns a generator of results
+</li><li class="listitem">
+e238410 HUE-2981 [search] Disable prefix parameter because of numeric fields
+</li><li class="listitem">
+ed3ed19 HUE-5656 [importer] Keep wizard headers fixed
+</li><li class="listitem">
+5d74cc9 HUE-5663 [core] Correct bottom border of the user dropdown when no dropdown is there
+</li><li class="listitem">
+d7eb6ec HUE-5664 [importer] Avoid going on a single line for destination name
+</li><li class="listitem">
+92f7bfc HUE-5618 [home] Use doc name while exporting individual docs
+</li><li class="listitem">
+ec115a6 HUE-2981 [search] Avoid error when un-nesting children documents
+</li><li class="listitem">
+cf0b768 HUE-5632 [editor] Show table comments in the autocomplete dropdown details panel
+</li><li class="listitem">
+9368922 HUE-5650 [responsive] The functions panel should show the functions of the active snippet type
+</li><li class="listitem">
+192ebee HUE-5649 [responsive] Move function category selection to the front
+</li><li class="listitem">
+244355d HUE-5634 [editor] Show details on hover in the new autocomplete dropdown
+</li><li class="listitem">
+11a5572 HUE-5627 [editor] Close the new autocomplete dropdown on outside scroll
+</li><li class="listitem">
+c971cd8 HUE-5629 [editor] Suppress all API errors in the new autocomplete dropdown
+</li><li class="listitem">
+6073694 HUE-5630 [editor] Let the contents decide the height of the autocomplete dropdown
+</li><li class="listitem">
+c12bf43 HUE-5628 [editor] Fix issue with incorrect highlighting of matched text in the autocomplete dropdown
+</li><li class="listitem">
+1aed0d8 HUE-5625 [editor] Close the autocomplete dropdown on empty result after typing
+</li><li class="listitem">
+fbe58a8 HUE-5640 [importer] Align better Solr fields
+</li><li class="listitem">
+9dcd96f HUE-5639 [importer] Add hide/show properties to db field
+</li><li class="listitem">
+4754ba2 HUE-5638 [importer] Delete column value shouldn’t delete the whole row
+</li><li class="listitem">
+13757bc HUE-5642 [jobbrowser] Fixed logic
+</li><li class="listitem">
+92c183e HUE-5642 [jobbrowser] Putting a not allowed value on the time filter shouldn’t give http 500
+</li><li class="listitem">
+e4489c0 HUE-5641 [jobbrowser] Align correctly the time filtering
+</li><li class="listitem">
+d54e93b HUE-5655 [metadata] Add support for S3 sources
+</li><li class="listitem">
+66a3d59 HUE-1176 [jb] Adding skeleton for bundle page
+</li><li class="listitem">
+db4e5c9 HUE-1176 [jb] Adding sections to the Workflow page
+</li><li class="listitem">
+67c1600 HUE-1176 [jb] Allow users to kill their own jobs in HUE when impersonation is disabled
+</li><li class="listitem">
+9fc2e1e HUE-1176 [jb] Plug-in the YARN kill job
+</li><li class="listitem">
+f6bca99 HUE-1176 [jb] Add properties and counters to Jobs, Attempts and Tasks
+</li><li class="listitem">
+0323837 HUE-1176 [jb] Task attempt page revamp
+</li><li class="listitem">
+d736ac3 HUE-1176 [jb] Open a Task Attempt operation
+</li><li class="listitem">
+f176112  HUE-1176 [jb] List task attempts of a MR2 task
+</li><li class="listitem">
+b4eefbe HUE-1176 [jb] Prettify the breadcrumb logic
+</li><li class="listitem">
+f17f048 HUE-1176 [jb] Open task of a MapReduce job
+</li><li class="listitem">
+ce291c5 HUE-1176 [jb] List tasks of a MR2 Job
+</li><li class="listitem">
+067cc25 HUE-5602 [jb] Make start time filter compatible with python2.6
+</li><li class="listitem">
+6f3a1e6 HUE-5482 Fix failing test_multiple_trash_directories test
+</li><li class="listitem">
+99eed45 HUE-5637 [importer] Refresh partition column names dynamically after primary keys change
+</li><li class="listitem">
+ed0da1e HUE-5619 [editor] Fix browser search override dark pattern
+</li><li class="listitem">
+b884eee HUE-5635 [importer] Document chooser should be used for queries
+</li><li class="listitem">
+cda612d HUE-5636 [importer] Reduce label size to avoid selectize triggering
+</li><li class="listitem">
+b31f95a HUE-7 [metastore] Unify Kudu partitions default values and auto add them if needed
+</li><li class="listitem">
+9dd16c8 HUE-7 [importer] Do not show default data in manual create table
+</li><li class="listitem">
+7106f8b HUE-7 [importer] Basic table comment input
+</li><li class="listitem">
+c7c3207 HUE-7 [importer] Add default string to the key of maps
+</li><li class="listitem">
+46ed47a HUE-7 [metastore] Automatically prompt for partition when using Kudu format
+</li><li class="listitem">
+f2a9eda HUE-7 [importer] Set hasHeader logic to depend on source format but then is independent later
+</li><li class="listitem">
+4c6f20b HUE-5626 [editor] Fix Firefox JS error in autocomplete dropdown
+</li><li class="listitem">
+db60a5f HUE-1176 [jb] Offer to Fetch non generic application information
+</li><li class="listitem">
+6128313 HUE-1176 [jb] Try to load and display the graph of a workflow
+</li><li class="listitem">
+dc3e79c HUE-1176 [jb] Basic skeleton to fetch Oozie workflow job logs
+</li><li class="listitem">
+5421456 HUE-1176 [jb] Add specific MR properties to the MR template
+</li><li class="listitem">
+118b94a HUE-1176 [jb] Basic skeleton to fetch MR job logs
+</li><li class="listitem">
+8b91748 HUE-1176 [jb] Basic breadcrumb navigation
+</li><li class="listitem">
+f78ade2 HUE-1176 [jb] Adding new overall layout for apps
+</li><li class="listitem">
+99c395c HUE-5617 [editor] Add colors for each suggestion category in the autocomplete dropdown
+</li><li class="listitem">
+ca47638 HUE-5598 [editor] Introduce selectable categories in the header of the autocomplete dropdown
+</li><li class="listitem">
+459dda9 HUE-5597 [editor] Skeleton for details area in autocomplete dropdown
+</li><li class="listitem">
+2038924 HUE-5599 [editor] Show a spinner inside the autocomplete dropdown when it’s loading suggestions
+</li><li class="listitem">
+4e9471c HUE-5623 [importer] Show column and data samples on the import preview
+</li><li class="listitem">
+6e4458a HUE-5620 [importer] Style maps, arrays and structs
+</li><li class="listitem">
+8bdd508 HUE-5624 [importer] Re-introduce bulk edit for column names
+</li><li class="listitem">
+de1cf6e HUE-5622 [importer] Non-guessed field types should default to string
+</li><li class="listitem">
+86ead14 HUE-5621 [importer] Changing step should reset the vertical scroll
+</li><li class="listitem">
+5ee44b4 HUE-5616 [oozie] Enable oozie backend filtering by default
+</li><li class="listitem">
+366fb7f HUE-5562 [core] Installing pig samples gives an error
+</li><li class="listitem">
+6f827c4 HUE-5590 [importer] Styled Kudu partitions
+</li><li class="listitem">
+bf41885 HUE-5614 [responsive] Prettify the new batch notification
+</li><li class="listitem">
+9d60e44 HUE-5615 [metastore] Drop a table shouldn’t throw a JS error
+</li><li class="listitem">
+73cb926 HUE-5596 [editor] Add popularity to tables in the autocomplete dropdown
+</li><li class="listitem">
+ee58ec0 HUE-5595 [editor] Add popularity of columns to the autocomplete dropdown
+</li><li class="listitem">
+bad553e HUE-5601 [editor] Add popular filters to the autocomplete dropdown
+</li><li class="listitem">
+6109918 HUE-5533 [home] Improve home page load time
+</li><li class="listitem">
+bc36557 HUE-1176 [fb] Submit and monitor HDFS archive extraction and offer to open destination
+</li><li class="listitem">
+25df370 HUE-1176 [indexer] Use the task submission when in responsive
+</li><li class="listitem">
+7f21f15 HUE-1176 [jb] Open notification in notification panel
+</li><li class="listitem">
+3375f75 HUE-1176 [jb] Display notifications in live
+</li><li class="listitem">
+fd8254b HUE-7 [editor] Basic export to table name validation
+</li><li class="listitem">
+b82b07b HUE-5602 [jb] Make date filter more user friendly
+</li><li class="listitem">
+31d1336 HUE-5590 [importer] Fixed add partition
+</li><li class="listitem">
+af8f44d HUE-7 [editor] Validate new table and database names
+</li><li class="listitem">
+8162a6f HUE-5590 [importer] Restyled normal partitions
+</li><li class="listitem">
+57ba982 HUE-5590 [importer] Support for comma separated column names paste directly into the field list
+</li><li class="listitem">
+0fc5d3f HUE-5590 [importer] Cleaned up hasHeader and import column names
+</li><li class="listitem">
+735e57c HUE-5590 [importer] Workaround a very weird bug
+</li><li class="listitem">
+6d7b633 HUE-5590 [importer] Allow to remove columns in manual mode
+</li><li class="listitem">
+19c38cf HUE-5607 [metastore] Selecting varchar instead of string is ignored in create table wizard
+</li><li class="listitem">
+954f899 HUE-5590 [metastore] Do not show the source type when coming from metastore
+</li><li class="listitem">
+46ddeba HUE-5590 [importer] Inlined forms
+</li><li class="listitem">
+cae4733 HUE-5590 [importer] Removed duplicated Ids
+</li><li class="listitem">
+8c1b943 HUE-5590 [importer] Fixed file type selectize
+</li><li class="listitem">
+bbf19cd HUE-5590 [importer] Fixed layout of the second step and moved knockout-selectize to Hue js
+</li><li class="listitem">
+023758e HUE-5590 [importer] Fixed outputFormat variables typo
+</li><li class="listitem">
+5d9cbec HUE-5590 [importer] Added truncatedText binding and put it on the data preview table
+</li><li class="listitem">
+3d48a64 HUE-5590 [importer] Added support for openOnFocus on the filechooser binding
+</li><li class="listitem">
+25fe089 HUE-5590 [importer] Fixed layout of the first step and top wizard
+</li><li class="listitem">
+d76e380 HUE-5613 [fb] Set output path outside shell script for extract batch job
+</li><li class="listitem">
+3543f0c HUE-5609 [core] Create a jHueScrollLeft plugin
+</li><li class="listitem">
+52a12ca HUE-1176 [jb] Componentize task submition and follow-up
+</li><li class="listitem">
+0a1ae28 HUE-1176 [jb] Display task history in the top right corner
+</li><li class="listitem">
+f0253a7 HUE-5594 [editor] Add popular group bys and order bys to the autocomplete dropdown
+</li><li class="listitem">
+3cb54f0 HUE-5593 [editor] Add popular aggregate functions to the autocomplete dropdown
+</li><li class="listitem">
+44b55b0 HUE-5600 [editor] Add popular join conditions to the autocomplete dropdown
+</li><li class="listitem">
+ced4f38 HUE-5592 [editor] Add popular joins to the new autocomplete dropdown
+</li><li class="listitem">
+5b125fb HUE-5591 [editor] Don’t show the autocomplete dropdown when there are no suggestions
+</li><li class="listitem">
+b241855 HUE-5588 [editor] Add hdfs paths to the autocomplete dropdown
+</li><li class="listitem">
+c9034b1 HUE-3294 [metadata] Avoid error when search returns the HDFS root directory
+</li><li class="listitem">
+a1aac29 HUE-7 [assist] Add create new table link to assist
+</li><li class="listitem">
+6a5f006 HUE-5606 [assist] Default sorting to creation order
+</li><li class="listitem">
+3e9c2d7 HUE-7 [metastore] Avoid js error when adding a new partition
+</li><li class="listitem">
+a65a90c HUE-5605 [metadata] Do not enable if desktop auth_password is set
+</li><li class="listitem">
+218b1ac HUE-5604 [core] Update localization for de, es, fr, ja, ko, zh
+</li><li class="listitem">
+d1334da HUE-3228 [impala] Avoid erroring when opening non existing table
+</li><li class="listitem">
+db693e7 HUE-1176 [jb] Iteration on the design of the single page app
+</li><li class="listitem">
+bf981c0 HUE-5603 [search] Avoid 500 when fixed dates are not specified
+</li><li class="listitem">
+a17df92 HUE-5553 [metadata] Add hook for API to check syntax
+</li><li class="listitem">
+2996c4b HUE-1176 [history] Skeleton to display submitted tasks in the UI
+</li><li class="listitem">
+e3a9267 HUE-5602 [jb] Add start time filter in jobs page
+</li><li class="listitem">
+a79aaab HUE-5482 [home] Fix failing multiple home/trash tests
+</li><li class="listitem">
+ceac01a HUE-5587 [editor] Add databases to the autocomplete dropdown
+</li><li class="listitem">
+5241edc HUE-5116 [solr] Allow indexing of records with missing fields
+</li><li class="listitem">
+28411f4 HUE-2142 [editor] Offer exporting query result in a scalable way
+</li><li class="listitem">
+af1fb7e HUE-5116 [search] Get number of buckets in range facets
+</li><li class="listitem">
+48b8f3c HUE-5578 [core] Move correct imports into common header footer template
+</li><li class="listitem">
+279b475 HUE-5116 [search] Support basic indexing in Solr 6 non cloud
+</li><li class="listitem">
+18a5ca0 HUE-2142 [editor] Change result download truncation limit to be a number of rows
+</li><li class="listitem">
+af1e8c1 HUE-2961 [indexer] Skeleton of quick indexing of SQL query
+</li><li class="listitem">
+8738a81 HUE-2961 [editor] Backend skeleton for quick indexing of SQL data
+</li><li class="listitem">
+cdbeb85 HUE-2559 [jb] Experimenting with addition of History in responsive menu
+</li><li class="listitem">
+81e45a4 HUE-5576 [search] Redraw the result grid when toggling all the fields
+</li><li class="listitem">
+65ccc29 HUE-2961 [editor] Direct link to export SQL result to Dashboard
+</li><li class="listitem">
+0633583 HUE-5585 [core] Unified scrollbars colors
+</li><li class="listitem">
+a6a1984 HUE-5585 [core] NiceScroll should have a darker scrollbar
+</li><li class="listitem">
+c84b768 HUE-5584 [core] jHueHorizontalScrollbar should have a darker scrollbar
+</li><li class="listitem">
+a43e7ed HUE-5583 [responsive] Support for history and popState
+</li><li class="listitem">
+48b451f HUE-5586 [editor] Add samples and column aliases to the autocomplete dropdown
+</li><li class="listitem">
+94ec5da HUE-5526 [editor] Use the use_new_autocompleter config flag to enable the new dropdown
+</li><li class="listitem">
+0e7331c HUE-5577 [editor] Add functions, identifiers and common table expressions to the new autocomplete dropdown
+</li><li class="listitem">
+569b23c HUE-5524 [editor] Add column suggestions to the new autocomplete dropdown
+</li><li class="listitem">
+d435866 HUE-5526 [editor] Have single instance of the new autocompleter dropdown for performance
+</li><li class="listitem">
+9e121da HUE-5575 [editor] Create autocompleter category for tables
+</li><li class="listitem">
+5935c5f HUE-5526 [editor] Enable live autocompletion for the new autocomplete dropdown
+</li><li class="listitem">
+60505c2 HUE-5526 [editor] Handle mouse events in the new autocomplete dropdown
+</li><li class="listitem">
+8ab1057 HUE-5526 [editor] Add prefix matching and keyboard navigation to the new autocomplete dropdown
+</li><li class="listitem">
+60c4b4f HUE-5526 [editor] Extract Hue autocompleter component to a separate file
+</li><li class="listitem">
+9af6355 HUE-5526 [editor] Add key and mouse bindings to the custom autocompleter
+</li><li class="listitem">
+d672171 HUE-5526 [editor] Skeleton for the custom autocompleter dropdown
+</li><li class="listitem">
+ed184ae HUE-5527 [editor] Add autocompleter category for keywords
+</li><li class="listitem">
+59f565a HUE-5579 [responsive] The file viewer breadcrumbs should point to the right file browser
+</li><li class="listitem">
+dd44d12 HUE-5581 [responsive] CSS of the file browser leaks on file viewer
+</li><li class="listitem">
+aad63aa HUE-5580 [responsive] Landing directly on fileviewer breaks the app
+</li><li class="listitem">
+6779ac0 HUE-5582 [fb] Get rid of chooser.mako
+</li><li class="listitem">
+93ec511 HUE-5573 [core] Remove placeholder plugin
+</li><li class="listitem">
+9f77524 HUE-5578 [core] Fix messages in the common footer
+</li><li class="listitem">
+d09fc7b HUE-5553 [metadata] Use another Python 2.6 OrderedDict in serialize
+</li><li class="listitem">
+c5e1f34 HUE-5553 [metadata] Use a Python 2.6 compatible OrderedDict
+</li><li class="listitem">
+ceed03f HUE-5553 [metadata] Update the lib with missing files
+</li><li class="listitem">
+50a6662 HUE-5574 [responsive] Unify the header and footer
+</li><li class="listitem">
+fb6b24d HUE-7 [importer] Apply selectize to input file format delimiters
+</li><li class="listitem">
+07bf2a3 HUE-7 [importer] Add selectize to the output table custom field delimiters
+</li><li class="listitem">
+7721a28 HUE-7 [importer] Properly warn and hint when creating or importing data to existing tables
+</li><li class="listitem">
+24136a6 HUE-5553 [metadata] Convert upload from shell exec to Python API
+</li><li class="listitem">
+d3af719 HUE-5553 [metadata] Update API to support uploads
+</li><li class="listitem">
+7f861bb HUE-5553 [metadata] Move to rest API instead of exec
+</li><li class="listitem">
+0e9ec14 HUE-5553 [metadata] Add new python API lib
+</li><li class="listitem">
+4eeff02 HUE-5571 [core] Introduce the window.zoom event
+</li><li class="listitem">
+b2a1a8c HUE-5570 [editor] The chart limit change logic in the case of pivoting
+</li><li class="listitem">
+139a24b HUE-3294 [responsive] Apply the same width to the compose icons
+</li><li class="listitem">
+4c5970d HUE-5569 [spark] Add "Spark Conf" param to Spark session config dropdown
+</li><li class="listitem">
+22b2df9 HUE-3294 [responsive] Clearer icon for dashboards
+</li><li class="listitem">
+6e52e52 HUE-5560 [home] Click and drag to select should start from outside the document list too
+</li><li class="listitem">
+e46b89c HUE-5561 [home] The trash entry shows a tooltip in the top right corner of the screen on opening
+</li><li class="listitem">
+55ae1d0 HUE-5564 [responsive] The home new document links should open in the same window
+</li><li class="listitem">
+5e502e5 HUE-5559 [fb] Enter key doesn’t act like clicking on <span class="emphasis"><em>copy</em></span> or <span class="emphasis"><em>move</em></span> button
+</li><li class="listitem">
+2b97a72 HUE-5022 [editor] Limit number of items in the chart
+</li><li class="listitem">
+e830925 HUE-5367 [editor] Editor resets vertical scrolling after query is executed
+</li><li class="listitem">
+0bebebe HUE-5556 [core] Create a customizable SVG logo
+</li><li class="listitem">
+7881a28 HUE-5558 [responsive] Restyle drop or click button
+</li><li class="listitem">
+752145d HUE-5555 [core] Create a global drag&amp;drop layer
+</li><li class="listitem">
+53d5e09 HUE-5554 [editor] The fixed headers should work also with a top banner
+</li><li class="listitem">
+43a50f3 HUE-5548 [core] Introduce basic Knockout validation
+</li><li class="listitem">
+13aeb09 HUE-5557 [core] Move to an SVG logo for the Hue topbar
+</li><li class="listitem">
+2f918e8 HUE-5546 [responsive] Avoid horizontal scrolling on the editor
+</li><li class="listitem">
+28da8e3 HUE-5544 [editor] Improve reliability of the log panel resizer
+</li><li class="listitem">
+b33c337 HUE-4583 [editor] Add autocompletion of IMPORT and EXPORT statements
+</li><li class="listitem">
+108545a HUE-7 [metastore] Add a click or drag &amp; drop message for file path
+</li><li class="listitem">
+1808d8e HUE-7 [metastore] Nested types SQL logic in the backend
+</li><li class="listitem">
+47566ac HUE-5551 [metadata] Perform Sentry based filtering on searched objects
+</li><li class="listitem">
+925e11c HUE-5551 [metadata] Sentry for optimizer filtering on database page
+</li><li class="listitem">
+0e3f617 HUE-7 [metastore] Nested types SQL logic in the frontend
+</li><li class="listitem">
+91cdb5f HUE-7 [metastore] Remove hard dependency on Solr
+</li><li class="listitem">
+a0ee046 HUE-5552 [editor] Japanese improvement for new SQL Editor #466
+</li><li class="listitem">
+c4ccf9a HUE-5541 [fb] Create visual hints for file and folder operations
+</li><li class="listitem">
+d2ed8f5 HUE-5549 [core] Make max length for a newly created Selectize value customizable
+</li><li class="listitem">
+740a6d1 HUE-5547 [core] Introduce Knockout maxLength extender for a field
+</li><li class="listitem">
+cfe65bb HUE-5545 [core] The filechooser path should never go to a new line
+</li><li class="listitem">
+3169f52 HUE-5542 [responsive] The file chooser not always shows up
+</li><li class="listitem">
+36851b4 HUE-5521 [editor] Update to use get_ordered_interpreters
+</li><li class="listitem">
+5705bad HUE-5129 [metastore] Backend to propose Kudu column properties like primary keys
+</li><li class="listitem">
+e446cb9 HUE-5129 [metastore] Properly browse Kudu tables from metastore
+</li><li class="listitem">
+f777306 HUE-5129 [metastore] Add Kudu HASH partitioning SQL generation
+</li><li class="listitem">
+35074bd HUE-7 [metastore] Generate partitions in the backend
+</li><li class="listitem">
+e6b895b HUE-5521 [desktop] Add generic command to override values in hue.ini using a JSON document (#464)
+</li><li class="listitem">
+d744c47 HUE-5478 [notebook] Allow users to specify interpreters on Notebook selection wheel (#461)
+</li><li class="listitem">
+232903e HUE-5169 [spark] cannot spark submit jar or python
+</li><li class="listitem">
+b3cab65  HUE-7 [metastore] Add support for creating manually a table
+</li><li class="listitem">
+b4780b7 HUE-7 [metastore] Add support for creating database via the importer
+</li><li class="listitem">
+5d8b5e5 HUE-7 [importer] Add support for creating manually a database
+</li><li class="listitem">
+639fbd8 HUE-7 [metastore] Add success url to open the table page after the creation
+</li><li class="listitem">
+dc96714 HUE-7 [metastore] Integrate new create table from a file in metastore
+</li><li class="listitem">
+d7d5c04 HUE-5484 [responsive] Make the full menu items clickable
+</li><li class="listitem">
+2d512fa HUE-5537 [editor] The HDFS path autocomplete shouldn’t cache values
+</li><li class="listitem">
+46edbcf HUE-5540 [editor] Fix JS error on pivot chart
+</li><li class="listitem">
+3b40717 HUE-4908 [metastore] Add kudu flag to test mock tables
+</li><li class="listitem">
+5e6b721 HUE-5484 [responsive] Embeddable create table
+</li><li class="listitem">
+59da393 HUE-5129 [metastore] Table partitioning frontend
+</li><li class="listitem">
+3fdf377 HUE-5129 [metastore] Kudu partitioning frontend
+</li><li class="listitem">
+1ce47ed HUE-5539 [editor] Temporary disable error message on fetch_result_size
+</li><li class="listitem">
+2d926bd HUE-7 [metastore] Notion of nested type in the frontend
+</li><li class="listitem">
+abe9354 HUE-7 [metastore] Create Hive json table
+</li><li class="listitem">
+f4c133f HUE-7 [metastore] Add Kudu as a supported table output format
+</li><li class="listitem">
+a73e10e HUE-7 [metastore] Connect frontend to backend for table creation wizard
+</li><li class="listitem">
+02163dd HUE-4908 [metastore] Support computing stats for Kudu tables
+</li><li class="listitem">
+bd5712a HUE-4908 [metastore] Remove notion of HDFS for Kudu tables
+</li><li class="listitem">
+549dc6d HUE-4908 [metastore] Fetch table properties to confirm that this is a Kudu table
+</li><li class="listitem">
+c001d10 HUE-4908 [metastore] Support displaying Kudu tables
+</li><li class="listitem">
+49fc79f HUE-5129 [metastore] Backend for providing create table as Kudu option
+</li><li class="listitem">
+1858ecd HUE-7 [metastore] Make create table wizard genric
+</li><li class="listitem">
+842ac35 HUE-7 [metastore] Skeleton of create table wizard redesign backend
+</li><li class="listitem">
+224fe94 HUE-7 [metastore] Skeleton of create table wizard redesign frontend
+</li><li class="listitem">
+5c5be06 HUE-5508 [fb] Give complete path when copying local script file to HDFS
+</li><li class="listitem">
+6e2aa77 HUE-5516 [responsive] Embeddable indexes
+</li><li class="listitem">
+7bcffbd HUE-5515 [responsive] Embeddable collection list
+</li><li class="listitem">
+db9d06a HUE-5517 [core] Improved UX of the auto logout modals
+</li><li class="listitem">
+e8ca96f HUE-5517 [core] Better logout and idle session timeouts messages
+</li><li class="listitem">
+e1aa39c HUE-5528 [responsive] Remove type URL parameter when navigating away from the editor
+</li><li class="listitem">
+078794e HUE-5522 [fb] Often get mis-aligned HDFS breadcrumbs on filechooser the first time
+</li><li class="listitem">
+fd62d08 HUE-5530 [responsive] Remove multiple bindings on the same element
+</li><li class="listitem">
+0eedf0d HUE-5529 [core] Remove JS error on Jasmine runner
+</li><li class="listitem">
+93c50ee HUE-5519 [fb] Clicking on New dir or New file bananas the #url
+</li><li class="listitem">
+2d0709e HUE-5117 [hbase] Only apply actions on the filtered selected tables
+</li><li class="listitem">
+c663d0e HUE-5245 [editor] Bump the darkness of placeholders and disabled snippet actions
+</li><li class="listitem">
+c0e8652 HUE-5520 [editor] Only fetch result size on SQL statements that are not DDL
+</li><li class="listitem">
+340cfae HUE-5518 [fb] Bubble up errors from forbidden actions
+</li><li class="listitem">
+32a8dde HUE-5100 [hbase] Swap Codemirror to Ace
+</li><li class="listitem">
+1b623af HUE-5513 [responsive] Metastore shouldn’t change the url
+</li><li class="listitem">
+8aaeb0d HUE-5514 [editor] Clear old marked words when opening the context popover
+</li><li class="listitem">
+9221bb1 HUE-5437 [editor] Don’t show context tooltip when hovering outside the editor text
+</li><li class="listitem">
+c50cffe HUE-5510 [responsive] Embeddable indexer
+</li><li class="listitem">
+b031155 HUE-5111 [responsive] Report and editor mode should work together
+</li><li class="listitem">
+49a503d HUE-5512 [responsive] Report mode shouldn’t change the url
+</li><li class="listitem">
+4e62dc8 HUE-5482 [home] Handle multiple home/trash directories by merging them into one.
+</li><li class="listitem">
+ccfb831 HUE-5491 [metadata] Upload stats for columns of tables
+</li><li class="listitem">
+a8fd198 HUE-5491 [metadata] Upload stats with number of rows of a table
+</li><li class="listitem">
+50514f4 HUE-5502 [responsive] Embeddable report
+</li><li class="listitem">
+054030d HUE-4578 [editor] Add autocompletion of GRANT and REVOKE statements
+</li><li class="listitem">
+80b95a2 HUE-5116 [search] Support of dimension N of Gradient Map
+</li><li class="listitem">
+2a883cf  HUE-5116 [search] Support of dimension 1 of Gradient Map
+</li><li class="listitem">
+b179dc1 HUE-5116 [search] Number of buckets for 1 dimension
+</li><li class="listitem">
+e83f1a2 HUE-5116 [search] Add n dimension to the timeline widget
+</li><li class="listitem">
+4b426a3 HUE-5116 [search] Add analytics grid to the timeline
+</li><li class="listitem">
+fe293b3 HUE-5116 [search] Add analytics timeline to the widget
+</li><li class="listitem">
+b8cb6a6  HUE-5116 [search] Allow to switch between pie and bucket widget type
+</li><li class="listitem">
+7ab8e2f HUE-5116 [search] Add grid to pie2 widget
+</li><li class="listitem">
+77bee32 HUE-5116 [search] Unify the grid of grid result and facet
+</li><li class="listitem">
+0809782 HUE-5116 [search] Properly add back the computed on the facets when loading dashboard
+</li><li class="listitem">
+42edf92 HUE-5417 [search] Provide the field analysis link
+</li><li class="listitem">
+cd4c5c9 HUE-5417 [search] Manage counts from each dimension
+</li><li class="listitem">
+cc9ab2f HUE-5417 [search] Grid layout scroll bar is showing up sometimes for no reason on Chrome
+</li><li class="listitem">
+b0b0413 HUE-5417 [search] Support displaying nested facet as a grid
+</li><li class="listitem">
+d7094ee HUE-5417 [search] Support result sorting for nested widgets
+</li><li class="listitem">
+0be5501 HUE-5417 [search] Support toggle all fields logic
+</li><li class="listitem">
+dad32c9 HUE-5417 [search] Add field list to the grid facet
+</li><li class="listitem">
+d5cb9b4 HUE-5417 [search] Add basic pagination to nested facets
+</li><li class="listitem">
+01a60ff HUE-5325 [search] Skeleton of generic nested grid widget
+</li><li class="listitem">
+6881f3f HUE-5116 [search] Convert facet data to a data table
+</li><li class="listitem">
+26fa81f HUE-5116 [search] Integrate sort on text facet of 2 dimensions
+</li><li class="listitem">
+476ca88 HUE-5116 [search] Display aggregates on dimension 2 even if dimension 1 has some aggregates
+</li><li class="listitem">
+da5ba80 HUE-5116 [search] Support N dimension with aggregates
+</li><li class="listitem">
+e854665 HUE-5500 [responsive] Embeddable oozie bundle editor
+</li><li class="listitem">
+7d4ac88 HUE-5499 [responsive] Embeddable oozie coordinator editor
+</li><li class="listitem">
+f918020 HUE-5501 [responsive] Fix all the editor links
+</li><li class="listitem">
+b90b7ef HUE-5505 [editor] Fix JS error on sqoop1 type and add placeholder
+</li><li class="listitem">
+c82ab28 HUE-5459 [editor] Improve autocomplete keyword completion around ANALYZE, COMPUTE and INVALIDATE
+</li><li class="listitem">
+aeff61e HUE-5459 [editor] Improve autocomplete keyword completion around DESCRIBE
+</li><li class="listitem">
+04984bb HUE-5492 [assist] Fix assist refresh
+</li><li class="listitem">
+0134659 HUE-5475 [editor] Add autocomplete support for partial UDFs
+</li><li class="listitem">
+1ecc4b3 HUE-5491 [metadata] Gather Hive table stats
+</li><li class="listitem">
+e2a570b HUE-5498 [editor] Fix the CSS problems with report mode
+</li><li class="listitem">
+5d8ea5c HUE-5497 [editor] Fix JS error on type jar
+</li><li class="listitem">
+8db223b HUE-5496 [responsive] Changing editor type should affect the currently selected editor snippet
+</li><li class="listitem">
+922637a HUE-5495 [responsive] The compose dropdown should load apps in the content area
+</li><li class="listitem">
+aa7a04a HUE-5493 [responsive] Create URL entry points for loading specific apps at startup
+</li><li class="listitem">
+e8dc807 HUE-5494 [core] Support for changing a URL parameter
+</li><li class="listitem">
+57f3ad4 HUE-4704 [security] Fixed Arbitrary host header accepted in Hue
+</li><li class="listitem">
+b8a5146 HUE-5477 [metadata] Make metadata cache conditions more modest
+</li><li class="listitem">
+f338dfb HUE-5481 [editor] Add a flag for background complexity check
+</li><li class="listitem">
+c4edeba HUE-5843 [jobsub] Avoid multiple list calls and fix JS error when deleting all the jobs
+</li><li class="listitem">
+5e9f442 HUE-5488 [responsive] Correct the file view page styling issues
+</li><li class="listitem">
+3e2169f HUE-5489 [responsive] Fix jHueNotify
+</li><li class="listitem">
+7271ff1 HUE-5490 [responsive] The Filebrowser list page shouldn’t have a global bottom bar
+</li><li class="listitem">
+451e59d HUE-5449 [editor] Fix for JS error on autocompletion of popular order by columns
+</li><li class="listitem">
+b780ba1 HUE-5469 [editor] Check Hive query complexity in the background
+</li><li class="listitem">
+fe13e5b HUE-5474 [core] Knockoutify the left nav in responsive
+</li><li class="listitem">
+ef2d74c HUE-5476 [core] Fix TTL is_idle middleware check
+</li><li class="listitem">
+785a149 HUE-5470 [responsive] Drop files should not overlay with other menu items
+</li><li class="listitem">
+d75ad26 HUE-5354 [fb] Edit file shouldn’t refresh the page
+</li><li class="listitem">
+04ab581 HUE-5468 [editor] Sort autocompleter table suggestions by popularity
+</li><li class="listitem">
+0463fc6 HUE-5472 [home] Fix rendering of the SVG icons and labels in embedded mode
+</li><li class="listitem">
+ee54c97 HUE-5471 [home] Remove navbar header in embedded mode
+</li><li class="listitem">
+998e98b HUE-5473 [home] The default view does not render all the list items
+</li><li class="listitem">
+9c393b7 HUE-5464 [search] Marker map legend output is very large
+</li><li class="listitem">
+83a395e HUE-5457 [fb] The edit file <span class="emphasis"><em>save as</em></span> should display better the filechooser
+</li><li class="listitem">
+56197c7 HUE-5458 [core] Embed S3 browser in responsive
+</li><li class="listitem">
+908b448 HUE-5447 [assist] Use the autocomplete timeout for fetching popular tables
+</li><li class="listitem">
+6275cab HUE-5467 [assist] Fix and improve styling of functions panel
+</li><li class="listitem">
+69261c9 HUE-5466 [core] Fix JS error in responsive
+</li><li class="listitem">
+508cde8 HUE-5455 [fb] Previewing a file shouldn’t refresh the page on file viewer
+</li><li class="listitem">
+6f181a8 HUE-5456 [fb] The file edit save button should submit via AJAX
+</li><li class="listitem">
+c074a61 HUE-5443 [metadata] Remove with instruction which is not Python 2.4 compatible
+</li><li class="listitem">
+2600bdc HUE-5465 [fb] Autoconfigure to enable S3 browser if IAM role being detected
+</li><li class="listitem">
+c2fdce2 HUE-5443 [metadata] Uncomment the skipping of tests when the lib is not configured
+</li><li class="listitem">
+f12d9a3 HUE-5443 [metadata] Convert to Python 2.4 the temporary file creation
+</li><li class="listitem">
+d13c67b HUE-5325 [core] Revoke S3 access permissions to default group
+</li><li class="listitem">
+f5a184d HUE-5448 [editor] The autocompleter should fetch columns in parallel to top columns
+</li><li class="listitem">
+1ba9259 HUE-5446 [assist] Include hostname in cache identifier
+</li><li class="listitem">
+eeb549e HUE-5451 [metastore] Fix js error in the create database wizard
+</li><li class="listitem">
+5634fb4 HUE-5445 [assist] Enable shift-click on refresh to clear all caches
+</li><li class="listitem">
+01c6f85 HUE-3294 [core] Add reports to Compose menu
+</li><li class="listitem">
+b05fd80 HUE-5443 [metadata] Upload history according to the editor type
+</li><li class="listitem">
+3ac3073 HUE-5443 [metadata] Option to only load the last 10 query history for dev purposes
+</li><li class="listitem">
+a548b0d HUE-5443 [metadata] Show basic progress of the history upload
+</li><li class="listitem">
+ce4f527 HUE-5443 [metadata] Upload proper query id and execution time
+</li><li class="listitem">
+358968b HUE-5443 [metadata] Switch uploading to propose the format in json
+</li><li class="listitem">
+37e24e9 HUE-5353 [fb] Switching between text and binary mode on view page shouldn’t refresh the page
+</li><li class="listitem">
+44d9e20 HUE-5454 [fb] Speed up binary rendering of the file viewer
+</li><li class="listitem">
+9f70650 HUE-5453 [fb] The file viewer refresh button shouldn’t reload the page
+</li><li class="listitem">
+233c0d5 HUE-5452 [fb] Remove lazy loading of pages from the file viewer
+</li><li class="listitem">
+b8196c8 HUE-4870 [assist] Open HDFS assist on home of the user by default
+</li><li class="listitem">
+7518481 HUE-5444 [assist] Only fetch popular tables for open databases
+</li><li class="listitem">
+cbc781c HUE-5438 [editor] Offer to hide the query cancel message
+</li><li class="listitem">
+6d8491c HUE-5272 [search] Warning messages when performing migrate (fix in libsolr)
+</li><li class="listitem">
+16dede5 HUE-5435 [notebook] Allow dbproxy classpath to be configurable (#458)
+</li><li class="listitem">
+fc086db HUE-5442 [core] Add missing TTL import in responsive
+</li><li class="listitem">
+3855945 HUE-5442 [assist] Introduce separate cache timeout for metadata
+</li><li class="listitem">
+024e6a3 HUE-5430 [assist] Prefetch popularity of tables
+</li><li class="listitem">
+8292ddd HUE-5430 [assist] Fix sort order for popular sort
+</li><li class="listitem">
+1f9473f HUE-5430 [assist] Use default sort for equally popular entries
+</li><li class="listitem">
+508847a HUE-5441 [fb] Add the fileviewer to responsive
+</li><li class="listitem">
+2bb9c18 HUE-5352 [fb] KOify the view file page
+</li><li class="listitem">
+bb35a40 HUE-5440 [home] Extract common home for normal and embeddable homes
+</li><li class="listitem">
+9cee7e0 HUE-5430 [assist] Switch sort icon to spinner when calling the API
+</li><li class="listitem">
+78161bf HUE-5430 [assist] Add popular sorting of tables
+</li><li class="listitem">
+1ab5321 HUE-5428 [assist] Add standard sorting options for DB assist
+</li><li class="listitem">
+4e4b957 HUE-5413 [home] Remove underlined links in IE
+</li><li class="listitem">
+9916b2b HUE-5296 [fb] Allow GETTRASHROOT to be called on full file path
+</li><li class="listitem">
+88dd96a HUE-5436 [fb] Fail elegantly if CHECKACCESS is not supported and returns a 400
+</li><li class="listitem">
+51e2624 HUE-5420 [aws] Support alternative s3 endpoints (#455)
+</li><li class="listitem">
+8401c82 HUE-5275 [libsentry] Privilege checker should return filtered list of the original objects
+</li><li class="listitem">
+c93405e HUE-5426 [fb] Disable drop from assist to the file list
+</li><li class="listitem">
+dd09139 HUE-5425 [fb] History click should load via AJAX
+</li><li class="listitem">
+230c87d HUE-5427 [fb] The drop functionality shouldn’t refresh the page
+</li><li class="listitem">
+4a637d9 HUE-5433 [core] Add startsWith, endsWith and includes string polyfills to hue.utils
+</li><li class="listitem">
+45fd138 HUE-5429 [useradmin] Creating a new user gives a AttributeError: <span class="emphasis"><em>User</em></span> object has no attribute <span class="emphasis"><em>user</em></span>
+</li><li class="listitem">
+651e027 HUE-5418 [aws] Support automatic configuration when IAM metadata is present
+</li><li class="listitem">
+c154c13 HUE-5272 [beeswax] Warning messages when performing migrate
+</li><li class="listitem">
+abbd723 HUE-5424 [fb] Embed file list in responsive
+</li><li class="listitem">
+3bb2d36 HUE-5416 [assist] Fix document panel styling
+</li><li class="listitem">
+9b85463 HUE-5414 [assist] Improve filter styling and positioning
+</li><li class="listitem">
+4ea6ea6 HUE-5333 [assist] Fix context popover in responsive
+</li><li class="listitem">
+5cc3d6f HUE-5422 [editor] Improve defaults chart values for marker maps
+</li><li class="listitem">
+4fca062 HUE-5421 [editor] The default X and Y for the charts should never refer to the same column
+</li><li class="listitem">
+03b22f4 HUE-5423 [search] Bar charts are wrongly rendered when passing from no data to data available
+</li><li class="listitem">
+a4beea2 HUE-5415 [metadata] Rename client command
+</li><li class="listitem">
+7b68581 HUE-5415 [metadata] API Skeleton to poll for upload status
+</li><li class="listitem">
+4facc9b HUE-5340 [search] Remove additional escaping as we already do it in make_field
+</li><li class="listitem">
+f39ca99 HUE-5382 [fb] Rename S3A to S3 in FileChooser
+</li><li class="listitem">
+67ec63d HUE-5412 [editor] Integrate skeleton of similar query suggestion API
+</li><li class="listitem">
+892b5c7 HUE-5411 [editor] Integrate skeleton of query history upload
+</li><li class="listitem">
+889b490 HUE-5363 [fb] Restore from trash form should submit via AJAX
+</li><li class="listitem">
+7583992 HUE-5398 [fb] Empty trash form should submit via AJAX
+</li><li class="listitem">
+0ea0d74 HUE-5361 [fb] Change owner form should submit via AJAX
+</li><li class="listitem">
+3ba2257 HUE-5360 [fb] Change permissions form should submit via AJAX
+</li><li class="listitem">
+637fdaa HUE-5359 [fb] Move file form should submit via AJAX
+</li><li class="listitem">
+8cdf822 HUE-5358 [fb] Rename file form should submit via AJAX
+</li><li class="listitem">
+3ff72e6 HUE-5407 [search] Bar charting of grid result can get doubled up
+</li><li class="listitem">
+27d74e5 HUE-5325 [aws] Update test to work even is s3 is disabled
+</li><li class="listitem">
+1c7a7de HUE-5325 [core] Revoke S3 access permissions to default group
+</li><li class="listitem">
+cd9906e HUE-5325 [fb] Add set of test about S3 permissions
+</li><li class="listitem">
+7c31aa1 HUE-5325 [aws] Enable S3 browser on only when keys are there
+</li><li class="listitem">
+5740b5d HUE-5310 [search] Use Doc2 modal in search_controller
+</li><li class="listitem">
+36b319a HUE-5374 [assist] Increase the context popover min width to prevent tab wrapping
+</li><li class="listitem">
+002f93a HUE-5375 [metastore] Use tooltips for upper right action icons
+</li><li class="listitem">
+df461b1 HUE-5346 [editor] Add autocompletion of popular aggregate functions
+</li><li class="listitem">
+4da1696 HUE-5378 [assist] Don’t show the comment header in the context popover when there’s no comment
+</li><li class="listitem">
+71197b8 HUE-5399 [editor] Banner might hide the right panel
+</li><li class="listitem">
+df0a8c6 HUE-5356 [fb] Create new folder form should submit via AJAX
+</li><li class="listitem">
+1731c17 HUE-5355 [fb] Create new file form should submit via AJAX
+</li><li class="listitem">
+c29ec5a HUE-5357 [fb] Copy file form should submit via AJAX
+</li><li class="listitem">
+d5d573d HUE-5403 [editor] Download results modal sometimes doesn’t close on IE11 or Edge
+</li><li class="listitem">
+f35944b HUE-5404 [editor] Nicescrollify log panel
+</li><li class="listitem">
+16f60ad HUE-5275 [libsentry] Avoid mutating original objects in privilege checker
+</li><li class="listitem">
+a3c5943 HUE-5340 [search] Escape Solr field that have XSS injection (like &lt;script&gt;alert(1234)&lt;/script&gt;)
+</li><li class="listitem">
+f28a06d HUE-5377 [assist] Don’t show the assist link in the context popover opened from the assist
+</li><li class="listitem">
+a9c0bc0 HUE-5380 [assist] Fix right-click context menu in assist for Firefox
+</li><li class="listitem">
+6b3e775 HUE-5391 [assist] Don’t show query builder when it’s disabled
+</li><li class="listitem">
+1749cef HUE-5390 [assist] Fix for incorrect column order
+</li><li class="listitem">
+2f8ddf2 HUE-4447 [auth] Try to ensure the user has a home directory when logging from any backend
+</li><li class="listitem">
+00d96c9 HUE-4447 [auth] Force create a home directory if a user has a profile with it
+</li><li class="listitem">
+2e7cab8 HUE-5331 [editor] Fix mousewheel scroll flakiness on the result grid
+</li><li class="listitem">
+0c7634b HUE-5362 [fb] Delete file form should submit via AJAX
+</li><li class="listitem">
+7ae7b48 HUE-5397 [fb] Meta clicking on the breadcrumbs should open a new tab
+</li><li class="listitem">
+980591f HUE-5369 [fb] The trash link shouldn’t refresh the page
+</li><li class="listitem">
+618e338 HUE-5368 [fb] The home link shouldn’t refresh the page
+</li><li class="listitem">
+b69fbd4 HUE-5388 [core] Remove index.html link from header
+</li><li class="listitem">
+8825d08 HUE-5275 [libsentry] Add remaining privilege checker test scenarios
+</li><li class="listitem">
+3335373 HUE-5275 [libsentry] Add optional key function aren, refactor tests by scenario
+</li><li class="listitem">
+d1eb2e3 HUE-5173 [fb] Fix handling of S3UploadError so that error is caught and displayed
+</li><li class="listitem">
+83062d2 HUE-5371 [core] Add the region to the filepicker breadcrumbs for S3
+</li><li class="listitem">
+2203cee HUE-5370 [metastore] Create table from S3 should remove the file from the create table form input when selecting it
+</li><li class="listitem">
+8eacce4 HUE-5379 [editor] Add autocompletion of Hue variables
+</li><li class="listitem">
+9b20e98 HUE-5381 [editor] Adjust popular values autocompletion to latest API
+</li><li class="listitem">
+5e582d5 HUE-5344 [editor] Add autocompletion of popular complete order by clauses
+</li><li class="listitem">
+a9cbe97 HUE-5344 [editor] Add autocompletion of popular complete group by clauses
+</li><li class="listitem">
+1e4e89b HUE-5372 [editor] The initial gutter of Ace overlaps with the editor text at page load
+</li><li class="listitem">
+2e8cf8c HUE-5373 [editor] The horizontal scroll handle should be at the end of the result table
+</li><li class="listitem">
+be0f445 HUE-5387 [assist] Rename <span class="emphasis"><em>Insert</em></span> from right click to be clearer
+</li><li class="listitem">
+4091530 HUE-5287 [metadata] Add create tenant API
+</li><li class="listitem">
+5a0fda7 HUE-5343 [metadata] Automatically pull the latest product id if none are specified
+</li><li class="listitem">
+ff8ba65 HUE-5295 [desktop] Avoid microsecond comparison for last_modified field MySQL &lt; 5.6 doesn’t support microsecond precision. <a class="ulink" href="https://code.djangoproject.com/ticket/19716" target="_top">https://code.djangoproject.com/ticket/19716</a>
+</li><li class="listitem">
+9efb39f HUE-5339 [search] Multivalued data can include js XSS injection
+</li><li class="listitem">
+6927305 HUE-5346 [editor] Prepare the parser for suggesting top aggregate functions
+</li><li class="listitem">
+c497518 HUE-5332 [assist] Fix context popover for databases
+</li><li class="listitem">
+7058b1a HUE-5350 [editor] Improve caching of top filters, joins and columns
+</li><li class="listitem">
+efd9fc1 HUE-5348 [search] General settings can include js XSS injection
+</li><li class="listitem">
+c836437 HUE-5183 [metastore] Improve import data modal
+</li><li class="listitem">
+1bd206a HUE-5364 [fb] The S3 and HDFS history items shouldn’t be displayed up together
+</li><li class="listitem">
+c4cc512 HUE-5349 [search] Query definitions can include js XSS injection
+</li><li class="listitem">
+30e9161 HUE-5345 [editor] Add editor autocompletion of popular filters
+</li><li class="listitem">
+781eef2 HUE-5344 [editor] The autocomplete parser should suggest complete order by, group by and filter
+</li><li class="listitem">
+700d27e HUE-5335 [assist] Show function description as tooltip
+</li><li class="listitem">
+16bdac1 HUE-5337 [editor] Autocompletion of top columns should take tables and databases into account
+</li><li class="listitem">
+c45bf50 HUE-5321 [assist] Add a toggle to the functions filter
+</li><li class="listitem">
+94a942e HUE-5336 [editor] Fix autocompletion UDF weight issue
+</li><li class="listitem">
+455637c HUE-5334 [editor] Prioritize top columns in select, order by and group by suggestions
+</li><li class="listitem">
+cabae26 HUE-5334 [editor] Prepare ApiHelper for autocompleter top column suggestions
+</li><li class="listitem">
+8ca1af2 HUE-5334 [editor] Add source to autocompleter suggest columns details
+</li><li class="listitem">
+1d77f77 HUE-5202 [fb] Add bash shebang in the extract script
+</li><li class="listitem">
+fa71a94 HUE-5279 [oozie] Add ENABLE_OOZIE_BACKEND_FILTERING param to support previous oozie versions
+</li><li class="listitem">
+64533ac HUE-5279 Bundle text filtering should call oozie rest API to display jobs list
+</li><li class="listitem">
+2e6ce60 HUE-5279 Coordinator text filtering should call oozie rest API to display jobs list
+</li><li class="listitem">
+e4eb56d HUE-5279 Workflow text filtering should call oozie rest API to display jobs list
+</li><li class="listitem">
+ef0c021 HUE-5317 [assist] Remove duplicate error lines when opening a table fails
+</li><li class="listitem">
+228b189 HUE-5315 [editor] Fix issue where the SQL parser counts CRLF as two lines
+</li><li class="listitem">
+5e7748c HUE-5316 [assist] Fix context popover for views
+</li><li class="listitem">
+0422d56 HUE-5314 [editor] Add support for multiple tables in join autocompletion
+</li><li class="listitem">
+5054bc8 HUE-5320 [editor] Resizing the editor should hide the fixed header and then redraw it
+</li><li class="listitem">
+8cc088c HUE-5319 [editor] The close expanded mode overlaps with the snippet help icon
+</li><li class="listitem">
+591dbce HUE-5318 [editor] Clicking on the labels on snippet settings should add properties
+</li><li class="listitem">
+68acdd7 HUE-5327 [core] Stop blurring after session expiration when the modal in closable
+</li><li class="listitem">
+480dc29 HUE-5322 [fb] Moving/Copying a folder in S3 results in duplicate children files at target
+</li><li class="listitem">
+091e9ff HUE-5311 [metadata] Basic display of query recommendation
+</li><li class="listitem">
+3724856 HUE-5238 [editor] Swap position of legend and value in the pie chart
+</li><li class="listitem">
+35d42f0 HUE-5309 [editor] The autocompleter should use table aliases in join suggestions
+</li><li class="listitem">
+8edf6ae HUE-5312 [core] Typo in ktrenewer error message
+</li><li class="listitem">
+7c4c43c HUE-5280 [search] Style the query definition title in the page
+</li><li class="listitem">
+d50f146 HUE-5293 [security] Fix DOM blur for logout modal
+</li><li class="listitem">
+97c000c HUE-5301 [search] Fix DOM blur for logout modal
+</li><li class="listitem">
+6381d72 HUE-5313 [assist] Add search to functions panel
+</li><li class="listitem">
+cbaf4c3 HUE-5298 [editor] Show readonly editor just after the file or document has loaded
+</li><li class="listitem">
+923c791 HUE-5307 [metastore] Fix double assist toggle buttons
+</li><li class="listitem">
+928c6e4 PR447 [oozie] Update the tests with the cleaner escaping of workflow names
+</li><li class="listitem">
+afc3ea2 HUE-5295 [desktop] Do not change the last_modified field when migrating history queries
+</li><li class="listitem">
+1a3c5db HUE-5308 [editor] Autocompleter should not suggest the active database in joins
+</li><li class="listitem">
+ad2326a HUE-5305 [home] Fix empty share document modal and improve sharing UX
+</li><li class="listitem">
+140d307 PR448 [notebook] Catch missing <span class="emphasis"><em>snippets</em></span> field in document2 data in hive_server2_lib
+</li><li class="listitem">
+50bec63 PR447 [oozie] Fix non-English workflow name mangling problem
+</li><li class="listitem">
+4e4b15d HUE-5303 [editor] Avoid XSS in the viewmodel options
+</li><li class="listitem">
+2e49b22 HUE-5299 [editor] Fix js error on the list of notebooks
+</li><li class="listitem">
+4bb4e2c HUE-5292 [about] Correct alignment of the logs checkboxes
+</li><li class="listitem">
+466a72d HUE-5300 [oozie] Workflow detail page has a js error
+</li><li class="listitem">
+91e0d12 HUE-5290 [search] Empty collections landing page for admin is misleading
+</li><li class="listitem">
+c34f870 HUE-5302 [core] Disallow new line in the x-editable binding
+</li><li class="listitem">
+829b612 HUE-3294 [search] Bubble-up Solr exception in case of 500
+</li><li class="listitem">
+aa42371 HUE-3294 [search] Avoid 500 error in typo in string substitution
+</li><li class="listitem">
+fd76a88 HUE-3294 [search] Do not show input function for non function like field
+</li><li class="listitem">
+b04096f HUE-5284 [notebook] Refactor to include file snippet in notebook too
+</li><li class="listitem">
+e9b1a07 HUE-3294 [core] Adding more links in the menu
+</li><li class="listitem">
+3b32792 HUE-3294 [search] Add metric functions to the nested facets
+</li><li class="listitem">
+6c102c5 HUE-3294 [core] Move left nav behind top nav
+</li><li class="listitem">
+0701566 HUE-3294 [assist] Show the assist visibility toggle on hover
+</li><li class="listitem">
+dacb747 HUE-3294 [assist] Style the functions dialect drop-down
+</li><li class="listitem">
+2847a7c HUE-3294 [editor] The Hue logo is now smaller and with a prettier trunk
+</li><li class="listitem">
+4ca8227 HUE-3294 [editor] The Hue logo should point to the home page
+</li><li class="listitem">
+3882409 HUE-3294 [core] Replace the top nav logo with svg version
+</li><li class="listitem">
+a207172 HUE-3294 [assist] Use hue-drop-down for SQL snippet source type
+</li><li class="listitem">
+c2ee67d HUE-3294 [assist] Use hue-drop-down for function dialect selection
+</li><li class="listitem">
+fae127e HUE-3294 [jobbrowser] First pass of integration of the workflow editor with the new layout
+</li><li class="listitem">
+61f96a8 HUE-3294 [core] Convert snippet-db-selection ko component to a generic hue-drop-down
+</li><li class="listitem">
+c85fc62 HUE-3294 [core] Move knockout scripts to common header
+</li><li class="listitem">
+11d4c11 HUE-3294 [editor] Add border to top bar
+</li><li class="listitem">
+f4bae0f HUE-3294 [core] Default to the editor
+</li><li class="listitem">
+930cfb6 HUE-3294 [editor] Drop the background on the top bar
+</li><li class="listitem">
+418b691 HUE-3294 [assist] Add tabs to the right assist
+</li><li class="listitem">
+ee13345 HUE-3294 [oozie] First pass of integration of the workflow editor with the new layout
+</li><li class="listitem">
+6d23bd1 HUE-3294 [search] Integration with the new layout
+</li><li class="listitem">
+a440175 HUE-5275 [metadata] Add correct db-table list format to top-aggs
+</li><li class="listitem">
+8021d58 HUE-3294 [search] Add support for add, sub and ms functions
+</li><li class="listitem">
+f18cd5d HUE-3294 [search] Add form to support percentiles aggregates
+</li><li class="listitem">
+71e334a HUE-3294 [core] Better caching of CSS and JS files
+</li><li class="listitem">
+038841b HUE-3294 [notebook] Remove create new query option from execute dropdown
+</li><li class="listitem">
+b29b996 HUE-3294 [search] Support multiplication in aggregate functions
+</li><li class="listitem">
+0c3382a HUE-3294 [search] Add more than one dimension to formula widget
+</li><li class="listitem">
+ef20fe9 HUE-3294 [core] Add drop target in left nav menu
+</li><li class="listitem">
+e4f2c9d HUE-3294 [assist] Extract functions panel
+</li><li class="listitem">
+498d455 HUE-3294 [core] Fixed missing variable from augmentHtml binding
+</li><li class="listitem">
+e6105c7 HUE-3294 [editor] Removing globally the nv.d3 debug infos
+</li><li class="listitem">
+421016f HUE-3294 [editor] Avoid reloading the same CSS and JS files
+</li><li class="listitem">
+41deff4 HUE-3294 [assist] Add the pig functions to the assist
+</li><li class="listitem">
+b8ce8cd HUE-3294 [editor] Caching and switching of apps
+</li><li class="listitem">
+80595b7 HUE-3294 [editor] Made table result scrolling work in embedded mode
+</li><li class="listitem">
+04c3cd5 HUE-5275 [metadata] Perform basic Sentry SELECT filtering on tables
+</li><li class="listitem">
+26c95d1 HUE-3294 [core] Add missing css file where assist is used
+</li><li class="listitem">
+5d3494e HUE-3294 [editor] Improved integration CSS
+</li><li class="listitem">
+fee331c HUE-3294 [core] Adjust SQL functions categories in the assist
+</li><li class="listitem">
+9ddcf04 HUE-3294 [core] Initial styling of the functions list in the right assist
+</li><li class="listitem">
+1df8bf0 HUE-3294 [search] Avoid null pointer on function subscribe
+</li><li class="listitem">
+97166bd HUE-5294 [editor] Extract reusable styles from the context popover
+</li><li class="listitem">
+45de9ff HUE-3294 [search] The new facet toggle shouldn’t be displayed vertically
+</li><li class="listitem">
+5d029b1 HUE-3294 [metadata] Support db-table-list in top columns and filter
+</li><li class="listitem">
+454dcd8 HUE-3294 [search] Add nested metric format instead of single function
+</li><li class="listitem">
+8a205f0 HUE-3294 [search] Improved style of the datepicker
+</li><li class="listitem">
+b6d04a2 HUE-3294 [core] Skeleton for function categories in the right assist panel
+</li><li class="listitem">
+8b48efc HUE-3294 [core] Add skeleton for functions in right assist panel
+</li><li class="listitem">
+409ef93 HUE-3294 [search] Fix JS error on the search viewmodel
+</li><li class="listitem">
+16a4d02 HUE-3294 [core] Add more spacing between alternatives in the the left nav
+</li><li class="listitem">
+e80caf3 HUE-3294 [core] Switch left menu to overlay and add some initial content and styling
+</li><li class="listitem">
+847894c HUE-3294 [core] Customize the hamburger icon
+</li><li class="listitem">
+8e481c7 HUE-3294 [search] Added selectize to the field chooser
+</li><li class="listitem">
+a6bb96e HUE-3294 [core] Slightly increase the size of the assist top buttons
+</li><li class="listitem">
+ce994db HUE-3294 [search] Better styling for the help of timepickers
+</li><li class="listitem">
+bb25b94 HUE-5291 [editor] Only autocomplete joins when possible
+</li><li class="listitem">
+fab229f HUE-5291 [editor] Add complete join suggestions to the autocompleter
+</li><li class="listitem">
+42cc01a HUE-3294 [search] Hide spinner after a partition chart has been rendered
+</li><li class="listitem">
+9daee3a HUE-3294 [search] Fixed clearfix for new facets
+</li><li class="listitem">
+6552ddf HUE-3294 [search] Fixed clearfix for facets
+</li><li class="listitem">
+cafa153 HUE-5287 [metadata] Add API for top columns autocomplete
+</li><li class="listitem">
+ab14ffe HUE-5287 [editor] Suggest popular join conditions in the editor
+</li><li class="listitem">
+98ed961 HUE-5289 [editor] Add hash as cache identifier option to the api helper
+</li><li class="listitem">
+d9fd92e HUE-3294 [metadata] Add top databases API
+</li><li class="listitem">
+3177441 HUE-3294 [core] Added nv.d3.sunburst and new nv.d3 utils
+</li><li class="listitem">
+d675955 HUE-3294 [core] Upgraded d3 to the latest
+</li><li class="listitem">
+e805d63 HUE-5288 [editor] Pressing enter key on the export results modal shouldn’t open a file chooser
+</li><li class="listitem">
+5307449 HUE-5287 [editor] Add join condition suggestions to the autocomplete parser
+</li><li class="listitem">
+8982c5d HUE-3294 [core] Add skeleton for jobs dropdown
+</li><li class="listitem">
+3a271ce HUE-3294 [home] Combine document and metadata search in general search
+</li><li class="listitem">
+9a92cf0 HUE-3294 [search] Simplify complex aggregated functions
+</li><li class="listitem">
+87f1e6b HUE-3294 [editor] Improved style of a readonly editor for a file type
+</li><li class="listitem">
+ec00b8d HUE-3294 [Editor] Improved style of a readonly editor
+</li><li class="listitem">
+e60903f HUE-3294 [oozie] Converted to documentChooser binding
+</li><li class="listitem">
+8fa499e HUE-3294 [editor] Added documentChooser binding
+</li><li class="listitem">
+5712b2c HUE-3294 [core] Make top nav buttons a tad bit lighter on hover
+</li><li class="listitem">
+c9d214d HUE-3294 [core] Style the top right nav admin menu
+</li><li class="listitem">
+d8b90d0 HUE-3294 [core] Style the top right nav actions
+</li><li class="listitem">
+8760c1a HUE-3294 [search] Add field type in field analysis popup
+</li><li class="listitem">
+7a952e6 HUE-3294 [editor] Set Ace to readonly if the type is not text
+</li><li class="listitem">
+b995f96 HUE-3294 [core] You can now call hueDebug.viewModel() with a target element
+</li><li class="listitem">
+b4974a6 HUe-3294 [notebook] Retrieve content of document snippet
+</li><li class="listitem">
+fa477b2 HUE-5232 [metadata] Add top aggs API
+</li><li class="listitem">
+353a3db HUE-3294 [search] Fixed text squeezer
+</li><li class="listitem">
+729a560 HUE-3294 [search] Improve counter display
+</li><li class="listitem">
+b02c739 HUE-5232 [metadata] Add top joins API
+</li><li class="listitem">
+942321a HUE-3294 [assist] Friendlier search placeholder
+</li><li class="listitem">
+892d807 HUE-4866 [editor] Load back the selected document snippet object
+</li><li class="listitem">
+dcabb7b HUE-3294 [core] Add global search autocomplete
+</li><li class="listitem">
+1534b41 HUE-3294 [editor] Fix typeahead binding
+</li><li class="listitem">
+1804979 HUE-3294 [core] Shrink the hamburger menu icon
+</li><li class="listitem">
+c7d5a0f HUE-3294 [core] Increase the size of the top nav search bar
+</li><li class="listitem">
+43097fa HUE-3294 [core] Fix url parameter content detection
+</li><li class="listitem">
+b69e6b0 HUE-3294 [core] Style the compose button
+</li><li class="listitem">
+be7c08e HUE-3294 [core] Style the main search bar
+</li><li class="listitem">
+4894752 HUE-3294 [editor] First round of adding Search
+</li><li class="listitem">
+b646609 HUE-3294 [editor] Added niceScroll to responsive
+</li><li class="listitem">
+2228b6a HUE-3294 [editor] Avoid double loading of JS files
+</li><li class="listitem">
+2e4f250 HUE-4866 [editor] Perform variable replacements in multi query in file queries
+</li><li class="listitem">
+352c991 HUE-5261 [editor] Smarter row count estimate
+</li><li class="listitem">
+715125f HUE-3294 [assist] Force loading of the db panel in background
+</li><li class="listitem">
+6988783 HUE-3294 [editor] Speed up scroll
+</li><li class="listitem">
+e9072f8 HUE-3294 [metastore] Added temporary links to load apps
+</li><li class="listitem">
+db2f17a HUE-4866 [editor] Remember last path on File editor chooser
+</li><li class="listitem">
+9f2fc43 HUE-4866 [notebook] Execute saved Hive snippet from a notebook snippet
+</li><li class="listitem">
+31fca1c HUE-4866 [editor] Avoid showing column list on re-execute
+</li><li class="listitem">
+6df91d8 HUE-3294 [core] Add IE support for responsive flex layout
+</li><li class="listitem">
+22a689c HUE-4866 [reporter] Fix result table extender
+</li><li class="listitem">
+d907a7d HUE-4866 [editor] Only pole for snippet file content when using a statement from a file
+</li><li class="listitem">
+605ac93 HUE-4866 [editor] Insert content of text snippet when using query from a file
+</li><li class="listitem">
+ba23d40 HUE-4866 [notebook] Select a document as a snippet
+</li><li class="listitem">
+5df0612 HUE-4866 [oozie] Refactor out the document selector
+</li><li class="listitem">
+c486023 HUE-3294 [core] Add right side panel and a split draggable binding for flex layout
+</li><li class="listitem">
+e7acec1 HUE-3294 [metastore] Created an embeddable version of the metastore
+</li><li class="listitem">
+b972da5 HUE-2981 [search] Detect and enable nested documents when they are in the collection
+</li><li class="listitem">
+51a5b6c HUE-3294 [assist] Adding refresh and filter icons to document panel
+</li><li class="listitem">
+9429861 HUE-3294 [desktop] Add backend document search for documents in assist
+</li><li class="listitem">
+82baec1 HUE-3294 [core] Renamed also right-panel related variable to content panel
+</li><li class="listitem">
+5a749a7 HUE-3294 [core] Renamed right-panel to content-panel
+</li><li class="listitem">
+ce628dc HUE-3294 [core] Fix assist panel resizer
+</li><li class="listitem">
+60f32e6 HUE-3294 [core] Support reloading of editors on responsive
+</li><li class="listitem">
+71be351 HUE-3294 [core] Add missing styles for assist and context popover to responsive
+</li><li class="listitem">
+c9938e8 HUE-3294 [core] Fix missing imports for results to show up
+</li><li class="listitem">
+c4ca69c HUE-3294 [core] Improved assist panel styling
+</li><li class="listitem">
+157e47a HUE-3294 [desktop] Move search document and data calls to desktop
+</li><li class="listitem">
+a205827 HUE-3294 [core] Change URLs for notebook.ko
+</li><li class="listitem">
+3b42f0b HUE-3294 [core] Fix assist toggle
+</li><li class="listitem">
+15d85fb HUE-3294 [core] Make the editor load completely
+</li><li class="listitem">
+968a81a HUE-3294 [core] Enable/disable assist in editor_components
+</li><li class="listitem">
+2873917 HUE-3294 [core] Fix HTML structure
+</li><li class="listitem">
+52fcfd6 HUE-3294 [core] Added hueDebug to the page
+</li><li class="listitem">
+6c5e48b HUE-3294 [core] Added editor_embeddable and loader
+</li><li class="listitem">
+0f3f79f HUE-5297 [beeswax] fixing Open redirect vulnerability in on_success_url
+</li><li class="listitem">
+40c6c45 HUE-4546 [editor] Cannot execute any Hive query: <span class="emphasis"><em>NoneType</em></span> object has no attribute <span class="emphasis"><em>update_data</em></span>
+</li><li class="listitem">
+07e78ae HUE-5296 [fb] Deleting a file from File Browser should determine the trash dir via getTrashRoots
+</li><li class="listitem">
+e18b270 HUE-5275 [libsentry] Add support for URI in privilege checker
+</li><li class="listitem">
+a899c18 HUE-5275 [libsentry] Add support for Solr (V2) Sentry objects to privilege checker
+</li><li class="listitem">
+33e491d HUE-5173 [fb] Raise S3UploadError if user does not have permissions to upload
+</li><li class="listitem">
+a396fca HUE-4866 [fb] Submit archives as batch job
+</li><li class="listitem">
+d2dc60b HUE-5275 [libsentry] Add privilege_checker test with mock API response
+</li><li class="listitem">
+797d6f7 HUE-5275 [security] Enable filtered searching of Sentry objects based on privileges
+</li><li class="listitem">
+1156463 HUE-5071 [oozie] Import workflow with hive dependency from cluster to another one fail
+</li><li class="listitem">
+ebee925 HUE-5202 [filebrowser] Fix incorrect path while copying script to hdfs
+</li><li class="listitem">
+02f6180 HUE-5286 [metadata] Taking into account full prefixing of tables and columns
+</li><li class="listitem">
+9403c35 HUE-5231 [search] Avoid error popup when analysing text fields
+</li><li class="listitem">
+ffc916e HUE-4866 [notebook] Test getting document as snippet source
+</li><li class="listitem">
+24693ff HUE-5284 [notebook] Refactor to include file snippet in notebook too
+</li><li class="listitem">
+1d645f8 HUE-5187 [assist] Default showCores to true in Collection if we only have cores
+</li><li class="listitem">
+f5ab2ed HUE-5231 [search] Bump default number of rows in grid result to 25
+</li><li class="listitem">
+4f9afe3 HUE-5231 Tweaking the responsive menu with new links
+</li><li class="listitem">
+073fa17 HUE-4866 [editor] Do not able execute from a file when only query string is set
+</li><li class="listitem">
+b043a1e HUE-5282 [editor] Add missing non SQL dialect types
+</li><li class="listitem">
+1fc42f9 HUE-5282 [editor] Clean-up toggling editor / notebook mode logic
+</li><li class="listitem">
+5d5a5aa HUE-5284 [notebook] Reset snippet status when switching its type
+</li><li class="listitem">
+6897617 HUE-4866 [editor] Support extracting query variables from a file
+</li><li class="listitem">
+c4a0c6e HUE-4866 [editor] Support multiquery in query from a file
+</li><li class="listitem">
+f52bc3a HUE-5283 [notebook] Show the top icon
+</li><li class="listitem">
+bc24d45 HUE-5282 [editor] Simplify logic when switching editor modes
+</li><li class="listitem">
+b6be60c HUE-5239 [assist] Don’t trigger search when switching tabs unless search is active
+</li><li class="listitem">
+64c0fde HUE-5240 [editor] Fix closing of inline search in the tabs
+</li><li class="listitem">
+508deb3 HUE-5249 [editor] Fix JS error on complex column right click
+</li><li class="listitem">
+98a198c HUE-5273 [editor] Show additional details in the tooltip for the context popover
+</li><li class="listitem">
+b469242 HUE-5274 [editor] Fix JS error related to comments in the context popover
+</li><li class="listitem">
+8e6c356 HUE-5231 [search] Avoid js error when nested types are disabled
+</li><li class="listitem">
+f52b2df HUE-5281 [core] Log real user real ip when using a load balancer
+</li><li class="listitem">
+0977ed6 HUE-5072 [oozie] Non accessible submitted saved workflow errors when opened in dashboard
+</li><li class="listitem">
+85656f7 HUE-4866 [editor] Unify when a statement isReady() across the snippet
+</li><li class="listitem">
+79e003d HUE-4866 [editor] Integrate file content into the query statement
+</li><li class="listitem">
+799bf62 HUE-4866 [editor] Submit query from a source file
+</li><li class="listitem">
+9c3e942 HUE-5252 [editor] The snippet settings layout should align vertically
+</li><li class="listitem">
+42fc911 HUE-5237 [useradmin] Use selectize.js for the settings
+</li><li class="listitem">
+0ceaea8 HUE-5231 [search] Align result grid headers to the left and make them scrollable
+</li><li class="listitem">
+27c007c HUE-5253 [editor] Improve query time formatting on long running queries
+</li><li class="listitem">
+39178f4 HUE-5250 [editor] DB selector dropdown is shifted to the left
+</li><li class="listitem">
+6e7b97e HUE-5251 [editor] The check status call should stop if there’s a server problem
+</li><li class="listitem">
+1065418 HUE-5254 [editor] The result count should be formatted
+</li><li class="listitem">
+6c43105 HUE-5258 [editor] Timeline charts has a D3 error with a timestamp Y value
+</li><li class="listitem">
+9f70614 HUE-5277 [oozie] User object in Job may not always be initialized
+</li><li class="listitem">
+877c2b6 HUE-2981 [search] Inject nested fq only when nested document is enabled
+</li><li class="listitem">
+989fd65 HUE-5269 [editor] Explain button does not do a use DB before executing
+</li><li class="listitem">
+50cebf6 PR445 [doc] Update Django version URL to exist
+</li><li class="listitem">
+2091d3e HUE-2981 [search] Build tree schema in collection property page
+</li><li class="listitem">
+4365deb HUE-2981 [search] Re-introduce 3rd dimension to the Timeline
+</li><li class="listitem">
+a68c894 HUE-2981 [search] Re-introduce analytics text facet sorting
+</li><li class="listitem">
+453006d HUE-2981 [search] Provide computed subcounts into the tree data
+</li><li class="listitem">
+20d30b8 HUE-5224 [metastore] Add complexity to the list of queries
+</li><li class="listitem">
+ea6a6f0 HUE-2981 [search] Add nested facets of dimension &gt; 2
+</li><li class="listitem">
+22754e7 HUE-5224 [metadata] Add popular joins API
+</li><li class="listitem">
+b523bac HUE-2981 [search] Support nested document faceting
+</li><li class="listitem">
+8a0827a HUE-2981 [search] Display nested documents of records
+</li><li class="listitem">
+9fc1daf HUE-2981 [search] Support nested documents display
+</li><li class="listitem">
+a830936 HUE-5141 [core] Home page import document popup should provide information about the import
+</li><li class="listitem">
+2991ec2 HUE-5174 [fb] Display correct error message when read-only user attempts to create/delete object in S3
+</li><li class="listitem">
+f1dafa8 HUE-5270 [assist] Context popover should handle complex types
+</li><li class="listitem">
+7d0aeca HUE-5268 [editor] Autocompleter should not suggest columns without tables
+</li><li class="listitem">
+9db73dd HUE-5234 [editor] Fix JS error related to editor locations
+</li><li class="listitem">
+d9c71f8 HUE-5232 [metadata] Add a search button to nav search
+</li><li class="listitem">
+03d104e HUE-5236 [editor] Deprioritize virtual columns in the autocomplete suggestions
+</li><li class="listitem">
+ddca8ce HUE-5259 [editor] Scrollbars appear on timeline chart when hovering at right end
+</li><li class="listitem">
+b7bb45a HUE-5256 [editor] Clicking on the Stop button of a snippet doesn’t give any feedback
+</li><li class="listitem">
+e83bc61 HUE-4895 [editor] Name downloaded query with their query name if possible
+</li><li class="listitem">
+8a713b8 HUE-5260 [editor] Double click on next/previous result search makes the results tremble
+</li><li class="listitem">
+dd70f73 HUE-5257 [editor] Clear up the status bar when a query gets canceled
+</li><li class="listitem">
+8fb5211 HUE-5266 [core] Fix Jasmine runner
+</li><li class="listitem">
+4715c1b HUE-5202 Clean up added zip file which is common across tests
+</li><li class="listitem">
+37e9d3e HUE-5141 [core] Import document popup should provide information about the import
+</li><li class="listitem">
+c403d21 HUE-5202 Use DEFAULT_USER.get() instead of hardcoding hue user
+</li><li class="listitem">
+31a942d HUE-5202 Disable extract uploaded archive using notebook connector by default
+</li><li class="listitem">
+0ed940a HUE-5202 Move extract functionality to desktop/lib/tasks/extract_archive
+</li><li class="listitem">
+7dbd1e6 HUE-5202 Unit test for validating extract_archive_in_hdfs()
+</li><li class="listitem">
+a41b6a6 HUE-5202 Added API to allow archive extraction using Notebook shell connector
+</li><li class="listitem">
+2bd5af1 HUE-5202 Added shell script that is used in the oozie job for extracting archive
+</li><li class="listitem">
+d49eda0 HUE-5235 [editor] Allow to type any setting in the session tab
+</li><li class="listitem">
+6a99a2c HUE-5187 [assist] Add show cores only option to the index assist panels
+</li><li class="listitem">
+f81f8d9 HUE-5230 [metadata] Enable ESC to cancel tag editing
+</li><li class="listitem">
+51bceab HUE-5215 [metastore] Add test for dropping tables with skip trash option
+</li><li class="listitem">
+9fdeb1e HUE-5215 [metastore] Add skip trash option when dropping table from metastore
+</li><li class="listitem">
+1ad4b85 HUE-5218 [search] Validate dashboard sharing works
+</li><li class="listitem">
+28a2a70 HUE-5225 [core] Prevent Oozie and Job Designer duplicate example documents from being installed
+</li><li class="listitem">
+9c11e66 HUE-5173 [fb] Correctly check READ and WRITE permissions for S3 before upload
+</li><li class="listitem">
+d8df800 HUE-5229 [filebrowser] Improve select all performance
+</li><li class="listitem">
+03dc9fe HUE-5223 [core] Lighten up the treeview chart
+</li><li class="listitem">
+592dfc5 HUE-5179 [search] Timeline search is not working after the first select
+</li><li class="listitem">
+09a325f HUE-5228 [editor] Allow SQL identifiers starting with numeric characters
+</li><li class="listitem">
+008f74c HUE-5227 [editor] Put exact type match suggestions on top in the autocompleter
+</li><li class="listitem">
+e8a999d HUE-5222 [editor] Move tags to the details tab in the context popover
+</li><li class="listitem">
+d18fec9 HUE-5219 [core] Deleted examples can not be re-installed
+</li><li class="listitem">
+3ac4d68 HUE-5115 [core] Revert custom job browser connection pooling
+</li><li class="listitem">
+d2d6fbc HUE-5221 [metadata] Show result count instead of autocomplete count in nav search
+</li><li class="listitem">
+67273fc HUE-5220 [editor] Show comments and various details for tables in the context popover
+</li><li class="listitem">
+4ed8e7d HUE-5145 [metadata] Adding popular table filters API
+</li><li class="listitem">
+5dae2bb HUE-5145 [metadata] Adding more information about popular queries and joins
+</li><li class="listitem">
+11e65b9 HUE-5217 [backend] Resolve LGPL copyleft issue - Paramiko
+</li><li class="listitem">
+72d2555 HUE-5106 [oozie] Delete on decision node children creates broken links
+</li><li class="listitem">
+efe534d HUE-5213 [metadata] Protect against matching terms with regexp syntax in frontend
+</li><li class="listitem">
+a98815a HUE-5213 [metadata] Protect against matching terms with regexp syntax in search
+</li><li class="listitem">
+0137696 HUE-5212 [metadata] Harmonize result description display and highlighting
+</li><li class="listitem">
+3031b2d HUE-5211 [metadata] Support utf8 in search
+</li><li class="listitem">
+a189251 HUE-5167 [core] Improve SASL error reporting in HUE
+</li><li class="listitem">
+46cdf8d HUE-5153 [aws] Turn off default AWS account when not configured
+</li><li class="listitem">
+28edd1b HUE-5153 [aws] Allow S3 client to attempt to pickup IAM instance metadata
+</li><li class="listitem">
+d89587b HUE-5165 [impala] Get result count for all select * queries
+</li><li class="listitem">
+ac52b36 HUE-5204 [beeswax] Hide editor links to avoid falling back to old editor when doing a drop/create table operation
+</li><li class="listitem">
+e643aae HUE-5189 [core] Add correct case to the HBase assist entry file
+</li><li class="listitem">
+85ad692 HUE-5210 [notebook] Reduce snippet icon brightness
+</li><li class="listitem">
+250fcea HUE-5206 [editor] Show tooltip for active chart type
+</li><li class="listitem">
+5535aab HUE-5205 [metadata] Fix tag editor js error after multiple edits
+</li><li class="listitem">
+9be9829 HUE-5203 [assist] Use info icon instead of chart icon for context popover
+</li><li class="listitem">
+213edf0 HUE-5200 [editor] Empty assist on first page load
+</li><li class="listitem">
+17f7988 HUE-5197 [assist] Lazy load the assist tabs
+</li><li class="listitem">
+b9e57c0 HUE-5186 [core] Get rid of deprecation warnings for Moment.js
+</li><li class="listitem">
+03beba5 HUE-5199 [editor] No blue highlighting of single line query when doing multi queries
+</li><li class="listitem">
+ce1eadd HUE-2753 [search] Nested text facet should propose the <span class="emphasis"><em>show more</em></span> option
+</li><li class="listitem">
+cb296dc HUE-5189 [core] Add Hbase to Assist
+</li><li class="listitem">
+e659bcf HUE-5196 [metadata] You can’t search for the same query multiple times
+</li><li class="listitem">
+a412c42 HUE-5195 [metadata] Nav autocomplete should have shadow like the other drop-downs
+</li><li class="listitem">
+e35b11c HUE-5194 [assist] Collapse button is hidden behind nav search when there are no tabs
+</li><li class="listitem">
+0b391fd HUE-5192 [assist] Add show details to right-click context menu
+</li><li class="listitem">
+087179d HUE-5193 [assist] Don’t show an error in case the collection size is zero
+</li><li class="listitem">
+e9f438b HUE-5191 [useradmin] Paginate the list of results
+</li><li class="listitem">
+023e232 HUE-5188 [notebook] Add assist JS imports to the main page
+</li><li class="listitem">
+fbbe2e0 HUE-5185 [beeswax] Remove dependency on VKBeautify
+</li><li class="listitem">
+8b79e20 HUE-5167 [core] Improve SASL error reporting in HUE
+</li><li class="listitem">
+05adc61 HUE-4888 [fb] Display S3 region to avoid misunderstandings
+</li><li class="listitem">
+acdc035 HUE-5184 [indexer] Do not error when listing collections on non Solr Cloud mode
+</li><li class="listitem">
+5f95b66 HUE-5182 [core] Centralize assist JS models imports
+</li><li class="listitem">
+caa995f HUE-5180 [search] Use pushState to change URL when saving a new collection
+</li><li class="listitem">
+318e233 HUE-5181 [editor] Clear editor selected query on SQL file drop from desktop
+</li><li class="listitem">
+7c32b80 HUE-5145 [metadata] Add Similar Query API
+</li><li class="listitem">
+f7bb58a HUE-2173 [search] Support nested text facet with &amp;up
+</li><li class="listitem">
+34b3ab2 HUE-2173 [search] Apply sort on value of function when using an aggregate
+</li><li class="listitem">
+95412b3 HUE-2173 [search] Apply proper ascending or descending sort
+</li><li class="listitem">
+ef4eeed HUE-5145 [metadata] Integrate APIs into the editor
+</li><li class="listitem">
+02d7cf4 HUE-5145 [metastore] Cleaner top favorite tables of a database
+</li><li class="listitem">
+757324b HUE-2173 [search] Add range to nested text facet
+</li><li class="listitem">
+0adee37 HUE-2173 [search] Add nested text facet on a string field
+</li><li class="listitem">
+30e5b0e HUE-4993 [assist] Use ko bindings for the query builder context menu
+</li><li class="listitem">
+81d3c2f HUE-4993 [assist] Replace double-click to insert with right-click context menu
+</li><li class="listitem">
+e5cc8d8 HUE-5084 [core] Add indexes as Assist Panel
+</li><li class="listitem">
+76b602b HUE-5178 [core] Fix assist S3 refresh cache
+</li><li class="listitem">
+42f696c HUE-5069 Create new deployment dir when imported doc points deleted one
+</li><li class="listitem">
+99b2921 HUE-5069 [core] Running imported workflow fails across users
+</li><li class="listitem">
+03b6c50 HUE-4906 [home] Allow superuser to trash shared documents
+</li><li class="listitem">
+4de01d3 HUE-5177 [home] Operation menu does not fit well on page with a top banner
+</li><li class="listitem">
+502fc2e HUE-5166 [impala] Handle empty session properties during upgrades
+</li><li class="listitem">
+2581664 HUE-5172 [core] Update FontAwesome to 4.7
+</li><li class="listitem">
+9e1171a HUE-5168 [indexer] Smaller input size for file types
+</li><li class="listitem">
+d77881f HUE-5168 [indexer] Populate default collection name automatically
+</li><li class="listitem">
+7d0450a HUE-5168 [indexer] Polish interface by hiding non essential fields
+</li><li class="listitem">
+627d496 HUE-2173 [search] Nested tree widget with functions
+</li><li class="listitem">
+9b883da HUE-2173 [search] Nested tree widget with dimension 2
+</li><li class="listitem">
+eec86f3 HUE-2173 [search] Nested tree widget with dimension 1
+</li><li class="listitem">
+b75d88f HUE-3281 [home] Add link to Job Browser 2 to the menu
+</li><li class="listitem">
+d1875c7 HUE-5145 [editor] Update top tables query to take  database in parameter
+</li><li class="listitem">
+3ca8d78 HUE-5145 [editor] Skeleton of statement compatibility API
+</li><li class="listitem">
+439361d HUE-5145 [editor] Skeleton of query risk API
+</li><li class="listitem">
+a1729b3 HUE-5145 [metadata] Add skeleton of table_details API
+</li><li class="listitem">
+b6eb1d1 HUE-2173 [indexer] Do not require Solr Cloud mode to get displayed
+</li><li class="listitem">
+27a2907 HUE-3281 [core] Adding link to more snippets in meu if admin
+</li><li class="listitem">
+2e943aa HUE-3281 [core] Add more icons for the main editors
+</li><li class="listitem">
+2e5cc66 HUE-3281 [home] Refacor the top menu to simplify its UX
+</li><li class="listitem">
+9fa2256 HUE-3281 [home] Add list of interpreters in the compose menu
+</li><li class="listitem">
+f28b3c7 HUE-3281 [home] Disable dynamic loading of component until it is ported out of require
+</li><li class="listitem">
+fd41c0b HUE-3281 [core] Rebase to start the new layout
+</li><li class="listitem">
+da5ba55 HUE-3281 [core] Use ko components for editor and metastore
+</li><li class="listitem">
+009c61d HUE-3281 [core] Add the assist panel
+</li><li class="listitem">
+2797d67 HUE-3281 [core] Add basic menu content
+</li><li class="listitem">
+0f29889 HUE-3281 [core] Fix left nav and page width issues
+</li><li class="listitem">
+ac48b2d HUE-3281 [core] Add left menu
+</li><li class="listitem">
+633b66d HUE-3281 [core] Use flex layout for top bar and page contents
+</li><li class="listitem">
+4242f65 HUE-3281 [core] Add top nav
+</li><li class="listitem">
+a60cdc1 HUE-3281 [core] Responsive skeleton
+</li><li class="listitem">
+1c092f8 HUE-4993 [assist] Assist entry optimization
+</li><li class="listitem">
+8f8ad7e HUE-4179 [metastore] Use common selected DB for hive and impala
+</li><li class="listitem">
+60d0a03 HUE-5171 [assist] Remember the last opened panel
+</li><li class="listitem">
+1e390c7 HUE-5164 [editor] Result grid should give hints on hover
+</li><li class="listitem">
+4ed34b2 HUE-5157 [editor] Add asterisk locations and expansion back to the editor
+</li><li class="listitem">
+82727a1 HUE-5159 [editor] Fix broken jasmine tests for HDFS locations
+</li><li class="listitem">
+aa8eda0 HUE-5163 [security] Speed up initial page rendering
+</li><li class="listitem">
+f135f6d HUE-5154 [oozie] Create an new oozie workflow throws server error 500
+</li><li class="listitem">
+fc8055a HUE-5145 [metadata] Remove old data mock option
+</li><li class="listitem">
+36f9b25 HUE-5162 [oozie] Add tests on creation of new workflow, coordinator and bundle
+</li><li class="listitem">
+06b82cb HUE-5125 [editor] Show file tree on context popup
+</li><li class="listitem">
+fbbb534 HUE-5151 [editor] No result in Query History search in editor toggles to Saved Query tab in FF
+</li><li class="listitem">
+fc58e04 HUE-5161 [security] Speed up roles rendering
+</li><li class="listitem">
+7a53e78 HUE-5158 [editor] Fix database name case issue in autocompleter
+</li><li class="listitem">
+d7d8b50 HUE-5156 [editor] Fix issue where search is active after clear and switching tabs
+</li><li class="listitem">
+93adbb5 HUE-5155 [editor] Make nav autocomplete icons bigger
+</li><li class="listitem">
+5443601 HUE-5160 [search] Avoid JS error on missing field check
+</li><li class="listitem">
+2e50b41 HUE-5149 [metadata] Support tags:hue syntax in result view
+</li><li class="listitem">
+938bd3c HUE-5149 [metadata] Add highlighting to the result records
+</li><li class="listitem">
+c9298b6 HUE-5149 [metadata] Print description of object in result
+</li><li class="listitem">
+7869628 HUE-5149 [metadata] Avoid error on list_tags
+</li><li class="listitem">
+ab5e0bb HUE-5149 [metadata] Only highlight in the name of the object
+</li><li class="listitem">
+dcc226d HUE-3281 [core] Assist for small screens
+</li><li class="listitem">
+5b0d9e8 HUE-5150 [metadata] Don’t do nav search on empty input
+</li><li class="listitem">
+a4e7b59 HUE-5149 [metadata] Mark autocomplete matches in bold and not italic
+</li><li class="listitem">
+1b377d0 HUE-5135 [metadata] Add syntax highlighting with &lt;em&gt;
+</li><li class="listitem">
+2199bcd HUE-5135 [metadata] Autocomplete highlighting on matching terms
+</li><li class="listitem">
+b307b78 HUE-5135 [metadata] Add proper autocomplete highlighting to matching facets
+</li><li class="listitem">
+47c8a8a HUE-5145 [metadata] Basic of upload optimization API
+</li><li class="listitem">
+38895a4 HUE-5145 [metadata] Rename API tests to client tests
+</li><li class="listitem">
+943a75a HUE-5145 [metadata] Get top tables from optimization API
+</li><li class="listitem">
+4d77d46 HUE-5145 [metadata] Get tenant from optimization API
+</li><li class="listitem">
+be5216f HUE-5148 [metadata] Show message when no autocomplete result is found for nav search
+</li><li class="listitem">
+8f9c38f HUE-5147 [metadata] Add counts to nav search autocomplete results
+</li><li class="listitem">
+f67a3c5 HUE-4958 [home] Don’t try to open single file in home automatically
+</li><li class="listitem">
+94ef74b HUE-5105 [jb] Opening an "ACCEPTED" job can return 500 error
+</li><li class="listitem">
+263b9a4 HUE-5140 [impala] Failed to get query profile from Impala Daemon server
+</li><li class="listitem">
+5060af5 HUE-5146 [editor] Add ctrl+space shortcut description to the editor help
+</li><li class="listitem">
+e0e7567 HUE-5126 [fb] Filechooser can have some autocomplete error
+</li><li class="listitem">
+255568a HUE-5135 [metadata] Do not send * query when typing a second term
+</li><li class="listitem">
+c875f7a HUE-5143 [jb] rm_ha decorator decorator does not specify the user correctly
+</li><li class="listitem">
+e05cb3e HUE-5135 [metadata] Keep default filtering on list of allowed types by source
+</li><li class="listitem">
+efec570 HUE-5144 [metadata] Tune the timings of the context popover for Nav search results
+</li><li class="listitem">
+d9c5db8 HUE-5142 [metadata] Don’t save tags when they haven’t changed
+</li><li class="listitem">
+8f985ad HUE-5122 [fb] Enable back execute bit permission set for HDFS files
+</li><li class="listitem">
+bd026a6 HUE-5135 [metadata] Case insensitive facet value matching
+</li><li class="listitem">
+d79b29e HUE-5135 [metadata] Make sure type value still makes sense for the source
+</li><li class="listitem">
+517a59a HUE-5135 [metadata] Case sentitive type: search and allow custom values like FIEL*
+</li><li class="listitem">
+314bfd9 HUE-5028 [oozie] User can’t edit shared WF with modify permissions in new editor mode
+</li><li class="listitem">
+d3cf3f7 HUE-4897 [core] Import document call should provide information about the import
+</li><li class="listitem">
+6b20d8a HUE-5137 [editor] Fix save query JS error
+</li><li class="listitem">
+14bf3a7 HUE-5123 [notebook] Creation of notebook snippet with shell action
+</li><li class="listitem">
+997158a HUE-5121 [home] Old query format with / cannot be imported
+</li><li class="listitem">
+9b9eafd HUE-5139 [metadata] Delete search words on ctrl + backspace
+</li><li class="listitem">
+9711cae HUE-5138 [metadata] Fix funky positioning of context popover in the search results
+</li><li class="listitem">
+98cc47b HUE-5125 [editor] Skeleton for HDFS details in context popover
+</li><li class="listitem">
+e06e6ae HUE-5136 [editor] Fix JS console error for token.value
+</li><li class="listitem">
+cf9a200 HUE-5134 [editor] Fix incorrect UDF locations for analytic functions
+</li><li class="listitem">
+4d9a68c HUE-5133 [metadata] Show search result on enter
+</li><li class="listitem">
+666b4df HUE-5135 [metadata] Prevent CSRF error when calling the search API
+</li><li class="listitem">
+12821d5 HUE-3281 [search] Mobilified collection list and dashboard
+</li><li class="listitem">
+91c7efe HUE-5127 [core] Revert typo about Python 2.6 in Makefile
+</li><li class="listitem">
+eb586e4 HUE-5130 [jobsub] Allow Sqoop 1 job even if Sqoop 2 app is not available
+</li><li class="listitem">
+9932445 HUe-5119 [oozie] Define statements for Hive snippets of notebooks
+</li><li class="listitem">
+fc1e7cd HUE-5097 [core] Add argparse for the sqlformater compatibility with Python 2.6
+</li><li class="listitem">
+99a14be HUE-5120 [core] Also log the potential detail of the PopUpException
+</li><li class="listitem">
+5c327f2 HUE-5127 [jb] Link text labels to its radio button
+</li><li class="listitem">
+4f9c93f HUE-5127 [jb] Remove coordinator actions from the editor
+</li><li class="listitem">
+7037387 HUE-3281 [editor] Disable swipe to slide
+</li><li class="listitem">
+c41ede7 HUE-3281 [editor] Enabled results
+</li><li class="listitem">
+6f2e7b1 HUE-5127 [jb] Integrate coordinator actions in revamp
+</li><li class="listitem">
+63bfbfa HUE-5119 [oozie] Offer file output path to Hive query batch
+</li><li class="listitem">
+e466707 HUE-3281 [editor] Added jquery touch swipe
+</li><li class="listitem">
+d7d1038 HUE-3281 [editor] Modified mobile skeleton
+</li><li class="listitem">
+ee9b040 HUE-3281 [editor] Simplified mobile version skeleton
+</li><li class="listitem">
+05f914d HUE-5120 [core] Popup Exception should log the original stack trace
+</li><li class="listitem">
+1824832 HUE-5119 [oozie] Email result on batch completion
+</li><li class="listitem">
+73d3edc HUE-2173 [search] Remove new line on editing mode
+</li><li class="listitem">
+7f42afa HUE-2173 [search] Add readonly dimension switch
+</li><li class="listitem">
+57a7bc8 HUE-2173 [search] Support global timeline filter
+</li><li class="listitem">
+3fbb7f4 HUE-2173 [search] Have pie and bucket widgets use the same dimension snippet
+</li><li class="listitem">
+0c75a92 HUE-2173 [search] Refactoring to share the dimension display in common
+</li><li class="listitem">
+054afea HUE-2173 [search] Skeleton of Analytic gradient map widget
+</li><li class="listitem">
+653444e HUE-2173 [search] Remove duplicate dimension add to widget
+</li><li class="listitem">
+fe082df HUE-3281 Interface revamp and modernization of UX: Hue 4
+</li><li class="listitem">
+cbf166e HUE-2173 [search] Skeleton of Analytic timeline widget
+</li><li class="listitem">
+82516e9 HUE-2173 [search] Automatically choose the field if there’s just one field available
+</li><li class="listitem">
+7b28677 HUE-2173 [search] Fix pre-population of the field chooser
+</li><li class="listitem">
+89da56f HUE-2173 [search] Fix top margin
+</li><li class="listitem">
+5ba3152 HUE-2173 [search] Make it responsive
+</li><li class="listitem">
+a64718a HUE-2173 [search] Introduce the Analytic Pie chart
+</li><li class="listitem">
+6bcc748 HUE-5127 [jb] Add loading job property
+</li><li class="listitem">
+90d8cbd HUE-5127 [core] Added basictable for responsive tables
+</li><li class="listitem">
+316332a HUE-5127 [jb] Integrated coordinator actions on detail page
+</li><li class="listitem">
+b003d24 HUE-5127 [jb] Added assist to JB
+</li><li class="listitem">
+8a8cf24 HUE-5127 [jb] Added hashchange to the apps page
+</li><li class="listitem">
+6e49c81 HUE-5127 [jb] Added observableDefault to KO
+</li><li class="listitem">
+6d88fc4 HUE-4873 [security] Change login modal UX
+</li><li class="listitem">
+16dd0a7 HUE-4873 [security] Deliver csrftoken cookie with "HTTP_ONLY" bit set when HTTPS
+</li><li class="listitem">
+9bbc09f HUE-4653 [core] Build a HTTP Client pool
+</li><li class="listitem">
+1c06e78 HUE-5076 [core] Unpack thrift handle guid, secret before adding to logs
+</li><li class="listitem">
+57748b1 HUE-5067 [oozie] Graph display of single executed action shows the full workflow
+</li><li class="listitem">
+0c66cc9 HUE-5097 [editor] Plugin the new SQL formatter in the editor
+</li><li class="listitem">
+313e92c HUE-5097 [editor] Introduce sqlparse lib for formatting and splitting SQL statements
+</li><li class="listitem">
+6d6982c HUE-5188 [editor] Add heatmap functionality to the leaflet map chart
+</li><li class="listitem">
+37ae3cd HUE-5109 [oozie] Update test to take into account the email content-type
+</li><li class="listitem">
+89fb005 HUE-5112 [oozie] Protect against invalid parameter values in document action
+</li><li class="listitem">
+086b276 HUE-5109 [oozie] Allow sending of email report when submitting a workflow
+</li><li class="listitem">
+56f0701 HUE-5108 [oozie] Workflow dashboard page with an email on kill or end has a js error
+</li><li class="listitem">
+608fbf2 HUE-5110 [oozie] First workflow save starts blinking the <span class="emphasis"><em>unsaved</em></span> feature in the editor
+</li><li class="listitem">
+d55eb79 HUE-5111 [oozie] Add margin to the last widget on the workflow editor
+</li><li class="listitem">
+20f5e78 HUE-3984 [jb] Failed MR application cannot be found even if still in RM
+</li><li class="listitem">
+cba68a0 HUE-3079 [jb] Display jobs from JHS (YARN and Spark) and their logs when not in RM
+</li><li class="listitem">
+9c02273 HUE-5107 [oozie] Restyle document autocomplete to look more like a dropdown
+</li><li class="listitem">
+c4690b9 HUE-4826 [fb] Allow to edit the path in the file chooser
+</li><li class="listitem">
+b5b46b9 HUE-5083 [charts] Improve redistribution of labels on bar charts
+</li><li class="listitem">
+19f29d9 HUE-5090 [oozie] Refactor batch API submittion of a Notebook
+</li><li class="listitem">
+bbd710e HUE-5090 [oozie] Initial prefixing of Oozie scheduled jobs
+</li><li class="listitem">
+eb12788 HUE-5090 [oozie] Initial prefixing of Oozie batch jobs
+</li><li class="listitem">
+bc5e14d HUE-5090 [editor] Rename correctly options for exporting data into a file
+</li><li class="listitem">
+d760de1 HUE-5090 [notebook] Refactor creation of a notebook with Hive or MR snippets
+</li><li class="listitem">
+1b2daef HUE-5103 [core] Add little blue footer to login page
+</li><li class="listitem">
+6379b3f HUE-4991 [oozie] Group Coordinator dashboard action buttons
+</li><li class="listitem">
+c4120a4 HUE-5098 [oozie] Swap readonly Codemirror to Ace
+</li><li class="listitem">
+b3a3aea HUE-5099 [editor] Avoid scrolling to top of the editor when executing a statement
+</li><li class="listitem">
+48d915d HUE-5093 [metadata] Use correct logic to check for app permission
+</li><li class="listitem">
+467633e HUE-5095 [backend] Python requests library should put port information in log message
+</li><li class="listitem">
+e99a6e0 HUE-5093 [metadata] Support partial facet matches in autocomplete
+</li><li class="listitem">
+90af786 HUE-5093 [metadata] Sort facet values by counts
+</li><li class="listitem">
+47c2064 HUE-5093 [metadata] Allow the listing of non default types in the autocomplete
+</li><li class="listitem">
+1099ebc HUE-5093 [metadata] Initial show sample popup on hover in search result
+</li><li class="listitem">
+095fbb7 HUE-5093 [metadata] Add counts to facet listing
+</li><li class="listitem">
+4ddd211 HUE-5093 [metadata] Have tests use an augmented user like after a real login
+</li><li class="listitem">
+8fd2a75 HUE-5093 [metadata] Show context popover for tables and fields in the navigator search results
+</li><li class="listitem">
+ca28774 HUE-5085 [editor] Fix context popover for backticked identifiers
+</li><li class="listitem">
+09c22b7 HUE-5077 [metadata] Prefix filter and keep the potential facets
+</li><li class="listitem">
+37d3df9 HUE-5092 [editor] Column search just by type or name
+</li><li class="listitem">
+7578aec HUE-5091 [charts] Stabilize map chart
+</li><li class="listitem">
+3cfb2c4 HUE-5081 [home] Unify import JSON modals
+</li><li class="listitem">
+e8f7494 HUE-5086 [metastore] Fix create table JS error
+</li><li class="listitem">
+1c01549 HUE-5050 [core] Logout fails for local login when multiple backends are used
+</li><li class="listitem">
+4f2c76a HUE-4181 [hive] Parse Hive MR query row count and size from job counter data
+</li><li class="listitem">
+5de3f14 HUE-4969 [core] fixing Support hive.server2.thrift.sasl.qop="auth-conf"
+</li><li class="listitem">
+874d728 PR436 [hive] Multiple Hive sessions for Tez
+</li><li class="listitem">
+0625ad0 HUE-5078 [core] Omit irrelevant files and paths in coverage
+</li><li class="listitem">
+e6f1e2f HUE-4886 [impala] Fix live cluster tests for impala row count
+</li><li class="listitem">
+cf0b845 HUE-5077 [metadata] Provide more facets
+</li><li class="listitem">
+4a7dc796 HUE-5074 [chart] Timeline tooltip can make the graph flicker
+</li><li class="listitem">
+d946027 HUE-5082 [metadata] Add more facets to nav search
+</li><li class="listitem">
+4d1e075 HUE-5080 [editor] Fix JS error for SQL syntax error checker
+</li><li class="listitem">
+9836d44 HUE-5066 [editor] Move cursor between () when autocompleting a udf
+</li><li class="listitem">
+cdcd130 HUE-5079 [metadata] Show tag edit icon on hover
+</li><li class="listitem">
+a3b6090 HUE-5065 [oozie] Document select for a d&amp;d could guide the user more
+</li><li class="listitem">
+41c24be HUE-5070 [oozie] Disable start import button until a file is selected
+</li><li class="listitem">
+f321ea9 HUE-5061 [editor] Default alignment does not show the end of column input box and the clearable
+</li><li class="listitem">
+59a32fa HUE-5075 [core] Call get_absolute_url() only when document content object has the attribute
+</li><li class="listitem">
+11e0af5 HUE-4957 [metastore] Creating table from file can 500 on the delimiter page
+</li><li class="listitem">
+9ad5819 HUE-4886 [impala] Parse unabbreviated count for Impala returned rows
+</li><li class="listitem">
+cea2c58 HUE-5057 [metadata] Skeleton to have tags in read only mode
+</li><li class="listitem">
+b806127 HUE-5064 [metadata] Reopen the Navigator search autocomplete when facets are selected
+</li><li class="listitem">
+e0dccf5 HUE-5063 [metadata] Save tags when clicking outside the tag editor in edit mode
+</li><li class="listitem">
+f976ce3 HUE-5062 [metadata] Improve design of Navigator search results
+</li><li class="listitem">
+c4de3f9 HUE-5059 [metadata] Show Navigator search autocomplete on focus
+</li><li class="listitem">
+4d5b4a4 HUE-5057 [metadata] Add read-only option to the Navigator tag editor
+</li><li class="listitem">
+0bda037 HUE-4961 [editor] Bar/Line chart rendering issue when user tries toggling Columns icon
+</li><li class="listitem">
+38430bd HUE-5060 [editor] Chart X axis value is not selectable at times
+</li><li class="listitem">
+2f28242 HUE-5061 [editor] Default alignment does not show the end of column input box and the clearable
+</li><li class="listitem">
+1e991c6 HUE-5049 [editor] Introduce the timeline bar/line chart
+</li><li class="listitem">
+cbd4060 HUE-5058 [metastore] Skip test_read_partitions unless in live cluster mode
+</li><li class="listitem">
+7b5ac49 HUE-4886 [impala] Get resultset row count
+</li><li class="listitem">
+ed6f84d HUE-5057 [medata] Only show enrichment if the user has the permission
+</li><li class="listitem">
+63c57d8 HUE-4996 [editor] Nested types can not be extended in assist
+</li><li class="listitem">
+f08b421 HUE-5015 [core] Install examples get "column username is not unique" if "hue" user exists
+</li><li class="listitem">
+8cdc2aa HUE-4838 [editor] Add S3 browsing to the assist panel
+</li><li class="listitem">
+449b2f5 HUE-5056 [editor] Delay history and saved query search to when the user stop typing
+</li><li class="listitem">
+f9e3524 HUE-5051 [metadata] Remove empty facet values
+</li><li class="listitem">
+4dc99b7 HUE-5051 [metadata] Remove empty filters like <span class="emphasis"><em>tag:*</em></span>
+</li><li class="listitem">
+c8757da HUE-5051 [metadata] Add default source filters to autocomplete
+</li><li class="listitem">
+439a524 HUE-5051 [metadata] Facet autocomplete should apply previous query filters
+</li><li class="listitem">
+2156255 HUE-5055 [editor] The chart multiple Y columns are not always loaded back on page refresh
+</li><li class="listitem">
+59afb57 HUE-5054 [editor] MapChart binding is called at saved query page refresh
+</li><li class="listitem">
+a1e653c HUE-4839 [editor] Add my documents to the assist panel
+</li><li class="listitem">
+e32b11f HUE-5053 [home] Fix search icon overlap
+</li><li class="listitem">
+42e0662 HUE-5052 [home] Rename file browser to doc browser
+</li><li class="listitem">
+b92f8d4 HUE-5048 [frontend] Remove RequireJS dependencies
+</li><li class="listitem">
+0f04045 HUE-5048 [frontend] Remove RequireJS from jasmine tests
+</li><li class="listitem">
+a6bdead HUE-5048 [frontend] Remove RequireJS from home and wizards
+</li><li class="listitem">
+e540078 HUE-5048 [frontend] Remove RequireJS from the metastore
+</li><li class="listitem">
+f63e55d HUE-5048 [frontend] Remove RequireJS from the editor
+</li><li class="listitem">
+852c196 HUE-4388 [editor] Fix unit test TestDocument2.test_get_document
+</li><li class="listitem">
+098920e PR437 [fb] Use relative URLs to support gateway/reverse proxy
+</li><li class="listitem">
+a8e0df8 HUE-5040 [notebook] Keep the progress bar to 99% orange until the status of query is READY
+</li><li class="listitem">
+fe99a2e HUE-4987 [oozie] 500 error when listing bundles
+</li><li class="listitem">
+106cb30 HUE-5045 [core] Avoid showing jHueNotify messages if the content is empty
+</li><li class="listitem">
+b79e8ae HUE-3276 [assist] Load more HDFS entries on scroll to the end
+</li><li class="listitem">
+99061a3 HUE-5043 [core] Fix wrongly closed html and svg elements
+</li><li class="listitem">
+b51a7eb HUE-4680 [editor] Horizontal scroll on SQL result with touchpad very slow on FF
+</li><li class="listitem">
+6fad03e HUE-4995 [oozie] Provide Email notification option at workflow submission
+</li><li class="listitem">
+58edfc7 HUE-5026 [core] Warn in logs on startup if ldap_url contains "ldaps://" and use_start_tls = true
+</li><li class="listitem">
+13f09cd HUE-5041 [editor] Hue export large file to HDFS doesn’t work on non-default database.
+</li><li class="listitem">
+3313039 HUE-5000 [metastore] ALTER database properties API
+</li><li class="listitem">
+f3090ca HUE-4672 [metastore] Gracefully fail if the input file is invalid for an external table
+</li><li class="listitem">
+51bc876 HUE-5039 [charts] Remove   from the scatter chart legend
+</li><li class="listitem">
+dcb17f3 HUE-5035 [charts] Avoid double bar chart rendering on window resize
+</li><li class="listitem">
+992ef98 HUE-5038 [assist] Use the active assist tab for nav search
+</li><li class="listitem">
+50bf71c HUE-5037 [assist] Increase spacing between the action icons
+</li><li class="listitem">
+c72a8b1 HUE-5036 [editor] Improve tag editor UX
+</li><li class="listitem">
+dac2722 HUE-5032 [editor] Improve navigator search facet matching
+</li><li class="listitem">
+489af81 HUE-5033 [editor] Preselect Y-axis going back and forth of pivot bar charts
+</li><li class="listitem">
+636600f HUE-5031 [charts] Pivot bar chart colors should stay the same for the series
+</li><li class="listitem">
+20d1619 HUE-5029 [charts] Remove   from multiBar legend
+</li><li class="listitem">
+dd56ea0 HUE-4388 [editor] Warn when deleting document with dependents
+</li><li class="listitem">
+d77d9e8 HUE-4999 [impala] Set default Impala idle_session_timeout to 1 hour
+</li><li class="listitem">
+32b764f HUE-4997 [impala] get_partitions is not being closed
+</li><li class="listitem">
+2cd56f6 HUE-5024 [editor] Exporting results to HDFS or new table changes the editor type from Hive to SQL
+</li><li class="listitem">
+6c4d044 HUE-4998 [impala] get_configuration is not being closed
+</li><li class="listitem">
+1531376 HUE-5014 [core] Prevent copying a Document folder into itself which then creates a recursive depth issue
+</li><li class="listitem">
+83742c9 HUE-5009 [core] Make ignore unicode decode errors compatible with Python 2.6
+</li><li class="listitem">
+d0aacf6 HUE-5020 [editor] Improved facet and multi-word autocompletion in nav search
+</li><li class="listitem">
+4627a3b HUE-5019 [editor] Load pivot chart preferences on saved queries
+</li><li class="listitem">
+37f0b64 HUE-5013 [oozie] Avoid splitting draggable actions in two lines
+</li><li class="listitem">
+35d8638 HUE-5016 [charts] Skip negative values on Pie charts
+</li><li class="listitem">
+b445746 HUE-4012 [charts] Graph 3rd dimension in stacked bar charts
+</li><li class="listitem">
+b4531d8 HUE-5018 [editor] Fix context popover flex for IE
+</li><li class="listitem">
+33e4043 HUE-5017 [assist] Improve the nav search styling
+</li><li class="listitem">
+20867d9 HUE-5011 [editor] Use pure CSS instead of KO binding to fix empty assist popover
+</li><li class="listitem">
+64e31b7 HUE-4931 [fb] Fix parquet decoding error on debug log messages
+</li><li class="listitem">
+509bef5 HUE-5009 [core] Fix parquet-python version checking to be 2.6 compatible
+</li><li class="listitem">
+0f2fde4 HUE-5009 [core] Backport parquet-python Fix issues invoking struct methods. (#42)
+</li><li class="listitem">
+9ff637d HUE-5009 [core] Backport parquet-python Add support for converted_types to dict-encoding.
+</li><li class="listitem">
+8f73e6c HUE-5009 [core] Backport parquet-python Add support for nulls in PLAIN_DICTIONARY pages.
+</li><li class="listitem">
+f15a44b HUE-5009 [core] Backport parquet-python Fix converted types for plain encoding.
+</li><li class="listitem">
+e895374 HUE-5009 [core] Backport parquet-python Fixes errors reported by flake8 and pylint
+</li><li class="listitem">
+9cc9b8c HUE-5009 [core] Backport parquet-python Logs error when a fileobj isn’t in binary mode
+</li><li class="listitem">
+b3f6c2b HUE-5012 [assist] Switch inner search to filter
+</li><li class="listitem">
+9713b2f HUE-5010 [oozie] Automatically refresh workflow parameters in a coordinator
+</li><li class="listitem">
+900b8f9 HUE-3666 [core] Autocomplete plugin to select and filter from all the documents
+</li><li class="listitem">
+0e55a51 HUE-5011 [editor] Fix empty context popover in Safari
+</li><li class="listitem">
+f560e67 HUE-4082 [assist] Fix issue with blank assist
+</li><li class="listitem">
+6c2eeb6 HUE-5006 [assist] Only show the active filter in the editor
+</li><li class="listitem">
+7eb51f4 HUE-4986 [oozie] Allow parameters in workflow name
+</li><li class="listitem">
+da52675 HUE-4943 [fb] Error trace when trying to download files that are missing perms
+</li><li class="listitem">
+d978e80 HUE-4954 [editor] Add variable attribute in default snippets of notebook
+</li><li class="listitem">
+948caa6 HUE-4954 [oozie] Prevent js error when schedule model is not completely loaded
+</li><li class="listitem">
+9f59cff HUE-5007 [core] Get ride of bad utf8 character when doing make-locale
+</li><li class="listitem">
+5926dd2 HUE-5007 [core] Update localization for de, es, fr, ja, ko, zh
+</li><li class="listitem">
+7fe7172 HUE-4989 [oozie] Automatically get and set the SSL truststore path from ssl-client
+</li><li class="listitem">
+de007e2 HUE-4989 [oozie] Pickup SSL truststore path from ssl-client.xml
+</li><li class="listitem">
+3eab32f HUE-4979 [editor] Add column count on the context popover
+</li><li class="listitem">
+48d59cd HUE-4868 [oozie] S3 workflows links are wrong in the dashboard
+</li><li class="listitem">
+d196180 HUE-5001 [metastore] Improve the positioning of DB tags
+</li><li class="listitem">
+89f879a HUE-4954 [oozie] Be explicit when schedule changes need to be saved before starting
+</li><li class="listitem">
+28e3c0e HUE-4954 [editor] Refresh schedule parameters on save
+</li><li class="listitem">
+0c67608 HUE-4954 [oozie] Automatically pick up the variables from the notebook
+</li><li class="listitem">
+486f85b HUE-4954 [oozie] List workflow dashboard coming from a coordinator pointing to a document
+</li><li class="listitem">
+d140821 HUE-4954 [editor] Generate and submit the coordinator
+</li><li class="listitem">
+13f4e03 HUE-4954 [editor] Edit and save the coordinator
+</li><li class="listitem">
+fa9f923 HUE-4954 [editor] Load and save the managed coordinator
+</li><li class="listitem">
+7d63129 HUE-4954 [editor] Indent saving info requirement
+</li><li class="listitem">
+454a554 HUE-4917 [fb] S3 upload progress of large files is not consistent
+</li><li class="listitem">
+93267e7 HUE-4962 [editor] Sample popup should save its last size
+</li><li class="listitem">
+982d7cb HUE-5005 [assist] Add filter for showing only active editor tables
+</li><li class="listitem">
+8b558b9 HUE-5002 [editor] Improve nav tag edit mode layout
+</li><li class="listitem">
+8a8ba49 HUE-5003 [core] Prevent JS error on calling scroll to column on just initialized HueDataTables
+</li><li class="listitem">
+f033cc6 HUE-5004 [editor] i18n missing on popover titles
+</li><li class="listitem">
+85b9ab0 HUE-4994 [oozie] Consider default path for decision nodes in dashboard graph
+</li><li class="listitem">
+63427b6 HUE-4982 [editor] Initial styling of the nav autocomplete
+</li><li class="listitem">
+39aadcf HUE-4985 [editor] Query builder fix in new editor
+</li><li class="listitem">
+1467d54 HUE-4878 [editor] Click to select a row in query result grid is gone
+</li><li class="listitem">
+02d36c9 HUE-4988 [metastore] Fix js error related to tagging
+</li><li class="listitem">
+7c3683a HUE-4982 [editor] Use the nav api endpoint for search autocomplete
+</li><li class="listitem">
+c4a1e16 HUE-4953 [core] Scrolling past 100 records on the table hides the top left cell of the fixed header
+</li><li class="listitem">
+83a3b46 HUE-4983 [notebook] Notebook pages can list objects on two rows
+</li><li class="listitem">
+d231c3b HUE-4942 [metadata] Default set of objects for each panel of assist
+</li><li class="listitem">
+d89324f HUE-4982 [editor] Add skeleton for nav search autocomplete
+</li><li class="listitem">
+4b16a63 HUE-4830 [editor] Autocomplete shouldn’t suggest SORT BY after ORDER BY
+</li><li class="listitem">
+be0f01b HUE-4981 [editor] Add SQL parser support for NOT in front of RLIKE and REGEXP
+</li><li class="listitem">
+b2fc59f HUE-4979 [editor] Fix the context popover metastore and assist links
+</li><li class="listitem">
+fad5e60 HUE-4975 [fb] Keep end of breadcrumbs visible with longer paths
+</li><li class="listitem">
+57694f8 HUE-4980 [editor] Format queries with AS keyword fails
+</li><li class="listitem">
+126a764 HUE-4949 [editor] Add LIMIT 100 to drag &amp; drop table from assist
+</li><li class="listitem">
+c94f144 HUE-4942 [metadata] Support custom end user filters
+</li><li class="listitem">
+e23c0b6 HUE-4978 [editor] Make the parser aware of database locations
+</li><li class="listitem">
+ae8bc5b HUE-4977 [metastore] Promote querying the table in the editor
+</li><li class="listitem">
+b141170 HUE-4892 [editor] Support CTRL+enter in parameter inputs
+</li><li class="listitem">
+ed5f502 HUE-4974 [editor] Use the new tag component in the metastore
+</li><li class="listitem">
+fe99bc7 HUE-4970 [editor] Editor does not horizontally scroll on autocomplete with &lt;enter&gt;
+</li><li class="listitem">
+094d428 HUE-4971 [metadata] Support query filters as search terms
+</li><li class="listitem">
+be05dc8 HUE-4685 [editor] Loading a query has a big gutter which is smaller when you click it
+</li><li class="listitem">
+7b79f85 HUE-4817 [fb] Filter box in filechooser picker
+</li><li class="listitem">
+a1083f0 HUE-4968 [oozie] Remove access to /oozie/import_wokflow when v2 is enabled
+</li><li class="listitem">
+85da54d HUE-4811 [oozie] Remove link to sub-workflow dashboard from editor
+</li><li class="listitem">
+146c408 HUE-4966 [metadata] Tweak search result display a bit
+</li><li class="listitem">
+7e63d69 HUE-4966 [metadata] Removing spinning forever on search
+</li><li class="listitem">
+c584706 HUE-4966 [metadata] Introduce interactive facet API for autocomplete
+</li><li class="listitem">
+3545f02 HUE-4967 [editor] Add edit mode for navigator tags
+</li><li class="listitem">
+81c97be HUE-4845 [fb] Filechooser picker is not getting escape key
+</li><li class="listitem">
+d3d820b HUE-4964 [editor] Make it possible to edit tags in the context-popover
+</li><li class="listitem">
+68deb7d HUE-4879 [editor] Column sort does not filter out NULL
+</li><li class="listitem">
+1a12d53 HUE-4828 [fb] Reset search filter when opening a directory
+</li><li class="listitem">
+d1539b5 HUE-4905 [editor] Result filter bar does not have any blue on hover effect
+</li><li class="listitem">
+18cce08 HUE-4956 [metadata] Filter metadata not on the same cluster
+</li><li class="listitem">
+f934788 HUE-4955 [editor] Show navigator tags in the context-popover
+</li><li class="listitem">
+22b699b HUE-4813 [core] Disable collecting referrer URL in Google Analytics
+</li><li class="listitem">
+be851c5 HUE-4887 [editor] Query history syntax highlighter does not handle Chinese char properly
+</li><li class="listitem">
+8c2f72a HUE-4876 [assist] Drag &amp; Drop a table to the editor broken with FF
+</li><li class="listitem">
+6199813 HUE-4711 [impala] Error highlighting does not work with multiquery
+</li><li class="listitem">
+fa3264a HUE-4855 [notebook] Dynamically display if a query or notebook can be batched or scheduled
+</li><li class="listitem">
+c1d11ab HUE-4855 [notebook] Get a consistent notebook based on how the editor is open
+</li><li class="listitem">
+fb340ed HUE-4855 [notebook] Notebook or editor gets the list of all available snippets
+</li><li class="listitem">
+256e573 HUE-4855 [notebook] Offer batch submission only when all the snippets support it
+</li><li class="listitem">
+34139ca HUE-4952 [core] Top menu disappears completely below 800px
+</li><li class="listitem">
+4efcb8d HUE-4951 [assist] Scroll to column data in sample popup can be incorrect
+</li><li class="listitem">
+4f073c2 HUE-4890 [editor] Graph bars are not in the same order as the column legend
+</li><li class="listitem">
+990d721 HUE-4862 [editor] Add support for qualified identifiers to the context-aware popup
+</li><li class="listitem">
+593f134 HUE-4914 [assist] Remove odd scroll bar on column list of a table
+</li><li class="listitem">
+ed732f8 HUE-4946 [core] Remove source mapping from JS plugin files
+</li><li class="listitem">
+db47398 HUE-4942 [metadata] Proof that we can have a different search by assist
+</li><li class="listitem">
+978df98 HUE-4942 [metadata] Display views properly and limit results to 25 to speed up
+</li><li class="listitem">
+ba035ab HUE-4942 [metadata] Update logic of to make the search input really clearable
+</li><li class="listitem">
+71ee364 HUE-4942 [metadata] Restrict search by default to tables and views only
+</li><li class="listitem">
+4a745cd HUE-4940 [editor] See which charts are used the most
+</li><li class="listitem">
+7b70fce HUE-4941 [editor] fixed Content Security Policy directive blocks an image when navigating on marker map
+</li><li class="listitem">
+5c7f7ca HUE-4937 [core] Set audit_event_log_dir and audit_max_log_file_size config values from Navigator conf if found
+</li><li class="listitem">
+2b0f991 HUE-4938 [editor] Fix issue where the map crashes the browser for large coordinate values
+</li><li class="listitem">
+0019319 HUE-4921 [oozie] Workflow dashboard page should not fail when properties have unicode characters
+</li><li class="listitem">
+6e91f19 HUE-4935 [aws] Enable support for AWS security token
+</li><li class="listitem">
+81472af HUE-4932 [metadata] Adding several test to list_tags and suggest
+</li><li class="listitem">
+a1bcf4d HUE-4932 [metadata] Adding API to suggest
+</li><li class="listitem">
+dd34d2d HUE-4932 [metadata] Add list_tags to the metadata API
+</li><li class="listitem">
+6ebfa46 HUE-4933 [editor] Fix issue with missing sample in pinned context
+</li><li class="listitem">
+da9579a HUE-4912 [editor] Add fixed first column to samples in context-popover
+</li><li class="listitem">
+13fec9e HUE-4930 [core] Fix clearing cookie option in HttpClient
+</li><li class="listitem">
+1248c19 HUE-4916 [core] Truncate last name to 30 chars on ldap import
+</li><li class="listitem">
+a74bf7e HUE-4928 [oozie] New Spark action can’t be added in workflows
+</li><li class="listitem">
+2e10e7e HUE-4910 [editor] Fix issue where headers become scrambled after viewing the graph
+</li><li class="listitem">
+41b4fdb HUE-4910 [editor] Fix header positioning for the samples table in the new context popover
+</li><li class="listitem">
+2a2ffa0 HUE-4910 [editor] Fix header issues when selecting columns
+</li><li class="listitem">
+98a388d HUE-4726 [core] Default buffered file stream to 128 MB chunks
+</li><li class="listitem">
+858bbf8 HUE-4726 [fb] Add test and sample file to read parquet snappy file
+</li><li class="listitem">
+26866c5 HUE-4726 [core] Fix struct.unpack error for Python 2.6
+</li><li class="listitem">
+d6437f9 HUE-4726 [core] Display exceptions in logs when reading file formats
+</li><li class="listitem">
+8690c1a HUE-4726 [core] Import OrderedDict from compatible module for Python 2.6
+</li><li class="listitem">
+1d414c3 HUE-4726 [core] Update parquet-python to use Python 2.6 compatible dict comprehension
+</li><li class="listitem">
+b4aac26 HUE-4726 [core] Upgrade parquet-python to 1.1 and include dependencies and backports
+</li><li class="listitem">
+4bc6b89 HUE-4898 [core] Exporting documents should generate a filename with date and num docs
+</li><li class="listitem">
+cfe4934 HUE-4910 [editor] Use the new table extender plugin for samples in the context pop-over
+</li><li class="listitem">
+eebb265 HUE-4910 [editor] Improved performance of fixed result headers
+</li><li class="listitem">
+b52bb14 HUE-4885 [editor] Silently hide the known non support operations from erroring out
+</li><li class="listitem">
+2bfe4f7 HUE-4761 [spark] Little clean-up on indentation and logging warnings info
+</li><li class="listitem">
+f99483e HUE-4761 [spark] Make sure dict properties values are proper List types
+</li><li class="listitem">
+14c7d0b HUE-4871 [useradmin] an unprivileged user can enumerate users
+</li><li class="listitem">
+da45f7e HUE-4891 [useradmin] an unprivileged user can list document items
+</li><li class="listitem">
+61e1912 HUE-4910 [editor] Increase performance of fixed result headers
+</li><li class="listitem">
+0e57b8b HUE-4910 [editor] Fix result header widths and improve Firefox scroll performance
+</li><li class="listitem">
+e82a383 HUE-4904 [editor] Bump name length of saved query
+</li><li class="listitem">
+13f2cc5 HUE-4885 [editor] Integrate result row count when available
+</li><li class="listitem">
+7081ed8 HUE-4896 [home] Add deletion confirmation on the home page
+</li><li class="listitem">
+4bce992 HUE-4815 [editor] Properly handle unicode characters in log output
+</li><li class="listitem">
+dc22578 HUE-4884 [editor] Make the context-popover pinnable
+</li><li class="listitem">
+ffdae14 HUE-4833 [editor] Adjust context-popover position when close to window limits
+</li><li class="listitem">
+0ec3494 HUE-4833 [editor] Drop the old table stats popover
+</li><li class="listitem">
+2bbf758 HUE-4833 [editor] Use the new SQL context-popover in assist and metastore
+</li><li class="listitem">
+537c6c8 HUE-1176 [jb] Add templates to the frontend
+</li><li class="listitem">
+39296fd HUE-4872 [useradmin] Fixing Hue silently fails auth for ldap backend if "Create LDAP users on login" is false
+</li><li class="listitem">
+d1890bc HUE-4848 [editor] Context popup column search does not filter on column types
+</li><li class="listitem">
+6c3b9cd HUE-4860 [editor] Update test to have the name of the exported query
+</li><li class="listitem">
+6a2bdf9 HUE-4834 [editor] Make the context-aware popover resizable
+</li><li class="listitem">
+3254ace HUE-4875 [editor] Make cancel query more obvious
+</li><li class="listitem">
+7003811 HUE-4867 [metadata] Clicking on browse table show the generic SQL icon
+</li><li class="listitem">
+fde7f5c HUE-1176 [jb] Split up the APIs in dedicated modules
+</li><li class="listitem">
+5380a14 HUE-4869 [editor] Fix typo in the name of the spark SQL snippet
+</li><li class="listitem">
+af717fb HUE-4798 [oozie] HDFS FS tip should be updated since we integrated with S3 as well
+</li><li class="listitem">
+e5b6374 HUE-4864 [notebook] Crashes when jobbrowser is blacklisted
+</li><li class="listitem">
+9b3062d HUE-4860 [editor] Exporting saved query result without a name should use query name
+</li><li class="listitem">
+9e3260a HUE-4861 [indexer] Fix end to end tests and skip them until the libs are automatically setup
+</li><li class="listitem">
+ad501b5 HUE-4835 [editor] Show partitions in the context-aware popover
+</li><li class="listitem">
+5fbdee7 HUE-4857 [editor] Columns are not highlighted when there are multiple tables
+</li><li class="listitem">
+bedc719 HUE-4631 [home] DB transaction failing because of atomic block on home page
+</li><li class="listitem">
+3d777a9 HUE-4057 Fix i18n in delete confirmation popup
+</li><li class="listitem">
+fe5771c HUE-4859 [editor] Add a config flag to enable the extended assist panel and the right context panel
+</li><li class="listitem">
+115b443 HUE-4837 [editor] Add HDFS browsing to the assist panel
+</li><li class="listitem">
+dcc4f48 HUE-4850 [editor] Fix js error when moving cursor over empty editor
+</li><li class="listitem">
+927aa37 HUE-4856 [core] Allow beeswax_install_examples to accept optional DB name
+</li><li class="listitem">
+76cea3e HUE-4853 [metastore] Browse and open in editor are duplicates
+</li><li class="listitem">
+9b66b98 HUE-4823 [fb] Display exception when Hue is configured with invalid S3 access key
+</li><li class="listitem">
+cdb3144 HUE-4822 [editor] Only run HS2 fetch_result_size tests in live-cluster mode
+</li><li class="listitem">
+5465bbd HUE-4057 [home] Show list of files in confirmation popup when sending files to the trash
+</li><li class="listitem">
+d55627c HUE-4824 [fb] Return graceful error message on failure to open a certain bucket
+</li><li class="listitem">
+fdebc1b HUE-4846 [editor] Export to a file should provide a default name
+</li><li class="listitem">
+78f6562 HUE-4825 [fb] Filechooser view should return buckets in alphabetical order
+</li><li class="listitem">
+6c4c214 HUE-4827 [fb] Pointing to a wrong S3 region breaks with no information
+</li><li class="listitem">
+48a8b61 HUE-4822 [editor] Provide live-cluster test harness for HS2 editor tests
+</li><li class="listitem">
+8d01584 PR-424 [search] Correct check for undefined variable
+</li><li class="listitem">
+4a05026 HUE-2854 [metastore] Delete databases with tables
+</li><li class="listitem">
+b0fec96 HUE-4035 [editor] Add column search to context popover
+</li><li class="listitem">
+d177852 HUE-4832 [editor] Show tooltip when hovering over context popover tokens
+</li><li class="listitem">
+c6ed6da HUE-3226 [oozie] Allow to Drag &amp; Dropped a saved MapReduce job into a workflow
+</li><li class="listitem">
+08e8e73 HUE-3226 [connector] MR snippet
+</li><li class="listitem">
+0bec844 HUE-4750 [oozie] Drag &amp; dropped a saved Shell query
+</li><li class="listitem">
+6d524fb HUE-4750 [connector] Shell snippet
+</li><li class="listitem">
+de230fb HUE-4814 [oozie] XML escape variable names in editor submissions
+</li><li class="listitem">
+0185665 HUE-4809 [hive] Add trustore parameters only if SSL is turned on
+</li><li class="listitem">
+4d6e893 HUE-4821 [oozie] Support arguments in Hive2 workflow action
+</li><li class="listitem">
+ea3813e HUE-4816 [oozie] Execute from Filebrowser fails with execute permission
+</li><li class="listitem">
+75ac0b6 HUE-4831 [editor] Refactor HS2 tests with Hadoop
+</li><li class="listitem">
+81b57d0 HUE-4810 [core] Fix tests by setting data to valid JSON type
+</li><li class="listitem">
+cfbd74d HUE-4785 [editor] Favour continuous partial matches in the autocomplete results
+</li><li class="listitem">
+37458d3 HUE-4789 [editor] Add autocompletion of values when the cursor is inside quoted values
+</li><li class="listitem">
+0e9e25e HUE-1176 [jb] Load info of single job when selecting it from the list
+</li><li class="listitem">
+04413de HUE-4797 [oozie] Drag &amp; Drop a DistCp script as an action
+</li><li class="listitem">
+aac4a0d HUE-4797 [connector] DistCp snippet
+</li><li class="listitem">
+9ef4bb7 HUE-4809 [oozie] Only add trustore paths when they are actually existing
+</li><li class="listitem">
+0662519 HUE-4801 [oozie] When importing oozie documents and remapping UUIDs, data should be updated accordingly
+</li><li class="listitem">
+1994066 HUE-4814 [oozie] fixing oozie job submitter should escape XML params
+</li><li class="listitem">
+8c468a5 Removed Ctrl-E keybinding (editor.create.new) on macOS (#420)
+</li><li class="listitem">
+bcdfc28 HUE-2689 [oozie] Sub-workflow submitted from coordinator gets parent workflow graph
+</li><li class="listitem">
+05d157e HUE-4808 [oozie] Don’t show the edit link for sub workflows when submitted outside Hue
+</li><li class="listitem">
+91a8e76 HUE-4703 [yarn] fixing alternatively Correct username is not used on hard failover
+</li><li class="listitem">
+b93b883 HUE-4035 [editor] Introduce the details tab in the smart context popover
+</li><li class="listitem">
+34da3e3 HUE-4805 [search] HTML widget preview update does not happen automatically
+</li><li class="listitem">
+0c683c4 HUE-4804 [search] Download function of HTML widget breaks the display
+</li><li class="listitem">
+576b861 HUE-4801 [core] Do not hide the username in small resolutions
+</li><li class="listitem">
+7e2d25f HUE-1176 [jb] Adding Batches and Schedules based on Oozie
+</li><li class="listitem">
+99c5e95 HUE-1176 [jb] Skeleton of Revamp v2
+</li><li class="listitem">
+cb8264a HUE-4706 [core] Importing documents should ignore reserved directories (home and trash)
+</li><li class="listitem">
+f7eded5 HUE-4181 [hive] API to provide result set row count and data size
+</li><li class="listitem">
+4aa411b HUE-4778 [backend] Fixing the utils.http.is_safe_url function in Django does not properly validate URLs
+</li><li class="listitem">
+90f3063 HUE-4777 [backend] Fixing The utils.html.strip_tags function in Django can cause a denial of service
+</li><li class="listitem">
+d593f7e HUE-4770 [backend] Fixing Avoided creating a session record when loading the session.
+</li><li class="listitem">
+59861a1 HUE-3878 [oozie] Drag &amp; Dropped a saved Sqoop1 snippet
+</li><li class="listitem">
+17fb361 HUE-3878 [editor] Sqoop DB import snippet
+</li><li class="listitem">
+28e53bc HUE-4787 [editor] Fixing Marker map tiles are not showing up
+</li><li class="listitem">
+75279c2 HUE-4781 [notebook] Fix export to hdfs to use download_cell_limit from beeswax.conf
+</li><li class="listitem">
+673f795 HUE-4793 [editor] The context-aware popover should show column sample and analysis
+</li><li class="listitem">
+2c29fa6 HUE-4791 [editor] Add function description to the context popover
+</li><li class="listitem">
+6b9f823 HUE-4792 [editor] Add autocompleter support for Hive array, binary and map UDFs
+</li><li class="listitem">
+b059cec HUE-4701 [editor] Older saved queries throw "<span class="emphasis"><em>NoneType</em></span> object has no attribute <span class="emphasis"><em>update_data</em></span>"
+</li><li class="listitem">
+84b00c4 HUE-4338 [editor] API to provide result set row count and data size
+</li><li class="listitem">
+dde3211 HUE-4032 [editor] Show table sample and analysis for tables in the editor
+</li><li class="listitem">
+b4069b9 HUE-4032 [editor] Only mark the column location in schema qualified references
+</li><li class="listitem">
+6037913 HUE-4032 [editor] Skeleton for context aware popover
+</li><li class="listitem">
+803532e HUE-4032 [editor] Check for locations on load
+</li><li class="listitem">
+fcd3a43 HUE-4773 [editor] Autocompleter spins forever when completing subqueries containing asterisk
+</li><li class="listitem">
+1dc7527 HUE-4771 [editor] Use parser locations for click to open tables in the metastore
+</li><li class="listitem">
+8d99b90 HUE-4765 [security] Fixing http_client should use SSL_CIPHER_LIST from conf
+</li><li class="listitem">
+6f6e43f HUE-4769 [editor] The autocompleter should support INSERT OVERWRITE DIRECTORY
+</li><li class="listitem">
+4015db9 HUE-4768 [editor] Autocomplete is being called multiple times when the cursor is on top of <span class="emphasis"><em>*</em></span> in a select statement
+</li><li class="listitem">
+4aaa92e HUE-4767 [editor] Limit the autocompleter length before and after the cursor
+</li><li class="listitem">
+d5860da HUE-4766 [core] Replace illegal characters on CSV downloads
+</li><li class="listitem">
+256a408 Fixing HUE-4703 [yarn] Correct username is not used on hard failover
+</li><li class="listitem">
+5e46c12 HUE-4738 [oozie] Use Concurrency and Throttle values set in coordinator settings
+</li><li class="listitem">
+6aa2c00 HUE-4764 [metastore] Show an indication when the partition limit is reached
+</li><li class="listitem">
+1c368b2 HUE-4763 [editor] Update the editor keyword highlight rules for Hive and Impala
+</li><li class="listitem">
+5145007 HUE-4319 [editor] Add Impala refresh dialog to assist DB list view
+</li><li class="listitem">
+23a12a8 HUE-4640 [editor] Fix for DB prefix autcomplete when typing table names after "? FROM db."
+</li><li class="listitem">
+0654ecf HUE-4760 [core] Fix error with indexer config when search is disabled
+</li><li class="listitem">
+f5e72fd HUE-4759 [editor] Don’t suggest tables in the select list when there is a FROM clause
+</li><li class="listitem">
+d553763 HUE-4525 [beeswax] Correctly parse Tez jobs and add functionality to test multiple execution engines
+</li><li class="listitem">
+8208bb3 HUE-4758 [editor] The autocompleter should suggest keywords at the start of a statement
+</li><li class="listitem">
+195cd49 PR369 [jdbc] Use CLASSPATH value for creating JavaGateway and load JDBC driver class
+</li><li class="listitem">
+af6d1ef HUE-4755 [doc2] Add is_trashed property to Document2
+</li><li class="listitem">
+d55d1fc HUE-4747 [editor] Improve the UX of download form submission
+</li><li class="listitem">
+40b40e1 HUE-4754 [editor] Increase default autocompleter API timeout to 5 seconds
+</li><li class="listitem">
+8d55bae HUE-4753 [editor] The autocompleter doesn’t merge columns correctly
+</li><li class="listitem">
+dd83439 HUE-4751 [oozie] Drag &amp; Drop saved Pig script into a workflow
+</li><li class="listitem">
+d5a511f HUE-3224 [connector] Convert Pig connector to offer a new Pig snippet
+</li><li class="listitem">
+1fa14f6 HUE-4689 [fb] D&amp;D a file into a directory in S3 gets <span class="emphasis"><em>RenameFormFormSet</em></span> object has no attribute <span class="emphasis"><em>data</em></span>
+</li><li class="listitem">
+9e38ad8 HUE-4730 [fb] Notify about failing file upload in file chooser
+</li><li class="listitem">
+3be53cd HUE-4670 [metastore] Allow headers to be ignored/removed when creating external table
+</li><li class="listitem">
+b44a671 HUE-4747 [editor] Download form should be submitted to a new tab otherwise the snippet gets closed
+</li><li class="listitem">
+fdc395f HUE-4739 [jobbrowser] fixed Jobbrowser tests which were failing after resource manager pool change
+</li><li class="listitem">
+a2b0c25 HUE-4584 [editor] The new autocompleter should support DELETE
+</li><li class="listitem">
+98c0722 HUE-4734 [editor] Autocompleter should trigger after <span class="emphasis"><em>.</em></span> when autocomplete as you type is enabled
+</li><li class="listitem">
+704ac40 HUE-4588 [editor] The new autocompleter should support SET
+</li><li class="listitem">
+06b3d06 HUE-4589 [editor] The new autocompleter should completely support COMPUTE and DROP STATS
+</li><li class="listitem">
+f593861 HUE-4590 [editor] The new autocompleter should support INVALIDATE METADATA
+</li><li class="listitem">
+8f311f7 HUE-4591 [editor] The new autocompleter should support REFRESH
+</li><li class="listitem">
+4f19b85 HUE-4732 [editor] Autocomplete should work inside parenthesized value expressions
+</li><li class="listitem">
+93e3b1f HUE-4733 [editor] Autocompleter doesn’t support arithmetic operations in in value list
+</li><li class="listitem">
+47592a6 HUE-4742 [core] Data sample popup HueDataTable renders weirdly on FF
+</li><li class="listitem">
+03e85be HUE-4713 [oozie] Properly escape the quotes in the example json fixture
+</li><li class="listitem">
+c98fff1 HUE-4675 [metastore] Assist not loaded and pointing to the source on the create table from a file page
+</li><li class="listitem">
+296a545 HUE-4633 [notebook] Disable by default Oozie integration until 3.12
+</li><li class="listitem">
+bd23fd0 HUE-4736 [editor] The autocompleter throws JS error
+</li><li class="listitem">
+c2e65f2 HUE-4735 [editor] The autocompleter should also suggest tables with <span class="emphasis"><em>.</em></span> when suggesting columns from multiple tables
+</li><li class="listitem">
+e73356f PR415 [liboauth] Fix several bugs in <code class="literal">get_redirect_uri</code> method and related calls
+</li><li class="listitem">
+9abfa7a HUE-4727 [fb] Fix WebHDFS upload tests
+</li><li class="listitem">
+10e36d7 HUE-4727 [fb] Raise warning if CHECKACCESS is not supported
+</li><li class="listitem">
+bb1e66c HUE-4737 [fb] Creating a bucket errors with [Errno 22] Bad Request
+</li><li class="listitem">
+c282a18 HUE-4737 [core] Manually re-apply HUE-4403
+</li><li class="listitem">
+9d8d8f9 HUE-4737 [core] Re-apply HUE-2943
+</li><li class="listitem">
+7c63c63 HUE-4737 [core] Upgrade boto to 2.42.0
+</li><li class="listitem">
+c182527 HUE-4415 [editor] Disable "Save" button in query export unless output is filled
+</li><li class="listitem">
+6e508da HUE-4344 [fb] Buffer reading parquet file and limit in size
+</li><li class="listitem">
+49aa1cd HUE-4725 [editor] The autocompleter should handle Impala complex types in the table list
+</li><li class="listitem">
+931077d HUE-4686 [fb] Bubble up error when trying to create directory in / in filechooser
+</li><li class="listitem">
+b304dd7 HUE-4724 [editor] Closing the table search should un-highlight the selected cell
+</li><li class="listitem">
+343ede3 HUE-4709 [editor] Search does not load cells when navigating
+</li><li class="listitem">
+4e94222 HUE-4720 [oozie] Drag &amp; Drop saved Spark app into a workflow
+</li><li class="listitem">
+1557034 HUE-4706 [core] Importing documents should ignore reserved directories (home and trash)
+</li><li class="listitem">
+27ad0c1 HUE-4708 [aws] Add test_rename for directory rename in S3
+</li><li class="listitem">
+f3eab39 HUE-4707 [aws] Enable non-US region support for AWS S3
+</li><li class="listitem">
+61f0c4c HUE-4247 [batch] Support for batch pyspark or spark
+</li><li class="listitem">
+4a19fc6 HUE-4719 [editor] Search disappears on load of new records
+</li><li class="listitem">
+97ecc59 HUE-2645 [oozie] More intuitive adding of a PySpark action
+</li><li class="listitem">
+9101f97 HUE-2645 [oozie] Move Spark option list to the main panel
+</li><li class="listitem">
+ecc87f8 HUE-2645 [oozie] Better Spark action UX
+</li><li class="listitem">
+e8a4147 HUE-4713 [oozie] Spark example should use yarn client mode and show how to add dependencies
+</li><li class="listitem">
+0a15297 HUE-4688 [editor] Generify references to HDFS when exporting query result to a file
+</li><li class="listitem">
+1e15595 HUE-4718 [core] jHueScrollUp pollutes the DOM with more than one scroll up anchor
+</li><li class="listitem">
+825b13c HUE-4683 [editor] Improve tooltip rendering of export results question mark
+</li><li class="listitem">
+1c2ea32 HUE-4683 [editor] Export result question mark icon does nothing
+</li><li class="listitem">
+0f414d2 HUE-4705 [editor] Possible XSS when hovering on saved query description
+</li><li class="listitem">
+f6a3f88 HUE-4688 [metastore] Authorize the selection of a directory in the create table from a file wizard
+</li><li class="listitem">
+f4bc5f8 HUE-4704 [security] Fixed Arbitrary host header accepted in Hue
+</li><li class="listitem">
+32845e1 HUE-4700 [beeswax] Protect against setting XSS in old editor
+</li><li class="listitem">
+3869ba9 HUE-4699 [editor] Autocompleter fix for decimal values
+</li><li class="listitem">
+a0c5034 HUE-4579 [editor] The new autocompleter should support Impala INSERT statements
+</li><li class="listitem">
+f006dfa HUE-4678 [editor] The label on marker maps is not updated to reflect what you choose on the left side dropdown
+</li><li class="listitem">
+955280d HUE-4682 [editor] Scroll to a col, reexec the query, the greyed column is still there
+</li><li class="listitem">
+83ff7e7 HUE-4696 [editor] JS .top error on certain reload/execute combos
+</li><li class="listitem">
+d44e9b7 HUE-4667 [editor] Geo plotting of states is case sensitive
+</li><li class="listitem">
+29eca42 HUE-4697 [editor] The autocompleter should suggest select list aliases
+</li><li class="listitem">
+b60ffd2 HUE-4665 [editor] Autocompletion of lateral views should not have parenthesis around the column aliases
+</li><li class="listitem">
+d3ee7b7 HUE-4684 [editor] No placeholder showing up in new editors
+</li><li class="listitem">
+328ebfb HUE-4691 [fb] S3 D&amp;D is allowed after a page refresh but not after opening a directory
+</li><li class="listitem">
+8637c0d HUE-4676 [editor] Table header is not XSS safe
+</li><li class="listitem">
+86da957 HUE-4673 [fb] S3 bucket names should automatically lowercase them
+</li><li class="listitem">
+2958743 HUE-4671 [fb] S3 create bucket should allow underscores in name
+</li><li class="listitem">
+ae8fb4c HUE-4373 [home] Exporting / Importing queries should handle associated workflows and coordinator
+</li><li class="listitem">
+0f52f8a HUE-4668 [fb] S3 rename directory raises IOError
+</li><li class="listitem">
+f00d088 HUE-4498 [security] Fixed Content Security Policy blocks PDF in HBase app
+</li><li class="listitem">
+bc0dbe7 HUE-4541 [security] fixing Hue job browser - Kerberos mutual authentication error in Hue
+</li><li class="listitem">
+f0793b8 HUE-4666 [search] Use the actual Hue user for impersonating in non secure mode
+</li><li class="listitem">
+ef634ca HUE-4661 [core] Demo backend should keep the admin user logged in
+</li><li class="listitem">
+ff96d1f HUE-4605 [fb] Move and copy in S3 have the HDFS path autocompleters in the popup
+</li><li class="listitem">
+a496a4c HUE-4660 [editor] Ace autocomplete spinner disappears too quick
+</li><li class="listitem">
+a686005 HUE-4659 [editor] Fix an issue with column merging of more than 2 tables
+</li><li class="listitem">
+665c275 HUE-4662 [security] fixing Hue - Wildcard Certificates not supported
+</li><li class="listitem">
+8dcdb14 HUE-4658 [core] Bump version to 3.11
+</li><li class="listitem">
+735c16e HUE-4658 [doc] Update release 3.11
+</li></ul></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_contributors"></a>4. Contributors</h2></div></div></div><p>This Hue release is made possible thanks to the contribution from:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Aaron Newton
+</li><li class="listitem">
+Aaron Peddle
+</li><li class="listitem">
+Aaron T. Myers
+</li><li class="listitem">
+abec
+</li><li class="listitem">
+Abraham Elmahrek
+</li><li class="listitem">
+Aditya Acharya
+</li><li class="listitem">
+airokey
+</li><li class="listitem">
+Alex Breshears
+</li><li class="listitem">
+Alex Newman
+</li><li class="listitem">
+Alex (posi) Newman
+</li><li class="listitem">
+alheio
+</li><li class="listitem">
+alphaskade
+</li><li class="listitem">
+Ambreen Kazi
+</li><li class="listitem">
+Amit Kabra
+</li><li class="listitem">
+Andrei Savu
+</li><li class="listitem">
+Andrew Bayer
+</li><li class="listitem">
+Andrew Yao
+</li><li class="listitem">
+Andy Braslavskiy
+</li><li class="listitem">
+Ann McCown
+</li><li class="listitem">
+antbell
+</li><li class="listitem">
+Antonio Bellezza
+</li><li class="listitem">
+arahuja
+</li><li class="listitem">
+Ashu Pachauri
+</li><li class="listitem">
+atupal
+</li><li class="listitem">
+Atupal
+</li><li class="listitem">
+Avindra Goolcharan
+</li><li class="listitem">
+bcwalrus
+</li><li class="listitem">
+bc Wong
+</li><li class="listitem">
+Ben Bishop
+</li><li class="listitem">
+Ben Gooley
+</li><li class="listitem">
+Ben White
+</li><li class="listitem">
+Bhargava Kalathuru
+</li><li class="listitem">
+Bruce Mitchener
+</li><li class="listitem">
+Bruno Mahé
+</li><li class="listitem">
+bwang
+</li><li class="listitem">
+Chris Conner
+</li><li class="listitem">
+Chris Stephens
+</li><li class="listitem">
+Christopher Conner
+</li><li class="listitem">
+Christopher McConnell
+</li><li class="listitem">
+Christopherwq Conner
+</li><li class="listitem">
+cmconner156
+</li><li class="listitem">
+Craig Minihan
+</li><li class="listitem">
+cwalet
+</li><li class="listitem">
+Daehan Kim
+</li><li class="listitem">
+dbeech
+</li><li class="listitem">
+Derek Chen-Becker
+</li><li class="listitem">
+Diego Sevilla Ruiz
+</li><li class="listitem">
+Dominik Gehl
+</li><li class="listitem">
+Eli Collins
+</li><li class="listitem">
+Enrico Berti
+</li><li class="listitem">
+Erick Tryzelaar
+</li><li class="listitem">
+Ewan Higgs
+</li><li class="listitem">
+fatherfox
+</li><li class="listitem">
+gdgt
+</li><li class="listitem">
+Gilad Wolff
+</li><li class="listitem">
+grundprinzip
+</li><li class="listitem">
+Guido Serra
+</li><li class="listitem">
+happywind
+</li><li class="listitem">
+Harsh
+</li><li class="listitem">
+Harsh J
+</li><li class="listitem">
+Henry Robinson
+</li><li class="listitem">
+Igor Wiedler
+</li><li class="listitem">
+Ilkka Turunen
+</li><li class="listitem">
+Istvan
+</li><li class="listitem">
+Ivan Orlov
+</li><li class="listitem">
+Jack McCracken
+</li><li class="listitem">
+Jaguar Xiong
+</li><li class="listitem">
+Jakub Kukul
+</li><li class="listitem">
+Jarcek
+</li><li class="listitem">
+Jarek Jarcec Cecho
+</li><li class="listitem">
+jeff.melching
+</li><li class="listitem">
+Jenkins
+</li><li class="listitem">
+Jenkins slave
+</li><li class="listitem">
+Jenny Kim
+</li><li class="listitem">
+Joe Crobak
+</li><li class="listitem">
+Joey Echeverria
+</li><li class="listitem">
+Johan Ahlen
+</li><li class="listitem">
+Johan Åhlén
+</li><li class="listitem">
+Jon Natkins
+</li><li class="listitem">
+Josh Walters
+</li><li class="listitem">
+Karissa McKelvey
+</li><li class="listitem">
+Kevin Wang
+</li><li class="listitem">
+Kostas Sakellis
+</li><li class="listitem">
+krish
+</li><li class="listitem">
+Lars Francke
+</li><li class="listitem">
+Li Jiahong
+</li><li class="listitem">
+linchan-ms
+</li><li class="listitem">
+Linden Hillenbrand
+</li><li class="listitem">
+Luca Natali
+</li><li class="listitem">
+Luke Carmichael
+</li><li class="listitem">
+lvziling
+</li><li class="listitem">
+Marcus McLaughlin
+</li><li class="listitem">
+Mariusz Strzelecki
+</li><li class="listitem">
+Mathias Rangel Wulff
+</li><li class="listitem">
+Matías Javier Rossi
+</li><li class="listitem">
+Michael Prim
+</li><li class="listitem">
+Michal Ferlinski
+</li><li class="listitem">
+Michalis Kongtongk
+</li><li class="listitem">
+Mobin Ranjbar
+</li><li class="listitem">
+motta
+</li><li class="listitem">
+mrmrs
+</li><li class="listitem">
+Nicolas Fouché
+</li><li class="listitem">
+NikolayZhebet
+</li><li class="listitem">
+Olaf Flebbe
+</li><li class="listitem">
+Oren Mazor
+</li><li class="listitem">
+oxpa
+</li><li class="listitem">
+Pala M Muthaia Chettiar
+</li><li class="listitem">
+Patricia Sz
+</li><li class="listitem">
+Patrycja Szabłowska
+</li><li class="listitem">
+pat white
+</li><li class="listitem">
+Paul Battaglia
+</li><li class="listitem">
+Paul McCaughtry
+</li><li class="listitem">
+peddle
+</li><li class="listitem">
+Peter Slawski
+</li><li class="listitem">
+Philip Zeyliger
+</li><li class="listitem">
+Piotr Ackermann
+</li><li class="listitem">
+Prakash Ranade
+</li><li class="listitem">
+Prasad Mujumdar
+</li><li class="listitem">
+Qi Xiao
+</li><li class="listitem">
+rainysia
+</li><li class="listitem">
+raphi
+</li><li class="listitem">
+Renxia Wang
+</li><li class="listitem">
+Rick Bernotas
+</li><li class="listitem">
+Ricky Saltzer
+</li><li class="listitem">
+robrotheram
+</li><li class="listitem">
+Romain Rigaux
+</li><li class="listitem">
+Roman Shaposhnik
+</li><li class="listitem">
+Rui Pereira
+</li><li class="listitem">
+Sai Chirravuri
+</li><li class="listitem">
+Scott Kahler
+</li><li class="listitem">
+Sean Mackrory
+</li><li class="listitem">
+Shahab Tajik
+</li><li class="listitem">
+Shawn Van Ittersum
+</li><li class="listitem">
+shobull
+</li><li class="listitem">
+Shrijeet
+</li><li class="listitem">
+Shrijeet Paliwal
+</li><li class="listitem">
+Shuo Diao
+</li><li class="listitem">
+Siddhartha Sahu
+</li><li class="listitem">
+Simon Beale
+</li><li class="listitem">
+Simon Whittaker
+</li><li class="listitem">
+sky4star
+</li><li class="listitem">
+spaztic1215
+</li><li class="listitem">
+Stefano Palazzo
+</li><li class="listitem">
+Stephanie Bodoff
+</li><li class="listitem">
+Suhas Satish
+</li><li class="listitem">
+TAKLON STEPHEN WU
+</li><li class="listitem">
+Tatsuo Kawasaki
+</li><li class="listitem">
+thinker0
+</li><li class="listitem">
+Thomas Aylott
+</li><li class="listitem">
+Thomas Poepping
+</li><li class="listitem">
+Tianjin Gu
+</li><li class="listitem">
+todaychi
+</li><li class="listitem">
+Todd Lipcon
+</li><li class="listitem">
+Tom Mulder
+</li><li class="listitem">
+Vadim Markovtsev
+</li><li class="listitem">
+van Orlov
+</li><li class="listitem">
+vinithra
+</li><li class="listitem">
+voyageth
+</li><li class="listitem">
+vybs
+</li><li class="listitem">
+Wang, Xiaozhe
+</li><li class="listitem">
+Weixia Xu
+</li><li class="listitem">
+William Bourque
+</li><li class="listitem">
+wilson
+</li><li class="listitem">
+Word
+</li><li class="listitem">
+Xavier Morera
+</li><li class="listitem">
+Xhxiong
+</li><li class="listitem">
+xq262144
+</li><li class="listitem">
+Yixiao Lin
+</li><li class="listitem">
+Yoer
+</li><li class="listitem">
+Yuriy Hupalo
+</li><li class="listitem">
+ywheel
+</li><li class="listitem">
+Zachary York
+</li><li class="listitem">
+Zach York
+</li><li class="listitem">
+Zhihai Xu
+</li><li class="listitem">
+z-york
+</li></ul></div></div></div></body></html>
