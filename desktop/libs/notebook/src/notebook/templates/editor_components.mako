@@ -2292,7 +2292,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     }
 
     if (rawDatum.snippet.chartLimit()) {
-      _data = _data.slice(1, rawDatum.snippet.chartLimit() + 1);
+      _data = _data.slice(0, rawDatum.snippet.chartLimit());
     }
 
     return _data;
@@ -2324,7 +2324,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     }
 
     if (rawDatum.snippet.chartLimit()) {
-      _data = _data.slice(1, rawDatum.snippet.chartLimit() + 1);
+      _data = _data.slice(0, rawDatum.snippet.chartLimit());
     }
 
     return _data;
@@ -2386,7 +2386,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     }
 
     if (rawDatum.snippet.chartLimit()) {
-      _data = _data.slice(1, rawDatum.snippet.chartLimit() + 1);
+      _data = _data.slice(0, rawDatum.snippet.chartLimit());
     }
 
     return _data;
@@ -2436,7 +2436,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             });
           }
           if (rawDatum.snippet.chartLimit()) {
-            _data = _data.slice(1, rawDatum.snippet.chartLimit() + 1);
+            _data = _data.slice(0, rawDatum.snippet.chartLimit() );
           }
           _datum.push({
             key: col,
@@ -2530,7 +2530,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           }
         });
         if (rawDatum.snippet.chartLimit()) {
-          _datum = _datum.slice(1, rawDatum.snippet.chartLimit() + 1);
+          _datum = _datum.slice(0, rawDatum.snippet.chartLimit());
         }
       }
       else {
@@ -2575,7 +2575,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 });
               }
               if (rawDatum.snippet.chartLimit()) {
-                _data = _data.slice(1, rawDatum.snippet.chartLimit() + 1);
+                _data = _data.slice(0, rawDatum.snippet.chartLimit());
               }
               _datum.push({
                 key: col,
@@ -2630,7 +2630,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             }
           });
           if (rawDatum.snippet.chartLimit()) {
-            _data = _data.slice(1, rawDatum.snippet.chartLimit() + 1);
+            _data = _data.slice(0, rawDatum.snippet.chartLimit());
           }
           _datum.push({
             key: col,
