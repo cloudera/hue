@@ -1903,6 +1903,18 @@ var SqlParseSupport = (function () {
       return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
     };
 
+    parser.mergeFacets = function (a, b) {
+      if (a && b) {
+        Object.keys(b).forEach(function (key) {
+          if (a[key]) {
+            a[key] = a[key].concat(b[key]);
+          } else {
+            a[key] = b[key];
+          }
+        });
+      }
+    };
+
     parser.parseGlobalSearch = function (beforeCursor, afterCursor, debug) {
       delete parser.yy.cursorFound;
 

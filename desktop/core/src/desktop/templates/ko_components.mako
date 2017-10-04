@@ -848,7 +848,7 @@ from desktop.views import _ko
         if (self.lastResult.suggestFacets) {
           var existingFacetIndex = {};
           if (self.lastResult.facets) {
-            self.lastResult.facets.forEach(function (facet) {
+            Object.keys(self.lastResult.facets).forEach(function (facet) {
               existingFacetIndex[facet.toLowerCase()] = true;
             })
           }

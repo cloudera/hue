@@ -64,7 +64,7 @@ GlobalSearchAutocomplete
  | SearchParts_EDIT 'EOF'
    {
      if (!$1.facets) {
-       $1.facets = [];
+       $1.facets = {};
      }
      return $1;
    }
@@ -75,11 +75,11 @@ GlobalSearchAutocomplete
  ;
 
 SearchParts
- : SearchPart                   -->  { facets: $1.facet ? [ $1.facet ] : [] }
+ : SearchPart                   -->  { facets: $1.facets ? $1.facets : {} }
  | SearchParts SearchPart
    {
-     if ($2.facet) {
-       $1.facets.push($2.facet);
+     if ($2.facets) {
+       parser.mergeFacets($1.facets, $2.facets);
      }
    }
  ;
@@ -97,7 +97,8 @@ SearchParts_EDIT
    }
  | SearchParts SearchPart_EDIT SearchParts
    {
-     $2.facets = $1.facets.concat($3.facets);
+     $2.facets = $1.facets;
+     parser.mergeFacets($2.facets, $3.facets);
      $$ = $2;
    }
  ;
@@ -113,7 +114,12 @@ SearchPart_EDIT
  ;
 
 Facet
- : 'FACET' FreeText     --> { facet: $1.substring(0, $1.length - 1) }
+ : 'FACET' FreeText
+   {
+     var facet = {};
+     facet[$1.substring(0, $1.length - 1)] = [ $2 ];
+     $$ = { facets: facet };
+   }
  ;
 
 Facet_EDIT
