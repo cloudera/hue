@@ -623,7 +623,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
   <script id="fileTemplate" type="text/html">
     <tr class="row-animated" style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
-      <td class="center" data-bind="click: handleSelect" style="cursor: default">
+      <td class="center" data-bind="click: handleSelect" style="cursor: default" data-bind="enabled: name !== '..' ">
         <div data-bind="multiCheck: '#fileBrowserTable', visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
       <td class="left"><i data-bind="click: $root.viewFile, css: { 'fa': true,
