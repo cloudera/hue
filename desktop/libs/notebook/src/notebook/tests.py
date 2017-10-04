@@ -24,7 +24,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
+from desktop.lib.test_utils import grant_access, add_permission
 from desktop.models import Directory, Document, Document2
 from hadoop import cluster as originalCluster
 
@@ -306,6 +306,7 @@ class MockFs():
     self.logical_name = logical_name if logical_name else ''
     self.DEFAULT_USER = 'test'
     self.user = 'test'
+    self._filebrowser_action = ''
 
   def setuser(self, user):
     self.user = user
@@ -322,6 +323,9 @@ class MockFs():
 
   def isdir(self, path):
     return path == '/user/hue'
+
+  def filebrowser_action(self):
+    return self._filebrowser_action
 
 
 class TestNotebookApiMocked(object):
@@ -346,6 +350,7 @@ class TestNotebookApiMocked(object):
     grant_access("test", "default", "beeswax")
     grant_access("not_perm_user", "default", "notebook")
     grant_access("not_perm_user", "default", "beeswax")
+    add_permission('test', 'has_adls', permname='adls_access', appname='filebrowser')
 
   def tearDown(self):
     notebook.connectors.hiveserver2.HS2Api = notebook.connectors.hiveserver2.original_HS2Api
@@ -400,6 +405,18 @@ class TestNotebookApiMocked(object):
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
     assert_equal('/user/hue/path.csv', data['watch_url']['destination'], data)
+
+    response = self.client.post(reverse('notebook:export_result'), {
+        'notebook': notebook_json,
+        'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+        'format': json.dumps('hdfs-file'),
+        'destination': json.dumps('adl:/user/hue/path.csv'),
+        'overwrite': json.dumps(False)
+    })
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
 
 
 def test_get_interpreters_to_show():

@@ -632,7 +632,6 @@ def export_result(request):
   api = get_api(request, snippet)
 
   if data_format == 'hdfs-file': # Blocking operation, like downloading
-    destination = request.fs.netnormpath(destination)
     if request.fs.isdir(destination):
       if notebook.get('name'):
         destination += '/%(name)s.csv' % notebook
@@ -673,7 +672,6 @@ def export_result(request):
       'allowed': True
     }
   elif data_format == 'hdfs-directory':
-    destination = request.fs.netnormpath(destination)
     if is_embedded:
       sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
 
