@@ -660,18 +660,25 @@ from desktop.views import _ko
 
       var InlineAutocomplete = function (params) {
         var self = this;
-        self.placeHolder = params.placeHolder;
+        self.disposals = [];
+
+        self.placeHolder = params.placeHolder || '${ _('Filter...') }';
         self.hasFocus = params.hasFocus || ko.observable();
-        self.searchInput = ko.observable('');
         self.querySpec = params.querySpec;
+        self.autocompleteFromEntries = params.autocompleteFromEntries || function () {};
+        self.facets = params.facets || [];
+        self.knownFacetValues = params.knownFacetValues || {};
+
+        self.searchInput = ko.observable('');
         self.inlineAutocomplete = ko.observable('');
         self.lastNonPartial = null;
         self.lastResult = {};
-        self.autocompleteFromEntries = params.autocompleteFromEntries;
-        self.disposals = [];
 
-        self.facets = params.facets;
-        self.knownFacetValues = params.knownFacetValues;
+        self.querySpec({
+          query: '',
+          facets: {},
+          text: []
+        });
 
         self.onClear = function () {
           if (params.onClear) {
@@ -695,11 +702,17 @@ from desktop.views import _ko
           }
           if (newValue !== '') {
             self.triggerAutocomplete(newValue);
+          } else {
+            self.querySpec({
+              query: '',
+              facets: {},
+              text: []
+            })
           }
         });
 
         self.disposals.push(function () {
-          inputSub.remove();
+          inputSub.dispose();
         });
 
         var onKeyDown = function (event) {
@@ -738,7 +751,7 @@ from desktop.views import _ko
         });
 
         self.disposals.push(function () {
-          focusSub.remove();
+          focusSub.dispose();
         });
       };
 
@@ -781,8 +794,9 @@ from desktop.views import _ko
         }
 
         if (self.lastResult.suggestFacetValues && !newAutocomplete) {
-          if (self.knownFacetValues()[self.lastResult.suggestFacetValues.toLowerCase()]) {
-            Object.keys(self.knownFacetValues()[self.lastResult.suggestFacetValues.toLowerCase()]).every(function (value) {
+          var facetValues = ko.unwrap(self.knownFacetValues);
+          if (facetValues[self.lastResult.suggestFacetValues.toLowerCase()]) {
+            Object.keys(facetValues[self.lastResult.suggestFacetValues.toLowerCase()]).every(function (value) {
               if (value.toLowerCase().indexOf(partialLower) === 0) {
                 newAutocomplete = self.lastNonPartial + partial + value.substring(partial.length, value.length);
                 return false;
@@ -819,6 +833,15 @@ from desktop.views import _ko
 
         if (self.lastNonPartial && self.lastNonPartial === nonPartial) {
           self.updateInlineAutocomplete(partial);
+          self.lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
+          var querySpec = { query: newValue };
+          if (self.lastResult.facets) {
+            querySpec.facets = self.lastResult.facets
+          }
+          if (self.lastResult.text) {
+            querySpec.text = self.lastResult.text;
+          }
+          self.querySpec(querySpec);
           return;
         }
 
@@ -1127,12 +1150,13 @@ from desktop.views import _ko
 
         navPromise.done(function (data) {
           if (data.facets) {
+            var facetValues = ko.unwrap(self.knownFacetValues);
             Object.keys(data.facets).forEach(function (facet) {
-              if (!self.knownFacetValues()[facet] && Object.keys(data.facets[facet]).length > 0) {
-                self.knownFacetValues()[facet] = {};
+              if (!facetValues[facet] && Object.keys(data.facets[facet]).length > 0) {
+                facetValues[facet] = {};
               }
               Object.keys(data.facets[facet]).forEach(function (facetKey) {
-                self.knownFacetValues()[facet][facetKey] = data.facets[facet][facetKey];
+                facetValues[facet][facetKey] = data.facets[facet][facetKey];
               });
             })
           }

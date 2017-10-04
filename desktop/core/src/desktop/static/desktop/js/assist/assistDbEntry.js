@@ -28,7 +28,7 @@ var AssistDbEntry = (function () {
    * @param {AssistDbEntry} parent
    * @param {AssistDbSource} assistDbSource
    * @param {Object} filter
-   * @param {function} filter.query (observable)
+   * @param {function} filter.querySpec (observable)
    * @param {function} filter.showViews (observable)
    * @param {function} filter.showTables (observable)
    * @param {Object} i18n
@@ -78,15 +78,32 @@ var AssistDbEntry = (function () {
     });
 
     self.filteredEntries = ko.pureComputed(function () {
-      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews() && self.filter.query().length === 0)) {
+      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews && self.filter.showViews() && (!self.filter.querySpec().facets || self.filter.querySpec().facets === {}) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
         return self.entries();
       }
+
       var result = [];
       $.each(self.entries(), function (index, entry) {
         if ((entry.definition.isTable && !self.filter.showTables()) || (entry.definition.isView && !self.filter.showViews()) ) {
           return;
         }
-        if (entry.definition.name.toLowerCase().indexOf(self.filter.query().toLowerCase()) > -1) {
+        var facets = self.filter.querySpec().facets;
+        var facetMatch = !facets || !facets['type'];
+        if (!facetMatch) {
+          facets['type'].every(function (typeFacet) {
+            facetMatch = (typeFacet === 'table' && entry.definition.isTable) || (typeFacet === 'view' && entry.definition.isView);
+            return !facetMatch;
+          });
+        }
+        var textMatch = !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
+        if (!textMatch) {
+          var nameLower = entry.definition.name.toLowerCase();
+          self.filter.querySpec().text.every(function (text) {
+            textMatch = nameLower.indexOf(text.toLowerCase()) !== -1;
+            return !textMatch;
+          });
+        }
+        if (facetMatch && textMatch) {
           result.push(entry);
         }
       });

@@ -73,11 +73,11 @@ var AssistDbSource = (function () {
     });
 
     self.filter = {
-      query: ko.observable("").extend({ rateLimit: 150 })
+      querySpec: ko.observable({})
     };
 
     self.filterActive = ko.pureComputed(function () {
-      return self.filter.query().length !== 0;
+      return self.filter.querySpec() && self.filter.querySpec().query !== '';
     });
 
     var storageSearchVisible = $.totalStorage(self.sourceType + ".assist.searchVisible");
@@ -94,12 +94,12 @@ var AssistDbSource = (function () {
     });
 
     self.filteredEntries = ko.pureComputed(function () {
-      if (self.filter.query().length === 0) {
+      if (!self.filter.querySpec() || typeof self.filter.querySpec().query === 'undefined' || !self.filter.querySpec().query) {
         return self.databases();
       }
       var result = [];
       $.each(self.databases(), function (index, database) {
-        if (database.definition.name.toLowerCase().indexOf(self.filter.query().toLowerCase()) > -1) {
+        if (database.definition.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
           result.push(database);
         }
       });
@@ -184,7 +184,7 @@ var AssistDbSource = (function () {
     self.loading = ko.observable(false);
     var dbIndex = {};
     var nestedFilter = {
-      query: ko.observable("").extend({ rateLimit: { timeout: 250, method: 'notifyWhenChangesStop' } }),
+      querySpec: ko.observable({}),
       showTables: ko.observable(true),
       showViews: ko.observable(true),
       activeEditorTables: ko.observableArray([])
