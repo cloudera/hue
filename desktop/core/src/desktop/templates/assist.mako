@@ -874,7 +874,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       </div>
     </div>
     <div class="assist-flex-search" data-bind="visible: hasEntries() && ! hasErrors()">
-      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      <div class="assist-filter">
+        <!-- ko component: {
+            name: 'inline-autocomplete',
+            params: {
+              querySpec: filter.querySpec,
+              facets: [],
+              knownFacetValues: {}
+            }
+          } --><!-- /ko -->
+      </div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries()">
       <!-- ko if: ! loading() && filteredEntries().length == 0 -->
@@ -942,7 +951,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- /ko -->
     </div>
     <div class="assist-flex-search" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
-      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      <div class="assist-filter">
+        <!-- ko component: {
+          name: 'inline-autocomplete',
+          params: {
+            querySpec: filter.querySpec,
+            facets: ['type'],
+            knownFacetValues: { 'type': {'table': -1, 'view': -1 } }
+          }
+        } --><!-- /ko -->
+      </div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()">
       <!-- ko template: 'assist-db-entries' --><!-- /ko -->
@@ -2211,13 +2229,22 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           </div>
         </div>
         <div class="assist-flex-search" data-bind="visible: activeTables().length > 0">
-          <div class="assist-filter"><input class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Filter...') }" /></div>
+          <div class="assist-filter">
+            <!-- ko component: {
+              name: 'inline-autocomplete',
+              params: {
+                querySpec: filter.querySpec,
+                facets: ['type'],
+                knownFacetValues: { 'type': {'table': -1, 'view': -1, 'column': -1, 'string': -1 } }
+              }
+            } --><!-- /ko -->
+          </div>
         </div>
         <div class="assist-flex-half assist-db-scrollable">
-          <!-- ko if: filteredTables().length === 0 && filter.query() === '' -->
+          <!-- ko if: filteredTables().length === 0 && (!filter.querySpec() || filter.querySpec().query === '') -->
           <div class="assist-no-entries">${ _('No tables identified.') }</div>
           <!-- /ko -->
-          <!-- ko if: filteredTables().length === 0 && filter.query() !== '' -->
+          <!-- ko if: filteredTables().length === 0 && filter.querySpec() && filter.querySpec().query !== '' -->
           <div class="assist-no-entries">${ _('No entries found.') }</div>
           <!-- /ko -->
           <!-- ko if: filteredTables().length > 0 -->
@@ -2325,7 +2352,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var activeTableIndex = {};
 
         self.filter = {
-          query: ko.observable(''),
+          querySpec: ko.observable({}),
           showViews: ko.observable(true),
           showTables: ko.observable(true)
         };
@@ -2333,7 +2360,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var openedByFilter = [];
 
         self.filteredTables = ko.pureComputed(function () {
-          if (self.filter.query() === '') {
+          if (!self.filter.querySpec() || self.filter.querySpec().query === '') {
             while (openedByFilter.length) {
               openedByFilter.pop().open(false);
             }
@@ -2346,7 +2373,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                 openedByFilter.push(table);
               }
               return true;
-            } else if (table.definition.name.toLowerCase().indexOf(self.filter.query().toLowerCase()) > -1) {
+            } else if (self.filter.querySpec() && table.definition.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
               return true;
             }
             return false;
@@ -2654,13 +2681,22 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           </div>
         </div>
         <div class="assist-flex-search" data-bind="visible: activeCollection() && activeCollection().fields().length > 0">
-          <div class="assist-filter"><input class="clearable" type="text" data-bind="clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'" placeholder="${ _('Filter...') }" /></div>
+          <div class="assist-filter">
+            <!-- ko component: {
+              name: 'inline-autocomplete',
+              params: {
+                querySpec: filter.querySpec,
+                facets: [],
+                knownFacetValues: {}
+              }
+            } --><!-- /ko -->
+          </div>
         </div>
         <div class="assist-flex-half assist-db-scrollable">
-          <!-- ko if: filteredFields().length === 0 && filter.query() === '' -->
+          <!-- ko if: filteredFields().length === 0 && (!filter.querySpec() || filter.querySpec().query === '') -->
           <div class="assist-no-entries">${ _('No fields available.') }</div>
           <!-- /ko -->
-          <!-- ko if: filteredFields().length === 0 && filter.query() !== '' -->
+          <!-- ko if: filteredFields().length === 0 && filter.querySpec() && filter.querySpec().query !== '' -->
           <div class="assist-no-entries">${ _('No fields found.') }</div>
           <!-- /ko -->
           <!-- ko if: filteredFields().length > 0 -->
@@ -2686,7 +2722,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.activeCollection = ko.observable();
 
         self.filter = {
-          query: ko.observable('')
+          querySpec: ko.observable({})
         };
 
         var activeDashboardCollection = huePubSub.subscribe('set.active.dashboard.collection', function(collection) {
@@ -2697,11 +2733,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           if (!self.activeCollection()){
             return [];
           }
-          if (self.filter.query() === '') {
+          if (!self.filter.querySpec() || self.filter.querySpec().query === '') {
             return self.activeCollection().fields();
           }
           var result = self.activeCollection().fields().filter(function (field) {
-            if (field.name().toLowerCase().indexOf(self.filter.query().toLowerCase()) > -1) {
+            if (field.name().toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
               return true;
             }
             return false;
