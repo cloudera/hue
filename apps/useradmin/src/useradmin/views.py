@@ -436,7 +436,7 @@ def edit_group(request, name=None):
         usernames = instance.user_set.all().values_list('username', flat=True)
         request.audit = {
           'operation': 'EDIT_GROUP',
-          'operationText': 'Edited Group: %s, with member(s): %s' % (name, ', '.join(usernames))
+          'operationText': 'Edited Group: %s, with member(s): %s' % (name, ', '.join([user.username for diffs in form._compute_diff("members") for user in diffs]) )
         }
       else:
         user_ids = request.POST.getlist('members', [])
