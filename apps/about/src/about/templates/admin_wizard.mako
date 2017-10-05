@@ -39,7 +39,7 @@ ${ layout.menubar(section='quick_start') }
         % if user.is_superuser:
           ${ _('Quick Start Wizard') } -
         % endif
-        Hue&trade; 4.0 - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Open gethue.com in a new window.') }">${ _("Query. Explore. Repeat.") }</a>
+        Hue&trade; 4.1 - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Open gethue.com in a new window.') }">${ _("Query. Explore. Repeat.") }</a>
       </h1>
 
      % if user.is_superuser:
