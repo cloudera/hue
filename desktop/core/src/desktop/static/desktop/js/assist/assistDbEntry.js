@@ -78,7 +78,7 @@ var AssistDbEntry = (function () {
     });
 
     self.filteredEntries = ko.pureComputed(function () {
-      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews && self.filter.showViews() && (!self.filter.querySpec().facets || self.filter.querySpec().facets === {}) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
+      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews && self.filter.showViews() && (!self.filter.querySpec().facets || Object.keys(self.filter.querySpec().facets).length === 0) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
         return self.entries();
       }
       var facets = self.filter.querySpec().facets;
