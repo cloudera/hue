@@ -81,20 +81,33 @@ var AssistDbEntry = (function () {
       if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews && self.filter.showViews() && (!self.filter.querySpec().facets || self.filter.querySpec().facets === {}) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
         return self.entries();
       }
+      var facets = self.filter.querySpec().facets;
+      if (self.entries().length > 0 && (self.entries()[0].definition.isColumn || self.entries()[0].definition.isComplex)) {
+        if (!facets || !facets['type']) {
+          return self.entries();
+        } else {
+          if ((Object.keys(facets['type']).length == 2 && facets['type']['table'] && facets['type']['view']) || (Object.keys(facets['type']).length == 1 && (facets['type']['table'] || facets['type']['view']))) {
+            return self.entries();
+          }
+          return self.entries().filter(function (entry) {
+            return facets['type'][entry.definition.type];
+          })
+        }
+      }
 
       var result = [];
       $.each(self.entries(), function (index, entry) {
         if ((entry.definition.isTable && !self.filter.showTables()) || (entry.definition.isView && !self.filter.showViews()) ) {
           return;
         }
-        var facets = self.filter.querySpec().facets;
-        var facetMatch = !facets || !facets['type'];
-        if (!facetMatch) {
-          facets['type'].every(function (typeFacet) {
-            facetMatch = (typeFacet === 'table' && entry.definition.isTable) || (typeFacet === 'view' && entry.definition.isView);
-            return !facetMatch;
-          });
+        var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
+        if (!facetMatch && facets['type']['table']) {
+          facetMatch = entry.definition.isTable;
         }
+        if (!facetMatch && facets['type']['view']) {
+          facetMatch = entry.definition.isView;
+        }
+
         var textMatch = !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
         if (!textMatch) {
           var nameLower = entry.definition.name.toLowerCase();
@@ -465,7 +478,7 @@ var AssistDbEntry = (function () {
    */
   AssistDbEntry.prototype.createEntry = function (definition) {
     var self = this;
-    return new AssistDbEntry(definition, self, self.assistDbSource, null, self.i18n, self.navigationSettings, self.sortFunctions)
+    return new AssistDbEntry(definition, self, self.assistDbSource, self.filter, self.i18n, self.navigationSettings, self.sortFunctions)
   };
 
   AssistDbEntry.prototype.getHierarchy = function () {
