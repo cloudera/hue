@@ -1907,7 +1907,9 @@ var SqlParseSupport = (function () {
       if (a && b) {
         Object.keys(b).forEach(function (key) {
           if (a[key]) {
-            a[key] = a[key].concat(b[key]);
+            Object.keys(b[key]).forEach(function (val) {
+              a[key][val.toLowerCase()] = true;
+            });
           } else {
             a[key] = b[key];
           }

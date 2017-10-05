@@ -957,7 +957,28 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           params: {
             querySpec: filter.querySpec,
             facets: ['type'],
-            knownFacetValues: { 'type': {'table': -1, 'view': -1 } }
+            knownFacetValues: { 'type': {
+              'array': -1,
+              'table': -1,
+              'view': -1,
+              'boolean': -1,
+              'bigint': -1,
+              'binary': -1,
+              'char': -1,
+              'date': -1,
+              'double': -1,
+              'decimal': -1,
+              'float': -1,
+              'int': -1,
+              'map': -1,
+              'real': -1,
+              'smallint': -1,
+              'string': -1,
+              'struct': -1,
+              'timestamp': -1,
+              'tinyint': -1,
+              'varchar': -1
+            }}
           }
         } --><!-- /ko -->
       </div>

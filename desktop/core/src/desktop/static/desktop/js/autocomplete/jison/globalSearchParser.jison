@@ -138,13 +138,15 @@ Facet
  : 'FACET' FreeText
    {
      var facet = {};
-     facet[$1.substring(0, $1.length - 1)] = [ $2 ];
+     var facetName = $1.substring(0, $1.length - 1).toLowerCase();
+     facet[facetName] = {};
+     facet[facetName][$2.toLowerCase()] = true;
      $$ = { facets: facet };
    }
  ;
 
 Facet_EDIT
- : 'FACET' 'CURSOR'     --> { suggestFacetValues: $1.substring(0, $1.length - 1) }
+ : 'FACET' 'CURSOR'     --> { suggestFacetValues: $1.substring(0, $1.length - 1).toLowerCase() }
  ;
 
 FreeText
