@@ -35,7 +35,7 @@
         suggestFacets: true,
         suggestResults: true,
         facets: {
-          'TAGS' : ['asdf']
+          'tags' : { 'asdf': true }
         },
         text: []
       });
@@ -45,7 +45,7 @@
       testParser('type:table tags: ', '', {
         suggestFacetValues: 'tags',
         facets: {
-          'type': ['table']
+          'type': { 'table': true }
         },
         text: []
       });
@@ -56,7 +56,7 @@
         suggestFacets: true,
         suggestResults: true,
         facets: {
-          'type': ['table', 'column']
+          'type': { 'table': true, 'column': true }
         },
         text: []
       });
@@ -76,8 +76,8 @@
         suggestFacets: true,
         suggestResults: true,
         facets: {
-          boo: ['asdfa adsf'],
-          foo: ['bar']
+          boo: { 'asdfa adsf': true },
+          foo: { 'bar': true }
         },
         text: ['some', 'text', 'goes', 'here', 'quoted value']
       });
@@ -88,14 +88,14 @@
         suggestFacets: true,
         suggestResults: true,
         facets: {
-          type: ['foo']
+          type: { 'foo': true }
         },
         text: ['bar']
       });
     });
 
-    it('should suggest facet values for "tags: |"', function () {
-      testParser('tags: ', '', {
+    it('should suggest facet values for "TAGS: |"', function () {
+      testParser('TAGS: ', '', {
         suggestFacetValues: 'tags',
         facets: {},
         text: []
