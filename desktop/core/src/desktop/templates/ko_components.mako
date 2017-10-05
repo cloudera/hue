@@ -668,10 +668,10 @@ from desktop.views import _ko
         self.autocompleteFromEntries = params.autocompleteFromEntries || function () {};
         self.facets = params.facets || [];
         self.knownFacetValues = params.knownFacetValues || {};
+        self.uniqueFacets = !!params.uniqueFacets;
 
         self.searchInput = ko.observable('');
         self.inlineAutocomplete = ko.observable('');
-        self.lastNonPartial = null;
         self.lastResult = {};
 
         self.querySpec({
@@ -689,7 +689,7 @@ from desktop.views import _ko
 
         if (params.triggerObservable) {
           var triggerSub = params.triggerObservable.subscribe(function () {
-            self.triggerAutocomplete(self.searchInput(), true);
+            self.autocomplete(self.searchInput(), self.inlineAutocomplete);
           });
           self.disposals.push(function () {
             triggerSub.remove();
@@ -697,17 +697,40 @@ from desktop.views import _ko
         }
 
         var inputSub = self.searchInput.subscribe(function (newValue) {
-          if (self.inlineAutocomplete().indexOf(newValue) !== 0 || newValue === '') {
-            self.inlineAutocomplete(newValue);
-          }
-          if (newValue !== '') {
-            self.triggerAutocomplete(newValue);
-          } else {
+          if (newValue === '' && self.querySpec() && self.querySpec().query !== '') {
             self.querySpec({
               query: '',
               facets: {},
               text: []
-            })
+            });
+          } else {
+            // TODO: Get cursor position and split to before and after
+            self.lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
+            if (hueDebug && hueDebug.showGlobalSearchParseResults) {
+              console.log(self.lastResult);
+            }
+            var querySpec = { query: newValue };
+            if (self.lastResult.facets) {
+              querySpec.facets = self.lastResult.facets
+            }
+            if (self.lastResult.text) {
+              querySpec.text = self.lastResult.text;
+            }
+            self.querySpec(querySpec);
+          }
+
+          if (newValue === '') {
+            self.inlineAutocomplete('');
+          } else if (self.inlineAutocomplete() === newValue || self.inlineAutocomplete().indexOf(newValue) !== 0) {
+            self.autocomplete(newValue, self.inlineAutocomplete);
+          } else if (self.inlineAutocomplete().indexOf(newValue) === 0) {
+            var newAutocomp = self.inlineAutocomplete();
+            while (newAutocomp.lastIndexOf(' ') >= newValue.length) {
+              newAutocomp = newAutocomp.substring(0, newAutocomp.lastIndexOf(' '));
+            }
+            if (newAutocomp !== self.inlineAutocomplete()) {
+              self.inlineAutocomplete(newAutocomp);
+            }
           }
         });
 
@@ -720,7 +743,7 @@ from desktop.views import _ko
             return;
           }
           if (event.keyCode === 32 && event.ctrlKey) { // Ctrl-Space
-            self.triggerAutocomplete(self.searchInput(), true);
+            self.autocomplete(self.searchInput(), self.inlineAutocomplete);
             return;
           }
           if (event.keyCode === 39 && self.inlineAutocomplete() !== '' && self.inlineAutocomplete() !== self.searchInput()) { // Right arrow
@@ -743,7 +766,7 @@ from desktop.views import _ko
             self.inlineAutocomplete('');
             $(document).off('keydown', onKeyDown);
           } else if (self.searchInput() !== '') {
-            self.triggerAutocomplete(self.searchInput());
+            self.autocomplete(self.searchInput(), self.inlineAutocomplete);
             $(document).on('keydown', onKeyDown);
           } else {
             $(document).on('keydown', onKeyDown);
@@ -762,35 +785,48 @@ from desktop.views import _ko
         }
       };
 
-      InlineAutocomplete.prototype.updateInlineAutocomplete = function (partial) {
+      InlineAutocomplete.prototype.autocomplete = function (text, callback) {
         var self = this;
+        if (!self.lastResult) {
+          callback('');
+          return;
+        }
+
+        var partial, nonPartial;
+        var partialMatch = text.match(/([^:\s]+)$/i);
+        if (partialMatch) {
+          partial = partialMatch[0];
+          nonPartial = text.substring(0, text.length - partial.length);
+        } else {
+          partial = '';
+          nonPartial = text;
+        }
+
         var newAutocomplete = '';
         var partialLower = partial.toLowerCase();
         if (self.lastResult.suggestFacets) {
           var existingFacetIndex = {};
-          if (self.lastResult.facets) {
+          if (self.uniqueFacets && self.lastResult.facets) {
             Object.keys(self.lastResult.facets).forEach(function (facet) {
               existingFacetIndex[facet.toLowerCase()] = true;
             })
           }
 
-          if (partial !== '') {
-            var lowerCase = partial.length !== '' && partialLower[partialLower.length - 1] === partial[partial.length - 1];
-            var suggestion = self.lastNonPartial + partial;
-            self.facets.every(function (facet) {
-              if (existingFacetIndex[facet]) {
-                return true;
-              }
-              if (facet.indexOf(partialLower) === 0) {
-                var remainder = facet.substring(partial.length);
-                suggestion += lowerCase ? remainder : remainder.toUpperCase();
-                suggestion += ':';
-                newAutocomplete = suggestion;
-                return false;
-              }
+          var suggestion = nonPartial + partial;
+          var isLowerCase = suggestion.length > 0 && suggestion.toLowerCase() === suggestion;
+          self.facets.every(function (facet) {
+            if (self.uniqueFacets && existingFacetIndex[facet]) {
               return true;
-            });
-          }
+            }
+            if (partial.length === 0 || facet.indexOf(partialLower) === 0) {
+              var remainder = facet.substring(partial.length);
+              suggestion += isLowerCase ? remainder : remainder.toUpperCase();
+              suggestion += ':';
+              newAutocomplete = suggestion;
+              return false;
+            }
+            return true;
+          });
         }
 
         if (self.lastResult.suggestFacetValues && !newAutocomplete) {
@@ -798,7 +834,7 @@ from desktop.views import _ko
           if (facetValues[self.lastResult.suggestFacetValues.toLowerCase()]) {
             Object.keys(facetValues[self.lastResult.suggestFacetValues.toLowerCase()]).every(function (value) {
               if (value.toLowerCase().indexOf(partialLower) === 0) {
-                newAutocomplete = self.lastNonPartial + partial + value.substring(partial.length, value.length);
+                newAutocomplete = nonPartial + partial + value.substring(partial.length, value.length);
                 return false;
               }
               return true;
@@ -807,67 +843,14 @@ from desktop.views import _ko
         }
 
         if (partial !== '' && self.lastResult.suggestResults && !newAutocomplete) {
-          newAutocomplete = self.autocompleteFromEntries(self.lastNonPartial, partial);
+          newAutocomplete = self.autocompleteFromEntries(nonPartial, partial);
         }
 
         if (!newAutocomplete) {
-          if (self.inlineAutocomplete() !== '') {
-            self.inlineAutocomplete('');
-          }
+          callback('');
         } else if (newAutocomplete !== self.inlineAutocomplete()) {
-          self.inlineAutocomplete(newAutocomplete);
+          callback(newAutocomplete);
         }
-      };
-
-      InlineAutocomplete.prototype.triggerAutocomplete = function (newValue, direct) {
-        var self = this;
-        var partial, nonPartial;
-        var partialMatch = newValue.match(/([^:\s]+)$/i);
-        if (partialMatch) {
-          partial = partialMatch[0];
-          nonPartial = newValue.substring(0, newValue.length - partial.length);
-        } else {
-          partial = '';
-          nonPartial = newValue;
-        }
-
-        if (self.lastNonPartial && self.lastNonPartial === nonPartial) {
-          self.updateInlineAutocomplete(partial);
-          self.lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
-          var querySpec = { query: newValue };
-          if (self.lastResult.facets) {
-            querySpec.facets = self.lastResult.facets
-          }
-          if (self.lastResult.text) {
-            querySpec.text = self.lastResult.text;
-          }
-          self.querySpec(querySpec);
-          return;
-        }
-
-        window.clearTimeout(self.autocompleteThrottle);
-        self.autocompleteThrottle = window.setTimeout(function () {
-          self.lastNonPartial = nonPartial;
-
-          // TODO: Get cursor position and split to before and after
-          self.lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
-          if (hueDebug && hueDebug.showGlobalSearchParseResults) {
-            console.log(self.lastResult);
-          }
-          if (self.lastResult) {
-            var querySpec = { query: newValue };
-            if (self.lastResult.facets) {
-              querySpec.facets = self.lastResult.facets
-            }
-            if (self.lastResult.text) {
-              querySpec.text = self.lastResult.text;
-            }
-            self.querySpec(querySpec);
-            self.updateInlineAutocomplete(partial);
-          } else {
-            self.lastNonPartial = null;
-          }
-        }, direct ? 0 : 200);
       };
 
       ko.components.register('inline-autocomplete', {

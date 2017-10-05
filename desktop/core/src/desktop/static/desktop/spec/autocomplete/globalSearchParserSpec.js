@@ -51,6 +51,17 @@
       });
     });
 
+    it('should suggest facet values for "type:table tags:a"', function() {
+      testParser('type:table tags:a', '', {
+        suggestFacetValues: 'tags',
+        facets: {
+          'type': { 'table': true },
+          'tags': { 'a': true }
+        },
+        text: []
+      });
+    });
+
     it('should give correct facet values for "type:table type:column"', function() {
       testParser('type:table type:column ', '', {
         suggestFacets: true,
