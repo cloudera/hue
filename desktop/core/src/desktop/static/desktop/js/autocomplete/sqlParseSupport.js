@@ -1904,19 +1904,32 @@ var SqlParseSupport = (function () {
     };
 
     parser.mergeFacets = function (a, b) {
-      if (a && b) {
-        Object.keys(b).forEach(function (key) {
-          if (a[key]) {
-            Object.keys(b[key]).forEach(function (val) {
-              a[key][val.toLowerCase()] = true;
-            });
-          } else {
-            a[key] = b[key];
-          }
-        });
+      if (!a.facets) {
+        a.facets = {};
       }
+      if (!b.facets) {
+        return;
+      }
+      Object.keys(b.facets).forEach(function (key) {
+        if (a.facets[key]) {
+          Object.keys(b.facets[key]).forEach(function (val) {
+            a.facets[key][val.toLowerCase()] = true;
+          });
+        } else {
+          a.facets[key] = b.facets[key];
+        }
+      });
     };
 
+    parser.mergeText = function (a, b) {
+      if (!a.text) {
+        a.text = [];
+      }
+      if (!b.text) {
+        return;
+      }
+      a.text = a.text.concat(b.text);
+    };
     parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
       if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
         var cursorIndex = yytext.indexOf('\u2020');
