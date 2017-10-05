@@ -957,28 +957,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           params: {
             querySpec: filter.querySpec,
             facets: ['type'],
-            knownFacetValues: { 'type': {
-              'array': -1,
-              'table': -1,
-              'view': -1,
-              'boolean': -1,
-              'bigint': -1,
-              'binary': -1,
-              'char': -1,
-              'date': -1,
-              'double': -1,
-              'decimal': -1,
-              'float': -1,
-              'int': -1,
-              'map': -1,
-              'real': -1,
-              'smallint': -1,
-              'string': -1,
-              'struct': -1,
-              'timestamp': -1,
-              'tinyint': -1,
-              'varchar': -1
-            }}
+            knownFacetValues: SQL_ASSIST_KNOWN_FACET_VALUES
           }
         } --><!-- /ko -->
       </div>
@@ -1028,6 +1007,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   </script>
 
   <script type="text/javascript">
+
+    var SQL_ASSIST_KNOWN_FACET_VALUES = {
+      'type': {'array': -1, 'table': -1, 'view': -1, 'boolean': -1, 'bigint': -1, 'binary': -1, 'char': -1, 'date': -1, 'double': -1, 'decimal': -1, 'float': -1, 'int': -1, 'map': -1, 'real': -1, 'smallint': -1, 'string': -1, 'struct': -1, 'timestamp': -1, 'tinyint': -1, 'varchar': -1 }
+    };
+
     (function () {
       ko.bindingHandlers.assistFileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
@@ -2256,7 +2240,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               params: {
                 querySpec: filter.querySpec,
                 facets: ['type'],
-                knownFacetValues: { 'type': {'table': -1, 'view': -1, 'column': -1, 'string': -1 } }
+                knownFacetValues: SQL_ASSIST_KNOWN_FACET_VALUES
               }
             } --><!-- /ko -->
           </div>
@@ -2381,25 +2365,42 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var openedByFilter = [];
 
         self.filteredTables = ko.pureComputed(function () {
-          if (!self.filter.querySpec() || self.filter.querySpec().query === '') {
+          if (self.filter == null || !self.filter.querySpec() || ((!self.filter.querySpec().facets || Object.keys(self.filter.querySpec().facets).length === 0) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
             while (openedByFilter.length) {
               openedByFilter.pop().open(false);
             }
             return self.activeTables();
           }
-          var result = self.activeTables().filter(function (table) {
-            if (table.filteredEntries().length > 0) {
-              if (!table.open()) {
-                table.open(true);
-                openedByFilter.push(table);
-              }
-              return true;
-            } else if (self.filter.querySpec() && table.definition.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
-              return true;
+
+          var facets = self.filter.querySpec().facets;
+
+          var result = [];
+          $.each(self.activeTables(), function (index, entry) {
+            var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
+            if (!facetMatch && facets['type']['table']) {
+              facetMatch = entry.definition.isTable;
             }
-            return false;
+            if (!facetMatch && facets['type']['view']) {
+              facetMatch = entry.definition.isView;
+            }
+
+            var textMatch = !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
+            if (!textMatch) {
+              var nameLower = entry.definition.name.toLowerCase();
+              self.filter.querySpec().text.every(function (text) {
+                textMatch = nameLower.indexOf(text.toLowerCase()) !== -1;
+                return !textMatch;
+              });
+            }
+            if (facetMatch && textMatch) {
+              if (!entry.open()) {
+                entry.open(true);
+                openedByFilter.push(entry);
+              }
+              result.push(entry);
+            }
           });
-          return result
+          return result;
         });
 
         var navigationSettings = {

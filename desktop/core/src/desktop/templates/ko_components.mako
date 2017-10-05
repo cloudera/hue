@@ -649,7 +649,7 @@ from desktop.views import _ko
   <script type="text/html" id="inline-autocomplete-template">
     <div class="inline-autocomplete-container">
       <div>
-        <input class="inline-autocomplete-input" type="text" data-bind="attr: { 'placeHolder' : hasFocus() ? '' : placeHolder }, textInput: searchInput, hasFocus: hasFocus, clearable: { value: searchInput, onClear: onClear }">
+        <input class="inline-autocomplete-input" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" data-bind="attr: { 'placeHolder' : hasFocus() ? '' : placeHolder }, textInput: searchInput, hasFocus: hasFocus, clearable: { value: searchInput, onClear: onClear }">
         <input class="inline-autocomplete-autocomplete" disabled type="text" data-bind="value: inlineAutocomplete">
       </div>
     </div>
