@@ -24,6 +24,7 @@ Quality release
 * SQL improvements
 
 Stability
+
 * Risk alert fix suggestions
 
 Security
