@@ -109,7 +109,7 @@ class TestIndexer():
 
     guessed_format = indexer.guess_format({'file': {"stream": stream, "name": "test.csv"}})
 
-    fields = indexer.guess_field_types({"file":{"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
+    fields = indexer.guess_field_types({"file": {"stream": stream, "name": "test.csv"}, "format": guessed_format})['columns']
     # test format
     expected_format = self.simpleCSVFormat
 
