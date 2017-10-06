@@ -23,7 +23,7 @@
   <link rel="shortcut icon" type="image/png" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine_favicon.png') }">
   <link rel="stylesheet" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine.css') }">
 
-  <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/js/hue.utils.js') }"></script>
   <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
