@@ -2387,12 +2387,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
             var textMatch = !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
             if (!textMatch) {
               var nameLower = entry.definition.name.toLowerCase();
-              self.filter.querySpec().text.every(function (text) {
-                textMatch = nameLower.indexOf(text.toLowerCase()) !== -1;
-                return !textMatch;
+              textMatch = self.filter.querySpec().text.every(function (text) {
+                return nameLower.indexOf(text.toLowerCase()) !== -1;
               });
             }
-            if (facetMatch && textMatch) {
+            entry.filterColumnNames(!textMatch);
+            if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
               if (!entry.open()) {
                 entry.open(true);
                 openedByFilter.push(entry);

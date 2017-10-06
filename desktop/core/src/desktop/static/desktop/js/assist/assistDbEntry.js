@@ -44,6 +44,7 @@ var AssistDbEntry = (function () {
     self.sortFunctions = assistDbSource.sortFunctions;
     self.parent = parent;
     self.filter = filter;
+    self.filterColumnNames = ko.observable(false);
     self.isSearchVisible = assistDbSource.isSearchVisible;
     self.sourceType = self.assistDbSource.sourceType;
     self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
@@ -78,49 +79,41 @@ var AssistDbEntry = (function () {
     });
 
     self.filteredEntries = ko.pureComputed(function () {
-      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews && self.filter.showViews() && (!self.filter.querySpec().facets || Object.keys(self.filter.querySpec().facets).length === 0) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
+      var facets = self.filter.querySpec().facets;
+      var tableAndViewFilterMatch = !self.definition.isDatabase || (self.filter.showTables && self.filter.showTables() && self.filter.showViews && self.filter.showViews());
+      var facetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
+      // Only text match on tables/views or columns if flag is set
+      var textMatch = (!self.definition.isDatabase && !self.filterColumnNames()) || (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0);
+
+      if (tableAndViewFilterMatch && facetMatch && textMatch) {
         return self.entries();
       }
-      var facets = self.filter.querySpec().facets;
-      if (self.entries().length > 0 && (self.entries()[0].definition.isColumn || self.entries()[0].definition.isComplex)) {
-        if (!facets || !facets['type']) {
-          return self.entries();
-        } else {
-          if ((Object.keys(facets['type']).length == 2 && facets['type']['table'] && facets['type']['view']) || (Object.keys(facets['type']).length == 1 && (facets['type']['table'] || facets['type']['view']))) {
-            return self.entries();
+
+      return self.entries().filter(function (entry) {
+        var match = true;
+        if (!tableAndViewFilterMatch) {
+          match = entry.definition.isTable && self.filter.showTables() || entry.definition.isView && self.filter.showViews();
+        }
+
+        if (match && !facetMatch) {
+          if (entry.definition.isColumn || entry.definition.isComplex) {
+            match = (Object.keys(facets['type']).length == 2 && facets['type']['table'] && facets['type']['view'])
+              || (Object.keys(facets['type']).length == 1 && (facets['type']['table'] || facets['type']['view']))
+              || facets['type'][entry.definition.type];
+          } else if (entry.definition.isView || entry.definition.isTable) {
+            match = (!facets['type']['table'] && !facets['type']['view']) || (facets['type']['table'] && entry.definition.isTable) || (facets['type']['view'] && entry.definition.isView);
           }
-          return self.entries().filter(function (entry) {
-            return facets['type'][entry.definition.type];
-          })
-        }
-      }
-
-      var result = [];
-      $.each(self.entries(), function (index, entry) {
-        if ((entry.definition.isTable && !self.filter.showTables()) || (entry.definition.isView && !self.filter.showViews()) ) {
-          return;
-        }
-        var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
-        if (!facetMatch && facets['type']['table']) {
-          facetMatch = entry.definition.isTable;
-        }
-        if (!facetMatch && facets['type']['view']) {
-          facetMatch = entry.definition.isView;
         }
 
-        var textMatch = !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
-        if (!textMatch) {
+        if (match && !textMatch) {
           var nameLower = entry.definition.name.toLowerCase();
-          self.filter.querySpec().text.every(function (text) {
-            textMatch = nameLower.indexOf(text.toLowerCase()) !== -1;
-            return !textMatch;
+          match = self.filter.querySpec().text.every(function (text) {
+            return nameLower.indexOf(text.toLowerCase()) !== -1
           });
         }
-        if (facetMatch && textMatch) {
-          result.push(entry);
-        }
+
+        return match;
       });
-      return result;
     });
 
     self.tableName = null;

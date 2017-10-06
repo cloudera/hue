@@ -1930,6 +1930,7 @@ var SqlParseSupport = (function () {
       }
       a.text = a.text.concat(b.text);
     };
+
     parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
       if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
         var cursorIndex = yytext.indexOf('\u2020');
@@ -1965,6 +1966,10 @@ var SqlParseSupport = (function () {
           console.log(err);
           console.error(err.stack);
           console.log(parser.yy.error);
+        }
+        return {
+          facets: {},
+          text: []
         }
       }
       return result;
