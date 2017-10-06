@@ -219,7 +219,7 @@ from django.utils.translation import ugettext as _
   </div>
 </div>
 
-<script src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
 <script>
   var $buttonsGroup = $("#buttons_group");
   if($buttonsGroup.children().length > 2) {
