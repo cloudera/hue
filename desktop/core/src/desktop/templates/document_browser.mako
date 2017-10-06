@@ -380,30 +380,60 @@ from desktop.views import _ko
                 </div>
                 <!-- /ko -->
 
-                <a class="btn" title="${_('New folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || ! canModify() }" style="height: 20px"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg></a>
-                <a class="btn" title="${_('Rename folder')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { showRenameDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || ! canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }"><i class="fa fa-fw fa-edit"></i></a>
-                <!-- ko if: isTrash() -->
-                  <a class="btn" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showRestoreConfirmation(); }, css: { 'disabled': selectedEntries().length === 0 }, attr: { 'title' : '${ _('Restore to Home ') }' }"><i class="fa fa-fw fa-undo"></i></a>
-                <!-- /ko -->
-                <a class="btn" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}, css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && ! superuser) }, attr: { 'title' : isTrash() || isTrashed() ? '${ _('Delete forever') }' : '${ _('Move to trash') }' }"><i class="fa fa-fw fa-times"></i></a>
-
                 <!-- ko if: app === 'documents' -->
                 <a class="btn" title="${_('Share')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
                 <!-- /ko -->
-                <a class="btn" title="${_('Export all or selected documents')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: download"><i class="fa fa-fw fa-download"></i></a>
-                <a class="btn" title="${_('Import documents')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a>
+
                 <!-- ko if: app === 'documents' -->
-                <div class="margin-left-20 pull-right" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
-                  <a class="btn" title="${_('Show trash')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
-                    <i class="fa fa-fw fa-trash-o"></i>
-                  </a>
+                <div class="margin-left-20 margin-right-20 pull-right doc-browser-type-filter" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
                   <!-- ko if: isTrash() || isTrashed() -->
-                  <ul class="hue-context-menu">
-                    <li><a href="javascript:void(0);" data-bind="click: emptyTrash"><i class="fa fa-fw fa-times"></i> ${ _('Empty trash') }</a></li>
-                  </ul>
+                  <a class="inactive-action" href="javascript:void(0);" data-bind="click: emptyTrash">
+                    <i class="fa fa-fw fa-trash"></i> ${_('Empty trash')}
+                  </a>
+                  <!-- /ko -->
+                  <!-- ko if: !isTrash() && !isTrashed() -->
+                  <a class="inactive-action" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
+                    <i class="fa fa-fw fa-trash-o"></i> ${_('Trash')}
+                  </a>
                   <!-- /ko -->
                 </div>
                 <!-- /ko -->
+
+                <div class="dropdown pull-right margin-left-10">
+                  <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+                    <i class="fa fa-fw fa-ellipsis-v"></i>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li data-bind="css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || !canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }">
+                      <a href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }"><i class="fa fa-fw fa-edit"></i> ${_('Rename folder')}</a>
+                    </li>
+                    <!-- ko if: isTrash() -->
+                    <li data-bind="css: { 'disabled': selectedEntries().length === 0 }">
+                      <a href="javascript:void(0);" data-bind="click: function() { showRestoreConfirmation() }"><i class="fa fa-fw fa-undo"></i> ${ _('Restore to Home ') }</a>
+                    </li>
+                    <!-- /ko -->
+                    <li data-bind="css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && !superuser) }">
+                      <a href="javascript:void(0);" data-bind="click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}"><i class="fa fa-fw fa-times"></i> <span data-bind="text:  isTrash() || isTrashed() ? '${ _ko('Delete forever') }' : '${ _ko('Move to trash') }'"></span></a>
+                    </li>
+                    <li>
+                      <a title="${_('Export all or selected documents')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i> ${_('Export')}</a>
+                    </li>
+                    <li data-bind="css: { 'disabled': isTrash() || isTrashed() }">
+                      <a href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i> ${_('Import')}</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li data-bind="css: { 'disabled': isTrash() || isTrashed() || !canModify() }">
+                      <a href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }"><svg class="hi hi-fw"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
+                    </li>
+                    <!-- ko if: isTrash() || isTrashed() -->
+                    <li>
+                      <a href="javascript:void(0);" data-bind="click: emptyTrash"><i class="fa fa-fw fa-times"></i> ${ _('Empty trash') }</a>
+                    </li>
+                    <!-- /ko -->
+                  </ul>
+                </div>
+
+
                 <!-- /ko -->
               </div>
             </div>
