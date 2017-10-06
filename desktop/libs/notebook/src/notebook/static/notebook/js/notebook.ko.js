@@ -431,8 +431,11 @@ var EditorViewModel = (function() {
 
     huePubSub.publish('assist.get.source');
 
+    var ignoreNextAssistDatabaseUpdate = false;
     self.handleAssistSelection = function (databaseDef) {
-      if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
+      if (ignoreNextAssistDatabaseUpdate) {
+        ignoreNextAssistDatabaseUpdate = false;
+      } else if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
         self.database(databaseDef.name);
       }
     };
@@ -728,6 +731,7 @@ var EditorViewModel = (function() {
           var db = match[1];
           huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
         }
+        ignoreNextAssistDatabaseUpdate = true;
         huePubSub.publish('assist.db.refresh', { sourceTypes: [self.type()] });
       });
     }, 0);
