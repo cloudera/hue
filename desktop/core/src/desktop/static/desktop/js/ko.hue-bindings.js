@@ -3865,6 +3865,9 @@
             // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
             token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
           }
+          if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
+            token = null;
+          }
           if (token !== null) {
             token.parseLocation = location;
             activeTokens.push(token);
