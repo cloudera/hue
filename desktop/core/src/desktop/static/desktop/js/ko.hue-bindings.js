@@ -3625,6 +3625,7 @@
         if (self.editor.session.$backMarkers[marker].clazz.indexOf('hue-ace-syntax-') === 0) {
           var token = self.editor.session.$backMarkers[marker].token;
           delete token.syntaxError;
+          delete token.notFound;
           self.editor.session.removeMarker(self.editor.session.$backMarkers[marker].id);
         }
       }
@@ -4360,7 +4361,7 @@
               } else if (token !== null && token.notFound) {
                 tooltipTimeout = window.setTimeout(function () {
                   // TODO: i18n
-                  if (token.notFound) {
+                  if (token.notFound && token.syntaxError) {
                     var tooltipText;
                     if (token.syntaxError.expected.length > 0) {
                       tooltipText = SyntaxCheckerGlobals.i18n.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
