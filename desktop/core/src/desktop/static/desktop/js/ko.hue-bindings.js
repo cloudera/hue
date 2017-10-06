@@ -3745,10 +3745,11 @@
             }
           }
 
-          var tokenValLower = token.value.toLowerCase();
+          var tokenValLower = token.actualValue.toLowerCase();
           // Break if found
           for (var i = 0; i < possibleValues.length; i++) {
-            if (possibleValues[i].name.toLowerCase() === tokenValLower) {
+            possibleValues[i].name = SqlUtils.backTickIfNeeded(self.snippet.type(), possibleValues[i].name);
+            if ((possibleValues[i].name.toLowerCase() === tokenValLower) || (tokenValLower.indexOf('`') === 0 && tokenValLower.replace(/`/g, '') === possibleValues[i].name.toLowerCase())) {
               return;
             }
           }
@@ -3766,7 +3767,7 @@
 
           var weightedExpected = $.map(possibleValues, function (val) {
             return {
-              text: isLowerCase ? val.name : val.name.toUpperCase(),
+              text: isLowerCase ? val.name.toLowerCase() : val.name,
               distance: SqlParseSupport.stringDistance(token.value, val.name)
             }
           });
@@ -3861,6 +3862,7 @@
           }
 
           var token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
+
           if (token && token.value && /`$/.test(token.value)) {
             // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
             token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
@@ -3868,6 +3870,13 @@
           if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
             token = null;
           }
+          if (token && token.value) {
+            var AceRange = ace.require('ace/range').Range;
+            var actualValue = self.editor.session.getTextRange(new AceRange(location.location.first_line - 1, location.location.first_column - 1, location.location.last_line - 1, location.location.last_column - 1));
+            // The Ace tokenizer also splits on '{', '(' etc. hence the actual value;
+            token.actualValue = actualValue;
+          }
+
           if (token !== null) {
             token.parseLocation = location;
             activeTokens.push(token);
