@@ -38,7 +38,7 @@ from metadata.conf import has_navigator
           <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
         </a>
         % endif
-        <a class="inactive-action pointer" data-bind="visible: openInTableBrowserEnabled, click: function() { huePubSub.publish('context.popover.open.in.metastore', isTable ? 'table' : 'db') }">
+        <a class="inactive-action pointer" data-bind="visible: openInTableBrowserEnabled, click: function() { huePubSub.publish('context.popover.open.in.metastore', isTable || isView ? 'table' : 'db') }">
           <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
         </a>
         <a class="inactive-action pointer" data-bind="visible: replaceEditorContentEnabled, click: function() { huePubSub.publish('context.popover.replace.in.editor') }">
@@ -1419,10 +1419,10 @@ from metadata.conf import has_navigator
 
             var showInMetastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function (type) {
               if (IS_HUE_4) {
-                huePubSub.publish('open.link', '/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'));
+                huePubSub.publish('open.link', '/metastore/table' + (type === 'table' || type === 'view' ? '/' : 's/') + path.join('/'));
                 huePubSub.publish('context.popover.hide');
               } else {
-                window.open('/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'), '_blank');
+                window.open('/metastore/table' + (type === 'table' || type === 'view' ? '/' : 's/') + path.join('/'), '_blank');
               }
             });
             self.disposals.push(function () {
@@ -1566,7 +1566,7 @@ from metadata.conf import has_navigator
         });
 
         var metastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function () {
-          huePubSub.publish('open.link', '/metastore/table' + (self.isTable ? '/' : 's/') + path.join('/'));
+          huePubSub.publish('open.link', '/metastore/table' + (self.isTable || self.isView ? '/' : 's/') + path.join('/'));
           params.globalSearch.close();
         });
 
