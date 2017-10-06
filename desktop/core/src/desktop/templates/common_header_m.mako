@@ -148,7 +148,7 @@ if USE_NEW_EDITOR.get():
   </script>
 
   <script src="${ static('desktop/js/hue.utils.js') }"></script>
-  <script src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/jquery-2.2.4.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.migration.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
