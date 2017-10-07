@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"POT-Creation-Date: 2017-08-21 22:36-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -104,7 +104,7 @@ msgstr "无法删除作业。"
 msgid "Could not start job."
 msgstr "无法启动作业。"
 
-#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:851
+#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:840
 msgid "Could not stop job."
 msgstr "无法停止作业。"
 
@@ -244,9 +244,9 @@ msgstr "复制"
 msgid "Delete the job"
 msgstr "删除作业"
 
-#: src/sqoop/templates/app.mako:147 src/sqoop/templates/app.mako:425
-#: src/sqoop/templates/app.mako:443 src/sqoop/templates/app.mako:520
-#: src/sqoop/templates/app.mako:614
+#: src/sqoop/templates/app.mako:147 src/sqoop/templates/app.mako:414
+#: src/sqoop/templates/app.mako:432 src/sqoop/templates/app.mako:509
+#: src/sqoop/templates/app.mako:603
 msgid "Delete"
 msgstr "删除"
 
@@ -298,7 +298,7 @@ msgstr "保存并运行"
 msgid "There are currently no links."
 msgstr "当前没有链接。"
 
-#: src/sqoop/templates/app.mako:251 src/sqoop/templates/app.mako:408
+#: src/sqoop/templates/app.mako:251 src/sqoop/templates/app.mako:397
 msgid "Name"
 msgstr "名称"
 
@@ -310,155 +310,153 @@ msgstr "连接器"
 msgid "Cancel"
 msgstr "取消"
 
-#: src/sqoop/templates/app.mako:288 src/sqoop/templates/app.mako:300
-#: src/sqoop/templates/app.mako:312
+#: src/sqoop/templates/app.mako:289 src/sqoop/templates/app.mako:301
 msgid "Close"
 msgstr "关闭"
 
-#: src/sqoop/templates/app.mako:289
-msgid "Choose a folder"
-msgstr "选择文件夹"
-
-#: src/sqoop/templates/app.mako:301
+#: src/sqoop/templates/app.mako:290
 msgid "Are you sure you'd like to delete this job?"
 msgstr "是否确定要删除此作业？"
 
-#: src/sqoop/templates/app.mako:305 src/sqoop/templates/app.mako:317
+#: src/sqoop/templates/app.mako:294 src/sqoop/templates/app.mako:306
 msgid "No"
 msgstr "否"
 
-#: src/sqoop/templates/app.mako:306 src/sqoop/templates/app.mako:318
+#: src/sqoop/templates/app.mako:295 src/sqoop/templates/app.mako:307
 msgid "Yes, delete it"
 msgstr "是，将其删除"
 
-#: src/sqoop/templates/app.mako:313
+#: src/sqoop/templates/app.mako:302
 msgid "Are you sure you'd like to delete this link?"
 msgstr "是否确定要删除此链接？"
 
-#: src/sqoop/templates/app.mako:330
+#: src/sqoop/templates/app.mako:319
 msgid "server at "
 msgstr "服务器位置 "
 
-#: src/sqoop/templates/app.mako:344 src/sqoop/templates/app.mako:350
+#: src/sqoop/templates/app.mako:333 src/sqoop/templates/app.mako:339
 msgid " to "
 msgstr " 至 "
 
-#: src/sqoop/templates/app.mako:415
+#: src/sqoop/templates/app.mako:404
 msgid "From link"
 msgstr "从以下项链接"
 
-#: src/sqoop/templates/app.mako:422 src/sqoop/templates/app.mako:440
+#: src/sqoop/templates/app.mako:411 src/sqoop/templates/app.mako:429
 msgid "Edit"
 msgstr "编辑"
 
-#: src/sqoop/templates/app.mako:433
+#: src/sqoop/templates/app.mako:422
 msgid "To link"
 msgstr "要链接"
 
-#: src/sqoop/templates/app.mako:453
+#: src/sqoop/templates/app.mako:442
 msgid "Add a new link"
 msgstr "添加新链接"
 
-#: src/sqoop/templates/app.mako:503 src/sqoop/templates/app.mako:597
+#: src/sqoop/templates/app.mako:492 src/sqoop/templates/app.mako:586
 msgid "Property name"
 msgstr "属性名称"
 
-#: src/sqoop/templates/app.mako:504 src/sqoop/templates/app.mako:598
+#: src/sqoop/templates/app.mako:493 src/sqoop/templates/app.mako:587
 msgid "Value"
 msgstr "值"
 
-#: src/sqoop/templates/app.mako:526 src/sqoop/templates/app.mako:620
+#: src/sqoop/templates/app.mako:515 src/sqoop/templates/app.mako:609
 msgid "Add"
 msgstr "添加"
 
-#: src/sqoop/templates/app.mako:576 src/sqoop/templates/app.mako:673
+#: src/sqoop/templates/app.mako:565 src/sqoop/templates/app.mako:662
 msgid "True"
 msgstr "True"
 
-#: src/sqoop/templates/app.mako:577 src/sqoop/templates/app.mako:674
+#: src/sqoop/templates/app.mako:566 src/sqoop/templates/app.mako:663
 msgid "False"
 msgstr "False"
 
-#: src/sqoop/templates/app.mako:725
+#: src/sqoop/templates/app.mako:714
 msgid "Step 1: From"
 msgstr "第 1 步：自"
 
-#: src/sqoop/templates/app.mako:726 src/sqoop/templates/app.mako:748
+#: src/sqoop/templates/app.mako:715 src/sqoop/templates/app.mako:737
 msgid "Database"
 msgstr "数据库"
 
-#: src/sqoop/templates/app.mako:732
+#: src/sqoop/templates/app.mako:721
 msgid "Step 2: To"
 msgstr "第 2 步：至"
 
-#: src/sqoop/templates/app.mako:733 src/sqoop/templates/app.mako:755
+#: src/sqoop/templates/app.mako:722 src/sqoop/templates/app.mako:744
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/sqoop/templates/app.mako:740
+#: src/sqoop/templates/app.mako:729
 msgid "Step 1: Information"
 msgstr "第 1 步：信息"
 
-#: src/sqoop/templates/app.mako:741
+#: src/sqoop/templates/app.mako:730
 msgid "Connection"
 msgstr "连接"
 
-#: src/sqoop/templates/app.mako:747
+#: src/sqoop/templates/app.mako:736
 msgid "Step 2: From"
 msgstr "第 2 步：自"
 
-#: src/sqoop/templates/app.mako:754
+#: src/sqoop/templates/app.mako:743
 msgid "Step 3: To"
 msgstr "第 3 步：至"
 
-#: src/sqoop/templates/app.mako:821
+#: src/sqoop/templates/app.mako:810
 msgid "Please specify a link."
 msgstr "请指定链接。"
 
-#: src/sqoop/templates/app.mako:830
+#: src/sqoop/templates/app.mako:819
 msgid "Cannot connect to sqoop server."
 msgstr "无法连接到 Sqoop 服务器。"
 
-#: src/sqoop/templates/app.mako:835
+#: src/sqoop/templates/app.mako:824
 msgid "The job is starting..."
 msgstr "正在启动作业..."
 
-#: src/sqoop/templates/app.mako:839
+#: src/sqoop/templates/app.mako:828
 msgid "Started job."
 msgstr "已启动作业。"
 
-#: src/sqoop/templates/app.mako:843
+#: src/sqoop/templates/app.mako:832
 msgid "Error: "
 msgstr "错误： "
 
-#: src/sqoop/templates/app.mako:847
+#: src/sqoop/templates/app.mako:836
 msgid "Stopped job."
 msgstr "已停止作业。"
 
-#: src/sqoop/templates/app.mako:855
+#: src/sqoop/templates/app.mako:844
 msgid "Could not load node."
 msgstr "无法加载节点。"
 
-#: src/sqoop/templates/app.mako:904
+#: src/sqoop/templates/app.mako:893
 msgid ""
 "Did you know? You can use the tab key or CTRL + Space to autocomplete "
 "file and folder names"
 msgstr "您知道吗？您可使用 Tab 键或 CTRL + 空格键自动完成文件和文件夹名称"
 
-#: src/sqoop/templates/app.mako:971
+#: src/sqoop/templates/app.mako:960
 msgid ""
 "There was a problem with the server. Look at the Sqoop2 server logs for "
 "more details."
 msgstr "服务器出现问题。有关更多详情，请查看 Sqoop2 服务器日志。"
 
-#: src/sqoop/templates/app.mako:974
+#: src/sqoop/templates/app.mako:963
 msgid "Unknown error."
 msgstr "未知错误。"
 
-#: src/sqoop/templates/app.mako:1079
+#: src/sqoop/templates/app.mako:1068
 msgid "Watch out! This path currently does not exist."
 msgstr "请注意！此路径当前不存在。"
 
-#: src/sqoop/templates/app.mako:1160
+#: src/sqoop/templates/app.mako:1149
 msgid "Untitled Job"
 msgstr "无标题作业"
+
+#~ msgid "Choose a folder"
+#~ msgstr ""
