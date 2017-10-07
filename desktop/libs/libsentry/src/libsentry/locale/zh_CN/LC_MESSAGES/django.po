@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-05-16 08:40-0700\n"
+"POT-Creation-Date: 2017-08-21 22:35-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -67,9 +67,3 @@ msgstr "没有配置 Sentry 服务器。"
 #: src/libsentry/sentry_site.py:152
 msgid "Error in retrieving Sentry server properties."
 msgstr "检索 Sentry 服务器属性时出错。"
-
-#~ msgid "No Sentry servers are available."
-#~ msgstr ""
-
-#~ msgid "Error in retrieving Sentry server properties from Zookeeper."
-#~ msgstr ""

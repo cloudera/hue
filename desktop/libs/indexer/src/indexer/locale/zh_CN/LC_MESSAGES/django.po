@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-05-16 08:39-0700\n"
+"POT-Creation-Date: 2017-08-21 22:34-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,10 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/indexer/api.py:39 src/indexer/api.py:142 src/indexer/api.py:190
-#: src/indexer/api.py:218 src/indexer/api.py:260 src/indexer/api.py:281
-#: src/indexer/api2.py:38 src/indexer/api2.py:68 src/indexer/api2.py:95
-#: src/indexer/api2.py:116 src/indexer/api2.py:132
+#: src/indexer/api.py:39 src/indexer/api.py:132 src/indexer/api.py:180
+#: src/indexer/api.py:208 src/indexer/api.py:250 src/indexer/api.py:271
 msgid "POST request required."
 msgstr "需要 POST 请求。"
 
@@ -38,170 +36,145 @@ msgstr "类型 %s 不受支持。"
 msgid "Source type %s not supported."
 msgstr "源类型 %s 不受支持。"
 
-#: src/indexer/api.py:178 src/indexer/api.py:209
+#: src/indexer/api.py:168 src/indexer/api.py:199
 msgid "Collection created!"
 msgstr "已创建集合！"
 
-#: src/indexer/api.py:183 src/indexer/api.py:211
+#: src/indexer/api.py:173 src/indexer/api.py:201
 msgid "Collection missing."
 msgstr "集合缺失。"
 
-#: src/indexer/api.py:225
+#: src/indexer/api.py:215
 msgid "No collections to remove."
 msgstr "没有要删除的集合。"
 
-#: src/indexer/api.py:237
+#: src/indexer/api.py:227
 msgid "Collections removed!"
 msgstr "集合已删除！"
 
-#: src/indexer/api.py:244
+#: src/indexer/api.py:234
 msgid "GET request required."
 msgstr "需要 GET 请求。"
 
-#: src/indexer/api.py:267
+#: src/indexer/api.py:257
 msgid "No collection to update."
 msgstr "没有要更新的集合。"
 
-#: src/indexer/api.py:274
+#: src/indexer/api.py:264
 msgid "Collection updated!"
 msgstr "集合已更新！"
 
-#: src/indexer/api.py:299
+#: src/indexer/api.py:289
 msgid "Index imported!"
 msgstr "索引已导入！"
 
-#: src/indexer/api.py:301
+#: src/indexer/api.py:291
 #, python-format
 msgid "Unsupported source %s"
 msgstr "不受支持的源 %s"
 
-#: src/indexer/api2.py:57
-msgid "Index created!"
-msgstr "已创建索引！"
-
-#: src/indexer/api2.py:59
-#, python-format
-msgid "Index could not be created: %s"
-msgstr "无法创建索引：%s"
-
-#: src/indexer/api2.py:61
-msgid "Index requires a name field."
-msgstr "索引需要一个名称字段。"
-
-#: src/indexer/api2.py:75
-msgid "No indexes to remove."
-msgstr "无要删除的索引。"
-
-#: src/indexer/api2.py:88
-msgid "Indexes removed!"
-msgstr "已删除索引！"
-
-#: src/indexer/api2.py:107
-msgid "Alias created or modified!"
-msgstr "已创建或修改别名！"
-
-#: src/indexer/api2.py:109
-#, python-format
-msgid "Alias could not be created or modified: %s"
-msgstr "无法创建或修改别名：%s"
-
-#: src/indexer/api2.py:170
-#, python-format
-msgid "Could not get index schema: %s"
-msgstr "无法获取索引架构：%s"
-
-#: src/indexer/api3.py:76
+#: src/indexer/api3.py:81
 #, python-format
 msgid "Path %(path)s is not a file"
 msgstr "路径 %(path)s 不是一个文件"
 
-#: src/indexer/conf.py:64
+#: src/indexer/api3.py:206 src/indexer/controller.py:248
+msgid "File size is too large to handle!"
+msgstr "文件过大，无法处理！"
+
+#: src/indexer/api3.py:266
+#, python-format
+msgid "Creating database %(name)s"
+msgstr "正在创建数据库 %(name)s"
+
+#: src/indexer/conf.py:72
 msgid "Flag to turn on the new metadata importer."
 msgstr "用于启用新的元数据导入器的标记。"
 
-#: src/indexer/conf.py:71
+#: src/indexer/conf.py:79
 msgid "Flag to turn on the new Solr indexer."
 msgstr "用于启用新的 Solr 索引器的标记。"
 
-#: src/indexer/conf.py:78 src/indexer/conf.py:105
+#: src/indexer/conf.py:86 src/indexer/conf.py:119
 msgid "oozie workspace template for indexing:"
 msgstr "用于进行索引的 oozie 工作区模板："
 
-#: src/indexer/conf.py:87
+#: src/indexer/conf.py:93
+msgid "Flag to turn on Sqoop imports."
+msgstr "用于启用 Sqoop 导入的标记。"
+
+#: src/indexer/conf.py:101
 msgid "Batch indexer path in HDFS."
 msgstr "HDFS 中的批次索引器路径。"
 
-#: src/indexer/conf.py:93
+#: src/indexer/conf.py:107
 msgid ""
 "Local path to Hue folder where Solr instance directories will be created "
 "in non-solrcloud mode."
 msgstr "在其中以 non-solrcloud 模式创建 Solr 实例目录的 Hue 文件夹的本地路径。"
 
-#: src/indexer/conf.py:99
+#: src/indexer/conf.py:113
 msgid "Default template used at collection creation."
 msgstr "集合创建时使用的默认模板。"
 
-#: src/indexer/conf.py:112
+#: src/indexer/conf.py:126
 msgid "Location of the solrctl binary."
 msgstr "Solrctl 二进制的位置。"
 
-#: src/indexer/conf.py:119
+#: src/indexer/conf.py:133
 msgid "Zookeeper ensemble."
 msgstr "Zookeeper 总体。"
 
-#: src/indexer/controller.py:134
+#: src/indexer/controller.py:122
 #, python-format
 msgid "Could not fetch fields for collection %s."
 msgstr "无法获取集合 %s 的字段。"
 
-#: src/indexer/controller.py:135
+#: src/indexer/controller.py:123
 #, python-format
 msgid "Could not fetch fields for collection %s. See logs for more info."
 msgstr "无法获取集合 %s 的字段。请参见日志以获取更多信息。"
 
-#: src/indexer/controller.py:140
+#: src/indexer/controller.py:128
 #, python-format
 msgid "Could not fetch unique key for collection %s."
 msgstr "无法获取集合 %s 的唯一密钥。"
 
-#: src/indexer/controller.py:141
+#: src/indexer/controller.py:129
 #, python-format
 msgid "Could not fetch unique key for collection %s. See logs for more info."
 msgstr "无法获取集合 %s 的唯一密钥。请参见日志以获取更多信息。"
 
-#: src/indexer/controller.py:167
-msgid "Error in copying Solr configurations."
-msgstr "复制 Solr 配置时出错。"
+#: src/indexer/controller.py:164
+#, python-format
+msgid "Error in copying Solr configurations: %s"
+msgstr "复制 Solr 配置时出错：%s"
 
-#: src/indexer/controller.py:178 src/indexer/controller.py:218
-#: src/indexer/controller2.py:175
+#: src/indexer/controller.py:175 src/indexer/controller.py:217
+#: src/indexer/solr_client.py:147
 msgid "Error in deleting Solr configurations."
 msgstr "删除 Solr 配置时出错。"
 
-#: src/indexer/controller.py:179 src/indexer/controller.py:198
+#: src/indexer/controller.py:176 src/indexer/controller.py:195
 msgid "Could not create collection. Check error logs for more info."
 msgstr "无法创建集合。检查错误日志以获取更多信息。"
 
-#: src/indexer/controller.py:186 src/indexer/controller2.py:140
+#: src/indexer/controller.py:183 src/indexer/solr_client.py:236
 #, python-format
 msgid ""
 "Instance directory %s already exists! Please remove it from the file "
 "system."
 msgstr "实例目录 %s 已存在！请从文件系统删除它。"
 
-#: src/indexer/controller.py:207
+#: src/indexer/controller.py:206
 msgid "Cannot remove Solr cores."
 msgstr "无法删除 Solr 内核。"
 
-#: src/indexer/controller.py:220 src/indexer/controller2.py:177
+#: src/indexer/controller.py:219
 msgid "Could not remove collection. Check error logs for more info."
 msgstr "无法删除集合。检查错误日志以获取更多信息。"
 
-#: src/indexer/controller.py:249
-msgid "File size is too large to handle!"
-msgstr "文件过大，无法处理！"
-
-#: src/indexer/controller.py:264
+#: src/indexer/controller.py:263
 #, python-format
 msgid "Could not update index. Unknown type %s"
 msgstr "无法更新索引。未知类型 %s"
@@ -219,930 +192,1290 @@ msgstr "无法更新索引。不支持索引策略 %s。"
 msgid "Could not update index."
 msgstr "无法更新索引。"
 
-#: src/indexer/controller2.py:90
+#: src/indexer/file_format.py:190
+msgid "Hue Log File"
+msgstr "Hue 日志文件"
+
+#: src/indexer/file_format.py:226
+msgid "Combined Apache Log File"
+msgstr "已合并的 Apache 日志文件"
+
+#: src/indexer/file_format.py:248
+msgid "Ruby Log"
+msgstr "Ruby 日志"
+
+#: src/indexer/file_format.py:264
+msgid "Syslog"
+msgstr "系统日志"
+
+#: src/indexer/file_format.py:282
+msgid "Parquet Table"
+msgstr "Parquet 表"
+
+#: src/indexer/file_format.py:287
+msgid "CSV File"
+msgstr "CSV 文件"
+
+#: src/indexer/solr_api.py:116
+msgid "Index created!"
+msgstr "已创建索引！"
+
+#: src/indexer/solr_api.py:129
+msgid "No indexes to remove."
+msgstr "无要删除的索引。"
+
+#: src/indexer/solr_api.py:142
+msgid "Indexes removed!"
+msgstr "已删除索引！"
+
+#: src/indexer/solr_api.py:160
+msgid "Alias created or modified!"
+msgstr "已创建或修改别名！"
+
+#: src/indexer/solr_client.py:86
 #, python-format
 msgid "Solr server could not be contacted properly: %s"
 msgstr "无法正确地连接 Solr 服务器：%s"
 
-#: src/indexer/controller2.py:129 src/indexer/controller2.py:152
-msgid "Could not create index. Check error logs for more info."
-msgstr "无法创建索引。检查错误日志以获取更多信息。"
-
-#: src/indexer/controller2.py:164
+#: src/indexer/solr_client.py:133
 msgid "Cannot remove non-Solr cloud cores."
 msgstr "无法删除非 Solr 云核。"
 
-#: src/indexer/controller2.py:191
+#: src/indexer/solr_client.py:150
+#, python-format
+msgid "Could not remove collection: %(message)s"
+msgstr "无法删除集合：%(message)s"
+
+#: src/indexer/solr_client.py:226
+#, python-format
+msgid "Could not create index: %s"
+msgstr "无法创建索引：%s"
+
+#: src/indexer/solr_client.py:248
+msgid "Could not create index. Check error logs for more info."
+msgstr "无法创建索引。检查错误日志以获取更多信息。"
+
+#: src/indexer/solr_client.py:292
 #, python-format
 msgid "Error in getting schema information for index '%s'"
 msgstr "获取索引 '%s' 的架构信息时出错"
 
-#: src/indexer/file_format.py:189
-msgid "Hue Log File"
-msgstr "Hue 日志文件"
-
-#: src/indexer/file_format.py:225
-msgid "Combined Apache Log File"
-msgstr "已合并的 Apache 日志文件"
-
-#: src/indexer/file_format.py:247
-msgid "Ruby Log"
-msgstr "Ruby 日志"
-
-#: src/indexer/file_format.py:263
-msgid "Syslog"
-msgstr "系统日志"
-
-#: src/indexer/file_format.py:281
-msgid "Parquet Table"
-msgstr "Parquet 表"
-
-#: src/indexer/file_format.py:286
-msgid "CSV File"
-msgstr "CSV 文件"
-
-#: src/indexer/operations.py:57
-msgid "Split Chararacter"
-msgstr "拆分字符"
-
-#: src/indexer/operations.py:64
-msgid "Regular Expression"
-msgstr "正则表达式"
-
-#: src/indexer/operations.py:71
-msgid "Date Format (eg: yyyy/MM/dd)"
-msgstr "日期格式（例如：yyyy/MM/dd）"
-
-#: src/indexer/operations.py:78
-msgid "Authority"
-msgstr "颁发机构"
-
-#: src/indexer/operations.py:79
-msgid "Fragment"
-msgstr "片段"
-
-#: src/indexer/operations.py:80
-msgid "Host"
-msgstr "主机"
-
-#: src/indexer/operations.py:81 src/indexer/templates/importer.mako:402
-#: src/indexer/templates/indexer.mako:253
-#: src/indexer/templates/indexes.mako:174
-msgid "Path"
-msgstr "路径"
-
-#: src/indexer/operations.py:82
-msgid "Port"
-msgstr "端口"
-
-#: src/indexer/operations.py:83 src/indexer/templates/importer.mako:419
-#: src/indexer/templates/indexer.mako:265
-msgid "Query"
-msgstr "查询"
-
-#: src/indexer/operations.py:84
-msgid "Scheme"
-msgstr "架构"
-
-#: src/indexer/operations.py:85
-msgid "Scheme Specific Path"
-msgstr "架构特定路径"
-
-#: src/indexer/operations.py:86
-msgid "User Info"
-msgstr "用户信息"
-
-#: src/indexer/operations.py:93
-msgid "ISO Code"
-msgstr "ISO 代码"
-
-#: src/indexer/operations.py:94
-msgid "Country Name"
-msgstr "国家/地区名称"
-
-#: src/indexer/operations.py:95
-msgid "Subdivisions Names"
-msgstr "细分线名称"
-
-#: src/indexer/operations.py:96
-msgid "Subdivisons ISO Code"
-msgstr "细分线 ISO 代码"
-
-#: src/indexer/operations.py:97
-msgid "City Name"
-msgstr "城市名称"
-
-#: src/indexer/operations.py:98
-msgid "Postal Code"
-msgstr "邮政编码"
-
-#: src/indexer/operations.py:99
-msgid "Latitude"
-msgstr "纬度"
-
-#: src/indexer/operations.py:100
-msgid "Longitude"
-msgstr "经度"
-
-#: src/indexer/operations.py:108
-msgid "Mapping"
-msgstr "映射"
-
-#: src/indexer/operations.py:115
-msgid "Find"
-msgstr "查找"
-
-#: src/indexer/operations.py:116
-msgid "Replace"
-msgstr "替换"
-
-#: src/indexer/utils.py:135
+#: src/indexer/utils.py:145
 #, python-format
 msgid "%s is not a boolean value"
 msgstr "%s 不是布尔值"
 
-#: src/indexer/views.py:38 src/indexer/views.py:47 src/indexer/views.py:62
+#: src/indexer/views.py:39 src/indexer/views.py:48 src/indexer/views.py:58
 msgid "Missing permission."
 msgstr "缺少权限。"
 
-#: src/indexer/views.py:122
+#: src/indexer/views.py:120
 msgid "A POST request is required."
 msgstr "需要 POST 请求。"
 
-#: src/indexer/management/commands/indexer_setup.py:44
-msgid "Installing twitter collection"
-msgstr "安装 twitter 集合"
+#: src/indexer/indexers/morphline.py:72
+#, python-format
+msgid "Indexing into %s"
+msgstr "正在编制索引至 %s"
 
-#: src/indexer/management/commands/indexer_setup.py:52
-msgid "Twitter collection successfully installed"
-msgstr "Twitter 集合已成功安装"
+#: src/indexer/indexers/morphline_operations.py:58
+msgid "Split Chararacter"
+msgstr "拆分字符"
 
-#: src/indexer/management/commands/indexer_setup.py:54
-msgid "Installing yelp collection"
-msgstr "安装 yelp 集合"
+#: src/indexer/indexers/morphline_operations.py:65
+msgid "Regular Expression"
+msgstr "正则表达式"
 
-#: src/indexer/management/commands/indexer_setup.py:62
-msgid "Yelp collection successfully installed"
-msgstr "Yelp 集合已成功安装"
+#: src/indexer/indexers/morphline_operations.py:72
+msgid "Date Format (eg: yyyy/MM/dd)"
+msgstr "日期格式（例如：yyyy/MM/dd）"
 
-#: src/indexer/management/commands/indexer_setup.py:64
-msgid "Installing logs collection"
-msgstr "安装日志集合"
+#: src/indexer/indexers/morphline_operations.py:79
+msgid "Authority"
+msgstr "颁发机构"
 
-#: src/indexer/management/commands/indexer_setup.py:75
-msgid "Logs collection successfully installed"
-msgstr "日志集合已成功安装"
+#: src/indexer/indexers/morphline_operations.py:80
+msgid "Fragment"
+msgstr "片段"
+
+#: src/indexer/indexers/morphline_operations.py:81
+msgid "Host"
+msgstr "主机"
+
+#: src/indexer/indexers/morphline_operations.py:82
+#: src/indexer/templates/importer.mako:232
+#: src/indexer/templates/indexer.mako:236
+msgid "Path"
+msgstr "路径"
+
+#: src/indexer/indexers/morphline_operations.py:83
+#: src/indexer/templates/importer.mako:269
+msgid "Port"
+msgstr "端口"
+
+#: src/indexer/indexers/morphline_operations.py:84
+#: src/indexer/templates/importer.mako:334
+#: src/indexer/templates/indexer.mako:248
+msgid "Query"
+msgstr "查询"
+
+#: src/indexer/indexers/morphline_operations.py:85
+msgid "Scheme"
+msgstr "架构"
+
+#: src/indexer/indexers/morphline_operations.py:86
+msgid "Scheme Specific Path"
+msgstr "架构特定路径"
+
+#: src/indexer/indexers/morphline_operations.py:87
+msgid "User Info"
+msgstr "用户信息"
+
+#: src/indexer/indexers/morphline_operations.py:94
+msgid "ISO Code"
+msgstr "ISO 代码"
+
+#: src/indexer/indexers/morphline_operations.py:95
+msgid "Country Name"
+msgstr "国家/地区名称"
+
+#: src/indexer/indexers/morphline_operations.py:96
+msgid "Subdivisions Names"
+msgstr "细分线名称"
+
+#: src/indexer/indexers/morphline_operations.py:97
+msgid "Subdivisons ISO Code"
+msgstr "细分线 ISO 代码"
+
+#: src/indexer/indexers/morphline_operations.py:98
+msgid "City Name"
+msgstr "城市名称"
+
+#: src/indexer/indexers/morphline_operations.py:99
+msgid "Postal Code"
+msgstr "邮政编码"
+
+#: src/indexer/indexers/morphline_operations.py:100
+msgid "Latitude"
+msgstr "纬度"
+
+#: src/indexer/indexers/morphline_operations.py:101
+msgid "Longitude"
+msgstr "经度"
+
+#: src/indexer/indexers/morphline_operations.py:109
+msgid "Mapping"
+msgstr "映射"
+
+#: src/indexer/indexers/morphline_operations.py:116
+msgid "Find"
+msgstr "查找"
+
+#: src/indexer/indexers/morphline_operations.py:117
+msgid "Replace"
+msgstr "替换"
+
+#: src/indexer/indexers/rdbms.py:86
+#, python-format
+msgid "Error accessing the database %s: %s"
+msgstr "访问数据库 %s 时出错：%s"
+
+#: src/indexer/indexers/rdbms.py:222
+#, python-format
+msgid "Indexer job for %(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s to %(path)s"
+msgstr "%(rdbmsDatabaseName)s.%(rdbmsDatabaseName)s 的 %(path)s 索引器作业"
+
+#: src/indexer/indexers/rdbms.py:272
+msgid "Failed to get sample data."
+msgstr "无法获取样本数据。"
+
+#: src/indexer/indexers/sql.py:206
+#, python-format
+msgid "Creating table %(database)s.%(table)s"
+msgstr "正在创建表 %(database)s.%(table)s"
 
 #: src/indexer/templates/collections.mako:25
 msgid "Search Indexes"
 msgstr "搜索索引"
 
-#: src/indexer/templates/collections.mako:66
-#: src/indexer/templates/collections.mako:207
-#: src/indexer/templates/indexes.mako:63
-msgid "Collections"
-msgstr "集合"
-
-#: src/indexer/templates/collections.mako:67
-msgid "Dashboards"
-msgstr "仪表板"
-
-#: src/indexer/templates/collections.mako:76
-#: src/indexer/templates/indexer.mako:119
+#: src/indexer/templates/collections.mako:70
+#: src/indexer/templates/indexer.mako:113 src/indexer/templates/indexes.mako:32
+#: src/indexer/templates/indexes.mako:167
 msgid "Index Browser"
 msgstr "索引浏览器"
 
-#: src/indexer/templates/collections.mako:76
-#: src/indexer/templates/collections.mako:556
-#: src/indexer/templates/indexer.mako:119
+#: src/indexer/templates/collections.mako:70
+#: src/indexer/templates/collections.mako:536
+#: src/indexer/templates/indexer.mako:113 src/indexer/templates/indexes.mako:76
 msgid "Indexes"
 msgstr "索引"
 
-#: src/indexer/templates/collections.mako:104
-#: src/indexer/templates/collections.mako:118
-#: src/indexer/templates/collections.mako:136
-#: src/indexer/templates/importer.mako:323
-#: src/indexer/templates/importer.mako:767
-#: src/indexer/templates/indexer.mako:172
-#: src/indexer/templates/indexes.mako:203
+#: src/indexer/templates/collections.mako:98
+#: src/indexer/templates/collections.mako:116
+#: src/indexer/templates/importer.mako:814
+#: src/indexer/templates/indexes.mako:263
+#: src/indexer/templates/indexes.mako:284
+#: src/indexer/templates/indexes.mako:301
 msgid "Close"
 msgstr "关闭"
 
-#: src/indexer/templates/collections.mako:105
-#: src/indexer/templates/importer.mako:324
-#: src/indexer/templates/indexer.mako:173
-msgid "Choose a file"
-msgstr "选择文件"
-
-#: src/indexer/templates/collections.mako:119
+#: src/indexer/templates/collections.mako:99
 msgid "Do you really want to delete the following index(es)?"
 msgstr "是否确实要删除以下索引？"
 
-#: src/indexer/templates/collections.mako:127
-#: src/indexer/templates/collections.mako:143
-#: src/indexer/templates/importer.mako:774
-#: src/indexer/templates/indexes.mako:104
-#: src/indexer/templates/indexes.mako:122
-#: src/indexer/templates/indexes.mako:164
+#: src/indexer/templates/collections.mako:107
+#: src/indexer/templates/collections.mako:123
+#: src/indexer/templates/importer.mako:821
+#: src/indexer/templates/indexes.mako:329
 msgid "Cancel"
 msgstr "取消"
 
-#: src/indexer/templates/collections.mako:128
-#: src/indexer/templates/collections.mako:144
-#: src/indexer/templates/indexes.mako:208
+#: src/indexer/templates/collections.mako:108
+#: src/indexer/templates/collections.mako:124
+#: src/indexer/templates/indexes.mako:275
+#: src/indexer/templates/indexes.mako:294
 msgid "Yes"
 msgstr "是"
 
-#: src/indexer/templates/collections.mako:137
+#: src/indexer/templates/collections.mako:117
 msgid "Confirm Delete"
 msgstr "确认删除"
 
-#: src/indexer/templates/collections.mako:140
+#: src/indexer/templates/collections.mako:120
 msgid "Are you sure you want to delete the index"
 msgstr "是否确定要删除该索引"
 
-#: src/indexer/templates/collections.mako:176
+#: src/indexer/templates/collections.mako:156
 msgid "Filter indexes..."
 msgstr "筛选索引..."
 
-#: src/indexer/templates/collections.mako:178
+#: src/indexer/templates/collections.mako:158
 msgid ""
 "Delete the selected indexes. These must be solr cloud collections. Cores "
 "cannot be deleted currently."
 msgstr "删除所选索引。这些索引必须是 solr 云集合。当前无法删除内核。"
 
-#: src/indexer/templates/collections.mako:179
-#: src/indexer/templates/collections.mako:384
-#: src/indexer/templates/indexes.mako:38
+#: src/indexer/templates/collections.mako:159
+#: src/indexer/templates/collections.mako:364
+#: src/indexer/templates/indexes.mako:223
 msgid "Delete"
 msgstr "删除"
 
-#: src/indexer/templates/collections.mako:181
+#: src/indexer/templates/collections.mako:161
 msgid "Show cores"
 msgstr "显示内核"
 
-#: src/indexer/templates/collections.mako:187
-#: src/indexer/templates/importer.mako:376
-#: src/indexer/templates/indexes.mako:161
+#: src/indexer/templates/collections.mako:167
+#: src/indexer/templates/importer.mako:196
+#: src/indexer/templates/indexes.mako:331
 msgid "Create"
 msgstr "创建"
 
-#: src/indexer/templates/collections.mako:195
+#: src/indexer/templates/collections.mako:175
 msgid "There are currently no indexes defined."
 msgstr "当前没有已定义的索引。"
 
-#: src/indexer/templates/collections.mako:195
+#: src/indexer/templates/collections.mako:175
 msgid "Click here to add"
 msgstr "单击此处添加"
 
-#: src/indexer/templates/collections.mako:195
+#: src/indexer/templates/collections.mako:175
 msgid "one or more."
 msgstr "一个或多个。"
 
-#: src/indexer/templates/collections.mako:206
-#: src/indexer/templates/collections.mako:253
-#: src/indexer/templates/collections.mako:315
-#: src/indexer/templates/collections.mako:396
-#: src/indexer/templates/importer.mako:500
-#: src/indexer/templates/importer.mako:502
-#: src/indexer/templates/importer.mako:785
-#: src/indexer/templates/importer.mako:843
-#: src/indexer/templates/indexer.mako:271
-#: src/indexer/templates/indexer.mako:391 src/indexer/templates/indexes.mako:61
-#: src/indexer/templates/indexes.mako:133
+#: src/indexer/templates/collections.mako:186
+#: src/indexer/templates/collections.mako:233
+#: src/indexer/templates/collections.mako:295
+#: src/indexer/templates/collections.mako:376
+#: src/indexer/templates/importer.mako:410
+#: src/indexer/templates/importer.mako:412
+#: src/indexer/templates/importer.mako:415
+#: src/indexer/templates/importer.mako:832
+#: src/indexer/templates/importer.mako:881
+#: src/indexer/templates/indexer.mako:254
+#: src/indexer/templates/indexer.mako:374
+#: src/indexer/templates/indexes.mako:350
+#: src/indexer/templates/indexes.mako:453
 msgid "Name"
 msgstr "名称"
 
-#: src/indexer/templates/collections.mako:238
-#: src/indexer/templates/collections.mako:451
-#: src/indexer/templates/indexer.mako:347
-#: src/indexer/templates/indexes.mako:409
+#: src/indexer/templates/collections.mako:187
+#: src/indexer/templates/indexes.mako:352
+msgid "Collections"
+msgstr "集合"
+
+#: src/indexer/templates/collections.mako:218
+#: src/indexer/templates/collections.mako:431
+#: src/indexer/templates/indexer.mako:330
 msgid "Previous"
 msgstr "上一页"
 
-#: src/indexer/templates/collections.mako:239
-#: src/indexer/templates/collections.mako:452
-#: src/indexer/templates/importer.mako:745
-#: src/indexer/templates/indexer.mako:352
-#: src/indexer/templates/indexer.mako:358
-#: src/indexer/templates/indexes.mako:408
+#: src/indexer/templates/collections.mako:219
+#: src/indexer/templates/collections.mako:432
+#: src/indexer/templates/importer.mako:792
+#: src/indexer/templates/indexer.mako:335
+#: src/indexer/templates/indexer.mako:341
 msgid "Next"
 msgstr "下一页"
 
-#: src/indexer/templates/collections.mako:240
-#: src/indexer/templates/collections.mako:453
+#: src/indexer/templates/collections.mako:220
+#: src/indexer/templates/collections.mako:433
 msgid "Finish"
 msgstr "完成"
 
-#: src/indexer/templates/collections.mako:250
+#: src/indexer/templates/collections.mako:230
 msgid "Pick a name and a CSV or Tab separated file with header to index from HDFS"
 msgstr "从 HDFS 选择名称和带标题的 CSV 或 Tab 分离文件用于索引"
 
-#: src/indexer/templates/collections.mako:255
+#: src/indexer/templates/collections.mako:235
 msgid "Name of index"
 msgstr "索引名称"
 
-#: src/indexer/templates/collections.mako:260
-#: src/indexer/templates/collections.mako:465
+#: src/indexer/templates/collections.mako:240
+#: src/indexer/templates/collections.mako:445
 msgid "Files"
 msgstr "文件"
 
-#: src/indexer/templates/collections.mako:267
-#: src/indexer/templates/collections.mako:472
+#: src/indexer/templates/collections.mako:247
+#: src/indexer/templates/collections.mako:452
 msgid "Source type"
 msgstr "源类型"
 
-#: src/indexer/templates/collections.mako:276
-#: src/indexer/templates/collections.mako:481
+#: src/indexer/templates/collections.mako:256
+#: src/indexer/templates/collections.mako:461
 msgid "Format of the selected file to index"
 msgstr "要索引的所选文件的格式"
 
-#: src/indexer/templates/collections.mako:279
-#: src/indexer/templates/collections.mako:484
+#: src/indexer/templates/collections.mako:259
+#: src/indexer/templates/collections.mako:464
 msgid "Separator"
 msgstr "分隔符"
 
-#: src/indexer/templates/collections.mako:286
-#: src/indexer/templates/collections.mako:491
+#: src/indexer/templates/collections.mako:266
+#: src/indexer/templates/collections.mako:471
 msgid "Quote character"
 msgstr "引证字符"
 
-#: src/indexer/templates/collections.mako:295
+#: src/indexer/templates/collections.mako:275
 msgid "Morphlines config name"
 msgstr "Morphlines 配置名称"
 
-#: src/indexer/templates/collections.mako:303
+#: src/indexer/templates/collections.mako:283
 msgid "Morphlines config expression"
 msgstr "Morphlines 配置表达式"
 
-#: src/indexer/templates/collections.mako:316
-#: src/indexer/templates/collections.mako:397
-#: src/indexer/templates/importer.mako:392
-#: src/indexer/templates/importer.mako:495
-#: src/indexer/templates/importer.mako:789
-#: src/indexer/templates/importer.mako:846
-#: src/indexer/templates/indexer.mako:247
-#: src/indexer/templates/indexer.mako:394 src/indexer/templates/indexes.mako:62
+#: src/indexer/templates/collections.mako:296
+#: src/indexer/templates/collections.mako:377
+#: src/indexer/templates/importer.mako:212
+#: src/indexer/templates/importer.mako:405
+#: src/indexer/templates/importer.mako:836
+#: src/indexer/templates/importer.mako:885
+#: src/indexer/templates/importer.mako:890
+#: src/indexer/templates/indexer.mako:230
+#: src/indexer/templates/indexer.mako:377
+#: src/indexer/templates/indexes.mako:351
+#: src/indexer/templates/indexes.mako:454
 msgid "Type"
 msgstr "类型"
 
-#: src/indexer/templates/collections.mako:317
-#: src/indexer/templates/collections.mako:398
+#: src/indexer/templates/collections.mako:297
+#: src/indexer/templates/collections.mako:378
 msgid "ID"
 msgstr "ID"
 
-#: src/indexer/templates/collections.mako:318
-#: src/indexer/templates/collections.mako:399
-#: src/indexer/templates/importer.mako:858
-#: src/indexer/templates/indexer.mako:408
+#: src/indexer/templates/collections.mako:298
+#: src/indexer/templates/collections.mako:379
+#: src/indexer/templates/importer.mako:901
+#: src/indexer/templates/indexer.mako:391
+#: src/indexer/templates/indexes.mako:455
 msgid "Required"
 msgstr "必填"
 
-#: src/indexer/templates/collections.mako:319
-#: src/indexer/templates/collections.mako:400
+#: src/indexer/templates/collections.mako:299
+#: src/indexer/templates/collections.mako:380
+#: src/indexer/templates/indexes.mako:457
 msgid "Indexed"
 msgstr "已索引"
 
-#: src/indexer/templates/collections.mako:320
-#: src/indexer/templates/collections.mako:401
+#: src/indexer/templates/collections.mako:300
+#: src/indexer/templates/collections.mako:381
+#: src/indexer/templates/indexes.mako:456
 msgid "Stored"
 msgstr "已存储"
 
-#: src/indexer/templates/collections.mako:321
+#: src/indexer/templates/collections.mako:301
 msgid "Default Field"
 msgstr "默认字段"
 
-#: src/indexer/templates/collections.mako:367
-#: src/indexer/templates/collections.mako:430
+#: src/indexer/templates/collections.mako:347
+#: src/indexer/templates/collections.mako:410
 msgid "Add"
 msgstr "添加"
 
-#: src/indexer/templates/collections.mako:369
+#: src/indexer/templates/collections.mako:349
 msgid "Generate a random ID"
 msgstr "生成随机 ID"
 
-#: src/indexer/templates/collections.mako:370
+#: src/indexer/templates/collections.mako:350
 msgid "Add ID"
 msgstr "添加 ID"
 
-#: src/indexer/templates/collections.mako:381
+#: src/indexer/templates/collections.mako:361
 msgid "Actions"
 msgstr "操作"
 
-#: src/indexer/templates/collections.mako:382
+#: src/indexer/templates/collections.mako:362
 msgid "Search"
 msgstr "搜索"
 
-#: src/indexer/templates/collections.mako:383
-msgid "Index file"
-msgstr "索引文件"
+#: src/indexer/templates/collections.mako:363
+msgid "Add data"
+msgstr "添加数据"
 
-#: src/indexer/templates/collections.mako:434
+#: src/indexer/templates/collections.mako:414
 msgid "Update"
 msgstr "更新"
 
-#: src/indexer/templates/collections.mako:462
+#: src/indexer/templates/collections.mako:442
 msgid "CSV or TSV file to index"
 msgstr "要索引的 CSV 或 TSV 文件"
 
-#: src/indexer/templates/collections.mako:529
+#: src/indexer/templates/collections.mako:509
 msgid "Name is missing"
 msgstr "缺少名称"
 
-#: src/indexer/templates/collections.mako:530
-#: src/indexer/templates/collections.mako:572
+#: src/indexer/templates/collections.mako:510
+#: src/indexer/templates/collections.mako:552
 msgid "File path is missing"
 msgstr "缺少的文件路径"
 
-#: src/indexer/templates/collections.mako:547
+#: src/indexer/templates/collections.mako:527
 msgid "Field name is missing"
 msgstr "缺少的字段名称"
 
-#: src/indexer/templates/collections.mako:548
+#: src/indexer/templates/collections.mako:528
 msgid "Field type is missing"
 msgstr "缺少的字段类型"
 
-#: src/indexer/templates/collections.mako:557
+#: src/indexer/templates/collections.mako:537
 msgid "Upload data"
 msgstr "上载数据"
 
-#: src/indexer/templates/importer.mako:30
-#: src/indexer/templates/importer.mako:270
+#: src/indexer/templates/importer.mako:31
+#: src/indexer/templates/importer.mako:87
 msgid "Importer"
 msgstr "导入器"
 
-#: src/indexer/templates/importer.mako:280
-#: src/indexer/templates/importer.mako:291
-#: src/indexer/templates/indexer.mako:129
-#: src/indexer/templates/indexer.mako:140
+#: src/indexer/templates/importer.mako:91
+msgid "Import to index"
+msgstr "导入至索引"
+
+#: src/indexer/templates/importer.mako:94
+msgid "Import to table"
+msgstr "导入至表"
+
+#: src/indexer/templates/importer.mako:97
+msgid "Create a new database"
+msgstr "创建新数据库"
+
+#: src/indexer/templates/importer.mako:109
+#: src/indexer/templates/importer.mako:120
+#: src/indexer/templates/indexer.mako:123
+#: src/indexer/templates/indexer.mako:134
+#: src/indexer/templates/indexes.mako:179
+#: src/indexer/templates/indexes.mako:189
 msgid "Toggle Assist"
 msgstr "切换帮助"
 
-#: src/indexer/templates/importer.mako:337
-#: src/indexer/templates/indexer.mako:186
+#: src/indexer/templates/importer.mako:155
+#: src/indexer/templates/indexer.mako:169
 msgid "Go to Step 1"
 msgstr "转到步骤 1"
 
-#: src/indexer/templates/importer.mako:352
+#: src/indexer/templates/importer.mako:170
 msgid "Pick data from "
 msgstr "从以下项选取数据"
 
-#: src/indexer/templates/importer.mako:355
+#: src/indexer/templates/importer.mako:173
 msgid "No source data"
 msgstr "无源数据"
 
-#: src/indexer/templates/importer.mako:361
-#: src/indexer/templates/indexer.mako:202
+#: src/indexer/templates/importer.mako:181
+#: src/indexer/templates/indexer.mako:185
 msgid "Go to Step 2"
 msgstr "转到步骤 2"
 
-#: src/indexer/templates/importer.mako:373
+#: src/indexer/templates/importer.mako:193
 msgid "Move it to "
 msgstr "将其移至"
 
-#: src/indexer/templates/importer.mako:388
+#: src/indexer/templates/importer.mako:208
+#: src/indexer/templates/indexes.mako:490
 msgid "Source"
 msgstr "源"
 
-#: src/indexer/templates/importer.mako:398
+#: src/indexer/templates/importer.mako:217
+msgid "Mode"
+msgstr "模式"
+
+#: src/indexer/templates/importer.mako:219
+msgid "Custom"
+msgstr "自定义"
+
+#: src/indexer/templates/importer.mako:222
+msgid "Configured"
+msgstr "已配置"
+
+#: src/indexer/templates/importer.mako:228
 msgid "No source is needed for creating a database."
 msgstr "创建数据库不需要源。"
 
-#: src/indexer/templates/importer.mako:403
+#: src/indexer/templates/importer.mako:233
 msgid "Click or drag from the assist"
 msgstr "单击或从助手拖动"
 
-#: src/indexer/templates/importer.mako:406
-#: src/indexer/templates/importer.mako:756
-#: src/indexer/templates/indexer.mako:369
-#: src/indexer/templates/indexer.mako:372
+#: src/indexer/templates/importer.mako:236
+#: src/indexer/templates/importer.mako:433
+#: src/indexer/templates/importer.mako:595
+#: src/indexer/templates/importer.mako:803
+#: src/indexer/templates/indexer.mako:352
+#: src/indexer/templates/indexer.mako:355
 msgid "Open"
 msgstr "打开"
 
-#: src/indexer/templates/importer.mako:413
-#: src/indexer/templates/indexer.mako:259
-#: src/indexer/templates/indexes.mako:187
+#: src/indexer/templates/importer.mako:246
+msgid "Driver"
+msgstr "驱动程序"
+
+#: src/indexer/templates/importer.mako:254
+msgid "Hostname"
+msgstr "主机名"
+
+#: src/indexer/templates/importer.mako:255
+msgid "Enter host/ip here eg. mysql.domain.com or 123.123.123.123"
+msgstr "在此处输入主机名/IP，例如 mysql.domain.com 或 123.123.123.123"
+
+#: src/indexer/templates/importer.mako:261
+msgid "JDBC Driver"
+msgstr "JDBC 驱动程序"
+
+#: src/indexer/templates/importer.mako:270
+msgid "Enter port number here eg. 3306"
+msgstr "在此处输入端口号，例如 3306"
+
+#: src/indexer/templates/importer.mako:275
+msgid "Username"
+msgstr "用户名"
+
+#: src/indexer/templates/importer.mako:276
+msgid "Enter username here"
+msgstr "在此处输入用户名"
+
+#: src/indexer/templates/importer.mako:281
+msgid "Password"
+msgstr "密码"
+
+#: src/indexer/templates/importer.mako:282
+msgid "Enter password here"
+msgstr "在此处输入密码"
+
+#: src/indexer/templates/importer.mako:289
+msgid "Test Connection"
+msgstr "测试连接"
+
+#: src/indexer/templates/importer.mako:297
+msgid "Options"
+msgstr "选项"
+
+#: src/indexer/templates/importer.mako:305
+msgid "Database Name"
+msgstr "数据库名称"
+
+#: src/indexer/templates/importer.mako:314
+msgid "Table Name"
+msgstr "表名"
+
+#: src/indexer/templates/importer.mako:319
+msgid "All Tables"
+msgstr "所有表"
+
+#: src/indexer/templates/importer.mako:328
+#: src/indexer/templates/indexer.mako:242
 msgid "Table"
 msgstr "表"
 
-#: src/indexer/templates/importer.mako:414
+#: src/indexer/templates/importer.mako:329
 msgid "Table name or <database>.<table>"
 msgstr "表名或 <database>.<table>"
 
-#: src/indexer/templates/importer.mako:420
+#: src/indexer/templates/importer.mako:335
 msgid "Search your documents..."
 msgstr "搜索文档..."
 
-#: src/indexer/templates/importer.mako:430
+#: src/indexer/templates/importer.mako:345
 msgid "Guessing format..."
 msgstr "猜测格式..."
 
-#: src/indexer/templates/importer.mako:433
-#: src/indexer/templates/importer.mako:530
-#: src/indexer/templates/indexer.mako:287
+#: src/indexer/templates/importer.mako:348
+#: src/indexer/templates/importer.mako:445
+#: src/indexer/templates/importer.mako:697
+#: src/indexer/templates/indexer.mako:270
 msgid "Format"
 msgstr "格式"
 
-#: src/indexer/templates/importer.mako:436
-#: src/indexer/templates/indexer.mako:290
+#: src/indexer/templates/importer.mako:351
+#: src/indexer/templates/indexer.mako:273
 msgid "File Type"
 msgstr "文件类型"
 
-#: src/indexer/templates/importer.mako:451
+#: src/indexer/templates/importer.mako:367
 msgid "Generating preview..."
 msgstr "生成预览..."
 
-#: src/indexer/templates/importer.mako:454
-#: src/indexer/templates/indexer.mako:314
+#: src/indexer/templates/importer.mako:370
+#: src/indexer/templates/indexer.mako:297
 msgid "Preview"
 msgstr "预览"
 
-#: src/indexer/templates/importer.mako:492
+#: src/indexer/templates/importer.mako:402
+#: src/indexer/templates/indexes.mako:489
 msgid "Destination"
 msgstr "目标"
 
-#: src/indexer/templates/importer.mako:506
+#: src/indexer/templates/importer.mako:412
+msgid "Directory must not exist in the path"
+msgstr "此目录不能位于此路径中"
+
+#: src/indexer/templates/importer.mako:418
 msgid "Only alphanumeric and underscore characters"
 msgstr "仅限字母数字和下划线字符"
 
-#: src/indexer/templates/importer.mako:513
+#: src/indexer/templates/importer.mako:424
+msgid "Empty name or invalid characters"
+msgstr "名称为空或字符无效"
+
+#: src/indexer/templates/importer.mako:428
 msgid "Adding data to the existing "
 msgstr "将数据添加到现有"
 
-#: src/indexer/templates/importer.mako:516
+#: src/indexer/templates/importer.mako:431
 msgid "Already existing"
 msgstr "已存在"
 
-#: src/indexer/templates/importer.mako:518
-msgid "Open it."
-msgstr "打开它。"
-
-#: src/indexer/templates/importer.mako:527
-#: src/indexer/templates/importer.mako:715
+#: src/indexer/templates/importer.mako:442
+#: src/indexer/templates/importer.mako:584
+#: src/indexer/templates/importer.mako:654
+#: src/indexer/templates/importer.mako:762
+#: src/indexer/templates/indexes.mako:436
 msgid "Properties"
 msgstr "属性"
 
-#: src/indexer/templates/importer.mako:537
+#: src/indexer/templates/importer.mako:452
 msgid "Store in Default location"
 msgstr "存储在默认位置"
 
-#: src/indexer/templates/importer.mako:542
-#: src/indexer/templates/importer.mako:725
+#: src/indexer/templates/importer.mako:457
+#: src/indexer/templates/importer.mako:772
 msgid "External location"
 msgstr "外部位置"
 
-#: src/indexer/templates/importer.mako:548
+#: src/indexer/templates/importer.mako:463
+#: src/indexer/templates/importer.mako:614
+#: src/indexer/templates/importer.mako:683
 msgid "Extras"
 msgstr "额外项"
 
-#: src/indexer/templates/importer.mako:549
+#: src/indexer/templates/importer.mako:464
+#: src/indexer/templates/importer.mako:615
+#: src/indexer/templates/importer.mako:684
 msgid "Show extra properties"
 msgstr "显示额外属性"
 
-#: src/indexer/templates/importer.mako:558
+#: src/indexer/templates/importer.mako:473
 msgid "Import data"
 msgstr "导入数据"
 
-#: src/indexer/templates/importer.mako:562
-#: src/indexer/templates/importer.mako:563
-#: src/indexer/templates/importer.mako:717
-#: src/indexer/templates/importer.mako:718
+#: src/indexer/templates/importer.mako:477
+#: src/indexer/templates/importer.mako:478
+#: src/indexer/templates/importer.mako:764
+#: src/indexer/templates/importer.mako:765
 msgid "Description"
 msgstr "描述"
 
-#: src/indexer/templates/importer.mako:568
+#: src/indexer/templates/importer.mako:483
+#: src/indexer/templates/importer.mako:644
 msgid "Use first row as header"
 msgstr "将第一行用作标头"
 
-#: src/indexer/templates/importer.mako:573
+#: src/indexer/templates/importer.mako:488
 msgid "Custom char delimiters"
 msgstr "自定义字符分隔符"
 
-#: src/indexer/templates/importer.mako:577
+#: src/indexer/templates/importer.mako:492
 msgid "Field"
 msgstr "字段"
 
-#: src/indexer/templates/importer.mako:580
+#: src/indexer/templates/importer.mako:495
 msgid "Array, Map"
 msgstr "数组、映射"
 
-#: src/indexer/templates/importer.mako:583
+#: src/indexer/templates/importer.mako:498
 msgid "Struct"
 msgstr "结构"
 
-#: src/indexer/templates/importer.mako:590
+#: src/indexer/templates/importer.mako:505
 msgid "Regexp"
 msgstr "正则表达式"
 
-#: src/indexer/templates/importer.mako:596
+#: src/indexer/templates/importer.mako:511
 msgid "Primary keys"
 msgstr "主要密钥"
 
-#: src/indexer/templates/importer.mako:602
+#: src/indexer/templates/importer.mako:517
 msgid "Partitions"
 msgstr "分区"
 
-#: src/indexer/templates/importer.mako:611
+#: src/indexer/templates/importer.mako:526
 msgid "Add Partition"
 msgstr "添加分区"
 
-#: src/indexer/templates/importer.mako:611
-#: src/indexer/templates/importer.mako:658
+#: src/indexer/templates/importer.mako:526
+#: src/indexer/templates/importer.mako:573
 msgid "Add partition"
 msgstr "添加分区"
 
-#: src/indexer/templates/importer.mako:646
+#: src/indexer/templates/importer.mako:561
 msgid "Add value"
 msgstr "添加值"
 
-#: src/indexer/templates/importer.mako:652
+#: src/indexer/templates/importer.mako:567
 msgid "Add column"
 msgstr "添加列"
 
-#: src/indexer/templates/importer.mako:669
-#: src/indexer/templates/indexer.mako:300
+#: src/indexer/templates/importer.mako:587
+msgid "Execute a cluster job to index a large dataset."
+msgstr "执行某个集群作业，以便为大型数据集编制索引。"
+
+#: src/indexer/templates/importer.mako:588
+msgid "Index with a job"
+msgstr "通过作业编制索引"
+
+#: src/indexer/templates/importer.mako:591
+#: src/indexer/templates/importer.mako:662
+msgid "Libs"
+msgstr "Lib"
+
+#: src/indexer/templates/importer.mako:602
+msgid "Primary key"
+msgstr "主键"
+
+#: src/indexer/templates/importer.mako:608
+msgid "Default field"
+msgstr "默认字段"
+
+#: src/indexer/templates/importer.mako:623
+msgid "Config set"
+msgstr "配置集"
+
+#: src/indexer/templates/importer.mako:629
+msgid "Num shards"
+msgstr "数字碎片"
+
+#: src/indexer/templates/importer.mako:635
+msgid "Replication factor"
+msgstr "复制因子"
+
+#: src/indexer/templates/importer.mako:656
+msgid "Mappers"
+msgstr "Mappers"
+
+#: src/indexer/templates/importer.mako:667
+msgid "Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue"
+msgstr "文件路径，如 hdfs://localhost:8020/user/hue/file.hue"
+
+#: src/indexer/templates/importer.mako:692
+msgid "Split By"
+msgstr "拆分依据"
+
+#: src/indexer/templates/importer.mako:702
+#: src/indexer/templates/importer.mako:719
+#: src/indexer/templates/indexer.mako:283
+#: src/indexer/templates/indexes.mako:377
+#: src/indexer/templates/indexes.mako:410
 msgid "Fields"
 msgstr "字段"
 
-#: src/indexer/templates/importer.mako:688
+#: src/indexer/templates/importer.mako:705
+msgid "Line"
+msgstr "行"
+
+#: src/indexer/templates/importer.mako:708
+msgid "Optionally Enclosed By"
+msgstr "也可封闭在"
+
+#: src/indexer/templates/importer.mako:739
 msgid "Add Field"
 msgstr "添加字段"
 
-#: src/indexer/templates/importer.mako:722
+#: src/indexer/templates/importer.mako:769
 msgid "Default location"
 msgstr "默认位置"
 
-#: src/indexer/templates/importer.mako:740
+#: src/indexer/templates/importer.mako:787
 msgid "Back"
 msgstr "返回"
 
-#: src/indexer/templates/importer.mako:751
+#: src/indexer/templates/importer.mako:798
 msgid "Submit"
 msgstr "提交"
 
-#: src/indexer/templates/importer.mako:757
+#: src/indexer/templates/importer.mako:804
 msgid "Check status"
 msgstr "检查状态"
 
-#: src/indexer/templates/importer.mako:768
+#: src/indexer/templates/importer.mako:815
 msgid "Write or paste comma separated field names"
 msgstr "写入或粘贴以逗号分隔的字段名称"
 
-#: src/indexer/templates/importer.mako:771
+#: src/indexer/templates/importer.mako:818
 msgid "e.g. id, name, salary"
 msgstr "例如，ID、名称、薪资"
 
-#: src/indexer/templates/importer.mako:775
+#: src/indexer/templates/importer.mako:822
 msgid "Change field names"
 msgstr "更改字段名称"
 
-#: src/indexer/templates/importer.mako:786
-#: src/indexer/templates/importer.mako:844
-#: src/indexer/templates/indexer.mako:392
+#: src/indexer/templates/importer.mako:833
+#: src/indexer/templates/importer.mako:882
+#: src/indexer/templates/indexer.mako:375
 msgid "Field name"
 msgstr "字段名称"
 
-#: src/indexer/templates/importer.mako:798
+#: src/indexer/templates/importer.mako:845
 msgid "Length"
 msgstr "长度"
 
-#: src/indexer/templates/importer.mako:800
+#: src/indexer/templates/importer.mako:847
 msgid "Precision"
 msgstr "精度"
 
-#: src/indexer/templates/importer.mako:801
+#: src/indexer/templates/importer.mako:848
 msgid "Scale"
 msgstr "比例"
 
-#: src/indexer/templates/importer.mako:806
+#: src/indexer/templates/importer.mako:853
 msgid "Value"
 msgstr "值"
 
-#: src/indexer/templates/importer.mako:807
+#: src/indexer/templates/importer.mako:854
 msgid "Partition value"
 msgstr "分区值"
 
-#: src/indexer/templates/importer.mako:812
-#: src/indexer/templates/importer.mako:849
+#: src/indexer/templates/importer.mako:859
+#: src/indexer/templates/importer.mako:894
 msgid "Show field properties"
 msgstr "显示字段属性"
 
-#: src/indexer/templates/importer.mako:815
+#: src/indexer/templates/importer.mako:862
 msgid "Field comment"
 msgstr "字段注释"
 
-#: src/indexer/templates/importer.mako:830
-msgid "No sample to be shown"
-msgstr "没有要显示的示例"
+#: src/indexer/templates/importer.mako:882
+msgid "Only alphanumeric and underscore characters and not _version_"
+msgstr "仅能使用字母数字和下划线字符，不能使用 _version_"
 
-#: src/indexer/templates/importer.mako:852
-#: src/indexer/templates/indexer.mako:402
+#: src/indexer/templates/importer.mako:891
+msgid "Field Type"
+msgstr "字段类型"
+
+#: src/indexer/templates/importer.mako:898
+#: src/indexer/templates/indexer.mako:385
 msgid "Unique"
 msgstr "唯一"
 
-#: src/indexer/templates/importer.mako:855
-#: src/indexer/templates/indexer.mako:405
-msgid "Keep in index"
-msgstr "保存在索引中"
+#: src/indexer/templates/importer.mako:905
+msgid "Keep"
+msgstr "保持"
 
-#: src/indexer/templates/importer.mako:863
-#: src/indexer/templates/importer.mako:871
-#: src/indexer/templates/indexer.mako:412
-#: src/indexer/templates/indexer.mako:418
+#: src/indexer/templates/importer.mako:911
+#: src/indexer/templates/importer.mako:921
+#: src/indexer/templates/indexer.mako:395
+#: src/indexer/templates/indexer.mako:401
 msgid "Add Operation"
 msgstr "添加操作"
 
-#: src/indexer/templates/importer.mako:863
-#: src/indexer/templates/indexer.mako:412
+#: src/indexer/templates/importer.mako:911
+#: src/indexer/templates/indexer.mako:395
 msgid "Operation"
 msgstr "操作"
 
-#: src/indexer/templates/importer.mako:871
-#: src/indexer/templates/indexer.mako:418
+#: src/indexer/templates/importer.mako:921
+#: src/indexer/templates/indexer.mako:401
 msgid "Operation to"
 msgstr "操作到"
 
-#: src/indexer/templates/importer.mako:881
-#: src/indexer/templates/indexer.mako:427
+#: src/indexer/templates/importer.mako:936
+msgid "No sample to be shown"
+msgstr "没有要显示的示例"
+
+#: src/indexer/templates/importer.mako:947
+#: src/indexer/templates/indexer.mako:410
 msgid "Number of expected fields"
 msgstr "预期字段数"
 
-#: src/indexer/templates/importer.mako:885
-#: src/indexer/templates/indexer.mako:431
+#: src/indexer/templates/importer.mako:951
+#: src/indexer/templates/indexer.mako:414
 msgid "Remove"
 msgstr "删除"
 
-#: src/indexer/templates/importer.mako:924
-#: src/indexer/templates/indexer.mako:463
+#: src/indexer/templates/importer.mako:990
+#: src/indexer/templates/indexer.mako:446
 msgid "Remove Pair"
 msgstr "删除对"
 
-#: src/indexer/templates/importer.mako:927
-#: src/indexer/templates/indexer.mako:466
+#: src/indexer/templates/importer.mako:993
+#: src/indexer/templates/indexer.mako:449
 msgid "Add Pair"
 msgstr "添加对"
 
-#: src/indexer/templates/importer.mako:943
-#: src/indexer/templates/indexer.mako:482
+#: src/indexer/templates/importer.mako:1009
+#: src/indexer/templates/indexer.mako:472
 msgid "generated"
 msgstr "已生成"
 
-#: src/indexer/templates/importer.mako:1644
-#: src/indexer/templates/importer.mako:1650
+#: src/indexer/templates/importer.mako:1401
+msgid "Connection Failed: "
+msgstr "连接失败："
+
+#: src/indexer/templates/importer.mako:1786
+msgid "Comma (,)"
+msgstr "逗号 (,)"
+
+#: src/indexer/templates/importer.mako:1787
+msgid "^Tab (\t)"
+msgstr "^Tab (\t)"
+
+#: src/indexer/templates/importer.mako:1788
+msgid "New line"
+msgstr "换行符"
+
+#: src/indexer/templates/importer.mako:1789
+msgid "Pipe"
+msgstr "管道符"
+
+#: src/indexer/templates/importer.mako:1790
+msgid "Double Quote"
+msgstr "双引号"
+
+#: src/indexer/templates/importer.mako:1791
+msgid "Single Quote"
+msgstr "单引号"
+
+#: src/indexer/templates/importer.mako:1792
+msgid "^A (\\001)"
+msgstr "^A (\\001)"
+
+#: src/indexer/templates/importer.mako:1793
+msgid "^B (\\002)"
+msgstr "^B (\\002)"
+
+#: src/indexer/templates/importer.mako:1794
+msgid "^C (\\003)"
+msgstr "^C (\\003)"
+
+#: src/indexer/templates/importer.mako:1930
+msgid "Creation success."
+msgstr "创建成功。"
+
+#: src/indexer/templates/importer.mako:1947
+#: src/indexer/templates/importer.mako:1953
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
 
-#: src/indexer/templates/importer.mako:1703
-msgid "Task "
-msgstr "任务"
+#: src/indexer/templates/importer.mako:1959
+msgid ""
+"Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT "
+"--target-dir hdfs://localhost:8020/user/foo -m 1"
+msgstr ""
+"示例：import  --connect jdbc:hsqldb:file:db.hsqldb --table TT "
+"--target-dir hdfs://localhost:8020/user/foo -m 1"
 
-#: src/indexer/templates/importer.mako:1703
-msgid " submitted."
-msgstr " 已提交。"
+#: src/indexer/templates/importer.mako:2018
+msgid "Task submitted"
+msgstr "任务已提交"
 
-#: src/indexer/templates/indexer.mako:27 src/indexer/templates/indexes.mako:23
-#: src/indexer/templates/indexes.mako:28
+#: src/indexer/templates/importer.mako:2024
+msgid "Creation success"
+msgstr "创建成功"
+
+#: src/indexer/templates/importer.mako:2028
+msgid "Error importing"
+msgstr "导入时出错"
+
+#: src/indexer/templates/indexer.mako:28
 msgid "Solr Indexes"
 msgstr "Solr 索引"
 
-#: src/indexer/templates/indexer.mako:199
+#: src/indexer/templates/indexer.mako:182
 msgid "Pick data"
 msgstr "选取数据"
 
-#: src/indexer/templates/indexer.mako:215
+#: src/indexer/templates/indexer.mako:198
 msgid "Get fields"
 msgstr "获取字段"
 
-#: src/indexer/templates/indexer.mako:218
+#: src/indexer/templates/indexer.mako:201
 msgid "Go to Step 3"
 msgstr "转到步骤 3"
 
-#: src/indexer/templates/indexer.mako:234
+#: src/indexer/templates/indexer.mako:217
 msgid "Index!"
 msgstr "索引！"
 
-#: src/indexer/templates/indexer.mako:241
+#: src/indexer/templates/indexer.mako:224
 msgid "Collection details"
 msgstr "集合详细信息"
 
-#: src/indexer/templates/indexer.mako:272
+#: src/indexer/templates/indexer.mako:255
 msgid "Collection name"
 msgstr "集合名称"
 
-#: src/indexer/templates/indexer.mako:273
+#: src/indexer/templates/indexer.mako:256
 msgid "A new collection will be created"
 msgstr "将创建新集合"
 
-#: src/indexer/templates/indexer.mako:275
+#: src/indexer/templates/indexer.mako:258
 msgid "Adding data to this existing collection"
 msgstr "将数据添加到此现有集合"
 
-#: src/indexer/templates/indexer.mako:364
+#: src/indexer/templates/indexer.mako:347
 msgid "Index it!"
 msgstr "为其编制索引！"
 
-#: src/indexer/templates/indexer.mako:370
+#: src/indexer/templates/indexer.mako:353
 msgid "Oozie Status"
 msgstr "Oozie 状态"
 
-#: src/indexer/templates/indexer.mako:373
+#: src/indexer/templates/indexer.mako:356
 msgid "View indexing status"
 msgstr "查看索引状态"
 
-#: src/indexer/templates/indexer.mako:376
+#: src/indexer/templates/indexer.mako:359
 msgid "View collection"
 msgstr "查看集合"
 
-#: src/indexer/templates/indexer.mako:397
+#: src/indexer/templates/indexer.mako:380
 msgid "Show indexing properties"
 msgstr "显示索引属性"
 
-#: src/indexer/templates/indexes.mako:32
-msgid "Search for name, description, etc..."
-msgstr "搜索名称、描述等..."
+#: src/indexer/templates/indexer.mako:388
+msgid "Keep in index"
+msgstr "保存在索引中"
 
-#: src/indexer/templates/indexes.mako:45 src/indexer/templates/indexes.mako:101
+#: src/indexer/templates/indexes.mako:61
+msgid "Search the index"
+msgstr "搜索索引"
+
+#: src/indexer/templates/indexes.mako:65
+msgid "Add Data"
+msgstr "添加数据"
+
+#: src/indexer/templates/indexes.mako:95
+msgid "Prefix filter..."
+msgstr "前缀筛选..."
+
+#: src/indexer/templates/indexes.mako:98
+msgid "Terms"
+msgstr "术语"
+
+#: src/indexer/templates/indexes.mako:99
+msgid "Stats"
+msgstr "统计数据"
+
+#: src/indexer/templates/indexes.mako:106
+msgid "There are no terms to be shown"
+msgstr "没有要显示的术语"
+
+#: src/indexer/templates/indexes.mako:125
+msgid "This field does not support stats"
+msgstr "此字段不支持统计数据"
+
+#: src/indexer/templates/indexes.mako:126
+msgid "There are no stats to be shown"
+msgstr "没有要显示的统计数据"
+
+#: src/indexer/templates/indexes.mako:144
+msgid "Not available"
+msgstr "不可用"
+
+#: src/indexer/templates/indexes.mako:217
+msgid "Search for name..."
+msgstr "搜索名称..."
+
+#: src/indexer/templates/indexes.mako:230
 msgid "Create index"
 msgstr "创建索引"
 
-#: src/indexer/templates/indexes.mako:48
-msgid "Create index from a file"
-msgstr "从文件中创建索引"
-
-#: src/indexer/templates/indexes.mako:51
+#: src/indexer/templates/indexes.mako:233
+#: src/indexer/templates/indexes.mako:302
 msgid "Create alias"
 msgstr "创建别名"
 
-#: src/indexer/templates/indexes.mako:64
-msgid "Schema"
-msgstr "架构"
+#: src/indexer/templates/indexes.mako:264
+msgid "Delete the selection?"
+msgstr "是否删除选定内容？"
 
-#: src/indexer/templates/indexes.mako:78 src/indexer/templates/indexes.mako:83
-msgid "Edit"
-msgstr "编辑"
-
-#: src/indexer/templates/indexes.mako:119
-msgid "Create or edit"
-msgstr "创建或编辑"
-
-#: src/indexer/templates/indexes.mako:153
-msgid "Get Sample"
-msgstr "获取示例"
-
-#: src/indexer/templates/indexes.mako:186
-msgid "Database"
-msgstr "数据库"
-
-#: src/indexer/templates/indexes.mako:204
-msgid "Delete the selected index(es)?"
-msgstr "删除所选索引？"
-
-#: src/indexer/templates/indexes.mako:207
+#: src/indexer/templates/indexes.mako:274
+#: src/indexer/templates/indexes.mako:293
 msgid "No"
 msgstr "否"
 
+#: src/indexer/templates/indexes.mako:285
+msgid "Delete?"
+msgstr "是否删除？"
+
+#: src/indexer/templates/indexes.mako:313
+msgid "Collection"
+msgstr "集合"
+
+#: src/indexer/templates/indexes.mako:365
+msgid "Edit"
+msgstr "编辑"
+
+#: src/indexer/templates/indexes.mako:376
+msgid "Overview"
+msgstr "概述"
+
+#: src/indexer/templates/indexes.mako:378
+#: src/indexer/templates/indexes.mako:418
+msgid "Sample"
+msgstr "样本"
+
+#: src/indexer/templates/indexes.mako:388
+msgid "Search for a field..."
+msgstr "搜索字段..."
+
 #: src/indexer/templates/indexes.mako:400
+#: src/indexer/templates/indexes.mako:429
+msgid "The index does not contain any data."
+msgstr "此索引不包含任何数据。"
+
+#: src/indexer/templates/indexes.mako:413
+#: src/indexer/templates/indexes.mako:425
+msgid "View more..."
+msgstr "查看更多..."
+
+#: src/indexer/templates/indexes.mako:438
+msgid "Unique Key"
+msgstr "唯一键"
+
+#: src/indexer/templates/indexes.mako:458
+msgid "Multivalued"
+msgstr "多值"
+
+#: src/indexer/templates/indexes.mako:485
+msgid "Copy Fields"
+msgstr "复制字段"
+
+#: src/indexer/templates/indexes.mako:505
+msgid "Dynamic Fields"
+msgstr "动态字段"
+
+#: src/indexer/templates/indexes.mako:725
 msgid "No data available"
 msgstr "没有可用数据"
 
-#: src/indexer/templates/indexes.mako:401
-msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
-
-#: src/indexer/templates/indexes.mako:402
-msgid "Showing 0 to 0 of 0 entries"
-msgstr "显示 0－0，共 0 个条目"
-
-#: src/indexer/templates/indexes.mako:403
-msgid "(filtered from _MAX_ total entries)"
-msgstr "（已从 _MAX_ 个总条目中过滤）"
-
-#: src/indexer/templates/indexes.mako:404
+#: src/indexer/templates/indexes.mako:726
 msgid "No matching records"
 msgstr "没有匹配记录"
 
-#: src/indexer/templates/indexes.mako:406
-msgid "First"
-msgstr "第一个"
+#: src/indexer/templates/indexes.mako:975
+msgid "The specified index has not been found"
+msgstr "未找到指定索引"
 
-#: src/indexer/templates/indexes.mako:407
-msgid "Last"
-msgstr "最后一个"
-
-#~ msgid "The table could not be created."
+#~ msgid "Index could not be created: %s"
 #~ msgstr ""
 
-#~ msgid "Click or drag & drop"
+#~ msgid "Index requires a name field."
 #~ msgstr ""
 
-#~ msgid "Create a new "
+#~ msgid "Alias could not be created or modified: %s"
 #~ msgstr ""
 
-#~ msgid "Status"
+#~ msgid "Could not get index schema: %s"
 #~ msgstr ""
 
-#~ msgid "There was a problem loading the databases"
+#~ msgid "Error in copying Solr configurations."
 #~ msgstr ""
 
-#~ msgid "There was a problem loading the table preview."
+#~ msgid "Installing twitter collection"
+#~ msgstr ""
+
+#~ msgid "Twitter collection successfully installed"
+#~ msgstr ""
+
+#~ msgid "Installing yelp collection"
+#~ msgstr ""
+
+#~ msgid "Yelp collection successfully installed"
+#~ msgstr ""
+
+#~ msgid "Installing logs collection"
+#~ msgstr ""
+
+#~ msgid "Logs collection successfully installed"
+#~ msgstr ""
+
+#~ msgid "Dashboards"
+#~ msgstr ""
+
+#~ msgid "Choose a file"
+#~ msgstr ""
+
+#~ msgid "Index file"
+#~ msgstr ""
+
+#~ msgid "Open it."
+#~ msgstr ""
+
+#~ msgid "Task "
+#~ msgstr ""
+
+#~ msgid " submitted."
+#~ msgstr ""
+
+#~ msgid "Search for name, description, etc..."
+#~ msgstr ""
+
+#~ msgid "Create index from a file"
+#~ msgstr ""
+
+#~ msgid "Schema"
+#~ msgstr ""
+
+#~ msgid "Create or edit"
+#~ msgstr ""
+
+#~ msgid "Get Sample"
+#~ msgstr ""
+
+#~ msgid "Database"
+#~ msgstr ""
+
+#~ msgid "Delete the selected index(es)?"
+#~ msgstr ""
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr ""
+
+#~ msgid "Showing 0 to 0 of 0 entries"
+#~ msgstr ""
+
+#~ msgid "(filtered from _MAX_ total entries)"
+#~ msgstr ""
+
+#~ msgid "First"
+#~ msgstr ""
+
+#~ msgid "Last"
 #~ msgstr ""

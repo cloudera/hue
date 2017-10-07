@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"POT-Creation-Date: 2017-08-21 22:36-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -217,9 +217,15 @@ msgid "No matching records"
 msgstr "No hay registros coincidentes"
 
 #: src/rdbms/templates/execute.mako:913
-msgid "Server error occured: "
-msgstr "Se ha producido un error del servidor: "
+msgid "Server error occurred: "
+msgstr "Se ha producido un error en el servidor: "
 
 #: src/rdbms/templates/execute.mako:916
-msgid "Unmanageable server error occured: "
-msgstr "Se ha producido un error de servidor que no se puede gestionar: "
+msgid "Unmanageable server error occurred: "
+msgstr "Se ha producido un error de servidor no administrable: "
+
+#~ msgid "Server error occured: "
+#~ msgstr ""
+
+#~ msgid "Unmanageable server error occured: "
+#~ msgstr ""
