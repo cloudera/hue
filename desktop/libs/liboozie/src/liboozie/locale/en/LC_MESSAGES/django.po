@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-05-16 08:39-0700\n"
+"POT-Creation-Date: 2017-08-21 22:34-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -53,22 +53,22 @@ msgstr ""
 msgid "Oozie Share Lib not installed in default location."
 msgstr ""
 
-#: src/liboozie/submission2.py:46 src/liboozie/submittion.py:43
+#: src/liboozie/submission2.py:47 src/liboozie/submittion.py:43
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr ""
 
-#: src/liboozie/submission2.py:186 src/liboozie/submittion.py:151
+#: src/liboozie/submission2.py:187 src/liboozie/submittion.py:151
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr ""
 
-#: src/liboozie/submission2.py:411 src/liboozie/submittion.py:252
+#: src/liboozie/submission2.py:413 src/liboozie/submittion.py:252
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr ""
 
-#: src/liboozie/submission2.py:416 src/liboozie/submittion.py:257
+#: src/liboozie/submission2.py:418 src/liboozie/submittion.py:257
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr ""

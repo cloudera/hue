@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-05-16 08:41-0700\n"
+"POT-Creation-Date: 2017-08-21 22:36-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -104,7 +104,7 @@ msgstr "Impossible de supprimer un job."
 msgid "Could not start job."
 msgstr "Impossible de lancer le job."
 
-#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:851
+#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:840
 msgid "Could not stop job."
 msgstr "Impossible d'arrêter le job."
 
@@ -244,9 +244,9 @@ msgstr "Copier"
 msgid "Delete the job"
 msgstr "Supprimer le job"
 
-#: src/sqoop/templates/app.mako:147 src/sqoop/templates/app.mako:425
-#: src/sqoop/templates/app.mako:443 src/sqoop/templates/app.mako:520
-#: src/sqoop/templates/app.mako:614
+#: src/sqoop/templates/app.mako:147 src/sqoop/templates/app.mako:414
+#: src/sqoop/templates/app.mako:432 src/sqoop/templates/app.mako:509
+#: src/sqoop/templates/app.mako:603
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -298,7 +298,7 @@ msgstr "Enregistrer et exécuter"
 msgid "There are currently no links."
 msgstr "Il n'existe actuellement aucun lien."
 
-#: src/sqoop/templates/app.mako:251 src/sqoop/templates/app.mako:408
+#: src/sqoop/templates/app.mako:251 src/sqoop/templates/app.mako:397
 msgid "Name"
 msgstr "Nom"
 
@@ -310,136 +310,131 @@ msgstr "Connecteur"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/sqoop/templates/app.mako:288 src/sqoop/templates/app.mako:300
-#: src/sqoop/templates/app.mako:312
+#: src/sqoop/templates/app.mako:289 src/sqoop/templates/app.mako:301
 msgid "Close"
 msgstr "Fermer"
 
-#: src/sqoop/templates/app.mako:289
-msgid "Choose a folder"
-msgstr "Choisir un dossier"
-
-#: src/sqoop/templates/app.mako:301
+#: src/sqoop/templates/app.mako:290
 msgid "Are you sure you'd like to delete this job?"
 msgstr "Voulez-vous vraiment supprimer ce job ?"
 
-#: src/sqoop/templates/app.mako:305 src/sqoop/templates/app.mako:317
+#: src/sqoop/templates/app.mako:294 src/sqoop/templates/app.mako:306
 msgid "No"
 msgstr "Non"
 
-#: src/sqoop/templates/app.mako:306 src/sqoop/templates/app.mako:318
+#: src/sqoop/templates/app.mako:295 src/sqoop/templates/app.mako:307
 msgid "Yes, delete it"
 msgstr "Oui, supprimer cet élément"
 
-#: src/sqoop/templates/app.mako:313
+#: src/sqoop/templates/app.mako:302
 msgid "Are you sure you'd like to delete this link?"
 msgstr "Voulez-vous vraiment supprimer ce lien ?"
 
-#: src/sqoop/templates/app.mako:330
+#: src/sqoop/templates/app.mako:319
 msgid "server at "
 msgstr "serveur à "
 
-#: src/sqoop/templates/app.mako:344 src/sqoop/templates/app.mako:350
+#: src/sqoop/templates/app.mako:333 src/sqoop/templates/app.mako:339
 msgid " to "
 msgstr " vers "
 
-#: src/sqoop/templates/app.mako:415
+#: src/sqoop/templates/app.mako:404
 msgid "From link"
 msgstr "Lien De"
 
-#: src/sqoop/templates/app.mako:422 src/sqoop/templates/app.mako:440
+#: src/sqoop/templates/app.mako:411 src/sqoop/templates/app.mako:429
 msgid "Edit"
 msgstr "Modifier"
 
-#: src/sqoop/templates/app.mako:433
+#: src/sqoop/templates/app.mako:422
 msgid "To link"
 msgstr "Lien Vers"
 
-#: src/sqoop/templates/app.mako:453
+#: src/sqoop/templates/app.mako:442
 msgid "Add a new link"
 msgstr "Ajouter un lien"
 
-#: src/sqoop/templates/app.mako:503 src/sqoop/templates/app.mako:597
+#: src/sqoop/templates/app.mako:492 src/sqoop/templates/app.mako:586
 msgid "Property name"
 msgstr "Nom de la propriété"
 
-#: src/sqoop/templates/app.mako:504 src/sqoop/templates/app.mako:598
+#: src/sqoop/templates/app.mako:493 src/sqoop/templates/app.mako:587
 msgid "Value"
 msgstr "Valeur"
 
-#: src/sqoop/templates/app.mako:526 src/sqoop/templates/app.mako:620
+#: src/sqoop/templates/app.mako:515 src/sqoop/templates/app.mako:609
 msgid "Add"
 msgstr "Ajouter"
 
-#: src/sqoop/templates/app.mako:576 src/sqoop/templates/app.mako:673
+#: src/sqoop/templates/app.mako:565 src/sqoop/templates/app.mako:662
 msgid "True"
 msgstr "Vrai"
 
-#: src/sqoop/templates/app.mako:577 src/sqoop/templates/app.mako:674
+#: src/sqoop/templates/app.mako:566 src/sqoop/templates/app.mako:663
 msgid "False"
 msgstr "Faux"
 
-#: src/sqoop/templates/app.mako:725
+#: src/sqoop/templates/app.mako:714
 msgid "Step 1: From"
 msgstr "Etape 1 : De"
 
-#: src/sqoop/templates/app.mako:726 src/sqoop/templates/app.mako:748
+#: src/sqoop/templates/app.mako:715 src/sqoop/templates/app.mako:737
 msgid "Database"
 msgstr "Base de données"
 
-#: src/sqoop/templates/app.mako:732
+#: src/sqoop/templates/app.mako:721
 msgid "Step 2: To"
 msgstr "Etape 2 : A"
 
-#: src/sqoop/templates/app.mako:733 src/sqoop/templates/app.mako:755
+#: src/sqoop/templates/app.mako:722 src/sqoop/templates/app.mako:744
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/sqoop/templates/app.mako:740
+#: src/sqoop/templates/app.mako:729
 msgid "Step 1: Information"
 msgstr "Etape 1 : Informations"
 
-#: src/sqoop/templates/app.mako:741
+#: src/sqoop/templates/app.mako:730
 msgid "Connection"
 msgstr "Connexion"
 
-#: src/sqoop/templates/app.mako:747
+#: src/sqoop/templates/app.mako:736
 msgid "Step 2: From"
 msgstr "Etape 2 : De"
 
-#: src/sqoop/templates/app.mako:754
+#: src/sqoop/templates/app.mako:743
 msgid "Step 3: To"
 msgstr "Etape 3 : A"
 
-#: src/sqoop/templates/app.mako:821
+#: src/sqoop/templates/app.mako:810
 msgid "Please specify a link."
 msgstr "Indiquez un lien."
 
-#: src/sqoop/templates/app.mako:830
+#: src/sqoop/templates/app.mako:819
 msgid "Cannot connect to sqoop server."
 msgstr "Impossible d'établir une connexion au serveur sqoop."
 
-#: src/sqoop/templates/app.mako:835
+#: src/sqoop/templates/app.mako:824
 msgid "The job is starting..."
 msgstr "Le job est en cours de lancement…"
 
-#: src/sqoop/templates/app.mako:839
+#: src/sqoop/templates/app.mako:828
 msgid "Started job."
 msgstr "Job lancé."
 
-#: src/sqoop/templates/app.mako:843
+#: src/sqoop/templates/app.mako:832
 msgid "Error: "
 msgstr "Erreur : "
 
-#: src/sqoop/templates/app.mako:847
+#: src/sqoop/templates/app.mako:836
 msgid "Stopped job."
 msgstr "Job arrêté."
 
-#: src/sqoop/templates/app.mako:855
+#: src/sqoop/templates/app.mako:844
 msgid "Could not load node."
 msgstr "Impossible de charger un nœud."
 
-#: src/sqoop/templates/app.mako:904
+#: src/sqoop/templates/app.mako:893
 msgid ""
 "Did you know? You can use the tab key or CTRL + Space to autocomplete "
 "file and folder names"
@@ -448,7 +443,7 @@ msgstr ""
 "combinaison de touches CTRL + Espace pour renseigner automatiquement les "
 "noms de dossier et de fichier"
 
-#: src/sqoop/templates/app.mako:971
+#: src/sqoop/templates/app.mako:960
 msgid ""
 "There was a problem with the server. Look at the Sqoop2 server logs for "
 "more details."
@@ -456,14 +451,17 @@ msgstr ""
 "Un problème est survenu avec le serveur. Consultez les journaux du "
 "serveur Sqoop2 pour plus de détails."
 
-#: src/sqoop/templates/app.mako:974
+#: src/sqoop/templates/app.mako:963
 msgid "Unknown error."
 msgstr "Erreur inconnue."
 
-#: src/sqoop/templates/app.mako:1079
+#: src/sqoop/templates/app.mako:1068
 msgid "Watch out! This path currently does not exist."
 msgstr "Attention ! Ce chemin d'accès n'existe pas actuellement."
 
-#: src/sqoop/templates/app.mako:1160
+#: src/sqoop/templates/app.mako:1149
 msgid "Untitled Job"
 msgstr "Job sans titre"
+
+#~ msgid "Choose a folder"
+#~ msgstr ""
