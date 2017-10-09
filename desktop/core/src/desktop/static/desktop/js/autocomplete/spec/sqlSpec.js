@@ -423,7 +423,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ALTER', 'ANALYZE TABLE', 'CREATE', 'DELETE', 'DESCRIBE',
+            suggestKeywords: ['ABORT', 'ALTER', 'ANALYZE TABLE', 'CREATE', 'DELETE', 'DESCRIBE',
               'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'GRANT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
               'RELOAD FUNCTION', 'RESET', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }

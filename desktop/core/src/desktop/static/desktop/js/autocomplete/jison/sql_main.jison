@@ -106,7 +106,8 @@ SqlStatement_EDIT
  ;
 
 NonReservedKeyword
- : '<hive>ADD'
+ : '<hive>ABORT'
+ | '<hive>ADD'
  | '<hive>ADMIN'
  | '<hive>AFTER'
  | '<hive>ANALYZE'

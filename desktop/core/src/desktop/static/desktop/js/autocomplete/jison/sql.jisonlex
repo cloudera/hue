@@ -69,6 +69,7 @@
 <hive>'VIEWS'                              { return '<hive>VIEWS'; }
 
 // Non-reserved Keywords
+<hive>'ABORT'                              { parser.determineCase(yytext); return '<hive>ABORT'; }
 <hive>'ADD'                                { return '<hive>ADD'; }
 <hive>'ADMIN'                              { return '<hive>ADMIN'; }
 <hive>'AFTER'                              { return '<hive>AFTER'; }
