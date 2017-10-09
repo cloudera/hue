@@ -1597,12 +1597,12 @@ var EditorViewModel = (function() {
           if (vm.editorMode()) {
             self.getLogs();
           }
+          self.result.endTime(new Date());
 
           if (data.status === 0) {
             self.status(data.query_status.status);
 
             if (self.status() == 'running' || self.status() == 'starting' || self.status() == 'waiting') {
-              self.result.endTime(new Date());
               var delay = self.result.executionTime() > 45000 ? 5000 : 1000; // 5s if more than 45s
               if (! notebook.unloaded()) {
                 self.checkStatusTimeout = setTimeout(self.checkStatus, delay);
