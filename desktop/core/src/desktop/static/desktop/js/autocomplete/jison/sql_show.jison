@@ -615,6 +615,10 @@ ShowTblPropertiesStatement
    {
      parser.addTablePrimary($3);
    }
+ | AnyShow '<hive>TBLPROPERTIES' RegularOrBackTickedSchemaQualifiedName '(' QuotedValue ')'
+   {
+     parser.addTablePrimary($3);
+   }
  ;
 
 ShowTblPropertiesStatement_EDIT
