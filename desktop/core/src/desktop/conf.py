@@ -1370,6 +1370,13 @@ USE_DEFAULT_CONFIGURATION = Config(
   help=_('Enable saved default configurations for Hive, Impala, Spark, and Oozie.')
 )
 
+USE_NEW_CHARTS = Config(
+  key='use_new_charts',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to use new charting library across the whole Hue.')
+)
+
 
 IS_HUE_4 = Config( # To remove in Hue 5
   key='is_hue_4',
