@@ -1444,37 +1444,37 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               <div data-bind="visible: hasDataForChart">
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.PIECHART -->
                 <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()}, fqs: ko.observableArray([]),
-                      transformer: pieChartDataTransformer, maxWidth: 350, parentSelector: '.chart-container' }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
+                      transformer: editorPieChartDataTransformer, maxWidth: 350, parentSelector: '.chart-container' }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
                 <!-- /ko -->
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
                 <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {skipWindowResize: true, datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()}, fqs: ko.observableArray([]), hideSelection: true,
-                      transformer: multiSerieDataTransformer, stacked: false, showLegend: true, isPivot: typeof chartXPivot() !== 'undefined'},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+                      transformer: editorMultiSerieDataTransformer, stacked: false, showLegend: true, isPivot: typeof chartXPivot() !== 'undefined'},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
                 <!-- /ko -->
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
                 <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()},
-                      transformer: multiSerieDataTransformer, showControls: false, enableSelection: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+                      transformer: editorMultiSerieDataTransformer, showControls: false, enableSelection: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
                 <!-- /ko -->
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
                 <div data-bind="attr:{'id': 'timelineChart_'+id()}, timelineChart: {type: chartTimelineType, skipWindowResize: true, datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()}, fqs: ko.observableArray([]), hideSelection: true,
-                      transformer: timelineChartDataTransformer, stacked: false, showLegend: true}, hideSelection: true, visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
+                      transformer: editorTimelineChartDataTransformer, stacked: false, showLegend: true}, hideSelection: true, visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" class="chart"></div>
                 <!-- /ko -->
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.MAP -->
                 <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()},
-                      transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
+                      transformer: editorLeafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
                 <!-- /ko -->
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
                 <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data, scope: chartScope(), limit: chartLimit()},
-                      transformer: mapChartDataTransformer, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
+                      transformer: editorMapChartDataTransformer, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
                 <!-- /ko -->
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART -->
                 <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, snippet: $data, limit: chartLimit()},
-                      transformer: scatterChartDataTransformer, maxWidth: 350, y: chartYSingle(), x: chartX(), size: chartScatterSize(), group: chartScatterGroup() }, visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
+                      transformer: editorScatterChartDataTransformer, maxWidth: 350, y: chartYSingle(), x: chartX(), size: chartScatterSize(), group: chartScatterGroup() }, visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
                 <!-- /ko -->
               </div>
             </div>
@@ -2255,7 +2255,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     return val !== 'NULL' && val !== null;
   }
 
-  function pieChartDataTransformer(rawDatum) {
+  function editorPieChartDataTransformer(rawDatum) {
     var _data = [];
 
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
@@ -2304,7 +2304,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     return _data;
   }
 
-  function mapChartDataTransformer(rawDatum) {
+  function editorMapChartDataTransformer(rawDatum) {
     var _data = [];
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
       var _idxRegion = -1;
@@ -2342,7 +2342,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   var MIN_LNG = -180;
   var MAX_LNG = 180;
 
-  function leafletMapChartDataTransformer(rawDatum) {
+  function editorLeafletMapChartDataTransformer(rawDatum) {
     var _data = [];
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
       var _idxLat = -1;
@@ -2399,7 +2399,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   }
 
 
-  function timelineChartDataTransformer(rawDatum) {
+  function editorTimelineChartDataTransformer(rawDatum) {
     var _datum = [];
     var _plottedSerie = 0;
 
@@ -2456,7 +2456,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     return _datum;
   }
 
-  function multiSerieDataTransformer(rawDatum) {
+  function editorMultiSerieDataTransformer(rawDatum) {
     var _datum = [];
 
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0) {
@@ -2596,7 +2596,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     return _datum;
   }
 
-  function scatterChartDataTransformer(rawDatum) {
+  function editorScatterChartDataTransformer(rawDatum) {
     var _datum = [];
 
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
