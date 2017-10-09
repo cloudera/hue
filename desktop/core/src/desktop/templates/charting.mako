@@ -34,6 +34,7 @@ from desktop import conf
   %if conf.USE_NEW_CHARTS.get():
   <script src="${ static('desktop/ext/js/plotly-latest.min.js') }"></script>
   <script src="${ static('desktop/js/ko.charts.plotly.js') }"></script>
+  <script src="${ static('desktop/js/ko.charts.leaflet.js') }"></script>
   %else:
   <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
@@ -66,6 +67,7 @@ from desktop import conf
   <script src="${ static('desktop/js/nv.d3.growingPie.js') }"></script>
   <script src="${ static('desktop/js/nv.d3.growingPieChart.js') }"></script>
   <script src="${ static('desktop/js/ko.charts.js') }"></script>
+  <script src="${ static('desktop/js/ko.charts.leaflet.js') }"></script>
   %endif
 
 </%def>
