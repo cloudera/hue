@@ -1914,7 +1914,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
       else if (location.getParameter("collection") != "") {
         var firstQuery = self.query.qs()[0].q();
-        hueUtils.changeURL("?collection=" + location.getParameter("collection") + (firstQuery ? "&q=" + firstQuery : ""));
+        if (firstQuery) {
+          hueUtils.changeURL("?collection=" + location.getParameter("collection") + "&q=" + firstQuery);
+        }
       }
 
       // Multi queries
