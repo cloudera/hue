@@ -26,17 +26,6 @@
 
     var assertAutoComplete = SqlTestUtils.assertAutocomplete;
 
-    it('should suggest keywords for "|"', function() {
-      assertAutoComplete({
-        beforeCursor: '',
-        afterCursor: '',
-        containsKeywords: ['DROP'],
-        expectedResult: {
-          lowerCase: false
-        }
-      });
-    });
-
     it('should suggest keywords for "DROP |"', function() {
       assertAutoComplete({
         beforeCursor: 'DROP ',
@@ -50,6 +39,31 @@
     });
 
     describe('hive specific', function () {
+
+      it('should suggest keywords for "|"', function() {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['ABORT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "ABORT |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'ABORT ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['TRANSACTIONS']
+          }
+        });
+      });
+
       it('should suggest keywords for "DROP |"', function () {
         assertAutoComplete({
           beforeCursor: 'DROP ',

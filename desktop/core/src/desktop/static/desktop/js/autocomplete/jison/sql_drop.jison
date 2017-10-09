@@ -16,10 +16,12 @@
 
 DataDefinition
  : DropStatement
+ | HiveAbortStatement
  ;
 
 DataDefinition_EDIT
  : DropStatement_EDIT
+ | HiveAbortStatement_EDIT
  ;
 
 DataManipulation
@@ -483,4 +485,20 @@ OptionalImpalaDeleteTableRef
 
 ImpalaDeleteTableRef_EDIT
  : TableReference_EDIT
+ ;
+
+HiveAbortStatement
+ : '<hive>ABORT' '<hive>TRANSACTIONS' TransactionIdList
+ ;
+
+HiveAbortStatement_EDIT
+ : '<hive>ABORT' 'CURSOR'
+   {
+     parser.suggestKeywords(['TRANSACTIONS']);
+   }
+ ;
+
+TransactionIdList
+ : UnsignedNumericLiteral
+ | TransactionIdList ',' UnsignedNumericLiteral
  ;
