@@ -1050,6 +1050,19 @@
         });
       });
 
+      it('should handle "SHOW TBLPROPERTIES boo("foo"); |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SHOW TBLPROPERTIES boo("foo"); ',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest tables for "SHOW TBLPROPERTIES |"', function() {
         assertAutoComplete({
           beforeCursor: 'SHOW TBLPROPERTIES ',
