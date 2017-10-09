@@ -1250,9 +1250,6 @@ var EditorViewModel = (function() {
         if (data.status == 0) {
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
-          if (vm.isOptimizerEnabled()) {
-            huePubSub.publish('editor.upload.query', data.history_id);
-          }
           if (data.handle.sync) {
             self.loadData(data.result, 100);
             self.status('available');
@@ -1261,6 +1258,9 @@ var EditorViewModel = (function() {
             if (! notebook.unloaded()) {
               self.checkStatus();
             }
+          }
+          if (vm.isOptimizerEnabled()) {
+            huePubSub.publish('editor.upload.query', data.history_id);
           }
         } else {
           self._ajaxError(data, self.execute);
