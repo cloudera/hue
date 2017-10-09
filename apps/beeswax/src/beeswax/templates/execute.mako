@@ -24,8 +24,8 @@
 %>
 
 <%namespace name="assist" file="/assist.mako" />
+<%namespace name="charting" file="/charting.mako" />
 <%namespace name="comps" file="beeswax_components.mako" />
-<%namespace name="dashboard" file="common_dashboard.mako" />
 <%namespace name="layout" file="layout.mako" />
 
 ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
@@ -1140,7 +1140,7 @@ ${ assist.assistPanel() }
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-${ dashboard.import_charts() }
+${ charting.import_charts() }
 
 
 <script type="text/javascript">

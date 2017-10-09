@@ -451,11 +451,8 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
-<script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
-<script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
-<script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
