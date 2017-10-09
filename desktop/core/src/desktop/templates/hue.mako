@@ -771,7 +771,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           opts.callback(self.processHeaders(opts.response));
         });
 
-        self.loadApp = function(app) {
+        self.loadApp = function(app, loadDeep) {
           if (self.currentApp() == 'editor') {
            var vm = ko.dataFor($('#editorComponents')[0]);
             if (vm.isPresentationMode()) {
@@ -815,20 +815,25 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }
             var baseURL = EMBEDDABLE_PAGE_URLS[app].url;
             if (self.currentContextParams() !== null) {
-              var route = new page.Route(baseURL);
-              route.keys.forEach(function (key) {
-                if (key.name === 0){
-                  if (typeof self.currentContextParams()[key.name] !== 'undefined') {
-                    baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+              if (loadDeep && self.currentContextParams()[0]) {
+                baseURL += self.currentContextParams()[0];
+              }
+              else {
+                var route = new page.Route(baseURL);
+                route.keys.forEach(function (key) {
+                  if (key.name === 0) {
+                    if (typeof self.currentContextParams()[key.name] !== 'undefined') {
+                      baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+                    }
+                    else {
+                      baseURL = baseURL.replace('*', '');
+                    }
                   }
                   else {
-                    baseURL = baseURL.replace('*', '');
+                    baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
                   }
-                }
-                else {
-                  baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
-                }
-              });
+                });
+              }
               self.currentContextParams(null);
             }
             if (self.currentQueryString() !== null) {
@@ -1091,7 +1096,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/useradmin', app: 'useradmin_users' },
           % if other_apps:
             % for other in other_apps:
-              { url: '/${ other.display_name }', app: '${ other.display_name }' },
+              { url: '/${ other.display_name }*', app: function (ctx) {
+                self.currentContextParams(ctx.params);
+                self.currentQueryString(ctx.querystring);
+                self.loadApp('${ other.display_name }', true)
+              }}
             % endfor
           % endif
         ];
