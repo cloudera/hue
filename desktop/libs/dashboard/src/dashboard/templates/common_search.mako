@@ -21,6 +21,7 @@ from desktop import conf
 from desktop.views import commonheader, commonfooter, _ko, commonshare
 %>
 
+<%namespace name="charting" file="/charting.mako" />
 <%namespace name="dashboard" file="common_dashboard.mako" />
 
 <%def name="page_structure(is_mobile=False, is_embeddable=False)">
@@ -2807,7 +2808,7 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.gridster.with-extras.min.js') }"></script>
 
 ${ dashboard.import_bindings() }
-${ dashboard.import_charts() }
+${ charting.import_charts() }
 
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
