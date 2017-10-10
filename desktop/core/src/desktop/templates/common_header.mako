@@ -180,6 +180,9 @@ if USE_NEW_EDITOR.get():
 
   <script src="${ static('metastore/js/metastore.model.js') }"></script>
 
+  <%namespace name="charting" file="/charting.mako" />
+  ${ charting.import_charts() }
+
   ${ koComponents.all() }
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
