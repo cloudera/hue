@@ -178,7 +178,7 @@ class GrokkedFormat(FileFormat):
   def get_format(self):
     format_ = super(GrokkedFormat, self).get_format()
     specific_format = {
-      "grok":self.get_grok()
+      "grok": self.get_grok()
     }
     format_.update(specific_format)
 
@@ -317,17 +317,21 @@ class CSVFormat(FileFormat):
 
   @staticmethod
   def format_character(string):
+    # Morphline supports only one char representation
     string = string.replace('"', '\\"')
     string = string.replace('\t', '\\t')
     string = string.replace('\n', '\\n')
     string = string.replace('\u0001', '\\u0001')
+    string = string.replace('\x00', '\\u0000')
     string = string.replace('\x01', '\\u0001')
+    string = string.replace('\x02', '\\u0002')
+    string = string.replace('\x03', '\\u0003')
 
     return string
 
   @classmethod
   def _valid_character(self, char):
-    return isinstance(char, basestring) and len(char) == 1
+    return isinstance(char, basestring) and len(char) == 1 or char.startswith('\\')
 
   @classmethod
   def _guess_dialect(cls, sample):
@@ -339,9 +343,9 @@ class CSVFormat(FileFormat):
   @classmethod
   def valid_format(cls, format_):
     valid = super(CSVFormat, cls).valid_format(format_)
-    valid = valid and cls._valid_character(format_["fieldSeparator"])
-    valid = valid and cls._valid_character(format_["recordSeparator"])
-    valid = valid and cls._valid_character(format_["quoteChar"])
+    valid = valid and cls._valid_character(cls.format_character(format_["fieldSeparator"]))
+    valid = valid and cls._valid_character(cls.format_character(format_["recordSeparator"]))
+    valid = valid and cls._valid_character(cls.format_character(format_["quoteChar"]))
     valid = valid and isinstance(format_["hasHeader"], bool)
 
     return valid
