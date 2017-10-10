@@ -493,10 +493,12 @@ ${ commonshare() | n,unicode }
   var shareViewModel = initSharing("#documentShareModal");
 </script>
 
+<%namespace name="charting" file="/charting.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
+${ charting.import_charts() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }

@@ -121,11 +121,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <![endif]-->
 <script src="${ static('desktop/ext/js/medium-editor.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<%namespace name="charting" file="/charting.mako" />
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="sqlSyntaxDropdown" file="/sql_syntax_dropdown.mako" />
-
-${ charting.import_charts() }
 
 <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
 

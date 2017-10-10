@@ -1416,6 +1416,9 @@
       var node = d3v3.select(document.createElement("div"))
       node.style({
         position: "absolute",
+        background: HueColors.cuiD3Scale()[0],
+        padding: "4px",
+        color: HueColors.WHITE,
         opacity: 0,
         pointerEvents: "none",
         boxSizing: "border-box"
@@ -1485,7 +1488,7 @@
     return tip
   };
 
-  if (typeof d3 !== 'undefined') {
+  if (typeof d3v3 !== 'undefined') {
     d3v3.tip = tipBuilder;
   }
 
