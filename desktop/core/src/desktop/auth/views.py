@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 try:
   import oauth2 as oauth
 except:
@@ -42,6 +41,7 @@ from desktop.lib.django_util import login_notrequired
 from desktop.lib.django_util import JsonResponse
 from desktop.log.access import access_warn, last_access_map
 from desktop.conf import LDAP, OAUTH, DEMO_ENABLED
+from desktop.settings import LOAD_BALANCER_COOKIE
 
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import get_profile
@@ -192,6 +192,7 @@ def dt_logout(request, next_page=None):
     'operation': 'USER_LOGOUT',
     'operationText': 'Logged out user: %s' % username
   }
+
   backends = get_backends()
   if backends:
     for backend in backends:
@@ -205,7 +206,10 @@ def dt_logout(request, next_page=None):
 
   if len(filter(lambda backend: hasattr(backend, 'logout'), backends)) == len(backends):
     LOG.warn("Failed to log out from all backends for user: %s" % (username))
-  return django.contrib.auth.views.logout(request, next_page)
+
+  response = django.contrib.auth.views.logout(request, next_page)
+  response.delete_cookie(LOAD_BALANCER_COOKIE)
+  return response
 
 
 def profile(request):
