@@ -47,6 +47,11 @@ Checked-in third party dependencies
 |Y|Thrift|0.9.1|Apache|http://incubator.apache.org/thrift/download/|
 |Y|urllib2_kerberos|0.1.6|ASL2|http://pypi.python.org/pypi/urllib2_kerberos|
 |Y|Werkzeug|0.5.1|BSD|http://pypi.python.org/packages/source/W/Werkzeug/Werkzeug-0.5.1.zip|
+|Y|djangosaml2|0.16.4|Apache|https://github.com/knaperek/djangosaml2/releases/tag/v0.16.4|
+|Y|pysaml2|4.4.0|Apache|https://github.com/rohe/pysaml2/tree/v4.4.0|
+|Y|defusedxml|0.4.1|Python|https://github.com/tiran/defusedxml/tree/v0.4.1|
+|Y|future|0.16.0|MIT|https://pypi.python.org/pypi/future/0.16.0|
+|Y|pycryptodomex|3.4.7|BSD|https://pypi.python.org/pypi/pycryptodomex/3.4.7|
 
 ---
 Downloaded third party dependencies during build
