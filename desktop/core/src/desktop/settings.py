@@ -454,6 +454,8 @@ if desktop.conf.SECURE_PROXY_SSL_HEADER.get():
 if 'useradmin' in [app.name for app in appmanager.DESKTOP_APPS]:
   MIDDLEWARE_CLASSES.append('useradmin.middleware.LastActivityMiddleware')
 
+LOAD_BALANCER_COOKIE = 'ROUTEID'
+
 ################################################################
 # Register file upload handlers
 # This section must go after the desktop lib modules are loaded
