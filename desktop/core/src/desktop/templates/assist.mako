@@ -839,7 +839,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <!-- ko if: typeof isSource === 'undefined' || !isSource -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       <!-- /ko -->
-      % if ENABLE_NEW_CREATE_TABLE.get():
+      % if hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get():
         <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
         <!-- ko if: typeof databaseName !== 'undefined' -->
           <a class="inactive-action" data-bind="hueLink: '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + databaseName + '/?sourceType=' + sourceType" title="${_('Create table')}" href="javascript:void(0)">
@@ -1646,7 +1646,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         });
 
         huePubSub.subscribe('assist.openCollections', function () {
-          % if ENABLE_NEW_INDEXER.get():
+          % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
             if (IS_HUE_4) {
               huePubSub.publish('open.link', '/indexer/indexes/');
             }
@@ -1668,7 +1668,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           if (entry.parent && entry.parent.definition.name !== '/') {
             definitionName = entry.parent.definition.name;
           }
-          % if ENABLE_NEW_INDEXER.get():
+          % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
             if (IS_HUE_4) {
               huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
             }
