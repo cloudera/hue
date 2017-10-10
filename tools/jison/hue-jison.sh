@@ -60,5 +60,12 @@ grunt uglify:globalSearchParser
 cat license.txt globalSearchParser.js > ../globalSearchParser.js
 rm globalSearchParser.js
 
+# === SOLR Expression parser ===
+echo "Creating SOLR Expression parser..."
+jison solrExpressionParser.jison
+grunt uglify:solrExpressionParser
+cat license.txt solrExpressionParser.js > ../solrExpressionParser.js
+rm solrExpressionParser.js
+
 popd
 echo "Done!"
