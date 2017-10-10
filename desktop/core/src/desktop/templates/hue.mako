@@ -559,11 +559,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         home: { url: '/home*', title: '${_('Home')}' },
         indexer: { url: '/indexer/indexer/', title: '${_('Indexer')}' },
         collections: { url: '/dashboard/admin/collections', title: '${_('Search')}' },
-        % if ENABLE_NEW_INDEXER.get():
+        % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
         indexes: { url: '/indexer/indexes/*', title: '${_('Indexes')}' },
-        %else:
+        % else:
         indexes: { url: '/indexer/', title: '${_('Indexes')}' },
-        %endif
+        % endif
         importer: { url: '/indexer/importer/', title: '${_('Importer')}' },
         useradmin_users: { url: '/useradmin/users', title: '${_('User Admin - Users')}' },
         useradmin_groups: { url: '/useradmin/groups', title: '${_('User Admin - Groups')}' },
@@ -600,7 +600,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
           'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
           'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
-          % if ENABLE_NEW_INDEXER.get():
+          % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
             'indexes',
           % endif
           % if other_apps:
