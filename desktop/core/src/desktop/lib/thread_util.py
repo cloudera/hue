@@ -41,7 +41,7 @@ def dump_traceback(file=sys.stderr, all_threads=True):
       name = "Current thread"
     else:
       name = "Thread"
-    
+
     trace_buffer = StringIO.StringIO()
     print >> trace_buffer, "%s: %s %s %s (most recent call last):" % (socket.gethostname(), name, thread.name, thread.ident)
     frame = sys._current_frames()[thread.ident]
