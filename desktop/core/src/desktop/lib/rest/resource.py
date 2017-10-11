@@ -16,6 +16,7 @@
 
 import logging
 import posixpath
+import time
 
 from desktop.lib.i18n import smart_unicode
 
@@ -69,6 +70,7 @@ class Resource(object):
     @return: Raw body or JSON dictionary (if response content type is JSON).
     """
     path = self._join_uri(relpath)
+    start_time = time.time()
     resp = self._client.execute(method,
                                 path,
                                 params=params,
@@ -81,8 +83,10 @@ class Resource(object):
 
     if log_response and self._client.logger.isEnabledFor(logging.DEBUG):
       self._client.logger.debug(
-          "%s Got response: %s%s" %
+          "%s %s Got response%s: %s%s" %
           (method,
+           path,
+           ' in %dms' % ((time.time() - start_time) * 1000),
            smart_unicode(resp.content[:1000], errors='replace'),
            len(resp.content) > 1000 and "..." or ""))
 
