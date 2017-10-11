@@ -15,9 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import socket
 import sys
 import threading
 import traceback
+import StringIO
+
+
+LOG = logging.getLogger(__name__)
+
 
 def dump_traceback(file=sys.stderr, all_threads=True):
   """Print a thread stacktrace"""
@@ -34,8 +41,11 @@ def dump_traceback(file=sys.stderr, all_threads=True):
       name = "Current thread"
     else:
       name = "Thread"
-
-    print >> file, "%s %s %s (most recent call last):" % (name, thread.name, thread.ident)
+    
+    trace_buffer = StringIO.StringIO()
+    print >> trace_buffer, "%s: %s %s %s (most recent call last):" % (socket.gethostname(), name, thread.name, thread.ident)
     frame = sys._current_frames()[thread.ident]
-    traceback.print_stack(frame, file=file)
-    print >> file
+    traceback.print_stack(frame, file=trace_buffer)
+
+    print >> file, trace_buffer.getvalue()
+    logging.debug(trace_buffer.getvalue())
