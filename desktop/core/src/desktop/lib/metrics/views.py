@@ -16,12 +16,17 @@
 # limitations under the License.
 
 import datetime
+import logging
 import json
 
 from django.views.decorators.http import require_GET
 
-from desktop.lib.django_util import JsonResponse, render, login_notrequired
+from desktop.lib.django_util import JsonResponse, login_notrequired
 from desktop.lib.metrics.registry import global_registry
+
+
+LOG = logging.getLogger(__name__)
+
 
 @login_notrequired
 @require_GET
@@ -35,4 +40,5 @@ def index(request):
       'timestamp': datetime.datetime.utcnow().isoformat(),
       'metric': global_registry().dump_metrics(),
   }
+  LOG.debug('Metrics: %s' % json.dumps(rep, indent=indent))
   return JsonResponse(rep, json_dumps_params={'indent': indent})
