@@ -72,6 +72,7 @@ class MorphlineIndexer(object):
       name=_('Indexing into %s') % collection_name,
       editor_type='notebook',
       on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
+      pub_sub_url='assist.collections.refresh',
       is_task=True,
       is_notebook=True,
       last_executed=start_time
