@@ -468,7 +468,11 @@ var SqlParseSupport = (function () {
           }
         }
         delete location.firstInChain;
+        if (location.type !== 'column' && location.type !== 'complex') {
+          delete location.qualified;
+        }
       }
+
       if (parser.yy.locations.length > 0) {
         parser.yy.allLocations = parser.yy.allLocations.concat(parser.yy.locations);
         parser.yy.locations = [];
@@ -1409,7 +1413,8 @@ var SqlParseSupport = (function () {
       parser.yy.locations.push({
         type: 'column',
         location: adjustLocationForCursor(location),
-        identifierChain: identifierChain
+        identifierChain: identifierChain,
+        qualified: identifierChain.length > 1
       });
     };
 
@@ -1426,7 +1431,8 @@ var SqlParseSupport = (function () {
       var unknownLoc = {
         type: 'unknown',
         location: adjustLocationForCursor(location),
-        identifierChain: identifierChain
+        identifierChain: identifierChain,
+        qualified: identifierChain.length > 1
       };
       parser.yy.locations.push(unknownLoc);
       return unknownLoc;

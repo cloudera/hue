@@ -56,7 +56,7 @@
           locations: [
             { type: 'statement', location: { 'first_line': 1, 'last_line': 1, 'first_column': 1, 'last_column': 23 } },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'tbl' }] },
-            { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'col' }, { name: 'field'}], tables: [{ identifierChain: [{ name: 'tbl' }] }] }
+            { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'col' }, { name: 'field'}], tables: [{ identifierChain: [{ name: 'tbl' }] }], qualified: true }
           ],
           lowerCase: false
         }
