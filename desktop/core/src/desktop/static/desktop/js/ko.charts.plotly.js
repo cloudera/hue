@@ -49,16 +49,16 @@
       });
     },
     update: function (element, valueAccessor) {
-      var _options = valueAccessor();
-      var plotterTimeout = window.setTimeout(function () {
-        window.clearTimeout(plotterTimeout);
-        var _data = _options.transformer(_options.data);
+      var options = valueAccessor();
+      window.clearTimeout(element.plotterTimeout);
+      element.plotterTimeout = window.setTimeout(function () {
+        var data = options.transformer(options.data);
         var chartData = {
           values: [],
           labels: [],
           type: 'pie'
         }
-        _data.forEach(function (el) {
+        data.forEach(function (el) {
           chartData.values.push(el.value);
           chartData.labels.push(el.label);
         });
