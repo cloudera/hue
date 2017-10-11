@@ -68,7 +68,7 @@ def has_navigator(user):
 def get_security_default():
   '''Get default security value from Hadoop'''
   from hadoop import cluster # Avoid dependencies conflicts
-  cluster = cluster.get_cluster_conf_for_job_submission()
+  cluster = cluster.get_yarn()
 
   return cluster.SECURITY_ENABLED.get()
 
