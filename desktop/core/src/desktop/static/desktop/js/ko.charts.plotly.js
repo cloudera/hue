@@ -18,23 +18,41 @@
 
   ko.HUE_CHARTS = {
     TYPES: {
-      LINECHART: "lines",
-      BARCHART: "bars",
-      TIMELINECHART: "timeline",
-      POINTCHART: "points",
-      PIECHART: "pie",
-      MAP: "map",
-      GRADIENTMAP: "gradientmap",
-      SCATTERCHART: "scatter"
+      LINECHART: 'lines',
+      BARCHART: 'bars',
+      TIMELINECHART: 'timeline',
+      POINTCHART: 'points',
+      PIECHART: 'pie',
+      MAP: 'map',
+      GRADIENTMAP: 'gradientmap',
+      SCATTERCHART: 'scatter'
+    },
+    PLOTLY_OPTIONS: {
+      displaylogo: false,
+      modeBarButtonsToRemove: ['sendDataToCloud', 'hoverCompareCartesian']
     }
   };
 
   ko.bindingHandlers.pieChart = {
-    init: function (element, valueAccessor) {
-      $(element).html('To-do.');
-    },
     update: function (element, valueAccessor) {
-      $(element).html('To-do.');
+      var _options = valueAccessor();
+      var plotterTimeout = window.setTimeout(function () {
+        window.clearTimeout(plotterTimeout);
+        var _data = _options.transformer(_options.data);
+        var chartData = {
+          values: [],
+          labels: [],
+          type: 'pie'
+        }
+        _data.forEach(function (el) {
+          chartData.values.push(el.value);
+          chartData.labels.push(el.label);
+        });
+        var layout = {
+          height: 400
+        };
+        Plotly.newPlot(element, [chartData], layout, ko.HUE_CHARTS.PLOTLY_OPTIONS);
+      }, 10);
     }
   };
 
