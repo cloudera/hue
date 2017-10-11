@@ -273,6 +273,8 @@ class LoginAndPermissionMiddleware(object):
     which tells us the log level. The downside is that we don't have the status code,
     which isn't useful for status logging anyways.
     """
+    request.ts = time.time()
+    request.view_func = view_func
     access_log_level = getattr(view_func, 'access_log_level', None)
     # First, skip views not requiring login
 
@@ -329,6 +331,11 @@ class LoginAndPermissionMiddleware(object):
       return response
     else:
       return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
+
+  def process_response(self, request, response):
+    if hasattr(request, 'ts') and hasattr(request, 'view_func'):
+      log_page_hit(request, request.view_func, level=logging.DEBUG, start_time=request.ts)
+    return response
 
 
 class JsonMessage(object):
