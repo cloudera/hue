@@ -19,6 +19,7 @@
 import json
 import logging
 import os
+import time
 import uuid
 
 from tempfile import NamedTemporaryFile
@@ -96,11 +97,13 @@ class OptimizerApi(object):
 
 
   def _call(self, *kwargs):
+    start_time = time.time()
+
     resp = self._api.call_api(*kwargs)
     data = resp.json()
 
     if resp.headers.get('x-altus-request-id'):
-      LOG.info('%s %s: %s' % (self.user, resp.headers['x-altus-request-id'], kwargs))
+      LOG.info('%s %s in %dms: %s' % (self.user, resp.headers['x-altus-request-id'], (time.time() - start_time) * 1000, kwargs))
 
     if data.get('code') == 'UNKNOWN':
       raise NavOptException(data.get('message'))
