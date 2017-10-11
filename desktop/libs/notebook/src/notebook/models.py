@@ -57,7 +57,7 @@ def escape_rows(rows, nulls_only=False):
 
 def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
                   files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
-                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False):
+                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False, pub_sub_url=None):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
   isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
@@ -103,6 +103,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'showHistory': True,
     'isSaved': is_saved,
     'onSuccessUrl': on_success_url,
+    'pubSubUrl': pub_sub_url,
     'skipHistorify': skip_historify,
     'isManaged': is_task,
     'snippets': [
