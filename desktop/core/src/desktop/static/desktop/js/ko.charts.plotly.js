@@ -34,6 +34,20 @@
   };
 
   ko.bindingHandlers.pieChart = {
+    init: function (element, valueAccessor) {
+      var resizeSubscription = huePubSub.subscribe('resize.plotly.chart', function () {
+        Plotly.Plots.resize(element);
+      });
+      var resizeEvent = function () {
+        Plotly.Plots.resize(element);
+      };
+
+      $(window).on('resize', resizeEvent);
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        resizeSubscription.remove();
+        $(window).off('resize', resizeEvent);
+      });
+    },
     update: function (element, valueAccessor) {
       var _options = valueAccessor();
       var plotterTimeout = window.setTimeout(function () {
