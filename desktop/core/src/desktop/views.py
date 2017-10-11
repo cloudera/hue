@@ -278,18 +278,18 @@ def dump_config(request):
 
 @access_log_level(logging.WARN)
 def threads(request):
-  """Dumps out server threads.  Useful for debugging."""
-  if not request.user.is_superuser:
-    return HttpResponse(_("You must be a superuser."))
-
+  """Dumps out server threads. Useful for debugging."""
   out = StringIO.StringIO()
   dump_traceback(file=out)
+
+  if not request.user.is_superuser:
+    return HttpResponse(_("You must be a superuser."))
 
   return HttpResponse(out.getvalue(), content_type="text/plain")
 
 @access_log_level(logging.WARN)
 def memory(request):
-  """Dumps out server threads.  Useful for debugging."""
+  """Dumps out server threads. Useful for debugging."""
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
