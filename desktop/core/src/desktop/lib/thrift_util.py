@@ -43,6 +43,7 @@ from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcard
 from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 
+
 # The maximum depth that we will recurse through a "jsonable" structure
 # while converting to thrift. This prevents us from infinite recursion
 # in the case of circular references.
@@ -465,7 +466,7 @@ class SuperClient(object):
           raise
         self.transport.close()
 
-        if isinstance(e, socket.timeout):
+        if isinstance(e, socket.timeout) or 'read operation timed out' in str(e): # Can come from ssl.SSLError
           logging.warn("Not retrying thrift call %s due to socket timeout" % attr)
           raise
         else:
