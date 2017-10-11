@@ -173,7 +173,7 @@ def dt_login(request, from_modal=False):
   if from_modal:
     renderable_path = 'login_modal.mako'
 
-  return render(renderable_path, request, {
+  response = render(renderable_path, request, {
     'action': urlresolvers.reverse('desktop.auth.views.dt_login'),
     'form': first_user_form or auth_form,
     'next': redirect_to,
@@ -182,6 +182,11 @@ def dt_login(request, from_modal=False):
     'backend_names': backend_names,
     'active_directory': is_active_directory
   })
+
+  if not request.user.is_authenticated():
+    response.delete_cookie(LOAD_BALANCER_COOKIE) # Note: might be re-balanced to another Hue on login.
+
+  return response
 
 
 def dt_logout(request, next_page=None):
