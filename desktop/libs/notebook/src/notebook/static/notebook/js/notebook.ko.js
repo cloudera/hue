@@ -2018,6 +2018,7 @@ var EditorViewModel = (function() {
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
+    self.pubSubUrl = ko.observable(typeof notebook.pubSubUrl != "undefined" && notebook.pubSubUrl != null ? notebook.pubSubUrl : null);
     self.presentationSnippets = ko.observable({});
 
     self.snippets = ko.observableArray();
