@@ -20,6 +20,7 @@ import time
 
 from desktop.lib.i18n import smart_unicode
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -83,12 +84,13 @@ class Resource(object):
 
     if log_response and self._client.logger.isEnabledFor(logging.DEBUG):
       self._client.logger.debug(
-          "%s %s Got response%s: %s%s" %
-          (method,
-           path,
+        "%s %s Got response%s: %s%s" % (
+          method,
+          smart_unicode(path, errors='ignore'),
            ' in %dms' % ((time.time() - start_time) * 1000),
            smart_unicode(resp.content[:1000], errors='replace'),
-           len(resp.content) > 1000 and "..." or ""))
+           len(resp.content) > 1000 and "..." or "")
+      )
 
     return self._format_response(resp)
 
