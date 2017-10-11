@@ -423,12 +423,7 @@ ${ assist.assistPanel() }
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Empty name or invalid characters') }
             </span>
             <span class="help-inline muted" data-bind="visible: isTargetExisting()">
-              <!-- ko if: outputFormat() == 'index' -->
-                ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
-              <!-- /ko -->
-              <!-- ko if: outputFormat() != 'index' -->
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
-              <!-- /ko -->
               <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" title="${ _('Open') }"></a>
             </span>
           </div>
@@ -1663,7 +1658,7 @@ ${ assist.assistPanel() }
             return '/metastore/tables/' + self.databaseName();
           }
           else if (self.outputFormat() == 'index') {
-            return '${ url("indexer:collections") }#edit/' + self.name();
+            return '/indexer/indexes/' + self.name();
           }
         }
         return '';
