@@ -3735,16 +3735,36 @@
       delete token.syntaxError;
 
       if (self.aceSqlSyntaxWorker && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
-        var knownTableAliases = [];
+        var aliases = [];
+
+        for (var i = 0; i < allLocations.length; i++) {
+          var location = allLocations[i];
+          if (location.type === 'alias') {
+            if (location.source === 'cte' && token.parseLocation.type === 'column') {
+              // We currently don't discover the columns from a CTE so we can't say if a column exists or not
+              if (!token.parseLocation.tables && token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 1 && token.parseLocation.identifierChain[0].name.toLowerCase() === location.alias.toLowerCase()) {
+                return;
+              }
+
+              if (token.parseLocation.tables) {
+                var found = token.parseLocation.tables.some(function (table) {
+                  return table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name && table.identifierChain[0].name.toLowerCase() === location.alias.toLowerCase();
+                });
+                if (found) {
+                  return;
+                }
+              }
+            }
+            // TODO: Take token.parseLocation.type into account
+            if (location.source === 'column' || location.source === 'table' || location.source === 'subquery' || location.source === 'cte') {
+              aliases.push({ name: location.alias.toLowerCase() });
+            }
+          }
+        }
 
         self.fetchPossibleValues(token).done(function (possibleValues) {
           // Append table aliases
-          for (var i = 0; i < allLocations.length; i++) {
-            var location = allLocations[i];
-            if (location.type === 'alias' && (location.source === 'column' || location.source === 'table' || location.source === 'subquery' || location.source === 'cte')) {
-              possibleValues.push({ name: location.alias.toLowerCase() });
-            }
-          }
+          possibleValues = possibleValues.concat(aliases);
 
           var tokenValLower = token.actualValue.toLowerCase();
           // Break if found
