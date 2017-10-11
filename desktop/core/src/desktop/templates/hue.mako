@@ -679,6 +679,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         huePubSub.subscribe('split.panel.resized', function() {
           huePubSub.publish('resize.form.actions');
+          huePubSub.publish('resize.plotly.chart');
         });
 
         huePubSub.publish('resize.form.actions');
