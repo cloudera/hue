@@ -16,6 +16,30 @@
 
 var SqlTestUtils = (function() {
 
+  // Needed to compare by val without taking attr order into account
+  var resultEquals = function (a, b) {
+    if (typeof a !== typeof b) {
+      return false;
+    }
+    if (a === b) {
+      return true;
+    }
+    if (typeof a === 'object') {
+      var aKeys = Object.keys(a);
+      if (aKeys.length !== Object.keys(b).length) {
+        return false;
+      }
+      for (var aKey in aKeys) {
+        if (!resultEquals(a[aKey], b[aKey])) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      return jasmine.matchersUtil.equals(a, b);
+    }
+  };
+
   var LOTS_OF_PARSE_RESULTS = [
     {index:0,colRef:{identifierChain:[{name:"ident_one"},{name:"ident_two"},{name:"ident_three"}]},lowerCase:false},
     {index:1,colRef:{identifierChain:[{name:"ident_one"},{name:"ident_two"}]},lowerCase:false},
@@ -445,7 +469,7 @@ var SqlTestUtils = (function() {
 
             if (testDefinition.locationsOnly) {
               return {
-                pass: jasmine.matchersUtil.equals(actualResponse.locations, testDefinition.expectedLocations),
+                pass: resultEquals(actualResponse.locations, testDefinition.expectedLocations),
                 message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
                 '          Dialect: ' + testDefinition.dialect + '\n' +
                 'Expected locations: ' + jsonStringToJsString(JSON.stringify(testDefinition.expectedLocations)) + '\n' +
@@ -549,7 +573,7 @@ var SqlTestUtils = (function() {
               delete actualResponse.suggestKeywords;
             }
             return {
-              pass: jasmine.matchersUtil.equals(actualResponse, testDefinition.expectedResult),
+              pass: resultEquals(actualResponse, testDefinition.expectedResult),
               message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
                          '          Dialect: ' + testDefinition.dialect + '\n' +
                          'Expected response: ' + jsonStringToJsString(JSON.stringify(testDefinition.expectedResult) + '\n') +

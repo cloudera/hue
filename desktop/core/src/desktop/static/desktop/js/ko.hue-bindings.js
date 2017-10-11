@@ -3755,7 +3755,10 @@
                 }
               }
             }
-            // TODO: Take token.parseLocation.type into account
+            // If it's qualified i.e.'b' in SELECT a.b we shouldn't suggest aliases
+            if (token.parseLocation.type === 'column' && token.parseLocation.qualified) {
+              continue;
+            }
             if (location.source === 'column' || location.source === 'table' || location.source === 'subquery' || location.source === 'cte') {
               aliases.push({ name: location.alias.toLowerCase() });
             }
