@@ -144,10 +144,12 @@ def log_page_hit(request, view_func, level=None, start_time=None):
     level = logging.INFO
   ai = AccessInfo(request)
   ai.log(level, start_time=start_time)
+
+  # Disabled for now as not used
   # Find the app
-  app_re_match = _MODULE_RE.match(view_func.__module__)
-  app = app_re_match and app_re_match.group(0) or '-'
-  ai.add_to_access_history(app)
+#   app_re_match = _MODULE_RE.match(view_func.__module__)
+#   app = app_re_match and app_re_match.group(0) or '-'
+#   ai.add_to_access_history(app)
 
 
 def access_log(request, msg=None, level=None):
