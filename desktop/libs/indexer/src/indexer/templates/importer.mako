@@ -1509,9 +1509,8 @@ ${ assist.assistPanel() }
           }
         }
         else if (self.outputFormat() == 'index') {
-          $.post("/search/get_collection", {
-              name: self.name(),
-              engine: 'solr'
+          $.post("${ url('indexer:list_index') }", {
+              name: self.name()
           }, function (data) {
             self.isTargetExisting(data.status == 0);
             self.isTargetChecking(false);
