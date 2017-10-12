@@ -161,7 +161,7 @@
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 29 } },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 15 } },
-          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'tbl' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }], alias: 'a' }], qualified: true },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'tbl' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }], alias: 'a' }], qualified: false },
           { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'tbl' }, { name: 'col' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }], alias: 'a' }], qualified: true },
           { type: 'database', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 23 }, identifierChain: [{ name: 'db' }] },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 24, last_column: 27 }, identifierChain: [{ name: 'db' }, { name: 'tbl' }] },
@@ -354,7 +354,7 @@
         expectedLocations: [
           { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 59 } },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 } },
-          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'bl' }], tables: [{ identifierChain: [{ name: 'blablabla' }] }, { subQuery: 's1' }], qualified: true },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'bl' }], tables: [{ identifierChain: [{ name: 'blablabla' }] }, { subQuery: 's1' }], qualified: false },
           { type: 'table', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 25 }, identifierChain: [{ name: 'blablabla' }] },
           { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 39, last_column: 40 }, subquery: true },
           { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 40 }, tables: [{ identifierChain: [{ name: 'blablabla' }] }] },

@@ -3382,7 +3382,7 @@
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 17, last_column :26}, identifierChain: [{ name: 'testTable' }]},
               { type: 'alias', source: 'table', alias: 't', location: { first_line: 1, last_line: 1, first_column: 27, last_column: 28 }, identifierChain: [{ name: 'testTable' }] },
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 31}, identifierChain: [{ name: 'testTable' }]},
-              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column :39}, identifierChain: [{ name: 'testMap'}], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't'  }], qualified: true},
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column :39}, identifierChain: [{ name: 'testMap'}], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't'  }], qualified: false },
               { type: 'alias', source: 'table', alias: 'tm', location: { first_line: 1, last_line: 1, first_column: 40, last_column: 42 }, identifierChain: [{ name: 't' }, { name: 'testMap' }] },
               { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 42, last_column: 42 } },
               { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 42, last_column: 42 } }
