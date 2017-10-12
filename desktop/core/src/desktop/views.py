@@ -77,7 +77,9 @@ def hue(request):
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
-      'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
+      'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get(),
+      'map_options': json.dumps(desktop.conf.LEAFLET_MAP_OPTIONS.get()),
+      'layer_options': json.dumps(desktop.conf.LEAFLET_TILE_LAYER_OPTIONS.get()),
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'banner_message': get_banner_message(request),
@@ -458,7 +460,9 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
     'skip_idle_timeout': skip_idle_timeout,
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
-      'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
+      'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get(),
+      'map_options': json.dumps(desktop.conf.LEAFLET_MAP_OPTIONS.get()),
+      'layer_options': json.dumps(desktop.conf.LEAFLET_TILE_LAYER_OPTIONS.get()),
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
