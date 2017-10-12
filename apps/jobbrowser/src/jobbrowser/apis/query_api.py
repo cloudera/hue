@@ -17,6 +17,7 @@
 
 import itertools
 import logging
+import re
 
 from django.utils.translation import ugettext as _
 
@@ -66,24 +67,65 @@ class QueryApi(Api):
       'total': jobs['num_in_flight_queries'] + jobs['num_executing_queries'] + jobs['num_waiting_queries']
     }
 
+  def time_in_ms(self, time, period):
+    if period == 'ns':
+      return float(time) / 1000
+    elif period == 'ms':
+      return float(time)
+    elif period == 's':
+      return float(time) * 1000
+    elif period == 'm':
+      return float(time) * 60000 #1000*60
+    elif period == 'h':
+      return float(time) * 3600000 #1000*60*60
+    else:
+      return float(time)
+
   def app(self, appid):
     api = get_impalad_api(user=self.user, url=self.server_url)
 
-    query = api.get_query(query_id=appid)
+    query = api.get_query_profile(query_id=appid)
+    user = re.search(r"^\s*User:\s*(.*)$", query['profile'], re.MULTILINE).group(1)
+    status = re.search(r"^\s*Query State:\s*(.*)$", query['profile'], re.MULTILINE).group(1)
+    stmt = re.search(r"^\s*Sql Statement:\s*(.*)$", query['profile'], re.MULTILINE).group(1)
+    partitions = re.findall(r"partitions=\s*(\d)+\s*\/\s*(\d)+", query['profile'])
+    end_time = re.search(r"^\s*End Time:\s*(.*)$", query['profile'], re.MULTILINE).group(1)
+    duration_1 = re.search(r"\s*Rows available:\s([\d.]*)(\w*)", query['profile'], re.MULTILINE)
+    duration_2 = re.search(r"\s*Request finished:\s([\d.]*)(\w*)", query['profile'], re.MULTILINE)
+    duration_3 = re.search(r"\s*Query Timeline:\s([\d.]*)(\w*)", query['profile'], re.MULTILINE)
+    submitted = re.search(r"^\s*Start Time:\s*(.*)$", query['profile'], re.MULTILINE).group(1)
+
+    progress = 0
+    if end_time:
+      progress = 100
+    elif partitions:
+      for partition in partitions:
+        progress += float(partition[0]) / float(partition[1])
+      progress /= len(partitions)
+      progress *= 100
+
+    duration = duration_1 or duration_2 or duration_3
+    if duration:
+      duration_ms = self.time_in_ms(duration.group(1), duration.group(2))
+    else:
+      duration_ms = 0
 
     common = {
         'id': appid,
-        'name': query['stmt'][:100] + ('...' if len(query['stmt']) > 100 else ''),
-        'status': query['status'],
-        'apiStatus': self._api_status(query['status']),
-        'progress': 50,
-        'duration': 10 * 3600,
-        'submitted': 0,
-        'type': 'NA',
+        'name': stmt,
+        'status': status,
+        'apiStatus': self._api_status(status),
+        'user': user,
+        'progress': progress,
+        'duration': duration_ms,
+        'submitted': submitted,
+        'type': 'queries'
     }
 
     common['properties'] = {
-      'properties': query
+      'memory': '',
+      'profile': '',
+      'plan': ''
     }
 
     return common
@@ -96,14 +138,30 @@ class QueryApi(Api):
   def logs(self, appid, app_type, log_name=None):
     return {'logs': ''}
 
+  def profile(self, appid, app_type, app_property, app_filters):
+    if app_property == 'memory':
+      return self._memory(appid, app_type, app_property, app_filters)
+    elif app_property == 'profile':
+      return self._query_profile(appid)
+    else:
+      return self._query(appid)
 
-  def profile(self, appid, app_type, app_property):
-    return {}
+  def _memory(self, appid, app_type, app_property, app_filters):
+    api = get_impalad_api(user=self.user, url=self.server_url)
+    return api.get_query_memory(query_id=appid);
+
+  def _query(self, appid):
+    api = get_impalad_api(user=self.user, url=self.server_url)
+    return api.get_query(query_id=appid)
+
+  def _query_profile(self, appid):
+    api = get_impalad_api(user=self.user, url=self.server_url)
+    return api.get_query_profile(query_id=appid)
 
   def _api_status(self, status):
-    if status in ['CREATING', 'CREATED', 'TERMINATING']:
+    if status in ['RUNNING', 'CREATED']:
       return 'RUNNING'
-    elif status in ['COMPLETED']:
+    elif status in ['FINISHED']:
       return 'SUCCEEDED'
     else:
       return 'FAILED' # INTERRUPTED , KILLED, TERMINATED and FAILED
