@@ -76,31 +76,44 @@
     }
   };
 
+  function basicChartBuilder(element, valueAccessor, chartType) {
+    var options = valueAccessor();
+    window.clearTimeout(element.plotterTimeout);
+    element.plotterTimeout = window.setTimeout(function () {
+      var data = options.transformer(options.datum);
+      var chartData = [];
+      data.forEach(function (el) {
+        var chartSerie = {
+          x: [],
+          y: [],
+          name: el.key,
+          type: options.chartType || chartType
+        }
+        el.values.forEach(function (serie) {
+          chartSerie.x.push(serie.x);
+          chartSerie.y.push(serie.y);
+        });
+        chartData.push(chartSerie)
+      });
+      Plotly.newPlot(element, chartData, PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
+    }, 200);
+  }
+
+  ko.bindingHandlers.basicChart = {
+    init: function (element, valueAccessor) {
+      resizeHandlers(element);
+    },
+    update: function (element, valueAccessor) {
+      basicChartBuilder(element, valueAccessor);
+    }
+  }
+
   ko.bindingHandlers.barChart = {
     init: function (element, valueAccessor) {
       resizeHandlers(element);
     },
     update: function (element, valueAccessor) {
-      var options = valueAccessor();
-      window.clearTimeout(element.plotterTimeout);
-      element.plotterTimeout = window.setTimeout(function () {
-        var data = options.transformer(options.datum);
-        var chartData = [];
-        data.forEach(function (el) {
-          var chartSerie = {
-            x: [],
-            y: [],
-            name: el.key,
-            type: 'bar'
-          }
-          el.values.forEach(function (serie) {
-            chartSerie.x.push(serie.x);
-            chartSerie.y.push(serie.y);
-          });
-          chartData.push(chartSerie)
-        });
-        Plotly.newPlot(element, chartData, PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
-      }, 200);
+      basicChartBuilder(element, valueAccessor, 'bar');
     }
   };
 
@@ -109,26 +122,7 @@
       resizeHandlers(element);
     },
     update: function (element, valueAccessor) {
-      var options = valueAccessor();
-      window.clearTimeout(element.plotterTimeout);
-      element.plotterTimeout = window.setTimeout(function () {
-        var data = options.transformer(options.datum);
-        var chartData = [];
-        data.forEach(function (el) {
-          var chartSerie = {
-            x: [],
-            y: [],
-            name: el.key,
-            type: 'scatter'
-          }
-          el.values.forEach(function (serie) {
-            chartSerie.x.push(serie.x);
-            chartSerie.y.push(serie.y);
-          });
-          chartData.push(chartSerie)
-        });
-        Plotly.newPlot(element, chartData, PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
-      }, 200);
+      basicChartBuilder(element, valueAccessor, 'scatter');
     }
   };
 
@@ -137,26 +131,7 @@
       resizeHandlers(element);
     },
     update: function (element, valueAccessor) {
-      var options = valueAccessor();
-      window.clearTimeout(element.plotterTimeout);
-      element.plotterTimeout = window.setTimeout(function () {
-        var data = options.transformer(options.datum);
-        var chartData = [];
-        data.forEach(function (el) {
-          var chartSerie = {
-            x: [],
-            y: [],
-            name: el.key,
-            type: 'scatter'
-          }
-          el.values.forEach(function (serie) {
-            chartSerie.x.push(serie.x);
-            chartSerie.y.push(serie.y);
-          });
-          chartData.push(chartSerie)
-        });
-        Plotly.newPlot(element, chartData, PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
-      }, 200);
+      basicChartBuilder(element, valueAccessor, 'scatter');
     }
   };
 
