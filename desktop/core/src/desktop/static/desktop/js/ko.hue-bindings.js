@@ -3708,7 +3708,9 @@
       if (token.parseLocation.tables && token.parseLocation.tables.length > 0) {
         var tablePromisses = [];
         token.parseLocation.tables.forEach(function (table) {
-          tablePromisses.push(self.fetchAutocompleteDeferred(table.identifierChain));
+          if (table.identifierChain) {
+            tablePromisses.push(self.fetchAutocompleteDeferred(table.identifierChain));
+          }
         });
         $.when.apply($, tablePromisses).always(function () {
           var joined = [];
