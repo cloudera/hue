@@ -26,27 +26,36 @@
       MAP: 'map',
       GRADIENTMAP: 'gradientmap',
       SCATTERCHART: 'scatter'
-    },
-    PLOTLY_OPTIONS: {
-      displaylogo: false,
-      modeBarButtonsToRemove: ['sendDataToCloud', 'hoverCompareCartesian']
     }
   };
 
+  var PLOTLY_COMMON_LAYOUT = {
+    height: 400
+  };
+
+  var PLOTLY_COMMON_OPTIONS = {
+    displaylogo: false,
+    modeBarButtonsToRemove: ['sendDataToCloud', 'hoverCompareCartesian']
+  }
+
+  function resizeHandlers(element) {
+    var resizeSubscription = huePubSub.subscribe('resize.plotly.chart', function () {
+      Plotly.Plots.resize(element);
+    });
+    var resizeEvent = function () {
+      Plotly.Plots.resize(element);
+    };
+
+    $(window).on('resize', resizeEvent);
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      resizeSubscription.remove();
+      $(window).off('resize', resizeEvent);
+    });
+  }
+
   ko.bindingHandlers.pieChart = {
     init: function (element, valueAccessor) {
-      var resizeSubscription = huePubSub.subscribe('resize.plotly.chart', function () {
-        Plotly.Plots.resize(element);
-      });
-      var resizeEvent = function () {
-        Plotly.Plots.resize(element);
-      };
-
-      $(window).on('resize', resizeEvent);
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        resizeSubscription.remove();
-        $(window).off('resize', resizeEvent);
-      });
+      resizeHandlers(element);
     },
     update: function (element, valueAccessor) {
       var options = valueAccessor();
@@ -62,20 +71,33 @@
           chartData.values.push(el.value);
           chartData.labels.push(el.label);
         });
-        var layout = {
-          height: 400
-        };
-        Plotly.newPlot(element, [chartData], layout, ko.HUE_CHARTS.PLOTLY_OPTIONS);
+        Plotly.newPlot(element, [chartData], PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
       }, 10);
     }
   };
 
   ko.bindingHandlers.barChart = {
     init: function (element, valueAccessor) {
-      $(element).html('To-do.');
+      resizeHandlers(element);
     },
     update: function (element, valueAccessor) {
-      $(element).html('To-do.');
+      var options = valueAccessor();
+      window.clearTimeout(element.plotterTimeout);
+      element.plotterTimeout = window.setTimeout(function () {
+        var data = options.transformer(options.datum);
+        var chartData = {
+          x: [],
+          y: [],
+          type: 'bar'
+        }
+        data.forEach(function (el) {
+          el.values.forEach(function (serie) {
+            chartData.x.push(serie.x);
+            chartData.y.push(serie.y);
+          });
+        });
+        Plotly.newPlot(element, [chartData], PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
+      }, 10);
     }
   };
 
