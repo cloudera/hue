@@ -86,17 +86,24 @@
         if (_hasAtLeastOneLat && _hasAtLeastOneLng) {
           try {
             if (_map == null) {
-              _map = L.map(element);
+              if (LeafletGlobals.mapOptions.crs) {
+                LeafletGlobals.mapOptions.crs = L.CRS[LeafletGlobals.mapOptions.crs];
+              }
+              _map = L.map(element, LeafletGlobals.mapOptions);
               var tileLayerOptions = {
                 layer: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               }
               if (LeafletGlobals) {
-                tileLayerOptions = LeafletGlobals;
+                if (LeafletGlobals.layer) {
+                  tileLayerOptions.layer = LeafletGlobals.layer;
+                }
+                if (LeafletGlobals.attribution) {
+                  tileLayerOptions.attribution = LeafletGlobals.attribution;
+                }
+                tileLayerOptions = $.extend(tileLayerOptions, LeafletGlobals.layerOptions);
               }
-              L.tileLayer(tileLayerOptions.layer, {
-                attribution: $(element).width() > 300 ? tileLayerOptions.attribution : ''
-              }).addTo(_map);
+              L.tileLayer(tileLayerOptions.layer, tileLayerOptions).addTo(_map);
 
               if (L.control.zoomBox) {
                 var _zoomBox = L.control.zoomBox({

@@ -390,6 +390,18 @@ LEAFLET_TILE_LAYER_ATTRIBUTION = Config(
   help=_("The copyright message for the specified Leaflet maps Tile Layer"),
   default='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors')
 
+LEAFLET_MAP_OPTIONS = Config(
+  key="leaflet_map_options",
+  help=_("All the map options, accordingly to http://leafletjs.com/reference-0.7.7.html#map-options. To change CRS, just use the name, ie. 'EPSG4326'"),
+  type=coerce_json_dict,
+  default="{}")
+
+LEAFLET_TILE_LAYER_OPTIONS = Config(
+  key="leaflet_tile_layer_options",
+  help=_("All the tile layer options, accordingly to http://leafletjs.com/reference-0.7.7.html#tilelayer"),
+  type=coerce_json_dict,
+  default="{}")
+
 POLL_ENABLED = Config(
   key="poll_enabled",
   help=_("Use poll(2) in Hue thrift pool."),
