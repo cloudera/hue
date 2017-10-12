@@ -5972,6 +5972,45 @@
           });
         });
 
+        it('should handle "SELECT * FROM boo TABLESAMPLE (0.1 PERCENT) baa;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (0.1 PERCENT) baa;',
+            afterCursor: '',
+            dialect: 'hive',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "SELECT * FROM boo TABLESAMPLE (5 ROWS) baa;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (5 ROWS) baa;',
+            afterCursor: '',
+            dialect: 'hive',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "SELECT * FROM boo TABLESAMPLE (205B) baa;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (205B) baa;',
+            afterCursor: '',
+            dialect: 'hive',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest keywords for "SELECT * FROM boo |', function () {
           assertAutoComplete({
             beforeCursor: 'SELECT * FROM boo ',
@@ -6013,6 +6052,30 @@
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['BUCKET']
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (0.1 |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (0.1 ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PERCENT']
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT * FROM boo TABLESAMPLE (1 |', function () {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM boo TABLESAMPLE (1 ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PERCENT', 'ROWS']
             }
           });
         });
