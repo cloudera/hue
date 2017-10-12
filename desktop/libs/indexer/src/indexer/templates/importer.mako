@@ -346,7 +346,7 @@ ${ assist.assistPanel() }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h4>${_('Format')}</h4>
       <div class="card-body">
-        <label data-bind="visible: createWizard.prefill.source_type().length == 0 && createWizard.source.inputFormat() != 'table'">
+        <label data-bind="visible: (createWizard.prefill.source_type().length == 0 || createWizard.prefill.target_type() == 'index') && createWizard.source.inputFormat() == 'file'">
           <div>${_('File Type')}</div>
           <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select>
         </label>
