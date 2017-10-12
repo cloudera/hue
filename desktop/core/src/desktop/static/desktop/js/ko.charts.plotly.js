@@ -85,18 +85,21 @@
       window.clearTimeout(element.plotterTimeout);
       element.plotterTimeout = window.setTimeout(function () {
         var data = options.transformer(options.datum);
-        var chartData = {
-          x: [],
-          y: [],
-          type: 'bar'
-        }
+        var chartData = [];
         data.forEach(function (el) {
+          var chartSerie = {
+            x: [],
+            y: [],
+            name: el.key,
+            type: 'bar'
+          }
           el.values.forEach(function (serie) {
-            chartData.x.push(serie.x);
-            chartData.y.push(serie.y);
+            chartSerie.x.push(serie.x);
+            chartSerie.y.push(serie.y);
           });
+          chartData.push(chartSerie)
         });
-        Plotly.newPlot(element, [chartData], PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
+        Plotly.newPlot(element, chartData, PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
       }, 200);
     }
   };
