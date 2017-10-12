@@ -2279,7 +2279,9 @@ OptionalLimitClause
 
 LimitClause
  : 'LIMIT' UnsignedNumericLiteral
+ | 'LIMIT' UnsignedNumericLiteral ',' UnsignedNumericLiteral
  | 'LIMIT' 'VARIABLE_REFERENCE'
+ | 'LIMIT' 'VARIABLE_REFERENCE' ',' 'VARIABLE_REFERENCE'
  | '<impala>LIMIT' ValueExpression
  ;
 
