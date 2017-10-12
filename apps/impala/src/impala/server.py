@@ -208,3 +208,15 @@ class ImpalaDaemonApi(object):
       return json.loads(resp)
     except ValueError, e:
       raise ImpalaDaemonApiException('ImpalaDaemonApi query_profile did not return valid JSON.')
+
+  def get_query_memory(self, query_id):
+    params = {
+      'query_id': query_id,
+      'json': 'true'
+    }
+
+    resp = self._root.get('query_memory', params=params)
+    try:
+      return json.loads(resp)
+    except ValueError, e:
+      raise ImpalaDaemonApiException('ImpalaDaemonApi query_memory did not return valid JSON.')
