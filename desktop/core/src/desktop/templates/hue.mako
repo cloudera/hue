@@ -225,7 +225,7 @@ ${ hueIcons.symbols() }
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
             % if user.is_superuser:
-            <li><a href="/about/"><span class="dropdown-no-icon">${_('Check Configuration')}</span></a></li>
+            <li><a href="/about/"><span class="dropdown-no-icon">${_('Hue Administration')}</span></a></li>
             % endif
             <li class="divider"></li>
             <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
