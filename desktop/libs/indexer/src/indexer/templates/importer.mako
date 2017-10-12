@@ -1223,7 +1223,9 @@ ${ assist.assistPanel() }
 
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
-        self.sample.removeAll();
+        if (self.sample()) {
+          self.sample.removeAll();
+        }
         self.path('');
         resizeElements();
         self.rdbmsMode('customRdbms');
