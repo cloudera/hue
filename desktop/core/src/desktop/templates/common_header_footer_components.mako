@@ -142,7 +142,9 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     var LeafletGlobals = {
       layer: '${ leaflet['layer'] |n,unicode }',
-      attribution: '${ leaflet['attribution'] |n,unicode }'
+      attribution: '${ leaflet['attribution'] |n,unicode }',
+      mapOptions: JSON.parse('${ leaflet['map_options'] |n,unicode }'),
+      layerOptions: JSON.parse('${ leaflet['layer_options'] |n,unicode }')
     };
 
     var ApiHelperGlobals = {
