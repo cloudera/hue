@@ -112,10 +112,26 @@
 
   ko.bindingHandlers.lineChart = {
     init: function (element, valueAccessor) {
-      $(element).html('To-do.');
+      resizeHandlers(element);
     },
     update: function (element, valueAccessor) {
-      $(element).html('To-do.');
+      var options = valueAccessor();
+      window.clearTimeout(element.plotterTimeout);
+      element.plotterTimeout = window.setTimeout(function () {
+        var data = options.transformer(options.datum);
+        var chartData = {
+          x: [],
+          y: [],
+          type: 'scatter'
+        }
+        data.forEach(function (el) {
+          el.values.forEach(function (serie) {
+            chartData.x.push(serie.x);
+            chartData.y.push(serie.y);
+          });
+        });
+        Plotly.newPlot(element, [chartData], PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
+      }, 200);
     }
   };
 
