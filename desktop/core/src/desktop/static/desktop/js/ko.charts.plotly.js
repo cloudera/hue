@@ -72,7 +72,7 @@
           chartData.labels.push(el.label);
         });
         Plotly.newPlot(element, [chartData], PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
-      }, 10);
+      }, 200);
     }
   };
 
@@ -97,7 +97,7 @@
           });
         });
         Plotly.newPlot(element, [chartData], PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
-      }, 10);
+      }, 200);
     }
   };
 
