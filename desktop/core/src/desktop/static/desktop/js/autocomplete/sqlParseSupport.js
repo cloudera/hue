@@ -470,6 +470,8 @@ var SqlParseSupport = (function () {
         delete location.firstInChain;
         if (location.type !== 'column' && location.type !== 'complex') {
           delete location.qualified;
+        } else if (typeof location.qualified === 'undefined') {
+          location.qualified = false;
         }
       }
 
