@@ -5791,6 +5791,19 @@
       });
 
       describe('Hive specific', function () {
+        it('should handle "SELECT * FROM testTable LIMIT 5,6; |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT * FROM testTable LIMIT 5,6; ',
+            afterCursor: '',
+            dialect: 'hive',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should not suggest anything for "SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT |"', function() {
           assertAutoComplete({
             beforeCursor: 'SELECT COUNT(*) AS boo FROM testTable GROUP BY baa LIMIT ',
