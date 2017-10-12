@@ -2749,7 +2749,7 @@
             suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'LATERAL VIEW', 'TABLESAMPLE', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN'],
+            suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'LATERAL VIEW', 'TABLESAMPLE', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN'],
             lowerCase: false
           }
         });
@@ -2765,7 +2765,7 @@
             suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }] },
             suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }] },
             suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }] },
-            suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'LATERAL VIEW', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN'],
+            suggestKeywords: ['WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'LATERAL VIEW', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN'],
             lowerCase: false
           }
         });
@@ -6798,7 +6798,7 @@
             expectedResult: {
               lowerCase: false,
               suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
-              suggestKeywords: ['LATERAL VIEW', 'CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']
+              suggestKeywords: ['LATERAL VIEW', 'CROSS', 'FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']
             }
           });
         });

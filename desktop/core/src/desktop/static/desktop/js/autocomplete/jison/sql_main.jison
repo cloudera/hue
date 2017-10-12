@@ -1641,7 +1641,7 @@ TableExpression_EDIT
      if ($3.empty && $4 && $4.joinType.toUpperCase() === 'JOIN') {
        keywords = keywords.concat(['FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
        if (parser.isHive()) {
-         keywords = keywords.concat(['CROSS', 'LEFT SEMI']);
+         keywords = keywords.concat(['CROSS', 'INNER', 'LEFT SEMI']);
        } else if (parser.isImpala()) {
          keywords = keywords.concat(['ANTI', 'CROSS', 'INNER', 'LEFT ANTI', 'LEFT INNER', 'LEFT SEMI', 'OUTER', 'RIGHT ANTI', 'RIGHT INNER', 'RIGHT SEMI', 'SEMI']);
        } else {
@@ -1679,7 +1679,11 @@ TableExpression_EDIT
        { value: 'RIGHT OUTER JOIN', weight: 1 }
      ]);
      if (parser.isHive()) {
-       keywords = keywords.concat([{ value: 'CROSS JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }]);
+       keywords = keywords.concat([
+         { value: 'CROSS JOIN', weight: 1 },
+         { value: 'INNER JOIN', weight: 1 },
+         { value: 'LEFT SEMI JOIN', weight: 1 }
+       ]);
      } else if (parser.isImpala()) {
        keywords = keywords.concat([
          { value: 'ANTI JOIN', weight: 1 },
