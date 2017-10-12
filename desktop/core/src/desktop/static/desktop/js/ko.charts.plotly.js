@@ -106,10 +106,29 @@
 
   ko.bindingHandlers.timelineChart = {
     init: function (element, valueAccessor) {
-      $(element).html('To-do.');
+      resizeHandlers(element);
     },
     update: function (element, valueAccessor) {
-      $(element).html('To-do.');
+      var options = valueAccessor();
+      window.clearTimeout(element.plotterTimeout);
+      element.plotterTimeout = window.setTimeout(function () {
+        var data = options.transformer(options.datum);
+        var chartData = [];
+        data.forEach(function (el) {
+          var chartSerie = {
+            x: [],
+            y: [],
+            name: el.key,
+            type: 'scatter'
+          }
+          el.values.forEach(function (serie) {
+            chartSerie.x.push(serie.x);
+            chartSerie.y.push(serie.y);
+          });
+          chartData.push(chartSerie)
+        });
+        Plotly.newPlot(element, chartData, PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
+      }, 200);
     }
   };
 
