@@ -149,6 +149,7 @@
 <hive>'PARQUET'                            { return '<hive>PARQUET'; }
 <hive>'PARTITIONED'                        { return '<hive>PARTITIONED'; }
 <hive>'PARTITIONS'                         { return '<hive>PARTITIONS'; }
+<hive>'PERCENT'                            { return '<hive>PERCENT'; }
 <hive>'PRIVILEGES'                         { return '<hive>PRIVILEGES'; }
 <hive>'PURGE'                              { return '<hive>PURGE'; }
 <hive>'QUARTER'                            { return '<hive>QUARTER'; }
