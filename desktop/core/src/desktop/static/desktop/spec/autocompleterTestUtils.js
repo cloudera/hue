@@ -29,8 +29,8 @@ var SqlTestUtils = (function() {
       if (aKeys.length !== Object.keys(b).length) {
         return false;
       }
-      for (var aKey in aKeys) {
-        if (!resultEquals(a[aKey], b[aKey])) {
+      for (var i = 0; i < aKeys.length; i++) {
+        if (!resultEquals(a[aKeys[i]], b[aKeys[i]])) {
           return false;
         }
       }
