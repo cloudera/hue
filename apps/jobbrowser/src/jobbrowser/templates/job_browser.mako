@@ -57,6 +57,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 
+% if ENABLE_QUERY_BROWSER.get():
+<script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
+<script src="${ static('desktop/ext/js/dagre-d3-min.js') }"></script>
+<script src="${ static('jobbrowser/js/impala_dagre.js') }"></script>
+% endif
+
 % if not is_mini:
 <div id="jobbrowserComponents" class="jobbrowser-components jobbrowser-full jb-panel">
 % else:
@@ -893,37 +899,54 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <ul class="nav nav-pills margin-top-20">
         <li>
-          <a href="#livy-session-page-statements${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#livy-session-page-statements${ SUFFIX }\']').tab('show'); }">
-            ${ _('Properties') }</a>
+          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': onQueriesPlanShown}">
+            ${ _('Plan') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-stmt${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-stmt${ SUFFIX }\']').tab('show'); }">
+            ${ _('Query') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-plan-text${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan-text${ SUFFIX }\']').tab('show'); }">
+            ${ _('Text Plan') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-summary${ SUFFIX }" data-bind="click: onQueriesSummaryClick">
+            ${ _('Summary') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-profile${ SUFFIX }" data-bind="click: function(){ fetchProfile('profile'); $('a[href=\'#queries-page-profile${ SUFFIX }\']').tab('show'); }">
+            ${ _('Profile') }</a>
+        </li>
+        <li>
+          <a href="#queries-page-memory${ SUFFIX }" data-bind="click: function(){ fetchProfile('memory'); $('a[href=\'#queries-page-memory${ SUFFIX }\']').tab('show'); }">
+            ${ _('Memory') }</a>
         </li>
       </ul>
 
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="livy-session-page-statements${ SUFFIX }">
-          <table id="actionsTable" class="datatables table table-condensed">
-            <thead>
-            <tr>
-              <th>${_('Id')}</th>
-              <th>${_('State')}</th>
-              <th>${_('Output')}</th>
-            </tr>
-            </thead>
-            <tbody data-bind="foreach: properties['statements']">
-              <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }" class="pointer">
-                <td>
-                  <a data-bind="hueLink: '/jobbrowser/jobs/' + id(), clickBubble: false">
-                    <i class="fa fa-tasks"></i>
-                  </a>
-                </td>
-                <td data-bind="text: state"></td>
-                <td data-bind="text: output"></td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="tab-pane" id="queries-page-plan${ SUFFIX }">
+          <svg style="border: 1px solid darkgray;width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
+            <g/>
+          </svg>
         </div>
-
+        <div class="tab-pane" id="queries-page-stmt${ SUFFIX }">
+          <pre data-bind="text: properties.plan().stmt"/>
+        </div>
+        <div class="tab-pane" id="queries-page-plan-text${ SUFFIX }">
+          <pre data-bind="text: properties.plan().plan"/>
+        </div>
+        <div class="tab-pane" id="queries-page-summary${ SUFFIX }">
+          <pre data-bind="text: properties.plan().summary"/>
+        </div>
+        <div class="tab-pane" id="queries-page-profile${ SUFFIX }">
+          <pre data-bind="text: properties.profile().profile"/>
+        </div>
+        <div class="tab-pane" id="queries-page-memory${ SUFFIX }">
+          <pre data-bind="text: properties.memory().mem_usage"/>
+        </div>
       </div>
     </div>
   </div>
@@ -1687,6 +1710,34 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.logs = ko.observable('');
 
       self.properties = ko.mapping.fromJS(job.properties || {});
+      self.onQueriesPlanShown = function () {
+        if (this._impalaDagre) {
+          this._impalaDagre.stop();
+        }
+        var self = this;
+        var dataSource = function () {
+          return new Promise(function(resolve, reject) {
+            self.fetchProfile('plan', function (data) {
+              resolve(data.plan.plan_json);
+            });
+          });
+        }
+        this._impalaDagre = impalaDagre('queries-page-plan-svg${ SUFFIX }', dataSource);
+        this._impalaDagre.start(5000);
+      };
+      self.onQueriesSummaryClick = function(){
+        $('a[href=\'#queries-page-summary${ SUFFIX }\']').tab('show');
+        var self = this;
+        var refresh = function () {
+          if (!$('#queries-page-summary${ SUFFIX }').hasClass('active')) {
+            return;
+          }
+          self.fetchProfile('plan', function (data) {
+            setTimeout(refresh, 5000);
+          });
+        };
+        setTimeout(refresh, 5000);
+      };
       self.mainType = ko.observable(vm.interface());
 
       self.coordinatorActions = ko.pureComputed(function() {
@@ -1888,7 +1939,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
             crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             vm.resetBreadcrumbs(crumbs);
-
+            if (vm.job().type() === 'queries' && !$("#queries-page-plan${ SUFFIX }").parent().children().hasClass("active")) {
+              $("a[href=\'#queries-page-plan${ SUFFIX }\']").tab("show");
+            }
             %if not is_mini:
             if (vm.job().type() === 'workflow' && !vm.job().workflowGraphLoaded) {
               vm.job().updateWorkflowGraph();
@@ -1946,7 +1999,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.fetchProfile = function (name) {
+      self.fetchProfile = function (name, callback) {
         $.post("/jobbrowser/api/job/profile", {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
@@ -1956,6 +2009,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }, function (data) {
           if (data.status == 0) {
             self.properties[name](data[name]);
+            if (callback) {
+              callback(data);
+            }
           } else {
             $(document).trigger("error", data.message);
           }
