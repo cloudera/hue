@@ -985,7 +985,7 @@ var EditorViewModel = (function() {
       self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 2000 } });
 
       self.checkComplexity = function () {
-        if (lastCheckedComplexityStatement === self.statement()) {
+        if (!self.inFocus() || lastCheckedComplexityStatement === self.statement()) {
           return;
         }
 
