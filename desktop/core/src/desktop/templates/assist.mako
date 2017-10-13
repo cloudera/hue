@@ -216,7 +216,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView && !navigationSettings.rightAssist, 'fa-table': definition.isTable && !navigationSettings.rightAssist }"></i>
         <span class="highlightable" data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </a>
-      <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
+      <div class="center" data-bind="visible: loading() && open()"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
   </script>
@@ -2193,6 +2193,27 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           navigationSettings: navigationSettings
         });
 
+        var loadEntriesTimeout = -1;
+        // This fetches the columns for each table synchronously with 2 second in between.
+        var loadEntries = function () {
+          window.clearTimeout(loadEntriesTimeout);
+          loadEntriesTimeout = window.setTimeout(function () {
+            self.activeTables().every(function (table) {
+              if (!table.loaded && !table.hasErrors() && !table.loading()) {
+                table.loadEntries(loadEntries, true);
+                return false;
+              }
+              return !table.loading();
+            })
+          }, 2000);
+        };
+
+        var activeTablesSub = self.activeTables.subscribe(loadEntries);
+        self.disposals.push(function () {
+          window.clearTimeout(loadEntriesTimeout);
+          activeTablesSub.dispose();
+        });
+
         var handleLocationUpdate = function (activeLocations) {
           assistDbSource.sourceType = activeLocations.type;
           if (!activeLocations) {
@@ -2253,8 +2274,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               if (!tableQidIndex[key]) {
                 delete activeTableIndex[key];
                 updateTables = true;
-              } else if (!activeTableIndex[key].loaded) {
-                activeTableIndex[key].loadEntries(function () {}, true);
               }
             });
 
