@@ -816,6 +816,11 @@ DROP TABLE IF EXISTS `%(table)s`;
 
     if total_records_match:
       total_records = int(total_records_match.group('total_records'))
+      query_plan = self._get_impala_profile_plan(query_id, fragment)
+      if query_plan:
+        LOG.info('Query plan for Impala query %s: %s' % (query_id, query_plan))
+      else:
+        LOG.info('Query plan for Impala query %s not found.' % query_id)
 
     return total_records, total_size, msg
 
@@ -846,3 +851,8 @@ DROP TABLE IF EXISTS `%(table)s`;
       raise PopupException(_("Could not find profile in query profile response from Impala Daemon Server."))
 
     return profile
+
+  def _get_impala_profile_plan(self, query_id, profile):
+    query_plan_re = "Query \(id=%(query_id)s\):.+?Execution Profile %(query_id)s" % {'query_id': query_id}
+    query_plan_match = re.search(query_plan_re, profile, re.MULTILINE | re.DOTALL)
+    return query_plan_match.group() if query_plan_match else None
