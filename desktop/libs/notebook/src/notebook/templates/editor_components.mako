@@ -546,7 +546,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <p>${ _('There are currently no active sessions, please reload the page.') }</p>
       <!-- /ko -->
       <!-- ko foreach: sessions -->
-      <h4 data-bind="text: $parents[1].getSnippetName(type())" style="clear:left; display: inline-block"></h4>
+      <h4 style="clear:left; display: inline-block">
+        <span data-bind="text: $parents[1].getSnippetName(type())"></span>
+        <!-- ko if: typeof session_id != 'undefined' && session_id -->
+          <span data-bind="text: session_id"></span>
+        <!-- /ko -->
+      </h4>
       <div class="session-actions">
         <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }">
           <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
@@ -558,7 +563,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
         % endif
         <!-- ko if: type() == 'impala' && typeof http_addr != 'undefined' -->
-        <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
+          <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank">
+            <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i>
+          </a>
         <!-- /ko -->
       </div>
       <div style="width:100%;">
