@@ -2479,7 +2479,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <div id="addFacetDemiModal" class="demi-modal fade" data-backdrop="false">
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
-    <div style="float: left; margin-right: 10px;text-align: center">
+    <div style="float: left; margin-right: 10px;">
       <input id="addFacetInput" type="text" data-bind="clearable: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input" style="float: left" /><br/>
     </div>
     <div>
