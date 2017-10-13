@@ -370,6 +370,9 @@ OptionalPartitionOperations
  | '<hive>COMPACT' QuotedValue OptionalAndWait OptionalWithOverwriteTblProperties
  | HiveEnableOrDisable HiveNoDropOrOffline
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification OptionalHiveFirstOrAfter OptionalHiveCascadeOrRestrict
+   {
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
+   }
  ;
 
 OptionalPartitionOperations_EDIT
@@ -382,6 +385,9 @@ OptionalPartitionOperations_EDIT
      parser.suggestColumns();
    }
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification_EDIT OptionalHiveFirstOrAfter OptionalHiveCascadeOrRestrict
+   {
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
+   }
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification OptionalHiveFirstOrAfter OptionalHiveCascadeOrRestrict 'CURSOR'
    {
      if (parser.isHive() && !$5 && !$6) {
@@ -395,8 +401,12 @@ OptionalPartitionOperations_EDIT
      } else if (parser.isHive() && $5 && !$6) {
        parser.suggestKeywords(['CASCADE', 'RESTRICT']);
      }
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
    }
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification OptionalHiveFirstOrAfter_EDIT OptionalHiveCascadeOrRestrict
+   {
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
+   }
  | '<hive>COMPACT' QuotedValue OptionalAndWait OptionalWithOverwriteTblProperties 'CURSOR'
    {
      if (!$3 && !$4) {
@@ -535,6 +545,9 @@ DropOperations
  | 'DROP' OptionalIfExists '<impala>RANGE' 'PARTITION' RangePartitionSpec
  | 'DROP' OptionalIfExists '<impala>RANGE' '<impala>PARTITION_VALUE' '=' UnsignedValueSpecification
  | 'DROP' '<impala>COLUMN' ColumnIdentifier
+   {
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
+   }
  ;
 
 DropOperations_EDIT

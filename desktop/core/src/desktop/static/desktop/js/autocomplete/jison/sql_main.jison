@@ -1026,8 +1026,8 @@ ColumnReference_EDIT
 BasicIdentifierChain
  : ColumnIdentifier
    {
-     $$ = [$1];
-     parser.yy.firstChainLocation = parser.addUnknownLocation(@1, [$1]);
+     $$ = [ $1.identifier ];
+     parser.yy.firstChainLocation = parser.addUnknownLocation($1.location, [ $1.identifier ]);
    }
  | BasicIdentifierChain AnyDot ColumnIdentifier
    {
@@ -1035,8 +1035,8 @@ BasicIdentifierChain
        parser.yy.firstChainLocation.firstInChain = true;
        delete parser.yy.firstChainLocation;
      }
-     $1.push($3);
-     parser.addUnknownLocation(@3, $1.concat());
+     $1.push($3.identifier);
+     parser.addUnknownLocation($3.location, $1.concat());
    }
  ;
 
@@ -1045,7 +1045,7 @@ BasicIdentifierChain_EDIT
  : ColumnIdentifier_EDIT
    {
      if ($1.insideKey) {
-       parser.suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       parser.suggestKeyValues({ identifierChain: [ $1.identifier ] });
        parser.suggestColumns();
        parser.suggestFunctions();
      }
@@ -1053,7 +1053,7 @@ BasicIdentifierChain_EDIT
  | BasicIdentifierChain AnyDot ColumnIdentifier_EDIT
    {
      if ($3.insideKey) {
-       parser.suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       parser.suggestKeyValues({ identifierChain: $1.concat([ $3.identifier ]) });
        parser.suggestColumns();
        parser.suggestFunctions();
      }
@@ -1077,10 +1077,10 @@ BasicIdentifierChain_EDIT
  ;
 
 DerivedColumnChain
- : ColumnIdentifier  -> [ $1 ]
+ : ColumnIdentifier  -> [ $1.identifier ]
  | DerivedColumnChain AnyDot ColumnIdentifier
    {
-     $1.push($3);
+     $1.push($3.identifier);
    }
  ;
 
@@ -1088,7 +1088,7 @@ DerivedColumnChain_EDIT
  : ColumnIdentifier_EDIT
    {
      if ($1.insideKey) {
-       parser.suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       parser.suggestKeyValues({ identifierChain: [ $1.identifier ] });
        parser.suggestColumns();
        parser.suggestFunctions();
      }
@@ -1096,7 +1096,7 @@ DerivedColumnChain_EDIT
  | DerivedColumnChain AnyDot ColumnIdentifier_EDIT
    {
      if ($3.insideKey) {
-       parser.suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       parser.suggestKeyValues({ identifierChain: $1.concat([ $3.identifier ]) });
        parser.suggestColumns();
        parser.suggestFunctions();
      }
@@ -1104,7 +1104,7 @@ DerivedColumnChain_EDIT
  | DerivedColumnChain AnyDot ColumnIdentifier_EDIT AnyDot DerivedColumnChain
    {
      if ($3.insideKey) {
-       parser.suggestKeyValues({ identifierChain: $1.concat({ name: $3.name }) });
+       parser.suggestKeyValues({ identifierChain: $1.concat([ $3.identifier ]) });
        parser.suggestColumns();
        parser.suggestFunctions();
      }
@@ -1112,7 +1112,7 @@ DerivedColumnChain_EDIT
  | ColumnIdentifier_EDIT AnyDot DerivedColumnChain
    {
      if ($1.insideKey) {
-       parser.suggestKeyValues({ identifierChain: [{ name: $1.name }] });
+       parser.suggestKeyValues({ identifierChain: [ $1.identifier ] });
        parser.suggestColumns();
        parser.suggestFunctions();
      }
@@ -1136,14 +1136,14 @@ DerivedColumnChain_EDIT
  ;
 
 ColumnIdentifier
- : RegularOrBacktickedIdentifier                                                                               -> { name: $1 };
- | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket ValueExpression HiveOrImpalaRightSquareBracket  -> { name: $1, keySet: true }
- | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket HiveOrImpalaRightSquareBracket                  -> { name: $1, keySet: true }
+ : RegularOrBacktickedIdentifier                                                                               -> { identifier: { name: $1 }, location: @1 };
+ | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket ValueExpression HiveOrImpalaRightSquareBracket  -> { identifier: { name: $1, keySet: true }, location: @1 }
+ | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket HiveOrImpalaRightSquareBracket                  -> { identifier: { name: $1, keySet: true }, location: @1 }
  ;
 
 ColumnIdentifier_EDIT
- : RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket AnyCursor HiveOrImpalaRightSquareBracketOrError             -> { name: $1, insideKey: true }
- | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket ValueExpression_EDIT HiveOrImpalaRightSquareBracketOrError  -> { name: $1 };
+ : RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket AnyCursor HiveOrImpalaRightSquareBracketOrError             -> { identifier: { name: $1 }, insideKey: true }
+ | RegularOrBacktickedIdentifier HiveOrImpalaLeftSquareBracket ValueExpression_EDIT HiveOrImpalaRightSquareBracketOrError  -> { identifier: { name: $1 }};
  ;
 
 PartialBacktickedIdentifierOrPartialCursor
@@ -2266,7 +2266,11 @@ SortByList_EDIT
  ;
 
 SortByIdentifier
- : ColumnIdentifier OptionalAscOrDesc  -> $2
+ : ColumnIdentifier OptionalAscOrDesc
+   {
+     parser.addColumnLocation($1.location, [ $1.identifier ]);
+     $$ = $2;
+   }
  ;
 
 SortByIdentifier_EDIT
