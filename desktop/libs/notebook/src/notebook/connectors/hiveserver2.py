@@ -187,6 +187,13 @@ class HS2Api(Api):
 
     response['properties'] = properties
     response['reuse_session'] = reuse_session
+    response['session_id'] = ''
+
+    try:
+      decoded_guid = session.get_handle().sessionId.guid
+      response['session_id'] = "%x:%x" % struct.unpack(b"QQ", decoded_guid)
+    except Exception, e:
+      LOG.warn('Failed to decode session handle: %s' % e)
 
     if lang == 'impala':
       http_addr = _get_impala_server_url(session)
