@@ -2047,12 +2047,8 @@
             }
             resized = true;
           }
-          else if (ace().session.getLength() > 8) {
-            $target.height((ace().session.getLength()) * 16);
-            resized = true;
-          }
           else {
-            $target.height(8 * 16);
+            $target.height(Math.max(ace().session.getLength() * 16, $.totalStorage('hue.editor.editor.size') || 131));
             resized = true;
           }
           if (ace().session.getLength() == editorHeight) {
