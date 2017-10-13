@@ -220,6 +220,87 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="context-popover-collection-stats-details">
+    <div class="context-popover-flex-fill" data-bind="niceScroll">
+      <div style="padding: 8px">
+        <div data-bind="with: stats">
+        <!-- ko hueSpinner: { spin:  $parent.loadingStats, center: true, size: 'large' } --><!-- /ko -->
+        <div class="alert" data-bind="visible: !$parent.loadingStats() && !$parent.statsSupported()">${ _('This field does not support stats') }</div>
+        <div class="alert" data-bind="visible: !$parent.loadingStats() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
+        <table style="width: 100%" data-bind="visible: !$parent.loadingStats() && $data.data().length > 0" class="table table-condensed">
+          <tbody data-bind="foreach: $data.data">
+          <tr>
+            <td style="vertical-align: top"><strong data-bind="text: key"></strong></td>
+            <!-- ko if: key == 'facets' -->
+            <td>
+              <!-- ko if: val[Object.keys(val)[0]] != null -->
+              <table>
+                <tbody data-bind="foreach: Object.keys(val[Object.keys(val)[0]])">
+                  <tr>
+                    <td style="vertical-align: top; padding-left: 4px; padding-right: 4px"><strong data-bind="text: $data"></strong></td>
+                    <td data-bind="template: 'context-popover-collection-stats-facets'"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- /ko -->
+              <!-- ko ifnot: val[Object.keys(val)[0]] != null -->
+              ${ _('Not available') }
+              <!-- /ko -->
+            </td>
+            <!-- /ko -->
+            <!-- ko ifnot: key == 'facets' -->
+            <td data-bind="text: val"></td>
+            <!-- /ko -->
+          </tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/html" id="context-popover-collection-stats-facets">
+    <table style="width: 100%">
+      <tbody data-bind="foreach: Object.keys($parent.val[Object.keys($parent.val)[0]][$data])">
+        <tr>
+          <td style="vertical-align: top; padding-left: 4px; padding-right: 4px"><strong data-bind="text: $data"></strong></td>
+          <!-- ko ifnot: $data == 'facets' -->
+          <td style="vertical-align: top" data-bind="text: $parents[1].val[Object.keys($parents[1].val)[0]][$parent][$data]"></td>
+          <!-- /ko -->
+        </tr>
+      </tbody>
+    </table>
+  </script>
+
+
+  <script type="text/html" id="context-popover-collection-terms-details">
+    <div class="context-popover-flex-fill" data-bind="niceScroll">
+      <div style="padding: 8px">
+        <div data-bind="with: terms">
+          <!-- ko hueSpinner: { spin:  $parent.loadingTerms, center: true, size: 'large' } --><!-- /ko -->
+          <div class="pull-right" data-bind="visible: !$parent.loadingTerms()">
+            <label class="muted margin-left-5 margin-bottom-10">${ _('Prefix filter') } <input type="text" data-bind="value: prefix, clearable: prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Filter...') }" class="margin-left-10 no-margin-bottom"></label>
+          </div>
+          <div class="clearfix"></div>
+          <div class="alert" data-bind="visible: !$parent.loadingTerms() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
+          <table style="width: 100%" data-bind="visible: !$parent.loadingTerms() && $data.data().length > 0" class="table table-condensed">
+            <tbody data-bind="foreach: $data.data">
+            <tr>
+              <td data-bind="text: val.value"></td>
+              <td style="width: 40px">
+                <div class="progress">
+                  <div class="bar-label" data-bind="text:val.count"></div>
+                  <div class="bar bar-info" style="margin-top:-20px;" data-bind="style: {'width': ((val.count / $parent.data()[0].val.count) * 100) + '%'}"></div>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="context-popover-asterisk-details">
     <div class="context-popover-flex-fill">
       <!-- ko component: { name: 'sql-columns-table', params: { columns: columns, scrollToColumns: false } } --><!-- /ko -->
@@ -328,6 +409,9 @@ from metadata.conf import has_navigator
       <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
       <div class="hue-popover-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 30px;">
         <i class="fa muted" data-bind="css: iconClass" style="margin-top: 3px"></i> <span style="padding-left: 4px;" data-bind="text: title"></span>
+        <!-- ko if: subtitle -->
+        <span class="muted" style="padding-left: 4px;" data-bind="html: subtitle"></span>
+        <!-- /ko -->
         <div style="position: absolute; right: 6px; top: 8px;">
           <a class="pointer inactive-action" data-bind="visible: pinEnabled, click: pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
           <a class="pointer inactive-action" data-bind="click: close"><i class="fa fa-fw fa-times"></i></a>
@@ -1087,6 +1171,104 @@ from metadata.conf import has_navigator
         })
       };
 
+      function CollectionContextTabs(data) {
+        var self = this;
+
+        self.apiHelper = ApiHelper.getInstance();
+
+        self.disposals = [];
+
+        self.data = ko.observable({
+          details: data,
+          loading: ko.observable(false),
+          hasErrors: ko.observable(false),
+          selectedPath: ko.observable(data.path),
+          loadingTerms: ko.observable(false),
+          loadingStats: ko.observable(false),
+          statsSupported: ko.observable(true),
+          terms: ko.mapping.fromJS({'prefix': '', 'data': []}),
+          stats: ko.mapping.fromJS({'facet': '', 'data': []})
+        });
+
+        self.data().terms.prefix.subscribe(function () {
+          self.loadTerms();
+        });
+        self.data().terms.prefix.extend({rateLimit: {timeout: 500, method: "notifyWhenChangesStop"}});
+
+        self.loadTerms();
+        self.loadStats();
+
+        self.tabs = [
+          {
+            id: 'terms',
+            label: '${ _("Terms") }',
+            template: 'context-popover-collection-terms-details',
+            templateData: self.data
+          },
+          {
+            id: 'stats',
+            label: '${ _("Stats") }',
+            template: 'context-popover-collection-stats-details',
+            templateData: self.data
+          }
+        ];
+        self.activeTab = ko.observable('terms');
+      }
+
+      CollectionContextTabs.prototype.loadTerms = function () {
+        var self = this;
+        self.data().terms.data.removeAll();
+        self.data().loadingTerms(true);
+        self.apiHelper.fetchDashboardTerms({
+          collectionName: self.data().details.parent.definition.name,
+          fieldName: self.data().details.definition.name,
+          prefix: self.data().terms.prefix(),
+          engine: 'solr',
+          successCallback: function (data) {
+            if (data.terms != null) {
+              $.each(data.terms, function (key, val) {
+                self.data().terms.data.push({'key': key, 'val': val});
+              });
+            }
+          },
+          alwaysCallback: function () {
+            self.data().loadingTerms(false);
+          }
+        });
+      };
+
+      CollectionContextTabs.prototype.loadStats = function () {
+        var self = this;
+        self.data().terms.data.removeAll();
+        self.data().loadingStats(true);
+        self.data().statsSupported(true);
+        self.apiHelper.fetchDashboardStats({
+          collectionName: self.data().details.parent.definition.name,
+          fieldName: self.data().details.definition.name,
+          engine: 'solr',
+          successCallback: function (data) {
+            if (data.stats.stats.stats_fields[self.data().details.definition.name] != null) {
+              $.each(data.stats.stats.stats_fields[self.data().details.definition.name], function (key, val) {
+                self.data().stats.data.push({'key': key, 'val': val});
+              });
+            }
+          },
+          notSupportedCallback: function () {
+            self.data().statsSupported(false);
+          },
+          alwaysCallback: function () {
+            self.data().loadingStats(false);
+          }
+        });
+      };
+
+      CollectionContextTabs.prototype.dispose = function () {
+        var self = this;
+        while (self.disposals.length) {
+          self.disposals.pop()();
+        }
+      };
+
       function ResizeHelper (orientation, leftAdjust, topAdjust) {
         var self = this;
 
@@ -1332,6 +1514,7 @@ from metadata.conf import has_navigator
         self.isAsterisk = params.data.type === 'asterisk';
         self.isView = params.data.type === 'view';
         self.isDocument = params.data.type.toLowerCase() === 'hue';
+        self.isCollection = params.data.type === 'collection';
 
         self.showInAssistEnabled = (typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true) && (self.isDocument || self.isDatabase || self.isTable || self.isColumn);
         self.openInDashboardEnabled = self.isTable || self.isView || self.isDatabase;
@@ -1404,6 +1587,11 @@ from metadata.conf import has_navigator
           self.contents = new DocumentContext(self.data.definition);
           self.title = self.data.definition.name;
           self.iconClass = 'fa-file-o';
+        } else if (self.isCollection) {
+          self.contents = new CollectionContextTabs(self.data);
+          self.title = self.data.parent.definition.name + '.' + self.data.definition.name;
+          self.subtitle = (self.data.parent.key() === self.data.definition.name ? '<i class="fa fa-key"></i> (' : '(') + self.data.definition.type + ')';
+          self.iconClass = 'fa-search';
         } else {
           self.title = '';
           self.iconClass = 'fa-info'
