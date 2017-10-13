@@ -1181,19 +1181,21 @@ ${ components.menubar(is_embeddable) }
       % endif
       <div class="content-panel" ${ not is_embeddable and 'data-bind="niceScroll"' or ''}>
         <div class="metastore-main">
+          <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
+          <!-- ko ifnot: loading -->
           <h1>
             <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
             <!-- ko template: { if: database() !== null && database().table() === null, name: 'metastore-tables-actions' }--><!-- /ko -->
             <!-- ko template: { if: database() === null, name: 'metastore-databases-actions' }--><!-- /ko -->
             <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
           </h1>
-          <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
           <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
           <!-- ko with: database -->
           <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
           <!-- ko template: { if: !loading() && table() === null, name: 'metastore-tables' } --><!-- /ko -->
           <!-- ko with: table -->
             <!-- ko template: 'metastore-describe-table' --><!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </div>
