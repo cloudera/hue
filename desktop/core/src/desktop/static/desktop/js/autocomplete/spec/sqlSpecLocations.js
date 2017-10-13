@@ -35,6 +35,24 @@
       });
     };
 
+    it('should report locations for "SELECT * FROM tbl WHERE tbl.mp[\'key\'].bla;"', function () {
+      assertLocations({
+        beforeCursor: 'SELECT * FROM tbl WHERE tbl.mp[\'key\'].bla; ',
+        dialect: 'hive',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 42 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'tbl' }] },
+          { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 19, last_column: 42 } },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain: [{ name: 'tbl' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 29, last_column: 31 }, identifierChain: [{ name: 'mp', keySet: true }], qualified: true, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+          { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 42 }, identifierChain: [{ name: 'mp', keySet: true }, { name: 'bla' }], qualified: true, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 42, last_column: 42 } }
+        ]
+      });
+    });
+
     it('should report locations for "WITH boo AS (SELECT * FROM tbl) SELECT * FROM boo; |"', function() {
       assertLocations({
         beforeCursor: 'WITH boo AS (SELECT * FROM tbl) SELECT * FROM boo; ',
