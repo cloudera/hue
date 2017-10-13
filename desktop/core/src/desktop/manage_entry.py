@@ -20,6 +20,7 @@ import os
 import os.path
 import sys
 import traceback
+import subprocess
 
 LOG = logging.getLogger(__name__)
 
@@ -46,10 +47,93 @@ def entry():
   argv = sys.argv[:]
   parser = LaxOptionParser(option_list=BaseCommand.option_list)
   parser.parse_args(argv)
+
   if len(argv) > 1:
     prof_id = subcommand = argv[1]
+    commands_req_db = [ "changepassword", "createsuperuser",
+                        "clean_history_docs", "convert_documents", "sync_documents",
+                        "dbshell", "dumpdata", "loaddata", "shell",
+                        "migrate", "syncdb",
+                        "import_ldap_group", "import_ldap_user", "sync_ldap_users_and_groups", "useradmin_sync_with_unix" ]
+    if subcommand in commands_req_db:
+      #Check if this is a CM managed cluster
+      cm_config_file = '/etc/cloudera-scm-agent/config.ini'
+      if os.path.isfile(cm_config_file) and "--cm-managed" not in sys.argv:
+        if not "HUE_CONF_DIR" in os.environ:
+          print "ALERT: This appears to be a CM Managed environment"
+          print "ALERT: HUE_CONF_DIR must be set when running hue commands in CM Managed environment"
+          print "ALERT: Please run 'hue <command> --cm-managed'"
   else:
     prof_id = str(os.getpid())
+
+  # Check if --cm-managed flag is set and strip it out
+  # to prevent from sending to subcommands
+  if "--cm-managed" in sys.argv:
+    sys.argv.remove("--cm-managed")
+    import ConfigParser
+    from ConfigParser import NoOptionError
+    config = ConfigParser.RawConfigParser()
+    config.read(cm_config_file)
+    try:
+      cm_supervisor_dir = config.get('General', 'agent_wide_credential_cache_location')
+    except NoOptionError:
+      cm_supervisor_dir = '/var/run/cloudera-scm-agent'
+      pass
+
+    #Parse CM supervisor include file for Hue and set env vars
+    cm_supervisor_dir = cm_supervisor_dir + '/supervisor/include'
+    hue_env_conf = None
+    envline = None
+    cm_hue_string = "HUE_SERVER"
+
+
+    for file in os.listdir(cm_supervisor_dir):
+      if cm_hue_string in file:
+        hue_env_conf = file
+
+    if not hue_env_conf == None:
+      if os.path.isfile(cm_supervisor_dir + "/" + hue_env_conf):
+        hue_env_conf_file = open(cm_supervisor_dir + "/" + hue_env_conf, "r")
+        for line in hue_env_conf_file:
+          if "environment" in line:
+            envline = line
+          if "directory" in line:
+            empty, hue_conf_dir = line.split("directory=")
+            os.environ["HUE_CONF_DIR"] = hue_conf_dir.rstrip()
+    else:
+      print "This appears to be a CM managed cluster the"
+      print "supervisor/include file for Hue could not be found"
+      print "in order to successfully run commands that access"
+      print "the database you need to set the following env vars:"
+      print ""
+      print "  export JAVA_HOME=<java_home>"
+      print "  export HUE_CONF_DIR=\"/var/run/cloudera-scm-agent/process/\`ls -1 /var/run/cloudera-scm-agent/process | grep HUE_SERVER | sort -n | tail -1 \`\""
+      print "  export HUE_IGNORE_PASSWORD_SCRIPT_ERRORS=1"
+      print "  export HUE_DATABASE_PASSWORD=<hueDBpassword>"
+
+    if not envline == None:
+      empty, environment = envline.split("environment=")
+      for envvar in environment.split(","):
+        if "HADOOP_C" in envvar or "PARCEL" in envvar:
+          envkey, envval = envvar.split("=")
+          envval = envval.replace("'", "").rstrip()
+          os.environ[envkey] = envval
+
+    #Set JAVA_HOME:
+    if "JAVA_HOME" not in os.environ.keys():
+      parcel_dir=os.environ["PARCELS_ROOT"] + '/' + os.environ["PARCEL_DIRNAMES"]
+      bigtop_javahome=parcel_dir + '/lib/bigtop-utils/bigtop-detect-javahome'
+      if os.path.isfile(bigtop_javahome):
+        command = "/bin/bash -c \"source " + bigtop_javahome + " && env\""
+        proc = subprocess.Popen(command, stdout = subprocess.PIPE, shell = True)
+        for procline in proc.stdout:
+          (key, _, value) = procline.partition("=")
+          if key == "JAVA_HOME":
+            os.environ[key] = value.rstrip()
+    
+    if "JAVA_HOME" not in os.environ.keys():
+      print "Not able to set JAVA_HOME.  Please set manually:"
+      print "  export JAVA_HOME=<java_home>"
 
   try:
     # Let django handle the normal execution
