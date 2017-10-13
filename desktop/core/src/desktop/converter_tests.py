@@ -135,7 +135,7 @@ class TestDocumentConverter(object):
       assert_equal(doch.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       # Verify session type
-      assert_equal('hive', doc2.data_dict['sessions'][0]['type'])
+      assert_false(doc2.data_dict['sessions'])
 
       # Verify snippet values
       assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
