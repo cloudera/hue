@@ -48,7 +48,13 @@ var MetastoreViewModel = (function () {
     });
 
     self.reloading = ko.observable(false);
-    self.loading = ko.observable(false);
+    self.loadingDatabases = ko.observable(false);
+    self.loadingTable = ko.observable(false);
+
+    self.loading = ko.pureComputed(function () {
+      return self.loadingDatabases() || self.loadingTable() || self.reloading();
+    });
+
     self.databases = ko.observableArray();
 
     self.selectedDatabases = ko.observableArray();
@@ -164,7 +170,7 @@ var MetastoreViewModel = (function () {
 
   MetastoreViewModel.prototype.loadDatabases = function (successCallback) {
     var self = this;
-    if (self.loading()) {
+    if (self.loadingDatabases()) {
       if (lastLoadDatabasesDeferred !== null) {
         lastLoadDatabasesDeferred.done(successCallback);
       }
@@ -174,7 +180,7 @@ var MetastoreViewModel = (function () {
     lastLoadDatabasesDeferred = $.Deferred();
     lastLoadDatabasesDeferred.done(successCallback);
 
-    self.loading(true);
+    self.loadingDatabases(true);
     self.apiHelper.loadDatabases({
       sourceType: self.sourceType(),
       successCallback: function (databaseNames) {
@@ -186,7 +192,7 @@ var MetastoreViewModel = (function () {
             sourceType: self.sourceType,
           })
         }));
-        self.loading(false);
+        self.loadingDatabases(false);
         lastLoadDatabasesDeferred.resolve();
       },
       errorCallback: function () {
@@ -198,9 +204,11 @@ var MetastoreViewModel = (function () {
 
   MetastoreViewModel.prototype.loadTableDef = function (tableDef, callback) {
     var self = this;
+    self.loadingTable(true);
     self.setDatabaseByName(tableDef.database, function () {
       if (self.database()) {
         if (self.database().table() && self.database().table().name == tableDef.name) {
+          self.loadingTable(false);
           if (callback) {
             callback();
           }
@@ -212,6 +220,7 @@ var MetastoreViewModel = (function () {
             return table.name === tableDef.name;
           });
           if (foundTables.length === 1) {
+            self.loadingTable(false);
             self.database().setTable(foundTables[0], callback);
           } else if (clearDbCacheOnMissing) {
             huePubSub.publish('assist.clear.db.cache', {
@@ -222,6 +231,8 @@ var MetastoreViewModel = (function () {
             self.database().load(function () {
               setTableAfterLoad(false);
             }, self.optimizerEnabled(), self.navigatorEnabled(), self.sourceType());
+          } else {
+            self.loadingTable(false);
           }
         };
 
@@ -268,7 +279,7 @@ var MetastoreViewModel = (function () {
       }
     };
 
-    if (self.loading() && lastLoadDatabasesDeferred !== null) {
+    if (self.loadingDatabases() && lastLoadDatabasesDeferred !== null) {
       lastLoadDatabasesDeferred.done(whenLoaded);
     } else {
       whenLoaded();
