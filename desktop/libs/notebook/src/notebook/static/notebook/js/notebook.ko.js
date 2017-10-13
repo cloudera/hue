@@ -1051,7 +1051,7 @@ var EditorViewModel = (function() {
       });
 
       self.checkComplexity = function () {
-        if (lastCheckedComplexityStatement === self.statement()) {
+        if (!self.inFocus() || lastCheckedComplexityStatement === self.statement()) {
           return;
         }
 
