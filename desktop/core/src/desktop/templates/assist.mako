@@ -2073,7 +2073,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           <!-- ko if: filteredFunctions().length > 0 -->
           <ul class="assist-functions" data-bind="foreach: filteredFunctions">
             <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
-              <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parent.selectedFunction() === $data }, multiClick: { click: function () { $parent.selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }, text: signature"></a>
+              <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parent.selectedFunction() === $data }, multiClick: { click: function () { $parent.selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }, html: signatureMatch"></a>
             </li>
           </ul>
           <!-- /ko -->
@@ -2089,7 +2089,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           <div class="assist-panel-close"><button class="close" data-bind="click: function() { $parent.selectedFunction(null); }">&times;</button></div>
           <div class="assist-function-signature blue" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, text: signature, event: { 'dblclick': function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }"></div>
           <!-- ko if: description -->
-          <div data-bind="text: description"></div>
+          <div data-bind="html: descriptionMatch"></div>
           <!-- /ko -->
         </div>
         <!-- /ko -->
@@ -2128,17 +2128,31 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.filteredFunctions = ko.pureComputed(function () {
           var result = [];
           var lowerCaseQuery = self.query().toLowerCase();
+          var replaceRegexp = new RegExp('(' + lowerCaseQuery + ')', 'i');
           self.activeCategories().forEach(function (category) {
             category.functions.forEach(function (fn) {
               if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) === 0) {
                 fn.weight = 2;
+                fn.signatureMatch(fn.signature.replace(replaceRegexp, '<b>$1</b>'));
+                fn.descriptionMatch(fn.description);
                 result.push(fn);
               } else if (fn.signature.toLowerCase().indexOf(lowerCaseQuery) !== -1) {
                 fn.weight = 1;
+                fn.signatureMatch(fn.signature.replace(replaceRegexp, '<b>$1</b>'));
+                fn.descriptionMatch(fn.description);
                 result.push(fn);
               } else if ((fn.description && fn.description.toLowerCase().indexOf(lowerCaseQuery) !== -1)) {
+                fn.signatureMatch(fn.signature);
+                fn.descriptionMatch(fn.description.replace(replaceRegexp, '<b>$1</b>'));
                 fn.weight = 0;
                 result.push(fn);
+              } else {
+                if (fn.signatureMatch() !== fn.signature) {
+                  fn.signatureMatch(fn.signature);
+                }
+                if (fn.descriptionMatch() !== fn.desciption) {
+                  fn.descriptionMatch(fn.description);
+                }
               }
             });
           });
@@ -2204,7 +2218,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               return {
                 draggable: fn.draggable,
                 signature: fn.signature,
-                description: fn.description
+                signatureMatch: ko.observable(fn.signature),
+                description: fn.description,
+                descriptionMatch: ko.observable(fn.description)
               }
             })
           };
