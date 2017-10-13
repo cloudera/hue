@@ -166,7 +166,8 @@ class HS2Api(Api):
 
     session = Session.objects.get_session(self.user, application=application)
 
-    if session is None:
+    reuse_session = session is not None
+    if not reuse_session:
       session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
 
     response = {
@@ -185,6 +186,7 @@ class HS2Api(Api):
         properties = self.get_properties(lang)
 
     response['properties'] = properties
+    response['reuse_session'] = reuse_session
 
     if lang == 'impala':
       http_addr = _get_impala_server_url(session)
