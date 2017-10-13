@@ -693,7 +693,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 22, container: '.assist-collections-scrollable' }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'collections-context-items', scrollContainer: '.assist-collections-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
-            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name + (definition.type != 'collection' && definition.type != 'alias' ? ' - ' + definition.type : '') }">
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: function (data, event) { definition.type == 'collection' ? click() : showContextPopover(data, event); }, attr: {'title': definition.name + (definition.type != 'collection' && definition.type != 'alias' ? ' - ' + definition.type : '') }">
               <!-- ko switch: definition.type -->
                 <!-- ko case: 'collection' -->
                 <i class="fa fa-fw fa-search muted valign-middle"></i>
