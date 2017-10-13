@@ -121,6 +121,34 @@ var AssistCollectionEntry = (function () {
 
   };
 
+  AssistCollectionEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
+    var self = this;
+    var $source = $(event.target);
+    var offset = $source.offset();
+    if (positionAdjustment) {
+      offset.left += positionAdjustment.left;
+      offset.top += positionAdjustment.top;
+    }
+
+    huePubSub.publish('context.popover.show', {
+      data: {
+        type: 'collection',
+        definition: self.definition,
+        parent: self.parent
+      },
+      showInAssistEnabled: false,
+      orientation: 'right',
+      pinEnabled: false,
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 3,
+        right: offset.left + $source.width() + 1,
+        bottom: offset.top + $source.height() - 3
+      }
+    });
+  };
+
   AssistCollectionEntry.prototype.openInBrowser = function () {
     huePubSub.publish('assist.openCollectionItem', this);
   };

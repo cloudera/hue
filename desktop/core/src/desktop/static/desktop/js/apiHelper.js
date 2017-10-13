@@ -65,6 +65,8 @@ var ApiHelper = (function () {
   var CONFIG_APPS_API = '/desktop/api/configurations';
   var SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
   var SOLR_FIELDS_API = '/indexer/api/index/list/';
+  var DASHBOARD_TERMS_API = '/dashboard/get_terms';
+  var DASHBOARD_STATS_API = '/dashboard/get_stats';
 
   var HBASE_API_PREFIX = '/hbase/api/';
   var SAVE_TO_FILE = '/filebrowser/save';
@@ -687,6 +689,111 @@ var ApiHelper = (function () {
       url: url,
       fetchFunction: fetchFunction
     }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {String} options.collectionName
+   * @param {String} options.fieldName
+   * @param {String} options.prefix
+   * @param {String} [options.engine]
+   * @param {Function} options.successCallback
+   * @param {Function} [options.alwaysCallback]
+   * @param {Number} [options.timeout]
+   *
+   */
+  ApiHelper.prototype.fetchDashboardTerms = function (options) {
+    var self = this;
+    if (options.timeout === 0) {
+      self.assistErrorCallback(options)({ status: -1 });
+      return;
+    }
+    $.ajax({
+      dataType: 'json',
+      url: DASHBOARD_TERMS_API,
+      type: 'POST',
+      data: {
+        collection: ko.mapping.toJSON({
+          id: '',
+          name: options.collectionName,
+          engine: options.engine || 'solr'
+        }),
+        analysis: ko.mapping.toJSON({
+          name: options.fieldName,
+          terms: {
+            prefix: options.prefix || ''
+          }
+        })
+      },
+      timeout: options.timeout,
+      success: function (data) {
+        if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
+          options.successCallback(data);
+        } else {
+          self.assistErrorCallback(options)(data);
+        }
+      }
+    })
+    .fail(self.assistErrorCallback(options))
+    .always(options.alwaysCallback);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {String} options.collectionName
+   * @param {String} options.fieldName
+   * @param {String} [options.engine]
+   * @param {Function} options.successCallback
+   * @param {Function} [options.alwaysCallback]
+   * @param {Number} [options.timeout]
+   *
+   */
+  ApiHelper.prototype.fetchDashboardStats = function (options) {
+    var self = this;
+    if (options.timeout === 0) {
+      self.assistErrorCallback(options)({ status: -1 });
+      return;
+    }
+    $.ajax({
+      dataType: 'json',
+      url: DASHBOARD_STATS_API,
+      type: 'POST',
+      data: {
+        collection: ko.mapping.toJSON({
+          id: '',
+          name: options.collectionName,
+          engine: options.engine || 'solr'
+        }),
+        analysis: ko.mapping.toJSON({
+          name: options.fieldName,
+          stats: {
+            facet: ''
+          },
+        }),
+        query: ko.mapping.toJSON({
+          qs: [{q: ''}],
+          fqs: []
+        })
+      },
+      timeout: options.timeout,
+      success: function (data) {
+        if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
+          if (data.status === 0){
+            options.successCallback(data);
+          }
+          else if (data.status === 1) {
+            options.notSupportedCallback(data);
+          }
+          else {
+            self.assistErrorCallback(options)(data);
+          }
+        } else {
+          self.assistErrorCallback(options)(data);
+        }
+      }
+    })
+    .fail(self.assistErrorCallback(options))
+    .always(options.alwaysCallback);
   };
 
   /**
