@@ -330,6 +330,7 @@ def _save_notebook(notebook, user):
   notebook['isSaved'] = True
   notebook['isHistory'] = False
   notebook['id'] = notebook_doc.id
+  _clear_sessions(notebook)
   notebook_doc1 = notebook_doc._get_doc1(doc2_type=notebook_type)
   notebook_doc.update_data(notebook)
   notebook_doc.search = _get_statement(notebook)
@@ -357,6 +358,10 @@ def save_notebook(request):
   response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
   return JsonResponse(response)
+
+
+def _clear_sessions(notebook):
+  notebook['sessions'] = [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr')]
 
 
 def _historify(notebook, user):
@@ -391,6 +396,7 @@ def _historify(notebook, user):
     )
 
   notebook['uuid'] = history_doc.uuid
+  _clear_sessions(notebook)
   history_doc.update_data(notebook)
   history_doc.search = _get_statement(notebook)
   history_doc.save()
