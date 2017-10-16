@@ -680,6 +680,17 @@ from desktop.views import _ko
           text: []
         });
 
+        var querySpecSub = self.querySpec.subscribe(function (newVal) {
+          if (!newVal || !newVal.query) {
+              self.searchInput('');
+              self.inlineAutocomplete('');
+          }
+        });
+
+        self.disposals.push(function () {
+          querySpecSub.dispose();
+        });
+
         self.onClear = function () {
           if (params.onClear) {
             params.onClear();
@@ -692,11 +703,15 @@ from desktop.views import _ko
             self.autocomplete(self.searchInput(), self.inlineAutocomplete);
           });
           self.disposals.push(function () {
-            triggerSub.remove();
+            triggerSub.dispose();
           })
         }
 
         var inputSub = self.searchInput.subscribe(function (newValue) {
+          if (newValue === '' && self.querySpec() && self.querySpec().query === '') {
+            self.inlineAutocomplete('');
+            return;
+          }
           if (newValue === '' && self.querySpec() && self.querySpec().query !== '') {
             self.querySpec({
               query: '',
@@ -935,6 +950,14 @@ from desktop.views import _ko
           }
         });
 
+        huePubSub.subscribe('context.popover.open.in.metastore', function () {
+          window.setTimeout(function () {
+            if (self.searchResultVisible()) {
+              self.close();
+            }
+          }, 0);
+        });
+
         huePubSub.subscribe('context.popover.show.in.assist', function () {
           window.setTimeout(function () {
             if (self.searchResultVisible()) {
@@ -1049,7 +1072,11 @@ from desktop.views import _ko
       GlobalSearch.prototype.close = function () {
         var self = this;
         self.searchResultVisible(false);
-        self.querySpec({});
+        self.querySpec({
+          query: '',
+          facets: {},
+          text: []
+        });
       };
 
       GlobalSearch.prototype.openResult = function () {

@@ -2373,7 +2373,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         var activeTableIndex = {};
 
         self.filter = {
-          querySpec: ko.observable({}),
+          querySpec: ko.observable({
+            query: '',
+            facets: {},
+            text: []
+          }),
           showViews: ko.observable(true),
           showTables: ko.observable(true)
         };
