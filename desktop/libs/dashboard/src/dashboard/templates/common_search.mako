@@ -717,7 +717,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-fw fa-plus"></i> ${ _('Add') }
       </a>
-      <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.fieldsNames" class="hit-options" style="margin-bottom: 0"></select>
+      <select data-bind="options: $root.collection.template.facetFieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options" style="margin-bottom: 0"></select>
       <div class="clearfix"></div>
     </div>
     <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
@@ -2111,44 +2111,34 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <script type="text/html" id="metric-form">
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
     <!-- ko if: $data.function() != 'field' && $parent.properties -->
-      <select data-bind="options: $parent.properties.facets_form.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
+      <select data-bind="options: $parent.properties.facets_form.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
     <!-- /ko -->
 
     <!-- ko if: $data.function() != 'field' && $data.metrics -->
-      <select data-bind="options: $data.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
-    <!-- /ko -->
-
-    <!-- ko if: $data.function() == 'field' -->
-      <select data-bind="options: $root.collection.template.fieldsNames, value: value, selectizeOptions: {create: true}, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.fieldsNames" class="hit-options" style="margin-bottom: 0"></select>
+      <select data-bind="options: $data.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
     <!-- /ko -->
 
     <!-- ko if: $data.function() == 'percentile' -->
       <!-- ko foreach: percentiles() -->
         <input type="number" class="input-mini" data-bind="value: value"/>
-        <a href="javascript: void(0)" data-bind="click: function() { $parent.percentiles.push(ko.mapping.fromJS({'value': 50})); }">
-          <i class="fa fa-plus" title="${ _('Add') }"></i>
-        </a>
+        <a href="javascript: void(0)" data-bind="click: function() { $parent.percentiles.remove($data); }">
         <i class="fa fa-minus" title="${ _('Delete') }"></i>
+        </a>
       <!-- /ko -->
+      <a href="javascript: void(0)" data-bind="click: function() { percentiles.push(ko.mapping.fromJS({'value': 50})); }">
+        <i class="fa fa-plus" title="${ _('Add') }"></i>
+      </a>
     <!-- /ko -->
-
-    <!-- ko if: ['mul', 'add', 'sub'].indexOf($data.function()) != -1 -->
-      <i class="fa fa-plus" title="${ _('Add') }"></i>
-    <!-- /ko -->
-
-    <a href="javascript: void(0)" data-bind="visible: typeof $parent.ops != 'undefined', click: function() { $parent.ops.pop($data); }">
-      <i class="fa fa-minus" title="${ _('Delete') }"></i>
-    </a>
 
     <br/>
-    <a href="javascript: void(0)" data-bind="click: function() {
-        ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': '', 'ops': []}, {'function': 'field', 'value': '1', 'ops': []}]})); }
-      ">
-      <i class="fa fa-plus" title="${ _('Add formula operation') }"></i>
-    </a>
-    <!-- ko foreach: ops() -->
-      <span data-bind="template: { name: 'metric-form' }"></span>
+
+    <!-- ko if: typeof $parent.properties != "undefined" -->
+      <input data-bind="value: formula, visible: $parent.properties.facets_form.field() == 'formula'"></input>
     <!-- /ko -->
+    <!-- ko if: typeof $parent.properties == "undefined" -->
+      <input data-bind="value: formula, visible: $parent.field() == 'formula'"></input>
+    <!-- /ko -->
+    <input data-bind="value: generated_formula" type="hidden"></input>
   </div>
 
   <div data-bind="visible: ! $root.isEditing(), text: getHitOption($data.function)" class="muted"></div>
@@ -2835,7 +2825,7 @@ var searchViewModel;
 moment.suppressDeprecationWarnings = true;
 
 var NUMERIC_HIT_OPTIONS = [
-    // No count
+    { value: "unique", label: "Count" },
     { value: "unique", label: "${ _('Unique Count') }" },
     { value: "avg", label: "${ _('Average') }" },
     { value: "sum", label: "${ _('Sum') }" },
@@ -2843,31 +2833,26 @@ var NUMERIC_HIT_OPTIONS = [
     { value: "max", label: "${ _('Max') }" },
     { value: "median", label: "${ _('Median') }" },
     { value: "percentile", label: "${ _('Percentiles') }" },
-    { value: "mul", label: "${ _('Multiply') }" },
-    { value: "add", label: "${ _('Add') }" },
-    { value: "sub", label: "${ _('Substract') }" },
     { value: "stddev", label: "${ _('Stddev') }" },
     { value: "variance", label: "${ _('Variance') }" }
 ];
 var DATETIME_HIT_OPTIONS = [
+    { value: "unique", label: "Count" },
     { value: "unique", label: "${ _('Unique Count') }" },
-    { value: "ms", label: "${ _('Substract dates') }" }
 ];
 var ALPHA_HIT_COUNTER_OPTIONS = [
+    { value: "unique", label: "Count" },
     { value: "unique", label: "${ _('Unique Count') }" },
     { value: "min", label: "${ _('Min') }" },
     { value: "max", label: "${ _('Max') }" }
 ];
 var ALPHA_HIT_OPTIONS = [
-    { value: "count", label: "Count" },
+    { value: "unique", label: "Count" },
     { value: "unique", label: "${ _('Unique Count') }" },
     { value: "min", label: "${ _('Min') }" },
     { value: "max", label: "${ _('Max') }" }
 ];
-var HIT_OPTIONS = [
-    { value: "count", label: "${ _('Count') }" }
-  ].concat(NUMERIC_HIT_OPTIONS)\
-  .concat([{ value: "ms", label: "${ _('Substract dates') }" }])
+var HIT_OPTIONS = NUMERIC_HIT_OPTIONS
 ;
 
 

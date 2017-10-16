@@ -956,7 +956,7 @@ var Collection = function (vm, collection) {
     facet.properties.facets_form.mincount(1);
 
     facet.properties.facets_form.aggregate.function('count');
-    facet.properties.facets_form.aggregate.ops.removeAll();
+    facet.properties.facets_form.aggregate.formula('');
     facet.properties.facets_form.aggregate.percentiles.removeAll();
     facet.properties.facets_form.aggregate.percentiles.push({'value': 50});
 
@@ -1062,6 +1062,10 @@ var Collection = function (vm, collection) {
     }).sort(function (a, b) {
       return a.toLowerCase().localeCompare(b.toLowerCase());
     });
+  });
+
+  self.template.facetFieldsNames = ko.computed(function () {
+    return ['formula'].concat(self.template.fieldsNames());
   });
 
   self.template.sortedGeogFieldsNames = ko.computed(function () {
