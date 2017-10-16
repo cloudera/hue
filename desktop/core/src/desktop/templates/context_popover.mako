@@ -409,7 +409,7 @@ from metadata.conf import has_navigator
       <div class="hue-popover-arrow" data-bind="style: { 'margin-left': leftAdjust() + 'px',  'margin-top': topAdjust() + 'px' }"></div>
       <div class="hue-popover-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-right: 30px;">
         <i class="fa muted" data-bind="css: iconClass" style="margin-top: 3px"></i> <span style="padding-left: 4px;" data-bind="text: title"></span>
-        <!-- ko if: subtitle -->
+        <!-- ko if: typeof subtitle !== 'undefined' && subtitle -->
         <span class="muted" style="padding-left: 4px;" data-bind="html: subtitle"></span>
         <!-- /ko -->
         <div style="position: absolute; right: 6px; top: 8px;">
