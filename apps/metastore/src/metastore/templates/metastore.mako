@@ -337,11 +337,18 @@ ${ components.menubar(is_embeddable) }
         <!-- /ko -->
       </div>
       <!-- ko with: $parent.tableStats -->
-        <!-- ko if: typeof last_modified_by !== 'undefined' -->
-          <div title="${ _('Last modified by') }"><i class="fa fa-fw fa-user muted"></i> <span data-bind="text: last_modified_by"></span> </div>
+        <!-- ko if: typeof transient_lastDdlTime !== 'undefined' -->
+          <span title="${ _('Last data update') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(transient_lastDdlTime * 1000)"></span></span>
         <!-- /ko -->
-        <!-- ko if: typeof last_modified_time !== 'undefined' -->
-          <div title="${ _('Last modified time') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(last_modified_time*1000)"></span></div>
+        <!-- ko if: typeof last_modified_by !== 'undefined' || typeof last_modified_time !== 'undefined' -->
+          <div>
+          <!-- ko if: typeof last_modified_time !== 'undefined' -->
+            <span title="${ _('Last DDL modified time') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(last_modified_time*1000)"></span></span>
+          <!-- /ko -->
+          <!-- ko if: typeof last_modified_by !== 'undefined' -->
+            <span title="${ _('Last DDL modified by') }"><i class="fa fa-fw fa-user muted"></i> <span data-bind="text: last_modified_by"></span></span>
+          <!-- /ko -->
+          </div>
         <!-- /ko -->
         <!-- ko if: typeof numFiles !== 'undefined' && typeof last_modified_by === 'undefined' -->
           <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span> ${ _('files') }</div>
