@@ -72,7 +72,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
         %if is_embeddable:
           <li>
             <a href="javascript: void(0)" data-bind="hueLink: '/home/?type=oozie-bundle2'">
-              <svg class="hi hi-fw"><use xlink:href="#hi-documents"></use></svg> ${ _('Bundles') }
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Bundles') }
             </a>
           </li>
         %endif
