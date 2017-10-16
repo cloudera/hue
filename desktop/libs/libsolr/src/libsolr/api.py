@@ -799,8 +799,8 @@ class SolrApi(object):
     else:
       f = facet['aggregate']
 
-    if not f['ops']:
-      f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]
+    if not f['formula']:
+      f['formula'] = facet['field']
 
     return cls.__get_aggregate_function(f)
 
@@ -810,8 +810,8 @@ class SolrApi(object):
       return f['value']
     else:
       fields = []
-      for _f in f['ops']:
-        fields.append(cls.__get_aggregate_function(_f))
+      if f['formula']:
+        fields.append(f['formula'])
       if f['function'] == 'median':
         f['function'] = 'percentile'
         fields.append('50')
