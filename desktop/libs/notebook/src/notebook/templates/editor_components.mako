@@ -3181,6 +3181,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           redrawFixedHeaders(200);
           $(window).bind("keydown", "esc", exitPlayerMode);
         } else {
+          hideFixedHeaders();
           huePubSub.publish('side.panels.show', true);
           viewModel.assistWithoutStorage(true);
           viewModel.isLeftPanelVisible(wasLeftPanelVisible);
