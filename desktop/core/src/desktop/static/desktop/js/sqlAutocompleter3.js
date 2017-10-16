@@ -1829,48 +1829,75 @@ var SqlAutocompleter3 = (function () {
     self.suggestions = new AutocompleteResults(options);
   }
 
-  SqlAutocompleter3.prototype.autocomplete = function () {
+  SqlAutocompleter3.prototype.parseActiveStatement = function () {
     var self = this;
-    try {
-      var parseResult = sqlAutocompleteParser.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
+    if (self.snippet.positionStatement() && self.snippet.positionStatement().location) {
+      var activeStatementLocation = self.snippet.positionStatement().location;
+      var cursorPosition = self.editor().getCursorPosition();
 
-      // Fall back to the active statement only on errors.
-      if (parseResult.errors && parseResult.errors.length > 0 && self.snippet.positionStatement() && self.snippet.positionStatement().location) {
+      if ((activeStatementLocation.first_line - 1 < cursorPosition.row || (activeStatementLocation.first_line - 1 === cursorPosition.row && activeStatementLocation.first_column <= cursorPosition.column)) &&
+        (activeStatementLocation.last_line - 1 > cursorPosition.row || (activeStatementLocation.last_line - 1 === cursorPosition.row && activeStatementLocation.last_column >= cursorPosition.column))) {
         var beforeCursor = self.editor().session.getTextRange({
           start: {
-            row: self.snippet.positionStatement().location.first_line - 1,
-            column: self.snippet.positionStatement().location.first_column
+            row: activeStatementLocation.first_line - 1,
+            column: activeStatementLocation.first_column
           },
-          end: {
-            row: self.editor().getCursorPosition().row,
-            column: self.editor().getCursorPosition().column
-          }
+          end: cursorPosition
         });
 
         var afterCursor = self.editor().session.getTextRange({
-          start: {
-            row: self.editor().getCursorPosition().row,
-            column: self.editor().getCursorPosition().column
-          },
+          start: cursorPosition,
           end: {
-            row: self.snippet.positionStatement().location.last_line - 1,
-            column: self.snippet.positionStatement().location.last_column
+            row: activeStatementLocation.last_line - 1,
+            column: activeStatementLocation.last_column
           }
         });
-        parseResult = sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), false);
+        return sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), false);
       }
+    }
+  };
 
-      if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
-        console.log(parseResult);
+  SqlAutocompleter3.prototype.autocomplete = function () {
+    var self = this;
+    var parseResult;
+    try {
+      parseResult = self.parseActiveStatement();
+
+      // This could happen in case the user is editing at the borders of the statement and the locations haven't
+      // been updated yet, in that case we have to force a location update before parsing
+      if (!parseResult) {
+        huePubSub.publish('editor.identify.statement.locations', self.snippet.id());
+        parseResult = self.parseActiveStatement();
       }
-
-      self.suggestions.update(parseResult);
-    } catch(e) {
+    } catch (e) {
       if (typeof console.warn !== 'undefined') {
         console.warn(e);
       }
+    }
+
+    // In the unlikely case the statement parser fails we fall back to parsing all of it
+    if (!parseResult) {
+      try {
+        parseResult = sqlAutocompleteParser.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
+      } catch (e) {
+        if (typeof console.warn !== 'undefined') {
+          console.warn(e);
+        }
+      }
+    }
+
+    if (!parseResult) {
       // This prevents Ace from inserting garbled text in case of exception
       huePubSub.publish('hue.ace.autocompleter.done');
+    } else {
+      try {
+        self.suggestions.update(parseResult);
+      } catch (e) {
+        if (typeof console.warn !== 'undefined') {
+          console.warn(e);
+        }
+        huePubSub.publish('hue.ace.autocompleter.done');
+      }
     }
   };
 
