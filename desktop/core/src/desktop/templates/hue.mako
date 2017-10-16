@@ -1246,6 +1246,16 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.leftNavVisible.subscribe(function (val) {
           huePubSub.publish('left.nav.open.toggle', val);
           hueAnalytics.convert('hue', 'leftNavVisible/' + val);
+          if (val) {
+            // Defer or it will be triggered by the open click
+            window.setTimeout(function () {
+              $(document).one('click', function () {
+                if (self.leftNavVisible()) {
+                  self.leftNavVisible(false);
+                }
+              })
+            }, 0);
+          }
         });
 
         self.onePageViewModel.currentApp.subscribe(function () {
