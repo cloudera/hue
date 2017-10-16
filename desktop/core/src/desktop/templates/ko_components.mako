@@ -658,6 +658,20 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
+      var getSortedFacets = function (facetIndex) {
+        var result = Object.keys(facetIndex);
+        result.sort(function (a, b) {
+          if (facetIndex[a] > facetIndex[b]) {
+            return -1;
+          }
+          if (facetIndex[b] > facetIndex[a]) {
+            return 1;
+          }
+          return a.localeCompare(b);
+        });
+        return result;
+      };
+
       var InlineAutocomplete = function (params) {
         var self = this;
         self.disposals = [];
@@ -726,7 +740,37 @@ from desktop.views import _ko
             }
             var querySpec = { query: newValue };
             if (self.lastResult.facets) {
-              querySpec.facets = self.lastResult.facets
+
+              var knownFacetValues = ko.unwrap(self.knownFacetValues);
+              var cleanFacets = {};
+              Object.keys(self.lastResult.facets).forEach(function (facet) {
+                if (!knownFacetValues[facet]) {
+                  cleanFacets[facet] = self.lastResult.facets[facet];
+                } else {
+                  cleanFacets[facet] = {};
+                  Object.keys(self.lastResult.facets[facet]).forEach(function (value) {
+                    if (knownFacetValues[facet][value]) {
+                      cleanFacets[facet][value] = self.lastResult.facets[facet][value];
+                    } else {
+                      var found = false;
+                      // Find the closest match, i.e. type:s -> type: [string, smallint, ...]
+                      getSortedFacets(knownFacetValues[facet]).forEach(function (knownValue) {
+                        if (knownValue.toLowerCase().indexOf(value.toLowerCase()) === 0) {
+                          if (!cleanFacets[facet][knownValue]) {
+                            cleanFacets[facet][knownValue] = [];
+                          }
+                          cleanFacets[facet][knownValue] = true;
+                          found = true
+                        }
+                      });
+                      if (!found) {
+                        cleanFacets[facet][value] = self.lastResult.facets[facet][value];
+                      }
+                    }
+                  })
+                }
+              });
+              querySpec.facets = cleanFacets;
             }
             if (self.lastResult.text) {
               querySpec.text = self.lastResult.text;
@@ -847,7 +891,7 @@ from desktop.views import _ko
         if (self.lastResult.suggestFacetValues && !newAutocomplete) {
           var facetValues = ko.unwrap(self.knownFacetValues);
           if (facetValues[self.lastResult.suggestFacetValues.toLowerCase()]) {
-            Object.keys(facetValues[self.lastResult.suggestFacetValues.toLowerCase()]).every(function (value) {
+            getSortedFacets(facetValues[self.lastResult.suggestFacetValues.toLowerCase()]).every(function (value) {
               if (value.toLowerCase().indexOf(partialLower) === 0) {
                 newAutocomplete = nonPartial + partial + value.substring(partial.length, value.length);
                 return false;
