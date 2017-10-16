@@ -1187,7 +1187,7 @@ def check_job_edition_permission(oozie_job, user):
 
 
 def has_job_edition_permission(oozie_job, user):
-  return user.is_superuser or oozie_job.user == user.username
+  return user.is_superuser or oozie_job.user == user.username or (oozie_job.group and user.groups.filter(name=oozie_job.group).exists())
 
 
 def has_dashboard_jobs_access(user):
