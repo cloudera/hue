@@ -88,75 +88,6 @@ ${ assist.assistPanel() }
   </h1>
 </script>
 
-<script type="text/html" id="analysis-popover">
-  <!-- ko if: $root.fieldAnalysesName() -->
-  <div data-bind="with: $root.getFieldAnalysis()">
-    <div class="pull-right">
-      <input type="text" data-bind="visible: section() == 'terms', clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Prefix filter...') }"/>
-    </div>
-    <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 20px">
-      <li class="active"><a href="#analysis-terms-index" role="tab" data-toggle="tab" data-bind="click: function() { section('terms'); }">${ _('Terms') }</a></li>
-      <li><a href="#analysis-stats-index" role="tab" data-toggle="tab" data-bind="click: function() { section('stats'); }">${ _('Stats') }</a></li>
-    </ul>
-    <div class="tab-content" style="max-height: 370px; height: 370px; border: none">
-      <div class="tab-pane active" id="analysis-terms-index" data-bind="with: terms">
-        <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
-          <i class="fa fa-spinner fa-spin"></i>
-        </div>
-        <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
-        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0" class="table table-condensed">
-          <tbody data-bind="foreach: $data.data">
-          <tr>
-            <td data-bind="text: val.value"></td>
-            <td style="width: 40px">
-              <div class="progress">
-                <div class="bar-label" data-bind="text:val.count"></div>
-                <div class="bar bar-info" style="margin-top:-20px;" data-bind="style: {'width': ((val.count / $parent.data()[0].val.count) * 100) + '%'}"></div>
-              </div>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="tab-pane" id="analysis-stats-index" data-bind="with: stats">
-        <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
-          <i class="fa fa-spinner fa-spin"></i>
-        </div>
-        <div class="alert" data-bind="visible: !$parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() == 'error'">${ _('This field does not support stats') }</div>
-        <div class="alert" data-bind="visible: !$parent.isLoading() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
-        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() != 'error'" class="table table-condensed">
-          <tbody data-bind="foreach: $data.data">
-          <tr>
-            <td style="vertical-align: top"><strong data-bind="text: key"></strong></td>
-            <!-- ko if: key == 'facets' -->
-            <td>
-              <!-- ko if: val[Object.keys(val)[0]] != null -->
-              <table style="width: 400px">
-                <tbody data-bind="foreach: Object.keys(val[Object.keys(val)[0]])">
-                  <tr>
-                    <td style="vertical-align: top; padding-left: 4px; padding-right: 4px"><strong data-bind="text: $data"></strong></td>
-                    <td data-bind="template: 'stats-facets'"></td>
-                  </tr>
-                </tbody>
-              </table>
-              <!-- /ko -->
-              <!-- ko ifnot: val[Object.keys(val)[0]] != null -->
-              ${ _('Not available') }
-              <!-- /ko -->
-            </td>
-            <!-- /ko -->
-            <!-- ko ifnot: key == 'facets' -->
-            <td data-bind="text: val"></td>
-            <!-- /ko -->
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  <!-- /ko -->
-</script>
-
 <div class="navbar hue-title-bar nokids">
     <div class="navbar-inner">
       <div class="container-fluid">
@@ -238,18 +169,6 @@ ${ assist.assistPanel() }
 
             <!-- ko template: { if: section() == 'list-indexes', name: 'list-indexes' }--><!-- /ko -->
             <!-- ko template: { if: section() == 'list-index', name: 'list-index', data: index() }--><!-- /ko -->
-
-            <div id="fieldAnalysisIndexes" class="popover mega-popover right">
-              <div class="arrow"></div>
-              <h3 class="popover-title" style="text-align: left">
-                <a class="pull-right pointer" data-bind="click: function(){ $('#fieldAnalysisIndexes').hide(); $root.fieldAnalysesName(''); }"><i class="fa fa-times"></i></a>
-                <strong data-bind="text: $root.fieldAnalysesName"></strong>
-                <!-- ko if: $root.getFieldAnalysis() -->
-                  (<span data-bind="text: $root.getFieldAnalysis().type"></span>)
-                <!-- /ko -->
-              </h3>
-              <div class="popover-content" data-bind="template: { name: 'analysis-popover' }" style="text-align: left"></div>
-            </div>
 
           </div>
 
@@ -462,7 +381,7 @@ ${ assist.assistPanel() }
         <tr>
           <td data-bind="text: $index() + 1"></td>
           <td>
-            <i class="fa fa-info muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze') }'}, visible: type() != 'aggr'"></i>
+            <i class="fa fa-info muted pointer analysis" data-bind="click: $root.showContextPopover, attr: {'title': '${ _ko('Analyze') }'}, visible: type() != 'aggr'"></i>
           </td>
           <td data-bind="text: name"></td>
           <td data-bind="text: type"></td>
@@ -676,22 +595,6 @@ ${ assist.assistPanel() }
       };
     };
 
-    var Collection = function () {
-      var self = this;
-
-      self.id = ko.observable('');
-      self.name = ko.observable('');
-      self.engine = 'solr';
-    }
-
-
-    var Query = function () {
-      var self = this;
-      self.qs = ko.observableArray([ ko.mapping.fromJS({q:''}) ]);
-      self.fqs = ko.observableArray([]);
-    }
-
-
     var IndexesViewModel = function (options) {
       var self = this;
 
@@ -818,7 +721,6 @@ ${ assist.assistPanel() }
         if (typeof reload == 'undefined' || reload) {
           self.fetchIndexes();
         }
-        $('#fieldAnalysisIndexes').hide();
       }
 
       self.fetchIndexes = function (callback) {
@@ -864,7 +766,6 @@ ${ assist.assistPanel() }
             self.index().type(index.type());
             self.index().getSample();
             hueUtils.changeURL(self.baseURL + self.index().name());
-            self.collection.name(self.index().name());
             self.section('list-index');
             self.tab('index-overview');
           } else {
@@ -893,37 +794,30 @@ ${ assist.assistPanel() }
         hueAnalytics.log('indexes', 'delete_indexes');
       };
 
-      self.fieldAnalyses = ko.observableArray([]);
-      self.fieldAnalysesName = ko.observable('');
-      self.collection = new Collection();
-      self.query = new Query();
+      self.showContextPopover = function (field, event) {
+        var $source = $(event.target);
+        var offset = $source.offset();
 
-      self.showFieldAnalysis = function (data, e) {
-        if (self.fieldAnalysesName()) {
-          var analyse = self.getFieldAnalysis();
-
-          if (analyse == null) {
-            analyse = new FieldAnalysis(self, self.fieldAnalysesName(), data.type());
-            self.fieldAnalyses.push(analyse);
-          }
-
-          analyse.update();
-          huePubSub.publish('show.analysis', e);
-        }
-      }
-
-      self.getFieldAnalysis = function () {
-        var fieldName = self.fieldAnalysesName();
-        var _analyse = null;
-
-        $.each(self.fieldAnalyses(), function (index, analyse) {
-          if (analyse.name() == fieldName) {
-            _analyse = analyse;
-            return false;
+        huePubSub.publish('context.popover.show', {
+          data: {
+            type: 'collection',
+            definition: ko.mapping.toJS(field),
+            parent: {
+              definition: ko.mapping.toJS(self.index),
+              key: ko.observable(self.index().uniqueKey)
+            }
+          },
+          showInAssistEnabled: false,
+          orientation: 'right',
+          pinEnabled: false,
+          source: {
+            element: event.target,
+            left: offset.left,
+            top: offset.top - 3,
+            right: offset.left + $source.width() + 1,
+            bottom: offset.top + $source.height() - 3
           }
         });
-
-        return _analyse;
       };
 
     };
@@ -948,26 +842,6 @@ ${ assist.assistPanel() }
         if (foundIndex) {
           viewModel.fetchIndex(foundIndex);
         }
-      }, 'indexes');
-
-      huePubSub.subscribe('show.analysis', function (originalEvent) {
-        if (originalEvent.pageX == null && originalEvent.clientX != null) {
-          var doc = document.documentElement, body = document.body;
-          originalEvent.pageX = originalEvent.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
-          originalEvent.pageY = originalEvent.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc && doc.clientTop || body && body.clientTop || 0);
-        }
-        if ($('#indexesComponents').offset().left > 0) {
-          originalEvent.pageX = originalEvent.pageX - $('#indexesComponents').offset().left;
-          originalEvent.pageY = originalEvent.pageY - $('#indexesComponents').offset().top;
-        }
-        else {
-          originalEvent.pageX = originalEvent.pageX - $('.content-panel').position().left;
-          originalEvent.pageY = originalEvent.pageY + $('.content-panel').scrollTop();
-        }
-        $("#fieldAnalysisIndexes").show().css({
-          top: Math.max(0, originalEvent.pageY + ${ is_embeddable and '48' or '-70'} - $("#fieldAnalysisIndexes").outerHeight() / 2),
-          left: originalEvent.pageX
-        });
       }, 'indexes');
 
       viewModel.fetchIndexes(function () {
