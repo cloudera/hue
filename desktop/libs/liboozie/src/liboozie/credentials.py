@@ -51,30 +51,33 @@ class Credentials(object):
     credentials = {}
     from beeswax import hive_site, conf
 
-    if hive_properties is None:
-      hive_properties = hive_site.get_metastore()
-      if hive_properties:
-        hive_properties['hive2.server.principal'] = hive_site.get_hiveserver2_kerberos_principal(conf.HIVE_SERVER_HOST.get())
+    if not hasattr(conf.HIVE_SERVER_HOST, 'get'):
+      LOG.warn('Could not get all the Oozie credentials: beeswax app is blacklisted.')
+    else:
+      if hive_properties is None:
+        hive_properties = hive_site.get_metastore()
+        if hive_properties:
+          hive_properties['hive2.server.principal'] = hive_site.get_hiveserver2_kerberos_principal(conf.HIVE_SERVER_HOST.get())
 
-    if not hive_properties:
-      hive_properties = {}
-      LOG.warn('Could not get all the Oozie credentials: hive-site.xml required on the Hue host.')
+      if not hive_properties:
+        hive_properties = {}
+        LOG.warn('Could not get all the Oozie credentials: hive-site.xml required on the Hue host.')
 
-    credentials[self.hive_name] = {
-      'xml_name': self.hive_name,
-      'properties': [
-         ('hcat.metastore.uri', hive_properties.get('thrift_uri')),
-         ('hcat.metastore.principal', hive_properties.get('kerberos_principal')),
-      ]
-    }
+      credentials[self.hive_name] = {
+        'xml_name': self.hive_name,
+        'properties': [
+           ('hcat.metastore.uri', hive_properties.get('thrift_uri')),
+           ('hcat.metastore.principal', hive_properties.get('kerberos_principal')),
+        ]
+      }
 
-    credentials[self.hiveserver2_name] = {
-      'xml_name': self.hiveserver2_name,
-      'properties': [
-         ('hive2.jdbc.url', hive_site.hiveserver2_jdbc_url()),
-         ('hive2.server.principal', hive_properties.get('hive2.server.principal')),
-      ]
-    }
+      credentials[self.hiveserver2_name] = {
+        'xml_name': self.hiveserver2_name,
+        'properties': [
+           ('hive2.jdbc.url', hive_site.hiveserver2_jdbc_url()),
+           ('hive2.server.principal', hive_properties.get('hive2.server.principal')),
+        ]
+      }
 
     credentials[self.hbase_name] = {
       'xml_name': self.hbase_name,
