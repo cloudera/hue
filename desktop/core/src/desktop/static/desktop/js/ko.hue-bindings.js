@@ -3572,6 +3572,17 @@
       var updateThrottle = -1;
 
       var cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
+      var forceUpdateSubscription = huePubSub.subscribe('editor.identify.statement.locations', function (editorId) {
+        if (self.editorId === editorId) {
+          cursorChangePaused = true;
+          window.clearTimeout(updateThrottle);
+          window.clearTimeout(changeThrottle);
+          parseForStatements();
+          updateActiveStatement();
+          cursorChangePaused = false;
+        }
+      });
+
       var cursorSubscription = huePubSub.subscribe('editor.active.cursor.location', function (locationDetails) {
         if (cursorChangePaused) {
           return;
@@ -3610,6 +3621,7 @@
         window.clearTimeout(changeThrottle);
         window.clearTimeout(updateThrottle);
         self.editor.off("change", changeListener);
+        forceUpdateSubscription.remove();
         locateSubscription.remove();
         cursorSubscription.remove();
       });
