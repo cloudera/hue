@@ -67,6 +67,19 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="autocomplete-details-option">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header" data-bind="text: value"></div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-code">${ _ko('Type:') } <span data-bind="text: details.type"></span></div>
+          <div class="details-code">${ _ko('Default:') } <span data-bind="text: details.default"></span></div>
+          <div class="details-description" data-bind="text: details.description"></div>
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="autocomplete-details-database">
   </script>
 

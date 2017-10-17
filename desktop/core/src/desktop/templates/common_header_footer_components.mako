@@ -186,6 +186,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
           sample: '${ _('Samples') }',
           table: '${ _('Tables') }',
           udf: '${ _('UDFs') }',
+          option: '${ _('Options') }',
           variable: '${ _('Variables') }'
         },
         meta: {
