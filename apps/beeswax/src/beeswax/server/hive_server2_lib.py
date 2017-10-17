@@ -961,7 +961,6 @@ class HiveServerClient:
     req = TGetOperationStatusReq(operationHandle=operation_handle)
     return self.call(self._client.GetOperationStatus, req)
 
-
   def explain(self, query):
     query_statement = query.get_query_statement(0)
     configuration = self._get_query_configuration(query)

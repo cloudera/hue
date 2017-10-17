@@ -1188,7 +1188,7 @@ var EditorViewModel = (function() {
       $(".jHueNotify").remove();
       hueAnalytics.log('notebook', 'execute/' + self.type());
 
-      if (self.result.fetchedOnce()) {
+      if (self.result.handle()) {
         self.close();
         self.statusForButtons('executed');
       }
