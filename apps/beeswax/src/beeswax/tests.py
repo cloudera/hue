@@ -110,7 +110,7 @@ def _make_query(client, query, submission_type="Execute",
   return res
 
 def random_generator(size=8, chars=string.ascii_uppercase + string.digits):
-   return ''.join(random.choice(chars) for _ in range(size))
+    return ''.join(random.choice(chars) for _ in range(size))
 
 def get_csv(client, result_response):
   """Get the csv for a query result"""
