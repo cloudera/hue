@@ -1252,15 +1252,16 @@
   }
 
   .close-logs-overlay {
-    opacity: 0.8;
     position: absolute;
-    top: 0;
-    right: 6px;
+    top: 2px;
+    right: 10px;
     font-size: 20px;
+    display: none;
+    background-color: @cui-gray-050;
   }
 
   .snippet-log-container:hover .close-logs-overlay {
-    opacity: 1;
+    display: block;
   }
 
   .jobs-overlay {
