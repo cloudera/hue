@@ -46,6 +46,7 @@ var AutocompleteResults = (function () {
     TABLE: { id: 'table', weight: 600, color: COLORS.TABLE, label: AutocompleterGlobals.i18n.category.table, detailsTemplate: 'table' },
     DATABASE: { id: 'database', weight: 500, color: COLORS.DATABASE, label: AutocompleterGlobals.i18n.category.database, detailsTemplate: 'database' },
     UDF: { id: 'udf', weight: 400, color: COLORS.UDF, label: AutocompleterGlobals.i18n.category.udf, detailsTemplate: 'udf' },
+    OPTION: { id: 'option', weight: 400, color: COLORS.UDF, label: AutocompleterGlobals.i18n.category.option, detailsTemplate: 'option' },
     HDFS: { id: 'hdfs', weight: 300, color: COLORS.HDFS, label: AutocompleterGlobals.i18n.category.hdfs, detailsTemplate: 'hdfs' },
     VIRTUAL_COLUMN: { id: 'virtualColumn', weight: 200, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
     COLREF_KEYWORD: { id: 'colrefKeyword', weight: 100, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
@@ -305,6 +306,7 @@ var AutocompleteResults = (function () {
     self.handleIdentifiers();
     self.handleColumnAliases();
     self.handleCommonTableExpressions();
+    self.handleOptions();
     self.handleFunctions(colRefDeferred);
     self.handleDatabases(databasesDeferred);
     var tablesDeferred = self.handleTables(databasesDeferred);
@@ -489,6 +491,15 @@ var AutocompleteResults = (function () {
         });
       });
       self.appendEntries(commonTableExpressionSuggestions);
+    }
+  };
+
+  AutocompleteResults.prototype.handleOptions = function () {
+    var self = this;
+    if (self.parseResult.suggestSetOptions) {
+      var suggestions = [];
+      SqlSetOptions.suggestOptions(self.snippet.type(), suggestions, CATEGORIES.OPTION);
+      self.appendEntries(suggestions);
     }
   };
 
