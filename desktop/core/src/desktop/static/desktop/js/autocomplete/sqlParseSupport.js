@@ -1205,6 +1205,10 @@ var SqlParseSupport = (function () {
       parser.yy.result.suggestAnalyticFunctions = true;
     };
 
+    parser.suggestSetOptions = function () {
+      parser.yy.result.suggestSetOptions = true;
+    };
+
     parser.suggestColumns = function (details) {
       if (typeof details === 'undefined') {
         details = {identifierChain: []};

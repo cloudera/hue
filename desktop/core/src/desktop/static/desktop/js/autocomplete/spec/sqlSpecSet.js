@@ -85,7 +85,8 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ROLE']
+            suggestKeywords: ['ROLE'],
+            suggestSetOptions: true
           }
         });
       });

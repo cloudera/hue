@@ -68,7 +68,6 @@ SqlStatement
  : DataDefinition
  | DataManipulation
  | QuerySpecification
- | SetSpecification
  | ExplainClause DataDefinition
  | ExplainClause DataManipulation
  | ExplainClause QuerySpecification
@@ -97,6 +96,7 @@ SqlStatement_EDIT
  | DataDefinition_EDIT
  | DataManipulation_EDIT
  | QuerySpecification_EDIT
+ | SetSpecification_EDIT
  | ExplainClause DataDefinition_EDIT
  | ExplainClause DataManipulation_EDIT
  | ExplainClause QuerySpecification_EDIT
@@ -265,25 +265,6 @@ RegularIdentifier
  : 'REGULAR_IDENTIFIER'
  | 'VARIABLE_REFERENCE'
  | NonReservedKeyword
- ;
-
-SetSpecification
- : 'SET' SetOption '=' SetValue
- ;
-
-SetOption
- : RegularIdentifier
- | SetOption AnyDot RegularIdentifier
- ;
-
-SetValue
- : RegularIdentifier
- | SignedInteger
- | SignedInteger RegularIdentifier
- | QuotedValue
- | 'TRUE'
- | 'FALSE'
- | 'NULL'
  ;
 
 ExplainClause
