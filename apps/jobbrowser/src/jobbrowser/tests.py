@@ -25,7 +25,7 @@ import unittest
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal
+from nose.tools import assert_true, assert_false, assert_equal, assert_raises
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
@@ -38,6 +38,7 @@ from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
 
 from jobbrowser import models, views
+from jobbrowser.api import get_api
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import can_view_job, can_modify_job, Job, LinkJobLogs
 
@@ -512,6 +513,159 @@ class TestMapReduce2NoHadoop:
     assert_true('Kill operation is forbidden.' in response.content, response.content)
 
 
+
+class TestResourceManagerHaNoHadoop:
+
+  def setUp(self):
+    # Beware: Monkey patching
+    if not hasattr(resource_manager_api, 'old_get_resource_manager_api'):
+      resource_manager_api.old_ResourceManagerApi = resource_manager_api.ResourceManagerApi
+    if not hasattr(mapreduce_api, 'old_get_mapreduce_api'):
+      mapreduce_api.old_get_mapreduce_api = mapreduce_api.get_mapreduce_api
+    if not hasattr(history_server_api, 'old_get_history_server_api'):
+      history_server_api.old_get_history_server_api = history_server_api.get_history_server_api
+
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "jobbrowser")
+    self.user = User.objects.get(username='test')
+
+    resource_manager_api.ResourceManagerApi =  MockResourceManagerHaApi
+    mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceHaApi(username)
+    history_server_api.get_history_server_api = lambda username: HistoryServerHaApi(username)
+
+    self.finish = []
+
+  def tearDown(self):
+    resource_manager_api.ResourceManagerApi = getattr(resource_manager_api, 'old_ResourceManagerApi')
+    mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
+    history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
+
+    for f in self.finish:
+      f()
+
+
+  def test_failover_no_ha(self):
+    self.finish = [
+        YARN_CLUSTERS.set_for_testing({'default': {}}),
+
+        YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),
+        YARN_CLUSTERS['default'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_host_active'),
+        YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing('jhs_host'),
+        YARN_CLUSTERS['default'].SECURITY_ENABLED.set_for_testing(False),
+        YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.set_for_testing(False),
+    ]
+
+    resource_manager_api.API_CACHE = None
+    api = get_api(self.user, jt=None)
+
+    api.get_jobs(self.user, username=self.user.username, state='running', text='')
+    assert_false(api.resource_manager_api.from_failover)
+
+    api.get_jobs(self.user, username=self.user.username, state='running', text='')
+    assert_false(api.resource_manager_api.from_failover)
+
+    assert_raises(Exception, api.get_jobs, self.user, username=self.user.username, state='running', text='')
+
+
+  def test_failover_ha(self):
+    self.finish = [
+        YARN_CLUSTERS.set_for_testing({'ha1': {}, 'ha2': {}}),
+
+        YARN_CLUSTERS['ha1'].SUBMIT_TO.set_for_testing(True),
+        YARN_CLUSTERS['ha1'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_host_active'),
+        YARN_CLUSTERS['ha1'].HISTORY_SERVER_API_URL.set_for_testing('jhs_host'),
+        YARN_CLUSTERS['ha1'].SECURITY_ENABLED.set_for_testing(False),
+        YARN_CLUSTERS['ha1'].SSL_CERT_CA_VERIFY.set_for_testing(False),
+        YARN_CLUSTERS['ha2'].SUBMIT_TO.set_for_testing(True),
+        YARN_CLUSTERS['ha2'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_2_host'),
+        YARN_CLUSTERS['ha2'].HISTORY_SERVER_API_URL.set_for_testing('jhs_host'),
+        YARN_CLUSTERS['ha2'].SECURITY_ENABLED.set_for_testing(False),
+        YARN_CLUSTERS['ha2'].SSL_CERT_CA_VERIFY.set_for_testing(False),
+    ]
+
+
+    resource_manager_api.API_CACHE = None
+    api = get_api(self.user, jt=None)
+
+    api.get_jobs(self.user, username=self.user.username, state='running', text='')
+    assert_false(api.resource_manager_api.from_failover)
+
+    api.get_jobs(self.user, username=self.user.username, state='running', text='')
+    assert_false(api.resource_manager_api.from_failover)
+
+    # rm1 is set to to fail the 3rd time
+    YARN_CLUSTERS['ha1'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_1_host')
+    YARN_CLUSTERS['ha2'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_2_host_active') # Just tells mocked RM that it should say it is active
+    api.get_jobs(self.user, username=self.user.username, state='running', text='')
+    assert_true(api.resource_manager_api.from_failover)
+    api.resource_manager_api.from_failover = False
+
+    api.get_jobs(self.user, username=self.user.username, state='running', text='')
+    assert_false(api.resource_manager_api.from_failover)
+
+    # rm2 is set to to fail the 3rd time
+    YARN_CLUSTERS['ha1'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_1_host_active')
+    YARN_CLUSTERS['ha2'].RESOURCE_MANAGER_API_URL.set_for_testing('rm_2_host')
+    api.get_jobs(self.user, username=self.user.username, state='running', text='')
+    assert_true(api.resource_manager_api.from_failover)
+    api.resource_manager_api.from_failover = False
+
+    api.get_jobs(self.user, username=self.user.username, state='running', text='')
+    assert_false(api.resource_manager_api.from_failover)
+
+    # if rm fails and no other active ones we fail
+    assert_raises(Exception, api.get_jobs, self.user, username=self.user.username, state='running', text='')
+
+
+class MockResourceManagerHaApi(object):
+  """
+  Mock the RM API.
+  Raise a failover exception after 2 calls. Is active if name contains 'active'.
+  """
+  def __init__(self, rm_url, security_enabled=False, ssl_cert_ca_verify=False):
+    self.rm_url = rm_url
+    self.from_failover = False
+    self.get_apps_count = 0
+
+  def setuser(self, user):
+    return user
+
+  @property
+  def user(self):
+    return 'test'
+
+  @property
+  def username(self):
+    return 'test'
+
+  @property
+  def url(self):
+    return self.rm_url
+
+  def apps(self, **kwargs):
+    if self.get_apps_count >= 2:
+      self.get_apps_count = 0
+      raise Exception('standby RM after 2 tries')
+
+    self.get_apps_count += 1
+    return {
+      'apps': {
+         'app': []
+      }
+    }
+
+  def cluster(self):
+    return {'clusterInfo': {'haState': 'ACTIVE' if 'active' in self.rm_url else 'STANDBY'}}
+
+
+class MockMapreduceHaApi(object):
+  def __init__(self, username): pass
+
+
+class HistoryServerHaApi(object):
+  def __init__(self, username): pass
+
+
 class MockResourceManagerApi:
   APPS = {
     'application_1356251510842_0054': {
@@ -797,7 +951,7 @@ class HistoryServerApi(MockMapreduce2Api):
               u'avgShuffleTime': 1421, u'queue': u'default', u'killedReduceAttempts': 0, u'failedMapAttempts': 0
           }
       }
-    else:      
+    else:
       return {
           u'job': {
               u'reducesCompleted': 1, u'avgMapTime': 1798, u'avgMergeTime': 1479, u'id': u'job_1356251510842_0009',
