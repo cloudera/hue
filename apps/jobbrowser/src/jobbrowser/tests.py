@@ -34,14 +34,17 @@ from hadoop import cluster
 from hadoop.conf import YARN_CLUSTERS
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
+from hadoop.yarn.spark_history_server_api import SparkHistoryServerApi
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
 
 from jobbrowser import views
 from jobbrowser.api import get_api
 from jobbrowser.apis.query_api import QueryApi
+from jobbrowser.apis import job_api
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import can_view_job, can_modify_job, LinkJobLogs
+from jobbrowser.yarn_models import SparkJob
 
 
 LOG = logging.getLogger(__name__)
@@ -614,6 +617,75 @@ class TestImpalaApi(object):
      assert_equal(response.get(key), value)
 
 
+class TestSparkNoHadoop(object):
+  def setUp(self):
+    self.c = make_logged_in_client(is_superuser=False)
+    grant_access("test", "test", "jobbrowser")
+    self.user = User.objects.get(username='test')
+
+    if not hasattr(job_api, 'old_NativeYarnApi'):
+      job_api.old_NativeYarnApi = job_api.YarnApi
+
+    if not hasattr(views, 'old_get_api'):
+      views.old_get_api = views.get_api
+
+    job_api.NativeYarnApi = MockYarnApi
+    views.get_api = MockYarnApi
+
+  def tearDown(self):
+    job_api.NativeYarnApi = getattr(job_api, 'old_NativeYarnApi')
+    views.get_api = getattr(views, 'old_get_api')
+
+  def test_spark_executor_logs(self):
+    # Spark job status is succeed
+    query_executor_data = {u'interface': [u'"jobs"'], u'app_id': [u'"driver_executor_application_1513618343677_0018"']}
+    resp_executor = self.c.post('/jobbrowser/api/job/jobs', query_executor_data)
+    response_executor = json.loads(resp_executor.content)
+    assert_equal(response_executor['status'], 0)
+    assert_equal(response_executor['app']['executor_id'], 'driver')
+
+    query_log_data = {u'interface': [u'"jobs"'], u'type': [u'"SPARK"'], u'app_id': [u'"application_1513618343677_0018"'], u'name': [u'"default"']}
+    resp_log = self.c.post('/jobbrowser/api/job/logs', query_log_data)
+    response_log = json.loads(resp_log.content)
+    assert_equal(response_log['status'], 0)
+    assert_equal(response_log['logs']['logs'], 'dummy_logs')
+
+    # Spark job status is running
+    query_executor_data = {u'interface': [u'"jobs"'], u'app_id': [u'"driver_executor_application_1513618343677_0020"']}
+    resp_executor = self.c.post('/jobbrowser/api/job/jobs', query_executor_data)
+    response_executor = json.loads(resp_executor.content)
+    assert_equal(response_executor['status'], 0)
+    assert_equal(response_executor['app']['executor_id'], 'driver')
+
+    query_log_data = {u'interface': [u'"jobs"'], u'type': [u'"SPARK"'], u'app_id': [u'"application_1513618343677_0020"'], u'name': [u'"default"']}
+    resp_log = self.c.post('/jobbrowser/api/job/logs', query_log_data)
+    response_log = json.loads(resp_log.content)
+    assert_equal(response_log['status'], 0)
+    assert_equal(response_log['logs']['logs'], 'dummy_logs')
+
+
+class MockYarnApi:
+  def __init__(self, user, jt=None):
+    self.user = user
+
+  def get_job(self, jobid):
+    return MockSparkJob(app_id=jobid)
+
+
+class MockSparkJob(SparkJob):
+  def __init__(self, app_id):
+    self.history_server_api = MockSparkHistoryApi()
+    self.jobId = app_id
+    self.trackingUrl = 'http://localhost:8088/proxy/' + app_id
+
+    if app_id == 'application_1513618343677_0018':
+      self.status = 'SUCCEEDED'
+    elif app_id == 'application_1513618343677_0020':
+      self.status = 'RUNNING'
+
+    self._get_metrics()
+
+
 class MockResourceManagerHaApi(object):
   """
   Mock the RM API.
@@ -974,6 +1046,100 @@ class MockMapreduceApi(MockMapreduce2Api):
       job['job']['id'] = job_id
       return job
 
+class MockSparkHistoryApi(SparkHistoryServerApi):
+  def __init__(self):
+    self.APPS = [{
+        "id": "application_1513618343677_0018",
+        "name": "Sleep15minPySpark",
+        "attempts": [ {
+          "attemptId": "1",
+          "startTime": "2017-12-20T20:25:19.672GMT",
+          "endTime": "2017-12-20T20:40:43.768GMT",
+          "sparkUser": "test",
+          "completed": True
+      }]
+    }, {
+        "id": "application_1513618343677_0020",
+        "name": "Sleep15minPySpark",
+        "attempts": [ {
+          "attemptId": "2",
+          "startTime": "2017-12-24T03:19:29.993GMT",
+          "endTime": "1969-12-31T23:59:59.999GMT",
+          "sparkUser": "test",
+          "completed": False
+        }, {
+          "attemptId": "1",
+          "startTime": "2017-12-24T03:12:50.763GMT",
+          "endTime": "2017-12-24T03:19:22.178GMT",
+          "sparkUser": "test",
+          "completed": True
+      }]
+    }]
+
+  def applications(self):
+    return self.APPS
+
+  def executors(self, job):
+    EXECUTORS_LISTS = {
+      u'application_1513618343677_0018': [{
+        u'diskUsed': 0,
+        u'totalShuffleWrite': 0,
+        u'totalCores': 0,
+        u'executorLogs': {
+          u'stderr': u'http://localhost:8042/node/containerlogs/container_1513618343677_0018_01_000001/test/stderr?start=-4096',
+          u'stdout': u'http://localhost:8042/node/containerlogs/container_1513618343677_0018_01_000001/test/stdout?start=-4096'
+        },
+        u'totalInputBytes': 0,
+        u'rddBlocks': 0,
+        u'maxMemory': 515553361,
+        u'totalShuffleRead': 0,
+        u'totalTasks': 0,
+        u'activeTasks': 0,
+        u'failedTasks': 0,
+        u'completedTasks': 0,
+        u'hostPort': u'172.31.122.54:43234',
+        u'maxTasks': 0, u'totalGCTime': 0,
+        u'isBlacklisted': False,
+        u'memoryUsed': 0,
+        u'id': u'driver',
+        u'isActive': True,
+        u'totalDuration': 0
+      }],
+      u'application_1513618343677_0020/2' : [{
+        u'diskUsed': 0,
+        u'totalShuffleWrite': 0,
+        u'totalCores': 0,
+        u'executorLogs': {
+          u'stderr': u'http://localhost:8042/node/containerlogs/container_1513618343677_0020_01_000001/test/stderr?start=-4096',
+          u'stdout': u'http://localhost:8042/node/containerlogs/container_1513618343677_0020_01_000001/test/stdout?start=-4096'},
+        u'totalInputBytes': 0,
+        u'rddBlocks': 0,
+        u'maxMemory': 515553361,
+        u'totalShuffleRead': 0,
+        u'totalTasks': 0,
+        u'activeTasks': 0,
+        u'failedTasks': 0,
+        u'completedTasks': 0,
+        u'hostPort': u'172.31.122.65:38210',
+        u'maxTasks': 0,
+        u'totalGCTime': 0,
+        u'isBlacklisted': False,
+        u'memoryUsed': 0,
+        u'id': u'driver',
+        u'isActive': True,
+        u'totalDuration': 0}]
+    }
+    app_id = self.get_real_app_id(job)
+    if not app_id:
+      return []
+
+    return EXECUTORS_LISTS[app_id] if app_id in EXECUTORS_LISTS else []
+
+  def download_executors_logs(self, request, job, name, offset):
+    return 'dummy_logs'
+
+  def download_executor_logs(self, user, executor, name, offset):
+    return 'dummy_log'
 
 class HistoryServerApi(MockMapreduce2Api):
 

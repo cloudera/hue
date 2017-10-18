@@ -31,6 +31,8 @@ from desktop.lib.view_util import big_filesizeformat, format_duration_in_millis
 
 from hadoop.yarn.clients import get_log_client
 
+from itertools import izip
+
 from jobbrowser.models import format_unixtime_ms
 
 
@@ -111,13 +113,14 @@ class SparkJob(Application):
   def __init__(self, job, rm_api=None, hs_api=None):
     super(SparkJob, self).__init__(job, rm_api)
     self._resolve_tracking_url()
-    if self.state not in ('NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING') and hs_api:
+    if self.status not in ('NEW', 'SUBMITTED', 'ACCEPTED') and hs_api:
       self.history_server_api = hs_api
       self._get_metrics()
 
   @property
   def logs_url(self):
-    return os.path.join(self.trackingUrl, 'executors')
+    log_links = self.history_server_api.get_executors_loglinks(self)
+    return log_links['stdout'] if log_links and 'stdout' in log_links else ''
 
   @property
   def attempt_id(self):
@@ -140,7 +143,7 @@ class SparkJob(Application):
   def _get_metrics(self):
     self.metrics = {}
     try:
-      executors = self.history_server_api.executors(self.jobId, self.attempt_id)
+      executors = self.history_server_api.executors(self)
       if executors:
         self.metrics['headers'] = [
           _('Executor Id'),
@@ -176,6 +179,18 @@ class SparkJob(Application):
     except Exception, e:
       LOG.error('Failed to get Spark Job executors: %s' % e)
       # Prevent a nosedive. Don't create metrics if api changes or url is unreachable.
+
+  def get_executors(self):
+    executor_list = []
+    if hasattr(self, 'metrics') and 'executors' in self.metrics:
+      executors = self.metrics['executors']
+      headers = ['executor_id', 'address', 'rdd_blocks', 'storage_memory', 'disk_used', 'active_tasks', 'failed_tasks',
+                 'complete_tasks', 'task_time', 'input', 'shuffle_read', 'shuffle_write', 'logs']
+      for executor in executors:
+        executor_data = dict(izip(headers, executor))
+        executor_data.update({'id': executor_data['executor_id'] + '_executor_' + self.jobId, 'type': 'SPARK_EXECUTOR'})
+        executor_list.append(executor_data)
+    return executor_list
 
 
 class Job(object):

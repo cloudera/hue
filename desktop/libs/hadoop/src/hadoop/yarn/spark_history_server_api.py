@@ -15,14 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import posixpath
 import threading
+import urlparse
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
+from django.utils.translation import ugettext as _
 from hadoop import cluster
+from hadoop.yarn.clients import get_log_client
+
+from lxml import html
 
 
 LOG = logging.getLogger(__name__)
@@ -93,7 +99,11 @@ class SparkHistoryServerApi(object):
   def stages(self, app_id):
     return self._root.get('applications/%(app_id)s/stages' % {'app_id': app_id}, headers=self.headers)
 
-  def executors(self, app_id):
+  def executors(self, job):
+    app_id = self.get_real_app_id(job)
+    if not app_id:
+      return []
+
     return self._root.get('applications/%(app_id)s/executors' % {'app_id': app_id}, headers=self.headers)
 
   def stage_attempts(self, app_id, stage_id):
@@ -119,3 +129,69 @@ class SparkHistoryServerApi(object):
 
   def download_attempt_logs(self, app_id, attempt_id):
     return self._root.get('applications/%(app_id)s/%(attempt_id)s/logs' % {'app_id': app_id, 'attempt_id': attempt_id}, headers=self.headers)
+
+  def download_executors_logs(self, request, job, name, offset):
+    log_links = self.get_executors_loglinks(job)
+
+    return self.retrieve_log_content(log_links, name, request.user.username, offset)
+
+  def download_executor_logs(self, user, executor, name, offset):
+    return self.retrieve_log_content(executor['logs'], name, user.username, offset)
+
+  def retrieve_log_content(self, log_links, log_name, username, offset):
+    params = {
+      'doAs': username
+    }
+
+    if offset != 0:
+      params['start'] = offset
+
+    if not log_name or not log_name == 'stderr':
+      log_name = 'stdout'
+
+    log = ''
+    if log_links and log_name in log_links:
+      log_link = log_links[log_name]
+
+      root = Resource(get_log_client(log_link), urlparse.urlsplit(log_link)[2], urlencode=False)
+      response = root.get('', params=params)
+      log = html.fromstring(response, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
+    return log
+
+  def get_executors_loglinks(self, job):
+    if job.metrics and 'executors' in job.metrics and job.metrics['executors']:
+      executors = [executor for executor in job.metrics['executors'] if executor[0] == 'driver']  # look up driver executor
+      if not executors:
+        executor = job.metrics['executors'][0]
+      else:
+        executor = executors[0]
+
+    return None if not executor else executor[12]
+
+  def get_real_app_id(self, job):
+    # https://spark.apache.org/docs/1.6.0/monitoring.html and https://spark.apache.org/docs/2.0.0/monitoring.html
+    # When running on Yarn, each application has multiple attempts, so [app-id] is actually [app-id]/[attempt-id] in all cases.
+    # When running job as cluster mode, an attempt number is part of application ID, but proxy URL can't be resolved to match
+    # Spark history URL. In the applications list, each job's attampt list shows if attempt ID is used and how many attempts.
+
+    app_id = job.jobId if job.jobId == job.attempt_id else job.jobId + '/' + job.attempt_id
+    if job.status not in ('SUCCEEDED', 'FAILED'):
+      try:
+        jobs_json = self.applications()
+        job_filtered_json = [x for x in jobs_json if x['id'] == job.jobId]
+
+        if not job_filtered_json:
+          return {}
+
+        attempts = job_filtered_json[0]['attempts']
+
+        if len(attempts) == 1:
+          app_id = job.jobId if 'attemptId' not in attempts[0] else job.jobId + '/' + attempts[0]['attemptId']
+        else:
+          app_id = job.jobId + '/%d' % len(attempts)
+
+      except Exception as e:
+        LOG.error('Cannot get executors %s' % e)
+        app_id = None
+
+    return app_id
