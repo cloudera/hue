@@ -410,6 +410,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- ko if: type() == 'SPARK' -->
     <div data-bind="template: { name: 'job-spark-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
+
+  <!-- ko if: type() == 'SPARK_EXECUTOR' -->
+    <div data-bind="template: { name: 'job-spark-executor-page${ SUFFIX }', data: $root.job() }"></div>
+  <!-- /ko -->
 </script>
 
 
@@ -802,7 +806,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a href="#job-spark-page-properties${ SUFFIX }" data-toggle="tab">${ _('Properties') }</a></li>
+        <li class="active"><a class="job-spark-logs-link" href="#job-spark-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-spark-page-executors${ SUFFIX }" data-bind="click: function(){ fetchProfile('executors'); $('a[href=\'#job-spark-page-executors${ SUFFIX }\']').tab('show'); }">${ _('Executors') }</a></li>
+        <li><a href="#job-spark-page-properties${ SUFFIX }" data-toggle="tab">${ _('Properties') }</a></li>
 
         <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
       </ul>
@@ -810,7 +816,56 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="job-spark-page-properties${ SUFFIX }">
+        <div class="tab-pane active" id="job-spark-page-logs${ SUFFIX }">
+          <ul class="nav nav-tabs">
+          % for name in ['stdout', 'stderr']:
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+          % endfor
+          </ul>
+
+          <pre data-bind="html: logs, logScroller: logs"></pre>
+        </div>
+        <div class="tab-pane" id="job-spark-page-executors${ SUFFIX }">
+          <form class="form-inline">
+            <input data-bind="textFilter: textFilter, clearable: {value: textFilter}, valueUpdate: 'afterkeydown'" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+          </form>
+
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>${_('Executor Id')}</th>
+              <th>${_('Address')}</th>
+              <th>${_('RDD Blocks')}</th>
+              <th>${_('Storage Memory')}</th>
+              <th>${_('Disk Used')}</th>
+              <th>${_('Active Tasks')}</th>
+              <th>${_('Failed Tasks')}</th>
+              <th>${_('Complete Tasks')}</th>
+              <th>${_('Task Time')}</th>
+              <th>${_('Input')}</th>
+              <th>${_('Shuffle Read')}</th>
+              <th>${_('Shuffle Write')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['executors']()['executor_list']">
+              <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }" class="status-border pointer">
+                <td data-bind="text: executor_id"></td>
+                <td data-bind="text: address"></td>
+                <td data-bind="text: rdd_blocks"></td>
+                <td data-bind="text: storage_memory"></td>
+                <td data-bind="text: disk_used"></td>
+                <td data-bind="text: active_tasks"></td>
+                <td data-bind="text: failed_tasks"></td>
+                <td data-bind="text: complete_tasks"></td>
+                <td data-bind="text: task_time"></td>
+                <td data-bind="text: input"></td>
+                <td data-bind="text: shuffle_read"></td>
+                <td data-bind="text: shuffle_write"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-pane" id="job-spark-page-properties${ SUFFIX }">
           <table class="datatables table table-condensed">
             <thead>
             <tr>
@@ -830,6 +885,69 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     </div>
   </div>
+</script>
+
+
+<script type="text/html" id="job-spark-executor-page${ SUFFIX }">
+
+  <div class="row-fluid">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <!-- ko with: properties -->
+          <li class="nav-header">${ _('Id') }</li>
+          <li class="break-word"><span data-bind="text: executor_id"></span></li>
+          <!-- /ko -->
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <!-- ko if: !$root.isMini() -->
+          <!-- ko with: properties -->
+            <li class="nav-header">${ _('Address') }</li>
+            <li><span data-bind="text: address"></span></li>
+            <li class="nav-header">${ _('RDD Blocks') }</li>
+            <li><span data-bind="text: rdd_blocks"></span></li>
+            <li class="nav-header">${ _('Storage Memory') }</li>
+            <li><span data-bind="text: storage_memory"></span></li>
+            <li class="nav-header">${ _('Disk Used') }</li>
+            <li><span data-bind="text: disk_used"></span></li>
+            <li class="nav-header">${ _('Active Tasks') }</li>
+            <li><span data-bind="text: active_tasks"></span></li>
+            <li class="nav-header">${ _('Failed Tasks') }</li>
+            <li><span data-bind="text: failed_tasks"></span></li>
+            <li class="nav-header">${ _('Complet Tasks') }</li>
+            <li><span data-bind="text: complete_tasks"></span></li>
+            <li class="nav-header">${ _('Input') }</li>
+            <li><span data-bind="text: input"></span></li>
+            <li class="nav-header">${ _('Shuffle Read') }</li>
+            <li><span data-bind="text: shuffle_read"></span></li>
+            <li class="nav-header">${ _('Shuffle Write') }</li>
+            <li><span data-bind="text: shuffle_write"></span></li>
+          <!-- /ko -->
+          <!-- /ko -->
+        </ul>
+      </div>
+    </div>
+
+    <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
+
+      <ul class="nav nav-pills margin-top-20">
+        <li class="active"><a class="jb-logs-link" href="#job-spark-executor-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="job-spark-executor-page-logs${ SUFFIX }">
+          <ul class="nav nav-tabs">
+          % for name in ['stdout', 'stderr']:
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+          % endfor
+          </ul>
+          <pre data-bind="html: logs, logScroller: logs"></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </script>
 
 
@@ -1717,7 +1835,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.canWrite = ko.observableDefault(job.canWrite == true);
 
       self.logs = ko.observable('');
-
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
 
@@ -1897,6 +2014,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             if (/^task_/.test(vm.job().id())) {
               crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
             }
+            if (/_executor_/.test(vm.job().id())) {
+              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
+            }
             var oozieWorkflow = vm.job().name().match(/oozie:launcher:T=.+?:W=.+?:A=.+?:ID=(.+?-oozie-oozi-W)$/i);
             if (oozieWorkflow) {
               crumbs.push({'id': oozieWorkflow[1], 'name': oozieWorkflow[1], 'type': 'workflow'});
@@ -1919,7 +2039,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               }
             }
 
-            crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
+            if (vm.job().type() == 'SPARK_EXECUTOR') {
+               crumbs.push({'id': vm.job().id(), 'name': vm.job().properties['executor_id'](), 'type': vm.job().type()});
+            }
+            else {
+               crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
+            }
             vm.resetBreadcrumbs(crumbs);
             //show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
             setTimeout(function () {

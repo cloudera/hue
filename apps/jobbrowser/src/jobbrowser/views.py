@@ -301,6 +301,20 @@ def kill_job(request, job):
 
   raise Exception(_("Job did not appear as killed within 15 seconds."))
 
+@check_job_permission
+def job_executor_logs(request, job, attempt_index=0, name='syslog', offset=LOG_OFFSET_BYTES):
+  response = {'status': -1}
+  try:
+    log = ''
+    if job.status not in ('NEW', 'SUBMITTED', 'ACCEPTED'):
+      log = job.history_server_api.download_executors_logs(request, job, name, offset)
+    response['status'] = 0
+    response['log'] = LinkJobLogs._make_hdfs_links(log)
+  except Exception, e:
+    response['log'] = _('Failed to retrieve executor log: %s' % e)
+
+  return JsonResponse(response)
+
 
 @check_job_permission
 def job_attempt_logs(request, job, attempt_index=0):
@@ -377,6 +391,9 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
   """
   def cmp_exec_time(task1, task2):
     return cmp(task1.execStartTimeMs, task2.execStartTimeMs)
+
+  if job.applicationType == 'SPARK':
+    return job.history_server_api.download_logs(job.app)
 
   task = None
 
