@@ -75,6 +75,7 @@ def rm_ha(funct):
         if rm_ha is not None:
           if rm_ha[1].url == api.resource_manager_api.url:
             raise ex
+          LOG.info('Retrying with Resource Manager: %s.' % rm_ha[1].url)
           config, api.resource_manager_api = rm_ha
           return funct(api, *args, **kwargs)
       raise ex
@@ -214,8 +215,6 @@ def get_next_ha_yarncluster(current_user=None):
   """
   Return the next available YARN RM instance and cache its name.
   """
-  from hadoop.yarn import mapreduce_api
-  from hadoop.yarn import resource_manager_api
   from hadoop.yarn.resource_manager_api import ResourceManagerApi
   global MR_NAME_CACHE
 
@@ -233,15 +232,14 @@ def get_next_ha_yarncluster(current_user=None):
         try:
           cluster_info = rm.cluster()
           if cluster_info['clusterInfo']['haState'] == 'ACTIVE':
+            if name != MR_NAME_CACHE:
+              LOG.info('RM %s has failed back to %s server' % (MR_NAME_CACHE, name))
+              rm.from_failover = True
             MR_NAME_CACHE = name
             LOG.warn('Picking RM HA: %s' % name)
-            resource_manager_api.API_CACHE = None  # Reset cache
-            mapreduce_api.API_CACHE = None
             return (config, rm)
           else:
             LOG.info('RM %s is not RUNNING, skipping it: %s' % (name, cluster_info))
-        except resource_manager_api.YarnFailoverOccurred:
-          LOG.info('RM %s has failed back to another server' % (name,))
         except Exception, ex:
           LOG.exception('RM %s is not available, skipping it: %s' % (name, ex))
       else:
