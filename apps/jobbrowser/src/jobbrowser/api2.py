@@ -70,8 +70,12 @@ def job(request):
   interface = json.loads(request.POST.get('interface'))
   app_id = json.loads(request.POST.get('app_id'))
 
-  response['app'] = get_api(request.user, interface).app(app_id)
-  response['status'] = 0
+  response_app = get_api(request.user, interface).app(app_id)
+  if response_app.get('status') == -1 and response_app.get('message'):
+    response.update(response_app)
+  else:
+    response['app'] = response_app
+    response['status'] = 0
 
   return JsonResponse(response)
 
