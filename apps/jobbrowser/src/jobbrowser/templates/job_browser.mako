@@ -859,7 +859,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="queries-page${ SUFFIX }">
 
-  <div class="row-fluid">
+  <div class="row-fluid" data-jobType="queries">
     <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
@@ -889,7 +889,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </div>
           </li>
           <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
+          <li><span data-bind="text: duration() && duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
         </ul>
@@ -899,7 +899,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <ul class="nav nav-pills margin-top-20">
         <li>
-          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': onQueriesPlanShown}">
+          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { fetchProfile('plan'); } }">
             ${ _('Plan') }</a>
         </li>
         <li>
@@ -911,7 +911,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             ${ _('Text Plan') }</a>
         </li>
         <li>
-          <a href="#queries-page-summary${ SUFFIX }" data-bind="click: onQueriesSummaryClick">
+          <a href="#queries-page-summary${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-summary${ SUFFIX }\']').tab('show'); }">
             ${ _('Summary') }</a>
         </li>
         <li>
@@ -927,25 +927,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane" id="queries-page-plan${ SUFFIX }">
+        <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan" data-bind="impalaDagre: properties.plan() && properties.plan().plan_json">
           <svg style="border: 1px solid darkgray;width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
             <g/>
           </svg>
         </div>
-        <div class="tab-pane" id="queries-page-stmt${ SUFFIX }">
-          <pre data-bind="text: properties.plan().stmt"/>
+        <div class="tab-pane" id="queries-page-stmt${ SUFFIX }" data-profile="plan">
+          <pre data-bind="text: properties.plan && properties.plan().stmt"/>
         </div>
-        <div class="tab-pane" id="queries-page-plan-text${ SUFFIX }">
-          <pre data-bind="text: properties.plan().plan"/>
+        <div class="tab-pane" id="queries-page-plan-text${ SUFFIX }" data-profile="plan">
+          <pre data-bind="text: properties.plan && properties.plan().plan"/>
         </div>
-        <div class="tab-pane" id="queries-page-summary${ SUFFIX }">
-          <pre data-bind="text: properties.plan().summary"/>
+        <div class="tab-pane" id="queries-page-summary${ SUFFIX }" data-profile="plan">
+          <pre data-bind="text: properties.plan && properties.plan().summary"/>
         </div>
-        <div class="tab-pane" id="queries-page-profile${ SUFFIX }">
-          <pre data-bind="text: properties.profile().profile"/>
+        <div class="tab-pane" id="queries-page-profile${ SUFFIX }" data-profile="profile">
+          <pre data-bind="text: properties.profile && properties.profile().profile"/>
         </div>
-        <div class="tab-pane" id="queries-page-memory${ SUFFIX }">
-          <pre data-bind="text: properties.memory().mem_usage"/>
+        <div class="tab-pane" id="queries-page-memory${ SUFFIX }" data-profile="mem_usage">
+          <pre data-bind="text: properties.memory && properties.memory().mem_usage"/>
         </div>
       </div>
     </div>
@@ -1710,34 +1710,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.logs = ko.observable('');
 
       self.properties = ko.mapping.fromJS(job.properties || {});
-      self.onQueriesPlanShown = function () {
-        if (this._impalaDagre) {
-          this._impalaDagre.stop();
-        }
-        var self = this;
-        var dataSource = function () {
-          return new Promise(function(resolve, reject) {
-            self.fetchProfile('plan', function (data) {
-              resolve(data.plan.plan_json);
-            });
-          });
-        }
-        this._impalaDagre = impalaDagre('queries-page-plan-svg${ SUFFIX }', dataSource);
-        this._impalaDagre.start(5000);
-      };
-      self.onQueriesSummaryClick = function(){
-        $('a[href=\'#queries-page-summary${ SUFFIX }\']').tab('show');
-        var self = this;
-        var refresh = function () {
-          if (!$('#queries-page-summary${ SUFFIX }').hasClass('active')) {
-            return;
-          }
-          self.fetchProfile('plan', function (data) {
-            setTimeout(refresh, 5000);
-          });
-        };
-        setTimeout(refresh, 5000);
-      };
       self.mainType = ko.observable(vm.interface());
 
       self.coordinatorActions = ko.pureComputed(function() {
@@ -1814,10 +1786,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.rerunModalContent = ko.observable('');
 
       self.hasKill = ko.pureComputed(function() {
-        return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
+        return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1;
       });
       self.killEnabled = ko.pureComputed(function() {
-        return self.hasKill() && self.canWrite() && (self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED');
+        //Impala can kill queries that are finished, but not yet terminated
+        return self.hasKill() && self.canWrite() && (vm.interface() === 'queries' || (self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED'));
       });
 
       self.hasResume = ko.pureComputed(function() {
@@ -1940,7 +1913,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             vm.resetBreadcrumbs(crumbs);
             if (vm.job().type() === 'queries' && !$("#queries-page-plan${ SUFFIX }").parent().children().hasClass("active")) {
-              $("a[href=\'#queries-page-plan${ SUFFIX }\']").tab("show");
+              //show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
+              setTimeout(function () {
+                $("a[href=\'#queries-page-plan${ SUFFIX }\']").tab("show");
+              }, 0)
             }
             %if not is_mini:
             if (vm.job().type() === 'workflow' && !vm.job().workflowGraphLoaded) {
@@ -1966,7 +1942,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.updateJob = function () {
         vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
         huePubSub.publish('graph.refresh.view');
-
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
           lastFetchJobRequest = self._fetchJob(function (data) {
             if (vm.job().type() == 'schedule') {
@@ -1975,7 +1950,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               vm.job().fetchStatus();
               vm.job().fetchLogs();
             }
-            // vm.job().fetchProfile(); // Get name of active tab?
+            var profile = $("div[data-jobType] .tab-content .active").data("profile")
+            if (profile) {
+              vm.job().fetchProfile(profile);
+            }
           });
         }
       };
@@ -2027,6 +2005,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.status(data.app.status);
             self.apiStatus(data.app.apiStatus);
             self.progress(data.app.progress);
+            self.canWrite(data.app.canWrite);
           } else {
             $(document).trigger("error", data.message);
           }
@@ -2147,7 +2126,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
+        return ['jobs', 'workflows', 'schedules', 'bundles', 'queries'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2322,6 +2301,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 if (self.apps()[i].status() != data.apps[j].status) {
                   self.apps()[i].status(data.apps[j].status);
                   self.apps()[i].apiStatus(data.apps[j].apiStatus);
+                  self.apps()[i].canWrite(data.apps[j].canWrite);
                 }
                 i++;
                 j++;

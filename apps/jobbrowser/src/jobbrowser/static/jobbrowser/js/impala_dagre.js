@@ -6,20 +6,15 @@ data_stream_target attribute.
 <script src="desktop/ext/js/dagre-d3-min.js"></script>
 Copied from https://github.com/apache/incubator-impala/blob/master/www/query_plan.tmpl
 */
-function impalaDagre(id, dataSource) {
+function impalaDagre(id) {
   var d3 = window.d3v3;
   var dagreD3 = window.dagreD3;
   var g = new dagreD3.graphlib.Graph().setGraph({rankDir: "BT"});
-  var svg = d3.select("#"+id);
+  var svg = d3.select("#"+id + " svg");
   var inner = svg.select("g");
   var _impalaDagree = {
-    start: function(refreshInterval) {
-      this._refreshInterval = refreshInterval;
-      // Force one refresh before starting the timer.
-      refresh();
-    },
-    stop: function() {
-      this._refreshInterval = null;
+    update: function(plan) {
+      renderGraph(plan);
     }
   };
 
@@ -145,19 +140,6 @@ function impalaDagre(id, dataSource) {
       is_first = false;
     }
 
-  }
-
-  // Called periodically, fetches the plan JSON from Impala and passes it to renderGraph()
-  // for display.
-  function refresh() {
-    if (!$("#"+id).parent().hasClass("active")) return;
-    dataSource().then(function(data) {
-      if (!$("#"+id).parent().hasClass("active")) return;
-      renderGraph(data);
-      if (_impalaDagree._refreshInterval) {
-        setTimeout(refresh, _impalaDagree._refreshInterval);
-      }
-    });
   }
 
   return _impalaDagree;

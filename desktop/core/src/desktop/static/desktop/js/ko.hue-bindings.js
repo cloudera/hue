@@ -6458,4 +6458,16 @@
     };
   })();
 
+  ko.bindingHandlers.impalaDagre = (function () {
+    return {
+      init: function (element, valueAccessor, allBindingsAccessor) {
+        var id = $(element).attr("id");
+        this._impalaDagre = impalaDagre(id);
+      },
+      update: function (element, valueAccessor) {
+        this._impalaDagre.update(ko.unwrap(valueAccessor()));
+      }
+    };
+  })();
+
 })();
