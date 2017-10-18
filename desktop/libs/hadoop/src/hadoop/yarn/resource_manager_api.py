@@ -39,8 +39,10 @@ _JSON_CONTENT_TYPE = 'application/json'
 API_CACHE = None
 API_CACHE_LOCK = threading.Lock()
 
+
 def get_resource_manager(username=None):
   global API_CACHE
+
   if API_CACHE is None:
     API_CACHE_LOCK.acquire()
     try:
@@ -56,8 +58,6 @@ def get_resource_manager(username=None):
 
   return API_CACHE
 
-class YarnFailoverOccurred(Exception):
-  pass
 
 class ResourceManagerApi(object):
 
@@ -67,6 +67,7 @@ class ResourceManagerApi(object):
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
     self._thread_local = threading.local() # To store user info
+    self.from_failover = False
 
     if self._security_enabled:
       self._client.set_kerberos_auth()
