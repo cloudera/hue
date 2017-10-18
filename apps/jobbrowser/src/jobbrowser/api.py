@@ -268,6 +268,8 @@ class YarnApi(JobBrowserApi):
           if not isinstance(resp, dict):
             raise PopupException(_('Mapreduce Proxy API did not return JSON response, check if the job is running.'))
           job = YarnJob(self.mapreduce_api, resp['job'])
+        elif app['state'] in ('NEW', 'SUBMITTED', 'RUNNING') and app['applicationType'] == 'SPARK':
+          job = SparkJob(app, rm_api=self.resource_manager_api, hs_api=self.spark_history_server_api)
         else:
           job = Application(app, self.resource_manager_api)
     except RestException, e:

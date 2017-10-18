@@ -23,11 +23,12 @@ from hadoop.yarn import resource_manager_api
 
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
-from jobbrowser.conf import MAX_JOB_FETCH
-from jobbrowser.views import job_single_logs
+from jobbrowser.conf import MAX_JOB_FETCH, LOG_OFFSET
+from jobbrowser.views import job_executor_logs, job_single_logs
 
 
 LOG = logging.getLogger(__name__)
+LOG_OFFSET_BYTES = LOG_OFFSET.get()
 
 
 try:
@@ -68,6 +69,8 @@ class JobApi(Api):
       return YarnMapReduceTaskApi(self.user, appid)
     elif appid.startswith('attempt_'):
       return YarnMapReduceTaskAttemptApi(self.user, appid)
+    elif appid.find('_executor_') > 0:
+      return SparkExecutorApi(self.user, appid)
     else:
       return self.yarn_api # application_
 
@@ -170,16 +173,19 @@ class YarnApi(Api):
           'durationFormatted': app['durationFormatted'],
           'startTimeFormatted': app['startTimeFormatted'],
           'diagnostics': app['diagnostics'] if app['diagnostics'] else '',
-
           'tasks': [],
           'metadata': [],
           'counters': []
       }
     elif app['applicationType'] == 'SPARK':
+      app['logs'] = job.logs_url if hasattr(job, 'logs_url') else ''
       common['type'] = 'SPARK'
       common['properties'] = {
-        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems()]
+        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems()],
+        'executors': []
       }
+      if hasattr(job, 'metrics'):
+        common['metrics'] = job.metrics
 
     return common
 
@@ -209,6 +215,9 @@ class YarnApi(Api):
         else:
           response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
           logs = json.loads(response.content).get('log')
+      elif app_type == 'SPARK':
+        response = job_executor_logs(MockDjangoRequest(self.user), job=appid, name=log_name)
+        logs = json.loads(response.content).get('log')
       else:
         logs = None
     except PopupException, e:
@@ -227,7 +236,12 @@ class YarnApi(Api):
         return NativeYarnApi(self.user).get_job(jobid=appid).full_job_conf
       elif app_property == 'counters':
         return NativeYarnApi(self.user).get_job(jobid=appid).counters
-
+    elif app_type == 'SPARK':
+      if app_property == 'executors':
+        return {
+          'executor_list': NativeYarnApi(self.user).get_job(jobid=appid).get_executors(),
+          'filter_text': ''
+        }
     return {}
 
   def _api_status(self, status):
@@ -423,3 +437,61 @@ class YarnMapReduceTaskAttemptApi(Api):
 
 class YarnAtsApi(Api):
   pass
+
+
+class SparkExecutorApi(Api):
+
+  def __init__(self, user, app_id):
+    Api.__init__(self, user)
+    self.app_executor_id = app_id
+    self.executor_id, self.app_id = app_id.split('_executor_')
+    job = NativeYarnApi(self.user).get_job(jobid=self.app_id)
+    if job:
+      executors = job.get_executors()
+      self._executors = [executor for executor in executors if executor['executor_id'] == self.executor_id]
+      self.history_server_api = job.history_server_api
+
+  def set_for_test(self, hs_api):
+    self.history_server_api = hs_api
+
+  def app(self, appid):
+    common = {}
+
+    if self._executors and self._executors[0]:
+      common = self._massage_executor(self._executors[0])
+      common['properties'] = {
+          'metadata': [],
+          'counters': []
+      }
+      common['properties'].update(self._massage_executor(self._executors[0]))
+
+    return common
+
+  def _massage_executor(self, executor):
+    return {
+       "app_id": self.app_id,
+       "type": 'SPARK_EXECUTOR',
+       "id": self.app_executor_id,
+       "executor_id": executor['executor_id'],
+       "address": executor['address'],
+       "rdd_blocks": executor['rdd_blocks'],
+       "storage_memory": executor['storage_memory'],
+       "disk_used": executor['disk_used'],
+       "active_tasks": executor['active_tasks'],
+       "failed_tasks": executor['failed_tasks'],
+       "complete_tasks": executor['complete_tasks'],
+       "task_time": executor['task_time'],
+       "input": executor['input'],
+       "shuffle_read": executor['shuffle_read'],
+       "shuffle_write": executor['shuffle_write'],
+       "logs": executor['logs']
+    }
+
+  def logs(self, appid, app_type, log_name, offset=LOG_OFFSET_BYTES):
+    log = ""
+
+    if self._executors and self._executors[0]:
+      log = self.history_server_api.download_executor_logs(self.user, self._executors[0], log_name, offset)
+    return {
+       "logs": log
+    }
