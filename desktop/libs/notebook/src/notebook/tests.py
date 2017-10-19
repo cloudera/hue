@@ -406,18 +406,6 @@ class TestNotebookApiMocked(object):
     assert_equal(0, data['status'], data)
     assert_equal('/user/hue/path.csv', data['watch_url']['destination'], data)
 
-    response = self.client.post(reverse('notebook:export_result'), {
-        'notebook': notebook_json,
-        'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
-        'format': json.dumps('hdfs-file'),
-        'destination': json.dumps('adl:/user/hue/path.csv'),
-        'overwrite': json.dumps(False)
-    })
-
-    data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
-
 
 def test_get_interpreters_to_show():
   default_interpreters = OrderedDict((
