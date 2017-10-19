@@ -352,7 +352,7 @@ CHERRYPY_SERVER_THREADS = Config(
   key="cherrypy_server_threads",
   help=_("Number of threads used by the CherryPy web server."),
   type=int,
-  default=40)
+  default=50)
 
 SECRET_KEY = Config(
   key="secret_key",
