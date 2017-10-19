@@ -219,16 +219,14 @@ class ConnectionPooler(object):
         this_round_timeout = None
 
       try:
-        connection = self.pooldict[_get_pool_key(conf)].get(
-          block=True, timeout=this_round_timeout)
+        connection = self.pooldict[_get_pool_key(conf)].get(block=True, timeout=this_round_timeout)
+        logging.debug("Thrift client %s got connection %s after %.2f seconds" % (self, connection, time.time() - start_pool_get_time))
       except Queue.Empty:
         has_waited_for = time.time() - start_pool_get_time
         if get_client_timeout is not None and has_waited_for > get_client_timeout:
           raise socket.timeout(
-            ("Timed out after %.2f seconds waiting to retrieve a " +
-             "%s client from the pool.") % (has_waited_for, conf.service_name))
-        logging.warn("Waited %d seconds for a thrift client to %s:%d" %
-          (has_waited_for, conf.host, conf.port))
+            ("Timed out after %.2f seconds waiting to retrieve a %s client from the pool.") % (has_waited_for, conf.service_name))
+        logging.warn("Waited %d seconds for a thrift client to %s:%d" % (has_waited_for, conf.host, conf.port))
 
     return connection
 
@@ -322,6 +320,7 @@ def _grab_transport_from_wrapper(outer_transport):
   else:
     raise Exception("Unknown transport type: " + outer_transport.__class__)
 
+
 class PooledClient(object):
   """
   A wrapper for a SuperClient
@@ -334,8 +333,7 @@ class PooledClient(object):
       return self.__dict__[attr_name]
 
     # Fetch the thrift client from the pool
-    superclient = _connection_pool.get_client(self.conf,
-        get_client_timeout=self.conf.timeout_seconds)
+    superclient = _connection_pool.get_client(self.conf, get_client_timeout=self.conf.timeout_seconds)
 
     # Fetch the attribute. If it's callable, wrap it in a wrapper that re-gets
     # the client.
@@ -374,6 +372,7 @@ class PooledClient(object):
 
           superclient.set_timeout(self.conf.timeout_seconds)
 
+          logging.debug("Thrift client %s call" % superclient)
           return attr(*args, **kwargs)
         except TApplicationException, e:
           # Unknown thrift exception... typically IO errors
@@ -421,6 +420,7 @@ class SuperClient(object):
     res = getattr(self.wrapped, attr)
     if not hasattr(res, '__call__'):
       return res
+
     def wrapper(*args, **kwargs):
       tries_left = 3
       while tries_left:
@@ -433,8 +433,7 @@ class SuperClient(object):
           st = time.time()
 
           str_args = _unpack_guid_secret_in_handle(repr(args))
-          logging.debug("Thrift call: %s.%s(args=%s, kwargs=%s)"
-            % (str(self.wrapped.__class__), attr, str_args, repr(kwargs)))
+          logging.debug("Thrift call: %s.%s(args=%s, kwargs=%s)" % (str(self.wrapped.__class__), attr, str_args, repr(kwargs)))
 
           ret = res(*args, **kwargs)
           log_msg = _unpack_guid_secret_in_handle(repr(ret))
@@ -445,10 +444,8 @@ class SuperClient(object):
 
           duration = time.time() - st
 
-          # Log the duration at different levels, depending on how long
-          # it took.
-          logmsg = "Thrift call %s.%s returned in %dms: %s" % (
-            str(self.wrapped.__class__), attr, duration * 1000, log_msg)
+          # Log the duration at different levels, depending on how long it took.
+          logmsg = "Thrift call %s.%s returned in %dms: %s" % (str(self.wrapped.__class__), attr, duration * 1000, log_msg)
           if duration >= WARN_LEVEL_CALL_DURATION_MS:
             logging.warn(logmsg)
           elif duration >= INFO_LEVEL_CALL_DURATION_MS:
@@ -464,6 +461,7 @@ class SuperClient(object):
         except Exception, e:
           logging.exception("Thrift saw exception (this may be expected).")
           raise
+
         self.transport.close()
 
         if isinstance(e, socket.timeout) or 'read operation timed out' in str(e): # Can come from ssl.SSLError
