@@ -22,7 +22,7 @@ from nose.tools import assert_equal, assert_true, assert_false
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-
+from azure.conf import is_adls_enabled
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission
 from desktop.models import Directory, Document, Document2
@@ -34,6 +34,7 @@ from notebook.api import _historify
 from notebook.connectors.base import Notebook, QueryError, Api
 from notebook.decorators import api_error_handler
 from notebook.conf import get_ordered_interpreters, INTERPRETERS_SHOWN_ON_WHEEL, INTERPRETERS
+
 
 try:
   from collections import OrderedDict
@@ -405,6 +406,19 @@ class TestNotebookApiMocked(object):
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
     assert_equal('/user/hue/path.csv', data['watch_url']['destination'], data)
+
+    if is_adls_enabled():
+        response = self.client.post(reverse('notebook:export_result'), {
+            'notebook': notebook_json,
+            'snippet': json.dumps(json.loads(notebook_json)['snippets'][0]),
+            'format': json.dumps('hdfs-file'),
+            'destination': json.dumps('adl:/user/hue/path.csv'),
+            'overwrite': json.dumps(False)
+        })
+
+        data = json.loads(response.content)
+        assert_equal(0, data['status'], data)
+        assert_equal('adl:/user/hue/path.csv', data['watch_url']['destination'], data)
 
 
 def test_get_interpreters_to_show():
