@@ -57,5 +57,5 @@ ENABLE_QUERY_BROWSER = Config(
     key="enable_query_browser",
     help=_("Show the query section for listing and showing more troubleshooting information."),
     type=coerce_bool,
-    default=False
+    default=True
 )
