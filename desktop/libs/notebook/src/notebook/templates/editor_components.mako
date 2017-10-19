@@ -2047,21 +2047,21 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         OF: "${_('of')}"
       },
       fnDrawCallback: function (oSettings) {
-        if (vm.editorMode()) {
-          $('#queryResults').removeAttr('style');
-          DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
-          $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-          $(el).jHueHorizontalScrollbar();
-          $(el).parents('.dataTables_wrapper').jHueScrollLeft();
-        }
-        else {
+##         if (vm.editorMode()) {
+##           $('#queryResults').removeAttr('style');
+##           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
+##           $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+##           $(el).jHueHorizontalScrollbar();
+##           $(el).parents('.dataTables_wrapper').jHueScrollLeft();
+##         }
+##         else {
           if ($(el).data('fnDraws') === 1) {
             $(el).parents(".dataTables_wrapper").jHueTableScroller({
               maxHeight: DATATABLES_MAX_HEIGHT,
               heightAfterCorrection: 0
             });
           }
-        }
+##         }
       },
       scrollable: vm.editorMode() && !vm.isPresentationMode() ? MAIN_SCROLLABLE : '.dataTables_wrapper',
       contained: !vm.editorMode() || vm.isPresentationMode()
@@ -2075,27 +2075,27 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         % else:
           var bannerTopHeight = 0;
         % endif
-        $(el).jHueTableExtender2({
-          mainScrollable: MAIN_SCROLLABLE,
-          fixedFirstColumn: vm.editorMode(),
-          % if is_embeddable:
-          stickToTopPosition: 48 + bannerTopHeight + ${ conf.CUSTOM.BANNER_TOP_HTML.get() and '0' or '2' },
-          % else:
-          stickToTopPosition: function() { return vm.isPresentationMode() || vm.isResultFullScreenMode() ? 1 + bannerTopHeight : 76 + bannerTopHeight },
-          % endif
-          parentId: 'snippet_' + snippet.id(),
-          clonedContainerPosition: 'fixed',
-          app: 'editor'
-        });
-        $(el).jHueHorizontalScrollbar();
+##         $(el).jHueTableExtender2({
+##           mainScrollable: MAIN_SCROLLABLE,
+##           fixedFirstColumn: vm.editorMode(),
+##           % if is_embeddable:
+##           stickToTopPosition: 48 + bannerTopHeight + ${ conf.CUSTOM.BANNER_TOP_HTML.get() and '0' or '2' },
+##           % else:
+##           stickToTopPosition: function() { return vm.isPresentationMode() || vm.isResultFullScreenMode() ? 1 + bannerTopHeight : 76 + bannerTopHeight },
+##           % endif
+##           parentId: 'snippet_' + snippet.id(),
+##           clonedContainerPosition: 'fixed',
+##           app: 'editor'
+##         });
+##         $(el).jHueHorizontalScrollbar();
       } else {
-        $(el).jHueTableExtender2({
-          mainScrollable: $(el).parents('.dataTables_wrapper')[0],
-          fixedFirstColumn: vm.editorMode(),
-          parentId: 'snippet_' + snippet.id(),
-          clonedContainerPosition: 'absolute',
-          app: 'editor'
-        });
+##         $(el).jHueTableExtender2({
+##           mainScrollable: $(el).parents('.dataTables_wrapper')[0],
+##           fixedFirstColumn: vm.editorMode(),
+##           parentId: 'snippet_' + snippet.id(),
+##           clonedContainerPosition: 'absolute',
+##           app: 'editor'
+##         });
       }
     }, 0);
 

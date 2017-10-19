@@ -61,7 +61,8 @@
 
     var firstCellWidth, leftPosition, th, thi, leftPadding;
     var throttledHeaderPadding = function () {
-      firstCellWidth = self.options.fixedFirstColumn ? self.firstColumnTopCell.outerWidth() : 0;
+      //firstCellWidth = self.options.fixedFirstColumn ? self.firstColumnTopCell.outerWidth() : 0;
+      firstCellWidth = self.options.fixedFirstColumn ? 47 : 0;
       for (thi = 0; thi < self.thMapping.length; thi++) {
         th = self.thMapping[thi];
         if (!th.original.is(':visible')) {
@@ -116,9 +117,9 @@
     var hideSubscription = huePubSub.subscribe('table.extender.hide', function (parentId) {
       if (parentId == self.options.parentId) {
         self.headerRowContainer.hide();
-        self.firstColumnInner.hide();
-        self.firstColumnTopCell.hide();
-        self.firstColumn.hide();
+        //self.firstColumnInner.hide();
+        //self.firstColumnTopCell.hide();
+        //self.firstColumn.hide();
       }
     });
     self.disposeFunctions.push(function () {
@@ -129,8 +130,8 @@
     var adjustSizes = function () {
       currentHeight = self.$parent.height();
       if (currentHeight != lastHeight) {
-        self.firstColumnInner.height(self.$parent.get(0).scrollHeight);
-        self.firstColumn.height(currentHeight);
+        //self.firstColumnInner.height(self.$parent.get(0).scrollHeight);
+        //self.firstColumn.height(currentHeight);
         lastHeight = currentHeight;
       }
 
@@ -266,10 +267,10 @@
       topPos = self.$parent.offset().top;
       firstColTopPos = topPos;
     }
-    self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
-    self.firstColumn.css("top", firstColTopPos + "px");
+    //self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
+    //self.firstColumn.css("top", firstColTopPos + "px");
     self.headerRowContainer.css("top", topPos + "px");
-    self.firstColumnTopCell.css("top", topPos + "px");
+    //self.firstColumnTopCell.css("top", topPos + "px");
   };
 
   Plugin.prototype.drawHeader = function () {
@@ -345,6 +346,110 @@
   };
 
   Plugin.prototype.drawFirstColumn = function (repositionHeader) {
+    var self = this;
+    // if (!self.options.fixedFirstColumn) {
+    //   self.firstColumnInner = $();
+    //   self.firstColumnTopCell = $();
+    //   self.firstColumn = $();
+    //   return;
+    // }
+    // if (!self.$element.attr("id") && self.options.parentId) {
+    //   self.$element.attr("id", "eT" + self.options.parentId);
+    // }
+    //
+    // var originalTh = self.$element.find("thead>tr th:eq(0)");
+    // var topPosition;
+    // if (self.options.clonedContainerPosition == 'absolute') {
+    //   topPosition = self.$parent.position().top - self.$mainScrollable.scrollTop();
+    // } else {
+    //   topPosition = self.$parent.offset().top - self.$mainScrollable.scrollTop();
+    // }
+    //
+    // $("#" + self.$element.attr("id") + "jHueTableExtenderClonedContainerCell").remove();
+    // var clonedCell = $('<table>').attr('class', self.$element.attr('class'));
+    // clonedCell.removeClass(self.options.classToRemove);
+    // clonedCell.css("margin-bottom", "0").css("table-layout", "fixed");
+    // var clonedCellTHead = $('<thead><tr></tr></thead>');
+    // clonedCellTHead.appendTo(clonedCell);
+    // var clonedCellTH = originalTh.clone();
+    // clonedCellTH.appendTo(clonedCellTHead.find('tr'));
+    // clonedCellTH.width(originalTh.width()).css({
+    //   "background-color": "#FFFFFF",
+    //   "border-color": "transparent"
+    // });
+    // clonedCellTH.click(function () {
+    //   originalTh.click();
+    // });
+    // $('<tbody>').appendTo(clonedCell);
+
+    // var clonedCellContainer = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth());
+
+    // clonedCell.appendTo(clonedCellContainer);
+
+    // var firstColumnTopCell = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerCell").addClass("fixed-first-cell").width(originalTh.outerWidth()).css("overflow", "hidden").css("top", topPosition + "px");
+    // firstColumnTopCell.css("position", self.options.clonedContainerPosition || "fixed");
+
+    //clonedCellContainer.appendTo(firstColumnTopCell);
+
+    //$("#" + self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").remove();
+    //var clonedTable = $('<table>').attr('class', self.$element.attr('class')).html('<thead><tr></tr></thead><tbody></tbody>');
+    //clonedTable.removeClass(self.options.classToRemove);
+    //clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
+    // self.$element.find("thead>tr th:eq(0)").clone().appendTo(clonedTable.find('thead tr'));
+    // var clonedTBody = clonedTable.find('tbody');
+    // var clones = self.$element.find("tbody>tr td:nth-child(1)").clone();
+    // var h = '';
+    // var foundEmptyTh = false;
+    // clones.each(function(){
+    //   if ($(this).html() === '') {
+    //     foundEmptyTh = true;
+    //   }
+    //   h+= '<tr><td>' + $(this).html() +'</td></tr>';
+    // });
+    // if (foundEmptyTh) {
+    //   // In IE it's sometimes empty so we'll redraw in a bit
+    //   window.setTimeout(self.drawFirstColumn.bind(self), 200);
+    //   self.firstColumnInner = $();
+    //   self.firstColumnTopCell = $();
+    //   self.firstColumn = $();
+    //   return;
+    // }
+    // clonedTBody.html(h);
+    if (self.options.lockSelectedRow) {
+      self.$element.find("tbody>tr tD:eq(0)").each(function(idx){
+        var cell = $(this);
+        cell.addClass('lockable');
+        $('<i>').addClass('fa fa-lock pointer muted').prependTo(cell).on('click', function(){
+          self.drawLockedRow($(this).parent().text()*1);
+        }).attr('title', self.options.labels.LOCK);
+        $('<i>').addClass('fa fa-expand pointer muted').prependTo(cell).on('click', function(){
+          huePubSub.publish('table.row.dblclick', {idx: idx, table: self.$element});
+        }).attr('title', self.options.labels.ROW_DETAILS);
+      });
+    }
+    // clonedTable.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
+
+    // var firstColumnInner = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth()).height(self.$parent.get(0).scrollHeight);
+    // clonedTable.appendTo(firstColumnInner);
+
+    // var firstColumn = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").addClass("fixed-first-column").width(originalTh.outerWidth()).height(self.$parent.height()).css("overflow", "hidden").css("top", topPosition + "px");
+    // firstColumn.css("position", self.options.clonedContainerPosition || "fixed");
+
+    // firstColumnInner.appendTo(firstColumn);
+    // firstColumn.appendTo(self.$parent);
+
+    // firstColumnTopCell.appendTo(self.$parent);
+
+    // self.firstColumnInner = firstColumnInner;
+    // self.firstColumnTopCell = firstColumnTopCell;
+    // self.firstColumn = firstColumn;
+
+    if (repositionHeader) {
+      self.repositionHeader();
+    }
+  };
+
+  Plugin.prototype.drawFirstColumnz = function (repositionHeader) {
     var self = this;
     if (!self.options.fixedFirstColumn) {
       self.firstColumnInner = $();
@@ -453,10 +558,10 @@
     if (Object.keys(self.lockedRows).length === 0) {
       self.headerRowContainer.find('tbody').empty();
       self.headerRowContainer.removeClass('locked');
-      self.firstColumnTopCell.removeClass('locked');
+      //self.firstColumnTopCell.removeClass('locked');
     } else {
       self.headerRowContainer.addClass('locked');
-      self.firstColumnTopCell.addClass('locked');
+      //self.firstColumnTopCell.addClass('locked');
       Object.keys(self.lockedRows).forEach(function (idx) {
         self.drawLockedRow(idx.substr(1), force);
       });
@@ -474,7 +579,7 @@
       $el.parent().remove();
       if (self.headerRowContainer.find('tbody tr').length == 0) {
         self.headerRowContainer.removeClass('locked');
-        self.firstColumnTopCell.removeClass('locked');
+        //self.firstColumnTopCell.removeClass('locked');
       }
     }
 

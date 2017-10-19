@@ -1578,13 +1578,19 @@ var EditorViewModel = (function() {
         self.result.fetchedOnce(true);
       }
 
-      self.result.meta().forEach(function (meta) {
+      self.result.meta().forEach(function (meta, count) {
         if ($.inArray(meta.type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1) {
           meta.cssClass = 'sort-numeric';
         } else if ($.inArray(meta.type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1) {
           meta.cssClass = 'sort-date';
         } else {
           meta.cssClass = 'sort-string';
+        }
+        if (count === 0) {
+          meta.cssClass += ' ht-fixed-col';
+        }
+        else {
+          meta.cssClass += ' ht-fixed-header';
         }
       });
 
