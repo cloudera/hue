@@ -113,6 +113,7 @@ def tree(request, id, path):
   cluster = get_cluster_or_404(id)
   zk = ZooKeeper(cluster['rest_url'])
 
+  path = ("/%s" % (path))
   znode = zk.get(path)
   children = sorted(zk.get_children_paths(path))
 
