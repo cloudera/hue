@@ -512,3 +512,7 @@ class S3FileSystem(object):
 
   def setuser(self, user):
     pass  # user-concept doesn't have sense for this implementation
+
+  def get_upload_chuck_size(self):
+    from hadoop.conf import UPLOAD_CHUNK_SIZE # circular dependency
+    return UPLOAD_CHUNK_SIZE.get()
