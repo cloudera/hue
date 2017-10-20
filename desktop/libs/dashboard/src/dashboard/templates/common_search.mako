@@ -645,24 +645,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <span data-bind="template: { name: 'measure-form' }"></span>
           </span>
         </div>
-
-        <div class="facet-field-cnt">
-          <span class="spinedit-cnt">
-            <span class="facet-field-label">
-              ${ _('Limit') }
-            </span>
-            <input type="text" class="input-medium" data-bind="spinedit: limit"/>
-          </span>
-        </div>
-
-        <div class="facet-field-cnt">
-          <span class="spinedit-cnt">
-            <span class="facet-field-label">
-              ${ _('Min Count') }
-            </span>
-            <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
-          </span>
-        </div>
       </div>
     </li>
   </ul>
@@ -2100,13 +2082,34 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </a>
       <!-- /ko -->
 
-      <select data-bind="options: $root.collection.template.facetFieldsNames, value: $parent.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options" style="margin-bottom: 0"></select>
+      <select data-bind="options: $root.collection.template.facetFieldsNames, value: $parent.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options input-small" style="margin-bottom: 0"></select>
 
       <div class="clearfix"></div>
       <br/>
 
       <input data-bind="value: formula, visible: $parent.field() == 'formula', valueUpdate: 'afterkeydown'"></input>
       <input data-bind="value: generated_formula" type="hidden"></input>
+
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label">
+            ${ _('Limit') }
+          </span>
+          <input type="text" class="input-medium" data-bind="spinedit: $parent.limit"/>
+        </span>
+      </div>
+
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label">
+            ${ _('Min Count') }
+          </span>
+          <input type="text" class="input-medium" data-bind="spinedit: $parent.mincount"/>
+        </span>
+      </div>
+      
+      ${ _('Prefix filtering') }
+      ${ _('Sorting') }
     </div>
     <!-- /ko -->
 
