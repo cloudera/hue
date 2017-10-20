@@ -17,6 +17,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from dashboard.conf import USE_GRIDSTER
 from desktop import conf
 from desktop.views import commonheader, commonfooter, _ko, commonshare
 %>
