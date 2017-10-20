@@ -717,9 +717,7 @@ var Collection = function (vm, collection) {
     }
     if (facet.properties.facets) {
       facet.properties.facets.subscribe(function(newValue) {
-        if (newValue.length > 0) {
-          vm.search();
-        }
+        vm.search();
       });
     }
 
