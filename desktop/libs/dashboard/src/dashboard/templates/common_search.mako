@@ -708,7 +708,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
   <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15 && widgetType() != 'hit-widget'" style="opacity: 0.7">
     <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
-      <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
+      <a data-bind="visible: properties.facets_form.field() && properties.facets_form.field() != 'formula' || properties.facets_form.aggregate.formula(), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-fw fa-plus"></i> ${ _('Add') }
       </a>
     </div>
@@ -2105,7 +2105,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="clearfix"></div>
       <br/>
 
-      <input data-bind="value: formula, visible: $parent.field() == 'formula'"></input>
+      <input data-bind="value: formula, visible: $parent.field() == 'formula', valueUpdate: 'afterkeydown'"></input>
       <input data-bind="value: generated_formula" type="hidden"></input>
     </div>
     <!-- /ko -->
