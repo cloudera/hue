@@ -454,6 +454,9 @@ if desktop.conf.SECURE_PROXY_SSL_HEADER.get():
 if 'useradmin' in [app.name for app in appmanager.DESKTOP_APPS]:
   MIDDLEWARE_CLASSES.append('useradmin.middleware.LastActivityMiddleware')
 
+if desktop.conf.SESSION.CONCURRENT_USER_SESSION_LIMIT.get():
+  MIDDLEWARE_CLASSES.append('useradmin.middleware.ConcurrentUserSessionMiddleware')
+
 LOAD_BALANCER_COOKIE = 'ROUTEID'
 
 ################################################################
