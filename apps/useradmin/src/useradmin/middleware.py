@@ -20,11 +20,13 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
 from django.db import DatabaseError
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from desktop.auth.views import dt_logout
-from desktop.conf import AUTH, LDAP
+from desktop.conf import AUTH, LDAP, SESSION
 
 from models import UserProfile, get_profile
 from views import import_ldap_users
@@ -101,3 +103,23 @@ class LastActivityMiddleware(object):
       return dt.total_seconds()
     else:
       return (dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6
+
+class ConcurrentUserSessionMiddleware(object):
+  """
+  Middleware that remove concurrent user sessions when configured
+  """
+  def process_response(self, request, response):
+    if request.user.is_authenticated() and request.session.modified and request.user.id:
+      limit = SESSION.CONCURRENT_USER_SESSION_LIMIT.get()
+      if limit:
+        count = 1;
+        for session in Session.objects.filter(~Q(session_key=request.session.session_key), expire_date__gte=datetime.now()).order_by('-expire_date'):
+          data = session.get_decoded()
+          if data.get('_auth_user_id') == request.user.id:
+            if count >= limit:
+              LOG.info('Expiring concurrent user session %s' % request.user.username)
+              session.expire_date = datetime.now()
+              session.save()
+            else:
+              count += 1
+    return response

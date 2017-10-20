@@ -25,8 +25,10 @@ import urllib
 
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false, assert_not_equal
-
+from datetime import datetime
 from django.contrib.auth.models import User, Group
+from django.contrib.sessions.models import Session
+from django.db.models import Q
 from django.utils.encoding import smart_unicode
 from django.core.urlresolvers import reverse
 from django.test.client import Client
@@ -41,6 +43,7 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 import useradmin.conf
 from useradmin.forms import UserChangeForm
 import useradmin.ldap_access
+from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.password_policy import reset_password_policy
@@ -960,3 +963,53 @@ class LastActivityMiddlewareTests(object):
     finally:
       for f in reset:
         f()
+
+class MockRequest(dict):
+  pass
+
+class MockUser(dict):
+  def is_authenticated(self):
+    return True
+
+class MockSession(dict):
+  pass
+
+class ConcurrentUserSessionMiddlewareTests(object):
+  def setUp(self):
+    self.cm = ConcurrentUserSessionMiddleware()
+    self.reset = desktop.conf.SESSION.CONCURRENT_USER_SESSION_LIMIT.set_for_testing(1)
+
+  def tearDown(self):
+    self.reset()
+
+  def test_concurrent_session_logout(self):
+    c = make_logged_in_client(username="test_concurr", groupname="test_concurr", recreate=True, is_superuser=True)
+    session = MockSession()
+    session.session_key = c.session.session_key
+    session.modified = True
+    user = MockUser()
+    user.id = c.session.get('_auth_user_id')
+    user.username = 'test_concurr'
+    request = MockRequest()
+    request.user = user
+    request.session = session
+    response = MockRequest()
+
+    # Call middleware with test_concurr on session 1
+    self.cm.process_response(request, response)
+
+    c2 = make_logged_in_client(username="test_concurr", groupname="test_concurr", is_superuser=True)
+    session.session_key = c2.session.session_key
+    request.session = session
+
+    # Call middleware with test_concurr on session 2
+    self.cm.process_response(request, response)
+
+    now = datetime.now()
+    # Session 1 is expired
+    assert_true(list(Session.objects.filter(Q(session_key=c.session.session_key)))[0].expire_date <= now)
+    assert_equal(302, c.get('/editor', follow=False).status_code) # Redirect to login page
+
+    # Session 2 is still active
+    assert_true(list(Session.objects.filter(Q(session_key=c2.session.session_key)))[0].expire_date > now)
+    assert_equal(200, c2.get('/editor', follow=True).status_code)
