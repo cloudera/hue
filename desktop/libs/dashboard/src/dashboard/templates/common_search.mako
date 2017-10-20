@@ -642,7 +642,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="content">
         <div class="facet-field-cnt">
           <span class="spinedit-cnt">
-            <span data-bind="template: { name: 'measure-form' }"></span>
+            <span data-bind="template: { name: 'metric-form' }"></span>
           </span>
         </div>
       </div>
@@ -656,8 +656,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="content content-readonly">
         <strong class="hit-title" data-bind="text: field, attr: {'title': field}"></strong>
         <span class="spinedit-cnt">
-          <span class="facet-field-label">${ _('Metric') }</span>
-          <span data-bind="template: { name: 'measure-form' }"></span>
+          <span data-bind="template: { name: 'metric-form' }"></span>
         </span>
       </div>
     </div>
@@ -698,7 +697,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
           <span class="facet-field-label"></span>
-          <span data-bind="template: { name: 'measure-form', data: properties.facets_form }"></span>
+          <span data-bind="template: { name: 'metric-form', data: properties.facets_form }"></span>
         </span>
       </div>
     </div>
@@ -2052,9 +2051,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <span class="facet-field-label">${ _('Metric') }</span>
-      <span data-bind="template: { name: 'metric-form', data: properties.aggregate }"></span>
-      <span data-bind="template: { name: 'facet-toggle2' }"></span>
+      <span data-bind="template: { name: 'metric-form' }"></span>
+      ## TODO: Range if numeric
     </div>
     <span class="big-counter" data-bind="textSqueezer: counts"></span>
   </div>
@@ -2062,13 +2060,20 @@ ${ dashboard.layout_skeleton(suffix='search') }
 </script>
 
 
-<script type="text/html" id="measure-form">
+<script type="text/html" id="metric-form">
   ## Facet measure has a slightly different format
   <!-- ko with: typeof properties != "undefined" ? properties.aggregate : aggregate -->
 
     <!-- ko if: $root.isEditing -->
     <div>
-      <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
+      ## For Counter widget
+      <!-- ko if: $data.function() != 'field' && $parent.properties -->
+        <select data-bind="options: $parent.properties.facets_form.aggregate.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
+      <!-- /ko -->
+
+      <!-- ko if: $data.function() != 'field' && $data.metrics -->
+        <select data-bind="options: $data.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
+      <!-- /ko -->
 
       <!-- ko if: $data.function() == 'percentile' -->
         <!-- ko foreach: percentiles() -->
@@ -2090,26 +2095,27 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <input data-bind="value: formula, visible: $parent.field() == 'formula', valueUpdate: 'afterkeydown'"></input>
       <input data-bind="value: generated_formula" type="hidden"></input>
 
-      <div class="facet-field-cnt">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label">
-            ${ _('Limit') }
+      <!-- ko if: $data.function() != 'field' && $data.metrics -->
+        <div class="facet-field-cnt">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label">
+              ${ _('Limit') }
+            </span>
+            <input type="text" class="input-medium" data-bind="spinedit: $parent.limit"/>
           </span>
-          <input type="text" class="input-medium" data-bind="spinedit: $parent.limit"/>
-        </span>
-      </div>
-
-      <div class="facet-field-cnt">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label">
-            ${ _('Min Count') }
+        </div>
+  
+        <div class="facet-field-cnt">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label">
+              ${ _('Min Count') }
+            </span>
+            <input type="text" class="input-medium" data-bind="spinedit: $parent.mincount"/>
           </span>
-          <input type="text" class="input-medium" data-bind="spinedit: $parent.mincount"/>
-        </span>
-      </div>
-      
-      ${ _('Prefix filtering') }
-      ${ _('Sorting') }
+        </div>
+  
+        ${ _('Sorting') }
+      <!-- /ko -->
     </div>
     <!-- /ko -->
 
@@ -2120,55 +2126,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- /ko -->
 
   <!-- /ko -->
-</script>
-
-
-
-<script type="text/html" id="metric-form">
-  <div data-bind="visible: $root.isEditing">
-    <!-- ko if: $data.function() != 'field' && $parent.properties -->
-      <select data-bind="options: $parent.properties.facets_form.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
-    <!-- /ko -->
-
-    <!-- ko if: $data.function() != 'field' && $data.metrics -->
-      <select data-bind="options: $data.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
-    <!-- /ko -->
-
-    <!-- ko if: $data.function() == 'percentile' -->
-      <!-- ko foreach: percentiles() -->
-        <input type="number" class="input-mini" data-bind="value: value"/>
-        <a href="javascript: void(0)" data-bind="click: function() { $parent.percentiles.remove($data); }">
-        <i class="fa fa-minus" title="${ _('Delete') }"></i>
-        </a>
-      <!-- /ko -->
-      <a href="javascript: void(0)" data-bind="click: function() { percentiles.push(ko.mapping.fromJS({'value': 50})); }">
-        <i class="fa fa-plus" title="${ _('Add') }"></i>
-      </a>
-    <!-- /ko -->
-
-    ## Form to add facet
-    <!-- ko if: $data.function() != 'field' && $parent.properties -->
-      <select data-bind="options: $root.collection.template.facetFieldsNames, value: $parent.properties.facets_form.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options" style="margin-bottom: 0"></select>
-    <!-- /ko -->
-    ## Added facet
-    <!-- ko if: $data.function() != 'field' && ! $parent.properties -->
-      <select data-bind="options: $root.collection.template.facetFieldsNames, value: $parent.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options" style="margin-bottom: 0"></select>
-    <!-- /ko -->
-
-    <div class="clearfix"></div>
-
-    <br/>
-
-    <!-- ko if: typeof $parent.properties != "undefined" -->
-      <input data-bind="value: formula, visible: $parent.properties.facets_form.field() == 'formula'"></input>
-    <!-- /ko -->
-    <!-- ko if: typeof $parent.properties == "undefined" -->
-      <input data-bind="value: formula, visible: $parent.field() == 'formula'"></input>
-    <!-- /ko -->
-    <input data-bind="value: generated_formula" type="hidden"></input>
-  </div>
-
-  <div data-bind="visible: ! $root.isEditing(), text: getPrettyMetric($data)" class="muted"></div>
 </script>
 
 
