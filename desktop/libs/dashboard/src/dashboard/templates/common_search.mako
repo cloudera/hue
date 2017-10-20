@@ -3607,6 +3607,23 @@ $(document).ready(function () {
     }, 200);
   });
 
+  $(".gridster>ul").gridster({
+    widget_margins: [5, 5],
+    widget_base_dimensions: ['auto', 100],
+    avoid_overlapped_widgets: true,
+    max_cols: 12,
+    max_row: 20,
+##     draggable: {
+##       handle: '.move-gridster-widget'
+##     },
+    resize: {
+      enabled: true,
+      stop: function (event, ui, $widget) {
+        huePubSub.publish('resize.plotly.chart');
+      },
+    }
+  });
+
   $(document).on("click", ".widget-settings-pill", function(){
     $(this).parents(".card-body").find(".widget-section").hide();
     selectAllCollectionFields(); // Make sure all the collection fields appear

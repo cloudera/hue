@@ -51,17 +51,34 @@ function loadSearchLayout(viewModel, json_layout) {
 
 function layoutToGridster(vm) {
   var numCols = 12;
-  var defaultWidgetHeight = 2;
-  var layout = []
+  var defaultWidgetHeight = 5;
+  var layout = [];
 
+  // flat layout
+  var rowCnt = 0;
   $.each(vm.columns(), function (indexY, column) {
     $.each(column.rows(), function (indexY, row) {
-      var rowColSize = numCols / row.widgets().length; // Full length of row if 1 widget
       $.each(row.widgets(), function (indexX, widget) {
-        layout.push({col: 1 + indexY * defaultWidgetHeight, row: 1 + indexX * rowColSize, size_x: rowColSize, size_y: defaultWidgetHeight, id: widget.id()});
+        layout.push({col: 1, row: 1 + rowCnt*defaultWidgetHeight, sizex: numCols, sizey: defaultWidgetHeight, widget: vm.getWidgetById(widget.id())});
+        rowCnt++;
       });
     });
   });
+
+  // $.each(vm.columns(), function (indexY, column) {
+  //   $.each(column.rows(), function (indexY, row) {
+  //     var rowColSize = numCols / row.widgets().length; // Full length of row if 1 widget
+  //     $.each(row.widgets(), function (indexX, widget) {
+  //       layout.push({
+  //         col: 1 + indexY * defaultWidgetHeight,
+  //         row: 1 + indexX * rowColSize,
+  //         sizex: rowColSize,
+  //         sizey: defaultWidgetHeight,
+  //         widget: vm.getWidgetById(widget.id())
+  //       });
+  //     });
+  //   });
+  // });
 
   return layout;
 }
@@ -2373,6 +2390,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         $(document).trigger("error", xhr.responseText);
       });
     };
+
+    self.gridItems = ko.mapping.fromJS(layoutToGridster(self));
+
   };
 
   self.reset = function() {
@@ -2510,7 +2530,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     if (window.location.search.indexOf("collection") > -1) {
       hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/new_search');
     }
-  }
+  };
+
+
 
   self.build();
 };
