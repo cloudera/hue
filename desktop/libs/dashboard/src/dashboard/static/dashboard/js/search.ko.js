@@ -28,7 +28,7 @@ function loadSearchLayout(viewModel, json_layout) {
       var row = new Row([], viewModel);
       $(json_row.widgets).each(function (wcnt, widget) {
         row.addWidget(new Widget({
-          size:widget.size,
+          size: widget.size,
           id: widget.id,
           name: widget.name,
           widgetType: widget.widgetType,
@@ -48,6 +48,20 @@ function loadSearchLayout(viewModel, json_layout) {
 }
 
 // End dashboard lib
+
+function layoutToGridster(vm) {
+  fullLayout(vm);
+
+  var numCols = 12;
+  var defaultWidgetHeight = 2;
+
+  $.each(vm.columns()[0].rows(), function (indexY, row) {
+	var rowColSize = numCols / row.widgets().length; // Full length of row if 1 widget
+	$.each(row.widgets(), function (indexX, widget) {
+      console.log({col: 1 + indexY * defaultWidgetHeight, row: 1 + indexX * rowColSize, size_x: rowColSize, size_y: defaultWidgetHeight, id: widget.id()});
+	});
+  });
+}
 
 var Query = function (vm, query) {
   var self = this;
