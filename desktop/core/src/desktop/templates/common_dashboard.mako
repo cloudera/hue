@@ -24,7 +24,7 @@
 <%!
   from django.utils.translation import ugettext as _
 
-  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED
+  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED, USE_GRIDSTER
 %>
 
 <%def name="import_layout(with_deferred=False)">
@@ -167,6 +167,15 @@
 
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
+  %if USE_GRIDSTER.get():
+
+    <div class="gridster">
+      <!-- ko if: typeof gridItems !== 'undefined' -->
+      <ul class="unstyled" data-bind="gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
+      <!-- /ko -->
+    </div>
+
+  %else:
     <!-- ko if: $root.selectedQDefinition() != null -->
     <div class="row-fluid">
       <div class="card card-additional card-home span12" style="background-color: #F5F5F5">
@@ -183,8 +192,19 @@
     <div class="row-fluid" data-bind="template: { name: 'column-template${ suffix }', foreach: columns}">
     </div>
     <div class="clearfix"></div>
+  %endif
   </div>
 </div>
+
+<script id="widget-template-gridster${ suffix }" type="text/html">
+  <li>
+    <!-- ko with: widget -->
+    <span data-bind="template: 'widget-template${ suffix }'"></span>
+    <div class="clearfix"></div>
+    <!-- /ko -->
+  </li>
+</script>
+
 
 <script type="text/html" id="column-template${ suffix }">
   <div data-bind="css: klass">

@@ -39,12 +39,15 @@
   }
 
   function resizeHandlers(element) {
-    var resizeSubscription = huePubSub.subscribe('resize.plotly.chart', function () {
-      Plotly.Plots.resize(element);
-    });
     var resizeEvent = function () {
-      Plotly.Plots.resize(element);
+      try {
+        if ($(element).is(':visible')){
+          Plotly.Plots.resize(element);
+        }
+      }
+      catch (e) {}
     };
+    var resizeSubscription = huePubSub.subscribe('resize.plotly.chart', resizeEvent);
 
     $(window).on('resize', resizeEvent);
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
