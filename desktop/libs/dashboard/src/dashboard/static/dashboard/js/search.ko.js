@@ -50,17 +50,20 @@ function loadSearchLayout(viewModel, json_layout) {
 // End dashboard lib
 
 function layoutToGridster(vm) {
-  fullLayout(vm);
-
   var numCols = 12;
   var defaultWidgetHeight = 2;
+  var layout = []
 
-  $.each(vm.columns()[0].rows(), function (indexY, row) {
-	var rowColSize = numCols / row.widgets().length; // Full length of row if 1 widget
-	$.each(row.widgets(), function (indexX, widget) {
-      console.log({col: 1 + indexY * defaultWidgetHeight, row: 1 + indexX * rowColSize, size_x: rowColSize, size_y: defaultWidgetHeight, id: widget.id()});
-	});
+  $.each(vm.columns(), function (indexY, column) {
+    $.each(column.rows(), function (indexY, row) {
+      var rowColSize = numCols / row.widgets().length; // Full length of row if 1 widget
+      $.each(row.widgets(), function (indexX, widget) {
+        layout.push({col: 1 + indexY * defaultWidgetHeight, row: 1 + indexX * rowColSize, size_x: rowColSize, size_y: defaultWidgetHeight, id: widget.id()});
+      });
+    });
   });
+
+  return layout;
 }
 
 var Query = function (vm, query) {
@@ -659,8 +662,8 @@ var Collection = function (vm, collection) {
   };
 
   self._get_field_operations = function(field, facet) {
-	if (! field) {
-	  return HIT_OPTIONS;
+    if (! field) {
+      return HIT_OPTIONS;
     } else if (isNumericColumn(field.type())) {
       return NUMERIC_HIT_OPTIONS;
     } else if (isDateTimeColumn(field.type())) {
@@ -673,7 +676,7 @@ var Collection = function (vm, collection) {
 
   self._addObservablesToFacet = function(facet, vm) {
     if (facet.properties.facets_form) { // Only Solr 5+
-	  facet.properties.facets_form.metrics = ko.computed(function() {
+      facet.properties.facets_form.metrics = ko.computed(function() {
         var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
       });
