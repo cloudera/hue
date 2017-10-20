@@ -693,7 +693,7 @@ var Collection = function (vm, collection) {
 
   self._addObservablesToFacet = function(facet, vm) {
     if (facet.properties.facets_form) { // Only Solr 5+
-      facet.properties.facets_form.metrics = ko.computed(function() {
+      facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
         var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
       });
