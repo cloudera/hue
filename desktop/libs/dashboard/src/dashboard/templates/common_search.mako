@@ -593,7 +593,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- /ko -->
 
 
-    <div class="facet-field-cnt hide">
+    <div class="facet-field-cnt">
       <span class="spinedit-cnt">
         <span class="facet-field-label facet-field-label-fixed-width">
           ${ _('Limit') }
@@ -602,7 +602,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </span>
     </div>
 
-    <div class="facet-field-cnt hide">
+    <div class="facet-field-cnt">
       <span class="spinedit-cnt">
         <span class="facet-field-label facet-field-label-fixed-width">
           ${ _('Min Count') }
@@ -642,12 +642,11 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="content">
         <div class="facet-field-cnt">
           <span class="spinedit-cnt">
-            <span class="facet-field-label">${ _('Metric') }</span>
             <span data-bind="template: { name: 'metric-form', data: aggregate }"></span>
           </span>
         </div>
 
-        <div class="facet-field-cnt hide">
+        <div class="facet-field-cnt">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Limit') }
@@ -656,7 +655,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </span>
         </div>
 
-        <div class="facet-field-cnt hide">
+        <div class="facet-field-cnt">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Min Count') }
@@ -718,8 +717,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-fw fa-plus"></i> ${ _('Add') }
       </a>
-      <select data-bind="options: $root.collection.template.facetFieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options" style="margin-bottom: 0"></select>
-      <div class="clearfix"></div>
     </div>
     <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
       <div class="facet-field-cnt">
@@ -2110,7 +2107,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="metric-form">
-  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+  <div data-bind="visible: $root.isEditing">
     <!-- ko if: $data.function() != 'field' && $parent.properties -->
       <select data-bind="options: $parent.properties.facets_form.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
     <!-- /ko -->
@@ -2131,6 +2128,17 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </a>
     <!-- /ko -->
 
+    ## Form to add facet
+    <!-- ko if: $data.function() != 'field' && $parent.properties -->
+      <select data-bind="options: $root.collection.template.facetFieldsNames, value: $parent.properties.facets_form.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options" style="margin-bottom: 0"></select>
+    <!-- /ko -->
+    ## Added facet
+    <!-- ko if: $data.function() != 'field' && ! $parent.properties -->
+      <select data-bind="options: $root.collection.template.facetFieldsNames, value: $parent.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options" style="margin-bottom: 0"></select>
+    <!-- /ko -->
+
+    <div class="clearfix"></div>
+
     <br/>
 
     <!-- ko if: typeof $parent.properties != "undefined" -->
@@ -2142,7 +2150,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <input data-bind="value: generated_formula" type="hidden"></input>
   </div>
 
-  <div data-bind="visible: ! $root.isEditing(), text: getHitOption($data.function)" class="muted"></div>
+  <div data-bind="visible: ! $root.isEditing(), text: getPrettyMetric($data)" class="muted"></div>
 </script>
 
 
@@ -2862,18 +2870,22 @@ var HIT_OPTIONS = NUMERIC_HIT_OPTIONS
 ;
 
 
-function prepareShareModal () {
+function prepareShareModal() {
   shareViewModel.setDocUuid(this.collection.uuid());
   openShareModal();
 }
 
-function getHitOption(value){
+function getHitOption(value) {
   for (var i=0; i < HIT_OPTIONS.length; i++){
     if (HIT_OPTIONS[i].value == value){
       return HIT_OPTIONS[i].label;
     }
   }
-  return '';
+  return value;
+}
+
+function getPrettyMetric(facet) {console.log(facet); // .function
+  return getHitOption(facet.function()); // facet. 
 }
 
 function prettifyDate(from, widget, to) {
