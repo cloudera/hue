@@ -2773,7 +2773,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
+%if USE_GRIDSTER.get():
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.gridster.min.css') }">
+%endif
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -2795,7 +2797,10 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
+%if USE_GRIDSTER.get():
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.gridster.with-extras.min.js') }"></script>
+<script src="${ static('desktop/ext/js/gridster-knockout.min.js') }"></script>
+%endif
 
 ${ dashboard.import_bindings() }
 
