@@ -732,6 +732,12 @@ SESSION = ConfigSection(
       help=_("Use session-length cookies. Logs out the user when she closes the browser window."),
       type=coerce_bool,
       default=False
+    ),
+    CONCURRENT_USER_SESSION_LIMIT = Config(
+      key="concurrent_user_session_limit",
+      help=_("If set, limits the number of concurrent user sessions. 1 represents 1 session per user. Default: 0 (unlimited sessions per user)"),
+      type=int,
+      default=0,
     )
   )
 )
@@ -957,7 +963,7 @@ AUTH = ConfigSection(
       help=_("If behind_reverse_proxy is True, it will look for the IP address from this header. Default: HTTP_X_FORWARDED_FOR"),
       type=str,
       default="HTTP_X_FORWARDED_FOR",
-    ),
+    )
 ))
 
 
