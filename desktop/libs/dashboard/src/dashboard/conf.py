@@ -58,6 +58,13 @@ HAS_REPORT_ENABLED = Config(
   type=coerce_bool
 )
 
+USE_GRIDSTER = Config(
+  key="use_gridster",
+  help=_t("Activate the new grid layout system (beta)."),
+  default=False,
+  type=coerce_bool
+)
+
 
 def get_properties():
   if ENGINES.get():
