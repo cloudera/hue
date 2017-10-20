@@ -715,28 +715,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
-          <span class="facet-field-label">
-            ${ _('Metric') }
-          </span>
-          <span data-bind="template: { name: 'metric-form', data: properties.facets_form.aggregate }"></span>
-        </span>
-      </div>
-
-      <div class="facet-field-cnt hide">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label">
-            ${ _('Limit') }
-          </span>
-          <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.limit"/>
-        </span>
-      </div>
-
-      <div class="facet-field-cnt hide">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label">
-            ${ _('Min Count') }
-          </span>
-          <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.mincount"/>
+          <span class="facet-field-label"></span>
+          <span data-bind="template: { name: 'measure-form', data: properties.facets_form }"></span>
         </span>
       </div>
     </div>
