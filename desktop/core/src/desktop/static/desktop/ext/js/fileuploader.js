@@ -1027,7 +1027,9 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         return this._inputs[id].value.replace(/.*(\/|\\)/, "");
     },
     _cancel: function(id){
-        this._options.onCancel(id, this.getName(id));
+        if (this._inputs[id]) {
+          this._options.onCancel(id, this.getName(id));
+        }
 
         delete this._inputs[id];
 
@@ -1295,7 +1297,9 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         this._dequeue(id);
     },
     _cancel: function(id){
-        this._options.onCancel(id, this.getName(id));
+        if (this._files[id]) {
+          this._options.onCancel(id, this.getName(id));
+        }
 
         this._files[id] = null;
 
