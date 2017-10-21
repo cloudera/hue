@@ -26,6 +26,7 @@ from itertools import groupby
 from django.utils.translation import ugettext as _
 
 from dashboard.facet_builder import _compute_range_facet
+from dashboard.models import Collection2
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import SERVER_USER
 from desktop.lib.i18n import force_unicode
@@ -217,7 +218,6 @@ class SolrApi(object):
 
     params += self._get_fq(collection, query)
 
-    from dashboard.models import Collection2
     fl = urllib.unquote(utf_quoter(','.join(Collection2.get_field_list(collection))))
 
     nested_fields = self._get_nested_fields(collection)
@@ -260,12 +260,11 @@ class SolrApi(object):
         _f['facet'][f_name] = {}
       _f = _f['facet']
 
-      n2 = {'count': facet['sort']}
-      # TODO: stay within same dim
-      for agg in facets[0:]:
-        if agg['aggregate']['function'] != 'count' and agg['sort'] != 'default':
+      sort = {'count': facet['sort']}
+      for i, agg in enumerate(self._get_dimension_aggregates(facets)):
+        if agg['sort'] != 'default':
           agg_function = self._get_aggregate_function(agg)
-          n2 = {'agg_%02d_00:%s' % (dim, agg_function): agg['sort']}
+          sort = {'agg_%02d_%02d:%s' % (dim, i, agg_function): agg['sort']}
 
       _f[f_name] = {
           'type': 'terms',
@@ -274,7 +273,7 @@ class SolrApi(object):
           'mincount': int(facet['mincount']),
           'numBuckets': True,
           'allBuckets': True,
-          'sort': n2
+          'sort': sort
           #'prefix': '' # Forbidden on numeric fields
       }
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
@@ -926,6 +925,10 @@ class SolrApi(object):
       params += (('fq', urllib.unquote(utf_quoter(' OR '.join(nested_fields)))),)
 
     return params
+
+
+  def _get_dimension_aggregates(self, facets):
+    return [agg for agg in facets[0:] if agg['aggregate']['function'] != 'count']
 
 
   def _get_nested_fields(self, collection):
