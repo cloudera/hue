@@ -806,6 +806,7 @@ class SolrApi(object):
 
   @classmethod
   def __get_aggregate_function(cls, f):
+    print f
     if f['function'] == 'field':
       return f['value']
     else:
