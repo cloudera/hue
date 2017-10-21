@@ -267,6 +267,7 @@ class SolrApi(object):
           'mincount': int(facet['mincount']),
           'numBuckets': True,
           'allBuckets': True,
+          'sort': {'count': facet['sort']}
           #'prefix': '' # Forbidden on numeric fields
       }
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':

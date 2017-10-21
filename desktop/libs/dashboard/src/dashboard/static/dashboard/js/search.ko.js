@@ -976,7 +976,8 @@ var Collection = function (vm, collection) {
       'field': ko.mapping.toJS(facet.properties.facets_form.field),
       'limit': ko.mapping.toJS(facet.properties.facets_form.limit),
       'mincount': ko.mapping.toJS(facet.properties.facets_form.mincount),
-      'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate)
+      'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
+      'sort': ko.mapping.toJS(facet.properties.facets_form.sort)
     });
     pivot.aggregate.metrics = ko.computed(function() {
       var _field = self.getTemplateField(pivot.field(), self.template.fieldsAttributes());
@@ -986,6 +987,7 @@ var Collection = function (vm, collection) {
     facet.properties.facets_form.field(null);
     facet.properties.facets_form.limit(5);
     facet.properties.facets_form.mincount(1);
+    facet.properties.facets_form.sort('desc');
 
     facet.properties.facets_form.aggregate.function('count');
     facet.properties.facets_form.aggregate.formula('');
@@ -1357,13 +1359,15 @@ var Collection = function (vm, collection) {
   };
 
   self.toggleSortFacet2 = function (facet_field, event) {
-    if (facet_field.properties.sort() == 'desc') {
-      facet_field.properties.sort('asc');
+    var sortField = facet_field.properties ? facet_field.properties.sort : facet_field.sort;
+
+    if (sortField() == 'desc') {
+      sortField('asc');
     } else {
-      facet_field.properties.sort('desc');
+      sortField('desc');
     }
 
-    if (facet_field.properties.type && facet_field.properties.type() == 'range-up') {
+    if (facet_field.properties && facet_field.properties.type && facet_field.properties.type() == 'range-up') {
       vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
     }
 

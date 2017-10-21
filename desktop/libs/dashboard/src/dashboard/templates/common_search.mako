@@ -2097,6 +2097,15 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <input data-bind="value: generated_formula" type="hidden"></input>
 
       <!-- ko if: $data.function() != 'field' && $data.metrics -->
+      <div class="facet-field-cnt">
+        <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
+        <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: function() { $root.collection.toggleSortFacet2($parent); }">
+          <i class="fa" data-bind="css: { 'fa-caret-down': $parent.sort() == 'desc', 'fa-caret-up': $parent.sort() == 'asc' }"></i>
+          <span data-bind="visible: $parent.sort() == 'desc'">${_('descending')}</span>
+          <span data-bind="visible: $parent.sort() == 'asc'">${_('ascending')}</span>
+        </a>
+      </div>
+
         <div class="facet-field-cnt">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
@@ -2105,8 +2114,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <input type="text" class="input-medium" data-bind="spinedit: $parent.limit"/>
           </span>
         </div>
-  
-        <div class="facet-field-cnt">
+
+        <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count'">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Min Count') }
@@ -2114,8 +2123,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <input type="text" class="input-medium" data-bind="spinedit: $parent.mincount"/>
           </span>
         </div>
-  
-        ${ _('Sorting') }
       <!-- /ko -->
     </div>
     <!-- /ko -->
