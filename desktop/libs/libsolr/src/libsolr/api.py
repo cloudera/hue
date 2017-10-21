@@ -260,6 +260,13 @@ class SolrApi(object):
         _f['facet'][f_name] = {}
       _f = _f['facet']
 
+      n2 = {'count': facet['sort']}
+      # TODO: stay within same dim
+      for agg in facets[0:]:
+        if agg['aggregate']['function'] != 'count' and agg['sort'] != 'default':
+          agg_function = self._get_aggregate_function(agg)
+          n2 = {'agg_%02d_00:%s' % (dim, agg_function): agg['sort']}
+
       _f[f_name] = {
           'type': 'terms',
           'field': '%(field)s' % facet,
@@ -267,7 +274,7 @@ class SolrApi(object):
           'mincount': int(facet['mincount']),
           'numBuckets': True,
           'allBuckets': True,
-          'sort': {'count': facet['sort']}
+          'sort': n2
           #'prefix': '' # Forbidden on numeric fields
       }
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
@@ -807,7 +814,6 @@ class SolrApi(object):
 
   @classmethod
   def __get_aggregate_function(cls, f):
-    print f
     if f['function'] == 'field':
       return f['value']
     else:
