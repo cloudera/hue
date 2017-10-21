@@ -2072,7 +2072,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <select data-bind="options: $parent.properties.facets_form.aggregate.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
       <!-- /ko -->
 
-      <!-- ko if: $data.function() != 'field' && $data.metrics -->
+      <!-- ko if: ($data.function() != 'field' || typeof properties == "undefined") && $data.metrics -->
         <select data-bind="options: $data.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
       <!-- /ko -->
 
@@ -2815,8 +2815,9 @@ var searchViewModel;
 moment.suppressDeprecationWarnings = true;
 
 var NUMERIC_HIT_OPTIONS = [
-    { value: "unique", label: "Count" },
-    { value: "unique", label: "${ _('Unique Count') }" },
+    { value: "count", label: "${ _('Group by') }" },
+    ## { value: "counts", label: "Count" },
+    { value: "unique", label: "${ _('Unique') }" },
     { value: "avg", label: "${ _('Average') }" },
     { value: "sum", label: "${ _('Sum') }" },
     { value: "min", label: "${ _('Min') }" },
@@ -2827,18 +2828,21 @@ var NUMERIC_HIT_OPTIONS = [
     { value: "variance", label: "${ _('Variance') }" }
 ];
 var DATETIME_HIT_OPTIONS = [
-    { value: "unique", label: "Count" },
-    { value: "unique", label: "${ _('Unique Count') }" },
+    { value: "count", label: "${ _('Group by') }" },
+    ## { value: "counts", label: "Count" },
+    { value: "unique", label: "${ _('Unique') }" },
 ];
 var ALPHA_HIT_COUNTER_OPTIONS = [
-    { value: "unique", label: "Count" },
-    { value: "unique", label: "${ _('Unique Count') }" },
+    { value: "count", label: "${ _('Group by') }" },
+    ## { value: "counts", label: "Count" },
+    { value: "unique", label: "${ _('Unique') }" },
     { value: "min", label: "${ _('Min') }" },
     { value: "max", label: "${ _('Max') }" }
 ];
 var ALPHA_HIT_OPTIONS = [
-    { value: "unique", label: "Count" },
-    { value: "unique", label: "${ _('Unique Count') }" },
+    { value: "count", label: "${ _('Group by') }" },
+    ## { value: "counts", label: "Count" },
+    { value: "unique", label: "${ _('Unique') }" },
     { value: "min", label: "${ _('Min') }" },
     { value: "max", label: "${ _('Max') }" }
 ];
