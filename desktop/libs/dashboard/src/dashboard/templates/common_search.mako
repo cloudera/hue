@@ -2100,13 +2100,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="facet-field-cnt">
         <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
         <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: function() { $root.collection.toggleSortFacet2($parent); }">
-          <i class="fa" data-bind="css: { 'fa-caret-down': $parent.sort() == 'desc', 'fa-caret-up': $parent.sort() == 'asc' }"></i>
+          <i class="fa" data-bind="css: { 'fa-caret-down': $parent.sort() == 'desc', 'fa-caret-up': $parent.sort() == 'asc', 'fa-sort': $parent.sort() == 'default' }"></i>
           <span data-bind="visible: $parent.sort() == 'desc'">${_('descending')}</span>
           <span data-bind="visible: $parent.sort() == 'asc'">${_('ascending')}</span>
+          <span data-bind="visible: $parent.sort() == 'default'"></span>
         </a>
       </div>
 
-        <div class="facet-field-cnt">
+        <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count'">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Limit') }
