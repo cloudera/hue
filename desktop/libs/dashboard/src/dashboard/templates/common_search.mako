@@ -1733,6 +1733,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div>
 
+      <span data-bind="template: { name: 'metric-form' }"></span>
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
       <div class="pull-right" style="margin-top: 40px">
