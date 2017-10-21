@@ -977,7 +977,7 @@ var Collection = function (vm, collection) {
       'limit': ko.mapping.toJS(facet.properties.facets_form.limit),
       'mincount': ko.mapping.toJS(facet.properties.facets_form.mincount),
       'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
-      'sort': ko.mapping.toJS(facet.properties.facets_form.sort)
+      'sort': ko.mapping.toJS(facet.properties.facets_form.aggregate.function == 'count' ? 'desc' : 'default')
     });
     pivot.aggregate.metrics = ko.computed(function() {
       var _field = self.getTemplateField(pivot.field(), self.template.fieldsAttributes());
