@@ -367,7 +367,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'canRange': False,
     'stacked': False,
     'limit': 10,
-    'mincount': 0,
+    'mincount': 1,
     'isDate': False,
     'aggregate': {'function': 'count', 'formula': '', 'generated_formula': '', 'percentiles': [{'value': 50}]}
   }
@@ -378,7 +378,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     facet_type = 'nested'
     properties['facets'] = []
     properties['domain'] = {'blockParent': [], 'blockChildren': []}
-    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': {'function': 'unique', 'formula': '', 'generated_formula': '', 'percentiles': [{'value': 50}]}}
+    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5, 'sort': 'desc', 'aggregate': {'function': 'unique', 'formula': '', 'generated_formula': '', 'percentiles': [{'value': 50}]}}
     properties['scope'] = 'world'
     properties['limit'] = 100
   else:
@@ -403,7 +403,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       else:
         facet_type = 'nested'
 
-      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': {'function': 'unique', 'formula': '', 'generated_formula': '', 'percentiles': [{'value': 50}]}}
+      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5, 'sort': 'desc', 'aggregate': {'function': 'unique', 'formula': '', 'generated_formula': '', 'percentiles': [{'value': 50}]}}
       properties['facets'] = []
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
 
