@@ -574,10 +574,11 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- ko if: widgetType() != 'hit-widget' -->
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
-      <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet2">
-        <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
+      <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click:  function() { $root.collection.toggleSortFacet2($data, $data); }">
+        <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc', 'fa-sort': properties.sort() == 'default' }"></i>
         <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
         <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
+        <span data-bind="visible: $parent.sort() == 'default'">${_('default')}</span>
       </a>
     </div>
     <!-- /ko -->
@@ -2099,11 +2100,11 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <!-- ko if: $data.function() != 'field' && $data.metrics -->
       <div class="facet-field-cnt">
         <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
-        <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: function() { $root.collection.toggleSortFacet2($parent); }">
+        <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: function() { $root.collection.toggleSortFacet2($parents[1], $parent); }">
           <i class="fa" data-bind="css: { 'fa-caret-down': $parent.sort() == 'desc', 'fa-caret-up': $parent.sort() == 'asc', 'fa-sort': $parent.sort() == 'default' }"></i>
           <span data-bind="visible: $parent.sort() == 'desc'">${_('descending')}</span>
           <span data-bind="visible: $parent.sort() == 'asc'">${_('ascending')}</span>
-          <span data-bind="visible: $parent.sort() == 'default'"></span>
+          <span data-bind="visible: $parent.sort() == 'default'">${_('default')}</span>
         </a>
       </div>
 
