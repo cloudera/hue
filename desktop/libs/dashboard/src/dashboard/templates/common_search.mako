@@ -578,7 +578,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc', 'fa-sort': properties.sort() == 'default' }"></i>
         <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
         <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
-        <span data-bind="visible: $parent.sort() == 'default'">${_('default')}</span>
+        <span data-bind="visible: properties.sort() == 'default'">${_('default')}</span>
       </a>
     </div>
     <!-- /ko -->
@@ -1739,8 +1739,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
       <div class="pull-right" style="margin-top: 40px">
 
-        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
-          <span class="facet-field-label">${ _('Sorting') }</span>
+        <div class="inline-block hide" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label hide">${ _('Sorting') }</span>
           <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
             <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
             <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
@@ -2095,7 +2095,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <br/>
 
       <input data-bind="value: formula, visible: $parent.field() == 'formula', valueUpdate: 'afterkeydown'"></input>
-      <input data-bind="value: generated_formula" type="hidden"></input>
+      <input data-bind="value: plain_formula" type="hidden"></input>
 
       <!-- ko if: $data.function() != 'field' && $data.metrics -->
       <div class="facet-field-cnt">
@@ -2132,6 +2132,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- ko if: !$root.isEditing() -->
     <div class="content" style="border: 1px solid #d8d8d8;">
       <div data-bind="text: getPrettyMetric($data)" class="muted"></div>
+      <!-- ko if: $data.function() != 'field' && $data.metrics -->
+      <i class="fa" data-bind="css: { 'fa-long-arrow-down': $parent.sort() == 'desc', 'fa-long-arrow-up': $parent.sort() == 'asc' }"></i>
+      <!-- /ko -->
     </div>
     <!-- /ko -->
 
@@ -2842,8 +2845,8 @@ var DATETIME_HIT_OPTIONS = [
     { value: "unique", label: "${ _('Unique') }" },
 ];
 var ALPHA_HIT_COUNTER_OPTIONS = [
-    { value: "count", label: "${ _('Group by') }" },
-    ## { value: "counts", label: "Count" },
+    ##{ value: "count", label: "${ _('Group by') }" },
+    ##{ value: "counts", label: "Count" },
     { value: "unique", label: "${ _('Unique') }" },
     { value: "min", label: "${ _('Min') }" },
     { value: "max", label: "${ _('Max') }" }
