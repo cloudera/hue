@@ -1358,7 +1358,7 @@ var Collection = function (vm, collection) {
     vm.search();
   };
 
-  self.toggleSortFacet2 = function (facet_field, event) {
+  self.toggleSortFacet2 = function (widget, facet_field) {
     var sortField = facet_field.properties ? facet_field.properties.sort : facet_field.sort;
 
     if (sortField() == 'desc') {
@@ -1367,11 +1367,43 @@ var Collection = function (vm, collection) {
       sortField('desc');
     }
 
+    // Update facets of same dimension to be consistent
+    if (self.engine() == 'solr') {
+      $.each(self.getDimensionFacets(widget, facet_field), function(index, facet) {
+        if (facet != facet_field) {
+          var sortField = facet.properties ? facet.properties.sort : facet.sort;
+          sortField('default');
+        }
+      })
+    }
+
     if (facet_field.properties && facet_field.properties.type && facet_field.properties.type() == 'range-up') {
       vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
     }
 
     vm.search();
+  };
+
+  self.getDimensionFacets = function (widget, facet_field) {
+    var facets = [widget];
+    var facetFound = widget == facet_field;
+
+    $.each(widget.properties.facets(), function(index, facet) {
+      if (facet.aggregate.function() == 'count') {    	
+    	if (facetFound) {
+    	  return false;
+    	} else {
+    	  facets = [facet];
+    	}
+      }
+      if (facet == facet_field) {
+        facetFound = true;
+      } else {
+    	facets.push(facet);
+      }
+    });
+
+    return facets;
   };
 
   self.toggleRangeFacet = function (facet_field, event) { // Deprecated after Hue 4
