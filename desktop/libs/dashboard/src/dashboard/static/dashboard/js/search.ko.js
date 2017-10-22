@@ -1389,17 +1389,17 @@ var Collection = function (vm, collection) {
     var facetFound = widget == facet_field;
 
     $.each(widget.properties.facets(), function(index, facet) {
-      if (facet.aggregate.function() == 'count') {    	
-    	if (facetFound) {
-    	  return false;
-    	} else {
-    	  facets = [facet];
-    	}
+      if (facet.aggregate.function() == 'count') {
+        if (facetFound) {
+          return false;
+        } else {
+          facets = [facet];
+        }
       }
       if (facet == facet_field) {
         facetFound = true;
       } else {
-    	facets.push(facet);
+        facets.push(facet);
       }
     });
 

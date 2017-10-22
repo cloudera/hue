@@ -143,13 +143,12 @@ class SolrApi(object):
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'nested':
-#           sort = {'count': facet['sort']}
           sort = {'count': facet['properties']['sort']}
           for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'])):
             if agg['sort'] != 'default':
               agg_function = self._get_aggregate_function(agg)
               sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
-          print sort
+
           if sort.get('count') == 'default':
             sort['count'] = 'desc'
           _f = {
