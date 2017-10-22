@@ -143,11 +143,20 @@ class SolrApi(object):
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'nested':
+#           sort = {'count': facet['sort']}
+          sort = {'count': facet['properties']['sort']}
+          for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'])):
+            if agg['sort'] != 'default':
+              agg_function = self._get_aggregate_function(agg)
+              sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
+          print sort
+          if sort.get('count') == 'default':
+            sort['count'] = 'desc'
           _f = {
               'field': facet['field'],
               'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'text-facet-widget' else 0),
               'mincount': int(facet['properties']['mincount']),
-              'sort': {'count': facet['properties']['sort']},
+              'sort': sort,
           }
 
           if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
@@ -265,6 +274,8 @@ class SolrApi(object):
         if agg['sort'] != 'default':
           agg_function = self._get_aggregate_function(agg)
           sort = {'agg_%02d_%02d:%s' % (dim, i, agg_function): agg['sort']}
+      if sort.get('count') == 'default':
+        sort['count'] = 'desc'
 
       _f[f_name] = {
           'type': 'terms',
@@ -276,6 +287,7 @@ class SolrApi(object):
           'sort': sort
           #'prefix': '' # Forbidden on numeric fields
       }
+
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
 
@@ -928,7 +940,13 @@ class SolrApi(object):
 
 
   def _get_dimension_aggregates(self, facets):
-    return [agg for agg in facets[0:] if agg['aggregate']['function'] != 'count']
+    aggregates = []
+    for agg in facets[0:]:
+      if agg['aggregate']['function'] != 'count':
+        aggregates.append(agg)
+      else:
+        return aggregates
+    return aggregates
 
 
   def _get_nested_fields(self, collection):
