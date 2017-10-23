@@ -1741,7 +1741,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
         <div class="inline-block hide" style="padding-bottom: 10px; padding-right: 20px">
           <span class="facet-field-label hide">${ _('Sorting') }</span>
-          <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
+          <a href="javascript: void(0)" title="${ _('Toggle sort order') }" class="hide" data-bind="click: $root.collection.toggleSortFacet">
             <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
             <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
             <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
@@ -3611,6 +3611,7 @@ $(document).ready(function () {
     }, 200);
   });
 
+%if USE_GRIDSTER.get():
   $(".gridster>ul").gridster({
     widget_margins: [5, 5],
     widget_base_dimensions: ['auto', 100],
@@ -3627,6 +3628,7 @@ $(document).ready(function () {
       },
     }
   });
+%endif
 
   $(document).on("click", ".widget-settings-pill", function(){
     $(this).parents(".card-body").find(".widget-section").hide();
