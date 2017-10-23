@@ -20,10 +20,12 @@ import re
 
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
-from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url, get_adls_grant_type
+from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
 
 
 LOG = logging.getLogger(__name__)
+
+REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/token'
 
 
 def get_default_client_id():
@@ -42,13 +44,9 @@ def get_default_authentication_code():
   return client_secret_script or get_adls_authentication_code()
 
 def get_default_refresh_url():
-  refresh_url = AZURE_ACCOUNTS['default'].REFRESH_URL.get()
+  refresh_url = REFRESH_URL.replace('<tenant_id>', AZURE_ACCOUNTS['default'].TENANT_ID.get())
   refresh_url = refresh_url if refresh_url else get_adls_refresh_url()
   return refresh_url or get_adls_refresh_url()
-
-def get_default_grant_type():
-  grant_type = AZURE_ACCOUNTS['default'].GRANT_TYPE.get()
-  return grant_type or get_adls_grant_type()
 
 def get_default_region():
   return ""
@@ -81,10 +79,7 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
     members=dict(
       CLIENT_ID=Config("client_id", help="", default=None),
       CLIENT_SECRET=Config("client_secret", help="", default=None),
-      REFRESH_URL=Config("refresh_url",help="https://login.microsoftonline.com/<tenant_id>/oauth2/token", default=None),
-      GRANT_TYPE=Config("grant_type",
-                         help="",
-                         type=str, default="client_credentials")
+      TENANT_ID=Config("tenant_id", help="", default=None)
     )
   )
 )
