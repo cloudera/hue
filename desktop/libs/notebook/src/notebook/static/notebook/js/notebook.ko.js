@@ -272,12 +272,17 @@ var EditorViewModel = (function() {
     });
 
     // Ace stuff
-    self.ace = ko.observable(null);
-    self.ace.subscribe(function () {
-      if (!vm.isPresentationMode()) {
-        self.ace().focus();
+    var aceEditor = null;
+
+    self.ace = function (newVal) {
+      if (newVal) {
+        aceEditor = newVal;
+        if (!vm.isPresentationMode()) {
+          aceEditor.focus();
+        }
       }
-    });
+      return aceEditor
+    };
     self.errors = ko.observableArray([]);
 
     self.aceErrorsHolder = ko.observableArray([]);
