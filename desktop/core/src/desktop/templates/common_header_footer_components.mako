@@ -185,6 +185,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
           column: '${ _('Columns') }',
           cte: '${ _('CTEs') }',
           database: '${ _('Databases') }',
+          field: '${ _('FIELD') }',
           identifier: '${ _('Identifiers') }',
           keyword: '${ _('Keywords') }',
           popular: '${ _('Popular') }',
