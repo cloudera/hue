@@ -1622,7 +1622,24 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           dataType:  'json',
           success: function() {
             $("#deleteModal").modal('hide');
-            self.retrieveData(true);
+            window.setTimeout(function () {
+              $(self.selectedFiles()).each(function (index, file) {
+                file.deleted(true);
+              });
+              var $scrollable = $(window);
+              %if is_embeddable:
+                $scrollable = $('.page-content');
+              %endif
+              if ($('.row-deleted').length > 0 && $('.row-deleted:eq(0)').offset()) {
+                $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
+              }
+            }, 500);
+            window.setTimeout(function () {
+              $(self.selectedFiles()).each(function (index, file) {
+                self.files.remove(file);
+              });
+              self.retrieveData(true);
+            }, 1000);
           },
           error: function(xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -2267,12 +2284,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $("#newRepFactorInput").removeClass("fieldError");
       });
 
-      viewModel.currentPath.subscribe(function (path) {
-        if (!path) return;
-        huePubSub.subscribe('assist.' + viewModel.fs() + '.refresh', function () {
+      huePubSub.subscribe('fb.' + viewModel.fs() + '.refresh', function (path) {
+        if (path === viewModel.currentPath()) {
           viewModel.retrieveData();
-        });
-      });
+        }
+      }, 'filebrowser');
 
       huePubSub.subscribe('update.autocompleters', function(){
         $("#moveDestination").jHueHdfsAutocomplete({
