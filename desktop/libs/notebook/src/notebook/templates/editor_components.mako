@@ -3115,6 +3115,49 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
+      if (window.Worker) {
+        // It can take a while before the worker is active
+        var whenWorkerIsReady = function (worker, message) {
+          if (!worker.isReady) {
+            window.clearTimeout(worker.pingTimeout);
+            worker.postMessage({ ping: true });
+            worker.pingTimeout = window.setTimeout(function () {
+              whenWorkerIsReady(worker, message);
+            }, 500);
+          } else {
+            worker.postMessage(message);
+          }
+        };
+
+        // For syntax checking
+        var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?bust=' + Math.random());
+        aceSqlSyntaxWorker.onmessage = function (e) {
+          if (e.data.ping) {
+            aceSqlSyntaxWorker.isReady = true;
+          } else {
+            huePubSub.publish('ace.sql.syntax.worker.message', e);
+          }
+        };
+
+        huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
+          whenWorkerIsReady(aceSqlSyntaxWorker, message);
+        });
+
+        // For location marking
+        var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?bust=' + Math.random());
+        aceSqlLocationWorker.onmessage = function (e) {
+          if (e.data.ping) {
+            aceSqlLocationWorker.isReady = true;
+          } else {
+            huePubSub.publish('ace.sql.location.worker.message', e);
+          }
+        };
+
+        huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
+          whenWorkerIsReady(aceSqlLocationWorker, message);
+        });
+      }
+
       if (viewModel.isOptimizerEnabled()) {
         huePubSub.subscribe('editor.upload.table.stats', function (options) {
           viewModel.selectedNotebook().snippets()[0].uploadTableStats(options);

@@ -3427,15 +3427,13 @@
       self.editor = editor;
       self.editorId = editorId;
       self.snippet = snippet;
-      self.aceSqlSyntaxWorker = null;
+      self.sqlSyntaxWorkerSub = null;
 
       self.disposeFunctions = [];
 
       self.attachCursorLocator();
       self.attachStatementLocator();
-      if (window.Worker) {
-        self.attachSqlWorker();
-      }
+      self.attachSqlWorker();
       self.attachGutterHandler();
     }
 
@@ -3485,11 +3483,11 @@
         }
 
         while(lastMarkedGutterLines.length) {
-          self.editor.session.removeGutterDecoration(lastMarkedGutterLines.shift(), 'ace-active-gutter-decoration');
+          self.editor.getSession().removeGutterDecoration(lastMarkedGutterLines.shift(), 'ace-active-gutter-decoration');
         }
         for (var line = statementDetails.activeStatement.location.first_line - 1 + leadingEmptyLineCount; line < statementDetails.activeStatement.location.last_line; line++) {
           lastMarkedGutterLines.push(line);
-          self.editor.session.addGutterDecoration(line, 'ace-active-gutter-decoration');
+          self.editor.getSession().addGutterDecoration(line, 'ace-active-gutter-decoration');
         }
       });
 
@@ -3629,65 +3627,76 @@
 
     AceLocationHandler.prototype.clearMarkedErrors = function () {
       var self = this;
-      for (var marker in self.editor.session.$backMarkers) {
-        if (self.editor.session.$backMarkers[marker].clazz.indexOf('hue-ace-syntax-') === 0) {
-          var token = self.editor.session.$backMarkers[marker].token;
+      for (var marker in self.editor.getSession().$backMarkers) {
+        if (self.editor.getSession().$backMarkers[marker].clazz.indexOf('hue-ace-syntax-') === 0) {
+          var token = self.editor.getSession().$backMarkers[marker].token;
           delete token.syntaxError;
           delete token.notFound;
-          self.editor.session.removeMarker(self.editor.session.$backMarkers[marker].id);
+          self.editor.getSession().removeMarker(self.editor.getSession().$backMarkers[marker].id);
         }
       }
     };
 
     AceLocationHandler.prototype.checkForSyntaxErrors = function (statementLocation, cursorPosition) {
       var self = this;
-      if (self.aceSqlSyntaxWorker !== null) {
+      if (self.sqlSyntaxWorkerSub !== null) {
         self.clearMarkedErrors();
         var AceRange = ace.require('ace/range').Range;
-        var beforeCursor = self.editor.session.getTextRange(new AceRange(statementLocation.first_line - 1, statementLocation.first_column, cursorPosition.row, cursorPosition.column));
-        var afterCursor = self.editor.session.getTextRange(new AceRange(cursorPosition.row, cursorPosition.column, statementLocation.last_line - 1, statementLocation.last_column));
-        self.aceSqlSyntaxWorker.postMessage({ beforeCursor: beforeCursor, afterCursor: afterCursor, statementLocation: statementLocation, type: self.snippet.type() });
+        var beforeCursor = self.editor.getSession().getTextRange(new AceRange(statementLocation.first_line - 1, statementLocation.first_column, cursorPosition.row, cursorPosition.column));
+        var afterCursor = self.editor.getSession().getTextRange(new AceRange(cursorPosition.row, cursorPosition.column, statementLocation.last_line - 1, statementLocation.last_column));
+        huePubSub.publish('ace.sql.syntax.worker.post', {
+          id: self.snippet.id(),
+          beforeCursor: beforeCursor,
+          afterCursor: afterCursor,
+          statementLocation: statementLocation,
+          type: self.snippet.type()
+        });
       }
     };
 
     AceLocationHandler.prototype.attachSqlSyntaxWorker = function () {
       var self = this;
-      if (window.Worker) {
-        self.aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?bust=' + Math.random());
 
-        self.aceSqlSyntaxWorker.onmessage = function(e) {
-          var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+      if (self.sqlSyntaxWorkerSub !== null) {
+        return;
+      }
 
-          if (e.data.syntaxError && e.data.syntaxError.ruleId && !suppressedRules[e.data.syntaxError.ruleId.toString() + e.data.syntaxError.text.toLowerCase()]) {
-            if (self.snippet.positionStatement() && SqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {
-              self.snippet.positionStatement().syntaxError = true;
-            }
-            if (hueDebug.showSyntaxParseResult) {
-              console.log(e.data.syntaxError);
-            }
-            if (!e.data.syntaxError.incompleteStatement) {
-              var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
-              // If no token is found it likely means that the parserresponse came back after the text was changed,
-              // at which point it will trigger another parse so we can ignore this.
-              if (token) {
-                token.syntaxError = e.data.syntaxError;
-                var AceRange = ace.require('ace/range').Range;
-                var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
-                var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-error');
-                self.editor.session.$backMarkers[markerId].token = token;
-              }
+      self.sqlSyntaxWorkerSub = huePubSub.subscribe('ace.sql.syntax.worker.message', function (e) {
+        if (e.data.id !== self.snippet.id()) {
+          return;
+        }
+        var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
+
+        if (e.data.syntaxError && e.data.syntaxError.ruleId && !suppressedRules[e.data.syntaxError.ruleId.toString() + e.data.syntaxError.text.toLowerCase()]) {
+          if (self.snippet.positionStatement() && SqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {
+            self.snippet.positionStatement().syntaxError = true;
+          }
+          if (hueDebug.showSyntaxParseResult) {
+            console.log(e.data.syntaxError);
+          }
+          if (!e.data.syntaxError.incompleteStatement) {
+            var token = self.editor.getSession().getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
+            // If no token is found it likely means that the parserresponse came back after the text was changed,
+            // at which point it will trigger another parse so we can ignore this.
+            if (token) {
+              token.syntaxError = e.data.syntaxError;
+              var AceRange = ace.require('ace/range').Range;
+              var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
+              var markerId = self.editor.getSession().addMarker(range, 'hue-ace-syntax-error');
+              self.editor.getSession().$backMarkers[markerId].token = token;
             }
           }
-        };
-        huePubSub.publish('editor.refresh.statement.locations', self.snippet);
-      }
+        }
+      });
+
+      huePubSub.publish('editor.refresh.statement.locations', self.snippet);
     };
 
     AceLocationHandler.prototype.detachSqlSyntaxWorker = function () {
       var self = this;
-      if (self.aceSqlSyntaxWorker) {
-        self.aceSqlSyntaxWorker.terminate();
-        self.aceSqlSyntaxWorker = null;
+      if (self.sqlSyntaxWorkerSub !== null) {
+        self.sqlSyntaxWorkerSub.remove();
+        self.sqlSyntaxWorkerSub = null;
       }
       self.clearMarkedErrors();
     };
@@ -3744,7 +3753,7 @@
       delete token.notFound;
       delete token.syntaxError;
 
-      if (self.aceSqlSyntaxWorker && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
+      if (self.sqlSyntaxWorkerSub !== null && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
         var aliases = [];
 
         for (var i = 0; i < allLocations.length; i++) {
@@ -3829,8 +3838,8 @@
           if (token.parseLocation) {
             var AceRange = ace.require('ace/range').Range;
             var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
-            var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-warning');
-            self.editor.session.$backMarkers[markerId].token = token;
+            var markerId = self.editor.getSession().addMarker(range, 'hue-ace-syntax-warning');
+            self.editor.getSession().$backMarkers[markerId].token = token;
           }
         });
       }
@@ -3841,26 +3850,21 @@
 
       var apiHelper = ApiHelper.getInstance();
       var activeTokens = [];
-      var aceSqlWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?bust=' + Math.random());
-      var workerIsReady = false;
-
-      self.disposeFunctions.push(function () {
-        aceSqlWorker.terminate();
-      });
 
       var lastKnownLocations = {};
 
-      var locationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
-        huePubSub.publish('set.active.editor.locations', lastKnownLocations);
+      var getLocationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
+        if (self.snippet.inFocus()) {
+          huePubSub.publish('set.active.editor.locations', lastKnownLocations);
+        }
       });
 
       self.disposeFunctions.push(function () {
-        locationsSub.remove();
+        getLocationsSub.remove();
       });
 
-      aceSqlWorker.onmessage = function(e) {
-        workerIsReady = true;
-        if (e.data.ping) {
+      var locationWorkerSub = huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
+        if (e.data.id !== self.snippet.id()) {
           return;
         }
 
@@ -3895,20 +3899,19 @@
             }
           }
 
-          var token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
+          var token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column);
 
           if (token && token.value && /`$/.test(token.value)) {
             // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
-            token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
+            token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
           }
           if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
             token = null;
           }
           if (token && token.value) {
             var AceRange = ace.require('ace/range').Range;
-            var actualValue = self.editor.session.getTextRange(new AceRange(location.location.first_line - 1, location.location.first_column - 1, location.location.last_line - 1, location.location.last_column - 1));
             // The Ace tokenizer also splits on '{', '(' etc. hence the actual value;
-            token.actualValue = actualValue;
+            token.actualValue = self.editor.getSession().getTextRange(new AceRange(location.location.first_line - 1, location.location.first_column - 1, location.location.last_line - 1, location.location.last_column - 1));
           }
 
           if (token !== null) {
@@ -3955,24 +3958,21 @@
         });
 
         huePubSub.publish('editor.active.locations', lastKnownLocations);
-      };
+      });
 
-      var whenWorkerIsReady = function (callback) {
-        if (!workerIsReady) {
-          aceSqlWorker.postMessage({ ping: true });
-          window.setTimeout(function () {
-            whenWorkerIsReady(callback);
-          }, 500);
-        } else {
-          callback();
-        }
-      };
-
+      self.disposeFunctions.push(function () {
+        locationWorkerSub.remove();
+      });
 
       var statementSubscription = huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
+        if (statementDetails.id !== self.editorId) {
+          return;
+        }
         if (self.snippet.type() === 'hive' || self.snippet.type() === 'impala') {
-          whenWorkerIsReady(function () {
-            aceSqlWorker.postMessage({ statementDetails: statementDetails, type: self.snippet.type() });
+          huePubSub.publish('ace.sql.location.worker.post', {
+            id: self.snippet.id(),
+            statementDetails: statementDetails,
+            type: self.snippet.type()
           });
         }
       });
@@ -3984,7 +3984,11 @@
 
     AceLocationHandler.prototype.dispose = function () {
       var self = this;
-      self.detachSqlSyntaxWorker();
+      if (self.sqlSyntaxWorkerSub !== null) {
+        self.sqlSyntaxWorkerSub.remove();
+        self.sqlSyntaxWorkerSub = null;
+      }
+
       self.disposeFunctions.forEach(function (dispose) {
         dispose();
       })
@@ -4014,7 +4018,6 @@
       $el.text(snippet.statement_raw());
 
       var editor = ace.edit($el.attr("id"));
-
       var Tooltip = ace.require("ace/tooltip").Tooltip;
       var AceRange = ace.require('ace/range').Range;
 
