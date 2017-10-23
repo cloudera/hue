@@ -18,7 +18,7 @@ from __future__ import absolute_import
 import logging
 
 from time import time
-from azure.conf import get_default_region, get_default_client_id, get_default_authentication_code, get_default_refresh_url, get_default_grant_type
+from azure.conf import get_default_region, get_default_client_id, get_default_authentication_code, get_default_refresh_url
 from desktop.lib.rest import http_client, resource
 
 LOG = logging.getLogger(__name__)
