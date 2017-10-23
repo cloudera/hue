@@ -295,9 +295,9 @@ from desktop.views import _ko
         var self = this;
         self.disposeFunctions = [];
         self.editor = params.editor;
-        self.snippet = params.snippet;
+        self.snippet = params.snippet || {};
 
-        self.autocompleter = new SqlAutocompleter3(params);
+        self.autocompleter = params.autocompleter || new SqlAutocompleter3(params);
         self.suggestions = self.autocompleter.suggestions;
 
         self.active = ko.observable(false).extend({ rateLimit: 10 }); // to prevent flickering on empty result

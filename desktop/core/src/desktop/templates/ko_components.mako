@@ -1299,4 +1299,170 @@ from desktop.views import _ko
       <div>${ _('No match found') }</div>
     </div>
   </script>
+
+  <script type="text/html" id="hue-simple-ace-editor-template">
+    <!-- ko if singleLine -->
+    <div class="simple-ace-single-line">
+      <div class="ace-editor"></div>
+    </div>
+    <!-- /ko -->
+    <!-- ko ifnot: singleLine -->
+    <div class="ace-editor"></div>
+    <!-- /ko -->
+    <!-- ko if: autocompleter !== null -->
+    <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace, autocompleter: autocompleter } } --><!-- /ko -->
+    <!-- /ko -->
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      var normalizedColors = HueColors.getNormalizedColors();
+
+      var SolrFormulaAutocompleter = (function () {
+        var COLORS = {
+          ALL: HueColors.BLUE,
+          FIELD: normalizedColors['green'][2]
+        };
+
+        var CATEGORIES = {
+          ALL: { id: 'all', color: COLORS.ALL, label: AutocompleterGlobals.i18n.category.all },
+          FIELD: { id: 'field', weight: 1000, color: COLORS.FIELD, label: AutocompleterGlobals.i18n.category.field, detailsTemplate: 'field' }
+        };
+
+        var SolrSuggestions = function () {
+          var self = this;
+          self.filtered = ko.pureComputed(function () {
+            // TODO: Implement autocomplete logic
+          });
+
+          self.availableCategories = ko.pureComputed(function () {
+            // TODO: Implement autocomplete logic
+            return [CATEGORIES.ALL];
+          });
+
+          self.loading = ko.observable(false);
+          self.filter = ko.observable();
+          self.cancelRequests = function () {};
+        };
+
+        var SolrFormulaAutocompleter = function () {
+          var self = this;
+
+          self.suggestions = new SolrSuggestions();
+        };
+
+        SolrFormulaAutocompleter.prototype.autocomplete = function () {
+          // TODO: parse the input and update suggestions
+        };
+
+        return SolrFormulaAutocompleter;
+      })();
+
+      var AVAILABLE_AUTOCOMPLETERS = {
+        'solrFormula': SolrFormulaAutocompleter
+      };
+
+      var SimpleAceEditor = function (params, element) {
+        var $element = $(element);
+        var self = this;
+        self.value = params.value;
+        self.ace = ko.observable();
+        self.disposeFunctions = [];
+
+        self.singleLine = !!params.singleLine;
+
+        if (params.autocomplete) {
+          if (!AVAILABLE_AUTOCOMPLETERS[params.autocomplete]) {
+            throw new Error('Could not find autocompleter for "' + params.autocomplete + '"');
+          }
+
+          self.autocompleter = new AVAILABLE_AUTOCOMPLETERS[params.autocomplete]();
+        } else {
+          self.autocompleter = null;
+        }
+
+        var aceOptions = params.aceOptions || {};
+
+        if (!$element.attr('id')) {
+          $element.attr('id', UUID());
+        }
+
+        var editor = ace.edit($element.find('.ace-editor')[0]);
+        self.ace(editor);
+
+        if (self.value()) {
+          editor.setValue(self.value());
+          editor.clearSelection();
+        }
+
+        if (self.singleLine) {
+          aceOptions = $.extend(aceOptions, {
+            fontSize: '14px',
+            maxLines: 1, // make it 1 line
+            autoScrollEditorIntoView: true,
+            highlightActiveLine: false,
+            printMargin: false,
+            showGutter: false,
+            enableBasicAutocompletion: params.autocomplete
+          });
+        }
+
+        editor.setOptions(aceOptions);
+
+        if (params.singleLine) {
+          editor.renderer.screenToTextCoordinates = function(x, y) {
+            var pos = this.pixelToScreenCoordinates(x, y);
+            return this.session.screenToDocumentPosition(
+                    Math.min(this.session.getScreenLength() - 1, Math.max(pos.row, 0)),
+                    Math.max(pos.column, 0)
+            );
+          };
+
+          editor.commands.bindKey("Enter|Shift-Enter", "null");
+
+          var pasteListener = editor.on("paste", function(e) {
+            e.text = e.text.replace(/[\r\n]+/g, " ");
+          });
+
+          self.disposeFunctions.push(function () {
+            editor.off('paste', pasteListener);
+          });
+        }
+
+        if (params.autocomplete) {
+          var AceAutocomplete = ace.require("ace/autocomplete").Autocomplete;
+
+          if (!editor.completer) {
+            editor.completer = new AceAutocomplete();
+          }
+          editor.completer.exactMatch = false;
+          editor.useHueAutocompleter = true;
+        }
+
+        var inputListener = editor.on('input', function () {
+          self.value(editor.getValue());
+        });
+
+        self.disposeFunctions.push(function () {
+          editor.off('input', inputListener);
+        });
+      };
+
+      SimpleAceEditor.prototype.dispose = function () {
+        var self = this;
+        self.disposeFunctions.forEach(function (dispose) {
+          dispose();
+        })
+      };
+
+      ko.components.register('hue-simple-ace-editor', {
+        viewModel: {
+          createViewModel: function(params, componentInfo) {
+            return new SimpleAceEditor(params, componentInfo.element);
+          }
+        },
+        template: {element: 'hue-simple-ace-editor-template'}
+      });
+    })();
+  </script>
 </%def>
