@@ -76,6 +76,7 @@ importScripts('${ static('desktop/js/sqlFunctions.js') }');
         });
 
         postMessage({
+          id: msg.data.id,
           locations: locations,
           activeStatementLocations: activeStatementLocations,
           totalStatementCount: msg.data.statementDetails.totalStatementCount,
