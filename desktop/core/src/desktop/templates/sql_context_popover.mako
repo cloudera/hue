@@ -309,7 +309,7 @@ from metadata.conf import has_navigator
             <div class="sql-context-flex-fill">
                 <div class="alert">
                 <span data-bind="text: $parent.errorText"></span>
-                <!-- ko if: $parent.enableSampleError && $parent.activeTab() === 'sample' -->
+                <!-- ko if: $parent.enableSampleError && $parents[1].activeTab() === 'sample' -->
                 <a href="javascript:void(0);" data-bind="click: function(){ huePubSub.publish('sample.error.insert.click', $data); huePubSub.publish('sql.context.popover.hide');}">${_('Insert ')}<span data-bind="text:$parent.title"></span> ${_(' sample query')}</a> ${_('at cursor')}
                 <!-- /ko -->
                 </div>
