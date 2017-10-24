@@ -654,7 +654,8 @@ def import_workflow_root(workflow, workflow_definition_root, metadata=None, fs=N
       })
 
     # Get XSLT
-    xslt = etree.parse(xslt_definition_fh)
+    parser = etree.XMLParser(resolve_entities=False)
+    xslt = etree.parse(xslt_definition_fh, parser=parser)
     xslt_definition_fh.close()
     transform = etree.XSLT(xslt)
 
@@ -706,7 +707,8 @@ def generate_v2_graph_nodes(workflow_definition):
     raise InvalidTagWithNamespaceException(workflow_definition_root.tag)
 
   # Get XSLT
-  xslt = etree.parse(xslt_definition_fh)
+  parser = etree.XMLParser(resolve_entities=False)
+  xslt = etree.parse(xslt_definition_fh, parser=parser)
   xslt_definition_fh.close()
   transform = etree.XSLT(xslt)
 
