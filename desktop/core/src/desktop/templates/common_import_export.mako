@@ -38,7 +38,7 @@ from django.utils.translation import ugettext as _
       <a class="btn btn-danger" data-bind="click: importDocument"> ${ _('Import') } </a>
     </div>
     <div class="fileupload fileupload-new" data-provides="fileupload">
-      <span class="btn btn-file" style="line-height: 29px">
+      <span class="btn btn-file">
         <span class="fileupload-new">${ _('Select json file') }</span>
         <span class="fileupload-exists">${ _('Change') }</span>
         <input type="file" accept=".json" id="fileData"/>
