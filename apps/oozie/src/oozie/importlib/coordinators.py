@@ -167,7 +167,8 @@ def import_coordinator_root(coordinator, coordinator_definition_root, metadata=N
     })
 
   # Get XSLT and Transform XML
-  xslt = etree.parse(xslt_definition_fh)
+  parser = etree.XMLParser(resolve_entities=False)
+  xslt = etree.parse(xslt_definition_fh, parser=parser)
   xslt_definition_fh.close()
   transform = etree.XSLT(xslt)
   transformed_root = transform(coordinator_definition_root)
