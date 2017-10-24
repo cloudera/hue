@@ -1812,11 +1812,9 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-columns-table-template">
     <div class="context-popover-flex">
       <div class="context-popover-flex-header">
-        <div style="margin: 10px 5px 0 10px;">
-          <span class="context-popover-header">${_('Columns')} (<span data-bind="text: filteredColumns().length"></span>)</span>
-          <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
-          <input class="input-large context-popover-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
-        </div>
+        <div class="context-popover-header" style="display:inline-block;">${_('Columns')} (<span data-bind="text: filteredColumns().length"></span>)</div>
+        <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
+        <input class="input-large context-popover-inline-search" style="padding: 3px 6px;" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
       </div>
       <div class="context-popover-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
         <table id="sqlColumnsTable" style="width: 100%" class="table table-condensed table-nowrap">
@@ -1876,7 +1874,7 @@ from metadata.conf import has_navigator
         var columns = params.columns;
         self.scrollToColumns = typeof params.scrollToColumns !== 'undefined' ?  params.scrollToColumns : true;
         self.searchInput = ko.observable('');
-        self.searchVisible = ko.observable(false);
+        self.searchVisible = ko.observable(true);
         self.searchFocus = ko.observable(false);
 
         self.searchVisible.subscribe(function (newValue) {
