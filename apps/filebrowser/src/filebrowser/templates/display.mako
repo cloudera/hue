@@ -85,7 +85,7 @@ ${ fb_components.menubar() }
           <!-- /ko -->
 
            <!-- ko if: $root.file().stats -->
-           <li class="white">
+           <li class="white margin-top-20">
             <dl class="muted">
               <dt>${_('Last modified')}</dt>
               <dd data-bind="text: localeFormat($root.file().stats.mtime()*1000)"></dd>
