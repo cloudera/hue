@@ -242,9 +242,9 @@ ${ layout.menubar(section='query') }
     <div class="alert">
       ${ _('This is the old SQL Editor, it is recommended to instead use: ') }
       % if app_name == 'impala':
-        <a href="${ url('notebook:editor') }?type=impala" target="_blank">${_('Impala')}</a>
+        <a href="/hue/editor?type=impala" target="_blank">${_('Impala')}</a>
       % else:
-        <a href="${ url('notebook:editor') }?type=hive" target="_blank">${_('Hive')}</a>
+        <a href="/hue/editor?type=hive" target="_blank">${_('Hive')}</a>
       % endif
     </div>
     % endif
