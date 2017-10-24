@@ -374,6 +374,9 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
+  elif widget_type == 'document-widget':
+    properties['uuid'] = facet_field
+    properties['subfacet'] = {}
   elif widget_type == 'gradient-map-widget':
     facet_type = 'nested'
     properties['facets'] = []
