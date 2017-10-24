@@ -929,7 +929,16 @@ var Collection = function (vm, collection) {
         if (data.status == 0) {
           var facet = ko.mapping.fromJS(data.facet);
 
-          self._addObservablesToFacet(facet, vm);
+          if (false) {
+        	// get doc2
+
+        	// facet.subfacet = ko.mapping.fromJS(data.facet);
+        	// self._addObservablesToFacet(facet, vm); // needed if we only have result?
+        	// "read only"
+        	// .isLoading(false)
+          } else {
+            self._addObservablesToFacet(facet, vm);
+          }
 
           self.facets.push(facet);
           vm.search();
@@ -1761,6 +1770,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.draggableGradienMap = ko.observable(bareWidgetBuilder("Gradient Map", "gradient-map-widget"));
     self.draggableTree2 = ko.observable(bareWidgetBuilder("Tree", "tree2-widget"));
     self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget"));
+    self.draggableDocument = ko.observable(bareWidgetBuilder("Document", "document-widget"));
 
     self.hasAvailableFields = ko.pureComputed(function () {
       return self.collection.availableFacetFields().length > 0;
@@ -2039,7 +2049,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           return $.post("/dashboard/search", {
             collection: ko.mapping.toJSON(self.collection),
             query: ko.mapping.toJSON(self.query),
-            facet: ko.mapping.toJSON(facet),
+            facet: ko.mapping.toJSON(facet)
           }, function (data) {
             facet.queryResult(new QueryResult(self, {
               type: self.collection.engine(),
