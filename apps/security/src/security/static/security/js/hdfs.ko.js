@@ -16,42 +16,6 @@
 
 var HdfsViewModel = (function () {
 
-  function parseAcl(acl) {
-    // (default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?
-    m = acl.match(/(default:)?(user|group|mask|other):(.*?):(.)(.)(.)/);
-    var acl = ko.mapping.fromJS({
-      'isDefault': m[1] != null,
-      'type': m[2],
-      'name': m[3],
-      'r': m[4] != '-',
-      'w': m[5] != '-',
-      'x': m[6] != '-',
-      'status': ''
-    });
-
-    acl.type.subscribe(function () {
-      acl.status('modified');
-    });
-    acl.name.subscribe(function () {
-      acl.status('modified');
-    });
-    acl.r.subscribe(function () {
-      acl.status('modified');
-    });
-    acl.w.subscribe(function () {
-      acl.status('modified');
-    });
-    acl.x.subscribe(function () {
-      acl.status('modified');
-    });
-
-    return acl;
-  }
-
-  function printAcl(acl) {
-    return (acl.isDefault() ? 'default:' : '') + acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
-  }
-
   var Assist = function (vm, assist) {
     var self = this;
 
@@ -163,13 +127,13 @@ var HdfsViewModel = (function () {
 
 
     self.addAcl = function () {
-      var newAcl = parseAcl('group::---');
+      var newAcl = vm.parseAcl('group::---');
       newAcl.status('new');
       self.acls.push(newAcl);
     };
 
     self.addDefaultAcl = function () {
-      var newAcl = parseAcl('default:group::---');
+      var newAcl = vm.parseAcl('default:group::---');
       newAcl.status('new');
       self.acls.push(newAcl);
     };
@@ -481,8 +445,8 @@ var HdfsViewModel = (function () {
           self.acls.removeAll();
           self.originalAcls.removeAll();
           $.each(data.entries, function (index, item) {
-            self.acls.push(parseAcl(item));
-            self.originalAcls.push(parseAcl(item));
+            self.acls.push(vm.parseAcl(item));
+            self.originalAcls.push(vm.parseAcl(item));
           });
           self.owner(data.owner);
           self.group(data.group);
@@ -664,6 +628,42 @@ var HdfsViewModel = (function () {
         self.availableHadoopGroups(data.groups);
         $(document).trigger("loadedUsers");
       });
+    }
+
+    self.parseAcl = function (acl) {
+    // (default:)?(user|group|mask|other):[[A-Za-z_][A-Za-z0-9._-]]*:([rwx-]{3})?
+    m = acl.match(/(default:)?(user|group|mask|other):(.*?):(.)(.)(.)/);
+    var acl = ko.mapping.fromJS({
+      'isDefault': m[1] != null,
+      'type': m[2],
+      'name': m[3],
+      'r': m[4] != '-',
+      'w': m[5] != '-',
+      'x': m[6] != '-',
+      'status': ''
+    });
+
+    acl.type.subscribe(function () {
+      acl.status('modified');
+    });
+    acl.name.subscribe(function () {
+      acl.status('modified');
+    });
+    acl.r.subscribe(function () {
+      acl.status('modified');
+    });
+    acl.w.subscribe(function () {
+      acl.status('modified');
+    });
+    acl.x.subscribe(function () {
+      acl.status('modified');
+    });
+
+    return acl;
+  }
+
+    self.printAcl = function (acl) {
+      return (acl.isDefault() ? 'default:' : '') + acl.type() + ':' + acl.name() + ':' + (acl.r() ? 'r' : '-') + (acl.w() ? 'w' : '-') + (acl.x() ? 'x' : '-');
     }
   };
 
