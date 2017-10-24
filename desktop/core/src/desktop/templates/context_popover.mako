@@ -384,7 +384,7 @@ from metadata.conf import has_navigator
         <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
 
         <!-- ko with: details -->
-        <div class="context-popover-doc-header-link" ><a href="javscript:void(0)" data-bind="hueLink: link, click: function () { $parents[2].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
+        <div class="context-popover-doc-header-link" ><a href="javscript:void(0)" data-bind="hueLink: link, click: function () { $parents[1].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
         <!-- ko if: description -->
         <div class="context-popover-doc-description" data-bind="text: description"></div>
         <!-- /ko -->
@@ -1733,6 +1733,8 @@ from metadata.conf import has_navigator
         self.isView = params.data.type.toLowerCase() === 'view';
         self.isDocument = params.data.type.toLowerCase() === 'hue';
 
+        self.close = params.globalSearch.close.bind(params.globalSearch);
+
         // These are currently not in the global search results
         self.isHdfs = false;
         self.isAsterisk = false;
@@ -1755,7 +1757,7 @@ from metadata.conf import has_navigator
 
         var metastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function () {
           huePubSub.publish('open.link', '/metastore/table' + (self.isTable || self.isView ? '/' : 's/') + path.join('/'));
-          params.globalSearch.close();
+          self.close();
         });
 
         self.disposals.push(function () {
