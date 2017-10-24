@@ -997,21 +997,17 @@ from desktop.views import _ko
           }
         });
 
-        huePubSub.subscribe('context.popover.open.in.metastore', function () {
+        var deferredCloseIfVisible = function () {
           window.setTimeout(function () {
             if (self.searchResultVisible()) {
               self.close();
             }
           }, 0);
-        });
+        };
 
-        huePubSub.subscribe('context.popover.show.in.assist', function () {
-          window.setTimeout(function () {
-            if (self.searchResultVisible()) {
-              self.close();
-            }
-          }, 0);
-        });
+        huePubSub.subscribe('context.popover.open.in.metastore', deferredCloseIfVisible);
+        huePubSub.subscribe('context.popover.show.in.assist', deferredCloseIfVisible);
+        huePubSub.subscribe('sample.error.insert.click', deferredCloseIfVisible);
 
         huePubSub.subscribe('draggable.text.started', function (meta) {
           // We have to set the height to 0 when dragging a text, just closing the results will break the
