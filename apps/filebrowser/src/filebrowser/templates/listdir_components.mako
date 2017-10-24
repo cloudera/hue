@@ -1888,8 +1888,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           action: action,
           template: '<div class="qq-uploader" style="margin-left: 10px">' +
           '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
-          '<div class="qq-upload-button">${_('Select files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
-          '<ul class="qq-upload-list qq-upload-files unstyled" style="margin-right: 0;"></ul>' +
+          '<div class="qq-upload-button qq-no-float">${_('Select files')}</div> &nbsp; <span class="muted">${_('or drag and drop them here')}</span>' +
+          '<ul class="qq-upload-list qq-upload-files unstyled qq-no-float" style="margin-right: 0;"></ul>' +
           '</div>',
           fileTemplate: '<li><span class="qq-upload-file-extended" style="display:none"></span><span class="qq-upload-spinner hide" style="display:none"></span>' +
           '<div class="progress-row dz-processing">' +
