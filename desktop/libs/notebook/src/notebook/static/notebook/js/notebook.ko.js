@@ -2407,7 +2407,7 @@ var EditorViewModel = (function() {
       $.post("/notebook/api/close_session", {
         session: ko.mapping.toJSON(session)
       }, function (data) {
-        if (! silent && data.status != 0 && data.status != -2) {
+        if (! silent && data && data.status != 0 && data.status != -2 && data.message) {
           $(document).trigger("error", data.message);
         }
 
