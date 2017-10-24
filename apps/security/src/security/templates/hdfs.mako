@@ -33,7 +33,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
 
 <script type="text/html" id="aclDisplay">
   <div data-bind="visible: status() != 'deleted'">
-    <span data-bind="text: printAcl($data)"></span>
+    <span data-bind="text: $root.printAcl($data)"></span>
   </div>
 </script>
 
