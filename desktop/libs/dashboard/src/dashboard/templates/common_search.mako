@@ -17,9 +17,10 @@
 <%!
 from django.utils.translation import ugettext as _
 
-from dashboard.conf import USE_GRIDSTER
 from desktop import conf
 from desktop.views import commonheader, commonfooter, _ko, commonshare
+
+from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
@@ -372,7 +373,7 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
          <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
          </a>
-   </div>
+    </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableGradienMap(), isEnabled: availableDraggableMap,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -381,7 +382,19 @@ from desktop.views import commonheader, commonfooter, _ko, commonshare
          <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
          </a>
-   </div>
+    </div>
+    % if HAS_REPORT_ENABLED.get():
+    <div data-bind="visible: $root.collection.supportAnalytics(),
+                    css: { 'draggable-widget': true, 'disabled': false },
+                    draggable: {data: draggableDocument(), isEnabled: true,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Document')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: true ? 'move' : 'default' }">
+                       <i class="fa fa-file-o"></i>
+         </a>
+    </div>
+    % endif
       </%def>
 </%dashboard:layout_toolbar>
 
@@ -1708,7 +1721,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                   transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
 
-            <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
+            <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                   transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
             <div class="clearfix"></div>
          <!-- /ko -->
@@ -1721,6 +1734,29 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 </script>
 
+
+
+<script type="text/html" id="document-widget">
+  ##<div class="widget-spinner" data-bind="visible: isLoading()">
+  ##  <i class="fa fa-spinner fa-spin"></i>
+  ##</div>
+
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+
+    <!-- ko with: $root.collection.getFacetById($parent.id()) -->
+    <div>
+      Name Uuid
+      
+      ## Get sub widget by ID
+      ## <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
+      
+    </div>
+   <!-- /ko -->
+  </div>
+
+  <!-- /ko -->
+</script>
 
 
 <script type="text/html" id="bucket-widget">
