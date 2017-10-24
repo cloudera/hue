@@ -628,13 +628,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <div class="assist-flex-fill assist-file-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
          <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 27, container: '.assist-file-scrollable' }">
-           <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable' }, assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
+           <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable' }, assistFileDroppable, assistFileDraggable, visibleOnHover: { 'selector': '.assist-file-actions' }">
              <div class="assist-file-actions table-actions">
                <a class="inactive-action" href="javascript:void(0)" data-bind="click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
              </div>
              <a href="javascript:void(0)" class="assist-entry assist-document-link" data-bind="click: open, attr: {'title': name }">
                <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko -->
-               <span class="highlightable" data-bind="css: { 'highlight': highlight }, draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
+               <span class="highlightable" data-bind="css: { 'highlight': highlight }, text: definition().name"></span>
              </a>
            </li>
          </ul>
@@ -1006,6 +1006,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     </div>
   </script>
 
+  <div class="assist-file-entry-drag">
+    <span class="drag-text"></span>
+  </div>
+
   <script type="text/javascript">
 
     var SQL_ASSIST_KNOWN_FACET_VALUES = {
@@ -1016,20 +1020,25 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       ko.bindingHandlers.assistFileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
           var dragData;
-          huePubSub.subscribe('doc.browser.dragging', function (data) {
+          var dragSub = huePubSub.subscribe('doc.browser.dragging', function (data) {
             dragData = data;
           });
+          ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+            dragSub.remove();
+          });
+
           var $element = $(element);
           if (boundEntry.isDirectory) {
             $element.droppable({
               drop: function () {
-                if (dragData && !dragData.dragToSelect) {
+                if (dragData && !dragData.dragToSelect && boundEntry.isDirectory()) {
                   boundEntry.moveHere(dragData.selectedEntries);
                   dragData.originEntry.load();
                 }
+                $element.removeClass('assist-file-entry-drop');
               },
               over: function () {
-                if (dragData && !dragData.dragToSelect) {
+                if (!$element.hasClass('assist-file-entry-drop') && dragData && !dragData.dragToSelect && boundEntry.isDirectory()) {
                   $element.addClass('assist-file-entry-drop');
                 }
               },
@@ -1038,6 +1047,54 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
               }
             })
           }
+        }
+      };
+
+      ko.bindingHandlers.assistFileDraggable = {
+        init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
+          var $element = $(element);
+
+          var dragStartY = -1;
+          var dragStartX = -1;
+          $element.draggable({
+            start: function (event, ui) {
+              var $container = $('.doc-browser-drag-container');
+              boundEntry.selected(true);
+              huePubSub.publish('doc.browser.dragging', {
+                selectedEntries: [ boundEntry ],
+                originEntry: boundEntry,
+                dragToSelect: false
+              });
+              huePubSub.publish('doc.drag.to.select', false);
+
+              dragStartX = event.clientX;
+              dragStartY = event.clientY;
+
+              var $helper = $('.assist-file-entry-drag').clone().show();
+              $helper.find('.drag-text').text(boundEntry.definition().name);
+              $helper.find('i').removeClass().addClass($element.find('.doc-browser-primary-col i').attr('class'));
+
+              $helper.appendTo($container);
+            },
+            drag: function (event) {
+            },
+            stop: function (event) {
+              var elementAtStart = document.elementFromPoint(dragStartX, dragStartY);
+              var elementAtStop = document.elementFromPoint(event.clientX, event.clientY);
+              if (elementAtStart.nodeName === "A" && elementAtStop.nodeName === "A" && Math.sqrt((dragStartX-event.clientX)*(dragStartX-event.clientX) + (dragStartY-event.clientY)*(dragStartY-event.clientY)) < 8) {
+                $(elementAtStop).trigger('click');
+              }
+              boundEntry.selected(false);
+            },
+            helper: function (event) {
+              return $('<div>').addClass('doc-browser-drag-container');
+            },
+            appendTo: "body",
+            cursorAt: {
+              top: 0,
+              left: 0
+            }
+          });
         }
       };
 
