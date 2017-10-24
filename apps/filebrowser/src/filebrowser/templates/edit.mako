@@ -36,7 +36,7 @@ ${ fb_components.menubar() }
 %endif
 
 
-<div class="container-fluid">
+<div class="container-fluid" style="padding: 0">
   <div class="row-fluid">
     <div class="span12">
       <div class="card card-small">
@@ -58,7 +58,7 @@ ${ fb_components.menubar() }
               % endif
               ${edit.render_field(form["path"], hidden=True, notitle=True)}
               ${edit.render_field(form["encoding"], hidden=True, notitle=True)}
-              <div style="width: 98%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", nolabel=True, notitle=True, klass="monospace", attrs=dict(
+              <div style="width: 98%; height: 100%;">${edit.render_field(form["contents"], tag="textarea", nolabel=True, notitle=True, klass="monospace file-editor", attrs=dict(
                 style="width:100%; height:400px; resize:none")) | n}</div>
               <input class="btn btn-primary" type="submit" name="save" value="${_('Save')}">
               <a id="saveAsBtn" class="btn">${_('Save as')}</a>
