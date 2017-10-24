@@ -34,20 +34,23 @@ try:
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
+def _get_api(user):
+  session = Session.objects.get_session(user, application='impala')
+  server_url = _get_impala_server_url(session)
+  return get_impalad_api(user=user, url=server_url)
 
 class QueryApi(Api):
 
-  def __init__(self, user):
-    self.user = user
-    session = Session.objects.get_session(self.user, application='impala')
-    self.server_url = _get_impala_server_url(session)
+  def __init__(self, user, impala_api=None):
+    if impala_api:
+      self.api = impala_api
+    else:
+      self.api = _get_api(user)
 
   def apps(self, filters):
     kwargs = {}
 
-    api = get_impalad_api(user=self.user, url=self.server_url)
-
-    jobs = api.get_queries(**kwargs)
+    jobs = self.api.get_queries(**kwargs)
 
     filter_list = self._get_filter_list(filters)
     jobs_iter = itertools.chain(jobs['in_flight_queries'], jobs['completed_queries'])
@@ -98,9 +101,7 @@ class QueryApi(Api):
       return float(time)
 
   def app(self, appid):
-    api = get_impalad_api(user=self.user, url=self.server_url)
-
-    query = api.get_query_profile(query_id=appid)
+    query = self.api.get_query_profile(query_id=appid)
     if query.get('error'):
       return {
         'status': -1,
@@ -108,8 +109,8 @@ class QueryApi(Api):
       }
 
     user = re.search(r"^\s*User:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-    status = re.search(r"^\s*Query State:\s?([^\n\r]*)$$", query['profile'], re.MULTILINE).group(1)
-    stmt = re.search(r"^\s*Sql Statement:\s?([^\n\r]*)$$", query['profile'], re.MULTILINE).group(1)
+    status = re.search(r"^\s*Query State:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
+    stmt = re.search(r"^\s*Sql Statement:\s?([^\n\r]*)", query['profile'], re.MULTILINE).group(1)
     partitions = re.findall(r"partitions=\s*(\d)+\s*\/\s*(\d)+", query['profile'])
     end_time = re.search(r"^\s*End Time:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
     submitted = re.search(r"^\s*Start Time:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
@@ -155,10 +156,9 @@ class QueryApi(Api):
     message = {'message': '', 'status': 0}
 
     if action.get('action') == 'kill':
-      api = get_impalad_api(user=self.user, url=self.server_url)
 
       for _id in appid:
-        result = api.kill(_id)
+        result = self.api.kill(_id)
         if result.get('error'):
           message['message'] = result.get('error')
           message['status'] = -1
@@ -180,16 +180,13 @@ class QueryApi(Api):
       return self._query(appid)
 
   def _memory(self, appid, app_type, app_property, app_filters):
-    api = get_impalad_api(user=self.user, url=self.server_url)
-    return api.get_query_memory(query_id=appid);
+    return self.api.get_query_memory(query_id=appid);
 
   def _query(self, appid):
-    api = get_impalad_api(user=self.user, url=self.server_url)
-    return api.get_query(query_id=appid)
+    return self.api.get_query(query_id=appid)
 
   def _query_profile(self, appid):
-    api = get_impalad_api(user=self.user, url=self.server_url)
-    return api.get_query_profile(query_id=appid)
+    return self.api.get_query_profile(query_id=appid)
 
   def _api_status_filter(self, status):
     if status in ['RUNNING', 'CREATED']:
