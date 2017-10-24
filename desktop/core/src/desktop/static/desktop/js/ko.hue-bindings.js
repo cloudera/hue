@@ -4761,8 +4761,7 @@
 
       var sampleErrorInsertSub = huePubSub.subscribe('sample.error.insert.click', function(popoverEntry) {
         var table = popoverEntry.identifierChain[popoverEntry.identifierChain.length - 1]['name'];
-        var text = "SELECT * FROM " + table + " LIMIT 100";
-
+        var text = "SELECT * FROM " + table + " LIMIT 100;";
         insertSqlAtCursor(text, -1);
       });
 
