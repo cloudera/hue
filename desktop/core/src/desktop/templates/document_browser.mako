@@ -129,7 +129,7 @@ from desktop.views import _ko
             </div>
 
             <div class="fileupload fileupload-new" data-provides="fileupload" data-bind="visible: !uploading() && !uploadComplete()">
-              <span class="btn btn-file" style="line-height: 29px">
+              <span class="btn btn-file">
                 <span class="fileupload-new">${ _('Select json file') }</span>
                 <span class="fileupload-exists">${ _('Change') }</span>
                 <input id="importDocumentInput" type="file" name="documents" accept=".json" data-bind="value: selectedImportFile" />
