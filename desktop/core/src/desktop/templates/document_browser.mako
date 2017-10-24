@@ -569,31 +569,33 @@ from desktop.views import _ko
 
       ko.bindingHandlers.docDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
-          var options = valueAccessor();
-          var allEntries = options.entries;
           var $element = $(element);
           var dragToSelect = false;
-          var alreadySelected = false;
-          huePubSub.subscribe('doc.drag.to.select', function (value) {
-            alreadySelected = boundEntry && boundEntry.selected ? boundEntry.selected() : false;
+          var selectSub = huePubSub.subscribe('doc.drag.to.select', function (value) {
             dragToSelect = value;
           });
+
+          var dragData;
+          var dragSub = huePubSub.subscribe('doc.browser.dragging', function (data) {
+            dragData = data;
+          });
+
+          ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+            dragSub.remove();
+            selectSub.remove();
+          });
+
           $element.droppable({
             drop: function (ev, ui) {
-              if (! dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
-                var entriesToMove = $.grep(allEntries(), function (entry) {
-                  return entry.selected() && ! entry.isSharedWithMe();
-                });
-                if (entriesToMove.length > 0) {
-                  boundEntry.moveHere(entriesToMove);
-                  boundEntry.load();
-                }
+              if (!dragToSelect && dragData && !dragData.dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
+                boundEntry.moveHere(dragData.selectedEntries);
+                dragData.originEntry.load();
               }
               $element.removeClass('doc-browser-drop-hover');
             },
             over: function () {
-              if (! dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
-                var movableCount = allEntries().filter(function (entry) {
+              if (!dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
+                var movableCount = dragData.selectedEntries.filter(function (entry) {
                   return entry.selected() && ! entry.isSharedWithMe();
                 }).length;
                 if (movableCount > 0) {
@@ -602,7 +604,7 @@ from desktop.views import _ko
               }
             },
             out: function (event, ui) {
-              if (! dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
+              if (!dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
                 $element.removeClass('doc-browser-drop-hover');
               }
             }
