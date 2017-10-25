@@ -529,14 +529,20 @@ from metadata.conf import has_optimizer, OPTIMIZER
       hueAnalytics.convert('hue', 'pageReloaded' + window.location.pathname);
     }
 
-    huePubSub.subscribe('table.row.dblclick', function(data){
+    huePubSub.subscribe('table.row.dblclick', function (data) {
       var $el = $(data.table);
       var $t = $('#rowDetailsModal').find('table');
       $t.html('');
       var html = '';
       $el.find('thead th').each(function (colIdx, col) {
         if (colIdx > 0) {
-          var value = $el.data('data')[data.idx][colIdx];
+          var value = '';
+          if ($el.hasClass('old-datatable')) {
+            value = $el.dataTable().fnGetData(data.idx, colIdx);
+          }
+          else {
+            value = $el.data('data')[data.idx][colIdx];
+          }
           var link = typeof value == 'string' && value.match(/^https?:\/\//i) ? '<a href="' + escapeOutput(value) + '" target="_blank">' + value + ' <i class="fa fa-external-link"></i></a>' : value;
           html += '<tr><th width="10%">' + $(col).text() + '</th><td>' + link + '</td></tr>';
         }
