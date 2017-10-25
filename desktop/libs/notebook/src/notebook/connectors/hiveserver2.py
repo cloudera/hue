@@ -347,7 +347,13 @@ class HS2Api(Api):
       db = self._get_db(snippet)
 
       handle = self._get_handle(snippet)
-      db.close_operation(handle)
+      try:
+        db.close_operation(handle)
+      except Exception, e:
+        if 'no valid handle' in str(e):
+          return {'status': -1}  # skipped
+        else:
+          raise e
       return {'status': 0}
     else:
       return {'status': -1}  # skipped
