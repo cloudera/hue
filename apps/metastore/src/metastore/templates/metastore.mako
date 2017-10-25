@@ -136,13 +136,10 @@ ${ components.menubar(is_embeddable) }
           <td><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
           <td title="${ _("Scroll to the column") }">
             <!-- ko if: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
-            <span data-bind="text: name"></span>
-            <!-- ko if: typeof primary_key !== 'undefined' && primary_key() == 'true' -->
-              <i class="fa fa-key"></i>
-            <!-- /ko -->
+            <span data-bind="text: name"></span> <i class="fa fa-key" data-bind="visible: typeof primary_key !== 'undefined' && primary_key() == 'true'"></i>
             <!-- /ko -->
             <!-- ko ifnot: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
-            <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: scrollToColumn"></a>
+            <a href="javascript:void(0)" class="column-selector" data-bind="click: scrollToColumn"><span data-bind="text: name"></span> <i class="fa fa-key" data-bind="visible: typeof primary_key !== 'undefined' && primary_key() == 'true'"></i></a>
             <!-- /ko -->
           </td>
           <td data-bind="text: type"></td>
