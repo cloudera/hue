@@ -5209,7 +5209,8 @@
         if ($.fn.niceScroll && withNiceScroll) {
           hueUtils.initNiceScroll($container, {
             horizrailenabled: false,
-            nativeparentscrolling: false
+            nativeparentscrolling: false,
+            enablescrollonselection: false // foreachVisible might dispose of elements on scroll
           });
         }
       } else {
