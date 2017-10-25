@@ -483,7 +483,7 @@ ${ assist.assistPanel() }
 
     <!-- ko if: copyFields() && copyFields().length > 0 -->
     <h4>${ _('Copy Fields') }</h4>
-    <table class="table table-condensed table-nowrap sample-table">
+    <table class="table table-condensed table-nowrap sample-table old-datatable">
       <thead>
         <tr>
           <th>${ _('Destination') }</th>
@@ -514,7 +514,7 @@ ${ assist.assistPanel() }
 
   <!-- ko ifnot: $root.index().loadingSample -->
   <!-- ko if: $root.index().fields().length != 0 -->
-  <table class="table table-condensed table-nowrap sample-table">
+  <table class="table table-condensed table-nowrap sample-table old-datatable">
     <thead>
       <tr>
         <th style="width: 1%">&nbsp;</th>
@@ -538,7 +538,7 @@ ${ assist.assistPanel() }
 
   ## Schemaless collections
   <!-- ko if: $root.index().fields().length == 0 && $data.length > 0 -->
-  <table class="table table-condensed table-nowrap sample-table">
+  <table class="table table-condensed table-nowrap sample-table old-datatable">
     <thead>
       <tr>
         <th style="width: 1%">&nbsp;</th>
