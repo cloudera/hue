@@ -34,6 +34,8 @@ from dashboard.dashboard_api import get_engine
 
 LOG = logging.getLogger(__name__)
 
+NESTED_FACET_FORM = {'field': '', 'mincount': 1, 'limit': 5, 'sort': 'desc', 'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}}
+
 
 class Collection2(object):
 

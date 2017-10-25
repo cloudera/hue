@@ -698,7 +698,7 @@ var Collection = function (vm, collection) {
     }
   }
 
-  self._addObservablesToFacet = function(facet, vm) {
+  self._addObservablesToFacet = function(facet, vm) { console.log(facet.properties.facets_form.aggregate);
     if (facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
       facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
         var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
