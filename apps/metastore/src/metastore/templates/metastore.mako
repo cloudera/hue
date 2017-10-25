@@ -254,7 +254,7 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-samples-table">
-  <table class="table table-condensed table-nowrap sample-table">
+  <table class="table table-condensed table-nowrap sample-table old-datatable">
     <thead>
       <tr>
         <th style="width: 1%">&nbsp;</th>
