@@ -693,11 +693,13 @@ from desktop.views import _ko
                 allRows.each(function (idx, row) {
                   var boundingRect = row.getBoundingClientRect();
                   var boundObject = ko.dataFor(row);
-                  if ((dragStartY <= boundingRect.top && event.clientY >= boundingRect.top) ||
-                      (event.clientY <= boundingRect.bottom && dragStartY >= boundingRect.bottom)) {
-                    boundObject.selected(true);
-                  } else if (!boundObject.alreadySelected) {
-                    boundObject.selected(false);
+                  if (boundObject) {
+                    if ((dragStartY <= boundingRect.top && event.clientY >= boundingRect.top) ||
+                        (event.clientY <= boundingRect.bottom && dragStartY >= boundingRect.bottom)) {
+                      boundObject.selected(true);
+                    } else if (!boundObject.alreadySelected) {
+                      boundObject.selected(false);
+                    }
                   }
                 });
                 $('.doc-browser-drag-select').css({
