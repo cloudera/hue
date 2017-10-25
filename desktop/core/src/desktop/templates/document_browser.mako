@@ -375,6 +375,10 @@ from desktop.views import _ko
                           </a>
                         </li>
                       % endif
+                      <li class="divider"></li>
+                      <li data-bind="css: { 'disabled': isTrash() || isTrashed() || !canModify() }">
+                        <a href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }"><svg class="hi hi-fw"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
+                      </li>
                     </ul>
                   </span>
                 </div>
@@ -421,11 +425,8 @@ from desktop.views import _ko
                     <li data-bind="css: { 'disabled': isTrash() || isTrashed() }">
                       <a href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i> ${_('Import')}</a>
                     </li>
-                    <li class="divider"></li>
-                    <li data-bind="css: { 'disabled': isTrash() || isTrashed() || !canModify() }">
-                      <a href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }"><svg class="hi hi-fw"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
-                    </li>
                     <!-- ko if: isTrash() || isTrashed() -->
+                    <li class="divider"></li>
                     <li>
                       <a href="javascript:void(0);" data-bind="click: emptyTrash"><i class="fa fa-fw fa-times"></i> ${ _('Empty trash') }</a>
                     </li>
