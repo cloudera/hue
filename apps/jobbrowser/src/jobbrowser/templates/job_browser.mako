@@ -928,7 +928,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="tab-content">
         <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan" data-bind="impalaDagre: properties.plan() && properties.plan().plan_json">
-          <svg style="border: 1px solid darkgray;width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
+          <svg class="query-plan" style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
             <g/>
           </svg>
         </div>
