@@ -109,7 +109,12 @@ class ConcurrentUserSessionMiddleware(object):
   Middleware that remove concurrent user sessions when configured
   """
   def process_response(self, request, response):
-    if request.user.is_authenticated() and request.session.modified and request.user.id:
+    try:
+      user = request.user
+    except AttributeError: # When the request does not store user. We care only about the login request which does store the user.
+      return response
+
+    if request.user.is_authenticated() and request.session.modified and request.user.id: # request.session.modified checks if a user just logged in
       limit = SESSION.CONCURRENT_USER_SESSION_LIMIT.get()
       if limit:
         count = 1;
