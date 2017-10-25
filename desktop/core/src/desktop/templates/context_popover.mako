@@ -1847,10 +1847,10 @@ from metadata.conf import has_navigator
             <!-- /ko -->
             <td style="overflow: hidden;">
               <!-- ko if: $parent.scrollToColumns -->
-              <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: function() { huePubSub.publish('context.popover.scroll.to.column', name); }" title="${ _("Show sample") }"></a>
+              <a href="javascript:void(0)" class="column-selector" data-bind="click: function() { huePubSub.publish('context.popover.scroll.to.column', name); }" title="${ _("Show sample") }"><span data-bind="text: name"></span> <i class="fa fa-key" data-bind="visible: typeof primary_key !== 'undefined' && primary_key === 'true'"></i></a>
               <!-- /ko -->
               <!-- ko ifnot: $parent.scrollToColumns -->
-              <span data-bind="text: name"></span>
+              <span data-bind="text: name"></span> <i class="fa fa-key" data-bind="visible: typeof primary_key !== 'undefined' && primary_key === 'true'"></i>
               <!-- /ko -->
             </td>
             <!-- ko if: typeof table !== 'undefined' -->
