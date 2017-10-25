@@ -46,12 +46,8 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
-<script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
-<script src="${ static('desktop/ext/js/wysihtml5-0.3.0.min.js') }"></script>
-<script src="${ static('desktop/js/bootstrap-wysihtml5-0.0.2.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-editable.wysihtml5.js') }"></script>
-<script src="${ static('beeswax/js/stats.utils.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
 
 ${ assist.assistJSModels() }
 
@@ -69,6 +65,11 @@ ${ assist.assistJSModels() }
 
 ${ assist.assistPanel() }
 % endif
+
+<script src="${ static('desktop/ext/js/wysihtml5-0.3.0.min.js') }"></script>
+<script src="${ static('desktop/js/bootstrap-wysihtml5-0.0.2.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.wysihtml5.js') }"></script>
+<script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
@@ -158,7 +159,7 @@ ${ components.menubar(is_embeddable) }
             % if has_write_access:
               <div class="show-inactive-on-hover">
               <a class="inactive-action pointer toggle-editable" title="${ _('Edit the comment') }"><i class="fa fa-pencil"></i></a>
-              <span data-bind="editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', skipNewLines: true, toggleElement: '.toggle-editable', placement: 'left', placeholder: '${ _ko('Add a comment...') }', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}">
+              <span data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'wysihtml5', toggle: 'manual', skipNewLines: true, toggleElement: '.toggle-editable', placement: 'left', placeholder: '${ _ko('Add a comment...') }', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}">
                 ${ _('Add a comment...') }</span>
               </div>
             % else:
@@ -876,7 +877,7 @@ ${ components.menubar(is_embeddable) }
   <div class="show-inactive-on-hover">
     <a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a>
     <div data-bind="toggleOverflow: {height: 24}">
-      <div data-bind="editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block margin-left-5">
+      <div data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'wysihtml5', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block margin-left-5">
         ${ _('Add a description...') }
       </div>
     </div>

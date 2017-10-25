@@ -432,7 +432,7 @@ var MetastoreTable = (function () {
     self.loadingQueries = ko.observable(true);
 
     //TODO: Fetch table comment async and don't set it from python
-    self.comment = ko.observable(options.comment);
+    self.comment = ko.observable(options.comment ? options.comment.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') : null);
     self.commentWithoutNewLines = ko.pureComputed(function(){
       return self.comment() ? self.comment().replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') : '';
     });
@@ -708,6 +708,9 @@ var MetastoreColumn = (function () {
   function MetastoreColumn(options) {
     var self = this;
     self.table = options.table;
+    if (options.extendedColumn && options.extendedColumn.comment) {
+      options.extendedColumn.comment = options.extendedColumn.comment.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    }
     ko.mapping.fromJS(options.extendedColumn, {}, self);
 
     self.favourite = ko.observable(false);
