@@ -2494,7 +2494,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       $.ajaxSetup({
         error:function (x, e) {
           if (x.status == 500 && x.responseText.indexOf("jobbrowser") == -1) {
-            $(document).trigger("error", "${_('There was a problem with your request.')}");
+            if (x.responseJSON && x.responseJSON.detail) {
+              $(document).trigger("error", x.responseJSON.detail);
+            }
+            else {
+              $(document).trigger("error", "${_('There was a problem with your request.')}");
+            }
             $("#hueBreadcrumbText").blur();
           }
         }
