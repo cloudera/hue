@@ -1712,11 +1712,11 @@ var EditorViewModel = (function() {
         if (data.status == 0) {
           // self.status('closed'); // Keep as 'running' as currently it happens before running a new query
         } else {
-          self._ajaxError(data);
+          // self._ajaxError(data);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         if (xhr.status !== 502) {
-          $(document).trigger("error", xhr.responseText);
+          // $(document).trigger("error", xhr.responseText);
         }
         self.status('failed');
       });
