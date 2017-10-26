@@ -236,17 +236,16 @@ var SqlParseSupport = (function () {
           }
         }
       }
-      if (SqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
+      if (typeof SqlFunctions === 'undefined' || SqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
         keywords = keywords.concat(['AND', 'OR']);
       }
-      if (SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
+      if (typeof SqlFunctions === 'undefined' || SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
         keywords = keywords.concat(['+', '-', '*', '/', '%', 'DIV']);
       }
-      if (SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
+      if (typeof SqlFunctions === 'undefined' || SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
         keywords = keywords.concat(parser.isImpala() ? ['ILIKE', 'IREGEXP', 'LIKE', 'NOT LIKE', 'REGEXP', 'RLIKE'] : ['LIKE', 'NOT LIKE', 'REGEXP', 'RLIKE']);
-
       }
-      return {suggestKeywords: keywords};
+      return { suggestKeywords: keywords };
     };
 
     parser.getTypeKeywords = function () {
@@ -358,11 +357,11 @@ var SqlParseSupport = (function () {
     };
 
     parser.findReturnTypes = function (functionName) {
-      return SqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
+      return typeof SqlFunctions === 'undefined' ? ['T'] : SqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
     };
 
     parser.applyArgumentTypesToSuggestions = function (functionName, position) {
-      var foundArguments = SqlFunctions.getArgumentTypes(parser.yy.activeDialect, functionName.toLowerCase(), position);
+      var foundArguments = typeof SqlFunctions === 'undefined' ? ['T'] : SqlFunctions.getArgumentTypes(parser.yy.activeDialect, functionName.toLowerCase(), position);
       if (foundArguments.length == 0 && parser.yy.result.suggestColumns) {
         delete parser.yy.result.suggestColumns;
         delete parser.yy.result.suggestKeyValues;
@@ -943,7 +942,7 @@ var SqlParseSupport = (function () {
         }
       }
       parser.yy.result.suggestColumns.tables = tables;
-      if (parser.yy.result.suggestColumns.identifierChain && parser.yy.result.suggestColumns.identifierChain.length == 0) {
+      if (parser.yy.result.suggestColumns.identifierChain && parser.yy.result.suggestColumns.identifierChain.length === 0) {
         delete parser.yy.result.suggestColumns.identifierChain;
       }
       parser.yy.result.suggestColumns.linked = true;
@@ -983,7 +982,7 @@ var SqlParseSupport = (function () {
             convertTablePrimariesToSuggestions(tablePrimaries);
           } else {
             suggestLateralViewAliasesAsIdentifiers();
-            if (tablePrimaries.length == 1 && (tablePrimaries[0].alias || tablePrimaries[0].subQueryAlias)) {
+            if (tablePrimaries.length === 1 && (tablePrimaries[0].alias || tablePrimaries[0].subQueryAlias)) {
               convertTablePrimariesToSuggestions(tablePrimaries);
             }
             parser.expandIdentifierChain(parser.yy.result.suggestColumns, false, true);
