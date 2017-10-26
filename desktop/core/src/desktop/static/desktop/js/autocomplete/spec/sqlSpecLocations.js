@@ -35,6 +35,22 @@
       });
     };
 
+    it('should report locations for "select cos(1) as foo from customers order by foo;"', function () {
+      assertLocations({
+        beforeCursor: 'select cos(1) as foo from customers order by foo; ',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 49 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 21 } },
+          { type: 'function', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, function: 'cos' },
+          { type: 'alias', source: 'column', alias: 'foo', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 }, parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 } },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 27, last_column: 36 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 36, last_column: 36 } },
+          { type: 'alias', location: { first_line: 1, last_line: 1, first_column: 46, last_column: 49 }, alias: 'foo', source: 'column', parentLocation: { first_line: 1, last_line: 1, first_column: 8, last_column: 14 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 49, last_column: 49 } }
+        ]
+      });
+    });
+
     it('should report locations for "SELECT * FROM tbl WHERE tbl.mp[\'key\'].bla;"', function () {
       assertLocations({
         beforeCursor: 'SELECT * FROM tbl WHERE tbl.mp[\'key\'].bla; ',
@@ -839,7 +855,7 @@
             { type: 'limitClause', subquery: true, missing: true, location: { first_line: 1, last_line: 1, first_column: 241, last_column: 241 }},
             { type: 'alias', source: 'subquery', alias: 'tmp', location: { first_line: 1, last_line: 1, first_column: 243, last_column: 246 } },
             { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 246, last_column: 246 }},
-            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 256, last_column: 257 }, identifierChain: [{ name: 'r' }], tables: [{ subQuery: 'tmp' }], qualified: false },
+            { type: 'alias', location: { first_line: 1, last_line: 1, first_column: 256, last_column: 257 }, alias: 'r', source: 'column', parentLocation: { first_line: 1, last_line: 1, first_column: 16, last_column: 31 } },
             { type: 'limitClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 263, last_column: 271 }}
           ]
         });
