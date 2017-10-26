@@ -16,6 +16,19 @@
 
 var SqlParseSupport = (function () {
 
+  // endsWith polyfill from hue_utils.js, needed as workers live in their own js environment
+  if (!String.prototype.endsWith) {
+    String.prototype.endsWith = function (searchString, position) {
+      var subjectString = this.toString();
+      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+        position = subjectString.length;
+      }
+      position -= searchString.length;
+      var lastIndex = subjectString.lastIndexOf(searchString, position);
+      return lastIndex !== -1 && lastIndex === position;
+    };
+  }
+
   /**
    * Calculates the Optimal String Alignment distance between two strings. Returns 0 when the strings are equal and the
    * distance when not, distances is less than or equal to the length of the longest string.
