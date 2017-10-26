@@ -71,7 +71,7 @@ class QueryApi(Api):
         'waiting': job['waiting'],
         'waiting_time': job['waiting_time']
       } for job in jobs_iter_filtered],
-      'total': jobs['num_in_flight_queries'] + jobs['num_executing_queries'] + jobs['num_waiting_queries']
+      'total': len(jobs['in_flight_queries']) + len(jobs['completed_queries'])
     }
 
   def _time_in_ms_groups(self, groups):
