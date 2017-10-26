@@ -1910,6 +1910,7 @@ var SqlParseSupport = (function () {
           return a.distance - b.distance
         });
         parser.yy.error.expected = weightedExpected;
+        parser.yy.error.incompleteStatement = true;
         return parser.yy.error;
       } else if (parser.yy.error) {
         parser.yy.error.expected = [];
