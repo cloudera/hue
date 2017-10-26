@@ -213,7 +213,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView && !navigationSettings.rightAssist, 'fa-table': definition.isTable && !navigationSettings.rightAssist }"></i>
         <span class="highlightable" data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </a>
-      <div class="center" data-bind="visible: loading() && open()"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
+      <div class="center assist-spinner" data-bind="visible: loading() && open()"><i class="fa fa-spinner fa-spin"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
   </script>
@@ -233,7 +233,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key === 'true'  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
-      <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
+      <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
   </script>
