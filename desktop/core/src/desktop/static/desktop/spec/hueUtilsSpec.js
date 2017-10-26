@@ -60,5 +60,9 @@
       hueUtils.changeURL('/jasmine');
     });
 
+    it("should remove JS code from a string", function() {
+      expect(hueUtils.deXSS('hello <script>alert(123)</script>world')).toEqual('hello world');
+    });
+
   });
 })();

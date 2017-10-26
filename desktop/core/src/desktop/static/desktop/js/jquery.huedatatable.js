@@ -384,7 +384,7 @@
             if ($t.data('fnDraws') === 0) {
               var html = '';
               for (var i = 0; i < data.length; i++) {
-                html += '<tr class="ht-visible-row ht-visible-row-' + i + '" style="height: 32px"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+                html += '<tr class="ht-visible-row ht-visible-row-' + i + '" style="height: 32px"><td>' + hueUtils.deXSS(data[i][0]) + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
               }
               appendable.html(html);
               if ($t.data('plugin_jHueTableExtender')) {
@@ -398,7 +398,7 @@
               if (force) {
                 var html = '';
                 for (var i = $t.find('.ht-visible-row').length; i < data.length; i++) {
-                  html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+                  html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + hueUtils.deXSS(data[i][0]) + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
                 }
                 appendable.html(appendable.html() + html);
               }
@@ -410,7 +410,7 @@
                 var row = data[i];
                 if (row) {
                   for (var j = 0; j < endCol; j++) {
-                    html += '<td ' + (!aoColumns[j].bVisible ? 'style="display: none"' : '') + '>' + row[j] + '</td>';
+                    html += '<td ' + (!aoColumns[j].bVisible ? 'style="display: none"' : '') + '>' + hueUtils.deXSS(row[j]) + '</td>';
                   }
 
                   if (endCol < aoColumns.length) {
@@ -419,7 +419,7 @@
                 }
               }
               else {
-                html = '<td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td>';
+                html = '<td>' + hueUtils.deXSS(data[i][0]) + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td>';
               }
               appendable.children().eq(i).html(html);
             }
