@@ -36,8 +36,28 @@
       expect(result.incompleteStatement).toBeTruthy();
     });
 
-    it('should not report incomplete statement for "SELECT "', function () {
+    it('should report incomplete statement for "SELECT "', function () {
       var result = sqlSyntaxParser.parseSyntax('SELECT ', '');
+      expect(result.incompleteStatement).toBeTruthy();
+    });
+
+    it('should not report incomplete statement for "SELECT * FROM tbl"', function () {
+      var result = sqlSyntaxParser.parseSyntax('SELECT * FROM tbl', '');
+      expect(result.incompleteStatement).toBeFalsy();
+    });
+
+    it('should not report incomplete statement for "SELECT * FROM tbl LIMIT 1"', function () {
+      var result = sqlSyntaxParser.parseSyntax('SELECT * FROM tbl LIMIT 1', '');
+      expect(result.incompleteStatement).toBeFalsy();
+    });
+
+    it('should report incomplete statement for "SELECT * FROM tbl LIMIT "', function () {
+      var result = sqlSyntaxParser.parseSyntax('SELECT * FROM tbl LIMIT ', '');
+      expect(result.incompleteStatement).toBeTruthy();
+    });
+
+    it('should report incomplete statement for "SELECT * FROM tbl GROUP"', function () {
+      var result = sqlSyntaxParser.parseSyntax('SELECT * FROM tbl GROUP', '');
       expect(result.incompleteStatement).toBeTruthy();
     });
 
