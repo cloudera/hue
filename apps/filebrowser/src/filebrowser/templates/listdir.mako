@@ -66,7 +66,8 @@ ${ fb_components.menubar() }
               ${_('Rename')}</a></li>
               <li><a href="javascript: void(0)" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-              <li><a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 &&
+              <li data-bind="css: {'disabled': $root.selectedFiles().length == 0 || isCurrentDirSelected().length > 0}">
+              <a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: ($root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0) ? $root.copy: void(0), enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
               % if show_download_button:
               <li>
