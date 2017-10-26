@@ -69,6 +69,23 @@
     return result;
   };
 
+  // we override the default html binding to prevent XSS/JS injection
+  var originalHtmlBinding = ko.bindingHandlers.html;
+  ko.bindingHandlers.html = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var newValueAccessor = function () {
+        return hueUtils.deXSS(ko.unwrap(valueAccessor()));
+      };
+      originalHtmlBinding.init(element, newValueAccessor, allBindings, viewModel, bindingContext);
+    },
+    update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var newValueAccessor = function () {
+        return hueUtils.deXSS(ko.unwrap(valueAccessor()));
+      };
+      originalHtmlBinding.update(element, newValueAccessor, allBindings, viewModel, bindingContext);
+    },
+  };
+
   ko.observableDefault = function () {
     var prop = arguments[0], defvalue = arguments[1] || null;
     return ko.observable(typeof prop != "undefined" && prop != null ? prop : defvalue);
