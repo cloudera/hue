@@ -486,7 +486,7 @@
       var tHtml = '';
       var aoColumns = self.$element.data('aoColumns');
       self.$element.data('data')[rowNo - 1].forEach(function(col, idx){
-        tHtml += '<td ' + (aoColumns && !aoColumns[idx].bVisible ? 'style="display: none"' : '') + '>' + col + '</td>';
+        tHtml += '<td ' + (aoColumns && !aoColumns[idx].bVisible ? 'style="display: none"' : '') + '>' + hueUtils.deXSS(col) + '</td>';
       });
       $clone.html(tHtml);
       $clone.appendTo(self.headerRowContainer.find('tbody'));
