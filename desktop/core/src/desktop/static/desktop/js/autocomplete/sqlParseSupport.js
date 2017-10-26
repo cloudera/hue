@@ -460,6 +460,22 @@ var SqlParseSupport = (function () {
         if (location.type === 'unknown') {
           location.type = 'column';
         }
+
+        // A column location might refer to a previously defined alias, i.e. last 'foo' in "SELECT cast(id AS int) foo FROM tbl ORDER BY foo;"
+        if (location.type === 'column') {
+          for (var j = i - 1; j >= 0; j--) {
+            var otherLocation = parser.yy.locations[j];
+            if (otherLocation.type === 'alias' && otherLocation.source === 'column' && location.identifierChain && location.identifierChain.length === 1 && location.identifierChain[0].name && otherLocation.alias && location.identifierChain[0].name.toLowerCase() === otherLocation.alias.toLowerCase()) {
+              location.type = 'alias';
+              location.source = 'column';
+              location.alias = location.identifierChain[0].name;
+              delete location.identifierChain;
+              location.parentLocation = otherLocation.parentLocation;
+              break;
+            }
+          }
+        }
+
         if (location.type === 'column') {
           if (parser.isHive() && !location.linked) {
             location.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, location.identifierChain);
