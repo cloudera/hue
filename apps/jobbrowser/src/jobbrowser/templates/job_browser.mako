@@ -2294,7 +2294,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             while ((self.apps().length == 0 || i < self.apps().length) && j < data.apps.length) { // Nothing displayed or compare existing
               if (self.apps().length == 0 || self.apps()[i].id() != data.apps[j].id) {
                 // New Job
-                newJobs.push(new Job(vm, data.apps[j]));
+                newJobs.unshift(new Job(vm, data.apps[j]));
                 j++;
               } else {
                 // Updated jobs
