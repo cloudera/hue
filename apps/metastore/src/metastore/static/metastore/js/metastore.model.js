@@ -432,9 +432,9 @@ var MetastoreTable = (function () {
     self.loadingQueries = ko.observable(true);
 
     //TODO: Fetch table comment async and don't set it from python
-    self.comment = ko.observable(options.comment ? options.comment.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') : null);
+    self.comment = ko.observable(hueUtils.deXSS(options.comment));
     self.commentWithoutNewLines = ko.pureComputed(function(){
-      return self.comment() ? self.comment().replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') : '';
+      return self.comment() ? hueUtils.deXSS(self.comment().replace(/<br\s*[\/]?>/gi, ' ')) : '';
     });
 
     self.comment.subscribe(function (newValue) {
@@ -709,7 +709,7 @@ var MetastoreColumn = (function () {
     var self = this;
     self.table = options.table;
     if (options.extendedColumn && options.extendedColumn.comment) {
-      options.extendedColumn.comment = options.extendedColumn.comment.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+      options.extendedColumn.comment = hueUtils.deXSS(options.extendedColumn.comment);
     }
     ko.mapping.fromJS(options.extendedColumn, {}, self);
 

@@ -366,6 +366,13 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     return a && b && a.toLowerCase() === b.toLowerCase();
   };
 
+  hueUtils.deXSS = function (str) {
+    if (typeof str !== 'undefined' && str !== null && typeof str === 'string') {
+      return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    }
+    return str;
+  }
+
 }(hueUtils = window.hueUtils || {}));
 
 if (!Object.keys) {

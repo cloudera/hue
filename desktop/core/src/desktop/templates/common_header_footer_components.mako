@@ -505,7 +505,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       var html = '';
       $el.find('thead th').each(function (colIdx, col) {
         if (colIdx > 0){
-          html += '<tr><th width="10%">' + $(col).text() + '</th><td>' + $el.data('data')[data.idx][colIdx] + '</td></tr>';
+          html += '<tr><th width="10%">' + hueUtils.deXSS($(col).text()) + '</th><td>' + hueUtils.deXSS($el.data('data')[data.idx][colIdx]) + '</td></tr>';
         }
       });
       $t.html(html);
