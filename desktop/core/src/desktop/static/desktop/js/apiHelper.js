@@ -1448,6 +1448,7 @@ var ApiHelper = (function () {
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    * @param {Number} [options.timeout]
+   * @param {boolean} [options.cachedOnly] - Default false
    * @param {Object} [options.editor] - Ace editor
    *
    * @param {string} options.databaseName
@@ -1469,7 +1470,7 @@ var ApiHelper = (function () {
     return typeof self.lastKnownDatabases[sourceType] !== 'undefined' && self.lastKnownDatabases[sourceType].indexOf(databaseName.toLowerCase()) > -1;
   };
 
-  ApiHelper.prototype.expandComplexIdentifierChain = function (sourceType, database, identifierChain, successCallback, errorCallback) {
+  ApiHelper.prototype.expandComplexIdentifierChain = function (sourceType, database, identifierChain, successCallback, errorCallback, cachedOnly) {
     var self = this;
 
     var fetchFieldsInternal =  function (table, database, identifierChain, callback, errorCallback, fetchedFields) {
@@ -1494,6 +1495,7 @@ var ApiHelper = (function () {
         tableName: table,
         fields: fetchedFields,
         timeout: self.timeout,
+        cachedOnly: cachedOnly,
         successCallback: function (data) {
           if (sourceType === 'hive'
               && typeof data.extended_columns !== 'undefined'
@@ -1536,6 +1538,7 @@ var ApiHelper = (function () {
    * @param {Object[]} options.identifierChain
    * @param {string} options.identifierChain.name
    * @param {string} options.defaultDatabase
+   * @param {boolean} [options.cachedOnly] - Default false
    *
    * @param {function} successCallback
    */
@@ -1552,7 +1555,7 @@ var ApiHelper = (function () {
     if (identifierChainClone.length > 1) {
       self.expandComplexIdentifierChain(options.sourceType, path[0], identifierChainClone, function (fetchedFields) {
         successCallback(path.concat(fetchedFields))
-      }, options.errorCallback);
+      }, options.errorCallback, options.cachedOnly);
     } else {
       successCallback(path.concat($.map(identifierChainClone, function (identifier) { return identifier.name })))
     }
@@ -1567,6 +1570,7 @@ var ApiHelper = (function () {
    * @param {boolean} [options.silenceErrors]
    * @param {Number} [options.timeout]
    * @param {Object} [options.editor] - Ace editor
+   * @param {boolean} [options.cachedOnly] - Default false
    *
    * @param {Object[]} options.identifierChain
    * @param {string} options.identifierChain.name
@@ -2081,6 +2085,7 @@ var ApiHelper = (function () {
    * @param {Function} options.errorCallback
    * @param {string} [options.cacheType] - Possible values 'default', 'optimizer'. Default value 'default'
    * @param {Number} [options.timeout]
+   * @param {boolean} [options.cachedOnly] - Default false
    * @param {Object} [options.editor] - Ace editor
    */
   var fetchAssistData = function (options) {
@@ -2097,6 +2102,12 @@ var ApiHelper = (function () {
         options.successCallback(cachedData[options.url].data);
         return;
       }
+    }
+    if (options.cachedOnly) {
+      if (options.errorCallback) {
+        options.errorCallback(false);
+      }
+      return;
     }
     if (typeof options.editor !== 'undefined' && options.editor !== null) {
       options.editor.showSpinner();

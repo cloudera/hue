@@ -4401,12 +4401,42 @@
                     var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
 
                     var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
+                    var colType;
+                    if (token.parseLocation.type === 'column') {
+                      var tableChain = token.parseLocation.identifierChain.concat();
+                      var lastIdentifier = tableChain.pop();
+                      if (tableChain.length > 0 && lastIdentifier && lastIdentifier.name) {
+                        var colName = lastIdentifier.name.toLowerCase();
+                        // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
+                        ApiHelper.getInstance().fetchAutocomplete({
+                          sourceType: snippet.type(),
+                          defaultDatabase: snippet.database(),
+                          identifierChain: tableChain,
+                          cachedOnly: true,
+                          successCallback: function (details) {
+                            if (details && details.extended_columns) {
+                              details.extended_columns.every(function (col) {
+                                if (col.name.toLowerCase() === colName) {
+                                  colType = col.type;
+                                  return false;
+                                }
+                                return true;
+                              })
+                            }
+                          },
+                          silenceErrors: true
+                        })
+                      }
+                    }
                     if (token.parseLocation.identifierChain) {
-                      tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) {
+                      tooltipText += ' - ' + $.map(token.parseLocation.identifierChain, function (identifier) {
                           return identifier.name
-                        }).join('.') + ')';
+                        }).join('.');
+                      if (colType) {
+                        tooltipText += ' (' + colType + ')';
+                      }
                     } else if (token.parseLocation.function) {
-                      tooltipText += ' (' + token.parseLocation.function + ')';
+                      tooltipText += ' - ' + token.parseLocation.function;
                     }
                     contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                   }
