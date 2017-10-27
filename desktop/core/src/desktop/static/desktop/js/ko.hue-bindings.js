@@ -4421,7 +4421,7 @@
                             if (details && details.extended_columns) {
                               details.extended_columns.every(function (col) {
                                 if (col.name.toLowerCase() === colName) {
-                                  colType = col.type;
+                                  colType = col.type.match(/^[^<]*/g)[0];
                                   return false;
                                 }
                                 return true;
