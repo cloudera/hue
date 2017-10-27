@@ -899,7 +899,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <ul class="nav nav-pills margin-top-20">
         <li>
-          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { fetchProfile('plan'); } }">
+          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan().plan) { fetchProfile('plan'); } } }">
             ${ _('Plan') }</a>
         </li>
         <li>
@@ -915,11 +915,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             ${ _('Summary') }</a>
         </li>
         <li>
-          <a href="#queries-page-profile${ SUFFIX }" data-bind="click: function(){ fetchProfile('profile'); $('a[href=\'#queries-page-profile${ SUFFIX }\']').tab('show'); }">
+          <a href="#queries-page-profile${ SUFFIX }" data-bind="click: function(){ if (!properties.profile || !properties.profile().profile) { fetchProfile('profile'); } $('a[href=\'#queries-page-profile${ SUFFIX }\']').tab('show'); }">
             ${ _('Profile') }</a>
         </li>
         <li>
-          <a href="#queries-page-memory${ SUFFIX }" data-bind="click: function(){ fetchProfile('memory'); $('a[href=\'#queries-page-memory${ SUFFIX }\']').tab('show'); }">
+          <a href="#queries-page-memory${ SUFFIX }" data-bind="click: function(){ if (!properties.memory || !properties.memory().mem_usage) { fetchProfile('memory'); } $('a[href=\'#queries-page-memory${ SUFFIX }\']').tab('show'); }">
             ${ _('Memory') }</a>
         </li>
       </ul>
