@@ -22,6 +22,7 @@ import re
 
 from itertools import islice
 
+from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
@@ -40,29 +41,30 @@ from metadata.metadata_sites import get_navigator_hue_server_name
 LOG = logging.getLogger(__name__)
 VERSION = 'v9'
 _JSON_CONTENT_TYPE = 'application/json'
-CLUSTER_SOURCE_IDS = None
+CLUSTER_SOURCE_IDS_CACHE_KEY = 'nav-cluster-source-ids-id'
 
 
 def get_cluster_source_ids(api):
   '''
   ClusterName is handled by getting the list of sourceIds of a Cluster. We can't filter directly on a clusterName.
   '''
-  global CLUSTER_SOURCE_IDS
+  cluster_source_ids = cache.get(CLUSTER_SOURCE_IDS_CACHE_KEY)
 
-  if CLUSTER_SOURCE_IDS is None:
-    CLUSTER_SOURCE_IDS = ''
+  if cluster_source_ids is None:
+    cluster_source_ids = ''
     if get_navigator_hue_server_name():
       sources = api.get_cluster_source_ids()
       LOG.info('Navigator cluster source ids: %s' % (sources,))
       if sources:
         # Sometimes sourceId seems to be missing
         source_ids = ['sourceId:%s' % (_id.get('sourceId') or _id.get('identity')) for _id in sources]
-        CLUSTER_SOURCE_IDS = '(' + ' OR '.join(source_ids) + ') AND '
+        cluster_source_ids = '(' + ' OR '.join(source_ids) + ') AND '
       else:
         # 0 means always false
-        CLUSTER_SOURCE_IDS = 'sourceId:0 AND'
+        cluster_source_ids = 'sourceId:0 AND'
+    cache.set(CLUSTER_SOURCE_IDS_CACHE_KEY, cluster_source_ids, 60 * 60 * 12) # 1/2 Day
 
-  return CLUSTER_SOURCE_IDS
+  return cluster_source_ids
 
 
 def get_filesystem_host():
