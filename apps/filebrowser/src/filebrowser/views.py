@@ -36,7 +36,7 @@ from django.contrib.auth.models import User, Group
 from django.core.paginator import EmptyPage
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
-from django.http import Http404, HttpResponse, HttpResponseNotModified, HttpResponseForbidden
+from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
@@ -75,7 +75,7 @@ from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkD
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
 MAX_CHUNK_SIZE_BYTES = 1024 * 1024 # 1MB
-DOWNLOAD_CHUNK_SIZE = 64 * 1024 * 1024 # 64MB
+DOWNLOAD_CHUNK_SIZE = 1 * 1024 * 1024 # 1MB
 
 # Defaults for "xxd"-style output.
 # Sentences refer to groups of bytes printed together, within a line.
@@ -157,7 +157,7 @@ def download(request, path):
         else:
             raise PopupException(_('Failed to download file at path "%s": %s') % (path, e))
 
-    response = HttpResponse(_file_reader(fh), content_type=content_type)
+    response = StreamingHttpResponse(_file_reader(fh), content_type=content_type)
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
     response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
