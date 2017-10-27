@@ -174,6 +174,11 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
   <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
   <script src="${ static('desktop/js/ace.extended.js') }"></script>
+  <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
+  <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
+  <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
+  <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
+
   <script>
     ace.config.set("basePath", "/static/desktop/js/ace");
   </script>
