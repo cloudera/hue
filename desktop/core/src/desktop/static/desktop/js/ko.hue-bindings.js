@@ -3766,6 +3766,15 @@
       delete token.syntaxError;
 
       if (self.sqlSyntaxWorkerSub !== null && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
+
+        // Ignore identifiers when the cursor is at the end to make it less annoying while editing
+        if (token && token.parseLocation) {
+          var cursorPos = self.editor.getCursorPosition();
+          if (cursorPos.row + 1 === token.parseLocation.location.last_line && cursorPos.column + 1 === token.parseLocation.location.first_column + token.value.length) {
+            return;
+          }
+        }
+
         var aliases = [];
 
         for (var i = 0; i < allLocations.length; i++) {
