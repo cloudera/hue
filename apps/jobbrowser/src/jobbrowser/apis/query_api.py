@@ -183,7 +183,10 @@ class QueryApi(Api):
     return self.api.get_query_memory(query_id=appid);
 
   def _query(self, appid):
-    return self.api.get_query(query_id=appid)
+    query = self.api.get_query(query_id=appid)
+    query['summary'] = query.get('summary').strip()
+    query['plan'] = query.get('plan').strip()
+    return query
 
   def _query_profile(self, appid):
     return self.api.get_query_profile(query_id=appid)
