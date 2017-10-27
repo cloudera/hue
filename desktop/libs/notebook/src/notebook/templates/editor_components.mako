@@ -1007,7 +1007,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <!-- ko with: suggestion() -->
         <!-- ko if: parseError -->
           <!-- ko if: $parent.compatibilityTargetPlatform() == $parent.type() && $parent.compatibilitySourcePlatform() == $parent.type() -->
-            <div class="round-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+            <div class="optimizer-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-exclamation"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
@@ -1016,7 +1016,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <!-- /ko -->
           ## Oracle, MySQL compatibility... as they return a parseError and not encounteredString.
           <!-- ko if: $parent.compatibilityTargetPlatform() != $parent.type() || $parent.type() != $parent.compatibilitySourcePlatform() -->
-            <div class="round-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+            <div class="optimizer-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-exclamation"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
@@ -1026,7 +1026,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- /ko -->
         <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform() != $parent.type() || $parent.compatibilitySourcePlatform() != $parent.type()) -->
           <!-- ko if: queryError.encounteredString().length == 0 -->
-            <div class="round-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+            <div class="optimizer-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-check"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
@@ -1043,7 +1043,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko ifnot: queryError.encounteredString().length == 0 -->
-          <div class="round-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+          <div class="optimizer-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
             <i class="fa fa-exclamation"></i>
           </div>
           <!-- ko if: $parent.showOptimizer -->
@@ -1055,23 +1055,23 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <!-- /ko -->
     <!-- ko if: ! hasSuggestion() && topRisk() -->
       <!-- ko if: topRisk().risk === 'low' -->
-        <div class="round-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some low risks were detected, see the assistant for details.') }">
+        <div class="optimizer-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some low risks were detected, see the assistant for details.') }">
           <i class="fa fa-check"></i>
         </div>
       <!-- /ko -->
       <!-- ko if: topRisk().risk == 'medium' -->
-        <div class="round-icon warning" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some medium risks were detected, see the assistant for details.') }">
+        <div class="optimizer-icon warning" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some medium risks were detected, see the assistant for details.') }">
           <i class="fa fa-exclamation"></i>
         </div>
       <!-- /ko -->
       <!-- ko if: topRisk().risk == 'high' -->
-        <div class="round-icon error" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some high risks were detected, see the assistant for details.') }">
+        <div class="optimizer-icon error" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Some high risks were detected, see the assistant for details.') }">
           <i class="fa fa-exclamation"></i>
         </div>
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: hasSuggestion() == '' && ! topRisk() -->
-      <div class="round-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Query validated, no issues found.') }">
+      <div class="optimizer-icon success" data-bind="click: function () { huePubSub.publish('assist.highlight.risk.suggestions'); }, tooltip: { placement: 'bottom' }" title="${ _('Query validated, no issues found.') }">
         <i class="fa fa-check"></i>
       </div>
     <!-- /ko -->
