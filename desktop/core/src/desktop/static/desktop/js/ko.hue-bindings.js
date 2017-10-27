@@ -3448,39 +3448,10 @@
 
       self.disposeFunctions = [];
 
-      self.attachCursorLocator();
       self.attachStatementLocator();
       self.attachSqlWorker();
       self.attachGutterHandler();
     }
-
-    AceLocationHandler.prototype.attachCursorLocator = function () {
-      var self = this;
-      var changeCursorThrottle = -1;
-      var changeCursorListener = self.editor.selection.on('changeCursor', function () {
-        window.clearTimeout(changeCursorThrottle);
-        changeCursorThrottle = window.setTimeout(function () {
-          huePubSub.publish('editor.active.cursor.location', {
-            id: self.editorId,
-            position: self.editor.getCursorPosition(),
-            editor: self.editor
-          });
-        }, 150);
-      });
-
-      self.disposeFunctions.push(function () {
-        window.clearTimeout(changeCursorThrottle);
-        self.editor.selection.off('changeCursor', changeCursorListener);
-      });
-
-      var cursorLocationSub = huePubSub.subscribe('get.active.editor.cursor.location', function () {
-        huePubSub.publish('editor.active.cursor.location', { id: self.editorId, position: self.editor.getCursorPosition(), editor: self.editor });
-      });
-
-      self.disposeFunctions.push(function () {
-        cursorLocationSub.remove();
-      });
-    };
 
     AceLocationHandler.prototype.attachGutterHandler = function () {
       var self = this;
@@ -3515,23 +3486,44 @@
 
     AceLocationHandler.prototype.attachStatementLocator = function () {
       var self = this;
-
-      var isPointInside = function (parseLocation, acePosition) {
-        var row = acePosition.row + 1; // ace positioning has 0 based rows while the parser has 1
-        var column = acePosition.column;
-        return (parseLocation.first_line < row && row < parseLocation.last_line) ||
-          (parseLocation.first_line === row && row === parseLocation.last_line && parseLocation.first_column <= column && column <= parseLocation.last_column) ||
-          (parseLocation.first_line === row && row < parseLocation.last_line && column >= parseLocation.first_column) ||
-          (parseLocation.first_line < row && row === parseLocation.last_line && column <= parseLocation.last_column);
-      };
-
       var lastKnownStatements = [];
       var activeStatement;
+
+      var isPointInside = function (parseLocation, editorPosition) {
+        var row = editorPosition.row + 1; // ace positioning has 0 based rows while the parser has 1
+        var column = editorPosition.column;
+        return (parseLocation.first_line < row && row < parseLocation.last_line) ||
+          (parseLocation.first_line === row && row === parseLocation.last_line && parseLocation.first_column <= column && column < parseLocation.last_column) ||
+          (parseLocation.first_line === row && row < parseLocation.last_line && column >= parseLocation.first_column) ||
+          (parseLocation.first_line < row && row === parseLocation.last_line && column < parseLocation.last_column);
+      };
+
+      var lastExecutingStatement = null;
       var updateActiveStatement = function (cursorChange) {
-        var cursorPosition = self.editor.getCursorPosition();
+        var selectionRange = self.editor.getSelectionRange();
+        var editorLocation = selectionRange.start;
+        if (selectionRange.start.row !== selectionRange.end.row || selectionRange.start.column !== selectionRange.end.column) {
+          if (!cursorChange && self.snippet.result && self.snippet.result.statement_range()) {
+            var executingStatement = self.snippet.result.statement_range();
+            // Row and col are 0 for both start and end on execute, so if the selection hasn't changed we'll use last known executed statement
+            if (executingStatement.start.row === 0 && executingStatement.start.column === 0 && executingStatement.end.row === 0 && executingStatement.end.column === 0 && lastExecutingStatement) {
+              executingStatement = lastExecutingStatement;
+            }
+            if (executingStatement.start.row === 0) {
+              editorLocation.column += executingStatement.start.column;
+            } else if (executingStatement.start.row !== 0 || executingStatement.start.column !== 0) {
+              editorLocation.row += executingStatement.start.row;
+              editorLocation.column = executingStatement.start.column;
+            }
+            lastExecutingStatement = executingStatement;
+          } else  {
+            lastExecutingStatement = null;
+          }
+        }
+
         if (cursorChange && activeStatement) {
           // Don't update when cursor stays in the same statement
-          if (isPointInside(activeStatement.location, cursorPosition)) {
+          if (isPointInside(activeStatement.location, editorLocation)) {
             return;
           }
         }
@@ -3541,21 +3533,31 @@
 
         var found = false;
         var statementIndex = 0;
-        lastKnownStatements.forEach(function (statement) {
-          if (isPointInside(statement.location, cursorPosition)) {
-            statementIndex++;
-            found = true;
-            activeStatement = statement;
-          } else if (!found) {
-            statementIndex++;
-            if (precedingStatements.length === STATEMENT_COUNT_AROUND_ACTIVE) {
-              precedingStatements.shift();
+        if (lastKnownStatements.length === 1) {
+          activeStatement = lastKnownStatements[0];
+        } else {
+          lastKnownStatements.forEach(function (statement) {
+            if (isPointInside(statement.location, editorLocation)) {
+              statementIndex++;
+              found = true;
+              activeStatement = statement;
+            } else if (!found) {
+              statementIndex++;
+              if (precedingStatements.length === STATEMENT_COUNT_AROUND_ACTIVE) {
+                precedingStatements.shift();
+              }
+              precedingStatements.push(statement);
+            } else if (found && followingStatements.length < STATEMENT_COUNT_AROUND_ACTIVE) {
+              followingStatements.push(statement);
             }
-            precedingStatements.push(statement);
-          } else if (found && followingStatements.length < STATEMENT_COUNT_AROUND_ACTIVE) {
-            followingStatements.push(statement);
+          });
+
+          // Can happen if multiple statements and the cursor is after the last one
+          if (!found) {
+            precedingStatements.pop();
+            activeStatement = lastKnownStatements[lastKnownStatements.length - 1];
           }
-        });
+        }
 
         huePubSub.publish('editor.active.statement.changed', {
           id: self.editorId,
@@ -3567,7 +3569,7 @@
         });
 
         if (activeStatement) {
-          self.checkForSyntaxErrors(activeStatement.location, cursorPosition);
+          self.checkForSyntaxErrors(activeStatement.location, editorLocation);
         }
       };
 
@@ -3583,40 +3585,32 @@
         }
       };
 
-      var changeThrottle = -1;
-      var updateThrottle = -1;
-
+      var changeThrottle = window.setTimeout(parseForStatements, 0);
+      var updateThrottle = window.setTimeout(updateActiveStatement, 0);
       var cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
-      var forceUpdateSubscription = huePubSub.subscribe('editor.identify.statement.locations', function (editorId) {
-        if (self.editorId === editorId) {
-          cursorChangePaused = true;
-          window.clearTimeout(updateThrottle);
-          window.clearTimeout(changeThrottle);
-          parseForStatements();
-          updateActiveStatement();
-          cursorChangePaused = false;
-        }
-      });
 
-      var cursorSubscription = huePubSub.subscribe('editor.active.cursor.location', function (locationDetails) {
+      var lastStart;
+      var changeSelectionListener = self.editor.on('changeSelection', function () {
         if (cursorChangePaused) {
           return;
         }
-        if (self.editorId === locationDetails.id) {
+        window.clearTimeout(changeThrottle);
+        changeThrottle = window.setTimeout(function () {
+          var newStart = self.editor.getSelectionRange().start;
+          if (lastStart && lastStart.row === newStart.row && lastStart.column === newStart.column) {
+            return;
+          }
           window.clearTimeout(updateThrottle);
-          updateThrottle = window.setTimeout(function () {
-            updateActiveStatement(true);
-          }, 100);
-        }
+          updateActiveStatement(true);
+          lastStart = newStart;
+        }, 100);
       });
-
-      changeThrottle = window.setTimeout(parseForStatements, 0);
-      updateThrottle = window.setTimeout(updateActiveStatement, 0);
 
       var changeListener = self.editor.on("change", function () {
         window.clearTimeout(changeThrottle);
         cursorChangePaused = true;
         changeThrottle = window.setTimeout(function () {
+          window.clearTimeout(updateThrottle);
           parseForStatements();
           updateActiveStatement();
           cursorChangePaused = false;
@@ -3625,20 +3619,21 @@
 
       var locateSubscription = huePubSub.subscribe('editor.refresh.statement.locations', function (snippet) {
         if (snippet === self.snippet) {
+          cursorChangePaused = true;
           window.clearTimeout(changeThrottle);
           window.clearTimeout(updateThrottle);
           parseForStatements();
           updateActiveStatement();
+          cursorChangePaused = false;
         }
       });
 
       self.disposeFunctions.push(function () {
         window.clearTimeout(changeThrottle);
         window.clearTimeout(updateThrottle);
-        self.editor.off("change", changeListener);
-        forceUpdateSubscription.remove();
+        self.editor.off('changeSelection', changeSelectionListener);
+        self.editor.off('change', changeListener);
         locateSubscription.remove();
-        cursorSubscription.remove();
       });
     };
 
