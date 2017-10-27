@@ -4433,14 +4433,15 @@
                       }
                     }
                     if (token.parseLocation.identifierChain) {
-                      tooltipText += ' - ' + $.map(token.parseLocation.identifierChain, function (identifier) {
+                      var sqlIdentifier = $.map(token.parseLocation.identifierChain, function (identifier) {
                           return identifier.name
                         }).join('.');
                       if (colType) {
-                        tooltipText += ' (' + colType + ')';
+                        sqlIdentifier += ' (' + colType + ')';
                       }
+                      tooltipText = sqlIdentifier + ' - ' + tooltipText;
                     } else if (token.parseLocation.function) {
-                      tooltipText += ' - ' + token.parseLocation.function;
+                      tooltipText = token.parseLocation.function + ' - ' + tooltipText;
                     }
                     contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                   }
