@@ -1877,7 +1877,7 @@ var SqlAutocompleter3 = (function () {
       // This could happen in case the user is editing at the borders of the statement and the locations haven't
       // been updated yet, in that case we have to force a location update before parsing
       if (!parseResult) {
-        huePubSub.publish('editor.identify.statement.locations', self.snippet.id());
+        huePubSub.publish('editor.refresh.statement.locations', self.snippet);
         parseResult = self.parseActiveStatement();
       }
     } catch (e) {
