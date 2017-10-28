@@ -21,6 +21,7 @@ import os
 from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.conf import Config
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -48,7 +49,7 @@ PRIVILEGE_CHECKER_CACHING=Config(
   key='privilege_checker_caching',
   help=_t('Number of seconds when the privilege list of a user is cached.'),
   type=int,
-  default=30,
+  default=60 * 5,
 )
 
 
