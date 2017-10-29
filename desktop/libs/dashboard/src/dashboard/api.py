@@ -402,18 +402,20 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       if widget_type == 'text-facet-widget':
         properties['type'] = facet_type
 
-      if widget_type == 'hit-widget':
-        facet_type = 'function'
-      else:
-        facet_type = 'nested'
-
       properties['facets_form'] = NESTED_FACET_FORM
       facet = NESTED_FACET_FORM.copy()
       facet['field'] = facet_field
       facet['limit'] = 10
-      facet['aggregate']['function'] = 'count'
+      properties['canRange'] = False
       properties['facets'] = [facet]
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
+
+      if widget_type == 'hit-widget':
+        facet_type = 'function'
+        facet['aggregate']['function'] = 'unique'
+      else:
+        facet_type = 'nested'
+        facet['aggregate']['function'] = 'count'
 
       if widget_type == 'pie2-widget':
         properties['scope'] = 'stack'
