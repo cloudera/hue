@@ -1010,7 +1010,7 @@ var Collection = function (vm, collection) {
     facet.properties.facets_form.mincount(1);
     facet.properties.facets_form.sort('desc');
 
-    facet.properties.facets_form.aggregate.function('count');
+    //facet.properties.facets_form.aggregate.function('count');
     facet.properties.facets_form.aggregate.formula('');
     facet.properties.facets_form.aggregate.percentiles.removeAll();
     facet.properties.facets_form.aggregate.percentiles.push({'value': 50});

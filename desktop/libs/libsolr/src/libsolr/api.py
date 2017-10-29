@@ -194,9 +194,26 @@ class SolrApi(object):
               _fname = _f['facet'].keys()[0]
               _f['sort'] = {_fname: facet['properties']['sort']}
               # domain = '-d2:NaN' # Solr 6.4
-          # _f = _f['facet']
-          print _f
-          json_facets[facet['id']] = _f['facet']['dim_01:country_code3']
+
+          if _f:
+            sort = {'count': facet['properties']['facets'][0]['sort']}
+            for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'][1:])):
+              if agg['sort'] != 'default':
+                agg_function = self._get_aggregate_function(agg)
+                sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
+   
+            if sort.get('count') == 'default':
+              sort['count'] = 'desc'            
+            dim_key = [key for key in _f['facet'].keys() if 'dim' in key][0]
+            _f['facet'][dim_key].update({
+                  'excludeTags': facet['id'],
+                  'offset': 0,
+                  'numBuckets': True,
+                  'allBuckets': True,
+                  'sort': sort
+                  #'prefix': '' # Forbidden on numeric fields
+              })
+            json_facets[facet['id']] = _f['facet'][dim_key]
         elif facet['type'] == 'function':
           json_facets[facet['id']] = self._get_aggregate_function(facet)
           json_facets['processEmpty'] = True
@@ -942,7 +959,7 @@ class SolrApi(object):
 
   def _get_dimension_aggregates(self, facets):
     aggregates = []
-    for agg in facets[0:]:
+    for agg in facets:
       if agg['aggregate']['function'] != 'count':
         aggregates.append(agg)
       else:

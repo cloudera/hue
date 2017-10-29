@@ -457,9 +457,9 @@ def augment_solr_response(response, collection, query):
         if collection_facet['properties']['canRange'] and not facet['properties'].get('type') == 'field':
           dimension = 3 if collection_facet['properties']['isDate'] else 1
           # Single dimension or dimension 2 with analytics
-          if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count' and len(collection_facet['properties']['facets']) == 1:
+          if len(collection_facet['properties']['facets']) == 1 or len(collection_facet['properties']['facets']) == 2 and collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count':
             column = 'count'
-            if len(collection_facet['properties']['facets']) == 1:
+            if len(collection_facet['properties']['facets']) == 2:
               agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_')]
               legend = agg_keys[0].split(':', 2)[1]
               column = agg_keys[0]
@@ -508,13 +508,13 @@ def augment_solr_response(response, collection, query):
 
           #_convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
           dimension = len(facet_fields)
-        elif not collection_facet['properties']['facets'] or (collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count' and len(collection_facet['properties']['facets']) == 1):
+        elif len(collection_facet['properties']['facets']) == 1 or (len(collection_facet['properties']['facets']) == 2 and collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count'):
           # Dimension 1 with 1 count or agg
           dimension = 1
 
           column = 'count'
           agg_keys = counts and [key for key, value in counts[0].items() if key.lower().startswith('agg_')]
-          if len(collection_facet['properties']['facets']) == 1 and agg_keys:
+          if len(collection_facet['properties']['facets']) == 2 and agg_keys:
             column = agg_keys[0]
           else:
             agg_keys = [column]
@@ -530,12 +530,16 @@ def augment_solr_response(response, collection, query):
           agg_keys = counts and [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
           agg_keys.sort(key=lambda a: a[4:])
 
-          if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
+          if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'): #PB
             agg_keys.insert(0, 'count')
           counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
-          actual_dimension = 1 + sum([_f['aggregate']['function'] == 'count' for _f in collection_facet['properties']['facets']])
+          actual_dimension = sum([_f['aggregate']['function'] == 'count' for _f in collection_facet['properties']['facets']])
+          print actual_dimension
+          print counts
+          print collection_facet['properties']['facets']
 
           counts = filter(lambda a: len(a['fq_fields']) == actual_dimension, counts)
+          print counts
 
         num_bucket = response['facets'][name]['numBuckets'] if 'numBuckets' in response['facets'][name] else len(response['facets'][name])
         facet = {
