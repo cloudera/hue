@@ -34,7 +34,14 @@ from dashboard.dashboard_api import get_engine
 
 LOG = logging.getLogger(__name__)
 
-NESTED_FACET_FORM = {'field': '', 'mincount': 1, 'limit': 5, 'sort': 'desc', 'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}}
+
+NESTED_FACET_FORM = {
+    'field': '',
+    'mincount': 1,
+    'limit': 5,
+    'sort': 'desc',
+    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}
+}
 
 
 class Collection2(object):
@@ -442,7 +449,7 @@ def augment_solr_response(response, collection, query):
         cols = ['%(field)s' % facet, 'count(%(field)s)' % facet]
         last_x_col = 0
         last_xx_col = 0
-        for i, f in enumerate(facet['properties']['facets']):
+        for i, f in enumerate(facet['properties']['facets'][1:]):
           if f['aggregate']['function'] == 'count':
             cols.append(f['field'])
             last_xx_col = last_x_col
@@ -534,12 +541,8 @@ def augment_solr_response(response, collection, query):
             agg_keys.insert(0, 'count')
           counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
           actual_dimension = sum([_f['aggregate']['function'] == 'count' for _f in collection_facet['properties']['facets']])
-          print actual_dimension
-          print counts
-          print collection_facet['properties']['facets']
 
           counts = filter(lambda a: len(a['fq_fields']) == actual_dimension, counts)
-          print counts
 
         num_bucket = response['facets'][name]['numBuckets'] if 'numBuckets' in response['facets'][name] else len(response['facets'][name])
         facet = {

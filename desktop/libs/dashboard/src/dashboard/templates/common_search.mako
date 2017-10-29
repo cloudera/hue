@@ -2089,7 +2089,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <span data-bind="template: { name: 'metric-form' }"></span>
+      ##<span data-bind="template: { name: 'metric-form' }"></span>
+      <span data-bind="template: { name: 'facet-toggle2' }"></span>
       ## TODO: Range if numeric
     </div>
     <span class="big-counter" data-bind="textSqueezer: counts"></span>
@@ -2106,7 +2107,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div>
       ## For Counter widget
       <!-- ko if: $data.function() != 'field' && $parent.properties -->
-        <select data-bind="options: $parent.properties.facets_form.aggregate.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
+        <select data-bind="options: $parents[1].properties.facets_form.aggregate.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
       <!-- /ko -->
 
       <!-- ko if: $data.function() != 'field' -->
