@@ -410,6 +410,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['facets_form'] = NESTED_FACET_FORM
       facet = NESTED_FACET_FORM.copy()
       facet['field'] = facet_field
+      facet['limit'] = 10
       facet['aggregate']['function'] = 'count'
       properties['facets'] = [facet]
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
