@@ -162,7 +162,7 @@ def collections_create(request):
         table = request.POST.get('table')
         columns = [field['name'] for field in collection.get('fields', [])]
 
-        searcher.update_data_from_hive(db, collection.get('name'), database, table, columns)
+        searcher.update_data_from_hive(db, collection.get('name'), database, table, columns) # No up to date
 
       response['status'] = 0
       response['message'] = _('Collection created!')

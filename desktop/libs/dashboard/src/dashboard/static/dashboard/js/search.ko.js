@@ -1635,7 +1635,7 @@ var QueryResult = function (vm, initial) { // Similar to to Notebook Snippet
 
 
 var DATE_TYPES = ['date', 'tdate', 'timestamp', 'pdate'];
-var NUMBER_TYPES = ['int', 'tint', 'pint', 'long', 'tlong', 'tlong', 'float', 'tfloat', 'pfloat', 'double', 'tdouble', 'pdouble', 'currency'];
+var NUMBER_TYPES = ['int', 'tint', 'pint', 'long', 'tlong', 'plong', 'float', 'tfloat', 'pfloat', 'double', 'tdouble', 'pdouble', 'currency'];
 var FLOAT_TYPES = ['float', 'tfloat', 'pfloat', 'double', 'tdouble', 'pdouble'];
 var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];
 
