@@ -282,7 +282,7 @@ class CollectionManagerController(object):
         has_more = result['has_more']
 
         if result['data']:
-          kwargs = {'rowid': 'id'}
+          kwargs = {}
           dataset = tablib.Dataset()
           dataset.append(columns)
           for i, row in enumerate(result['data']):

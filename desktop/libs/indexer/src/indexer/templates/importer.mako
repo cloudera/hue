@@ -1040,12 +1040,12 @@ ${ assist.assistPanel() }
     var MAPPINGS = {
       SOLR_TO_HIVE: {
         "string": "string",
-        "long": "bigint",
-        "double": "double",
-        "date": "timestamp"
+        "plong": "bigint",
+        "pdouble": "double",
+        "pdate": "timestamp"
       },
       HIVE_TO_SOLR: {
-        "bigint": "long"
+        "bigint": "plong"
       },
       get: function(type, key, defaultValue) {
         return type[key] || defaultValue
