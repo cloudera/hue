@@ -698,8 +698,9 @@ var Collection = function (vm, collection) {
     }
   }
 
-  self._addObservablesToFacet = function(facet, vm) { console.log(facet.properties.facets_form.aggregate);
-    if (facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
+  self._addObservablesToFacet = function(facet, vm) {
+    if (facet.properties) { // Very top facet
+	if (facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
       facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
         var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
@@ -727,8 +728,9 @@ var Collection = function (vm, collection) {
         vm.search();
       });
     }
+    }
 
-    // For Hue 4 facets only
+    // For Solr 5+ facets only
     if (typeof facet.template != 'undefined') {
       facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields
         var _fields = [];
@@ -937,7 +939,10 @@ var Collection = function (vm, collection) {
         	// "read only"
         	// .isLoading(false)
           } else {
-            self._addObservablesToFacet(facet, vm);
+            self._addObservablesToFacet(facet, vm); // Top widget
+            if (facet.properties.facets) { // Sub facet
+        	  self._addObservablesToFacet(facet.properties.facets()[0], vm);
+        	}
           }
 
           self.facets.push(facet);

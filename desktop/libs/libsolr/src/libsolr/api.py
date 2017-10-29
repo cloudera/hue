@@ -143,58 +143,60 @@ class SolrApi(object):
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'nested':
-          sort = {'count': facet['properties']['sort']}
-          for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'])):
-            if agg['sort'] != 'default':
-              agg_function = self._get_aggregate_function(agg)
-              sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
+#           sort = {'count': facet['properties']['sort']}
+#           for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'])):
+#             if agg['sort'] != 'default':
+#               agg_function = self._get_aggregate_function(agg)
+#               sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
+# 
+#           if sort.get('count') == 'default':
+#             sort['count'] = 'desc'
+#           _f = {
+#               'field': facet['field'],
+#               'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'text-facet-widget' else 0),
+#               'mincount': int(facet['properties']['mincount']),
+#               'sort': sort,
+#           }
+# 
+#           if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
+#             _f['domain'] = {}
+#             if facet['properties']['domain'].get('blockParent'):
+#               _f['domain']['blockParent'] = ' OR '.join(facet['properties']['domain']['blockParent'])
+#             if facet['properties']['domain'].get('blockChildren'):
+#               _f['domain']['blockChildren'] = ' OR '.join(facet['properties']['domain']['blockChildren'])
+# 
+#           if 'start' in facet['properties'] and not facet['properties'].get('type') == 'field':
+#             _f.update({
+#                 'type': 'range',
+#                 'start': facet['properties']['start'],
+#                 'end': facet['properties']['end'],
+#                 'gap': facet['properties']['gap'],
+#             })
+#             if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'bucket-widget'):
+#               _f.update(self._get_time_filter_query(timeFilter, facet))
+#           else:
+#             _f.update({
+#                 'type': 'terms',
+#                 'field': facet['field'],
+#                 'excludeTags': facet['id'],
+#                 'offset': 0,
+#                 'numBuckets': True,
+#                 'allBuckets': True,
+#                 #'prefix': '' # Forbidden on numeric fields
+#             })
+#             if facet['properties']['canRange'] and not facet['properties']['isDate']:
+#               del _f['mincount'] # Numeric fields do not support
 
-          if sort.get('count') == 'default':
-            sort['count'] = 'desc'
-          _f = {
-              'field': facet['field'],
-              'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'text-facet-widget' else 0),
-              'mincount': int(facet['properties']['mincount']),
-              'sort': sort,
-          }
-
-          if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
-            _f['domain'] = {}
-            if facet['properties']['domain'].get('blockParent'):
-              _f['domain']['blockParent'] = ' OR '.join(facet['properties']['domain']['blockParent'])
-            if facet['properties']['domain'].get('blockChildren'):
-              _f['domain']['blockChildren'] = ' OR '.join(facet['properties']['domain']['blockChildren'])
-
-          if 'start' in facet['properties'] and not facet['properties'].get('type') == 'field':
-            _f.update({
-                'type': 'range',
-                'start': facet['properties']['start'],
-                'end': facet['properties']['end'],
-                'gap': facet['properties']['gap'],
-            })
-            if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'bucket-widget'):
-              _f.update(self._get_time_filter_query(timeFilter, facet))
-          else:
-            _f.update({
-                'type': 'terms',
-                'field': facet['field'],
-                'excludeTags': facet['id'],
-                'offset': 0,
-                'numBuckets': True,
-                'allBuckets': True,
-                #'prefix': '' # Forbidden on numeric fields
-            })
-            if facet['properties']['canRange'] and not facet['properties']['isDate']:
-              del _f['mincount'] # Numeric fields do not support
-
+          _f = {}
           if facet['properties']['facets']:
             self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1)
             if facet['widgetType'] == 'text-facet-widget':
               _fname = _f['facet'].keys()[0]
               _f['sort'] = {_fname: facet['properties']['sort']}
               # domain = '-d2:NaN' # Solr 6.4
-
-          json_facets[facet['id']] = _f
+          # _f = _f['facet']
+          print _f
+          json_facets[facet['id']] = _f['facet']['dim_01:country_code3']
         elif facet['type'] == 'function':
           json_facets[facet['id']] = self._get_aggregate_function(facet)
           json_facets['processEmpty'] = True
