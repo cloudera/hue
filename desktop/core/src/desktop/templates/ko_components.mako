@@ -420,7 +420,10 @@ from desktop.views import _ko
                   if (notebook.onSuccessUrl() && notebook.onSuccessUrl() !== 'assist.db.refresh') { // TODO: Similar if in in FB directory, also refresh FB dir
                     huePubSub.publish('open.link', notebook.onSuccessUrl());
                   }
-                  if (notebook.onSuccessUrl()) {
+
+                  if (notebook.onSuccessUrl() == 'assist.db.refresh') {
+                    huePubSub.publish('assist.db.refresh', {sourceTypes: [snippet.type()]});
+                  } else if (notebook.onSuccessUrl()) {
                     huePubSub.publish(notebook.pubSubUrl());
                   }
                 } else { // Perform last DROP statement execute
