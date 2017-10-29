@@ -214,7 +214,7 @@ class HueLogFormat(GrokkedFormat):
       Field("component", "string"),
       Field("log_level", "string"),
       Field("details", "string"),
-      Field("message", "text_en"),
+      Field("message", "text_general"),
       Field("ip", "string", [geo_ip_operation]),
       Field("user", "string"),
       Field("http_method", "string"),
@@ -246,7 +246,7 @@ class ApacheCombinedFormat(GrokLineFormat):
       Field("response", "long"),
       Field("bytes", "long"),
       Field("referrer", "string"),
-      Field("field_line", "text_en")
+      Field("field_line", "text_general")
     ]
 
 
@@ -262,8 +262,8 @@ class RubyLogFormat(GrokLineFormat):
       Field("pid", "long"),
       Field("loglevel", "string"),
       Field("progname", "string"),
-      Field("message", "text_en"),
-      Field("field_line", "text_en")
+      Field("message", "text_general"),
+      Field("field_line", "text_general")
     ]
 
 
@@ -281,7 +281,7 @@ class SyslogFormat(GrokLineFormat):
       Field("logsource", "string"),
       Field("program", "string"),
       Field("pid", "string"),
-      Field("message", "text_en"),
+      Field("message", "text_general"),
     ]
 
 

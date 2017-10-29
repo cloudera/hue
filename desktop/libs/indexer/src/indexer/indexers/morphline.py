@@ -127,13 +127,10 @@ class MorphlineIndexer(object):
 
   def guess_field_types(self, data):
     file_format = get_file_format_instance(data['file'], data['format'])
-    fields = file_format.get_fields() if file_format else {'columns': []}
-    for field in fields['columns']:
-      self._port_field_types(field)
-    return fields
+    return file_format.get_fields() if file_format else {'columns': []}
 
   # Breadth first ordering of fields
-  def get_field_list(self, field_data):
+  def get_field_list(self, field_data, is_converting_types=False):
     fields = []
 
     queue = deque(field_data)
@@ -141,7 +138,8 @@ class MorphlineIndexer(object):
     while len(queue):
       curr_field = queue.popleft()
       curr_field['type'] = curr_field['type']
-      self._port_field_types(curr_field)
+      if is_converting_types:
+        self._port_field_types(curr_field)
       fields.append(curr_field)
 
       for operation in curr_field["operations"]:
@@ -191,7 +189,7 @@ class MorphlineIndexer(object):
 
     properties = {
       "collection_name": collection_name,
-      "fields": self.get_field_list(data['columns']),
+      "fields": self.get_field_list(data['columns'], is_converting_types=True),
       "num_base_fields": len(data['columns']),
       "uuid_name" : uuid_name,
       "get_regex": MorphlineIndexer._get_regex_for_type,

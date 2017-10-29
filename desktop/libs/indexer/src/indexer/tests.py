@@ -89,7 +89,7 @@ class TestIndexerWithSolr:
 
   def test_create_and_delete_collection(self):
     name = get_db_prefix(name='solr') + 'test_create_collection'
-    fields = [{'name': 'id', 'type': 'string'}, {'name': 'my_text', 'type': 'text_en'}]
+    fields = [{'name': 'id', 'type': 'string'}, {'name': 'my_text', 'type': 'text_general'}]
 
     # We get exceptions if problems in both case there
     try:

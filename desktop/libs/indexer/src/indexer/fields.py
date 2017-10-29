@@ -76,7 +76,7 @@ class Field(object):
     }
 
 FIELD_TYPES = [
-  FieldType('text_en', "^[\\s\\S]*$", heuristic_regex="^[\\s\\S]{101,}$"),
+  FieldType('text_general', "^[\\s\\S]*$", heuristic_regex="^[\\s\\S]{101,}$"),
   FieldType('string', "^[\\s\\S]*$", heuristic_regex="^[\\s\\S]{1,100}$"),
   FieldType('double', "^([+-]?[0-9]+(\.[0-9]+)?(E[+-]?[0-9]+)?)$"),
   FieldType('long', "^(?:[+-]?(?:[0-9]+))$"),
