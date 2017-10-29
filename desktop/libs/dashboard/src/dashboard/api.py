@@ -34,7 +34,8 @@ from dashboard.dashboard_api import get_engine
 from dashboard.data_export import download as export_download
 from dashboard.decorators import allow_viewer_only
 from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
-from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception
+from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception,\
+  NESTED_FACET_FORM
 
 
 LOG = logging.getLogger(__name__)
@@ -381,7 +382,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     facet_type = 'nested'
     properties['facets'] = []
     properties['domain'] = {'blockParent': [], 'blockChildren': []}
-    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5, 'sort': 'desc', 'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}}
+    properties['facets_form'] = NESTED_FACET_FORM
     properties['scope'] = 'world'
     properties['limit'] = 100
   else:
@@ -406,8 +407,11 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       else:
         facet_type = 'nested'
 
-      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5, 'sort': 'desc', 'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}}
-      properties['facets'] = []
+      properties['facets_form'] = NESTED_FACET_FORM
+      facet = NESTED_FACET_FORM.copy()
+      facet['field'] = facet_field
+      facet['aggregate']['function'] = 'count'
+      properties['facets'] = [facet]
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
 
       if widget_type == 'pie2-widget':
