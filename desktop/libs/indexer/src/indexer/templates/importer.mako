@@ -1042,7 +1042,11 @@ ${ assist.assistPanel() }
         "string": "string",
         "plong": "bigint",
         "pdouble": "double",
-        "pdate": "timestamp"
+        "pdate": "timestamp",
+        "long": "bigint",
+        "double": "double",
+        "date": "timestamp",
+        "boolean": "boolean",
       },
       HIVE_TO_SOLR: {
         "bigint": "plong"
