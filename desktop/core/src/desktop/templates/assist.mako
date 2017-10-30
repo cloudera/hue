@@ -187,15 +187,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <!-- /ko -->
   </script>
 
-  <script type="text/html" id="collections-title-context-items">
-    <li><a href="javascript: void(0);" data-bind="click: function(){ huePubSub.publish('assist.openCollections'); }"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Browser') }</a></li>
-  </script>
-
-  <script type="text/html" id="collections-context-items">
-    <li><a href="javascript: void(0);" data-bind="click: openInBrowser"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Browser') }</a></li>
-    <li><a href="javascript: void(0);" data-bind="click: openInDashboard"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
-  </script>
-
   <script type="text/html" id="assist-database-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
       <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
@@ -289,6 +280,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
   <script type="text/html" id="assist-sql-inner-panel">
     <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
+    <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
+    <!-- ko with: selectedSource -->
+    <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+    <!-- ko with: selectedDatabase -->
+    <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
+    <!-- /ko -->
+    <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="assist-solr-inner-panel">
     <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
     <!-- ko with: selectedSource -->
     <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
@@ -652,89 +653,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     </div>
   </script>
 
-  <script type="text/html" id="assist-collections-header-actions">
-    <div class="assist-db-header-actions">
-      <!-- ko ifnot: parent -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.toggleSearch, css: { 'blue' : $parent.isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
-      <!-- /ko -->
-      <a class="inactive-action" data-bind="hueLink: '/indexer/importer/prefill/all/index/'" title="${_('Create index')}" href="javascript:void(0)">
-        <i class="pointer fa fa-plus" title="${_('Create index')}"></i>
-      </a>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.collections.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
-    </div>
-  </script>
-
-  <script type="text/html" id="assist-collections-inner-panel">
-    <!-- ko with: selectedCollectionEntry -->
-    <div class="assist-inner-header assist-breadcrumb">
-      <!-- ko if: parent -->
-      <a href="javascript: void(0);" data-bind="appAwareTemplateContextMenu: { template: 'collections-context-items', scrollContainer: '.assist-collections-scrollable' },click: function () { huePubSub.publish('assist.clickCollectionItem', parent); }">
-        <i class="fa fa-fw fa-chevron-left"></i>
-        <i class="fa fa-fw fa-search"></i>
-        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'top' }"></span>
-      </a>
-      <!-- /ko -->
-      <!-- ko ifnot: parent -->
-      <a href="javascript:void(0)" data-bind="appAwareTemplateContextMenu: { template: 'collections-title-context-items' }">${_('Collections')}</a>
-      <!-- /ko -->
-      <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
-    </div>
-    <!-- ko ifnot: parent -->
-    <div class="assist-flex-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0">
-      <div>
-        <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: $parent.showCores" />${_('Show cores')}</label>
-      </div>
-    </div>
-    <!-- /ko -->
-    <div class="assist-flex-search" data-bind="visible: !loading() && !hasErrors() && entries().length > 0">
-      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown'"/></div>
-    </div>
-    <div class="assist-flex-fill assist-collections-scrollable">
-      <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-        <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 22, container: '.assist-collections-scrollable' }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'collections-context-items', scrollContainer: '.assist-collections-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
-            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: function (data, event) { definition.type == 'collection' ? click() : showContextPopover(data, event); }, attr: {'title': definition.name + (definition.type != 'collection' && definition.type != 'alias' ? ' - ' + definition.type : '') }">
-              <!-- ko switch: definition.type -->
-                <!-- ko case: 'collection' -->
-                <i class="fa fa-fw fa-search muted valign-middle"></i>
-                <!-- /ko -->
-                <!-- ko case: 'alias' -->
-                <i class="fa fa-fw fa-eye muted valign-middle"></i>
-                <!-- /ko -->
-                <!-- ko case: $default -->
-                  <!-- ko if: parent.key() === definition.name -->
-                    <i class="fa fa-fw fa-key muted valign-middle"></i>
-                  <!-- /ko -->
-                  <!-- ko ifnot: parent.key() === definition.name -->
-                    <i class="fa fa-fw fa-genderless muted valign-middle"></i>
-                  <!-- /ko -->
-                <!-- /ko -->
-              <!-- /ko -->
-              <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
-            </a>
-          </li>
-        </ul>
-        <!-- ko if: !loading() && entries().length === 0 -->
-        <ul class="assist-tables">
-          <li class="assist-entry"><span class="assist-no-entries">
-            <!-- ko if: parent -->
-            ${_('No available fields.')}
-            <!-- /ko -->
-            <!-- ko ifnot: parent -->
-            ${_('No available collections.')}
-            <!-- /ko -->
-          </span></li>
-        </ul>
-        <!-- /ko -->
-      </div>
-      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-      <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-        <span>${ _('Error loading contents.') }</span>
-      </div>
-    </div>
-    <!-- /ko -->
-  </script>
-
   <script type="text/html" id="assist-hbase-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hbase.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
@@ -869,8 +787,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/html" id="assist-databases-template">
     <div class="assist-flex-header" data-bind="visibleOnHover: { selector: '.hover-actions', override: loading() }">
       <div class="assist-inner-header">
+        <!-- ko ifnot: sourceType === 'solr' -->
         ${_('Databases')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: sourceType === 'solr' -->
+        ${_('Sources')}
+        <!-- /ko -->
       </div>
     </div>
     <div class="assist-flex-search" data-bind="visible: hasEntries() && ! hasErrors()">
@@ -909,7 +832,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   <script type="text/html" id="assist-tables-template">
     <div class="assist-flex-header">
       <div class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
+        <!-- ko ifnot: sourceType === 'solr' -->
         ${_('Tables')}
+        <!-- /ko -->
+        <!-- ko if: sourceType === 'solr' -->
+        ${_('Collections')}
+        <!-- /ko -->
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
     </div>
@@ -1106,7 +1034,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
        * @param {string} options.icon
        * @param {boolean} [options.rightAlignIcon] - Default false
        * @param {boolean} options.visible
-       * @param {(AssistDbPanel|AssistHdfsPanel|AssistGitPanel|AssistDocumentsPanel|AssistS3Panel|AssistCollectionsPanel)} panelData
+       * @param {(AssistDbPanel|AssistHdfsPanel|AssistGitPanel|AssistDocumentsPanel|AssistS3Panel)} panelData
        * @constructor
        */
       function AssistInnerPanel (options) {
@@ -1158,14 +1086,23 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
         if (typeof options.sourceTypes === 'undefined') {
           options.sourceTypes = [];
-          % for interpreter in get_ordered_interpreters(request.user):
-            % if interpreter["is_sql"]:
-              options.sourceTypes.push({
-                type: '${ interpreter["type"] }',
-                name: '${ interpreter["name"] }'
-              });
-            % endif
-          % endfor
+
+          if (options.isSolr) {
+            options.sourceTypes = [{
+              type: 'solr',
+              name: 'solr'
+            }];
+          }
+          else {
+            % for interpreter in get_ordered_interpreters(request.user):
+              % if interpreter["is_sql"]:
+                options.sourceTypes.push({
+                  type: '${ interpreter["type"] }',
+                  name: '${ interpreter["name"] }'
+                });
+              % endif
+            % endfor
+          }
         }
 
         self.sources = ko.observableArray();
@@ -1663,113 +1600,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
        * @param {ApiHelper} options.apiHelper
        * @constructor
        **/
-      function AssistCollectionsPanel (options) {
-        var self = this;
-        self.apiHelper = options.apiHelper;
-
-        self.isSearchVisible = ko.observable(false);
-
-        self.toggleSearch = function () {
-          self.isSearchVisible(!self.isSearchVisible());
-        };
-
-        self.showCores = ko.observable(false);
-        self.selectedCollectionEntry = ko.observable();
-        self.filter = ko.observable('');
-        self.reload = function () {
-          var currentEntry = new AssistCollectionEntry({
-            definition: {
-              name: '/',
-              type: 'collection'
-            },
-            apiHelper: self.apiHelper
-          }, self.filter, self.showCores);
-          self.selectedCollectionEntry(currentEntry);
-          currentEntry.loadEntries();
-          currentEntry.hasOnlyCores.subscribe(function (onlyCores) {
-            self.showCores(onlyCores);
-          });
-          self.showCores(currentEntry.hasOnlyCores());
-        };
-
-        huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
-          if (entry.definition.type === 'collection' || entry.definition.type === 'alias') {
-            entry.loadEntries();
-            self.selectedCollectionEntry(entry);
-          }
-          else {
-            huePubSub.publish('assist.openCollectionItem', entry);
-          }
-        });
-
-        huePubSub.subscribe('assist.openCollections', function () {
-          % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
-            if (IS_HUE_4) {
-              huePubSub.publish('open.link', '/indexer/indexes/');
-            }
-            else {
-              window.open('/indexer/indexes/');
-            }
-          % else:
-            if (IS_HUE_4) {
-              huePubSub.publish('open.link', '/indexer');
-            }
-            else {
-              window.open('/indexer');
-            }
-          % endif
-        });
-
-        huePubSub.subscribe('assist.openCollectionItem', function (entry) {
-          var definitionName = entry.definition.name;
-          if (entry.parent && entry.parent.definition.name !== '/') {
-            definitionName = entry.parent.definition.name;
-          }
-          % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
-            if (IS_HUE_4) {
-              huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
-            }
-            else {
-              window.open('/indexer/indexes/' + definitionName);
-            }
-          % else:
-            var hash = '#edit/' + definitionName;
-            if (IS_HUE_4) {
-              if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
-                window.location.hash = hash;
-              }
-              else {
-                huePubSub.subscribeOnce('app.gained.focus', function (app) {
-                  if (app === 'indexes') {
-                    window.setTimeout(function () {
-                      window.location.hash = hash;
-                    }, 0)
-                  }
-                });
-                huePubSub.publish('open.link', '/indexer');
-              }
-            }
-            else {
-              window.open('/indexer/' + hash);
-            }
-          % endif
-        });
-
-        huePubSub.subscribe('assist.collections.refresh', function () {
-          huePubSub.publish('assist.clear.collections.cache');
-          self.reload();
-        });
-      }
-
-      AssistCollectionsPanel.prototype.init = function () {
-        this.reload();
-      };
-
-      /**
-       * @param {Object} options
-       * @param {ApiHelper} options.apiHelper
-       * @constructor
-       **/
       function AssistHBasePanel(options) {
         var self = this;
         self.apiHelper = options.apiHelper;
@@ -1986,14 +1816,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('indexes') != -1) {
                 panels.push(new AssistInnerPanel({
-                  panelData: new AssistCollectionsPanel({
-                    apiHelper: self.apiHelper
-                  }),
+                  panelData: new AssistDbPanel($.extend({
+                    apiHelper: self.apiHelper,
+                    i18n: i18n,
+                    isSolr: true
+                  }, params.sql)),
                   apiHelper: self.apiHelper,
                   name: '${ _("Collections") }',
-                  type: 'collections',
+                  type: 'solr',
                   icon: 'fa-search-plus',
-                  minHeight: 50
+                  minHeight: 75
                 }));
               }
 
