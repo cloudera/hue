@@ -485,7 +485,7 @@ var SqlParseSupport = (function () {
                 location.type = 'column';
                 parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: true });
               } else {
-                location.type = found[0].impalaComplex ? 'complex' : 'table';
+                location.type = found[0].impalaComplex ? 'column' : 'table';
                 parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: true });
               }
             } else {
@@ -907,6 +907,9 @@ var SqlParseSupport = (function () {
       }
 
       if (foundPrimary) {
+        if (foundPrimary.impalaComplex && wrapper.type === 'column') {
+          wrapper.type = 'complex';
+        }
         identifierChain.shift();
         if (doubleMatch) {
           identifierChain.shift();
