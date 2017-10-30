@@ -3630,12 +3630,40 @@ $(document).ready(function () {
     }
   });
 
-  huePubSub.subscribe('calculate.gridster.heights', function () {
-    var g = $('.gridster ul').data('gridster');
+  function resizeGridsterWidget($el){
+    $(".gridster>ul").data('gridster').resize_widget($el, $el.data('sizex'), Math.ceil($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+  }
+
+  huePubSub.subscribeOnce('calculate.gridster.heights', function () {
     $('.gridster ul li.gs-w').each(function () {
-      var $el = $(this);
-      g.resize_widget($el, $el.data('sizex'), Math.ceil($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+      resizeGridsterWidget($(this));
     });
+  }, 'dashboard');
+
+
+  // there's no elegant way to do this because it doesn't work with knockout afterrender events
+  var previousWidgetsHeights = 0;
+  var toleranceCycles = 0;
+  var renderingCheckInterval = window.setInterval(function () {
+    if (toleranceCycles === 5) {
+      window.clearInterval(renderingCheckInterval);
+      huePubSub.publish('calculate.gridster.heights');
+    }
+    var latestWidgetsHeights = 0;
+    $('.gridster ul li.gs-w .card-widget').each(function () {
+      latestWidgetsHeights += $(this).height();
+    });
+    if (latestWidgetsHeights !== previousWidgetsHeights) {
+      previousWidgetsHeights = latestWidgetsHeights;
+      toleranceCycles = 0;
+    }
+    else {
+      toleranceCycles++;
+    }
+  }, 200);
+
+  huePubSub.subscribe('plotly.afterplot', function (element){
+    resizeGridsterWidget($(element).parents('li.gs-w'));
   }, 'dashboard');
 
 %endif
