@@ -684,6 +684,19 @@
         expect(actual).toEqual([{ name: 't' }, { name: 'testMap' }]);
       });
 
+      it('should expand a simple map reference without alias', function () {
+        var tablePrimaries = [
+          { alias: 't', identifierChain: [{ name: 'testTable' }] },
+          { identifierChain: [{ name: 't' }, { name: 'testMap' }] }
+        ];
+
+        var identifierChain = [{ name: 'testMap' }];
+
+        var actual = sqlAutocompleteParser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
+
+        expect(actual).toEqual([{ name: 't' }, { name: 'testMap' }]);
+      });
+
       it('should not expand without map reference', function () {
         var tablePrimaries = [
           { alias: 't1', identifierChain: [{ name: 'databaseTwo' }, { name: 'testTable1' }] },

@@ -715,7 +715,11 @@ var SqlParseSupport = (function () {
       }
       var expand = function (identifier, expandedChain) {
         var foundPrimary = tablePrimaries.filter(function (tablePrimary) {
-          return equalIgnoreCase(tablePrimary.alias, identifier);
+          var primaryIdentifier = tablePrimary.alias;
+          if (!primaryIdentifier && tablePrimary.identifierChain && tablePrimary.identifierChain.length > 0) {
+            primaryIdentifier = tablePrimary.identifierChain[tablePrimary.identifierChain.length - 1].name;
+          }
+          return equalIgnoreCase(primaryIdentifier, identifier);
         });
 
         if (foundPrimary.length === 1 && foundPrimary[0].identifierChain) {
