@@ -1161,6 +1161,8 @@ def copy(request):
     params = ['src_path']
     def bulk_copy(*args, **kwargs):
         for arg in args:
+            if arg['src_path'] == arg['dest_path']:
+                raise PopupException(_('Source path and destination path cannot be same'))
             request.fs.copy(arg['src_path'], arg['dest_path'], recursive=True, owner=request.user)
     return generic_op(CopyFormSet, request, bulk_copy, ["src_path", "dest_path"], None,
                       data_extractor=formset_data_extractor(recurring, params),
