@@ -122,7 +122,8 @@ class QueryApi(Api):
         'progress': int(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100,
         'duration': app.get('duration'),
         'submitted': app.get('submitted'),
-        'type': 'queries'
+        'type': 'queries',
+        'doc_url': "%s/query_plan?query_id=%s" % (self.api.url, appid)
     }
 
     common['properties'] = {
