@@ -6528,7 +6528,9 @@
         this._impalaDagre = impalaDagre(id);
       },
       update: function (element, valueAccessor) {
-        this._impalaDagre.update(ko.unwrap(valueAccessor()));
+        var props = ko.unwrap(valueAccessor());
+        this._impalaDagre.update(props.value);
+        this._impalaDagre.height(props.height);
       }
     };
   })();
