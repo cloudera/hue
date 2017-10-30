@@ -374,15 +374,72 @@ var SqlParseSupport = (function () {
       }
     };
 
+    var getCleanImpalaPrimaries = function (primaries) {
+      var cleanPrimaries = [];
+      for (var i = primaries.length - 1; i >= 0; i--) {
+        var cleanPrimary = primaries[i];
+        if (cleanPrimary.identifierChain && cleanPrimary.identifierChain.length > 0) {
+          for (var j = i - 1; j >=0; j--) {
+            var parentPrimary = primaries[j];
+            if (parentPrimary.alias && cleanPrimary.identifierChain[0].name === parentPrimary.alias) {
+              var restOfChain = cleanPrimary.identifierChain.concat();
+              restOfChain.shift();
+              if (cleanPrimary.alias) {
+                cleanPrimary = { identifierChain: parentPrimary.identifierChain.concat(restOfChain), alias: cleanPrimary.alias, impalaComplex: true };
+              } else {
+                cleanPrimary = { identifierChain: parentPrimary.identifierChain.concat(restOfChain), impalaComplex: true };
+              }
+            }
+          }
+        }
+        cleanPrimaries.push(cleanPrimary);
+      }
+      return cleanPrimaries;
+    };
+
     parser.commitLocations = function () {
+      if (parser.yy.locations.length === 0) {
+        return;
+      }
+
+      var tablePrimaries = parser.yy.latestTablePrimaries;
+
+      if (parser.isImpala()) {
+        tablePrimaries = [];
+        getCleanImpalaPrimaries(parser.yy.latestTablePrimaries).forEach(function (primary) {
+          var cleanPrimary = primary;
+          if (primary.identifierChain && primary.identifierChain.length > 0) {
+            for (var j = parser.yy.primariesStack.length - 1; j >= 0; j--) {
+              getCleanImpalaPrimaries(parser.yy.primariesStack[j]).every(function (parentPrimary) {
+                if (parentPrimary.alias && parentPrimary.alias === primary.identifierChain[0].name) {
+                  var identifierChain = primary.identifierChain.concat();
+                  identifierChain.shift();
+                  cleanPrimary = { identifierChain: parentPrimary.identifierChain.concat(identifierChain) };
+                  if (primary.alias) {
+                    cleanPrimary.alias = primary.alias;
+                  }
+                  return false;
+                }
+                return true;
+              });
+            }
+          }
+          tablePrimaries.unshift(cleanPrimary);
+        });
+      }
       var i = parser.yy.locations.length;
+
       while (i--) {
         var location = parser.yy.locations[i];
 
         // Impala can have references to previous tables after FROM, i.e. FROM testTable t, t.testArray
         // In this testArray would be marked a type table so we need to switch it to column.
-        if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 1 && parser.yy.latestTablePrimaries) {
-          var found = parser.yy.latestTablePrimaries.filter(function (primary) {
+        if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 1 && tablePrimaries) {
+          var allPrimaries = tablePrimaries;
+          parser.yy.primariesStack.forEach(function (parentPrimaries) {
+            allPrimaries = getCleanImpalaPrimaries(parentPrimaries).concat(allPrimaries);
+          });
+          var found = allPrimaries.filter(function (primary) {
             return equalIgnoreCase(primary.alias, location.identifierChain[0].name);
           });
           if (found.length > 0) {
@@ -390,24 +447,30 @@ var SqlParseSupport = (function () {
           }
         }
 
-        if (location.type === 'database' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0 && parser.yy.latestTablePrimaries) {
-          var foundAlias = parser.yy.latestTablePrimaries.filter(function (primary) {
+        if (location.type === 'database' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0 && tablePrimaries) {
+          var allPrimaries = tablePrimaries;
+          parser.yy.primariesStack.forEach(function (parentPrimaries) {
+            allPrimaries = getCleanImpalaPrimaries(parentPrimaries).concat(allPrimaries);
+          });
+          var foundAlias = allPrimaries.filter(function (primary) {
             return equalIgnoreCase(primary.alias, location.identifierChain[0].name);
           });
-          if (foundAlias.length > 0) {
+          if (foundAlias.length > 0 && parser.isImpala()) {
             // Impala complex reference in FROM clause, i.e. FROM testTable t, t.testMap tm
             location.type = 'table';
-            parser.expandIdentifierChain(location, true);
+            parser.expandIdentifierChain({ tablePrimaries: allPrimaries, wrapper: location, anyOwner: true });
+            location.type = location.identifierChain.length === 1 ? 'table' : 'complex';
+            continue;
           }
         }
 
         if (location.type === 'unknown') {
-          if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0 && location.identifierChain.length <= 2 && parser.yy.latestTablePrimaries) {
-            var found = parser.yy.latestTablePrimaries.filter(function (primary) {
+          if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0 && location.identifierChain.length <= 2 && tablePrimaries) {
+            var found = tablePrimaries.filter(function (primary) {
               return equalIgnoreCase(primary.alias, location.identifierChain[0].name) || (primary.identifierChain && equalIgnoreCase(primary.identifierChain[0].name, location.identifierChain[0].name));
             });
             if (!found.length && location.firstInChain) {
-              found = parser.yy.latestTablePrimaries.filter(function (primary) {
+              found = tablePrimaries.filter(function (primary) {
                 return !primary.alias && primary.identifierChain && equalIgnoreCase(primary.identifierChain[primary.identifierChain.length - 1].name, location.identifierChain[0].name);
               });
             }
@@ -417,13 +480,13 @@ var SqlParseSupport = (function () {
                 location.type = 'database';
               } else if (found[0].alias && equalIgnoreCase(location.identifierChain[0].name, found[0].alias) && location.identifierChain.length > 1) {
                 location.type = 'column';
-                parser.expandIdentifierChain(location, true);
+                parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: true });
               } else if (!found[0].alias && found[0].identifierChain && equalIgnoreCase(location.identifierChain[0].name, found[0].identifierChain[found[0].identifierChain.length - 1].name) && location.identifierChain.length > 1) {
                 location.type = 'column';
-                parser.expandIdentifierChain(location, true);
+                parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: true });
               } else {
-                location.type = 'table';
-                parser.expandIdentifierChain(location, true);
+                location.type = found[0].impalaComplex ? 'complex' : 'table';
+                parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: true });
               }
             } else {
               if (parser.yy.subQueries) {
@@ -440,10 +503,11 @@ var SqlParseSupport = (function () {
         }
 
         if (location.type === 'asterisk' && !location.linked) {
-          if (parser.yy.latestTablePrimaries && parser.yy.latestTablePrimaries.length > 0) {
+
+          if (tablePrimaries && tablePrimaries.length > 0) {
             location.tables = [];
             location.linked = false;
-            parser.expandIdentifierChain(location, true);
+            parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: true });
             if (location.tables.length === 0) {
               parser.yy.locations.splice(i, 1);
             }
@@ -481,7 +545,8 @@ var SqlParseSupport = (function () {
           }
 
           var initialIdentifierChain = location.identifierChain ? location.identifierChain.concat() : undefined;
-          parser.expandIdentifierChain(location, true, true, true);
+
+          parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: true, isColumnWrapper: true, isColumnLocation: true });
 
           if (typeof location.identifierChain === 'undefined') {
             parser.yy.locations.splice(i, 1);
@@ -742,12 +807,17 @@ var SqlParseSupport = (function () {
       }
     };
 
-    parser.expandIdentifierChain = function (wrapper, anyOwner, isColumnWrapper, isColumnLocation) {
-      if (typeof wrapper.identifierChain === 'undefined' || typeof parser.yy.latestTablePrimaries === 'undefined') {
+    parser.expandIdentifierChain = function (options) {
+      var wrapper = options.wrapper;
+      var anyOwner = options.anyOwner;
+      var isColumnWrapper = options.isColumnWrapper;
+      var isColumnLocation = options.isColumnLocation;
+      var tablePrimaries = options.tablePrimaries || parser.yy.latestTablePrimaries;
+
+      if (typeof wrapper.identifierChain === 'undefined' || typeof tablePrimaries === 'undefined') {
         return;
       }
       var identifierChain = wrapper.identifierChain.concat();
-      var tablePrimaries = parser.yy.latestTablePrimaries;
 
       if (tablePrimaries.length === 0) {
         delete wrapper.identifierChain;
@@ -784,7 +854,7 @@ var SqlParseSupport = (function () {
       }
 
       if (!anyOwner) {
-        tablePrimaries = filterTablePrimariesForOwner(wrapper.owner);
+        tablePrimaries = filterTablePrimariesForOwner(tablePrimaries, wrapper.owner);
       }
       // Impala can have references to maps or array, i.e. FROM table t, t.map m
       // We need to replace those in the identifierChain
@@ -913,9 +983,9 @@ var SqlParseSupport = (function () {
       }
     };
 
-    var filterTablePrimariesForOwner = function (owner) {
+    var filterTablePrimariesForOwner = function (tablePrimaries, owner) {
       var result = [];
-      parser.yy.latestTablePrimaries.forEach(function (primary) {
+      tablePrimaries.forEach(function (primary) {
         if (typeof owner === 'undefined' && typeof primary.owner === 'undefined') {
           result.push(primary);
         } else if (owner === primary.owner) {
@@ -992,7 +1062,7 @@ var SqlParseSupport = (function () {
       });
 
       if (typeof parser.yy.result.suggestColumns !== 'undefined' && !parser.yy.result.suggestColumns.linked) {
-        var tablePrimaries = filterTablePrimariesForOwner(parser.yy.result.suggestColumns.owner);
+        var tablePrimaries = filterTablePrimariesForOwner(parser.yy.latestTablePrimaries, parser.yy.result.suggestColumns.owner);
         if (!parser.yy.result.suggestColumns.tables) {
           parser.yy.result.suggestColumns.tables = [];
         }
@@ -1007,7 +1077,7 @@ var SqlParseSupport = (function () {
             if (tablePrimaries.length === 1 && (tablePrimaries[0].alias || tablePrimaries[0].subQueryAlias)) {
               convertTablePrimariesToSuggestions(tablePrimaries);
             }
-            parser.expandIdentifierChain(parser.yy.result.suggestColumns, false, true);
+            parser.expandIdentifierChain({ wrapper: parser.yy.result.suggestColumns, anyOwner: false, isColumnWrapper: true });
           }
         } else {
           // Expand exploded views in the identifier chain
@@ -1022,24 +1092,24 @@ var SqlParseSupport = (function () {
                 parser.yy.result.suggestKeywords[0].value === '*') {
                 delete parser.yy.result.suggestKeywords;
               }
-              parser.expandIdentifierChain(parser.yy.result.suggestColumns, false, true);
+              parser.expandIdentifierChain({ wrapper: parser.yy.result.suggestColumns, anyOwner: false, isColumnWrapper: true });
             }
           } else {
-            parser.expandIdentifierChain(parser.yy.result.suggestColumns, false, true);
+            parser.expandIdentifierChain({ wrapper: parser.yy.result.suggestColumns, anyOwner: false, isColumnWrapper: true });
           }
         }
       }
 
       if (typeof parser.yy.result.colRef !== 'undefined' && !parser.yy.result.colRef.linked) {
-        parser.expandIdentifierChain(parser.yy.result.colRef);
+        parser.expandIdentifierChain({ wrapper: parser.yy.result.colRef });
 
-        var primaries = filterTablePrimariesForOwner();
+        var primaries = filterTablePrimariesForOwner(parser.yy.latestTablePrimaries);
         if (primaries.length === 0 || (primaries.length > 1 && parser.yy.result.colRef.identifierChain.length === 1)) {
           parser.yy.result.colRef.identifierChain = [];
         }
       }
       if (typeof parser.yy.result.suggestKeyValues !== 'undefined' && !parser.yy.result.suggestKeyValues.linked) {
-        parser.expandIdentifierChain(parser.yy.result.suggestKeyValues);
+        parser.expandIdentifierChain({ wrapper: parser.yy.result.suggestKeyValues });
       }
     };
 
