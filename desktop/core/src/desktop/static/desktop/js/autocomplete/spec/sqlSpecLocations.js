@@ -54,6 +54,26 @@
       });
     });
 
+    it('should report locations for "SELECT o.order_id FROM customers c, c.orders o;"', function () {
+      assertLocations({
+        beforeCursor: 'SELECT o.order_id FROM customers c, c.orders o;',
+        dialect: 'impala',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 47 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 18 } },
+          { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, identifierChain: [{ name: 'customers' }, { name: 'orders' }], qualified: false },
+          { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 18 }, identifierChain: [{ name: 'order_id' }], qualified: true, tables: [{ identifierChain: [{ name: 'customers' }, { name: 'orders' }], alias: 'o' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 24, last_column: 33 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'alias', source: 'table', alias: 'c', location: { first_line: 1, last_line: 1, first_column: 34, last_column: 35 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 38 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 45 }, identifierChain: [{ name: 'orders' }], tables: [{ identifierChain: [{ name: 'customers' }], alias: 'c' }], qualified: false },
+          { type: 'alias', source: 'table', alias: 'o', location: { first_line: 1, last_line: 1, first_column: 46, last_column: 47 }, identifierChain: [{ name: 'c' }, { name: 'orders' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 47, last_column: 47 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 47, last_column: 47 } }
+        ]
+      });
+    });
+
     it('should report locations for "SELECT tm.| FROM testTable t, t.testMap tm;"', function() {
       assertLocations({
         beforeCursor: 'SELECT tm.',
