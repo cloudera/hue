@@ -3666,6 +3666,10 @@ $(document).ready(function () {
     resizeGridsterWidget($(element).parents('li.gs-w'));
   }, 'dashboard');
 
+  huePubSub.subscribe('leaflet.afterplot', function (element){
+    resizeGridsterWidget($(element).parents('li.gs-w'));
+  }, 'dashboard');
+
 %endif
 
   $(document).on("click", ".widget-settings-pill", function(){

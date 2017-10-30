@@ -158,6 +158,9 @@
                 _map.on("zoomend", function () {
                   _onRegionChange(_map.getBounds());
                 });
+                _map.on("viewreset", function(){
+                  huePubSub.publish('leaflet.afterplot', element);
+                });
               }
 
             }
