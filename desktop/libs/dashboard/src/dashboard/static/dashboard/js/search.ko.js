@@ -51,7 +51,7 @@ function loadSearchLayout(viewModel, json_layout) {
 
 function layoutToGridster(vm) {
   var numCols = 12;
-  var defaultWidgetHeight = 5;
+  var defaultWidgetHeight = 40;
   var layout = [];
 
   // flat layout
@@ -59,11 +59,18 @@ function layoutToGridster(vm) {
   $.each(vm.columns(), function (indexY, column) {
     $.each(column.rows(), function (indexY, row) {
       $.each(row.widgets(), function (indexX, widget) {
-        layout.push({col: 1, row: 1 + rowCnt*defaultWidgetHeight, sizex: numCols, sizey: defaultWidgetHeight, widget: vm.getWidgetById(widget.id())});
+        layout.push({
+          col: 1,
+          row: 1 + rowCnt * defaultWidgetHeight,
+          sizex: numCols,
+          sizey: defaultWidgetHeight,
+          widget: vm.getWidgetById(widget.id())
+        });
         rowCnt++;
       });
     });
   });
+
 
   // $.each(vm.columns(), function (indexY, column) {
   //   $.each(column.rows(), function (indexY, row) {
