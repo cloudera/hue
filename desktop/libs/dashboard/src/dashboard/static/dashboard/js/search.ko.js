@@ -699,35 +699,37 @@ var Collection = function (vm, collection) {
   }
 
   self._addObservablesToFacet = function(facet, vm) {
-    if (facet.properties) { // Very top facet
-	if (facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
+    // Very top facet
+    if (facet.properties && facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
       facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
         var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
       });
+
+      if (facet.properties.facets) {
+        facet.properties.facets.subscribe(function(newValue) {
+          vm.search();
+        });
+      }
     }
 
-    facet.properties.limit.subscribe(function () {
+    var facet_properties = facet.properties ? facet.properties : facet; // Old facet, nested facet
+
+    facet_properties.limit.subscribe(function () {
       vm.search();
     });
-    facet.properties.mincount.subscribe(function () {
+    facet_properties.mincount.subscribe(function () {
       vm.search();
     });
-    if (facet.properties.gap) {
-      facet.properties.gap.subscribe(function () {
+    if (facet_properties.gap) {
+      facet_properties.gap.subscribe(function () {
         vm.search();
       });
     }
-    if (facet.properties.aggregate) {
-      facet.properties.aggregate.function.subscribe(function () {
+    if (facet_properties.aggregate) {
+      facet_properties.aggregate.function.subscribe(function () {
         vm.search();
       });
-    }
-    if (facet.properties.facets) {
-      facet.properties.facets.subscribe(function(newValue) {
-        vm.search();
-      });
-    }
     }
 
     // For Solr 5+ facets only
@@ -932,17 +934,17 @@ var Collection = function (vm, collection) {
           var facet = ko.mapping.fromJS(data.facet);
 
           if (false) {
-        	// get doc2
+            // get doc2
 
-        	// facet.subfacet = ko.mapping.fromJS(data.facet);
-        	// self._addObservablesToFacet(facet, vm); // needed if we only have result?
-        	// "read only"
-        	// .isLoading(false)
+            // facet.subfacet = ko.mapping.fromJS(data.facet);
+            // self._addObservablesToFacet(facet, vm); // needed if we only have result?
+            // "read only"
+            // .isLoading(false)
           } else {
             self._addObservablesToFacet(facet, vm); // Top widget
             if (facet.properties.facets) { // Sub facet
-        	  self._addObservablesToFacet(facet.properties.facets()[0], vm);
-        	}
+              self._addObservablesToFacet(facet.properties.facets()[0], vm);
+            }
           }
 
           self.facets.push(facet);
