@@ -56,6 +56,12 @@
     });
   }
 
+  function eventEmitterSetup(element) {
+    element.on('plotly_afterplot', function () {
+      huePubSub.publish('plotly.afterplot', element);
+    });
+  }
+
   ko.bindingHandlers.pieChart = {
     init: function (element, valueAccessor) {
       resizeHandlers(element);
@@ -75,6 +81,7 @@
           chartData.labels.push(el.label);
         });
         Plotly.newPlot(element, [chartData], PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
+        eventEmitterSetup(element);
       }, 200);
     }
   };
@@ -99,6 +106,7 @@
         chartData.push(chartSerie)
       });
       Plotly.newPlot(element, chartData, PLOTLY_COMMON_LAYOUT, PLOTLY_COMMON_OPTIONS);
+      eventEmitterSetup(element);
     }, 200);
   }
 
