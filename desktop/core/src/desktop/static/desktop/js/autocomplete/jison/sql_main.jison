@@ -3108,7 +3108,7 @@ TableSubQueryInner
    {
      var subQuery = parser.getSubQuery($2);
      subQuery.columns.forEach(function (column) {
-       parser.expandIdentifierChain(column);
+       parser.expandIdentifierChain({ wrapper: column });
        delete column.linked;
      });
      parser.popQueryState(subQuery);
