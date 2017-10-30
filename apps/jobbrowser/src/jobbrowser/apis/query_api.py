@@ -101,45 +101,27 @@ class QueryApi(Api):
       return float(time)
 
   def app(self, appid):
-    query = self.api.get_query_profile(query_id=appid)
-    if query.get('error'):
+    apps = self.apps({
+      'text': 'id:' + appid
+    })
+
+    if not apps.get('apps'):
       return {
         'status': -1,
-        'message': query.get('error')
+        'message': _('Unknown or expired query id %s') % appid
       }
-
-    user = re.search(r"^\s*User:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-    status = re.search(r"^\s*Query State:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-    stmt = re.search(r"^\s*Sql Statement:\s?([^\n\r]*)", query['profile'], re.MULTILINE).group(1)
-    partitions = re.findall(r"partitions=\s*(\d)+\s*\/\s*(\d)+", query['profile'])
-    end_time = re.search(r"^\s*End Time:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-    submitted = re.search(r"^\s*Start Time:\s?([^\n\r]*)$", query['profile'], re.MULTILINE).group(1)
-
-    progress = 0
-    if end_time:
-      progress = 100
-    elif partitions:
-      for partition in partitions:
-        progress += float(partition[0]) / float(partition[1])
-      progress /= len(partitions)
-      progress *= 100
-
-    if end_time:
-      end_time_ms = int(time.mktime(datetime.strptime(end_time[:26], '%Y-%m-%d %H:%M:%S.%f').timetuple()))*1000
-      start_time_ms = int(time.mktime(datetime.strptime(submitted[:26], '%Y-%m-%d %H:%M:%S.%f').timetuple()))*1000
-      duration_ms = end_time_ms - start_time_ms
-    else:
-      duration_ms = 0
+    app = apps.get('apps')[0]
+    progress_groups = re.search(r"(\d{0,3})%", app.get('progress'))
 
     common = {
-        'id': appid,
-        'name': stmt,
-        'status': status,
-        'apiStatus': self._api_status(status),
-        'user': user,
-        'progress': progress,
-        'duration': duration_ms,
-        'submitted': submitted,
+        'id': app.get('id'),
+        'name': app.get('name'),
+        'status': app.get('status'),
+        'apiStatus': app.get('apiStatus'),
+        'user': app.get('user'),
+        'progress': int(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100,
+        'duration': app.get('duration'),
+        'submitted': app.get('submitted'),
         'type': 'queries'
     }
 
@@ -218,13 +200,13 @@ class QueryApi(Api):
         'status':'status'
       }
 
-      def makeLambda(name, value):
+      def make_lambda(name, value):
         return lambda app: app[name] == value
 
       for key, name in filter_names.items():
           text_filter = re.search(r"\s*("+key+")\s*:([^ ]+)", filters.get("text"))
           if text_filter and text_filter.group(1) == key:
-            filter_list.append(makeLambda(name, text_filter.group(2).strip()))
+            filter_list.append(make_lambda(name, text_filter.group(2).strip()))
     if filters.get("time"):
       time_filter = filters.get("time")
       period_ms = self._time_in_ms(float(time_filter.get("time_value")), time_filter.get("time_unit")[0:1])
