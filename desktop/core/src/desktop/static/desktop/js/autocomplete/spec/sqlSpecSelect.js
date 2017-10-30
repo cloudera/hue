@@ -3382,6 +3382,19 @@
         });
       });
 
+      it('should suggest columns for "SELECT testMap.| FROM testTable t, t.testMap;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT testMap.',
+          afterCursor: ' FROM testTable t, t.testMap;',
+          dialect: 'impala',
+          expectedResult: {
+            suggestKeywords: ['*'],
+            lowerCase: false,
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'testMap' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+          }
+        });
+      });
+
       it('should suggest columns for "SELECT tm.a| FROM testTable t, t.testMap tm;"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT tm.a',
