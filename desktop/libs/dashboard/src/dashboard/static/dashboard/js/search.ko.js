@@ -685,7 +685,7 @@ var Collection = function (vm, collection) {
     return _field;
   };
 
-  self._get_field_operations = function(field, facet) {
+  self._get_field_operations = function(field, facet) {console.log('aaaa ' + field);
     if (! field) {
       return HIT_OPTIONS;
     } else if (isNumericColumn(field.type())) {
@@ -693,16 +693,16 @@ var Collection = function (vm, collection) {
     } else if (isDateTimeColumn(field.type())) {
       return DATETIME_HIT_OPTIONS;
     } else {
-      facet.properties.facets_form.aggregate.function('count');
-      return facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : ALPHA_HIT_OPTIONS;
+      //facet.properties.facets_form.aggregate.function('count');
+      return ALPHA_HIT_OPTIONS; //facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : ALPHA_HIT_OPTIONS;
     }
   }
 
-  self._addObservablesToFacet = function(facet, vm) {
-    // Very top facet
+  // Very top facet
+  self._addObservablesToFacet = function(facet, vm) { 
     if (facet.properties && facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
       facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
-        var _field = self.getTemplateField(facet.widgetType() == 'hit-widget' ? facet.field() : facet.properties.facets_form.field(), self.template.fieldsAttributes());
+        var _field = self.getTemplateField(facet.properties.facets_form.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
       });
 
@@ -711,29 +711,27 @@ var Collection = function (vm, collection) {
           vm.search();
         });
       }
+    } else {
+	    facet.properties.limit.subscribe(function () {
+	      vm.search();
+	    });
+	    facet.properties.mincount.subscribe(function () {
+	      vm.search();
+	    });
+	    if (facet.properties.gap) {
+	      facet.properties.gap.subscribe(function () {
+	        vm.search();
+	      });
+	    }
+	    if (facet.properties.aggregate) {
+	      facet.properties.aggregate.function.subscribe(function () {
+	        vm.search();
+	      });
+	    }
     }
-
-    var facet_properties = facet.properties ? facet.properties : facet; // Old facet, nested facet
-
-    facet_properties.limit.subscribe(function () {
-      vm.search();
-    });
-    facet_properties.mincount.subscribe(function () {
-      vm.search();
-    });
-    if (facet_properties.gap) {
-      facet_properties.gap.subscribe(function () {
-        vm.search();
-      });
-    }
-    if (facet_properties.aggregate) {
-      facet_properties.aggregate.function.subscribe(function () {
-        vm.search();
-      });
-    }
-
-    // For Solr 5+ facets only
-    if (typeof facet.template != 'undefined') {
+        
+    // For Solr 5+  only
+    if (typeof facet.template != 'undefined') {        
       facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields
         var _fields = [];
 
@@ -784,18 +782,48 @@ var Collection = function (vm, collection) {
         type: self.engine(),
       }));
     }
+    
+    if (facet.properties.facets) { // Sub facet
+    	$.each(facet.properties.facets(), function (index, nestedFacet) {
+          self._addObservablesToNestedFacet(self, nestedFacet, vm);
+    	});
+      }
+  }
+  
+  self._addObservablesToNestedFacet = function(facet, nestedFacet, vm) {
+
+	nestedFacet.limit.subscribe(function () {
+      vm.search();
+    });
+	  nestedFacet.mincount.subscribe(function () {
+      vm.search();
+    });
+    if (nestedFacet.gap) {
+      nestedFacet.gap.subscribe(function () {
+        vm.search();
+      });
+    }
+
+    nestedFacet.aggregate.function.subscribe(function () {
+      vm.search();
+    });
+
+    nestedFacet.aggregate.metrics = ko.computed(function() {
+	  var _field = self.getTemplateField(nestedFacet.field(), facet.template.fieldsAttributes());
+	  return self._get_field_operations(_field, facet);
+	});
   }
 
   self.facets = ko.mapping.fromJS(collection.facets);
   $.each(self.facets(), function (index, facet) {
     self._addObservablesToFacet(facet, vm);
 
-    if (facet.properties.aggregate && facet.properties.aggregate.function) {
+  /*  if (facet.properties.aggregate && facet.properties.aggregate.function) {
       facet.properties.aggregate.function.subscribe(function () {
         vm.search();
       });
-    }
-
+    }*/
+/*
     if (typeof facet.properties.facets != 'undefined') {
       $.each(facet.properties.facets(), function (index, pivotFacet) {
         if (pivotFacet.aggregate && pivotFacet.aggregate.function) {
@@ -804,7 +832,7 @@ var Collection = function (vm, collection) {
           });
         }
       });
-    }
+    }*/
   });
 
 
@@ -942,9 +970,6 @@ var Collection = function (vm, collection) {
             // .isLoading(false)
           } else {
             self._addObservablesToFacet(facet, vm); // Top widget
-            if (facet.properties.facets) { // Sub facet
-              self._addObservablesToFacet(facet.properties.facets()[0], vm);
-            }
           }
 
           self.facets.push(facet);

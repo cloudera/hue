@@ -570,6 +570,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="facet-toggle2">
   <div class="pull-left margin-right-20">
+  
+  ## TODO toggle3 for nested facet probably / compat for toggle2
+  
 ##   <!-- ko if: $root.isEditing -->
 ##     <!-- ko if: properties.canRange() && typeof properties.type != "undefined" -->
 ##     <div class="facet-field-cnt">
@@ -582,20 +585,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 ##       </a>
 ##     </div>
 ##     <!-- /ko -->
-## 
-##     <!-- ko if: widgetType() != 'hit-widget' -->
-##     <div class="facet-field-cnt">
-##       <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
-##       <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click:  function() { $root.collection.toggleSortFacet2($data, $data); }">
-##         <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc', 'fa-sort': properties.sort() == 'default' }"></i>
-##         <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
-##         <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
-##         <span data-bind="visible: properties.sort() == 'default'">${_('default')}</span>
-##       </a>
-##     </div>
-##     <!-- /ko -->
-## 
-## 
+##  
 ##     <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'nested' && typeof properties.min != "undefined") -->
 ##       <!-- ko ifnot: properties.isDate() -->
 ##         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
@@ -2075,14 +2065,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
     <!-- ko if: $root.isEditing -->
     <div>
-      ## For Counter widget
-      <!-- ko if: $data.function() != 'field' && $parent.properties -->
-        <select data-bind="options: $parents[1].properties.facets_form.aggregate.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
-      <!-- /ko -->
-
-      <!-- ko if: $data.function() != 'field' -->
-        <select data-bind="options: $parents[1].properties.facets_form.aggregate.metrics, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-small"></select>
-      <!-- /ko -->
+      ##<!-- ko if: $data.function() != 'field' -->
+        <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0)" class="input-small"></select>
+      ##<!-- /ko -->
 
       <!-- ko if: $data.function() == 'percentile' -->
         <!-- ko foreach: percentiles() -->
