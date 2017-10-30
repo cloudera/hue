@@ -15,11 +15,17 @@ function impalaDagre(id) {
   var _impalaDagree = {
     update: function(plan) {
       renderGraph(plan);
+    },
+    height: function(value) {
+      var scale = _impalaDagree.scale || 1;
+      var height = value || 600;
+      svg.attr('height', Math.min(g.graph().height * scale + 40, height) || height);
     }
   };
 
   // Set up zoom support
   var zoom = d3.behavior.zoom().on("zoom", function() {
+    _impalaDagree.scale = d3.event.scale;
     inner.attr("transform", "translate(" + d3.event.translate + ")" +
                "scale(" + d3.event.scale + ")");
   });
@@ -132,11 +138,12 @@ function impalaDagre(id) {
 
     // Center the graph, but only the first time through (so as to not lose user zooms).
     if (is_first) {
-      var initialScale = 0.75;
+      var initialScale = 1;
+      _impalaDagree.scale = initialScale;
       zoom.translate([((svg.attr("width") || $("#"+id).width()) - g.graph().width * initialScale) / 2, 20])
         .scale(initialScale)
         .event(svg);
-      svg.attr('height', Math.max(g.graph().height * initialScale + 40, 600));
+      svg.attr('height', Math.min(g.graph().height * initialScale + 40, 600));
       is_first = false;
     }
 
