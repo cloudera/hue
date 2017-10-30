@@ -1874,6 +1874,10 @@ var SqlAutocompleter3 = (function () {
     try {
       parseResult = self.parseActiveStatement();
 
+      if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
+        console.log(parseResult);
+      }
+
       // This could happen in case the user is editing at the borders of the statement and the locations haven't
       // been updated yet, in that case we have to force a location update before parsing
       if (!parseResult) {
