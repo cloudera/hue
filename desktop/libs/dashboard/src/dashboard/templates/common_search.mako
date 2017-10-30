@@ -570,7 +570,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="facet-toggle2">
   <div class="pull-left margin-right-20">
-    ## Dimension 1
 ##   <!-- ko if: $root.isEditing -->
 ##     <!-- ko if: properties.canRange() && typeof properties.type != "undefined" -->
 ##     <div class="facet-field-cnt">
@@ -605,44 +604,27 @@ ${ dashboard.layout_skeleton(suffix='search') }
 ##         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
 ##       <!-- /ko -->
 ##     <!-- /ko -->
-## 
-## 
-##     <div class="facet-field-cnt">
-##       <span class="spinedit-cnt">
-##         <span class="facet-field-label facet-field-label-fixed-width">
-##           ${ _('Limit') }
-##         </span>
-##         <input type="text" class="input-medium" data-bind="spinedit: properties.limit"/>
-##       </span>
-##     </div>
-## 
-##     <div class="facet-field-cnt">
-##       <span class="spinedit-cnt">
-##         <span class="facet-field-label facet-field-label-fixed-width">
-##           ${ _('Min Count') }
-##         </span>
-##         <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
-##       </span>
-##     </div>
-## 
-##     <div class="facet-field-cnt" data-bind="visible: $root.collection.nested.enabled">
-##       <span class="spinedit-cnt">
-##         <span class="facet-field-label">
-##           ${ _('Domain') }
-##         </span>
-##         ${ _('Parent') }
-##         <select data-bind="selectedOptions: properties.domain.blockParent, options: $root.collection.nestedNames" size="5" multiple="true"></select>
-##         ${ _('Children') }
-##         <select data-bind="selectedOptions: properties.domain.blockChildren, options: $root.collection.nestedNames" size="5" multiple="true"></select>
-## 
-##         <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
-##       </span>
-##     </div>
+
+
 ##   <!-- /ko -->
 ##   </div>
 
-  ## Dimensions > 1
   <!-- ko if: $root.isEditing -->
+
+  <div class="facet-field-cnt" data-bind="visible: $root.collection.nested.enabled">
+    <span class="spinedit-cnt">
+      <span class="facet-field-label">
+        ${ _('Domain') }
+      </span>
+      ${ _('Parent') }
+      <select data-bind="selectedOptions: properties.domain.blockParent, options: $root.collection.nestedNames" size="5" multiple="true"></select>
+      ${ _('Children') }
+      <select data-bind="selectedOptions: properties.domain.blockChildren, options: $root.collection.nestedNames" size="5" multiple="true"></select>
+
+      <input type="text" class="input-medium" data-bind="spinedit: properties.mincount"/>
+    </span>
+  </div>
+
   <ul data-bind="sortable: { data: properties.facets, options: { axis: 'x', containment: 'parent', handle: '.title' }}" class="unstyled pull-left white">
     <li class="filter-box">
       <div class="title move">
@@ -1769,20 +1751,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div>
-
-      ##<span data-bind="template: { name: 'metric-form' }"></span>
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
       <div class="pull-right" style="margin-top: 40px">
-
-        ##<div class="inline-block hide" style="padding-bottom: 10px; padding-right: 20px">
-        ##  <span class="facet-field-label hide">${ _('Sorting') }</span>
-        ##  <a href="javascript: void(0)" title="${ _('Toggle sort order') }" class="hide" data-bind="click: $root.collection.toggleSortFacet">
-        ##    <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
-        ##    <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
-        ##    <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
-        ##  </a>
-        ##</div>
 
       <!-- ko if: properties.isDate -->
         <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
@@ -2089,7 +2060,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      ##<span data-bind="template: { name: 'metric-form' }"></span>
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
       ## TODO: Range if numeric
     </div>
@@ -2134,7 +2104,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <input data-bind="value: formula, visible: $parent.field() == 'formula', valueUpdate: 'afterkeydown'"></input>
       <input data-bind="value: plain_formula" type="hidden"></input>
 
-      <!-- ko if: $data.function() != 'field' -->
+      <!-- ko if: $data.function() != 'field' && $parents[1].widgetType() != 'hit-widget' -->
       <div class="facet-field-cnt">
         <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
         <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: function() { $root.collection.toggleSortFacet2($parents[1], $parent); }">
