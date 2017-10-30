@@ -646,7 +646,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <ul data-bind="sortable: { data: properties.facets, options: { axis: 'x', containment: 'parent', handle: '.title' }}" class="unstyled pull-left white">
     <li class="filter-box">
       <div class="title move">
-        <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
+        <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }, visible: $parent.properties.facets().length > 1" class="pull-right" href="javascript:void(0)">
           <i class="fa fa-times"></i>
         </a>
         <div class="hit-title" data-bind="text: field, attr: {'title': field}"></div>
