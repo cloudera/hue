@@ -3612,12 +3612,13 @@ $(document).ready(function () {
   });
 
 %if USE_GRIDSTER.get():
+  var WIDGET_BASE_HEIGHT = 50;
   $(".gridster>ul").gridster({
     widget_margins: [5, 5],
-    widget_base_dimensions: ['auto', 100],
+    widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     avoid_overlapped_widgets: true,
     max_cols: 12,
-    max_row: 20,
+    max_rows: 60,
 ##     draggable: {
 ##       handle: '.move-gridster-widget'
 ##     },
@@ -3628,6 +3629,15 @@ $(document).ready(function () {
       },
     }
   });
+
+  huePubSub.subscribe('calculate.gridster.heights', function () {
+    var g = $('.gridster ul').data('gridster');
+    $('.gridster ul li.gs-w').each(function () {
+      var $el = $(this);
+      g.resize_widget($el, $el.data('sizex'), Math.ceil($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+    });
+  }, 'dashboard');
+
 %endif
 
   $(document).on("click", ".widget-settings-pill", function(){
