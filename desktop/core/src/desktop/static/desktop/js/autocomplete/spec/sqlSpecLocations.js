@@ -35,6 +35,74 @@
       });
     };
 
+    it('should report locations for "SELECT * FROM customers c, c.orders o;"', function () {
+      assertLocations({
+        beforeCursor: 'SELECT * FROM customers c, c.orders o;',
+        dialect: 'impala',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 38 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ alias: 'c', identifierChain: [{ name: 'customers' }] }, { alias: 'o', identifierChain: [{ name: 'customers' }, { name: 'orders' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'alias', source: 'table', alias: 'c', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 26 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 29 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 36 }, identifierChain: [{ name: 'orders' }], tables: [{ identifierChain: [{ name: 'customers' }], alias: 'c' }], qualified: false },
+          { type: 'alias', source: 'table', alias: 'o', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 38 }, identifierChain: [{ name: 'c' }, { name: 'orders' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 38, last_column: 38 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 38, last_column: 38 } }
+        ]
+      });
+    });
+
+    it('should report locations for "SELECT tm.| FROM testTable t, t.testMap tm;"', function() {
+      assertLocations({
+        beforeCursor: 'SELECT tm.',
+        afterCursor: ' FROM testTable t, t.testMap tm;',
+        dialect: 'impala',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 42 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 12 } },
+          // TODO: Does it matter if we mark following as complex or column?
+          { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testTable' }, { name: 'testMap' }], qualified: false },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 26 }, identifierChain: [{ name: 'testTable' }] },
+          { type: 'alias', source: 'table', alias: 't', location: { first_line: 1, last_line: 1, first_column: 27, last_column: 28 }, identifierChain: [{ name: 'testTable' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 31 }, identifierChain: [{ name: 'testTable' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column: 39 }, identifierChain: [{ name: 'testMap' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }], qualified: false },
+          { type: 'alias', source: 'table', alias: 'tm', location: { first_line: 1, last_line: 1, first_column: 40, last_column: 42 }, identifierChain: [{ name: 't' }, { name: 'testMap' }] },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 42, last_column: 42 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 42, last_column: 42 } }
+        ]
+      });
+    });
+
+    it('should report locations for "SELECT * FROM customers c, c.orders o, (SELECT price FROM o.items) v;"', function () {
+      assertLocations({
+        beforeCursor: 'SELECT * FROM customers c, c.orders o, (SELECT price FROM o.items) v;',
+        dialect: 'impala',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 69 } },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ alias: 'c', identifierChain: [{ name: 'customers' }] }, { alias: 'o', identifierChain: [{ name: 'customers' }, { name: 'orders' }] }, { identifierChain: [{ subQuery: 'v' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'alias', source: 'table', alias: 'c', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 26 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 29 }, identifierChain: [{ name: 'customers' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 30, last_column: 36 }, identifierChain: [{ name: 'orders' }], tables: [{ identifierChain: [{ name: 'customers' }], alias: 'c' }], qualified: false },
+          { type: 'alias', source: 'table', alias: 'o', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 38 }, identifierChain: [{ name: 'c' }, { name: 'orders' }] },
+          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 48, last_column: 53 }, subquery: true },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 48, last_column: 53 }, identifierChain: [{ name: 'price' }], qualified: false, tables: [{ identifierChain: [{ name: 'customers' }, { name: 'orders' }, { name: 'items' }] }] },
+          { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 59, last_column: 60 }, identifierChain: [{ name: 'customers' }, { name: 'orders' }] },
+          { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 61, last_column: 66 }, identifierChain: [{ name: 'o' }, { name: 'items' }], tables: [{ identifierChain: [{ name: 'customers' }, { name: 'orders' }, { name: 'items' }] }], qualified: false },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 66, last_column: 66 }, subquery: true },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 66, last_column: 66 }, subquery: true },
+          { type: 'alias', source: 'subquery', alias: 'v', location: { first_line: 1, last_line: 1, first_column: 68, last_column: 69 } },
+          { type: 'whereClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 69, last_column: 69 } },
+          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 69, last_column: 69 } }
+        ]
+      });
+    });
+
+
+
     it('should report locations for "select cos(1) as foo from customers order by foo;"', function () {
       assertLocations({
         beforeCursor: 'select cos(1) as foo from customers order by foo; ',
