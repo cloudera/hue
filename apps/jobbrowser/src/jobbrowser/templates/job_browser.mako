@@ -1910,12 +1910,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
             crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             vm.resetBreadcrumbs(crumbs);
-            if (vm.job().type() === 'queries' && !$("#queries-page-plan${ SUFFIX }").parent().children().hasClass("active")) {
-              //show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
-              setTimeout(function () {
+            //show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
+            setTimeout(function () {
+              if (vm.job().type() === 'queries' && !$("#queries-page-plan${ SUFFIX }").parent().children().hasClass("active")) {
                 $("a[href=\'#queries-page-plan${ SUFFIX }\']").tab("show");
-              }, 0)
-            }
+              }
+            }, 0);
             %if not is_mini:
             if (vm.job().type() === 'workflow' && !vm.job().workflowGraphLoaded) {
               vm.job().updateWorkflowGraph();

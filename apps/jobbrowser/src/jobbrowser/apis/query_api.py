@@ -167,8 +167,8 @@ class QueryApi(Api):
 
   def _query(self, appid):
     query = self.api.get_query(query_id=appid)
-    query['summary'] = query.get('summary').strip()
-    query['plan'] = query.get('plan').strip()
+    query['summary'] = query.get('summary').strip() if query.get('summary') else ''
+    query['plan'] = query.get('plan').strip() if query.get('plan') else ''
     return query
 
   def _query_profile(self, appid):
