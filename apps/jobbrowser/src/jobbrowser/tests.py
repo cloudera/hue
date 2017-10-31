@@ -620,12 +620,12 @@ class TestResourceManagerHaNoHadoop:
 
 class TestImpalaApi(object):
   def setUp(self):
-    api = MockImpalaQueryApi()
+    api = MockImpalaQueryApi('http://url.com')
     self.api = QueryApi(None, impala_api=api)
 
   def test_apps(self):
     response = self.api.apps({})
-    target = [{'status': u'FINISHED', 'rows_fetched': 28, 'user': u'admin', 'canWrite': False, 'duration': 3355000.0, 'id': u'8a46a8865624698f:b80b211500000000', 'apiStatus': 'SUCCEEDED', 'name': u'SELECT sample_07.description, sample_07.salary\r\nFROM\r\n  sample_07\r\nWHERE\r\n( sample_07.salary > 10000...', 'submitted': u'2017-10-25 15:38:26.637010000', 'queue': u'root.admin', 'waiting': True, 'progress': u'1 / 1 ( 100%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}, {'status': u'FINISHED', 'rows_fetched': 53, 'user': u'admin', 'canWrite': False, 'duration': 3369000.0, 'id': u'4d497267f34ff17d:817bdfb500000000', 'apiStatus': 'SUCCEEDED', 'name': u'select * from customers', 'submitted': u'2017-10-25 15:38:12.872825000', 'queue': u'root.admin', 'waiting': True, 'progress': u'1 / 1 ( 100%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}]
+    target = [{'status': u'FINISHED', 'rows_fetched': 28, 'user': u'admin', 'canWrite': False, 'duration': 3355000.0, 'id': u'8a46a8865624698f:b80b211500000000', 'apiStatus': 'SUCCEEDED', 'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...', 'submitted': u'2017-10-25 15:38:26.637010000', 'queue': u'root.admin', 'waiting': True, 'progress': u'1 / 1 ( 100%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}, {'status': u'FINISHED', 'rows_fetched': 53, 'user': u'admin', 'canWrite': False, 'duration': 3369000.0, 'id': u'4d497267f34ff17d:817bdfb500000000', 'apiStatus': 'SUCCEEDED', 'name': u'select * from customers', 'submitted': u'2017-10-25 15:38:12.872825000', 'queue': u'root.admin', 'waiting': True, 'progress': u'1 / 1 ( 100%)', 'type': u'QUERY', 'waiting_time': u'52m8s'}]
     for i in range(0,len(target)):
       for key, value in target[i].iteritems():
         assert_equal(response.get('apps')[i].get(key), value)
@@ -633,16 +633,16 @@ class TestImpalaApi(object):
   def test_app(self):
     response = self.api.app('4d497267f34ff17d:817bdfb500000000')
     for key, value in {'status': u'FINISHED', 'name': u'select * from customers',
-     'duration': 211000, 'progress': 100, 'user': u'admin', 'type': 'queries',
-     'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-26 11:19:40.420511000', 'apiStatus': 'SUCCEEDED'}.iteritems():
+     'duration': 3369000.0, 'progress': 100, 'user': u'admin', 'type': 'queries',
+     'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-25 15:38:12.872825000', 'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=4d497267f34ff17d:817bdfb500000000'}.iteritems():
       assert_equal(response.get(key), value)
 
     response = self.api.app('8a46a8865624698f:b80b211500000000')
 
     for key, value in {'status': u'FINISHED',
-     'name': u'SELECT sample_07.description, sample_07.salary', 'duration': 180000, 'progress': 100, 'user': u'admin',
-     'type': 'queries', 'id': '8a46a8865624698f:b80b211500000000', 'submitted': u'2017-10-26 11:20:11.971764000',
-     'apiStatus': 'SUCCEEDED'}.iteritems():
+     'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...', 'duration': 3355000.0, 'progress': 100, 'user': u'admin',
+     'type': 'queries', 'id': '8a46a8865624698f:b80b211500000000', 'submitted': u'2017-10-25 15:38:26.637010000',
+     'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.iteritems():
      assert_equal(response.get(key), value)
 
 
@@ -836,8 +836,8 @@ class MockImpalaQueryApi:
     '4d497267f34ff17d:817bdfb500000000': {u'query_id': u'1a48b5796f8f07f5:49ba9e6b00000000', u'__common__': {u'navbar': [{u'link': u'/backends', u'title': u'/backends'}, {u'link': u'/catalog', u'title': u'/catalog'}, {u'link': u'/hadoop-varz', u'title': u'/hadoop-varz'}, {u'link': u'/log_level', u'title': u'/log_level'}, {u'link': u'/logs', u'title': u'/logs'}, {u'link': u'/memz', u'title': u'/memz'}, {u'link': u'/metrics', u'title': u'/metrics'}, {u'link': u'/queries', u'title': u'/queries'}, {u'link': u'/rpcz', u'title': u'/rpcz'}, {u'link': u'/sessions', u'title': u'/sessions'}, {u'link': u'/threadz', u'title': u'/threadz'}, {u'link': u'/varz', u'title': u'/varz'}], u'process-name': u'impalad'}, u'mem_usage': u'The query is finished, current memory consumption is not available.'},
     '8a46a8865624698f:b80b211500000000': {u'query_id': u'd424420e0c44ab9:c637ac2900000000', u'__common__': {u'navbar': [{u'link': u'/backends', u'title': u'/backends'}, {u'link': u'/catalog', u'title': u'/catalog'}, {u'link': u'/hadoop-varz', u'title': u'/hadoop-varz'}, {u'link': u'/log_level', u'title': u'/log_level'}, {u'link': u'/logs', u'title': u'/logs'}, {u'link': u'/memz', u'title': u'/memz'}, {u'link': u'/metrics', u'title': u'/metrics'}, {u'link': u'/queries', u'title': u'/queries'}, {u'link': u'/rpcz', u'title': u'/rpcz'}, {u'link': u'/sessions', u'title': u'/sessions'}, {u'link': u'/threadz', u'title': u'/threadz'}, {u'link': u'/varz', u'title': u'/varz'}], u'process-name': u'impalad'}, u'mem_usage': u'The query is finished, current memory consumption is not available.'}
   }
-  #PROFILE = {}
-  def __init__(self): pass
+  def __init__(self, url):
+    self.url = url
 
   def get_queries(self, **kwargs):
     return {
