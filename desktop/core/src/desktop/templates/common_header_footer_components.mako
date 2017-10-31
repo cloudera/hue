@@ -21,7 +21,7 @@ from desktop import conf
 from desktop.lib.i18n import smart_unicode
 
 from beeswax.conf import LIST_PARTITIONS_LIMIT
-
+from indexer.conf import ENABLE_NEW_INDEXER
 from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
@@ -31,6 +31,11 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
     var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+    %if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+    var IS_NEW_INDEXER_ENABLED = true;
+    %else:
+    var IS_NEW_INDEXER_ENABLED = false;
+    %endif
 
     %if request and request.COOKIES and request.COOKIES.get('csrftoken','')!='':
     window.CSRF_TOKEN = '${request.COOKIES.get('csrftoken')}';

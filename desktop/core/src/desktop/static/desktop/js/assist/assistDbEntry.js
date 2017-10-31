@@ -501,9 +501,14 @@ var AssistDbEntry = (function () {
     }
   };
 
-  AssistDbEntry.prototype.explore = function () {
+  AssistDbEntry.prototype.explore = function (isSolr) {
     var self = this;
-    huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbSource.sourceType);
+    if (isSolr) {
+      huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.definition.name);
+    }
+    else {
+      huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.getDatabaseName() + '.' + self.getTableName() + '?engine=' + self.assistDbSource.sourceType);
+    }
   };
 
   AssistDbEntry.prototype.openInMetastore = function () {
@@ -523,6 +528,40 @@ var AssistDbEntry = (function () {
       window.open(url, '_blank');
     }
   };
+
+  AssistDbEntry.prototype.openInIndexer = function () {
+    var definitionName = this.definition.name;
+    if (IS_NEW_INDEXER_ENABLED) {
+      if (IS_HUE_4) {
+        huePubSub.publish('open.link', '/indexer/indexes/' + definitionName);
+      }
+      else {
+        window.open('/indexer/indexes/' + definitionName);
+      }
+    }
+    else {
+      var hash = '#edit/' + definitionName;
+      if (IS_HUE_4) {
+        if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
+          window.location.hash = hash;
+        }
+        else {
+          huePubSub.subscribeOnce('app.gained.focus', function (app) {
+            if (app === 'indexes') {
+              window.setTimeout(function () {
+                window.location.hash = hash;
+              }, 0)
+            }
+          });
+          huePubSub.publish('open.link', '/indexer');
+        }
+      }
+      else {
+        window.open('/indexer/' + hash);
+      }
+    }
+  };
+
 
   AssistDbEntry.prototype.toggleOpen = function () {
     var self = this;

@@ -87,33 +87,48 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
   <script type="text/html" id="sql-context-items">
     <!-- ko if: typeof definition !== 'undefined' -->
-    <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
-    <!-- ko if: !definition.isDatabase && $currentApp() === 'editor' -->
-    <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
-    <!-- /ko -->
-    <!-- ko if: definition.isView || definition.isTable || definition.isDatabase -->
-    <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
-    <!-- /ko -->
-    <!-- ko if: definition.isView || definition.isTable -->
-    <li>
-      <a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }">
-        <i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }
-      </a>
-    </li>
-    % if HAS_SQL_ENABLED.get():
-    <li>
-      <a href="javascript: void(0);" data-bind="click: explore">
-        <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }
-      </a>
-    </li>
-    % endif
-    <!-- /ko -->
-    %if ENABLE_QUERY_BUILDER.get():
-    <!-- ko if: definition.isColumn && $currentApp() === 'editor' -->
-    <li class="divider"></li>
-    <!-- ko template: { name: 'query-builder-context-items' } --><!-- /ko -->
-    <!-- /ko -->
-    %endif
+      <!-- ko if: sourceType === 'solr' -->
+        <!-- ko if: definition.isColumn -->
+        <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+        <!-- /ko -->
+        <!-- ko if: definition.isView || definition.isTable -->
+        <li><a href="javascript:void(0);" data-bind="click: openInIndexer"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
+        <li>
+          <a href="javascript: void(0);" data-bind="click: function() { explore(true); }">
+            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }
+          </a>
+        </li>
+        <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko ifnot: sourceType === 'solr' -->
+        <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+        <!-- ko if: !definition.isDatabase && $currentApp() === 'editor' -->
+        <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
+        <!-- /ko -->
+        <!-- ko if: definition.isView || definition.isTable || definition.isDatabase -->
+        <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
+        <!-- /ko -->
+        <!-- ko if: definition.isView || definition.isTable -->
+        <li>
+          <a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }">
+            <i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }
+          </a>
+        </li>
+        % if HAS_SQL_ENABLED.get():
+        <li>
+          <a href="javascript: void(0);" data-bind="click: function() { explore(false); }">
+            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }
+          </a>
+        </li>
+        % endif
+        <!-- /ko -->
+        %if ENABLE_QUERY_BUILDER.get():
+        <!-- ko if: definition.isColumn && $currentApp() === 'editor' -->
+        <li class="divider"></li>
+        <!-- ko template: { name: 'query-builder-context-items' } --><!-- /ko -->
+        <!-- /ko -->
+        %endif
+      <!-- /ko -->
     <!-- /ko -->
   </script>
 
