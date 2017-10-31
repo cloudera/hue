@@ -1339,7 +1339,7 @@
         }
       });
       _el.on("slideStop", function (e) {
-        viewModel.search();
+        searchViewModel.search();
       });
     },
     update: function (element, valueAccessor) {
