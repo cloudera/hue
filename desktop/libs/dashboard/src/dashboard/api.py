@@ -392,6 +392,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       facet_type = 'field'
 
     if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget', 'gradient-map-widget'):
+      properties = {'canRange': False, 'stacked': False}
+
       if widget_type == 'text-facet-widget':
         properties['type'] = facet_type
 
@@ -408,12 +410,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         facet['stacked'] = False
         facet['type'] = 'range'
       else:
-        facet['canRange'] = False
         facet['type'] = facet_type
-
-      if widget_type == 'gradient-map-widget':
-        properties['scope'] = 'world'
-        facet['limit'] = 100
 
       properties['facets'] = [facet]
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
@@ -432,11 +429,14 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         properties['scope'] = 'tree'
         properties['facets_form']['limit'] = 5
         properties['isOldPivot'] = True
+      elif widget_type == 'gradient-map-widget':
+        properties['scope'] = 'world'
+        facet['limit'] = 100
       else:
         properties['scope'] = 'stack'
         properties['timelineChartType'] = 'bar'
 
-  if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
+  if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget') and widget_type != 'gradient-map-widget':
     properties['mincount'] = 1
     properties['facets'] = []
     properties['stacked'] = True
