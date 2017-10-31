@@ -505,7 +505,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <li class="${ name == 'default' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
-
+          <!-- ko if: properties.diagnostics() -->
+            <pre data-bind="text: properties.diagnostics"></pre>
+          <!-- /ko -->
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
