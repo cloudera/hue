@@ -491,7 +491,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </div>
     <!-- /ko -->
 
-    <!-- ko if: widgetType() == 'map-widget' || widgetType() == 'gradient-map-widget' -->
+    <!-- ko if: widgetType() == 'map-widget' -->
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
           <span class="facet-field-label facet-field-label-fixed-width">
@@ -621,30 +621,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </div>
     </div>
   </span>
-  <!-- /ko -->
-
-  <!-- ko if: widgetType() == 'gradient-map-widget' -->
-  <div class="facet-field-cnt">
-    <span class="spinedit-cnt">
-      <span class="facet-field-label facet-field-label-fixed-width">
-        ${ _('Scope') }
-      </span>
-      <select data-bind="selectedOptions: properties.scope" class="input-small">
-        <option value="world">${ _("World") }</option>
-        <option value="europe">${ _("Europe") }</option>
-        <option value="aus">${ _("Australia") }</option>
-        <option value="bra">${ _("Brazil") }</option>
-        <option value="can">${ _("Canada") }</option>
-        <option value="chn">${ _("China") }</option>
-        <option value="fra">${ _("France") }</option>
-        <option value="deu">${ _("Germany") }</option>
-        <option value="ita">${ _("Italy") }</option>
-        <option value="jpn">${ _("Japan") }</option>
-        <option value="gbr">${ _("UK") }</option>
-        <option value="usa">${ _("USA") }</option>
-      </select>
-    </span>
-  </div>
   <!-- /ko -->
 
   <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15 && widgetType() != 'hit-widget'" style="opacity: 0.7">
@@ -2305,17 +2281,39 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
+      <div class="clearfix"></div>
     </div>
 
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
-    <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
-
-        <!-- ko if: $data.properties.facets().length == 1 -->
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('Scope') }
+          </span>
+          <select data-bind="selectedOptions: properties.scope" class="input-small">
+            <option value="world">${ _("World") }</option>
+            <option value="europe">${ _("Europe") }</option>
+            <option value="aus">${ _("Australia") }</option>
+            <option value="bra">${ _("Brazil") }</option>
+            <option value="can">${ _("Canada") }</option>
+            <option value="chn">${ _("China") }</option>
+            <option value="fra">${ _("France") }</option>
+            <option value="deu">${ _("Germany") }</option>
+            <option value="ita">${ _("Italy") }</option>
+            <option value="jpn">${ _("Japan") }</option>
+            <option value="gbr">${ _("UK") }</option>
+            <option value="usa">${ _("USA") }</option>
+          </select>
+        </span>
+      </div>
+      
+      <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
+        <!-- ko if: $data.properties.facets().length == 2 -->
           <div class="margin-bottom-10">
-            <span data-bind="text: $data.properties.facets()[0].field"></span>
+            <span data-bind="text: $data.properties.facets()[1].field"></span>
           </div>
         <!-- /ko -->
-    </div>
+      </div>
 
       <span data-bind="template: { name: 'data-grid' }"></span>
     <!-- /ko -->

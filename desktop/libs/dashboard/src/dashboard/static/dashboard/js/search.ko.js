@@ -711,22 +711,22 @@ var Collection = function (vm, collection) {
         });
       }
     } else {
-        facet.properties.limit.subscribe(function () {
+      facet.properties.limit.subscribe(function () {
+        vm.search();
+      });
+      facet.properties.mincount.subscribe(function () {
+        vm.search();
+      });
+      if (facet.properties.gap) {
+        facet.properties.gap.subscribe(function () {
           vm.search();
         });
-        facet.properties.mincount.subscribe(function () {
+      }
+      if (facet.properties.aggregate) {
+        facet.properties.aggregate.function.subscribe(function () {
           vm.search();
         });
-        if (facet.properties.gap) {
-          facet.properties.gap.subscribe(function () {
-            vm.search();
-          });
-        }
-        if (facet.properties.aggregate) {
-          facet.properties.aggregate.function.subscribe(function () {
-            vm.search();
-          });
-        }
+      }
     }
 
     // For Solr 5+  only
@@ -790,18 +790,20 @@ var Collection = function (vm, collection) {
   }
 
   self._addObservablesToNestedFacet = function(facet, nestedFacet, vm) {
-
     nestedFacet.limit.subscribe(function () {
       vm.search();
     });
-      nestedFacet.mincount.subscribe(function () {
+
+    nestedFacet.mincount.subscribe(function () {
       vm.search();
     });
+
     if (nestedFacet.gap) {
       nestedFacet.gap.subscribe(function () {
         vm.search();
       });
     }
+
     if (nestedFacet.aggregate) {
       nestedFacet.aggregate.function.subscribe(function () {
         vm.search();
@@ -815,6 +817,7 @@ var Collection = function (vm, collection) {
   }
 
   self.facets = ko.mapping.fromJS(collection.facets);
+
   $.each(self.facets(), function (index, facet) {
     self._addObservablesToFacet(facet, vm);
   });

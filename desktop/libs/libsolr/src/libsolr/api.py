@@ -151,6 +151,14 @@ class SolrApi(object):
               _f['sort'] = {_fname: facet['properties']['sort']}
               # domain = '-d2:NaN' # Solr 6.4
 
+          if facet['properties'].get('domain'):
+            if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
+              _f['domain'] = {}
+              if facet['properties']['domain'].get('blockParent'):
+                _f['domain']['blockParent'] = ' OR '.join(facet['properties']['domain']['blockParent'])
+              if facet['properties']['domain'].get('blockChildren'):
+                _f['domain']['blockChildren'] = ' OR '.join(facet['properties']['domain']['blockChildren'])
+
           if _f:
             sort = {'count': facet['properties']['facets'][0]['sort']}
             for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'][1:])):
@@ -273,14 +281,6 @@ class SolrApi(object):
 # Disabled currently
 #         if timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides']): # or facet['widgetType'] != 'bucket-widget'):
 #           _f.update(self._get_time_filter_query(timeFilter, facet))
-
-      if facet.get('domain'):
-        if facet['domain'].get('blockParent') or facet['domain'].get('blockChildren'):
-          _f['domain'] = {}
-          if facet['domain'].get('blockParent'):
-            _f['domain']['blockParent'] = ' OR '.join(facet['domain']['blockParent'])
-          if facet['domain'].get('blockChildren'):
-            _f['domain']['blockChildren'] = ' OR '.join(facet['domain']['blockChildren'])
 
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
