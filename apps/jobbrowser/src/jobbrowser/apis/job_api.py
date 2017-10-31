@@ -169,6 +169,7 @@ class YarnApi(Api):
           'desiredReduces': app['desiredReduces'] or 0,
           'durationFormatted': app['durationFormatted'],
           'startTimeFormatted': app['startTimeFormatted'],
+          'diagnostics': app['diagnostics'] if app['diagnostics'] else '',
 
           'tasks': [],
           'metadata': [],
