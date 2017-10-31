@@ -570,34 +570,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="facet-toggle2">
   <div class="pull-left margin-right-20">
-  
-  ## TODO toggle3 for nested facet probably / compat for toggle2
-  
-##   <!-- ko if: $root.isEditing -->
-##     <!-- ko if: properties.canRange() && typeof properties.type != "undefined" -->
-##     <div class="facet-field-cnt">
-##       <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
-##       <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet2">
-##         <i class="fa" data-bind="css: { 'fa-arrows-h': properties.type() == 'range', 'fa-circle': properties.type() == 'field', 'fa-level-up': properties.type() == 'range-up' }, attr: { title: properties.type() == 'field' ? 'Range' : properties.type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
-##         <span data-bind="visible: properties.type() == 'range'">${_('range')}</span>
-##         <span data-bind="visible: properties.type() == 'range-up'">${_('range & up')}</span>
-##         <span data-bind="visible: properties.type() == 'field'">${_('field')}</span>
-##       </a>
-##     </div>
-##     <!-- /ko -->
-##  
-##     <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'nested' && typeof properties.min != "undefined") -->
-##       <!-- ko ifnot: properties.isDate() -->
-##         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
-##       <!-- /ko -->
-##       <!-- ko if: properties.isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
-##         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
-##       <!-- /ko -->
-##     <!-- /ko -->
-
-
-##   <!-- /ko -->
-##   </div>
 
   <!-- ko if: $root.isEditing -->
 
@@ -1282,6 +1254,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
+      <div class="clearfix"></div>
     </div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
@@ -1861,6 +1834,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
+      <div class="clearfix"></div>
     </div>
 
     <span data-bind="template: { name: 'data-grid' }"></span>
@@ -2060,14 +2034,12 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="metric-form">
-  ## Facet measure has a slightly different format
-  <!-- ko with: typeof properties != "undefined" ? properties.aggregate : aggregate -->
 
     <!-- ko if: $root.isEditing -->
+
     <div>
-      ##<!-- ko if: $data.function() != 'field' -->
-        <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0)" class="input-small"></select>
-      ##<!-- /ko -->
+          <!-- ko with: aggregate -->
+      <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0 && $parent.type)" class="input-small"></select>
 
       <!-- ko if: $data.function() == 'percentile' -->
         <!-- ko foreach: percentiles() -->
@@ -2089,6 +2061,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <input data-bind="value: formula, visible: $parent.field() == 'formula', valueUpdate: 'afterkeydown'"></input>
       <input data-bind="value: plain_formula" type="hidden"></input>
 
+
+
       <!-- ko if: $data.function() != 'field' && $parents[1].widgetType() != 'hit-widget' -->
       <div class="facet-field-cnt">
         <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
@@ -2100,7 +2074,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </a>
       </div>
 
-        <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count'">
+        <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count' && !$parent.canRange()">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Limit') }
@@ -2118,19 +2092,41 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </span>
         </div>
       <!-- /ko -->
+        <!-- /ko -->
+        
+
+    <!-- ko if: canRange() -->
+    <div class="facet-field-cnt">
+      <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
+      <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet2">
+        <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field', 'fa-level-up': type() == 'range-up' }, attr: { title: type() == 'field' ? 'Range' : type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
+        <span data-bind="visible: type() == 'range'">${_('range')}</span>
+        <span data-bind="visible: type() == 'range-up'">${_('range & up')}</span>
+        <span data-bind="visible: type() == 'field'">${_('field')}</span>
+      </a>
     </div>
-    <!-- /ko -->
+  
+      <!-- ko ifnot: isDate() -->
+        <div class="slider-cnt" data-bind="slider: {start: min, end: max, gap: initial_gap, min: initial_start, max: initial_end, properties: $data, labels: SLIDER_LABELS}"></div>
+      <!-- /ko -->
+      <!-- ko if: isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
+        <div data-bind="daterangepicker: {start: start, end: end, gap: initial_gap, relatedgap: gap, min: min, max: max}"></div>
+      <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
+    <!-- /ko -->  
 
     <!-- ko if: !$root.isEditing() -->
     <div class="content" style="border: 1px solid #d8d8d8;">
-      <div data-bind="text: getPrettyMetric($data)" class="muted"></div>
-      <!-- ko if: $data.function() != 'field' && $data.metrics -->
-      <i class="fa" data-bind="css: { 'fa-long-arrow-down': $parent.sort() == 'desc', 'fa-long-arrow-up': $parent.sort() == 'asc' }"></i>
+      <div data-bind="text: getPrettyMetric(aggregate)" class="muted"></div>
+      <!-- ko if: aggregate.function() != 'field' && aggregate.metrics -->
+      <i class="fa" data-bind="css: { 'fa-long-arrow-down': sort() == 'desc', 'fa-long-arrow-up': sort() == 'asc' }"></i>
       <!-- /ko -->
     </div>
     <!-- /ko -->
 
-  <!-- /ko -->
+
 </script>
 
 

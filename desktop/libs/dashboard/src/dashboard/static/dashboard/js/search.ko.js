@@ -1471,12 +1471,12 @@ var Collection = function (vm, collection) {
   self.toggleRangeFacet2 = function (facet_field, event) {
     vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
 
-    if (facet_field.properties.type() == 'field') {
-       facet_field.properties.type('range');
-     } else if (facet_field.properties.type() == 'range') {
-       facet_field.properties.type('range-up')
-     } else if (facet_field.properties.type() == 'range-up') {
-       facet_field.properties.type('field')
+    if (facet_field.type() == 'field') {
+       facet_field.type('range');
+     } else if (facet_field.type() == 'range') {
+       facet_field.type('range-up')
+     } else if (facet_field.type() == 'range-up') {
+       facet_field.type('field')
      }
 
     vm.search();

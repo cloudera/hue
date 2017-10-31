@@ -378,13 +378,6 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
   elif widget_type == 'document-widget':
     properties['uuid'] = facet_field
     properties['subfacet'] = {}
-  elif widget_type == 'gradient-map-widget':
-    facet_type = 'nested'
-    properties['facets'] = []
-    properties['domain'] = {'blockParent': [], 'blockChildren': []}
-    properties['facets_form'] = NESTED_FACET_FORM
-    properties['scope'] = 'world'
-    properties['limit'] = 100
   else:
     api = get_engine(user, collection)
     range_properties = _new_range_facet(api, collection, facet_field, widget_type)
@@ -398,7 +391,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       facet_type = 'field'
 
-    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget'):
+    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget', 'gradient-map-widget'):
       if widget_type == 'text-facet-widget':
         properties['type'] = facet_type
 
@@ -406,7 +399,22 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       facet = NESTED_FACET_FORM.copy()
       facet['field'] = facet_field
       facet['limit'] = 10
-      properties['canRange'] = False
+
+      if range_properties:
+        facet.update(range_properties)
+        facet['initial_gap'] = properties['gap']
+        facet['initial_start'] = properties['start']
+        facet['initial_end'] = properties['end']
+        facet['stacked'] = False
+        facet['type'] = 'range'
+      else:
+        facet['canRange'] = False
+        facet['type'] = facet_type
+
+      if widget_type == 'gradient-map-widget':
+        properties['scope'] = 'world'
+        facet['limit'] = 100
+
       properties['facets'] = [facet]
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
 
