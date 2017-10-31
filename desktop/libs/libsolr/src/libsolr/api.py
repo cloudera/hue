@@ -158,12 +158,7 @@ class SolrApi(object):
 #               'sort': sort,
 #           }
 # 
-#           if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
-#             _f['domain'] = {}
-#             if facet['properties']['domain'].get('blockParent'):
-#               _f['domain']['blockParent'] = ' OR '.join(facet['properties']['domain']['blockParent'])
-#             if facet['properties']['domain'].get('blockChildren'):
-#               _f['domain']['blockChildren'] = ' OR '.join(facet['properties']['domain']['blockChildren'])
+
 # 
 #           if 'start' in facet['properties'] and not facet['properties'].get('type') == 'field':
 #             _f.update({
@@ -189,7 +184,7 @@ class SolrApi(object):
 
           _f = {}
           if facet['properties']['facets']:
-            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1)
+            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1, timeFilter)
             if facet['widgetType'] == 'text-facet-widget':
               _fname = _f['facet'].keys()[0]
               _f['sort'] = {_fname: facet['properties']['sort']}
@@ -277,7 +272,7 @@ class SolrApi(object):
     return self._get_json(response)
 
 
-  def _n_facet_dimension(self, widget, _f, facets, dim):
+  def _n_facet_dimension(self, widget, _f, facets, dim, timeFilter):
     facet = facets[0]
     f_name = 'dim_%02d:%s' % (dim, facet['field'])
 
@@ -307,14 +302,32 @@ class SolrApi(object):
           #'prefix': '' # Forbidden on numeric fields
       }
 
+      if 'start' in facet and not facet.get('type') == 'field':
+        _f[f_name].update({
+            'type': 'range',
+            'start': facet['start'],
+            'end': facet['end'],
+            'gap': facet['gap']
+        })
+#         if timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides']): # or facet['widgetType'] != 'bucket-widget'):
+#           _f.update(self._get_time_filter_query(timeFilter, facet))
+
+      if facet.get('domain'):
+        if facet['domain'].get('blockParent') or facet['domain'].get('blockChildren'):
+          _f['domain'] = {}
+          if facet['domain'].get('blockParent'):
+            _f['domain']['blockParent'] = ' OR '.join(facet['domain']['blockParent'])
+          if facet['domain'].get('blockChildren'):
+            _f['domain']['blockChildren'] = ' OR '.join(facet['domain']['blockChildren'])
+
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
 
       if len(facets) > 1: # Get n+1 dimension
         if facets[1]['aggregate']['function'] == 'count':
-          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim + 1)
+          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim + 1, timeFilter)
         else:
-          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim)
+          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim, timeFilter)
     else:
       agg_function = self._get_aggregate_function(facet)
       _f['facet'] = {
@@ -325,7 +338,7 @@ class SolrApi(object):
           agg_function = self._get_aggregate_function(_f_agg)
           _f['facet']['agg_%02d_%02d:%s' % (dim, i, agg_function)] = agg_function
         else:
-          self._n_facet_dimension(widget, _f, facets[i:], dim + 1) # Get n+1 dimension
+          self._n_facet_dimension(widget, _f, facets[i:], dim + 1, timeFilter) # Get n+1 dimension
           break
 
 

@@ -40,6 +40,8 @@ NESTED_FACET_FORM = {
     'mincount': 1,
     'limit': 5,
     'sort': 'desc',
+    'canRange': False,
+    'isDate': False,
     'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}
 }
 
