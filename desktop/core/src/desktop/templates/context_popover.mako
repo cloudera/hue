@@ -1220,8 +1220,8 @@ from metadata.conf import has_navigator
         self.data().terms.data.removeAll();
         self.data().loadingTerms(true);
         self.apiHelper.fetchDashboardTerms({
-          collectionName: self.data().details.parent.definition.name,
-          fieldName: self.data().details.definition.name,
+          collectionName: self.data().details.identifierChain[1].name,
+          fieldName: self.data().details.identifierChain[2].name,
           prefix: self.data().terms.prefix(),
           engine: 'solr',
           successCallback: function (data) {
@@ -1242,13 +1242,14 @@ from metadata.conf import has_navigator
         self.data().terms.data.removeAll();
         self.data().loadingStats(true);
         self.data().statsSupported(true);
+        var fieldName = self.data().details.identifierChain[2].name;
         self.apiHelper.fetchDashboardStats({
-          collectionName: self.data().details.parent.definition.name,
-          fieldName: self.data().details.definition.name,
+          collectionName: self.data().details.identifierChain[1].name,
+          fieldName: fieldName,
           engine: 'solr',
           successCallback: function (data) {
-            if (data.stats.stats.stats_fields[self.data().details.definition.name] != null) {
-              $.each(data.stats.stats.stats_fields[self.data().details.definition.name], function (key, val) {
+            if (data.stats.stats.stats_fields[fieldName] != null) {
+              $.each(data.stats.stats.stats_fields[fieldName], function (key, val) {
                 self.data().stats.data.push({'key': key, 'val': val});
               });
             }
@@ -1589,8 +1590,7 @@ from metadata.conf import has_navigator
           self.iconClass = 'fa-file-o';
         } else if (self.isCollection) {
           self.contents = new CollectionContextTabs(self.data);
-          self.title = self.data.parent.definition.name + '.' + self.data.definition.name;
-          self.subtitle = (self.data.parent.key() === self.data.definition.name ? '<i class="fa fa-key"></i> (' : '(') + self.data.definition.type + ')';
+          self.title = self.data.identifierChain[1].name + '.' + self.data.identifierChain[2].name;
           self.iconClass = 'fa-search';
         } else {
           self.title = '';
