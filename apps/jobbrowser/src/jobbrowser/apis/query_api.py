@@ -59,7 +59,7 @@ class QueryApi(Api):
     return {
       'apps': sorted([{
         'id': job['query_id'],
-        'name': job['stmt'][:100] + ('...' if len(job['stmt']) > 100 else ''),
+        'name': job['stmt'].replace('\r\n', ' ')[:60] + ('...' if len(job['stmt']) > 60 else ''),
         'status': job['state'],
         'apiStatus': self._api_status(job['state']),
         'type': job['stmt_type'],
