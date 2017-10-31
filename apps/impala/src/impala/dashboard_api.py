@@ -64,11 +64,12 @@ class SQLApi():
     if timeFilter:
       filters.append(timeFilter)
 
-    if facet:
+    if facet and facet['properties']['facets']:
       if facet['type'] == 'nested':
         fields_dimensions = [self._get_dimension_field(f)['name'] for f in self._get_dimension_fields(facet)]
         last_dimension_seen = False
         fields = []
+
         for f in reversed(facet['properties']['facets']):
           if f['aggregate']['function'] == 'count':
             if not last_dimension_seen:
@@ -78,10 +79,6 @@ class SQLApi():
           else:
             if not last_dimension_seen:
               fields.insert(0, self._get_aggregate_function(f))
-
-        if not last_dimension_seen:
-          fields.insert(0, 'COUNT(*) as Count')
-        fields.insert(0, self._get_dimension_field(facet)['select'])
 
         sql = '''SELECT %(fields)s
         FROM %(database)s.%(table)s
@@ -103,7 +100,7 @@ class SQLApi():
         %(filters)s''' % {
             'database': database,
             'table': table,
-            'fields': self._get_aggregate_function(facet),
+            'fields': self._get_aggregate_function(facet['properties']['facets'][0]),
             'filters': self._convert_filters_to_where(filters),
         }
     else:
@@ -308,7 +305,7 @@ class SQLApi():
 
 
   def _get_dimension_fields(self, facet):
-    return [facet] + [f for f in facet['properties']['facets'] if f['aggregate']['function'] == 'count']
+    return [f for f in facet['properties']['facets'] if f['aggregate']['function'] == 'count']
 
 
   def _convert_filters_to_where(self, filters):
@@ -365,52 +362,39 @@ class SQLApi():
 
   @classmethod
   def _get_aggregate_function(cls, facet):
-    if 'properties' in facet:
-      f = facet['properties']['aggregate'] # Level 1 facet
+    fields = []
+
+    if facet['aggregate']['function'] == 'median':
+      facet['aggregate']['function'] = 'percentile'
+      fields.append('50')
+    elif facet['aggregate']['function'] == 'unique':
+      facet['aggregate']['function'] = 'count'
+      fields.append('distinct `%(field)s`' % facet)
+    elif facet['aggregate']['function'] == 'percentiles':
+      fields.extend(map(lambda a: str(a), [_p['value'] for _p in facet['aggregate']['percentiles']]))
     else:
-      f = facet['aggregate']
+      fields.append(facet['field'])
 
-    if not f['ops']:
-      f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]
-
-    return cls.__get_aggregate_function(f)
-
-
-  @classmethod
-  def __get_aggregate_function(cls, f):
-    if f['function'] == 'field':
-      return f['value']
-    else:
-      fields = []
-      for _f in f['ops']:
-        fields.append(cls.__get_aggregate_function(_f))
-      if f['function'] == 'median':
-        f['function'] = 'percentile'
-        fields.append('50')
-      elif f['function'] == 'unique':
-        f['function'] = 'count'
-        fields[0] = 'distinct `%s`' % fields[0]
-      elif f['function'] == 'percentiles':
-        fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
-      return '%s(%s)' % (f['function'], ','.join(fields))
+    return '%s(%s)' % (facet['aggregate']['function'], ','.join(fields))
 
 
   def _get_dimension_field(self, facet):
     # facet salary --> cast(salary / 11000 as INT) * 10 AS salary_range
     # facet salary --> salary_range
     # facets --> Count DESC   |   salary_range ASC
-    if facet['properties']['canRange']:
+
+    if facet['canRange']:
       field_name = '%(field)s_range' % facet
       order_by = '`%(field)s_range` ASC' % facet
-      if facet['properties']['isDate']:
+      if facet['isDate']:
         field = '`%(field)s`' % facet
 
-        slot = self._gap_to_units(facet['properties']['gap'])
+        slot = self._gap_to_units(facet['gap'])
 
         if slot['unit'] != 'SECOND':
           select = """
             trunc(%(field)s, '%(slot)s') AS `%(field_name)s`,
-            trunc(%(field)s, '%(slot)s') + interval %(slot_interval)s AS `%(field_name)s_to`""" 
+            trunc(%(field)s, '%(slot)s') + interval %(slot_interval)s AS `%(field_name)s_to`"""
         else:
           select = """
             %(field)s AS `%(field_name)s`,
@@ -420,17 +404,17 @@ class SQLApi():
             'slot': slot['sql_trunc'],
             'slot_interval': slot['sql_interval'],
             'field_name': field_name,
-            'start': facet['properties']['start'],
-            'end': facet['properties']['end'],
+            'start': facet['start'],
+            'end': facet['end'],
         }
       else:
-        slot = facet['properties']['gap']
+        slot = facet['gap']
         select = """
         floor(floor((`%(field)s` - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS `%(field_name)s`""" % { # Beware: start might be not in sync with the UI
           'field': facet['field'],
           'slot': slot,
           'field_name': field_name,
-          'start': facet['properties']['start']
+          'start': facet['start']
         }
     else:
       field_name = '%(field)s' % facet
@@ -569,21 +553,23 @@ class SQLApi():
 }''')
 
     response['id'] = facet['id']
-    response['field'] = facet['field']
-    response['label'] = facet['field']
+    nested_facet = facet['properties']['facets'][0]
+
+    response['field'] = nested_facet['field']
+    response['label'] = nested_facet['field']
 
     cols = [col['name'] for col in result['meta']]
     rows = list(result['data']) # No escape_rows
 
-    if facet['properties']['canRange']:
-      if facet['properties']['isDate']:
-        slot = self._gap_to_units(facet['properties']['gap'])
-        print augment_date_range_list(rows, facet['properties']['start'], facet['properties']['end'], slot['timedelta'], len(cols))
+    if nested_facet['canRange']:
+      if nested_facet['isDate']:
+        slot = self._gap_to_units(nested_facet['gap'])
+        print augment_date_range_list(rows, nested_facet['start'], nested_facet['end'], slot['timedelta'], len(cols))
       else:
-        rows = augment_number_range_list(rows, facet['properties']['start'], facet['properties']['end'], facet['properties']['gap'], len(cols))
+        rows = augment_number_range_list(rows, nested_facet['start'], nested_facet['end'], nested_facet['gap'], len(cols))
 
     response['fieldsAttributes'] = [{
-         "sort":{
+         "sort": {
             "direction": None
          },
          "isDynamic": False,
@@ -603,9 +589,9 @@ class SQLApi():
     counts = []
     if dimension == 1:
       for row in rows:
-        if facet['properties']['isDate']:
+        if nested_facet['isDate']:
           counts.append({
-            "field": facet['field'],
+            "field": nested_facet['field'],
             "total_counts": row[-1],
             "is_single_unit_gap": True,
             "from": row[0].replace(' ', 'T') + 'Z',
@@ -617,7 +603,7 @@ class SQLApi():
           })
         else:
           counts.append({
-             "cat": facet['field'],
+             "cat": nested_facet['field'],
              "count": row[-1],
              "exclude": False,
              "selected": row[0] in fq_fields,

@@ -392,7 +392,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       facet_type = 'field'
 
     if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget', 'gradient-map-widget'):
-      properties = {'canRange': False, 'stacked': False}
+      properties = {'canRange': False, 'stacked': False, 'limit': 10} # Lighter weight top nested facet
 
       if widget_type == 'text-facet-widget':
         properties['type'] = facet_type
