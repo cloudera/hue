@@ -1680,7 +1680,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 </script>
 
 
-
+## WIP skeleton
 <script type="text/html" id="document-widget">
   ##<div class="widget-spinner" data-bind="visible: isLoading()">
   ##  <i class="fa fa-spinner fa-spin"></i>
@@ -1692,10 +1692,10 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div>
       Name Uuid
-      
+
       ## Get sub widget by ID
       ## <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
-      
+
     </div>
    <!-- /ko -->
   </div>
@@ -2036,9 +2036,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <script type="text/html" id="metric-form">
 
     <!-- ko if: $root.isEditing -->
-
     <div>
-          <!-- ko with: aggregate -->
+      <!-- ko with: aggregate -->
       <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0 && $parent.type)" class="input-small"></select>
 
       <!-- ko if: $data.function() == 'percentile' -->
@@ -2061,18 +2060,16 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <input data-bind="value: formula, visible: $parent.field() == 'formula', valueUpdate: 'afterkeydown'"></input>
       <input data-bind="value: plain_formula" type="hidden"></input>
 
-
-
       <!-- ko if: $data.function() != 'field' && $parents[1].widgetType() != 'hit-widget' -->
-      <div class="facet-field-cnt">
-        <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
-        <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: function() { $root.collection.toggleSortFacet2($parents[1], $parent); }">
-          <i class="fa" data-bind="css: { 'fa-caret-down': $parent.sort() == 'desc', 'fa-caret-up': $parent.sort() == 'asc', 'fa-sort': $parent.sort() == 'default' }"></i>
-          <span data-bind="visible: $parent.sort() == 'desc'">${_('descending')}</span>
-          <span data-bind="visible: $parent.sort() == 'asc'">${_('ascending')}</span>
-          <span data-bind="visible: $parent.sort() == 'default'">${_('default')}</span>
-        </a>
-      </div>
+        <div class="facet-field-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
+          <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: function() { $root.collection.toggleSortFacet2($parents[1], $parent); }">
+            <i class="fa" data-bind="css: { 'fa-caret-down': $parent.sort() == 'desc', 'fa-caret-up': $parent.sort() == 'asc', 'fa-sort': $parent.sort() == 'default' }"></i>
+            <span data-bind="visible: $parent.sort() == 'desc'">${_('descending')}</span>
+            <span data-bind="visible: $parent.sort() == 'asc'">${_('ascending')}</span>
+            <span data-bind="visible: $parent.sort() == 'default'">${_('default')}</span>
+          </a>
+        </div>
 
         <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count' && !$parent.canRange()">
           <span class="spinedit-cnt">
@@ -2092,30 +2089,28 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </span>
         </div>
       <!-- /ko -->
-        <!-- /ko -->
-        
-
-    <!-- ko if: canRange() -->
-    <div class="facet-field-cnt">
-      <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
-      <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet2">
-        <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field', 'fa-level-up': type() == 'range-up' }, attr: { title: type() == 'field' ? 'Range' : type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
-        <span data-bind="visible: type() == 'range'">${_('range')}</span>
-        <span data-bind="visible: type() == 'range-up'">${_('range & up')}</span>
-        <span data-bind="visible: type() == 'field'">${_('field')}</span>
-      </a>
-    </div>
-  
-      <!-- ko ifnot: isDate() -->
-        <div class="slider-cnt" data-bind="slider: {start: min, end: max, gap: initial_gap, min: initial_start, max: initial_end, properties: $data, labels: SLIDER_LABELS}"></div>
       <!-- /ko -->
-      <!-- ko if: isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
-        <div data-bind="daterangepicker: {start: start, end: end, gap: initial_gap, relatedgap: gap, min: min, max: max}"></div>
-      <!-- /ko -->
-        <!-- /ko -->
-    </div>
 
-    <!-- /ko -->  
+      <!-- ko if: canRange() -->
+        <div class="facet-field-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
+          <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet2">
+            <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field', 'fa-level-up': type() == 'range-up' }, attr: { title: type() == 'field' ? 'Range' : type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
+            <span data-bind="visible: type() == 'range'">${_('range')}</span>
+            <span data-bind="visible: type() == 'range-up'">${_('range & up')}</span>
+            <span data-bind="visible: type() == 'field'">${_('field')}</span>
+          </a>
+        </div>
+
+        <!-- ko ifnot: isDate() -->
+          <div class="slider-cnt" data-bind="slider: {start: min, end: max, gap: initial_gap, min: initial_start, max: initial_end, properties: $data, labels: SLIDER_LABELS}"></div>
+        <!-- /ko -->
+        <!-- ko if: isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
+          <div data-bind="daterangepicker: {start: start, end: end, gap: initial_gap, relatedgap: gap, min: min, max: max}"></div>
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    <!-- /ko -->
 
     <!-- ko if: !$root.isEditing() -->
     <div class="content" style="border: 1px solid #d8d8d8;">
@@ -2125,8 +2120,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <!-- /ko -->
     </div>
     <!-- /ko -->
-
-
 </script>
 
 
