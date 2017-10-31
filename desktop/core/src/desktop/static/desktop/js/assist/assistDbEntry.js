@@ -206,6 +206,10 @@ var AssistDbEntry = (function () {
       type = 'database';
     }
 
+    if (self.sourceType === 'solr') {
+      type = 'collection';
+    }
+
     self.statsVisible(true);
     huePubSub.publish('context.popover.show', {
       data: {
