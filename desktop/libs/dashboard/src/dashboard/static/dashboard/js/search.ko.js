@@ -685,7 +685,7 @@ var Collection = function (vm, collection) {
     return _field;
   };
 
-  self._get_field_operations = function(field, facet) {console.log('aaaa ' + field);
+  self._get_field_operations = function(field, facet) {
     if (! field) {
       return HIT_OPTIONS;
     } else if (isNumericColumn(field.type())) {
@@ -693,13 +693,12 @@ var Collection = function (vm, collection) {
     } else if (isDateTimeColumn(field.type())) {
       return DATETIME_HIT_OPTIONS;
     } else {
-      //facet.properties.facets_form.aggregate.function('count');
-      return ALPHA_HIT_OPTIONS; //facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : ALPHA_HIT_OPTIONS;
+      return facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : ALPHA_HIT_OPTIONS;
     }
   }
 
   // Very top facet
-  self._addObservablesToFacet = function(facet, vm) { 
+  self._addObservablesToFacet = function(facet, vm) {
     if (facet.properties && facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
       facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
         var _field = self.getTemplateField(facet.properties.facets_form.field(), self.template.fieldsAttributes());
@@ -712,26 +711,26 @@ var Collection = function (vm, collection) {
         });
       }
     } else {
-	    facet.properties.limit.subscribe(function () {
-	      vm.search();
-	    });
-	    facet.properties.mincount.subscribe(function () {
-	      vm.search();
-	    });
-	    if (facet.properties.gap) {
-	      facet.properties.gap.subscribe(function () {
-	        vm.search();
-	      });
-	    }
-	    if (facet.properties.aggregate) {
-	      facet.properties.aggregate.function.subscribe(function () {
-	        vm.search();
-	      });
-	    }
+        facet.properties.limit.subscribe(function () {
+          vm.search();
+        });
+        facet.properties.mincount.subscribe(function () {
+          vm.search();
+        });
+        if (facet.properties.gap) {
+          facet.properties.gap.subscribe(function () {
+            vm.search();
+          });
+        }
+        if (facet.properties.aggregate) {
+          facet.properties.aggregate.function.subscribe(function () {
+            vm.search();
+          });
+        }
     }
-        
+
     // For Solr 5+  only
-    if (typeof facet.template != 'undefined') {        
+    if (typeof facet.template != 'undefined') {
       facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields
         var _fields = [];
 
@@ -782,20 +781,20 @@ var Collection = function (vm, collection) {
         type: self.engine(),
       }));
     }
-    
+
     if (facet.properties.facets) { // Sub facet
-    	$.each(facet.properties.facets(), function (index, nestedFacet) {
-          self._addObservablesToNestedFacet(self, nestedFacet, vm);
-    	});
-      }
+      $.each(facet.properties.facets(), function (index, nestedFacet) {
+        self._addObservablesToNestedFacet(self, nestedFacet, vm);
+      });
+    }
   }
-  
+
   self._addObservablesToNestedFacet = function(facet, nestedFacet, vm) {
 
-	nestedFacet.limit.subscribe(function () {
+    nestedFacet.limit.subscribe(function () {
       vm.search();
     });
-	  nestedFacet.mincount.subscribe(function () {
+      nestedFacet.mincount.subscribe(function () {
       vm.search();
     });
     if (nestedFacet.gap) {
@@ -803,36 +802,21 @@ var Collection = function (vm, collection) {
         vm.search();
       });
     }
+    if (nestedFacet.aggregate) {
+      nestedFacet.aggregate.function.subscribe(function () {
+        vm.search();
+      });
 
-    nestedFacet.aggregate.function.subscribe(function () {
-      vm.search();
-    });
-
-    nestedFacet.aggregate.metrics = ko.computed(function() {
-	  var _field = self.getTemplateField(nestedFacet.field(), facet.template.fieldsAttributes());
-	  return self._get_field_operations(_field, facet);
-	});
+      nestedFacet.aggregate.metrics = ko.computed(function() {
+        var _field = self.getTemplateField(nestedFacet.field(), facet.template.fieldsAttributes());
+        return self._get_field_operations(_field, facet);
+      });
+    }
   }
 
   self.facets = ko.mapping.fromJS(collection.facets);
   $.each(self.facets(), function (index, facet) {
     self._addObservablesToFacet(facet, vm);
-
-  /*  if (facet.properties.aggregate && facet.properties.aggregate.function) {
-      facet.properties.aggregate.function.subscribe(function () {
-        vm.search();
-      });
-    }*/
-/*
-    if (typeof facet.properties.facets != 'undefined') {
-      $.each(facet.properties.facets(), function (index, pivotFacet) {
-        if (pivotFacet.aggregate && pivotFacet.aggregate.function) {
-          pivotFacet.aggregate.function.subscribe(function () {
-            vm.search();
-          });
-        }
-      });
-    }*/
   });
 
 
@@ -961,18 +945,9 @@ var Collection = function (vm, collection) {
         if (data.status == 0) {
           var facet = ko.mapping.fromJS(data.facet);
 
-          if (false) {
-            // get doc2
-
-            // facet.subfacet = ko.mapping.fromJS(data.facet);
-            // self._addObservablesToFacet(facet, vm); // needed if we only have result?
-            // "read only"
-            // .isLoading(false)
-          } else {
-            self._addObservablesToFacet(facet, vm); // Top widget
-          }
-
+          self._addObservablesToFacet(facet, vm); // Top widget
           self.facets.push(facet);
+
           vm.search();
         } else {
           $(document).trigger("error", data.message);
@@ -1025,7 +1000,8 @@ var Collection = function (vm, collection) {
       'limit': ko.mapping.toJS(facet.properties.facets_form.limit),
       'mincount': ko.mapping.toJS(facet.properties.facets_form.mincount),
       'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
-      'sort': ko.mapping.toJS(facet.properties.facets_form.aggregate.function == 'count' ? 'desc' : 'default')
+      'sort': ko.mapping.toJS(facet.properties.facets_form.aggregate.function == 'count' ? 'desc' : 'default'),
+      'canRange': false // No supported on dim 2 currently
     });
     pivot.aggregate.metrics = ko.computed(function() {
       var _field = self.getTemplateField(pivot.field(), self.template.fieldsAttributes());
@@ -1037,7 +1013,6 @@ var Collection = function (vm, collection) {
     facet.properties.facets_form.mincount(1);
     facet.properties.facets_form.sort('desc');
 
-    //facet.properties.facets_form.aggregate.function('count');
     facet.properties.facets_form.aggregate.formula('');
     facet.properties.facets_form.aggregate.percentiles.removeAll();
     facet.properties.facets_form.aggregate.percentiles.push({'value': 50});

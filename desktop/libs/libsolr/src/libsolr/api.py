@@ -143,45 +143,6 @@ class SolrApi(object):
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'nested':
-#           sort = {'count': facet['properties']['sort']}
-#           for i, agg in enumerate(self._get_dimension_aggregates(facet['properties']['facets'])):
-#             if agg['sort'] != 'default':
-#               agg_function = self._get_aggregate_function(agg)
-#               sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
-# 
-#           if sort.get('count') == 'default':
-#             sort['count'] = 'desc'
-#           _f = {
-#               'field': facet['field'],
-#               'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'text-facet-widget' else 0),
-#               'mincount': int(facet['properties']['mincount']),
-#               'sort': sort,
-#           }
-# 
-
-# 
-#           if 'start' in facet['properties'] and not facet['properties'].get('type') == 'field':
-#             _f.update({
-#                 'type': 'range',
-#                 'start': facet['properties']['start'],
-#                 'end': facet['properties']['end'],
-#                 'gap': facet['properties']['gap'],
-#             })
-#             if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'bucket-widget'):
-#               _f.update(self._get_time_filter_query(timeFilter, facet))
-#           else:
-#             _f.update({
-#                 'type': 'terms',
-#                 'field': facet['field'],
-#                 'excludeTags': facet['id'],
-#                 'offset': 0,
-#                 'numBuckets': True,
-#                 'allBuckets': True,
-#                 #'prefix': '' # Forbidden on numeric fields
-#             })
-#             if facet['properties']['canRange'] and not facet['properties']['isDate']:
-#               del _f['mincount'] # Numeric fields do not support
-
           _f = {}
           if facet['properties']['facets']:
             self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1, timeFilter)
@@ -196,9 +157,9 @@ class SolrApi(object):
               if agg['sort'] != 'default':
                 agg_function = self._get_aggregate_function(agg)
                 sort = {'agg_%02d_%02d:%s' % (1, i, agg_function): agg['sort']}
-   
+
             if sort.get('count') == 'default':
-              sort['count'] = 'desc'            
+              sort['count'] = 'desc'
             dim_key = [key for key in _f['facet'].keys() if 'dim' in key][0]
             _f['facet'][dim_key].update({
                   'excludeTags': facet['id'],
@@ -309,6 +270,7 @@ class SolrApi(object):
             'end': facet['end'],
             'gap': facet['gap']
         })
+# Disabled currently
 #         if timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides']): # or facet['widgetType'] != 'bucket-widget'):
 #           _f.update(self._get_time_filter_query(timeFilter, facet))
 
