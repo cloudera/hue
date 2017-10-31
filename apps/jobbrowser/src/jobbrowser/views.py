@@ -202,6 +202,7 @@ def massage_job_for_json(job, request=None, user=None):
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
     'canKill': can_kill_job(job, request.user if request else user),
     'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or '',
+    'diagnostics': hasattr(job, 'diagnostics') and job.diagnostics or '',
   }
   return job
 
