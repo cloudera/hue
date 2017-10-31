@@ -2306,7 +2306,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </select>
         </span>
       </div>
-      
+
       <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
         <!-- ko if: $data.properties.facets().length == 2 -->
           <div class="margin-bottom-10">
