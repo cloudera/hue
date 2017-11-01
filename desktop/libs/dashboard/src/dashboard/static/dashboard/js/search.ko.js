@@ -1389,6 +1389,8 @@ var Collection = function (vm, collection) {
 
     if (sortField() == 'desc') {
       sortField('asc');
+    } else if (sortField() == 'asc' && self.engine() != 'solr') {
+      sortField('default');
     } else {
       sortField('desc');
     }
@@ -1645,7 +1647,10 @@ var QueryResult = function (vm, initial) { // Similar to to Notebook Snippet
 
 
 var DATE_TYPES = ['date', 'tdate', 'timestamp', 'pdate'];
-var NUMBER_TYPES = ['int', 'tint', 'pint', 'long', 'tlong', 'plong', 'float', 'tfloat', 'pfloat', 'double', 'tdouble', 'pdouble', 'currency'];
+var NUMBER_TYPES = [
+    'int', 'tint', 'pint', 'long', 'tlong', 'plong', 'float', 'tfloat', 'pfloat', 'double', 'tdouble', 'pdouble', 'currency',
+    'smallint', 'bigint', 'tinyint'
+];
 var FLOAT_TYPES = ['float', 'tfloat', 'pfloat', 'double', 'tdouble', 'pdouble'];
 var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];
 
