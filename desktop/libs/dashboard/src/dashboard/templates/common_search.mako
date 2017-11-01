@@ -2035,7 +2035,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="clearfix"></div>
       <br/>
 
-      <input data-bind="value: formula, visible: $parent.field() == 'formula', valueUpdate: 'afterkeydown'"></input>
+      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: formula, autocomplete: 'solrFormula', singleLine: true } }"></div>
       <input data-bind="value: plain_formula" type="hidden"></input>
 
       <!-- ko if: $data.function() != 'field' && $parents[1].widgetType() != 'hit-widget' -->
