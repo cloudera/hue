@@ -1511,6 +1511,24 @@ var Collection = function (vm, collection) {
     vm.search();
   }
 
+  self.rangeZoomOut2 = function (facet_json) {
+    var facet_id = ko.mapping.toJS(facet_json).id;
+    var facet = self.getFacetById(facet_id).properties.facets()[0]; // 1 dimension only currently
+
+    vm.query.removeFilter(ko.mapping.fromJS({'id': facet_id}));
+    if (facet.gap() != null) { // Bar, line charts don't have gap
+      facet.gap(facet.initial_gap());
+    }
+    if (facet.initial_start() != null) { // Bar and line charts
+      facet.start(facet.initial_start());
+      facet.end(facet.initial_end());
+      facet.min(facet.initial_start());
+      facet.max(facet.initial_end());
+    }
+
+    vm.search();
+  }
+
   self.translateSelectedField = function (index, direction, template) {
     var array = template.fieldsSelected();
     if (self.template == template) {
