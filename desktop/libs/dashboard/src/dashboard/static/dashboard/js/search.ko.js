@@ -62,8 +62,8 @@ function layoutToGridster(vm) {
         layout.push({
           col: 1,
           row: 1 + rowCnt * defaultWidgetHeight,
-          sizex: numCols,
-          sizey: defaultWidgetHeight,
+          size_x: numCols,
+          size_y: defaultWidgetHeight,
           widget: vm.getWidgetById(widget.id())
         });
         rowCnt++;
@@ -2593,6 +2593,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.asyncSearchesCounter([]);
     self.isSyncingCollections(false);
     self.isPlayerMode(false);
+    self.gridItems([]);
 
     if (window.location.search.indexOf("collection") > -1) {
       hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/new_search');
