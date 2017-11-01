@@ -169,6 +169,12 @@
   <div class="container-fluid">
   %if USE_GRIDSTER.get():
 
+    <div class="container-fluid" data-bind="visible: $root.isEditing() && columns().length > 0">
+      <div class="add-row-gridster" data-bind="droppable: { data: showAddFacetDemiModal, options:{ greedy:true }}">
+        ${ _('Drag a widget here') }
+      </div>
+    </div>
+
     <div class="gridster">
       <!-- ko if: typeof gridItems !== 'undefined' -->
       <ul class="unstyled" data-bind="gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
