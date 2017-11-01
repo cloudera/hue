@@ -513,3 +513,11 @@ class TestParser(object):
     column = {'name': name, 'type': 'array', 'comment': comment, 'item': {'type': 'struct', 'fields': [{'name': 'name', 'type': 'string'}, {'name': 'age', 'type': 'int'}]}}
     parse_tree = parser.parse_column(name, type, comment)
     assert_equal(parse_tree, column)
+
+  def test_parse_nested_with_array(self):
+    name = 'nested'
+    type = 'struct<fieldname1:bigint,fieldname2:int,fieldname3:int,fieldname4:array<bigint>,fieldname5:bigint,fieldname6:array<struct<array_elem:string>>,fieldname7:string>'
+    comment = 'test_parse_nested'
+    column = {'comment': 'test_parse_nested', 'fields': [{'type': 'bigint', 'name': 'fieldname1'}, {'type': 'int', 'name': 'fieldname2'}, {'type': 'int', 'name': 'fieldname3'}, {'item': {'type': 'bigint'}, 'type': 'array', 'name': 'fieldname4'}, {'type': 'bigint', 'name': 'fieldname5'}, {'item': {'fields': [{'type': 'string', 'name': 'array_elem'}], 'type': 'struct'}, 'type': 'array', 'name': 'fieldname6'}, {'type': 'string', 'name': 'fieldname7'}], 'type': 'struct', 'name': 'nested'}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)
