@@ -55,6 +55,9 @@ from desktop.views import _ko
   <script type="text/html" id="autocomplete-details-keyword">
   </script>
 
+  <script type="text/html" id="autocomplete-details-solr-field">
+  </script>
+
   <script type="text/html" id="autocomplete-details-udf">
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-superscript"></i> <span data-bind="text: details.signature.substring(0, details.signature.indexOf('('));"></span></div>
