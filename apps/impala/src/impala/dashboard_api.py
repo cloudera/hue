@@ -65,6 +65,9 @@ class SQLApi():
       filters.append(timeFilter)
 
     if facet and facet['properties']['facets']:
+      for i, _facet in enumerate(facet['properties']['facets']):
+        _facet['position'] = i
+
       if facet['type'] == 'nested':
         fields_dimensions = [self._get_dimension_field(f)['name'] for f in self._get_dimension_fields(facet)]
         last_dimension_seen = False
@@ -73,24 +76,26 @@ class SQLApi():
         for f in reversed(facet['properties']['facets']):
           if f['aggregate']['function'] == 'count':
             if not last_dimension_seen:
-              fields.insert(0, 'COUNT(*) AS Count')
+              fields.insert(0, 'COUNT(*) AS %(field)s_%(position)s' % f)
               last_dimension_seen = True
-            fields.insert(0, self._get_dimension_field(f)['select'])
+            fields.insert(0, self._get_dimension_field(f)['name' if last_dimension_seen else 'select'])
           else:
             if not last_dimension_seen:
-              fields.insert(0, self._get_aggregate_function(f))
+              fields.insert(0, self._get_aggregate_function(f) + 'AS %(field)s_%(position)s' % f)
+
+        order_by = ', '.join([self._get_dimension_field(f)['order_by'] for f in reversed(facet['properties']['facets']) if f['sort'] != 'default'])
 
         sql = '''SELECT %(fields)s
         FROM %(database)s.%(table)s
         %(filters)s
         GROUP BY %(fields_dimensions)s
-        ORDER BY %(order_by)s
+        %(order_by)s
         LIMIT %(limit)s''' % {
             'database': database,
             'table': table,
             'fields': ', '.join(fields),
             'fields_dimensions': ', '.join(fields_dimensions),
-            'order_by': ', '.join([self._get_dimension_field(f)['order_by'] for f in self._get_dimension_fields(facet)]),
+            'order_by': 'ORDER BY %s' % order_by if order_by else '',
             'filters': self._convert_filters_to_where(filters),
             'limit': LIMIT
         }
@@ -375,17 +380,17 @@ class SQLApi():
     else:
       fields.append(facet['field'])
 
-    return '%s(%s)' % (facet['aggregate']['function'], ','.join(fields))
+    return '%s(%s) ' % (facet['aggregate']['function'], ','.join(fields))
 
 
   def _get_dimension_field(self, facet):
-    # facet salary --> cast(salary / 11000 as INT) * 10 AS salary_range
-    # facet salary --> salary_range
-    # facets --> Count DESC   |   salary_range ASC
+    # facet salary --> cast(salary / 11000 as INT) * 10 AS salary_range_1
+    # facet salary --> salary_range_2
+    # facets --> Count DESC / salary_range_3 ASC
 
     if facet['canRange']:
       field_name = '%(field)s_range' % facet
-      order_by = '`%(field)s_range` ASC' % facet
+      order_by = '`%(field)s_range_%(position)s` %(sort)s' % facet
       if facet['isDate']:
         field = '`%(field)s`' % facet
 
@@ -393,12 +398,12 @@ class SQLApi():
 
         if slot['unit'] != 'SECOND':
           select = """
-            trunc(%(field)s, '%(slot)s') AS `%(field_name)s`,
-            trunc(%(field)s, '%(slot)s') + interval %(slot_interval)s AS `%(field_name)s_to`"""
+            trunc(%(field)s, '%(slot)s') AS `%(field_name)s_%(position)s`,
+            trunc(%(field)s, '%(slot)s') + interval %(slot_interval)s AS `%(field_name)s_to_%(position)s`"""
         else:
           select = """
-            %(field)s AS `%(field_name)s`,
-            %(field)s + interval %(slot_interval)s AS `%(field_name)s_to`"""
+            %(field)s AS `%(field_name)s_%(position)s`,
+            %(field)s + interval %(slot_interval)s AS `%(field_name)s_to_%(position)s`"""
         select = select % {
             'field': field,
             'slot': slot['sql_trunc'],
@@ -406,20 +411,22 @@ class SQLApi():
             'field_name': field_name,
             'start': facet['start'],
             'end': facet['end'],
+            'position': facet['position']
         }
       else:
         slot = facet['gap']
         select = """
-        floor(floor((`%(field)s` - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS `%(field_name)s`""" % { # Beware: start might be not in sync with the UI
+        floor(floor((`%(field)s` - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS `%(field_name)s_%(position)s`""" % { # Beware: start might be not in sync with the UI
           'field': facet['field'],
           'slot': slot,
           'field_name': field_name,
-          'start': facet['start']
+          'start': facet['start'],
+          'position': facet['position']
         }
     else:
       field_name = '%(field)s' % facet
-      select = field_name
-      order_by = 'Count DESC'
+      select = '%(field)s AS %(field)s_%(position)s' % facet
+      order_by = '%(field)s_%(position)s %(sort)s' % facet
 
     return {
       'name': '`%s`' % field_name,
@@ -570,7 +577,7 @@ class SQLApi():
 
     response['fieldsAttributes'] = [{
          "sort": {
-            "direction": None
+            "direction": nested_facet['sort']
          },
          "isDynamic": False,
          "type": column['type'],
