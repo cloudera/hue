@@ -1843,7 +1843,7 @@ from desktop.views import _ko
 
         if (self.singleLine) {
           aceOptions = $.extend(aceOptions, {
-            fontSize: '14px',
+            fontSize: '13px',
             maxLines: 1, // make it 1 line
             autoScrollEditorIntoView: true,
             highlightActiveLine: false,
