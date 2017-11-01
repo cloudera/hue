@@ -196,9 +196,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 <%dashboard:layout_toolbar>
   <%def name="results()">
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
-                    draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast'); $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); }}}"
+                    draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset, options: getDraggableOptions({ stop: function() { $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); } }) }"
          title="${_('Grid')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-table"></i>
@@ -208,14 +206,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableHtmlResultset(),
                     isEnabled: availableDraggableResultset,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){
-                                  $('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});
-                                  $root.collection.template.isGridLayout(false);
-                                  checkResultHighlightingAvailability();
-                               }
-                             }
-                    }"
+                    options: getDraggableOptions({ stop: function(){ $root.collection.template.isGridLayout(false); checkResultHighlightingAvailability(); } }) }"
          title="${_('HTML')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-code"></i>
@@ -224,8 +215,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
                     draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
                        <i class="fa fa-filter"></i>
@@ -234,8 +224,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableLeaflet()},
                     draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableLeaflet,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Marker Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: 'move' }">
              <i class="fa fa-map-marker"></i>
@@ -245,8 +234,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: $root.collection.supportAnalytics,
                     css: { 'draggable-widget': true, 'disabled': !hasAvailableFields() },
                     draggable: {data: draggableCounter(), isEnabled: hasAvailableFields,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Counter')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.hasAvailableFields() ? 'move' : 'default' }">
                        <i class="fa fa-superscript" style="font-size: 110%"></i>
@@ -257,8 +245,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
       <%def name="widgets()">
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sort-amount-asc"></i>
@@ -266,8 +253,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableTextFacet(), isEnabled: availableDraggableChart,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sort-amount-asc"></i>
@@ -275,8 +261,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-pie-chart"></i>
@@ -284,8 +269,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie2(), isEnabled: availableDraggableChart,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-pie-chart"></i>
@@ -294,8 +278,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableBar(), isEnabled: availableDraggableChart,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-bar-chart"></i>
@@ -304,8 +287,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': ! availableDraggableChart() },
                     draggable: {data: draggableBucket(), isEnabled: availableDraggableChart,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-bar-chart"></i>
@@ -314,8 +296,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
                     draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Line Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
                        <i class="hcha hcha-line-chart"></i>
@@ -323,8 +304,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Tree')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sitemap fa-rotate-270"></i>
@@ -332,8 +312,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree2(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Tree')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sitemap fa-rotate-270"></i>
@@ -342,8 +321,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableHeatmap(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Heatmap')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-th"></i>
@@ -351,8 +329,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
                        <i class="hcha hcha-timeline-chart"></i>
@@ -360,8 +337,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableTimeline() },
                     draggable: {data: draggableTimeline(), isEnabled: availableTimeline,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableTimeline() ? 'move' : 'default' }">
                        <i class="fa fa-line-chart"></i>
@@ -369,8 +345,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableMap,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Gradient Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
@@ -378,8 +353,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableGradienMap(), isEnabled: availableDraggableMap,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Gradient Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
@@ -389,8 +363,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableDocument(), isEnabled: true,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+                    options: getDraggableOptions() }"
          title="${_('Document')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: true ? 'move' : 'default' }">
                        <i class="fa fa-file-o"></i>
@@ -2776,7 +2749,7 @@ ${ dashboard.import_layout(True) }
 
 %if USE_GRIDSTER.get():
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.gridster.with-extras.min.js') }"></script>
-<script src="${ static('desktop/ext/js/gridster-knockout.min.js') }"></script>
+<script src="${ static('desktop/js/gridster-knockout.js') }"></script>
 %endif
 
 ${ dashboard.import_bindings() }
@@ -2954,6 +2927,35 @@ function getFormat(format, minMaxDiff, widget) {
 
 
 var lastWindowScrollPosition = 0;
+%if USE_GRIDSTER.get():
+var getDraggableOptions = function() {
+  return {
+    'start': function (event, ui) {
+      $(ui.helper).css('z-index','999999');
+    }
+  };
+};
+%else:
+  var getDraggableOptions = function (options) {
+    return {
+      'start': function (event, ui) {
+        lastWindowScrollPosition = $(window).scrollTop();
+        $('.card-body').slideUp('fast');
+        if (options && options.start) {
+          options.start();
+        }
+      },
+      'stop': function (event, ui) {
+        $('.card-body').slideDown('fast', function () {
+          $(window).scrollTop(lastWindowScrollPosition)
+        });
+        if (options && options.stop) {
+          options.stop();
+        }
+      }
+    }
+  }
+%endif
 
 function pieChartDataTransformer(data) {
   var _data = [];
@@ -3599,7 +3601,7 @@ $(document).ready(function () {
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     avoid_overlapped_widgets: true,
     max_cols: 12,
-    max_rows: 60,
+    max_rows: 6000,
     resize: {
       enabled: true,
       stop: function (event, ui, $widget) {
@@ -3650,6 +3652,20 @@ $(document).ready(function () {
 
   huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
     $(".gridster>ul").data('gridster').remove_widget($("#wdg_" + widgetId).parents('li.gs-w'));
+  }, 'dashboard')
+
+  huePubSub.subscribe('gridster.add.widget', function (widgetId){
+    var newPosition = $('.gridster ul').data('gridster').next_position(12, 12);
+    searchViewModel.gridItems.push(ko.mapping.fromJS({
+      col: newPosition.col,
+      row: newPosition.row,
+      size_x: 12,
+      size_y: 12,
+      widget: searchViewModel.getWidgetById(widgetId),
+      callback: function(el){
+        $('.gridster ul').data('gridster').move_widget(el, 1, 1);
+      }
+    }));
   }, 'dashboard');
 
 %endif
@@ -3854,6 +3870,55 @@ $(document).ready(function () {
 
   var selectedWidget = null;
   var selectedRow = null;
+  %if USE_GRIDSTER.get():
+  function showAddFacetDemiModal(widget) {
+    var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
+    fakeRow.addWidget(widget)
+
+    if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
+      searchViewModel.collection.template.fieldsModalFilter("");
+      searchViewModel.collection.template.fieldsModalType(widget.widgetType());
+
+      selectedWidget = widget;
+
+      if (searchViewModel.collection.template.availableWidgetFields().length == 1){
+        addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
+      }
+      else {
+        $('#addFacetInput').typeahead({
+          'source': searchViewModel.collection.template.availableWidgetFieldsNames(),
+          'updater': function (item) {
+            addFacetDemiModalFieldPreview({'name': function () {
+              return item
+            }});
+            return item;
+          }
+        });
+        $("#addFacetDemiModal").modal("show");
+        $("#addFacetDemiModal input[type='text']").focus();
+      }
+    }
+    else {
+      huePubSub.publish('gridster.add.widget', widget.id());
+    }
+  }
+
+
+  function addFacetDemiModalFieldPreview(field) {
+    var _existingFacet = searchViewModel.collection.getFacetById(selectedWidget.id());
+    if (selectedWidget != null) {
+      selectedWidget.hasBeenSelected = true;
+      selectedWidget.isLoading(true);
+      searchViewModel.collection.addFacet({'name': field.name(), 'widget_id': selectedWidget.id(), 'widgetType': selectedWidget.widgetType()});
+      if (_existingFacet != null) {
+        _existingFacet.label(field.name());
+        _existingFacet.field(field.name());
+      }
+      $("#addFacetDemiModal").modal("hide");
+      huePubSub.publish('gridster.add.widget', selectedWidget.id());
+    }
+  }
+  %else:
   function showAddFacetDemiModal(widget, row) {
     if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
       searchViewModel.collection.template.fieldsModalFilter("");
@@ -3901,6 +3966,7 @@ $(document).ready(function () {
       }
     }
   }
+  %endif
 
   function addFacetDemiModalFieldCancel() {
     searchViewModel.removeWidget(selectedWidget);
