@@ -146,10 +146,6 @@ class SolrApi(object):
           _f = {}
           if facet['properties']['facets']:
             self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1, timeFilter)
-            if facet['widgetType'] == 'text-facet-widget':
-              _fname = _f['facet'].keys()[0]
-              _f['sort'] = {_fname: facet['properties']['sort']}
-              # domain = '-d2:NaN' # Solr 6.4
 
           if facet['properties'].get('domain'):
             if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
@@ -168,6 +164,7 @@ class SolrApi(object):
 
             if sort.get('count') == 'default':
               sort['count'] = 'desc'
+
             dim_key = [key for key in _f['facet'].keys() if 'dim' in key][0]
             _f['facet'][dim_key].update({
                   'excludeTags': facet['id'],
