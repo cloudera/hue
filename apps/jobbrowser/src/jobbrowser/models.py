@@ -24,6 +24,7 @@ import urllib2
 from urlparse import urlparse, urlunparse
 
 from django.core.urlresolvers import reverse
+from desktop.conf import REST_CONN_TIMEOUT
 from desktop.lib.view_util import format_duration_in_millis
 from desktop.lib import i18n
 from django.utils.html import escape
@@ -477,7 +478,7 @@ class TaskAttempt(object):
                       None))
     LOG.info('Retrieving %s' % (url,))
     try:
-      data = urllib2.urlopen(url)
+      data = urllib2.urlopen(url, timeout=REST_CONN_TIMEOUT.get())
     except urllib2.URLError:
       raise urllib2.URLError(_("Cannot retrieve logs from TaskTracker %(id)s.") % {'id': self.taskTrackerId})
 
