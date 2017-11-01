@@ -175,34 +175,10 @@ var AutocompleteResults = (function () {
       var result = self.entries();
 
       if (self.filter()) {
-        var lowerCaseFilter = self.filter().toLowerCase();
-        result = result.filter(function (suggestion) {
-          // TODO: Extend with fuzzy matches
-          var foundIndex = suggestion.value.toLowerCase().indexOf(lowerCaseFilter);
-          if (foundIndex !== -1) {
-            if (foundIndex === 0 || (suggestion.filterValue && suggestion.filterValue.toLowerCase().indexOf(lowerCaseFilter) === 0)) {
-              suggestion.filterWeight = 3;
-            } else  {
-              suggestion.filterWeight = 2;
-            }
-          } else {
-            if (suggestion.details && suggestion.details.comment && lowerCaseFilter.indexOf(' ') === -1) {
-              foundIndex = suggestion.details.comment.toLowerCase().indexOf(lowerCaseFilter);
-              if (foundIndex !== -1) {
-                suggestion.filterWeight = 1;
-                suggestion.matchComment = true;
-              }
-            }
-          }
-          if (foundIndex !== -1) {
-            suggestion.matchIndex = foundIndex;
-            suggestion.matchLength = self.filter().length;
-            return true;
-          }
-          return false;
-        });
+        result = SqlUtils.autocompleteFilter(self.filter(), result);
         huePubSub.publish('hue.ace.autocompleter.match.updated');
       }
+
       updateCategories(result);
 
       var activeCategory = self.activeCategory();
@@ -221,39 +197,7 @@ var AutocompleteResults = (function () {
         return activeCategory === CATEGORIES.ALL || activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular());
       });
 
-      result.sort(function (a, b) {
-        if (self.filter()) {
-          if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight !== 'undefined' && b.filterWeight !== a.filterWeight) {
-            return b.filterWeight - a.filterWeight;
-          }
-          if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight === 'undefined') {
-            return -1;
-          }
-          if (typeof a.filterWeight === 'undefined' && typeof b.filterWeight !== 'undefined') {
-            return 1;
-          }
-        }
-        if (self.sortOverride && self.sortOverride.partitionColumnsFirst) {
-          if (a.partitionKey && !b.partitionKey) {
-            return -1;
-          }
-          if (b.partitionKey && !a.partitionKey) {
-            return 1;
-          }
-        }
-        var aWeight = a.category.weight + (a.weightAdjust || 0);
-        var bWeight = b.category.weight + (b.weightAdjust || 0);
-        if (typeof aWeight !== 'undefined' && typeof bWeight !== 'undefined' && bWeight !== aWeight) {
-          return bWeight - aWeight;
-        }
-        if (typeof aWeight !== 'undefined' && typeof bWeight === 'undefined') {
-          return -1;
-        }
-        if (typeof aWeight === 'undefined' && typeof bWeight !== 'undefined') {
-          return 1;
-        }
-        return a.value.localeCompare(b.value);
-      });
+      SqlUtils.sortSuggestions(result, self.filter(), self.sortOverride);
       self.sortOverride = null;
       return result;
     }).extend({ rateLimit: 200 });

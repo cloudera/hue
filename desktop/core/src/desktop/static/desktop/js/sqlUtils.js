@@ -45,7 +45,73 @@ var SqlUtils = (function () {
     TABLES: true, TABLESAMPLE: true, TBLPROPERTIES: true, TERMINATED: true, TEXTFILE: true, THEN: true, TIMESTAMP: true, TINYINT: true, TO: true, TRUE: true, UNCACHED: true, UNION: true, UPDATE_FN: true, UPSERT: true, USE: true, USING: true, VALUES: true, VIEW: true, WHEN: true, WHERE: true, WITH: true
   };
 
+  var autocompleteFilter = function (filter, entries) {
+    var lowerCaseFilter = filter.toLowerCase();
+    return entries.filter(function (suggestion) {
+      // TODO: Extend with fuzzy matches
+      var foundIndex = suggestion.value.toLowerCase().indexOf(lowerCaseFilter);
+      if (foundIndex !== -1) {
+        if (foundIndex === 0 || (suggestion.filterValue && suggestion.filterValue.toLowerCase().indexOf(lowerCaseFilter) === 0)) {
+          suggestion.filterWeight = 3;
+        } else  {
+          suggestion.filterWeight = 2;
+        }
+      } else {
+        if (suggestion.details && suggestion.details.comment && lowerCaseFilter.indexOf(' ') === -1) {
+          foundIndex = suggestion.details.comment.toLowerCase().indexOf(lowerCaseFilter);
+          if (foundIndex !== -1) {
+            suggestion.filterWeight = 1;
+            suggestion.matchComment = true;
+          }
+        }
+      }
+      if (foundIndex !== -1) {
+        suggestion.matchIndex = foundIndex;
+        suggestion.matchLength = filter.length;
+        return true;
+      }
+      return false;
+    });
+  };
+
+  var sortSuggestions = function (suggestions, filter, sortOverride) {
+    suggestions.sort(function (a, b) {
+      if (filter) {
+        if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight !== 'undefined' && b.filterWeight !== a.filterWeight) {
+          return b.filterWeight - a.filterWeight;
+        }
+        if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight === 'undefined') {
+          return -1;
+        }
+        if (typeof a.filterWeight === 'undefined' && typeof b.filterWeight !== 'undefined') {
+          return 1;
+        }
+      }
+      if (sortOverride && sortOverride.partitionColumnsFirst) {
+        if (a.partitionKey && !b.partitionKey) {
+          return -1;
+        }
+        if (b.partitionKey && !a.partitionKey) {
+          return 1;
+        }
+      }
+      var aWeight = a.category.weight + (a.weightAdjust || 0);
+      var bWeight = b.category.weight + (b.weightAdjust || 0);
+      if (typeof aWeight !== 'undefined' && typeof bWeight !== 'undefined' && bWeight !== aWeight) {
+        return bWeight - aWeight;
+      }
+      if (typeof aWeight !== 'undefined' && typeof bWeight === 'undefined') {
+        return -1;
+      }
+      if (typeof aWeight === 'undefined' && typeof bWeight !== 'undefined') {
+        return 1;
+      }
+      return a.value.localeCompare(b.value);
+    });
+  };
+
   return {
+    autocompleteFilter : autocompleteFilter,
     backTickIfNeeded: function (sourceType, identifier) {
       if (identifier.indexOf('`') === 0) {
         return identifier;
@@ -67,7 +133,7 @@ var SqlUtils = (function () {
     },
     locationEquals: function (a, b) {
       return a && b && a.first_line === b.first_line && a.first_column === b.first_column && a.last_line === b.last_line && a.last_column === b.last_column;
-    }
+    },
+    sortSuggestions: sortSuggestions
   }
-
 })();
