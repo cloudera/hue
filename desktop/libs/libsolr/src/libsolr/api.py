@@ -804,24 +804,14 @@ class SolrApi(object):
 
   @classmethod
   def _get_aggregate_function(cls, facet):
-    if 'properties' in facet:
-      f = facet['properties']['aggregate'] # Level 1 facet
-    else:
-      f = facet['aggregate']
+    f = facet['aggregate']
 
-    if not f['formula']:
-      f['formula'] = facet['field']
-
-    return cls.__get_aggregate_function(f)
-
-  @classmethod
-  def __get_aggregate_function(cls, f):
-    if f['function'] == 'field':
+    if f['formula']:
+      return f['formula']
+    elif f['function'] == 'field':
       return f['value']
     else:
-      fields = []
-      if f['formula']:
-        fields.append(f['formula'])
+      fields = [facet['field']]
       if f['function'] == 'median':
         f['function'] = 'percentile'
         fields.append('50')
