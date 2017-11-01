@@ -2326,6 +2326,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           $.each(row.widgets(), function (z, widget) {
             if (widget && widget.id() == widget_id) {
               row.widgets.remove(widget);
+              huePubSub.publish('gridster.remove.widget', widget_id);
               row.autosizeWidgets();
               return false;
             }
