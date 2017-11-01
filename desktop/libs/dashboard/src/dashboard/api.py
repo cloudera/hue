@@ -392,7 +392,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       facet_type = 'field'
 
     if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget', 'gradient-map-widget'):
-      properties = {'canRange': False, 'stacked': False, 'limit': 10} # Lighter weight top nested facet
+      # properties = {'canRange': False, 'stacked': False, 'limit': 10} # TODO: Lighter weight top nested facet
 
       if widget_type == 'text-facet-widget':
         properties['type'] = facet_type
@@ -403,10 +403,11 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       facet['limit'] = 10
 
       if range_properties:
+        # TODO: timeline still uses properties from top properties
         facet.update(range_properties)
-        facet['initial_gap'] = properties['gap']
-        facet['initial_start'] = properties['start']
-        facet['initial_end'] = properties['end']
+        facet['initial_gap'] = facet['gap']
+        facet['initial_start'] = facet['start']
+        facet['initial_end'] = facet['end']
         facet['stacked'] = False
         facet['type'] = 'range'
       else:

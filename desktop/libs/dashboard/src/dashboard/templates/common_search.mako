@@ -1224,13 +1224,13 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </select>&nbsp;
       </span>
       <span class="facet-field-label">${ _('Zoom') }</span>
-      <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
+      <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut2"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
       <span class="facet-field-label" data-bind="visible: $root.query.multiqs().length > 1">${ _('Group by') }</span>
       <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
     </div>
 
     <span data-bind="template: { name: 'data-grid' }"></span>
-  <!-- /ko -->
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 </script>
@@ -1493,9 +1493,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </div>
       </div>
 
-         <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showChart()">
-           <div data-bind="visible: ! template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
-           <div class="grid-chart-container" data-bind="visible: template.hasDataForChart" style="overflow-x: auto">
+      <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showChart()">
+        <div data-bind="visible: ! template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
+        <div class="grid-chart-container" data-bind="visible: template.hasDataForChart" style="overflow-x: auto">
 
         <!-- ko if: widgetType() == 'bucket-widget' -->
           <!-- ko with: $parent -->
@@ -1547,8 +1547,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <div class="clearfix"></div>
           <!-- /ko -->
 
-           <!-- /ko -->
-         <!-- /ko -->
+          <!-- /ko -->
+        <!-- /ko -->
 
         <!-- ko if: widgetType() == 'gradient-map-widget' -->
           <!-- ko with: $parent -->
@@ -1561,7 +1561,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               },
               onComplete: function(){ var widget = searchViewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
            <!-- /ko -->
-         <!-- /ko -->
+        <!-- /ko -->
 
         <!-- ko if: widgetType() == 'timeline-widget' -->
           <!-- ko with: $parent -->
@@ -1576,54 +1576,53 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <!-- /ko -->
         <!-- /ko -->
 
+        <!-- ko if: widgetType() == 'pie2-widget' -->
+          <!-- ko if: type() == 'range' -->
+          <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+            transformer: rangePieChartDataTransformer,
+            maxWidth: 250,
+            onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
+            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+          <div class="clearfix"></div>
+          <!-- /ko -->
 
-    <!-- ko if: widgetType() == 'pie2-widget' -->
-      <!-- ko if: type() == 'range' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
-        transformer: rangePieChartDataTransformer,
-        maxWidth: 250,
-        onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
-        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
-      <div class="clearfix"></div>
-      <!-- /ko -->
+          <!-- ko if: type() == 'range-up' -->
+          <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+            transformer: rangeUpPieChartDataTransformer,
+            rangeUp: true,
+            maxWidth: 250,
+            onClick: function(d){ searchViewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
+            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+          <div class="clearfix"></div>
+          <!-- /ko -->
 
-      <!-- ko if: type() == 'range-up' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
-        transformer: rangeUpPieChartDataTransformer,
-        rangeUp: true,
-        maxWidth: 250,
-        onClick: function(d){ searchViewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
-        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
-      <div class="clearfix"></div>
-      <!-- /ko -->
+          <!-- ko if: type().indexOf('range') == -1 -->
+          <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+            transformer: pieChartDataTransformer,
+            maxWidth: 250,
+            onClick: function(d){ searchViewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
+            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+          <div class="clearfix"></div>
+          <!-- /ko -->
+        <!-- /ko -->
 
-      <!-- ko if: type().indexOf('range') == -1 -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
-        transformer: pieChartDataTransformer,
-        maxWidth: 250,
-        onClick: function(d){ searchViewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
-        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
-      <div class="clearfix"></div>
-      <!-- /ko -->
-    <!-- /ko -->
+        <!-- ko if: widgetType() == 'resultset-widget' -->
+          <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
+                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
 
-         <!-- ko if: widgetType() == 'resultset-widget' -->
-            <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
-                  transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
+          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
+                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
 
-            <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
-                  transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
+                transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
 
-            <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
-                  transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+          <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
+                transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
+          <div class="clearfix"></div>
+        <!-- /ko -->
 
-            <div data-bind="attr: {'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
-                  transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
-            <div class="clearfix"></div>
-         <!-- /ko -->
-
-           </div>
-         </div>
+       </div>
+     </div>
 
     </div>
   </div>
