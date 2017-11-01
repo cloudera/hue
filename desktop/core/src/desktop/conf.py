@@ -454,6 +454,12 @@ ALLOWED_HOSTS = Config(
   help=_('Comma separated list of strings representing the host/domain names that the Hue server can serve.')
 )
 
+REST_CONN_TIMEOUT = Config(
+  key='rest_conn_timeout',
+  default=120,
+  type=int,
+  help=_('Timeout in seconds for REST calls.'))
+
 VCS = UnspecifiedConfigSection(
   "vcs",
   help="One entry for each Version Control",
