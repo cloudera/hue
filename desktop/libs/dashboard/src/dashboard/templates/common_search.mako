@@ -3600,9 +3600,6 @@ $(document).ready(function () {
     avoid_overlapped_widgets: true,
     max_cols: 12,
     max_rows: 60,
-##     draggable: {
-##       handle: '.move-gridster-widget'
-##     },
     resize: {
       enabled: true,
       stop: function (event, ui, $widget) {
@@ -3643,12 +3640,16 @@ $(document).ready(function () {
     }
   }, 200);
 
-  huePubSub.subscribe('plotly.afterplot', function (element){
+  huePubSub.subscribe('plotly.afterplot', function (element) {
     resizeGridsterWidget($(element).parents('li.gs-w'));
   }, 'dashboard');
 
-  huePubSub.subscribe('leaflet.afterplot', function (element){
+  huePubSub.subscribe('leaflet.afterplot', function (element) {
     resizeGridsterWidget($(element).parents('li.gs-w'));
+  }, 'dashboard');
+
+  huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
+    $(".gridster>ul").data('gridster').remove_widget($("#wdg_" + widgetId).parents('li.gs-w'));
   }, 'dashboard');
 
 %endif
