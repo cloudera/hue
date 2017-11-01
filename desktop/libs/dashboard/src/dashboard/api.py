@@ -412,6 +412,9 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       else:
         facet['type'] = facet_type
 
+      if collection.get('engine', 'solr') != 'solr':
+        facet['sort'] = 'default'
+
       properties['facets'] = [facet]
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
 
