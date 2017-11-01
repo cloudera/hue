@@ -151,7 +151,7 @@ class HttpClient(object):
     return self._session.headers.copy()
 
   def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True,
-              files=None, clear_cookies=False):
+              files=None, clear_cookies=False, timeout=conf.REST_CONN_TIMEOUT.get()):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
@@ -175,7 +175,7 @@ class HttpClient(object):
         self.logger.warn("GET and DELETE methods do not pass any data. Path '%s'" % path)
         data = None
 
-    request_kwargs = {'allow_redirects': allow_redirects}
+    request_kwargs = {'allow_redirects': allow_redirects, 'timeout': timeout}
     if headers:
       request_kwargs['headers'] = headers
     if data:
