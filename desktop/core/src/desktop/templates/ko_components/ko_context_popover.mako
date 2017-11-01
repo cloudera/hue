@@ -385,7 +385,7 @@ from metadata.conf import has_navigator
         <!-- ko with: details -->
         <div class="context-popover-doc-header-link" ><a href="javscript:void(0)" data-bind="hueLink: link, click: function () { $parents[1].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
         <!-- ko if: description -->
-        <div class="context-popover-doc-description" data-bind="text: description"></div>
+        <div class="context-popover-doc-description" data-bind="html: description"></div>
         <!-- /ko -->
         <!-- /ko -->
 
