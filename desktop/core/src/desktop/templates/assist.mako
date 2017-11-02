@@ -771,7 +771,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
     <div class="assist-db-header-actions">
       <!-- ko ifnot: loading -->
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-      <!-- ko if: typeof isSource === 'undefined' || !isSource -->
+      <!-- ko if: (typeof isSource === 'undefined' || !isSource) && sourceType !== 'solr' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       <!-- /ko -->
       % if hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get():
