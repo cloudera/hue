@@ -491,7 +491,6 @@ from desktop.views import _ko
           var self = this;
           var syncEntries = [];
           if (parseResult.suggestFunctions) {
-
             Object.keys(SOLR_FUNCTIONS).forEach(function (name) {
               syncEntries.push({
                 category: CATEGORIES.FUNCTION,
@@ -500,6 +499,19 @@ from desktop.views import _ko
                 weightAdjust: 0, // Add when we type aware
                 popular: ko.observable(false),
                 details: SOLR_FUNCTIONS[name]
+              })
+            });
+          }
+
+          if (parseResult.suggestAggregateFunctions) {
+            Object.keys(SOLR_AGGREGATE_FUNCTIONS).forEach(function (name) {
+              syncEntries.push({
+                category: CATEGORIES.FUNCTION,
+                value: name + '()',
+                meta: SOLR_AGGREGATE_FUNCTIONS[name].returnTypes.join('|'),
+                weightAdjust: 0, // Add when we type aware
+                popular: ko.observable(false),
+                details: SOLR_AGGREGATE_FUNCTIONS[name]
               })
             });
           }

@@ -69,7 +69,7 @@ SolrExpressionAutocomplete
    }
  | 'CURSOR' 'EOF'
    {
-     return { suggestFunctions: true, suggestFields: true }
+     return { suggestAggregateFunctions: true }
    }
  ;
 
