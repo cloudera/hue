@@ -35,7 +35,7 @@ from thrift.protocol.TMultiplexedProtocol import TMultiplexedProtocol
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from desktop.conf import SASL_MAX_BUFFER
+from desktop.conf import SASL_MAX_BUFFER, CHERRYPY_SERVER_THREADS
 
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
@@ -304,7 +304,8 @@ def connect_to_thrift(conf):
   return service, protocol, transport
 
 
-_connection_pool = ConnectionPooler()
+_connection_pool = ConnectionPooler(poolsize=CHERRYPY_SERVER_THREADS.get())
+
 
 def get_client(klass, host, port, service_name, **kwargs):
   conf = ConnectionConfig(klass, host, port, service_name, **kwargs)
