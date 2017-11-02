@@ -460,9 +460,10 @@ from desktop.views import _ko
           FUNCTION: { id: 'function', weight: 900, color: COLORS.FUNCTION, label: AutocompleterGlobals.i18n.category.function, detailsTemplate: 'udf' }
         };
 
-        var SolrFormulaSuggestions = function () {
+        var SolrFormulaSuggestions = function (fieldAccessor) {
           var self = this;
           self.entries = ko.observableArray();
+          self.fieldAccessor = fieldAccessor;
 
           self.filtered = ko.pureComputed(function () {
             var result = self.entries();
@@ -490,6 +491,20 @@ from desktop.views import _ko
         SolrFormulaSuggestions.prototype.update = function (parseResult) {
           var self = this;
           var syncEntries = [];
+
+          if (parseResult.suggestFields) {
+            self.fieldAccessor().forEach(function (field) {
+              syncEntries.push({
+                category: CATEGORIES.FIELD,
+                value: field.name(),
+                meta: field.type(),
+                weightAdjust: 0,
+                popular: ko.observable(false),
+                details: field
+              })
+            });
+          }
+
           if (parseResult.suggestFunctions) {
             Object.keys(SOLR_FUNCTIONS).forEach(function (name) {
               syncEntries.push({
@@ -522,12 +537,14 @@ from desktop.views import _ko
         /**
          * @param {Object} options
          * @param {Ace} options.editor
+         * @param {Object} options.support
+         * @param {function} options.support.fields - The observable/function containing the fields
          * @constructor
          */
         var SolrFormulaAutocompleter = function (options) {
           var self = this;
           self.editor = options.editor;
-          self.suggestions = new SolrFormulaSuggestions();
+          self.suggestions = new SolrFormulaSuggestions(options.support.fields);
         };
 
         SolrFormulaAutocompleter.prototype.autocomplete = function () {
@@ -563,11 +580,11 @@ from desktop.views import _ko
         self.ace(editor);
 
         if (params.autocomplete) {
-          if (!AVAILABLE_AUTOCOMPLETERS[params.autocomplete]) {
-            throw new Error('Could not find autocompleter for "' + params.autocomplete + '"');
+          if (!AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type]) {
+            throw new Error('Could not find autocompleter for "' + params.autocomplete.type + '"');
           }
 
-          self.autocompleter = new AVAILABLE_AUTOCOMPLETERS[params.autocomplete]({ editor: editor });
+          self.autocompleter = new AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type]({ editor: editor, support: params.autocomplete.support });
         } else {
           self.autocompleter = null;
         }
@@ -586,7 +603,7 @@ from desktop.views import _ko
         if (params.autocomplete) {
           aceOptions = $.extend(aceOptions, {
             enableLiveAutocompletion: true,
-            enableBasicAutocompletion: params.autocomplete
+            enableBasicAutocompletion: true
           });
         }
 
