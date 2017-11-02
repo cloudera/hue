@@ -463,24 +463,28 @@ var SqlAutocompleter2 = (function () {
 
       $.when(topColumnsDeferral, suggestColumnsDeferral).then(function (topColumns, suggestions) {
         if (topColumns.length > 0) {
-          suggestions.forEach(function (suggestion) {
-            var path = '';
-            if (!self.snippet.getApiHelper().isDatabase(suggestion.table.identifierChain[0].name, self.snippet.type())) {
-              path = database + '.';
-            }
-            path += $.map(suggestion.table.identifierChain, function (identifier) { return identifier.name }).join('.') + '.' + suggestion.value.replace(/[\[\]]/g, '');
-            for (var i = 0; i < topColumns.length; i++) {
-              // TODO: Switch to map once nav opt API is stable
-              if (path.toLowerCase().indexOf(topColumns[i].path.toLowerCase()) !== -1) {
-                suggestion.weight += Math.min(topColumns[i].columnCount, 99);
-                suggestion.meta = suggestion.meta + ' *';
-                suggestion.docHTML = self.createTopColumnHtml(topColumns[i]);
-                break;
+          self.snippet.getApiHelper().getDatabases(self.snippet.type()).done(function (databases) {
+            suggestions.forEach(function (suggestion) {
+              var path = '';
+              if (!suggestion.table.identifierChain[0].name || databases.indexOf(suggestion.table.identifierChain[0].name.toLowerCase() === -1)) {
+                path = database + '.';
               }
-            }
+              path += $.map(suggestion.table.identifierChain, function (identifier) { return identifier.name }).join('.') + '.' + suggestion.value.replace(/[\[\]]/g, '');
+              for (var i = 0; i < topColumns.length; i++) {
+                // TODO: Switch to map once nav opt API is stable
+                if (path.toLowerCase().indexOf(topColumns[i].path.toLowerCase()) !== -1) {
+                  suggestion.weight += Math.min(topColumns[i].columnCount, 99);
+                  suggestion.meta = suggestion.meta + ' *';
+                  suggestion.docHTML = self.createTopColumnHtml(topColumns[i]);
+                  break;
+                }
+              }
+            });
+            mergeNavOptColDeferral.resolve();
           });
+        } else {
+          mergeNavOptColDeferral.resolve();
         }
-        mergeNavOptColDeferral.resolve();
       });
 
       if (self.snippet.type() === 'hive' && /[^\.]$/.test(beforeCursor)) {

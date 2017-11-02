@@ -3884,101 +3884,114 @@
         getLocationsSub.remove();
       });
 
+      // The parser isn't aware of the DDL so sometimes it marks complex columns as tables
+      // I.e. "Impala SELECT a FROM b.c" Is 'b' a database or a table? If table then 'c' is complex
+      var identifyComplexLocations = function (locations, callback) {
+        apiHelper.getDatabases(self.snippet.type()).done(function (databases) {
+          locations.forEach(function (location) {
+            if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
+              return;
+            }
+            if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {
+              var clonedChain = location.identifierChain.concat();
+              if (databases.indexOf(clonedChain[0].name.toLowerCase()) > -1) {
+                clonedChain.shift();
+                if (clonedChain.length > 1) {
+                  location.type = 'complex';
+                }
+              }
+            }
+          });
+          callback();
+        });
+      };
+
       var locationWorkerSub = huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
         if (e.data.id !== self.snippet.id()) {
           return;
         }
 
-        lastKnownLocations = {
-          id: self.editorId,
-          type: self.snippet.type(),
-          defaultDatabase: self.snippet.database(),
-          locations: e.data.locations,
-          activeStatementLocations: e.data.activeStatementLocations,
-          totalStatementCount: e.data.totalStatementCount,
-          activeStatementIndex: e.data.activeStatementIndex
-        };
+        identifyComplexLocations(e.data.locations, function () {
+          lastKnownLocations = {
+            id: self.editorId,
+            type: self.snippet.type(),
+            defaultDatabase: self.snippet.database(),
+            locations: e.data.locations,
+            activeStatementLocations: e.data.activeStatementLocations,
+            totalStatementCount: e.data.totalStatementCount,
+            activeStatementIndex: e.data.activeStatementIndex
+          };
 
-        // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
-        while(activeTokens.length > 0) {
-          delete activeTokens.pop().parseLocation;
-        }
-
-        e.data.locations.forEach(function (location) {
-          if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
-            return;
+          // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
+          while(activeTokens.length > 0) {
+            delete activeTokens.pop().parseLocation;
           }
-          if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {
-            var clonedChain = location.identifierChain.concat();
-            var dbFound = false;
-            if (apiHelper.containsDatabase(self.snippet.type(), clonedChain[0].name)) {
-              clonedChain.shift();
-              dbFound = true;
+
+          e.data.locations.forEach(function (location) {
+            if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
+              return;
             }
-            if (dbFound && clonedChain.length > 1) {
-              location.type = 'complex';
+
+            var token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column);
+
+            if (token && token.value && /`$/.test(token.value)) {
+              // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
+              token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
             }
-          }
+            if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
+              token = null;
+            }
+            if (token && token.value) {
+              var AceRange = ace.require('ace/range').Range;
+              // The Ace tokenizer also splits on '{', '(' etc. hence the actual value;
+              token.actualValue = self.editor.getSession().getTextRange(new AceRange(location.location.first_line - 1, location.location.first_column - 1, location.location.last_line - 1, location.location.last_column - 1));
+            }
 
-          var token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column);
-
-          if (token && token.value && /`$/.test(token.value)) {
-            // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
-            token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
-          }
-          if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
-            token = null;
-          }
-          if (token && token.value) {
-            var AceRange = ace.require('ace/range').Range;
-            // The Ace tokenizer also splits on '{', '(' etc. hence the actual value;
-            token.actualValue = self.editor.getSession().getTextRange(new AceRange(location.location.first_line - 1, location.location.first_column - 1, location.location.last_line - 1, location.location.last_column - 1));
-          }
-
-          if (token !== null) {
-            token.parseLocation = location;
-            activeTokens.push(token);
-            if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
-              var findIdentifierChainInTable = function (tablesToGo) {
-                var nextTable = tablesToGo.shift();
-                if (typeof nextTable.subQuery === 'undefined') {
-                  apiHelper.fetchAutocomplete({
-                    sourceType: self.snippet.type(),
-                    defaultDatabase: self.snippet.database(),
-                    identifierChain: nextTable.identifierChain,
-                    silenceErrors: true,
-                    successCallback: function (data) {
-                      if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
-                        location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
-                        delete location.tables;
-                        self.verifyExists(token, e.data.locations);
-                      } else if (tablesToGo.length > 0) {
-                        findIdentifierChainInTable(tablesToGo);
-                      } else {
-                        self.verifyExists(token, e.data.locations);
+            if (token !== null) {
+              token.parseLocation = location;
+              activeTokens.push(token);
+              if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
+                var findIdentifierChainInTable = function (tablesToGo) {
+                  var nextTable = tablesToGo.shift();
+                  if (typeof nextTable.subQuery === 'undefined') {
+                    apiHelper.fetchAutocomplete({
+                      sourceType: self.snippet.type(),
+                      defaultDatabase: self.snippet.database(),
+                      identifierChain: nextTable.identifierChain,
+                      silenceErrors: true,
+                      successCallback: function (data) {
+                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
+                          location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
+                          delete location.tables;
+                          self.verifyExists(token, e.data.locations);
+                        } else if (tablesToGo.length > 0) {
+                          findIdentifierChainInTable(tablesToGo);
+                        } else {
+                          self.verifyExists(token, e.data.locations);
+                        }
                       }
-                    }
-                  })
-                } else if (tablesToGo.length > 0) {
-                  findIdentifierChainInTable(tablesToGo);
-                } else {
+                    })
+                  } else if (tablesToGo.length > 0) {
+                    findIdentifierChainInTable(tablesToGo);
+                  } else {
+                    self.verifyExists(token, e.data.locations);
+                  }
+                };
+                if (location.tables.length > 1) {
+                  findIdentifierChainInTable(location.tables.concat());
+                } else if (location.tables.length == 1 && location.tables[0].identifierChain) {
+                  location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
+                  delete location.tables;
                   self.verifyExists(token, e.data.locations);
                 }
-              };
-              if (location.tables.length > 1) {
-                findIdentifierChainInTable(location.tables.concat());
-              } else if (location.tables.length == 1 && location.tables[0].identifierChain) {
-                location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
-                delete location.tables;
+              } else {
                 self.verifyExists(token, e.data.locations);
               }
-            } else {
-              self.verifyExists(token, e.data.locations);
             }
-          }
-        });
+          });
 
-        huePubSub.publish('editor.active.locations', lastKnownLocations);
+          huePubSub.publish('editor.active.locations', lastKnownLocations);
+        });
       });
 
       self.disposeFunctions.push(function () {

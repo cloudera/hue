@@ -170,12 +170,6 @@ var ApiHelper = (function () {
     }
   }
 
-  ApiHelper.prototype.isDatabase = function (name, sourceType) {
-    var self = this;
-    return typeof self.lastKnownDatabases[sourceType] !== 'undefined'
-        && self.lastKnownDatabases[sourceType].filter(function (knownDb) { return knownDb.toLowerCase() === name.toLowerCase() }).length === 1;
-  };
-
   ApiHelper.prototype.hasExpired = function (timestamp, cacheType) {
     if (typeof hueDebug !== 'undefined' && typeof hueDebug.cacheTimeout !== 'undefined') {
       return (new Date()).getTime() - timestamp > hueDebug.cacheTimeout;
@@ -1465,9 +1459,55 @@ var ApiHelper = (function () {
     }));
   };
 
+  /**
+   * Returns a promise that will always be resolved with:
+   *
+   * 1. Cached databases
+   * 2. Fetched databases
+   * 3. Empty array
+   *
+   * @param sourceType
+   * @return {Promise}
+   */
+  ApiHelper.prototype.getDatabases = function (sourceType) {
+    var self = this;
+    var promise = $.Deferred();
+    if (typeof self.lastKnownDatabases[sourceType] !== 'undefined') {
+      promise.resolve(self.lastKnownDatabases[sourceType])
+    } else {
+      self.loadDatabases({
+        sourceType: sourceType,
+        silenceErrors: true,
+        successCallback: function (databases) {
+          promise.resolve(databases)
+        },
+        errorCallback: function () {
+          promise.resolve([]);
+        }
+      });
+    }
+    return promise;
+  };
+
+  /**
+   * Tests if a database exists or not for the given sourceType
+   * Returns a promise that will always be resolved with either true or false. In case of error it will be false.
+   *
+   * @param sourceType
+   * @param databaseName
+   * @return {Promise}
+   */
   ApiHelper.prototype.containsDatabase = function (sourceType, databaseName) {
     var self = this;
-    return typeof self.lastKnownDatabases[sourceType] !== 'undefined' && self.lastKnownDatabases[sourceType].indexOf(databaseName.toLowerCase()) > -1;
+    var promise = $.Deferred(); // Will always be resolved
+    if (databaseName) {
+      self.getDatabases(sourceType).done(function (databases) {
+        promise.resolve(databases && databases.indexOf(databaseName.toLowerCase()) > -1);
+      });
+    } else {
+      promise.resolve(false);
+    }
+    return promise;
   };
 
   ApiHelper.prototype.expandComplexIdentifierChain = function (sourceType, database, identifierChain, successCallback, errorCallback, cachedOnly) {
@@ -1544,22 +1584,31 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.identifierChainToPath = function (options, successCallback) {
     var self = this;
+    if (options.identifierChain.length === 0) {
+      successCallback([options.defaultDatabase]);
+      return;
+    }
+
     var identifierChainClone = options.identifierChain.concat();
     var path = [];
-    if (identifierChainClone.length === 0 || ! self.containsDatabase(options.sourceType, identifierChainClone[0].name)) {
-      path.push(options.defaultDatabase);
-    } else {
-      path.push(identifierChainClone.shift().name)
-    }
 
-    if (identifierChainClone.length > 1) {
-      self.expandComplexIdentifierChain(options.sourceType, path[0], identifierChainClone, function (fetchedFields) {
-        successCallback(path.concat(fetchedFields))
-      }, options.errorCallback, options.cachedOnly);
-    } else {
-      successCallback(path.concat($.map(identifierChainClone, function (identifier) { return identifier.name })))
-    }
+    var dbPromise = self.containsDatabase(options.sourceType, identifierChainClone[0].name);
 
+    dbPromise.done(function (firstIsDatabase) {
+      if (!firstIsDatabase) {
+        path.push(options.defaultDatabase);
+      } else {
+        path.push(identifierChainClone.shift().name)
+      }
+
+      if (identifierChainClone.length > 1) {
+        self.expandComplexIdentifierChain(options.sourceType, path[0], identifierChainClone, function (fetchedFields) {
+          successCallback(path.concat(fetchedFields))
+        }, options.errorCallback, options.cachedOnly);
+      } else {
+        successCallback(path.concat($.map(identifierChainClone, function (identifier) { return identifier.name })))
+      }
+    });
   };
 
   /**
@@ -1631,67 +1680,64 @@ var ApiHelper = (function () {
 
     var hierarchy = '';
 
-    self.loadDatabases({
-      sourceType: options.sourceType,
-      successCallback: function () {
-        // Database
-        if (clonedIdentifierChain.length > 1 && self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
-          hierarchy = clonedIdentifierChain.shift().name
-        } else {
-          hierarchy = options.defaultDatabase;
+    var dbPromise = self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name);
+
+    dbPromise.done(function (firstIsDatabase) {
+      // Database
+      if (firstIsDatabase) {
+        hierarchy = clonedIdentifierChain.shift().name
+      } else {
+        hierarchy = options.defaultDatabase;
+      }
+
+      // Table
+      if (clonedIdentifierChain.length > 0) {
+        hierarchy += '/' + clonedIdentifierChain.shift().name;
+      }
+
+      // Column/Complex
+      if (clonedIdentifierChain.length > 0) {
+        hierarchy += '/stats/' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('/')
+      }
+
+      var url = "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + hierarchy;
+
+      var fetchFunction = function (storeInCache) {
+        if (options.timeout === 0) {
+          self.assistErrorCallback(options)({ status: -1 });
+          return;
         }
-
-        // Table
-        if (clonedIdentifierChain.length > 0) {
-          hierarchy += '/' + clonedIdentifierChain.shift().name;
-        }
-
-        // Column/Complex
-        if (clonedIdentifierChain.length > 0) {
-          hierarchy += '/stats/' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('/')
-        }
-
-        var url = "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + hierarchy;
-
-        var fetchFunction = function (storeInCache) {
-          if (options.timeout === 0) {
-            self.assistErrorCallback(options)({ status: -1 });
-            return;
-          }
-          $.ajax({
-            url: url,
-            data: {
-              "format" : 'json'
-            },
-            beforeSend: function (xhr) {
-              xhr.setRequestHeader("X-Requested-With", "Hue");
-            },
-            timeout: options.timeout
-          }).done(function (data) {
-            if (! self.successResponseIsError(data)) {
-              if ((typeof data.cols !== 'undefined' && data.cols.length > 0) || typeof data.sample !== 'undefined') {
-                storeInCache(data);
-              }
-              options.successCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          })
-            .fail(self.assistErrorCallback(options))
-            .always(function () {
-              if (typeof options.editor !== 'undefined' && options.editor !== null) {
-                options.editor.hideSpinner();
-              }
-            });
-        };
-
-        fetchCached.bind(self)($.extend({}, options, {
+        $.ajax({
           url: url,
-          fetchFunction: fetchFunction
-        }));
-      },
-      silenceErrors: options.silenceErrors,
-      errorCallback: options.errorCallback
+          data: {
+            "format" : 'json'
+          },
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader("X-Requested-With", "Hue");
+          },
+          timeout: options.timeout
+        }).done(function (data) {
+          if (! self.successResponseIsError(data)) {
+            if ((typeof data.cols !== 'undefined' && data.cols.length > 0) || typeof data.sample !== 'undefined') {
+              storeInCache(data);
+            }
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        })
+          .fail(self.assistErrorCallback(options))
+          .always(function () {
+            if (typeof options.editor !== 'undefined' && options.editor !== null) {
+              options.editor.hideSpinner();
+            }
+          });
+      };
+
+      fetchCached.bind(self)($.extend({}, options, {
+        url: url,
+        fetchFunction: fetchFunction
+      }));
     });
   };
 
@@ -1736,25 +1782,28 @@ var ApiHelper = (function () {
 
     var clonedIdentifierChain = options.identifierChain.concat();
 
-    var database = options.defaultDatabase && !self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name) ? options.defaultDatabase : clonedIdentifierChain.shift().name;
+    var dpPromise = self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name);
 
-    var url = NAV_URLS.FIND_ENTITY + '?type=database&name=' + database;
+    dpPromise.done(function (firstIsDatabase) {
+      var database = options.defaultDatabase && !firstIsDatabase ? options.defaultDatabase : clonedIdentifierChain.shift().name;
+      var url = NAV_URLS.FIND_ENTITY + '?type=database&name=' + database;
 
-    var isView = !!options.isView;
+      var isView = !!options.isView;
 
-    if (clonedIdentifierChain.length > 0) {
-      var table = clonedIdentifierChain.shift().name;
-      url = NAV_URLS.FIND_ENTITY + (isView ? '?type=view' : '?type=table') + '&database=' + database + '&name=' + table;
       if (clonedIdentifierChain.length > 0) {
-        url = NAV_URLS.FIND_ENTITY + '?type=field&database=' + database + '&table=' + table + '&name=' + clonedIdentifierChain.shift().name;
+        var table = clonedIdentifierChain.shift().name;
+        url = NAV_URLS.FIND_ENTITY + (isView ? '?type=view' : '?type=table') + '&database=' + database + '&name=' + table;
+        if (clonedIdentifierChain.length > 0) {
+          url = NAV_URLS.FIND_ENTITY + '?type=field&database=' + database + '&table=' + table + '&name=' + clonedIdentifierChain.shift().name;
+        }
       }
-    }
 
-    fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
-      url: url,
-      errorCallback: self.assistErrorCallback(options),
-      noCache: true
-    }));
+      fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
+        url: url,
+        errorCallback: self.assistErrorCallback(options),
+        noCache: true
+      }));
+    });
   };
 
   ApiHelper.prototype.addNavTags = function (entityId, tags) {
@@ -1792,27 +1841,34 @@ var ApiHelper = (function () {
     var self = this;
     var tables = [];
     var tableIndex = {};
-    options.tables.forEach(function (table) {
-      if (table.subQuery || !table.identifierChain) {
-        return;
-      }
-      var clonedIdentifierChain = table.identifierChain.concat();
 
-      var databasePrefix;
-      if (clonedIdentifierChain.length > 1 && self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
-        databasePrefix = clonedIdentifierChain.shift().name + '.';
-      } else if (options.defaultDatabase) {
-        databasePrefix = options.defaultDatabase + '.';
-      } else {
-        databasePrefix = '';
-      }
-      var identifier = databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.');
-      if (!tableIndex[databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.')]) {
-        tables.push(identifier);
-        tableIndex[identifier] = true;
-      }
+    var promise = $.Deferred();
+
+    self.getDatabases(options.sourceType).done(function (databases){
+      options.tables.forEach(function (table) {
+        if (table.subQuery || !table.identifierChain) {
+          return;
+        }
+        var clonedIdentifierChain = table.identifierChain.concat();
+
+        var databasePrefix;
+        if (clonedIdentifierChain.length > 1 && clonedIdentifierChain[0].name && databases.indexOf(clonedIdentifierChain[0].name.toLowerCase()) > -1) {
+          databasePrefix = clonedIdentifierChain.shift().name + '.';
+        } else if (options.defaultDatabase) {
+          databasePrefix = options.defaultDatabase + '.';
+        } else {
+          databasePrefix = '';
+        }
+        var identifier = databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.');
+        if (!tableIndex[databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.')]) {
+          tables.push(identifier);
+          tableIndex[identifier] = true;
+        }
+      });
+      promise.resolve(ko.mapping.toJSON(tables))
     });
-    return ko.mapping.toJSON(tables);
+
+    return promise;
   };
 
   /**
@@ -1921,68 +1977,71 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavOptCached = function (url, options, cacheCondition) {
     var self = this;
 
-    var data, hash;
-    if (options.tables) {
-      data = {
-        dbTables: self.createNavOptDbTablesJson(options)
-      };
-      hash = data.dbTables.hashCode();
-    } else if (options.database) {
-      data = {
-        database: options.database
-      };
-      hash = data.database;
-    }
-
-    var promise = self.queueManager.getQueued(url, hash);
-    var firstInQueue = typeof promise === 'undefined';
-    if (firstInQueue) {
-      promise = $.Deferred();
-      self.queueManager.addToQueue(promise, url, hash);
-    }
-
-    promise.done(options.successCallback).fail(self.assistErrorCallback(options)).always(function () {
-      if (typeof options.editor !== 'undefined' && options.editor !== null) {
-        options.editor.hideSpinner();
+    var performFetch = function (data, hash) {
+      var promise = self.queueManager.getQueued(url, hash);
+      var firstInQueue = typeof promise === 'undefined';
+      if (firstInQueue) {
+        promise = $.Deferred();
+        self.queueManager.addToQueue(promise, url, hash);
       }
-    });
 
-    if (!firstInQueue) {
-      return;
-    }
+      promise.done(options.successCallback).fail(self.assistErrorCallback(options)).always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
 
-    var fetchFunction = function (storeInCache) {
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({ status: -1 });
+      if (!firstInQueue) {
         return;
       }
 
-      return $.ajax({
-        type: 'post',
-        url: url,
-        data: data,
-        timeout: options.timeout
-      })
-      .done(function (data) {
-        if (data.status === 0) {
-          if (cacheCondition(data)) {
-            storeInCache(data);
-          }
-          promise.resolve(data);
-        } else {
-          promise.reject(data);
+      var fetchFunction = function (storeInCache) {
+        if (options.timeout === 0) {
+          self.assistErrorCallback(options)({ status: -1 });
+          return;
         }
-      })
-      .fail(promise.reject);
-    };
 
-    return fetchCached.bind(self)($.extend({}, options, {
-      url: url,
-      hash: hash,
-      cacheType: 'optimizer',
-      fetchFunction: fetchFunction,
-      promise: promise
-    }));
+        return $.ajax({
+          type: 'post',
+          url: url,
+          data: data,
+          timeout: options.timeout
+        })
+          .done(function (data) {
+            if (data.status === 0) {
+              if (cacheCondition(data)) {
+                storeInCache(data);
+              }
+              promise.resolve(data);
+            } else {
+              promise.reject(data);
+            }
+          })
+          .fail(promise.reject);
+      };
+
+      return fetchCached.bind(self)($.extend({}, options, {
+        url: url,
+        hash: hash,
+        cacheType: 'optimizer',
+        fetchFunction: fetchFunction,
+        promise: promise
+      }));
+    }
+
+    var promise = $.Deferred();
+    if (options.tables) {
+      self.createNavOptDbTablesJson(options).done(function (json) {
+        promise.resolve(performFetch({
+          dbTables: json
+        }, json.hashCode()))
+      });
+    } else if (options.database) {
+      promise.resolve(performFetch({
+        database: options.database
+      }, options.database));
+    }
+    return promise;
   };
 
   ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
