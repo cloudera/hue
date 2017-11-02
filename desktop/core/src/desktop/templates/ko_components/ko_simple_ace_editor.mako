@@ -650,6 +650,19 @@ from desktop.views import _ko
           }
           editor.completer.exactMatch = false;
           editor.useHueAutocompleter = true;
+
+          var afterExecListener = editor.commands.on('afterExec', function (e) {
+            if (e.command.name === "insertstring" && /\S+\(\)$/.test(e.args)) {
+              editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - 1);
+              window.setTimeout(function () {
+                editor.execCommand("startAutocomplete");
+              }, 1);
+            }
+          });
+
+          self.disposeFunctions.push(function () {
+            editor.commands.off('afterExec', afterExecListener);
+          });
         }
 
         var inputListener = editor.on('input', function () {
