@@ -788,6 +788,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         <!-- /ko -->
         <!-- /ko -->
       % endif
+      <!-- ko if: sourceType === 'solr' -->
+      <a class="inactive-action" data-bind="hueLink: '/indexer/importer/prefill/all/index/'" title="${_('Create index')}">
+        <i class="pointer fa fa-plus" title="${_('Create index')}"></i>
+      </a>
+      <!-- /ko -->
       <!-- ko if: sourceType === 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
       <!-- /ko -->
