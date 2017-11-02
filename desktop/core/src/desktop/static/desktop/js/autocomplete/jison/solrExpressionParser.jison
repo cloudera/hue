@@ -27,9 +27,9 @@
 [0-9]+(?:[,.][0-9]+)?                      { return 'NUMBER'; }
 
 '-'                                        { return '-'; }
-'*'                                        { return 'OPERATOR'; }
-'+'                                        { return 'OPERATOR'; }
-'/'                                        { return 'OPERATOR'; }
+'+'                                        { return '+'; }
+'*'                                        { return '*'; }
+'/'                                        { return '/'; }
 
 [a-z]+\s*\(                                {
                                              yy.lexer.unput('(');
@@ -52,7 +52,8 @@
 
 /lex
 
-%left '-' 'OPERATOR'
+%left '+' '-'
+%left '*' '/'
 
 %start SolrExpressionAutocomplete
 
@@ -61,7 +62,9 @@
 SolrExpressionAutocomplete
  : SolrExpression 'EOF'
    {
-     return {};
+     return {
+       parsedValue: $1
+     };
    }
  | SolrExpression_EDIT 'EOF'
    {
@@ -75,7 +78,7 @@ SolrExpressionAutocomplete
 
 SolrExpression
  : NonParenthesizedSolrExpression
- | '(' NonParenthesizedSolrExpression ')'
+ | '(' NonParenthesizedSolrExpression ')'  -> $1 + $2 + $3
  ;
 
 SolrExpression_EDIT
@@ -86,10 +89,12 @@ SolrExpression_EDIT
 NonParenthesizedSolrExpression
  : 'NUMBER'
  | 'IDENTIFIER'
- | 'FUNCTION' '(' ArgumentList ')'
- | SolrExpression 'OPERATOR' SolrExpression
- | SolrExpression '-' SolrExpression
- | '-' SolrExpression
+ | 'FUNCTION' '(' ArgumentList ')'    -> $1 + $2 + $3 + $4
+ | SolrExpression '+' SolrExpression  -> 'sum(' + $1 + ',' + $3 + ')'
+ | SolrExpression '-' SolrExpression  -> 'sub(' + $1 + ',' + $3 + ')'
+ | SolrExpression '*' SolrExpression  -> 'mul(' + $1 + ',' + $3 + ')'
+ | SolrExpression '/' SolrExpression  -> 'div(' + $1 + ',' + $3 + ')'
+ | '-' SolrExpression                 -> 'sub(0,' + $2 + ')'
  ;
 
 NonParenthesizedSolrExpression_EDIT
@@ -106,10 +111,10 @@ NonParenthesizedSolrExpression_EDIT
  ;
 
 NonParenthesizedSolrExpression_EDIT
- : SolrExpression 'OPERATOR' 'CURSOR'                                --> { suggestFunctions: true, suggestFields: true }
- | 'CURSOR' 'OPERATOR' SolrExpression                                --> { suggestFunctions: true, suggestFields: true }
- | SolrExpression_EDIT 'OPERATOR' SolrExpression                     --> $1
- | SolrExpression 'OPERATOR' SolrExpression_EDIT                     --> $3
+ : SolrExpression '+' 'CURSOR'                                       --> { suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '+' SolrExpression                                       --> { suggestFunctions: true, suggestFields: true }
+ | SolrExpression_EDIT '+' SolrExpression                            --> $1
+ | SolrExpression '+' SolrExpression_EDIT                            --> $3
  ;
 
 NonParenthesizedSolrExpression_EDIT
@@ -117,6 +122,20 @@ NonParenthesizedSolrExpression_EDIT
  | 'CURSOR' '-' SolrExpression                                       --> { suggestFunctions: true, suggestFields: true }
  | SolrExpression_EDIT '-' SolrExpression                            --> $1
  | SolrExpression '-' SolrExpression_EDIT                            --> $3
+ ;
+
+NonParenthesizedSolrExpression_EDIT
+ : SolrExpression '*' 'CURSOR'                                       --> { suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '*' SolrExpression                                       --> { suggestFunctions: true, suggestFields: true }
+ | SolrExpression_EDIT '*' SolrExpression                            --> $1
+ | SolrExpression '*' SolrExpression_EDIT                            --> $3
+ ;
+
+NonParenthesizedSolrExpression_EDIT
+ : SolrExpression '/' 'CURSOR'                                       --> { suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '/' SolrExpression                                       --> { suggestFunctions: true, suggestFields: true }
+ | SolrExpression_EDIT '/' SolrExpression                            --> $1
+ | SolrExpression '/' SolrExpression_EDIT                            --> $3
  ;
 
 NonParenthesizedSolrExpression_EDIT
@@ -179,7 +198,25 @@ parser.addFieldLocation = function (location, name) {
   parser.yy.locations.push({ type: 'field', name: name, location: adjustLocationForCursor(location) });
 }
 
-parser.parseSolrExpression = function (beforeCursor, afterCursor, debug) {
+parser.parseSolrExpression = function (expression, debug) {
+  parser.yy.cursorFound = false;
+  parser.yy.locations = [];
+  expression = expression.replace(/\r\n|\n\r/gm, '\n');
+
+  var result;
+  try {
+    result = parser.parse(expression);
+  } catch (err) {
+    if (debug) {
+      console.log(beforeCursor + '\u2020' + afterCursor);
+      console.log(err);
+      console.error(err.stack);
+    }
+  }
+  return result || false;
+}
+
+parser.autocompleteSolrExpression = function (beforeCursor, afterCursor, debug) {
   parser.yy.cursorFound = false;
   parser.yy.locations = [];
 

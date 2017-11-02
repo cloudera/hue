@@ -16,67 +16,130 @@
 (function () {
   describe('solrExpressionParser.js', function () {
 
-    var testParser = function (beforeCursor, afterCursor, expectedResult) {
-      var result = solrExpressionParser.parseSolrExpression(beforeCursor, afterCursor, true);
-      if (!expectedResult.locations) {
-        delete result.locations;
-      }
-      expect(result).toEqual(expectedResult);
-    };
+    describe('autocomplete', function () {
+      var testAutocomplete = function (beforeCursor, afterCursor, expectedResult) {
+        var result = solrExpressionParser.autocompleteSolrExpression(beforeCursor, afterCursor, true);
+        if (!expectedResult.locations) {
+          delete result.locations;
+        }
+        expect(result).toEqual(expectedResult);
+      };
 
-    it('should suggest aggregate functions for "|"', function () {
-      testParser('', '', {
-        suggestAggregateFunctions: true
+      it('should suggest aggregate functions for "|"', function () {
+        testAutocomplete('', '', {
+          suggestAggregateFunctions: true
+        });
+      });
+
+      it('should suggest functions and fields for "min(|"', function () {
+        testAutocomplete('min(', '', {
+          suggestFunctions: true,
+          suggestFields: true,
+          locations: [
+            {type: 'function', name: 'min', location: {first_line: 1, last_line: 1, first_column: 1, last_column: 4}}
+          ]
+        });
+      });
+
+      it('should suggest functions and fields for "min(boo + |"', function () {
+        testAutocomplete('min(boo + ', '', {
+          suggestFunctions: true,
+          suggestFields: true
+        });
+      });
+
+      it('should suggest functions and fields for "min(boo + | + baa)"', function () {
+        testAutocomplete('min(boo + ', ' + baa)', {
+          suggestFunctions: true,
+          suggestFields: true
+        });
+      });
+
+      it('should suggest functions and fields for "min(1- max(|"', function () {
+        testAutocomplete('min(1- max(', '', {
+          suggestFunctions: true,
+          suggestFields: true
+        });
+      });
+
+      it('should suggest operators for "min(boo + 1) - 4 + mul(10, baa)|"', function () {
+        testAutocomplete('min(boo + 1) - 4 + mul(10, baa)', '', {
+          suggestOperators: true,
+          locations: [
+            {type: 'function', name: 'min', location: {first_line: 1, last_line: 1, first_column: 1, last_column: 4}},
+            {type: 'field', name: 'boo', location: {first_line: 1, last_line: 1, first_column: 5, last_column: 8}},
+            {type: 'function', name: 'mul', location: {first_line: 1, last_line: 1, first_column: 20, last_column: 23}},
+            {type: 'field', name: 'baa', location: {first_line: 1, last_line: 1, first_column: 28, last_column: 31}}
+          ]
+        });
+      });
+
+      it('should suggest operators for "min(boo |"', function () {
+        testAutocomplete('min(boo ', '', {
+          suggestOperators: true
+        });
       });
     });
 
-    it('should suggest functions and fields for "min(|"', function () {
-      testParser('min(', '', {
-        suggestFunctions: true,
-        suggestFields: true,
-        locations: [
-          { type: 'function', name: 'min', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 4 }}
-        ]
-      });
-    });
+    describe('parse', function () {
+      var testParse = function (expression, expectedResult) {
+        var result = solrExpressionParser.parseSolrExpression(expression);
+        expect(result).toBeTruthy();
+        expect(result).toEqual(expectedResult);
+      };
 
-    it('should suggest functions and fields for "min(boo + |"', function () {
-      testParser('min(boo + ', '', {
-        suggestFunctions: true,
-        suggestFields: true
+      it('should parse "min(boo)"', function () {
+        testParse('min(boo)', {
+          parsedValue: 'min(boo)'
+        });
       });
-    });
 
-    it('should suggest functions and fields for "min(boo + | + baa)"', function () {
-      testParser('min(boo + ', ' + baa)', {
-        suggestFunctions: true,
-        suggestFields: true
+      it('should fail parsing "min(boo"', function () {
+        var result = solrExpressionParser.parseSolrExpression('min(boo');
+        expect(result).toBeFalsy();
       });
-    });
 
-    it('should suggest functions and fields for "min(1- max(|"', function () {
-      testParser('min(1- max(', '', {
-        suggestFunctions: true,
-        suggestFields: true
+      it('should convert + to sum for "min(boo + 1)"', function () {
+        testParse('min(boo + 1)', {
+          parsedValue: 'min(sum(boo,1))'
+        });
       });
-    });
 
-    it('should suggest operators for "min(boo + 1) - 4 + mul(10, baa)|"', function () {
-      testParser('min(boo + 1) - 4 + mul(10, baa)', '', {
-        suggestOperators: true,
-        locations: [
-          { type: 'function', name: 'min', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 4 } },
-          { type: 'field', name: 'boo', location: { first_line: 1, last_line: 1, first_column: 5, last_column: 8 } },
-          { type: 'function', name: 'mul', location: { first_line: 1, last_line: 1, first_column: 20, last_column: 23 } },
-          { type: 'field', name: 'baa', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 31 } }
-        ]
+      it('should convert - to sub for "10 - min(boo + 1)"', function () {
+        testParse('10 - min(boo + 1)', {
+          parsedValue: 'sub(10,min(sum(boo,1)))'
+        });
       });
-    });
 
-    it('should suggest operators for "min(boo |"', function () {
-      testParser('min(boo ', '', {
-        suggestOperators: true
+      it('should convert - to sub for "-min(boo)"', function () {
+        testParse('-min(boo)', {
+          parsedValue: 'sub(0,min(boo))'
+        });
       });
-    });
+
+      it('should convert / to div for "min(boo)/10"', function () {
+        testParse('min(boo)/10', {
+          parsedValue: 'div(min(boo),10)'
+        });
+      });
+
+      it('should convert * to mul for "1*2*3*4"', function () {
+        testParse('1*2*3*4', {
+          parsedValue: 'mul(mul(mul(1,2),3),4)'
+        });
+      });
+
+      it('should handle precedence properly  "1*2+3*4"', function () {
+        testParse('1*2+3*4', {
+          parsedValue: 'sum(mul(1,2),mul(3,4))'
+        });
+      });
+
+      it('should handle precedence properly with parentheses "1*(2+3)*4"', function () {
+        testParse('1*(2+3)*4', {
+          parsedValue: 'mul(mul(1,(sum(2,3))),4)'
+        });
+      });
+    })
   });
 })();
