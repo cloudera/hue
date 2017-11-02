@@ -167,7 +167,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="clearable: q, valueUpdate:'afterkeydown', autogrowInput: { minWidth: $root.query.qs().length > 1 ? 90 : 206, maxWidth: 270, comfortZone: 15 }, typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xxlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
+        <input data-bind="clearable: q, valueUpdate:'afterkeydown', autogrowInput: { minWidth: $root.query.qs().length > 1 ? 90 : 206, maxWidth: 270, comfortZone: 15 }, typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
         <!-- ko if: $index() >= 1 -->
         <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
