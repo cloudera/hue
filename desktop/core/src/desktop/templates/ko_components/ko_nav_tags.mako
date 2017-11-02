@@ -19,7 +19,7 @@ from desktop.views import _ko
 from django.utils.translation import ugettext as _
 %>
 
-<%def name="nav_tags(readOnly=False)">
+<%def name="navTags()">
   <link href="${ static('desktop/ext/css/selectize.css') }" rel="stylesheet">
 
   <script type="text/html" id="nav-tags-template">
@@ -29,7 +29,7 @@ from django.utils.translation import ugettext as _
      <div style="width: 100%" data-bind="ifnot: loading">
        <textarea style="width: 100%" data-bind="tagEditor: {
           placeholder: '${_ko('No tags')}',
-          readOnly: '${ readOnly }' === 'True',
+          readOnly: '${ not user.has_hue_permission(action="write", app="metadata") }' === 'True',
           hasErrors: hasErrors,
           errorMessage: '${_ko("Tags could not be loaded.")}',
           setTags: currentTags,
