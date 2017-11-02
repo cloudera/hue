@@ -24,11 +24,9 @@
       expect(result).toEqual(expectedResult);
     };
 
-    it('should suggest functions and fields for "|"', function () {
+    it('should suggest aggregate functions for "|"', function () {
       testParser('', '', {
-        suggestFunctions: true,
-        suggestFields: true,
-        locations: []
+        suggestAggregateFunctions: true
       });
     });
 
