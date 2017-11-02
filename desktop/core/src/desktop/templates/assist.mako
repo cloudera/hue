@@ -330,6 +330,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   </script>
 
   <script type="text/html" id="assist-s3-inner-panel">
+    <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
     <!-- ko with: selectedS3Entry -->
     <div class="assist-flex-header assist-breadcrumb" >
       <!-- ko if: parent !== null -->
@@ -494,6 +495,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   </script>
 
   <script type="text/html" id="assist-hdfs-inner-panel">
+    <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
     <!-- ko with: selectedHdfsEntry -->
     <div class="assist-flex-header assist-breadcrumb" >
       <!-- ko if: parent !== null -->
@@ -551,6 +553,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
   </script>
 
   <script type="text/html" id="assist-adls-inner-panel">
+    <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
     <!-- ko with: selectedAdlsEntry -->
     <div class="assist-flex-header assist-breadcrumb" >
       <!-- ko if: parent !== null -->
@@ -1431,8 +1434,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.apiHelper = options.apiHelper;
 
         self.selectedHdfsEntry = ko.observable();
+        self.loading = ko.observable();
 
         var loadPath = function (path) {
+          self.loading(true);
           var parts = path.split('/');
           parts.shift();
 
@@ -1449,6 +1454,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           currentEntry.loadDeep(parts, function (entry) {
             self.selectedHdfsEntry(entry);
             entry.open(true);
+            self.loading(false);
           });
         };
 
@@ -1481,8 +1487,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.apiHelper = options.apiHelper;
 
         self.selectedAdlsEntry = ko.observable();
+        self.loading = ko.observable();
 
         var loadPath = function (path) {
+          self.loading(true);
           var parts = path.split('/');
           parts.shift();
 
@@ -1499,6 +1507,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           currentEntry.loadDeep(parts, function (entry) {
             self.selectedAdlsEntry(entry);
             entry.open(true);
+            self.loading(false);
           });
         };
 
@@ -1581,7 +1590,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         self.apiHelper = options.apiHelper;
 
         self.selectedS3Entry = ko.observable();
+        self.loading = ko.observable();
         self.reload = function () {
+          self.loading(true);
           var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentS3Path', '/');
           var parts = lastKnownPath.split('/');
           parts.shift();
@@ -1599,6 +1610,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
           currentEntry.loadDeep(parts, function (entry) {
             self.selectedS3Entry(entry);
             entry.open(true);
+            self.loading(false);
           });
         };
 
