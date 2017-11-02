@@ -1858,7 +1858,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
                   apiHelper: self.apiHelper,
                   name: '${ _("HBase") }',
                   type: 'hbase',
-                  icon: 'fa-th-large',
+                  iconSvg: '#hi-hbase',
                   minHeight: 50
                 }));
               }
