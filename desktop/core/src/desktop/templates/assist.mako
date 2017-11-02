@@ -52,12 +52,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
       home_dir = '/'
   %>
 
-  <%namespace name="contextPopover" file="/context_popover.mako" />
-  <%namespace name="nav_components" file="/nav_components.mako" />
-
-  ${ contextPopover.contextPopover() }
-  ${ nav_components.nav_tags(readOnly=not user.has_hue_permission(action="write", app="metadata")) }
-
   <script type="text/html" id="assist-no-database-entries">
     <ul class="assist-tables">
       <li>
