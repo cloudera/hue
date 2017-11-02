@@ -189,7 +189,9 @@ if USE_NEW_EDITOR.get():
   <%namespace name="charting" file="/charting.mako" />
   ${ charting.import_charts() }
 
+  % if user.is_authenticated():
   ${ koComponents.all() }
+  %endif
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
