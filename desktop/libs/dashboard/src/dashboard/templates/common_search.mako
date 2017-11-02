@@ -2007,8 +2007,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="clearfix"></div>
       <br/>
 
-      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true } }, visible: $parent.field() == 'formula'"></div>
-      <input data-bind="value: plain_formula" type="hidden"></input>
+      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: plain_formula, parsedValue: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true } }, visible: $parent.field() == 'formula'"></div>
 
       <!-- ko if: $data.function() != 'field' && $parents[1].widgetType() != 'hit-widget' -->
         <div class="facet-field-cnt">

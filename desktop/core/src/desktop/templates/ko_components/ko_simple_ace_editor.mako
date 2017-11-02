@@ -212,6 +212,13 @@ from desktop.views import _ko
             draggable: 'ms()',
             description: 'Returns milliseconds of difference between its arguments. Dates are relative to the Unix or POSIX time epoch, midnight, January 1, 1970 UTC. Arguments may be the name of an indexed TrieDateField, or date math based on a constant date or NOW.\n\n- ms(): Equivalent to ms(NOW), number of milliseconds since the epoch.\n- ms(a): Returns the number of milliseconds since the epoch that the argument represents.\n- ms(a,b) : Returns the number of milliseconds that b occurs before a (that is, a - b)'
           },
+          mul: {
+            returnTypes: ['T'],
+            arguments: [[{type: 'T', multiple: true}]],
+            signature: 'mul(x, y, ...)',
+            draggable: 'mul()',
+            description: 'Returns the product of multiple values or functions, which are specified in a comma-separated list. Same as the product function.'
+          },
           norm: {
             returnTypes: ['T'],
             arguments: [[{type: 'T'}]],
@@ -549,8 +556,12 @@ from desktop.views import _ko
 
         SolrFormulaAutocompleter.prototype.autocomplete = function () {
           var self = this;
-          var parseResult = solrExpressionParser.parseSolrExpression(self.editor.getTextBeforeCursor(), self.editor.getTextAfterCursor());
+          var parseResult = solrExpressionParser.autocompleteSolrExpression(self.editor.getTextBeforeCursor(), self.editor.getTextAfterCursor());
           self.suggestions.update(parseResult);
+        };
+
+        SolrFormulaAutocompleter.prototype.parse = function (value) {
+          return solrExpressionParser.parseSolrExpression(value);
         };
 
         return SolrFormulaAutocompleter;
@@ -564,6 +575,7 @@ from desktop.views import _ko
         var $element = $(element);
         var self = this;
         self.value = params.value;
+        self.parsedValue = params.parsedValue;
         self.ace = ko.observable();
         self.disposeFunctions = [];
 
@@ -665,8 +677,21 @@ from desktop.views import _ko
           });
         }
 
+        var parseThrottle = -1;
         var inputListener = editor.on('input', function () {
           self.value(editor.getValue());
+          if (self.parsedValue && self.autocompleter && self.autocompleter.parse) {
+            window.clearTimeout(parseThrottle);
+            parseThrottle = window.setTimeout(function () {
+              var parseResult = self.autocompleter.parse(editor.getValue());
+              if (parseResult) {
+                self.parsedValue(parseResult.parsedValue)
+              } else {
+                // TODO: What to do when we can't parse?
+                self.parsedValue(editor.getValue());
+              }
+            }, 200);
+          }
         });
 
         self.disposeFunctions.push(function () {
