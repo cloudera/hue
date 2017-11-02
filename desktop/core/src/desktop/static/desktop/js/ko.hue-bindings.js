@@ -4516,7 +4516,7 @@
         });
 
         disposeFunctions.push(function () {
-          editor.off('input', mousemoveListener);
+          editor.off('input', inputListener);
         });
 
         var mouseoutListener = function (e) {
