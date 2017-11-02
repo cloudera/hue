@@ -59,85 +59,101 @@
         expect(subject.successResponseIsError({ traceback: {} })).toBeTruthy();
       });
     });
-    
+
     describe('NavOpt', function () {
       describe('Tables JSON generation', function () {
         it('should add the default database when no database is found in the identifier chain', function () {
-          spyOn(subject, 'containsDatabase').and.callFake(function () {
-            return false;
+          spyOn(subject, 'getDatabases').and.callFake(function () {
+            return $.Deferred().resolve([]);
           });
 
-          var result = subject.createNavOptDbTablesJson({
+          var promise = subject.createNavOptDbTablesJson({
             defaultDatabase: 'default',
             sourceType: 'hive',
             tables: [{ identifierChain: [{ name: 'some_table' }] }]
           });
 
-          expect(result).toEqual('["default.some_table"]');
+          expect(promise.state()).toEqual('resolved');
+          promise.done(function (result) {
+            expect(result).toEqual('["default.some_table"]');
+          });
         });
 
         it('should add the database from the identifier chain if found', function () {
-          spyOn(subject, 'containsDatabase').and.callFake(function () {
-            return true;
+          spyOn(subject, 'getDatabases').and.callFake(function () {
+            return $.Deferred().resolve(['some_db']);
           });
 
-          var result = subject.createNavOptDbTablesJson({
+          var promise = subject.createNavOptDbTablesJson({
             defaultDatabase: 'default',
             sourceType: 'hive',
             tables: [{ identifierChain: [{ name: 'some_db' }, { name: 'some_table' }] }]
           });
 
-          expect(result).toEqual('["some_db.some_table"]');
+          expect(promise.state()).toEqual('resolved');
+          promise.done(function (result) {
+            expect(result).toEqual('["some_db.some_table"]');
+          });
+
         });
 
         it('should support tables with same names as databases', function () {
-          spyOn(subject, 'containsDatabase').and.callFake(function () {
-            return true;
+          spyOn(subject, 'getDatabases').and.callFake(function () {
+            return $.Deferred().resolve(['table_and_db_name']);
           });
 
-          var result = subject.createNavOptDbTablesJson({
+          var promise = subject.createNavOptDbTablesJson({
             defaultDatabase: 'default',
             sourceType: 'hive',
             tables: [{ identifierChain: [{ name: 'table_and_db_name' }] }]
           });
 
-          expect(result).toEqual('["default.table_and_db_name"]');
+          expect(promise.state()).toEqual('resolved');
+          promise.done(function (result) {
+            expect(result).toEqual('["default.table_and_db_name"]');
+          });
         });
 
         it('should support tables with same names as databases', function () {
-          spyOn(subject, 'containsDatabase').and.callFake(function () {
-            return true;
+          spyOn(subject, 'getDatabases').and.callFake(function () {
+            return $.Deferred().resolve(['table_and_db_name']);
           });
 
-          var result = subject.createNavOptDbTablesJson({
+          var promise = subject.createNavOptDbTablesJson({
             defaultDatabase: 'default',
             sourceType: 'hive',
             tables: [{ identifierChain: [{ name: 'table_and_db_name' }, { name: 'table_and_db_name' }] }]
           });
 
-          expect(result).toEqual('["table_and_db_name.table_and_db_name"]');
+          expect(promise.state()).toEqual('resolved');
+          promise.done(function (result) {
+            expect(result).toEqual('["table_and_db_name.table_and_db_name"]');
+          });
         });
 
         it('should support multiple tables some with databases some without', function () {
-          spyOn(subject, 'containsDatabase').and.callFake(function () {
-            return true;
+          spyOn(subject, 'getDatabases').and.callFake(function () {
+            return $.Deferred().resolve(['a_table_from_default', 'other_db']);
           });
 
-          var result = subject.createNavOptDbTablesJson({
+          var promise = subject.createNavOptDbTablesJson({
             defaultDatabase: 'default',
             sourceType: 'hive',
             tables: [{ identifierChain: [{ name: 'a_table_from_default' }] }, { identifierChain: [{ name: 'other_db' }, { name: 'a_table_from_other_db' }] }]
           });
 
-          expect(result).toEqual('["default.a_table_from_default","other_db.a_table_from_other_db"]');
+          expect(promise.state()).toEqual('resolved');
+          promise.done(function (result) {
+            expect(result).toEqual('["default.a_table_from_default","other_db.a_table_from_other_db"]');
+          });
         });
 
         it('should remove duplicates', function () {
-          spyOn(subject, 'containsDatabase').and.callFake(function () {
-            return true;
+          spyOn(subject, 'getDatabases').and.callFake(function () {
+            return $.Deferred().resolve(['sometable', 'somedb', 'default']);
           });
 
-          var result = subject.createNavOptDbTablesJson({
+          var promise = subject.createNavOptDbTablesJson({
             defaultDatabase: 'default',
             sourceType: 'hive',
             tables: [
@@ -152,7 +168,10 @@
             ]
           });
 
-          expect(result).toEqual('["default.someTable","someDb.someTable","someDb.otherTable"]');
+          expect(promise.state()).toEqual('resolved');
+          promise.done(function (result) {
+            expect(result).toEqual('["default.someTable","someDb.someTable","someDb.otherTable"]');
+          });
         })
       });
     })
