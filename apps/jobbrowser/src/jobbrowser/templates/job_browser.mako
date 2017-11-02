@@ -141,6 +141,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
             <!-- ko if: !$root.job() -->
             <form class="form-inline">
+              <!-- ko if: !$root.isMini() && interface() == 'queries' -->
+                ${ _('Impala queries from') }
+              <!-- /ko -->
               <input type="text" class="input-large" data-bind="clearable: jobs.textFilter, valueUpdate: 'afterkeydown'" placeholder="${_('Filter by id, name, user...')}" />
               <!-- ko if: jobs.statesValuesFilter -->
               <span data-bind="foreach: jobs.statesValuesFilter">
