@@ -21,6 +21,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+from indexer.solr_client import SolrClient
 
 from notebook.connectors.base import Api, QueryError
 from notebook.models import escape_rows
@@ -145,10 +146,7 @@ class SolrApi(Api):
     if database is None:
       response['databases'] = [self.options.get('collection') or snippet.get('database') or 'default']
     elif table is None:
-      tables_meta = []
-      for t in assist.get_tables(database):
-        tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
-      response['tables_meta'] = tables_meta
+      response['tables_meta'] = assist.get_tables(database)
     else:
       columns = assist.get_columns(database, table)
       response['columns'] = [col['name'] for col in columns]
@@ -189,7 +187,14 @@ class Assist():
     return self.options['collection'].get('collection') or ['default']
 
   def get_tables(self, database, table_names=[]):
-    return self.db.collections2()
+    searcher = SolrClient(self.user)
+    return [{
+        'name': table['name'],
+        'comment': '',
+        'type': 'View' if table['type'] == 'alias' else 'Table'
+      }
+      for table in searcher.get_indexes()
+    ]
 
   def get_columns(self, database, table):
     return [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in self.db.schema_fields(table)['fields']]
