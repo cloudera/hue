@@ -1271,15 +1271,21 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
 
       AssistDbPanel.prototype.init = function () {
         var self = this;
-        var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
+        if (self.options.isSolr) {
+          self.selectedSource(self.sourceIndex['solr']);
+          self.setDatabaseWhenLoaded();
+        }
+        else {
+          var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
 
-        if (!self.selectedSource()) {
-          if (self.options.activeSourceType) {
-            self.selectedSource(self.sourceIndex[self.options.activeSourceType]);
-            self.setDatabaseWhenLoaded();
-          } else if (storageSourceType && self.sourceIndex[storageSourceType]) {
-            self.selectedSource(self.sourceIndex[storageSourceType]);
-            self.setDatabaseWhenLoaded();
+          if (!self.selectedSource()) {
+            if (self.options.activeSourceType) {
+              self.selectedSource(self.sourceIndex[self.options.activeSourceType]);
+              self.setDatabaseWhenLoaded();
+            } else if (storageSourceType && self.sourceIndex[storageSourceType]) {
+              self.selectedSource(self.sourceIndex[storageSourceType]);
+              self.setDatabaseWhenLoaded();
+            }
           }
         }
       };
