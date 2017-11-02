@@ -572,11 +572,6 @@ from desktop.views import _ko
           self.autocompleter = null;
         }
 
-        if (self.value()) {
-          editor.setValue(self.value());
-          editor.clearSelection();
-        }
-
         if (self.singleLine) {
           aceOptions = $.extend(aceOptions, {
             fontSize: '13px',
@@ -606,15 +601,28 @@ from desktop.views import _ko
             );
           };
 
-          editor.commands.bindKey("Enter|Shift-Enter", "null");
+          editor.commands.bindKey('Enter|Shift-Enter', 'null');
 
-          var pasteListener = editor.on("paste", function(e) {
-            e.text = e.text.replace(/[\r\n]+/g, " ");
+          var pasteListener = editor.on('paste', function(e) {
+            e.text = e.text.replace(/[\r\n]+/g, ' ');
+          });
+
+          var changeListener = editor.on('change', function (e) {
+            if (e.action === 'insert' && (e.start.row !== 0 || e.end.row !== 0)) {
+              editor.setValue(editor.getValue().replace(/[\r\n]+/g, ' '));
+              editor.clearSelection();
+            }
           });
 
           self.disposeFunctions.push(function () {
             editor.off('paste', pasteListener);
+            editor.off('change', changeListener);
           });
+        }
+
+        if (self.value()) {
+          editor.setValue(self.value());
+          editor.clearSelection();
         }
 
         if (params.autocomplete) {
