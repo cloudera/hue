@@ -366,13 +366,13 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="generic-document-context-template">
-    <div style="width:100%; text-align: center; margin-top: 40px; font-size: 140px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
+    <div style="width:100%; text-align: center; margin-top: 30px; font-size: 100px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
     <div style="width: 100%; margin-top: 20px; text-align:center">
       <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
       <br/>
       <span data-bind="text: DocumentTypeGlobals[type] || type"></span>
       <!-- ko if: description -->
-      <br/><br/><span data-bind="text: description"></span>
+      <div class="context-popover-doc-description" data-bind="html: description"></div>
       <!-- /ko -->
     </div>
   </script>
