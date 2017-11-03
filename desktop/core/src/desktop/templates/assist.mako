@@ -17,17 +17,19 @@
 <%!
 from django.utils.translation import ugettext as _
 
+
+from indexer.conf import ENABLE_NEW_INDEXER
+from metadata.conf import has_navigator, OPTIMIZER
+from metastore.conf import ENABLE_NEW_CREATE_TABLE
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
+
 from dashboard.conf import HAS_SQL_ENABLED
+
 from desktop import appmanager
 from desktop import conf
 from desktop.conf import USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
-
-from indexer.conf import ENABLE_NEW_INDEXER
-from metadata.conf import has_navigator
-from metastore.conf import ENABLE_NEW_CREATE_TABLE
-from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
 %>
 
 <%def name="assistJSModels()">
@@ -2283,7 +2285,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ord
         });
 
         self.isMissingStats = ko.pureComputed(function () {
+          % if OPTIMIZER.AUTO_UPLOAD_STATS.get():
           return self.activeRisks().noStats && self.activeRisks().noStats.length > 0;
+          % else:
+          return false;
+          % endif
         });
 
         var createQualifiedIdentifier = function (identifierChain, defaultDatabase) {
