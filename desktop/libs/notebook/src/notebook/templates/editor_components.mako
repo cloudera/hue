@@ -21,7 +21,7 @@ from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
 
-from metadata.conf import has_optimizer
+from metadata.conf import has_optimizer, OPTIMIZER
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
 %>
 
@@ -3160,17 +3160,23 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       }
 
       if (viewModel.isOptimizerEnabled()) {
-        huePubSub.subscribe('editor.upload.table.stats', function (options) {
-          viewModel.selectedNotebook().snippets()[0].uploadTableStats(options);
-        }, HUE_PUB_SUB_EDITOR_ID);
-
-        huePubSub.subscribe("editor.upload.history", function () {
-          viewModel.selectedNotebook().snippets()[0].uploadQueryHistory(5);
-        }, HUE_PUB_SUB_EDITOR_ID);
-
+        % if OPTIMIZER.AUTO_UPLOAD_QUERIES.get():
         huePubSub.subscribe("editor.upload.query", function (query_id) {
           viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
         }, HUE_PUB_SUB_EDITOR_ID);
+        % endif
+
+        % if OPTIMIZER.AUTO_UPLOAD_DDL.get():
+        huePubSub.subscribe('editor.upload.table.stats', function (options) {
+          viewModel.selectedNotebook().snippets()[0].uploadTableStats(options);
+        }, HUE_PUB_SUB_EDITOR_ID);
+        % endif
+
+        % if OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() != 0:
+        huePubSub.subscribe("editor.upload.history", function () {
+          viewModel.selectedNotebook().snippets()[0].uploadQueryHistory(5);
+        }, HUE_PUB_SUB_EDITOR_ID);
+        % endif
       }
 
       viewModel.selectedNotebook.subscribe(function (newVal) {

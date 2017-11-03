@@ -1898,14 +1898,15 @@ var EditorViewModel = (function() {
           return table.databaseName + '.' + table.tableName;
         })),
         sourcePlatform: ko.mapping.toJSON(self.type()),
-        with_columns: ko.mapping.toJSON(true),
-        with_ddl: ko.mapping.toJSON(true)
+        with_ddl: ko.mapping.toJSON(true),
+        with_table_stats: ko.mapping.toJSON(true),
+        with_columns_stats: ko.mapping.toJSON(true)
       }, function(data) {
         if (data.status == 0) {
           if (options.showProgress) {
             $(document).trigger("info", $.map(options.activeTables, function(table) { return table.tableName; }) + " stats sent to analyse");
           }
-          if (data.upload_table_ddl) {
+          if (data.upload_table_ddl && options.showProgress) { // With showProgress only currently as can be very slow
             self.watchUploadStatus(data.upload_table_ddl.status.workloadId, options.showProgress);
           }
         } else {

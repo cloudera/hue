@@ -388,12 +388,20 @@ def upload_table_stats(request):
 
   db_tables = json.loads(request.POST.get('db_tables'), '[]')
   source_platform = json.loads(request.POST.get('sourcePlatform', '"hive"'))
-  with_columns = json.loads(request.POST.get('with_columns', 'false'))
   with_ddl = json.loads(request.POST.get('with_ddl', 'false'))
+  with_table_stats = json.loads(request.POST.get('with_table', 'false'))
+  with_columns_stats = json.loads(request.POST.get('with_columns', 'false'))
 
+  table_ddls = []
   table_stats = []
   column_stats = []
-  table_ddls = []
+
+  if not OPTIMIZER.AUTO_UPLOAD_DDL.get():
+    with_ddl = False
+
+  if not OPTIMIZER.AUTO_UPLOAD_STATS.get():
+    with_table_stats = with_columns_stats = False
+
 
   for db_table in db_tables:
     path = _get_table_name(db_table)
@@ -409,24 +417,25 @@ def upload_table_stats(request):
           db.close(handle)
           table_ddls.append((0, 0, ' '.join([row[0] for row in result.rows()]), path['database']))
 
-      mock_request = MockRequest(user=request.user, source_platform=source_platform)
-      full_table_stats = json.loads(get_table_stats(mock_request, database=path['database'], table=path['table']).content)
-      stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
+      if with_table_stats:
+        mock_request = MockRequest(user=request.user, source_platform=source_platform)
+        full_table_stats = json.loads(get_table_stats(mock_request, database=path['database'], table=path['table']).content)
+        stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
 
-      table_stats.append({
-        'table_name': '%(database)s.%(table)s' % path, # DB Prefix
-        'num_rows':  stats.get('numRows', -1),
-        'last_modified_time':  stats.get('transient_lastDdlTime', -1),
-        'total_size':  stats.get('totalSize', -1),
-        'raw_data_size':  stats.get('rawDataSize', -1),
-        'num_files':  stats.get('numFiles', -1),
-        'num_partitions':  stats.get('numPartitions', -1),
-        # bytes_cached
-        # cache_replication
-        # format
-      })
+        table_stats.append({
+          'table_name': '%(database)s.%(table)s' % path, # DB Prefix
+          'num_rows':  stats.get('numRows', -1),
+          'last_modified_time':  stats.get('transient_lastDdlTime', -1),
+          'total_size':  stats.get('totalSize', -1),
+          'raw_data_size':  stats.get('rawDataSize', -1),
+          'num_files':  stats.get('numFiles', -1),
+          'num_partitions':  stats.get('numPartitions', -1),
+          # bytes_cached
+          # cache_replication
+          # format
+        })
 
-      if with_columns:
+      if with_columns_stats:
         if source_platform == 'impala':
           colum_stats = json.loads(get_table_stats(mock_request, database=path['database'], table=path['table'], column=-1).content)['stats']
         else:
@@ -456,13 +465,22 @@ def upload_table_stats(request):
 
   api = OptimizerApi(request.user)
 
-  response['upload_table_stats'] = api.upload(data=table_stats, data_type='table_stats', source_platform=source_platform)
-  response['status'] = 0 if response['upload_table_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
+  response['status'] = 0
+
+  if table_stats:
+    response['upload_table_stats'] = api.upload(data=table_stats, data_type='table_stats', source_platform=source_platform)
+    response['upload_table_stats_status'] = 0 if response['upload_table_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
+    response['status'] = response['upload_table_stats_status']
   if column_stats:
     response['upload_cols_stats'] = api.upload(data=column_stats, data_type='cols_stats', source_platform=source_platform)
-    response['status'] = response['status'] if response['upload_cols_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
+    response['upload_cols_stats_status'] = response['status'] if response['upload_cols_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
+    if response['upload_cols_stats_status'] != 0:
+      response['status'] = response['upload_cols_stats_status']
   if table_ddls:
     response['upload_table_ddl'] = api.upload(data=table_ddls, data_type='queries', source_platform=source_platform)
+    response['upload_table_ddl_status'] = response['status'] if response['upload_table_ddl']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
+    if response['upload_table_ddl_status'] != 0:
+      response['status'] = response['upload_table_ddl_status']
 
   return JsonResponse(response)
 

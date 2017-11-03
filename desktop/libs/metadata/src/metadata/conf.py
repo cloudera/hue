@@ -136,6 +136,18 @@ OPTIMIZER = ConfigSection(
       default=True,
       type=coerce_bool
     ),
+    AUTO_UPLOAD_DDL = Config(
+      key="auto_upload_ddl",
+      help=_t("Automatically upload queried tables DDL in order to improve recommendations."),
+      default=True,
+      type=coerce_bool
+    ),
+    AUTO_UPLOAD_STATS = Config(
+      key="auto_upload_stats",
+      help=_t("Automatically upload queried tables and columns stats in order to improve recommendations."),
+      default=False,
+      type=coerce_bool
+    ),
     QUERY_HISTORY_UPLOAD_LIMIT = Config(
       key="query_history_upload_limit",
       help=_t("Allow admins to upload the last N executed queries in the quick start wizard. Use 0 to disable."),
