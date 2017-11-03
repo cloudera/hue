@@ -38,7 +38,7 @@ Checked-in third party dependencies
 |Y|python-daemon|1.5.1|Python|http://pypi.python.org/pypi/python-daemon/|
 |Y|python-ldap|2.3.13|Python|http://pypi.python.org/pypi/python-ldap/|
 |Y|pytidylib|0.2.1|MIT|http://cloud.github.com/downloads/countergram/pytidylib/pytidylib-0.2.1.tar.gz|
-|Y|requests|2.0.0|ASL2|https://github.com/kennethreitz/requests/|
+|Y|requests|2.10.0|ASL2|https://github.com/kennethreitz/requests/|
 |Y|Shakespeares Sonnets|?|Public Domain from Gutenberg|http://www.gutenberg.org/dirs/etext97/wssnt10.txt|
 |Y|sasl|0.1.1|Apache|http://pypi.python.org/pypi/sasl/0.1.1|
 |Y|South|1.0.2|Apache|http://south.aeracode.org/|
