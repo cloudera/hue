@@ -392,7 +392,7 @@ from metadata.conf import has_navigator
         <div class="context-popover-header" style="margin: 10px 0 5px 0">${_('Contents')}</div>
         <!-- ko with: documentContents -->
         <!-- ko foreach: snippets -->
-        <div data-bind="highlight: { value: statement, formatted: true, dialect: type }"></div>
+        <div data-bind="highlight: { value: statement_raw, formatted: true, dialect: type }"></div>
         <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
