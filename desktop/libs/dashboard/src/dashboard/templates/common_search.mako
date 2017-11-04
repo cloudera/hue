@@ -731,7 +731,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     </div>
     <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <!-- ko if: properties.type() == 'field' -->
+      <!-- ko if: properties.facets()[0].type() == 'field' -->
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
               <!-- ko if: $index() < $parent.properties.limit() -->
@@ -771,7 +771,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </div>
         </div>
       <!-- /ko -->
-      <!-- ko if: properties.type() == 'range' -->
+      <!-- ko if: properties.facets()[0].type() == 'range' -->
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
               <!-- ko if: ! selected -->
@@ -793,7 +793,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </div>
         </div>
       <!-- /ko -->
-      <!-- ko if: properties.type() == 'range-up' -->
+      <!-- ko if: properties.facets()[0].type() == 'range-up' -->
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
               <!-- ko if: ! selected -->
