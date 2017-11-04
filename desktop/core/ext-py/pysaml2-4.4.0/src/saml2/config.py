@@ -28,10 +28,23 @@ __author__ = 'rolandh'
 
 
 COMMON_ARGS = [
-    "entityid", "xmlsec_binary", "debug", "key_file", "cert_file",
-    "encryption_keypairs", "additional_cert_files",
-    "metadata_key_usage", "secret", "accepted_time_diff", "name", "ca_certs",
-    "description", "valid_for", "verify_ssl_cert",
+    "entityid",
+    "xmlsec_binary",
+    "debug",
+    "key_file",
+    "key_file_passphrase",
+    "cert_file",
+    "encryption_type",
+    "encryption_keypairs",
+    "additional_cert_files",
+    "metadata_key_usage",
+    "secret",
+    "accepted_time_diff",
+    "name",
+    "ca_certs",
+    "description",
+    "valid_for",
+    "verify_ssl_cert",
     "organization",
     "contact_person",
     "name_form",
@@ -172,6 +185,7 @@ class Config(object):
         self.xmlsec_path = []
         self.debug = False
         self.key_file = None
+        self.key_file_passphrase = None
         self.cert_file = None
         self.encryption_keypairs = None
         self.additional_cert_files = None
