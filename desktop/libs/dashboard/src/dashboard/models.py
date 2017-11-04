@@ -355,6 +355,52 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
   return pairs
 
 
+def range_pair2(facet_field, cat, fq_filter, iterable, end, facet):
+  # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
+  pairs = []
+  selected_values = [f['value'] for f in fq_filter]
+  print facet
+  is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(facet['gap'])) is not None
+  is_up = facet['sort'] == 'asc'
+
+  if facet['sort'] == 'asc' and facet['type'] == 'range-up':
+    prev = None
+    n = []
+    for e in iterable:
+      if prev is not None:
+        n.append(e)
+        n.append(prev)
+        prev = None
+      else:
+        prev = e
+    iterable = n
+    iterable.reverse()
+
+  a, to = itertools.tee(iterable)
+  next(to, None)
+  counts = iterable[1::2]
+  total_counts = counts.pop(0) if facet['sort'] == 'asc' else 0
+
+  for element in a:
+    next(to, None)
+    to_value = next(to, end)
+    count = next(a)
+
+    pairs.append({
+        'field': facet_field, 'from': element, 'value': count, 'to': to_value, 'selected': element in selected_values,
+        'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element]),
+        'is_single_unit_gap': is_single_unit_gap,
+        'total_counts': total_counts,
+        'is_up': is_up
+    })
+    total_counts += counts.pop(0) if counts else 0
+
+  if facet['sort'] == 'asc' and facet['type'] != 'range-up':
+    pairs.reverse()
+
+  return pairs
+
+
 def augment_solr_response(response, collection, query):
   augmented = response
   augmented['normalized_facets'] = []
@@ -460,11 +506,12 @@ def augment_solr_response(response, collection, query):
           cols.append(SolrApi._get_aggregate_function(f))
         rows = []
 
-        # For dim in dimensions
-
+        facet_one = collection_facet['properties']['facets'][0]
+        
         # Number or Date range
-        if collection_facet['properties']['canRange'] and not facet['properties'].get('type') == 'field':
-          dimension = 3 if collection_facet['properties']['isDate'] else 1
+        if facet_one['canRange'] and not facet_one['type'] == 'field':
+          dimension = 3 if facet_one['isDate'] else 1
+
           # Single dimension or dimension 2 with analytics
           if len(collection_facet['properties']['facets']) == 1 or len(collection_facet['properties']['facets']) == 2 and collection_facet['properties']['facets'][1]['aggregate']['function'] != 'count':
             column = 'count'
@@ -479,7 +526,7 @@ def augment_solr_response(response, collection, query):
             _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
 
             counts = [_v for _f in counts for _v in (_f['val'], _f[column])]
-            counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet)
+            counts = range_pair2(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet['properties']['facets'][0])
           else:
             # Dimension 1 with counts and 2 with analytics
             agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
@@ -501,7 +548,7 @@ def augment_solr_response(response, collection, query):
                   _series[legend].append(cell)
 
             for _name, val in _series.iteritems():
-              _c = range_pair(facet['field'], _name, selected_values.get(facet['id'], []), val, 1, collection_facet)
+              _c = range_pair2(facet['field'], _name, selected_values.get(facet['id'], []), val, 1, collection_facet['properties']['facets'][0])
               extraSeries.append({'counts': _c, 'label': _name})
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
