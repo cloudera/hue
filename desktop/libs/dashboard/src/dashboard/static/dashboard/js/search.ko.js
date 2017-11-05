@@ -750,7 +750,7 @@ var Collection = function (vm, collection) {
 
       facet.fields = facet.template.fieldsAttributes;
 
-      facet.template.fields = ko.computed(function () {  // Dup of template.fields
+      facet.template.fields = ko.computed(function () { // Dup of template.fields
         var _fields = [];
         $.each(facet.template.fieldsAttributes(), function (index, field) {
           var position = facet.template.fieldsSelected.indexOf(field.name());
@@ -1004,7 +1004,8 @@ var Collection = function (vm, collection) {
       'mincount': ko.mapping.toJS(facet.properties.facets_form.mincount),
       'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
       'sort': ko.mapping.toJS(facet.properties.facets_form.aggregate.function == 'count' ? 'desc' : 'default'),
-      'canRange': false // No supported on dim 2 currently
+      'canRange': ko.mapping.toJS(facet.properties.facets_form.canRange),
+      'type': ko.mapping.toJS(facet.properties.facets_form.type)
     });
     pivot.aggregate.metrics = ko.computed(function() {
       var _field = self.getTemplateField(pivot.field(), self.template.fieldsAttributes());

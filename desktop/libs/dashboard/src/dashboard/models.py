@@ -359,7 +359,6 @@ def range_pair2(facet_field, cat, fq_filter, iterable, end, facet):
   # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
   pairs = []
   selected_values = [f['value'] for f in fq_filter]
-  print facet
   is_single_unit_gap = re.match('^[\+\-]?1[A-Za-z]*$', str(facet['gap'])) is not None
   is_up = facet['sort'] == 'asc'
 
@@ -507,7 +506,7 @@ def augment_solr_response(response, collection, query):
         rows = []
 
         facet_one = collection_facet['properties']['facets'][0]
-        
+
         # Number or Date range
         if facet_one['canRange'] and not facet_one['type'] == 'field':
           dimension = 3 if facet_one['isDate'] else 1
