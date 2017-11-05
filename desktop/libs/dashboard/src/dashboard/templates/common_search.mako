@@ -1975,8 +1975,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
-      ## TODO: Range if numeric
     </div>
+
     <span class="big-counter" data-bind="textSqueezer: counts"></span>
   </div>
   <!-- /ko -->
@@ -1988,7 +1988,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <!-- ko if: $root.isEditing -->
     <div>
       <!-- ko with: aggregate -->
-      <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0 && $parent.type)" class="input-small"></select>
+      <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0 && !$parent.isFacetForm" class="input-small"></select>
 
       <!-- ko if: $data.function() == 'percentile' -->
         <!-- ko foreach: percentiles() -->
@@ -2009,7 +2009,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
       <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: plain_formula, parsedValue: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true } }, visible: $parent.field() == 'formula'"></div>
 
-      <!-- ko if: $data.function() != 'field' && $parents[1].widgetType() != 'hit-widget' -->
+      <!-- ko if: $parents[1].widgetType() != 'hit-widget' -->
         <div class="facet-field-cnt">
           <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
           <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: function() { $root.collection.toggleSortFacet2($parents[1], $parent); }">
@@ -2040,6 +2040,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <!-- /ko -->
       <!-- /ko -->
 
+      <!-- ko if: $parent.widgetType() != 'hit-widget' && type() != 'field' -->
       <!-- ko if: canRange() -->
         <div class="facet-field-cnt">
           <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
@@ -2056,6 +2057,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
         <!-- ko if: isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
           <div data-bind="daterangepicker: {start: start, end: end, gap: initial_gap, relatedgap: gap, min: min, max: max}"></div>
+        <!-- /ko -->
+
         <!-- /ko -->
         <!-- /ko -->
       </div>
@@ -2519,7 +2522,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <legend><i class="fa fa-bookmark-o"></i> ${ _('Query definitions') }
               <div class="input-append" style="margin-left: 30px; margin-top: 4px">
                 <input id="newqname" type="text" class="input-xxlarge" data-bind="textInput: $root.collection.newQDefinitionName, valueUpdate:'afterkeydown', tagsNotAllowed" style="margin-bottom: 0" placeholder="${ _('Add current query as...') }" />
-                <a title="${ _('Click on this button to add the currenty query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition, css:{'disabled': $.trim($root.collection.newQDefinitionName()) == ''}" style="margin-top: 1px">
+                <a title="${ _('Click on this button to add the currenty query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition, css: {'disabled': $.trim($root.collection.newQDefinitionName()) == ''}" style="margin-top: 1px">
                   <i class="fa fa-plus"></i>
                 </a>
               </div>

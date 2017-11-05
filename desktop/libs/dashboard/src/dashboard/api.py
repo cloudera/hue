@@ -398,6 +398,11 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         properties['type'] = facet_type
 
       properties['facets_form'] = NESTED_FACET_FORM
+      # Not supported on dim 2 currently
+      properties['facets_form']['type'] = 'field'
+      properties['facets_form']['canRange'] = False
+      properties['facets_form']['isFacetForm'] = True
+
       facet = NESTED_FACET_FORM.copy()
       facet['field'] = facet_field
       facet['limit'] = 10
