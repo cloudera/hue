@@ -2798,6 +2798,10 @@ var DATETIME_HIT_OPTIONS = [
     { value: "count", label: "${ _('Group by') }" },
     ## { value: "counts", label: "Count" },
     { value: "unique", label: "${ _('Unique') }" },
+    { value: "min", label: "${ _('Min') }" },
+    { value: "max", label: "${ _('Max') }" },
+    { value: "median", label: "${ _('Median') }" },
+    { value: "percentile", label: "${ _('Percentiles') }" }
 ];
 var ALPHA_HIT_COUNTER_OPTIONS = [
     ##{ value: "count", label: "${ _('Group by') }" },
