@@ -934,6 +934,7 @@ var EditorViewModel = (function() {
         status: self.status,
         statementType: self.statementType,
         statement: self.statement,
+        aceCursorPosition: self.aceCursorPosition,
         statementPath: self.statementPath,
         associatedDocumentUuid: self.associatedDocumentUuid,
         properties: self.properties,
