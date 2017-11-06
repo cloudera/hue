@@ -229,7 +229,8 @@ var AssistStorageEntry = (function () {
     self.currentPage++;
     self.loadingMore(true);
     self.hasErrors(false);
-    self.apiHelper.fetchHdfsPath({
+
+    self.apiHelper[TYPE_SPECIFICS[self.type].apiHelperFetchFunction]({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
       filter: self.filter().trim() ? self.filter() : undefined,
