@@ -272,6 +272,8 @@ var EditorViewModel = (function() {
     });
 
     // Ace stuff
+    self.aceCursorPosition = ko.observable(snippet.aceCursorPosition);
+
     var aceEditor = null;
 
     self.ace = function (newVal) {
