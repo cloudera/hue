@@ -169,7 +169,7 @@ ENABLE_PRESENTATION = Config(
   key="enable_presentation",
   help=_t("Flag to turn on the Presentation mode of the editor."),
   type=bool,
-  default=False
+  default=True
 )
 
 
