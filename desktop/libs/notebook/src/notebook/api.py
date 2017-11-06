@@ -655,7 +655,7 @@ def export_result(request):
         description=_('Query %s to %s') % (_get_snippet_name(notebook), success_url),
         editor_type=snippet['type'],
         statement=sql,
-        status='ready-execute',
+        status='ready',
         database=snippet['database'],
         on_success_url=success_url,
         last_executed=start_time,
