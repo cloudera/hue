@@ -1070,6 +1070,12 @@ var AutocompleteResults = (function () {
           weightAdjust: 0,
           popular: ko.observable(false),
           details: null
+        },{
+          value: '/',
+          meta: 'dir',
+          category: CATEGORIES.HDFS,
+          popular: ko.observable(false),
+          details: null
         }]);
       }
 
