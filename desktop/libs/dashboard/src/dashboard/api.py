@@ -247,12 +247,13 @@ def get_terms(request):
     field = analysis['name']
     properties = {
       'terms.limit': 25,
-      'terms.prefix': analysis['terms']['prefix']
       # lower
       # limit
       # mincount
       # maxcount
     }
+    if analysis['terms']['prefix']:
+      properties['terms.prefix'] = analysis['terms']['prefix']
 
     result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
     result['terms'] = pairwise2(field, [], result['terms']['terms'][field])
