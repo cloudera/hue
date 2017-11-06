@@ -90,18 +90,6 @@ def get_auth(ldap_config):
 
   return ldap_conf
 
-def get_connection(ldap_config):
-  global CACHED_LDAP_CONN
-  if CACHED_LDAP_CONN is not None:
-    return CACHED_LDAP_CONN
-
-  search_bind_authentication = ldap_config.SEARCH_BIND_AUTHENTICATION.get()
-  if search_bind_authentication:
-    ldap_obj = LdapConnection(ldap_config, *get_auth(ldap_config))
-  else:
-    ldap_obj = LdapConnection(ldap_config, *get_auth(ldap_config))
-  return ldap_obj
-
 def get_ldap_username(username, nt_domain):
   if nt_domain:
     return '%s@%s' % (username, nt_domain)
