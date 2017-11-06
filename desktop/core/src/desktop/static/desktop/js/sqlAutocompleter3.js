@@ -1047,13 +1047,51 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingPaths, pathsDeferred);
       pathsDeferred.done(self.appendEntries);
 
-      var parts = suggestHdfs.path.split('/');
+      var path = suggestHdfs.path;
+      if (path === '') {
+        self.appendEntries([{
+          value: 'adl://',
+          meta: AutocompleterGlobals.i18n.meta.keyword,
+          category: CATEGORIES.KEYWORD,
+          weightAdjust: 0,
+          popular: ko.observable(false),
+          details: null
+        },{
+          value: 's3a://',
+          meta: AutocompleterGlobals.i18n.meta.keyword,
+          category: CATEGORIES.KEYWORD,
+          weightAdjust: 0,
+          popular: ko.observable(false),
+          details: null
+        },{
+          value: 'hdfs://',
+          meta: AutocompleterGlobals.i18n.meta.keyword,
+          category: CATEGORIES.KEYWORD,
+          weightAdjust: 0,
+          popular: ko.observable(false),
+          details: null
+        }]);
+      }
+
+      var fetchFunction = 'fetchHdfsPath';
+
+      if (/^s3a:\/\//i.test(path)) {
+        fetchFunction = 'fetchS3Path';
+        path = path.substring(5);
+      } else if (/^adl:\/\//i.test(path)) {
+        fetchFunction = 'fetchAdlsPath';
+        path = path.substring(5);
+      } else if (/^hdfs:\/\//i.test(path)) {
+        path = path.substring(6);
+      }
+
+      var parts = path.split('/');
       // Drop the first " or '
       parts.shift();
       // Last one is either partial name or empty
       parts.pop();
 
-      self.lastKnownRequests.fetchHdfsPath = self.apiHelper.fetchHdfsPath({
+      self.lastKnownRequests[fetchFunction] = self.apiHelper[fetchFunction]({
         pathParts: parts,
         successCallback: function (data) {
           if (!data.error) {
@@ -1061,7 +1099,7 @@ var AutocompleteResults = (function () {
             data.files.forEach(function (file) {
               if (file.name !== '..' && file.name !== '.') {
                 pathSuggestions.push({
-                  value: suggestHdfs.path === '' ? '/' + file.name : file.name,
+                  value: path === '' ? '/' + file.name : file.name,
                   meta: file.type,
                   category: CATEGORIES.HDFS,
                   popular: ko.observable(false),
