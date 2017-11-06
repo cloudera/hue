@@ -1305,6 +1305,7 @@ from desktop.views import _ko
         self.user = options.user;
 
         self.activeEntry = ko.observable();
+        self.activeSort = ko.observable('defaultAsc');
         self.typeFilter = ko.observable({
           type: 'all',
           label: DocumentTypeGlobals['all']
@@ -1319,7 +1320,7 @@ from desktop.views import _ko
             apiHelper: self.apiHelper,
             app: 'documents',
             user: self.user,
-            activeSort: ko.observable('name'),
+            activeSort: self.activeSort,
             typeFilter: self.typeFilter,
             definition: {
               uuid: lastOpenedUuid,
@@ -1383,7 +1384,7 @@ from desktop.views import _ko
               apiHelper: self.apiHelper,
               app: 'documents',
               user: self.user,
-              activeSort: ko.observable('name'),
+              activeSort: self.activeSort,
               typeFilter: self.typeFilter,
               definition: {
                 uuid: details.parentUuid,
@@ -1410,7 +1411,7 @@ from desktop.views import _ko
             apiHelper: self.apiHelper,
             app: 'documents',
             user: self.user,
-            activeSort: ko.observable('name'),
+            activeSort: self.activeSort,
             typeFilter: self.typeFilter,
             definition: {
               name: '/',
