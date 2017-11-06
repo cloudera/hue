@@ -3590,19 +3590,26 @@
       var cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
 
       var lastStart;
+      var lastCursorPosition;
       var changeSelectionListener = self.editor.on('changeSelection', function () {
         if (cursorChangePaused) {
           return;
         }
         window.clearTimeout(changeThrottle);
         changeThrottle = window.setTimeout(function () {
-          var newStart = self.editor.getSelectionRange().start;
-          if (lastStart && lastStart.row === newStart.row && lastStart.column === newStart.column) {
-            return;
+          var newCursorPosition = self.editor.getCursorPosition();
+          if (!lastCursorPosition || lastCursorPosition.row !== newCursorPosition.row || lastCursorPosition.column !== newCursorPosition.column) {
+            self.snippet.aceCursorPosition(newCursorPosition);
+            lastCursorPosition = newCursorPosition;
           }
-          window.clearTimeout(updateThrottle);
-          updateActiveStatement(true);
-          lastStart = newStart;
+
+          // The active statement is initially the top one in the selection, batch execution updates this.
+          var newStart = self.editor.getSelectionRange().start;
+          if (!lastStart || lastStart.row !== newStart.row || lastStart.column !== newStart.column) {
+            window.clearTimeout(updateThrottle);
+            updateActiveStatement(true);
+            lastStart = newStart;
+          }
         }, 100);
       });
 
@@ -4116,7 +4123,6 @@
         processErrorsAndWarnings('error', newErrors);
       });
 
-
       var aceWarningsSub = snippet.aceWarnings.subscribe(function (newWarnings) {
         processErrorsAndWarnings('warning', newWarnings);
       });
@@ -4302,6 +4308,13 @@
       disposeFunctions.push(function () {
         editor.off('input', inputListener);
       });
+
+      if (snippet.aceCursorPosition()) {
+        editor.moveCursorToPosition(snippet.aceCursorPosition());
+        window.setTimeout(function () {
+          editor.centerSelection();
+        }, 0);
+      }
 
       var focusListener = editor.on('focus', function () {
         initAutocompleters();
