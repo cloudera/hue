@@ -275,9 +275,10 @@ class SolrApi(object):
             'end': facet['end'],
             'gap': facet['gap']
         })
-# Disabled currently
-#         if timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides']): # or facet['widgetType'] != 'bucket-widget'):
-#           _f.update(self._get_time_filter_query(timeFilter, facet))
+
+        # Only on dim 1 currently
+        if timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides']): # or facet['widgetType'] != 'bucket-widget'):
+          _f[f_name].update(self._get_time_filter_query(timeFilter, facet))
 
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])

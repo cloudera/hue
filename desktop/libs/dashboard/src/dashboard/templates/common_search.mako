@@ -1220,13 +1220,11 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <select class="input-small" data-bind="options: $root.intervalOptions,
                        optionsText: 'label',
                        optionsValue: 'value',
-                       value: properties.gap">
+                       value: properties.facets()[0].gap">
         </select>&nbsp;
       </span>
       <span class="facet-field-label">${ _('Zoom') }</span>
       <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut2"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
-      <span class="facet-field-label" data-bind="visible: $root.query.multiqs().length > 1">${ _('Group by') }</span>
-      <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
     </div>
 
     <span data-bind="template: { name: 'data-grid' }"></span>
@@ -1516,7 +1514,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
                   searchViewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
                 }
               },
-              onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+              onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
               onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
             />
             <div class="clearfix"></div>
@@ -1540,7 +1538,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
             type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
             fqs: $root.query.fqs,
-            onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+            onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
             onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
             onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
             onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
@@ -1568,7 +1566,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
             type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
             fqs: $root.query.fqs,
-            onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+            onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
             onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
             onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
             onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
@@ -2055,6 +2053,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- ko ifnot: isDate() -->
           <div class="slider-cnt" data-bind="slider: {start: min, end: max, gap: initial_gap, min: initial_start, max: initial_end, properties: $data, labels: SLIDER_LABELS}"></div>
         <!-- /ko -->
+
         <!-- ko if: isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
           <div data-bind="daterangepicker: {start: start, end: end, gap: initial_gap, relatedgap: gap, min: min, max: max}"></div>
         <!-- /ko -->
@@ -2522,7 +2521,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <legend><i class="fa fa-bookmark-o"></i> ${ _('Query definitions') }
               <div class="input-append" style="margin-left: 30px; margin-top: 4px">
                 <input id="newqname" type="text" class="input-xxlarge" data-bind="textInput: $root.collection.newQDefinitionName, valueUpdate:'afterkeydown', tagsNotAllowed" style="margin-bottom: 0" placeholder="${ _('Add current query as...') }" />
-                <a title="${ _('Click on this button to add the currenty query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition, css: {'disabled': $.trim($root.collection.newQDefinitionName()) == ''}" style="margin-top: 1px">
+                <a title="${ _('Click on this button to add the current query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition, css: {'disabled': $.trim($root.collection.newQDefinitionName()) == ''}" style="margin-top: 1px">
                   <i class="fa fa-plus"></i>
                 </a>
               </div>

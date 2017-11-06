@@ -1494,6 +1494,38 @@ var Collection = function (vm, collection) {
     vm.search();
   }
 
+  self.selectTimelineFacet2 = function (data) {
+    var facet = self.getFacetById(data.widget_id);
+    var nestedFacet = facet.properties.facets()[0];
+
+    if (nestedFacet.isDate()) {
+      nestedFacet.start(moment(data.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
+      nestedFacet.end(moment(data.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
+      nestedFacet.min(moment(data.from).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
+      nestedFacet.max(moment(data.to).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]"));
+    }
+
+    vm.query.selectRangeFacet({widget_id: data.widget_id, from: data.from, to: data.to, cat: data.cat, no_refresh: true, force: true});
+
+    $.ajax({
+      type: "POST",
+      url: "/dashboard/get_range_facet",
+      data: {
+        collection: ko.mapping.toJSON(self),
+        facet: ko.mapping.toJSON(facet),
+        action: 'select'
+      },
+      success: function (data) {
+        if (data.status == 0) {
+          nestedFacet.gap(data.properties.gap);
+        }
+      },
+      async: false
+    });
+
+    vm.search();
+  }
+
   self.rangeZoomOut = function (facet_json) {
     var facet_id = ko.mapping.toJS(facet_json).id;
     var facet = self.getFacetById(facet_id);
