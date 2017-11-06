@@ -4256,8 +4256,9 @@
 
       initAutocompleters();
 
+      var UNICODES_TO_REMOVE = /[\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u200B\u202F\u205F\u3000\uFEFF]/ig;  //taken from https://www.cs.tut.fi/~jkorpela/chars/spaces.html
+
       var removeUnicodes = function (value) {
-        var UNICODES_TO_REMOVE = /[\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u200B\u202F\u205F\u3000\uFEFF]/ig;  //taken from https://www.cs.tut.fi/~jkorpela/chars/spaces.html
         return value.replace(UNICODES_TO_REMOVE, ' ');
       };
 
@@ -4275,19 +4276,8 @@
         }
       }
 
-      var lastEditorValue = null;
-      var checkEditorValueInterval = -1;
       var pasteListener = editor.on('paste', function (e) {
-        window.clearInterval(checkEditorValueInterval);
-        checkEditorValueInterval = window.setInterval(function () {
-          if (lastEditorValue !== editor.getValue()) {
-            var lastKnownPosition = editor.getCursorPosition();
-            window.clearInterval(checkEditorValueInterval);
-            lastEditorValue = editor.getValue();
-            editor.setValue(removeUnicodes(lastEditorValue), 1);
-            editor.moveCursorToPosition(lastKnownPosition);
-          }
-        }, 10);
+        e.text = removeUnicodes(e.text);
       });
 
       disposeFunctions.push(function () {
