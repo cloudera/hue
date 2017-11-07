@@ -96,10 +96,15 @@ class SolrClient(object):
       if self.is_solr_six_or_more():
         if not config_name:
           config_sets = self.list_configs()
+          if self.is_sentry_protected:
+            config_sets = [config for config in config_sets if 'Secure' in config]
           if not config_sets:
-            raise PopupException(_('Solr does not have any predefined configSets.'))
+            raise PopupException(_('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected, self.list_configs()))
 
-          config_name_target = 'managedTemplate' # 'Secure' cf. /solr/admin/info/system
+          config_name_target = 'managedTemplate'
+          if self.is_sentry_protected:
+            config_name_target += 'Secure'
+
           if config_name_target in config_sets:
             config_name = config_name_target
           else:
