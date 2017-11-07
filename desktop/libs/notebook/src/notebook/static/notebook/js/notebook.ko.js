@@ -721,7 +721,7 @@ var EditorViewModel = (function() {
     }
     self.showGrid = ko.observable(typeof snippet.showGrid != "undefined" && snippet.showGrid != null ? snippet.showGrid : true);
     self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
-    var defaultShowLogs = false;
+    var defaultShowLogs = true;
     if (vm.editorMode() && $.totalStorage('hue.editor.showLogs')) {
       defaultShowLogs = $.totalStorage('hue.editor.showLogs');
     }
