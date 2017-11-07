@@ -33,6 +33,7 @@
 
       it('should suggest functions and fields for "min(|"', function () {
         testAutocomplete('min(', '', {
+          suggestAggregateFunctions: true,
           suggestFunctions: true,
           suggestFields: true,
           locations: [
@@ -43,6 +44,7 @@
 
       it('should suggest functions and fields for "min(boo + |"', function () {
         testAutocomplete('min(boo + ', '', {
+          suggestAggregateFunctions: true,
           suggestFunctions: true,
           suggestFields: true
         });
@@ -50,6 +52,7 @@
 
       it('should suggest functions and fields for "min(boo + | + baa)"', function () {
         testAutocomplete('min(boo + ', ' + baa)', {
+          suggestAggregateFunctions: true,
           suggestFunctions: true,
           suggestFields: true
         });
@@ -57,6 +60,7 @@
 
       it('should suggest functions and fields for "min(1- max(|"', function () {
         testAutocomplete('min(1- max(', '', {
+          suggestAggregateFunctions: true,
           suggestFunctions: true,
           suggestFields: true
         });

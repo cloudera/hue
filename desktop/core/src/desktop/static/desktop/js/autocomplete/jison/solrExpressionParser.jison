@@ -100,46 +100,46 @@ NonParenthesizedSolrExpression
 NonParenthesizedSolrExpression_EDIT
  : 'NUMBER' 'CURSOR'                                                 --> { suggestOperators: true }
  | 'IDENTIFIER' 'CURSOR'                                             --> { suggestOperators: true }
- | 'CURSOR' 'NUMBER'                                                 --> { suggestFunctions: true, suggestFields: true }
- | 'CURSOR' 'IDENTIFIER'                                             --> { suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' 'NUMBER'                                                 --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' 'IDENTIFIER'                                             --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
  ;
 
 NonParenthesizedSolrExpression_EDIT
- : 'FUNCTION' '(' 'CURSOR' RightParenthesisOrError                   --> { suggestFunctions: true, suggestFields: true }
+ : 'FUNCTION' '(' 'CURSOR' RightParenthesisOrError                   --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
  | 'FUNCTION' '(' ArgumentList_EDIT RightParenthesisOrError          --> $3
  | 'FUNCTION' '(' ArgumentList ')' 'CURSOR'                          --> { suggestOperators: true }
  ;
 
 NonParenthesizedSolrExpression_EDIT
- : SolrExpression '+' 'CURSOR'                                       --> { suggestFunctions: true, suggestFields: true }
- | 'CURSOR' '+' SolrExpression                                       --> { suggestFunctions: true, suggestFields: true }
+ : SolrExpression '+' 'CURSOR'                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '+' SolrExpression                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
  | SolrExpression_EDIT '+' SolrExpression                            --> $1
  | SolrExpression '+' SolrExpression_EDIT                            --> $3
  ;
 
 NonParenthesizedSolrExpression_EDIT
- : SolrExpression '-' 'CURSOR'                                       --> { suggestFunctions: true, suggestFields: true }
- | 'CURSOR' '-' SolrExpression                                       --> { suggestFunctions: true, suggestFields: true }
+ : SolrExpression '-' 'CURSOR'                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '-' SolrExpression                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
  | SolrExpression_EDIT '-' SolrExpression                            --> $1
  | SolrExpression '-' SolrExpression_EDIT                            --> $3
  ;
 
 NonParenthesizedSolrExpression_EDIT
- : SolrExpression '*' 'CURSOR'                                       --> { suggestFunctions: true, suggestFields: true }
- | 'CURSOR' '*' SolrExpression                                       --> { suggestFunctions: true, suggestFields: true }
+ : SolrExpression '*' 'CURSOR'                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '*' SolrExpression                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
  | SolrExpression_EDIT '*' SolrExpression                            --> $1
  | SolrExpression '*' SolrExpression_EDIT                            --> $3
  ;
 
 NonParenthesizedSolrExpression_EDIT
- : SolrExpression '/' 'CURSOR'                                       --> { suggestFunctions: true, suggestFields: true }
- | 'CURSOR' '/' SolrExpression                                       --> { suggestFunctions: true, suggestFields: true }
+ : SolrExpression '/' 'CURSOR'                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '/' SolrExpression                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
  | SolrExpression_EDIT '/' SolrExpression                            --> $1
  | SolrExpression '/' SolrExpression_EDIT                            --> $3
  ;
 
 NonParenthesizedSolrExpression_EDIT
- : '-' 'CURSOR'                                                      --> { suggestFunctions: true, suggestFields: true }
+ : '-' 'CURSOR'                                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
  | '-' SolrExpression_EDIT                                           --> $2
  ;
 
