@@ -369,6 +369,20 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
+  def create_config(self, name, base_config, immutable=False):
+    try:
+      params = self._get_params() + (
+          ('action', 'CREATE'),
+          ('myConfigSet', name),
+          ('baseConfigSet', base_config),
+          ('configSetProp.immutable', 'false' if immutable else 'true'),
+          ('wt', 'json'),
+      )
+      return self._root.get('admin/configs', params=params)['configSets']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
   def list_aliases(self):
     try:
       params = self._get_params() + (

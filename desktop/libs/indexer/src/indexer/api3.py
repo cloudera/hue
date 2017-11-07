@@ -241,11 +241,12 @@ def _create_index(user, fs, client, source, destination, index_name):
   if not client.exists(index_name):
     client.create_index(
         name=index_name,
-        fields=fields,
+        config_name=destination.get('indexerConfigSet'),
+        fields=fields,        
         unique_key_field=unique_key_field,
         df=df,
         shards=destination['indexerNumShards'],
-        replication=destination['indexerReplicationFactor']
+        replication=destination['indexerReplicationFactor'],
     )
 
   if source['inputFormat'] not in ('manual', 'table'):
