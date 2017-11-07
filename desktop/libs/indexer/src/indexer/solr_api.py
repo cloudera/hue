@@ -131,7 +131,7 @@ def delete_indexes(request):
 
     for index in indexes:
       if index['type'] == 'collection':
-        client.delete_index(index['name'])
+        client.delete_index(index['name'], keep_config=False)
       elif index['type'] == 'alias':
         client.delete_alias(index['name'])
       else:
