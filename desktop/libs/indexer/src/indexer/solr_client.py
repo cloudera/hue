@@ -96,17 +96,19 @@ class SolrClient(object):
       if self.is_solr_six_or_more():
         if not config_name:
           config_sets = self.list_configs()
-          if self.is_sentry_protected:
+          if self.is_sentry_protected():
             config_sets = [config for config in config_sets if 'Secure' in config]
           if not config_sets:
-            raise PopupException(_('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected, self.list_configs()))
+            raise PopupException(_('Solr does not have any predefined (secure: %s) configSets: %s') % (self.is_sentry_protected(), self.list_configs()))
 
           config_name_target = 'managedTemplate'
-          if self.is_sentry_protected:
+          if self.is_sentry_protected():
             config_name_target += 'Secure'
 
           if config_name_target in config_sets:
             config_name = config_name_target
+          elif '_default' in config_sets:
+            config_name = '_default'
           else:
             config_name = config_sets[0]
 
@@ -121,13 +123,13 @@ class SolrClient(object):
               }
             })
 
-        self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
+        self.api.create_collection2(name, config_name=name, shards=shards, replication=replication)
 
         fields = [{
             'name': field['name'],
-            'type': field['type'],
+            'type': SolrClient._port_field_types(field)['type'],
             'stored': field.get('stored', True)
-          } for field in fields
+          } for field in fields if field['name'] != 'id'
         ]
         self.api.add_fields(name, fields)
       else:
@@ -319,6 +321,13 @@ class SolrClient(object):
         _ZOOKEEPER_HOST = command_line_arg.split('-DzkHost=', 1)[1]
       if '-Dsolr.authorization.sentry.site' in command_line_arg:
         _IS_SENTRY_PROTECTED = True
+
+
+  @staticmethod
+  def _port_field_types(field):
+    if not field['type'].startswith('p'): # Check for automatically converting to new default Solr types
+      field['type'] = field['type'].replace('long', 'plong').replace('double', 'pdouble').replace('date', 'pdate')
+    return field
 
 
   def _reset_properties(self):

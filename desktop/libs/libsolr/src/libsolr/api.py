@@ -373,9 +373,9 @@ class SolrApi(object):
     try:
       params = self._get_params() + (
           ('action', 'CREATE'),
-          ('myConfigSet', name),
+          ('name', name),
           ('baseConfigSet', base_config),
-          ('configSetProp.immutable', 'false' if immutable else 'true'),
+          ('configSetProp.immutable', immutable),
           ('wt', 'json'),
       )
       return self._root.post('admin/configs', params=params, contenttype='application/json')
@@ -393,7 +393,7 @@ class SolrApi(object):
         ('wt', 'json')
       )
 
-      data = self._root.post('admin/configs', params=params, contenttype='application/json')
+      data = self._root.get('admin/configs', params=params)
       if data['responseHeader']['status'] == 0:
         response['status'] = 0
       else:
