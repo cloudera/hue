@@ -251,7 +251,14 @@ def _create_index(user, fs, client, source, destination, index_name):
 
   if source['inputFormat'] not in ('manual', 'table'):
     data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
-    client.index(name=index_name, data=data, **kwargs)
+    try:
+      client.index(name=index_name, data=data, **kwargs)
+    except Exception, e:
+      try:
+        client.delete_index(index_name, keep_config=False)
+      except Exception, e2:
+        LOG.warn('Error while cleaning-up config of failed collection creation %s: %s' % (index_name, e2))
+      raise e
 
   return {'status': 0, 'on_success_url': reverse('indexer:indexes', kwargs={'index': index_name}), 'pub_sub_url': 'assist.collections.refresh'}
 
