@@ -44,6 +44,7 @@ _IS_SOLR_CLOUD = None
 _IS_SOLR_6_OR_MORE = None
 _IS_SOLR_WITH_HDFS = None
 _ZOOKEEPER_HOST = None
+_IS_SENTRY_PROTECTED = None
 
 
 class SolrClientException(Exception):
@@ -224,6 +225,15 @@ class SolrClient(object):
     return _IS_SOLR_WITH_HDFS
 
 
+  def is_sentry_protected(self):
+    global _IS_SENTRY_PROTECTED
+
+    if _IS_SENTRY_PROTECTED is None:
+      self._fillup_properties()
+
+    return _IS_SENTRY_PROTECTED
+
+
   def get_zookeeper_host(self):
     global _ZOOKEEPER_HOST
 
@@ -241,7 +251,8 @@ class SolrClient(object):
           df=df,
           solr_cloud_mode=True,
           is_solr_six_or_more=self.is_solr_six_or_more(),
-          is_solr_hdfs_mode=self.is_solr_with_hdfs()
+          is_solr_hdfs_mode=self.is_solr_with_hdfs(),
+          is_sentry_protected=self.is_sentry_protected()
       )
 
       try:
@@ -286,6 +297,7 @@ class SolrClient(object):
     global _IS_SOLR_6_OR_MORE
     global _IS_SOLR_WITH_HDFS
     global _ZOOKEEPER_HOST
+    global _IS_SENTRY_PROTECTED
 
     properties = self.api.info_system()
 
@@ -300,6 +312,8 @@ class SolrClient(object):
         _IS_SOLR_WITH_HDFS = True
       if '-DzkHost=' in command_line_arg:
         _ZOOKEEPER_HOST = command_line_arg.split('-DzkHost=', 1)[1]
+      if '-Dsolr.authorization.sentry.site' in command_line_arg:
+        _IS_SENTRY_PROTECTED = True
 
 
   def _reset_properties(self):
@@ -307,8 +321,9 @@ class SolrClient(object):
     global _IS_SOLR_6_OR_MORE
     global _IS_SOLR_WITH_HDFS
     global _ZOOKEEPER_HOST
+    global _IS_SENTRY_PROTECTED
 
-    _IS_SOLR_CLOUD = _IS_SOLR_6_OR_MORE = _IS_SOLR_6_OR_MORE = _IS_SOLR_WITH_HDFS = _ZOOKEEPER_HOST = None
+    _IS_SOLR_CLOUD = _IS_SOLR_6_OR_MORE = _IS_SOLR_6_OR_MORE = _IS_SOLR_WITH_HDFS = _ZOOKEEPER_HOST = _IS_SENTRY_PROTECTED = None
 
 
   # Used by morphline indexer

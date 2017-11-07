@@ -32,7 +32,6 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import force_unicode, smart_str
-from libsentry.conf import is_enabled as is_sentry_enabled
 
 from indexer import conf
 from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES, DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
@@ -88,7 +87,7 @@ class SolrConfigXml(object):
     self.xml = force_unicode(force_unicode(self.xml).replace(u'<str name="df">text</str>', u'<str name="df">%s</str>' % force_unicode(df) if df is not None else ''))
 
 
-def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six_or_more=False, is_solr_hdfs_mode=True):
+def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six_or_more=False, is_solr_hdfs_mode=True, is_sentry_protected=False):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
 
@@ -118,7 +117,7 @@ def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True, is_solr_six
       else:
         solr_config_name = 'solrconfig.xml.solr6NonHdfs'
 
-    if is_sentry_enabled():
+    if is_sentry_protected:
       solr_config_name += '.secure'
 
     solrconfig = 'conf/%s' % solr_config_name
