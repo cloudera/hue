@@ -92,19 +92,35 @@ class SolrClient(object):
 
   def create_index(self, name, fields, config_name=None, unique_key_field=None, df=None, shards=1, replication=1):
     if self.is_solr_cloud_mode():
-      if config_name is None:
-        self._create_cloud_config(name, fields, unique_key_field, df)
-        config_name = name
-
-      self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
-      fields = [{
-          'name': field['name'],
-          'type': field['type'],
-          'stored': field.get('stored', True)
-        } for field in fields
-      ]
       if self.is_solr_six_or_more():
+        if not config_name:
+          config_sets = self.list_configs()
+          if not config_sets:
+            raise PopupException(_('Solr does not have any predefined configSets.'))
+
+          config_name_target = 'managedTemplate' # 'Secure' cf. /solr/admin/info/system
+          if config_name_target in config_sets:
+            config_name = config_name_target
+          else:
+            config_name = config_sets[0]
+
+          self.api.create_config(name, config_name, immutable=False)
+
+        # unique_key_field
+        # df
+
+        self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
+
+        fields = [{
+            'name': field['name'],
+            'type': field['type'],
+            'stored': field.get('stored', True)
+          } for field in fields
+        ]
         self.api.add_fields(name, fields)
+      else:
+        self._create_cloud_config(name, fields, unique_key_field, df)
+        self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
     else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
 
