@@ -107,7 +107,13 @@ class SolrClient(object):
           # Note: uniqueKey is always 'id'
           self.api.create_config(name, config_name, immutable=False)
 
-        # df
+          if df:
+            self.api.update_config(name, {
+              'update-requesthandler': {
+                "name": "/query",
+                "df": df,
+              }
+            })
 
         self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
 
