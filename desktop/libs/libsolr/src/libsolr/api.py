@@ -378,9 +378,29 @@ class SolrApi(object):
           ('configSetProp.immutable', 'false' if immutable else 'true'),
           ('wt', 'json'),
       )
-      return self._root.get('admin/configs', params=params)['configSets']
+      return self._root.post('admin/configs', params=params, contenttype='application/json')
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def delete_config(self, name):
+    response = {'status': -1, 'message': ''}
+
+    try:
+      params = self._get_params() + (
+        ('action', 'DELETE'),
+        ('name', name),
+        ('wt', 'json')
+      )
+
+      data = self._root.post('admin/configs', params=params, contenttype='application/json')
+      if data['responseHeader']['status'] == 0:
+        response['status'] = 0
+      else:
+        response['message'] = "Could not remove config: %s" % data
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+    return response
 
 
   def list_aliases(self):
