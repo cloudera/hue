@@ -139,7 +139,7 @@ class MorphlineIndexer(object):
       curr_field = queue.popleft()
       curr_field['type'] = curr_field['type']
       if is_converting_types:
-        self._port_field_types(curr_field)
+        SolrClient._port_field_types(curr_field)
       fields.append(curr_field)
 
       for operation in curr_field["operations"]:
@@ -147,10 +147,6 @@ class MorphlineIndexer(object):
           queue.append(field)
 
     return fields
-
-  def _port_field_types(self, field):
-    if not field['type'].startswith('p'): # Check for automatically converting to new default Solr types
-      field['type'] = field['type'].replace('long', 'plong').replace('double', 'pdouble').replace('date', 'pdate')
 
   def get_kept_field_list(self, field_data):
     return [field for field in self.get_field_list(field_data) if field['keep']]
