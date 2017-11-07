@@ -210,8 +210,8 @@ def importer_submit(request):
 
 
 def _create_index(user, fs, client, source, destination, index_name):
-  unique_key_field = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
-  df = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
+  unique_key_field = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
+  df = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
   kwargs = {}
 
   if source['inputFormat'] not in ('manual', 'table'):
@@ -311,6 +311,7 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
       name=collection_name,
       fields=request.POST.get('fields', schema_fields),
       unique_key_field=unique_field
+      # No df currently
     )
 
   if file_format['inputFormat'] == 'table':

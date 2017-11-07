@@ -115,14 +115,6 @@ class SolrClient(object):
           # Note: uniqueKey is always 'id'
           self.api.create_config(name, config_name, immutable=False)
 
-          if df:
-            self.api.update_config(name, {
-              'update-requesthandler': {
-                "name": "/query",
-                "df": df,
-              }
-            })
-
         self.api.create_collection2(name, config_name=name, shards=shards, replication=replication)
 
         fields = [{
@@ -132,6 +124,15 @@ class SolrClient(object):
           } for field in fields if field['name'] != 'id'
         ]
         self.api.add_fields(name, fields)
+
+        if df:
+          self.api.update_config(name, {
+            'update-requesthandler': {
+              "name": "/select",
+              "class": "solr.SearchHandler",
+              "defaults": {"df": df},
+            }
+          })
       else:
         self._create_cloud_config(name, fields, unique_key_field, df)
         self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
