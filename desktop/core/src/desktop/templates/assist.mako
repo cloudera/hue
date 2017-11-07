@@ -1139,6 +1139,10 @@ from desktop.views import _ko
           self.sources.push(self.sourceIndex[sourceType.type]);
         });
 
+        huePubSub.subscribe('assist.collections.refresh', function() {
+          huePubSub.publish('assist.db.refresh', { sourceTypes: ['solr'], allCacheTypes: false });
+        });
+
         huePubSub.subscribe('assist.db.highlight', function (location) {
           huePubSub.publish('left.assist.show');
           huePubSub.publish('assist.show.sql');
