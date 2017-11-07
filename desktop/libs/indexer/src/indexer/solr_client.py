@@ -104,9 +104,9 @@ class SolrClient(object):
           else:
             config_name = config_sets[0]
 
+          # Note: uniqueKey is always 'id'
           self.api.create_config(name, config_name, immutable=False)
 
-        # unique_key_field
         # df
 
         self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
@@ -155,14 +155,17 @@ class SolrClient(object):
     if result['status'] == 0:
       # Delete instance directory.
       if not keep_config:
-        try:
-          root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-          with ZookeeperClient(hosts=self.get_zookeeper_host(), read_only=False) as zc:
-            zc.delete_path(root_node)
-        except Exception, e:
-          # Re-create collection so that we don't have an orphan config
-          self.api.add_collection(name)
-          raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
+        if self.is_solr_six_or_more():
+          return self.api.delete_config(name)
+        else:
+          try:
+            root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+            with ZookeeperClient(hosts=self.get_zookeeper_host(), read_only=False) as zc:
+              zc.delete_path(root_node)
+          except Exception, e:
+            # Re-create collection so that we don't have an orphan config
+            self.api.add_collection(name)
+            raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
     else:
       if not 'Cannot unload non-existent core' in json.dumps(result):
         raise PopupException(_('Could not remove collection: %(message)s') % result)
