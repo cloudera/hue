@@ -556,12 +556,12 @@ from desktop.views import _ko
 
         SolrFormulaAutocompleter.prototype.autocomplete = function () {
           var self = this;
-          var parseResult = solrExpressionParser.autocompleteSolrExpression(self.editor.getTextBeforeCursor(), self.editor.getTextAfterCursor());
+          var parseResult = solrFormulaParser.autocompleteSolrFormula(self.editor.getTextBeforeCursor(), self.editor.getTextAfterCursor());
           self.suggestions.update(parseResult);
         };
 
         SolrFormulaAutocompleter.prototype.parse = function (value) {
-          return solrExpressionParser.parseSolrExpression(value);
+          return solrFormulaParser.parseSolrFormula(value);
         };
 
         return SolrFormulaAutocompleter;

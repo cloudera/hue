@@ -21,11 +21,11 @@ echo "Generating parser..."
 
 pushd ../../desktop/core/src/desktop/static/desktop/js/autocomplete/jison
 
-echo "Creating SOLR Expression parser..."
-jison solrExpressionParser.jison
-grunt uglify:solrExpressionParser
-cat license.txt solrExpressionParser.js > ../solrExpressionParser.js
-rm solrExpressionParser.js
+echo "Creating SOLR Formula parser..."
+jison solrFormulaParser.jison
+grunt uglify:solrFormulaParser
+cat license.txt solrFormulaParser.js > ../solrFormulaParser.js
+rm solrFormulaParser.js
 
 popd
 echo "Done!"

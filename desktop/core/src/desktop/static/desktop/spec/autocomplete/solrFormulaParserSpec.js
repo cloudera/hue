@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 (function () {
-  describe('solrExpressionParser.js', function () {
+  describe('solrFormulaParser.js', function () {
 
     describe('autocomplete', function () {
       var testAutocomplete = function (beforeCursor, afterCursor, expectedResult) {
-        var result = solrExpressionParser.autocompleteSolrExpression(beforeCursor, afterCursor, true);
+        var result = solrFormulaParser.autocompleteSolrFormula(beforeCursor, afterCursor, true);
         if (!expectedResult.locations) {
           delete result.locations;
         }
@@ -87,7 +87,7 @@
 
     describe('parse', function () {
       var testParse = function (expression, expectedResult) {
-        var result = solrExpressionParser.parseSolrExpression(expression);
+        var result = solrFormulaParser.parseSolrFormula(expression);
         expect(result).toBeTruthy();
         expect(result).toEqual(expectedResult);
       };
@@ -99,7 +99,7 @@
       });
 
       it('should fail parsing "min(boo"', function () {
-        var result = solrExpressionParser.parseSolrExpression('min(boo');
+        var result = solrFormulaParser.parseSolrFormula('min(boo');
         expect(result).toBeFalsy();
       });
 
