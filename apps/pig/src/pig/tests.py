@@ -79,7 +79,7 @@ class TestMock(TestPigBase):
 
     # Regular
     wf = api._create_workflow(pig_script, '[]')
-    assert_false({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog'} in wf.find_all_parameters(), wf.find_all_parameters())
+    assert_false({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog,hive'} in wf.find_all_parameters(), wf.find_all_parameters())
 
     # With HCat
     pig_script.update_from_dict({
@@ -90,7 +90,7 @@ class TestMock(TestPigBase):
     pig_script.save()
 
     wf = api._create_workflow(pig_script, '[]')
-    assert_true({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog'} in wf.find_all_parameters(), wf.find_all_parameters())
+    assert_true({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog,hive'} in wf.find_all_parameters(), wf.find_all_parameters())
 
     start_link = wf.start.get_link()
     pig_action = start_link.child
