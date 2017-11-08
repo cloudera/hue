@@ -78,7 +78,7 @@ class OozieApi(object):
     workflow.name = OozieApi.WORKFLOW_NAME
     workflow.is_history = True
     if pig_script.use_hcatalog:
-      workflow.add_parameter("oozie.action.sharelib.for.pig", "pig,hcatalog")
+      workflow.add_parameter("oozie.action.sharelib.for.pig", "pig,hcatalog,hive")
     workflow.save()
     Workflow.objects.initialize(workflow, self.fs)
 
