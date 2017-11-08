@@ -232,13 +232,33 @@ ace:
 
 
 ###################################
-# JISON Parser Generator
+# JISON Parser Generators
 ###################################
 
 # <<<< DEV ONLY
-.PHONY: jison
-jison:
-	@cd tools/jison && ./hue-jison.sh
+.PHONY: global-search-parser
+global-search-parser:
+	@cd tools/jison && ./hue-global-search.sh
+
+.PHONY: solr-formula-parser
+solr-formula-parser:
+	@cd tools/jison && ./hue-solr-formula.sh
+
+.PHONY: sql-all-parsers
+sql-all-parsers:
+	@cd tools/jison && ./hue-sql-autocomplete.sh && ./hue-sql-statement.sh && ./hue-sql-syntax.sh
+
+.PHONY: sql-autocomplete-parser
+sql-autocomplete-parser:
+	@cd tools/jison && ./hue-sql-autocomplete.sh
+
+.PHONY: sql-statement-parser
+sql-statement-parser:
+	@cd tools/jison && ./hue-sql-statement.sh
+
+.PHONY: sql-syntax-parser
+sql-syntax-parser:
+	@cd tools/jison && ./hue-sql-syntax.sh
 # END DEV ONLY >>>>
 
 ###################################
