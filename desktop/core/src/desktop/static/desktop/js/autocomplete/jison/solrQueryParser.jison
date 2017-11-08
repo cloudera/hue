@@ -15,25 +15,79 @@
 // limitations under the License.
 
 %lex
-%options case-insensitive
+%options case-insensitive flex
+%x squareBracketRange curlyBracketRange doubleQuotedValue singleQuotedValue
 %%
 
-\s                                         { /* skip whitespace */ }
-'--'.*                                     { /* skip comments */ }
-[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]        { /* skip comments */ }
+\s                                             { /* skip whitespace */ }
+'--'.*                                         { /* skip comments */ }
+[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]            { /* skip comments */ }
 
-'('                                        { return '('; }
-')'                                        { return ')'; }
+'\u2020'                                       { parser.yy.cursorFound = yylloc; return 'CURSOR'; }
+'\u2021'                                       { parser.yy.cursorFound = yylloc; return 'PARTIAL_CURSOR'; }
 
-'\u2020'                                   { parser.yy.cursorFound = yylloc; return 'CURSOR'; }
+'AND'                                          { return 'AND'; }
+'&&'                                           { return 'AND'; }
+'OR'                                           { return 'OR'; }
+'||'                                           { return 'OR'; }
+'NOT'                                          { return 'NOT'; }
+'!'                                            { return 'NOT'; }
+'+'                                            { return '+'; }
+'-'                                            { return '-'; }
+':'                                            { return ':'; }
+'*'                                            { return '*'; }
 
-[0-9]+(?:[,.][0-9]+)?                      { return 'NUMBER'; }
+'('                                            { return '('; }
+')'                                            { return ')'; }
 
-[^\u2020()]+                               { parser.addFieldLocation(yylloc, yytext); return 'IDENTIFIER'; }
+[0-9]+(?:[,.][0-9]+)?                          { return 'NUMBER'; }
 
-<<EOF>>                                    { return 'EOF'; }
+'['                                            { this.begin('squareBracketRange'); return '['; }
+<squareBracketRange>(?:\\[\]]|[^\]])+          {
+                                                 if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, ']')) {
+                                                   return 'PARTIAL_VALUE';
+                                                 }
+                                                 return 'VALUE';
+                                               }
+<singleQuotedValue>\]                          { this.popState(); return ']'; }
+
+'{'                                            { this.begin('curlyBracketRange'); return '{'; }
+<curlyBracketRange>(?:\\[\}]|[^\}])+           {
+                                                 if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '}')) {
+                                                   return 'PARTIAL_VALUE';
+                                                 }
+                                                 return 'VALUE';
+                                               }
+<curlyBracketRange>\}                          { this.popState(); return '}'; }
+
+\'                                             { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
+<singleQuotedValue>(?:\\[']|[^'])+             {
+                                                 if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '\'')) {
+                                                   yytext = yytext.replace(/[\u2020\u2021].*/, '');
+                                                   return 'PARTIAL_VALUE';
+                                                 }
+                                                 return 'VALUE';
+                                               }
+<singleQuotedValue>\'                          { this.popState(); return 'SINGLE_QUOTE'; }
+
+\"                                             { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
+<doubleQuotedValue>(?:\\["]|[^"])+             {
+                                                 if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '"')) {
+                                                   yytext = yytext.replace(/[\u2020\u2021].*/, '');
+                                                   return 'PARTIAL_VALUE';
+                                                 }
+                                                 return 'VALUE';
+                                               }
+<doubleQuotedValue>\"                          { this.popState(); return 'DOUBLE_QUOTE'; }
+
+[^\s\u3000!():"'^+\-!\[\]{}~*?/\u2020\u2021]+  { return 'TERM'; }
+
+<<EOF>>                                        { return 'EOF'; }
 
 /lex
+
+%left 'AND' 'OR' '&&' '||' BooleanOperator
+%left 'CURSOR' 'PARTIAL_CURSOR' AnyCursor       // Cursor precedence needed to not conflict with operators i.e. x 'CURSOR' y vs. x 'AND' y
 
 %start SolrQueryAutocomplete
 
@@ -41,13 +95,16 @@
 
 SolrQueryAutocomplete
  : SolrQuery 'EOF'
+   {
+     return {}
+   }
  | SolrQuery_EDIT 'EOF'
    {
      return $1;
    }
- | 'CURSOR' 'EOF'
+ | AnyCursor 'EOF'
    {
-     return { suggestFields: true }
+     return { suggestFields: {} }
    }
  ;
 
@@ -56,28 +113,66 @@ SolrQuery
  | '(' NonParenthesizedSolrQuery ')'
  ;
 
-SolrQuery
+SolrQuery_EDIT
  : NonParenthesizedSolrQuery_EDIT
  | '(' NonParenthesizedSolrQuery_EDIT RightParenthesisOrError  --> $2
  ;
 
 NonParenthesizedSolrQuery
  : 'NUMBER'
- | 'IDENTIFIER'
+ | 'TERM'
+ | KeywordMatch
  ;
 
 NonParenthesizedSolrQuery_EDIT
- : 'NUMBER' 'CURSOR'                                                --> { suggestOperators: true }
- | 'IDENTIFIER' 'CURSOR'                                            --> { suggestOperators: true }
- | 'CURSOR' 'NUMBER'                                                --> { suggestFields: true }
- | 'CURSOR' 'IDENTIFIER'                                            --> { suggestFields: true }
+ : 'TERM' 'PARTIAL_CURSOR'                                     --> { suggestFields: { startsWith: $1 }, suggestValues: { field: $1, prependColon: true }, suggestKeywords: [':'] }
+ | KeywordMatch_EDIT
  ;
 
-RightParenthesisOrError
- : ')'
- | error
+NonParenthesizedSolrQuery
+ : SolrQuery BooleanOperator SolrQuery
  ;
 
+NonParenthesizedSolrQuery_EDIT
+ : SolrQuery 'CURSOR'                                          --> { suggestKeywords: ['AND', 'OR', '&&', '||'] }
+ | SolrQuery 'CURSOR' SolrQuery                                --> { suggestKeywords: ['AND', 'OR', '&&', '||'] }
+ | 'CURSOR' SolrQuery                                          --> { suggestFields: {} }
+ ;
+
+NonParenthesizedSolrQuery_EDIT
+ : SolrQuery BooleanOperator 'CURSOR'                         --> { suggestFields: {} }
+ | 'CURSOR' BooleanOperator SolrQuery                         --> { suggestFields: {} }
+ | SolrQuery BooleanOperator SolrQuery_EDIT                    --> $3
+ | SolrQuery_EDIT BooleanOperator SolrQuery                    --> $1
+ ;
+
+KeywordMatch
+ : 'TERM' ':' 'TERM'
+ | 'TERM' ':' QuotedValue
+ ;
+
+KeywordMatch_EDIT
+ : 'TERM' ':' AnyCursor                                        --> { suggestValues: { field: $1 } }
+ | 'TERM' ':' 'TERM' 'PARTIAL_CURSOR'                          --> { suggestValues: { field: $1, startsWith: $3 } }
+ | 'TERM' ':' QuotedValue_EDIT                                 --> { suggestValues: { field: $1, startsWith: $3 } }
+ ;
+
+// ======= Common constructs =======
+AnyCursor
+: 'CURSOR' | 'PARTIAL_CURSOR';
+
+BooleanOperator
+: 'AND' | 'OR' | '&&' | '||';
+
+QuotedValue
+: 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE' | 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE';
+
+QuotedValue_EDIT
+: 'SINGLE_QUOTE' 'PARTIAL_VALUE'                               --> $2
+| 'DOUBLE_QUOTE' 'PARTIAL_VALUE'                               --> $2
+;
+
+RightParenthesisOrError: ')' | error;
 %%
 
 parser.yy.parseError = function () { return false; }
@@ -90,6 +185,31 @@ parser.identifyPartials = function (beforeCursor, afterCursor) {
   var beforeMatch = beforeCursor.match(/[^()-*+/,\s]*$/);
   var afterMatch = afterCursor.match(/^[^()-*+/,\s]*/);
   return { left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0 };
+};
+
+parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
+  if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
+    parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
+    var cursorIndex = parser.yy.partialCursor ? yytext.indexOf('\u2021') : yytext.indexOf('\u2020');
+    parser.yy.cursorFound = {
+      first_line: yylloc.first_line,
+      last_line: yylloc.last_line,
+      first_column: yylloc.first_column + cursorIndex,
+      last_column: yylloc.first_column + cursorIndex + 1
+    };
+    var remainder = yytext.substring(cursorIndex + 1);
+    var remainingQuotes = (lexer.upcomingInput().match(new RegExp(quoteChar, 'g')) || []).length;
+    if (remainingQuotes > 0 && remainingQuotes & 1 != 0) {
+      parser.yy.missingEndQuote = false;
+      lexer.input();
+    } else {
+      parser.yy.missingEndQuote = true;
+      lexer.unput(remainder);
+    }
+    lexer.popState();
+    return true;
+  }
+  return false;
 };
 
 var adjustLocationForCursor = function (location) {
@@ -111,24 +231,6 @@ var adjustLocationForCursor = function (location) {
   return newLocation;
 };
 
-parser.parseSolrQuery = function (query, debug) {
-  parser.yy.cursorFound = false;
-  parser.yy.locations = [];
-  query = query.replace(/\r\n|\n\r/gm, '\n');
-
-  var result;
-  try {
-    result = parser.parse(query);
-  } catch (err) {
-    if (debug) {
-      console.log(beforeCursor + '\u2020' + afterCursor);
-      console.log(err);
-      console.error(err.stack);
-    }
-  }
-  return result || false;
-}
-
 parser.autocompleteSolrQuery = function (beforeCursor, afterCursor, debug) {
   parser.yy.cursorFound = false;
   parser.yy.locations = [];
@@ -138,8 +240,14 @@ parser.autocompleteSolrQuery = function (beforeCursor, afterCursor, debug) {
 
   parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
 
-  if (parser.yy.partialLengths.left > 0) {
-    beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
+  parser.yy.partialCursor = parser.yy.partialLengths.left > 0;
+
+
+  var cursorChar = parser.yy.partialCursor ? '\u2021' : '\u2020';
+
+  // TODO: Remove left adjust if no need for it
+  if (parser.yy.partialCursor) {
+    parser.yy.partialLengths.left = 0;
   }
 
   if (parser.yy.partialLengths.right > 0) {
@@ -148,7 +256,7 @@ parser.autocompleteSolrQuery = function (beforeCursor, afterCursor, debug) {
 
   var result;
   try {
-    result = parser.parse(beforeCursor + '\u2020' + afterCursor);
+    result = parser.parse(beforeCursor + cursorChar + afterCursor);
   } catch (err) {
     // Workaround for too many missing parentheses (it's the only error we handle in the parser)
     if (err && err.toString().indexOf('Parsing halted while starting to recover from another error') !== -1) {
@@ -160,17 +268,17 @@ parser.autocompleteSolrQuery = function (beforeCursor, afterCursor, debug) {
         rightCount++;
       }
       try {
-        result = parser.parse(beforeCursor + '\u2020' + parenthesisPad);
+        result = parser.parse(beforeCursor + cursorChar + parenthesisPad);
       } catch (err) {
-        return {}
+        return { locations: parser.yy.locations }
       }
     } else {
       if (debug) {
-        console.log(beforeCursor + '\u2020' + afterCursor);
+        console.log(beforeCursor + cursorChar + afterCursor);
         console.log(err);
         console.error(err.stack);
       }
-      return {}
+      return { locations: parser.yy.locations }
     }
   }
   result.locations = parser.yy.locations;
