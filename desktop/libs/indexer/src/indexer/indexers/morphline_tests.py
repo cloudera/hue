@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.from nose.tools import assert_equal
 
+from copy import deepcopy
+
 import StringIO
 import logging
 
@@ -151,8 +153,8 @@ class TestIndexer():
 
   def test_generate_csv_morphline(self):
     indexer = MorphlineIndexer("test", solr_client=self.solr_client)
-    morphline =indexer.generate_morphline_config("test_collection", {
-        "columns": self.simpleCSVFields,
+    morphline = indexer.generate_morphline_config("test_collection", {
+        "columns": deepcopy(self.simpleCSVFields),
         "format": self.simpleCSVFormat
       })
 
@@ -289,7 +291,7 @@ class TestIndexer():
     assert_true(isinstance(morphline, basestring))
 
   def _test_generate_field_operation_morphline(self, operation_format):
-    fields = TestIndexer.simpleCSVFields[:]
+    fields = deepcopy(TestIndexer.simpleCSVFields)
     fields[0]['operations'].append(operation_format)
 
     indexer = MorphlineIndexer("test", solr_client=self.solr_client)
