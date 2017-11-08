@@ -120,9 +120,9 @@ module.exports = function(grunt) {
           'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/globalSearchParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/globalSearchParser.js']
         }
       },
-      solrExpressionParser: {
+      solrFormulaParser: {
         files: {
-          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrExpressionParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrExpressionParser.js']
+          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrFormulaParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrFormulaParser.js']
         }
       }
     }

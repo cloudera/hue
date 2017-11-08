@@ -55,18 +55,18 @@
 %left '+' '-'
 %left '*' '/'
 
-%start SolrExpressionAutocomplete
+%start SolrFormulaAutocomplete
 
 %%
 
-SolrExpressionAutocomplete
- : SolrExpression 'EOF'
+SolrFormulaAutocomplete
+ : SolrFormula 'EOF'
    {
      return {
        parsedValue: $1
      };
    }
- | SolrExpression_EDIT 'EOF'
+ | SolrFormula_EDIT 'EOF'
    {
      return $1
    }
@@ -76,83 +76,83 @@ SolrExpressionAutocomplete
    }
  ;
 
-SolrExpression
- : NonParenthesizedSolrExpression
- | '(' NonParenthesizedSolrExpression ')'  -> $1 + $2 + $3
+SolrFormula
+ : NonParenthesizedSolrFormula
+ | '(' NonParenthesizedSolrFormula ')'  -> $1 + $2 + $3
  ;
 
-SolrExpression_EDIT
- : NonParenthesizedSolrExpression_EDIT
- | '(' NonParenthesizedSolrExpression_EDIT RightParenthesisOrError   --> $2
+SolrFormula_EDIT
+ : NonParenthesizedSolrFormula_EDIT
+ | '(' NonParenthesizedSolrFormula_EDIT RightParenthesisOrError  --> $2
  ;
 
-NonParenthesizedSolrExpression
+NonParenthesizedSolrFormula
  : 'NUMBER'
  | 'IDENTIFIER'
  | 'FUNCTION' '(' ArgumentList ')'    -> $1 + $2 + $3 + $4
- | SolrExpression '+' SolrExpression  -> 'sum(' + $1 + ',' + $3 + ')'
- | SolrExpression '-' SolrExpression  -> 'sub(' + $1 + ',' + $3 + ')'
- | SolrExpression '*' SolrExpression  -> 'mul(' + $1 + ',' + $3 + ')'
- | SolrExpression '/' SolrExpression  -> 'div(' + $1 + ',' + $3 + ')'
- | '-' SolrExpression                 -> 'sub(0,' + $2 + ')'
+ | SolrFormula '+' SolrFormula  -> 'sum(' + $1 + ',' + $3 + ')'
+ | SolrFormula '-' SolrFormula  -> 'sub(' + $1 + ',' + $3 + ')'
+ | SolrFormula '*' SolrFormula  -> 'mul(' + $1 + ',' + $3 + ')'
+ | SolrFormula '/' SolrFormula  -> 'div(' + $1 + ',' + $3 + ')'
+ | '-' SolrFormula                 -> 'sub(0,' + $2 + ')'
  ;
 
-NonParenthesizedSolrExpression_EDIT
- : 'NUMBER' 'CURSOR'                                                 --> { suggestOperators: true }
- | 'IDENTIFIER' 'CURSOR'                                             --> { suggestOperators: true }
- | 'CURSOR' 'NUMBER'                                                 --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | 'CURSOR' 'IDENTIFIER'                                             --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+NonParenthesizedSolrFormula_EDIT
+ : 'NUMBER' 'CURSOR'                                             --> { suggestOperators: true }
+ | 'IDENTIFIER' 'CURSOR'                                         --> { suggestOperators: true }
+ | 'CURSOR' 'NUMBER'                                             --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' 'IDENTIFIER'                                         --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
  ;
 
-NonParenthesizedSolrExpression_EDIT
- : 'FUNCTION' '(' 'CURSOR' RightParenthesisOrError                   --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | 'FUNCTION' '(' ArgumentList_EDIT RightParenthesisOrError          --> $3
- | 'FUNCTION' '(' ArgumentList ')' 'CURSOR'                          --> { suggestOperators: true }
+NonParenthesizedSolrFormula_EDIT
+ : 'FUNCTION' '(' 'CURSOR' RightParenthesisOrError               --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'FUNCTION' '(' ArgumentList_EDIT RightParenthesisOrError      --> $3
+ | 'FUNCTION' '(' ArgumentList ')' 'CURSOR'                      --> { suggestOperators: true }
  ;
 
-NonParenthesizedSolrExpression_EDIT
- : SolrExpression '+' 'CURSOR'                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | 'CURSOR' '+' SolrExpression                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | SolrExpression_EDIT '+' SolrExpression                            --> $1
- | SolrExpression '+' SolrExpression_EDIT                            --> $3
+NonParenthesizedSolrFormula_EDIT
+ : SolrFormula '+' 'CURSOR'                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '+' SolrFormula                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | SolrFormula_EDIT '+' SolrFormula                              --> $1
+ | SolrFormula '+' SolrFormula_EDIT                              --> $3
  ;
 
-NonParenthesizedSolrExpression_EDIT
- : SolrExpression '-' 'CURSOR'                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | 'CURSOR' '-' SolrExpression                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | SolrExpression_EDIT '-' SolrExpression                            --> $1
- | SolrExpression '-' SolrExpression_EDIT                            --> $3
+NonParenthesizedSolrFormula_EDIT
+ : SolrFormula '-' 'CURSOR'                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '-' SolrFormula                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | SolrFormula_EDIT '-' SolrFormula                              --> $1
+ | SolrFormula '-' SolrFormula_EDIT                              --> $3
  ;
 
-NonParenthesizedSolrExpression_EDIT
- : SolrExpression '*' 'CURSOR'                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | 'CURSOR' '*' SolrExpression                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | SolrExpression_EDIT '*' SolrExpression                            --> $1
- | SolrExpression '*' SolrExpression_EDIT                            --> $3
+NonParenthesizedSolrFormula_EDIT
+ : SolrFormula '*' 'CURSOR'                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '*' SolrFormula                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | SolrFormula_EDIT '*' SolrFormula                              --> $1
+ | SolrFormula '*' SolrFormula_EDIT                              --> $3
  ;
 
-NonParenthesizedSolrExpression_EDIT
- : SolrExpression '/' 'CURSOR'                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | 'CURSOR' '/' SolrExpression                                       --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | SolrExpression_EDIT '/' SolrExpression                            --> $1
- | SolrExpression '/' SolrExpression_EDIT                            --> $3
+NonParenthesizedSolrFormula_EDIT
+ : SolrFormula '/' 'CURSOR'                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | 'CURSOR' '/' SolrFormula                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | SolrFormula_EDIT '/' SolrFormula                              --> $1
+ | SolrFormula '/' SolrFormula_EDIT                              --> $3
  ;
 
-NonParenthesizedSolrExpression_EDIT
- : '-' 'CURSOR'                                                      --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
- | '-' SolrExpression_EDIT                                           --> $2
+NonParenthesizedSolrFormula_EDIT
+ : '-' 'CURSOR'                                                  --> { suggestAggregateFunctions: true, suggestFunctions: true, suggestFields: true }
+ | '-' SolrFormula_EDIT                                          --> $2
  ;
 
 ArgumentList
- : SolrExpression
- | ArgumentList ',' SolrExpression
+ : SolrFormula
+ | ArgumentList ',' SolrFormula
  ;
 
 ArgumentList_EDIT
- : SolrExpression_EDIT
- | ArgumentList ',' SolrExpression_EDIT                              --> $3
- | SolrExpression_EDIT ',' ArgumentList
- | ArgumentList ',' SolrExpression_EDIT ',' ArgumentList             --> $3
+ : SolrFormula_EDIT
+ | ArgumentList ',' SolrFormula_EDIT                             --> $3
+ | SolrFormula_EDIT ',' ArgumentList
+ | ArgumentList ',' SolrFormula_EDIT ',' ArgumentList            --> $3
  ;
 
 
@@ -198,14 +198,14 @@ parser.addFieldLocation = function (location, name) {
   parser.yy.locations.push({ type: 'field', name: name, location: adjustLocationForCursor(location) });
 }
 
-parser.parseSolrExpression = function (expression, debug) {
+parser.parseSolrFormula = function (formula, debug) {
   parser.yy.cursorFound = false;
   parser.yy.locations = [];
-  expression = expression.replace(/\r\n|\n\r/gm, '\n');
+  formula = formula.replace(/\r\n|\n\r/gm, '\n');
 
   var result;
   try {
-    result = parser.parse(expression);
+    result = parser.parse(formula);
   } catch (err) {
     if (debug) {
       console.log(beforeCursor + '\u2020' + afterCursor);
@@ -216,7 +216,7 @@ parser.parseSolrExpression = function (expression, debug) {
   return result || false;
 }
 
-parser.autocompleteSolrExpression = function (beforeCursor, afterCursor, debug) {
+parser.autocompleteSolrFormula = function (beforeCursor, afterCursor, debug) {
   parser.yy.cursorFound = false;
   parser.yy.locations = [];
 
