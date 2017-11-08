@@ -56,7 +56,7 @@ class QueryApi(Api):
     jobs_iter = itertools.chain(jobs['in_flight_queries'], jobs['completed_queries'])
     jobs_iter_filtered = self._n_filter(filter_list, jobs_iter)
 
-    return {
+    apps = {
       'apps': sorted([{
         'id': job['query_id'],
         'name': job['stmt'].replace('\r\n', ' ')[:60] + ('...' if len(job['stmt']) > 60 else ''),
@@ -74,8 +74,11 @@ class QueryApi(Api):
         'waiting': job['waiting'],
         'waiting_time': job['waiting_time']
       } for job in jobs_iter_filtered], key=lambda job: job.get('submitted'), reverse=True),
-      'total': len(jobs_iter_filtered)
+      'total': 0
     }
+    apps['total'] = len(apps['apps'])
+
+    return apps
 
   def _time_in_ms_groups(self, groups):
     time = 0
