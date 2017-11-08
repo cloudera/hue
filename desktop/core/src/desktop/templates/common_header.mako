@@ -280,14 +280,15 @@ ${ hueIcons.symbols() }
       </li>
     % endif
     % if 'jobbrowser' in apps:
-      <li class="hide1380"><a title="${_('Manage jobs')}" data-rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
-      <li class="hideMoreThan1380"><a title="${_('Job Browser')}" data-rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i></a></li>
       <% from jobbrowser.conf import ENABLE_V2 %>
-      % if ENABLE_V2.get():
+      % if not ENABLE_V2.get():
+        <li class="hide1380"><a title="${_('Manage jobs')}" data-rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+        <li class="hideMoreThan1380"><a title="${_('Job Browser')}" data-rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i></a></li>
+      % else:
         <li class="hide1380"><a title="${_('Manage jobs')}" data-rel="navigator-tooltip" href="/jobbrowser/apps">
-          <i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser 2')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a>
+          <i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a>
         </li>
-        <li class="hideMoreThan1380"><a title="${_('Job Browser 2')}" data-rel="navigator-tooltip" href="/jobbrowser/apps"><i class="fa fa-list-alt"></i></a></li>
+        <li class="hideMoreThan1380"><a title="${_('Job Browser')}" data-rel="navigator-tooltip" href="/jobbrowser/apps"><i class="fa fa-list-alt"></i></a></li>
       % endif
     % endif
     <%
