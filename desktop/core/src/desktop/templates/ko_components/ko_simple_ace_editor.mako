@@ -91,7 +91,7 @@ from desktop.views import _ko
             arguments: [[{type: 'T'}, {type: 'T'}]],
             signature: 'docfreq(field, value)',
             draggable: 'docfreq()',
-            description: 'Returns the number of documents that contain the term in the field. This is a constant (the same value for all documents in the index).\n\n You can quote the term if it’s more complex, or do parameter substitution for the term value.'
+            description: 'Returns the number of documents that contain the term in the field. This is a constant (the same value for all documents in the index).\n\n You can quote the term if it\'s more complex, or do parameter substitution for the term value.'
           },
           exists: {
             returnTypes: ['boolean'],
@@ -203,7 +203,7 @@ from desktop.views import _ko
             arguments: [[{type: 'T', multiple: true}]],
             signature: 'min(x, y, ...)',
             draggable: 'min()',
-            description: 'Returns the minimum numeric value of multiple nested functions of constants, which are specified as arguments: min(x,y,…...). The min function can also be useful for providing an "upper bound" on a function using a constant.'
+            description: 'Returns the minimum numeric value of multiple nested functions of constants, which are specified as arguments: min(x,y,...). The min function can also be useful for providing an "upper bound" on a function using a constant.'
           },
           ms: {
             returnTypes: ['T'],
@@ -273,7 +273,7 @@ from desktop.views import _ko
             arguments: [[{type: 'T', multiple: true}]],
             signature: 'product(x, y, ...)',
             draggable: 'product()',
-            description: 'Returns the product of multiple values or functions, which are specified in a comma-separated list. mul(...​) may also be used as an alias for this function.'
+            description: 'Returns the product of multiple values or functions, which are specified in a comma-separated list. mul(...) may also be used as an alias for this function.'
           },
           query: {
             returnTypes: ['T'],
@@ -322,7 +322,7 @@ from desktop.views import _ko
             arguments: [[{type: 'T', multiple: true}]],
             signature: 'strdist(string1, string2, distance_measure)',
             draggable: 'strdist()',
-            description: 'Calculate the distance between two strings. Uses the Lucene spell checker StringDistance interface and supports all of the implementations available in that package, plus allows applications to plug in their own via Solr’s resource loading capabilities. strdist takes (string1, string2, distance measure).\n\nPossible values for distance measure are:\n- jw: Jaro-Winkler\n- edit: Levenstein or Edit distance\n- ngram: The NGramDistance, if specified, can optionally pass in the ngram size too. Default is 2.\n- FQN: Fully Qualified class Name for an implementation of the StringDistance interface. Must have a no-arg constructor.'
+            description: 'Calculate the distance between two strings. Uses the Lucene spell checker StringDistance interface and supports all of the implementations available in that package, plus allows applications to plug in their own via Solr\'s resource loading capabilities. strdist takes (string1, string2, distance measure).\n\nPossible values for distance measure are:\n- jw: Jaro-Winkler\n- edit: Levenstein or Edit distance\n- ngram: The NGramDistance, if specified, can optionally pass in the ngram size too. Default is 2.\n- FQN: Fully Qualified class Name for an implementation of the StringDistance interface. Must have a no-arg constructor.'
           },
           sub: {
             returnTypes: ['T'],
