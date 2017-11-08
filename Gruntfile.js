@@ -63,7 +63,7 @@ module.exports = function(grunt) {
           'apps/security/src/security/static/security/css/security.css': 'apps/security/src/security/static/security/less/security.less',
           'apps/sqoop/src/sqoop/static/sqoop/css/sqoop.css': 'apps/sqoop/src/sqoop/static/sqoop/less/sqoop.less',
           'desktop/libs/indexer/src/indexer/static/indexer/css/indexes.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/indexes.less',
-          'desktop/libs/indexer/src/indexer/static/indexer/css/importer.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/importer.less',
+          'desktop/libs/indexer/src/indexer/static/indexer/css/importer.css': 'desktop/libs/indexer/src/indexer/static/indexer/less/importer.less'
         }
       }
     },
@@ -94,7 +94,7 @@ module.exports = function(grunt) {
           'apps/security/src/security/static/security/less/*.less',
           'apps/security/src/security/static/security/less/**/*.less',
           'apps/sqoop/src/sqoop/static/sqoop/less/*.less',
-          'apps/sqoop/src/sqoop/static/sqoop/less/**/*.less',
+          'apps/sqoop/src/sqoop/static/sqoop/less/**/*.less'
         ],
         tasks: ['less']
       }
@@ -123,6 +123,11 @@ module.exports = function(grunt) {
       solrFormulaParser: {
         files: {
           'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrFormulaParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrFormulaParser.js']
+        }
+      },
+      solrQueryParser: {
+        files: {
+          'desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrQueryParser.js': ['desktop/core/src/desktop/static/desktop/js/autocomplete/jison/solrQueryParser.js']
         }
       }
     }

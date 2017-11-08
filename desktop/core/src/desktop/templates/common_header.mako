@@ -177,6 +177,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
+  <script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/solrFormulaParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
 

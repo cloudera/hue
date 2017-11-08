@@ -240,6 +240,14 @@ ace:
 global-search-parser:
 	@cd tools/jison && ./hue-global-search.sh
 
+.PHONY: solr-all-parsers
+solr-all-parsers:
+	@cd tools/jison && ./hue-solr-query.sh && ./hue-solr-formula.sh
+
+.PHONY: solr-query-parser
+solr-query-parser:
+	@cd tools/jison && ./hue-solr-query.sh
+
 .PHONY: solr-formula-parser
 solr-formula-parser:
 	@cd tools/jison && ./hue-solr-formula.sh
