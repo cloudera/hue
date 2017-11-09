@@ -243,12 +243,12 @@ def get_terms(request):
   try:
     collection = json.loads(request.POST.get('collection', '{}'))
     analysis = json.loads(request.POST.get('analysis', '{}'))
+    limit = json.loads(request.POST.get('limit', '25'))
 
     field = analysis['name']
     properties = {
-      'terms.limit': 25,
+      'terms.limit': limit,
       # lower
-      # limit
       # mincount
       # maxcount
     }
