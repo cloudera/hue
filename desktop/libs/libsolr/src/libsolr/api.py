@@ -358,6 +358,17 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
+  def config(self, name):
+    try:
+      params = self._get_params() + (
+          ('wt', 'json'),
+      )
+      response = self._root.get('%s/config' % name, params=params)
+      return self._get_json(response)['config']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
   def configs(self):
     try:
       params = self._get_params() + (
