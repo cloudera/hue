@@ -219,7 +219,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <!-- /ko -->
             <!-- ko ifnot: editorMode -->
               <a href="javascript:void(0)" data-bind="click: newNotebook">
-                <i class="fa fa-file-o"></i> ${ _('New Notebook') }
+                <i class="fa fa-fw fa-file-o"></i> ${ _('New Notebook') }
               </a>
             <!-- /ko -->
             </li>
