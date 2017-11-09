@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 (function () {
-  fdescribe('solrQueryParser.js', function () {
+  describe('solrQueryParser.js', function () {
     var testAutocomplete = function (beforeCursor, afterCursor, expectedResult) {
       var result = solrQueryParser.autocompleteSolrQuery(beforeCursor, afterCursor, true);
       if (!expectedResult.locations) {
@@ -26,21 +26,20 @@
 
     it('should suggest fields for "|"', function () {
       testAutocomplete('', '', {
-        suggestFields: {}
+        suggestFields: { appendColon: true }
       });
     });
 
     it('should suggest values for "field|"', function () {
       testAutocomplete('field', '', {
-        suggestFields: { startsWith: 'field' },
-        suggestValues: { field: 'field', prependColon: true },
-        suggestKeywords: [':']
+        suggestFields: { appendColon: true }
       });
     });
 
     it('should suggest AND or OR for "field |"', function () {
       testAutocomplete('field ', '', {
-        suggestKeywords: ['AND', 'OR', '&&', '||']
+        suggestKeywords: ['AND', 'OR', ':'],
+        suggestValues: { field: 'field', prependColon: true }
       });
     });
 
@@ -52,71 +51,68 @@
 
     it('should suggest values for "field:someVal|"', function () {
       testAutocomplete('field:someVal', '', {
-        suggestValues: { field: 'field', startsWith: 'someVal' }
+        suggestValues: { field: 'field' }
       });
     });
 
     it('should suggest values for "field:"some Val|"', function () {
       testAutocomplete('field:"some Val', '', {
-        suggestValues: { field: 'field', startsWith: 'some Val' }
+        suggestValues: { field: 'field' }
       });
     });
 
     it('should suggest values for "field:"some Val| foo"', function () {
       testAutocomplete('field:"some Val', ' foo"', {
-        suggestValues: { field: 'field', startsWith: 'some Val' }
+        suggestValues: { field: 'field' }
       });
     });
 
     it('should suggest AND or OR for "field:value |"', function () {
       testAutocomplete('field:value ', '', {
-        suggestKeywords: ['AND', 'OR', '&&', '||']
+        suggestKeywords: ['AND', 'OR']
       });
     });
 
     it('should suggest fields for "field:value AND |"', function () {
       testAutocomplete('field:value AND ', '', {
-        suggestFields: {}
+        suggestFields: { appendColon: true }
       });
     });
 
     it('should suggest fields for "(field:value OR foo) AND |"', function () {
       testAutocomplete('(field:value OR foo) AND ', '', {
-        suggestFields: {}
+        suggestFields: { appendColon: true }
       });
     });
 
     it('should suggest fields for "| field"', function () {
       testAutocomplete('', ' field', {
-        suggestFields: {}
+        suggestFields: { appendColon: true }
       });
     });
 
     it('should suggest fields for "| && field"', function () {
       testAutocomplete('', ' && field', {
-        suggestFields: {}
+        suggestFields: { appendColon: true }
       });
     });
 
-    it('should suggest values for "foo and b|"', function () {
-      testAutocomplete('foo and b', '', {
-        suggestFields: { startsWith: 'b' },
-        suggestValues: { field: 'b', prependColon: true },
-        suggestKeywords: [':']
+    it('should suggest values for "foo AND b|"', function () {
+      testAutocomplete('foo AND b', '', {
+        suggestFields: { appendColon: true }
       });
     });
 
-    it('should suggest values for "f| or boo"', function () {
-      testAutocomplete('f', ' or boo', {
-        suggestFields: { startsWith: 'f' },
-        suggestValues: { field: 'f', prependColon: true },
-        suggestKeywords: [':']
+    it('should suggest values for "f| OR boo"', function () {
+      testAutocomplete('f', ' OR boo', {
+        suggestFields: { appendColon: true }
       });
     });
 
     it('should suggest AND or OR for "foo | field:value "', function () {
       testAutocomplete('foo ', ' field:value', {
-        suggestKeywords: ['AND', 'OR', '&&', '||']
+        suggestKeywords: ['AND', 'OR', ':'],
+        suggestValues: { field: 'foo', prependColon: true }
       });
     });
   });
