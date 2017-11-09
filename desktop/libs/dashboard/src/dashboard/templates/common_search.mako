@@ -52,144 +52,149 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
   </form>
 %else:
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
-  <div class="pull-left">
-    <div class="app-header">
-      <a href="#" data-bind="hueLink: '${ url('dashboard:new_search') }'">
-        <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
-        <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'dashboard' }} --><!-- /ko -->
-      </a>
+  <div class="search-bar-header">
+    <div class="search-bar-logo">
+      <div class="app-header">
+        <a href="#" data-bind="hueLink: '${ url('dashboard:new_search') }'">
+          <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
+          <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'dashboard' }} --><!-- /ko -->
+        </a>
+      </div>
     </div>
-  </div>
-
-  <div class="pull-right" style="${ not is_embeddable and 'padding-right:50px' or ''}">
-    <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
-      <i class="fa fa-pencil"></i>
-    </a>
-    % if is_owner:
-    <a class="btn pointer" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}, visible: columns().length != 0">
-      <i class="fa fa-save"></i>
-    </a>
-    % endif
-
-    <div class="dropdown pull-right margin-left-10">
-      <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
-        <i class="fa fa-fw fa-ellipsis-v"></i>
-      </a>
-      <ul class="dropdown-menu">
-        <li data-bind="visible: isSaved()">
-          <a class="share-link" data-bind="click: prepareShareModal, css: {'isShared': isShared()}">
-            <i class="fa fa-fw fa-users"></i> ${ _('Share') }
-          </a>
-        </li>
-        %if not is_embeddable:
-          <li>
-            <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-              <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
-            </a>
-          </li>
-        %endif
-
-        <li data-bind="visible: columns().length != 0">
-          <a class="pointer" data-toggle="modal" data-target="#settingsDemiModal">
-            <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
-          </a>
-        </li>
-        <li data-bind="visible: columns().length != 0">
-          <a class="pointer" data-toggle="modal" data-target="#qdefinitionsDemiModal">
-            <i class="fa fa-fw fa-bookmark-o"></i> ${ _('Saved Queries') }
-          </a>
-        </li>
-        <li data-bind="visible: columns().length != 0" class="divider"></li>
-        <li>
-          <a href="javascript:void(0)" data-bind="click: newSearch">
-            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
-          </a>
-        </li>
-        <!-- ko if: IS_HUE_4 -->
-        <li>
-          <a href="/home/?type=search-dashboard">
-            <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
-          </a>
-        </li>
+    <div class="search-bar-middle">
+      <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0">
+        ${ _('Select one') }
+        <!-- ko if: $root.initial.engines().length > 1 -->
+        <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
         <!-- /ko -->
-        <!-- ko ifnot: IS_HUE_4 -->
-        <li>
-          <a href="${ url('dashboard:admin_collections') }">
-            <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
-          </a>
-        </li>
+        <!-- ko ifnot: $root.initial.engines().length > 1 -->
+        ${_('index')}
         <!-- /ko -->
-      </ul>
-    </div>
 
-  </div>
-
-  <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0">
-    ${ _('Select one') }
-    <!-- ko if: $root.initial.engines().length > 1 -->
-      <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
-    <!-- /ko -->
-    <!-- ko ifnot: $root.initial.engines().length > 1 -->
-      ${_('index')}
-    <!-- /ko -->
-
-    <!-- ko if: $root.collection.engine() == 'solr' -->
-      <!-- ko if: columns().length == 0 -->
-      <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections"></select>
+        <!-- ko if: $root.collection.engine() == 'solr' -->
+        <!-- ko if: columns().length == 0 -->
+        <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections"></select>
 
         <label class="checkbox" style="display:inline-block; margin-left: 10px">
           <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
         </label>
-      <!-- /ko -->
-    <!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
 
-    <!-- ko if: $root.collection.engine() != 'solr' -->
-      <!-- ko if: columns().length == 0 -->
+        <!-- ko if: $root.collection.engine() != 'solr' -->
+        <!-- ko if: columns().length == 0 -->
         <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }">
-      <!-- /ko -->
-    <!-- /ko -->
-
-    <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
-    <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
-    <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
-
-    <!-- ko if: $root.collection.engine() == 'solr' -->
-      <span data-bind="template: {name: 'nested-document-filter'}"></span>
-    <!-- /ko -->
-  </form>
-
-  <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
-    <div class="input-append">
-      <div class="selectMask">
-        <span
-            data-bind="editable: collection.label, editableOptions: {enabled: $root.isEditing(), placement: 'right'}">
-        </span>
-      </div>
-
-      <span data-bind="foreach: query.qs">
-        <input data-bind="clearable: q, valueUpdate:'afterkeydown', autogrowInput: { minWidth: $root.query.qs().length > 1 ? 90 : 206, maxWidth: 270, comfortZone: 15 }, typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
-        <!-- ko if: $index() >= 1 -->
-        <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
-      </span>
-      <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ, css: { 'flat-left': $root.query.qs().length === 1}, style: { 'margin-left': $root.query.qs().length > 1 ? '10px' : '0' }, visible: ! collection.supportAnalytics()">
-        <i class="fa fa-plus"></i>
-      </a>
-
-      <button type="submit" id="search-btn" class="btn btn-primary disable-feedback" style="margin-left:10px; margin-right:10px">
-        <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
-        <i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i>
-        <!-- ko if: $root.collection.async() -->
-          <i class="fa fa-stop" clas="red" data-bind="click: cancelAsync, visible: isRetrievingResults()"></i>
         <!-- /ko -->
-      </button>
 
+        <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
+        <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
+        <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
+
+        <!-- ko if: $root.collection.engine() == 'solr' -->
+        <span data-bind="template: {name: 'nested-document-filter'}"></span>
+        <!-- /ko -->
+      </form>
+
+      <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
+        <div class="search-bar-query-container">
+          <div class="search-bar-collection">
+            <div class="selectMask">
+              <span data-bind="editable: collection.label, editableOptions: { enabled: $root.isEditing(), placement: 'right' }"></span>
+            </div>
+          </div>
+          <div class="search-bar-query" data-bind="foreach: query.qs">
+
+            <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
+            <!-- ko if: $index() >= 1 -->
+              <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
+            <!-- /ko -->
+          </div>
+          <div class="search-bar-query-operations">
+            <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ, css: { 'flat-left': $root.query.qs().length === 1}, style: { 'margin-left': $root.query.qs().length > 1 ? '10px' : '0' }, visible: ! collection.supportAnalytics()">
+              <i class="fa fa-plus"></i>
+            </a>
+
+            <button type="submit" id="search-btn" class="btn btn-primary disable-feedback" style="margin-left:10px; margin-right:10px">
+              <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
+              <i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i>
+              <!-- ko if: $root.collection.async() -->
+              <i class="fa fa-stop" clas="red" data-bind="click: cancelAsync, visible: isRetrievingResults()"></i>
+              <!-- /ko -->
+            </button>
+            <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
+            <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
+
+            <span data-bind="template: {name: 'nested-document-filter'}"></span>
+          </div>
+        </div>
+      </form>
     </div>
-    <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
-    <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
 
-    <span data-bind="template: {name: 'nested-document-filter'}"></span>
-  </form>
+    <div class="search-bar-operations">
+      <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+        <i class="fa fa-pencil"></i>
+      </a>
+      % if is_owner:
+        <a class="btn pointer" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}, visible: columns().length != 0">
+          <i class="fa fa-save"></i>
+        </a>
+      % endif
+
+      <div class="dropdown pull-right margin-left-10">
+        <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+          <i class="fa fa-fw fa-ellipsis-v"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li data-bind="visible: isSaved()">
+            <a class="share-link" data-bind="click: prepareShareModal, css: {'isShared': isShared()}">
+              <i class="fa fa-fw fa-users"></i> ${ _('Share') }
+            </a>
+          </li>
+          %if not is_embeddable:
+            <li>
+              <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
+                <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
+              </a>
+            </li>
+          %endif
+
+          <li data-bind="visible: columns().length != 0">
+            <a class="pointer" data-toggle="modal" data-target="#settingsDemiModal">
+              <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
+            </a>
+          </li>
+          <li data-bind="visible: columns().length != 0">
+            <a class="pointer" data-toggle="modal" data-target="#qdefinitionsDemiModal">
+              <i class="fa fa-fw fa-bookmark-o"></i> ${ _('Saved Queries') }
+            </a>
+          </li>
+          <li data-bind="visible: columns().length != 0" class="divider"></li>
+          <li>
+            <a href="javascript:void(0)" data-bind="click: newSearch">
+              <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+            </a>
+          </li>
+          <!-- ko if: IS_HUE_4 -->
+          <li>
+            <a href="/home/?type=search-dashboard">
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
+            </a>
+          </li>
+          <!-- /ko -->
+          <!-- ko ifnot: IS_HUE_4 -->
+          <li>
+            <a href="${ url('dashboard:admin_collections') }">
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
+            </a>
+          </li>
+          <!-- /ko -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
 </div>
 %endif
 
