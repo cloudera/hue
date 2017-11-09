@@ -872,21 +872,17 @@ a:visited {
 /* TODO: Positioning and clean-up */
 .context-panel {
   position: fixed;
+  display: none;
   background: @cui-white;
-  height: calc(40%);
   top: 113px;
   z-index: 401;
-  overflow-y: auto;
-  padding: 10px 0;
-  width: 420px;
-  right: -440px;
   outline: none !important;
-  .hue-box-shadow(-2px, 2px);
-  .hue-ease-transition(right);
-}
+  .hue-box-shadow-bottom;
 
-.context-panel.visible {
-  right: 0;
+  .context-panel-content {
+    height: calc(40%);
+    overflow-y: auto;
+  }
 }
 
 .context-panel .nav-tabs {
