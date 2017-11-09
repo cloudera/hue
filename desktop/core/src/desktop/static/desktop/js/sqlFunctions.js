@@ -142,11 +142,6 @@ var SqlSetOptions = (function () {
   var SET_OPTIONS = {
     hive: {},
     impala: {
-      'ABORT_ON_DEFAULT_LIMIT_EXCEEDED': {
-        description: 'When this option is enabled, Impala cancels a query immediately when any of the nodes encounters an error, rather than continuing and possibly returning incomplete results. This option is disabled by default, to help gather maximum diagnostic information when an error occurs, for example, whether the same problem occurred on all nodes or only a single node. Currently, the errors that Impala can skip over involve data corruption, such as a column that contains a string value when expected to contain an integer value.\n\nTo control how much logging Impala does for non-fatal errors when ABORT_ON_ERROR is turned off, use the MAX_ERRORS option.',
-        type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
-        default: 'false (shown as 0 in output of SET statement)'
-      },
       'APPX_COUNT_DISTINCT': {
         description: 'Allows multiple COUNT(DISTINCT) operations within a single query, by internally rewriting each COUNT(DISTINCT) to use the NDV() function. The resulting count is approximate rather than precise.',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
@@ -332,11 +327,6 @@ var SqlSetOptions = (function () {
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
         default: 'true (shown as 1 in output of SET statement)'
       },
-      'SCAN_NODE_CODEGEN_THRESHOLD': {
-        description: 'The SCAN_NODE_CODEGEN_THRESHOLD query option adjusts the aggressiveness of the code generation optimization process when performing I/O read operations. It can help to work around performance problems for queries where the table is small and the WHERE clause is complicated.',
-        type: 'Integer',
-        default: '1800000 (1.8 million)'
-      },
       'SCHEDULE_RANDOM_REPLICA': {
         description: 'The SCHEDULE_RANDOM_REPLICA query option fine-tunes the algorithm for deciding which host processes each HDFS data block. It only applies to tables and partitions that are not enabled for the HDFS caching feature.',
         type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
@@ -346,11 +336,6 @@ var SqlSetOptions = (function () {
         description: 'Specifies the maximum amount of disk storage, in bytes, that any Impala query can consume on any host using the "spill to disk" mechanism that handles queries that exceed the memory limit.',
         type: 'Numeric, with optional unit specifier',
         default: '-1 (amount of spill space is unlimited)'
-      },
-      'SUPPORT_START_OVER': {
-        description: 'Leave this setting at its default value. It is a read-only setting, tested by some client applications such as Hue.\n\nIf you accidentally change it through impala-shell, subsequent queries encounter errors until you undo the change by issuing UNSET support_start_over.',
-        type: 'Boolean; recognized values are 1 and 0, or true and false; any other value interpreted as false',
-        default: 'false (shown as 0 in output of SET statement)'
       },
       'SYNC_DDL': {
         description: 'When enabled, causes any DDL operation such as CREATE TABLE or ALTER TABLE to return only when the changes have been propagated to all other Impala nodes in the cluster by the Impala catalog service. That way, if you issue a subsequent CONNECT statement in impala-shell to connect to a different node in the cluster, you can be sure that other node will already recognize any added or changed tables. (The catalog service automatically broadcasts the DDL changes to all nodes automatically, but without this option there could be a period of inconsistency if you quickly switched to another node, such as by issuing a subsequent query through a load-balancing proxy.)',
