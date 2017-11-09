@@ -105,7 +105,8 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
           </div>
           <div class="search-bar-query" data-bind="foreach: query.qs">
 
-            <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
+            <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: q, autocomplete: { type: 'solrQuery', support: { fields: ko.observableArray() } }, singleLine: true } }"></div>
+##             <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
             <!-- ko if: $index() >= 1 -->
               <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
             <!-- /ko -->
