@@ -110,7 +110,7 @@ var AssistDbSource = (function () {
 
     self.selectedDatabase.subscribe(function () {
       var db = self.selectedDatabase();
-      if (HAS_OPTIMIZER && db && !db.popularityIndexSet) {
+      if (HAS_OPTIMIZER && db && !db.popularityIndexSet && self.sourceType !== 'solr') {
         self.apiHelper.fetchNavOptTopTables({
           sourceType: self.sourceType,
           database: db.definition.name,
