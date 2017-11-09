@@ -1198,7 +1198,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="workflow-page-xml${ SUFFIX }">
-          <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+          <div data-bind="readOnlyAce: properties['xml'], path: 'xml', type: 'xml'"></div>
         </div>
       </div>
     </div>
@@ -1280,7 +1280,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="workflow-action-page-xml${ SUFFIX }">
-          <div data-bind="readonlyXML: properties['conf']"></div>
+          <div data-bind="readOnlyAce: properties['conf'], type: 'xml'"></div>
         </div>
 
       </div>
@@ -1408,7 +1408,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="schedule-page-xml${ SUFFIX }">
-          <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+          <div data-bind="readOnlyAce: properties['xml'], path: 'xml', type: 'xml'"></div>
         </div>
       </div>
     </div>
@@ -1516,7 +1516,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="bundle-page-xml${ SUFFIX }">
-          <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+          <div data-bind="readOnlyAce: properties['xml'], path: 'xml', type: 'xml'"></div>
         </div>
       </div>
     </div>

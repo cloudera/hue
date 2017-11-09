@@ -6085,7 +6085,7 @@
     }
   };
 
-  ko.bindingHandlers.readonlyXML = {
+  ko.bindingHandlers.readOnlyAce = {
     init: function (element, valueAccessor, allBindingsAccessor) {
       $(element).css({
         'min-height': '250px'
@@ -6096,12 +6096,12 @@
         maxLines: Infinity
       });
       editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
-      editor.getSession().setMode("ace/mode/xml");
       $(element).data('aceEditor', editor);
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
       var value = ko.unwrap(valueAccessor());
       var options = ko.unwrap(allBindingsAccessor());
+      $(element).data('aceEditor').getSession().setMode("ace/mode/" + options.type || 'xml'); // e.g. xml, json...
       if (typeof value !== 'undefined' && value !== '') { // allows highlighting static code
         if (options.path) {
           value = value[options.path];
