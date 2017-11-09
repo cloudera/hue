@@ -1050,6 +1050,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return self.currentPath().toLowerCase().indexOf('s3a://') === 0;
       });
 
+      self.isAdls = ko.pureComputed(function () {
+        return self.currentPath().toLowerCase().indexOf('adl:/') === 0;
+      });
+
       self.scheme = ko.pureComputed(function () {
         var path = self.currentPath();
         return path.substring(0, path.indexOf(':/')) || "hdfs";
@@ -1092,7 +1096,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return currentPath.indexOf('/') === 0 || currentPath.indexOf('hdfs') === 0
       });
       self.isCompressEnabled = ko.pureComputed(function () {
-        return !self.isS3();
+        return !self.isS3() && !self.isAdls();
       });
       self.isSummaryEnabled = ko.pureComputed(function () {
         return self.isHdfs();
