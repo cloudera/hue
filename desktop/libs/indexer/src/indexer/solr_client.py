@@ -199,6 +199,10 @@ class SolrClient(object):
     return self.api.select(collection, rows=min(rows, 1000))
 
 
+  def get_config(self, collection):
+    return self.api.config(collection)
+
+
   def list_configs(self):
     return self.api.configs()
 
@@ -260,6 +264,7 @@ class SolrClient(object):
     return _ZOOKEEPER_HOST
 
 
+  # Deprecated
   def _create_cloud_config(self, name, fields, unique_key_field, df):
     with ZookeeperClient(hosts=self.get_zookeeper_host(), read_only=False) as zc:
       tmp_path, solr_config_path = copy_configs(
@@ -287,6 +292,7 @@ class SolrClient(object):
         shutil.rmtree(tmp_path)
 
 
+  # Deprecated
   def _create_non_solr_cloud_index(self, name, fields, unique_key_field, df):
     # Create instance directory locally.
     instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)

@@ -178,6 +178,21 @@ def sample_index(request):
 
 @require_POST
 @api_error_handler
+def config_index(request):
+  response = {'status': -1}
+
+  name = request.POST.get('name')
+
+  client = SolrClient(user=request.user)
+
+  response['config'] = client.get_config(name)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@api_error_handler
 def list_configs(request):
   response = {'status': -1}
 
