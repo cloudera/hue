@@ -423,7 +423,7 @@ var AssistDbEntry = (function () {
       loadEntriesDeferred.resolve([]);
     };
 
-    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && self.definition.isTable) {
+    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && self.definition.isTable && self.assistDbSource.sourceType !== 'solr') {
       self.assistDbSource.apiHelper.fetchNavOptTopColumns({
         sourceType: self.assistDbSource.sourceType,
         successCallback: function (data) {
