@@ -24,7 +24,6 @@
 [/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]            { /* skip comments */ }
 
 '\u2020'                                       { parser.yy.cursorFound = yylloc; return 'CURSOR'; }
-'\u2021'                                       { parser.yy.cursorFound = yylloc; return 'PARTIAL_CURSOR'; }
 
 'AND'                                          { return 'AND'; }
 '&&'                                           { return 'AND'; }
@@ -63,7 +62,7 @@
 \'                                             { this.begin('singleQuotedValue'); return 'SINGLE_QUOTE'; }
 <singleQuotedValue>(?:\\[']|[^'])+             {
                                                  if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '\'')) {
-                                                   yytext = yytext.replace(/[\u2020\u2021].*/, '');
+                                                   yytext = yytext.replace(/[\u2020].*/, '');
                                                    return 'PARTIAL_VALUE';
                                                  }
                                                  return 'VALUE';
@@ -73,21 +72,21 @@
 \"                                             { this.begin('doubleQuotedValue'); return 'DOUBLE_QUOTE'; }
 <doubleQuotedValue>(?:\\["]|[^"])+             {
                                                  if (parser.handleQuotedValueWithCursor(this, yytext, yylloc, '"')) {
-                                                   yytext = yytext.replace(/[\u2020\u2021].*/, '');
+                                                   yytext = yytext.replace(/[\u2020].*/, '');
                                                    return 'PARTIAL_VALUE';
                                                  }
                                                  return 'VALUE';
                                                }
 <doubleQuotedValue>\"                          { this.popState(); return 'DOUBLE_QUOTE'; }
 
-[^\s\u3000!():"'^+\-!\[\]{}~*?/\u2020\u2021]+  { return 'TERM'; }
+[^\s\u3000!():"'^+\-!\[\]{}~*?/\u2020]+        { return 'TERM'; }
 
 <<EOF>>                                        { return 'EOF'; }
 
 /lex
 
 %left 'AND' 'OR' '&&' '||' BooleanOperator
-%left 'CURSOR' 'PARTIAL_CURSOR' AnyCursor       // Cursor precedence needed to not conflict with operators i.e. x 'CURSOR' y vs. x 'AND' y
+%left 'CURSOR'  // Cursor precedence needed to not conflict with operators i.e. x 'CURSOR' y vs. x 'AND' y
 
 %start SolrQueryAutocomplete
 
@@ -102,15 +101,15 @@ SolrQueryAutocomplete
    {
      return $1;
    }
- | AnyCursor 'EOF'
+ | 'CURSOR' 'EOF'
    {
-     return { suggestFields: {} }
+     return { suggestFields: { appendColon: true } }
    }
  ;
 
 SolrQuery
  : NonParenthesizedSolrQuery
- | '(' NonParenthesizedSolrQuery ')'
+ | '(' NonParenthesizedSolrQuery ')'                           --> $2
  ;
 
 SolrQuery_EDIT
@@ -121,12 +120,11 @@ SolrQuery_EDIT
 NonParenthesizedSolrQuery
  : 'NUMBER'
  | 'TERM'
- | KeywordMatch
+ | KeywordMatch                                                --> { hasKeywordMatch: true }
  ;
 
 NonParenthesizedSolrQuery_EDIT
- : 'TERM' 'PARTIAL_CURSOR'                                     --> { suggestFields: { startsWith: $1 }, suggestValues: { field: $1, prependColon: true }, suggestKeywords: [':'] }
- | KeywordMatch_EDIT
+ : KeywordMatch_EDIT
  ;
 
 NonParenthesizedSolrQuery
@@ -134,14 +132,28 @@ NonParenthesizedSolrQuery
  ;
 
 NonParenthesizedSolrQuery_EDIT
- : SolrQuery 'CURSOR'                                          --> { suggestKeywords: ['AND', 'OR', '&&', '||'] }
- | SolrQuery 'CURSOR' SolrQuery                                --> { suggestKeywords: ['AND', 'OR', '&&', '||'] }
- | 'CURSOR' SolrQuery                                          --> { suggestFields: {} }
+ : SolrQuery 'CURSOR'
+   {
+     if ($1.hasKeywordMatch) {
+       $$ = { suggestKeywords: ['AND', 'OR'] };
+     } else {
+       $$ = { suggestKeywords: ['AND', 'OR', ':'], suggestValues: { field: $1, prependColon: true } };
+     }
+   }
+ | SolrQuery 'CURSOR' SolrQuery
+   {
+     if ($1.hasKeywordMatch) {
+       $$ = { suggestKeywords: ['AND', 'OR'] };
+     } else {
+       $$ = { suggestKeywords: ['AND', 'OR', ':'], suggestValues: { field: $1, prependColon: true } };
+     }
+   }
+ | 'CURSOR' SolrQuery                                          --> { suggestFields: { appendColon: true } }
  ;
 
 NonParenthesizedSolrQuery_EDIT
- : SolrQuery BooleanOperator 'CURSOR'                         --> { suggestFields: {} }
- | 'CURSOR' BooleanOperator SolrQuery                         --> { suggestFields: {} }
+ : SolrQuery BooleanOperator 'CURSOR'                          --> { suggestFields: { appendColon: true } }
+ | 'CURSOR' BooleanOperator SolrQuery                          --> { suggestFields: { appendColon: true } }
  | SolrQuery BooleanOperator SolrQuery_EDIT                    --> $3
  | SolrQuery_EDIT BooleanOperator SolrQuery                    --> $1
  ;
@@ -152,25 +164,24 @@ KeywordMatch
  ;
 
 KeywordMatch_EDIT
- : 'TERM' ':' AnyCursor                                        --> { suggestValues: { field: $1 } }
- | 'TERM' ':' 'TERM' 'PARTIAL_CURSOR'                          --> { suggestValues: { field: $1, startsWith: $3 } }
- | 'TERM' ':' QuotedValue_EDIT                                 --> { suggestValues: { field: $1, startsWith: $3 } }
+ : 'TERM' ':' 'CURSOR'                                         --> { suggestValues: { field: $1 } }
+ | 'TERM' ':' QuotedValue_EDIT                                 --> { suggestValues: { field: $1 } }
  ;
 
 // ======= Common constructs =======
-AnyCursor
-: 'CURSOR' | 'PARTIAL_CURSOR';
 
 BooleanOperator
-: 'AND' | 'OR' | '&&' | '||';
+ : 'AND' | 'OR' | '&&' | '||';
 
 QuotedValue
-: 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE' | 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE';
+ : 'SINGLE_QUOTE' 'VALUE' 'SINGLE_QUOTE'                       --> $2
+ | 'DOUBLE_QUOTE' 'VALUE' 'DOUBLE_QUOTE'                       --> $2
+ ;
 
 QuotedValue_EDIT
-: 'SINGLE_QUOTE' 'PARTIAL_VALUE'                               --> $2
-| 'DOUBLE_QUOTE' 'PARTIAL_VALUE'                               --> $2
-;
+ : 'SINGLE_QUOTE' 'PARTIAL_VALUE'                              --> $2
+ | 'DOUBLE_QUOTE' 'PARTIAL_VALUE'                              --> $2
+ ;
 
 RightParenthesisOrError: ')' | error;
 %%
@@ -182,15 +193,14 @@ parser.addFieldLocation = function (location, name) {
 }
 
 parser.identifyPartials = function (beforeCursor, afterCursor) {
-  var beforeMatch = beforeCursor.match(/[^()-*+/,\s]*$/);
-  var afterMatch = afterCursor.match(/^[^()-*+/,\s]*/);
+  var beforeMatch = beforeCursor.match(/[^()-*+/,:\s]*$/);
+  var afterMatch = afterCursor.match(/^[^()-*+/,:\s]*/);
   return { left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0 };
 };
 
 parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
-  if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
-    parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
-    var cursorIndex = parser.yy.partialCursor ? yytext.indexOf('\u2021') : yytext.indexOf('\u2020');
+  if (yytext.indexOf('\u2020') !== -1) {
+    var cursorIndex = yytext.indexOf('\u2020');
     parser.yy.cursorFound = {
       first_line: yylloc.first_line,
       last_line: yylloc.last_line,
@@ -242,12 +252,8 @@ parser.autocompleteSolrQuery = function (beforeCursor, afterCursor, debug) {
 
   parser.yy.partialCursor = parser.yy.partialLengths.left > 0;
 
-
-  var cursorChar = parser.yy.partialCursor ? '\u2021' : '\u2020';
-
-  // TODO: Remove left adjust if no need for it
-  if (parser.yy.partialCursor) {
-    parser.yy.partialLengths.left = 0;
+  if (parser.yy.partialLengths.left > 0) {
+    beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
   }
 
   if (parser.yy.partialLengths.right > 0) {
@@ -256,7 +262,7 @@ parser.autocompleteSolrQuery = function (beforeCursor, afterCursor, debug) {
 
   var result;
   try {
-    result = parser.parse(beforeCursor + cursorChar + afterCursor);
+    result = parser.parse(beforeCursor + '\u2020' + afterCursor);
   } catch (err) {
     // Workaround for too many missing parentheses (it's the only error we handle in the parser)
     if (err && err.toString().indexOf('Parsing halted while starting to recover from another error') !== -1) {
@@ -268,13 +274,13 @@ parser.autocompleteSolrQuery = function (beforeCursor, afterCursor, debug) {
         rightCount++;
       }
       try {
-        result = parser.parse(beforeCursor + cursorChar + parenthesisPad);
+        result = parser.parse(beforeCursor + '\u2020' + parenthesisPad);
       } catch (err) {
         return { locations: parser.yy.locations }
       }
     } else {
       if (debug) {
-        console.log(beforeCursor + cursorChar + afterCursor);
+        console.log(beforeCursor + '\u2020' + afterCursor);
         console.log(err);
         console.error(err.stack);
       }
