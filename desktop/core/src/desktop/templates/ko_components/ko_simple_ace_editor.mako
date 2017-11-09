@@ -42,6 +42,16 @@ from desktop.views import _ko
     (function () {
       var normalizedColors = HueColors.getNormalizedColors();
 
+      // TODO: Autocomplete colors should be global
+      var COLORS = {
+        ALL: HueColors.BLUE,
+        FIELD: normalizedColors['green'][2],
+        FUNCTION: normalizedColors['purple-gray'][3],
+        KEYWORD: normalizedColors['blue'][4]
+      };
+
+      var DEFAULT_POPULAR = ko.observable(false);
+
       var SolrFormulaAutocompleter = (function () {
         var SOLR_FUNCTIONS = {
           abs: {
@@ -455,12 +465,6 @@ from desktop.views import _ko
           }
         };
 
-        var COLORS = {
-          ALL: HueColors.BLUE,
-          FIELD: normalizedColors['green'][2],
-          FUNCTION: normalizedColors['purple-gray'][3]
-        };
-
         var CATEGORIES = {
           ALL: { id: 'all', color: COLORS.ALL, label: AutocompleterGlobals.i18n.category.all },
           FIELD: { id: 'field', weight: 1000, color: COLORS.FIELD, label: AutocompleterGlobals.i18n.category.field, detailsTemplate: 'solr-field' },
@@ -567,8 +571,100 @@ from desktop.views import _ko
         return SolrFormulaAutocompleter;
       })();
 
+      var SolrQueryAutocompleter = (function () {
+
+        var CATEGORIES = {
+          ALL: { id: 'all', color: COLORS.ALL, label: AutocompleterGlobals.i18n.category.all },
+          FIELD: { id: 'field', weight: 1000, color: COLORS.FIELD, label: AutocompleterGlobals.i18n.category.field, detailsTemplate: 'solr-field' },
+          KEYWORD: { id: 'keyword', weight: 0, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' }
+        };
+
+        var SolrQuerySuggestions = function (fieldAccessor) {
+          var self = this;
+          self.entries = ko.observableArray();
+          self.fieldAccessor = fieldAccessor;
+
+          self.filtered = ko.pureComputed(function () {
+            var result = self.entries();
+
+            if (self.filter()) {
+              result = SqlUtils.autocompleteFilter(self.filter(), result);
+              huePubSub.publish('hue.ace.autocompleter.match.updated');
+            }
+
+            SqlUtils.sortSuggestions(result, self.filter(), self.sortOverride);
+
+            return result;
+          });
+
+          self.availableCategories = ko.pureComputed(function () {
+            // TODO: Implement autocomplete logic
+            return [CATEGORIES.ALL];
+          });
+
+          self.loading = ko.observable(false);
+          self.filter = ko.observable();
+          self.cancelRequests = function () {};
+        };
+
+        SolrQuerySuggestions.prototype.update = function (parseResult) {
+          var self = this;
+          var syncEntries = [];
+
+          if (parseResult.suggestFields) {
+            self.fieldAccessor().forEach(function (field) {
+              syncEntries.push({
+                category: CATEGORIES.FIELD,
+                value: field.name(),
+                meta: field.type(),
+                weightAdjust: 0,
+                popular: DEFAULT_POPULAR,
+                details: field
+              })
+            });
+          }
+
+          if (parseResult.suggestKeywords) {
+            parseResult.suggestKeywords.forEach(function (keyword) {
+              syncEntries.push({
+                category: CATEGORIES.KEYWORD,
+                value: keyword,
+                meta: AutocompleterGlobals.i18n.meta.keyword,
+                weightAdjust: 0,
+                popular: DEFAULT_POPULAR,
+                details: null
+              })
+            });
+          }
+
+          self.entries(syncEntries);
+        };
+
+        /**
+         * @param {Object} options
+         * @param {Ace} options.editor
+         * @param {Object} options.support
+         * @param {function} options.support.fields - The observable/function containing the fields
+         * @constructor
+         */
+        var SolrQueryAutocompleter = function (options) {
+          var self = this;
+          self.editor = options.editor;
+          self.suggestions = new SolrQuerySuggestions(options.support.fields);
+        };
+
+        SolrQueryAutocompleter.prototype.autocomplete = function () {
+          var self = this;
+          var parseResult = solrQueryParser.autocompleteSolrQuery(self.editor.getTextBeforeCursor(), self.editor.getTextAfterCursor());
+          self.suggestions.update(parseResult);
+        };
+
+        return SolrQueryAutocompleter;
+      })();
+
       var AVAILABLE_AUTOCOMPLETERS = {
-        'solrFormula': SolrFormulaAutocompleter
+        'solrFormula': SolrFormulaAutocompleter,
+        'solrQuery':  SolrQueryAutocompleter
       };
 
       var SimpleAceEditor = function (params, element) {
