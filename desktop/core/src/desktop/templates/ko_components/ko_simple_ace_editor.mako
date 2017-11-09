@@ -47,7 +47,8 @@ from desktop.views import _ko
         ALL: HueColors.BLUE,
         FIELD: normalizedColors['green'][2],
         FUNCTION: normalizedColors['purple-gray'][3],
-        KEYWORD: normalizedColors['blue'][4]
+        KEYWORD: normalizedColors['blue'][4],
+        SAMPLE: normalizedColors['purple'][5]
       };
 
       var DEFAULT_POPULAR = ko.observable(false);
@@ -573,16 +574,20 @@ from desktop.views import _ko
 
       var SolrQueryAutocompleter = (function () {
 
+        var SAMPLE_LIMIT = 100;
+
         var CATEGORIES = {
           ALL: { id: 'all', color: COLORS.ALL, label: AutocompleterGlobals.i18n.category.all },
           FIELD: { id: 'field', weight: 1000, color: COLORS.FIELD, label: AutocompleterGlobals.i18n.category.field, detailsTemplate: 'solr-field' },
-          KEYWORD: { id: 'keyword', weight: 0, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' }
+          KEYWORD: { id: 'keyword', weight: 0, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
+          SAMPLE: { id: 'sample', weight: 900, color: COLORS.SAMPLE, label: AutocompleterGlobals.i18n.category.sample, detailsTemplate: 'value' }
         };
 
-        var SolrQuerySuggestions = function (fieldAccessor) {
+        var SolrQuerySuggestions = function (collection) {
           var self = this;
           self.entries = ko.observableArray();
-          self.fieldAccessor = fieldAccessor;
+          self.collection = collection;
+          self.apiHelper = ApiHelper.getInstance();
 
           self.filtered = ko.pureComputed(function () {
             var result = self.entries();
@@ -612,10 +617,10 @@ from desktop.views import _ko
           var syncEntries = [];
 
           if (parseResult.suggestFields) {
-            self.fieldAccessor().forEach(function (field) {
+            self.collection.template.fieldsAttributes().forEach(function (field) {
               syncEntries.push({
                 category: CATEGORIES.FIELD,
-                value: field.name(),
+                value: field.name() + (parseResult.suggestFields.appendColon ? ':' : ''),
                 meta: field.type(),
                 weightAdjust: 0,
                 popular: DEFAULT_POPULAR,
@@ -638,6 +643,45 @@ from desktop.views import _ko
           }
 
           self.entries(syncEntries);
+
+          if (parseResult.suggestValues) {
+            var fieldName = parseResult.suggestValues.field;
+            console.log(parseResult.suggestValues.quotePresent);
+            var hasField = self.collection.template.fieldsAttributes().some(function (field) {
+              return field.name() === fieldName;
+            });
+            if (hasField) {
+              self.loading(true);
+              self.apiHelper.fetchSamples({
+                defaultDatabase: self.collection.name(),
+                identifierChain: [{ name: self.collection.name() }, { name: fieldName }],
+                sourceType: 'solr',
+                silenceErrors: true,
+                successCallback: function (result) {
+                  if (result && result.status === 0 && result.rows && result.rows.length > 0) {
+                    var sampleSuggestions = [];
+                    for (var i = 0; i < Math.min(SAMPLE_LIMIT, result.rows.length); i++) {
+                      var shouldQuote = !parseResult.suggestValues.quotePresent && /[\s\u3000!():"'^+\-\[\]{}~*?/]/.test(sampleValue);
+                      var sampleValue = result.rows[i][0];
+                      sampleSuggestions.push({
+                        value: shouldQuote ? '"' + sampleValue + '"' : sampleValue,
+                        meta: AutocompleterGlobals.i18n.meta.sample,
+                        category: CATEGORIES.SAMPLE,
+                        popular: DEFAULT_POPULAR,
+                        details: null
+                      })
+
+                    }
+                    self.entries(self.entries().concat(sampleSuggestions));
+                  }
+                  self.loading(false);
+                },
+                errorCallback: function () {
+                  self.loading(false);
+                }
+              })
+            }
+          }
         };
 
         /**
@@ -645,12 +689,13 @@ from desktop.views import _ko
          * @param {Ace} options.editor
          * @param {Object} options.support
          * @param {function} options.support.fields - The observable/function containing the fields
+         * @param {function} options.support.collection - The observable/function containing the active collection
          * @constructor
          */
         var SolrQueryAutocompleter = function (options) {
           var self = this;
           self.editor = options.editor;
-          self.suggestions = new SolrQuerySuggestions(options.support.fields);
+          self.suggestions = new SolrQuerySuggestions(options.support.collection);
         };
 
         SolrQueryAutocompleter.prototype.autocomplete = function () {
@@ -760,11 +805,20 @@ from desktop.views import _ko
           editor.useHueAutocompleter = true;
 
           var afterExecListener = editor.commands.on('afterExec', function (e) {
-            if (e.command.name === "insertstring" && /\S+\(\)$/.test(e.args)) {
-              editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - 1);
-              window.setTimeout(function () {
-                editor.execCommand("startAutocomplete");
-              }, 1);
+            if (e.command.name === 'insertstring') {
+              var triggerAutocomplete = false;
+              if (/\S+\(\)$/.test(e.args)) {
+                editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - 1);
+                triggerAutocomplete = true;
+              } else if (params.autocomplete.type === 'solrQuery' && /:$/.test(e.args)) {
+                triggerAutocomplete = true;
+              }
+
+              if (triggerAutocomplete) {
+                window.setTimeout(function () {
+                  editor.execCommand("startAutocomplete");
+                }, 1);
+              }
             }
           });
 
