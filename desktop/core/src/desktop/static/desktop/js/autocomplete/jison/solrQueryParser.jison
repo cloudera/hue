@@ -79,7 +79,7 @@
                                                }
 <doubleQuotedValue>\"                          { this.popState(); return 'DOUBLE_QUOTE'; }
 
-[^\s\u3000!():"'^+\-!\[\]{}~*?/\u2020]+        { return 'TERM'; }
+[^\s\u3000!():"'^+\-\[\]{}~*?/\u2020]+         { return 'TERM'; }
 
 <<EOF>>                                        { return 'EOF'; }
 
@@ -165,7 +165,7 @@ KeywordMatch
 
 KeywordMatch_EDIT
  : 'TERM' ':' 'CURSOR'                                         --> { suggestValues: { field: $1 } }
- | 'TERM' ':' QuotedValue_EDIT                                 --> { suggestValues: { field: $1 } }
+ | 'TERM' ':' QuotedValue_EDIT                                 --> { suggestValues: { field: $1, quotePresent: true } }
  ;
 
 // ======= Common constructs =======
@@ -193,8 +193,8 @@ parser.addFieldLocation = function (location, name) {
 }
 
 parser.identifyPartials = function (beforeCursor, afterCursor) {
-  var beforeMatch = beforeCursor.match(/[^()-*+/,:\s]*$/);
-  var afterMatch = afterCursor.match(/^[^()-*+/,:\s]*/);
+  var beforeMatch = beforeCursor.match(/[^()-*+/,:"'\s]*$/);
+  var afterMatch = afterCursor.match(/^[^()-*+/,:"'\s]*/);
   return { left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0 };
 };
 
