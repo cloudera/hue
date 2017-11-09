@@ -317,18 +317,18 @@ ${ assist.assistPanel() }
         <!-- ko template: { if: $root.tab() == 'index-sample', name: 'indexes-index-sample', data: sample(), full: true }--><!-- /ko -->
       <!-- /ko -->
       <!-- ko if: !sample() || sample().length === 0 -->
-      <div class="margin-top-10 margin-left-10">${ _('The index does not contain any data.')}</div>
+        <div class="margin-top-10 margin-left-10">${ _('The index does not contain any data.')}</div>
       <!-- /ko -->
     </div>
 
     <div class="tab-pane" id="index-config">
       <!-- ko hueSpinner: { spin: $root.index().loadingConfig, center: true, size: 'xlarge' } --><!-- /ko -->
 
-      <!-- ko if: config() && config().length > 0 -->
-        <span data-bind="text: ko.mapping.toJSON(config)"></span>
+      <!-- ko if: config() -->
+        <div data-bind="readOnlyAce: config, type: 'json'"></div>
       <!-- /ko -->
-      <!-- ko if: !config() || config().length === 0 -->
-      <div class="margin-top-10 margin-left-10">${ _('The config could not be retrieved.')}</div>
+      <!-- ko if: !config() -->
+        <div class="margin-top-10 margin-left-10">${ _('The config could not be retrieved.')}</div>
       <!-- /ko -->
     </div>
   </div>

@@ -185,7 +185,7 @@ def config_index(request):
 
   client = SolrClient(user=request.user)
 
-  response['config'] = client.get_config(name)
+  response['config'] = json.dumps(client.get_config(name), indent=2)
   response['status'] = 0
 
   return JsonResponse(response)
