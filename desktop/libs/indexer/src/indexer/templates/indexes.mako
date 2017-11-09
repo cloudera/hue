@@ -295,6 +295,7 @@ ${ assist.assistPanel() }
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')} (<span data-bind="text: sample().length"></span>)</a></li>
+    <li><a href="#index-config" data-toggle="tab" data-bind="click: function(){ if (!config()) { getConfig(); }; $root.tab('index-config'); }">${_('Config')}</a></li>
   </ul>
 
   <div class="tab-content" style="border: none; overflow: hidden">
@@ -317,6 +318,17 @@ ${ assist.assistPanel() }
       <!-- /ko -->
       <!-- ko if: !sample() || sample().length === 0 -->
       <div class="margin-top-10 margin-left-10">${ _('The index does not contain any data.')}</div>
+      <!-- /ko -->
+    </div>
+
+    <div class="tab-pane" id="index-config">
+      <!-- ko hueSpinner: { spin: $root.index().loadingConfig, center: true, size: 'xlarge' } --><!-- /ko -->
+
+      <!-- ko if: config() && config().length > 0 -->
+        <span data-bind="text: ko.mapping.toJSON(config)"></span>
+      <!-- /ko -->
+      <!-- ko if: !config() || config().length === 0 -->
+      <div class="margin-top-10 margin-left-10">${ _('The config could not be retrieved.')}</div>
       <!-- /ko -->
     </div>
   </div>
@@ -549,6 +561,7 @@ ${ assist.assistPanel() }
 
       self.dynamicFields = ko.mapping.fromJS(index.schema.dynamicFields);
       self.copyFields = ko.mapping.fromJS(index.schema.copyFields);
+      self.config = ko.observable('');
 
       self.sample = ko.observableArray();
       self.samplePreview = ko.pureComputed(function () {
@@ -556,6 +569,7 @@ ${ assist.assistPanel() }
       });
 
       self.loadingSample = ko.observable(false);
+      self.loadingConfig = ko.observable(false);
 
       self.getSample = function () {
         self.loadingSample(true);
@@ -572,6 +586,23 @@ ${ assist.assistPanel() }
           $(document).trigger("error", xhr.responseText);
         }).always(function () {
           self.loadingSample(false);
+        });
+      };
+
+      self.getConfig = function () {
+        self.loadingConfig(true);
+        $.post("${ url('indexer:config_index') }", {
+          name: self.name()
+        }, function (data) {
+          if (data.status == 0) {
+            self.config(data.config);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        }).always(function () {
+          self.loadingConfig(false);
         });
       };
 
