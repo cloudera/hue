@@ -57,13 +57,19 @@
 
     it('should suggest values for "field:"some Val|"', function () {
       testAutocomplete('field:"some Val', '', {
-        suggestValues: { field: 'field' }
+        suggestValues: { field: 'field', quotePresent: true }
+      });
+    });
+
+    fit('should suggest values for "field:"a|"', function () {
+      testAutocomplete('field:"a', '', {
+        suggestValues: { field: 'field', quotePresent: true }
       });
     });
 
     it('should suggest values for "field:"some Val| foo"', function () {
       testAutocomplete('field:"some Val', ' foo"', {
-        suggestValues: { field: 'field' }
+        suggestValues: { field: 'field', quotePresent: true }
       });
     });
 
