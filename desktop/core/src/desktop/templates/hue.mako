@@ -390,23 +390,22 @@ ${ hueIcons.symbols() }
       </div>
     </div>
 
-    <div class="context-panel" data-bind="css: { 'visible': contextPanelVisible }">
-      <a href="javascript: void(0);" class="inactive-action" style="position: absolute; left: 6px; top: 4px;" data-bind="click: function () { huePubSub.publish('context.panel.visible.editor', false); }"><i class="fa fa-chevron-right"></i></a>
-      <ul class="nav nav-tabs">
-        <!-- ko if: sessionsAvailable -->
-        <li class="active"><a href="#sessionsTab" data-toggle="tab" data-bind="visible: sessionsAvailable">${_('Sessions')}</a></li>
-        <!-- /ko -->
-      </ul>
-
-      <div class="tab-content">
-        <!-- ko if: sessionsAvailable() && templateApp() -->
-        <div class="tab-pane active" id="sessionsTab">
+    <div class="context-panel" data-bind="slideVisible: contextPanelVisible">
+      <div class="margin-top-10 padding-left-10 padding-right-10">
+        <h4 class="margin-bottom-30"><i class="fa fa-cogs"></i> ${_('Session')}</h4>
+        <div class="context-panel-content">
+          <!-- ko if: sessionsAvailable() && templateApp() -->
           <div class="row-fluid">
-            <div class="span12" data-bind="template: { name: 'notebook-session-config-template' + templateApp(), data: activeAppViewModel }"></div>
+            <div class="span11" data-bind="template: { name: 'notebook-session-config-template' + templateApp(), data: activeAppViewModel }"></div>
           </div>
+          <!-- /ko -->
+
+          <!-- ko ifnot: sessionsAvailable() && templateApp() -->
+          ${_('There are currently no information about the sessions.')}
+          <!-- /ko -->
         </div>
-        <!-- /ko -->
       </div>
+      <a class="pointer demi-modal-chevron" style="position: absolute; bottom: 0" data-bind="click: function () { huePubSub.publish('context.panel.visible.editor', false); }"><i class="fa fa-chevron-up"></i></a>
     </div>
   </div>
 </div>
@@ -1193,6 +1192,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         self.contextPanelVisible = ko.observable(false);
+        self.contextPanelVisible.subscribe(function () {
+          var $el = $('.snippet .ace-editor:visible');
+          if ($el.length === 0) {
+            $el = $('.content-panel:visible');
+          }
+          $('.context-panel').width($el.width()).css('left', $el.offset().left);
+        });
+
         self.sessionsAvailable = ko.observable(false);
 
         self.activeAppViewModel.subscribe(function (viewModel) {
