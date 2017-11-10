@@ -41,7 +41,7 @@ class ScheduleApi(Api):
 
   def apps(self, filters):
     oozie_api = get_oozie(self.user)
-    kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
+    kwargs = {'cnt': hasattr(OOZIE_JOBS_COUNT, 'get') and OOZIE_JOBS_COUNT.get(), 'filters': []}
 
     _filter_oozie_jobs(self.user, filters, kwargs)
 
