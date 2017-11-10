@@ -801,11 +801,11 @@ ${ assist.assistPanel() }
         huePubSub.publish('context.popover.show', {
           data: {
             type: 'collection',
-            definition: ko.mapping.toJS(field),
-            parent: {
-              definition: ko.mapping.toJS(self.index),
-              key: ko.observable(self.index().uniqueKey)
-            }
+            identifierChain: [
+              {}, // empty, needed by the context popover
+              ko.mapping.toJS(self.index),
+              ko.mapping.toJS(field)
+            ]
           },
           showInAssistEnabled: false,
           orientation: 'right',
