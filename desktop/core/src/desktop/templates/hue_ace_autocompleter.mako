@@ -389,7 +389,11 @@ from desktop.views import _ko
             self.detach();
           } else {
             changeTimeout = window.setTimeout(function () {
-              self.suggestions.filter(self.editor().session.getTextRange({ start: self.base, end: self.editor().getCursorPosition() }));
+              var pos = self.editor().getCursorPosition();
+              if (self.active() && self.autocompleter.onPartial) {
+                self.autocompleter.onPartial(aceUtil.retrievePrecedingIdentifier(self.editor().session.getLine(pos.row), pos.column));
+              }
+              self.suggestions.filter(self.editor().session.getTextRange({ start: self.base, end: pos }));
               if (self.suggestions.filtered().length === 0) {
                 self.detach();
               }
