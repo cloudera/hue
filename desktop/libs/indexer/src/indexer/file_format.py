@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib import i18n
 
 from indexer.argument import CheckboxArgument, TextDelimiterArgument
-from indexer.conf import ENABLE_NEW_INDEXER
+from indexer.conf import ENABLE_SCALABLE_INDEXER
 from indexer.fields import Field, guess_field_type_from_samples
 from indexer.indexers.morphline_operations import get_operator
 
@@ -40,7 +40,7 @@ IMPORT_PEEK_NLINES = 20
 def get_format_types():
   formats = [CSVFormat]
 
-  if ENABLE_NEW_INDEXER.get():
+  if ENABLE_SCALABLE_INDEXER.get():
     formats.extend([
       ApacheCombinedFormat,
       SyslogFormat,
