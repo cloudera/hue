@@ -2296,6 +2296,53 @@ from desktop.views import _ko
   </script>
 
   <script type="text/javascript">
+    var AssistantUtils = (function () {
+          return {
+            getFilteredTablesPureComputed: function (vm) {
+              var openedByFilter = [];
+              return ko.pureComputed(function () {
+                if (vm.filter == null || !vm.filter.querySpec() || ((!vm.filter.querySpec().facets || Object.keys(vm.filter.querySpec().facets).length === 0) && (!vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0))) {
+                  while (openedByFilter.length) {
+                    openedByFilter.pop().open(false);
+                  }
+                  return vm.activeTables();
+                }
+
+                var facets = vm.filter.querySpec().facets;
+
+                var result = [];
+                $.each(vm.activeTables(), function (index, entry) {
+                  var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
+                  if (!facetMatch && facets['type']['table']) {
+                    facetMatch = entry.definition.isTable;
+                  }
+                  if (!facetMatch && facets['type']['view']) {
+                    facetMatch = entry.definition.isView;
+                  }
+
+                  var textMatch = !vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0;
+                  if (!textMatch) {
+                    var nameLower = entry.definition.name.toLowerCase();
+                    textMatch = vm.filter.querySpec().text.every(function (text) {
+                      return nameLower.indexOf(text.toLowerCase()) !== -1;
+                    });
+                  }
+                  entry.filterColumnNames(!textMatch);
+                  if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
+                    if (!entry.open()) {
+                      entry.open(true);
+                      openedByFilter.push(entry);
+                    }
+                    result.push(entry);
+                  }
+                });
+                return result;
+              });
+            }
+          }
+        })();
+
+
     (function () {
       function EditorAssistantPanel(params) {
         var self = this;
@@ -2360,46 +2407,7 @@ from desktop.views import _ko
           showTables: ko.observable(true)
         };
 
-        var openedByFilter = [];
-
-        self.filteredTables = ko.pureComputed(function () {
-          if (self.filter == null || !self.filter.querySpec() || ((!self.filter.querySpec().facets || Object.keys(self.filter.querySpec().facets).length === 0) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
-            while (openedByFilter.length) {
-              openedByFilter.pop().open(false);
-            }
-            return self.activeTables();
-          }
-
-          var facets = self.filter.querySpec().facets;
-
-          var result = [];
-          $.each(self.activeTables(), function (index, entry) {
-            var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
-            if (!facetMatch && facets['type']['table']) {
-              facetMatch = entry.definition.isTable;
-            }
-            if (!facetMatch && facets['type']['view']) {
-              facetMatch = entry.definition.isView;
-            }
-
-            var textMatch = !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
-            if (!textMatch) {
-              var nameLower = entry.definition.name.toLowerCase();
-              textMatch = self.filter.querySpec().text.every(function (text) {
-                return nameLower.indexOf(text.toLowerCase()) !== -1;
-              });
-            }
-            entry.filterColumnNames(!textMatch);
-            if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
-              if (!entry.open()) {
-                entry.open(true);
-                openedByFilter.push(entry);
-              }
-              result.push(entry);
-            }
-          });
-          return result;
-        });
+        self.filteredTables = AssistantUtils.getFilteredTablesPureComputed(self);
 
         var navigationSettings = {
           showStats: true,
@@ -2730,44 +2738,7 @@ from desktop.views import _ko
         self.activeTables = ko.observableArray();
         var openedByFilter = [];
 
-        self.filteredTables = ko.pureComputed(function () {
-          if (self.filter == null || !self.filter.querySpec() || ((!self.filter.querySpec().facets || Object.keys(self.filter.querySpec().facets).length === 0) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
-            while (openedByFilter.length) {
-              openedByFilter.pop().open(false);
-            }
-            return self.activeTables();
-          }
-
-          var facets = self.filter.querySpec().facets;
-
-          var result = [];
-          $.each(self.activeTables(), function (index, entry) {
-            var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
-            if (!facetMatch && facets['type']['table']) {
-              facetMatch = entry.definition.isTable;
-            }
-            if (!facetMatch && facets['type']['view']) {
-              facetMatch = entry.definition.isView;
-            }
-
-            var textMatch = !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
-            if (!textMatch) {
-              var nameLower = entry.definition.name.toLowerCase();
-              textMatch = self.filter.querySpec().text.every(function (text) {
-                return nameLower.indexOf(text.toLowerCase()) !== -1;
-              });
-            }
-            entry.filterColumnNames(!textMatch);
-            if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
-              if (!entry.open()) {
-                entry.open(true);
-                openedByFilter.push(entry);
-              }
-              result.push(entry);
-            }
-          });
-          return result;
-        });
+        self.filteredTables = AssistantUtils.getFilteredTablesPureComputed(self);
 
         var navigationSettings = {
           showStats: true,
