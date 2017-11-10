@@ -646,7 +646,6 @@ from desktop.views import _ko
 
           if (parseResult.suggestValues) {
             var fieldName = parseResult.suggestValues.field;
-            console.log(parseResult.suggestValues.quotePresent);
             var hasField = self.collection.template.fieldsAttributes().some(function (field) {
               return field.name() === fieldName;
             });
@@ -793,6 +792,31 @@ from desktop.views import _ko
         if (self.value()) {
           editor.setValue(self.value());
           editor.clearSelection();
+        }
+
+        if (params.placeHolder && ko.unwrap(params.placeHolder)) {
+          var placeHolderVisible = false;
+
+          var $placeHolder = $("<div>").text(ko.unwrap(params.placeHolder)).addClass("ace_invisible ace_emptyMessage");
+
+          if (editor.getValue().length == 0) {
+            $placeHolder.appendTo(editor.renderer.scroller);
+            placeHolderVisible = true;
+          }
+
+          var inputListener = editor.on('input', function () {
+            if (editor.getValue().length > 0 && placeHolderVisible) {
+              $placeHolder.remove();
+              placeHolderVisible = false;
+            } else if (editor.getValue().length === 0 && !placeHolderVisible) {
+              $placeHolder.appendTo(editor.renderer.scroller);
+              placeHolderVisible = true;
+            }
+          });
+
+          self.disposeFunctions.push(function () {
+            editor.off('input', inputListener);
+          });
         }
 
         if (params.autocomplete) {
