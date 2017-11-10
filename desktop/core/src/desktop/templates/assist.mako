@@ -932,7 +932,7 @@ from desktop.views import _ko
           params: {
             querySpec: filter.querySpec,
             facets: ['type'],
-            knownFacetValues: SQL_ASSIST_KNOWN_FACET_VALUES
+            knownFacetValues: sourceType === 'solr' ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES
           }
         } --><!-- /ko -->
       </div>
@@ -990,6 +990,11 @@ from desktop.views import _ko
     var SQL_ASSIST_KNOWN_FACET_VALUES = {
       'type': {'array': -1, 'table': -1, 'view': -1, 'boolean': -1, 'bigint': -1, 'binary': -1, 'char': -1, 'date': -1, 'double': -1, 'decimal': -1, 'float': -1, 'int': -1, 'map': -1, 'real': -1, 'smallint': -1, 'string': -1, 'struct': -1, 'timestamp': -1, 'tinyint': -1, 'varchar': -1 }
     };
+
+    var SOLR_ASSIST_KNOWN_FACET_VALUES = {
+      'type': {'date': -1, 'tdate': -1, 'timestamp': -1, 'pdate': -1, 'int': -1, 'tint': -1, 'pint': -1, 'long': -1, 'tlong': -1, 'plong': -1, 'float': -1, 'tfloat': -1, 'pfloat': -1, 'double': -1, 'tdouble': -1, 'pdouble': -1, 'currency': -1, 'smallint': -1, 'bigint': -1, 'tinyint': -1, 'SpatialRecursivePrefixTreeFieldType': -1 }
+    };
+
 
     (function () {
       ko.bindingHandlers.assistFileDroppable = {
@@ -2222,7 +2227,7 @@ from desktop.views import _ko
               params: {
                 querySpec: filter.querySpec,
                 facets: ['type'],
-                knownFacetValues: SQL_ASSIST_KNOWN_FACET_VALUES
+                knownFacetValues: isSolr() ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES
               }
             } --><!-- /ko -->
           </div>
@@ -2244,7 +2249,7 @@ from desktop.views import _ko
           <!-- ko if: filteredTables().length > 0 -->
           <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: filteredTables, minHeight: 23, container: '.assist-db-scrollable' }">
             <!-- ko if: hasErrors -->
-            <li class="assist-table hue-warning" data-bind="attr: { 'title': isSolr() ? '${ _ko('Error loading collection details.') }' : '${ _ko('Error loading table details.') }'}">
+            <li class="assist-table hue-warning" data-bind="attr: { 'title': $parent.isSolr() ? '${ _ko('Error loading collection details.') }' : '${ _ko('Error loading table details.') }'}">
               <span class="assist-entry">
                 <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
                 <span data-bind="text: definition.displayName"></span>
