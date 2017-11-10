@@ -583,11 +583,14 @@ from desktop.views import _ko
           SAMPLE: { id: 'sample', weight: 900, color: COLORS.SAMPLE, label: AutocompleterGlobals.i18n.category.sample, detailsTemplate: 'value' }
         };
 
-        var SolrQuerySuggestions = function (collection) {
+        var SolrQuerySuggestions = function (collection, editor) {
           var self = this;
           self.entries = ko.observableArray();
+          self.editor = editor;
           self.collection = collection;
           self.apiHelper = ApiHelper.getInstance();
+          self.lastNonSampleSuggestions = [];
+          self.parseResult = {};
 
           self.filtered = ko.pureComputed(function () {
             var result = self.entries();
@@ -614,11 +617,12 @@ from desktop.views import _ko
 
         SolrQuerySuggestions.prototype.update = function (parseResult) {
           var self = this;
-          var syncEntries = [];
+          self.lastNonSampleSuggestions = [];
+          self.parseResult = parseResult;
 
-          if (parseResult.suggestFields) {
+          if (self.parseResult.suggestFields) {
             self.collection.template.fieldsAttributes().forEach(function (field) {
-              syncEntries.push({
+              self.lastNonSampleSuggestions.push({
                 category: CATEGORIES.FIELD,
                 value: field.name() + (parseResult.suggestFields.appendColon ? ':' : ''),
                 meta: field.type(),
@@ -629,9 +633,9 @@ from desktop.views import _ko
             });
           }
 
-          if (parseResult.suggestKeywords) {
+          if (self.parseResult.suggestKeywords) {
             parseResult.suggestKeywords.forEach(function (keyword) {
-              syncEntries.push({
+              self.lastNonSampleSuggestions.push({
                 category: CATEGORIES.KEYWORD,
                 value: keyword,
                 meta: AutocompleterGlobals.i18n.meta.keyword,
@@ -642,50 +646,83 @@ from desktop.views import _ko
             });
           }
 
-          self.entries(syncEntries);
+          self.entries(self.lastNonSampleSuggestions);
 
-          if (parseResult.suggestValues) {
-            var fieldName = parseResult.suggestValues.field;
-            var hasField = self.collection.template.fieldsAttributes().some(function (field) {
-              return field.name() === fieldName;
-            });
-            if (hasField) {
-              self.loading(true);
-              self.apiHelper.fetchDashboardTerms({
-                collectionName: self.collection.name(),
-                fieldName: fieldName,
-                // prefix: somePrefix,
-                silenceErrors: true,
-                successCallback: function (result) {
-                  if (result && result.terms && result.terms.length) {
-                    var sampleSuggestions = [];
-                    var maxCount = 1;
-                    for (var i = 0; i < Math.min(SAMPLE_LIMIT, result.terms.length); i++) {
-                      var sampleValue = result.terms[i].value;
-                      var shouldQuote = !parseResult.suggestValues.quotePresent && /[\s\u3000!():"'^+\-\[\]{}~*?/]/.test(sampleValue);
-                      if (maxCount < result.terms[i].count) {
-                        maxCount = result.terms[i].count;
-                      }
-                      sampleSuggestions.push({
-                        value: shouldQuote ? '"' + sampleValue + '"' : sampleValue,
-                        meta: AutocompleterGlobals.i18n.meta.sample,
-                        category: CATEGORIES.SAMPLE,
-                        popular: DEFAULT_POPULAR,
-                        details: result.terms[i]
-                      })
+          if (self.parseResult.suggestValues) {
+            var aceUtil = ace.require('ace/autocomplete/util');
+            var pos = self.editor.getCursorPosition();
+            var partial = aceUtil.retrievePrecedingIdentifier(self.editor.session.getLine(pos.row), pos.column);
+
+            var valuesPromise = self.handleSampleSuggestions(partial);
+            self.loading(true);
+            valuesPromise.done(function (suggestions) {
+              if (suggestions.length) {
+                self.entries(self.lastNonSampleSuggestions.concat(suggestions));
+              }
+              self.loading(false);
+            })
+          }
+        };
+
+        SolrQuerySuggestions.prototype.handleSampleSuggestions = function (prefix) {
+          var self = this;
+          var promise = $.Deferred();
+          var fieldName = self.parseResult.suggestValues.field;
+          var hasField = self.collection.template.fieldsAttributes().some(function (field) {
+            return field.name() === fieldName;
+          });
+          if (hasField) {
+            self.apiHelper.fetchDashboardTerms({
+              collectionName: self.collection.name(),
+              fieldName: fieldName,
+              prefix: prefix || '',
+              silenceErrors: true,
+              successCallback: function (result) {
+                var sampleSuggestions = [];
+                if (result && result.terms && result.terms.length) {
+                  var maxCount = 1;
+                  for (var i = 0; i < Math.min(SAMPLE_LIMIT, result.terms.length); i++) {
+                    var sampleValue = result.terms[i].value;
+                    var shouldQuote = !self.parseResult.suggestValues.quotePresent && /[\s\u3000!():"'^+\-\[\]{}~*?/]/.test(sampleValue);
+                    if (maxCount < result.terms[i].count) {
+                      maxCount = result.terms[i].count;
                     }
-                    sampleSuggestions.forEach(function (sampleSuggestion) {
-                      sampleSuggestion.weightAdjust = sampleSuggestion.details.count / maxCount;
-                    });
-                    self.entries(self.entries().concat(sampleSuggestions));
+                    sampleSuggestions.push({
+                      value: shouldQuote ? '"' + sampleValue + '"' : sampleValue,
+                      meta: AutocompleterGlobals.i18n.meta.sample,
+                      category: CATEGORIES.SAMPLE,
+                      popular: DEFAULT_POPULAR,
+                      details: result.terms[i]
+                    })
                   }
-                  self.loading(false);
-                },
-                errorCallback: function () {
-                  self.loading(false);
+                  sampleSuggestions.forEach(function (sampleSuggestion) {
+                    sampleSuggestion.weightAdjust = sampleSuggestion.details.count / maxCount;
+                  });
                 }
-              });
-            }
+                promise.resolve(sampleSuggestions);
+              },
+              errorCallback: function () {
+                promise.resolve([]);
+              }
+            });
+          } else {
+            promise.resolve([]);
+          }
+
+          return promise;
+        };
+
+        SolrQuerySuggestions.prototype.onPartial = function (partial) {
+          var self = this;
+          if (self.parseResult.suggestValues) {
+            var promise = self.handleSampleSuggestions(partial);
+            promise.done(function (suggestions) {
+              if (suggestions.length) {
+                self.entries(self.lastNonSampleSuggestions.concat(suggestions));
+              } else {
+                self.entries(self.lastNonSampleSuggestions);
+              }
+            })
           }
         };
 
@@ -700,13 +737,18 @@ from desktop.views import _ko
         var SolrQueryAutocompleter = function (options) {
           var self = this;
           self.editor = options.editor;
-          self.suggestions = new SolrQuerySuggestions(options.support.collection);
+          self.suggestions = new SolrQuerySuggestions(options.support.collection, self.editor);
         };
 
         SolrQueryAutocompleter.prototype.autocomplete = function () {
           var self = this;
           var parseResult = solrQueryParser.autocompleteSolrQuery(self.editor.getTextBeforeCursor(), self.editor.getTextAfterCursor());
           self.suggestions.update(parseResult);
+        };
+
+        SolrQueryAutocompleter.prototype.onPartial = function (partial) {
+          var self = this;
+          self.suggestions.onPartial(partial);
         };
 
         return SolrQueryAutocompleter;
