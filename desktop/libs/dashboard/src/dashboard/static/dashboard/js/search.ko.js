@@ -17,6 +17,7 @@
 function magicSearchLayout(vm) {
   loadSearchLayout(vm, vm.initial.layout);
   $(document).trigger("magicSearchLayout");
+  huePubSub.publish('dashboard.set.layout');
 }
 
 function loadSearchLayout(viewModel, json_layout) {
@@ -50,42 +51,37 @@ function loadSearchLayout(viewModel, json_layout) {
 // End dashboard lib
 
 function layoutToGridster(vm) {
-  var numCols = 12;
   var defaultWidgetHeight = 40;
   var layout = [];
-
-  // flat layout
+  var previousCol = 1;
   var rowCnt = 0;
+
   $.each(vm.columns(), function (indexY, column) {
-    $.each(column.rows(), function (indexY, row) {
-      $.each(row.widgets(), function (indexX, widget) {
-        layout.push({
-          col: 1,
+    rowCnt = 0;
+    $.each(column.rows(), function (indexX, row) {
+      $.each(row.widgets(), function (indexW, widget) {
+        layout.push(ko.mapping.fromJS({
+          col: previousCol,
           row: 1 + rowCnt * defaultWidgetHeight,
-          size_x: numCols,
+          size_x: column.size(),
           size_y: defaultWidgetHeight,
           widget: vm.getWidgetById(widget.id())
-        });
+        }));
         rowCnt++;
       });
+      if (row.widgets().length === 0) {
+        layout.push(ko.mapping.fromJS({
+          col: previousCol,
+          row: 1 + rowCnt * defaultWidgetHeight,
+          size_x: column.size(),
+          size_y: defaultWidgetHeight,
+          widget: null
+        }));
+        rowCnt++;
+      }
     });
+    previousCol = previousCol + column.size();
   });
-
-
-  // $.each(vm.columns(), function (indexY, column) {
-  //   $.each(column.rows(), function (indexY, row) {
-  //     var rowColSize = numCols / row.widgets().length; // Full length of row if 1 widget
-  //     $.each(row.widgets(), function (indexX, widget) {
-  //       layout.push({
-  //         col: 1 + indexY * defaultWidgetHeight,
-  //         row: 1 + indexX * rowColSize,
-  //         sizex: rowColSize,
-  //         sizey: defaultWidgetHeight,
-  //         widget: vm.getWidgetById(widget.id())
-  //       });
-  //     });
-  //   });
-  // });
 
   return layout;
 }
@@ -1838,6 +1834,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget"));
     self.draggableDocument = ko.observable(bareWidgetBuilder("Document", "document-widget"));
 
+    self.gridItems = ko.observableArray([]);
+
     self.hasAvailableFields = ko.pureComputed(function () {
       return self.collection.availableFacetFields().length > 0;
     });
@@ -2509,7 +2507,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
     };
 
-    self.gridItems = ko.mapping.fromJS(layoutToGridster(self));
+    huePubSub.subscribe('dashboard.set.layout', function() {
+      self.gridItems(layoutToGridster(self));
+    }, 'dashboard');
+
+    self.gridItems(layoutToGridster(self));
 
   };
 
