@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
-  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, CONFIG_INDEXER_LIBS_PATH
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, CONFIG_INDEXER_LIBS_PATH, ENABLE_SCALABLE_INDEXER
   from notebook.conf import ENABLE_SQL_INDEXER
 %>
 
@@ -577,6 +577,7 @@ ${ assist.assistPanel() }
         <div class="card step">
           <h4>${_('Properties')}</h4>
           <div class="card-body">
+            % if ENABLE_SCALABLE_INDEXER.get():
             <div class="control-group">
               <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
                 <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
@@ -591,6 +592,7 @@ ${ assist.assistPanel() }
                 </a>
               <!-- /ko -->
             </div>
+            % endif
 
             <div class="control-group">
               <label for="kuduPksIndex" class="control-label"><div>${ _('Primary key') }</div>

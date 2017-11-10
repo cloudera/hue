@@ -28,7 +28,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from hadoop.pseudo_hdfs4 import is_live_cluster, shared_cluster
 
-from indexer.conf import ENABLE_NEW_INDEXER
+from indexer.conf import ENABLE_SCALABLE_INDEXER
 from indexer.controller import CollectionManagerController
 from indexer.file_format import ApacheCombinedFormat, RubyLogFormat, HueLogFormat
 from indexer.fields import Field
@@ -100,7 +100,7 @@ class TestIndexer():
     self.user = User.objects.get(username='test')
     self.solr_client = SolrClient(self.user, api=MockSolrCdhCloudHdfsApi())
 
-    self.finish = ENABLE_NEW_INDEXER.set_for_testing(True)
+    self.finish = ENABLE_SCALABLE_INDEXER.set_for_testing(True)
 
   def tearDown(self):
     self.finish()

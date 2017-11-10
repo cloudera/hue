@@ -74,11 +74,19 @@ ENABLE_NEW_IMPORTER = Config(
   default=False
 )
 
+# Deprecated as always on
 ENABLE_NEW_INDEXER = Config(
   key="enable_new_indexer",
   help=_t("Flag to turn on the new Solr indexer."),
   type=bool,
   default=True
+)
+
+ENABLE_SCALABLE_INDEXER = Config(
+  key="enable_scalable_indexer",
+  help=_t("Flag to turn on the Morphline Solr indexer."),
+  type=bool,
+  default=False
 )
 
 CONFIG_INDEXER_LIBS_PATH = Config(
