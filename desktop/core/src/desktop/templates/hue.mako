@@ -22,7 +22,7 @@
   from desktop.conf import DEV_EMBEDDED
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
-  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
+  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -199,7 +199,7 @@ ${ hueIcons.symbols() }
 
       <div class="top-nav-middle">
 
-        <!-- ko if: cluster.clusters().length > 1 -->
+        <!-- ko if: cluster.clusters().length > 1 && cluster.clusters()[0].type() != ANALYTIC_DB -->
         <div class="btn-group pull-right" style="display: none;" data-bind="visible: cluster.clusters().length > 1">
           <button class="btn" data-bind="text: cluster.cluster().name() + (cluster.cluster().interface ? ' ' + cluster.cluster().interface() : '')"></button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -245,7 +245,7 @@ ${ hueIcons.symbols() }
 
       <div class="top-nav-right">
 
-        % if user.is_authenticated() and section != 'login':
+        % if user.is_authenticated() and section != 'login' and cluster != ANALYTIC_DB:
         <div class="dropdown navbar-dropdown pull-right">
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser

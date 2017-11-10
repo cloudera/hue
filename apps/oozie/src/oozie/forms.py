@@ -348,7 +348,7 @@ class CoordinatorForm(forms.ModelForm):
   class Meta:
     model = Coordinator
     exclude = ('owner', 'deployment_dir')
-    if ENABLE_CRON_SCHEDULING.get():
+    if hasattr(ENABLE_CRON_SCHEDULING, 'get') and ENABLE_CRON_SCHEDULING.get():
         exclude += ('frequency_number', 'frequency_unit')
     widgets = {
       'description': forms.TextInput(attrs={'class': 'span5'}),

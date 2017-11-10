@@ -1549,7 +1549,7 @@ def get_cluster_config(user):
 
 
 DATAENG = 'dataeng'
-IMPALAUI = 'impalaui'
+ANALYTIC_DB = 'analyticdb'
 
 
 class ClusterConfig():
@@ -1646,7 +1646,7 @@ class ClusterConfig():
     _interpreters = get_ordered_interpreters(self.user)
     if self.cluster_type == DATAENG:
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'mapreduce')]
-    elif self.cluster_type == IMPALAUI:
+    elif self.cluster_type == ANALYTIC_DB:
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
 
     for interpreter in _interpreters:
@@ -1660,7 +1660,7 @@ class ClusterConfig():
         'is_sql': interpreter['is_sql']
       })
 
-    if SHOW_NOTEBOOKS.get() and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if SHOW_NOTEBOOKS.get() and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       try:
         first_non_sql_index = [interpreter['is_sql'] for interpreter in interpreters].index(False)
       except ValueError:
@@ -1691,7 +1691,7 @@ class ClusterConfig():
   def _get_dashboard(self):
     interpreters = get_engines(self.user)
 
-    if interpreters and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if interpreters and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
@@ -1711,7 +1711,7 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if 'filebrowser' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1720,7 +1720,7 @@ class ClusterConfig():
         'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
       })
 
-    if is_s3_enabled() and has_s3_access(self.user):
+    if is_s3_enabled() and has_s3_access(self.user) and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 's3',
         'displayName': _('S3'),
@@ -1729,7 +1729,7 @@ class ClusterConfig():
         'page': '/filebrowser/view=S3A://'
       })
 
-    if is_adls_enabled() and has_adls_access(self.user):
+    if is_adls_enabled() and has_adls_access(self.user) and self.cluster_type != ANALYTIC_DB:
       interpreters.append({
         'type': 'adls',
         'displayName': _('ADLS'),
@@ -1747,7 +1747,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if 'search' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1756,7 +1756,7 @@ class ClusterConfig():
         'page': '/indexer/'
       })
 
-    if 'jobbrowser' in self.apps and self.cluster_type != IMPALAUI:
+    if 'jobbrowser' in self.apps:
       if self.cluster_type == DATAENG:
         interpreters.append({
           'type': 'dataeng',
@@ -1767,16 +1767,19 @@ class ClusterConfig():
         })
       else:
         from hadoop.cluster import get_default_yarncluster # Circular loop
+
+        title =  _('Jobs') if self.cluster_type != ANALYTIC_DB else _('Queries')
+
         if get_default_yarncluster():
           interpreters.append({
             'type': 'yarn',
-            'displayName': _('Jobs'),
-            'buttonName': _('Jobs'),
-            'tooltip': _('Jobs'),
+            'displayName': title,
+            'buttonName': title,
+            'tooltip': title,
             'page': '/jobbrowser/'
           })
 
-    if 'hbase' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if 'hbase' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1785,7 +1788,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if 'security' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1794,7 +1797,7 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
-    if 'sqoop' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
+    if 'sqoop' in self.apps and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
       interpreters.append({
         'type': 'sqoop',
         'displayName': _('Sqoop'),
@@ -1903,11 +1906,16 @@ class Cluster():
     default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
 
     if clusters and default_cluster:
-      default_cluster_json = json.loads(default_cluster[USER_PREFERENCE_CLUSTER])
-      default_cluster_name = default_cluster_json.get('name')
+      if len(clusters) == 1:
+        default_cluster = clusters.values()[0]
+        default_cluster_index = 0
+        default_cluster_interface = ANALYTIC_DB
+      else:
+        default_cluster_json = json.loads(default_cluster[USER_PREFERENCE_CLUSTER])
+        default_cluster_name = default_cluster_json.get('name')
 
-      default_cluster_index = default_cluster_name in clusters.keys() and clusters.keys().index(default_cluster_name) or 0
-      default_cluster_interface = default_cluster_json.get('interface', '')
+        default_cluster_index = default_cluster_name in clusters.keys() and clusters.keys().index(default_cluster_name) or 0
+        default_cluster_interface = default_cluster_json.get('interface', '')
 
     return default_cluster_index, default_cluster_interface
 

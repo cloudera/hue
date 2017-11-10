@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
-from desktop.models import Cluster, IMPALAUI
+from desktop.models import Cluster, ANALYTIC_DB
 from filebrowser.views import location_to_url
 
 from beeswax import hive_site
@@ -50,7 +50,7 @@ def get(user, query_server=None):
 
   if query_server is None:
     cluster_type = Cluster(user).get_type()
-    if cluster_type == IMPALAUI:
+    if cluster_type == ANALYTIC_DB:
       kwargs = {'name': 'impala'}
     else:
       kwargs = {}

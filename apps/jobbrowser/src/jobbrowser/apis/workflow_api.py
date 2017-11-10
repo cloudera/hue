@@ -208,12 +208,12 @@ def _filter_oozie_jobs(user, filters, kwargs):
     if 'time' in filters:
       kwargs['filters'].extend([('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
 
-    if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
+    if hasattr(ENABLE_OOZIE_BACKEND_FILTERING, 'get') and ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
       kwargs['filters'].extend([('text', text_filters.get('text'))])
 
     if filters['pagination']:
       kwargs['offset'] = filters['pagination']['offset']
-      kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT.get())
+      kwargs['cnt'] = min(filters['pagination']['limit'], hasattr(OOZIE_JOBS_COUNT, 'get') and OOZIE_JOBS_COUNT.get())
 
     if filters.get('states'):
       states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
