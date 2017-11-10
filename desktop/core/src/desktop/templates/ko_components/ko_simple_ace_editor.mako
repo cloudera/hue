@@ -651,26 +651,32 @@ from desktop.views import _ko
             });
             if (hasField) {
               self.loading(true);
-              self.apiHelper.fetchSamples({
-                defaultDatabase: self.collection.name(),
-                identifierChain: [{ name: self.collection.name() }, { name: fieldName }],
-                sourceType: 'solr',
+              self.apiHelper.fetchDashboardTerms({
+                collectionName: self.collection.name(),
+                fieldName: fieldName,
+                // prefix: somePrefix,
                 silenceErrors: true,
                 successCallback: function (result) {
-                  if (result && result.status === 0 && result.rows && result.rows.length > 0) {
+                  if (result && result.terms && result.terms.length) {
                     var sampleSuggestions = [];
-                    for (var i = 0; i < Math.min(SAMPLE_LIMIT, result.rows.length); i++) {
+                    var maxCount = 1;
+                    for (var i = 0; i < Math.min(SAMPLE_LIMIT, result.terms.length); i++) {
+                      var sampleValue = result.terms[i].value;
                       var shouldQuote = !parseResult.suggestValues.quotePresent && /[\s\u3000!():"'^+\-\[\]{}~*?/]/.test(sampleValue);
-                      var sampleValue = result.rows[i][0];
+                      if (maxCount < result.terms[i].count) {
+                        maxCount = result.terms[i].count;
+                      }
                       sampleSuggestions.push({
                         value: shouldQuote ? '"' + sampleValue + '"' : sampleValue,
                         meta: AutocompleterGlobals.i18n.meta.sample,
                         category: CATEGORIES.SAMPLE,
                         popular: DEFAULT_POPULAR,
-                        details: null
+                        details: result.terms[i]
                       })
-
                     }
+                    sampleSuggestions.forEach(function (sampleSuggestion) {
+                      sampleSuggestion.weightAdjust = sampleSuggestion.details.count / maxCount;
+                    });
                     self.entries(self.entries().concat(sampleSuggestions));
                   }
                   self.loading(false);
@@ -678,7 +684,7 @@ from desktop.views import _ko
                 errorCallback: function () {
                   self.loading(false);
                 }
-              })
+              });
             }
           }
         };
