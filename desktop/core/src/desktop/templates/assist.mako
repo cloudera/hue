@@ -37,7 +37,6 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
 <script src="${ static('desktop/js/assist/assistStorageEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistGitEntry.js') }"></script>
-<script src="${ static('desktop/js/assist/assistCollectionEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistHBaseEntry.js') }"></script>
 <script src="${ static('desktop/js/document/hueDocument.js') }"></script>
 <script src="${ static('desktop/js/document/hueFileEntry.js') }"></script>
