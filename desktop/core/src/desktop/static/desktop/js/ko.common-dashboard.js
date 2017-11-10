@@ -346,6 +346,7 @@ function setLayout(colSizes, vm) {
 
   vm.columns(_cols);
 
+  huePubSub.publish('dashboard.set.layout');
   $(document).trigger("setLayout");
 }
 
