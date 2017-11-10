@@ -18,7 +18,6 @@
 from django.utils.translation import ugettext as _
 
 
-from indexer.conf import ENABLE_NEW_INDEXER
 from metadata.conf import has_navigator, OPTIMIZER
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
