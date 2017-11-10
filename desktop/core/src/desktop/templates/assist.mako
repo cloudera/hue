@@ -2203,9 +2203,15 @@ from desktop.views import _ko
       <div class="assist-flex-panel">
 
         <div class="assist-flex-header">
-          <div class="assist-inner-header">${ _('Tables') }
+          <div class="assist-inner-header">
+            <!-- ko if: isSolr -->
+            ${ _('Collections') }
+            <!-- /ko -->
+            <!-- ko ifnot: isSolr  -->
+            ${ _('Tables') }
             <!-- ko if: statementCount() > 1 -->
             <div class="statement-count">${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span></div>
+            <!-- /ko -->
             <!-- /ko -->
           </div>
         </div>
@@ -2223,7 +2229,14 @@ from desktop.views import _ko
         </div>
         <div class="assist-flex-half assist-db-scrollable">
           <!-- ko if: filteredTables().length === 0 && (!filter.querySpec() || filter.querySpec().query === '') -->
-          <div class="assist-no-entries">${ _('No tables identified.') }</div>
+          <div class="assist-no-entries">
+            <!-- ko if: isSolr -->
+            ${ _('No collections selected.') }
+            <!-- /ko -->
+            <!-- ko ifnot: isSolr  -->
+            ${ _('No tables identified.') }
+            <!-- /ko -->
+          </div>
           <!-- /ko -->
           <!-- ko if: filteredTables().length === 0 && filter.querySpec() && filter.querySpec().query !== '' -->
           <div class="assist-no-entries">${ _('No entries found.') }</div>
@@ -2231,7 +2244,7 @@ from desktop.views import _ko
           <!-- ko if: filteredTables().length > 0 -->
           <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: filteredTables, minHeight: 23, container: '.assist-db-scrollable' }">
             <!-- ko if: hasErrors -->
-            <li class="assist-table hue-warning" title="${ _('Error loading table details.') }">
+            <li class="assist-table hue-warning" data-bind="attr: { 'title': isSolr() ? '${ _ko('Error loading collection details.') }' : '${ _ko('Error loading table details.') }'}">
               <span class="assist-entry">
                 <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
                 <span data-bind="text: definition.displayName"></span>
@@ -2246,7 +2259,7 @@ from desktop.views import _ko
           <!-- /ko -->
         </div>
 
-        <!-- ko if: HAS_OPTIMIZER -->
+        <!-- ko if: HAS_OPTIMIZER && !isSolr() -->
         <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Suggestions') }</div></div>
         <div class="assist-flex-half">
           <!-- ko if: ! activeRisks().hints -->
@@ -2288,6 +2301,7 @@ from desktop.views import _ko
         var self = this;
 
         self.disposals = [];
+        self.isSolr = ko.observable(false);
 
         self.uploadingTableStats = ko.observable(false);
         self.activeStatement = ko.observable();
@@ -2697,66 +2711,63 @@ from desktop.views import _ko
     })();
   </script>
 
-  <script type="text/html" id="dashboard-assistant-panel-template">
-    <div class="assist-inner-panel assist-assistant-panel">
-      <div class="assist-flex-panel">
-
-        <div class="assist-flex-header">
-          <div class="assist-inner-header">${ _('Fields') }
-          </div>
-        </div>
-        <div class="assist-flex-search" data-bind="visible: activeCollection() && activeCollection().entries().length > 0">
-          <div class="assist-filter">
-            <!-- ko component: {
-              name: 'inline-autocomplete',
-              params: {
-                querySpec: filter.querySpec,
-                facets: [],
-                knownFacetValues: {}
-              }
-            } --><!-- /ko -->
-          </div>
-        </div>
-        <div class="assist-flex-half assist-db-scrollable">
-          <ul class="database-tree assist-tables">
-            <!-- ko with: activeCollection -->
-            <li class="assist-table">
-              <a class="assist-entry assist-table-link default-cursor" href="javascript:void(0)" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }">
-                <i class="fa fa-fw muted valign-middle fa-search" data-bind="css: { 'fa-eye': definition.isView &amp;&amp; !navigationSettings.rightAssist, 'fa-table': definition.isTable &amp;&amp; sourceType !== 'solr' &amp;&amp; !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
-                <span class="highlightable" data-bind="text: definition.displayName, css: { 'highlight': highlight }">bikeshare</span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><!-- /ko -->
-              </a>
-              <div class="center assist-spinner" data-bind="visible: loading()"><i class="fa fa-spinner fa-spin"></i></div>
-              <!-- ko ifnot: loading -->
-                <!-- ko if: $parent.filteredFields().length === 0 && (!$parent.filter.querySpec() || $parent.filter.querySpec().query === '') -->
-                <div class="assist-no-entries">${ _('No fields available.') }</div>
-                <!-- /ko -->
-                <!-- ko if: $parent.filteredFields().length === 0 && $parent.filter.querySpec() && $parent.filter.querySpec().query !== '' -->
-                <div class="assist-no-entries">${ _('No fields found.') }</div>
-                <!-- /ko -->
-                <!-- ko if: $parent.filteredFields().length > 0 -->
-                <ul class="assist-tables" data-bind="foreachVisible: { data: $parent.filteredFields, minHeight: 23, container: '.assist-db-scrollable' }">
-                  <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry-assistant' } --><!-- /ko -->
-                </ul>
-                <!-- /ko -->
-              <!-- /ko -->
-            </li>
-            <!-- /ko -->
-          </ul>
-        </div>
-      </div>
-    </div>
-  </script>
-
   <script type="text/javascript">
     (function () {
       function DashboardAssistantPanel(params) {
         var self = this;
+
         self.disposals = [];
-        self.activeCollection = ko.observable();
+        self.isSolr = ko.observable(true);
 
         self.filter = {
-          querySpec: ko.observable({})
+          querySpec: ko.observable({
+            query: '',
+            facets: {},
+            text: []
+          })
         };
+
+        self.activeTables = ko.observableArray();
+        var openedByFilter = [];
+
+        self.filteredTables = ko.pureComputed(function () {
+          if (self.filter == null || !self.filter.querySpec() || ((!self.filter.querySpec().facets || Object.keys(self.filter.querySpec().facets).length === 0) && (!self.filter.querySpec().text || self.filter.querySpec().text.length === 0))) {
+            while (openedByFilter.length) {
+              openedByFilter.pop().open(false);
+            }
+            return self.activeTables();
+          }
+
+          var facets = self.filter.querySpec().facets;
+
+          var result = [];
+          $.each(self.activeTables(), function (index, entry) {
+            var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
+            if (!facetMatch && facets['type']['table']) {
+              facetMatch = entry.definition.isTable;
+            }
+            if (!facetMatch && facets['type']['view']) {
+              facetMatch = entry.definition.isView;
+            }
+
+            var textMatch = !self.filter.querySpec().text || self.filter.querySpec().text.length === 0;
+            if (!textMatch) {
+              var nameLower = entry.definition.name.toLowerCase();
+              textMatch = self.filter.querySpec().text.every(function (text) {
+                return nameLower.indexOf(text.toLowerCase()) !== -1;
+              });
+            }
+            entry.filterColumnNames(!textMatch);
+            if ((facetMatch && textMatch) || entry.filteredEntries().length > 0) {
+              if (!entry.open()) {
+                entry.open(true);
+                openedByFilter.push(entry);
+              }
+              result.push(entry);
+            }
+          });
+          return result;
+        });
 
         var navigationSettings = {
           showStats: true,
@@ -2800,26 +2811,10 @@ from desktop.views import _ko
               navigationSettings,
               {}
           );
-          self.activeCollection(collection);
+          self.activeTables([collection]);
           if (!collection.loaded && !collection.hasErrors() && !collection.loading()) {
-            collection.loadEntries();
+            collection.loadEntries(function() { collection.toggleOpen(); });
           }
-        });
-
-        self.filteredFields = ko.pureComputed(function () {
-          if (!self.activeCollection()){
-            return [];
-          }
-          if (!self.filter.querySpec() || self.filter.querySpec().query === '') {
-            return self.activeCollection().entries();
-          }
-          var result = self.activeCollection().entries().filter(function (field) {
-            if (field.columnName.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
-              return true;
-            }
-            return false;
-          });
-          return result
         });
 
         self.disposals.push(function () {
@@ -2836,7 +2831,7 @@ from desktop.views import _ko
 
       ko.components.register('dashboard-assistant-panel', {
         viewModel: DashboardAssistantPanel,
-        template: { element: 'dashboard-assistant-panel-template' }
+        template: { element: 'editor-assistant-panel-template' }
       });
     })();
   </script>
