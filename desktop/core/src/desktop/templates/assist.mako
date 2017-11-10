@@ -2823,7 +2823,7 @@ from desktop.views import _ko
             return self.activeCollection().entries();
           }
           var result = self.activeCollection().entries().filter(function (field) {
-            if (field.name().toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
+            if (field.columnName.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
               return true;
             }
             return false;
