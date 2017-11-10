@@ -2725,17 +2725,19 @@ from desktop.views import _ko
                 <i class="fa fa-fw muted valign-middle fa-search" data-bind="css: { 'fa-eye': definition.isView &amp;&amp; !navigationSettings.rightAssist, 'fa-table': definition.isTable &amp;&amp; sourceType !== 'solr' &amp;&amp; !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
                 <span class="highlightable" data-bind="text: definition.displayName, css: { 'highlight': highlight }">bikeshare</span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><!-- /ko -->
               </a>
-              <div class="center assist-spinner" data-bind="visible: loading() &amp;&amp; open()" style="display: none;"><i class="fa fa-spinner fa-spin"></i></div>
-              <!-- ko if: $parent.filteredFields().length === 0 && (!$parent.filter.querySpec() || $parent.filter.querySpec().query === '') -->
-              <div class="assist-no-entries">${ _('No fields available.') }</div>
-              <!-- /ko -->
-              <!-- ko if: $parent.filteredFields().length === 0 && $parent.filter.querySpec() && $parent.filter.querySpec().query !== '' -->
-              <div class="assist-no-entries">${ _('No fields found.') }</div>
-              <!-- /ko -->
-              <!-- ko if: $parent.filteredFields().length > 0 -->
-              <ul class="assist-tables" data-bind="foreachVisible: { data: $parent.filteredFields, minHeight: 23, container: '.assist-db-scrollable' }">
-                <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry-assistant' } --><!-- /ko -->
-              </ul>
+              <div class="center assist-spinner" data-bind="visible: loading()"><i class="fa fa-spinner fa-spin"></i></div>
+              <!-- ko ifnot: loading -->
+                <!-- ko if: $parent.filteredFields().length === 0 && (!$parent.filter.querySpec() || $parent.filter.querySpec().query === '') -->
+                <div class="assist-no-entries">${ _('No fields available.') }</div>
+                <!-- /ko -->
+                <!-- ko if: $parent.filteredFields().length === 0 && $parent.filter.querySpec() && $parent.filter.querySpec().query !== '' -->
+                <div class="assist-no-entries">${ _('No fields found.') }</div>
+                <!-- /ko -->
+                <!-- ko if: $parent.filteredFields().length > 0 -->
+                <ul class="assist-tables" data-bind="foreachVisible: { data: $parent.filteredFields, minHeight: 23, container: '.assist-db-scrollable' }">
+                  <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry-assistant' } --><!-- /ko -->
+                </ul>
+                <!-- /ko -->
               <!-- /ko -->
             </li>
             <!-- /ko -->
@@ -2754,20 +2756,6 @@ from desktop.views import _ko
 
         self.filter = {
           querySpec: ko.observable({})
-        };
-
-        var loadEntriesTimeout = -1;
-        // This fetches the columns for each table synchronously with 2 second in between.
-        var loadEntries = function () {
-          window.clearTimeout(loadEntriesTimeout);
-          loadEntriesTimeout = window.setTimeout(function () {
-            var collection = self.activeCollection();
-            if (!collection.loaded && !collection.hasErrors() && !collection.loading()) {
-              collection.loadEntries(loadEntries, true);
-              return false;
-            }
-            return !collection.loading();
-          }, 2000);
         };
 
         var navigationSettings = {
@@ -2798,7 +2786,7 @@ from desktop.views import _ko
         );
 
         var activeDashboardCollection = huePubSub.subscribe('set.active.dashboard.collection', function(collection) {
-          self.activeCollection(new AssistDbEntry(
+          var collection = new AssistDbEntry(
               {
                 name: collection.name(),
                 type: 'table',
@@ -2811,8 +2799,11 @@ from desktop.views import _ko
               {},
               navigationSettings,
               {}
-          ));
-          loadEntries();
+          );
+          self.activeCollection(collection);
+          if (!collection.loaded && !collection.hasErrors() && !collection.loading()) {
+            collection.loadEntries();
+          }
         });
 
         self.filteredFields = ko.pureComputed(function () {
@@ -2832,7 +2823,6 @@ from desktop.views import _ko
         });
 
         self.disposals.push(function () {
-          window.clearTimeout(loadEntriesTimeout);
           activeDashboardCollection.remove();
         });
       }
