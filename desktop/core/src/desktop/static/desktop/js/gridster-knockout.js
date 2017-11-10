@@ -105,6 +105,7 @@ ko.bindingHandlers.gridster = {
             break;
         }
       });
+      itemsArray = ko.unwrap(model.items);
     }, null, "arrayChange");
 
     var syncPositionsToModel = function () {
@@ -121,7 +122,7 @@ ko.bindingHandlers.gridster = {
     // Just in case the consumer set up their own resize handler, we need to chain the calls
     var oldOnResize = gridster.options.resize.stop;
     gridster.options.resize.stop = function (event, ui, $widget) {
-      var widgetId = $widget.attr('data-widgetId');
+      var widgetId = $widget.attr('data-widgetid');
       var newSizeX = $widget.attr('data-sizex');
       var newSizeY = $widget.attr('data-sizey');
 
