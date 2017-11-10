@@ -298,8 +298,8 @@ class LoginAndPermissionMiddleware(object):
       try:
         access_view = 'access_view:%s:%s' % (request._desktop_app, resolve(request.path)[0].__name__)
       except Exception, e:
-        access_log(request, 'error checking view perm: %s', e, level=access_log_level)
-        access_view =''
+        access_log(request, 'error checking view perm: %s' % e, level=access_log_level)
+        access_view = ''
 
       # Accessing an app can access an underlying other app.
       # e.g. impala or spark uses code from beeswax and so accessing impala shows up as beeswax here.

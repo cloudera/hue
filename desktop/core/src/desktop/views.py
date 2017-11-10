@@ -70,6 +70,7 @@ def hue(request):
   apps = appmanager.get_apps_dict(request.user)
   current_app, other_apps, apps_list = _get_apps(request.user, '')
   default_cluster_index, default_cluster_interface = Cluster(request.user).get_list_interface_indexes()
+  clusters = get_clusters().values()
 
   return render('hue.mako', request, {
     'apps': apps,
@@ -86,7 +87,8 @@ def hue(request):
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'banner_message': get_banner_message(request),
     'user_preferences': dict((x.key, x.value) for x in UserPreferences.objects.filter(user=request.user)),
-    'clusters_config_json': json.dumps(get_clusters().values()),
+    'cluster': clusters[0]['type'] if clusters else None,
+    'clusters_config_json': json.dumps(clusters),
     'default_cluster_index': default_cluster_index,
     'default_cluster_interface': default_cluster_interface
   })
