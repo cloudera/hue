@@ -930,7 +930,7 @@ var Collection = function (vm, collection) {
     return null;
   }
 
-  self.addFacet = function (facet_json) {
+  self.addFacet = function (facet_json, callback) {
     self.removeFacet(function(){return facet_json.widget_id});
     hueAnalytics.log('dashboard', 'add_facet/' + facet_json.widgetType);
 
@@ -950,6 +950,9 @@ var Collection = function (vm, collection) {
           vm.search();
         } else {
           $(document).trigger("error", data.message);
+        }
+        if (callback) {
+          callback();
         }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
@@ -1068,10 +1071,10 @@ var Collection = function (vm, collection) {
   }
 
   self.dropOnWidget = function (id) {
-    if (vm.isEditing() && vm.lastDraggedMeta() && vm.lastDraggedMeta().type === 'solr') {
+    if (vm.isEditing() && vm.lastDraggedMeta() && vm.lastDraggedMeta().type === 'sql' && vm.lastDraggedMeta().column  && self.template.availableWidgetFieldsNames().indexOf(vm.lastDraggedMeta().column) > -1) {
       var facet = self.getFacetById(id);
       if (facet && facet.properties && facet.properties.facets_form) {
-        facet.properties.facets_form.field(vm.lastDraggedMeta().field());
+        facet.properties.facets_form.field(vm.lastDraggedMeta().column);
       }
       if (self.supportAnalytics()) {
         self.addPivotFacetValue2(facet);
@@ -1084,7 +1087,7 @@ var Collection = function (vm, collection) {
   }
 
   self.dropOnEmpty = function (column, atBeginning) {
-    if (vm.isEditing() && vm.lastDraggedMeta() && vm.lastDraggedMeta().type === 'solr') {
+    if (vm.isEditing() && vm.lastDraggedMeta() && vm.lastDraggedMeta().type === 'sql' && vm.lastDraggedMeta().column  && self.template.availableWidgetFieldsNames().indexOf(vm.lastDraggedMeta().column) > -1) {
       var row = column.addEmptyRow(atBeginning);
       if (self.supportAnalytics()) {
         row.addWidget(vm.draggableBucket());
@@ -1094,7 +1097,7 @@ var Collection = function (vm, collection) {
       }
       var widget = row.widgets()[0];
       self.addFacet({
-        'name': vm.lastDraggedMeta().field(),
+        'name': vm.lastDraggedMeta().column,
         'widget_id': widget.id(),
         'widgetType': widget.widgetType()
       });
