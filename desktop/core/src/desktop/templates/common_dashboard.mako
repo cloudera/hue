@@ -170,7 +170,7 @@
   %if USE_GRIDSTER.get():
 
     <div class="container-fluid" data-bind="visible: $root.isEditing() && columns().length > 0">
-      <div class="add-row-gridster" data-bind="droppable: { data: showAddFacetDemiModal, options:{ greedy:true }}">
+      <div class="add-row-gridster" data-bind="droppable: { data: showAddFacetDemiModal, options: { greedy:true, hoverClass: 'droppable-hover' }}">
         ${ _('Drag a widget here') }
       </div>
     </div>
@@ -205,14 +205,16 @@
 <script id="widget-template-gridster${ suffix }" type="text/html">
   <li>
     <!-- ko ifnot: widget -->
-    <div class="inline pull-right remove-empty-gridster" data-bind="visible: $root.isEditing">
-      <a href="javascript:void(0)" data-bind="click: function(data, e){ huePubSub.publish('gridster.remove', e.target); }"><i class="fa fa-times"></i></a>
+    <div class="empty-gridster-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}">
+      <div class="inline pull-right remove-empty-gridster" data-bind="visible: $root.isEditing">
+        <a href="javascript:void(0)" data-bind="click: function(data, e){ huePubSub.publish('gridster.remove', e.target); }"><i class="fa fa-times"></i></a>
+      </div>
     </div>
     <!-- /ko -->
-    <!-- ko with: widget -->
+  <!-- ko with: widget -->
     <span data-bind="template: 'widget-template${ suffix }'"></span>
     <div class="clearfix"></div>
-    <!-- /ko -->
+  <!-- /ko -->
   </li>
 </script>
 
