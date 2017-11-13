@@ -3902,51 +3902,74 @@ $(document).ready(function () {
   %if USE_GRIDSTER.get():
   var selectedGridster = null;
   function showAddFacetDemiModal(widget, gridsterTarget) {
-    var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
-    fakeRow.addWidget(widget);
     selectedGridster = gridsterTarget;
+    if (widget && widget.id) {
+      var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
+      fakeRow.addWidget(widget);
 
-    if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
-      searchViewModel.collection.template.fieldsModalFilter("");
-      searchViewModel.collection.template.fieldsModalType(widget.widgetType());
+      if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
+        searchViewModel.collection.template.fieldsModalFilter("");
+        searchViewModel.collection.template.fieldsModalType(widget.widgetType());
 
-      selectedWidget = widget;
+        selectedWidget = widget;
 
-      if (searchViewModel.collection.template.availableWidgetFields().length == 1){
-        addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
+        if (searchViewModel.collection.template.availableWidgetFields().length == 1) {
+          addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
+        }
+        else {
+          $('#addFacetInput').typeahead({
+            'source': searchViewModel.collection.template.availableWidgetFieldsNames(),
+            'updater': function (item) {
+              addFacetDemiModalFieldPreview({
+                'name': function () {
+                  return item
+                }
+              });
+              return item;
+            }
+          });
+          $("#addFacetDemiModal").modal("show");
+          $("#addFacetDemiModal input[type='text']").focus();
+        }
       }
       else {
-        $('#addFacetInput').typeahead({
-          'source': searchViewModel.collection.template.availableWidgetFieldsNames(),
-          'updater': function (item) {
-            addFacetDemiModalFieldPreview({'name': function () {
-              return item
-            }});
-            return item;
-          }
-        });
-        $("#addFacetDemiModal").modal("show");
-        $("#addFacetDemiModal input[type='text']").focus();
+        huePubSub.publish('gridster.add.widget', {id: widget.id(), target: gridsterTarget});
       }
     }
-    else {
-      huePubSub.publish('gridster.add.widget', { id: widget.id(), target: gridsterTarget });
+    else if (searchViewModel.lastDraggedMeta() && searchViewModel.lastDraggedMeta().type === 'sql' && searchViewModel.lastDraggedMeta().column && searchViewModel.collection.template.availableWidgetFieldsNames().indexOf(searchViewModel.lastDraggedMeta().column) > -1) {
+      if (searchViewModel.collection.supportAnalytics()) {
+        selectedWidget = searchViewModel.draggableTextFacet();
+      }
+      else {
+        selectedWidget = searchViewModel.draggableFacet();
+      }
+      var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
+      fakeRow.addWidget(selectedWidget);
+      addFacetDemiModalFieldPreview({
+        'name': function () {
+          return searchViewModel.lastDraggedMeta().column
+        }
+      });
     }
   }
-
 
   function addFacetDemiModalFieldPreview(field) {
     var _existingFacet = searchViewModel.collection.getFacetById(selectedWidget.id());
     if (selectedWidget != null) {
       selectedWidget.hasBeenSelected = true;
       selectedWidget.isLoading(true);
-      searchViewModel.collection.addFacet({'name': field.name(), 'widget_id': selectedWidget.id(), 'widgetType': selectedWidget.widgetType()});
+      searchViewModel.collection.addFacet({
+        'name': field.name(),
+        'widget_id': selectedWidget.id(),
+        'widgetType': selectedWidget.widgetType()
+      }, function () {
+        huePubSub.publish('gridster.add.widget', {id: selectedWidget.id(), target: selectedGridster});
+      });
       if (_existingFacet != null) {
         _existingFacet.label(field.name());
         _existingFacet.field(field.name());
       }
       $("#addFacetDemiModal").modal("hide");
-      huePubSub.publish('gridster.add.widget', { id: selectedWidget.id(), target: selectedGridster });
     }
   }
   %else:
