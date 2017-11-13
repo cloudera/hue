@@ -204,6 +204,11 @@
 
 <script id="widget-template-gridster${ suffix }" type="text/html">
   <li>
+    <!-- ko ifnot: widget -->
+    <div class="inline pull-right remove-empty-gridster" data-bind="visible: $root.isEditing">
+      <a href="javascript:void(0)" data-bind="click: function(data, e){ huePubSub.publish('gridster.remove', e.target); }"><i class="fa fa-times"></i></a>
+    </div>
+    <!-- /ko -->
     <!-- ko with: widget -->
     <span data-bind="template: 'widget-template${ suffix }'"></span>
     <div class="clearfix"></div>
