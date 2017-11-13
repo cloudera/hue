@@ -86,6 +86,15 @@
     },
   };
 
+  ko.bindingHandlers.htmlUnsecure = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      originalHtmlBinding.init(element, valueAccessor, allBindings, viewModel, bindingContext);
+    },
+    update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      originalHtmlBinding.update(element, valueAccessor, allBindings, viewModel, bindingContext);
+    },
+  };
+
   ko.observableDefault = function () {
     var prop = arguments[0], defvalue = arguments[1] || null;
     return ko.observable(typeof prop != "undefined" && prop != null ? prop : defvalue);

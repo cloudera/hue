@@ -279,7 +279,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 
 <!-- ko if: $root.job() -->
-  <div id="rerun-modal${ SUFFIX }" class="modal hide" data-bind="html: $root.job().rerunModalContent"></div>
+  <div id="rerun-modal${ SUFFIX }" class="modal hide" data-bind="htmlUnsecure: $root.job().rerunModalContent"></div>
 <!-- /ko -->
 
 </div>
