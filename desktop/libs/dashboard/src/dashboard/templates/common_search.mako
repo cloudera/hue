@@ -3625,8 +3625,10 @@ $(document).ready(function () {
     }
   });
 
-  function resizeGridsterWidget($el){
-    $(".gridster>ul").data('gridster').resize_widget($el, $el.data('sizex'), Math.ceil($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+  function resizeGridsterWidget($el) {
+    if ($el.find('.card-widget').length > 0) {
+      $(".gridster>ul").data('gridster').resize_widget($el, $el.data('sizex'), Math.ceil($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+    }
   }
 
   huePubSub.subscribeOnce('calculate.gridster.heights', function () {
