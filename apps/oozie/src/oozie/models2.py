@@ -4020,7 +4020,7 @@ class WorkflowBuilder():
               "retry_max": [],
               "retry_interval": [],
               "job_properties": [],
-              "capture_output": True,
+              "capture_output": False,
               "prepares": [],
               "credentials": credentials,
               "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
