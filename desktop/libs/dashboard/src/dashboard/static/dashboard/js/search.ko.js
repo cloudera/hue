@@ -52,35 +52,35 @@ function loadSearchLayout(viewModel, json_layout) {
 
 function layoutToGridster(vm) {
   var defaultWidgetHeight = 40;
+  var emptyWidgetHeight = 4;
   var layout = [];
-  var previousCol = 1;
-  var rowCnt = 0;
+  var startingCol = 1;
 
   $.each(vm.columns(), function (indexY, column) {
-    rowCnt = 0;
+    var startingRow = 1;
     $.each(column.rows(), function (indexX, row) {
       $.each(row.widgets(), function (indexW, widget) {
         layout.push(ko.mapping.fromJS({
-          col: previousCol,
-          row: 1 + rowCnt * defaultWidgetHeight,
+          col: startingCol,
+          row: startingRow,
           size_x: column.size(),
           size_y: defaultWidgetHeight,
           widget: vm.getWidgetById(widget.id())
         }));
-        rowCnt++;
+        startingRow += defaultWidgetHeight;
       });
       if (row.widgets().length === 0) {
         layout.push(ko.mapping.fromJS({
-          col: previousCol,
-          row: 1 + rowCnt * defaultWidgetHeight,
+          col: startingCol,
+          row: startingRow,
           size_x: column.size(),
-          size_y: defaultWidgetHeight,
+          size_y: emptyWidgetHeight,
           widget: null
         }));
-        rowCnt++;
+        startingRow += emptyWidgetHeight;
       }
     });
-    previousCol = previousCol + column.size();
+    startingCol += column.size();
   });
 
   return layout;
