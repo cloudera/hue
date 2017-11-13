@@ -3665,9 +3665,14 @@ $(document).ready(function () {
     resizeGridsterWidget($(element).parents('li.gs-w'));
   }, 'dashboard');
 
-  huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
-    $(".gridster>ul").data('gridster').remove_widget($("#wdg_" + widgetId).parents('li.gs-w'));
+  huePubSub.subscribe('gridster.remove', function (element) {
+    $(".gridster>ul").data('gridster').remove_widget($(element).parents('li.gs-w'));
   }, 'dashboard')
+
+  huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
+    huePubSub.publish('gridster.remove', "#wdg_" + widgetId);
+  }, 'dashboard');
+
 
   huePubSub.subscribe('gridster.add.widget', function (widgetId){
     var newPosition = $('.gridster ul').data('gridster').next_position(12, 12);
