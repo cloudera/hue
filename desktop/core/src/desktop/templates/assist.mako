@@ -2751,34 +2751,36 @@ from desktop.views import _ko
         };
         var i18n = {};
 
-        var assistDbSource = new AssistDbSource({
-          i18n : i18n,
-          type: 'solr',
-          name: 'solr',
-          navigationSettings: navigationSettings
-        });
-
-        var assistFakeDb = new AssistDbEntry(
-            {
-              name: 'default',
-              type: 'database',
-              isDatabase: true
-            },
-            null,
-            assistDbSource,
-            self.filter,
-            i18n,
-            navigationSettings,
-            {}
-        );
-
         var activeDashboardCollection = huePubSub.subscribe('set.active.dashboard.collection', function(collection) {
+          var collectionName = collection.name();
+
+          var assistDbSource = new AssistDbSource({
+            i18n : i18n,
+            type: collection.engine(),
+            name: collection.engine(),
+            navigationSettings: navigationSettings
+          });
+
+          var assistFakeDb = new AssistDbEntry(
+              {
+                name: collectionName.indexOf('.') > -1 ? collectionName.split('.')[0] : 'default',
+                type: 'database',
+                isDatabase: true
+              },
+              null,
+              assistDbSource,
+              self.filter,
+              i18n,
+              navigationSettings,
+              {}
+          );
+
           var collection = new AssistDbEntry(
               {
-                name: collection.name(),
+                name: collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName,
                 type: 'table',
                 isTable: true,
-                displayName: collection.name().toLowerCase()
+                displayName: collectionName.toLowerCase()
               },
               assistFakeDb,
               assistDbSource,
