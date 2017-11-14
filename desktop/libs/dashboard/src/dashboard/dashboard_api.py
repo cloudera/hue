@@ -26,8 +26,15 @@ def get_engine(user, engine='solr'):
     engine = engine.get('engine', 'solr')
 
   if engine != 'solr':
-    from impala.dashboard_api import SQLApi
-    return SQLApi(user, engine)
+    if engine == 'impala':
+      from impala.dashboard_api import ImpalaDashboardApi
+      return ImpalaDashboardApi(user, engine)
+    elif engine == 'hive':
+      from beeswax.dashboard_api import HiveDashboardApi
+      return HiveDashboardApi(user, engine)
+    else:
+      from notebook.dashboard_api import SQLDashboardApi
+      return SQLDashboardApi(user, engine)
   else:
     from search.dashboard_api import SearchApi
     return SearchApi(user)
