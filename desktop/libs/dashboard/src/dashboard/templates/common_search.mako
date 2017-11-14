@@ -2029,7 +2029,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </a>
         </div>
 
-        <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count' && !$parent.canRange()">
+        <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count' && !$parent.canRange() && $root.collection.engine() == 'solr'">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Limit') }
