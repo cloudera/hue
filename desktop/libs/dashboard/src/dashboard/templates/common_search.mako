@@ -106,10 +106,10 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
           <div class="search-bar-query" data-bind="foreach: query.qs">
 
             <!-- ko if: $root.collection.engine() === 'solr' -->
-            <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: q, placeHolder: '${ _ko('Example: field:value, or press CTRL + space') }', autocomplete: { type: 'solrQuery', support: { collection: $root.collection } }, singleLine: true } }"></div>
+            <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: q, onExec: $parent.searchBtn, placeHolder: '${ _ko('Example: field:value, or press CTRL + space') }', autocomplete: { type: 'solrQuery', support: { collection: $root.collection } }, singleLine: true } }"></div>
             <!-- /ko -->
             <!-- ko if: $root.collection.engine() !== 'solr' -->
-            <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: q, placeHolder: '${ _ko('Example: col = value') }', singleLine: true } }"></div>
+            <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: q, onExec: $parent.searchBtn, placeHolder: '${ _ko('Example: col = value') }', singleLine: true } }"></div>
             <!-- /ko -->
 ##             <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
             <!-- ko if: $index() >= 1 -->
