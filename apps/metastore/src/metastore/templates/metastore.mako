@@ -139,7 +139,7 @@ ${ components.menubar(is_embeddable) }
             <span data-bind="text: name"></span> <i class="fa fa-key" data-bind="visible: typeof primary_key !== 'undefined' && primary_key() == 'true'"></i>
             <!-- /ko -->
             <!-- ko ifnot: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
-            <a href="javascript:void(0)" class="column-selector" data-bind="click: scrollToColumn"><span data-bind="text: name"></span> <i class="fa fa-key" data-bind="visible: typeof primary_key !== 'undefined' && primary_key() == 'true'"></i></a>
+            <a href="javascript:void(0)" class="column-selector" data-bind="click: $root.scrollToColumn"><span data-bind="text: name"></span> <i class="fa fa-key" data-bind="visible: typeof primary_key !== 'undefined' && primary_key() == 'true'"></i></a>
             <!-- /ko -->
           </td>
           <td data-bind="text: type"></td>
@@ -1072,7 +1072,7 @@ ${ components.menubar(is_embeddable) }
               <div class="progress bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : joinpercent() + '%' }"></div>
             </td>
             <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().name + '/' + tableName() }"></a></td>
-            <td class="pointer"><code data-bind="text: joinColumns, click: scrollToColumn"></code></td>
+            <td class="pointer"><code data-bind="text: joinColumns, click: $root.scrollToColumn"></code></td>
             <td data-bind="text: numJoins"></td>
           </tr>
           </tbody>
@@ -1385,14 +1385,7 @@ ${ components.menubar(is_embeddable) }
         $('${ MAIN_SCROLLABLE }').getNiceScroll().resize();
       });
 
-      ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
-
-      if (location.getParameter('refresh') === 'true') {
-        huePubSub.publish('assist.db.refresh', { sourceTypes: [viewModel.sourceType()] });
-        hueUtils.replaceURL('?');
-      }
-
-      window.scrollToColumn = function (col) {
+      viewModel.scrollToColumn = function (col) {
         if (!col.table.samples.loading()) {
           $('a[href="#sample"]').click();
           hueUtils.waitForRendered('#sample .sample-table', function (el) {
@@ -1413,6 +1406,13 @@ ${ components.menubar(is_embeddable) }
             sampleTable.parent().trigger('scroll_update');
           });
         }
+      }
+
+      ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
+
+      if (location.getParameter('refresh') === 'true') {
+        huePubSub.publish('assist.db.refresh', { sourceTypes: [viewModel.sourceType()] });
+        hueUtils.replaceURL('?');
       }
 
     });
