@@ -73,6 +73,9 @@ class Collection2(object):
       props['collection']['description'] = self.document.description
 
     # For backward compatibility
+    if 'gridItems' not in props:
+      props['gridItems'] = []
+
     if 'rows' not in props['collection']['template']:
       props['collection']['template']['rows'] = 25
     if 'showGrid' not in props['collection']['template']:
