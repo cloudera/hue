@@ -153,7 +153,10 @@ class SQLDashboardApi(DashboardApi):
 
   def datasets(self, show_all=False):
     snippet = {'type': self.engine}
-    return [table['name'] for table in get_api(MockRequest(self.user), snippet).autocomplete(snippet, database='default')['tables_meta']]
+    # Ideally from left assist at some point instead
+    databases = get_api(MockRequest(self.user), snippet).autocomplete(snippet)['databases']
+    database = databases and 'default' not in databases and databases[0] or 'default'
+    return [table['name'] for table in get_api(MockRequest(self.user), snippet).autocomplete(snippet, database=database)['tables_meta']]
 
 
   def fields(self, dashboard):
