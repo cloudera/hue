@@ -51,6 +51,19 @@ DEFAULT_LAYOUT = [
         "drops":["temp"],"klass":"card card-home card-column span10"},
 ]
 
+QUEERY_BUILDER_LAYOUT = [
+  {u'klass': u'card card-home card-column span12', u'rows': [
+    {u'widgets': [
+        {u'name': u'Filter Bar', u'widgetType': u'filter-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'abe50df3-a5a0-408a-8122-019d779b4354', u'size': 12}],
+     u'id': u'22532a0a-8e43-603a-daa9-77d5d233fd7f', u'columns': []},
+        {u'widgets': [], u'id': u'ebb7fe4d-64c5-c660-bdc0-02a77ff8321e', u'columns': []},
+        {u'widgets': [{u'name': u'Grid Results', u'widgetType': u'resultset-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'14023aef-b233-9420-96c6-15d48293532b', u'size': 12}],
+    u'id': u'2bfa8b4b-f7f3-1491-4de0-282130c6ab61', u'columns': []}
+    ],
+    u'id': u'7e0c0a45-ae90-43a6-669a-2a852ef4a449', u'drops': [u'temp'], u'size': 12
+  }
+]
+
 
 def index(request, is_mobile=False):
   hue_collections = DashboardController(request.user).get_search_collections()
@@ -87,6 +100,7 @@ def index(request, is_mobile=False):
     'initial': json.dumps({
         'collections': [],
         'layout': DEFAULT_LAYOUT,
+        'qb_layout': QUEERY_BUILDER_LAYOUT,
         'is_latest': _get_latest(),
         'engines': get_engines(request.user)
     }),
@@ -115,6 +129,7 @@ def new_search(request):
       'initial': {
           'collections': collections,
           'layout': DEFAULT_LAYOUT,
+          'qb_layout': QUEERY_BUILDER_LAYOUT,
           'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }
@@ -126,6 +141,7 @@ def new_search(request):
       'initial': json.dumps({
           'collections': collections,
           'layout': DEFAULT_LAYOUT,
+          'qb_layout': QUEERY_BUILDER_LAYOUT,
           'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }),
@@ -159,6 +175,7 @@ def browse(request, name, is_mobile=False):
                "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
           "drops":["temp"],"klass":"card card-home card-column span10"}
       ],
+      'qb_layout': QUEERY_BUILDER_LAYOUT,
       'is_latest': _get_latest(),
       'engines': get_engines(request.user)
     }),

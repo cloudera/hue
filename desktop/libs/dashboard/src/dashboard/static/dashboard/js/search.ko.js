@@ -20,6 +20,13 @@ function magicSearchLayout(vm) {
   huePubSub.publish('dashboard.set.layout');
 }
 
+function queryBuilderSearchLayout(vm) {
+  loadSearchLayout(vm, vm.initial.qbLayout);
+  $(document).trigger("magicSearchLayout");
+  huePubSub.publish('dashboard.set.layout');
+}
+
+
 function loadSearchLayout(viewModel, json_layout) {
   var _columns = [];
 
@@ -1599,6 +1606,7 @@ var NewTemplate = function (vm, initial) {
   self.collections = ko.mapping.fromJS(initial.collections);
   self.engines = ko.mapping.fromJS(initial.engines);
   self.layout = initial.layout;
+  self.qbLayout = initial.qb_layout;
   self.inited = ko.observable(self.collections().length > 0); // No collection if not a new dashboard
 
   self.init = function() {
@@ -2630,7 +2638,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.query.selectedMultiq('query');
 
 
-
     // UI
     self.selectedQDefinition(null);
     self.response({});
@@ -2655,7 +2662,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/new_search');
     }
   };
-
 
 
   self.build();
