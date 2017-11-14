@@ -61,7 +61,7 @@
       });
     });
 
-    fit('should suggest values for "field:"a|"', function () {
+    it('should suggest values for "field:"a|"', function () {
       testAutocomplete('field:"a', '', {
         suggestValues: { field: 'field', quotePresent: true }
       });
