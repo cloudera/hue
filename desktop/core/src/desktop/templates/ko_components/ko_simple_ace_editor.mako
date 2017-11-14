@@ -809,6 +809,15 @@ from desktop.views import _ko
 
         editor.setOptions(aceOptions);
 
+        if (params.onExec) {
+          var bindPrefix = params.singleLine ? 'Enter|Shift-Enter|' : '';
+          editor.commands.addCommand({
+            name: 'enter',
+            bindKey: { win: bindPrefix + 'Ctrl-Enter', mac: bindPrefix + 'Ctrl-Enter|Command-Enter' },
+            exec: params.onExec
+          });
+        }
+
         if (params.singleLine) {
           editor.renderer.screenToTextCoordinates = function(x, y) {
             var pos = this.pixelToScreenCoordinates(x, y);
@@ -818,7 +827,9 @@ from desktop.views import _ko
             );
           };
 
-          editor.commands.bindKey('Enter|Shift-Enter', 'null');
+          if (!params.onExec) {
+            editor.commands.bindKey('Enter|Shift-Enter', 'null');
+          }
 
           var pasteListener = editor.on('paste', function(e) {
             e.text = e.text.replace(/[\r\n]+/g, ' ');
@@ -847,7 +858,7 @@ from desktop.views import _ko
 
           var $placeHolder = $("<div>").text(ko.unwrap(params.placeHolder)).addClass("ace_invisible ace_emptyMessage");
 
-          if (editor.getValue().length == 0) {
+          if (editor.getValue().length === 0) {
             $placeHolder.appendTo(editor.renderer.scroller);
             placeHolderVisible = true;
           }
@@ -900,7 +911,7 @@ from desktop.views import _ko
         }
 
         var parseThrottle = -1;
-        var inputListener = editor.on('input', function () {
+        var valueUpdateListener = editor.on('input', function () {
           self.value(editor.getValue());
           if (self.parsedValue && self.autocompleter && self.autocompleter.parse) {
             window.clearTimeout(parseThrottle);
@@ -917,7 +928,7 @@ from desktop.views import _ko
         });
 
         self.disposeFunctions.push(function () {
-          editor.off('input', inputListener);
+          editor.off('input', valueUpdateListener);
         });
       };
 
