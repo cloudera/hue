@@ -23,5 +23,5 @@ from notebook.dashboard_api import SQLDashboardApi
 LOG = logging.getLogger(__name__)
 
 
-class ImpalaDashboardApi(SQLDashboardApi):
+class HiveDashboardApi(SQLDashboardApi):
   pass
