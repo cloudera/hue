@@ -55,6 +55,22 @@ function loadSearchLayout(viewModel, json_layout) {
   viewModel.columns(_columns);
 }
 
+function loadDashboardLayout(viewModel, grister_layout) {
+  $.each(grister_layout, function(index, item) {
+    self.gridItems.push(
+      ko.mapping.fromJS({
+        col: item.col,
+        row: item.row,
+        size_x: item.size_x,
+        size_y: item.size_y,
+        widget: viewModel.getWidgetById(item.widget.id),
+        callback: function (el) {
+          $('.gridster ul').data('gridster').move_widget(el, 1, 1);
+        }
+      }));
+  });
+}
+
 // End dashboard lib
 
 function layoutToGridster(vm) {
@@ -1792,6 +1808,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
     loadSearchLayout(self, self.collectionJson.layout);
 
+    self.gridItems = ko.observableArray();
+
     self.additionalMustache = null;
 
     self.isEditing = ko.observable(false);
@@ -1850,8 +1868,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.draggableTree2 = ko.observable(bareWidgetBuilder("Tree", "tree2-widget", 6));
     self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget", 6));
     self.draggableDocument = ko.observable(bareWidgetBuilder("Document", "document-widget", 6));
-
-    self.gridItems = ko.observableArray([]);
 
     self.hasAvailableFields = ko.pureComputed(function () {
       return self.collection.availableFacetFields().length > 0;
@@ -2158,59 +2174,59 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
 
       $.when.apply($, [
-          $.post("/dashboard/search", {
-              collection: ko.mapping.toJSON(self.collection),
-              query: ko.mapping.toJSON(self.query),
-              layout: ko.mapping.toJSON(self.columns)
-            }, function (data) {
-              data = JSON.bigdataParse(data);
-              try {
-                if (self.collection.engine() == 'solr') {
-                  self._make_grid_result(data, callback);
-                } else {
-                  self.collection.queryResult(new QueryResult(self, {
-                    type: self.collection.engine(),
-                    result: data,
-                    status: 'running',
-                    progress: 0,
-                  }));
-                  self.checkStatus(self.collection);
-                }
+        $.post("/dashboard/search", {
+            collection: ko.mapping.toJSON(self.collection),
+            query: ko.mapping.toJSON(self.query),
+            layout: ko.mapping.toJSON(self.columns)
+          }, function (data) {
+            data = JSON.bigdataParse(data);
+            try {
+              if (self.collection.engine() == 'solr') {
+                self._make_grid_result(data, callback);
+              } else {
+                self.collection.queryResult(new QueryResult(self, {
+                  type: self.collection.engine(),
+                  result: data,
+                  status: 'running',
+                  progress: 0,
+                }));
+                self.checkStatus(self.collection);
               }
-              catch (e) {
-                console.log(e);
-              }
-            },
-            "text")
+            }
+            catch (e) {
+              console.log(e);
+            }
+          },
+          "text")
         ].concat(multiQs)
       )
-        .done(function () {
-          if (arguments[0] instanceof Array) {
-            if (self.collection.engine() == 'solr') { // If multi queries
-              var histograms = self.collection.getHistogramFacets();
-              for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
-                var histoFacetId = histograms[h].id();
-                var histoFacet = self.getFacetFromQuery(histoFacetId);
-                var _series = [];
-                for (var i = 1; i < arguments.length; i++) {
-                  _series.push(arguments[i][0]['series']);
-                }
-                histoFacet.extraSeries(_series);
+      .done(function () {
+        if (arguments[0] instanceof Array) {
+          if (self.collection.engine() == 'solr') { // If multi queries
+            var histograms = self.collection.getHistogramFacets();
+            for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
+              var histoFacetId = histograms[h].id();
+              var histoFacet = self.getFacetFromQuery(histoFacetId);
+              var _series = [];
+              for (var i = 1; i < arguments.length; i++) {
+                _series.push(arguments[i][0]['series']);
               }
-              self.response.valueHasMutated();
+              histoFacet.extraSeries(_series);
             }
+            self.response.valueHasMutated();
           }
-        })
-        .fail(function (xhr, textStatus, errorThrown) {
-          $(document).trigger("error", xhr.responseText);
-        })
-        .always(function () {
-          if (!self.collection.async()) {
-            self.isRetrievingResults(false);
-            self.hasRetrievedResults(true);
-            $('.btn-loading').button('reset');
-          }
-        });
+        }
+      })
+      .fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      })
+      .always(function () {
+        if (!self.collection.async()) {
+          self.isRetrievingResults(false);
+          self.hasRetrievedResults(true);
+          $('.btn-loading').button('reset');
+        }
+      });
     };
 
     self._make_grid_result = function (data, callback) {
@@ -2461,7 +2477,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             versionField[0].value(data.update.adds[1]);
             versionField[0].hasChanged(false);
           }
-          ;
 
           doc.originalDetails(ko.toJSON(doc.details()));
         }
@@ -2504,7 +2519,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.save = function () {
       $.post("/dashboard/save", {
         collection: ko.mapping.toJSON(self.collection),
-        layout: ko.mapping.toJSON(self.columns)
+        layout: ko.mapping.toJSON(self.columns),
+        gridItems: ko.mapping.toJSON(self.gridItems)
       }, function (data) {
         if (data.status == 0) {
           if (! self.collection.id()) {
@@ -2524,11 +2540,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
     };
 
+    loadDashboardLayout(self, self.collectionJson.gridItems);
+
     huePubSub.subscribe('dashboard.set.layout', function() {
       self.gridItems(layoutToGridster(self));
     }, 'dashboard');
-
-    self.gridItems(layoutToGridster(self));
 
   };
 
@@ -2663,6 +2679,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.isSyncingCollections(false);
     self.isPlayerMode(false);
     self.gridItems([]);
+    // loadDashboardLayout(self, self.collectionJson.gridItems); // TODO
 
     if (window.location.search.indexOf("collection") > -1) {
       hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/new_search');
@@ -2672,4 +2689,3 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
   self.build();
 };
-

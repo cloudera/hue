@@ -200,6 +200,7 @@ def save(request):
 
   collection = json.loads(request.POST.get('collection', '{}'))
   layout = json.loads(request.POST.get('layout', '{}'))
+  gridItems = json.loads(request.POST.get('gridItems', '{}'))
 
   collection['template']['extracode'] = escape(collection['template']['extracode'])
 
@@ -212,7 +213,8 @@ def save(request):
 
     dashboard_doc.update_data({
         'collection': collection,
-        'layout': layout
+        'layout': layout,
+        'gridItems': gridItems
     })
     dashboard_doc1 = dashboard_doc.doc.get()
     dashboard_doc.name = dashboard_doc1.name = collection['label']

@@ -3635,7 +3635,6 @@ $(document).ready(function () {
     }
   }
 
-
   huePubSub.subscribe('plotly.afterplot', function (element) {
     resizeGridsterWidget($(element).parents('li.gs-w'));
   }, 'dashboard');
@@ -3667,20 +3666,21 @@ $(document).ready(function () {
       }
       else {
         var newPosition = $('.gridster ul').data('gridster').next_position(12, targetHeight);
-        searchViewModel.gridItems.push(ko.mapping.fromJS({
-          col: newPosition.col,
-          row: newPosition.row,
-          size_x: 12,
-          size_y: targetHeight,
-          widget: widget,
-          callback: function (el) {
-            $('.gridster ul').data('gridster').move_widget(el, 1, 1);
-          }
-        }));
+        searchViewModel.gridItems.push(
+          ko.mapping.fromJS({
+            col: newPosition.col,
+            row: newPosition.row,
+            size_x: 12,
+            size_y: targetHeight,
+            widget: widget,
+            callback: function (el) {
+              $('.gridster ul').data('gridster').move_widget(el, 1, 1);
+            }
+          })
+        );
       }
     }
   }, 'dashboard');
-
 %endif
 
   $(document).on("click", ".widget-settings-pill", function(){
