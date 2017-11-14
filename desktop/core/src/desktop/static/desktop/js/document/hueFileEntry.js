@@ -26,6 +26,9 @@ var HueFileEntry = (function () {
       if (!a.isDirectory() && b.isDirectory()) {
         return 1;
       }
+      if (a.isDirectory() && b.isDirectory()) {
+        return sorts.nameAsc(a, b);
+      }
       return sorts.lastModifiedDesc(a, b);
     },
     nameAsc: function (a, b) {
