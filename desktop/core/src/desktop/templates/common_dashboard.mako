@@ -54,7 +54,7 @@
       </div>
     </a>
     % if HAS_QUERY_BUILDER_ENABLED.get():
-    <a href="javascript: fullLayout(searchViewModel)" title="${ _('Query Builder: Single widget for easily analysing data in multiple dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Query Builder: Single widget for easily analysing data in multiple dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
       </div>
