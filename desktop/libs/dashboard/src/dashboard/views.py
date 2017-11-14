@@ -18,10 +18,10 @@
 import json
 import logging
 
+from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from django.core.urlresolvers import reverse
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
@@ -29,6 +29,7 @@ from desktop.models import Document2, Document
 from desktop.views import antixss
 
 from search.conf import LATEST
+from indexer.views import importer
 
 from dashboard.dashboard_api import get_engine
 from dashboard.decorators import allow_owner_only
@@ -117,7 +118,10 @@ def new_search(request):
   engine = request.GET.get('engine', 'solr')
   collections = get_engine(request.user, engine).datasets()
   if not collections:
-    return no_collections(request)
+    if engine == 'solr':
+      return no_collections(request)
+    else:
+      return importer(request)
 
   collection = Collection2(user=request.user, name=collections[0], engine=engine)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
