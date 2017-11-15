@@ -222,6 +222,12 @@ if USE_NEW_EDITOR.get():
 
 ${ hueIcons.symbols() }
 
+% if conf.DISABLE_HUE_3.get() and conf.IS_HUE_4.get() and request.environ.get("PATH_INFO").find("/hue/") < 0:
+  <script>
+    window.location.replace("/");
+  </script>
+% endif
+
 % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
   <div class="banner">
     ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }

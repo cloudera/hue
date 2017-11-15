@@ -1409,6 +1409,13 @@ IS_HUE_4 = Config( # To remove in Hue 5
   help=_('Choose whether to enable the new Hue 4 interface.')
 )
 
+DISABLE_HUE_3 = Config( # To remove in Hue 5
+  key='disable_hue_3',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether to still allow users to enable the old Hue 3 interface.')
+)
+
 
 def get_clusters():
   if CLUSTERS.get():
