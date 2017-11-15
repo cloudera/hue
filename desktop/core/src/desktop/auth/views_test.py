@@ -539,6 +539,72 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
     assert_true(self.fs.exists("/user/%s" % self.test_username))
 
 
+class TestMultipleBackendLoginNoHadoop(object):
+  reset = []
+  test_username = "test_mlogin_no_hadoop"
+
+  @classmethod
+  def setup_class(cls):
+    # Simulate first login ever
+    User.objects.all().delete()
+
+    cls.ldap_backend = django_auth_ldap_backend.LDAPBackend
+    django_auth_ldap_backend.LDAPBackend = MockLdapBackend
+
+    # Override auth backend, settings are only loaded from conf at initialization so we can't use set_for_testing
+    cls.auth_backends = settings.AUTHENTICATION_BACKENDS
+    settings.AUTHENTICATION_BACKENDS = (['desktop.auth.backend.LdapBackend', 'desktop.auth.backend.AllowFirstUserDjangoBackend'])
+
+    # Need to recreate LdapBackend class with new monkey patched base class
+    reload(backend)
+
+  @classmethod
+  def teardown_class(cls):
+    django_auth_ldap_backend.LDAPBackend = cls.ldap_backend
+
+    settings.AUTHENTICATION_BACKENDS = cls.auth_backends
+
+    reload(backend)
+
+  def setUp(self):
+    self.c = Client()
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing(['AllowFirstUserDjangoBackend', 'LdapBackend']) )
+    self.reset.append(conf.LDAP.LDAP_URL.set_for_testing('does not matter'))
+
+  def tearDown(self):
+    User.objects.all().delete()
+
+    for finish in self.reset:
+      finish()
+
+  def test_login(self):
+    response = self.c.get('/hue/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true(response.context['first_login_ever'])
+
+    response = self.c.post('/hue/accounts/login/', {
+        'username': self.test_username,
+        'password': "ldap1",
+        'password1': "ldap1",
+        'password2': "ldap1",
+        'server': "Local"
+    })
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
+
+    response = self.c.get('/hue/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_false(response.context['first_login_ever'])
+
+    self.c.get('/accounts/logout')
+
+    response = self.c.post('/hue/accounts/login/', {
+        'username': self.test_username,
+        'password': "ldap1",
+        'server': "LDAP"
+    })
+    assert_equal(200, response.status_code, "Expected ok status.")
+
+
 class TestLogin(PseudoHdfsTestBase):
 
   reset = []
