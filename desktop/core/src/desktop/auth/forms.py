@@ -18,7 +18,7 @@
 import datetime
 
 from django.conf import settings
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_backends
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm as AuthAuthenticationForm, UserCreationForm as AuthUserCreationForm
 from django.forms import CharField, TextInput, PasswordInput, ChoiceField, ValidationError
@@ -29,11 +29,26 @@ from desktop import conf
 from useradmin.password_policy import get_password_validators
 
 
+def get_backend_names():
+  return get_backends and [backend.__class__.__name__ for backend in get_backends()]
+
+def is_active_directory():
+  return 'LdapBackend' in get_backend_names() and \
+                          (bool(conf.LDAP.NT_DOMAIN.get()) or bool(conf.LDAP.LDAP_SERVERS.get()) or conf.LDAP.LDAP_URL.get() is not None)
+
+def get_ldap_server_keys():
+  return [(ldap_server_record_key) for ldap_server_record_key in conf.LDAP.LDAP_SERVERS.get()]
+
 def get_server_choices():
   if conf.LDAP.LDAP_SERVERS.get():
-    return [(ldap_server_record_key, ldap_server_record_key) for ldap_server_record_key in conf.LDAP.LDAP_SERVERS.get()]
+    auth_choices = [(ldap_server_record_key, ldap_server_record_key) for ldap_server_record_key in conf.LDAP.LDAP_SERVERS.get()]
   else:
-    return [('LDAP', 'LDAP')]
+    auth_choices = [('LDAP', 'LDAP')]
+
+  if is_active_directory() and 'AllowFirstUserDjangoBackend' in get_backend_names():
+    auth_choices.append(('Local', _('Local')))
+
+  return auth_choices
 
 
 class AuthenticationForm(AuthAuthenticationForm):
