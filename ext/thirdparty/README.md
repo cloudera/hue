@@ -85,9 +85,75 @@ Downloaded third party dependencies during build
 |Re-distributed|Project|Version|License|Source URL|
 |--------------|-------|-------|-------|----------|
 |Y|ipython|0.10|BSD|http://ipython.scipy.org/dist|
-|Y|MooTools-Core|?|MIT|http://mootools.net/download|
 |Y|Nose|0.11.3|LGPL|http://somethingaboutorange.com/mrl/projects/nose/0.11.3/|
 |Y|nosetty|0.4|LGPL|http://code.google.com/p/nosetty/|
 |N|pylint|0.19.0|GPL|http://www.logilab.org/project/pylint|
 |Y|Werkzeug|0.6|BSD|http://werkzeug.pocoo.org/|
 |Y|windmill|1.3|Apache2|http://www.getwindmill.com/|
+
+
+---
+Checked-in frontend third party dependencies
+
+|Project|Version|License|Source URL|
+|-------|-------|-------|----------|
+|Ace Editor|1.2.2|BSD|https://github.com/ajaxorg/ace|
+|Chosen|1.0.0|MIT|https://github.com/harvesthq/chosen|
+|Jasmine|2.3.4|MIT|https://github.com/jasmine/jasmine|
+|jQuery|2.2.4|MIT|https://github.com/jquery/jquery|
+|jQuery Basic Table|?|MIT|https://github.com/jerrylow/basictable|
+|jQuery contextMenu|?|MIT|https://github.com/swisnl/jQuery-contextMenu|
+|jQuery Cookie|1.4.1|MIT|https://github.com/carhartl/jquery-cookie|
+|jQuery curvedArrow|?|None|https://github.com/csytan/jquery-curvedarrow|
+|jQuery dataTables|1.8.2|BSD|http://www.datatables.net|
+|jQuery Flot|0.8.2|MIT|https://github.com/flot/flot|
+|jQuery Form Plugin|3.51.0-2014.06.20|MIT|https://github.com/malsup/form|
+|Gridster.js|0.7.0|MIT|https://github.com/dsmorse/gridster.js|
+|jQuery Hotkeys Plugin|0.2.0|MIT|https://github.com/jeresig/jquery.hotkeys|
+|Nicescroll|3.7.6|MIT|https://github.com/inuyaksa/jquery.nicescroll|
+|TotalStorage|1.1.3|MIT|https://github.com/Upstatement/jquery-total-storage|
+|TouchSwipe|1.6.18|MIT|https://github.com/mattbryson/TouchSwipe-Jquery-Plugin|
+|TouchSwipe|1.6.18|MIT|https://github.com/mattbryson/TouchSwipe-Jquery-Plugin|
+|jQuery UI|1.10.4+1.12.1|MIT|https://github.com/jquery/jquery-ui|
+|jQuery visible|?|MIT|https://github.com/customd/jquery-visible|
+|jQuery fieldSelection|0.1.1|WTFPL|https://github.com/localhost/jquery-fieldselection|
+|jqCron|?|MIT|https://github.com/arnapou/jqcron|
+|Leaflet|0.7.2|BSD|https://github.com/Leaflet/Leaflet|
+|Leaflet Heat|?|BSD|https://github.com/mourner/simpleheat|
+|Leaflet ZoomBox|?|ISC|https://github.com/consbio/Leaflet.ZoomBox|
+|Bootstrap|2.3.2|Apache|https://github.com/twbs/bootstrap|
+|bootstrap-better-typeahead.js|1.0.0|Apache|https://github.com/ianqueue/Bootstrap-Better-Typeahead|
+|bootstrap-datepicker.js|?|Apache|http://www.eyecon.ro/bootstrap-datepicker/|
+|bootstrap-daterangepicker.js|1.3.7|Apache|https://github.com/dangrossman/bootstrap-daterangepicker/|
+|X-editable|1.5.1|MIT|http://github.com/vitalets/x-editable|
+|bootstrap-fileupload.js|j2|Apache|https://github.com/jasny/bootstrap/|
+|bootstrap-timepicker.js|?|MIT|http://www.github.com/jdewit/bootstrap-timepicker|
+|bootstrap slider|?|Apache|https://github.com/seiyria/bootstrap-slider|
+|bootstrap spinedit|?|Apache|https://github.com/geersch/bootstrap-spinedit|
+|classList.js|?|Unlicense|https://github.com/eligrey/classList.js|
+|clipboard.js|1.7.1|MIT|https://zenorocha.github.io/clipboard.js|
+|Codemirror|3.11|MIT|https://github.com/codemirror/CodeMirror|
+|D3|3.5.2+4.4.4|BSD|https://github.com/d3/d3|
+|Dropzone.js|4.3.0|MIT|https://github.com/enyo/dropzone|
+|filesize.js|3.2.1|BSD|https://github.com/avoidwork/filesize.js|
+|FileUploader|?|MIT|https://github.com/FineUploader/fine-uploader|
+|Freshereditor|?|None|https://github.com/mquan/freshereditor|
+|Malihu custom scrollbar|3.1.5|MIT|https://github.com/malihu/malihu-custom-scrollbar-plugin|
+|KnockoutJS|3.4.2|MIT|https://github.com/knockout/knockout|
+|Knockout Validation|2.0.3|MIT|https://github.com/Knockout-Contrib/Knockout-Validation|
+|Knockout Switch/Case|2.0.1|MIT|https://github.com/mbest/knockout-switch-case|
+|LESS|1.7.0|Apache|https://github.com/less/less.js/|
+|Markdown.js|?|MIT|https://github.com/cadorn/markdown-js|
+|Medium Editor|?|MIT|https://github.com/yabwe/medium-editor|
+|Moment.js|2.13.0|MIT|https://momentjs.com|
+|Mustache.js|0.7.2|MIT|http://github.com/janl/mustache.js|
+|nvd3|1.1.15b|Apache|https://github.com/novus/nvd3|
+|Plotly.js|1.31.0|MIT|https://github.com/plotly/plotly.js/|
+|Selectize.js|0.12.3|Apache|https://github.com/selectize/selectize.js|
+|Shepherd|1.8.1|MIT|https://github.com/HubSpot/shepherd|
+|Shortcut.js|2.01.B|BSD|http://www.openjs.com/scripts/events/keyboard_shortcuts/|
+|Tether|0.6.5|MIT|https://github.com/HubSpot/tether|
+|TopoJSON|1.0.0|BSD|https://github.com/topojson/topojson|
+|tzdetect.js|?|MIT|https://github.com/Canop/tzdetect.js|
+|wysihtml5|0.3.0|MIT|https://github.com/xing/wysihtml5|
+|Select2|3.5.1|MIT|https://github.com/select2/select2|
