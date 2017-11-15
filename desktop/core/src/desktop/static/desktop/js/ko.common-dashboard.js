@@ -229,6 +229,7 @@ var Widget = function (params) {
   }
 
   self.size = ko.observable(params.size).extend({ numeric: 0 });
+  self.gridsterHeight = ko.observable(params.gridsterHeight).extend({ numeric: 0 });
 
   self.name = ko.observable(params.name);
   self.id = ko.observable(params.id);

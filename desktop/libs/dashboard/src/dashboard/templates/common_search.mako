@@ -3635,33 +3635,6 @@ $(document).ready(function () {
     }
   }
 
-  huePubSub.subscribeOnce('calculate.gridster.heights', function () {
-    $('.gridster ul li.gs-w').each(function () {
-      resizeGridsterWidget($(this));
-    });
-  }, 'dashboard');
-
-
-  // there's no elegant way to do this because it doesn't work with knockout afterrender events
-  var previousWidgetsHeights = 0;
-  var toleranceCycles = 0;
-  var renderingCheckInterval = window.setInterval(function () {
-    if (toleranceCycles === 5) {
-      window.clearInterval(renderingCheckInterval);
-      huePubSub.publish('calculate.gridster.heights');
-    }
-    var latestWidgetsHeights = 0;
-    $('.gridster ul li.gs-w .card-widget').each(function () {
-      latestWidgetsHeights += $(this).height();
-    });
-    if (latestWidgetsHeights !== previousWidgetsHeights) {
-      previousWidgetsHeights = latestWidgetsHeights;
-      toleranceCycles = 0;
-    }
-    else {
-      toleranceCycles++;
-    }
-  }, 200);
 
   huePubSub.subscribe('plotly.afterplot', function (element) {
     resizeGridsterWidget($(element).parents('li.gs-w'));
@@ -3680,26 +3653,31 @@ $(document).ready(function () {
   }, 'dashboard');
 
   huePubSub.subscribe('gridster.add.widget', function (options) {
-    var widgetId = options.id;
-    if (options.target) {
-      searchViewModel.gridItems().forEach(function (item) {
-        if (item.col() === options.target.col() && item.row() === options.target.row()) {
-          item.widget(searchViewModel.getWidgetById(widgetId));
-        }
-      });
-    }
-    else {
-      var newPosition = $('.gridster ul').data('gridster').next_position(12, 12);
-      searchViewModel.gridItems.push(ko.mapping.fromJS({
-        col: newPosition.col,
-        row: newPosition.row,
-        size_x: 12,
-        size_y: 12,
-        widget: searchViewModel.getWidgetById(widgetId),
-        callback: function (el) {
-          $('.gridster ul').data('gridster').move_widget(el, 1, 1);
-        }
-      }));
+    var widget = searchViewModel.getWidgetById(options.id);
+    if (widget) {
+      var targetHeight = widget.gridsterHeight() || 6;
+      if (options.target) {
+        searchViewModel.gridItems().forEach(function (item) {
+          if (item.col() === options.target.col() && item.row() === options.target.row()) {
+            item.widget(widget);
+            item.size_y(targetHeight);
+            $('.gridster ul').data('gridster').resize_widget($(item.gridsterElement), item.size_x(), item.size_y());
+          }
+        });
+      }
+      else {
+        var newPosition = $('.gridster ul').data('gridster').next_position(12, targetHeight);
+        searchViewModel.gridItems.push(ko.mapping.fromJS({
+          col: newPosition.col,
+          row: newPosition.row,
+          size_x: 12,
+          size_y: targetHeight,
+          widget: widget,
+          callback: function (el) {
+            $('.gridster ul').data('gridster').move_widget(el, 1, 1);
+          }
+        }));
+      }
     }
   }, 'dashboard');
 
