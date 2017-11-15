@@ -458,6 +458,22 @@ from desktop.views import _ko
             }))
           }
         });
+
+        this._editorSettingsUpdate = huePubSub.subscribe('editor.settings.update', function (data) {
+          var setting;
+          for (var i = 0; i < self.values.length; i++) {
+            if (self.values().key == data.key) {
+              setting = self.values()[i];
+              break;
+            }
+          }
+          if (!setting) {
+            self.addValue();
+            setting = self.values()[self.values().length - 1];
+          }
+          setting.key(data.key);
+          setting.value(data.value);
+        });
       }
 
       KeyValueListInputViewModel.prototype.addValue = function () {
@@ -472,6 +488,10 @@ from desktop.views import _ko
       KeyValueListInputViewModel.prototype.removeValue = function (valueToRemove) {
         var self = this;
         self.values.remove(valueToRemove);
+      };
+
+      KeyValueListInputViewModel.prototype.dispose = function () {
+        this._editorSettingsUpdate.remove();
       };
 
       ko.components.register('key-value-list-input', {

@@ -1175,12 +1175,14 @@ var EditorViewModel = (function() {
 
           self.errors.push({
             message: data.message.replace(match[0], 'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')),
+            help: null,
             line: errorLine - 1,
             col: errorCol
           })
         } else {
           self.errors.push({
             message: data.message,
+            help: data.help,
             line: null,
             col: null
           });
