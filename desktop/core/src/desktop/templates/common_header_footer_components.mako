@@ -521,7 +521,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       set: version
     }, function (data) {
       if (data && data.status == 0) {
-        location.href = version === 3 ? window.location.pathname.substr(4) + window.location.search : '/hue' + window.location.pathname + window.location.search
+        location.href = version === 3 && '${ conf.DISABLE_HUE_3.get() }' == 'False' ? window.location.pathname.substr(4) + window.location.search : '/hue' + window.location.pathname + window.location.search
       }
       else {
         $.jHueNotify.error("${ _('An error occurred while saving your default Hue preference. Please try again...') }");

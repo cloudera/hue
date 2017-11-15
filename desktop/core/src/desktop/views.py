@@ -46,7 +46,7 @@ import desktop.log.log_buffer
 from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 
-from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, get_clusters
+from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, get_clusters, DISABLE_HUE_3
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
@@ -347,11 +347,11 @@ def unsupported(request):
   return render('unsupported.mako', request, None)
 
 def index(request):
-  is_hue_4 = IS_HUE_4.get()
+  is_hue_4 = IS_HUE_4.get() or DISABLE_HUE_3.get()
   if is_hue_4:
     try:
       user_hue_version = json.loads(UserPreferences.objects.get(user=request.user, key='hue_version').value)
-      is_hue_4 = user_hue_version >= 4
+      is_hue_4 = user_hue_version >= 4 or DISABLE_HUE_3.get()
     except UserPreferences.DoesNotExist:
       pass
 

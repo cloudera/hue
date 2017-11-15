@@ -18,7 +18,6 @@
 import logging
 import json
 import StringIO
-import re
 import tempfile
 import zipfile
 
