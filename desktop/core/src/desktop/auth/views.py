@@ -80,19 +80,17 @@ def first_login_ever():
   return False
 
 
-def get_backend_names():
-  return get_backends and [backend.__class__.__name__ for backend in get_backends()]
-
-
 @login_notrequired
 @watch_login
 def dt_login(request, from_modal=False):
   redirect_to = request.REQUEST.get('next', '/')
   is_first_login_ever = first_login_ever()
-  backend_names = get_backend_names()
-  is_active_directory = 'LdapBackend' in backend_names and ( bool(LDAP.NT_DOMAIN.get()) or bool(LDAP.LDAP_SERVERS.get()) )
+  backend_names = auth_forms.get_backend_names()
+  is_active_directory = auth_forms.is_active_directory()
+  is_ldap_option_selected = 'server' not in request.POST or request.POST['server'] == 'LDAP' \
+                            or request.POST['server'] in auth_forms.get_ldap_server_keys()
 
-  if is_active_directory:
+  if is_active_directory and is_ldap_option_selected:
     UserCreationForm = auth_forms.LdapUserCreationForm
     AuthenticationForm = auth_forms.LdapAuthenticationForm
   else:
