@@ -3619,8 +3619,17 @@ $(document).ready(function () {
     max_rows: 6000,
     resize: {
       enabled: true,
+      start: function (event, ui, $widget) {
+        if ($widget.find('.card-widget').length > 0) {
+          $widget.find('.card-widget').hide();
+        }
+      },
       stop: function (event, ui, $widget) {
         huePubSub.publish('resize.plotly.chart');
+        if ($widget.find('.card-widget').length > 0) {
+          $widget.find('.card-widget').show();
+          $widget.find('.card-widget').height($widget.height());
+        }
       },
     }
   });
