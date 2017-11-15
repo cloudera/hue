@@ -902,7 +902,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <ul class="nav nav-pills margin-top-20">
         <li>
-          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan().plan) { fetchProfile('plan'); } } }">
+          <a href="#queries-page-plan${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-plan${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.plan || !properties.plan().plan_json) { fetchProfile('plan'); } } }">
             ${ _('Plan') }</a>
         </li>
         <li>
@@ -918,11 +918,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             ${ _('Summary') }</a>
         </li>
         <li>
-          <a href="#queries-page-profile${ SUFFIX }" data-bind="click: function(){ if (!properties.profile || !properties.profile().profile) { fetchProfile('profile'); } $('a[href=\'#queries-page-profile${ SUFFIX }\']').tab('show'); }">
+          <a href="#queries-page-profile${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-profile${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.profile || !properties.profile().profile) { fetchProfile('profile'); } } }">
             ${ _('Profile') }</a>
         </li>
         <li>
-          <a href="#queries-page-memory${ SUFFIX }" data-bind="click: function(){ if (!properties.memory || !properties.memory().mem_usage) { fetchProfile('memory'); } $('a[href=\'#queries-page-memory${ SUFFIX }\']').tab('show'); }">
+          <a href="#queries-page-memory${ SUFFIX }" data-bind="click: function(){ $('a[href=\'#queries-page-memory${ SUFFIX }\']').tab('show'); }, event: {'shown': function () { if (!properties.memory || !properties.memory().mem_usage) { fetchProfile('memory'); } } }">
             ${ _('Memory') }</a>
         </li>
       </ul>
@@ -930,25 +930,30 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, height:$root.isMini() ? 250 : 600 }">
-          <svg class="query-plan" style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
-            <g/>
-          </svg>
+        <div class="tab-pane" id="queries-page-plan${ SUFFIX }" data-profile="plan">
+          <div data-bind="visible:properties.plan && properties.plan().plan_json && properties.plan().plan_json.plan_nodes.length">
+            <div id="queries-page-plan-graph${ SUFFIX }" data-bind="impalaDagre: {value: properties.plan && properties.plan().plan_json, height:$root.isMini() ? 250 : 600 }">
+              <svg class="query-plan" style="width:100%;height:100%;" id="queries-page-plan-svg${ SUFFIX }">
+                <g/>
+              </svg>
+            </div>
+          </div>
+          <pre data-bind="visible:!properties.plan || !properties.plan().plan_json || !properties.plan().plan_json.plan_nodes.length" >${ _('The selected tab has no data') }</pre>
         </div>
         <div class="tab-pane" id="queries-page-stmt${ SUFFIX }" data-profile="plan">
-          <pre data-bind="text: properties.plan && properties.plan().stmt"/>
+          <pre data-bind="text: (properties.plan && properties.plan().stmt) || _('The selected tab has no data')"/>
         </div>
         <div class="tab-pane" id="queries-page-plan-text${ SUFFIX }" data-profile="plan">
-          <pre data-bind="text: properties.plan && properties.plan().plan"/>
+          <pre data-bind="text: (properties.plan && properties.plan().plan) || _('The selected tab has no data')"/>
         </div>
         <div class="tab-pane" id="queries-page-summary${ SUFFIX }" data-profile="plan">
-          <pre data-bind="text: properties.plan && properties.plan().summary"/>
+          <pre data-bind="text: (properties.plan && properties.plan().summary) || _('The selected tab has no data')"/>
         </div>
         <div class="tab-pane" id="queries-page-profile${ SUFFIX }" data-profile="profile">
-          <pre data-bind="text: properties.profile && properties.profile().profile"/>
+          <pre data-bind="text: (properties.profile && properties.profile().profile) || _('The selected tab has no data')"/>
         </div>
         <div class="tab-pane" id="queries-page-memory${ SUFFIX }" data-profile="mem_usage">
-          <pre data-bind="text: properties.memory && properties.memory().mem_usage"/>
+          <pre data-bind="text: (properties.memory && properties.memory().mem_usage) || _('The selected tab has no data')"/>
         </div>
       </div>
     </div>
