@@ -312,6 +312,9 @@ def get_api(request, snippet):
   elif interface == 'jdbc' or interface == 'teradata':
     from notebook.connectors.jdbc import JdbcApi
     return JdbcApi(request.user, interpreter=interpreter)
+  elif interface == 'sqlalchemy':
+    from notebook.connectors.sqlalchemyapi import SqlAlchemyApi
+    return SqlAlchemyApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
     from notebook.connectors.solr import SolrApi
     return SolrApi(request.user, interpreter=interpreter)
