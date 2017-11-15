@@ -36,7 +36,7 @@ from django.contrib.auth.models import User, Group
 from django.core.paginator import EmptyPage
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
-from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden
+from django.http import Http404, StreamingHttpResponse, HttpResponseNotModified, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_http_methods
 from django.views.static import was_modified_since
 from django.shortcuts import redirect
