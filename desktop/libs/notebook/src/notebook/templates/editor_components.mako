@@ -1627,6 +1627,15 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: errors().length > 0">
       <ul class="unstyled" data-bind="foreach: errors">
         <li data-bind="text: message"></li>
+        <!-- ko if: help -->
+        <li><a href="javascript:void(0)" data-bind="click: function() {
+          huePubSub.publish('editor.settings.update', {
+            key: $data.help.setting.name,
+            value: $data.help.setting.value
+          });
+          $parent.settingsVisible(true);
+        }">${ _("Update max_row_size setting.") }</a></li>
+        <!-- /ko -->
       </ul>
     </div>
     <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: aceErrors().length > 0">
