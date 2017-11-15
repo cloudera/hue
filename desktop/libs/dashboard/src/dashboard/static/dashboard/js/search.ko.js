@@ -67,14 +67,15 @@ function layoutToGridster(vm) {
     var startingRow = 1;
     $.each(column.rows(), function (indexX, row) {
       $.each(row.widgets(), function (indexW, widget) {
+        var targetHeight = vm.draggableWidgets[widget.widgetType()].gridsterHeight() || 6;
         layout.push(ko.mapping.fromJS({
           col: startingCol,
           row: startingRow,
           size_x: column.size(),
-          size_y: defaultWidgetHeight,
+          size_y: targetHeight,
           widget: vm.getWidgetById(widget.id())
         }));
-        startingRow += defaultWidgetHeight;
+        startingRow += targetHeight;
       });
       if (row.widgets().length === 0) {
         layout.push(ko.mapping.fromJS({
@@ -1814,36 +1815,41 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
     self.isPlayerMode = ko.observable(false);
 
-    function bareWidgetBuilder(name, type) {
-      return new Widget({
+    self.draggableWidgets = {};
+
+    function bareWidgetBuilder(name, type, gridsterHeight) {
+      var w = new Widget({
         size: 12,
+        gridsterHeight: gridsterHeight,
         id: UUID(),
         name: name,
         widgetType: type
       });
+      self.draggableWidgets[type] = w;
+      return w;
     }
 
-    self.draggableHit = ko.observable(bareWidgetBuilder("Hit Count", "hit-widget")); // Not used
-    self.draggableFacet = ko.observable(bareWidgetBuilder("Facet", "facet-widget")); // Deprecated
-    self.draggableResultset = ko.observable(bareWidgetBuilder("Grid Results", "resultset-widget"));
-    self.draggableHtmlResultset = ko.observable(bareWidgetBuilder("HTML Results", "html-resultset-widget"));
-    self.draggableHistogram = ko.observable(bareWidgetBuilder("Histogram", "histogram-widget")); // Deprecated
-    self.draggableBar = ko.observable(bareWidgetBuilder("Bar Chart", "bar-widget")); // Deprecated
-    self.draggableMap = ko.observable(bareWidgetBuilder("Map", "map-widget")); // Deprecated
-    self.draggableLeafletMap = ko.observable(bareWidgetBuilder("Marker Map", "leafletmap-widget"));
-    self.draggableLine = ko.observable(bareWidgetBuilder("Line Chart", "line-widget")); // Deprecated
-    self.draggablePie = ko.observable(bareWidgetBuilder("Pie Chart", "pie-widget")); // Deprecated
-    self.draggablePie2 = ko.observable(bareWidgetBuilder("Pie Chart", "pie2-widget"));
-    self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget"));
-    self.draggableTree = ko.observable(bareWidgetBuilder("Tree", "tree-widget")); // Deprecated
-    self.draggableHeatmap = ko.observable(bareWidgetBuilder("Heatmap", "heatmap-widget"));
-    self.draggableCounter = ko.observable(bareWidgetBuilder("Counter", "hit-widget"));
-    self.draggableBucket = ko.observable(bareWidgetBuilder("Chart", "bucket-widget"));
-    self.draggableTimeline = ko.observable(bareWidgetBuilder("Timeline", "timeline-widget"));
-    self.draggableGradienMap = ko.observable(bareWidgetBuilder("Gradient Map", "gradient-map-widget"));
-    self.draggableTree2 = ko.observable(bareWidgetBuilder("Tree", "tree2-widget"));
-    self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget"));
-    self.draggableDocument = ko.observable(bareWidgetBuilder("Document", "document-widget"));
+    self.draggableHit = ko.observable(bareWidgetBuilder("Hit Count", "hit-widget", 6)); // Not used
+    self.draggableFacet = ko.observable(bareWidgetBuilder("Facet", "facet-widget", 6)); // Deprecated
+    self.draggableResultset = ko.observable(bareWidgetBuilder("Grid Results", "resultset-widget", 21));
+    self.draggableHtmlResultset = ko.observable(bareWidgetBuilder("HTML Results", "html-resultset-widget", 21));
+    self.draggableHistogram = ko.observable(bareWidgetBuilder("Histogram", "histogram-widget", 6)); // Deprecated
+    self.draggableBar = ko.observable(bareWidgetBuilder("Bar Chart", "bar-widget", 6)); // Deprecated
+    self.draggableMap = ko.observable(bareWidgetBuilder("Map", "map-widget", 6)); // Deprecated
+    self.draggableLeafletMap = ko.observable(bareWidgetBuilder("Marker Map", "leafletmap-widget", 9));
+    self.draggableLine = ko.observable(bareWidgetBuilder("Line Chart", "line-widget", 6)); // Deprecated
+    self.draggablePie = ko.observable(bareWidgetBuilder("Pie Chart", "pie-widget", 6)); // Deprecated
+    self.draggablePie2 = ko.observable(bareWidgetBuilder("Pie Chart", "pie2-widget", 6));
+    self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget", 3));
+    self.draggableTree = ko.observable(bareWidgetBuilder("Tree", "tree-widget", 6)); // Deprecated
+    self.draggableHeatmap = ko.observable(bareWidgetBuilder("Heatmap", "heatmap-widget", 6));
+    self.draggableCounter = ko.observable(bareWidgetBuilder("Counter", "hit-widget", 6));
+    self.draggableBucket = ko.observable(bareWidgetBuilder("Chart", "bucket-widget", 6));
+    self.draggableTimeline = ko.observable(bareWidgetBuilder("Timeline", "timeline-widget", 6));
+    self.draggableGradienMap = ko.observable(bareWidgetBuilder("Gradient Map", "gradient-map-widget", 6));
+    self.draggableTree2 = ko.observable(bareWidgetBuilder("Tree", "tree2-widget", 6));
+    self.draggableTextFacet = ko.observable(bareWidgetBuilder("Text Facet", "text-facet-widget", 6));
+    self.draggableDocument = ko.observable(bareWidgetBuilder("Document", "document-widget", 6));
 
     self.gridItems = ko.observableArray([]);
 
