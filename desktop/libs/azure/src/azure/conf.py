@@ -28,19 +28,11 @@ LOG = logging.getLogger(__name__)
 REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/token'
 
 
-def get_default_client_id():
-  """
-  Attempt to set AWS access key ID from script, else core-site, else None
-  """
-  client_id_script = AZURE_ACCOUNTS['default'].CLIENT_ID.get()
-  return client_id_script or get_adls_client_id()
-
-
-def get_default_authentication_code():
+def get_default_secret_key():
   """
   Attempt to set AWS secret key from script, else core-site, else None
   """
-  client_secret_script = AZURE_ACCOUNTS['default'].CLIENT_SECRET.get()
+  client_secret_script = AZURE_ACCOUNTS['default'].CLIENT_SECRET_SCRIPT.get()
   return client_secret_script or get_adls_authentication_code()
 
 def get_default_refresh_url():
@@ -77,9 +69,30 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
   each=ConfigSection(
     help="Information about a single azure account",
     members=dict(
-      CLIENT_ID=Config("client_id", help="", default=None),
-      CLIENT_SECRET=Config("client_secret", help="", default=None),
-      TENANT_ID=Config("tenant_id", help="", default=None)
+      CLIENT_ID=Config(
+        key="client_id",
+        type=str,
+        default=None,
+        private=True,
+        help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
+      CLIENT_SECRET=Config(
+        key="client_secret",
+        type=str,
+        dynamic_default=get_default_secret_key,
+        private=True,
+        help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
+      CLIENT_SECRET_SCRIPT=Config(
+        key='client_secret_script',
+        default=None,
+        private=True,
+        type=coerce_password_from_script,
+        help=_("Execute this script to produce the ADLS client secret.")),
+      TENANT_ID=Config(
+        key="tenant_id",
+        type=str,
+        default=None,
+        private=True,
+        help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api")
     )
   )
 )
