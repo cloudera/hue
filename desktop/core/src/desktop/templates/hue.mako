@@ -1160,6 +1160,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           hueAnalytics.convert('hue', 'leftAssistVisible/' + val);
           window.setTimeout(function () {
             huePubSub.publish('split.panel.resized');
+            $(window).trigger('resize');
           }, 0);
         });
 
@@ -1173,6 +1174,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             huePubSub.publish('reposition.scroll.anchor.up');
             huePubSub.publish('nicescroll.resize');
             huePubSub.publish('split.panel.resized');
+            $(window).trigger('resize');
           }, 0);
         });
         self.rightAssistAvailable = ko.observable(false);
