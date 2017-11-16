@@ -474,6 +474,8 @@ class Attempt:
       }
       if int(offset) != 0:
         params['start'] = offset
+      else:
+        params['start'] = 0
 
       response = None
       try:
