@@ -3570,6 +3570,7 @@
 
         huePubSub.publish('editor.active.statement.changed', {
           id: self.editorId,
+          editorChangeTime: lastKnownStatements.editorChangeTime,
           activeStatementIndex: statementIndex,
           totalStatementCount: lastKnownStatements.length,
           precedingStatements: precedingStatements,
@@ -3584,7 +3585,10 @@
 
       var parseForStatements = function () {
         try {
+          var lastChangeTime = self.editor.lastChangeTime;
           lastKnownStatements = sqlStatementsParser.parse(self.editor.getValue());
+          lastKnownStatements.editorChangeTime = lastChangeTime;
+
           if (typeof hueDebug !== 'undefined' && hueDebug.logStatementLocations) {
             console.log(lastKnownStatements);
           }
@@ -3622,7 +3626,7 @@
         }, 100);
       });
 
-      var changeListener = self.editor.on("change", function () {
+      var changeListener = self.editor.on('change', function () {
         window.clearTimeout(changeThrottle);
         cursorChangePaused = true;
         changeThrottle = window.setTimeout(function () {
@@ -3631,6 +3635,7 @@
           updateActiveStatement();
           cursorChangePaused = false;
         }, 500);
+        self.editor.lastChangeTime = Date.now();
       });
 
       var locateSubscription = huePubSub.subscribe('editor.refresh.statement.locations', function (snippet) {
@@ -3653,10 +3658,10 @@
       });
     };
 
-    AceLocationHandler.prototype.clearMarkedErrors = function () {
+    AceLocationHandler.prototype.clearMarkedErrors = function (type) {
       var self = this;
       for (var marker in self.editor.getSession().$backMarkers) {
-        if (self.editor.getSession().$backMarkers[marker].clazz.indexOf('hue-ace-syntax-') === 0) {
+        if (self.editor.getSession().$backMarkers[marker].clazz.indexOf('hue-ace-syntax-' + (type || '')) === 0) {
           var token = self.editor.getSession().$backMarkers[marker].token;
           delete token.syntaxError;
           delete token.notFound;
@@ -3668,12 +3673,13 @@
     AceLocationHandler.prototype.checkForSyntaxErrors = function (statementLocation, cursorPosition) {
       var self = this;
       if (self.sqlSyntaxWorkerSub !== null) {
-        self.clearMarkedErrors();
         var AceRange = ace.require('ace/range').Range;
+        var editorChangeTime = self.editor.lastChangeTime;
         var beforeCursor = self.editor.getSession().getTextRange(new AceRange(statementLocation.first_line - 1, statementLocation.first_column, cursorPosition.row, cursorPosition.column));
         var afterCursor = self.editor.getSession().getTextRange(new AceRange(cursorPosition.row, cursorPosition.column, statementLocation.last_line - 1, statementLocation.last_column));
         huePubSub.publish('ace.sql.syntax.worker.post', {
           id: self.snippet.id(),
+          editorChangeTime: editorChangeTime,
           beforeCursor: beforeCursor,
           afterCursor: afterCursor,
           statementLocation: statementLocation,
@@ -3690,11 +3696,11 @@
       }
 
       self.sqlSyntaxWorkerSub = huePubSub.subscribe('ace.sql.syntax.worker.message', function (e) {
-        if (e.data.id !== self.snippet.id()) {
+        if (e.data.id !== self.snippet.id() || e.data.editorChangeTime !== self.editor.lastChangeTime) {
           return;
         }
+        self.clearMarkedErrors('error');
         var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
-
         if (e.data.syntaxError && e.data.syntaxError.ruleId && !suppressedRules[e.data.syntaxError.ruleId.toString() + e.data.syntaxError.text.toLowerCase()]) {
           if (self.snippet.positionStatement() && SqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {
             self.snippet.positionStatement().syntaxError = true;
@@ -3786,110 +3792,113 @@
       return promise;
     };
 
-    AceLocationHandler.prototype.verifyExists = function (token, allLocations) {
+    AceLocationHandler.prototype.verifyExists = function (tokens, allLocations) {
       var self = this;
-      delete token.notFound;
-      delete token.syntaxError;
+      self.clearMarkedErrors('warning');
+      tokens.forEach(function (token) {
+        delete token.notFound;
+        delete token.syntaxError;
 
-      if (self.sqlSyntaxWorkerSub !== null && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
-
-        // Ignore identifiers when the cursor is at the end to make it less annoying while editing
-        if (token && token.parseLocation) {
-          var cursorPos = self.editor.getCursorPosition();
-          if (cursorPos.row + 1 === token.parseLocation.location.last_line && cursorPos.column + 1 === token.parseLocation.location.first_column + token.value.length) {
-            return;
-          }
-        }
-
-        var aliases = [];
-
-        for (var i = 0; i < allLocations.length; i++) {
-          var location = allLocations[i];
-          if (location.type === 'alias') {
-            if (location.source === 'cte' && token.parseLocation.type === 'column') {
-              // We currently don't discover the columns from a CTE so we can't say if a column exists or not
-              if (!token.parseLocation.tables && token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 1 && token.parseLocation.identifierChain[0].name.toLowerCase() === location.alias.toLowerCase()) {
-                return;
-              }
-
-              if (token.parseLocation.tables) {
-                var found = token.parseLocation.tables.some(function (table) {
-                  return table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name && table.identifierChain[0].name.toLowerCase() === location.alias.toLowerCase();
-                });
-                if (found) {
-                  return;
-                }
-              }
-            }
-            // If it's qualified i.e.'b' in SELECT a.b we shouldn't suggest aliases
-            if (token.parseLocation.type === 'column' && token.parseLocation.qualified) {
-              continue;
-            }
-            if (location.source === 'column' || location.source === 'table' || location.source === 'subquery' || location.source === 'cte') {
-              aliases.push({ name: location.alias.toLowerCase() });
-            }
-          }
-        }
-
-        self.fetchPossibleValues(token).done(function (possibleValues) {
-          // Append table aliases
-          possibleValues = possibleValues.concat(aliases);
-
-          var tokenValLower = token.actualValue.toLowerCase();
-          // Break if found
-          for (var i = 0; i < possibleValues.length; i++) {
-            possibleValues[i].name = SqlUtils.backTickIfNeeded(self.snippet.type(), possibleValues[i].name);
-            if ((possibleValues[i].name.toLowerCase() === tokenValLower) || (tokenValLower.indexOf('`') === 0 && tokenValLower.replace(/`/g, '') === possibleValues[i].name.toLowerCase())) {
+        if (self.sqlSyntaxWorkerSub !== null && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
+          // Ignore identifiers when the cursor is at the end to make it less annoying while editing
+          if (token && token.parseLocation) {
+            var cursorPos = self.editor.getCursorPosition();
+            if (cursorPos.row + 1 === token.parseLocation.location.last_line && cursorPos.column + 1 === token.parseLocation.location.first_column + token.value.length) {
               return;
             }
           }
 
-          var uniqueIndex = {};
-          possibleValues = possibleValues.filter(function (value) {
-            if (uniqueIndex[value.name.toLowerCase()]) {
-              return false;
-            }
-            uniqueIndex[value.name.toLowerCase()] = true;
-            return true;
-          });
+          var aliases = [];
 
-          var isLowerCase = tokenValLower === token.value;
+          for (var i = 0; i < allLocations.length; i++) {
+            var location = allLocations[i];
+            if (location.type === 'alias') {
+              if (location.source === 'cte' && token.parseLocation.type === 'column') {
+                // We currently don't discover the columns from a CTE so we can't say if a column exists or not
+                if (!token.parseLocation.tables && token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 1 && token.parseLocation.identifierChain[0].name.toLowerCase() === location.alias.toLowerCase()) {
+                  return;
+                }
 
-          var weightedExpected = $.map(possibleValues, function (val) {
-            return {
-              text: isLowerCase ? val.name.toLowerCase() : val.name,
-              distance: SqlParseSupport.stringDistance(token.value, val.name)
+                if (token.parseLocation.tables) {
+                  var found = token.parseLocation.tables.some(function (table) {
+                    return table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name && table.identifierChain[0].name.toLowerCase() === location.alias.toLowerCase();
+                  });
+                  if (found) {
+                    return;
+                  }
+                }
+              }
+              // If it's qualified i.e.'b' in SELECT a.b we shouldn't suggest aliases
+              if (token.parseLocation.type === 'column' && token.parseLocation.qualified) {
+                continue;
+              }
+              if (location.source === 'column' || location.source === 'table' || location.source === 'subquery' || location.source === 'cte') {
+                aliases.push({ name: location.alias.toLowerCase() });
+              }
             }
-          });
-          weightedExpected.sort(function (a, b) {
-            if (a.distance === b.distance) {
-              return a.text.localeCompare(b.text);
-            }
-            return a.distance - b.distance
-          });
-          token.syntaxError = {
-            expected: weightedExpected
-          };
-          token.notFound = true;
-
-          if (token.parseLocation && token.parseLocation.type === 'table') {
-            ApiHelper.getInstance().identifierChainToPath({
-              identifierChain: token.parseLocation.identifierChain,
-              sourceType: self.snippet.type(),
-              defaultDatabase: self.snippet.database()
-            }, function (path) {
-              token.qualifiedIdentifier = path.join('.');
-            })
           }
 
-          if (token.parseLocation) {
-            var AceRange = ace.require('ace/range').Range;
-            var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
-            var markerId = self.editor.getSession().addMarker(range, 'hue-ace-syntax-warning');
-            self.editor.getSession().$backMarkers[markerId].token = token;
-          }
-        });
-      }
+          self.fetchPossibleValues(token).done(function (possibleValues) {
+            // Append table aliases
+            possibleValues = possibleValues.concat(aliases);
+
+            var tokenValLower = token.actualValue.toLowerCase();
+            // Break if found
+            for (var i = 0; i < possibleValues.length; i++) {
+              possibleValues[i].name = SqlUtils.backTickIfNeeded(self.snippet.type(), possibleValues[i].name);
+              if ((possibleValues[i].name.toLowerCase() === tokenValLower) || (tokenValLower.indexOf('`') === 0 && tokenValLower.replace(/`/g, '') === possibleValues[i].name.toLowerCase())) {
+                return;
+              }
+            }
+
+            var uniqueIndex = {};
+            possibleValues = possibleValues.filter(function (value) {
+              if (uniqueIndex[value.name.toLowerCase()]) {
+                return false;
+              }
+              uniqueIndex[value.name.toLowerCase()] = true;
+              return true;
+            });
+
+            var isLowerCase = tokenValLower === token.value;
+
+            var weightedExpected = $.map(possibleValues, function (val) {
+              return {
+                text: isLowerCase ? val.name.toLowerCase() : val.name,
+                distance: SqlParseSupport.stringDistance(token.value, val.name)
+              }
+            });
+            weightedExpected.sort(function (a, b) {
+              if (a.distance === b.distance) {
+                return a.text.localeCompare(b.text);
+              }
+              return a.distance - b.distance
+            });
+            token.syntaxError = {
+              expected: weightedExpected
+            };
+            token.notFound = true;
+
+            if (token.parseLocation && token.parseLocation.type === 'table') {
+              ApiHelper.getInstance().identifierChainToPath({
+                identifierChain: token.parseLocation.identifierChain,
+                sourceType: self.snippet.type(),
+                defaultDatabase: self.snippet.database()
+              }, function (path) {
+                token.qualifiedIdentifier = path.join('.');
+              })
+            }
+
+            if (token.parseLocation) {
+              var AceRange = ace.require('ace/range').Range;
+              var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
+              var markerId = self.editor.getSession().addMarker(range, 'hue-ace-syntax-warning');
+              self.editor.getSession().$backMarkers[markerId].token = token;
+            }
+          });
+        }
+
+      })
     };
 
     AceLocationHandler.prototype.attachSqlWorker = function () {
@@ -3933,7 +3942,7 @@
       };
 
       var locationWorkerSub = huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
-        if (e.data.id !== self.snippet.id()) {
+        if (e.data.id !== self.snippet.id() || e.data.editorChangeTime !== self.editor.lastChangeTime) {
           return;
         }
 
@@ -3953,6 +3962,7 @@
             delete activeTokens.pop().parseLocation;
           }
 
+          var tokensToVerify = [];
           e.data.locations.forEach(function (location) {
             if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
               return;
@@ -3989,18 +3999,18 @@
                         if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
                           location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
                           delete location.tables;
-                          self.verifyExists(token, e.data.locations);
+                          tokensToVerify.push(token);
                         } else if (tablesToGo.length > 0) {
                           findIdentifierChainInTable(tablesToGo);
                         } else {
-                          self.verifyExists(token, e.data.locations);
+                          tokensToVerify.push(token);
                         }
                       }
                     })
                   } else if (tablesToGo.length > 0) {
                     findIdentifierChainInTable(tablesToGo);
                   } else {
-                    self.verifyExists(token, e.data.locations);
+                    tokensToVerify.push(token);
                   }
                 };
                 if (location.tables.length > 1) {
@@ -4008,14 +4018,15 @@
                 } else if (location.tables.length == 1 && location.tables[0].identifierChain) {
                   location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
                   delete location.tables;
-                  self.verifyExists(token, e.data.locations);
+                  tokensToVerify.push(token);
                 }
               } else {
-                self.verifyExists(token, e.data.locations);
+                tokensToVerify.push(token);
               }
             }
           });
 
+          self.verifyExists(tokensToVerify, e.data.locations);
           huePubSub.publish('editor.active.locations', lastKnownLocations);
         });
       });

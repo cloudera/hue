@@ -62,6 +62,7 @@ importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
       }
       postMessage({
         id: msg.data.id,
+        editorChangeTime: msg.data.editorChangeTime,
         syntaxError: syntaxError,
         statementLocation: msg.data.statementLocation
       });

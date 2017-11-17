@@ -77,6 +77,7 @@ importScripts('${ static('desktop/js/sqlFunctions.js') }');
 
         postMessage({
           id: msg.data.id,
+          editorChangeTime: msg.data.statementDetails.editorChangeTime,
           locations: locations,
           activeStatementLocations: activeStatementLocations,
           totalStatementCount: msg.data.statementDetails.totalStatementCount,
