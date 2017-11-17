@@ -3662,10 +3662,7 @@
       var self = this;
       for (var marker in self.editor.getSession().$backMarkers) {
         if (self.editor.getSession().$backMarkers[marker].clazz.indexOf('hue-ace-syntax-' + (type || '')) === 0) {
-          var token = self.editor.getSession().$backMarkers[marker].token;
-          delete token.syntaxError;
-          delete token.notFound;
-          self.editor.getSession().removeMarker(self.editor.getSession().$backMarkers[marker].id);
+          self.editor.getSession().$backMarkers[marker].dispose()
         }
       }
     };
@@ -3685,6 +3682,22 @@
           statementLocation: statementLocation,
           type: self.snippet.type()
         });
+      }
+    };
+
+    AceLocationHandler.prototype.addAnchoredMarker = function (range, token, clazz) {
+      var self = this;
+      range.start = self.editor.getSession().doc.createAnchor(range.start);
+      range.end = self.editor.getSession().doc.createAnchor(range.end);
+      var markerId = self.editor.getSession().addMarker(range, clazz);
+      var marker = self.editor.getSession().$backMarkers[markerId];
+      marker.token = token;
+      marker.dispose = function () {
+        range.start.detach();
+        range.end.detach();
+        delete marker.token.syntaxError;
+        delete marker.token.notFound;
+        self.editor.getSession().removeMarker(markerId);
       }
     };
 
@@ -3727,8 +3740,7 @@
             token.syntaxError = e.data.syntaxError;
             var AceRange = ace.require('ace/range').Range;
             var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
-            var markerId = self.editor.getSession().addMarker(range, 'hue-ace-syntax-error');
-            self.editor.getSession().$backMarkers[markerId].token = token;
+            self.addAnchoredMarker(range,  token, 'hue-ace-syntax-error');
           }
         }
       });
@@ -3892,8 +3904,7 @@
             if (token.parseLocation) {
               var AceRange = ace.require('ace/range').Range;
               var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
-              var markerId = self.editor.getSession().addMarker(range, 'hue-ace-syntax-warning');
-              self.editor.getSession().$backMarkers[markerId].token = token;
+              self.addAnchoredMarker(range,  token, 'hue-ace-syntax-warning');
             }
           });
         }
