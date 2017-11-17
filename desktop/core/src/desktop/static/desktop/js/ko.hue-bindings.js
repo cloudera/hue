@@ -3702,7 +3702,19 @@
           if (hueDebug.showSyntaxParseResult) {
             console.log(e.data.syntaxError);
           }
+
           var token = self.editor.getSession().getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
+
+          // Don't mark the current edited word as an error if the cursor is at the end of the word
+          // For now [a-z] is fine as we only check syntax for keywords
+          if (/[a-z]$/i.test(self.editor.getTextBeforeCursor()) && !/^[a-z]/i.test(self.editor.getTextAfterCursor())) {
+            var cursorPos = self.editor.getCursorPosition();
+            var cursorToken = self.editor.getSession().getTokenAt(cursorPos.row, cursorPos.column);
+            if (cursorToken === token) {
+              return;
+            }
+          }
+
           // If no token is found it likely means that the parser response came back after the text was changed,
           // at which point it will trigger another parse so we can ignore this.
           if (token) {
