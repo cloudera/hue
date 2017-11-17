@@ -3713,6 +3713,12 @@
           return;
         }
         self.clearMarkedErrors('error');
+
+        if (!e.data.syntaxError || !e.data.syntaxError.expected || e.data.syntaxError.expected.length === 0) {
+          // Only show errors that we have suggestions for
+          return;
+        }
+
         var suppressedRules = ApiHelper.getInstance().getFromTotalStorage('hue.syntax.checker', 'suppressedRules', {});
         if (e.data.syntaxError && e.data.syntaxError.ruleId && !suppressedRules[e.data.syntaxError.ruleId.toString() + e.data.syntaxError.text.toLowerCase()]) {
           if (self.snippet.positionStatement() && SqlUtils.locationEquals(e.data.statementLocation, self.snippet.positionStatement().location)) {

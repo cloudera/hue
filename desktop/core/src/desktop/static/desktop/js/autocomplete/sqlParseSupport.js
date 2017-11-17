@@ -1888,6 +1888,7 @@ var SqlParseSupport = (function () {
 
     var IGNORED_EXPECTED = {
       ';': true,
+      '.': true,
       'EOF': true,
       'UNSIGNED_INTEGER': true,
       'UNSIGNED_INTEGER_E': true,
