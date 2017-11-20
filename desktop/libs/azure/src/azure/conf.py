@@ -27,6 +27,12 @@ LOG = logging.getLogger(__name__)
 
 REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/token'
 
+def get_default_client_id():
+  """
+  Attempt to set AWS client id from script, else core-site, else None
+  """
+  client_id_script = AZURE_ACCOUNTS['default'].CLIENT_ID_SCRIPT.get()
+  return client_id_script or get_adls_client_id()
 
 def get_default_secret_key():
   """
@@ -34,6 +40,13 @@ def get_default_secret_key():
   """
   client_secret_script = AZURE_ACCOUNTS['default'].CLIENT_SECRET_SCRIPT.get()
   return client_secret_script or get_adls_authentication_code()
+
+def get_default_tenant_id():
+  """
+  Attempt to set AWS tenant id from script, else core-site, else None
+  """
+  tenant_id_script = AZURE_ACCOUNTS['default'].TENANT_ID_SCRIPT.get()
+  return tenant_id_script or get_adls_refresh_url()
 
 def get_default_refresh_url():
   refresh_url = REFRESH_URL.replace('<tenant_id>', AZURE_ACCOUNTS['default'].TENANT_ID.get())
@@ -72,9 +85,15 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
       CLIENT_ID=Config(
         key="client_id",
         type=str,
-        default=None,
+        dynamic_default=get_default_client_id,
         private=True,
         help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
+      CLIENT_ID_SCRIPT=Config(
+        key="client_id_script",
+        type=coerce_password_from_script,
+        default=None,
+        private=True,
+        help="Execute this script to produce the ADLS client id."),
       CLIENT_SECRET=Config(
         key="client_secret",
         type=str,
@@ -83,16 +102,22 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
         help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
       CLIENT_SECRET_SCRIPT=Config(
         key='client_secret_script',
+        type=coerce_password_from_script,
         default=None,
         private=True,
-        type=coerce_password_from_script,
         help=_("Execute this script to produce the ADLS client secret.")),
       TENANT_ID=Config(
         key="tenant_id",
         type=str,
+        dynamic_default=get_default_tenant_id,
+        private=True,
+        help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
+      TENANT_ID_SCRIPT=Config(
+        key='tenant_id_script',
+        type=coerce_password_from_script,
         default=None,
         private=True,
-        help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api")
+        help=_("Execute this script to produce the ADLS tenant id.")),
     )
   )
 )
