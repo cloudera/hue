@@ -1015,7 +1015,7 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1, fai
     LOG.debug("Importing posix user %s into group %s" % (smart_str(posix_member), smart_str(group.name)))
     user_info = None
     try:
-      user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+      user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
     except LdapSearchException, e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
@@ -1066,7 +1066,7 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1, faile
     LOG.debug("Synchronizing posix user %s with group %s" % (smart_str(posix_member), smart_str(group.name)))
     users_info = []
     try:
-      users_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+      users_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
     except LdapSearchException, e:
       LOG.warn("Failed to find LDAP users: %s" % e)
 
@@ -1227,7 +1227,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
           # which are defined by 'uid'.
           user_info = None
           try:
-            user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
           except LdapSearchException, e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
@@ -1241,7 +1241,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
         for posix_member in posix_members:
           user_info = []
           try:
-            user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+            user_info = connection.find_users(posix_member, search_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
           except LdapSearchException, e:
             LOG.warn("Failed to find LDAP user: %s" % e)
 
