@@ -24,6 +24,7 @@ InsertStatement
  | ImpalaInsertOrUpsertStatement
  | CommonTableExpression HiveInsertStatement
  | CommonTableExpression ImpalaInsertOrUpsertStatement
+ | HiveMergeStatement
  ;
 
 DataManipulation_EDIT
@@ -40,6 +41,7 @@ DataManipulation_EDIT
      parser.addCommonTableExpressions($1);
    }
  | CommonTableExpression_EDIT ImpalaInsertOrUpsertStatement
+ | HiveMergeStatement_EDIT
  ;
 
 HiveInsertStatement
@@ -537,4 +539,224 @@ ParenthesizedImpalaRowValuesList_EDIT
      parser.suggestFunctions();
    }
  | '(' ValueExpressionList_EDIT RightParenthesisOrError
+ ;
+
+HiveMergeStatement
+ : HiveMergeStatementLeftPart 'ON' ValueExpression WhenList
+ ;
+
+HiveMergeStatement_EDIT
+ : HiveMergeStatementLeftPart_EDIT
+ | HiveMergeStatementLeftPart 'CURSOR'
+   {
+     parser.suggestKeywords(['ON']);
+   }
+ | HiveMergeStatementLeftPart 'ON' 'CURSOR'
+   {
+     parser.valueExpressionSuggest();
+   }
+ | HiveMergeStatementLeftPart 'ON' ValueExpression_EDIT
+ | HiveMergeStatementLeftPart 'ON' ValueExpression 'CURSOR'
+   {
+     parser.suggestValueExpressionKeywords($3, [{ value: 'WHEN', weight: 2 }]);
+   }
+ | HiveMergeStatementLeftPart 'ON' ValueExpression WhenList_EDIT
+ ;
+
+HiveMergeStatementLeftPart
+ : '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier '<hive>AS' RegularIdentifier '<hive>USING' MergeSource '<hive>AS' RegularIdentifier
+   {
+     $3.alias = $5;
+     parser.addTablePrimary($3);
+     if ($7.subQuery) {
+       parser.addTablePrimary({ subQueryAlias: $9 });
+     } else {
+       $7.alias = $9;
+     }
+   }
+ ;
+
+HiveMergeStatementLeftPart_EDIT
+ : '<hive>MERGE' 'CURSOR'
+   {
+     parser.suggestKeywords(['INTO']);
+   }
+ | '<hive>MERGE' 'INTO' 'CURSOR'
+   {
+     parser.suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+   }
+ | '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier_EDIT
+ | '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier 'CURSOR'
+   {
+     parser.addTablePrimary($3);
+     parser.suggestKeywords(['AS T USING']);
+   }
+ | '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier '<hive>AS' 'CURSOR'
+   {
+     parser.addTablePrimary($3);
+     parser.suggestKeywords(['T USING']);
+   }
+ | '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier '<hive>AS' RegularIdentifier 'CURSOR'
+   {
+     $3.alias = $5;
+     parser.addTablePrimary($3);
+     parser.suggestKeywords(['USING']);
+   }
+ | '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier '<hive>AS' RegularIdentifier '<hive>USING' 'CURSOR'
+   {
+     $3.alias = $5;
+     parser.addTablePrimary($3);
+     parser.suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+   }
+ | '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier '<hive>AS' RegularIdentifier '<hive>USING' MergeSource_EDIT
+   {
+     $3.alias = $5;
+     parser.addTablePrimary($3);
+   }
+ | '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier '<hive>AS' RegularIdentifier '<hive>USING' MergeSource 'CURSOR'
+   {
+     $3.alias = $5;
+     parser.addTablePrimary($3);
+     parser.suggestKeywords(['AS S ON']);
+   }
+ | '<hive>MERGE' 'INTO' SchemaQualifiedTableIdentifier '<hive>AS' RegularIdentifier '<hive>USING' MergeSource '<hive>AS' 'CURSOR'
+   {
+     $3.alias = $5;
+     parser.addTablePrimary($3);
+     parser.suggestKeywords(['S ON']);
+   }
+ ;
+
+MergeSource
+ : '(' TableSubQueryInner ')'  --> $2
+ | SchemaQualifiedTableIdentifier
+   {
+     parser.addTablePrimary($1);
+   }
+ ;
+
+MergeSource_EDIT
+ : '(' 'CURSOR' RightParenthesisOrError
+   {
+     parser.suggestKeywords(['SELECT']);
+   }
+ | '(' TableSubQueryInner_EDIT RightParenthesisOrError
+ | SchemaQualifiedTableIdentifier_EDIT
+ ;
+
+WhenList
+ : WhenClause
+ | WhenClause WhenClause
+ | WhenClause WhenClause WhenClause
+ ;
+
+WhenList_EDIT
+ : WhenClause_EDIT
+   {
+     if ($1.suggestThenKeywords) {
+       parser.suggestKeywords(['DELETE', 'INSERT VALUES', 'UPDATE SET']);
+     }
+   }
+ | WhenClause 'CURSOR'
+   {
+     if (!$1.notPresent) {
+       parser.suggestKeywords(['WHEN']);
+     }
+   }
+ | WhenClause WhenClause_EDIT
+  {
+     if (!$1.notPresent && $2.suggestThenKeywords) {
+       var keywords = [];
+       if (!$1.isDelete) {
+         keywords.push('DELETE');
+       }
+       if (!$1.isInsert) {
+         keywords.push('INSERT VALUES');
+       }
+       if (!$1.isUpdate) {
+         keywords.push('UPDATE SET');
+       }
+       parser.suggestKeywords(keywords);
+     }
+   }
+ | WhenClause WhenClause 'CURSOR'
+   {
+     if (!$2.notPresent) {
+       parser.suggestKeywords(['WHEN']);
+     }
+   }
+ | WhenClause WhenClause WhenClause_EDIT
+   {
+     if (!$2.notPresent && $3.suggestThenKeywords) {
+       var keywords = [];
+       if (!$1.isDelete && !$2.isDelete) {
+         keywords.push('DELETE');
+       }
+       if (!$1.isInsert && !$2.isInsert) {
+         keywords.push('INSERT VALUES');
+       }
+       if (!$1.isUpdate && !$2.isUpdate) {
+         keywords.push('UPDATE SET');
+       }
+       parser.suggestKeywords(keywords);
+     }
+   }
+ ;
+
+WhenClause
+ : 'WHEN' OptionalNot '<hive>MATCHED' OptionalMatchCondition 'THEN' UpdateDeleteOrInsert  --> { notPresent: !!$2, isDelete: $6.isDelete, isInsert: $6.isInsert, isUpdate: $6.isUpdate }
+ ;
+
+WhenClause_EDIT
+ : 'WHEN' OptionalNot 'CURSOR'
+   {
+     if (!$2) {
+       parser.suggestKeywords(['NOT MATCHED', 'MATCHED']);
+     } else {
+       parser.suggestKeywords(['MATCHED']);
+     }
+   }
+ | 'WHEN' OptionalNot '<hive>MATCHED' OptionalMatchCondition 'CURSOR'
+   {
+     if (!$4) {
+       parser.suggestKeywords(['AND', 'THEN']);
+     } else {
+       parser.suggestValueExpressionKeywords($4, [{ value: 'THEN', weight: 2 }]);
+     }
+   }
+ | 'WHEN' OptionalNot '<hive>MATCHED' MatchCondition_EDIT
+ | 'WHEN' OptionalNot '<hive>MATCHED' OptionalMatchCondition 'THEN' 'CURSOR' --> { suggestThenKeywords: true }
+ | 'WHEN' OptionalNot '<hive>MATCHED' OptionalMatchCondition 'THEN' UpdateDeleteOrInsert_EDIT
+ ;
+
+OptionalMatchCondition
+ :
+ | 'AND' ValueExpression --> $2
+ ;
+
+MatchCondition_EDIT
+ : 'AND' 'CURSOR'
+   {
+     parser.valueExpressionSuggest();
+   }
+ ;
+
+UpdateDeleteOrInsert
+ : 'UPDATE' 'SET' SetClauseList              --> { isUpdate: true }
+ | '<hive>DELETE'                            --> { isDelete: true }
+ | '<hive>INSERT' 'VALUES' InsertValuesList  --> { isInsert: true }
+ ;
+
+UpdateDeleteOrInsert_EDIT
+ : 'UPDATE' 'CURSOR'
+   {
+     parser.suggestKeywords(['SET']);
+   }
+ | 'UPDATE' 'SET' SetClauseList_EDIT
+ | '<hive>INSERT' 'CURSOR'
+   {
+     parser.suggestKeywords(['VALUES']);
+   }
  ;
