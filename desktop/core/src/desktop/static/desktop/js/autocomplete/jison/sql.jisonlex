@@ -132,6 +132,8 @@
 <hive>'LOCATION'                           { this.begin('hdfs'); return '<hive>LOCATION'; }
 <hive>'LOCK'                               { return '<hive>LOCK'; }
 <hive>'LOCKS'                              { return '<hive>LOCKS'; }
+<hive>'MATCHED'                            { return '<hive>MATCHED'; }
+<hive>'MERGE'                              { return '<hive>MERGE'; }
 <hive>'METADATA'                           { return '<hive>METADATA'; }
 <hive>'MINUTE'                             { return '<hive>MINUTE'; }
 <hive>'MONTH'                              { return '<hive>MONTH'; }
