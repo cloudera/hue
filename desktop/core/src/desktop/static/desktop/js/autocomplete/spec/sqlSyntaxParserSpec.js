@@ -162,7 +162,7 @@
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'hive');
         expect(result).toBeTruthy();
-        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'RELOAD', 'ABORT', 'ANALYZE', 'CREATE', 'EXPLAIN', 'EXPORT', 'GRANT', 'IMPORT', 'LOAD', 'MSCK', 'REVOKE', 'SHOW', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE']);
+        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'RELOAD', 'ABORT', 'ANALYZE', 'CREATE', 'EXPLAIN', 'EXPORT', 'GRANT', 'IMPORT', 'LOAD', 'MERGE', 'MSCK', 'REVOKE', 'SHOW', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE']);
       });
     });
 
