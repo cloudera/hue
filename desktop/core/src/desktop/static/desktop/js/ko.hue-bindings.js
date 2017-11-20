@@ -3907,7 +3907,7 @@
               })
             }
 
-            if (token.parseLocation) {
+            if (token.parseLocation && weightedExpected.length > 0) {
               var AceRange = ace.require('ace/range').Range;
               var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
               self.addAnchoredMarker(range,  token, 'hue-ace-syntax-warning');
