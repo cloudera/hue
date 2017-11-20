@@ -753,6 +753,17 @@
     vertical-align: middle;
   }
 
+  .gridster {
+    .remove-widget, .remove-empty-gridster {
+      opacity: 0;
+    }
+    .gs-w:hover {
+      .remove-widget, .remove-empty-gridster {
+        opacity: 1;
+      }
+    }
+  }
+
   @media screen and (max-width: 1000px) {
     .card-widget, .card-column {
       float: left !important;
