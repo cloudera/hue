@@ -424,7 +424,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ABORT', 'ALTER', 'ANALYZE TABLE', 'CREATE', 'DELETE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'GRANT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
+              'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'GRANT', 'IMPORT', 'INSERT', 'LOAD', 'MERGE', 'MSCK',
               'RELOAD FUNCTION', 'RESET', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });

@@ -1184,7 +1184,7 @@ var SqlParseSupport = (function () {
       }
 
       if (parser.isHive()) {
-        keywords = keywords.concat(['ABORT', 'ANALYZE TABLE', 'DELETE', 'EXPORT', 'IMPORT', 'LOAD', 'MSCK', 'RELOAD FUNCTION', 'RESET']);
+        keywords = keywords.concat(['ABORT', 'ANALYZE TABLE', 'DELETE', 'EXPORT', 'IMPORT', 'LOAD', 'MERGE', 'MSCK', 'RELOAD FUNCTION', 'RESET']);
       }
 
       if (parser.isImpala()) {
