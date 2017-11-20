@@ -63,7 +63,6 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div class="search-bar-middle">
       <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0">
-        ${ _('Select one') }
         <!-- ko if: $root.initial.engines().length > 1 -->
         <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
         <!-- /ko -->

@@ -47,7 +47,7 @@
 
   .search-bar .app-header {
     padding-top: 5px;
-    margin-right: 15px;
+    margin-right: 0;
   }
 
   .search-bar form, .search-bar form select {
@@ -64,12 +64,13 @@
     height: 100%;
 
     .search-bar-logo {
-      .flex(1 0 180px);
+      .flex(1 0 160px);
     }
 
     .search-bar-middle {
       .flex(1 1 100%);
-      padding: 0 20px;
+      padding: 0;
+      white-space: nowrap;
 
       .search-bar-query-container {
         .display-flex();
