@@ -3435,12 +3435,13 @@ OptionalWindowSpec
 
 WindowSpec
  : RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
+ | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing
  ;
 
 WindowSpec_EDIT
  : RowsOrRange 'CURSOR'
    {
-     parser.suggestKeywords(['BETWEEN']);
+     parser.suggestKeywords(parser.isHive() ? ['BETWEEN', 'UNBOUNDED'] : ['BETWEEN']);
    }
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing 'CURSOR'
    {
@@ -3452,6 +3453,13 @@ WindowSpec_EDIT
    }
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding_EDIT OptionalAndFollowing
  | RowsOrRange 'BETWEEN' PopLexerState OptionalCurrentOrPreceding OptionalAndFollowing_EDIT
+ | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding 'CURSOR'
+   {
+     if (!$4 && parser.isHive()) {
+       parser.suggestKeywords(['PRECEDING']);
+     }
+   }
+ | RowsOrRange 'UNBOUNDED' PopLexerState OptionalCurrentOrPreceding_EDIT
  ;
 
 PopLexerState

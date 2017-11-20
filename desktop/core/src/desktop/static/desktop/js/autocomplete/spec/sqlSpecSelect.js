@@ -1364,6 +1364,7 @@
         assertAutoComplete({
           beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS ',
           afterCursor: '',
+          dialect: 'impala',
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['BETWEEN']
@@ -1551,6 +1552,30 @@
             containsKeywords: ['ORDER BY', 'PARTITION BY'],
             expectedResult: {
               lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BETWEEN', 'UNBOUNDED']
+            }
+          });
+        });
+
+        it('should suggest keywords for "SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS UNBOUNDED |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT row_number() OVER (PARTITION BY a ORDER BY b ROWS UNBOUNDED ',
+            afterCursor: '',
+            dialect: 'hive',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PRECEDING']
             }
           });
         });
