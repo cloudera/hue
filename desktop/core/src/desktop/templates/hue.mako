@@ -359,6 +359,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_admin_wizard" class="embeddable"></div>
       <div id="embeddable_logs" class="embeddable"></div>
       <div id="embeddable_dump_config" class="embeddable"></div>
+      <div id="embeddable_threads" class="embeddable"></div>
       <div id="embeddable_403" class="embeddable"></div>
       <div id="embeddable_404" class="embeddable"></div>
       <div id="embeddable_500" class="embeddable"></div>
@@ -590,6 +591,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         admin_wizard: { url: '/about/admin_wizard', title: '${_('Admin Wizard')}' },
         logs: { url: '/logs', title: '${_('Logs')}' },
         dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
+        threads: { url: '/desktop/debug/threads', title: '${_('Threads')}' },
         sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
         jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
         % if other_apps:
@@ -948,6 +950,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }},
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
+          { url: '/desktop/debug/threads', app: 'threads' },
           { url: '/desktop/download_logs', app: function () {
             location.href = '/desktop/download_logs';
           }},
