@@ -5762,6 +5762,19 @@
             }
           });
         });
+
+        it('should suggest keywords for "SELECT a, b, SUM(c) FROM tab1 GROUP BY a, b GROUPING SETS (a,b) |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'SELECT a, b, SUM(c) FROM tab1 GROUP BY a, b GROUPING SETS (a,b) ',
+            afterCursor: '',
+            dialect: 'hive',
+            containsKeywords: ['LIMIT'],
+            expectedResult: {
+              lowerCase: false,
+              suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'tab1' }] }] }
+            }
+          });
+        });
       })
     });
 
