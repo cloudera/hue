@@ -1849,9 +1849,13 @@ OptionalSelectConditions_EDIT
      if ($2.suggestKeywords) {
        keywords = keywords.concat(parser.createWeightedKeywords($2.suggestKeywords, 8));
      }
-     $$ = parser.getValueExpressionKeywords($2, keywords);
-     if ($2.columnReference) {
-       $$.columnReference = $2.columnReference;
+     if ($2.valueExpression) {
+       $$ = parser.getValueExpressionKeywords($2.valueExpression, keywords);
+       if ($2.valueExpression.columnReference) {
+         $$.columnReference = $2.valueExpression.columnReference;
+       }
+     } else {
+       $$ = { suggestKeywords: keywords };
      }
      $$.cursorAtEnd = !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
      if (!$4 && !$5 && !$6) {
@@ -1951,16 +1955,9 @@ OptionalGroupByClause
 GroupByClause
  : AnyGroup 'BY' GroupByColumnList OptionalHiveGroupingSetsCubeOrRollup
    {
-     if (!$4) {
-       $$ = $3;
-       if (parser.isHive()) {
-         if (!$$.suggestKeywords) {
-           $$.suggestKeywords = [];
-         }
-         $$.suggestKeywords.push('GROUPING SETS');
-         $$.suggestKeywords.push('WITH CUBE');
-         $$.suggestKeywords.push('WITH ROLLUP');
-       }
+     $$ = { valueExpression: $4 ? false : $3 };
+     if (!$4 && parser.isHive()) {
+       $$.suggestKeywords = ['GROUPING SETS', 'WITH CUBE', 'WITH ROLLUP'];
      }
    }
  ;
