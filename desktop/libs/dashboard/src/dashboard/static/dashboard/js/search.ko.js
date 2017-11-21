@@ -1013,6 +1013,9 @@ var Collection = function (vm, collection) {
       pivot.aggregate.subscribe(function() {
         vm.search();
       });
+      pivot.mincount.subscribe(function () {
+        vm.search();
+      });
       facet.properties.facets.push(pivot);
     }
   }
@@ -1045,6 +1048,9 @@ var Collection = function (vm, collection) {
 
     if (pivot != null) {
       pivot.aggregate.function.subscribe(function() {
+        vm.search();
+      });
+      pivot.mincount.subscribe(function () {
         vm.search();
       });
       facet.properties.facets.push(pivot);
