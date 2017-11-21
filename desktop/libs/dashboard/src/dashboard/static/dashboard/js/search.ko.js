@@ -74,7 +74,6 @@ function loadDashboardLayout(viewModel, grister_layout) {
 // End dashboard lib
 
 function layoutToGridster(vm) {
-  var defaultWidgetHeight = 40;
   var emptyWidgetHeight = 4;
   var layout = [];
   var startingCol = 1;
@@ -1806,10 +1805,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
       return totalSize;
     });
-    loadSearchLayout(self, self.collectionJson.layout);
-
-    self.gridItems = ko.observableArray();
-
+    self.gridItems = ko.observableArray([]);
     self.additionalMustache = null;
 
     self.isEditing = ko.observable(false);
@@ -2540,7 +2536,13 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
     };
 
-    loadDashboardLayout(self, self.collectionJson.gridItems);
+    loadSearchLayout(self, self.collectionJson.layout);
+    if (self.collectionJson.gridItems && self.collectionJson.gridItems.length > 0) {
+      loadDashboardLayout(self, self.collectionJson.gridItems);
+    }
+    else {
+      self.gridItems(layoutToGridster(self));
+    }
 
     huePubSub.subscribe('dashboard.set.layout', function() {
       self.gridItems(layoutToGridster(self));
@@ -2671,6 +2673,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.fieldAnalysesName("");
     self.previewColumns("");
     self.columns([]);
+    self.gridItems([]);
     loadSearchLayout(self, self.collectionJson.layout);
     self.isEditing(true);
     self.isRetrievingResults(false);
@@ -2678,7 +2681,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.asyncSearchesCounter([]);
     self.isSyncingCollections(false);
     self.isPlayerMode(false);
-    self.gridItems([]);
     // loadDashboardLayout(self, self.collectionJson.gridItems); // TODO
 
     if (window.location.search.indexOf("collection") > -1) {
