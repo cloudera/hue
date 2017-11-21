@@ -3611,7 +3611,7 @@ $(document).ready(function () {
 %if USE_GRIDSTER.get():
   var WIDGET_BASE_HEIGHT = 50;
   $(".gridster>ul").gridster({
-    widget_margins: [5, 5],
+    widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     avoid_overlapped_widgets: true,
     max_cols: 12,
