@@ -555,7 +555,7 @@ from desktop.views import _ko
          */
         var SolrFormulaAutocompleter = function (options) {
           var self = this;
-          self.editor = options.editor;
+          self.editor = options.editor();
           self.suggestions = new SolrFormulaSuggestions(options.support.fields);
         };
 
@@ -736,7 +736,7 @@ from desktop.views import _ko
          */
         var SolrQueryAutocompleter = function (options) {
           var self = this;
-          self.editor = options.editor;
+          self.editor = options.editor();
           self.suggestions = new SolrQuerySuggestions(options.support.collection, self.editor);
         };
 
@@ -756,7 +756,9 @@ from desktop.views import _ko
 
       var AVAILABLE_AUTOCOMPLETERS = {
         'solrFormula': SolrFormulaAutocompleter,
-        'solrQuery':  SolrQueryAutocompleter
+        'solrQuery':  SolrQueryAutocompleter,
+        'impalaQuery': SqlAutocompleter3,
+        'hiveQuery': SqlAutocompleter3
       };
 
       var SimpleAceEditor = function (params, element) {
@@ -784,7 +786,34 @@ from desktop.views import _ko
             throw new Error('Could not find autocompleter for "' + params.autocomplete.type + '"');
           }
 
-          self.autocompleter = new AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type]({ editor: editor, support: params.autocomplete.support });
+          var sourceType = params.autocomplete.type.substring(0, params.autocomplete.type.indexOf('Query'));
+
+          var autocompleteArgs = {
+            editor: function() { return editor },
+            snippet: {
+              type: function () {
+                return sourceType;
+              },
+              database: function () {
+                if (params.autocomplete.support.collection.name()) {
+                  var path = params.autocomplete.support.collection.name().split('.');
+                  return path.length > 1 ? path[0] : 'default';
+                } else {
+                  return 'default';
+                }
+              },
+              positionStatement: function () {
+                return {
+                  location: { first_line: 1, last_line: 1, first_column: 0, last_column: editor.getValue().length }
+                }
+              }
+            },
+            fixedPrefix: sourceType !== 'solr' ? function() { return 'SELECT * FROM ' + params.autocomplete.support.collection.name() + ' WHERE '; } : undefined,
+            fixedPostfix: sourceType !== 'solr' ? function() { return ' GROUP BY 1;' } : undefined, // By adding group by it will limit it to the filter suggestions
+            support: params.autocomplete.support
+          };
+
+          self.autocompleter = new AVAILABLE_AUTOCOMPLETERS[params.autocomplete.type](autocompleteArgs);
         } else {
           self.autocompleter = null;
         }
