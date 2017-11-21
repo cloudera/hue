@@ -82,14 +82,38 @@ class SQLDashboardApi(DashboardApi):
             if not last_dimension_seen:
               fields.insert(0, self._get_aggregate_function(f) + 'AS %(field)s_%(position)s' % f)
 
+        if self._supports_count_over():
+          mincount_fields_name = []
+          mincount_fields_operation = []
+          mincount_where = []
+          for f in facet['properties']['facets']:
+            mincount_fields_name.append(f['field'])
+            mincount_field_name = '_'.join(mincount_fields_name) + "_count"
+            mincount_fields_operation.append('count(*) over (partition by %s) as %s' % (','.join(mincount_fields_name), mincount_field_name) )
+            mincount_where.append('%s >= %s' % (mincount_field_name, str(f['mincount'])))
+          sql_mincount = '''(SELECT * FROM (SELECT *,%(fields)s
+          FROM %(database)s.%(table)s) default
+          WHERE %(where)s) default''' % {
+            'fields': ', '.join(mincount_fields_operation),
+            'database': database,
+            'table': table,
+            'where': ' and '.join(mincount_where)
+          }
+        else:
+          sql_mincount = '(%(database)s.%(table)s)' % {
+            'database': database,
+            'table': table
+          }
+
         order_by = ', '.join([self._get_dimension_field(f)['order_by'] for f in reversed(facet['properties']['facets']) if f['sort'] != 'default'])
 
         sql = '''SELECT %(fields)s
-        FROM %(database)s.%(table)s
+        FROM %(sql_mincount)s
         %(filters)s
         GROUP BY %(fields_dimensions)s
         %(order_by)s
         LIMIT %(limit)s''' % {
+            'sql_mincount': sql_mincount,
             'database': database,
             'table': table,
             'fields': ', '.join(fields),
@@ -116,7 +140,7 @@ class SQLDashboardApi(DashboardApi):
       }
       if filters:
         sql += ' ' + self._convert_filters_to_where(filters)
-      sql += ' LIMIT %s' % LIMIT
+      sql += ' LIMIT %s' % dashboard['template']['rows'] or LIMIT
 
     editor = make_notebook(
         name='Execute and watch',
@@ -134,6 +158,8 @@ class SQLDashboardApi(DashboardApi):
 
     return response
 
+  def _supports_count_over(self):
+    return True
 
   def fetch_result(self, dashboard, query, facet):
     notebook = {}
@@ -630,6 +656,20 @@ class SQLDashboardApi(DashboardApi):
             "value": row[1],
             "cat": row[0],
             "exclude": False
+        })
+    else: # Nested facets can have dimension > 2
+      for row in rows:
+        value_fields = [f['field'] for f in
+                        dimension_fields]
+        fq_values = row[:dimension]
+        counts.append({
+          "count": row[-1],
+          "fq_values": fq_values,
+          "selected": fq_values in fq_fields,
+          "fq_fields": value_fields,
+          "value": ",".join(row[:dimension]),
+          "cat": row[0],
+          "exclude": False
         })
 
     response['dimension'] = dimension
