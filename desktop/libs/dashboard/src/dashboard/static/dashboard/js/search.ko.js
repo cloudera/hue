@@ -57,13 +57,13 @@ function loadSearchLayout(viewModel, json_layout) {
 
 function loadDashboardLayout(viewModel, grister_layout) {
   $.each(grister_layout, function(index, item) {
-    self.gridItems.push(
+    viewModel.gridItems.push(
       ko.mapping.fromJS({
         col: item.col,
         row: item.row,
         size_x: item.size_x,
         size_y: item.size_y,
-        widget: viewModel.getWidgetById(item.widget.id),
+        widget: item.widget ? viewModel.getWidgetById(item.widget.id) : null,
         callback: function (el) {
           $('.gridster ul').data('gridster').move_widget(el, 1, 1);
         }
