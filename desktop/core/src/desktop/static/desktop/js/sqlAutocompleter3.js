@@ -1819,12 +1819,16 @@ var SqlAutocompleter3 = (function () {
   /**
    * @param {Object} options
    * @param {Snippet} options.snippet
+   * @param {string) [options.fixedPrefix] - Optional prefix to always use on parse
+   * @param {string) [options.fixedPostfix] - Optional postfix to always use on parse
    * @constructor
    */
   function SqlAutocompleter3(options) {
     var self = this;
     self.snippet = options.snippet;
     self.editor = options.editor;
+    self.fixedPrefix = options.fixedPrefix || function () { return '' };
+    self.fixedPostfix = options.fixedPostfix || function () { return '' };
     self.suggestions = new AutocompleteResults(options);
   }
 
@@ -1836,21 +1840,20 @@ var SqlAutocompleter3 = (function () {
 
       if ((activeStatementLocation.first_line - 1 < cursorPosition.row || (activeStatementLocation.first_line - 1 === cursorPosition.row && activeStatementLocation.first_column <= cursorPosition.column)) &&
         (activeStatementLocation.last_line - 1 > cursorPosition.row || (activeStatementLocation.last_line - 1 === cursorPosition.row && activeStatementLocation.last_column >= cursorPosition.column))) {
-        var beforeCursor = self.editor().session.getTextRange({
+        var beforeCursor = self.fixedPrefix() + self.editor().session.getTextRange({
           start: {
             row: activeStatementLocation.first_line - 1,
             column: activeStatementLocation.first_column
           },
           end: cursorPosition
         });
-
         var afterCursor = self.editor().session.getTextRange({
           start: cursorPosition,
           end: {
             row: activeStatementLocation.last_line - 1,
             column: activeStatementLocation.last_column
           }
-        });
+        }) + self.fixedPostfix();
         return sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), false);
       }
     }
