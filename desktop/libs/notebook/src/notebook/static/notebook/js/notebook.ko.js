@@ -1330,6 +1330,7 @@ var EditorViewModel = (function() {
           }
         } else {
           self._ajaxError(data, self.execute);
+          notebook.isExecutingAll(false);
         }
 
         if (data.handle) {
