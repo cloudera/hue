@@ -780,8 +780,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         self.loadApp = function(app, loadDeep) {
-          if (self.currentApp() == 'editor') {
-           var vm = ko.dataFor($('#editorComponents')[0]);
+          if (self.currentApp() == 'editor' && $('#editorComponents').length) {
+            var vm = ko.dataFor($('#editorComponents')[0]);
             if (vm.isPresentationMode()) {
               vm.isPresentationMode(false);
             }
@@ -960,7 +960,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               if (typeof self.embeddable_cache['editor'] === 'undefined'){
                 if (window.location.getParameter('editor') !== '') {
                   self.extraEmbeddableURLParams('&editor=' + window.location.getParameter('editor'));
-                } else if (window.location.getParameter('type') !== '') {
+                } else if (window.location.getParameter('type') !== '' && window.location.getParameter('type') !== 'notebook') {
                   self.extraEmbeddableURLParams('&type=' + window.location.getParameter('type'));
                 }
                 self.loadApp('editor');
