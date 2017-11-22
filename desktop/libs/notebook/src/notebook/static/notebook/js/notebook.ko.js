@@ -2748,7 +2748,7 @@ var EditorViewModel = (function() {
                 _statement.push(line);
               }
             });
-            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n'), variables: _variables}, skipSession=true);
+            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n'), variables: ko.mapping.toJS(_variables)}, skipSession=true);
             _snippet.init();
             _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
           }
