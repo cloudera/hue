@@ -49,17 +49,25 @@ from desktop.views import _ko
         <div class="global-search-category">
           <div class="global-search-category-header" data-bind="text: label"></div>
           <ul data-bind="foreach: result">
+            <!-- ko if: typeof draggable !== 'undefined' -->
             <li data-bind="multiClick: {
                 click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
                 dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
               }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }, draggableText: { text: draggable, meta: draggableMeta }"></li>
+            <!-- /ko -->
+            <!-- ko if: typeof draggable === 'undefined' -->
+            <li data-bind="multiClick: {
+                click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
+                dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
+              }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }"></li>
+            <!-- /ko -->
           </ul>
         </div>
       </div>
       <div class="global-search-preview" style="overflow: auto;">
         <!-- ko with: selectedResult -->
           <!-- ko switch: type -->
-            <!-- ko case: ['database', 'document', 'field', 'table', 'view']  -->
+            <!-- ko case: ['database', 'document', 'field', 'table', 'view', 'hueApp']  -->
               <!-- ko component: { name: 'context-popover-contents-global-search', params: { data: data, globalSearch: $parent } } --><!-- /ko -->
             <!-- /ko -->
             <!-- ko case: $default -->
@@ -251,6 +259,10 @@ from desktop.views import _ko
           huePubSub.publish('context.popover.show.in.assist');
         } else if (selectedResult.type === 'document') {
           huePubSub.publish('open.link', '/hue' + selectedResult.data.link);
+        } else if (selectedResult.type === 'hueApp' && selectedResult.data.interpreter && selectedResult.data.interpreter.page) {
+          huePubSub.publish('open.link', selectedResult.data.interpreter.page);
+        } else if (selectedResult.type === 'hueApp' && selectedResult.data.app && selectedResult.data.app.page) {
+          huePubSub.publish('open.link', selectedResult.data.app.page);
         }
         self.close();
       };
@@ -286,7 +298,16 @@ from desktop.views import _ko
         'database': '${ _('Databases') }',
         'field': '${ _('Columns') }',
         'partition': '${ _('Partitions') }',
-        'view': '${ _('Views') }'
+        'view': '${ _('Views') }',
+        'hueDoc': '${ _('Documents') }'
+      };
+
+      var HUE_APP_PREFIX = 'hueApp_';
+
+      GlobalSearch.prototype.fetchHueConfig = function (query) {
+        var promise = $.Deferred();
+        huePubSub.publish('cluster.config.get.config', promise.resolve);
+        return promise;
       };
 
       GlobalSearch.prototype.fetchResults = function (query) {
@@ -295,12 +316,60 @@ from desktop.views import _ko
         self.searchResultVisible(true);
         var hueDocsPromise = self.apiHelper.fetchHueDocsInteractive(query);
         var navPromise = self.apiHelper.fetchNavEntitiesInteractive(query);
+        var hueAppsPromise = self.fetchHueConfig();
+
+        hueAppsPromise.done(function (apps) {
+          var categories = self.searchResultCategories().filter(function (category) {
+            return category.type.indexOf(HUE_APP_PREFIX) !== 0;
+          });
+
+          var appResultChange = categories.length !== self.searchResultCategories().length;
+
+          if (apps && apps.app_config) {
+            Object.keys(apps.app_config).forEach(function (appConfigKey) {
+              var appCatecory = apps.app_config[appConfigKey];
+              var addAll = appCatecory.name.toLowerCase().indexOf(query) !== - 1;
+              var newAppCategory = {
+                type: HUE_APP_PREFIX + appConfigKey,
+                label: appCatecory.displayName,
+                result: []
+              };
+              if (appCatecory.interpreters) {
+                appCatecory.interpreters.forEach(function (interpreter) {
+                  // Special case for metastore that is now called table browser
+                  var metastoreMatch = appCatecory.name === 'browser' && interpreter.type === 'tables' && 'metastore'.indexOf(query.toLowerCase()) !== -1;
+                  if (addAll || metastoreMatch || interpreter.displayName.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+                    newAppCategory.result.push({
+                      label: interpreter.displayName,
+                      type: 'hueApp',
+                      data: {
+                        interpreter: interpreter,
+                        app: appCatecory,
+                        type: 'hueApp',
+                        originalName: interpreter.displayName
+                      }
+                    })
+                  }
+                })
+              }
+              if (newAppCategory.result.length > 0) {
+                appResultChange = true;
+                categories.unshift(newAppCategory);
+              }
+            })
+          }
+          if (appResultChange) {
+            self.selectedIndex(undefined);
+            self.searchResultCategories(categories);
+          }
+        });
+
         hueDocsPromise.done(function (data) {
           var categories = self.searchResultCategories().filter(function (category) {
             return category.type !== 'documents';
           });
           var docCategory = {
-            label: '${ _('Documents') }',
+            label: CATEGORIES.hueDoc,
             result: [],
             type: 'documents'
           };
@@ -335,7 +404,9 @@ from desktop.views import _ko
               });
             })
           }
-          var categories = self.searchResultCategories().length > 0 && self.searchResultCategories()[0].type === 'documents' ? [self.searchResultCategories()[0]] : [];
+          var categories = self.searchResultCategories().filter(function (category) {
+            return category.type.indexOf('nav') !== 0;
+          });
           var newCategories = {};
           data.results.forEach(function (result) {
             var typeLower = result.type.toLowerCase();
@@ -344,7 +415,8 @@ from desktop.views import _ko
               if (!category) {
                 category = {
                   label: CATEGORIES[typeLower],
-                  result: []
+                  result: [],
+                  type: 'nav'
                 };
                 newCategories[typeLower] = category;
               }
@@ -387,7 +459,7 @@ from desktop.views import _ko
           self.searchResultCategories(categories);
         });
 
-        $.when.apply($, [navPromise, hueDocsPromise]).always(function () {
+        $.when.apply($, [hueAppsPromise, navPromise, hueDocsPromise]).always(function () {
           self.loading(false);
         })
       };
