@@ -1437,6 +1437,13 @@ var SqlFunctions = (function () {
         draggable: 'count()',
         description: 'An aggregate function that returns the number of rows, or the number of non-NULL rows.'
       },
+      group_concat: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'T'}], [{type: 'STRING', optional: true}]],
+        signature: 'group_concat([ALL] col [, separator])',
+        draggable: 'group_concat()',
+        description: 'An aggregate function that returns a single string representing the argument value concatenated together for each row of the result set. If the optional separator string is specified, the separator is added between each pair of concatenated values. The default separator is a comma followed by a space.'
+      },
       max: {
         returnTypes: ['T'],
         arguments: [[{type: 'T'}]],
@@ -1450,20 +1457,6 @@ var SqlFunctions = (function () {
         signature: 'min([DISTINCT | ALL] T col)',
         draggable: 'min()',
         description: 'An aggregate function that returns the minimum value from a set of numbers. Opposite of the MAX function. Its single argument can be numeric column, or the numeric result of a function or expression applied to the column value. Rows with a NULL value for the specified column are ignored. If the table is empty, or all the values supplied to MIN are NULL, MIN returns NULL.'
-      },
-      sum: {
-        returnTypes: ['BIGINT', 'DOUBLE'],
-        arguments: [[{type: 'T'}]],
-        signature: 'sum([DISTINCT | ALL] col)',
-        draggable: 'sum()',
-        description: 'An aggregate function that returns the sum of a set of numbers. Its single argument can be numeric column, or the numeric result of a function or expression applied to the column value. Rows with a NULL value for the specified column are ignored. If the table is empty, or all the values supplied to MIN are NULL, SUM returns NULL.'
-      },
-      group_concat: {
-        returnTypes: ['STRING'],
-        arguments: [[{type: 'T'}], [{type: 'STRING', optional: true}]],
-        signature: 'group_concat([ALL] col [, separator])',
-        draggable: 'group_concat()',
-        description: 'An aggregate function that returns a single string representing the argument value concatenated together for each row of the result set. If the optional separator string is specified, the separator is added between each pair of concatenated values. The default separator is a comma followed by a space.'
       },
       ndv: {
         returnTypes: ['DOUBLE'],
@@ -1490,8 +1483,15 @@ var SqlFunctions = (function () {
         returnTypes: ['DOUBLE'],
         arguments: [[{type: 'T'}]],
         signature: 'stddev_samp([DISTINCT | ALL] col)',
-				draggable: 'stddev_samp()',
+        draggable: 'stddev_samp()',
         description: 'Returns the unbiased sample standard deviation of a numeric column in the group.'
+      },
+      sum: {
+        returnTypes: ['BIGINT', 'DOUBLE'],
+        arguments: [[{type: 'T'}]],
+        signature: 'sum([DISTINCT | ALL] col)',
+        draggable: 'sum()',
+        description: 'An aggregate function that returns the sum of a set of numbers. Its single argument can be numeric column, or the numeric result of a function or expression applied to the column value. Rows with a NULL value for the specified column are ignored. If the table is empty, or all the values supplied to MIN are NULL, SUM returns NULL.'
       },
       variance: {
         returnTypes: ['DOUBLE'],
@@ -1947,6 +1947,13 @@ var SqlFunctions = (function () {
         draggable: 'int_months_between()',
         description: 'Returns the number of months between the date portions of two TIMESTAMP values, as an INT representing only the full months that passed.'
       },
+      last_day: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'last_day(TIMESTAMP t)',
+        draggable: 'last_day()',
+        description: 'Returns a TIMESTAMP corresponding to the beginning of the last calendar day in the same month as the TIMESTAMP argument.'
+      },
       microseconds_add: {
         returnTypes: ['TIMESTAMP'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'BIGINT'}, {type: 'INT'}]],
@@ -2130,6 +2137,13 @@ var SqlFunctions = (function () {
         signature: 'unix_timestamp([STRING datetime [, STRING format]]|[TIMESTAMP datetime])',
 				draggable: 'unix_timestamp()',
         description: 'Returns an integer value representing the current date and time as a delta from the Unix epoch, or converts from a specified date and time value represented as a TIMESTAMP or STRING.'
+      },
+      utc_timestamp: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [],
+        signature: 'utc_timestamp()',
+        draggable: 'utc_timestamp()',
+        description: 'Returns a TIMESTAMP corresponding to the current date and time in the UTC time zone.'
       },
       weekofyear: {
         returnTypes: ['INT'],
@@ -2698,6 +2712,20 @@ var SqlFunctions = (function () {
         signature: 'ascii(STRING str)',
 				draggable: 'ascii()',
         description: 'Returns the numeric ASCII code of the first character of the argument.'
+      },
+      base64decode: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'base64decode(STRING str)',
+        draggable: 'base64decode()',
+        description: 'Decodes the given string from Base64, an ACSII string format. It\'s typically used in combination with base64encode(), to store data in an Impala table string that is problematic to store or transmit'
+      },
+      base64encode: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'base64encode(STRING str)',
+        draggable: 'base64encode()',
+        description: 'Encodes the given string to Base64, an ACSII string format. It\'s typically used in combination with base64decode(), to store data in an Impala table string that is problematic to store or transmit'
       },
       btrim: {
         returnTypes: ['STRING'],
