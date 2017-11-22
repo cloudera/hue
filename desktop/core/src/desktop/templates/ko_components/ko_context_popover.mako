@@ -377,6 +377,17 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="context-hue-app-details">
+    <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="with: data">
+      <div style="padding: 8px">
+        <div style="width:100%; text-align: center; margin-top: 30px; font-size: 100px; color: #787878;" data-bind="template: { name: 'app-icon-template', data: { icon: interpreter.type } }"></div>
+         <div style="width: 100%; margin-top: 20px; text-align:center">
+           <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: interpreter.displayName, hueLink: interpreter.page, click: function () { $parents[1].close(); }, attr: { 'title': interpreter.tooltip }"></a>
+         </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="context-document-details">
     <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="niceScroll">
       <div style="padding: 8px">
@@ -1110,6 +1121,14 @@ from metadata.conf import has_navigator
         self.activeTab = ko.observable('details');
       }
 
+      function HueAppContext(data) {
+        var self = this;
+        self.data = data;
+        self.hasErrors = ko.observable(false);
+        self.loading = ko.observable(false);
+        self.template = 'context-hue-app-details';
+      }
+
       function DocumentContext(data) {
         var self = this;
         self.disposals = [];
@@ -1731,6 +1750,7 @@ from metadata.conf import has_navigator
         self.isColumn = params.data.type.toLowerCase() === 'field';
         self.isView = params.data.type.toLowerCase() === 'view';
         self.isDocument = params.data.type.toLowerCase() === 'hue';
+        self.isHueApp = params.data.type.toLowerCase() === 'hueapp';
 
         self.close = params.globalSearch.close.bind(params.globalSearch);
 
@@ -1740,7 +1760,7 @@ from metadata.conf import has_navigator
         self.isComplex = false;
         self.isFunction = false;
 
-        self.showInAssistEnabled = true;
+        self.showInAssistEnabled = !self.isHueApp;
         self.openInDashboardEnabled = self.isTable || self.isView || self.isDatabase;
         self.openInTableBrowserEnabled = self.isTable || self.isView || self.isDatabase;
         self.replaceEditorContentEnabled = self.isHdfs;
@@ -1762,7 +1782,6 @@ from metadata.conf import has_navigator
         self.disposals.push(function () {
           metastorePubSub.remove();
         });
-
 
         var sqlSourceType;
         if (self.isDatabase || self.isTable || self.isView || self.isColumn || self.isComplex) {
@@ -1786,6 +1805,8 @@ from metadata.conf import has_navigator
           self.contents = new TableAndColumnContextTabs(adaptedData, sqlSourceType, 'default', true, false);
         } else if (self.isDocument) {
           self.contents = new DocumentContext(params.data);
+        } else if (self.isHueApp) {
+          self.contents = new HueAppContext(params.data);
         }
       };
 
