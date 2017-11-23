@@ -263,8 +263,8 @@ var AutocompleteResults = (function () {
     self.activeDeferrals.push(self.handleJoins());
     self.activeDeferrals.push(self.handleJoinConditions());
     self.activeDeferrals.push(self.handleAggregateFunctions());
-    self.activeDeferrals.push(self.handleGroupBys());
-    self.activeDeferrals.push(self.handleOrderBys());
+    self.activeDeferrals.push(self.handleGroupBys(columnsDeferred));
+    self.activeDeferrals.push(self.handleOrderBys(columnsDeferred));
     self.activeDeferrals.push(self.handleFilters());
     self.activeDeferrals.push(self.handlePopularTables(tablesDeferred));
     self.activeDeferrals.push(self.handlePopularColumns(columnsDeferred));
@@ -1343,7 +1343,29 @@ var AutocompleteResults = (function () {
     return aggregateFunctionsDeferred;
   };
 
-  AutocompleteResults.prototype.handleGroupBys = function () {
+  /**
+   * Merges popular group by and order by columns with the column suggestions
+   *
+   * @param sourceDeferred
+   * @param columnsDeferred
+   * @param suggestions
+   */
+  var mergeWithColumns = function (sourceDeferred, columnsDeferred, suggestions) {
+    columnsDeferred.done(function (columns) {
+      var suggestionIndex = {};
+      suggestions.forEach(function (suggestion) {
+        suggestionIndex[suggestion.value] = suggestion;
+      });
+      columns.forEach(function (col) {
+        if (suggestionIndex[col.details.name]) {
+          col.category = suggestionIndex[col.details.name].category
+        }
+      });
+      sourceDeferred.resolve([]);
+    })
+  };
+
+  AutocompleteResults.prototype.handleGroupBys = function (columnsDeferred) {
     var self = this;
     var groupBysDeferred = $.Deferred();
     var suggestGroupBys = self.parseResult.suggestGroupBys;
@@ -1359,8 +1381,8 @@ var AutocompleteResults = (function () {
         tables: suggestGroupBys.tables,
         successCallback: function (data) {
           var groupBySuggestions = [];
+          var prefix = suggestGroupBys.prefix ? (self.parseResult.lowerCase ? suggestGroupBys.prefix.toLowerCase() : suggestGroupBys.prefix) + ' ' : '';
           if (typeof data.values.groupbyColumns !== 'undefined') {
-            var prefix = suggestGroupBys.prefix ? (self.parseResult.lowerCase ? suggestGroupBys.prefix.toLowerCase() : suggestGroupBys.prefix) + ' ' : '';
             data.values.groupbyColumns.forEach(function (value) {
               var filterValue = self.createNavOptIdentifierForColumn(value, suggestGroupBys.tables);
               groupBySuggestions.push({
@@ -1374,7 +1396,11 @@ var AutocompleteResults = (function () {
               });
             });
           }
-          groupBysDeferred.resolve(groupBySuggestions);
+          if (prefix === '' && groupBySuggestions.length) {
+            mergeWithColumns(groupBysDeferred, columnsDeferred, groupBySuggestions);
+          } else {
+            groupBysDeferred.resolve(groupBySuggestions);
+          }
         },
         errorCallback: groupBysDeferred.reject
       });
@@ -1385,7 +1411,7 @@ var AutocompleteResults = (function () {
     return groupBysDeferred;
   };
 
-  AutocompleteResults.prototype.handleOrderBys = function () {
+  AutocompleteResults.prototype.handleOrderBys = function (columnsDeferred) {
     var self = this;
     var orderBysDeferred = $.Deferred();
     var suggestOrderBys = self.parseResult.suggestOrderBys;
@@ -1401,8 +1427,8 @@ var AutocompleteResults = (function () {
         tables: suggestOrderBys.tables,
         successCallback: function (data) {
           var orderBySuggestions = [];
+          var prefix = suggestOrderBys.prefix ? (self.parseResult.lowerCase ? suggestOrderBys.prefix.toLowerCase() : suggestOrderBys.prefix) + ' ' : '';
           if (typeof data.values.orderbyColumns !== 'undefined') {
-            var prefix = suggestOrderBys.prefix ? (self.parseResult.lowerCase ? suggestOrderBys.prefix.toLowerCase() : suggestOrderBys.prefix) + ' ' : '';
             data.values.orderbyColumns.forEach(function (value) {
               var filterValue = self.createNavOptIdentifierForColumn(value, suggestOrderBys.tables);
               orderBySuggestions.push({
@@ -1416,7 +1442,11 @@ var AutocompleteResults = (function () {
               });
             });
           }
-          orderBysDeferred.resolve(orderBySuggestions);
+          if (prefix === '' && orderBySuggestions.length) {
+            mergeWithColumns(orderBysDeferred, columnsDeferred, orderBySuggestions);
+          } else {
+            orderBysDeferred.resolve(orderBySuggestions);
+          }
         },
         errorCallback: orderBysDeferred.reject
       });
