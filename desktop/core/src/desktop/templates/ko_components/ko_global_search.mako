@@ -29,6 +29,7 @@ from desktop.views import _ko
       name: 'inline-autocomplete',
       params: {
         hasFocus: searchHasFocus,
+        disableNavigation: true,
         placeHolder: '${ _ko('Search data and saved documents...') }',
         querySpec: querySpec,
         onClear: function () { selectedIndex(null); searchResultVisible(false); },
