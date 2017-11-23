@@ -332,6 +332,7 @@ var MetastoreTable = (function () {
     self.apiHelper = ApiHelper.getInstance();
 
     self.hasErrors = ko.observable(false);
+    self.errorMessage = ko.observable();
     self.loaded = ko.observable(false);
     self.loading = ko.observable(true);
 
@@ -360,7 +361,8 @@ var MetastoreTable = (function () {
         self.loading(false);
         self.loaded(true);
       },
-      errorCallback: function (data) {
+      errorCallback: function (message) {
+        self.errorMessage(message);
         self.hasErrors(true);
         self.loading(false);
         self.loaded(true);
