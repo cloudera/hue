@@ -117,7 +117,7 @@ def test_ensure_safe_redirect_middleware():
     c = make_logged_in_client()
 
     # POST works
-    response = c.post("/hue/accounts/login/", {
+    response = c.post("/accounts/login/", {
       'username': 'test',
       'password': 'test',
     })
@@ -125,7 +125,7 @@ def test_ensure_safe_redirect_middleware():
 
     # Disallow most redirects
     done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('^\d+$'))
-    response = c.post("/hue/accounts/login/", {
+    response = c.post("/accounts/login/", {
       'username': 'test',
       'password': 'test',
       'next': 'http://example.com',
@@ -134,7 +134,7 @@ def test_ensure_safe_redirect_middleware():
 
     # Allow all redirects
     done.append(desktop.conf.REDIRECT_WHITELIST.set_for_testing('.*'))
-    response = c.post("/hue/accounts/login/", {
+    response = c.post("/accounts/login/", {
       'username': 'test',
       'password': 'test',
       'next': 'http://example.com',
