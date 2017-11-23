@@ -61,9 +61,23 @@ from desktop.views import _ko
         self.facets = params.facets || [];
         self.knownFacetValues = params.knownFacetValues || {};
         self.uniqueFacets = !!params.uniqueFacets;
+        self.disableNavigation = !!params.disableNavigation;
 
         self.searchInput = ko.observable('');
-        self.inlineAutocomplete = ko.observable('');
+        self.suggestions = ko.observableArray();
+        self.selectedSuggestionIndex = ko.observable(0);
+
+        self.suggestions.subscribe(function () {
+          self.selectedSuggestionIndex(0);
+        });
+
+        self.inlineAutocomplete = ko.pureComputed(function () {
+          if (self.suggestions().length === 0) {
+            return '';
+          }
+          return self.suggestions()[self.selectedSuggestionIndex()];
+        });
+
         self.lastResult = {};
 
         self.querySpec({
@@ -74,8 +88,8 @@ from desktop.views import _ko
 
         var querySpecSub = self.querySpec.subscribe(function (newVal) {
           if (!newVal || !newVal.query) {
-              self.searchInput('');
-              self.inlineAutocomplete('');
+            self.searchInput('');
+            self.clearSuggestions();
           }
         });
 
@@ -87,12 +101,12 @@ from desktop.views import _ko
           if (params.onClear) {
             params.onClear();
           }
-          self.inlineAutocomplete('');
+          self.clearSuggestions();
         };
 
         if (params.triggerObservable) {
           var triggerSub = params.triggerObservable.subscribe(function () {
-            self.autocomplete(self.searchInput(), self.inlineAutocomplete);
+            self.autocomplete();
           });
           self.disposals.push(function () {
             triggerSub.dispose();
@@ -101,7 +115,7 @@ from desktop.views import _ko
 
         var inputSub = self.searchInput.subscribe(function (newValue) {
           if (newValue === '' && self.querySpec() && self.querySpec().query === '') {
-            self.inlineAutocomplete('');
+            self.clearSuggestions();
             return;
           }
           if (newValue === '' && self.querySpec() && self.querySpec().query !== '') {
@@ -157,16 +171,16 @@ from desktop.views import _ko
           }
 
           if (newValue === '') {
-            self.inlineAutocomplete('');
+            self.clearSuggestions();
           } else if (self.inlineAutocomplete() === newValue || self.inlineAutocomplete().indexOf(newValue) !== 0) {
-            self.autocomplete(newValue, self.inlineAutocomplete);
+            self.autocomplete();
           } else if (self.inlineAutocomplete().indexOf(newValue) === 0) {
             var newAutocomp = self.inlineAutocomplete();
             while (newAutocomp.lastIndexOf(' ') >= newValue.length) {
               newAutocomp = newAutocomp.substring(0, newAutocomp.lastIndexOf(' '));
             }
             if (newAutocomp !== self.inlineAutocomplete()) {
-              self.inlineAutocomplete(newAutocomp);
+              self.suggestions([newAutocomp]);
             }
           }
         });
@@ -179,8 +193,27 @@ from desktop.views import _ko
           if (!self.hasFocus()) {
             return;
           }
+          if (!self.disableNavigation && event.keyCode === 38 && self.suggestions().length) { // Up
+            if (self.selectedSuggestionIndex() === 0) {
+              self.selectedSuggestionIndex(self.suggestions().length - 1);
+            } else {
+              self.selectedSuggestionIndex(self.selectedSuggestionIndex() - 1);
+            }
+            event.preventDefault();
+            return;
+          }
+
+          if (!self.disableNavigation && event.keyCode === 40 && self.suggestions().length) { // Down
+            if (self.selectedSuggestionIndex() === self.suggestions().length - 1) {
+              self.selectedSuggestionIndex(0);
+            } else {
+              self.selectedSuggestionIndex(self.selectedSuggestionIndex() + 1);
+            }
+            event.preventDefault();
+            return;
+          }
           if (event.keyCode === 32 && event.ctrlKey) { // Ctrl-Space
-            self.autocomplete(self.searchInput(), self.inlineAutocomplete);
+            self.autocomplete();
             return;
           }
           if (event.keyCode === 39 && self.inlineAutocomplete() !== '' && self.inlineAutocomplete() !== self.searchInput()) { // Right arrow
@@ -200,10 +233,10 @@ from desktop.views import _ko
 
         var focusSub = self.hasFocus.subscribe(function (newVal) {
           if (!newVal) {
-            self.inlineAutocomplete('');
+            self.clearSuggestions();
             $(document).off('keydown', onKeyDown);
           } else if (self.searchInput() !== '') {
-            self.autocomplete(self.searchInput(), self.inlineAutocomplete);
+            self.autocomplete();
             $(document).on('keydown', onKeyDown);
           } else {
             $(document).on('keydown', onKeyDown);
@@ -215,6 +248,13 @@ from desktop.views import _ko
         });
       };
 
+      InlineAutocomplete.prototype.clearSuggestions = function () {
+        var self = this;
+        if (self.suggestions().length > 0) {
+          self.suggestions([]);
+        }
+      };
+
       InlineAutocomplete.prototype.dispose = function () {
         var self = this;
         while (self.disposals.length) {
@@ -222,13 +262,14 @@ from desktop.views import _ko
         }
       };
 
-      InlineAutocomplete.prototype.autocomplete = function (text, callback) {
+      InlineAutocomplete.prototype.autocomplete = function () {
         var self = this;
         if (!self.lastResult) {
-          callback('');
+          self.clearSuggestions();
           return;
         }
 
+        var text = self.searchInput();
         var partial, nonPartial;
         var partialMatch = text.match(/([^:\s]+)$/i);
         if (partialMatch) {
@@ -239,7 +280,7 @@ from desktop.views import _ko
           nonPartial = text;
         }
 
-        var newAutocomplete = '';
+        var newSuggestions = [];
         var partialLower = partial.toLowerCase();
         if (self.lastResult.suggestFacets) {
           var existingFacetIndex = {};
@@ -251,43 +292,35 @@ from desktop.views import _ko
 
           var suggestion = nonPartial + partial;
           var isLowerCase = suggestion.length > 0 && suggestion.toLowerCase() === suggestion;
-          self.facets.every(function (facet) {
+          self.facets.forEach(function (facet) {
             if (self.uniqueFacets && existingFacetIndex[facet]) {
-              return true;
+              return;
             }
             if (partial.length === 0 || facet.indexOf(partialLower) === 0) {
               var remainder = facet.substring(partial.length);
               suggestion += isLowerCase ? remainder : remainder.toUpperCase();
               suggestion += ':';
-              newAutocomplete = suggestion;
-              return false;
+              newSuggestions.push(suggestion);
             }
-            return true;
           });
         }
 
-        if (self.lastResult.suggestFacetValues && !newAutocomplete) {
+        if (self.lastResult.suggestFacetValues) {
           var facetValues = ko.unwrap(self.knownFacetValues);
           if (facetValues[self.lastResult.suggestFacetValues.toLowerCase()]) {
-            getSortedFacets(facetValues[self.lastResult.suggestFacetValues.toLowerCase()]).every(function (value) {
+            getSortedFacets(facetValues[self.lastResult.suggestFacetValues.toLowerCase()]).forEach(function (value) {
               if (value.toLowerCase().indexOf(partialLower) === 0) {
-                newAutocomplete = nonPartial + partial + value.substring(partial.length, value.length);
-                return false;
+                newSuggestions.push(nonPartial + partial + value.substring(partial.length, value.length));
               }
-              return true;
             });
           }
         }
 
-        if (partial !== '' && self.lastResult.suggestResults && !newAutocomplete) {
-          newAutocomplete = self.autocompleteFromEntries(nonPartial, partial);
+        if (partial !== '' && self.lastResult.suggestResults) {
+          newSuggestions = newSuggestions.concat(self.autocompleteFromEntries(nonPartial, partial));
         }
 
-        if (!newAutocomplete) {
-          callback('');
-        } else if (newAutocomplete !== self.inlineAutocomplete()) {
-          callback(newAutocomplete);
-        }
+        self.suggestions(newSuggestions);
       };
 
       ko.components.register('inline-autocomplete', {
