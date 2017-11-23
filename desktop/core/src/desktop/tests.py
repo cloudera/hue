@@ -461,7 +461,7 @@ def test_desktop_permissions():
   c = make_logged_in_client(USERNAME, groupname=GROUPNAME, recreate=True, is_superuser=False)
 
   # Access to the basic works
-  assert_equal(200, c.get('/hue/accounts/login/', follow=True).status_code)
+  assert_equal(200, c.get('/accounts/login/', follow=True).status_code)
   assert_equal(200, c.get('/accounts/logout', follow=True).status_code)
   assert_equal(200, c.get('/home', follow=True).status_code)
 
@@ -798,7 +798,7 @@ def test_last_access_time():
   raise SkipTest
 
   c = make_logged_in_client(username="access_test")
-  c.post('/hue/accounts/login/')
+  c.post('/accounts/login/')
   login = desktop.auth.views.get_current_users()
   before_access_time = time.time()
   response = c.get('/home')
@@ -890,7 +890,7 @@ class TestStrictRedirection():
 
   def _test_redirection(self, redirection_url, expected_status_code, **kwargs):
     self.client.get('/accounts/logout', **kwargs)
-    response = self.client.post('/hue/accounts/login/?next=' + redirection_url, self.user, **kwargs)
+    response = self.client.post('/accounts/login/?next=' + redirection_url, self.user, **kwargs)
     assert_equal(expected_status_code, response.status_code)
     if expected_status_code == 403:
         error_msg = 'Redirect to ' + redirection_url + ' is not allowed.'

@@ -422,15 +422,15 @@ class TestUserAdmin(BaseUserAdminTests):
       # Test first-ever login with password policy enabled
       c = Client()
 
-      response = c.get('/hue/accounts/login/')
+      response = c.get('/accounts/login/')
       assert_equal(200, response.status_code)
       assert_true(response.context['first_login_ever'])
 
-      response = c.post('/hue/accounts/login/', dict(username="test_first_login", password="foo"))
+      response = c.post('/accounts/login/', dict(username="test_first_login", password="foo"))
       assert_true(response.context['first_login_ever'])
       assert_equal([password_error_msg], response.context["form"]["password"].errors)
 
-      response = c.post('/hue/accounts/login/', dict(username="test_first_login", password="foobarTest1["), follow=True)
+      response = c.post('/accounts/login/', dict(username="test_first_login", password="foobarTest1["), follow=True)
       assert_equal(200, response.status_code)
       assert_true(User.objects.get(username="test_first_login").is_superuser)
       assert_true(User.objects.get(username="test_first_login").check_password("foobarTest1["))
