@@ -4137,14 +4137,9 @@
       function processErrorsAndWarnings(type, list) {
         editor.clearErrorsAndWarnings(type);
         var offset = 0;
-        if (snippet.isSqlDialect()) {
-          if (editor.getSelectedText()) {
-            var selectionRange = editor.getSelectionRange();
-            offset = Math.min(selectionRange.start.row, selectionRange.end.row);
-          }
-          if (snippet.result && snippet.result.statements_count() > 1) {
-            offset = snippet.result.statement_range().start.row;
-          }
+        if (snippet.isSqlDialect() && editor.getSelectedText()) {
+          var selectionRange = editor.getSelectionRange();
+          offset = Math.min(selectionRange.start.row, selectionRange.end.row);
         }
         if (list.length > 0) {
           list.forEach(function (item, cnt) {
