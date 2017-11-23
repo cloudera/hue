@@ -332,6 +332,9 @@ from desktop.views import _ko
             } else if (self.selectedIndex() > 0) {
               self.selectedIndex(self.selectedIndex() - 1);
               self.scrollSelectionIntoView();
+            } else {
+              self.selectedIndex(self.suggestions.filtered().length - 1);
+              self.scrollSelectionIntoView();
             }
           },
           'Down': function(editor) {
@@ -340,6 +343,9 @@ from desktop.views import _ko
               self.editor().execCommand('golinedown');
             } else if (self.selectedIndex() < self.suggestions.filtered().length - 1) {
               self.selectedIndex(self.selectedIndex() + 1);
+              self.scrollSelectionIntoView();
+            } else {
+              self.selectedIndex(0);
               self.scrollSelectionIntoView();
             }
           },
