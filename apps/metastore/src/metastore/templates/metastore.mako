@@ -825,7 +825,7 @@ ${ components.menubar(is_embeddable) }
   <div data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;" class="empty-message">${ _('The table does not contain any data.') }</div>
   <!-- /ko -->
   <!-- ko if: hasErrors() -->
-  <div class="empty-message">${ _('Could not load the sample, see the server log for details.') }</div>
+  <div class="empty-message alert" data-bind="text: errorMessage() || '${ _ko('Could not load the sample, see the server log for details.') }'"></div>
   <!-- /ko -->
   <!-- /ko -->
 </script>
