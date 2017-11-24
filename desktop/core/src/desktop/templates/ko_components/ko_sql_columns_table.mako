@@ -33,7 +33,8 @@ from desktop.views import _ko
             params: {
               querySpec: querySpec,
               facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
-              knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES
+              knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES,
+              autocompleteFromEntries: autocompleteFromEntries
             }
           } --><!-- /ko -->
         </div>
@@ -98,7 +99,7 @@ from desktop.views import _ko
 
       function SqlColumnsTable(params) {
         var self = this;
-        var columns = params.columns;
+        self.columns = params.columns;
         self.scrollToColumns = typeof params.scrollToColumns !== 'undefined' ?  params.scrollToColumns : true;
         self.searchInput = ko.observable('');
         self.searchVisible = ko.observable(true);
@@ -113,14 +114,14 @@ from desktop.views import _ko
 
         self.filteredColumns = ko.pureComputed(function () {
           if (!self.querySpec() || self.querySpec().query === '') {
-            return columns;
+            return self.columns;
           }
 
           var facets = self.querySpec().facets;
           var isFacetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
           var isTextMatch = !self.querySpec().text || self.querySpec().text.length === 0;
 
-          return columns.filter(function (column) {
+          return self.columns.filter(function (column) {
             var match = true;
 
             if (!isFacetMatch) {
@@ -136,6 +137,17 @@ from desktop.views import _ko
             return match;
           })
         });
+
+        self.autocompleteFromEntries = function (nonPartial, partial) {
+          var result = [];
+          var partialLower = partial.toLowerCase();
+          self.columns.forEach(function (column) {
+            if (column.name.toLowerCase().indexOf(partialLower) === 0) {
+              result.push(nonPartial + partial + column.name.substring(partial.length))
+            }
+          });
+          return result;
+        };
       }
 
       ko.components.register('sql-columns-table', {
