@@ -27,7 +27,17 @@ from desktop.views import _ko
       <div class="context-popover-flex-header">
         <div class="context-popover-header" style="display:inline-block;">${_('Columns')} (<span data-bind="text: filteredColumns().length"></span>)</div>
         <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
-        <input class="input-large context-popover-inline-search" style="padding: 3px 6px;" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
+        <div class="context-popover-inline-autocomplete" data-bind="visible: searchVisible">
+          <!-- ko component: {
+            name: 'inline-autocomplete',
+            params: {
+              querySpec: querySpec,
+              facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
+              knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES
+            }
+          } --><!-- /ko -->
+        </div>
+##         <input class="input-large context-popover-inline-search" style="padding: 3px 6px;" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
       </div>
       <div class="context-popover-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
         <table id="sqlColumnsTable" style="width: 100%" class="table table-condensed table-nowrap">
@@ -82,6 +92,10 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
+      window.SQL_COLUMNS_KNOWN_FACET_VALUES = {
+        'type': {'array': -1, 'boolean': -1, 'bigint': -1, 'binary': -1, 'char': -1, 'date': -1, 'double': -1, 'decimal': -1, 'float': -1, 'int': -1, 'map': -1, 'real': -1, 'smallint': -1, 'string': -1, 'struct': -1, 'timestamp': -1, 'tinyint': -1, 'varchar': -1 }
+      };
+
       function SqlColumnsTable(params) {
         var self = this;
         var columns = params.columns;
@@ -89,6 +103,7 @@ from desktop.views import _ko
         self.searchInput = ko.observable('');
         self.searchVisible = ko.observable(true);
         self.searchFocus = ko.observable(false);
+        self.querySpec = ko.observable();
 
         self.searchVisible.subscribe(function (newValue) {
           if (newValue) {
@@ -97,15 +112,28 @@ from desktop.views import _ko
         });
 
         self.filteredColumns = ko.pureComputed(function () {
-          if (self.searchInput() === '') {
+          if (!self.querySpec() || self.querySpec().query === '') {
             return columns;
           }
-          var query = self.searchInput().toLowerCase();
+
+          var facets = self.querySpec().facets;
+          var isFacetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
+          var isTextMatch = !self.querySpec().text || self.querySpec().text.length === 0;
+
           return columns.filter(function (column) {
-            return column.name.toLowerCase().indexOf(query) != -1
-                || column.type.toLowerCase().indexOf(query) != -1
-                || column.comment.toLowerCase().indexOf(query) != -1
-                || (typeof column.table !== 'undefined' && column.table.toLowerCase().indexOf(query) !== -1);
+            var match = true;
+
+            if (!isFacetMatch) {
+              match = !!facets['type'][column.type];
+            }
+
+            if (match && !isTextMatch) {
+              match = self.querySpec().text.every(function (text) {
+                return column.name.toLowerCase().indexOf(text.toLowerCase()) !== -1 || column.comment.toLowerCase().indexOf(text.toLowerCase()) != -1
+              });
+            }
+
+            return match;
           })
         });
       }
