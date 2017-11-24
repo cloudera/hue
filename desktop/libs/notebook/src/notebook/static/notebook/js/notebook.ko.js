@@ -34,6 +34,28 @@ var EditorViewModel = (function() {
       .extend("throttle", 100);
     self.handle = ko.observable(typeof result.handle != "undefined" && result.handle != null ? result.handle : {});
     self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
+
+    var adaptMeta = function () {
+      var i = 0;
+      self.meta().forEach(function (item) {
+        if (typeof item.checked === 'undefined') {
+          item.checked = ko.observable(true);
+          item.checked.subscribe(function () {
+            self.filteredMetaChecked(self.filteredMeta().some(function (item) { return item.checked(); }));
+          });
+        }
+        item.type = item.type.replace(/_type/i, '').toLowerCase();
+        if (typeof item.originalIndex === 'undefined') {
+          item.originalIndex = i;
+        }
+        i++;
+      })
+    };
+
+    adaptMeta();
+    self.meta.subscribe(adaptMeta);
+
+
     self.rows = ko.observable(typeof result.rows != "undefined" && result.rows != null ? result.rows : null);
     self.hasMore = ko.observable(typeof result.hasMore != "undefined" && result.hasMore != null ? result.hasMore : false);
     self.statement_id = ko.observable(typeof result.statement_id != "undefined" && result.statement_id != null ? result.statement_id : 0);
@@ -54,47 +76,47 @@ var EditorViewModel = (function() {
         return item.name != ''
       });
     });
-    self.metaFilter = ko.observable('');
+    self.metaFilter = ko.observable();
+
     self.isMetaFilterVisible = ko.observable(false);
     self.filteredMetaChecked = ko.observable(true);
     self.filteredMeta = ko.pureComputed(function () {
-      return ko.utils.arrayFilter(self.meta(), function (item, i) {
-        if (typeof item.checked === 'undefined') {
-          item.checked = ko.observable(true);
-          item.checked.subscribe(function () {
-            self.filteredMetaChecked(ko.utils.arrayFilter(self.filteredMeta(), function (item) {
-                return !item.checked();
-              }).length == 0);
+      if (!self.metaFilter() || self.metaFilter().query === '') {
+        return self.meta();
+      }
+
+      return self.meta().filter(function (item) {
+        var facets = self.metaFilter().facets;
+        var isFacetMatch = !facets || Object.keys(facets).length === 0 || !facets['type']; // So far only type facet is used for SQL
+        var isTextMatch = !self.metaFilter().text || self.metaFilter().text.length === 0;
+        var match = true;
+
+        if (!isFacetMatch) {
+          match = !!facets['type'][item.type];
+        }
+
+        if (match && !isTextMatch) {
+          match = self.metaFilter().text.every(function (text) {
+            return item.name.toLowerCase().indexOf(text.toLowerCase()) !== -1;
           });
         }
-        if (typeof item.originalIndex === 'undefined') {
-          item.originalIndex = i;
-        }
-        var metaFilterValue = self.metaFilter().toLowerCase();
-        var metaFilterValues = metaFilterValue.split(' ');
-        var toBeReturned = item.name !== '';
-        var hasPartial = false;
-        metaFilterValues.forEach(function (partial) {
-          if (partial.indexOf('column:') > -1) {
-            partial = $.trim(partial.split('column:')[1]);
-            toBeReturned = toBeReturned && item.name.toLowerCase().indexOf(partial) > -1;
-            hasPartial = true;
-          }
-          if (partial.indexOf('type:') > -1) {
-            partial = $.trim(partial.split('type:')[1]);
-            toBeReturned = toBeReturned && item.type.toLowerCase().indexOf(partial) > -1;
-            hasPartial = true;
-          }
-          if (partial.indexOf('column:') === -1 && partial.indexOf('type:') === -1) {
-            if (!hasPartial) {
-              toBeReturned = toBeReturned && (item.name.toLowerCase().indexOf(partial) > -1 || item.type.toLowerCase().indexOf(partial) > -1);
-            }
-          }
-        });
-        return toBeReturned;
+        return match;
       });
     });
 
+    self.autocompleteFromEntries = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.meta().forEach(function (column) {
+        if (column.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + column.name.substring(partial.length))
+        } else if (column.name.toLowerCase().indexOf('.' + partialLower) !== -1) {
+          result.push(nonPartial + partial + column.name.substring(partial.length + column.name.toLowerCase().indexOf('.' + partialLower) + 1))
+        }
+      });
+
+      return result;
+    };
     self.clickFilteredMetaCheck = function () {
       self.filteredMeta().forEach(function (item) {
         item.checked(self.filteredMetaChecked());
