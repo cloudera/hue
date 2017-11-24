@@ -384,7 +384,7 @@
             if ($t.data('fnDraws') === 0) {
               var html = '';
               for (var i = 0; i < data.length; i++) {
-                html += '<tr class="ht-visible-row ht-visible-row-' + i + '" style="height: 32px"><td>' + hueUtils.deXSS(data[i][0]) + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+                html += '<tr class="ht-visible-row ht-visible-row-' + i + '"><td>' + hueUtils.deXSS(data[i][0]) + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
               }
               appendable.html(html);
               if ($t.data('plugin_jHueTableExtender')) {
