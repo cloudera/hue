@@ -3614,7 +3614,7 @@ $(document).ready(function () {
   $(".gridster>ul").gridster({
     widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
-    avoid_overlapped_widgets: true,
+    avoid_overlapped_widgets: false,
     max_cols: 12,
     max_rows: 6000,
     resize: {
