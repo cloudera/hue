@@ -93,10 +93,6 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
-      window.SQL_COLUMNS_KNOWN_FACET_VALUES = {
-        'type': {'array': -1, 'boolean': -1, 'bigint': -1, 'binary': -1, 'char': -1, 'date': -1, 'double': -1, 'decimal': -1, 'float': -1, 'int': -1, 'map': -1, 'real': -1, 'smallint': -1, 'string': -1, 'struct': -1, 'timestamp': -1, 'tinyint': -1, 'varchar': -1 }
-      };
-
       function SqlColumnsTable(params) {
         var self = this;
         self.columns = params.columns;
