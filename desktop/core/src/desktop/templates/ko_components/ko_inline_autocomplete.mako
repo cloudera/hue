@@ -57,6 +57,11 @@ from desktop.views import _ko
         self.placeHolder = params.placeHolder || '${ _('Filter...') }';
         self.hasFocus = params.hasFocus || ko.observable();
         self.querySpec = params.querySpec;
+        self.querySpec({
+          query: '',
+          facets: {},
+          text: []
+        });
         self.autocompleteFromEntries = params.autocompleteFromEntries || function () {};
         self.facets = params.facets || [];
         self.knownFacetValues = params.knownFacetValues || {};
@@ -78,13 +83,7 @@ from desktop.views import _ko
           return self.suggestions()[self.selectedSuggestionIndex()];
         });
 
-        self.lastResult = {};
-
-        self.querySpec({
-          query: '',
-          facets: {},
-          text: []
-        });
+        self.lastParseResult = {};
 
         var querySpecSub = self.querySpec.subscribe(function (newVal) {
           if (!newVal || !newVal.query) {
@@ -114,75 +113,24 @@ from desktop.views import _ko
         }
 
         var inputSub = self.searchInput.subscribe(function (newValue) {
-          if (newValue === '' && self.querySpec() && self.querySpec().query === '') {
-            self.clearSuggestions();
+          if (self.inlineAutocomplete() === newValue) {
             return;
-          }
-          if (newValue === '' && self.querySpec() && self.querySpec().query !== '') {
-            self.querySpec({
-              query: '',
-              facets: {},
-              text: []
-            });
-          } else {
-            // TODO: Get cursor position and split to before and after
-            self.lastResult = globalSearchParser.parseGlobalSearch(newValue, '');
-            if (hueDebug && hueDebug.showGlobalSearchParseResults) {
-              console.log(self.lastResult);
-            }
-            var querySpec = { query: newValue };
-            if (self.lastResult.facets) {
-
-              var knownFacetValues = ko.unwrap(self.knownFacetValues);
-              var cleanFacets = {};
-              Object.keys(self.lastResult.facets).forEach(function (facet) {
-                if (!knownFacetValues[facet]) {
-                  cleanFacets[facet] = self.lastResult.facets[facet];
-                } else {
-                  cleanFacets[facet] = {};
-                  Object.keys(self.lastResult.facets[facet]).forEach(function (value) {
-                    if (knownFacetValues[facet][value]) {
-                      cleanFacets[facet][value] = self.lastResult.facets[facet][value];
-                    } else {
-                      var found = false;
-                      // Find the closest match, i.e. type:s -> type: [string, smallint, ...]
-                      getSortedFacets(knownFacetValues[facet]).forEach(function (knownValue) {
-                        if (knownValue.toLowerCase().indexOf(value.toLowerCase()) === 0) {
-                          if (!cleanFacets[facet][knownValue]) {
-                            cleanFacets[facet][knownValue] = [];
-                          }
-                          cleanFacets[facet][knownValue] = true;
-                          found = true
-                        }
-                      });
-                      if (!found) {
-                        cleanFacets[facet][value] = self.lastResult.facets[facet][value];
-                      }
-                    }
-                  })
-                }
-              });
-              querySpec.facets = cleanFacets;
-            }
-            if (self.lastResult.text) {
-              querySpec.text = self.lastResult.text;
-            }
-            self.querySpec(querySpec);
           }
 
           if (newValue === '') {
             self.clearSuggestions();
-          } else if (self.inlineAutocomplete() === newValue || self.inlineAutocomplete().indexOf(newValue) !== 0) {
-            self.autocomplete();
-          } else if (self.inlineAutocomplete().indexOf(newValue) === 0) {
-            var newAutocomp = self.inlineAutocomplete();
-            while (newAutocomp.lastIndexOf(' ') >= newValue.length) {
-              newAutocomp = newAutocomp.substring(0, newAutocomp.lastIndexOf(' '));
+            if (self.querySpec() && self.querySpec().query !== '') {
+              self.querySpec({
+                query: '',
+                facets: {},
+                text: []
+              });
             }
-            if (newAutocomp !== self.inlineAutocomplete()) {
-              self.suggestions([newAutocomp]);
-            }
+            return;
           }
+
+          self.updateQuerySpec();
+          self.autocomplete();
         });
 
         self.disposals.push(function () {
@@ -248,6 +196,54 @@ from desktop.views import _ko
         });
       };
 
+      InlineAutocomplete.prototype.updateQuerySpec = function () {
+        var self = this;
+        // TODO: Get cursor position and split to before and after
+        self.lastParseResult = globalSearchParser.parseGlobalSearch(self.searchInput(), '');
+        if (hueDebug && hueDebug.showGlobalSearchParseResults) {
+          console.log(self.lastParseResult);
+        }
+        var querySpec = { query: self.searchInput() };
+
+        if (self.lastParseResult.facets) {
+          var knownFacetValues = ko.unwrap(self.knownFacetValues);
+          var cleanFacets = {};
+          Object.keys(self.lastParseResult.facets).forEach(function (facet) {
+            if (!knownFacetValues[facet]) {
+              cleanFacets[facet] = self.lastParseResult.facets[facet];
+            } else {
+              cleanFacets[facet] = {};
+              Object.keys(self.lastParseResult.facets[facet]).forEach(function (value) {
+                if (knownFacetValues[facet][value]) {
+                  cleanFacets[facet][value] = self.lastParseResult.facets[facet][value];
+                } else {
+                  var found = false;
+                  // Find the closest match, i.e. type:s -> type: [string, smallint, ...]
+                  getSortedFacets(knownFacetValues[facet]).forEach(function (knownValue) {
+                    if (knownValue.toLowerCase().indexOf(value.toLowerCase()) === 0) {
+                      if (!cleanFacets[facet][knownValue]) {
+                        cleanFacets[facet][knownValue] = [];
+                      }
+                      cleanFacets[facet][knownValue] = true;
+                      found = true
+                    }
+                  });
+                  if (!found) {
+                    cleanFacets[facet][value] = self.lastParseResult.facets[facet][value];
+                  }
+                }
+              })
+            }
+          });
+          querySpec.facets = cleanFacets;
+        }
+        if (self.lastParseResult.text) {
+          querySpec.text = self.lastParseResult.text;
+        }
+
+        self.querySpec(querySpec);
+      };
+
       InlineAutocomplete.prototype.clearSuggestions = function () {
         var self = this;
         if (self.suggestions().length > 0) {
@@ -264,7 +260,7 @@ from desktop.views import _ko
 
       InlineAutocomplete.prototype.autocomplete = function () {
         var self = this;
-        if (!self.lastResult) {
+        if (!self.lastParseResult) {
           self.clearSuggestions();
           return;
         }
@@ -282,10 +278,10 @@ from desktop.views import _ko
 
         var newSuggestions = [];
         var partialLower = partial.toLowerCase();
-        if (self.lastResult.suggestFacets) {
+        if (self.lastParseResult.suggestFacets) {
           var existingFacetIndex = {};
-          if (self.uniqueFacets && self.lastResult.facets) {
-            Object.keys(self.lastResult.facets).forEach(function (facet) {
+          if (self.uniqueFacets && self.lastParseResult.facets) {
+            Object.keys(self.lastParseResult.facets).forEach(function (facet) {
               existingFacetIndex[facet.toLowerCase()] = true;
             })
           }
@@ -305,10 +301,10 @@ from desktop.views import _ko
           });
         }
 
-        if (self.lastResult.suggestFacetValues) {
+        if (self.lastParseResult.suggestFacetValues) {
           var facetValues = ko.unwrap(self.knownFacetValues);
-          if (facetValues[self.lastResult.suggestFacetValues.toLowerCase()]) {
-            getSortedFacets(facetValues[self.lastResult.suggestFacetValues.toLowerCase()]).forEach(function (value) {
+          if (facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()]) {
+            getSortedFacets(facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()]).forEach(function (value) {
               if (value.toLowerCase().indexOf(partialLower) === 0) {
                 newSuggestions.push(nonPartial + partial + value.substring(partial.length, value.length));
               }
@@ -316,7 +312,7 @@ from desktop.views import _ko
           }
         }
 
-        if (partial !== '' && self.lastResult.suggestResults) {
+        if (partial !== '' && self.lastParseResult.suggestResults) {
           newSuggestions = newSuggestions.concat(self.autocompleteFromEntries(nonPartial, partial));
         }
 
