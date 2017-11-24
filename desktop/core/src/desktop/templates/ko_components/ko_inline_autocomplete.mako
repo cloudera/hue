@@ -113,7 +113,7 @@ from desktop.views import _ko
         }
 
         var inputSub = self.searchInput.subscribe(function (newValue) {
-          if (self.inlineAutocomplete() === newValue) {
+          if (self.querySpec() && self.querySpec().query === newValue) {
             return;
           }
 
