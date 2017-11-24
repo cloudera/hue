@@ -1371,14 +1371,26 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </th>
         </tr>
         <tr data-bind="visible: result.isMetaFilterVisible">
-          <td colspan="3"><input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" title="${ _('Type column:xxx or type:yyy for specific filters.') }" style="width: 257px" /></td>
+          <td colspan="3" class="context-popover-inline-autocomplete">
+            <!-- ko component: {
+              name: 'inline-autocomplete',
+              params: {
+                placeHolder: '${ _ko('Filter columns...') }',
+                querySpec: result.metaFilter,
+                facets: Object.keys(SQL_COLUMNS_KNOWN_FACET_VALUES),
+                knownFacetValues: SQL_COLUMNS_KNOWN_FACET_VALUES,
+                autocompleteFromEntries: result.autocompleteFromEntries
+              }
+            } --><!-- /ko -->
+            ##<input class="meta-filter" type="text" data-bind="blurHide: result.isMetaFilterVisible, clearable: result.metaFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }" title="${ _('Type column:xxx or type:yyy for specific filters.') }" style="width: 257px" />
+          </td>
         </tr>
       </thead>
       <tbody class="unstyled filtered-meta" data-bind="foreach: result.filteredMeta">
         <tr data-bind="visible: name != ''">
-          <td><input class="no-margin-top" type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, $data.originalIndex, $parent);} }, checked: $data.checked" /></td>
-          <td><a class="pointer" data-bind="click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: $data.name + ' - ' + $data.type}"><span data-bind="text: $data.name"></span></a></td>
-          <td><span data-bind="text: $data.type" class="muted margin-left-20"></span></td>
+          <td><input class="no-margin-top" type="checkbox" data-bind="event: { change: function(){ toggleColumn($element, originalIndex, $parent);} }, checked: checked" /></td>
+          <td><a class="pointer" data-bind="click: function(){ scrollToColumn($element, $data.originalIndex); }, attr: { title: name + ' - ' + type}"><span data-bind="text: name"></span></a></td>
+          <td><span data-bind="text: type" class="muted margin-left-20"></span></td>
         </tr>
       </tbody>
       <tfoot>
