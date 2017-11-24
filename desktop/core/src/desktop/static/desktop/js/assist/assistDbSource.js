@@ -106,6 +106,17 @@ var AssistDbSource = (function () {
       return result;
     });
 
+    self.autocompleteFromEntries = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.databases().forEach(function (db) {
+        if (db.definition.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + db.definition.name.substring(partial.length))
+        }
+      });
+      return result;
+    };
+
     self.selectedDatabase = ko.observable();
 
     self.selectedDatabase.subscribe(function () {

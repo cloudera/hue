@@ -849,7 +849,8 @@ from desktop.views import _ko
             params: {
               querySpec: filter.querySpec,
               facets: [],
-              knownFacetValues: {}
+              knownFacetValues: {},
+              autocompleteFromEntries: autocompleteFromEntries
             }
           } --><!-- /ko -->
       </div>
@@ -931,7 +932,8 @@ from desktop.views import _ko
           params: {
             querySpec: filter.querySpec,
             facets: ['type'],
-            knownFacetValues: sourceType === 'solr' ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES
+            knownFacetValues: sourceType === 'solr' ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES,
+            autocompleteFromEntries: autocompleteFromEntries
           }
         } --><!-- /ko -->
       </div>
@@ -2226,7 +2228,8 @@ from desktop.views import _ko
               params: {
                 querySpec: filter.querySpec,
                 facets: ['type'],
-                knownFacetValues: isSolr() ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES
+                knownFacetValues: isSolr() ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES,
+                autocompleteFromEntries: autocompleteFromEntries
               }
             } --><!-- /ko -->
           </div>
@@ -2439,6 +2442,25 @@ from desktop.views import _ko
               return !table.loading();
             })
           }, 2000);
+        };
+
+        self.autocompleteFromEntries = function (nonPartial, partial) {
+          var added = {};
+          var result = [];
+          var partialLower = partial.toLowerCase();
+          self.activeTables().forEach(function (table) {
+            if (!added[table.definition.name] && table.definition.name.toLowerCase().indexOf(partialLower) === 0) {
+              added[table.definition.name] = true;
+              result.push(nonPartial + partial + table.definition.name.substring(partial.length))
+            }
+            table.entries().forEach(function (col) {
+              if (!added[col.definition.name] && col.definition.name.toLowerCase().indexOf(partialLower) === 0) {
+                added[col.definition.name] = true;
+                result.push(nonPartial + partial + col.definition.name.substring(partial.length))
+              }
+            })
+          });
+          return result;
         };
 
         var activeTablesSub = self.activeTables.subscribe(loadEntries);
