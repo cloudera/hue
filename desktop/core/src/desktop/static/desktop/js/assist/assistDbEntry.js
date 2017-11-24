@@ -116,6 +116,17 @@ var AssistDbEntry = (function () {
       });
     });
 
+    self.autocompleteFromEntries = function (nonPartial, partial) {
+      var result = [];
+      var partialLower = partial.toLowerCase();
+      self.entries().forEach(function (entry) {
+        if (entry.definition.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + entry.definition.name.substring(partial.length))
+        }
+      });
+      return result;
+    };
+
     self.tableName = null;
     self.columnName = null;
     self.type = null;

@@ -62,7 +62,7 @@ from desktop.views import _ko
           facets: {},
           text: []
         });
-        self.autocompleteFromEntries = params.autocompleteFromEntries || function () {};
+        self.autocompleteFromEntries = params.autocompleteFromEntries || function () { return []; };
         self.facets = params.facets || [];
         self.knownFacetValues = params.knownFacetValues || {};
         self.uniqueFacets = !!params.uniqueFacets;
