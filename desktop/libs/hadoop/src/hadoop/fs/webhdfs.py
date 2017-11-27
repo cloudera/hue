@@ -1013,7 +1013,7 @@ def test_fs_configuration(fs_config):
               'is owned by the cluster superuser "%s".') % DEFAULT_HDFS_SUPERUSER]
   finally:
     try:
-      fs.remove(tmpname)
+      fs.remove(tmpname, skip_trash=True)
     except Exception, ex:
       LOG.error("Failed to remove '%s': %s" % (tmpname, ex))
       return [(fs_config.WEBHDFS_URL, _('Failed to remove temporary file "%s"') % tmpname)]
