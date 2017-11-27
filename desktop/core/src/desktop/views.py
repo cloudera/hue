@@ -290,9 +290,7 @@ def threads(request):
   if request.is_ajax():
     return HttpResponse(out.getvalue(), content_type="text/plain")
   else:
-    return render("threads.mako", request, dict(text=out.getvalue(),
-                                                is_embeddable=request.GET.get('is_embeddable', False)
-                                              ))
+    return render("threads.mako", request, {'text': out.getvalue(), 'is_embeddable': request.GET.get('is_embeddable', False)})
 
 
 @access_log_level(logging.WARN)
