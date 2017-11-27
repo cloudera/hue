@@ -126,7 +126,7 @@ from desktop.views import _ko
           if (self.selectedIndex()) {
             return self.searchResultCategories()[self.selectedIndex().categoryIndex].result[self.selectedIndex().resultIndex]
           }
-        });
+        }).extend({ deferred: true });;
 
         var deferredCloseIfVisible = function () {
           window.setTimeout(function () {
@@ -295,6 +295,8 @@ from desktop.views import _ko
       };
 
       var HUE_APP_CATEGORY = 'hueApp';
+      var HUE_DOC_CATEGORY = 'documents';
+      var NAV_CATEGORY = 'nav';
 
       var CATEGORIES = {
         'table': '${ _('Tables') }',
@@ -313,6 +315,46 @@ from desktop.views import _ko
         return promise;
       };
 
+      GlobalSearch.prototype.updateCategories = function (type, categoriesToAdd) {
+        var self = this;
+        var newCategories = self.searchResultCategories().filter(function (category) {
+          return category.type !== type;
+        });
+
+        var change = newCategories.length !== self.searchResultCategories().length;
+
+        if (categoriesToAdd.length > 0) {
+          newCategories = newCategories.concat(categoriesToAdd);
+          newCategories.sort(function (a, b) {
+            if (a.weight === b.weight) {
+              return a.label.localeCompare(b.label);
+            }
+            return b.weight - a.weight;
+          });
+          change = true;
+        }
+
+        if (change) {
+          var selected = self.selectedResult();
+          var newIndex = undefined;
+          if (selected) {
+            for (var i = 0; i < newCategories.length; i++) {
+              for (var j = 0; j < newCategories[i].result.length; j++) {
+                if (newCategories[i].result[j].type === selected.type && newCategories[i].result[j].label === selected.label) {
+                  newIndex = { categoryIndex: i, resultIndex: j };
+                  break;
+                }
+              }
+              if (newIndex) {
+                break;
+              }
+            }
+          }
+          self.selectedIndex(newIndex);
+          self.searchResultCategories(newCategories);
+        }
+      };
+
       GlobalSearch.prototype.fetchResults = function (query) {
         var self = this;
         self.loading(true);
@@ -322,17 +364,14 @@ from desktop.views import _ko
         var hueAppsPromise = self.fetchHueConfig();
 
         hueAppsPromise.done(function (apps) {
-          var categories = self.searchResultCategories().filter(function (category) {
-            return category.type !== HUE_APP_CATEGORY;
-          });
-
-          var appResultChange = categories.length !== self.searchResultCategories().length;
+          var categories = [];
 
           if (apps && apps.app_config) {
             var hueApps = {
               type: HUE_APP_CATEGORY,
               label: CATEGORIES[HUE_APP_CATEGORY],
-              result: []
+              result: [],
+              weight: 1
             };
             Object.keys(apps.app_config).forEach(function (appConfigKey) {
               var appCatecory = apps.app_config[appConfigKey];
@@ -369,24 +408,20 @@ from desktop.views import _ko
             hueApps.result.sort(function (a, b) {
               return a.label.localeCompare(b.label);
             });
-            appResultChange = true;
             categories.push(hueApps);
           }
 
-          if (appResultChange) {
-            self.selectedIndex(undefined);
-            self.searchResultCategories(categories);
-          }
+          self.updateCategories(HUE_APP_CATEGORY, categories);
         });
 
         hueDocsPromise.done(function (data) {
-          var categories = self.searchResultCategories().filter(function (category) {
-            return category.type !== 'documents';
-          });
+          var categories = [];
+
           var docCategory = {
             label: CATEGORIES.hueDoc,
             result: [],
-            type: 'documents'
+            type: HUE_DOC_CATEGORY,
+            weight: 3
           };
 
           data.results.forEach(function (doc) {
@@ -400,11 +435,12 @@ from desktop.views import _ko
               data: doc
             })
           });
+
           if (docCategory.result.length) {
-            categories.unshift(docCategory);
+            categories.push(docCategory);
           }
-          self.selectedIndex(undefined);
-          self.searchResultCategories(categories);
+
+          self.updateCategories(HUE_DOC_CATEGORY, categories);
         });
 
         navPromise.done(function (data) {
@@ -419,9 +455,7 @@ from desktop.views import _ko
               });
             })
           }
-          var categories = self.searchResultCategories().filter(function (category) {
-            return category.type.indexOf('nav') !== 0;
-          });
+          var categories = [];
           var newCategories = {};
           data.results.forEach(function (result) {
             var typeLower = result.type.toLowerCase();
@@ -431,7 +465,8 @@ from desktop.views import _ko
                 category = {
                   label: CATEGORIES[typeLower],
                   result: [],
-                  type: 'nav'
+                  type: NAV_CATEGORY,
+                  weight: 2
                 };
                 newCategories[typeLower] = category;
               }
@@ -470,8 +505,8 @@ from desktop.views import _ko
           Object.keys(newCategories).forEach(function (key) {
             categories.push(newCategories[key]);
           });
-          self.selectedIndex(undefined);
-          self.searchResultCategories(categories);
+
+          self.updateCategories(NAV_CATEGORY, categories);
         });
 
         $.when.apply($, [hueAppsPromise, navPromise, hueDocsPromise]).always(function () {
