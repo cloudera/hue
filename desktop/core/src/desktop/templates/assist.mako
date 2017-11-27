@@ -2229,7 +2229,7 @@ from desktop.views import _ko
                 querySpec: filter.querySpec,
                 facets: ['type'],
                 knownFacetValues: isSolr() ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES,
-                autocompleteFromEntries: autocompleteFromEntries
+                autocompleteFromEntries: $component.autocompleteFromEntries
               }
             } --><!-- /ko -->
           </div>
@@ -2762,7 +2762,6 @@ from desktop.views import _ko
         };
 
         self.activeTables = ko.observableArray();
-        var openedByFilter = [];
 
         self.filteredTables = AssistantUtils.getFilteredTablesPureComputed(self);
 
@@ -2792,11 +2791,10 @@ from desktop.views import _ko
               assistDbSource,
               self.filter,
               i18n,
-              navigationSettings,
-              {}
+              navigationSettings
           );
 
-          var collection = new AssistDbEntry(
+          var collectionEntry = new AssistDbEntry(
               {
                 name: collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName,
                 type: 'table',
@@ -2806,13 +2804,33 @@ from desktop.views import _ko
               assistFakeDb,
               assistDbSource,
               self.filter,
-              {},
-              navigationSettings,
-              {}
+              i18n,
+              navigationSettings
           );
-          self.activeTables([collection]);
-          if (!collection.loaded && !collection.hasErrors() && !collection.loading()) {
-            collection.loadEntries(function() { collection.toggleOpen(); });
+
+          self.activeTables([collectionEntry]);
+
+          self.autocompleteFromEntries = function (nonPartial, partial) {
+            var added = {};
+            var result = [];
+            var partialLower = partial.toLowerCase();
+            self.activeTables().forEach(function (table) {
+              if (!added[table.definition.name] && table.definition.name.toLowerCase().indexOf(partialLower) === 0) {
+                added[table.definition.name] = true;
+                result.push(nonPartial + partial + table.definition.name.substring(partial.length))
+              }
+              table.entries().forEach(function (col) {
+                if (!added[col.definition.name] && col.definition.name.toLowerCase().indexOf(partialLower) === 0) {
+                  added[col.definition.name] = true;
+                  result.push(nonPartial + partial + col.definition.name.substring(partial.length))
+                }
+              })
+            });
+            return result;
+          };
+
+          if (!collectionEntry.loaded && !collectionEntry.hasErrors() && !collectionEntry.loading()) {
+            collectionEntry.loadEntries(function() { collectionEntry.toggleOpen(); });
           }
         });
 
@@ -2939,7 +2957,7 @@ from desktop.views import _ko
             }
           }
           updateTabs();
-        }
+        };
 
         var snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', updateContentsForType);
         self.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
