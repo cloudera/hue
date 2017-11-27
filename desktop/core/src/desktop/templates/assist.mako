@@ -1136,6 +1136,7 @@ from desktop.views import _ko
         self.options = options;
         self.apiHelper = options.apiHelper;
         self.i18n = options.i18n;
+        self.initialized = false;
 
         if (typeof options.sourceTypes === 'undefined') {
           options.sourceTypes = [];
@@ -1145,8 +1146,7 @@ from desktop.views import _ko
               type: 'solr',
               name: 'solr'
             }];
-          }
-          else {
+          } else {
             % for interpreter in get_ordered_interpreters(request.user):
               % if interpreter["is_sql"]:
                 options.sourceTypes.push({
@@ -1175,34 +1175,6 @@ from desktop.views import _ko
           huePubSub.publish('assist.db.refresh', { sourceTypes: ['solr'], allCacheTypes: false });
         });
 
-        huePubSub.subscribe('assist.db.highlight', function (location) {
-          huePubSub.publish('left.assist.show');
-          huePubSub.publish('assist.show.sql');
-          huePubSub.publish('context.popover.hide');
-          window.setTimeout(function () {
-            var foundSource;
-            $.each(self.sources(), function (idx, source) {
-              if (source.sourceType === location.sourceType) {
-                foundSource = source;
-                return false;
-              }
-            });
-            if (foundSource) {
-              var whenLoaded = function () {
-                if (self.selectedSource() !== foundSource) {
-                  self.selectedSource(foundSource);
-                }
-                foundSource.highlightInside(location.path);
-              };
-              if (foundSource.hasEntries()) {
-                whenLoaded();
-              } else {
-                foundSource.initDatabases(whenLoaded);
-              }
-            }
-          }, 0);
-        });
-
         self.selectedSource = ko.observable(null);
 
         self.setDatabaseWhenLoaded = function (databaseName) {
@@ -1221,68 +1193,98 @@ from desktop.views import _ko
           }
         };
 
-        huePubSub.subscribe("assist.set.database", function (databaseDef) {
-          if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
-            return;
-          }
-          self.selectedSource(self.sourceIndex[databaseDef.source]);
-          self.setDatabaseWhenLoaded(databaseDef.name);
-        });
+        if (!options.isSolr) {
+          huePubSub.subscribe('assist.db.highlight', function (location) {
+            huePubSub.publish('left.assist.show');
+            huePubSub.publish('assist.show.sql');
+            huePubSub.publish('context.popover.hide');
+            window.setTimeout(function () {
+              var foundSource;
+              $.each(self.sources(), function (idx, source) {
+                if (source.sourceType === location.sourceType) {
+                  foundSource = source;
+                  return false;
+                }
+              });
+              if (foundSource) {
+                var whenLoaded = function () {
+                  if (self.selectedSource() !== foundSource) {
+                    self.selectedSource(foundSource);
+                  }
+                  foundSource.highlightInside(location.path);
+                };
+                if (foundSource.hasEntries()) {
+                  whenLoaded();
+                } else {
+                  foundSource.initDatabases(whenLoaded);
+                }
+              }
+            }, 0);
+          });
 
-        huePubSub.subscribe("assist.get.database", function (source) {
-          if (self.sourceIndex[source] && self.sourceIndex[source].selectedDatabase()) {
-            huePubSub.publish("assist.database.set", {
-              source: source,
-              name: self.sourceIndex[source].selectedDatabase().databaseName
-            });
-          } else {
-            huePubSub.publish("assist.database.set", {
-              source: source,
-              name: 'default'
-            });
-          }
-        });
-
-        huePubSub.subscribe('assist.get.database.callback',  function (options) {
-          if (self.sourceIndex[options.source] && self.sourceIndex[options.source].selectedDatabase()) {
-            options.callback({
-              source: options.source,
-              name: self.sourceIndex[options.source].selectedDatabase().databaseName
-            });
-          } else {
-            options.callback({
-              source: options.source,
-              name: 'default'
-            });
-          }
-        });
-
-        huePubSub.subscribe('assist.get.source', function () {
-          huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
-        });
-
-        huePubSub.subscribe('assist.set.source', function (source) {
-          if (self.sourceIndex[source]) {
-            self.selectedSource(self.sourceIndex[source]);
-          }
-        });
-
-        huePubSub.publish('assist.db.panel.ready');
-
-        huePubSub.subscribe('assist.is.db.panel.ready', function () {
-          huePubSub.publish('assist.db.panel.ready');
-        });
-
-        self.selectedSource.subscribe(function (newSource) {
-          if (newSource) {
-            if (newSource.databases().length === 0) {
-              newSource.initDatabases();
+          huePubSub.subscribe("assist.set.database", function (databaseDef) {
+            if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
+              return;
             }
-            self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
-          } else {
-            self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
-          }
-        });
+            self.selectedSource(self.sourceIndex[databaseDef.source]);
+            self.setDatabaseWhenLoaded(databaseDef.name);
+          });
+
+          huePubSub.subscribe("assist.get.database", function (source) {
+            if (self.sourceIndex[source] && self.sourceIndex[source].selectedDatabase()) {
+              huePubSub.publish("assist.database.set", {
+                source: source,
+                name: self.sourceIndex[source].selectedDatabase().databaseName
+              });
+            } else {
+              huePubSub.publish("assist.database.set", {
+                source: source,
+                name: 'default'
+              });
+            }
+          });
+
+          huePubSub.subscribe('assist.get.database.callback',  function (options) {
+            if (self.sourceIndex[options.source] && self.sourceIndex[options.source].selectedDatabase()) {
+              options.callback({
+                source: options.source,
+                name: self.sourceIndex[options.source].selectedDatabase().databaseName
+              });
+            } else {
+              options.callback({
+                source: options.source,
+                name: 'default'
+              });
+            }
+          });
+
+          huePubSub.subscribe('assist.get.source', function () {
+            huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
+          });
+
+          huePubSub.subscribe('assist.set.source', function (source) {
+            if (self.sourceIndex[source]) {
+              self.selectedSource(self.sourceIndex[source]);
+            }
+          });
+
+          huePubSub.publish('assist.db.panel.ready');
+
+          huePubSub.subscribe('assist.is.db.panel.ready', function () {
+            huePubSub.publish('assist.db.panel.ready');
+          });
+
+          self.selectedSource.subscribe(function (newSource) {
+            if (newSource) {
+              if (newSource.databases().length === 0) {
+                newSource.initDatabases();
+              }
+              self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
+            } else {
+              self.apiHelper.setInTotalStorage('assist', 'lastSelectedSource');
+            }
+          });
+        }
 
         self.breadcrumb = ko.computed(function () {
           if (self.selectedSource()) {
@@ -1306,13 +1308,14 @@ from desktop.views import _ko
 
       AssistDbPanel.prototype.init = function () {
         var self = this;
+        if (self.initialized) {
+          return;
+        }
         if (self.options.isSolr) {
           self.selectedSource(self.sourceIndex['solr']);
           self.setDatabaseWhenLoaded();
-        }
-        else {
+        } else {
           var storageSourceType = self.apiHelper.getFromTotalStorage('assist', 'lastSelectedSource');
-
           if (!self.selectedSource()) {
             if (self.options.activeSourceType) {
               self.selectedSource(self.sourceIndex[self.options.activeSourceType]);
@@ -1323,6 +1326,7 @@ from desktop.views import _ko
             }
           }
         }
+        self.initialized = true;
       };
 
       /**
@@ -1471,9 +1475,9 @@ from desktop.views import _ko
       function AssistHdfsPanel (options) {
         var self = this;
         self.apiHelper = options.apiHelper;
-
         self.selectedHdfsEntry = ko.observable();
         self.loading = ko.observable();
+        self.initialized = false;
 
         var loadPath = function (path) {
           self.loading(true);
@@ -1518,15 +1522,20 @@ from desktop.views import _ko
       }
 
       AssistHdfsPanel.prototype.init = function () {
-        this.reload();
+        var self = this;
+        if (self.initialized) {
+          return;
+        }
+        self.reload();
+        self.initialized = true;
       };
 
       function AssistAdlsPanel (options) {
         var self = this;
         self.apiHelper = options.apiHelper;
-
         self.selectedAdlsEntry = ko.observable();
         self.loading = ko.observable();
+        self.initialized = false;
 
         var loadPath = function (path) {
           self.loading(true);
@@ -1571,7 +1580,12 @@ from desktop.views import _ko
       }
 
       AssistAdlsPanel.prototype.init = function () {
-        this.reload();
+        var self = this;
+        if (self.initialized) {
+          return;
+        }
+        self.reload();
+        self.initialized = true;
       };
 
       /**
@@ -1630,6 +1644,8 @@ from desktop.views import _ko
 
         self.selectedS3Entry = ko.observable();
         self.loading = ko.observable();
+        self.initialized = false;
+
         self.reload = function () {
           self.loading(true);
           var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentS3Path', '/');
@@ -1665,7 +1681,12 @@ from desktop.views import _ko
       }
 
       AssistS3Panel.prototype.init = function () {
-        this.reload();
+        var self = this;
+        if (self.initialized) {
+          return;
+        }
+        self.reload();
+        self.initialized = true;
       };
 
       /**
@@ -1676,6 +1697,7 @@ from desktop.views import _ko
       function AssistHBasePanel(options) {
         var self = this;
         self.apiHelper = options.apiHelper;
+        self.initialized = false;
 
         var root = new AssistHBaseEntry({
           definition: {
@@ -1765,7 +1787,12 @@ from desktop.views import _ko
       }
 
       AssistHBasePanel.prototype.init = function () {
-        this.reload();
+        var self = this;
+        if (self.initialized) {
+          return;
+        }
+        self.reload();
+        self.initialized = true;
       };
 
       var NAV_FACET_ICON = 'fa-tags';
@@ -1843,7 +1870,7 @@ from desktop.views import _ko
               panels.push(sqlPanel);
 
               huePubSub.subscribe('assist.show.sql', function () {
-                if (self.visiblePanel !== sqlPanel) {
+                if (self.visiblePanel() !== sqlPanel) {
                   self.visiblePanel(sqlPanel);
                 }
               });
@@ -1937,7 +1964,7 @@ from desktop.views import _ko
               panels.push(documentsPanel);
 
               huePubSub.subscribe('assist.show.documents', function () {
-                if (self.visiblePanel !== documentsPanel) {
+                if (self.visiblePanel() !== documentsPanel) {
                   self.visiblePanel(documentsPanel);
                 }
               });
@@ -1988,7 +2015,9 @@ from desktop.views import _ko
 
           self.visiblePanel.subscribe(function(newValue) {
             self.lastOpenPanelType(newValue.type);
-            newValue.panelData.init();
+            if (newValue.type !== 'sql' && !newValue.panelData.initialized) {
+              newValue.panelData.init();
+            }
           });
 
           self.visiblePanel(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels()[0]);
