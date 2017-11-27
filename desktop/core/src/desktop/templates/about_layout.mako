@@ -46,8 +46,8 @@ def is_selected(section, matcher):
                 <li class="${is_selected(section, 'log_view')}">
                   <a href="${ url('desktop.views.log_view') }">${_('Server Logs')}</a>
                 </li>
-                  <li class="${is_selected(section, 'threads')}">
-                  <a href="${url('desktop.views.threads')}">${_('Threads')}</a>
+                <li class="${is_selected(section, 'threads')}">
+                  <a href="${ url('desktop.views.threads') }">${_('Threads')}</a>
                 </li>
               % endif
             </ul>
