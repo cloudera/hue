@@ -294,18 +294,20 @@ from desktop.views import _ko
         }
       };
 
+      var HUE_APP_CATEGORY = 'hueApp';
+
       var CATEGORIES = {
         'table': '${ _('Tables') }',
         'database': '${ _('Databases') }',
         'field': '${ _('Columns') }',
         'partition': '${ _('Partitions') }',
         'view': '${ _('Views') }',
-        'hueDoc': '${ _('Documents') }'
+        'hueDoc': '${ _('Documents') }',
+        'hueApp': '${ _('Applications') }'
       };
 
-      var HUE_APP_PREFIX = 'hueApp_';
 
-      GlobalSearch.prototype.fetchHueConfig = function (query) {
+      GlobalSearch.prototype.fetchHueConfig = function () {
         var promise = $.Deferred();
         huePubSub.publish('cluster.config.get.config', promise.resolve);
         return promise;
@@ -321,44 +323,56 @@ from desktop.views import _ko
 
         hueAppsPromise.done(function (apps) {
           var categories = self.searchResultCategories().filter(function (category) {
-            return category.type.indexOf(HUE_APP_PREFIX) !== 0;
+            return category.type !== HUE_APP_CATEGORY;
           });
 
           var appResultChange = categories.length !== self.searchResultCategories().length;
 
           if (apps && apps.app_config) {
+            var hueApps = {
+              type: HUE_APP_CATEGORY,
+              label: CATEGORIES[HUE_APP_CATEGORY],
+              result: []
+            };
             Object.keys(apps.app_config).forEach(function (appConfigKey) {
               var appCatecory = apps.app_config[appConfigKey];
-              var addAll = appCatecory.name.toLowerCase().indexOf(query) !== - 1;
-              var newAppCategory = {
-                type: HUE_APP_PREFIX + appConfigKey,
-                label: appCatecory.displayName,
-                result: []
-              };
+              var addAll = appCatecory.name.toLowerCase().indexOf(query) === 0 || appCatecory.displayName.toLowerCase().indexOf(query) === 0;
               if (appCatecory.interpreters) {
                 appCatecory.interpreters.forEach(function (interpreter) {
-                  // Special case for metastore that is now called table browser
-                  var metastoreMatch = appCatecory.name === 'browser' && interpreter.type === 'tables' && 'metastore'.indexOf(query.toLowerCase()) !== -1;
-                  if (addAll || metastoreMatch || interpreter.displayName.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
-                    newAppCategory.result.push({
-                      label: interpreter.displayName,
-                      type: 'hueApp',
+                  // Special case for metastore that is now called table browser and hdfs
+                  var specialMatch = appCatecory.name === 'browser' && (
+                    (interpreter.type === 'tables' && 'metastore'.indexOf(query.toLowerCase()) === 0) ||
+                    (interpreter.type === 'hdfs' && 'hdfs'.indexOf(query.toLowerCase()) === 0));
+                  if (addAll || specialMatch || interpreter.displayName.toLowerCase().indexOf(query.toLowerCase()) === 0) {
+                    var label;
+                    if (appCatecory.name === 'browser') {
+                      label = '${ _('Browse') } ' + interpreter.displayName;
+                    } else {
+                      label = interpreter.displayName + ' ' + appCatecory.displayName;
+                    }
+                    hueApps.result.push({
+                      label: label,
+                      type: HUE_APP_CATEGORY,
                       data: {
                         interpreter: interpreter,
                         app: appCatecory,
-                        type: 'hueApp',
+                        type: HUE_APP_CATEGORY,
                         originalName: interpreter.displayName
                       }
                     })
                   }
                 })
               }
-              if (newAppCategory.result.length > 0) {
-                appResultChange = true;
-                categories.unshift(newAppCategory);
-              }
             })
           }
+          if (hueApps.result.length > 0) {
+            hueApps.result.sort(function (a, b) {
+              return a.label.localeCompare(b.label);
+            });
+            appResultChange = true;
+            categories.push(hueApps);
+          }
+
           if (appResultChange) {
             self.selectedIndex(undefined);
             self.searchResultCategories(categories);
