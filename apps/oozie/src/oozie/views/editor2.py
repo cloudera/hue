@@ -203,7 +203,7 @@ def save_workflow(request):
 
   is_imported = workflow['properties'].get('imported')
 
-  workflow_doc = _save_workflow(workflow, layout, request.user)
+  workflow_doc = _save_workflow(workflow, layout, request.user, fs=request.fs)
 
   # For old workflow import
   if is_imported:
