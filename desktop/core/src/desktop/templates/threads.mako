@@ -14,21 +14,23 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
-import re
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
+
 %if not is_embeddable:
 ${ commonheader(_('Threads'), "about", user, request) | n,unicode }
 %endif
+
 ${layout.menubar(section='threads')}
 
-<div>
-    <pre> ${text}</pre>
+<div id="logsComponents" class="container-fluid">
+  <div class="card card-small" style="padding-top: 10px">
+    <pre>${text}</pre>
+  </div>
 </div>
 
 %if not is_embeddable:
