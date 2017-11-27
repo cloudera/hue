@@ -2001,15 +2001,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0 && !$parent.isFacetForm" class="input-small"></select>
 
       <!-- ko if: $data.function() == 'percentile' -->
-        <!-- ko foreach: percentiles() -->
-          <input type="number" class="input-mini" data-bind="value: value"/>
-          <a href="javascript: void(0)" data-bind="click: function() { $parent.percentiles.remove($data); }">
-            <i class="fa fa-minus" title="${ _('Delete') }"></i>
-          </a>
-        <!-- /ko -->
-        <a href="javascript: void(0)" data-bind="click: function() { percentiles.push(ko.mapping.fromJS({'value': 50})); }">
-          <i class="fa fa-plus" title="${ _('Add') }"></i>
-        </a>
+      <input type="number" class="input-mini" data-bind="value: percentile"/>
       <!-- /ko -->
 
       <select data-bind="options: $root.collection.template.facetFieldsNames, value: $parent.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.facetFieldsNames" class="hit-options input-small" style="margin-bottom: 0"></select>
@@ -2801,7 +2793,7 @@ var NUMERIC_HIT_OPTIONS = [
     { value: "min", label: "${ _('Min') }" },
     { value: "max", label: "${ _('Max') }" },
     { value: "median", label: "${ _('Median') }" },
-    { value: "percentile", label: "${ _('Percentiles') }" },
+    { value: "percentile", label: "${ _('Percentile') }" },
     { value: "stddev", label: "${ _('Stddev') }" },
     { value: "variance", label: "${ _('Variance') }" }
 ];
@@ -2812,7 +2804,7 @@ var DATETIME_HIT_OPTIONS = [
     { value: "min", label: "${ _('Min') }" },
     { value: "max", label: "${ _('Max') }" },
     { value: "median", label: "${ _('Median') }" },
-    { value: "percentile", label: "${ _('Percentiles') }" }
+    { value: "percentile", label: "${ _('Percentile') }" }
 ];
 var ALPHA_HIT_COUNTER_OPTIONS = [
     ##{ value: "count", label: "${ _('Group by') }" },

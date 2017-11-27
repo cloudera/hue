@@ -862,7 +862,7 @@ class SolrApi(object):
         f['function'] = 'percentile'
         fields.append('50')
       elif f['function'] == 'percentile':
-        fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
+        fields.append(str(f['percentile']))
         f['function'] = 'percentile'
       return '%s(%s)' % (f['function'], ','.join(fields))
 

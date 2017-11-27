@@ -25,3 +25,11 @@ LOG = logging.getLogger(__name__)
 
 class ImpalaDashboardApi(SQLDashboardApi):
   pass
+
+  @classmethod
+  def _supports_median(self):
+    return False
+
+  @classmethod
+  def _supports_percentile(cls):
+    return False
