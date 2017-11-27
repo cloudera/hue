@@ -25,3 +25,7 @@ LOG = logging.getLogger(__name__)
 
 class HiveDashboardApi(SQLDashboardApi):
   pass
+
+  @classmethod
+  def _supports_median(self):
+    return False

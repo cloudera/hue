@@ -371,7 +371,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'limit': 10,
     'mincount': 1,
     'isDate': False,
-    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentiles': [{'value': 50}]}
+    'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50}
   }
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
