@@ -2482,8 +2482,15 @@ from desktop.views import _ko
           if (activeLocations.activeStatementLocations) {
             var updateTables = false;
             var tableQidIndex = {};
+            var ctes = {};
             activeLocations.activeStatementLocations.forEach(function (location) {
-              if (location.type === 'table') {
+              if (location.type === 'alias' && location.source === 'cte') {
+                ctes[location.alias.toLowerCase()] = true;
+              }
+            });
+
+            activeLocations.activeStatementLocations.forEach(function (location) {
+              if (location.type === 'table' && (location.identifierChain.length !== 1 || !ctes[location.identifierChain[0].name.toLowerCase()])) {
                 var database = location.identifierChain.length === 2 ? location.identifierChain[0].name : activeLocations.defaultDatabase;
                 database = database.toLowerCase();
                 if (!databaseIndex[database]) {
