@@ -339,8 +339,6 @@
 
       $element.hueAutocomplete(options);
 
-      ko.bindingHandlers.niceScroll.init($element.data('custom-hueAutocomplete').menu.element, function () {});
-
       var enableAutocomplete = function () {
         if ($element.data('custom-hueAutocomplete')) {
           $element.hueAutocomplete("option", "disabled", false);
@@ -1933,9 +1931,6 @@
             }
           });
         }
-        if ($.fn.niceScroll) {
-          $('.assist-flex-fill').getNiceScroll().resize();
-        }
       };
 
       resizeByRatio();
@@ -2036,9 +2031,6 @@
               panelRatios[panelDefinitions()[idx].type] = $(panel).outerHeight(true) / totalHeightForPanels;
             });
             apiHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
-            if ($.fn.niceScroll) {
-              $('.assist-flex-fill').getNiceScroll().resize();
-            }
           }
         });
       });
@@ -5380,7 +5372,6 @@
             });
           });
 
-      var withNiceScroll = !options.disableNiceScroll;
       var $wrapper = $element.parent();
       if (!$wrapper.hasClass('foreach-wrapper')) {
         $wrapper = $('<div>').css({
@@ -5392,20 +5383,6 @@
           'top': 0,
           'width': '100%'
         }).appendTo($wrapper);
-
-        if ($.fn.niceScroll && withNiceScroll) {
-          hueUtils.initNiceScroll($container, {
-            horizrailenabled: false,
-            nativeparentscrolling: false,
-            enablescrollonselection: false // foreachVisible might dispose of elements on scroll
-          });
-        }
-      } else {
-        window.setTimeout(function(){
-          if ($.fn.niceScroll && withNiceScroll) {
-            $container.getNiceScroll().resize();
-          }
-        }, 200);
       }
 
       // This is kept up to date with the currently rendered elements, it's used to keep track of any
@@ -5430,9 +5407,6 @@
           totalHeight += height;
         });
         $wrapper.height(totalHeight + 'px');
-        if ($.fn.niceScroll) {
-          $container.getNiceScroll().resize();
-        }
       };
       resizeWrapper();
 
@@ -5792,23 +5766,6 @@
     }
   };
 
-  ko.bindingHandlers.niceScroll = {
-    init: function (element, valueAccessor, allBindings) {
-      var options = valueAccessor() || {};
-      if ((typeof options.enable === 'undefined' || options.enable) && $.fn.niceScroll) {
-        hueUtils.initNiceScroll($(element), options);
-        $(element).addClass('nicescrollified');
-        huePubSub.subscribe('nicescroll.resize', function () {
-          $(element).getNiceScroll().resize();
-        });
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-          $(element).getNiceScroll().remove();
-        });
-      }
-    }
-  };
-
-
   ko.bindingHandlers.plotly = {
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
@@ -5851,18 +5808,7 @@
         }
       }
 
-      if (options.nicescroll) {
-        var checkForNicescrollInit = -1;
-        checkForNicescrollInit = window.setInterval(function () {
-          if ($(scrollable).hasClass('nicescrollified')) {
-            window.clearTimeout(checkForNicescrollInit);
-            $(scrollable).on('scroll', dock);
-          }
-        }, 200);
-      }
-      else {
-        $(scrollable).on('scroll', dock);
-      }
+      $(scrollable).on('scroll', dock);
 
       huePubSub.subscribe('scrollable.scroll.off', function (scrollElement) {
         if (scrollElement === scrollable) {

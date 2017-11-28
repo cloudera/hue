@@ -34,7 +34,7 @@ from desktop.views import _ko
           <div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div>
         </div>
         <!-- /ko -->
-        <div class="autocompleter-entries" data-bind="foreach: suggestions.filtered, niceScroll">
+        <div class="autocompleter-entries" data-bind="foreach: suggestions.filtered">
           <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
               css: { 'selected': $index() === $parent.selectedIndex() },
               event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
