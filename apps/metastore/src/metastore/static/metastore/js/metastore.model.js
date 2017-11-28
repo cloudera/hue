@@ -444,6 +444,7 @@ var MetastoreTable = (function () {
 
     self.comment.subscribe(function (newValue) {
       $.post('/metastore/table/' + self.database.name + '/' + self.name + '/alter', {
+        source_type: self.sourceType,
         comment: newValue ? newValue : ""
       }, function () {
         huePubSub.publish('assist.clear.db.cache', {
@@ -724,6 +725,7 @@ var MetastoreColumn = (function () {
 
     self.comment.subscribe(function (newValue) {
       $.post('/metastore/table/' + self.table.database.name + '/' + self.table.name + '/alter_column', {
+        source_type: self.table.sourceType,
         column: self.name(),
         comment: newValue
       }, function (data) {
