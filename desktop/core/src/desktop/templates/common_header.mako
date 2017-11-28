@@ -30,6 +30,7 @@ if USE_NEW_EDITOR.get():
 <%namespace name="koComponents" file="/ko_components.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
+<%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
 
 <!DOCTYPE html>
 <%def name="is_selected(selected)">
@@ -180,6 +181,12 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/autocomplete/solrQueryParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/solrFormulaParser.js') }"></script>
   <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
+  <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
+  <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
+  <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
+  <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
+  <script src="${ static('desktop/js/autocompleter.js') }"></script>
+
 
   <script>
     ace.config.set("basePath", "/static/desktop/js/ace");
@@ -192,6 +199,7 @@ if USE_NEW_EDITOR.get():
 
   % if user.is_authenticated():
   ${ koComponents.all() }
+  ${ hueAceAutocompleter.hueAceAutocompleter() }
   %endif
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
