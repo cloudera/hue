@@ -76,20 +76,20 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/%s" % self.test_username)
 
   def test_login(self):
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true(response.context['first_login_ever'])
 
-    response = self.c.post('/accounts/login/', dict(username=self.test_username, password="foo"))
+    response = self.c.post('/hue/accounts/login/', dict(username=self.test_username, password="foo"))
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_true(self.fs.exists("/user/%s" % self.test_username))
 
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
   def test_login_home_creation_failure(self):
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true(response.context['first_login_ever'])
 
@@ -99,7 +99,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     assert_false(cluster.fs.exists("/user/%s" % self.test_username))
     fs.do_as_superuser(fs.create, "/user/%s" % self.test_username)
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "test-hue-foo2",
       }, follow=True)
@@ -110,7 +110,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     # 'Could not create home directory.' won't show up because the messages are consumed before
 
   def test_login_expiration(self):
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "test-hue-foo2",
       }, follow=True)
@@ -122,7 +122,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     user.save()
 
     # Deactivate user
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "test-hue-foo2",
       }, follow=True)
@@ -133,7 +133,7 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     user = User.objects.get(username=self.test_username)
     user.is_active = True
     user.save()
-    response = self.c.post('/accounts/login/', dict(username=self.test_username, password="foo"))
+    response = self.c.post('/hue/accounts/login/', dict(username=self.test_username, password="foo"))
     assert_equal(200, response.status_code, "Expected ok status.")
 
 
@@ -185,28 +185,28 @@ class TestLdapLogin(PseudoHdfsTestBase):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/curly")
 
   def test_login(self):
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "ldap1"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_true(self.fs.exists("/user/%s" % self.test_username))
 
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
   def test_login_failure_for_bad_username(self):
     self.reset.append(conf.LDAP.LDAP_SERVERS.set_for_testing(get_mocked_config()))
 
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
 
-    response = self.c.post('/accounts/login/', dict(username="test1*)(&(objectClass=*)", password="foo"))
+    response = self.c.post('/hue/accounts/login/', dict(username="test1*)(&(objectClass=*)", password="foo"))
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true('Invalid username or password' in response.content, response)
 
@@ -221,7 +221,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert_false(user.groups.exists())
 
     # No groups
-    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal([default_group.name], list(user.groups.values_list('name', flat=True)))
 
@@ -229,7 +229,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     # Two groups
     client.get('/accounts/logout')
-    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(set([default_group.name, test_group.name]), set(user.groups.values_list('name', flat=True)))
 
@@ -238,7 +238,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     # Keep manual group only, don't re-add default group
     client.get('/accounts/logout')
-    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal([test_group.name], list(user.groups.values_list('name', flat=True)))
 
@@ -247,12 +247,12 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     # Re-add default group
     client.get('/accounts/logout')
-    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal([default_group.name], list(user.groups.values_list('name', flat=True)))
 
   def test_login_home_creation_failure(self):
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
@@ -262,7 +262,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     assert_false(cluster.fs.exists("/user/%s" % self.test_username))
     fs.do_as_superuser(fs.create, "/user/%s" % self.test_username)
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "test-hue-ldap2",
     }, follow=True)
@@ -274,7 +274,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
   def test_login_ignore_case(self):
     self.reset.append(conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username.upper(),
         'password': "ldap1"
     })
@@ -284,7 +284,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     self.c.logout()
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "ldap1"
     })
@@ -295,7 +295,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
   def test_login_force_lower_case(self):
     self.reset.append(conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username.upper(),
         'password': "ldap1"
     })
@@ -304,7 +304,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     self.c.logout()
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "ldap1"
     })
@@ -316,7 +316,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     self.reset.append(conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
     self.reset.append(conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username.upper(),
         'password': "ldap1"
     })
@@ -326,7 +326,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     self.c.logout()
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "ldap1"
     })
@@ -341,7 +341,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
     import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
       'username': "curly",
       'password': "ldap1"
     })
@@ -392,12 +392,12 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, "/user/%s_%s" % (self.test_username, '2'))
 
   def test_normal(self):
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
     assert_equal(0, len(User.objects.all()))
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": self.test_username})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": self.test_username})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(1, len(User.objects.all()))
     assert_equal(self.test_username, User.objects.all()[0].username)
@@ -405,26 +405,26 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
   def test_ignore_case(self):
     self.reset.append( conf.AUTH.IGNORE_USERNAME_CASE.set_for_testing(True) )
 
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": self.test_username})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": self.test_username})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(1, len(User.objects.all()))
     assert_equal(self.test_username, User.objects.all()[0].username)
 
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": self.test_username.upper()})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": self.test_username.upper()})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(1, len(User.objects.all()))
     assert_equal(self.test_username, User.objects.all()[0].username)
 
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "%s_%s" % (self.test_username.upper(), '2')})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": "%s_%s" % (self.test_username.upper(), '2')})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(2, len(User.objects.all().order_by('username')))
     assert_equal("%s_%s" % (self.test_username, '2'), User.objects.all().order_by('username')[1].username)
 
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "%s_%s" % (self.test_username, '2')})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": "%s_%s" % (self.test_username, '2')})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(2, len(User.objects.all()))
     assert_equal("%s_%s" % (self.test_username, '2'), User.objects.all().order_by('username')[1].username)
@@ -432,16 +432,16 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
   def test_force_lower_case(self):
     self.reset.append( conf.AUTH.FORCE_USERNAME_LOWERCASE.set_for_testing(True) )
 
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": self.test_username})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": self.test_username})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(1, len(User.objects.all()))
     assert_equal(self.test_username, User.objects.all()[0].username)
 
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": self.test_username.upper()})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": self.test_username.upper()})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(1, len(User.objects.all()))
     assert_equal(self.test_username, User.objects.all()[0].username)
@@ -450,7 +450,7 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
   def test_ignore_case_and_force_lower_case(self):
     reset = conf.AUTH.FORCE_USERNAME_LOWERCASE.set_for_testing(False)
     try:
-      response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": self.test_username.upper()})
+      response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": self.test_username.upper()})
       assert_equal(200, response.status_code, "Expected ok status.")
       assert_equal(1, len(User.objects.all()))
       assert_equal(self.test_username.upper(), User.objects.all()[0].username)
@@ -461,13 +461,13 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
     self.reset.append( conf.AUTH.IGNORE_USERNAME_CASE.set_for_testing(True) )
 
     # Previously existing users should not be forced to lower case.
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": self.test_username.upper()})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": self.test_username.upper()})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(1, len(User.objects.all()))
     assert_equal(self.test_username.upper(), User.objects.all()[0].username)
 
     # New users should be forced to lowercase.
-    response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "%s_%s" % (self.test_username.upper(), '2')})
+    response = self.c.post('/hue/accounts/login/', {}, **{"REMOTE_USER": "%s_%s" % (self.test_username.upper(), '2')})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(2, len(User.objects.all()))
     assert_equal("%s_%s" % (self.test_username, '2'), User.objects.all().order_by('username')[1].username)
@@ -520,7 +520,7 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
   def test_login_with_ldap(self):
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
-    response = self.c.post('/accounts/login/', {
+    response = self.c.post('/hue/accounts/login/', {
       'username': "curly",
       'password': "ldap1"
     })
@@ -534,7 +534,7 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
     client.get('/accounts/logout')
     user = User.objects.get(username=self.test_username)
 
-    response = self.c.post('/accounts/login/', dict(username=self.test_username, password="foo"))
+    response = self.c.post('/hue/accounts/login/', dict(username=self.test_username, password="foo"))
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_true(self.fs.exists("/user/%s" % self.test_username))
 
@@ -575,11 +575,11 @@ class TestLogin(PseudoHdfsTestBase):
   def test_bad_first_user(self):
     self.reset.append( conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]) )
 
-    response = self.c.get('/accounts/login/')
+    response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true(response.context['first_login_ever'])
 
-    response = self.c.post('/accounts/login/', dict(username="foo 1", password="foo"))
+    response = self.c.post('/hue/accounts/login/', dict(username="foo 1", password="foo"))
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true('This value may contain only letters, numbers and @/./+/-/_ characters.' in response.content, response)
 
@@ -588,7 +588,7 @@ class TestLogin(PseudoHdfsTestBase):
     # Logout first
     client.get('/accounts/logout')
     # Login
-    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     if is_hue4():
       template = 'hue.mako'
     else:
@@ -610,7 +610,7 @@ class TestLogin(PseudoHdfsTestBase):
     try:
       user.is_superuser = True
       user.save()
-      response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+      response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
       assert_equal(200, response.status_code, "Expected ok status.")
 
       client.get('/accounts/logout')
@@ -619,13 +619,13 @@ class TestLogin(PseudoHdfsTestBase):
       settings.ADMINS = [(self.test_username, 'test@test.com')]
       user.is_superuser = False
       user.save()
-      response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+      response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
       assert_equal(200, response.status_code, "Expected ok status.")
       assert_true('Account deactivated. Please contact an <a href="mailto:test@test.com">administrator</a>' in response.content, response.content)
 
       # Failure should report an inactive user without admin link
       settings.ADMINS = []
-      response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+      response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
       assert_equal(200, response.status_code, "Expected ok status.")
       assert_true("Account deactivated. Please contact an administrator." in response.content, response.content)
     finally:
@@ -644,7 +644,7 @@ class TestLogin(PseudoHdfsTestBase):
     # Login fail
     user.is_superuser = True
     user.save()
-    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected unauthorized status.")
 
 
@@ -689,7 +689,7 @@ class TestLoginNoHadoop(object):
     user.groups.all().delete()
     assert_false(user.groups.exists())
 
-    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    response = client.post('/hue/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
 
 
