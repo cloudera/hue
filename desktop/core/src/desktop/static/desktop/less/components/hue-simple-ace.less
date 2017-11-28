@@ -27,8 +27,40 @@
   .ace-editor {
     position: absolute;
     top: 4px;
-    right: 3px;
+    right: 15px;
     bottom: 4px;
     left: 3px;
+  }
+
+  .ace-clearable {
+    position: absolute;
+    right: 5px;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    opacity: 0;
+    color: @cui-gray-700;
+    .hue-ease-transition(~"opacity, color");
+
+    &:hover {
+      color: @hue-primary-color-dark;
+    }
+
+    .fa {
+      position:absolute;
+      top: 0;
+      bottom: 0;
+      height: 13px;
+      font-size: 13px;
+      display: block;
+      margin: auto;
+      vertical-align: middle;
+    }
+
+    &.visible {
+      opacity: 1;
+      cursor: pointer;
+    }
   }
 }
