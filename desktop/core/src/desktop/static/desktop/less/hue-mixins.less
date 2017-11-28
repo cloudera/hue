@@ -59,17 +59,21 @@
 }
 
 .hue-linear-transition(@attributes) {
-  -webkit-transition: @attributes 0.2s linear;
-  -moz-transition: @attributes 0.2s linear;
-  -ms-transition: @attributes 0.2s linear;
-  transition: @attributes 0.2s linear;
+  @value: ~`"@{attributes}".replace(/,/g, ' .2s linear,')`;
+
+  -webkit-transition: @value .2s linear;
+  -moz-transition: @value .2s linear;
+  -ms-transition: @value .2s linear;
+  transition: @value .2s linear;
 }
 
 .hue-ease-transition(@attributes) {
-  -webkit-transition: @attributes 0.2s ease;
-  -moz-transition: @attributes 0.2s ease;
-  -ms-transition: @attributes 0.2s ease;
-  transition: @attributes 0.2s ease;
+  @value: ~`"@{attributes}".replace(/,/g, ' .2s ease,')`;
+
+  -webkit-transition: @value .2s ease;
+  -moz-transition: @value .2s ease;
+  -ms-transition: @value .2s ease;
+  transition: @value .2s ease;
 }
 
 .hue-box-shadow-top {

@@ -27,6 +27,7 @@ from desktop.views import _ko
   <script type="text/html" id="hue-simple-ace-editor-template">
     <!-- ko if: singleLine -->
     <div class="simple-ace-single-line">
+      <div class="ace-clearable" data-bind="css: { 'visible': value() !== '' }, click: clear"><i class="fa fa-times-circle"></i></div>
       <div class="ace-editor"></div>
     </div>
     <!-- /ko -->
@@ -959,6 +960,15 @@ from desktop.views import _ko
         self.disposeFunctions.push(function () {
           editor.off('input', valueUpdateListener);
         });
+      };
+
+      SimpleAceEditor.prototype.clear = function () {
+        var self = this;
+        if (self.ace()) {
+          self.ace().setValue('');
+        } else {
+          self.value('');
+        }
       };
 
       SimpleAceEditor.prototype.dispose = function () {
