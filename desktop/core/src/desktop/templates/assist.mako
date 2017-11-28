@@ -2462,15 +2462,20 @@ from desktop.views import _ko
         // This fetches the columns for each table synchronously with 2 second in between.
         var loadEntries = function () {
           window.clearTimeout(loadEntriesTimeout);
-          loadEntriesTimeout = window.setTimeout(function () {
-            self.activeTables().every(function (table) {
-              if (!table.loaded && !table.hasErrors() && !table.loading()) {
-                table.loadEntries(loadEntries, true);
-                return false;
-              }
-              return !table.loading();
-            })
-          }, 2000);
+          if (self.activeTables().length === 1) {
+            self.activeTables()[0].open(true);
+          }
+          else {
+            loadEntriesTimeout = window.setTimeout(function () {
+              self.activeTables().every(function (table) {
+                if (!table.loaded && !table.hasErrors() && !table.loading()) {
+                  table.loadEntries(loadEntries, true);
+                  return false;
+                }
+                return !table.loading();
+              })
+            }, 2000);
+          }
         };
 
         self.autocompleteFromEntries = function (nonPartial, partial) {
