@@ -780,9 +780,13 @@
 
 .context-popover-sample {
   text-align: left;
-  padding: 3px;
+  padding: 0;
   overflow: hidden;
   height: 100%;
+
+  .dataTables_wrapper {
+    overflow: auto;
+  }
 
   th {
     border-right: 1px solid @cui-gray-200;
