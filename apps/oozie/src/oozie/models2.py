@@ -850,7 +850,7 @@ class Node():
         self.data['properties']['capture_output'] = action['properties']['capture_output']
         self.data['properties']['arguments'] = [{'value': prop} for prop in action['properties']['arguments']]
 
-        self.data['properties']['files'] = ([{'value': action['properties']['command_path']}] if not action['properties'].get('command_path', '').startswith('/') else []) + [{'value': prop} for prop in action['properties']['files']]
+        self.data['properties']['files'] = ([{'value': action['properties']['command_path']}] if not action['properties'].get('command_path', '').startswith('/') else []) + [{'value': prop.get('path', prop)} for prop in action['properties']['files']]
         self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
 
     elif self.data['type'] == MapReduceDocumentAction.TYPE:
