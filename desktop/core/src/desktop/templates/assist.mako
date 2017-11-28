@@ -269,7 +269,7 @@ from desktop.views import _ko
     </ul>
     <!-- /ko -->
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length > 0 -->
-    <ul class="database-tree" data-bind="foreachVisible: { data: filteredEntries, minHeight: 23, container: '.assist-db-scrollable' }, css: { 'assist-tables': definition.isDatabase }">
+    <ul class="database-tree" data-bind="foreachVisible: { data: filteredEntries, minHeight: navigationSettings.rightAssist ? 22 : 23, container: '.assist-db-scrollable' }, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko if: navigationSettings.rightAssist -->
         <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry-assistant' } --><!-- /ko -->
@@ -861,7 +861,7 @@ from desktop.views import _ko
         <li class="assist-entry no-entries">${_('No results found')}</li>
       </ul>
       <!-- /ko -->
-      <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 22, container: '.assist-db-scrollable' }">
+      <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 23, container: '.assist-db-scrollable' }">
         <!-- ko template: { name: 'assist-database-entry' } --><!-- /ko -->
       </ul>
     </div>
