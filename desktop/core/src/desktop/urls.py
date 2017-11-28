@@ -52,7 +52,7 @@ admin.autodiscover()
 
 # Some django-wide URLs
 dynamic_patterns = patterns('desktop.auth.views',
-  (r'^accounts/login/$', 'dt_login'),
+  (r'^hue/accounts/login/$', 'dt_login'),
   (r'^accounts/logout/$', 'dt_logout', {'next_page': '/'}),
   (r'^profile$', 'profile'),
   (r'^login/oauth/?$', 'oauth_login'),
