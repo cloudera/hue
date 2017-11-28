@@ -25,13 +25,14 @@ from nose.tools import *
 from django.test.client import Client
 import django
 
+
 def test_require_login():
   c = Client()
   # We're not logged in, so expect a redirection.
 
   response = c.get('/profile')
   assert_true(isinstance(response, django.http.HttpResponseRedirect), "Expected redirect")
-  assert_equal("http://testserver/accounts/login/?next=/profile", response["Location"], "Expected redirection to login page")
+  assert_equal("http://testserver/hue/accounts/login?next=/profile", response["Location"])
 
   # AllowAllBackend should let us in.
   c.login(username="test", password="test")
