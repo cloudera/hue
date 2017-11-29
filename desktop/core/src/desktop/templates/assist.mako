@@ -1222,7 +1222,7 @@ from desktop.views import _ko
             }, 0);
           });
 
-          huePubSub.subscribe("assist.set.database", function (databaseDef) {
+          huePubSub.subscribe('assist.set.database', function (databaseDef) {
             if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
               return;
             }
@@ -1230,14 +1230,14 @@ from desktop.views import _ko
             self.setDatabaseWhenLoaded(databaseDef.name);
           });
 
-          huePubSub.subscribe("assist.get.database", function (source) {
+          huePubSub.subscribe('assist.get.database', function (source) {
             if (self.sourceIndex[source] && self.sourceIndex[source].selectedDatabase()) {
-              huePubSub.publish("assist.database.set", {
+              huePubSub.publish('assist.database.set', {
                 source: source,
                 name: self.sourceIndex[source].selectedDatabase().databaseName
               });
             } else {
-              huePubSub.publish("assist.database.set", {
+              huePubSub.publish('assist.database.set', {
                 source: source,
                 name: 'default'
               });
