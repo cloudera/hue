@@ -40,7 +40,7 @@
 
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 9px;
 }
 
 ::-webkit-scrollbar-track {
@@ -48,9 +48,14 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: 4px;
+  border-radius: 4.5px;
   border: 1px solid @cui-white;
-  background-color: @cui-gray-200;
+  border-right-width: 2px;
+  background-color: @cui-gray-300;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: @cui-gray-500;
 }
 
 body {
