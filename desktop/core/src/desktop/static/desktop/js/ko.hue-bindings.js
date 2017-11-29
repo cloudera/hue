@@ -6253,6 +6253,7 @@
         'pig': 'query-pig',
         'sqoop': 'query-sqoop1',
         'distcp-doc': 'query-distcp',
+        'shell-doc': 'query-shell',
         'mapreduce-doc': 'query-mapreduce',
         'hive-document-widget': 'query-hive',
         'impala-document-widget': 'query-impala',
