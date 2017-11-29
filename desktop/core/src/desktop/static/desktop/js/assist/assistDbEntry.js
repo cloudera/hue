@@ -205,7 +205,9 @@ var AssistDbEntry = (function () {
     }
 
     var type;
-    if (self.definition.isColumn) {
+    if (self.definition.isColumn && self.sourceType === 'solr') {
+      type = 'collection';
+    } else if (self.definition.isColumn) {
       type = 'column';
     } else if (self.definition.isComplex) {
       type = 'complex';
@@ -215,10 +217,6 @@ var AssistDbEntry = (function () {
       type = 'view';
     } else {
       type = 'database';
-    }
-
-    if (self.sourceType === 'solr') {
-      type = 'collection';
     }
 
     self.statsVisible(true);

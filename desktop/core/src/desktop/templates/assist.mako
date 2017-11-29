@@ -86,9 +86,7 @@ from desktop.views import _ko
   <script type="text/html" id="sql-context-items">
     <!-- ko if: typeof definition !== 'undefined' -->
       <!-- ko if: sourceType === 'solr' -->
-        <!-- ko if: definition.isColumn -->
         <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
-        <!-- /ko -->
         <!-- ko if: definition.isView || definition.isTable -->
         <li><a href="javascript:void(0);" data-bind="click: openInIndexer"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
         <li>
@@ -210,9 +208,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { override: statsVisible() || navigationSettings.rightAssist, selector: '.table-actions' }">
       <div class="assist-actions table-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
-        <!-- ko if: sourceType !== 'solr' -->
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
-        <!-- /ko -->
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': definition.isView, 'table': tableName, 'database': databaseName} }">
