@@ -62,7 +62,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
       </div>
     </div>
     <div class="search-bar-middle">
-      <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0">
+      <form class="form-search" data-bind="visible: $root.isEditing() && columns().length == 0, submit: function() { return false }">
         <!-- ko if: $root.initial.engines().length > 1 -->
         <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
         <!-- /ko -->
@@ -82,7 +82,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 
         <!-- ko if: $root.collection.engine() != 'solr' -->
         <!-- ko if: columns().length == 0 -->
-        <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }">
+        <input type="text" class="no-margin" data-bind="hivechooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }" style="margin-top: 1px">
         <!-- /ko -->
         <!-- /ko -->
 
@@ -2472,7 +2472,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <div class="control-group">
               <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
               <div class="controls">
-                <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
+                <input type="text" class="no-margin" data-bind="hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
               </div>
             </div>
             <!-- /ko -->
