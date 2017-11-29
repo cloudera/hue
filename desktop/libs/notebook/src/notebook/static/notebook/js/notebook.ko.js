@@ -2684,17 +2684,6 @@ var EditorViewModel = (function() {
     self.loadingScheduler = ko.observable(false);
 
 
-    huePubSub.subscribeOnce('assist.db.panel.ready', function () {
-      if (self.type().indexOf('query') === 0 && self.snippets().length == 1) {
-        huePubSub.publish('assist.set.database', {
-          source: self.snippets()[0].type(),
-          name: self.snippets()[0].database()
-        });
-      }
-    }, vm.huePubSubId);
-
-    huePubSub.publish('assist.is.db.panel.ready');
-
     // Init
     if (notebook.snippets) {
       $.each(notebook.snippets, function (index, snippet) {
@@ -2715,6 +2704,29 @@ var EditorViewModel = (function() {
         });
       }
     }
+
+    huePubSub.subscribeOnce('assist.db.panel.ready', function () {
+      if (self.type().indexOf('query') === 0) {
+        if (self.snippets().length === 1) {
+          huePubSub.publish('assist.set.database', {
+            source: self.snippets()[0].type(),
+            name: self.snippets()[0].database()
+          });
+        } else {
+          var snippetsSub = self.snippets.subscribe(function (snippets) {
+            if (snippets.length === 1) {
+              huePubSub.publish('assist.set.database', {
+                source: self.snippets()[0].type(),
+                name: self.snippets()[0].database()
+              });
+            }
+            snippetsSub.dispose();
+          })
+        }
+      }
+    }, vm.huePubSubId);
+
+    huePubSub.publish('assist.is.db.panel.ready');
   };
 
   function EditorViewModel(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
