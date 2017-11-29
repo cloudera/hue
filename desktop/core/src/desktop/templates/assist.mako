@@ -2553,7 +2553,8 @@ from desktop.views import _ko
                       name: tableName,
                       type: 'table',
                       isTable: true,
-                      displayName: displayName.toLowerCase()
+                      displayName: displayName.toLowerCase(),
+                      title: displayName
                     },
                     databaseIndex[database],
                     assistDbSource,
