@@ -79,6 +79,10 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="collection-title-context-items">
+    <li><a href="javascript:void(0);" data-bind="hueLink: '/indexer'"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
+  </script>
+
   <script type="text/html" id="sql-context-items">
     <!-- ko if: typeof definition !== 'undefined' -->
       <!-- ko if: sourceType === 'solr' -->
@@ -883,7 +887,7 @@ from desktop.views import _ko
         ${_('Tables')}
         <!-- /ko -->
         <!-- ko if: sourceType === 'solr' -->
-        ${_('Collections')}
+        <div data-bind="appAwareTemplateContextMenu: { template: 'collection-title-context-items', scrollContainer: '.assist-db-scrollable' }">${_('Collections')}</div>
         <!-- /ko -->
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
@@ -2240,7 +2244,7 @@ from desktop.views import _ko
         <div class="assist-flex-header">
           <div class="assist-inner-header">
             <!-- ko if: isSolr -->
-            ${ _('Collections') }
+            <div data-bind="appAwareTemplateContextMenu: { template: 'collection-title-context-items', scrollContainer: '.assist-db-scrollable' }">${_('Collections')}</div>
             <!-- /ko -->
             <!-- ko ifnot: isSolr  -->
             ${ _('Tables') }
