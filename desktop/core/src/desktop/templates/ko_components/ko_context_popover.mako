@@ -37,9 +37,11 @@ from metadata.conf import has_navigator
           <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
         </a>
         % endif
+        <!-- ko if: sourceType !== 'solr' -->
         <a class="inactive-action pointer" data-bind="visible: openInTableBrowserEnabled, click: function() { huePubSub.publish('context.popover.open.in.metastore', isTable || isView ? 'table' : 'db') }">
           <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
         </a>
+        <!-- /ko -->
         <a class="inactive-action pointer" data-bind="visible: replaceEditorContentEnabled, click: function() { huePubSub.publish('context.popover.replace.in.editor') }">
           <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
         </a>
@@ -680,18 +682,20 @@ from metadata.conf import has_navigator
             errorText: '${ _("There was a problem loading the columns.") }',
             isColumn: false
           });
-          self.tabs.push({
-            id: 'tableDetails',
-            label: '${ _("Details") }',
-            template: 'context-popover-table-details',
-            templateData: self.tableDetails,
-            errorText: '${ _("There was a problem loading the table details.") }',
-            isColumn: false
-          });
+          if (sourceType !== 'solr') {
+            self.tabs.push({
+              id: 'tableDetails',
+              label: '${ _("Details") }',
+              template: 'context-popover-table-details',
+              templateData: self.tableDetails,
+              errorText: '${ _("There was a problem loading the table details.") }',
+              isColumn: false
+            });
+          }
           self.activeTab('columns');
         }
 
-        if (!isComplex) {
+        if (!isComplex && sourceType !== 'solr') {
           self.tabs.push({
             id: 'sample',
             label: '${ _("Sample") }',
@@ -1520,6 +1524,8 @@ from metadata.conf import has_navigator
             self.left(params.source.left - self.width());
         }
 
+        self.isSolr = params.sourceType === 'solr';
+
         self.isDatabase = params.data.type === 'database';
         self.isTable = params.data.type === 'table';
         self.isColumn = params.data.type === 'column';
@@ -1558,9 +1564,14 @@ from metadata.conf import has_navigator
         self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isHdfs;
 
         if (self.isTable || self.isView) {
-          self.title = $.map(self.data.identifierChain, function (identifier) { return identifier.name; }).join('.');
-          if (self.title.indexOf('.') === -1) {
-            self.title = self.defaultDatabase + '.' + self.title;
+          if (self.isSolr) {
+            self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          }
+          else {
+            self.title = $.map(self.data.identifierChain, function (identifier) { return identifier.name; }).join('.');
+            if (self.title.indexOf('.') === -1) {
+              self.title = self.defaultDatabase + '.' + self.title;
+            }
           }
         }
 
@@ -1570,14 +1581,14 @@ from metadata.conf import has_navigator
           self.iconClass = 'fa-database';
         } else if (self.isTable) {
           self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, false);
-          self.iconClass = 'fa-table'
+          self.iconClass = self.isSolr ? 'fa-search' : 'fa-table';
         } else if (self.isView) {
           self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, false);
-          self.iconClass = 'fa-eye'
+          self.iconClass = self.isSolr ? 'fa-search' : 'fa-eye';
         } else if (self.isComplex) {
           self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, true);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
-          self.iconClass = 'fa-columns'
+          self.iconClass = 'fa-columns';
         } else if (self.isColumn) {
           self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, true, false);
           if (self.data.identifierChain.length > 1) {
@@ -1585,15 +1596,15 @@ from metadata.conf import has_navigator
           } else {
             self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           }
-          self.iconClass = 'fa-columns'
+          self.iconClass = 'fa-columns';
         } else if (self.isFunction) {
           self.contents = new FunctionContextTabs(self.data, self.sourceType);
           self.title = self.data.function;
-          self.iconClass = 'fa-superscript'
+          self.iconClass = 'fa-superscript';
         } else if (self.isHdfs) {
           self.contents = new HdfsContextTabs(self.data);
           self.title = self.data.path;
-          self.iconClass = 'fa-folder-o'
+          self.iconClass = 'fa-folder-o';
         } else if (self.isAsterisk) {
           self.contents = new AsteriskContextTabs(self.data, self.sourceType, self.defaultDatabase);
           self.title = '*';
@@ -1608,7 +1619,7 @@ from metadata.conf import has_navigator
           self.iconClass = 'fa-search';
         } else {
           self.title = '';
-          self.iconClass = 'fa-info'
+          self.iconClass = 'fa-info';
         }
         self.orientationClass = 'hue-popover-' + orientation;
 
