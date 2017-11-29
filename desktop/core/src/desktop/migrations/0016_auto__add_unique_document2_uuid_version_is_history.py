@@ -11,73 +11,44 @@ from desktop.models import Document2
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Unfortunately before this change it was possible to have multiple
-        # documents that shared the same (uuid, version, is_history). However,
-        # as opposed to before we can't just delete the records as Document2
-        # documents contain user data. So instead what we'll do is identify
-        # what's the most recent document, and manipulate the other document
-        # version numbers to be negative. This keeps the duplicates linked
-        # together.
+        # As opposed to Document1, we can't just delete Document2 documents if
+        # there is a duplication because it actually holds data. So instead
+        # we'll just find duplications and emit a better error message.
+        duplicated_records = Document2.objects \
+         .values('uuid', 'version', 'is_history') \
+         .annotate(id_count=models.Count('id')) \
+         .filter(id_count__gt=1)
 
-        # We'll start off by first finding all the duplicate documents.
-        # Ideally we'd do this in one pass, but Django's aggregates don't seem
-        # to support doing a GROUP BY without grouping all the selected fields
-        # together. So we'll do this in a few phases. First we'll just find the
-        # duplicates.
-        #
-        # Note we reset the `order_by` to make sure that if a default ordering
-        # is ever added, it's never included in the group by.
 
-        # We need to wrap the data migration and alter operation in separate transactions for PostgreSQL
-        # See: http://south.readthedocs.org/en/latest/migrationstructure.html#transactions
-        try:
-            db.start_transaction()
-            duplicated_records = Document2.objects \
-                .values('uuid', 'version', 'is_history') \
-                .annotate(id_count=models.Count('id')) \
-                .filter(id_count__gt=1) \
-                .order_by()
+        duplicated_records = list(duplicated_records)
+        duplicated_ids = []
+        duplicated_ids_to_delete = []
 
-            for record in duplicated_records:
-                # We found some duplicates, now actually fetch the duplicated
-                # documents for these values.
-                docs = Document2.objects \
-                    .filter(
-                    uuid=record['uuid'],
-                    version=record['version'],
-                    is_history=record['is_history'],
-                ) \
-                    .order_by('-version', '-last_modified')
+        for record in duplicated_records:
+             docs = Document2.objects \
+                 .values_list('id', flat=True) \
+                 .filter(
+                     uuid=record['uuid'],
+                     version=record['version'],
+                     is_history=record['is_history'],
+                 ) \
+                 .order_by('-last_modified')
 
-                # Grab all but the first document, which we're preserving as the
-                # current version.
-                docs = list(docs[1:])
+             duplicated_ids.extend(docs)
+             duplicated_ids_to_delete.extend(docs[1:]) # Keep the most recent duplicate
 
-                logging.warn('Modifying version number of these duplicated docs %s' %
-                             [doc.id for doc in docs])
-
-                # Update all these document's version numbers. To be safe, we want
-                # to give them a unique negative number so there's no collision and
-                # also so they're easily discoverable.
-                version = Document2.objects \
-                    .values_list('version') \
-                    .filter(uuid=record['uuid']) \
-                    .earliest('version')[0]
-
-                version = min(0, version) - 1
-
-                # Finally, update the version numbers.
-                for doc in docs:
-                    doc.version = version
-
-                    if not db.dry_run:
-                        doc.save()
-
-                    version -= 1
-            db.commit_transaction()
-        except Exception, e:
-            db.rollback_transaction()
-            raise e
+        if duplicated_ids:
+             msg = 'Found duplicated Document2 records! %(duplicated_ids)s.\n' \
+                   'This will require manual merging or deletion of the Document2 records with duplicate ids and rerunning the migration.\n' \
+                   'For more information on manipulating Hue built in objects, have a look at our blog: http://gethue.com/hue-api-execute-some-builtin-commands/\n' \
+                   'For example, to delete Document2 records with the oldest duplicated ids execute the following:\n\n' \
+                   'from desktop.models import Document2\n' \
+                   'Document2.objects.filter(id__in=%(duplicated_ids_to_delete)s).delete()\n' % {
+                       'duplicated_ids': duplicated_ids,
+                       'duplicated_ids_to_delete': duplicated_ids_to_delete
+                   }
+             logging.error(msg)
+             raise RuntimeError(msg)
 
         try:
             db.start_transaction()
