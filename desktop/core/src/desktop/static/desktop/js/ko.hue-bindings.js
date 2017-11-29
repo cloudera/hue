@@ -4898,6 +4898,17 @@
       var lastMeta = {};
       var draggableTextSub = huePubSub.subscribe('draggable.text.meta', function (meta) {
         lastMeta = meta;
+        if (meta.isView) {
+          $tableDropMenu.find('.editor-drop-update').hide();
+          $tableDropMenu.find('.editor-drop-insert').hide();
+          $tableDropMenu.find('.editor-drop-drop').hide();
+          $tableDropMenu.find('.editor-drop-view').show();
+        } else {
+          $tableDropMenu.find('.editor-drop-update').show();
+          $tableDropMenu.find('.editor-drop-insert').show();
+          $tableDropMenu.find('.editor-drop-drop').show();
+          $tableDropMenu.find('.editor-drop-view').hide();
+        }
         if (typeof meta !== 'undefined' && typeof meta.database !== 'undefined' && typeof meta.table !== 'undefined') {
           $identifierDropMenu.text(meta.database + '.' + meta.table)
         }
@@ -4924,6 +4935,10 @@
 
       $tableDropMenu.find('.editor-drop-update').click(function () {
         insertSqlAtCursor('UPDATE ' + lastMeta.database + '.' + lastMeta.table + ' SET ', 0, menu);
+      });
+
+      $tableDropMenu.find('.editor-drop-view').click(function () {
+        insertSqlAtCursor('DROP VIEW ' + lastMeta.database + '.' + lastMeta.table + ';', -1, menu);
       });
 
       $tableDropMenu.find('.editor-drop-drop').click(function () {
