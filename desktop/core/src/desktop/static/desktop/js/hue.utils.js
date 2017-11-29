@@ -345,6 +345,24 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     }
   };
 
+  hueUtils.initNiceScroll = function ($el, options) {
+    var defaults = {
+      cursorcolor: "#7D7D7D",
+      cursorborder: "1px solid #7D7D7D",
+      cursoropacitymin: 0,
+      cursoropacitymax: navigator.platform.indexOf('Win') > -1 ? 1: 0.7,
+      mousescrollstep: 60,
+      cursorwidth: "6px",
+      railpadding: { top: 1, right: 1, left: 1, bottom: 1 },
+      hidecursordelay: 0,
+      scrollspeed: 100,
+      cursorminheight: 20,
+      horizrailenabled: true,
+      autohidemode: "leave"
+    };
+    return $el.niceScroll($.extend(defaults, options || {}));
+  };
+
   hueUtils.equalIgnoreCase = function (a, b) {
     return a && b && a.toLowerCase() === b.toLowerCase();
   };

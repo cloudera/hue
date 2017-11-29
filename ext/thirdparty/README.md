@@ -110,6 +110,7 @@ Checked-in frontend third party dependencies
 |jQuery Form Plugin|3.51.0-2014.06.20|MIT|https://github.com/malsup/form|
 |Gridster.js|0.7.0|MIT|https://github.com/dsmorse/gridster.js|
 |jQuery Hotkeys Plugin|0.2.0|MIT|https://github.com/jeresig/jquery.hotkeys|
+|Nicescroll|3.7.6|MIT|https://github.com/inuyaksa/jquery.nicescroll|
 |TotalStorage|1.1.3|MIT|https://github.com/Upstatement/jquery-total-storage|
 |TouchSwipe|1.6.18|MIT|https://github.com/mattbryson/TouchSwipe-Jquery-Plugin|
 |TouchSwipe|1.6.18|MIT|https://github.com/mattbryson/TouchSwipe-Jquery-Plugin|
