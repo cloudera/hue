@@ -32,13 +32,14 @@ importScripts('${ static('desktop/js/sqlFunctions.js') }');
 
   this.throttle = -1;
 
-  this.handleStatement = function (statement, locations, type) {
+  this.handleStatement = function (statement, locations, type, active) {
     // Statement locations come in the message to the worker and are generally more accurate
     locations.push(statement);
     try {
       var sqlParseResult = sqlAutocompleteParser.parseSql(statement.statement + ' ', '', type, false);
       if (sqlParseResult.locations) {
         sqlParseResult.locations.forEach(function (location) {
+          location.active = active;
           // Skip statement locations from the sql parser
           if (location.type !== 'statement') {
             if (location.location.first_line === 1) {
@@ -65,14 +66,14 @@ importScripts('${ static('desktop/js/sqlFunctions.js') }');
         var locations = [];
         var activeStatementLocations = [];
         msg.data.statementDetails.precedingStatements.forEach(function (statement) {
-          this.handleStatement(statement, locations, msg.data.type);
+          this.handleStatement(statement, locations, msg.data.type, false);
         });
         if (msg.data.statementDetails.activeStatement) {
-          this.handleStatement(msg.data.statementDetails.activeStatement, activeStatementLocations, msg.data.type);
+          this.handleStatement(msg.data.statementDetails.activeStatement, activeStatementLocations, msg.data.type, true);
           locations = locations.concat(activeStatementLocations);
         }
         msg.data.statementDetails.followingStatements.forEach(function (statement) {
-          this.handleStatement(statement, locations, msg.data.type);
+          this.handleStatement(statement, locations, msg.data.type, false);
         });
 
         postMessage({
