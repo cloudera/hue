@@ -600,7 +600,7 @@ from metadata.conf import has_navigator
 
         self.columns = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete, self);
         self.columnDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete, self);
-        self.tableDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis, self);
+        self.tableDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, sourceType === 'solr' ? $.noop : apiHelper.fetchAnalysis, self);
         self.sample = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples, self);
         self.analysis = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis, self);
         self.partitions = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions, self);
@@ -691,7 +691,7 @@ from metadata.conf import has_navigator
           self.activeTab('columns');
         }
 
-        if (!isComplex && sourceType !== 'solr') {
+        if (!isComplex) {
           self.tabs.push({
             id: 'sample',
             label: '${ _("Sample") }',
