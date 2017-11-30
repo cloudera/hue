@@ -3812,7 +3812,7 @@
     };
 
     var VERIFY_LIMIT = 50;
-    var VERIFY_DELAY = 150;
+    var VERIFY_DELAY = 50;
 
     var verifyThrottle = -1;
 
@@ -4014,23 +4014,20 @@
       // The parser isn't aware of the DDL so sometimes it marks complex columns as tables
       // I.e. "Impala SELECT a FROM b.c" Is 'b' a database or a table? If table then 'c' is complex
       var identifyComplexLocations = function (locations, callback) {
-        apiHelper.getDatabases(self.snippet.type()).done(function (databases) {
-          locations.forEach(function (location) {
-            if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
-              return;
-            }
-            if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {
-              var clonedChain = location.identifierChain.concat();
-              if (databases.indexOf(clonedChain[0].name.toLowerCase()) > -1) {
-                clonedChain.shift();
-                if (clonedChain.length > 1) {
+        if (self.snippet.type() === 'impala') {
+          apiHelper.getDatabases(self.snippet.type()).done(function (databases) {
+            locations.forEach(function (location) {
+              if (location.identifierChain && location.identifierChain.length > 2
+                && (location.type === 'table' || location.type === 'column')
+                && databases.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
                   location.type = 'complex';
-                }
               }
-            }
+            });
+            callback();
           });
+        } else {
           callback();
-        });
+        }
       };
 
       var locationWorkerSub = huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
