@@ -108,7 +108,7 @@ var AutocompleteResults = (function () {
 
     self.entries = ko.observableArray();
 
-    self.lastKnownRequests = {};
+    self.lastKnownRequests = [];
     self.activeDeferrals = [];
 
     self.loadingKeywords = ko.observable(false);
@@ -206,9 +206,9 @@ var AutocompleteResults = (function () {
   AutocompleteResults.prototype.cancelRequests = function () {
     var self = this;
 
-    Object.keys(self.lastKnownRequests).forEach(function (key) {
-      self.apiHelper.cancelActiveRequest(self.lastKnownRequests[key]);
-    });
+    while (self.lastKnownRequests.length) {
+      self.apiHelper.cancelActiveRequest(self.lastKnownRequests.pop());
+    }
   };
 
   AutocompleteResults.prototype.update = function (parseResult) {
@@ -537,7 +537,7 @@ var AutocompleteResults = (function () {
         }
 
         var database = suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.activeDatabase;
-        self.lastKnownRequests.fetchTables = self.apiHelper.fetchTables({
+        self.lastKnownRequests.push(self.apiHelper.fetchTables({
           sourceType: self.snippet.type(),
           databaseName: database,
           successCallback: function (data) {
@@ -564,7 +564,7 @@ var AutocompleteResults = (function () {
           silenceErrors: true,
           errorCallback: tablesDeferred.reject,
           timeout: AUTOCOMPLETE_TIMEOUT
-        });
+        }));
       };
 
       if (self.snippet.type() == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length === 1) {
@@ -1097,7 +1097,7 @@ var AutocompleteResults = (function () {
       // Last one is either partial name or empty
       parts.pop();
 
-      self.lastKnownRequests[fetchFunction] = self.apiHelper[fetchFunction]({
+      self.lastKnownRequests.push(self.apiHelper[fetchFunction]({
         pathParts: parts,
         successCallback: function (data) {
           if (!data.error) {
@@ -1120,7 +1120,7 @@ var AutocompleteResults = (function () {
         silenceErrors: true,
         errorCallback: pathsDeferred.reject,
         timeout: AUTOCOMPLETE_TIMEOUT
-      });
+      }));
     } else {
       pathsDeferred.reject();
     }
@@ -1135,7 +1135,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingJoins, joinsDeferred);
       joinsDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.fetchNavOptPopularJoins = self.apiHelper.fetchNavOptPopularJoins({
+      self.lastKnownRequests.push(self.apiHelper.fetchNavOptPopularJoins({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1200,7 +1200,7 @@ var AutocompleteResults = (function () {
           joinsDeferred.resolve(joinSuggestions);
         },
         errorCallback: joinsDeferred.reject
-      });
+      }));
     } else {
       joinsDeferred.reject();
     }
@@ -1215,7 +1215,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingJoinConditions, joinConditionsDeferred);
       joinConditionsDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.fetchNavOptPopularJoins = self.apiHelper.fetchNavOptPopularJoins({
+      self.lastKnownRequests.push(self.apiHelper.fetchNavOptPopularJoins({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1253,7 +1253,7 @@ var AutocompleteResults = (function () {
           joinConditionsDeferred.resolve(joinConditionSuggestions);
         },
         errorCallback: joinConditionsDeferred.reject
-      });
+      }));
     } else {
       joinConditionsDeferred.reject();
     }
@@ -1270,7 +1270,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingAggregateFunctions, aggregateFunctionsDeferred);
       aggregateFunctionsDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.fetchNavOptTopAggs = self.apiHelper.fetchNavOptTopAggs({
+      self.lastKnownRequests.push(self.apiHelper.fetchNavOptTopAggs({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1336,7 +1336,7 @@ var AutocompleteResults = (function () {
           aggregateFunctionsDeferred.resolve(aggregateFunctionsSuggestions);
         },
         errorCallback: aggregateFunctionsDeferred.reject
-      });
+      }));
     } else {
       aggregateFunctionsDeferred.reject();
     }
@@ -1373,7 +1373,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingGroupBys, groupBysDeferred);
       groupBysDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.fetchNavOptTopColumns = self.apiHelper.fetchNavOptTopColumns({
+      self.lastKnownRequests.push(self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1403,7 +1403,7 @@ var AutocompleteResults = (function () {
           }
         },
         errorCallback: groupBysDeferred.reject
-      });
+      }));
     } else {
       groupBysDeferred.reject();
     }
@@ -1419,7 +1419,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingOrderBys, orderBysDeferred);
       orderBysDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.fetchNavOptTopColumns = self.apiHelper.fetchNavOptTopColumns({
+      self.lastKnownRequests.push(self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1449,7 +1449,7 @@ var AutocompleteResults = (function () {
           }
         },
         errorCallback: orderBysDeferred.reject
-      });
+      }));
     } else {
       orderBysDeferred.reject();
     }
@@ -1464,7 +1464,7 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingFilters, filtersDeferred);
       filtersDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.fetchNavOptTopFilters = self.apiHelper.fetchNavOptTopFilters({
+      self.lastKnownRequests.push(self.apiHelper.fetchNavOptTopFilters({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1509,7 +1509,7 @@ var AutocompleteResults = (function () {
           filtersDeferred.resolve(filterSuggestions);
         },
         errorCallback: filtersDeferred.reject
-      });
+      }));
     } else {
       filtersDeferred.reject();
     }
@@ -1526,7 +1526,7 @@ var AutocompleteResults = (function () {
         && self.parseResult.suggestTables.identifierChain.length === 1
         && self.parseResult.suggestTables.identifierChain[0].name ? self.parseResult.suggestTables.identifierChain[0].name : self.activeDatabase;
 
-      self.lastKnownRequests.fetchNavOptTopTables = self.apiHelper.fetchNavOptTopTables({
+      self.lastKnownRequests.push(self.apiHelper.fetchNavOptTopTables({
         database: db,
         sourceType: self.snippet.type(),
         silenceErrors: true,
@@ -1563,7 +1563,7 @@ var AutocompleteResults = (function () {
           });
         },
         errorCallback: popularTablesDeferred.reject
-      });
+      }));
     } else {
       popularTablesDeferred.reject();
     }
@@ -1578,7 +1578,7 @@ var AutocompleteResults = (function () {
     if (HAS_OPTIMIZER && suggestColumns && suggestColumns.source !== 'undefined') {
       initLoading(self.loadingPopularColumns, popularColumnsDeferred);
 
-      self.lastKnownRequests.fetchNavOptTopColumns = self.apiHelper.fetchNavOptTopColumns({
+      self.lastKnownRequests.push(self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -1657,7 +1657,7 @@ var AutocompleteResults = (function () {
           });
         },
         errorCallback: popularColumnsDeferred.reject
-      });
+      }));
     } else {
       popularColumnsDeferred.reject();
     }
@@ -1766,7 +1766,7 @@ var AutocompleteResults = (function () {
         identifierChain = identifierChain.slice(1);
       }
 
-      self.lastKnownRequests.fetchFields = self.apiHelper.fetchFields({
+      self.lastKnownRequests.push(self.apiHelper.fetchFields({
         sourceType: self.snippet.type(),
         databaseName: database,
         tableName: table,
@@ -1802,7 +1802,7 @@ var AutocompleteResults = (function () {
         },
         silenceErrors: true,
         errorCallback: errorCallback
-      });
+      }));
     };
 
     // For Impala the first parts of the identifier chain could be either database or table, either:
