@@ -34,14 +34,16 @@ from desktop.views import _ko
           <div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div>
         </div>
         <!-- /ko -->
-        <div class="autocompleter-entries" data-bind="foreach: suggestions.filtered, niceScroll">
-          <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
-              css: { 'selected': $index() === $parent.selectedIndex() },
-              event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
-            <div class="autocompleter-suggestion-value">
-              <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span> <!-- ko if: details && details.primary_key === 'true' --><i class="fa fa-key"></i><!-- /ko -->
+        <div class="autocompleter-entries">
+          <div data-bind="foreachVisible: { data: suggestions.filtered, minHeight: 25, container: '.autocompleter-entries' }">
+            <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index() + $indexOffset()); $parent.insertSuggestion(); $parent.editor().focus(); },
+                css: { 'selected': $index() + $indexOffset() === $parent.selectedIndex() },
+                event: { 'mouseover': function () { $parent.hoveredIndex($index() + $indexOffset()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
+              <div class="autocompleter-suggestion-value">
+                <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span> <!-- ko if: details && details.primary_key === 'true' --><i class="fa fa-key"></i><!-- /ko -->
+              </div>
+              <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-color"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
             </div>
-            <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-color"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
           </div>
         </div>
       </div>
@@ -299,6 +301,7 @@ from desktop.views import _ko
         self.disposeFunctions = [];
         self.editor = params.editor;
         self.snippet = params.snippet || {};
+        self.foreachVisible = ko.observable();
 
         self.autocompleter = params.autocompleter || new SqlAutocompleter3(params);
         self.suggestions = self.autocompleter.suggestions;
@@ -564,19 +567,8 @@ from desktop.views import _ko
 
       HueAceAutocompleter.prototype.scrollSelectionIntoView = function () {
         var self = this;
-        var $autocompleterList = $('.autocompleter-entries');
-        var selected = $autocompleterList.children().eq(self.selectedIndex());
-        var selectedTop = selected.position().top;
-        if (selectedTop < 0) {
-          $autocompleterList.scrollTop($autocompleterList.scrollTop() + selectedTop);
-          return;
-        }
-        var selectedHeight = selected.outerHeight(true);
-        var listHeight = $autocompleterList.innerHeight();
-
-        var diff = (selectedHeight + selectedTop) - listHeight;
-        if (diff > 0) {
-          $autocompleterList.scrollTop($autocompleterList.scrollTop() + diff);
+        if (self.foreachVisible()) {
+          self.foreachVisible().scrollToIndex(self.selectedIndex());
         }
       };
 
