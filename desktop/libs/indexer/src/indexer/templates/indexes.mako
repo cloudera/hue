@@ -807,7 +807,7 @@ ${ assist.assistPanel() }
               ko.mapping.toJS(field)
             ]
           },
-          showInAssistEnabled: false,
+          showInAssistEnabled: true,
           orientation: 'right',
           pinEnabled: false,
           source: {
