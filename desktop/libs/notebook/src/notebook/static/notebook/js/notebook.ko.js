@@ -131,15 +131,19 @@ var EditorViewModel = (function() {
     });
 
     function isNumericColumn(type) {
-      return $.inArray(type, ['TINYINT_TYPE', 'SMALLINT_TYPE', 'INT_TYPE', 'BIGINT_TYPE', 'FLOAT_TYPE', 'DOUBLE_TYPE', 'DECIMAL_TYPE']) > -1;
+      return $.inArray(type, ['tinyint', 'smallint', 'int', 'bigint', 'float', 'double', 'decimal', 'real']) > -1;
     }
 
     function isDateTimeColumn(type) {
-      return $.inArray(type, ['TIMESTAMP_TYPE', 'DATE_TYPE']) > -1;
+      return $.inArray(type, ['timestamp', 'date']) > -1;
+    }
+
+    function isComplexColumn(type) {
+      return $.inArray(type, ['array', 'map', 'struct']) > -1;
     }
 
     function isStringColumn(type) {
-      return !isNumericColumn(type) && !isDateTimeColumn(type);
+      return !isNumericColumn(type) && !isDateTimeColumn(type) && !isComplexColumn(type);
     }
 
     self.cleanedNumericMeta = ko.computed(function () {
