@@ -42,8 +42,7 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
 
       self.metrics = ${metrics | n,unicode};
       self.metricsKeys = ko.observableArray(Object.keys(self.metrics).sort());
-      self.selectedMetric = ko.observable(self.metricsKeys().length > 0 ? self.metricsKeys()[0] : null);
-
+      self.selectedMetric = ko.observable('All');
       self.metricsFilter = ko.observable();
       self.filteredMetrics = ko.pureComputed(function () {
         if (self.metricsFilter()) {
@@ -60,6 +59,8 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
             });
             if (atleastOne) {
               result[key] = filteredSubMetric;
+            }else {
+              result[key] = null;
             }
           });
           return result;
@@ -80,44 +81,52 @@ ${layout.menubar(section='metrics')}
 <div id="metricsComponent" class="container-fluid">
   <div class="card card-small margin-top-10">
     <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0,topSnap: '${ TOP_SNAP }', triggerAdjust: ${ is_embeddable and "0" or "106" }}">
-      <!-- ko if: metrics -->
-      <ul class="nav nav-pills" data-bind="foreach: metricsKeys">
-        <li data-bind="css: { 'active': $root.selectedMetric() === $data }">
-          <a href="javascript:void(0)" data-bind="text: $data, click: function(){ $root.selectedMetric($data) }"></a>
-        </li>
-      </ul>
+    <!-- ko if: metrics -->
+    <ul class="nav nav-pills">
+      <li data-bind="css: { 'active': $root.selectedMetric() === 'All' }">
+        <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
+      </li>
+      <!-- ko foreach: metricsKeys -->
+      <li data-bind="css: { 'active': $root.selectedMetric() === $data }">
+        <a href="javascript:void(0)" data-bind="text: $data, click: function(){ $root.selectedMetric($data) }"></a>
+      </li>
       <!-- /ko -->
+    </ul>
+    <!-- /ko -->
+    <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
+        class="input-xlarge pull-right margin-bottom-10" placeholder="${_('Filter metrics...')}">
     </div>
-
-
     <div class="margin-top-10">
-      <input type="text" data-bind="textInput: metricsFilter, clearable: metricsFilter" class="input-xlarge pull-right margin-bottom-10" placeholder="${_('Filter metrics...')}">
-      <h4 data-bind="text: selectedMetric"></h4>
-      <table class="table table-condensed">
-        <thead>
-          <tr>
+      <div data-bind="foreach: {data: Object.keys($root.filteredMetrics()), as: '_masterkey'}">
+       <!-- ko if: ($root.selectedMetric() === 'All' && $root.filteredMetrics()[_masterkey]) || $root.selectedMetric() === _masterkey-->
+       <h4 data-bind="text: _masterkey"></h4>
+       <table class="table table-condensed">
+         <thead>
+           <tr>
             <th>${ _('Name') }</th>
             <th>${ _('Value') }</th>
-          </tr>
-        </thead>
-        <!-- ko if: $data.filteredMetrics()[$data.selectedMetric()] -->
-        <tbody data-bind="foreach: {'data': Object.keys($data.filteredMetrics()[$data.selectedMetric()])}">
-          <tr>
+           </tr>
+         </thead>
+         <!-- ko if: $root.filteredMetrics()[_masterkey] -->
+         <tbody data-bind="foreach: {'data': Object.keys($root.filteredMetrics()[_masterkey])}">
+           <tr>
             <td data-bind="text: $data"></td>
-            <td data-bind="text: $parent.filteredMetrics()[$parent.selectedMetric()][$data]"></td>
-          </tr>
-        </tbody>
-        <!-- /ko -->
-        <!-- ko ifnot: $data.filteredMetrics()[$data.selectedMetric()] -->
-        <tfoot>
-          <tr>
+            <td data-bind="text: $root.filteredMetrics()[_masterkey][$data]"></td>
+           </tr>
+         </tbody>
+         <!-- /ko -->
+         <!-- ko ifnot: $root.filteredMetrics()[_masterkey] -->
+         <tfoot>
+           <tr>
             <td colspan="2">${ _('There are no metrics matching your filter') }</td>
-          </tr>
-        </tfoot>
+           </tr>
+           </tfoot>
+         <!-- /ko -->
+        </table>
         <!-- /ko -->
-      </table>
-    </div>
+      </div>
   </div>
+ </div>
 </div>
 
 
