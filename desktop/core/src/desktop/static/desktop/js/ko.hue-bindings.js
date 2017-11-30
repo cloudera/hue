@@ -5384,19 +5384,31 @@
 
       var huePubSubs = [];
 
-      var scrollToIndex = function (idx, offset, entry) {
+      var scrollToIndex = function (idx, offset, instant, callback) {
         var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
-        if (! lastKnownHeights) {
+        if (! lastKnownHeights || lastKnownHeights.length <= idx) {
           return;
         }
         var top = 0;
         for (var i = 0; i < idx; i++) {
           top += lastKnownHeights[i];
         }
+        var bottom = top + lastKnownHeights[idx];
         window.setTimeout(function () {
-          $('.assist-db-scrollable').stop().animate({ scrollTop: top + offset }, '500', 'swing', function () {
-            huePubSub.publish('assist.db.scrollToComplete', entry);
-          });
+          var newScrollTop = top + offset;
+          if (instant) {
+            if (newScrollTop >= $container.height() + $container.scrollTop()) {
+              $container.scrollTop(bottom - $container.height());
+            } else if (newScrollTop <= $container.scrollTop()) {
+              $container.scrollTop(newScrollTop);
+            }
+          } else {
+            $container.stop().animate({ scrollTop: newScrollTop }, '500', 'swing', function () {
+              if (callback) {
+                callback();
+              }
+            });
+          }
         }, 0);
 
       };
@@ -5411,9 +5423,20 @@
         });
         if (foundIndex !== -1) {
           var offset = depth > 0 ? $parentFVOwnerElement.position().top : 0;
-          scrollToIndex(foundIndex, offset, targetEntry);
+          scrollToIndex(foundIndex, offset, false, function () {
+            huePubSub.publish('assist.db.scrollToComplete', targetEntry);
+          });
         }
       }));
+
+      if (ko.isObservable(viewModel.foreachVisible)) {
+        viewModel.foreachVisible({
+          scrollToIndex: function (index) {
+            var offset = depth > 0 ? $parentFVOwnerElement.position().top : 0;
+            scrollToIndex(index, offset, true);
+          }
+        })
+      }
 
       var childBindingContext = bindingContext.createChildContext(
           bindingContext.$rawData,
