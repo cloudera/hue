@@ -1231,6 +1231,23 @@ from metadata.conf import has_navigator
           }
         ];
         self.activeTab = ko.observable('terms');
+
+        self.apiHelper.identifierChainToPath({
+          sourceType: 'solr',
+          identifierChain: data.identifierChain,
+          defaultDatabase: 'default'
+        }, function (path) {
+          var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
+            huePubSub.publish('assist.db.highlight', {
+              sourceType: 'solr',
+              path: path
+            });
+          });
+          self.disposals.push(function () {
+            showInAssistPubSub.remove();
+          })
+        });
+
       }
 
       CollectionContextTabs.prototype.loadTerms = function () {
@@ -1537,7 +1554,7 @@ from metadata.conf import has_navigator
         self.isDocument = params.data.type.toLowerCase() === 'hue';
         self.isCollection = params.data.type === 'collection';
 
-        self.showInAssistEnabled = (typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true) && (self.isDocument || self.isDatabase || self.isTable || self.isColumn);
+        self.showInAssistEnabled = (typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true) && (self.isDocument || self.isDatabase || self.isTable || self.isColumn || self.isCollection);
         self.openInDashboardEnabled = self.isTable || self.isView || self.isDatabase;
         self.openInTableBrowserEnabled = self.isTable || self.isView || self.isDatabase;
         self.replaceEditorContentEnabled = self.isHdfs;
