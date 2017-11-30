@@ -33,7 +33,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         <ul class="nav">
           <li class="app-header">
             <a href="/${app_name}">
-              <!-- ko template: { name: 'app-icon-template', data: { icon: 'hbase' } } --><!-- /ko -->
+              <img src="${ static('hbase/art/icon_hbase_48.png') }" class="app-icon" alt="${ _('HBase icon') }" />
               ${ _('HBase Browser') }
             </a>
           </li>
