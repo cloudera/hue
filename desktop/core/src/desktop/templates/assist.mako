@@ -2471,16 +2471,22 @@ from desktop.views import _ko
 
         var loadEntriesTimeout = -1;
         // This fetches the columns for each table synchronously with 2 second in between.
-        var loadEntries = function () {
+        var loadEntries = function (currentCount) {
+          var count = currentCount || 0;
+          count++;
+          if (count > 10) {
+            return;
+          }
           window.clearTimeout(loadEntriesTimeout);
           if (self.activeTables().length === 1) {
             self.activeTables()[0].open(true);
-          }
-          else {
+          } else {
             loadEntriesTimeout = window.setTimeout(function () {
               self.activeTables().every(function (table) {
                 if (!table.loaded && !table.hasErrors() && !table.loading()) {
-                  table.loadEntries(loadEntries, true);
+                  table.loadEntries(function () {
+                    loadEntries(count);
+                  }, true);
                   return false;
                 }
                 return !table.loading();
