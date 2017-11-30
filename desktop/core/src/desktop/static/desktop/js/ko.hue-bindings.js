@@ -3771,11 +3771,12 @@
         identifierChain: identifierChain,
         defaultDatabase: self.snippet.database(),
         silenceErrors: true,
-        errorCallback: function (data) {
-          promise.reject([]);
-        },
+        cachedOnly: true,
         successCallback: function (data) {
           promise.resolve(data.extended_columns || data.tables_meta || []);
+        },
+        errorCallback: function () {
+          promise.reject([]);
         }
       });
       return promise;
@@ -3785,19 +3786,19 @@
       var self = this;
       var promise = $.Deferred();
       if (token.parseLocation.tables && token.parseLocation.tables.length > 0) {
-        var tablePromisses = [];
+        var tablePromises = [];
         token.parseLocation.tables.forEach(function (table) {
           if (table.identifierChain) {
-            tablePromisses.push(self.fetchAutocompleteDeferred(table.identifierChain));
+            tablePromises.push(self.fetchAutocompleteDeferred(table.identifierChain));
           }
         });
-        $.when.apply($, tablePromisses).always(function () {
+        $.when.apply($, tablePromises).done(function () {
           var joined = [];
           for (var i = 0; i < arguments.length; i++) {
             joined = joined.concat(arguments[i]);
           }
           promise.resolve(joined);
-        });
+        }).fail(promise.reject);
       } else if (token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 0) {
         // fetch the parent
         // TODO: Fetch the parents parent first to see if it actually exists to prevent a bunch of failing calls when
@@ -3861,6 +3862,7 @@
                 sourceType: self.snippet.type(),
                 defaultDatabase: self.snippet.database(),
                 identifierChain: nextTable.identifierChain,
+                cachedOnly: true,
                 silenceErrors: true,
                 successCallback: function (data) {
                   if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
@@ -3982,7 +3984,10 @@
             }
             verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
           });
-        })
+        }).fail(function () {
+          // Can happen when tables aren't cached etc.
+          verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
+        });
       };
 
       verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
