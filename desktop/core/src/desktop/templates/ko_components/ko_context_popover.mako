@@ -37,7 +37,7 @@ from metadata.conf import has_navigator
           <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
         </a>
         % endif
-        <!-- ko if: sourceType !== 'solr' -->
+        <!-- ko if: typeof sourceType === 'undefined' || sourceType !== 'solr' -->
         <a class="inactive-action pointer" data-bind="visible: openInTableBrowserEnabled, click: function() { huePubSub.publish('context.popover.open.in.metastore', isTable || isView ? 'table' : 'db') }">
           <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
         </a>
