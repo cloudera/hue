@@ -21,7 +21,7 @@ import json
 
 from django.views.decorators.http import require_GET
 
-from desktop.lib.django_util import JsonResponse, login_notrequired
+from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.metrics.registry import global_registry
 
 
@@ -41,4 +41,7 @@ def index(request):
       'metric': global_registry().dump_metrics(),
   }
   LOG.debug('Metrics: %s' % json.dumps(rep, indent=indent))
-  return JsonResponse(rep, json_dumps_params={'indent': indent})
+  if request.is_ajax():
+    return JsonResponse(rep, json_dumps_params={'indent': indent})
+  else:
+    return render("metrics.mako", request, {'metrics': json.dumps(rep['metric']), 'is_embeddable': request.GET.get('is_embeddable', False)})
