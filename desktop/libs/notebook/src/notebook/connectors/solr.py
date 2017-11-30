@@ -164,11 +164,15 @@ class SolrApi(Api):
     assist = Assist(self, self.user, db)
     response = {'status': -1}
 
-    sample_data = assist.get_sample_data(database, table, column)
+    if snippet.get('source') == 'sql':
+      sample_data = assist.get_sample_data_sql(database, table, column)
+    else:
+      sample_data = assist.get_sample_data(database, table, column)
 
     if sample_data:
       response['status'] = 0
       response['headers'] = sample_data['headers']
+      response['full_headers'] = sample_data.get('full_headers')
       response['rows'] = sample_data['rows']
     else:
       response['message'] = _('Failed to get sample data.')
@@ -200,6 +204,24 @@ class Assist():
     return [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in self.db.schema_fields(table)['fields']]
 
   def get_sample_data(self, database, table, column=None):
+    # Note: currently ignores dynamic fields
+    full_headers = self.get_columns(database, table)
+    headers = [col['name'] for col in full_headers]
+
+    records = self.db.select(table, rows=100)['response']['docs']
+    rows = [[record.get(col, '') for col in headers] for record in records]
+
+    response = {'status': -1}
+
+    response['status'] = 0
+    response['full_headers'] = full_headers
+    response['headers'] = headers
+    response['rows'] = escape_rows(rows, nulls_only=True)
+
+    return response
+
+  def get_sample_data_sql(self, database, table, column=None):
+
     if column is None:
       column = ', '.join([col['name'] for col in self.get_columns(database, table)])
 
