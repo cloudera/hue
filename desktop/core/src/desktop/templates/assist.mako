@@ -1193,35 +1193,40 @@ from desktop.views import _ko
           }
         };
 
-        if (!options.isSolr) {
-          huePubSub.subscribe('assist.db.highlight', function (location) {
-            huePubSub.publish('left.assist.show');
+        huePubSub.subscribe('assist.db.highlight', function (location) {
+          huePubSub.publish('left.assist.show');
+          if (location.sourceType === 'solr') {
+            huePubSub.publish('assist.show.solr');
+          }
+          else {
             huePubSub.publish('assist.show.sql');
-            huePubSub.publish('context.popover.hide');
-            window.setTimeout(function () {
-              var foundSource;
-              $.each(self.sources(), function (idx, source) {
-                if (source.sourceType === location.sourceType) {
-                  foundSource = source;
-                  return false;
-                }
-              });
-              if (foundSource) {
-                var whenLoaded = function () {
-                  if (self.selectedSource() !== foundSource) {
-                    self.selectedSource(foundSource);
-                  }
-                  foundSource.highlightInside(location.path);
-                };
-                if (foundSource.hasEntries()) {
-                  whenLoaded();
-                } else {
-                  foundSource.initDatabases(whenLoaded);
-                }
+          }
+          huePubSub.publish('context.popover.hide');
+          window.setTimeout(function () {
+            var foundSource;
+            $.each(self.sources(), function (idx, source) {
+              if (source.sourceType === location.sourceType) {
+                foundSource = source;
+                return false;
               }
-            }, 0);
-          });
+            });
+            if (foundSource) {
+              var whenLoaded = function () {
+                if (self.selectedSource() !== foundSource) {
+                  self.selectedSource(foundSource);
+                }
+                foundSource.highlightInside(location.path);
+              };
+              if (foundSource.hasEntries()) {
+                whenLoaded();
+              } else {
+                foundSource.initDatabases(whenLoaded);
+              }
+            }
+          }, 0);
+        });
 
+        if (!options.isSolr) {
           huePubSub.subscribe('assist.set.database', function (databaseDef) {
             if (!databaseDef.source || !self.sourceIndex[databaseDef.source]) {
               return;
@@ -1919,7 +1924,7 @@ from desktop.views import _ko
               }
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('indexes') != -1) {
-                panels.push(new AssistInnerPanel({
+                var solrPanel = new AssistInnerPanel({
                   panelData: new AssistDbPanel($.extend({
                     apiHelper: self.apiHelper,
                     i18n: i18nCollections,
@@ -1930,7 +1935,13 @@ from desktop.views import _ko
                   type: 'solr',
                   icon: 'fa-search-plus',
                   minHeight: 75
-                }));
+                });
+                panels.push(solrPanel);
+                huePubSub.subscribe('assist.show.solr', function () {
+                  if (self.visiblePanel() !== solrPanel) {
+                    self.visiblePanel(solrPanel);
+                  }
+                });
               }
 
               if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hbase') != -1) {
