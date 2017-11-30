@@ -3810,73 +3810,141 @@
       return promise;
     };
 
+    var VERIFY_LIMIT = 50;
+    var VERIFY_DELAY = 150;
+
+    var verifyThrottle = -1;
+
     AceLocationHandler.prototype.verifyExists = function (tokens, allLocations) {
       var self = this;
+      window.clearInterval(verifyThrottle);
       self.clearMarkedErrors('warning');
       tokens.forEach(function (token) {
         delete token.notFound;
         delete token.syntaxError;
+      });
 
-        if (self.sqlSyntaxWorkerSub !== null && token.parseLocation && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column') && (token.parseLocation.identifierChain || token.parseLocation.tables)) {
-          // Ignore identifiers when the cursor is at the end to make it less annoying while editing
-          if (token && token.parseLocation) {
-            var cursorPos = self.editor.getCursorPosition();
-            if (cursorPos.row + 1 === token.parseLocation.location.last_line && cursorPos.column + 1 === token.parseLocation.location.first_column + token.value.length) {
+      if (self.sqlSyntaxWorkerSub === null) {
+        return;
+      }
+
+      var cursorPos = self.editor.getCursorPosition();
+
+      var tokensToVerify = tokens.filter(function (token) {
+        return token && token.parseLocation
+          && (token.parseLocation.type === 'table' || token.parseLocation.type === 'column')
+          && (token.parseLocation.identifierChain || token.parseLocation.tables)
+          && !(cursorPos.row + 1 === token.parseLocation.location.last_line && cursorPos.column + 1 === token.parseLocation.location.first_column + token.value.length)
+      }).slice(0, VERIFY_LIMIT);
+
+      if (tokensToVerify.length === 0) {
+        return;
+      }
+
+      var aliasIndex = {};
+      var aliases = [];
+
+      allLocations.forEach(function (location) {
+        if (location.type === 'alias' && (location.source === 'column' || location.source === 'table' || location.source === 'subquery' || location.source === 'cte')) {
+          aliasIndex[location.alias.toLowerCase()] = location;
+          aliases.push({ name: location.alias.toLowerCase() })
+        }
+      });
+
+      var adjustColumnLocation = function (location) {
+        var promise = $.Deferred();
+        if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
+          var findIdentifierChainInTable = function (tablesToGo) {
+            var nextTable = tablesToGo.shift();
+            if (typeof nextTable.subQuery === 'undefined') {
+              ApiHelper.getInstance().fetchAutocomplete({
+                sourceType: self.snippet.type(),
+                defaultDatabase: self.snippet.database(),
+                identifierChain: nextTable.identifierChain,
+                silenceErrors: true,
+                successCallback: function (data) {
+                  if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
+                    location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
+                    delete location.tables;
+                    promise.resolve();
+                  } else if (tablesToGo.length > 0) {
+                    findIdentifierChainInTable(tablesToGo);
+                  } else {
+                    promise.resolve();
+                  }
+                },
+                errorCallback: promise.resolve
+              })
+            } else if (tablesToGo.length > 0) {
+              findIdentifierChainInTable(tablesToGo);
+            } else {
+              promise.resolve();
+            }
+          };
+          if (location.tables.length > 1) {
+            findIdentifierChainInTable(location.tables.concat());
+          } else if (location.tables.length === 1 && location.tables[0].identifierChain) {
+            location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
+            delete location.tables;
+            promise.resolve();
+          }
+        } else {
+          promise.resolve();
+        }
+        return promise;
+      };
+
+      var verify = function () {
+        if (tokensToVerify.length === 0) {
+          return;
+        }
+        var token = tokensToVerify.shift();
+        var location = token.parseLocation;
+
+        adjustColumnLocation(location).done(function () {
+          if (location.type === 'column') {
+            var possibleAlias;
+            if (!location.tables && location.identifierChain && location.identifierChain.length > 1) {
+              possibleAlias = aliasIndex[token.parseLocation.identifierChain[0].name.toLowerCase()];
+            } else if (location.tables) {
+              location.tables.some(function (table) {
+                if (table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name) {
+                  possibleAlias = aliasIndex[table.identifierChain[0].name.toLowerCase()]
+                  return possibleAlias;
+                }
+                return false;
+              });
+            }
+            if (possibleAlias && possibleAlias.source === 'cte') {
+              // We currently don't discover the columns from a CTE so we can't say if a column exists or not
+              verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
               return;
             }
           }
 
-          var aliases = [];
-
-          for (var i = 0; i < allLocations.length; i++) {
-            var location = allLocations[i];
-            if (location.type === 'alias') {
-              if (location.source === 'cte' && token.parseLocation.type === 'column') {
-                // We currently don't discover the columns from a CTE so we can't say if a column exists or not
-                if (!token.parseLocation.tables && token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 1 && token.parseLocation.identifierChain[0].name.toLowerCase() === location.alias.toLowerCase()) {
-                  return;
-                }
-
-                if (token.parseLocation.tables) {
-                  var found = token.parseLocation.tables.some(function (table) {
-                    return table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name && table.identifierChain[0].name.toLowerCase() === location.alias.toLowerCase();
-                  });
-                  if (found) {
-                    return;
-                  }
-                }
-              }
-              // If it's qualified i.e.'b' in SELECT a.b we shouldn't suggest aliases
-              if (token.parseLocation.type === 'column' && token.parseLocation.qualified) {
-                continue;
-              }
-              if (location.source === 'column' || location.source === 'table' || location.source === 'subquery' || location.source === 'cte') {
-                aliases.push({ name: location.alias.toLowerCase() });
-              }
-            }
-          }
-
           self.fetchPossibleValues(token).done(function (possibleValues) {
-            // Append table aliases
-            possibleValues = possibleValues.concat(aliases);
+            // Append aliases unless qualified i.e.for 'b' in SELECT a.b we shouldn't suggest aliases
+            if ((token.parseLocation.type !== 'column' && token.parseLocation.type !== 'complex') || !token.parseLocation.qualified) {
+              possibleValues = possibleValues.concat(aliases);
+            }
 
             var tokenValLower = token.actualValue.toLowerCase();
-            // Break if found
+            var uniqueIndex = {};
+            var uniqueValues = [];
             for (var i = 0; i < possibleValues.length; i++) {
               possibleValues[i].name = SqlUtils.backTickIfNeeded(self.snippet.type(), possibleValues[i].name);
-              if ((possibleValues[i].name.toLowerCase() === tokenValLower) || (tokenValLower.indexOf('`') === 0 && tokenValLower.replace(/`/g, '') === possibleValues[i].name.toLowerCase())) {
+              var nameLower = possibleValues[i].name.toLowerCase();
+              if ((nameLower === tokenValLower) || (tokenValLower.indexOf('`') === 0 && tokenValLower.replace(/`/g, '') === nameLower)) {
+                // Break if found
+                verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
                 return;
               }
-            }
-
-            var uniqueIndex = {};
-            possibleValues = possibleValues.filter(function (value) {
-              if (uniqueIndex[value.name.toLowerCase()]) {
-                return false;
+              if (!uniqueIndex[nameLower]) {
+                uniqueValues.push(possibleValues[i]);
+                uniqueIndex[nameLower] = true;
               }
-              uniqueIndex[value.name.toLowerCase()] = true;
-              return true;
-            });
+            }
+            possibleValues = uniqueValues;
 
             var isLowerCase = tokenValLower === token.value;
 
@@ -3912,10 +3980,12 @@
               var range = new AceRange(token.parseLocation.location.first_line - 1, token.parseLocation.location.first_column - 1, token.parseLocation.location.last_line - 1, token.parseLocation.location.last_column - 1);
               self.addAnchoredMarker(range,  token, 'hue-ace-syntax-warning');
             }
+            verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
           });
-        }
+        })
+      };
 
-      })
+      verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
     };
 
     AceLocationHandler.prototype.attachSqlWorker = function () {
@@ -3979,9 +4049,8 @@
             delete activeTokens.pop().parseLocation;
           }
 
-          var tokensToVerify = [];
           e.data.locations.forEach(function (location) {
-            if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
+            if (['statement', 'selectList', 'whereClause', 'limitClause'].indexOf(location.type) !== -1 ||  ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
               return;
             }
 
@@ -4003,47 +4072,10 @@
             if (token !== null) {
               token.parseLocation = location;
               activeTokens.push(token);
-              if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
-                var findIdentifierChainInTable = function (tablesToGo) {
-                  var nextTable = tablesToGo.shift();
-                  if (typeof nextTable.subQuery === 'undefined') {
-                    apiHelper.fetchAutocomplete({
-                      sourceType: self.snippet.type(),
-                      defaultDatabase: self.snippet.database(),
-                      identifierChain: nextTable.identifierChain,
-                      silenceErrors: true,
-                      successCallback: function (data) {
-                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
-                          location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
-                          delete location.tables;
-                          tokensToVerify.push(token);
-                        } else if (tablesToGo.length > 0) {
-                          findIdentifierChainInTable(tablesToGo);
-                        } else {
-                          tokensToVerify.push(token);
-                        }
-                      }
-                    })
-                  } else if (tablesToGo.length > 0) {
-                    findIdentifierChainInTable(tablesToGo);
-                  } else {
-                    tokensToVerify.push(token);
-                  }
-                };
-                if (location.tables.length > 1) {
-                  findIdentifierChainInTable(location.tables.concat());
-                } else if (location.tables.length == 1 && location.tables[0].identifierChain) {
-                  location.identifierChain = location.tables[0].identifierChain.concat(location.identifierChain);
-                  delete location.tables;
-                  tokensToVerify.push(token);
-                }
-              } else {
-                tokensToVerify.push(token);
-              }
             }
           });
 
-          self.verifyExists(tokensToVerify, e.data.locations);
+          self.verifyExists(activeTokens, e.data.locations);
           huePubSub.publish('editor.active.locations', lastKnownLocations);
         });
       });
