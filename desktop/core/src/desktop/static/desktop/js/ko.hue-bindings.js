@@ -3956,7 +3956,7 @@
               return a.distance - b.distance
             });
             token.syntaxError = {
-              expected: weightedExpected
+              expected: weightedExpected.slice(0, 50)
             };
             token.notFound = true;
 
