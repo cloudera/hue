@@ -1952,7 +1952,7 @@ from desktop.views import _ko
                   apiHelper: self.apiHelper,
                   name: '${ _("HBase") }',
                   type: 'hbase',
-                  iconSvg: '#hi-hbase',
+                  icon: 'fa-th-large',
                   minHeight: 50
                 }));
               }
