@@ -276,28 +276,24 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="context-popover-collection-terms-details">
     <div class="context-popover-flex-fill" data-bind="niceScroll">
-      <div style="padding: 8px">
-        <div data-bind="with: terms">
-          <!-- ko hueSpinner: { spin:  $parent.loadingTerms, center: true, size: 'large' } --><!-- /ko -->
-          <div class="pull-right" data-bind="visible: !$parent.loadingTerms()">
-            <label class="muted margin-left-5 margin-bottom-10">${ _('Prefix filter') } <input type="text" data-bind="value: prefix, clearable: prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Filter...') }" class="margin-left-10 no-margin-bottom"></label>
-          </div>
-          <div class="clearfix"></div>
-          <div class="alert" data-bind="visible: !$parent.loadingTerms() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
-          <table style="width: 100%" data-bind="visible: !$parent.loadingTerms() && $data.data().length > 0" class="table table-condensed">
-            <tbody data-bind="foreach: $data.data">
-            <tr>
-              <td data-bind="text: val.value"></td>
-              <td style="width: 40px">
-                <div class="progress">
-                  <div class="bar-label" data-bind="text:val.count"></div>
-                  <div class="bar bar-info" style="margin-top:-20px;" data-bind="style: {'width': ((val.count / $parent.data()[0].val.count) * 100) + '%'}"></div>
-                </div>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+      <input type="text" data-bind="value: terms.prefix, clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Filter...') }" class="pull-right">
+      <div data-bind="with: terms">
+        <!-- ko hueSpinner: { spin:  $parent.loadingTerms, center: true, size: 'large' } --><!-- /ko -->
+        <div class="clearfix"></div>
+        <div class="alert" data-bind="visible: !$parent.loadingTerms() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
+        <table style="width: 100%" data-bind="visible: !$parent.loadingTerms() && $data.data().length > 0" class="table table-condensed">
+          <tbody data-bind="foreach: $data.data">
+          <tr>
+            <td data-bind="text: val.value"></td>
+            <td style="width: 40px">
+              <div class="progress">
+                <div class="bar-label" data-bind="text:val.count"></div>
+                <div class="bar bar-info" style="margin-top:-20px;" data-bind="style: {'width': ((val.count / $parent.data()[0].val.count) * 100) + '%'}"></div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </script>
