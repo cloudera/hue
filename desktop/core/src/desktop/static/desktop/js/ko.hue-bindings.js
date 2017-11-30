@@ -3801,9 +3801,6 @@
         }).fail(promise.reject);
       } else if (token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 0) {
         // fetch the parent
-        // TODO: Fetch the parents parent first to see if it actually exists to prevent a bunch of failing calls when
-        // typing, i.e. SELECT * FROM c| -> SELECT * FROM cu| -> SELECT * FROM cus|
-        // Better yet, don't check tables next to cursor
         return self.fetchAutocompleteDeferred(token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1));
       } else {
         promise.reject([]);
@@ -3820,10 +3817,6 @@
       var self = this;
       window.clearInterval(verifyThrottle);
       self.clearMarkedErrors('warning');
-      tokens.forEach(function (token) {
-        delete token.notFound;
-        delete token.syntaxError;
-      });
 
       if (self.sqlSyntaxWorkerSub === null) {
         return;
@@ -4051,6 +4044,8 @@
             delete activeTokens.pop().parseLocation;
           }
 
+          var tokensToVerify = [];
+
           e.data.locations.forEach(function (location) {
             if (['statement', 'selectList', 'whereClause', 'limitClause'].indexOf(location.type) !== -1 ||  ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
               return;
@@ -4074,10 +4069,15 @@
             if (token !== null) {
               token.parseLocation = location;
               activeTokens.push(token);
+              delete token.notFound;
+              delete token.syntaxError;
+              if (location.active) {
+                tokensToVerify.push(token);
+              }
             }
           });
 
-          self.verifyExists(activeTokens, e.data.locations);
+          self.verifyExists(tokensToVerify, e.data.activeStatementLocations);
           huePubSub.publish('editor.active.locations', lastKnownLocations);
         });
       });
