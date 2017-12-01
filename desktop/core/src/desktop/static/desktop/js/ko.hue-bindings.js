@@ -5413,21 +5413,23 @@
 
       };
 
-      huePubSubs.push(huePubSub.subscribe('assist.db.scrollTo', function (targetEntry) {
-        var foundIndex = -1;
-        $.each(allEntries, function (idx, entry) {
-          if (targetEntry === entry) {
-            foundIndex = idx;
-            return false;
-          }
-        });
-        if (foundIndex !== -1) {
-          var offset = depth > 0 ? $parentFVOwnerElement.position().top : 0;
-          scrollToIndex(foundIndex, offset, false, function () {
-            huePubSub.publish('assist.db.scrollToComplete', targetEntry);
+      if (!options.skipScrollEvent) {
+        huePubSubs.push(huePubSub.subscribe('assist.db.scrollTo', function (targetEntry) {
+          var foundIndex = -1;
+          $.each(allEntries, function (idx, entry) {
+            if (targetEntry === entry) {
+              foundIndex = idx;
+              return false;
+            }
           });
-        }
-      }));
+          if (foundIndex !== -1) {
+            var offset = depth > 0 ? $parentFVOwnerElement.position().top : 0;
+            scrollToIndex(foundIndex, offset, false, function () {
+              huePubSub.publish('assist.db.scrollToComplete', targetEntry);
+            });
+          }
+        }));
+      }
 
       if (ko.isObservable(viewModel.foreachVisible)) {
         viewModel.foreachVisible({
