@@ -17,6 +17,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
+  from desktop.models import ANALYTIC_DB
   from desktop.views import commonheader, commonfooter, _ko
   from jobbrowser.conf import DISABLE_KILLING_JOBS, MAX_JOB_FETCH, ENABLE_QUERY_BROWSER
 %>
@@ -2395,17 +2396,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
       self.appConfig = ko.observable();
+      self.clusterType = ko.observable();
       self.isMini = ko.observable(false);
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1;
+          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 && self.clusterType() != '${ ANALYTIC_DB }';
         }
         var dataEngInterfaceCondition = function () {
           return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('dataeng') != -1;
         }
         var schedulerInterfaceCondition = function () {
-          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True';
+          return '${ user.has_hue_permission(action="access", app="oozie") }' == 'True' && self.clusterType() != '${ ANALYTIC_DB }';
         }
         var livyInterfaceCondition = function () {
           return self.appConfig() && self.appConfig()['editor'] && self.appConfig()['editor']['interpreter_names'].indexOf('pyspark') != -1;
@@ -2648,6 +2650,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
         jobBrowserViewModel.appConfig(clusterConfig && clusterConfig['app_config']);
+        jobBrowserViewModel.clusterType(clusterConfig && clusterConfig['cluster_type']);
         loadHash();
       });
 
