@@ -47,7 +47,7 @@ from dashboard.conf import get_engines
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
-from desktop.conf import get_clusters
+from desktop.conf import get_clusters, IS_EMBEDDED
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
@@ -1840,7 +1840,7 @@ class ClusterConfig():
       }
     ]
 
-    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not self.user.is_superuser) and self.cluster_type != 'impalaui':
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not self.user.is_superuser) and self.cluster_type != ANALYTIC_DB:
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
@@ -1884,7 +1884,9 @@ class Cluster():
     self.default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
     self.data = {}
 
-    if self.default_cluster:
+    if IS_EMBEDDED.get():
+      self.data = get_clusters()['Default']
+    elif self.default_cluster:
       clusters = get_clusters()
       cluster_name = json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
       self.data = cluster_name and clusters.get(cluster_name) and clusters[cluster_name] or None

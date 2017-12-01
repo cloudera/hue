@@ -1441,11 +1441,15 @@ def get_clusters():
       }) for i in cluster_config]
     )
   else:
-    clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini', 'interfaces': []})])
+    if IS_EMBEDDED.get():
+      clusters = OrderedDict([('Default', {'name': 'Analytic DB', 'type': 'analyticdb', 'interfaces': []})])
+    else:
+      clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini', 'interfaces': []})])
 
   if 'Data Eng' in clusters:
     clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c1'})
     clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c2'})
+
   return clusters
 
 
