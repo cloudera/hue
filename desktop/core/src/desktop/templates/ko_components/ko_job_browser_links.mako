@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-from desktop import conf
+from desktop.conf import IS_EMBEDDED
 from desktop.lib.i18n import smart_unicode
 
 from django.utils.translation import ugettext as _
@@ -27,7 +27,7 @@ from desktop.views import _ko
   <script type="text/html" id="hue-job-browser-links-template">
     <div class="btn-group pull-right">
       <a class="btn btn-flat" style="padding-right: 4px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function() { huePubSub.publish('hide.jobs.panel'); }">
-        <span>${ _('Jobs') }</span>
+        <span>${ _('Queries') if IS_EMBEDDED.get() else _('Jobs') }</span>
       </a>
       <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Jobs preview')}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
         <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
@@ -149,10 +149,12 @@ from desktop.views import _ko
           }
         });
 
+        % if not IS_EMBEDDED.get():
         var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
         huePubSub.subscribe('check.job.browser', checkYarnBrowserStatus);
         huePubSub.subscribe('check.schedules.browser', checkScheduleBrowserStatus);
+        % endif
       };
 
       ko.components.register('hue-job-browser-links', {
