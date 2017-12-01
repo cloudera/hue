@@ -2077,7 +2077,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
     <!-- ko if: !$root.isEditing() -->
     <div class="content" style="border: 1px solid #d8d8d8;">
-      <div data-bind="text: getPrettyMetric(aggregate)" class="muted"></div>
+      <div data-bind="text: getPrettyMetric($data)" class="muted"></div>
       <!-- ko if: aggregate.function() != 'field' && aggregate.metrics -->
       <i class="fa" data-bind="css: { 'fa-long-arrow-down': sort() == 'desc', 'fa-long-arrow-up': sort() == 'asc' }"></i>
       <!-- /ko -->
@@ -2847,7 +2847,13 @@ function getHitOption(value) {
 }
 
 function getPrettyMetric(facet) {
-  return getHitOption(facet.function());
+  if (facet.field() == 'formula') {
+    return facet.aggregate.plain_formula()
+  } else if (facet.aggregate.function() == 'percentile') {
+    return 'percentile(' + facet.aggregate.percentiles()[0]['value']() + ')';
+  } else {
+    return getHitOption(facet.aggregate.function());
+  }
 }
 
 function prettifyDate(from, widget, to) {
