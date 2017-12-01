@@ -287,15 +287,19 @@ ${ hueIcons.symbols() }
     <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
     <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('mini.jb.expand'); huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
     <ul class="nav nav-pills">
+      % if cluster != ANALYTIC_DB:
       <li class="active" data-interface="jobs"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'jobs')">${_('Jobs')}</a></li>
+      % endif
       % if 'jobbrowser' in apps:
       <% from jobbrowser.conf import ENABLE_QUERY_BROWSER %>
       % if ENABLE_QUERY_BROWSER.get():
-        <li data-interface="queries"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'queries')">${_('Queries')}</a></li>
+        <li data-interface="queries" class="${ 'active' if cluster == ANALYTIC_DB else '' }"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'queries')">${_('Queries')}</a></li>
       % endif
       % endif
-      <li data-interface="workflows"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'workflows')">${_('Workflows')}</a></li>
-      <li data-interface="schedules"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'schedules')">${_('Schedules')}</a></li>
+      % if cluster != ANALYTIC_DB:
+        <li data-interface="workflows"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'workflows')">${_('Workflows')}</a></li>
+        <li data-interface="schedules"><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'schedules')">${_('Schedules')}</a></li>
+      % endif
     </ul>
     <div id="mini_jobbrowser"></div>
   </div>
@@ -1381,7 +1385,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 }
               });
 
-              % if user.is_superuser:
+              % if user.is_superuser and cluster != ANALYTIC_DB:
                 if (app.name === 'editor') {
                   interpreters.push({
                     displayName: '${ _('Add more...') }',
