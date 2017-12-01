@@ -727,7 +727,7 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
     count = bucket['count']
     dim_row = [val]
 
-    _fq_fields = fq_fields + _fields[0:1]
+    _fq_fields = fq_fields + _fields[1:2] # Pick dim 2 if there is one
     _fq_values = fq_values + [val]
 
     for agg_key in agg_keys:
