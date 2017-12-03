@@ -1,0 +1,8 @@
+[run]
+branch = True
+omit = packaging/_compat.py
+
+[report]
+exclude_lines =
+    @abc.abstractmethod
+    @abc.abstractproperty

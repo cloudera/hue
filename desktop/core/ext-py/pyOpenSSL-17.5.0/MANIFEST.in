@@ -1,0 +1,11 @@
+include             LICENSE MANIFEST.in *.rst tox.ini .coveragerc
+exclude             leakcheck
+recursive-include   tests           *.py
+recursive-include   doc             *
+recursive-include   examples        *
+recursive-include   rpm             *
+recursive-exclude   leakcheck       *.py *.pem
+recursive-exclude   examples/simple *.cert *.pkey
+prune               doc/_build
+prune               .travis
+prune               .mention-bot
