@@ -133,6 +133,15 @@ class SolrClient(object):
               "defaults": {"df": df},
             }
           })
+
+        if self.is_solr_six_or_more():
+          self.api.update_config(name, {
+            'add-updateprocessor': {
+              "name" : "tolerant",
+              "class": "solr.TolerantUpdateProcessorFactory",
+              "maxErrors": "100"
+            }
+          })
       else:
         self._create_cloud_config(name, fields, unique_key_field, df)
         self.api.create_collection2(name, config_name=config_name, shards=shards, replication=replication)
