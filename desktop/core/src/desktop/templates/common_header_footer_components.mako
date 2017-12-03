@@ -556,7 +556,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
             value = $el.data('data')[data.idx][colIdx];
           }
           var link = typeof value == 'string' && value.match(/^https?:\/\//i) ? '<a href="' + escapeOutput(value) + '" target="_blank">' + value + ' <i class="fa fa-external-link"></i></a>' : value;
-          html += '<tr><th width="10%">' + hueUtils.deXSS($(col).text()) + '</th><td>' + hueUtils.deXSS(link) + '</td></tr>';
+          html += '<tr><th width="10%" title="' + $(col).attr("title") + '">' + hueUtils.deXSS($(col).text()) + '</th><td>' + hueUtils.deXSS(link) + '</td></tr>';
         }
       });
       $t.html(html);
