@@ -2033,6 +2033,9 @@ ${ assist.assistPanel() }
                 huePubSub.publish(resp.pub_sub_url);
               }
               $.jHueNotify.info("${ _('Creation success') }");
+              if (resp.errors) {
+                $.jHueNotify.warn("${ _('Skipped records: ') }" + resp.errors.join(', '));
+              }
               huePubSub.publish('open.link', resp.on_success_url);
             }
           } else {
