@@ -213,6 +213,7 @@ def _create_index(user, fs, client, source, destination, index_name):
   unique_key_field = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
   df = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
   kwargs = {}
+  errors = []
 
   if source['inputFormat'] not in ('manual', 'table'):
     stats = fs.stats(source["path"])
@@ -252,7 +253,10 @@ def _create_index(user, fs, client, source, destination, index_name):
   if source['inputFormat'] not in ('manual', 'table'):
     data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
     try:
-      client.index(name=index_name, data=data, **kwargs)
+      if client.is_solr_six_or_more():
+        kwargs['processor'] = 'tolerant'
+      response = client.index(name=index_name, data=data, **kwargs)
+      errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
     except Exception, e:
       try:
         client.delete_index(index_name, keep_config=False)
@@ -260,7 +264,7 @@ def _create_index(user, fs, client, source, destination, index_name):
         LOG.warn('Error while cleaning-up config of failed collection creation %s: %s' % (index_name, e2))
       raise e
 
-  return {'status': 0, 'on_success_url': reverse('indexer:indexes', kwargs={'index': index_name}), 'pub_sub_url': 'assist.collections.refresh'}
+  return {'status': 0, 'on_success_url': reverse('indexer:indexes', kwargs={'index': index_name}), 'pub_sub_url': 'assist.collections.refresh', 'errors': errors}
 
 
 def _create_database(request, source, destination, start_time):
