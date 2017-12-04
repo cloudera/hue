@@ -916,7 +916,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <div class="snippet-body" data-bind="clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode()">
               <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
+              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode() && !$root.isPresentationMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
                 <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header${ suffix }' } --><!-- /ko -->
                 <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header${ suffix }' } --><!-- /ko -->
               </h2>
