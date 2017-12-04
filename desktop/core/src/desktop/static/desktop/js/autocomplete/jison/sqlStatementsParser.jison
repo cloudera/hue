@@ -54,13 +54,14 @@
                                                                         };
                                                                         return 'PART_OF_STATEMENT';
                                                                       }
-[-][^;-]                                                              { return 'PART_OF_STATEMENT'; }
-[/][^;*]                                                              { return 'PART_OF_STATEMENT'; }
+[-][^;-]?                                                             { return 'PART_OF_STATEMENT'; }
+[/][^;*]?                                                             { return 'PART_OF_STATEMENT'; }
 
 ';'                                                                   { return ';'; }
 
 <<EOF>>                                                               { return 'EOF'; }
 
+.                                                                     { /* To prevent console logging of unknown chars */ }
 /lex
 
 %start SqlStatementsParser
