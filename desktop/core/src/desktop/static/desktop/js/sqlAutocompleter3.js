@@ -1893,17 +1893,18 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     var parseResult;
     try {
+      huePubSub.publish('get.active.editor.locations', function (locations) {
+        // This could happen in case the user is editing at the borders of the statement and the locations haven't
+        // been updated yet, in that case we have to force a location update before parsing
+        if (self.snippet.ace && self.snippet.ace() && locations && self.snippet.ace().lastChangeTime !== locations.editorChangeTime) {
+          huePubSub.publish('editor.refresh.statement.locations', self.snippet);
+        }
+      }, self.snippet);
+
       parseResult = self.parseActiveStatement();
 
       if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
         console.log(parseResult);
-      }
-
-      // This could happen in case the user is editing at the borders of the statement and the locations haven't
-      // been updated yet, in that case we have to force a location update before parsing
-      if (!parseResult) {
-        huePubSub.publish('editor.refresh.statement.locations', self.snippet);
-        parseResult = self.parseActiveStatement();
       }
     } catch (e) {
       if (typeof console.warn !== 'undefined') {
