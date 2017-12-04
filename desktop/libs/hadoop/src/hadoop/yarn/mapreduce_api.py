@@ -141,6 +141,11 @@ class MapreduceApi(object):
     job_id = job_id.replace('application', 'job')
     return self._root.get('%(app_id)s/ws/%(version)s/mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts/%(attempt_id)s' % {'app_id': app_id, 'job_id': job_id, 'task_id': task_id, 'attempt_id': attempt_id, 'version': _API_VERSION}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
 
+  def task_attempt_counters(self, job_id, task_id, attempt_id):
+    app_id = job_id.replace('job', 'application')
+    job_id = job_id.replace('application', 'job')
+    return self._root.get('%(app_id)s/ws/%(version)s/mapreduce/jobs/%(job_id)s/tasks/%(task_id)s/attempts/%(attempt_id)s/counters' % {'app_id': app_id, 'job_id': job_id, 'task_id': task_id, 'attempt_id': attempt_id, 'version': _API_VERSION}, params=self._get_params(), headers={'Accept': _JSON_CONTENT_TYPE})
+
   def kill(self, job_id):
     app_id = job_id.replace('job', 'application')
     get_resource_manager(self.username).kill(app_id) # We need to call the RM
