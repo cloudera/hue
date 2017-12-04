@@ -163,17 +163,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="pull-right margin-right-10">
-
+      % if ENABLE_PRESENTATION.get():
+        <!-- ko if: $root.isPresentationModeEnabled -->
         <div class="btn-group">
-
-          % if ENABLE_PRESENTATION.get():
           <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
             css: {'btn-inverse': $root.isPresentationMode(), 'btn': true}">
             <i class="fa fa-line-chart"></i>
           </a>
-          % endif
-
         </div>
+        <!-- /ko -->
+      % endif
 
         <div class="btn-group">
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
