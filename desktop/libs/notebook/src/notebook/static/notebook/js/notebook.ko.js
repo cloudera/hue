@@ -332,6 +332,8 @@ var EditorViewModel = (function() {
       }
     });
 
+    self.editorMode = vm.editorMode;
+
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;
     };

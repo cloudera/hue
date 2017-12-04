@@ -2396,6 +2396,7 @@ from desktop.views import _ko
 
         self.disposals = [];
         self.isSolr = ko.observable(false);
+        self.activeTab = params.activeTab;
 
         self.uploadingTableStats = ko.observable(false);
         self.activeStatement = ko.observable();
@@ -2520,7 +2521,10 @@ from desktop.views import _ko
           activeTablesSub.dispose();
         });
 
+        var updateOnVisible = false;
+
         var handleLocationUpdate = function (activeLocations) {
+          updateOnVisible = false;
           assistDbSource.sourceType = activeLocations.type;
           if (!activeLocations) {
             self.activeLocations(undefined);
@@ -2605,10 +2609,29 @@ from desktop.views import _ko
           }
         };
 
-        huePubSub.subscribeOnce('set.active.editor.locations', handleLocationUpdate);
-        huePubSub.publish('get.active.editor.locations');
+        if (self.activeTab() === 'editorAssistant') {
+          huePubSub.publish('get.active.editor.locations', handleLocationUpdate);
+        } else {
+          updateOnVisible = true;
+        }
 
-        var activeLocationsSub = huePubSub.subscribe('editor.active.locations', handleLocationUpdate);
+        var activeTabSub = self.activeTab.subscribe(function (activeTab) {
+          if (activeTab === 'editorAssistant' && updateOnVisible) {
+            huePubSub.publish('get.active.editor.locations', handleLocationUpdate);
+          }
+        });
+
+        self.disposals.push(function () {
+          activeTabSub.dispose();
+        });
+
+        var activeLocationsSub = huePubSub.subscribe('editor.active.locations', function (activeLocations) {
+          if (self.activeTab() === 'editorAssistant') {
+            handleLocationUpdate(activeLocations);
+          } else {
+            updateOnVisible = true;
+          }
+        });
 
         var activeRisksSub = huePubSub.subscribe('editor.active.risks', function (details) {
           if (details.risks !== self.activeRisks()) {
@@ -2922,16 +2945,16 @@ from desktop.views import _ko
       </ul>
 
       <div class="right-panel-tab-content tab-content">
-        <!-- ko if: activeTab() === 'editorAssistant' && editorAssistantTabAvailable()-->
-        <div data-bind="component: { name: 'editor-assistant-panel' }"></div>
+        <!-- ko if: editorAssistantTabAvailable-->
+        <div data-bind="component: { name: 'editor-assistant-panel', params: { activeTab: activeTab } }, visible: activeTab() === 'editorAssistant'"></div>
         <!-- /ko -->
 
-        <!-- ko if: activeTab() === 'functions' && functionsTabAvailable -->
-        <div data-bind="component: { name: 'functions-panel' }"></div>
+        <!-- ko if: functionsTabAvailable -->
+        <div data-bind="component: { name: 'functions-panel' }, visible: activeTab() === 'functions'"></div>
         <!-- /ko -->
 
-        <!-- ko if: activeTab() === 'dashboardAssistant' && dashboardAssistantTabAvailable()-->
-        <div data-bind="component: { name: 'dashboard-assistant-panel' }"></div>
+        <!-- ko if: dashboardAssistantTabAvailable -->
+        <div data-bind="component: { name: 'dashboard-assistant-panel' }, visible: activeTab() === 'dashboardAssistant'"></div>
         <!-- /ko -->
 
         ## TODO: Switch to if: when loadSchedules from notebook.ko.js has been moved to the schedule-panel component
