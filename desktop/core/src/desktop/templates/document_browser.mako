@@ -391,7 +391,7 @@ from desktop.views import _ko
                 <!-- ko if: app === 'documents' -->
                 <div class="margin-left-20 margin-right-20 pull-right doc-browser-type-filter" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
                   <!-- ko if: isTrash() || isTrashed() -->
-                  <a class="inactive-action" href="javascript:void(0);" data-bind="click: emptyTrash">
+                  <a href="javascript:void(0);" data-bind="click: emptyTrash">
                     <i class="fa fa-fw fa-trash"></i> ${_('Empty trash')}
                   </a>
                   <!-- /ko -->
