@@ -84,11 +84,11 @@ urlpatterns += patterns('notebook.api',
   # HS2, RDBMS, JDBC
   url(r'^api/autocomplete/?$', 'autocomplete', name='api_autocomplete_databases'),
   url(r'^api/autocomplete/(?P<database>\w+)/?$', 'autocomplete', name='api_autocomplete_tables'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/?$', 'autocomplete', name='api_autocomplete_columns'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', 'autocomplete', name='api_autocomplete_column'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/(?P<nested>.+)/?$', 'autocomplete', name='api_autocomplete_nested'),
-  url(r'^api/sample/(?P<database>\w+)/(?P<table>\w+)/?$', 'get_sample_data', name='api_sample_data'),
-  url(r'^api/sample/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', 'get_sample_data', name='api_sample_data_column'),
+  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>[\w_\-]+)/?$', 'autocomplete', name='api_autocomplete_columns'),
+  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', 'autocomplete', name='api_autocomplete_column'),
+  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/(?P<nested>.+)/?$', 'autocomplete', name='api_autocomplete_nested'),
+  url(r'^api/sample/(?P<database>\w+)/(?P<table>[\w_\-]+)/?$', 'get_sample_data', name='api_sample_data'),
+  url(r'^api/sample/(?P<database>\w+)/(?P<table>[\w_\-]+)/(?P<column>\w+)/?$', 'get_sample_data', name='api_sample_data_column'),
 
   # SQLite
   url(r'^api/autocomplete//?(?P<server>[\w_\-/]+)/(?P<database>[\w._\-0-9]+)/?$', 'autocomplete', name='api_autocomplete_tables'),
