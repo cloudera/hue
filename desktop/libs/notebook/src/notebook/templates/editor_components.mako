@@ -453,7 +453,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
   <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $(MAIN_SCROLLABLE).data('lastScroll'); if (ls && ls != $(MAIN_SCROLLABLE).scrollTop()){ $(document).trigger('hideAutocomplete'); }; $(MAIN_SCROLLABLE).data('lastScroll', $(MAIN_SCROLLABLE).scrollTop()) } }, with: selectedNotebook">
     <div>
-      <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
+      <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing, 'margin-left-10': $root.isPresentationMode},
         sortable: {
           template: 'snippet${ suffix }',
           data: snippets,
