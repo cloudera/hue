@@ -3509,6 +3509,9 @@
 
       var lastExecutingStatement = null;
       var updateActiveStatement = function (cursorChange) {
+        if (!self.snippet.isSqlDialect()) {
+          return;
+        }
         var selectionRange = self.editor.getSelectionRange();
         var editorLocation = selectionRange.start;
         if (selectionRange.start.row !== selectionRange.end.row || selectionRange.start.column !== selectionRange.end.column) {
@@ -3584,17 +3587,19 @@
       };
 
       var parseForStatements = function () {
-        try {
-          var lastChangeTime = self.editor.lastChangeTime;
-          lastKnownStatements = sqlStatementsParser.parse(self.editor.getValue());
-          lastKnownStatements.editorChangeTime = lastChangeTime;
+        if (self.snippet.isSqlDialect()) {
+          try {
+            var lastChangeTime = self.editor.lastChangeTime;
+            lastKnownStatements = sqlStatementsParser.parse(self.editor.getValue());
+            lastKnownStatements.editorChangeTime = lastChangeTime;
 
-          if (typeof hueDebug !== 'undefined' && hueDebug.logStatementLocations) {
-            console.log(lastKnownStatements);
+            if (typeof hueDebug !== 'undefined' && hueDebug.logStatementLocations) {
+              console.log(lastKnownStatements);
+            }
+          } catch (error) {
+            console.warn('Could not parse statements!');
+            console.warn(error);
           }
-        } catch (error) {
-          console.warn('Could not parse statements!');
-          console.warn(error);
         }
       };
 
@@ -3618,7 +3623,7 @@
 
           // The active statement is initially the top one in the selection, batch execution updates this.
           var newStart = self.editor.getSelectionRange().start;
-          if (!lastStart || lastStart.row !== newStart.row || lastStart.column !== newStart.column) {
+          if (self.snippet.isSqlDialect() && (!lastStart || lastStart.row !== newStart.row || lastStart.column !== newStart.column)) {
             window.clearTimeout(updateThrottle);
             updateActiveStatement(true);
             lastStart = newStart;
@@ -3627,15 +3632,17 @@
       });
 
       var changeListener = self.editor.on('change', function () {
-        window.clearTimeout(changeThrottle);
-        cursorChangePaused = true;
-        changeThrottle = window.setTimeout(function () {
-          window.clearTimeout(updateThrottle);
-          parseForStatements();
-          updateActiveStatement();
-          cursorChangePaused = false;
-        }, 500);
-        self.editor.lastChangeTime = Date.now();
+        if (self.snippet.isSqlDialect()) {
+          window.clearTimeout(changeThrottle);
+          cursorChangePaused = true;
+          changeThrottle = window.setTimeout(function () {
+            window.clearTimeout(updateThrottle);
+            parseForStatements();
+            updateActiveStatement();
+            cursorChangePaused = false;
+          }, 500);
+          self.editor.lastChangeTime = Date.now();
+        }
       });
 
       var locateSubscription = huePubSub.subscribe('editor.refresh.statement.locations', function (snippet) {
@@ -3669,7 +3676,7 @@
 
     AceLocationHandler.prototype.checkForSyntaxErrors = function (statementLocation, cursorPosition) {
       var self = this;
-      if (self.sqlSyntaxWorkerSub !== null) {
+      if (self.sqlSyntaxWorkerSub !== null && (self.snippet.type() === 'impala' || self.snippet.type() === 'hive'))  {
         var AceRange = ace.require('ace/range').Range;
         var editorChangeTime = self.editor.lastChangeTime;
         var beforeCursor = self.editor.getSession().getTextRange(new AceRange(statementLocation.first_line - 1, statementLocation.first_column, cursorPosition.row, cursorPosition.column));
@@ -4024,7 +4031,7 @@
       };
 
       var locationWorkerSub = huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
-        if (e.data.id !== self.snippet.id() || e.data.editorChangeTime !== self.editor.lastChangeTime) {
+        if (e.data.id !== self.snippet.id() || e.data.editorChangeTime !== self.editor.lastChangeTime || !self.snippet.isSqlDialect()) {
           return;
         }
 
@@ -4077,7 +4084,9 @@
             }
           });
 
-          self.verifyExists(tokensToVerify, e.data.activeStatementLocations);
+          if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
+            self.verifyExists(tokensToVerify, e.data.activeStatementLocations);
+          }
           huePubSub.publish('editor.active.locations', lastKnownLocations);
         });
       });
