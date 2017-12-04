@@ -60,6 +60,20 @@
       }]);
     });
 
+    it('should handle "-" correctly', function () {
+      testParser('-', [{
+        statement: '-',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 1 }
+      }]);
+    });
+
+    it('should handle "/" correctly', function () {
+      testParser('/', [{
+        statement: '/',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 1 }
+      }]);
+    });
+
     it('should split ";   \\n;   \\r\\n;" correctly', function () {
       testParser(';   \n;   \r\n;', [{
         statement: ';',
