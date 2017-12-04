@@ -55,17 +55,6 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
       <ul class="dropdown-menu">
-        <li data-bind="visible: canEdit">
-          <a class="pointer" data-toggle="modal" data-target="#settingsModal">
-            <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
-          </a>
-        </li>
-        <li data-bind="visible: coordinator.id() != null && canEdit()">
-          <a class="pointer share-link" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal, css: {'isShared': isShared()}">
-            <i class="fa fa-fw fa-users"></i> ${ _("Share") }
-          </a>
-        </li>
-        <li class="divider"></li>
         <li>
           <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_coordinator') }'">
             <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
@@ -78,6 +67,17 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
             </a>
           </li>
         %endif
+        <li class="divider"></li>
+        <li data-bind="visible: canEdit">
+          <a class="pointer" data-toggle="modal" data-target="#settingsModal">
+            <i class="fa fa-fw fa-cog"></i> ${ _('Settings') }
+          </a>
+        </li>
+        <li data-bind="visible: coordinator.id() != null && canEdit()">
+          <a class="pointer share-link" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal, css: {'isShared': isShared()}">
+            <i class="fa fa-fw fa-users"></i> ${ _("Share") }
+          </a>
+        </li>
       </ul>
     </div>
 
