@@ -4021,9 +4021,9 @@
 
       var lastKnownLocations = {};
 
-      var getLocationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
-        if (self.snippet.inFocus()) {
-          huePubSub.publish('set.active.editor.locations', lastKnownLocations);
+      var getLocationsSub = huePubSub.subscribe('get.active.editor.locations', function (callback) {
+        if (self.snippet.inFocus() || self.snippet.editorMode()) {
+          callback(lastKnownLocations);
         }
       });
 
