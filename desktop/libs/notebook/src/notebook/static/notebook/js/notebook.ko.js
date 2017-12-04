@@ -2411,7 +2411,7 @@ var EditorViewModel = (function() {
     };
 
     self.executeAll = function () {
-      if (self.isExecutingAll()) {
+      if (self.isExecutingAll() || self.snippets().length === 0) {
         return;
       }
 
