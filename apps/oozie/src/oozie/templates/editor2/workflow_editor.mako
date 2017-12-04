@@ -57,6 +57,19 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
         <i class="fa fa-fw fa-ellipsis-v"></i>
       </a>
       <ul class="dropdown-menu">
+        <li>
+          <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_workflow') }'">
+            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+          </a>
+        </li>
+        %if is_embeddable:
+          <li>
+            <a href="javascript: void(0)" data-bind="hueLink: '/home/?type=oozie-workflow2'">
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Workflows') }
+            </a>
+          </li>
+        %endif
+        <li class="divider"></li>
         <li data-bind="visible: workflow.id() != null, css: {'disabled': workflow.isDirty()}">
           <a class="pointer" data-bind="click: schedule">
             <i class="fa fa-fw fa-calendar"></i> ${ _('Schedule') }
@@ -80,19 +93,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
             <i class="fa fa-fw fa-users"></i> ${ _("Share") }
           </a>
         </li>
-        <li class="divider"></li>
-        <li>
-          <a href="javascript: void(0)" data-bind="hueLink: '${ url('oozie:new_workflow') }'">
-            <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
-          </a>
-        </li>
-        %if is_embeddable:
-          <li>
-            <a href="javascript: void(0)" data-bind="hueLink: '/home/?type=oozie-workflow2'">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Workflows') }
-            </a>
-          </li>
-        %endif
       </ul>
     </div>
 

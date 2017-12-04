@@ -152,6 +152,26 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
           <i class="fa fa-fw fa-ellipsis-v"></i>
         </a>
         <ul class="dropdown-menu">
+          <li>
+            <a href="javascript:void(0)" data-bind="click: newSearch">
+              <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+            </a>
+          </li>
+          <!-- ko if: IS_HUE_4 -->
+          <li>
+            <a href="/home/?type=search-dashboard">
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
+            </a>
+          </li>
+          <!-- /ko -->
+          <!-- ko ifnot: IS_HUE_4 -->
+          <li>
+            <a href="${ url('dashboard:admin_collections') }">
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
+            </a>
+          </li>
+          <!-- /ko -->
+          <li data-bind="visible: columns().length != 0" class="divider"></li>
           <li data-bind="visible: isSaved()">
             <a class="share-link" data-bind="click: prepareShareModal, css: {'isShared': isShared()}">
               <i class="fa fa-fw fa-users"></i> ${ _('Share') }
@@ -175,26 +195,6 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
               <i class="fa fa-fw fa-bookmark-o"></i> ${ _('Saved Queries') }
             </a>
           </li>
-          <li data-bind="visible: columns().length != 0" class="divider"></li>
-          <li>
-            <a href="javascript:void(0)" data-bind="click: newSearch">
-              <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
-            </a>
-          </li>
-          <!-- ko if: IS_HUE_4 -->
-          <li>
-            <a href="/home/?type=search-dashboard">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
-            </a>
-          </li>
-          <!-- /ko -->
-          <!-- ko ifnot: IS_HUE_4 -->
-          <li>
-            <a href="${ url('dashboard:admin_collections') }">
-              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
-            </a>
-          </li>
-          <!-- /ko -->
         </ul>
       </div>
     </div>
