@@ -2826,6 +2826,9 @@ var EditorViewModel = (function() {
 
     self.combinedContent = ko.observable();
     self.isPresentationMode = ko.observable(false);
+    self.isPresentationModeEnabled = ko.pureComputed(function () {
+      return self.selectedNotebook() && self.selectedNotebook().snippets().length === 1 && self.selectedNotebook().snippets()[0].isSqlDialect()
+    });
     self.isResultFullScreenMode = ko.observable(false);
     self.isHidingCode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url); // Deprecated
