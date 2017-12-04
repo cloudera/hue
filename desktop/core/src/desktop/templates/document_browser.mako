@@ -259,7 +259,7 @@ from desktop.views import _ko
         <!-- /ko -->
       </div>
       <div class="modal-body">
-        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: selectedDocsWithDependents().length === 0">
+        <div class="doc-browser-empty animated" style="display: none;" data-bind="visible: entriesToDelete().length > 0 && selectedDocsWithDependents().length === 0">
           <i class="fa fa-spinner fa-spin fa-2x"></i>
         </div>
         <ul data-bind="foreach: selectedDocsWithDependents()">
@@ -417,7 +417,7 @@ from desktop.views import _ko
                     </li>
                     <!-- /ko -->
                     <li data-bind="css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && !superuser) }">
-                      <a href="javascript:void(0);" data-bind="click: function() {getSelectedDocsWithDependents(); showDeleteConfirmation();}"><i class="fa fa-fw fa-times"></i> <span data-bind="text:  isTrash() || isTrashed() ? '${ _ko('Delete forever') }' : '${ _ko('Move to trash') }'"></span></a>
+                      <a href="javascript:void(0);" data-bind="click: function() { getSelectedDocsWithDependents(); showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> <span data-bind="text:  isTrash() || isTrashed() ? '${ _ko('Delete forever') }' : '${ _ko('Move to trash') }'"></span></a>
                     </li>
                     <li>
                       <a title="${_('Export all or selected documents')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i> ${_('Export')}</a>
@@ -517,7 +517,7 @@ from desktop.views import _ko
                 <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected()  && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function () { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }">
                   <i class="fa fa-fw fa-times"></i> ${ _('Move to trash') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a>
                 </li>
-                <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser}"><i class="fa fa-fw fa-times"></i> ${ _('Delete forever') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser }"><a href="javascript:void(0);" data-bind="click: function() { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() && ! $parent.superuser}"><i class="fa fa-fw fa-times"></i> ${ _('Delete forever') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
                 <!-- /ko -->
               </ul>
