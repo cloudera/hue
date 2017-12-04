@@ -245,38 +245,28 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <!-- ko if: editorMode -->
               <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
               <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
-              <!-- ko if: editorType() == 'impala' -->
-                Impala
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'rdbms' -->
-                DB Query
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'pig' -->
-                Pig
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'java' -->
-                Java
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'spark2' -->
-                Spark
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'sqoop1' -->
-                Sqoop 1
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'distcp' -->
-                DistCp
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'shell' -->
-                Shell
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'mapreduce' -->
-                MapReduce
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
-                Hive
-              <!-- /ko -->
-              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->
-                SQL
+
+              <!-- ko switch: editorType() -->
+                <!-- ko case: 'impala' -->Impala<!-- /ko -->
+                <!-- ko case: 'rdbms' -->DB Query<!-- /ko -->
+                <!-- ko case: 'pig' -->Pig<!-- /ko -->
+                <!-- ko case: 'java' -->Java<!-- /ko -->
+                <!-- ko case: 'spark2' -->Spark<!-- /ko -->
+                <!-- ko case: 'sqoop1' -->Sqoop 1<!-- /ko -->
+                <!-- ko case: 'distcp' -->DistCp<!-- /ko -->
+                <!-- ko case: 'shell' -->Shell<!-- /ko -->
+                <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
+                <!-- ko case: ['beeswax', 'hive'] -->Hive<!-- /ko -->
+                <!-- ko case: 'mapreduce' -->MapReduce<!-- /ko -->
+                <!-- ko case: 'spark' -->Scala<!-- /ko -->
+                <!-- ko case: 'pyspark' -->PySpark<!-- /ko -->
+                <!-- ko case: 'r' -->R<!-- /ko -->
+                <!-- ko case: 'jar' -->Spark Submit Jar<!-- /ko -->
+                <!-- ko case: 'py' -->Spark Submit Python<!-- /ko -->
+                <!-- ko case: 'solr' -->Solr SQL<!-- /ko -->
+                <!-- ko case: 'markdown' -->Markdown<!-- /ko -->
+                <!-- ko case: 'text' -->Text<!-- /ko -->
+                <!-- ko case: $default -->SQL<!-- /ko -->
               <!-- /ko -->
               <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'editor', interpreter: editorType() }} --><!-- /ko -->
               </a>
