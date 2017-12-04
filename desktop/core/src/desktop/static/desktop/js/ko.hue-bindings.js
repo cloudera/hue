@@ -4001,8 +4001,8 @@
 
       var lastKnownLocations = {};
 
-      var getLocationsSub = huePubSub.subscribe('get.active.editor.locations', function (callback) {
-        if (self.snippet.inFocus() || self.snippet.editorMode()) {
+      var getLocationsSub = huePubSub.subscribe('get.active.editor.locations', function (callback, snippet) {
+        if (self.snippet === snippet || self.snippet.inFocus() || self.snippet.editorMode()) {
           callback(lastKnownLocations);
         }
       });
@@ -4041,6 +4041,7 @@
             type: self.snippet.type(),
             defaultDatabase: self.snippet.database(),
             locations: e.data.locations,
+            editorChangeTime: e.data.editorChangeTime,
             activeStatementLocations: e.data.activeStatementLocations,
             totalStatementCount: e.data.totalStatementCount,
             activeStatementIndex: e.data.activeStatementIndex
