@@ -197,20 +197,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <i class="fa fa-fw fa-ellipsis-v"></i>
           </a>
           <ul class="dropdown-menu">
-            <!-- ko if: $root.canSave -->
-            <li>
-              <a class="share-link" data-bind="click: prepareShareModal,
-                css: {'isShared': isShared()}">
-                <i class="fa fa-fw fa-users"></i> ${ _('Share') }
-              </a>
-            </li>
-            <!-- /ko -->
-            <li>
-              <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-                <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
-              </a>
-            </li>
-            <li class="divider"></li>
             <li>
             <!-- ko if: editorMode -->
               <a href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
@@ -234,6 +220,20 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                 <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
               </a>
               <!-- /ko -->
+            </li>
+            <li class="divider"></li>
+            <!-- ko if: $root.canSave -->
+            <li>
+              <a class="share-link" data-bind="click: prepareShareModal,
+                css: {'isShared': isShared()}">
+                <i class="fa fa-fw fa-users"></i> ${ _('Share') }
+              </a>
+            </li>
+            <!-- /ko -->
+            <li>
+              <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+                <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
+              </a>
             </li>
           </ul>
         </div>
