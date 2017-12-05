@@ -400,7 +400,7 @@ def _get_tenant_id(api):
   tenant_id = OPTIMIZER.TENANT_ID.get() or cache.get(OPTIMIZER_TENANT_ID_CACHE_KEY)
   if not tenant_id:
     tenant = api.get_tenant(cluster_id=OPTIMIZER.CLUSTER_ID.get())
-    if 'tenant' in tenant:
+    if tenant.get('tenant'):
       tenant_id = tenant['tenant']
     else:
       raise PopupException(_('Could not get tenant id from cluster id %s: %s') % (OPTIMIZER.CLUSTER_ID.get(), tenant))
