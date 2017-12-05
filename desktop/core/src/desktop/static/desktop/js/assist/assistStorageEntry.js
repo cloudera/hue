@@ -69,6 +69,8 @@ var AssistStorageEntry = (function () {
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
     self.filter.subscribe(function () {
+      self.currentPage = 1;
+      self.hasMorePages = true;
       self.loadEntries();
     });
 
