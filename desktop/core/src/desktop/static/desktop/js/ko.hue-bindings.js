@@ -1182,11 +1182,17 @@
                 ko.applyBindings(viewModel, $tip.get(0));
                 $tip.find(".close-popover").click(hidePopover);
                 if (options.minWidth) {
-                  $(".popover:visible").css('min-width', options.minWidth)
+                  var heightBefore = $tip.height();
+                  $tip.css('min-width', options.minWidth);
+                  // The width might affect the height in which case we need to reposition the popover
+                  var diff = (heightBefore - $tip.height()) / 2;
+                  if (diff !== 0) {
+                    $tip.css('top', ($tip.position().top + diff) + 'px');
+                  }
                 }
                 $content.empty();
                 $title.empty();
-                $(document).on('click', hideOnClickOutside)
+                $(document).on('click', hideOnClickOutside);
                 visible = true;
               }
             }, $title.get(0), 'replaceChildren');
