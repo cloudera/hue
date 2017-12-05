@@ -1505,7 +1505,7 @@ var EditorViewModel = (function() {
           self.aceErrorsHolder([]);
           self.aceWarningsHolder([]);
           self.suggestion(ko.mapping.fromJS(data.query_compatibility));
-          if (self.suggestion().queryError.errorString()) {
+          if (self.suggestion().queryError && self.suggestion().queryError.errorString()) {
             var match = ERROR_REGEX.exec(self.suggestion().queryError.errorString());
             var line = null;
             if (match) {
