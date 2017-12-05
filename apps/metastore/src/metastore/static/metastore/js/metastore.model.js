@@ -727,7 +727,7 @@ var MetastoreColumn = (function () {
       }, function (data) {
         if (data.status == 0) {
           huePubSub.publish('assist.clear.db.cache', {
-            sourceType: self.sourceType,
+            sourceType: self.table.sourceType,
             databaseName: self.table.database.name,
             tableName: self.table.name
           });
@@ -749,7 +749,7 @@ var MetastoreColumn = (function () {
         identifierChain: [{ name: entry.table.name }, { name: entry.name() }]
       },
       orientation: 'right',
-      sourceType: self.sourceType,
+      sourceType: entry.table.sourceType,
       defaultDatabase: entry.table.database.name,
       source: {
         element: event.target,
