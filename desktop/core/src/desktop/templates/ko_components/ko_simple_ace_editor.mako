@@ -779,6 +779,9 @@ from desktop.views import _ko
         }
 
         var editor = ace.edit($element.find('.ace-editor')[0]);
+        if (params.mode) {
+          editor.getSession().setMode('ace/mode/' + ko.unwrap(params.mode));
+        }
         editor.$blockScrolling = Infinity;
         editor.setTheme($.totalStorage('hue.ace.theme') || 'ace/theme/hue');
         self.ace(editor);
