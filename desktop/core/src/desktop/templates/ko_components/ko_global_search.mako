@@ -128,6 +128,8 @@ from desktop.views import _ko
         self.selectedResult = ko.pureComputed(function () {
           if (self.selectedIndex()) {
             return self.searchResultCategories()[self.selectedIndex().categoryIndex].result[self.selectedIndex().resultIndex]
+          } else if (self.searchResultCategories().length > 0 && self.searchResultCategories()[0].result.length > 0) {
+            return self.searchResultCategories()[0].result[0];
           }
         }).extend({ deferred: true });;
 
