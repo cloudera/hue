@@ -51,7 +51,7 @@ define(function (require, exports, module) {
             regex : "[a-zA-Z_$][a-zA-Z0-9_$]*\\b"
         }, {
             token : "keyword.operator",
-            regex : '\\+|\\-|\\/|\\?|&|\\^|~|:|\\*|\\||!|"'
+            regex : '\\+|\\-|\\/|\\?|&|\\^|~|:|\\*|\\||!|"|\\[|\\]'
         }, {
             token : "paren.lparen",
             regex : "[\\(]"
