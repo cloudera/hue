@@ -616,6 +616,9 @@
           }
           if (options.center) {
             $spinner.addClass('hue-spinner-center');
+            if (options.inline) {
+              $container.css('width', '100%');
+            }
           }
         }
         $container.append($spinner);
