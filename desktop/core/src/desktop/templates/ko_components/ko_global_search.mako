@@ -46,7 +46,8 @@ from desktop.views import _ko
         <div>${ _('No results found.') }</div>
       <!-- /ko -->
       <!-- ko if: searchResultCategories().length > 0 -->
-      <div class="global-search-alternatives" data-bind="foreach: searchResultCategories, niceScroll">
+      <div class="global-search-alternatives" data-bind="niceScroll" style="position:relative;">
+        <!-- ko foreach: searchResultCategories -->
         <div class="global-search-category">
           <div class="global-search-category-header" data-bind="text: label"></div>
           <ul data-bind="foreach: result">
@@ -64,6 +65,8 @@ from desktop.views import _ko
             <!-- /ko -->
           </ul>
         </div>
+        <!-- /ko -->
+        <!-- ko hueSpinner: { spin: loading() && searchResultCategories().length > 0, center: true, inline: true } --><!-- /ko -->
       </div>
       <div class="global-search-preview" style="overflow: auto;">
         <!-- ko with: selectedResult -->
