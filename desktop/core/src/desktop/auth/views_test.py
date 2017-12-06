@@ -191,7 +191,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
-        'password': "ldap1"
+        'password': "ldap1",
+        'server': "LDAP"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_true(self.fs.exists("/user/%s" % self.test_username))
@@ -265,6 +266,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
         'password': "test-hue-ldap2",
+        'server': "LDAP"
     }, follow=True)
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true('/beeswax' in response.content, response.content)
@@ -276,7 +278,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username.upper(),
-        'password': "ldap1"
+        'password': "ldap1",
+        'server': "LDAP"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_equal(1, len(User.objects.all()))
@@ -286,7 +289,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
-        'password': "ldap1"
+        'password': "ldap1",
+        'server': "LDAP"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_equal(1, len(User.objects.all()))
@@ -297,7 +301,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username.upper(),
-        'password': "ldap1"
+        'password': "ldap1",
+        'server': "LDAP"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_equal(1, len(User.objects.all()))
@@ -306,7 +311,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
-        'password': "ldap1"
+        'password': "ldap1",
+        'server': "LDAP"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_equal(1, len(User.objects.all()))
@@ -318,7 +324,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username.upper(),
-        'password': "ldap1"
+        'password': "ldap1",
+        'server': "LDAP"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_equal(1, len(User.objects.all()))
@@ -328,7 +335,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
         'username': self.test_username,
-        'password': "ldap1"
+        'password': "ldap1",
+        'server': "LDAP"
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_equal(1, len(User.objects.all()))
@@ -343,7 +351,8 @@ class TestLdapLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
       'username': "curly",
-      'password': "ldap1"
+      'password': "ldap1",
+      'server': "TestUsers"
     })
     assert_equal(302, response.status_code, response.status_code)
     assert_equal(1, len(User.objects.all()))
@@ -522,7 +531,8 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
 
     response = self.c.post('/hue/accounts/login/', {
       'username': "curly",
-      'password': "ldap1"
+      'password': "ldap1",
+      'server': "LDAP"
     })
     assert_equal(302, response.status_code, response.status_code)
     assert_equal(1, len(User.objects.all()))
@@ -534,7 +544,7 @@ class TestMultipleBackendLogin(PseudoHdfsTestBase):
     client.get('/accounts/logout')
     user = User.objects.get(username=self.test_username)
 
-    response = self.c.post('/hue/accounts/login/', dict(username=self.test_username, password="foo"))
+    response = self.c.post('/hue/accounts/login/', dict(username=self.test_username, password="foo", server="LDAP"))
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_true(self.fs.exists("/user/%s" % self.test_username))
 
@@ -602,7 +612,7 @@ class TestMultipleBackendLoginNoHadoop(object):
         'password': "ldap1",
         'server': "LDAP"
     })
-    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(302, response.status_code, "Expected ok redirect status.")
 
 
 class TestLogin(PseudoHdfsTestBase):
