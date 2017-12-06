@@ -2285,7 +2285,7 @@ from desktop.views import _ko
             <!-- /ko -->
           </div>
           <!-- /ko -->
-          <!-- ko if: filteredTables().length === 0 && filter.querySpec() && filter.querySpec().query !== '' -->
+          <!-- ko if: filteredTables().length === 0 && filter.querySpec() && filter.querySpec().query !== '' && !someLoading() -->
           <div class="assist-no-entries">${ _('No entries found.') }</div>
           <!-- /ko -->
           <!-- ko if: filteredTables().length > 0 -->
@@ -2304,6 +2304,7 @@ from desktop.views import _ko
             <!-- /ko -->
           </ul>
           <!-- /ko -->
+          <!-- ko hueSpinner: { spin: filter.querySpec() && filter.querySpec().query !== '' && someLoading(), inline: true,  center: true} --><!-- /ko -->
         </div>
 
         <!-- ko if: HAS_OPTIMIZER && !isSolr() -->
@@ -2430,6 +2431,12 @@ from desktop.views import _ko
           % else:
           return false;
           % endif
+        });
+
+        self.someLoading = ko.pureComputed(function () {
+          return self.activeTables().some(function (table) {
+            return table.loading() || (!table.hasEntries() && !table.hasErrors());
+          });
         });
 
         var createQualifiedIdentifier = function (identifierChain, defaultDatabase) {
