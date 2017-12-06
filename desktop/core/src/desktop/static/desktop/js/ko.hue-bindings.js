@@ -3912,6 +3912,17 @@
         var token = tokensToVerify.shift();
         var location = token.parseLocation;
 
+        // TODO: Verify columns in subqueries, i.e. 'code' in 'select code from (select * from web_logs) wl, customers c;'
+        if ((location.type === 'column' || location.type === 'complex') && location.tables) {
+          var hasSubQueries = location.tables.some(function (table) {
+            return typeof table.subQuery !== 'undefined';
+          });
+          if (hasSubQueries) {
+            verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
+            return;
+          }
+        }
+
         adjustColumnLocation(location).done(function () {
           if (location.type === 'column') {
             var possibleAlias;
