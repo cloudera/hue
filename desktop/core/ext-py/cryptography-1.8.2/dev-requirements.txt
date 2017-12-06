@@ -1,0 +1,8 @@
+clint
+coverage
+invoke
+requests
+tox >= 2.4.1
+twine
+-e .[test,docstest,pep8test]
+-e vectors
