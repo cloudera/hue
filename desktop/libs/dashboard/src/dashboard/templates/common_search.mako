@@ -109,6 +109,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
               onExec: $parent.searchBtn,
               placeHolder: $root.collection.engine() === 'solr' ? '${ _ko('Example: field:value, or press CTRL + space') }' : '${ _ko('Example: col = value, or press CTRL + space') }',
               autocomplete: { type: $root.collection.engine() + 'Query', support: { collection: $root.collection } },
+              mode: $root.collection.engine(),
               singleLine: true }
             }"></div>
 ##             <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css: {'input-small': $root.query.qs().length > 1, 'flat-left': $index() === 0, 'input-xlarge': $root.collection.supportAnalytics()}" maxlength="4096" type="text" class="search-query">
@@ -2016,7 +2017,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="clearfix"></div>
       <br/>
 
-      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: plain_formula, parsedValue: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true } }, visible: $parent.field() == 'formula'"></div>
+      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: plain_formula, parsedValue: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true, mode: $root.collection.engine() } }, visible: $parent.field() == 'formula'"></div>
 
       <!-- ko if: $parents[1].widgetType() != 'hit-widget' -->
         <div class="facet-field-cnt">
