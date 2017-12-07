@@ -108,6 +108,9 @@ dynamic_patterns += patterns('desktop.views',
   # Jasmine
   (r'^jasmine', 'jasmine'),
 
+  # JS that needs to be mako
+  (r'^desktop/globalJsConstants.js', 'global_js_constants'),
+
   # Web workers
   (r'^desktop/workers/aceSqlLocationWorker.js', 'ace_sql_location_worker'),
   (r'^desktop/workers/aceSqlSyntaxWorker.js', 'ace_sql_syntax_worker'),

@@ -1349,7 +1349,7 @@ from desktop.views import _ko
         self.activeSort = ko.observable('defaultAsc');
         self.typeFilter = ko.observable({
           type: 'all',
-          label: DocumentTypeGlobals['all']
+          label: HUE_I18n.documentType['all']
         });
 
         var lastOpenedUuid = self.apiHelper.getFromTotalStorage('assist', 'last.opened.assist.doc.uuid');

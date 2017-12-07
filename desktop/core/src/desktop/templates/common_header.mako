@@ -120,7 +120,11 @@ if USE_NEW_EDITOR.get():
     var IS_HUE_4 = false;
   </script>
 
-  ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
+  ${ commonHeaderFooterComponents.header_i18n_redirection() }
+
+  % if user.is_authenticated():
+  <script src="/desktop/globalJsConstants.js"></script>
+  % endif
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
@@ -168,8 +172,11 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
   <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
   <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
-  <script src="${ static('desktop/js/sqlUtils.js') }"></script>
   <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
+
+% if user.is_authenticated():
+
+  <script src="${ static('desktop/js/sqlUtils.js') }"></script>
   <script src="${ static('desktop/js/ace/ace.js') }"></script>
   <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
   <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
@@ -187,12 +194,12 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
   <script src="${ static('desktop/js/autocompleter.js') }"></script>
 
-
   <script>
     ace.config.set("basePath", "/static/desktop/js/ace");
   </script>
 
   <script src="${ static('metastore/js/metastore.model.js') }"></script>
+  %endif
 
   <%namespace name="charting" file="/charting.mako" />
   ${ charting.import_charts() }

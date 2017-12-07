@@ -20,8 +20,6 @@
 (function ($, window, document, undefined) {
 
   var pluginName = "jHueFileChooser",
-  // global variables (jHueFileChooserGlobals, useful for i18n) can be set on
-  // desktop/templates/common_header.mako
     defaults = {
       initialPath: "",
       forceRefresh: false,
@@ -122,19 +120,9 @@
   function Plugin(element, options) {
     this.element = element;
     $(element).data('jHueFileChooser', this);
-    if (typeof jHueFileChooserGlobals != 'undefined') {
-      var extendedDefaults = $.extend({}, defaults, jHueFileChooserGlobals);
-      extendedDefaults.labels = $.extend({}, defaults.labels, jHueFileChooserGlobals.labels);
-      this.options = $.extend({}, extendedDefaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
-      }
-    } else {
-      this.options = $.extend({}, defaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, defaults.labels, options.labels);
-      }
-    }
+
+    this.options = $.extend({}, defaults, { user: LOGGED_USERNAME }, options);
+    this.options.labels = $.extend({}, defaults.labels, HUE_I18n.jHueFileChooser, options ? options.labels : {});
     this._defaults = defaults;
     this._name = pluginName;
     this.previousPath = "";
@@ -143,20 +131,8 @@
 
   Plugin.prototype.setOptions = function (options) {
     var self = this;
-    if (typeof jHueFileChooserGlobals != 'undefined') {
-      var extendedDefaults = $.extend({}, defaults, jHueFileChooserGlobals);
-      extendedDefaults.labels = $.extend({}, defaults.labels, jHueFileChooserGlobals.labels);
-      self.options = $.extend({}, extendedDefaults, options);
-      if (options != null) {
-        self.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
-      }
-    } else {
-      self.options = $.extend({}, defaults, options);
-      if (options != null) {
-        self.options.labels = $.extend({}, defaults.labels, options.labels);
-      }
-    }
-
+    self.options = $.extend({}, defaults, { user: LOGGED_USERNAME }, options);
+    self.options.labels = $.extend({}, defaults.labels, HUE_I18n.jHueFileChooser, options ? options.labels : {});
     var initialPath = $.trim(self.options.initialPath);
     var scheme = initialPath && initialPath.substring(0,initialPath.indexOf(":"));
     if (scheme && scheme.length) {

@@ -4623,9 +4623,9 @@
                   if (token.notFound && token.syntaxError) {
                     var tooltipText;
                     if (token.syntaxError.expected.length > 0) {
-                      tooltipText = SyntaxCheckerGlobals.i18n.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                      tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
                     } else {
-                      tooltipText = SyntaxCheckerGlobals.i18n.couldNotFind + ' "' + (token.qualifiedIdentifier || token.value) + '"';
+                      tooltipText = HUE_I18n.syntaxChecker.couldNotFind + ' "' + (token.qualifiedIdentifier || token.value) + '"';
                     }
                     var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
                     contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
@@ -4637,9 +4637,9 @@
                   if (token.syntaxError) {
                     var tooltipText;
                     if (token.syntaxError.expected.length > 0) {
-                      tooltipText = SyntaxCheckerGlobals.i18n.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
+                      tooltipText = HUE_I18n.syntaxChecker.didYouMean + ' "' + token.syntaxError.expected[0].text + '"?';
                     } else if (token.syntaxError.expectedStatementEnd) {
-                      tooltipText = SyntaxCheckerGlobals.i18n.expectedStatementEnd;
+                      tooltipText = HUE_I18n.syntaxChecker.expectedStatementEnd;
                     }
                     if (tooltipText) {
                       var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
@@ -6602,7 +6602,7 @@
         '<span class="break-word" data-dz-name></span>' +
         '<div class="pull-right">' +
         '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
-        '<span data-dz-remove><a href="javascript:undefined;" title="' + DropzoneGlobals.i18n.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
+        '<span data-dz-remove><a href="javascript:undefined;" title="' + HUE_I18n.dropzone.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
           '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
         '</div>' +
         '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
@@ -6629,7 +6629,7 @@
           $('#progressStatusBar div').width(progress.toFixed() + "%");
         },
         canceled: function () {
-          $.jHueNotify.info(DropzoneGlobals.i18n.uploadCanceled);
+          $.jHueNotify.info(HUE_I18n.dropzone.uploadCanceled);
         },
         complete: function (file) {
           if (file.xhr.response != '') {
@@ -6642,7 +6642,7 @@
                 }
               }
               else {
-                $(document).trigger('info', response.path + ' ' + DropzoneGlobals.i18n.uploadSucceeded);
+                $(document).trigger('info', response.path + ' ' + HUE_I18n.dropzone.uploadSucceeded);
                 if (value.onComplete) {
                   value.onComplete(response.path);
                 }

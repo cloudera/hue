@@ -37,7 +37,7 @@ var HomeViewModel = (function () {
     self.allDocumentTypes = ko.observableArray();
 
     var initialType = window.location.getParameter('type') !== '' ? window.location.getParameter('type') : 'all';
-    var availableTypes = $.map(DocumentTypeGlobals, function (value, key) {
+    var availableTypes = $.map(HUE_I18n.documentType, function (value, key) {
       var type = {
         type: key,
         label: value

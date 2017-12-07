@@ -424,7 +424,7 @@ var MetastoreTable = (function () {
     });
 
     self.partitionsCountLabel = ko.pureComputed(function () {
-      if (self.partitions.values().length === MetastoreGlobals.partitionsLimit) {
+      if (self.partitions.values().length === METASTORE_PARTITION_LIMIT) {
         return self.partitions.values().length + '+'
       }
       return self.partitions.values().length;
@@ -468,7 +468,7 @@ var MetastoreTable = (function () {
         },
         errorCallback: function (data) {
           self.refreshingTableStats(false);
-          $.jHueNotify.error(MetastoreGlobals.i18n.errorRefreshingTableStats);
+          $.jHueNotify.error(HUE_I18n.metastore.errorRefreshingTableStats);
           console.error('apiHelper.refreshTableStats error');
           console.error(data);
         }
