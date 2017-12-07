@@ -1348,6 +1348,13 @@ ENABLE_SQL_SYNTAX_CHECK = Config(
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
+EMBEDDED_MODE = Config(
+  key='embedded_mode',
+  default=False,
+  type=coerce_bool,
+  help=_('Choose whether Hue is embedded or not.')
+)
+
 USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
   key='use_new_autocompleter',
   default=True,
