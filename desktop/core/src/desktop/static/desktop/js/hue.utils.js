@@ -374,6 +374,17 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     return str;
   }
 
+  hueUtils.getStyleFromCSSClass = function (cssClass) {
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var cssClasses = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
+      for (var x = 0; x < cssClasses.length; x++) {
+        if (cssClasses[x].selectorText == cssClass) {
+          return (cssClasses[x].style) ? cssClasses[x].style : cssClasses[x];
+        }
+      }
+    }
+  }
+
 }(hueUtils = window.hueUtils || {}));
 
 if (!Object.keys) {

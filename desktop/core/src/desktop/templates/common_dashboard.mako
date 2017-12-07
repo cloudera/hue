@@ -94,7 +94,6 @@
     ${caller.widgets()}
   </div>
   %endif
-
   <div class="clearfix"></div>
 </div>
 
@@ -168,12 +167,6 @@
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
   %if USE_GRIDSTER.get():
-
-    <div class="container-fluid" data-bind="visible: $root.isEditing() && columns().length > 0">
-      <div class="add-row-gridster" data-bind="droppable: { data: showAddFacetDemiModal, options: { greedy:true, hoverClass: 'droppable-hover' }}">
-        ${ _('Drag a widget here') }
-      </div>
-    </div>
 
     <div class="gridster">
       <!-- ko if: typeof gridItems !== 'undefined' -->
