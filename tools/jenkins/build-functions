@@ -36,6 +36,7 @@ check_mtime() {
 #
 # Use $CDH_URL to control where to download Hadoop.
 # If not specified, it uses the $CDH variable to select an archive location.
+# Latest public release URL example: http://archive.cloudera.com/cdh5/cdh/5/hadoop-2.6.0-cdh5.13.0.tar.gz
 #
 
 CDH_URL=${CDH_URL:-http://repos.jenkins.cloudera.com/cdh5-nightly/cdh/5/hadoop-2.6.0-cdh5.15.0-SNAPSHOT.tar.gz}
