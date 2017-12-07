@@ -3436,9 +3436,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       }
 
       function resetResultsResizer(snippet) {
-        $("#snippet_" + snippet.id()).find('.table-results .column-side').width(BOOTSTRAP_RATIOS.SPAN3() + '%').data('newWidth', BOOTSTRAP_RATIOS.SPAN3());
+        $("#snippet_" + snippet.id()).find('.table-results .column-side').width(hueUtils.bootstrapRatios.span3() + '%').data('newWidth', hueUtils.bootstrapRatios.span3());
         if (snippet.isResultSettingsVisible()){
-          $("#snippet_" + snippet.id()).find('.table-results .grid-side').data('newWidth', BOOTSTRAP_RATIOS.SPAN9()).width(BOOTSTRAP_RATIOS.SPAN9() + '%');
+          $("#snippet_" + snippet.id()).find('.table-results .grid-side').data('newWidth', hueUtils.bootstrapRatios.span9()).width(hueUtils.bootstrapRatios.span9() + '%');
         }
         else {
           $("#snippet_" + snippet.id()).find('.table-results .grid-side').data('newWidth', 100).width('100%');
@@ -3456,7 +3456,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           containment: $("#snippet_" + snippet.id()).find('.table-results'),
           create: function (event, ui) {
             initialPosition = $("#snippet_" + snippet.id()).find('.resize-bar').position().left;
-            $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth', BOOTSTRAP_RATIOS.SPAN3());
+            $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth', hueUtils.bootstrapRatios.span3());
             $("#snippet_" + snippet.id()).find('.meta-filter').width($("#snippet_" + snippet.id()).find('.table-results .column-side').width() - 28)
           },
           drag: function (event, ui) {
@@ -3464,8 +3464,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
               initialPosition = $("#snippet_" + snippet.id()).find('.resize-bar').position().left;
             }
             ui.position.left = Math.max(150, ui.position.left);
-            var newSpan3Width = ui.position.left * BOOTSTRAP_RATIOS.SPAN3() / initialPosition;
-            var newSpan9Width = 100 - newSpan3Width - BOOTSTRAP_RATIOS.MARGIN();
+            var newSpan3Width = ui.position.left * hueUtils.bootstrapRatios.span3() / initialPosition;
+            var newSpan9Width = 100 - newSpan3Width - hueUtils.bootstrapRatios.margin();
             $("#snippet_" + snippet.id()).find('.table-results .column-side').width(newSpan3Width + '%').data('newWidth', newSpan3Width);
             $("#snippet_" + snippet.id()).find('.table-results .grid-side').width(newSpan9Width + '%').data('newWidth', newSpan9Width);
             $("#snippet_" + snippet.id()).find('.meta-filter').width($("#snippet_" + snippet.id()).find('.table-results .column-side').width() - 28)
@@ -3485,7 +3485,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             scrollInertia: 0
           });
           if (snippet.isResultSettingsVisible()){
-            $("#snippet_" + snippet.id()).find('.table-results .grid-side').width((100 - $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth') - BOOTSTRAP_RATIOS.MARGIN()) + '%');
+            $("#snippet_" + snippet.id()).find('.table-results .grid-side').width((100 - $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth') - hueUtils.bootstrapRatios.margin()) + '%');
           }
           else {
             $("#snippet_" + snippet.id()).find('.table-results .grid-side').width('100%');

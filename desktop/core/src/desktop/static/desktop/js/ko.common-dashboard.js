@@ -133,7 +133,7 @@ var Row = function (widgets, vm, columns) {
   self.columns = ko.observableArray(columns ? columns : []);
   self.columns.subscribe(function (val) {
     self.columns().forEach(function (col) {
-      col.percWidth(Math.max(3, (100 - self.columns().length * BOOTSTRAP_RATIOS.MARGIN()) / self.columns().length));
+      col.percWidth(Math.max(3, (100 - self.columns().length * BOOTSTRAP_RATIOS.margin()) / self.columns().length));
     });
   });
 

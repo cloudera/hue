@@ -8,19 +8,12 @@
   <link rel="stylesheet" href="../static/desktop/ext/js/jasmine-2.3.4/jasmine.css">
 
   <script type="text/javascript" charset="utf-8">
-    var ApiHelperGlobals = {
-      i18n: {
-        errorLoadingDatabases: 'errorLoadingDatabases',
-        errorLoadingTablePreview: 'errorLoadingTablePreview'
-      },
-      user: 'user'
-    };
-
-
     var AUTOCOMPLETE_TIMEOUT = 0;
 
-    var AutocompleterGlobals = {
-      i18n: {
+    var LOGGED_USERNAME = 'test';
+
+    var HUE_I18n = {
+      autocomplete: {
         category: {
           all: 'All',
           column: 'Columns',
@@ -52,11 +45,14 @@
           virtual: 'virtual'
         }
       }
-    };
+    }
 
     var HAS_OPTIMIZER = false;
 
-    var CACHEABLE_TTL = 0;
+    var CACHEABLE_TTL = {
+      default: 0,
+      optmizer: 0
+    };
   </script>
 
   <script type="text/javascript" src="../static/desktop/ext/js/jquery/jquery-2.2.4.min.js"></script>

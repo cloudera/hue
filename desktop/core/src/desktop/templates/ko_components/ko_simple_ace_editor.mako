@@ -468,9 +468,9 @@ from desktop.views import _ko
         };
 
         var CATEGORIES = {
-          ALL: { id: 'all', color: COLORS.ALL, label: AutocompleterGlobals.i18n.category.all },
-          FIELD: { id: 'field', weight: 1000, color: COLORS.FIELD, label: AutocompleterGlobals.i18n.category.field, detailsTemplate: 'solr-field' },
-          FUNCTION: { id: 'function', weight: 900, color: COLORS.FUNCTION, label: AutocompleterGlobals.i18n.category.function, detailsTemplate: 'udf' }
+          ALL: { id: 'all', color: COLORS.ALL, label: HUE_I18n.autocomplete.category.all },
+          FIELD: { id: 'field', weight: 1000, color: COLORS.FIELD, label: HUE_I18n.autocomplete.category.field, detailsTemplate: 'solr-field' },
+          FUNCTION: { id: 'function', weight: 900, color: COLORS.FUNCTION, label: HUE_I18n.autocomplete.category.function, detailsTemplate: 'udf' }
         };
 
         var SolrFormulaSuggestions = function (fieldAccessor) {
@@ -578,10 +578,10 @@ from desktop.views import _ko
         var SAMPLE_LIMIT = 100;
 
         var CATEGORIES = {
-          ALL: { id: 'all', color: COLORS.ALL, label: AutocompleterGlobals.i18n.category.all },
-          FIELD: { id: 'field', weight: 1000, color: COLORS.FIELD, label: AutocompleterGlobals.i18n.category.field, detailsTemplate: 'solr-field' },
-          KEYWORD: { id: 'keyword', weight: 0, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
-          SAMPLE: { id: 'sample', weight: 900, color: COLORS.SAMPLE, label: AutocompleterGlobals.i18n.category.sample, detailsTemplate: 'value' }
+          ALL: { id: 'all', color: COLORS.ALL, label: HUE_I18n.autocomplete.category.all },
+          FIELD: { id: 'field', weight: 1000, color: COLORS.FIELD, label: HUE_I18n.autocomplete.category.field, detailsTemplate: 'solr-field' },
+          KEYWORD: { id: 'keyword', weight: 0, color: COLORS.KEYWORD, label: HUE_I18n.autocomplete.category.keyword, detailsTemplate: 'keyword' },
+          SAMPLE: { id: 'sample', weight: 900, color: COLORS.SAMPLE, label: HUE_I18n.autocomplete.category.sample, detailsTemplate: 'value' }
         };
 
         var SolrQuerySuggestions = function (collection, editor) {
@@ -639,7 +639,7 @@ from desktop.views import _ko
               self.lastNonSampleSuggestions.push({
                 category: CATEGORIES.KEYWORD,
                 value: keyword,
-                meta: AutocompleterGlobals.i18n.meta.keyword,
+                meta: HUE_I18n.autocomplete.meta.keyword,
                 weightAdjust: 0,
                 popular: DEFAULT_POPULAR,
                 details: null
@@ -690,7 +690,7 @@ from desktop.views import _ko
                     }
                     sampleSuggestions.push({
                       value: shouldQuote ? '"' + sampleValue + '"' : sampleValue,
-                      meta: AutocompleterGlobals.i18n.meta.sample,
+                      meta: HUE_I18n.autocomplete.meta.sample,
                       category: CATEGORIES.SAMPLE,
                       popular: DEFAULT_POPULAR,
                       details: result.terms[i]

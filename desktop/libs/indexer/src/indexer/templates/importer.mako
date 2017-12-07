@@ -73,7 +73,7 @@ ${ assist.assistPanel() }
 % endif
 </style>
 
-<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
+<span id="importerComponents" class="notebook importer-main" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
 <div class="dz-message" data-dz-message></div>
 <div class="navbar hue-title-bar">
   <div class="navbar-inner">

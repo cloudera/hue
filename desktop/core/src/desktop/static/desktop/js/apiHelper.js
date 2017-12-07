@@ -90,18 +90,8 @@ var ApiHelper = (function () {
     return typeof data !== 'undefined' && typeof data.status !== 'undefined' && data.status === 0;
   };
 
-  /**
-   * @param {Object} i18n
-   * @param {string} i18n.errorLoadingDatabases
-   * @param {string} i18n.errorLoadingTablePreview
-   * @param {string} user
-   *
-   * @constructor
-   */
-  function ApiHelper (i18n, user) {
+  function ApiHelper () {
     var self = this;
-    self.i18n = i18n;
-    self.user = user;
     self.lastKnownDatabases = {};
     self.queueManager = ApiQueueManager.getInstance();
     self.invalidateImpala = null;
@@ -182,8 +172,7 @@ var ApiHelper = (function () {
    * @returns {string}
    */
   ApiHelper.prototype.getTotalStorageUserPrefix = function (sourceType) {
-    var self = this;
-    return sourceType + '_' + self.user + '_' + window.location.hostname;
+    return sourceType + '_' + LOGGED_USERNAME + '_' + window.location.hostname;
   };
 
   /**
@@ -2282,7 +2271,7 @@ var ApiHelper = (function () {
      */
     getInstance: function () {
       if (instance === null) {
-        instance = new ApiHelper(ApiHelperGlobals.i18n, ApiHelperGlobals.user);
+        instance = new ApiHelper();
       }
       return instance;
     }

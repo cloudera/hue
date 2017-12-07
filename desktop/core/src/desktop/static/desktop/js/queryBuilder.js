@@ -158,7 +158,7 @@
       // Should we have an input field?
       var inputField = '';
       if (hasInput) {
-        inputField = '<input type="text" placeholder="' + QueryBuilderGlobals.i18n.INSERT_VALUE_HERE + '" required>';
+        inputField = '<input type="text" placeholder="' + HUE_I18n.queryBuilder.insertValueHere + '" required>';
       }
 
       // Used to store new rule
@@ -256,7 +256,7 @@
       if (rules[PROJECT].length < 1 && rules[AGGREGATE].length < 1) {
         return {
           "status": "fail",
-          "message": QueryBuilderGlobals.i18n.QUERY_REQUIRE
+          "message": HUE_I18n.queryBuilder.queryRequire
         };
       }
 

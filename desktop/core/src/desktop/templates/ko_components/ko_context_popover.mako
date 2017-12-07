@@ -368,7 +368,7 @@ from metadata.conf import has_navigator
     <div style="width: 100%; margin-top: 20px; text-align:center">
       <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
       <br/>
-      <span data-bind="text: DocumentTypeGlobals[type] || type"></span>
+      <span data-bind="text: HUE_I18n.documentType[type] || type"></span>
       <!-- ko if: description -->
       <div class="context-popover-doc-description" data-bind="html: description"></div>
       <!-- /ko -->
