@@ -208,7 +208,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 <%dashboard:layout_toolbar>
   <%def name="results()">
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
-                    draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset, options: getDraggableOptions({ stop: function() { $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); } }) }"
+                    draggable: {data: draggableResultset(), isEnabled: availableDraggableResultset, options: getDraggableOptions({ data: draggableResultset(), stop: function() { $root.collection.template.isGridLayout(true); checkResultHighlightingAvailability(); } }) }"
          title="${_('Grid')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-table"></i>
@@ -218,7 +218,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableHtmlResultset(),
                     isEnabled: availableDraggableResultset,
-                    options: getDraggableOptions({ stop: function(){ $root.collection.template.isGridLayout(false); checkResultHighlightingAvailability(); } }) }"
+                    options: getDraggableOptions({ data: draggableHtmlResultset(), stop: function(){ $root.collection.template.isGridLayout(false); checkResultHighlightingAvailability(); } }) }"
          title="${_('HTML')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableResultset() ? 'move' : 'default' }">
                        <i class="fa fa-code"></i>
@@ -227,7 +227,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
                     draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableFilter() }) }"
          title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
                        <i class="fa fa-filter"></i>
@@ -236,7 +236,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableLeaflet()},
                     draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableLeaflet,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableLeafletMap() }) }"
          title="${_('Marker Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: 'move' }">
              <i class="fa fa-map-marker"></i>
@@ -246,7 +246,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: $root.collection.supportAnalytics,
                     css: { 'draggable-widget': true, 'disabled': !hasAvailableFields() },
                     draggable: {data: draggableCounter(), isEnabled: hasAvailableFields,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableCounter()}) }"
          title="${_('Counter')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.hasAvailableFields() ? 'move' : 'default' }">
                        <i class="fa fa-superscript" style="font-size: 110%"></i>
@@ -257,7 +257,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
       <%def name="widgets()">
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableFacet() }) }"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sort-amount-asc"></i>
@@ -265,7 +265,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableTextFacet(), isEnabled: availableDraggableChart,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableTextFacet() }) }"
          title="${_('Text Facet')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sort-amount-asc"></i>
@@ -273,7 +273,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggablePie() }) }"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-pie-chart"></i>
@@ -281,7 +281,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie2(), isEnabled: availableDraggableChart,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggablePie2() }) }"
          title="${_('Pie Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-pie-chart"></i>
@@ -290,7 +290,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableBar(), isEnabled: availableDraggableChart,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableBar() }) }"
          title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-bar-chart"></i>
@@ -299,7 +299,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': ! availableDraggableChart() },
                     draggable: {data: draggableBucket(), isEnabled: availableDraggableChart,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableBucket() }) }"
          title="${_('Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-bar-chart"></i>
@@ -308,7 +308,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
                     draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableLine() }) }"
          title="${_('Line Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
                        <i class="hcha hcha-line-chart"></i>
@@ -316,7 +316,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree(), isEnabled: true,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableTree() }) }"
          title="${_('Tree')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sitemap fa-rotate-270"></i>
@@ -324,7 +324,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree2(), isEnabled: true,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableTree2() }) }"
          title="${_('Tree')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sitemap fa-rotate-270"></i>
@@ -333,7 +333,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableHeatmap(), isEnabled: true,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableHeatmap() }) }"
          title="${_('Heatmap')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-th"></i>
@@ -341,7 +341,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableHistogram() }) }"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableHistogram() ? 'move' : 'default' }">
                        <i class="hcha hcha-timeline-chart"></i>
@@ -349,7 +349,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableTimeline() },
                     draggable: {data: draggableTimeline(), isEnabled: availableTimeline,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableTimeline() }) }"
          title="${_('Timeline')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableTimeline() ? 'move' : 'default' }">
                        <i class="fa fa-line-chart"></i>
@@ -357,7 +357,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableMap,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableMap() }) }"
          title="${_('Gradient Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
@@ -365,7 +365,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableGradienMap(), isEnabled: availableDraggableMap,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableGradienMap() }) }"
          title="${_('Gradient Map')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableMap() ? 'move' : 'default' }">
                        <i class="hcha hcha-map-chart"></i>
@@ -375,7 +375,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     <div data-bind="visible: $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableDocument(), isEnabled: true,
-                    options: getDraggableOptions() }"
+                    options: getDraggableOptions({ data: draggableDocument() }) }"
          title="${_('Document')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: true ? 'move' : 'default' }">
                        <i class="fa fa-file-o"></i>
@@ -2950,10 +2950,14 @@ function getFormat(format, minMaxDiff, widget) {
 
 var lastWindowScrollPosition = 0;
 %if USE_GRIDSTER.get():
-var getDraggableOptions = function() {
+var getDraggableOptions = function(options) {
   return {
     'start': function (event, ui) {
       $(ui.helper).css('z-index','999999');
+      huePubSub.publish('top.widget.drag.start', { event: event, widget: options.data });
+    },
+    'drag': function (event) {
+      huePubSub.publish('top.widget.drag', { event: event, widgetHeight: options.data.gridsterHeight() });
     }
   };
 };
@@ -3622,6 +3626,11 @@ $(document).ready(function () {
     widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     avoid_overlapped_widgets: false,
+    shift_widgets_up: false,
+    shift_larger_widgets_down: false,
+    collision: {
+      wait_for_mouseup: true
+    },
     max_cols: 12,
     max_rows: 6000,
     resize: {
@@ -3635,6 +3644,57 @@ $(document).ready(function () {
       },
     }
   });
+
+  function addPreviewHolder() {
+    if (!$('.hue-preview-holder').length) {
+      $('<li>').addClass('preview-holder hue-preview-holder').attr('data-sizex', '6').attr('data-sizey', '2').attr('data-row', '1').attr('data-col', '1').appendTo($('.gridster>ul'));
+    }
+  }
+
+  function removePreviewHolder() {
+    $('.hue-preview-holder').remove();
+  }
+
+
+  var widgetGridHeight = parseInt(hueUtils.getStyleFromCSSClass('[data-sizey="1"]').height);
+  var widgetGridWidth = parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width);
+
+  var tempDraggable = null;
+  huePubSub.subscribe('top.widget.drag.start', function (options) {
+    tempDraggable = options.widget;
+    addPreviewHolder();
+  }, 'dashboard');
+
+  huePubSub.subscribe('top.widget.drag', function (options) {
+    if (!$('.gridster').hasClass('dragging')) {
+      $('.hue-preview-holder').attr('data-sizey', options.widgetHeight);
+      $('.hue-preview-holder').attr('data-col', Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))));
+      $('.hue-preview-holder').attr('data-row', Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))));
+    }
+  }, 'dashboard');
+
+  huePubSub.subscribe('drop.on.page', function (options) {
+    removePreviewHolder();
+    if (tempDraggable) {
+      var dropPosition = {
+        col: Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))),
+        row: Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10)))
+      }
+      searchViewModel.gridItems.push(
+          ko.mapping.fromJS({
+            col: dropPosition.col,
+            row: dropPosition.row,
+            size_x: 6,
+            size_y: tempDraggable.gridsterHeight(),
+            widget: null,
+            callback: function (el) {
+              showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+              tempDraggable = null;
+            }
+          })
+      );
+    }
+  }, 'dashboard');
 
   function resizeGridsterWidget($el) {
     if ($el.find('.card-widget').length > 0) {
@@ -3761,6 +3821,12 @@ $(document).ready(function () {
       top: Math.max(0, originalEvent.pageY - $("#fieldAnalysis").outerHeight() / 2),
       left: originalEvent.pageX
     })
+  });
+
+  $('#searchComponents').parents('.embeddable').droppable({
+    drop: function( event, ui ) {
+      huePubSub.publish('drop.on.page', {event: event, ui: ui});
+    }
   });
 
   % if is_owner:
