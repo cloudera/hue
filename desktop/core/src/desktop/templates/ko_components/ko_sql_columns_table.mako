@@ -58,14 +58,14 @@ from desktop.views import _ko
           </tr>
           </thead>
           <!-- /ko -->
-          <tbody data-bind="foreachVisible: { data: filteredColumns, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'context.popover.dispose' }">
+          <tbody data-bind="foreachVisible: { data: filteredColumns, disableNiceScroll: true, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'context.popover.dispose' }">
           <tr>
             <!-- ko if: typeof selected === 'undefined' -->
             <td data-bind="text: $index()+$indexOffset()+1"></td>
             <!-- /ko -->
             <!-- ko if: typeof selected !== 'undefined' -->
-            <td data-bind="toggle: selected" class="center" style="cursor: default;">
-              <div class="hueCheckbox fa" data-bind="multiCheck: '#sqlColumnsTable', css: {'fa-check': selected }"></div>
+            <td class="center" data-bind="multiCheckForeachVisible: { entries: $parent.filteredColumns, selectedAttr: 'selected' }" style="cursor: default;">
+              <div class="hueCheckbox fa" data-bind="css: {'fa-check': selected }"></div>
             </td>
 
             <!-- /ko -->
