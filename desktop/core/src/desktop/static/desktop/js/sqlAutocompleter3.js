@@ -31,28 +31,28 @@ var AutocompleteResults = (function () {
   };
 
   var CATEGORIES = {
-    ALL: { id: 'all', color: HueColors.BLUE, label: AutocompleterGlobals.i18n.category.all },
-    POPULAR: { id: 'popular', color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_AGGREGATE: { id: 'popularAggregate', weight: 1500, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'agg-udf' },
-    POPULAR_GROUP_BY: { id: 'popularGroupBy', weight: 1300, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'group-by' },
-    POPULAR_ORDER_BY: { id: 'popularOrderBy', weight: 1200, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'order-by' },
-    POPULAR_FILTER: { id: 'popularFilter', weight: 1400, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'filter' },
-    POPULAR_ACTIVE_JOIN: { id: 'popularActiveJoin', weight: 1500, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join' },
-    POPULAR_JOIN_CONDITION: { id: 'popularJoinCondition', weight: 1500, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join-condition' },
-    COLUMN: { id: 'column', weight: 1000, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
-    SAMPLE: { id: 'sample',weight: 900, color: COLORS.SAMPLE, label: AutocompleterGlobals.i18n.category.sample, detailsTemplate: 'value' },
-    IDENTIFIER: { id: 'identifier', weight: 800, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.identifier, detailsTemplate: 'identifier' },
-    CTE: { id: 'cte', weight: 700, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.cte, detailsTemplate: 'cte' },
-    TABLE: { id: 'table', weight: 600, color: COLORS.TABLE, label: AutocompleterGlobals.i18n.category.table, detailsTemplate: 'table' },
-    DATABASE: { id: 'database', weight: 500, color: COLORS.DATABASE, label: AutocompleterGlobals.i18n.category.database, detailsTemplate: 'database' },
-    UDF: { id: 'udf', weight: 400, color: COLORS.UDF, label: AutocompleterGlobals.i18n.category.udf, detailsTemplate: 'udf' },
-    OPTION: { id: 'option', weight: 400, color: COLORS.UDF, label: AutocompleterGlobals.i18n.category.option, detailsTemplate: 'option' },
-    HDFS: { id: 'hdfs', weight: 300, color: COLORS.HDFS, label: AutocompleterGlobals.i18n.category.hdfs, detailsTemplate: 'hdfs' },
-    VIRTUAL_COLUMN: { id: 'virtualColumn', weight: 200, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
-    COLREF_KEYWORD: { id: 'colrefKeyword', weight: 100, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
-    VARIABLE: { id: 'variable', weight: 50, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.variable, detailsTemplate: 'variable' },
-    KEYWORD: { id: 'keyword', weight: 0, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
-    POPULAR_JOIN: { id: 'popularJoin', weight: 1500, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join' }
+    ALL: { id: 'all', color: HueColors.BLUE, label: HUE_I18n.autocomplete.category.all },
+    POPULAR: { id: 'popular', color: COLORS.POPULAR, label: HUE_I18n.autocomplete.category.popular },
+    POPULAR_AGGREGATE: { id: 'popularAggregate', weight: 1500, color: COLORS.POPULAR, label: HUE_I18n.autocomplete.category.popular, detailsTemplate: 'agg-udf' },
+    POPULAR_GROUP_BY: { id: 'popularGroupBy', weight: 1300, color: COLORS.POPULAR, label: HUE_I18n.autocomplete.category.popular, detailsTemplate: 'group-by' },
+    POPULAR_ORDER_BY: { id: 'popularOrderBy', weight: 1200, color: COLORS.POPULAR, label: HUE_I18n.autocomplete.category.popular, detailsTemplate: 'order-by' },
+    POPULAR_FILTER: { id: 'popularFilter', weight: 1400, color: COLORS.POPULAR, label: HUE_I18n.autocomplete.category.popular, detailsTemplate: 'filter' },
+    POPULAR_ACTIVE_JOIN: { id: 'popularActiveJoin', weight: 1500, color: COLORS.POPULAR, label: HUE_I18n.autocomplete.category.popular, detailsTemplate: 'join' },
+    POPULAR_JOIN_CONDITION: { id: 'popularJoinCondition', weight: 1500, color: COLORS.POPULAR, label: HUE_I18n.autocomplete.category.popular, detailsTemplate: 'join-condition' },
+    COLUMN: { id: 'column', weight: 1000, color: COLORS.COLUMN, label: HUE_I18n.autocomplete.category.column, detailsTemplate: 'column' },
+    SAMPLE: { id: 'sample',weight: 900, color: COLORS.SAMPLE, label: HUE_I18n.autocomplete.category.sample, detailsTemplate: 'value' },
+    IDENTIFIER: { id: 'identifier', weight: 800, color: COLORS.IDENT_CTE_VAR, label: HUE_I18n.autocomplete.category.identifier, detailsTemplate: 'identifier' },
+    CTE: { id: 'cte', weight: 700, color: COLORS.IDENT_CTE_VAR, label: HUE_I18n.autocomplete.category.cte, detailsTemplate: 'cte' },
+    TABLE: { id: 'table', weight: 600, color: COLORS.TABLE, label: HUE_I18n.autocomplete.category.table, detailsTemplate: 'table' },
+    DATABASE: { id: 'database', weight: 500, color: COLORS.DATABASE, label: HUE_I18n.autocomplete.category.database, detailsTemplate: 'database' },
+    UDF: { id: 'udf', weight: 400, color: COLORS.UDF, label: HUE_I18n.autocomplete.category.udf, detailsTemplate: 'udf' },
+    OPTION: { id: 'option', weight: 400, color: COLORS.UDF, label: HUE_I18n.autocomplete.category.option, detailsTemplate: 'option' },
+    HDFS: { id: 'hdfs', weight: 300, color: COLORS.HDFS, label: HUE_I18n.autocomplete.category.hdfs, detailsTemplate: 'hdfs' },
+    VIRTUAL_COLUMN: { id: 'virtualColumn', weight: 200, color: COLORS.COLUMN, label: HUE_I18n.autocomplete.category.column, detailsTemplate: 'column' },
+    COLREF_KEYWORD: { id: 'colrefKeyword', weight: 100, color: COLORS.KEYWORD, label: HUE_I18n.autocomplete.category.keyword, detailsTemplate: 'keyword' },
+    VARIABLE: { id: 'variable', weight: 50, color: COLORS.IDENT_CTE_VAR, label: HUE_I18n.autocomplete.category.variable, detailsTemplate: 'variable' },
+    KEYWORD: { id: 'keyword', weight: 0, color: COLORS.KEYWORD, label: HUE_I18n.autocomplete.category.keyword, detailsTemplate: 'keyword' },
+    POPULAR_JOIN: { id: 'popularJoin', weight: 1500, color: COLORS.POPULAR, label: HUE_I18n.autocomplete.category.popular, detailsTemplate: 'join' }
   };
 
   var POPULAR_CATEGORIES = [CATEGORIES.POPULAR_AGGREGATE, CATEGORIES.POPULAR_GROUP_BY, CATEGORIES.POPULAR_ORDER_BY, CATEGORIES.POPULAR_FILTER, CATEGORIES.POPULAR_ACTIVE_JOIN, CATEGORIES.POPULAR_JOIN_CONDITION, CATEGORIES.POPULAR_JOIN];
@@ -336,7 +336,7 @@ var AutocompleteResults = (function () {
       var keywordSuggestions = $.map(self.parseResult.suggestKeywords, function (keyword) {
         return {
           value: self.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value,
-          meta: AutocompleterGlobals.i18n.meta.keyword,
+          meta: HUE_I18n.autocomplete.meta.keyword,
           category: CATEGORIES.KEYWORD,
           weightAdjust: keyword.weight,
           popular: ko.observable(false),
@@ -356,7 +356,7 @@ var AutocompleteResults = (function () {
             self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
               colRefKeywordSuggestions.push({
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
-                meta: AutocompleterGlobals.i18n.meta.keyword,
+                meta: HUE_I18n.autocomplete.meta.keyword,
                 category: CATEGORIES.COLREF_KEYWORD,
                 popular: ko.observable(false),
                 details: {
@@ -397,7 +397,7 @@ var AutocompleteResults = (function () {
         if (type === 'COLREF') {
           columnAliasSuggestions.push({
             value: columnAlias.name,
-            meta: AutocompleterGlobals.i18n.meta.alias,
+            meta: HUE_I18n.autocomplete.meta.alias,
             category: CATEGORIES.COLUMN,
             popular: ko.observable(false),
             details: columnAlias
@@ -428,7 +428,7 @@ var AutocompleteResults = (function () {
         commonTableExpressionSuggestions.push({
           value: prefix + expression.name,
           filterValue: expression.name,
-          meta: AutocompleterGlobals.i18n.meta.commonTableExpression,
+          meta: HUE_I18n.autocomplete.meta.commonTableExpression,
           category: CATEGORIES.CTE,
           popular: ko.observable(false),
           details: null
@@ -510,7 +510,7 @@ var AutocompleteResults = (function () {
           databaseSuggestions.push({
             value: prefix + SqlUtils.backTickIfNeeded(self.snippet.type(), db) + (suggestDatabases.appendDot ? '.' : ''),
             filterValue: db,
-            meta: AutocompleterGlobals.i18n.meta.database,
+            meta: HUE_I18n.autocomplete.meta.database,
             category: CATEGORIES.DATABASE,
             popular: ko.observable(false),
             details: null
@@ -553,7 +553,7 @@ var AutocompleteResults = (function () {
                 value: prefix + SqlUtils.backTickIfNeeded(self.snippet.type(), tableMeta.name),
                 filterValue: tableMeta.name,
                 tableName: tableMeta.name,
-                meta: AutocompleterGlobals.i18n.meta[tableMeta.type.toLowerCase()],
+                meta: HUE_I18n.autocomplete.meta[tableMeta.type.toLowerCase()],
                 category: CATEGORIES.TABLE,
                 popular: ko.observable(false),
                 details: details
@@ -612,14 +612,14 @@ var AutocompleteResults = (function () {
             if (self.snippet.type() === 'hive' && /[^\.]$/.test(self.editor().getTextBeforeCursor())) {
               columnSuggestions.push({
                 value: 'BLOCK__OFFSET__INSIDE__FILE',
-                meta: AutocompleterGlobals.i18n.meta.virtual,
+                meta: HUE_I18n.autocomplete.meta.virtual,
                 category: CATEGORIES.VIRTUAL_COLUMN,
                 popular: ko.observable(false),
                 details: null
               });
               columnSuggestions.push({
                 value: 'INPUT__FILE__NAME',
-                meta: AutocompleterGlobals.i18n.meta.virtual,
+                meta: HUE_I18n.autocomplete.meta.virtual,
                 category: CATEGORIES.VIRTUAL_COLUMN,
                 popular: ko.observable(false),
                 details: null
@@ -1012,7 +1012,7 @@ var AutocompleteResults = (function () {
       if (self.parseResult.colRef && self.parseResult.colRef.identifierChain) {
         valueSuggestions.push({
           value: '${' + self.parseResult.colRef.identifierChain[self.parseResult.colRef.identifierChain.length - 1].name + '}',
-          meta: AutocompleterGlobals.i18n.meta.variable,
+          meta: HUE_I18n.autocomplete.meta.variable,
           category: CATEGORIES.VARIABLE,
           popular: ko.observable(false),
           details: null
@@ -1026,7 +1026,7 @@ var AutocompleteResults = (function () {
           colRef.sample.forEach(function (sample) {
             valueSuggestions.push({
               value: isString ? startQuote + sample + endQuote : new String(sample),
-              meta: AutocompleterGlobals.i18n.meta.sample,
+              meta: HUE_I18n.autocomplete.meta.sample,
               category: CATEGORIES.SAMPLE,
               popular: ko.observable(false),
               details: null
@@ -1051,21 +1051,21 @@ var AutocompleteResults = (function () {
       if (path === '') {
         self.appendEntries([{
           value: 'adl://',
-          meta: AutocompleterGlobals.i18n.meta.keyword,
+          meta: HUE_I18n.autocomplete.meta.keyword,
           category: CATEGORIES.KEYWORD,
           weightAdjust: 0,
           popular: ko.observable(false),
           details: null
         },{
           value: 's3a://',
-          meta: AutocompleterGlobals.i18n.meta.keyword,
+          meta: HUE_I18n.autocomplete.meta.keyword,
           category: CATEGORIES.KEYWORD,
           weightAdjust: 0,
           popular: ko.observable(false),
           details: null
         },{
           value: 'hdfs://',
-          meta: AutocompleterGlobals.i18n.meta.keyword,
+          meta: HUE_I18n.autocomplete.meta.keyword,
           category: CATEGORIES.KEYWORD,
           weightAdjust: 0,
           popular: ko.observable(false),
@@ -1186,7 +1186,7 @@ var AutocompleteResults = (function () {
               totalCount += value.totalQueryCount;
               joinSuggestions.push({
                 value: suggestionString,
-                meta: AutocompleterGlobals.i18n.meta.join,
+                meta: HUE_I18n.autocomplete.meta.join,
                 category: suggestJoins.prependJoin ? CATEGORIES.POPULAR_JOIN : CATEGORIES.POPULAR_ACTIVE_JOIN,
                 popular: ko.observable(true),
                 details: value
@@ -1238,7 +1238,7 @@ var AutocompleteResults = (function () {
               totalCount += value.totalQueryCount;
               joinConditionSuggestions.push({
                 value: suggestionString,
-                meta: AutocompleterGlobals.i18n.meta.joinCondition,
+                meta: HUE_I18n.autocomplete.meta.joinCondition,
                 category: CATEGORIES.POPULAR_JOIN_CONDITION,
                 popular: ko.observable(true),
                 details: value
@@ -1388,7 +1388,7 @@ var AutocompleteResults = (function () {
               groupBySuggestions.push({
                 value: prefix + filterValue,
                 filterValue: filterValue,
-                meta: AutocompleterGlobals.i18n.meta.groupBy,
+                meta: HUE_I18n.autocomplete.meta.groupBy,
                 category: CATEGORIES.POPULAR_GROUP_BY,
                 weightAdjust: Math.min(value.columnCount, 99),
                 popular: ko.observable(true),
@@ -1434,7 +1434,7 @@ var AutocompleteResults = (function () {
               orderBySuggestions.push({
                 value: prefix + filterValue,
                 filterValue: filterValue,
-                meta: AutocompleterGlobals.i18n.meta.orderBy,
+                meta: HUE_I18n.autocomplete.meta.orderBy,
                 category: CATEGORIES.POPULAR_ORDER_BY,
                 weightAdjust: Math.min(value.columnCount, 99),
                 popular: ko.observable(true),
@@ -1491,7 +1491,7 @@ var AutocompleteResults = (function () {
                     totalCount += popularValue.count;
                     filterSuggestions.push({
                       value: compVal,
-                      meta: AutocompleterGlobals.i18n.meta.filter,
+                      meta: HUE_I18n.autocomplete.meta.filter,
                       category: CATEGORIES.POPULAR_FILTER,
                       popular: ko.observable(true),
                       details: popularValue

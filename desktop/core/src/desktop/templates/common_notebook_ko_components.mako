@@ -366,15 +366,14 @@ except ImportError, e:
                 result += '\n';
               });
               return result;
-            }
-            else {
-              return CopyToClipboardGlobals.i18n.ERROR;
+            } else {
+              return HUE_I18n.copyToClipboard.error;
             }
           }
         });
 
         clipboard.on('success', function (e) {
-          $.jHueNotify.info(self.snippet.result.data().length + ' ' + CopyToClipboardGlobals.i18n.SUCCESS)
+          $.jHueNotify.info(self.snippet.result.data().length + ' ' + HUE_I18n.copyToClipboard.success);
           e.clearSelection();
         });
 

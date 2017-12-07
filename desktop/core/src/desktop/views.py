@@ -339,6 +339,17 @@ def jasmine(request):
   return render('jasmine.mako', request, None)
 
 
+def global_js_constants(request):
+  return HttpResponse(render('global_js_constants.mako', request, {
+    'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
+    'leaflet': {
+      'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
+      'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get(),
+      'map_options': json.dumps(desktop.conf.LEAFLET_MAP_OPTIONS.get()),
+      'layer_options': json.dumps(desktop.conf.LEAFLET_TILE_LAYER_OPTIONS.get()),
+    }
+  }), content_type="application/javascript")
+
 def ace_sql_location_worker(request):
   return HttpResponse(render('ace_sql_location_worker.mako', request, None), content_type="application/javascript")
 

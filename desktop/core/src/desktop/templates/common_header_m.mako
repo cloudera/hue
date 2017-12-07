@@ -75,53 +75,65 @@ if USE_NEW_EDITOR.get():
       optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
     };
 
-    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() }
+    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
 
-    // jHue plugins global configuration
-    jHueFileChooserGlobals = {
-      labels: {
-        BACK: "${_('Back')}",
-        SELECT_FOLDER: "${_('Select this folder')}",
-        CREATE_FOLDER: "${_('Create folder')}",
-        FOLDER_NAME: "${_('Folder name')}",
-        CANCEL: "${_('Cancel')}",
-        FILE_NOT_FOUND: "${_('The file has not been found')}",
-        UPLOAD_FILE: "${_('Upload a file')}",
-        FAILED: "${_('Failed')}"
+    window.HUE_I18n = {
+      documentType: {
+        'all': '${_('All')}',
+        'directory': '${ _('Directory') }',
+        'link-pigscript': '${_('Pig Design')}',
+        'link-workflow': '${_('Job Design')}',
+        'notebook': '${_('Notebook')}',
+        'oozie-bundle2': '${_('Oozie Bundle')}',
+        'oozie-coordinator2': (IS_HUE_4 ? '${_('Oozie Schedule')}' : '${_('Oozie Coordinator')}'),
+        'oozie-workflow2': '${_('Oozie Workflow')}',
+        'query-hive': '${_('Hive Query')}',
+        'query-impala': '${_('Impala Query')}',
+        'search-dashboard': '${_('Search Dashboard')}',
+        'query-mapreduce': '${_('MapReduce Job')}',
+        'query-sqoop1': '${_('Import Job')}',
+        'query-spark2': '${_('Spark Job')}',
+        'query-java': '${_('Java Job')}',
+        'query-pig': '${_('Pig Script')}',
+        'query-shell': '${_('Shell Script')}',
+        'query-distcp': '${_('DistCp Job')}'
       },
-      user: "${ user.username }"
-    };
-
-    jHueHdfsTreeGlobals = {
-      labels: {
-        CREATE_FOLDER: "${_('Create folder')}",
-        FOLDER_NAME: "${_('Folder name')}",
-        CANCEL: "${_('Cancel')}"
+      jHueHdfsTree: {
+        GO_TO_COLUMN: '${_('Go to column:')}',
+        PLACEHOLDER: '${_('column name...')}',
+        LOCK: '${_('Lock this row')}',
+        UNLOCK: '${_('Unlock this row')}',
+        ROW_DETAILS: '${_('Show row details')}'
+      },
+      jHueFileChooser: {
+        BACK: '${_('Back')}',
+        SELECT_FOLDER: '${_('Select this folder')}',
+        CREATE_FOLDER: '${_('Create folder')}',
+        FOLDER_NAME: '${_('Folder name')}',
+        CANCEL: '${_('Cancel')}',
+        FILE_NOT_FOUND: '${_('The file has not been found')}',
+        UPLOAD_FILE: '${_('Upload a file')}',
+        FAILED: '${_('Failed')}'
+      },
+      jHueTableExtender: {
+        GO_TO_COLUMN: '${_('Go to column:')}',
+        PLACEHOLDER: '${_('column name...')}',
+        LOCK: '${_('Lock this row')}',
+        UNLOCK: '${_('Unlock this row')}',
+        ROW_DETAILS: '${_('Show row details')}'
+      },
+      syntaxChecker: {
+        didYouMean: '${_('Did you mean')}',
+        expectedStatementEnd: '${_('Expected end of statement')}',
+        suppressError: '${_('Ignore this type of error')}',
+        couldNotFind: '${_('Could not find')}'
       }
     };
 
-    jHueTableExtenderGlobals = {
-      labels: {
-        GO_TO_COLUMN: "${_('Go to column:')}",
-        PLACEHOLDER: "${_('column name...')}",
-        LOCK: "${_('Lock this row')}",
-        UNLOCK: "${_('Unlock this row')}",
-        ROW_DETAILS: "${_('Show row details')}"
-      }
-    };
-
-    LeafletGlobals = {
+    window.LEAFLET_DEFAULTS = {
       layer: '${ leaflet['layer'] |n,unicode }',
       attribution: '${ leaflet['attribution'] |n,unicode }'
     };
-
-    ApiHelperGlobals = {
-      i18n: {
-        errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
-        errorLoadingTablePreview: '${ _('There was a problem loading the preview') }'
-      },
-      user: '${ user.username }'
-    }
   </script>
 
   <!--[if lt IE 9]>

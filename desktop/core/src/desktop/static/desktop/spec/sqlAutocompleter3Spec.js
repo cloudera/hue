@@ -311,9 +311,9 @@
         });
         expect(subject.filtered().length).toBe(2);
         // Sorted by weight, case adjusted
-        expect(subject.filtered()[0].meta).toBe(AutocompleterGlobals.i18n.meta.keyword);
+        expect(subject.filtered()[0].meta).toBe(HUE_I18n.autocomplete.meta.keyword);
         expect(subject.filtered()[0].value).toBe('foo');
-        expect(subject.filtered()[1].meta).toBe(AutocompleterGlobals.i18n.meta.keyword);
+        expect(subject.filtered()[1].meta).toBe(HUE_I18n.autocomplete.meta.keyword);
         expect(subject.filtered()[1].value).toBe('bar');
       });
 

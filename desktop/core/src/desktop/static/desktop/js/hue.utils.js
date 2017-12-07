@@ -122,6 +122,32 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
 (function (hueUtils) {
   'use strict';
 
+  hueUtils.bootstrapRatios = {
+    span3: function () {
+      var windowWidth = $(window).width();
+      if (windowWidth >= 1200) {
+        return 23.07692308;
+      } else if (windowWidth >= 768 && windowWidth <= 979) {
+        return 22.9281768;
+      } else {
+        return 23.17073171;
+      }
+    },
+    span9: function () {
+      var windowWidth = $(window).width();
+      if (windowWidth >= 1200) {
+        return 74.35897436;
+      } else if (windowWidth >= 768 && windowWidth <= 979) {
+        return 74.30939227;
+      } else {
+        return 74.3902439;
+      }
+    },
+    margin: function () {
+      return 2.56410256;
+    }
+  };
+
   /*
    * Convert text to URLs
    * Selector arg can be jQuery or document.querySelectorAll()

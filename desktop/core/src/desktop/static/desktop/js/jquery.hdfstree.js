@@ -43,24 +43,12 @@
           CANCEL: "Cancel",
           HOME: "Home"
         }
-      }
+      };
 
   function Plugin(element, options) {
     this.element = element;
-    if (typeof jHueHdfsTreeGlobals != 'undefined') {
-      var extendedDefaults = $.extend({}, defaults, jHueHdfsTreeGlobals);
-      extendedDefaults.labels = $.extend({}, defaults.labels, jHueHdfsTreeGlobals.labels);
-      this.options = $.extend({}, extendedDefaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
-      }
-    }
-    else {
-      this.options = $.extend({}, defaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, defaults.labels, options.labels);
-      }
-    }
+    this.options = $.extend({}, defaults, options);
+    this.options.labels = $.extend({}, defaults.labels, HUE_I18n.jHueHdfsTree, options ? options.labels : {});
     this._defaults = defaults;
     this._name = pluginName;
     this.lastPath = "";

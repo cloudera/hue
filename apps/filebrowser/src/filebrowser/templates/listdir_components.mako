@@ -2081,7 +2081,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 '<span class="break-word" data-dz-name></span>' +
                 '<div class="pull-right">' +
                 '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
-                '<span data-dz-remove><a href="javascript:undefined;" title="' + DropzoneGlobals.i18n.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
+                '<span data-dz-remove><a href="javascript:undefined;" title="' + HUE_I18n.dropzone.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
                 '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
                 '</div>' +
                 '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
@@ -2120,7 +2120,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               $('#progressStatusBar div').width(progress.toFixed() + "%");
             },
             canceled: function () {
-              $.jHueNotify.info(DropzoneGlobals.i18n.uploadCanceled);
+              $.jHueNotify.info(HUE_I18n.dropzone.uploadCanceled);
             },
             complete: function (data) {
               if (data.xhr.response != '') {
@@ -2128,9 +2128,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 if (response && response.status != null) {
                   if (response.status != 0) {
                     $(document).trigger('error', response.data);
-                  }
-                  else {
-                    $(document).trigger('info', response.path + ' ' + DropzoneGlobals.i18n.uploadSucceeded);
+                  } else {
+                    $(document).trigger('info', response.path + ' ' + HUE_I18n.dropzone.uploadSucceeded);
                     viewModel.filesToHighlight.push(response.path);
                   }
                 }

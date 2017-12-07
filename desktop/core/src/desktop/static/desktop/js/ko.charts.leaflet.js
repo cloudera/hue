@@ -86,22 +86,22 @@
         if (_hasAtLeastOneLat && _hasAtLeastOneLng) {
           try {
             if (_map == null) {
-              if (LeafletGlobals.mapOptions.crs) {
-                LeafletGlobals.mapOptions.crs = L.CRS[LeafletGlobals.mapOptions.crs];
+              if (LEAFLET_DEFAULTS.mapOptions.crs) {
+                LEAFLET_DEFAULTS.mapOptions.crs = L.CRS[LEAFLET_DEFAULTS.mapOptions.crs];
               }
-              _map = L.map(element, LeafletGlobals.mapOptions);
+              _map = L.map(element, LEAFLET_DEFAULTS.mapOptions);
               var tileLayerOptions = {
                 layer: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              };
+              if (LEAFLET_DEFAULTS.layer) {
+                tileLayerOptions.layer = LEAFLET_DEFAULTS.layer;
               }
-              if (LeafletGlobals) {
-                if (LeafletGlobals.layer) {
-                  tileLayerOptions.layer = LeafletGlobals.layer;
-                }
-                if (LeafletGlobals.attribution) {
-                  tileLayerOptions.attribution = LeafletGlobals.attribution;
-                }
-                tileLayerOptions = $.extend(tileLayerOptions, LeafletGlobals.layerOptions);
+              if (LEAFLET_DEFAULTS.attribution) {
+                tileLayerOptions.attribution = LEAFLET_DEFAULTS.attribution;
+              }
+              if (LEAFLET_DEFAULTS.layerOptions) {
+                tileLayerOptions = $.extend(tileLayerOptions, LEAFLET_DEFAULTS.layerOptions);
               }
               L.tileLayer(tileLayerOptions.layer, tileLayerOptions).addTo(_map);
 

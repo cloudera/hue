@@ -528,7 +528,7 @@ from desktop.views import _ko
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
                 <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }"></div>
-                <div class="doc-browser-attr-col doc-browser-type" data-bind="text: DocumentTypeGlobals[type] || type"></div>
+                <div class="doc-browser-attr-col doc-browser-type" data-bind="text: HUE_I18n.documentType[type] || type"></div>
                 <div class="doc-browser-attr-col doc-browser-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
                 <div class="doc-browser-attr-col doc-browser-modified" data-bind="text: localeFormat(last_modified)"></div>
                 <!-- /ko -->

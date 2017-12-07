@@ -55,10 +55,12 @@
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
 
   <script type="text/javascript">
-    var IS_HUE_4 = true;
+    window.IS_HUE_4 = true;
   </script>
 
-  ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
+  ${ commonHeaderFooterComponents.header_i18n_redirection() }
+
+  <script src="/desktop/globalJsConstants.js"></script>
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
@@ -284,8 +286,8 @@ ${ hueIcons.symbols() }
       <div class="sidebar-footer-panel">
         <div data-bind="dropzone: {
             clickable: false,
-            url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir,
-            params: { dest: DropzoneGlobals.homeDir },
+            url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR,
+            params: { dest: DROPZONE_HOME_DIR },
             paramName: 'hdfs_file',
             onError: onePageViewModel.dropzoneError,
             onComplete: onePageViewModel.dropzoneComplete },
@@ -903,7 +905,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.dropzoneError = function (filename) {
           self.loadApp('importer');
           self.getActiveAppViewModel(function (vm) {
-            vm.createWizard.source.path(DropzoneGlobals.homeDir + '/' + filename);
+            vm.createWizard.source.path(DROPZONE_HOME_DIR + '/' + filename);
           });
           $('.dz-drag-hover').removeClass('dz-drag-hover');
         };
@@ -986,7 +988,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/filebrowser/view=*', app: 'filebrowser' },
           { url: '/filebrowser/download=*', app: 'filebrowser' },
           { url: '/filebrowser/*', app: function () {
-            page('/filebrowser/view=' + DropzoneGlobals.homeDir);
+            page('/filebrowser/view=' + DROPZONE_HOME_DIR);
           }},
           { url: '/hbase/', app: 'hbase' },
           { url: '/help', app: 'help' },

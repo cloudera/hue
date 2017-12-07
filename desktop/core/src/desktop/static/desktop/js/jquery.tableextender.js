@@ -50,21 +50,8 @@
   }
 
   Plugin.prototype.setOptions = function (options) {
-    if (typeof jHueTableExtenderGlobals != 'undefined') {
-      var extendedDefaults = $.extend({}, defaults, jHueTableExtenderGlobals);
-      extendedDefaults.labels = $.extend({}, defaults.labels, jHueTableExtenderGlobals.labels);
-      this.options = $.extend({}, extendedDefaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
-      }
-    }
-    else {
-      this.options = $.extend({}, defaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, defaults.labels, options.labels);
-      }
-    }
-
+    this.options = $.extend({}, defaults, options);
+    this.options.labels = $.extend({}, defaults.labels, HUE_I18n.jHueTableExtender, options ? options.labels : {});
     this._defaults = defaults;
 
     if (this.options.fixedHeader) {

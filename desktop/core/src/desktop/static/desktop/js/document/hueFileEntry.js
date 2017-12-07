@@ -108,7 +108,7 @@ var HueFileEntry = (function () {
         var type = entry.definition().type;
         if (!filters[type] && type !== 'directory') {
 
-          var label = DocumentTypeGlobals[type];
+          var label = HUE_I18n.documentType[type];
           if (!label) {
             if (type.indexOf('query-') === 0) {
               label = type.substring(6);
@@ -137,7 +137,7 @@ var HueFileEntry = (function () {
 
       result.unshift({
         type: 'all',
-        label: DocumentTypeGlobals['all']
+        label: HUE_I18n.documentType['all']
       });
 
       return result;
@@ -159,7 +159,7 @@ var HueFileEntry = (function () {
           var entryType = entry.definition().type;
           return (typeFilter === 'all' || entryType === typeFilter || entryType === 'directory')
             && (!filter || entry.definition().name.toLowerCase().indexOf(filter) !== -1 ||
-            (DocumentTypeGlobals[entryType] && DocumentTypeGlobals[entryType].toLowerCase().indexOf(filter) !== -1));
+            (HUE_I18n.documentType[entryType] && HUE_I18n.documentType[entryType].toLowerCase().indexOf(filter) !== -1));
         })
       }
       return self.entries();

@@ -226,19 +226,8 @@
   };
 
   Plugin.prototype.setOptions = function (options) {
-    if (typeof jHueTableExtenderGlobals != 'undefined') {
-      var extendedDefaults = $.extend({}, DEFAULT_OPTIONS, jHueTableExtenderGlobals);
-      extendedDefaults.labels = $.extend({}, DEFAULT_OPTIONS.labels, jHueTableExtenderGlobals.labels);
-      this.options = $.extend({}, extendedDefaults, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, extendedDefaults.labels, options.labels);
-      }
-    } else {
-      this.options = $.extend({}, DEFAULT_OPTIONS, options);
-      if (options != null) {
-        this.options.labels = $.extend({}, DEFAULT_OPTIONS.labels, options.labels);
-      }
-    }
+    this.options = $.extend({}, DEFAULT_OPTIONS, options);
+    this.options.labels = $.extend({}, DEFAULT_OPTIONS.labels, HUE_I18n.jHueTableExtender, options ? options.labels : {})
   };
 
   Plugin.prototype.repositionHeader = function () {
