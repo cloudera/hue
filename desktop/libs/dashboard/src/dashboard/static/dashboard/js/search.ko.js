@@ -1818,6 +1818,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.toggleEditing = function () {
       self.isEditing(!self.isEditing());
     };
+
+    self.isToolbarVisible = ko.observable(false);
+
     self.isRetrievingResults = ko.observable(false);
     self.hasRetrievedResults = ko.observable(true);
     self.asyncSearchesCounter = ko.observableArray([]);
