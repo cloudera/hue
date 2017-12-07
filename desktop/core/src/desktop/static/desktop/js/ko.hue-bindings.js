@@ -1078,6 +1078,51 @@
     }
   };
 
+  ko.bindingHandlers.multiCheckForeachVisible = {
+    init: function (element, valueAccessor, allBindings, clickedEntry, bindingContext) {
+      var $element = $(element);
+      var parentContext = bindingContext.$parentContext;
+
+      var selectedAttr = valueAccessor().selectedAttr;
+      var entries = valueAccessor().entries;
+
+      $element.attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
+
+      $element.on('click', function (e) {
+        if (e.shiftKey && parentContext.$multiCheckLastEntry) {
+          var lastEntry = parentContext.$multiCheckLastEntry;
+          var inside = false;
+          entries().every(function (otherEntry) {
+            if (otherEntry === lastEntry || otherEntry === clickedEntry) {
+              if (inside) {
+                return false;
+              }
+              inside = true;
+              return true;
+            }
+            if (inside && otherEntry[selectedAttr]() !== lastEntry[selectedAttr]()) {
+              otherEntry[selectedAttr](lastEntry[selectedAttr]());
+            }
+            return true;
+          });
+          if (clickedEntry[selectedAttr]() !== lastEntry[selectedAttr]()) {
+            clickedEntry[selectedAttr](lastEntry[selectedAttr]());
+          }
+        } else {
+          clickedEntry[selectedAttr](!clickedEntry[selectedAttr]());
+        }
+
+        parentContext.$multiCheckLastEntry = clickedEntry;
+        parentContext.$multiCheckLastChecked = clickedEntry[selectedAttr]();
+      });
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        $element.off('click');
+      });
+    },
+    update: function () {}
+  };
+
   ko.bindingHandlers.multiCheck = {
     init: function (element, valueAccessor) {
       $(element).attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
