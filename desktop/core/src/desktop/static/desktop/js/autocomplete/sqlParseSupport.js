@@ -507,7 +507,10 @@ var SqlParseSupport = (function () {
           if (tablePrimaries && tablePrimaries.length > 0) {
             location.tables = [];
             location.linked = false;
-            parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: true });
+            if (!location.identifierChain) {
+              location.identifierChain = [{ asterisk: true }];
+            }
+            parser.expandIdentifierChain({ tablePrimaries: tablePrimaries, wrapper: location, anyOwner: false });
             if (location.tables.length === 0) {
               parser.yy.locations.splice(i, 1);
             }
@@ -828,6 +831,10 @@ var SqlParseSupport = (function () {
         return;
       }
 
+      if (!anyOwner) {
+        tablePrimaries = filterTablePrimariesForOwner(tablePrimaries, wrapper.owner);
+      }
+
       if (identifierChain.length > 0 && identifierChain[identifierChain.length - 1].asterisk) {
         var tables = [];
         tablePrimaries.forEach(function (tablePrimary) {
@@ -857,9 +864,6 @@ var SqlParseSupport = (function () {
         }
       }
 
-      if (!anyOwner) {
-        tablePrimaries = filterTablePrimariesForOwner(tablePrimaries, wrapper.owner);
-      }
       // Impala can have references to maps or array, i.e. FROM table t, t.map m
       // We need to replace those in the identifierChain
       if (parser.isImpala()) {
