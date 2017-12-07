@@ -26,8 +26,7 @@ from desktop.views import _ko
     <div class="context-popover-flex">
       <div class="context-popover-flex-header">
         <div class="context-popover-header" style="display:inline-block;">${_('Columns')} (<span data-bind="text: filteredColumns().length"></span>)</div>
-        <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
-        <div class="context-popover-inline-autocomplete" data-bind="visible: searchVisible">
+        <div class="context-popover-inline-autocomplete">
           <!-- ko component: {
             name: 'inline-autocomplete',
             params: {
@@ -38,7 +37,6 @@ from desktop.views import _ko
             }
           } --><!-- /ko -->
         </div>
-##         <input class="input-large context-popover-inline-search" style="padding: 3px 6px;" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
       </div>
       <div class="context-popover-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
         <table id="sqlColumnsTable" style="width: 100%" class="table table-condensed table-nowrap">
@@ -98,15 +96,8 @@ from desktop.views import _ko
         self.columns = params.columns;
         self.scrollToColumns = typeof params.scrollToColumns !== 'undefined' ?  params.scrollToColumns : true;
         self.searchInput = ko.observable('');
-        self.searchVisible = ko.observable(true);
         self.searchFocus = ko.observable(false);
         self.querySpec = ko.observable();
-
-        self.searchVisible.subscribe(function (newValue) {
-          if (newValue) {
-            self.searchFocus(true);
-          }
-        });
 
         self.filteredColumns = ko.pureComputed(function () {
           if (!self.querySpec() || self.querySpec().query === '') {
