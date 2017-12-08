@@ -693,7 +693,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 <link href="${ static('sqoop/css/sqoop.css') }" rel="stylesheet">
 
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
+% if conf.CUSTOM.BANNER_TOP_HTML.get() or not is_embeddable:
   #sqoopComponents .top-bar {
     top: 58px!important;
   }

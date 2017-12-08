@@ -2767,7 +2767,7 @@ ${ dashboard.import_layout(True) }
 ${ dashboard.import_bindings() }
 
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
+% if conf.CUSTOM.BANNER_TOP_HTML.get() or not is_embeddable:
   .search-bar {
     top: 58px!important;
   }
