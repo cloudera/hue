@@ -260,7 +260,7 @@ ${ hueIcons.symbols() }
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
-      % if not is_s3_enabled:
+      % if not is_s3_enabled and not is_adls_enabled:
       <li class="hide1380">
         <a title="${_('Manage HDFS')}" data-rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}">
           <i class="fa fa-file"></i>&nbsp;${_('File Browser')}&nbsp;
@@ -275,9 +275,16 @@ ${ hueIcons.symbols() }
             <li><a href="/${apps['filebrowser'].display_name}">
               <i class="fa fa-fw fa-file" style="vertical-align: middle"></i>${_('HDFS Browser')}</a>
             </li>
+            % if is_s3_enabled:
             <li><a href="/${apps['filebrowser'].display_name}/view=S3A://">
               <i class="fa fa-fw fa-cubes" style="vertical-align: middle"></i>${_('S3 Browser')}</a>
             </li>
+            % endif
+            % if is_adls_enabled:
+            <li><a href="/${apps['filebrowser'].display_name}/view=adl:/">
+              <span class="fa fa-fw" style="font-size:20px;vertical-align: middle;"><svg class="hi"><use xlink:href='#hi-adls'></use></svg></span>${_('ADLS Browser')}</a>
+            </li>
+            % endif
           </ul>
         </li>
       % endif
@@ -290,6 +297,13 @@ ${ hueIcons.symbols() }
         % if is_s3_enabled:
           <a title="${_('S3 Browser')}" data-rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=S3A://">
             <i class="fa fa-cubes"></i>
+          </a>
+        % endif
+      </li>
+      <li class="hideMoreThan1380">
+        % if is_adls_enabled:
+          <a title="${_('ADLS Browser')}" data-rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=adl:/">
+            <span style="font-size:15px;vertical-align: middle;"><svg class="hi"><use xlink:href='#hi-adls'></use></svg></span>
           </a>
         % endif
       </li>
