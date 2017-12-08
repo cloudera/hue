@@ -109,7 +109,7 @@
       }).appendTo(jHueTableExtenderNavigator);
       $("<label>").html(_this.options.labels.GO_TO_COLUMN + " <input type=\"text\" placeholder=\"" + _this.options.labels.PLACEHOLDER + "\" />").appendTo(jHueTableExtenderNavigator);
 
-      jHueTableExtenderNavigator.appendTo($("body"));
+      jHueTableExtenderNavigator.appendTo(HUE_CONTAINER);
 
       $(_this.element).find("tbody").click(function (event) {
         if ($.trim(getSelection()) == "") {

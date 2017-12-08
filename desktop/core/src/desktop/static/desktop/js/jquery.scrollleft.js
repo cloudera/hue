@@ -55,7 +55,7 @@
       $(document).off("click", "#jHueScrollLeftAnchor");
     }
     else {
-      link = $("<a/>").attr("id", "jHueScrollLeftAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-left'></i>").appendTo("body");
+      link = $("<a/>").attr("id", "jHueScrollLeftAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-left'></i>").appendTo(HUE_CONTAINER);
     }
 
     $(_this.element).attr("jHueLeftScrollified", "true");

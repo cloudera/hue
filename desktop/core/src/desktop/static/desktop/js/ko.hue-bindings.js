@@ -145,7 +145,7 @@
   ko.bindingHandlers.clickToCopy = {
     init: function (element, valueAccessor) {
       $(element).click(function () {
-        var $input = $('<textarea>').css({ opacity: 0 }).val(ko.unwrap(valueAccessor())).appendTo('body').select();
+        var $input = $('<textarea>').css({ opacity: 0 }).val(ko.unwrap(valueAccessor())).appendTo(HUE_CONTAINER).select();
         document.execCommand('copy');
         $input.remove()
       });
@@ -951,7 +951,7 @@
 
         var $menu = $('#hueContextMenu_' + options.template);
         if ($menu.length === 0) {
-          $menu = $('<ul id="hueContextMenu_' + options.template  + '" class="hue-context-menu" data-bind="template: { name: \'' + options.template + '\', data: viewModel, afterRender: afterRender }"></ul>').appendTo('body');
+          $menu = $('<ul id="hueContextMenu_' + options.template  + '" class="hue-context-menu" data-bind="template: { name: \'' + options.template + '\', data: viewModel, afterRender: afterRender }"></ul>').appendTo(HUE_CONTAINER);
         } else {
           ko.cleanNode($menu[0]);
         }
@@ -1186,7 +1186,7 @@
       var clickTrigger = options.trigger === 'click';
       var $container = $('#popover-container');
       if (! $container.length) {
-        $container = $('<div>').attr('id', 'popover-container').appendTo('body');
+        $container = $('<div>').attr('id', 'popover-container').appendTo(HUE_CONTAINER);
         $('<div>').addClass('temp-content').hide().appendTo($container);
         $('<div>').addClass('temp-title').hide().appendTo($container);
       }
@@ -3277,7 +3277,7 @@
     _btn.click(function (e) {
       e.preventDefault();
       if (!isNestedModal) {
-        $("body").addClass("modal-open");
+        $(HUE_CONTAINER).addClass("modal-open");
       }
       // check if it's a relative path
       callFileChooser();
@@ -3340,7 +3340,7 @@
         }
         if (!isNestedModal) {
           $("#chooseFile").on("hidden", function () {
-            $("body").removeClass("modal-open");
+            $(HUE_CONTAINER).removeClass("modal-open");
             $(".modal-backdrop").remove();
           });
         }

@@ -345,7 +345,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
 
   hueUtils.scrollbarWidth = function () {
     var $parent, $children, width;
-    $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
+    $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo(HUE_CONTAINER);
     $children = $parent.children();
     width = $children.innerWidth() - $children.height(99).innerWidth();
     $parent.remove();

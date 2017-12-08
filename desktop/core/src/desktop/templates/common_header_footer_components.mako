@@ -398,7 +398,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
           $('#login-modal .link-message').hide();
           if (isAutoLogout) {
-            $('body').children(':not(#login-modal)').addClass('blurred');
+            $(HUE_CONTAINER).children(':not(#login-modal)').addClass('blurred');
             $('#login-modal .auto-logged-out').show();
             $('#login-modal').modal({
               backdrop: 'static',
