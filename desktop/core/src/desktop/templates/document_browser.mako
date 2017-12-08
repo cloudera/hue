@@ -683,7 +683,7 @@ from desktop.views import _ko
 
                 $helper.appendTo($container);
               } else {
-                $('<div>').addClass('doc-browser-drag-select').appendTo('body');
+                $('<div>').addClass('doc-browser-drag-select').appendTo(HUE_CONTAINER);
               }
             },
             drag: function (event) {

@@ -435,7 +435,7 @@ ${ commonshare() | n,unicode }
 
       var pos = cm.cursorCoords();
       $(".CodeMirror-spinner").remove();
-      $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo($("body"));
+      $("<i class='fa fa-spinner fa-spin CodeMirror-spinner'></i>").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").appendTo(HUE_CONTAINER);
 
       if ($.totalStorage('rdbms_tables_' + viewModel.server().name() + "_" + viewModel.database()) == null) {
         CodeMirror.showHint(cm, AUTOCOMPLETE_SET);

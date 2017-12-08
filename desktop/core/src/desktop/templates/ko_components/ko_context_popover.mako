@@ -1758,7 +1758,7 @@ from metadata.conf import has_navigator
       huePubSub.subscribe('context.popover.show', function (details) {
         hidePopover();
         var $contextPopover = $('<div id="contextPopover" data-bind="component: { name: \'context-popover\', params: $data }" />');
-        $('body').append($contextPopover);
+        $(HUE_CONTAINER).append($contextPopover);
         ko.applyBindings(details, $contextPopover[0]);
         huePubSub.publish('context.popover.shown');
       });

@@ -59,7 +59,7 @@
       $("<div>").attr("id", "jHueHdfsAutocomplete").addClass("jHueAutocomplete popover")
           .attr("style", "position:absolute;display:none;max-width:1000px;z-index:" + _this.options.zIndex)
           .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p><ul class="unstyled"></ul></p></div></div>')
-          .appendTo($("body"));
+          .appendTo($(HUE_CONTAINER));
     }
 
     function setHueBreadcrumbCaretAtEnd(element) {
