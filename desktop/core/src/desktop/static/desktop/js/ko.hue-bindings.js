@@ -5971,6 +5971,7 @@
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
       var scrollable = options.scrollable ? options.scrollable : window;
+      var triggerAdjust = options.triggerAdjust || 0;
 
       $(element).addClass('dockable');
 
@@ -5985,8 +5986,9 @@
       function dock() {
         if (initialTopPosition == -1) {
           initialTopPosition = $(element).position().top;
+          ghost.height($(element).outerHeight() + (options.jumpCorrection || 0));
         }
-        if ($(scrollable).scrollTop() > initialTopPosition) {
+        if ($(scrollable).scrollTop() + triggerAdjust > initialTopPosition) {
           $(element).css({
             'position': 'fixed',
             'top': options.topSnap,
@@ -6013,10 +6015,27 @@
         $(scrollable).on('scroll', dock);
       }
 
-      huePubSub.subscribe('scrollable.scroll.off', function (scrollElement) {
+      var scrollOffSubscription = huePubSub.subscribe('scrollable.scroll.off', function (scrollElement) {
         if (scrollElement === scrollable) {
           $(scrollable).on('scroll', dock);
         }
+      });
+
+      function resetInitialStyle() {
+        $(element).removeAttr('style');
+        initialSize = {
+          w: $(element).width(),
+          h: $(element).outerHeight() + (options.jumpCorrection || 0)
+        };
+        dock();
+      }
+
+      $(window).on('resize', resetInitialStyle);
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        $(window).off('resize', resetInitialStyle);
+        $(scrollable).off('scroll', dock);
+        scrollOffSubscription.remove();
       });
 
     }

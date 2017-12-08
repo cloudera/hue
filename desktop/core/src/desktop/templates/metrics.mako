@@ -20,11 +20,11 @@ from desktop import conf
 %>
 
 <%
-MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
+MAIN_SCROLLABLE = is_embeddable and "'.page-content'" or "window"
 if conf.CUSTOM.BANNER_TOP_HTML.get():
   TOP_SNAP = is_embeddable and "78px" or "106px"
 else:
-  TOP_SNAP = is_embeddable and "50px" or "74px"
+  TOP_SNAP = is_embeddable and "50px" or "106px"
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -36,83 +36,88 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
 
 
 <script type="text/javascript">
+  (function () {
+    var MetricsViewModel = function () {
+      var self = this;
 
+      self.metrics = ${metrics | n,unicode};
+      self.metricsKeys = ko.observableArray(Object.keys(self.metrics).sort());
+      self.selectedMetric = ko.observable(self.metricsKeys().length > 0 ? self.metricsKeys()[0] : null);
 
-  var MetricsViewModel = function () {
-    var self = this;
-    self.metricsFilter = ko.observable();
-    self.metrics = ${metrics | n,unicode};
-    self.selectedSubMetric = ko.observable(Object.keys(self.metrics)[0]);
-    self.filteredMetrics = ko.pureComputed(function () {
-      if (self.metricsFilter()) {
-        var lowerQuery = self.metricsFilter().toLowerCase();
-        var result = {};
-        Object.keys(self.metrics).forEach(function (key) {
-          var filteredSubMetric = {};
-          var atleastOne = false;
-          Object.keys(self.metrics[key]).forEach(function (subMetricKey) {
-            if (subMetricKey.toLowerCase().indexOf(lowerQuery) !== -1) {
-              filteredSubMetric[subMetricKey] = self.metrics[key][subMetricKey];
-              atleastOne = true;
+      self.metricsFilter = ko.observable();
+      self.filteredMetrics = ko.pureComputed(function () {
+        if (self.metricsFilter()) {
+          var lowerQuery = self.metricsFilter().toLowerCase();
+          var result = {};
+          Object.keys(self.metrics).forEach(function (key) {
+            var filteredSubMetric = {};
+            var atleastOne = false;
+            Object.keys(self.metrics[key]).forEach(function (subMetricKey) {
+              if (subMetricKey.toLowerCase().indexOf(lowerQuery) !== -1) {
+                filteredSubMetric[subMetricKey] = self.metrics[key][subMetricKey];
+                atleastOne = true;
+              }
+            });
+            if (atleastOne) {
+              result[key] = filteredSubMetric;
             }
           });
-          if (atleastOne) {
-            result[key] = filteredSubMetric;
-          }
-         });
-        return result;
-      }
-      return self.metrics;
-     });
-  }
+          return result;
+        }
+        return self.metrics;
+      });
+    }
 
-  $(document).ready(function () {
-    var metricsViewModel = new MetricsViewModel();
-    ko.cleanNode(document.getElementById("metricsComponent"));
-    ko.applyBindings(metricsViewModel, document.getElementById('metricsComponent'));
-  });
-
- </script>
+    $(document).ready(function () {
+      ko.cleanNode(document.getElementById("metricsComponent"));
+      ko.applyBindings(new MetricsViewModel(), document.getElementById('metricsComponent'));
+    });
+  })();
+</script>
 
 ${layout.menubar(section='metrics')}
 
 <div id="metricsComponent" class="container-fluid">
- <span class="card card-small" style="padding-top: 10px">
-  <br>
-  <div data-bind="dockable: { scrollable: '${ MAIN_SCROLLABLE }', jumpCorrection: 0,topSnap: '${ TOP_SNAP }'}">
-   <!-- ko if: $data.metrics -->
-   <ol class="breadcrumb" data-bind="foreach: {'data': Object.keys($data.metrics)}">
-     <li><a href="" data-bind="text: $data,click: function(){$root.selectedSubMetric(this)}"/></li>
-   </ol><!-- /ko -->
-    <br>
-    <!-- ko hueSpinner: { spin: !$data.filteredMetrics(), center: true, size: 'xlarge' } --><!-- /ko -->
-    <form class="form-search">
-      <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
-             class="input-xlarge search-query float-right" placeholder="${_('Filter metrics...')}">
-    </form>
-  </div>
-  <br>
-  <div>
-    <strong data-bind="text: $data.selectedSubMetric()"/>
-    <table class="table table-condensed">
-     <thead>
-      <tr>
-        <th>${ _('Name') }</th>
-        <th>${ _('Value') }</th>
-      </tr>
-     </thead>
-     <!-- ko if: $data.filteredMetrics()[$data.selectedSubMetric()] -->
-     <tbody data-bind="foreach: {'data': Object.keys($data.filteredMetrics()[$data.selectedSubMetric()])}">
-      <tr>
-        <td data-bind="text: $data"></td>
-        <td data-bind="text: $parent.filteredMetrics()[$parent.selectedSubMetric()][$data]"></td>
-      </tr>
-      </tbody>
-     <!-- /ko -->
-    </table>
-  </div>
+  <div class="card card-small margin-top-10">
+    <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0,topSnap: '${ TOP_SNAP }', triggerAdjust: ${ is_embeddable and "0" or "106" }}">
+      <!-- ko if: metrics -->
+      <ul class="nav nav-pills" data-bind="foreach: metricsKeys">
+        <li data-bind="css: { 'active': $root.selectedMetric() === $data }">
+          <a href="javascript:void(0)" data-bind="text: $data, click: function(){ $root.selectedMetric($data) }"></a>
+        </li>
+      </ul>
+      <!-- /ko -->
+    </div>
 
- </span>
+
+    <div class="margin-top-10">
+      <input type="text" data-bind="textInput: metricsFilter, clearable: metricsFilter" class="input-xlarge pull-right margin-bottom-10" placeholder="${_('Filter metrics...')}">
+      <h4 data-bind="text: selectedMetric"></h4>
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th>${ _('Name') }</th>
+            <th>${ _('Value') }</th>
+          </tr>
+        </thead>
+        <!-- ko if: $data.filteredMetrics()[$data.selectedMetric()] -->
+        <tbody data-bind="foreach: {'data': Object.keys($data.filteredMetrics()[$data.selectedMetric()])}">
+          <tr>
+            <td data-bind="text: $data"></td>
+            <td data-bind="text: $parent.filteredMetrics()[$parent.selectedMetric()][$data]"></td>
+          </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko ifnot: $data.filteredMetrics()[$data.selectedMetric()] -->
+        <tfoot>
+          <tr>
+            <td colspan="2">${ _('There are no metrics matching your filter') }</td>
+          </tr>
+        </tfoot>
+        <!-- /ko -->
+      </table>
+    </div>
+  </div>
 </div>
 
 
