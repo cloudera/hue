@@ -18,6 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
+  from desktop.conf import EMBEDDED_MODE
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -31,6 +32,8 @@
     default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
     optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
   };
+
+  window.HUE_CONTAINER = '${ EMBEDDED_MODE.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
   %if request and request.COOKIES and request.COOKIES.get('csrftoken', '') != '':
     window.CSRF_TOKEN = '${request.COOKIES.get('csrftoken')}';

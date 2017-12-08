@@ -3556,11 +3556,11 @@ function loadSearch(collection, query, initial) {
   searchViewModel.isPlayerMode.subscribe(function(value) {
     if (value){
       $(".navigator").hide();
-      $("body").css("paddingTop", "40px");
+      $(HUE_CONTAINER).css("paddingTop", "40px");
     }
     else {
       $(".navigator").show();
-      $("body").css("paddingTop", "80px");
+      $(HUE_CONTAINER).css("paddingTop", "80px");
     }
   });
 

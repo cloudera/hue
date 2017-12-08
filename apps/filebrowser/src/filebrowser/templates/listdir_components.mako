@@ -861,7 +861,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         showContextMenu: function (row, e) {
           var cm = $('.context-menu'),
             actions = $('#ch-dropdown'),
-            rect = document.querySelector('body').getBoundingClientRect();
+            rect = document.querySelector(HUE_CONTAINER).getBoundingClientRect();
 
           e.stopPropagation();
 
@@ -1995,17 +1995,17 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
     $(document).ready(function () {
       // hide context menu
-      $('body').on('click', function (e) {
+      $(HUE_CONTAINER).on('click', function (e) {
         hideContextMenu();
       });
 
-      $('body').on('contextmenu', function (e) {
+      $(HUE_CONTAINER).on('contextmenu', function (e) {
         if ($.inArray(e.toElement, $('.table-huedatatable *')) === -1) {
           hideContextMenu();
         }
       });
 
-      $('body').on('contextmenu', '.context-menu', function (e) {
+      $(HUE_CONTAINER).on('contextmenu', '.context-menu', function (e) {
         hideContextMenu();
       });
 
