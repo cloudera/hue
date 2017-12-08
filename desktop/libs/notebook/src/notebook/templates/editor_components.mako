@@ -1522,6 +1522,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties().destination_path, valueUpdate: 'afterkeydown', filechooser: properties().destination_path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true }" placeholder="${ _('Destination path, e.g. ${nameNode2}/path/to/output.txt') }"/>
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label">${_('Variables')}</label>
+        <div class="controls">
+          <!-- ko template: { if: typeof properties().distcp_parameters != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko("Arguments") }', value: properties().distcp_parameters, title: '${ _ko("Arguments for the script") }', placeholder: '${ _ko("e.g. MAX=10, PATH=$PATH:/user/path") }' } } --><!-- /ko -->
+        </div>
+      </div>
       <!-- /ko -->
       <!-- ko if: type() == 'shell' -->
       <div class="control-group">
