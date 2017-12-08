@@ -1860,7 +1860,7 @@ class ClusterConfig():
         'displayName': other.nice_name,
         'buttonName': other.nice_name,
         'tooltip': other.nice_name,
-        'page': '/%s' % other.nice_name
+        'page': '/%s' % other.display_name
       })
 
     if interpreters:
