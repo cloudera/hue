@@ -16,16 +16,18 @@
 from __future__ import absolute_import
 
 import logging
-import re
+
 
 from django.utils.translation import ugettext_lazy as _, ugettext as _t
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
+
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_password_from_script
 from hadoop.core_site import get_adls_client_id, get_adls_authentication_code, get_adls_refresh_url
 
 
 LOG = logging.getLogger(__name__)
 
 REFRESH_URL = 'https://login.microsoftonline.com/<tenant_id>/oauth2/token'
+
 
 def get_default_client_id():
   """
@@ -86,7 +88,6 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
         key="client_id",
         type=str,
         dynamic_default=get_default_client_id,
-        private=True,
         help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
       CLIENT_ID_SCRIPT=Config(
         key="client_id_script",
@@ -110,7 +111,6 @@ AZURE_ACCOUNTS = UnspecifiedConfigSection(
         key="tenant_id",
         type=str,
         dynamic_default=get_default_tenant_id,
-        private=True,
         help="https://docs.microsoft.com/en-us/azure/data-lake-store/data-lake-store-service-to-service-authenticate-rest-api"),
       TENANT_ID_SCRIPT=Config(
         key='tenant_id_script',
