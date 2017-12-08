@@ -39,6 +39,7 @@ from django.views.decorators.http import require_POST
 import django.views.debug
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
+from azure.conf import is_adls_enabled, has_adls_access
 
 import desktop.conf
 import desktop.log.log_buffer
@@ -74,6 +75,7 @@ def hue(request):
     'apps': apps,
     'other_apps': other_apps,
     'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
+    'is_adls_enabled': is_adls_enabled() and has_adls_access(request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
@@ -471,6 +473,7 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
     'is_s3_enabled': is_s3_enabled() and has_s3_access(user),
+    'is_adls_enabled': is_adls_enabled() and has_adls_access(request.user),
     'banner_message': get_banner_message(request)
   })
 
