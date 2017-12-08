@@ -5976,7 +5976,6 @@
       var options = valueAccessor() || {};
       var scrollable = options.scrollable ? options.scrollable : window;
       var triggerAdjust = options.triggerAdjust || 0;
-
       $(element).addClass('dockable');
 
       var initialTopPosition = -1;
@@ -6024,6 +6023,7 @@
           $(scrollable).on('scroll', dock);
         }
       });
+
 
       function resetInitialStyle() {
         $(element).removeAttr('style');
