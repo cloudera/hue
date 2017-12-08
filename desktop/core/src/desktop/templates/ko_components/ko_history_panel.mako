@@ -25,13 +25,13 @@ from desktop.views import _ko
 <%def name="historyPanel()">
 
   <script type="text/html" id="hue-history-panel-template">
-    <button class="btn btn-flat pull-right btn-toggle-jobs-panel" title="${_('Task history')}" data-bind="toggle: historyPanelVisible">
+    <button class="btn btn-flat pull-right btn-toggle-jobs-panel" title="${_('Task history')}" data-bind="click: toggleVisibility">
       <i class="fa fa-history"></i>
       <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
       ## <div class="jobs-badge" data-bind="text: historyFinishedJobs().length, visible: historyFinishedJobs().length > 0"></div>
     </button>
 
-    <div class="jobs-panel history-panel" data-bind="visible: historyPanelVisible" style="display: none;">
+    <div class="jobs-panel history-panel" data-bind="visible: historyPanelVisible, style: { 'top' : top, 'left': left }" style="display: none;">
       <a class="pointer inactive-action pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
       <!-- ko ifnot: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
         <span style="font-style: italic">${ _('No task history.') }</span>
@@ -136,6 +136,9 @@ from desktop.views import _ko
     (function () {
       var HistoryPanel = function (params) {
         var self = this;
+
+        self.top = ko.observable();
+        self.left = ko.observable();
         self.historyPanelVisible = ko.observable(false);
 
         self.historyPanelVisible.subscribe(function (newVal) {
@@ -176,6 +179,14 @@ from desktop.views import _ko
         self.editorViewModel.editorMode(true);
         self.editorViewModel.isNotificationManager(true);
         self.editorViewModel.newNotebook();
+
+        self.$toggleElement;
+        var $container = $(HUE_CONTAINER);
+
+        self.reposition = function () {
+          self.top((self.$toggleElement.offset().top + self.$toggleElement.height() + 15) + 'px');
+          self.left(($container.offset().left + $container.width() - 630) + 'px');
+        };
 
         self.historyRunningJobs = ko.computed(function() {
           if (self.editorViewModel.selectedNotebook()) {
@@ -245,6 +256,26 @@ from desktop.views import _ko
             self.historyPanelVisible(true);
           });
         });
+      };
+
+      HistoryPanel.prototype.toggleVisibility = function (historyPanel, event) {
+        var self = this;
+        if (!self.historyPanelVisible()) {
+          self.$toggleElement = $(event.target);
+          self.reposition();
+          $(window).on('resize', self.reposition);
+          var positionSub = self.historyPanelVisible.subscribe(function (newValue) {
+            if (!newValue) {
+              $(window).off('resize', self.reposition);
+              positionSub.dispose();
+            }
+          })
+        }
+        self.historyPanelVisible(!self.historyPanelVisible());
+      };
+
+      HistoryPanel.prototype.dispose = function () {
+        $(window).off('resize', self.reposition);
       };
 
       ko.components.register('hue-history-panel', {

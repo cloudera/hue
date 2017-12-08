@@ -33,8 +33,6 @@
     optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
   };
 
-  window.HUE_CONTAINER = '${ EMBEDDED_MODE.get() }' === 'True' ? '.hue-embedded-container' : 'body';
-
   %if request and request.COOKIES and request.COOKIES.get('csrftoken', '') != '':
     window.CSRF_TOKEN = '${request.COOKIES.get('csrftoken')}';
   %else:
@@ -46,6 +44,8 @@
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+
+  window.HUE_CONTAINER = '${ EMBEDDED_MODE.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
   window.HUE_I18n = {
     autocomplete: {
