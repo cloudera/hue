@@ -5971,6 +5971,7 @@
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
       var scrollable = options.scrollable ? options.scrollable : window;
+      var triggerAdjust = options.triggerAdjust ? options.triggerAdjust : 0;
 
       $(element).addClass('dockable');
 
@@ -5985,8 +5986,9 @@
       function dock() {
         if (initialTopPosition == -1) {
           initialTopPosition = $(element).position().top;
+          ghost.height($(element).outerHeight() + (options.jumpCorrection || 0));
         }
-        if ($(scrollable).scrollTop() > initialTopPosition) {
+        if ($(scrollable).scrollTop() + triggerAdjust > initialTopPosition) {
           $(element).css({
             'position': 'fixed',
             'top': options.topSnap,
@@ -6017,6 +6019,15 @@
         if (scrollElement === scrollable) {
           $(scrollable).on('scroll', dock);
         }
+      });
+
+      $(window).on('resize', function(){
+        $(element).removeAttr('style');
+        initialSize = {
+          w: $(element).width(),
+          h: $(element).outerHeight() + (options.jumpCorrection || 0)
+        };
+        dock();
       });
 
     }
