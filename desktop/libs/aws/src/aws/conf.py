@@ -93,7 +93,6 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ACCESS_KEY_ID=Config(
         key='access_key_id',
         type=str,
-        private=True,
         dynamic_default=get_default_access_key_id
       ),
       ACCESS_KEY_ID_SCRIPT=Config(
