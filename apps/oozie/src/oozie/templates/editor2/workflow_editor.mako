@@ -601,7 +601,7 @@ ${ dashboard.import_bindings() }
 ${ utils.submit_popup_event() }
 
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
+% if conf.CUSTOM.BANNER_TOP_HTML.get() or not is_embeddable:
   .card-toolbar {
     top: 100px!important;
   }
