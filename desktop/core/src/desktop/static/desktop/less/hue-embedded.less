@@ -18,27 +18,23 @@
 @import (reference) "cui/colors.less";
 @import (reference) "hue-mixins.less";
 
-@import "cui/sidebar";
-@import "hue-assist";
-@import "hue-autocomplete";
-@import "hue-cui-overrides.less";
-@import "hue-cross-version.less";
+@import (inline) "../ext/css/cui/cui.css";
+@import (inline) "../ext/css/cui/bootstrap2.css";
+@import (inline) "../ext/css/cui/bootstrap-responsive2.css";
+@import (inline) "../css/jquery-ui.css";
 
-@import "components/hue-hamburger.less";
-@import "hue4.less";
-
-html {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  font-size: 1em;
-}
-
-body {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+.hue-embedded-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
   overflow: hidden;
+
+  @import "hue-assist.less";
+  @import "hue-autocomplete.less";
+  @import "hue-cui-overrides.less";
+  @import "hue-cross-version.less";
+  @import "hue4.less";
+  @import "home.less";
 }
