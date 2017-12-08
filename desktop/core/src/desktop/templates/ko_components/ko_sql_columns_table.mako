@@ -56,7 +56,7 @@ from desktop.views import _ko
           </tr>
           </thead>
           <!-- /ko -->
-          <tbody data-bind="foreachVisible: { data: filteredColumns, disableNiceScroll: true, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'context.popover.dispose' }">
+          <tbody data-bind="foreachVisible: { data: filteredColumns, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'context.popover.dispose' }">
           <tr>
             <!-- ko if: typeof selected === 'undefined' -->
             <td data-bind="text: $index()+$indexOffset()+1"></td>
