@@ -32,7 +32,9 @@
             % if node['properties']['java_opts']:
               <java-opts>${ node['properties']['java_opts'] }</java-opts>
             % endif
-
+            % for argument in node['properties']['distcp_parameters']:
+              <arg>${ argument }</arg>
+            % endfor
             <arg>${ smart_path(node['properties']['source_path']) }</arg>
             <arg>${ smart_path(node['properties']['destination_path']) }</arg>
         </distcp>

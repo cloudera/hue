@@ -3954,6 +3954,7 @@ class WorkflowBuilder():
     node = self._get_distcp_node(document.uuid, is_document_node=True)
 
     node['properties']['uuid'] = document.uuid
+    node['properties']['distcp_parameters'] = document.data_dict['snippets'][0]['properties'].get('distcp_parameters', [])
 
     return node
 
@@ -3974,6 +3975,7 @@ class WorkflowBuilder():
               "retry_interval": [],
               "job_properties": [],
               "prepares": [],
+              "distcp_parameters": [],
               "credentials": credentials,
               "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
               "archives": []
