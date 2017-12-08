@@ -18,6 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
+  from desktop.conf import EMBEDDED_MODE
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
@@ -44,16 +45,17 @@
   <meta name="author" content="">
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
+% if EMBEDDED_MODE.get():
+  <link href="${ static('desktop/css/hue-embedded.css') }" rel="stylesheet">
+% else:
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
-
-
-  <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/home.css') }" rel="stylesheet">
-
+% endif
   <script type="text/javascript">
     window.IS_HUE_4 = true;
   </script>
@@ -69,6 +71,10 @@
 </head>
 
 <body>
+
+% if EMBEDDED_MODE.get():
+<div class="hue-embedded-container">
+% endif
 
 % if is_demo:
   <ul class="side-labels unstyled">
@@ -1674,6 +1680,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 </script>
 
 ${ commonHeaderFooterComponents.footer(messages) }
+
+% if EMBEDDED_MODE.get():
+</div>
+% endif
 
 </body>
 </html>
