@@ -26,7 +26,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-job-browser-links-template">
     <div class="btn-group pull-right">
-      <a class="btn btn-flat" style="padding-right: 4px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function(){ huePubSub.publish('hide.jobs.panel'); }">
+      <a class="btn btn-flat" style="padding-right: 4px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser#!jobs', click: function() { huePubSub.publish('hide.jobs.panel'); }">
         <span>${ _('Jobs') }</span>
       </a>
       <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Jobs preview')}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
@@ -43,13 +43,25 @@ from desktop.views import _ko
       var JobBrowserPanel = function (params) {
         var self = this;
 
+        var $container = $(HUE_CONTAINER);
+        var $jobsPanel = $('#jobsPanel');
+        var $toggle = $('.btn-toggle-jobs-panel');
+
+        var reposition = function () {
+          $jobsPanel.css('top', ($toggle.offset().top + $toggle.height() + 15) + 'px');
+          $jobsPanel.css('left', ($container.offset().left + $container.width() - 630) + 'px')
+        };
+
         huePubSub.subscribe('hide.jobs.panel', function () {
-          $('#jobsPanel').hide();
+          $(window).off('resize', reposition);
+          $jobsPanel.hide();
         });
 
         huePubSub.subscribe('show.jobs.panel', function (section) {
           huePubSub.publish('hide.history.panel');
-          $('#jobsPanel').show();
+          $(window).on('resize', reposition);
+          reposition();
+          $jobsPanel.show();
           huePubSub.publish('mini.jb.navigate', section && section.interface ? section.interface : 'jobs');
           if (section && section.id) {
             huePubSub.publish('mini.jb.open.job', section.id);
@@ -57,7 +69,7 @@ from desktop.views import _ko
         });
 
         huePubSub.subscribe('toggle.jobs.panel', function () {
-          if ($('#jobsPanel').is(':visible')){
+          if ($jobsPanel.is(':visible')){
             huePubSub.publish('hide.jobs.panel');
           }
           else {
