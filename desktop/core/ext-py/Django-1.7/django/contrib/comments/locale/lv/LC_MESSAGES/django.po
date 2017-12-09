@@ -1,0 +1,315 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:44+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Latvian (http://www.transifex.com/projects/p/django/language/"
+"lv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lv\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
+
+#: contrib/comments/admin.py:25
+msgid "Content"
+msgstr "Saturs"
+
+#: contrib/comments/admin.py:28
+msgid "Metadata"
+msgstr "Metadati"
+
+#: contrib/comments/admin.py:55
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: contrib/comments/admin.py:57
+msgid "Flag selected comments"
+msgstr "Atzīmēt izvēlētos komentārus"
+
+#: contrib/comments/admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: contrib/comments/admin.py:63
+msgid "Approve selected comments"
+msgstr "Apstiprināt izvēlētos komentārus"
+
+#: contrib/comments/admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: contrib/comments/admin.py:69
+msgid "Remove selected comments"
+msgstr "Dzēst izvēlētos komentārus"
+
+#: contrib/comments/apps.py:8
+msgid "Comments"
+msgstr ""
+
+#: contrib/comments/feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "%(site_name)s komentāri"
+
+#: contrib/comments/feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Pēdējie komentāri lapā %(site_name)s"
+
+#: contrib/comments/forms.py:96
+msgid "Name"
+msgstr "Vārds"
+
+#: contrib/comments/forms.py:97
+msgid "Email address"
+msgstr "E-pasta adrese"
+
+#: contrib/comments/forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: contrib/comments/forms.py:99
+msgid "Comment"
+msgstr "Komentārs"
+
+#: contrib/comments/forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Lūdzam ievērot pieklājību! Vārds %s šeit nav atļauts."
+msgstr[1] "Lūdzam ievērot pieklājību! Vārdi %s šeit nav atļauti."
+msgstr[2] "Lūdzam ievērot pieklājību! Vārdi %s šeit nav atļauti."
+
+#: contrib/comments/forms.py:181
+#: contrib/comments/templates/comments/preview.html:16
+msgid "and"
+msgstr "un"
+
+#: contrib/comments/forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Ja aizpildīsiet šo lauku, tad komentārs tiks uzskatīts par spamu"
+
+#: contrib/comments/models.py:23
+msgid "content type"
+msgstr "satura tips"
+
+#: contrib/comments/models.py:25
+msgid "object ID"
+msgstr "objekta ID"
+
+#: contrib/comments/models.py:53 contrib/comments/models.py:177
+msgid "user"
+msgstr "lietotājs"
+
+#: contrib/comments/models.py:55
+msgid "user's name"
+msgstr "lietotāja vārds"
+
+#: contrib/comments/models.py:56
+msgid "user's email address"
+msgstr "lietotāja e-pasta adrese"
+
+#: contrib/comments/models.py:57
+msgid "user's URL"
+msgstr "lietotāja URL"
+
+#: contrib/comments/models.py:59 contrib/comments/models.py:79
+#: contrib/comments/models.py:178
+msgid "comment"
+msgstr "komentārs"
+
+#: contrib/comments/models.py:62
+msgid "date/time submitted"
+msgstr "nosūtīšanas datums/laiks"
+
+#: contrib/comments/models.py:63
+msgid "IP address"
+msgstr "IP adrese"
+
+#: contrib/comments/models.py:64
+msgid "is public"
+msgstr "publisks"
+
+#: contrib/comments/models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Noņemiet ķeksi, lai komentārs neparādītos lapā."
+
+#: contrib/comments/models.py:67
+msgid "is removed"
+msgstr "dzēsts"
+
+#: contrib/comments/models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Atķeksējiet, ja komentārs ir neatbilstošs (nepieklājīgs). Tā vietā tiks "
+"rādīts paziņojums \"Šis komentārs ir izdzēsts\"."
+
+#: contrib/comments/models.py:80
+msgid "comments"
+msgstr "komentāri"
+
+#: contrib/comments/models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Šo komentāru rakstīja autentificēts lietotājs, tāpēc vārds ir tikai "
+"lasīšanas režīmā."
+
+#: contrib/comments/models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Šo komentāru rakstīja autentificēts lietotājs, tāpēc e-pasts ir tikai "
+"lasīšanas režīmā."
+
+#: contrib/comments/models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Pievienojis  %(user)s, %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:179
+msgid "flag"
+msgstr "atzīmēt"
+
+#: contrib/comments/models.py:180
+msgid "date"
+msgstr "datums"
+
+#: contrib/comments/models.py:190
+msgid "comment flag"
+msgstr "komentāra atzīmējums"
+
+#: contrib/comments/models.py:191
+msgid "comment flags"
+msgstr "komentāra atzīmējumi"
+
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Apstiprināt komentāru"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Patiešām padarīt šo komentāru publisku?"
+
+#: contrib/comments/templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Apstiprināt"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Paldies par apstiprināšanu"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr ""
+"Paldies par laika veltīšanu mūsu lapas diskusiju kvalitātes uzlabošanai"
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Dzēst komentāru"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Patiešām dzēst šo komentāru?"
+
+#: contrib/comments/templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Dzēst"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Paldies par dzēšanu"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Atzīmēt šo komentāru"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Patiešām atzīmēt šo komentāru?"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Atzīmējums"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Paldies par komentāra atzīmēšanu"
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Post"
+msgstr "Iesūtīt"
+
+#: contrib/comments/templates/comments/form.html:18
+#: contrib/comments/templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Priekšskats"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Paldies par komentēšanu"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Paldies par Jūsu komentāru"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:13
+msgid "Preview your comment"
+msgstr "Pirmsskatīt komentāru"
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgstr "Lūdzu, izlabojiet kļūdu zemāk."
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Iesūtīt komentāru"
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "vai veikt izmaiņas"

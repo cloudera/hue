@@ -1,0 +1,316 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Janos Guljas <janos@resenje.org>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:44+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Serbian (Latin) (http://www.transifex.com/projects/p/django/"
+"language/sr@latin/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sr@latin\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: contrib/comments/admin.py:25
+msgid "Content"
+msgstr "Sadržaj"
+
+#: contrib/comments/admin.py:28
+msgid "Metadata"
+msgstr "Metapodaci"
+
+#: contrib/comments/admin.py:55
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: contrib/comments/admin.py:57
+msgid "Flag selected comments"
+msgstr "Označavanje izabranih komentara"
+
+#: contrib/comments/admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: contrib/comments/admin.py:63
+msgid "Approve selected comments"
+msgstr "Odobrenje izabranih komentara"
+
+#: contrib/comments/admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: contrib/comments/admin.py:69
+msgid "Remove selected comments"
+msgstr "Obriši izabrane komentare"
+
+#: contrib/comments/apps.py:8
+msgid "Comments"
+msgstr ""
+
+#: contrib/comments/feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "Komentari na sajtu %(site_name)s"
+
+#: contrib/comments/feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Skoriji komentari na sajtu %(site_name)s"
+
+#: contrib/comments/forms.py:96
+msgid "Name"
+msgstr "Ime"
+
+#: contrib/comments/forms.py:97
+msgid "Email address"
+msgstr "Imejl adresa"
+
+#: contrib/comments/forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: contrib/comments/forms.py:99
+msgid "Comment"
+msgstr "Komentari"
+
+#: contrib/comments/forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Pazite šta pišete! Reč %s nije dozvoljena ovde."
+msgstr[1] "Pazite šta pišete! Reči %s nisu dozvoljene ovde."
+msgstr[2] "Pazite šta pišete! Reči %s nisu dozvoljene ovde."
+
+#: contrib/comments/forms.py:181
+#: contrib/comments/templates/comments/preview.html:16
+msgid "and"
+msgstr "i"
+
+#: contrib/comments/forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Ako išta unesete u ovo polje, Vaš komentar će se smatrati spamom."
+
+#: contrib/comments/models.py:23
+msgid "content type"
+msgstr "tip sadržaja"
+
+#: contrib/comments/models.py:25
+msgid "object ID"
+msgstr "ID objekta"
+
+#: contrib/comments/models.py:53 contrib/comments/models.py:177
+msgid "user"
+msgstr "korisnik"
+
+#: contrib/comments/models.py:55
+msgid "user's name"
+msgstr "korisnikovo ime"
+
+#: contrib/comments/models.py:56
+msgid "user's email address"
+msgstr "korisnikova imejl adresa"
+
+#: contrib/comments/models.py:57
+msgid "user's URL"
+msgstr "korisnikov URL"
+
+#: contrib/comments/models.py:59 contrib/comments/models.py:79
+#: contrib/comments/models.py:178
+msgid "comment"
+msgstr "komentar"
+
+#: contrib/comments/models.py:62
+msgid "date/time submitted"
+msgstr "datum/vreme postavljanja"
+
+#: contrib/comments/models.py:63
+msgid "IP address"
+msgstr "IP adresa"
+
+#: contrib/comments/models.py:64
+msgid "is public"
+msgstr "javno"
+
+#: contrib/comments/models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr ""
+"Deselektujte ovo polje ako želite da poruka faktički nestane sa ovog sajta."
+
+#: contrib/comments/models.py:67
+msgid "is removed"
+msgstr "uklonjen"
+
+#: contrib/comments/models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Obeležite ovu kućicu ako je komentar neprikladan. Poruka o uklanjanju će "
+"biti prikazana umesto komentara."
+
+#: contrib/comments/models.py:80
+msgid "comments"
+msgstr "komentari"
+
+#: contrib/comments/models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Ovaj komentar je postavio prijavljen korisnik i zato je polje sa imenom "
+"zaključano."
+
+#: contrib/comments/models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Ovaj komentar je postavio prijavljen korisnik i zato je polje sa imejl "
+"adresom zaključano."
+
+#: contrib/comments/models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Postavio %(user)s, %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:179
+msgid "flag"
+msgstr "oznaka"
+
+#: contrib/comments/models.py:180
+msgid "date"
+msgstr "datum"
+
+#: contrib/comments/models.py:190
+msgid "comment flag"
+msgstr "oznaka komentara"
+
+#: contrib/comments/models.py:191
+msgid "comment flags"
+msgstr "oznake komentara"
+
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Odobrenje komentara"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Da li zaista želite da označite ovaj komentar javnim?"
+
+#: contrib/comments/templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Odobri"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Hvala na odobrenju!"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "Hvala na učešću u unapređenju kvaliteta diskusija na našem sajtu."
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Obriši komentar"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Da li zaista želite da obrišete ovaj komentar?"
+
+#: contrib/comments/templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Obriši"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Hvala što koristite naš sajt!"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Označavanje komentara"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Da li zaista želite da označite ovaj komentar?"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Označi"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Hvala što ste označili komentar."
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Post"
+msgstr "Postavi"
+
+#: contrib/comments/templates/comments/form.html:18
+#: contrib/comments/templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Pregled"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Hvala na komentaru"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Hvala što ste ostavili svoj komentar"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:13
+msgid "Preview your comment"
+msgstr "Pregledaj komentar"
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgstr "Ispravite navedene greške"
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr ""
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Postavi komentar"
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "ili izvrši izmene"

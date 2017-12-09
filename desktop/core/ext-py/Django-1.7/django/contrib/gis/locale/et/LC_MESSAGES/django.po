@@ -1,0 +1,99 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# eallik <eallik@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Janno Liivak <jannolii@gmail.com>, 2013-2014
+# madisvain <madisvain@gmail.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-06-20 21:19+0000\n"
+"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
+"et/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: et\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: contrib/gis/apps.py:8
+msgid "GIS"
+msgstr "GIS"
+
+#: contrib/gis/db/models/fields.py:56
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr "Baas GIS väli -- ühildub OpenGIS Spetsifikatsiooni Geomeetria tüübiga."
+
+#: contrib/gis/db/models/fields.py:298
+msgid "Point"
+msgstr "Punkt"
+
+#: contrib/gis/db/models/fields.py:304
+msgid "Line string"
+msgstr "Üherea tekst"
+
+#: contrib/gis/db/models/fields.py:310
+msgid "Polygon"
+msgstr "Polügon"
+
+#: contrib/gis/db/models/fields.py:316
+msgid "Multi-point"
+msgstr "Multi-punkt"
+
+#: contrib/gis/db/models/fields.py:322
+msgid "Multi-line string"
+msgstr "Mitmerealine string"
+
+#: contrib/gis/db/models/fields.py:328
+msgid "Multi polygon"
+msgstr "Multi-polügon"
+
+#: contrib/gis/db/models/fields.py:334
+msgid "Geometry collection"
+msgstr "Geomeetriakogum"
+
+#: contrib/gis/forms/fields.py:22
+msgid "No geometry value provided."
+msgstr "Geomeetriline väärtus puudub."
+
+#: contrib/gis/forms/fields.py:23
+msgid "Invalid geometry value."
+msgstr "Vigane geomeetriline väärtus."
+
+#: contrib/gis/forms/fields.py:24
+msgid "Invalid geometry type."
+msgstr "Vigane geomeetriline tüüp."
+
+#: contrib/gis/forms/fields.py:25
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr "Geomeetria teisendamisel geomeetria vormivälja SRID-ks tekkis viga."
+
+#: contrib/gis/sitemaps/views.py:56
+#, python-format
+msgid "No sitemap available for section: %r"
+msgstr "Sektsioonil %r puudub saidikaart"
+
+#: contrib/gis/sitemaps/views.py:70
+#, python-format
+msgid "Page %s empty"
+msgstr "Leht %s on tühi"
+
+#: contrib/gis/sitemaps/views.py:72
+#, python-format
+msgid "No page '%s'"
+msgstr "Puudub leht '%s'"
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr "Ühtegi voogu pole registreeritud."
+
+#: contrib/gis/views.py:16
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Nälk %r ei ole registreeritud."

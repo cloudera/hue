@@ -1,0 +1,319 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-05-20 09:44+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
+"cy/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cy\n"
+"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
+"11) ? 2 : 3;\n"
+
+#: contrib/comments/admin.py:25
+msgid "Content"
+msgstr "Cynnwys"
+
+#: contrib/comments/admin.py:28
+msgid "Metadata"
+msgstr "Metadata"
+
+#: contrib/comments/admin.py:55
+#, python-format
+msgid "%d comment was successfully flagged"
+msgid_plural "%d comments were successfully flagged"
+msgstr[0] "fflagiwyd %d sylw yn llwyddiannus"
+msgstr[1] "fflagiwyd %d sylw yn llwyddiannus"
+msgstr[2] "fflagiwyd %d sylw yn llwyddiannus"
+msgstr[3] "fflagiwyd %d sylw yn llwyddiannus"
+
+#: contrib/comments/admin.py:57
+msgid "Flag selected comments"
+msgstr "Fflagio'r sylwadau â ddewisiwyd"
+
+#: contrib/comments/admin.py:61
+#, python-format
+msgid "%d comment was successfully approved"
+msgid_plural "%d comments were successfully approved"
+msgstr[0] "Cymeradwywyd %d sylw yn llwyddiannus"
+msgstr[1] "Cymeradwywyd %d sylw yn llwyddiannus"
+msgstr[2] "Cymeradwywyd %d sylw yn llwyddiannus"
+msgstr[3] "Cymeradwywyd %d sylw yn llwyddiannus"
+
+#: contrib/comments/admin.py:63
+msgid "Approve selected comments"
+msgstr "Cymeradwyo'r sylwadau â ddewiswyd"
+
+#: contrib/comments/admin.py:67
+#, python-format
+msgid "%d comment was successfully removed"
+msgid_plural "%d comments were successfully removed"
+msgstr[0] "Gwaredwyd %d sylw yn llwyddiannus"
+msgstr[1] "Gwaredwyd %d sylw yn llwyddiannus"
+msgstr[2] "Gwaredwyd %d sylw yn llwyddiannus"
+msgstr[3] "Gwaredwyd %d sylw yn llwyddiannus"
+
+#: contrib/comments/admin.py:69
+msgid "Remove selected comments"
+msgstr "Gwaredu'r sylwadau a ddewiswyd"
+
+#: contrib/comments/apps.py:8
+msgid "Comments"
+msgstr ""
+
+#: contrib/comments/feeds.py:14
+#, python-format
+msgid "%(site_name)s comments"
+msgstr "Sylwadau %(site_name)s"
+
+#: contrib/comments/feeds.py:20
+#, python-format
+msgid "Latest comments on %(site_name)s"
+msgstr "Sylwadau diweddaraf ar %(site_name)s"
+
+#: contrib/comments/forms.py:96
+msgid "Name"
+msgstr "Enw"
+
+#: contrib/comments/forms.py:97
+msgid "Email address"
+msgstr "Cyfeiriad ebost"
+
+#: contrib/comments/forms.py:98
+msgid "URL"
+msgstr "URL"
+
+#: contrib/comments/forms.py:99
+msgid "Comment"
+msgstr "Sylw"
+
+#: contrib/comments/forms.py:177
+#, python-format
+msgid "Watch your mouth! The word %s is not allowed here."
+msgid_plural "Watch your mouth! The words %s are not allowed here."
+msgstr[0] "Bydd yn ofalus!  Ni ganiateir y gair %s yma."
+msgstr[1] "Bydd yn ofalus!  Ni ganiateir y geiriau %s yma."
+msgstr[2] "Bydd yn ofalus!  Ni ganiateir y geiriau %s yma."
+msgstr[3] "Bydd yn ofalus!  Ni ganiateir y geiriau %s yma."
+
+#: contrib/comments/forms.py:181
+#: contrib/comments/templates/comments/preview.html:16
+msgid "and"
+msgstr "a"
+
+#: contrib/comments/forms.py:186
+msgid ""
+"If you enter anything in this field your comment will be treated as spam"
+msgstr "Os rowch unrhywbeth yn y maes yma bydd y sylw yn cael ei drin fel sbam"
+
+#: contrib/comments/models.py:23
+msgid "content type"
+msgstr "math cynnwys"
+
+#: contrib/comments/models.py:25
+msgid "object ID"
+msgstr "ID gwrthrych"
+
+#: contrib/comments/models.py:53 contrib/comments/models.py:177
+msgid "user"
+msgstr "defnyddiwr"
+
+#: contrib/comments/models.py:55
+msgid "user's name"
+msgstr "enw'r defnyddiwr"
+
+#: contrib/comments/models.py:56
+msgid "user's email address"
+msgstr "cyfeiriad ebost y defnyddiwr"
+
+#: contrib/comments/models.py:57
+msgid "user's URL"
+msgstr "URL y defnyddiwr"
+
+#: contrib/comments/models.py:59 contrib/comments/models.py:79
+#: contrib/comments/models.py:178
+msgid "comment"
+msgstr "sylw"
+
+#: contrib/comments/models.py:62
+msgid "date/time submitted"
+msgstr "dyddiad/amser cyflwynwyd"
+
+#: contrib/comments/models.py:63
+msgid "IP address"
+msgstr "cyfeiriad IP"
+
+#: contrib/comments/models.py:64
+msgid "is public"
+msgstr "cyhoeddus"
+
+#: contrib/comments/models.py:65
+msgid ""
+"Uncheck this box to make the comment effectively disappear from the site."
+msgstr "Dad-ddewiswch y blwch yma i wneud i'r sywl ddiflannu o'r wefan."
+
+#: contrib/comments/models.py:67
+msgid "is removed"
+msgstr "wedi'i waredu"
+
+#: contrib/comments/models.py:68
+msgid ""
+"Check this box if the comment is inappropriate. A \"This comment has been "
+"removed\" message will be displayed instead."
+msgstr ""
+"Dewiswch y blwch yma os ydy'r sylw yn amhriodol.  Bydd neges yn dweud "
+"\"Mae'r sylw yma wedi  ei waredu\" yn dangos yn ei le."
+
+#: contrib/comments/models.py:80
+msgid "comments"
+msgstr "sylwadau"
+
+#: contrib/comments/models.py:124
+msgid ""
+"This comment was posted by an authenticated user and thus the name is read-"
+"only."
+msgstr ""
+"Postiwyd y neges hon gan ddefnyddiwr wedi'i ddilysu ac felly mae'r enw yn "
+"ddarllenadwy yn unig."
+
+#: contrib/comments/models.py:134
+msgid ""
+"This comment was posted by an authenticated user and thus the email is read-"
+"only."
+msgstr ""
+"Postiwyd y neges hon gan ddefnyddiwr wedi'i ddilysu ac felly mae'r ebost yn "
+"ddarllenadwy yn unig."
+
+#: contrib/comments/models.py:160
+#, python-format
+msgid ""
+"Posted by %(user)s at %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+msgstr ""
+"Postiwyd gan %(user)s ar %(date)s\n"
+"\n"
+"%(comment)s\n"
+"\n"
+"http://%(domain)s%(url)s"
+
+#: contrib/comments/models.py:179
+msgid "flag"
+msgstr "baner"
+
+#: contrib/comments/models.py:180
+msgid "date"
+msgstr "dyddiad"
+
+#: contrib/comments/models.py:190
+msgid "comment flag"
+msgstr "baner sylw"
+
+#: contrib/comments/models.py:191
+msgid "comment flags"
+msgstr "baner sylw"
+
+#: contrib/comments/templates/comments/approve.html:4
+msgid "Approve a comment"
+msgstr "Cymeradwyo sylw"
+
+#: contrib/comments/templates/comments/approve.html:7
+msgid "Really make this comment public?"
+msgstr "Ydych yn sicr eich bod am wneud y sylw yma yn gyhoeddus?"
+
+#: contrib/comments/templates/comments/approve.html:12
+msgid "Approve"
+msgstr "Cymeradwyo"
+
+#: contrib/comments/templates/comments/approved.html:4
+msgid "Thanks for approving"
+msgstr "Diolch am gymeradwyo"
+
+#: contrib/comments/templates/comments/approved.html:7
+#: contrib/comments/templates/comments/deleted.html:7
+#: contrib/comments/templates/comments/flagged.html:7
+msgid ""
+"Thanks for taking the time to improve the quality of discussion on our site"
+msgstr "Diolch am gymryd amser i wella ansawdd y drafodaeth ar ein gwefan"
+
+#: contrib/comments/templates/comments/delete.html:4
+msgid "Remove a comment"
+msgstr "Gwaredu sylw"
+
+#: contrib/comments/templates/comments/delete.html:7
+msgid "Really remove this comment?"
+msgstr "Ydych yn sicr eich bod am waredu'r sylw yma?"
+
+#: contrib/comments/templates/comments/delete.html:12
+msgid "Remove"
+msgstr "Gwaredu"
+
+#: contrib/comments/templates/comments/deleted.html:4
+msgid "Thanks for removing"
+msgstr "Diolch am waredu"
+
+#: contrib/comments/templates/comments/flag.html:4
+msgid "Flag this comment"
+msgstr "Fflagio'r sylw"
+
+#: contrib/comments/templates/comments/flag.html:7
+msgid "Really flag this comment?"
+msgstr "Ydych yn sicr eich bod am fflagio'r sylw hwn?"
+
+#: contrib/comments/templates/comments/flag.html:12
+msgid "Flag"
+msgstr "Fflagio"
+
+#: contrib/comments/templates/comments/flagged.html:4
+msgid "Thanks for flagging"
+msgstr "Diolch am fflagio"
+
+#: contrib/comments/templates/comments/form.html:17
+#: contrib/comments/templates/comments/preview.html:32
+msgid "Post"
+msgstr "Postio"
+
+#: contrib/comments/templates/comments/form.html:18
+#: contrib/comments/templates/comments/preview.html:33
+msgid "Preview"
+msgstr "Rhagolwg"
+
+#: contrib/comments/templates/comments/posted.html:4
+msgid "Thanks for commenting"
+msgstr "Diolch am adael sylw"
+
+#: contrib/comments/templates/comments/posted.html:7
+msgid "Thank you for your comment"
+msgstr "Diolch am eich sylw"
+
+#: contrib/comments/templates/comments/preview.html:4
+#: contrib/comments/templates/comments/preview.html:13
+msgid "Preview your comment"
+msgstr "Rhagwylio eich sylw"
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the error below"
+msgstr "Cywirwch y gwall isod"
+
+#: contrib/comments/templates/comments/preview.html:11
+msgid "Please correct the errors below"
+msgstr "Cywirwch y gwallau isod"
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "Post your comment"
+msgstr "Postio eich sylw"
+
+#: contrib/comments/templates/comments/preview.html:16
+msgid "or make changes"
+msgstr "neu gwneud newidiadau"

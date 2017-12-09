@@ -1,0 +1,43 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Shinya Okano <tokibito@gmail.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-05-19 15:12+0200\n"
+"PO-Revision-Date: 2014-06-28 10:03+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
+"ja/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contrib/sessions/apps.py:8
+msgid "Sessions"
+msgstr "セッション"
+
+#: contrib/sessions/models.py:38
+msgid "session key"
+msgstr "セッションキー"
+
+#: contrib/sessions/models.py:40
+msgid "session data"
+msgstr "セッションデータ"
+
+#: contrib/sessions/models.py:41
+msgid "expire date"
+msgstr "有効期限"
+
+#: contrib/sessions/models.py:46
+msgid "session"
+msgstr "セッション"
+
+#: contrib/sessions/models.py:47
+msgid "sessions"
+msgstr "セッション"
