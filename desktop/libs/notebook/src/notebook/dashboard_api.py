@@ -82,25 +82,26 @@ class SQLDashboardApi(DashboardApi):
             if not last_dimension_seen:
               fields.insert(0, self._get_aggregate_function(f) + 'AS %(field)s_%(position)s' % f)
 
-        if self._supports_count_over():
+        has_facet_mincount_greater_than_one = [f for f in facet['properties']['facets'] if f['mincount'] > 1]
+        if has_facet_mincount_greater_than_one and self._supports_count_over():
           mincount_fields_name = []
           mincount_fields_operation = []
           mincount_where = []
           for f in facet['properties']['facets']:
             mincount_fields_name.append(f['field'])
-            mincount_field_name = '_'.join(mincount_fields_name) + "_count"
-            mincount_fields_operation.append('count(*) over (partition by %s) as %s' % (','.join(mincount_fields_name), mincount_field_name) )
+            mincount_field_name = 'count__' + '_'.join(mincount_fields_name)
+            mincount_fields_operation.append('COUNT(*) OVER (PARTITION BY %s) AS %s' % (', '.join(mincount_fields_name), mincount_field_name) )
             mincount_where.append('%s >= %s' % (mincount_field_name, str(f['mincount'])))
-          sql_mincount = '''(SELECT * FROM (SELECT *,%(fields)s
+          sql_mincount = '''(SELECT * FROM (SELECT *, %(fields)s
           FROM %(database)s.%(table)s) default
           WHERE %(where)s) default''' % {
             'fields': ', '.join(mincount_fields_operation),
             'database': database,
             'table': table,
-            'where': ' and '.join(mincount_where)
+            'where': ' AND '.join(mincount_where)
           }
         else:
-          sql_mincount = '(%(database)s.%(table)s)' % {
+          sql_mincount = '%(database)s.%(table)s' % {
             'database': database,
             'table': table
           }
@@ -706,30 +707,16 @@ class SQLDashboardApi(DashboardApi):
              "selected": row[0] in fq_fields,
              "value": row[0]
           })
-    elif dimension == 2:
-      for row in rows:
-        value_fields = [f['field'] for f in dimension_fields] # e.g. SELECT `job`, cast(salary / 11000 as INT) * 10 AS salary_range, `gender`, COUNT(*), avg(salary)
-        fq_values = [row[0], row[1]]
-        counts.append({
-            "count": row[-1],
-            "fq_values": fq_values,
-            "selected": fq_values in fq_fields,
-            "fq_fields": value_fields,
-            "value": row[1],
-            "cat": row[0],
-            "exclude": False
-        })
     else: # Nested facets can have dimension > 2
       for row in rows:
-        value_fields = [f['field'] for f in
-                        dimension_fields]
+        value_fields = [f['field'] for f in dimension_fields]  # e.g. SELECT `job`, cast(salary / 11000 as INT) * 10 AS salary_range, `gender`, COUNT(*), avg(salary)
         fq_values = row[:dimension]
         counts.append({
           "count": row[-1],
           "fq_values": fq_values,
           "selected": fq_values in fq_fields,
           "fq_fields": value_fields,
-          "value": ",".join(row[:dimension]),
+          "value": row[1] if dimension == 2 else ', '.join(str(x) for x in fq_values),
           "cat": row[0],
           "exclude": False
         })
