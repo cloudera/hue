@@ -733,9 +733,6 @@ var Collection = function (vm, collection) {
       facet.properties.limit.subscribe(function () {
         vm.search();
       });
-      facet.properties.mincount.subscribe(function () {
-        vm.search();
-      });
       if (facet.properties.gap) {
         facet.properties.gap.subscribe(function () {
           vm.search();
@@ -810,10 +807,6 @@ var Collection = function (vm, collection) {
 
   self._addObservablesToNestedFacet = function(facet, nestedFacet, vm) {
     nestedFacet.limit.subscribe(function () {
-      vm.search();
-    });
-
-    nestedFacet.mincount.subscribe(function () {
       vm.search();
     });
 
@@ -1013,9 +1006,6 @@ var Collection = function (vm, collection) {
       pivot.aggregate.subscribe(function() {
         vm.search();
       });
-      pivot.mincount.subscribe(function () {
-        vm.search();
-      });
       facet.properties.facets.push(pivot);
     }
   }
@@ -1047,9 +1037,6 @@ var Collection = function (vm, collection) {
 
     if (pivot != null) {
       pivot.aggregate.function.subscribe(function() {
-        vm.search();
-      });
-      pivot.mincount.subscribe(function () {
         vm.search();
       });
       facet.properties.facets.push(pivot);
