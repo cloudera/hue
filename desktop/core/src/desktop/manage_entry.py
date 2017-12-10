@@ -36,7 +36,7 @@ def entry():
   _deprecation_check(sys.argv[0])
 
   from django.core.exceptions import ImproperlyConfigured
-  from django.core.management import execute_from_command_line, find_commands, find_management_module
+  from django.core.management import execute_from_command_line, find_commands
   from django.core.management import LaxOptionParser
   from django.core.management.base import BaseCommand
 

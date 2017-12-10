@@ -76,7 +76,7 @@ class CheckForSetup(models.Model):
   whether jobsub_setup has run succesfully.
   """
   # Pre-Hue2 setup
-  setup_run = models.BooleanField()
+  setup_run = models.BooleanField(default=False)
   # What kind of setup have we done?
   setup_level = models.IntegerField(default=0)
 

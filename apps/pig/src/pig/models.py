@@ -57,7 +57,7 @@ class PigScript(Document):
       'hadoopProperties': []
   }))
 
-  doc = generic.GenericRelation(Doc, related_name='pig_doc')
+  doc = generic.GenericRelation(Doc, related_query_name='pig_doc')
 
   isV2 = False
 

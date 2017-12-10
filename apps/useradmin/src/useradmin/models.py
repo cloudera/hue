@@ -293,8 +293,8 @@ def update_app_permissions(**kwargs):
             uptodate,
             available - len(added) - updated - uptodate))
 
-models.signals.post_syncdb.connect(update_app_permissions)
-models.signals.post_syncdb.connect(get_default_user_group)
+models.signals.post_migrate.connect(update_app_permissions)
+models.signals.post_migrate.connect(get_default_user_group)
 
 
 def install_sample_user():

@@ -26,7 +26,7 @@ from django.core.management.base import BaseCommand
 from django.test.utils import get_runner
 from django_nose import runner
 
-import south.management.commands
+#import south.management.commands
 import sys
 import textwrap
 import logging
@@ -74,9 +74,9 @@ class Command(BaseCommand):
     args = argv[2:] # First two are "desktop" and "test"
 
     # Patch South things in
-    south.management.commands.patch_for_test_db_setup()
-    south_logger = logging.getLogger('south')
-    south_logger.setLevel(logging.INFO)
+    #south.management.commands.patch_for_test_db_setup()
+    #south_logger = logging.getLogger('south')
+    #south_logger.setLevel(logging.INFO)
 
     if len(args) == 0:
       print self.help

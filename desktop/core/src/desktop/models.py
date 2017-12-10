@@ -944,7 +944,7 @@ class Document2QuerySet(QuerySet, Document2QueryMixin):
 
 class Document2Manager(models.Manager, Document2QueryMixin):
 
-  def get_query_set(self):
+  def get_queryset(self):
     return Document2QuerySet(self.model, using=self._db)
 
   # TODO prevent get() in favor of this
@@ -1077,7 +1077,7 @@ class Document2(models.Model):
 
   parent_directory = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
 
-  doc = generic.GenericRelation(Document, related_name='doc_doc') # Compatibility with Hue 3
+  doc = generic.GenericRelation(Document, related_query_name='doc_doc') # Compatibility with Hue 3
 
   objects = Document2Manager()
 

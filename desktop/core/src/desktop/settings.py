@@ -191,7 +191,7 @@ INSTALLED_APPS = [
     'django_extensions',
 
     # 'debug_toolbar',
-    'south', # database migration tool
+    #'south', # database migration tool
 
     # i18n support
     'babeldjango',

@@ -275,7 +275,7 @@ class SavedQuery(models.Model):
 
   is_redacted = models.BooleanField(default=False)
 
-  doc = generic.GenericRelation(Document, related_name='hql_doc')
+  doc = generic.GenericRelation(Document, related_query_name='hql_doc')
 
   class Meta:
     ordering = ['-mtime']
@@ -509,7 +509,7 @@ class MetaInstall(models.Model):
   """
   Metadata about the installation. Should have at most one row.
   """
-  installed_example = models.BooleanField()
+  installed_example = models.BooleanField(default=False)
 
   @staticmethod
   def get():

@@ -125,7 +125,7 @@ class Job(models.Model):
                                 help_text=_t('Parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
   is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'), blank=True, # Deprecated
                                    help_text=_t('If this job is trashed.'))
-  doc = generic.GenericRelation(Document, related_name='oozie_doc')
+  doc = generic.GenericRelation(Document, related_query_name='oozie_doc')
   data = models.TextField(blank=True, default=json.dumps({}))  # e.g. data=json.dumps({'sla': [python data], ...})
 
   objects = JobManager()
