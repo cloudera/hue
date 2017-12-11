@@ -114,7 +114,7 @@ class QueryApi(Api):
         'message': _('Unknown or expired query id %s') % appid
       }
     app = apps.get('apps')[0]
-    progress_groups = re.search(r"(\d{0,3})%", app.get('progress'))
+    progress_groups = re.search(r"([\d\.\,]+)%", app.get('progress'))
 
     common = {
         'id': app.get('id'),
@@ -122,7 +122,7 @@ class QueryApi(Api):
         'status': app.get('status'),
         'apiStatus': app.get('apiStatus'),
         'user': app.get('user'),
-        'progress': int(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100,
+        'progress': float(progress_groups.group(1)) if progress_groups and progress_groups.group(1) else 100,
         'duration': app.get('duration'),
         'submitted': app.get('submitted'),
         'type': 'queries',
