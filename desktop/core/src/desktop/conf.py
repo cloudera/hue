@@ -1298,6 +1298,12 @@ DEV = Config("dev",
    help=_("Enable development mode, where notably static files are not cached.")
 )
 
+DEV_EMBEDDED = Config("dev_embedded",
+   type=coerce_bool,
+   default=False,
+   help=_("Enable embedded development mode, where the page will be rendered inside a container div element.")
+)
+
 HTTP_500_DEBUG_MODE = Config(
   key='http_500_debug_mode',
   help=_('Enable or disable debugging information in the 500 internal server error response. '
