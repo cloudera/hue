@@ -1835,7 +1835,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var lastUpdateJobRequest = null;
 
       self._fetchJob = function (callback) {
-        return $.post("/jobbrowser/api/job", {
+        return $.post("/jobbrowser/api/job/" + vm.interface(), {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
         }, function (data) {
@@ -2252,7 +2252,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
       self._fetchJobs = function (callback) {
-        return $.post("/jobbrowser/api/jobs", {
+        return $.post("/jobbrowser/api/jobs/" + vm.interface(), {
           interface: ko.mapping.toJSON(vm.interface),
           filters: ko.mapping.toJSON(self.filters),
         }, function (data) {
@@ -2371,7 +2371,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       self._control = function (app_ids, action, callback) {
-        $.post("/jobbrowser/api/job/action", {
+        $.post("/jobbrowser/api/job/action/" + vm.interface() + "/" + action, {
           app_ids: ko.mapping.toJSON(app_ids),
           interface: ko.mapping.toJSON(vm.interface),
           operation: ko.mapping.toJSON({action: action})

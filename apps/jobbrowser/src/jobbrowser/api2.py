@@ -48,7 +48,7 @@ def api_error_handler(func):
 
 
 @api_error_handler
-def jobs(request):
+def jobs(request, interface=None):
   response = {'status': -1}
 
   interface = json.loads(request.POST.get('interface'))
@@ -64,7 +64,7 @@ def jobs(request):
 
 
 @api_error_handler
-def job(request):
+def job(request, interface=None):
   response = {'status': -1}
 
   interface = json.loads(request.POST.get('interface'))
@@ -81,7 +81,7 @@ def job(request):
 
 
 @api_error_handler
-def action(request):
+def action(request, interface=None, action=None):
   response = {'status': -1, 'message': ''}
 
   interface = json.loads(request.POST.get('interface'))
