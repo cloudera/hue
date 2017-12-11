@@ -155,6 +155,8 @@ class SQLDashboardApi(DashboardApi):
             'fields': self._get_aggregate_function(facet['properties']['facets'][0]),
             'filters': self._convert_filters_to_where(filters),
         }
+      elif facet['type'] == 'statement':
+        sql = facet['properties']['statement']
     else:
       fields = Collection2.get_field_list(dashboard)
       sql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
