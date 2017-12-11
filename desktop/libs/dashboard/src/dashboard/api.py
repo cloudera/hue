@@ -377,8 +377,12 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
   elif widget_type == 'document-widget':
+    # SQL query, 1 solr widget
     properties['uuid'] = facet_field
-    properties['subfacet'] = {}
+    properties['engine'] = 'impala'
+    properties['statement'] = 'select * from web_logs limit 50'
+    properties['facets'] = [{'canRange': False, 'field': 'blank', 'limit': 10, 'mincount': 1, 'sort': 'desc', 'aggregate': {'function': 'count'}, 'isDate': False}]
+    facet_type = 'statement'
   else:
     api = get_engine(user, collection)
     range_properties = _new_range_facet(api, collection, facet_field, widget_type)
