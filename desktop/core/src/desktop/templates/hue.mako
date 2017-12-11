@@ -1378,7 +1378,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               $.each(app['interpreters'], function(index, interpreter) {
                 // Promote the first catagory of interpreters
                 if (! dividerAdded) {
-                  toAddDivider = app.name === 'editor' && (lastInterpreter != null && lastInterpreter.is_sql != interpreter.is_sql);
+                  toAddDivider = (app.name === 'editor' || app.name === 'dashboard') && (lastInterpreter != null && lastInterpreter.is_sql != interpreter.is_sql);
                 }
                 interpreters.push({
                   displayName: interpreter.displayName,
