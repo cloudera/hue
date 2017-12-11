@@ -47,6 +47,7 @@
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
 % if EMBEDDED_MODE.get():
+  <link href="${ static('desktop/css/hue-bootstrap-embedded.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue-embedded.css') }" rel="stylesheet">
 % else:
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
