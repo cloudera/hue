@@ -552,6 +552,10 @@
           notifiedOnDragStarted = false;
         },
         drag: function (event) {
+          huePubSub.publish('draggable.text.drag', {
+            event: event,
+            meta: options.meta
+          });
           if (!notifiedOnDragStarted && Math.sqrt((dragStartX-event.clientX)*(dragStartX-event.clientX) + (dragStartY-event.clientY)*(dragStartY-event.clientY)) >= 10) {
             huePubSub.publish('draggable.text.started', options.meta);
             notifiedOnDragStarted = true;
