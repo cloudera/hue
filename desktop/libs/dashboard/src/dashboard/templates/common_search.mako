@@ -3646,7 +3646,7 @@ $(document).ready(function () {
   });
 
   function addPreviewHolder() {
-    if (!$('.hue-preview-holder').length) {
+    if (!$('.hue-preview-holder').length && searchViewModel.columns().length > 0) {
       $('<li>').addClass('preview-holder hue-preview-holder').attr('data-sizex', '6').attr('data-sizey', '2').attr('data-row', '1').attr('data-col', '1').appendTo($('.gridster>ul'));
     }
   }
@@ -3655,6 +3655,13 @@ $(document).ready(function () {
     $('.hue-preview-holder').remove();
   }
 
+  function movePreviewHolder (options) {
+    if (!$('.gridster').hasClass('dragging')) {
+      $('.hue-preview-holder').attr('data-sizey', options.widgetHeight || 6);
+      $('.hue-preview-holder').attr('data-col', Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))));
+      $('.hue-preview-holder').attr('data-row', Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))));
+    }
+  }
 
   var widgetGridHeight = parseInt(hueUtils.getStyleFromCSSClass('[data-sizey="1"]').height);
   var widgetGridWidth = parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width);
@@ -3665,34 +3672,47 @@ $(document).ready(function () {
     addPreviewHolder();
   }, 'dashboard');
 
-  huePubSub.subscribe('top.widget.drag', function (options) {
-    if (!$('.gridster').hasClass('dragging')) {
-      $('.hue-preview-holder').attr('data-sizey', options.widgetHeight);
-      $('.hue-preview-holder').attr('data-col', Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))));
-      $('.hue-preview-holder').attr('data-row', Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))));
-    }
-  }, 'dashboard');
+  huePubSub.subscribe('top.widget.drag', movePreviewHolder, 'dashboard');
+  huePubSub.subscribe('draggable.text.drag', movePreviewHolder, 'dashboard');
+
+  huePubSub.subscribe('draggable.text.meta', addPreviewHolder, 'dashboard');
 
   huePubSub.subscribe('drop.on.page', function (options) {
-    removePreviewHolder();
-    if (tempDraggable) {
+    if (searchViewModel.columns().length > 0) {
+      removePreviewHolder();
       var dropPosition = {
         col: Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))),
         row: Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10)))
       }
-      searchViewModel.gridItems.push(
-          ko.mapping.fromJS({
-            col: dropPosition.col,
-            row: dropPosition.row,
-            size_x: 6,
-            size_y: tempDraggable.gridsterHeight(),
-            widget: null,
-            callback: function (el) {
-              showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
-              tempDraggable = null;
-            }
-          })
-      );
+      if (tempDraggable) {
+        searchViewModel.gridItems.push(
+            ko.mapping.fromJS({
+              col: dropPosition.col,
+              row: dropPosition.row,
+              size_x: 6,
+              size_y: tempDraggable.gridsterHeight(),
+              widget: null,
+              callback: function (el) {
+                showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+                tempDraggable = null;
+              }
+            })
+        );
+      }
+      else if (searchViewModel.lastDraggedMeta()) {
+        searchViewModel.gridItems.push(
+            ko.mapping.fromJS({
+              col: dropPosition.col,
+              row: dropPosition.row,
+              size_x: 6,
+              size_y: 6,
+              widget: null,
+              callback: function (el) {
+                showAddFacetDemiModal(null, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+              }
+            })
+        );
+      }
     }
   }, 'dashboard');
 
