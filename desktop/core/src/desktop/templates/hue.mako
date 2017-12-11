@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import EMBEDDED_MODE
+  from desktop.conf import IS_EMBEDDED
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
@@ -46,7 +46,7 @@
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
-% if EMBEDDED_MODE.get():
+% if IS_EMBEDDED.get():
   <link href="${ static('desktop/css/hue-bootstrap-embedded.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue-embedded.css') }" rel="stylesheet">
 % else:
@@ -73,7 +73,7 @@
 
 <body>
 
-% if EMBEDDED_MODE.get():
+% if IS_EMBEDDED.get():
 <div class="hue-embedded-container">
 % endif
 
@@ -1682,7 +1682,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 ${ commonHeaderFooterComponents.footer(messages) }
 
-% if EMBEDDED_MODE.get():
+% if IS_EMBEDDED.get():
 </div>
 % endif
 
