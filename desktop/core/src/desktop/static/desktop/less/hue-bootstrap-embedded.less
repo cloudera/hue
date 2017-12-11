@@ -15,25 +15,19 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-@import (reference) "cui/colors.less";
-@import (reference) "hue-mixins.less";
-
-@import (inline) "../ext/css/cui/cui.css";
-@import (inline) "../ext/css/cui/bootstrap-responsive2.css";
-@import (inline) "../css/jquery-ui.css";
 
 .hue-embedded-container {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  overflow: hidden;
+  // From body definition in bootstrap2.css
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #424242;
+  background-color: #ECEFF1;
 
-  @import "hue-assist.less";
-  @import "hue-autocomplete.less";
-  @import "hue-cui-overrides.less";
-  @import "hue-cross-version.less";
-  @import "hue4.less";
-  @import "home.less";
+  // From html definition in bootstrap2.css
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @import (less) "../ext/css/cui/bootstrap2.css";
 }
