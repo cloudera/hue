@@ -2690,13 +2690,15 @@
               }
           });
       }
-  }
+  };
 
   ko.bindingHandlers.tooltip = {
     after: ['attr'],
     update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-      var local = ko.utils.unwrapObservable(valueAccessor()),
-          options = {};
+      var local = ko.utils.unwrapObservable(valueAccessor());
+      var options = {
+        container: HUE_CONTAINER
+      };
 
       $(element).tooltip("destroy");
 
