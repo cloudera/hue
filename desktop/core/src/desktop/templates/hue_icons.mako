@@ -277,6 +277,7 @@
     <!-- ko switch: icon -->
     <!-- ko case: 'dashboard' --><svg class="hi"><use xlink:href="#hi-dashboard"></use></svg><!-- /ko -->
     <!-- ko case: 'documents' --><svg class="hi"><use xlink:href="#hi-documents"></use></svg><!-- /ko -->
+    <!-- ko case: 'report' --><i class="fa fa-fw fa-area-chart"></i><!-- /ko -->
     <!-- ko case: 'dist-cp' --><i class="fa fa-fw fa-files-o"></i><!-- /ko -->
     <!-- ko case: 'editor' --><svg class="hi"><use xlink:href="#hi-editor"></use></svg><!-- /ko -->
     <!-- ko case: 'hbase' --><svg class="hi"><use xlink:href="#hi-hbase"></use></svg><!-- /ko -->

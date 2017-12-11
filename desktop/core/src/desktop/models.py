@@ -43,7 +43,7 @@ from settings import HUE_DESKTOP_VERSION
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from azure.conf import is_adls_enabled, has_adls_access
-from dashboard.conf import get_engines
+from dashboard.conf import get_engines, HAS_REPORT_ENABLED
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
@@ -1692,17 +1692,31 @@ class ClusterConfig():
     interpreters = get_engines(self.user)
 
     if interpreters and (self.cluster_type not in (DATAENG, ANALYTIC_DB)):
+      _interpreters = [{
+          'type': interpreter['type'],
+          'displayName': interpreter['type'].title(),
+          'buttonName': interpreter['type'].title(),
+          'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
+          'tooltip': _('%s Dashboard') % interpreter['type'].title(),
+          'is_sql': True
+        } for interpreter in interpreters
+      ]
+
+      if HAS_REPORT_ENABLED.get():
+        _interpreters.append({
+          'type': 'report',
+          'displayName': 'Report',
+          'buttonName': 'Report',
+          'page': '/dashboard/new_search?engine=report',
+          'tooltip': _('Report'),
+          'is_sql': False
+        })
+
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
         'buttonName': _('Dashboard'),
-        'interpreters': [{
-            'type': interpreter['type'],
-            'displayName': interpreter['type'].title(),
-            'buttonName': interpreter['type'].title(),
-            'page': '/dashboard/new_search?engine=%(type)s' % interpreter,
-            'tooltip': _('%s Dashboard') % interpreter['type'].title()
-          } for interpreter in interpreters],
+        'interpreters': _interpreters,
         'page': '/dashboard/new_search?engine=%(type)s' % interpreters[0]
       }
     else:
