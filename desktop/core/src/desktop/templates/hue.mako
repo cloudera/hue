@@ -19,6 +19,7 @@
 
   from desktop import conf
   from desktop.conf import IS_EMBEDDED
+  from desktop.conf import DEV_EMBEDDED
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
   from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
@@ -43,6 +44,35 @@
   <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }"/>
   <meta name="description" content="">
   <meta name="author" content="">
+
+% if DEV_EMBEDDED.get():
+  <style>
+    html {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      font-size: 1em;
+    }
+
+    body {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: pink;
+    }
+
+    .hue-embedded-container {
+      position: absolute !important;
+      top: 60px !important;
+      left: 60px !important;
+      bottom: 60px !important;
+      right: 60px !important;
+    }
+  </style>
+% endif
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
