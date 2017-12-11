@@ -1348,8 +1348,8 @@ ENABLE_SQL_SYNTAX_CHECK = Config(
   help=_('Choose whether to enable SQL syntax check or not.')
 )
 
-EMBEDDED_MODE = Config(
-  key='embedded_mode',
+IS_EMBEDDED = Config(
+  key='is_embedded',
   default=False,
   type=coerce_bool,
   help=_('Choose whether Hue is embedded or not.')

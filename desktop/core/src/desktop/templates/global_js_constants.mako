@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.conf import EMBEDDED_MODE
+  from desktop.conf import IS_EMBEDDED
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -45,7 +45,7 @@
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
-  window.HUE_CONTAINER = '${ EMBEDDED_MODE.get() }' === 'True' ? '.hue-embedded-container' : 'body';
+  window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
   window.HUE_I18n = {
     autocomplete: {
