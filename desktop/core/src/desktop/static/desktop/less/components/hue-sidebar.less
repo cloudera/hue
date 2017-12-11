@@ -16,7 +16,7 @@
  limitations under the License.
 */
 
-@import (reference) "extra-variables.less";
+@import (reference) "../cui/extra-variables.less";
 @import (reference) "../hue-mixins.less";
 
 @sidebar-width: 200px;
@@ -27,7 +27,7 @@
 @sidebar-left-spacing-item: 30px;
 @sidebar-background-color: @cui-gray-050;
 
-.sidebar {
+.hue-sidebar {
   position: fixed;
   top: @navbar-height;
   left: 0;
@@ -39,13 +39,13 @@
   overflow: hidden;
   box-shadow: 0 1px 2px 0;
 
-  &.sidebar-below-top-bar {
+  &.hue-sidebar-below-top-bar {
     position: absolute;
     top: 0;
     padding-top: 10px;
   }
 
-  .sidebar-content {
+  .hue-sidebar-content {
     top: 24px;
     bottom: 50px;
     position: absolute;
@@ -53,7 +53,7 @@
     min-width: @sidebar-width;
   }
 
-  .sidebar-item {
+  .hue-sidebar-item {
     display: block;
     padding-left: @sidebar-left-spacing-item;
     line-height: 38px;
@@ -62,7 +62,7 @@
 
     .hue-ease-transition(~"background-color, color");
 
-    .sidebar-icon {
+    .hue-sidebar-icon {
       color: @cui-gray-600;
       display: inline-block;
       margin-right: 14px;
@@ -72,7 +72,7 @@
     }
   }
 
-  .sidebar-item.active {
+  .hue-sidebar-item.active {
     font-weight: bold;
     color: @cui-blue-500;
     background-color: @cui-gray-100;
@@ -82,7 +82,7 @@
     }
   }
 
-  .sidebar-item:hover {
+  .hue-sidebar-item:hover {
     color: @cui-blue-500;
     background-color: @cui-gray-100;
     .sidebar-icon {
@@ -90,14 +90,14 @@
     }
   }
 
-  .sidebar-category-item {
+  .hue-sidebar-category-item {
     margin: 20px 0 4px @sidebar-left-spacing;
     font-size: @sidebar-category-font-size * 1.2;
     color: @cui-blue-700;
     transition: opacity @sidebar-animation-duration;
   }
 
-  .sidebar-action-button {
+  .hue-sidebar-action-button {
     background-color: inherit;
     display: block;
     position: absolute;
@@ -116,12 +116,12 @@
     }
   }
 
-  .sidebar-item-name {
+  .hue-sidebar-item-name {
     transition: opacity @sidebar-animation-duration;
     opacity: 1;
   }
 
-  .sidebar-footer-panel {
+  .hue-sidebar-footer-panel {
     background-color: inherit;
     position: absolute;
     bottom: 0;
@@ -130,23 +130,43 @@
     width: 100%;
     color: @text-color;
     box-shadow: 0 0 2px 0;
+
+    .dropzone {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      text-align: center;
+      i {
+        .hue-ease-transition(color);
+      }
+    }
+
+    .dz-drag-hover, .dropzone:hover {
+      background-color: @cui-gray-200!important;
+      i {
+        color: @cui-blue-500;
+      }
+    }
+
+    a {
+      .pointer
+    }
   }
 }
 
-.sidebar.collapsed {
+.hue-sidebar.collapsed {
   width: @collapsed-sidebar-width;
 
-  .sidebar-category-item, .sidebar-item-name {
+  .hue-sidebar-category-item, .sidebar-item-name {
     opacity: 0;
   }
 
-  .sidebar-action-button {
+  .hue-sidebar-action-button {
     text-align: center;
     padding: 0;
   }
 }
 
-.sidebar-placeholder {
+.hue-sidebar-placeholder {
   transition: width @sidebar-animation-duration;
   width: @sidebar-width;
   height: 100%;

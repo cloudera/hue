@@ -303,16 +303,16 @@ ${ hueIcons.symbols() }
   <div class="content-wrapper">
 
     <script type="text/html" id="tmpl-sidebar-link">
-      <a role="button" class="sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
-        <span class="sidebar-item-name" data-bind="text: item.displayName"></span>
+      <a role="button" class="hue-sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
+        <span class="hue-sidebar-item-name" data-bind="text: item.displayName"></span>
       </a>
     </script>
 
-    <div class="sidebar sidebar-below-top-bar" data-bind="visible: leftNavVisible" style="display:none;">
-      <div class="sidebar-content">
+    <div class="hue-sidebar hue-sidebar-below-top-bar" data-bind="visible: leftNavVisible" style="display:none;">
+      <div class="hue-sidebar-content">
         <!-- ko foreach: {data: items, as: 'item'} -->
           <!-- ko if: item.isCategory -->
-             <h4 class="sidebar-category-item" data-bind="text: item.displayName"></h4>
+             <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
              <!-- ko template: {name: 'tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: item.isCategory -->
@@ -320,7 +320,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
         <!-- /ko -->
       </div>
-      <div class="sidebar-footer-panel">
+      <div class="hue-sidebar-footer-panel">
         <div data-bind="dropzone: {
             clickable: false,
             url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR,
@@ -1580,7 +1580,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       }
 
       var sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
-      ko.applyBindings(sidebarViewModel, $('.sidebar')[0]);
+      ko.applyBindings(sidebarViewModel, $('.hue-sidebar')[0]);
     })(onePageViewModel, topNavViewModel);
 
     huePubSub.publish('cluster.config.get.config');
