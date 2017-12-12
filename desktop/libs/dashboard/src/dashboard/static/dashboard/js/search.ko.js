@@ -788,7 +788,8 @@ var Collection = function (vm, collection) {
         facet.widgetType(
             newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' :
             (newValue == ko.HUE_CHARTS.TYPES.TIMELINECHART ? 'timeline-widget' :
-            (newValue == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? 'gradient-map-widget' : 'bucket-widget'))
+            (newValue == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? 'gradient-map-widget' :
+            (newValue == ko.HUE_CHARTS.TYPES.COUNTER ? 'hit-widget' : 'bucket-widget')))
         );
       });
 
@@ -1207,7 +1208,8 @@ var Collection = function (vm, collection) {
       hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && self.template.chartSettings.chartYMulti().length > 0;
     }
     else {
-     hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && typeof self.template.chartSettings.chartYSingle() != "undefined" && self.template.chartSettings.chartYSingle() != null ;
+      hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && typeof self.template.chartSettings.chartYSingle() != "undefined" && self.template.chartSettings.chartYSingle() != null
+        || self.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER;
     }
     if (!hasData && self.template.showChart()){
       self.template.showFieldList(true);

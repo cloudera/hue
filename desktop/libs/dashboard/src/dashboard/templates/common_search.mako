@@ -1313,6 +1313,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <div class="dropdown">
           <a class="grid-side-btn" style="padding-right:0" href="javascript:void(0)"
              data-bind="css: {'active': template.showChart() }, click: function(){ template.showChart(true); template.showGrid(false); huePubSub.publish('gridChartForceUpdate'); }">
+            % if HAS_REPORT_ENABLED.get()
+            <i class="fa fa-superscript fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER"></i>
+            % endif
             <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
             <i class="hcha hcha-line-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" style="display: none;"></i>
             <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" style="display: none;"></i>
@@ -1326,6 +1329,13 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </a>
 
           <ul class="dropdown-menu">
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.COUNTER); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
+                 class="active">
+                <i class="fa fa-superscript fa-fw"></i> ${_('Counter')}
+              </a>
+            </li>
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
@@ -1511,6 +1521,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showChart()">
         <div data-bind="visible: ! template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
         <div class="grid-chart-container" data-bind="visible: template.hasDataForChart" style="overflow-x: auto">
+
+        <!-- ko if: widgetType() == 'hit-widget' -->
+          <!-- ko with: $parent -->
+            <!-- ko if: counts().length > 0 -->
+              <span class="big-counter" data-bind="textSqueezer: counts()[0].count"></span>
+            <!-- /ko -->
+          <!-- /ko -->
+        <!-- /ko -->
 
         <!-- ko if: widgetType() == 'bucket-widget' -->
           <!-- ko with: $parent -->
