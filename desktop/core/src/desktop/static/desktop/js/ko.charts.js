@@ -18,6 +18,7 @@
 
   ko.HUE_CHARTS = {
     TYPES: {
+      COUNTER: "counter",
       LINECHART: "lines",
       BARCHART: "bars",
       TIMELINECHART: "timeline",
