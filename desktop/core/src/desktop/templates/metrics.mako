@@ -59,7 +59,7 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
             });
             if (atleastOne) {
               result[key] = filteredSubMetric;
-            }else {
+            } else {
               result[key] = null;
             }
           });
