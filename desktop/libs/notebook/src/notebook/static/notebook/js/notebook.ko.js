@@ -1689,9 +1689,7 @@ var EditorViewModel = (function() {
         if (self.statusForButtons() == 'canceling' || self.status() == 'canceled') {
           // Query was canceled in the meantime, do nothing
         } else {
-          if (vm.editorMode()) {
-            self.getLogs();
-          }
+          self.getLogs();
           self.result.endTime(new Date());
 
           if (data.status === 0) {
