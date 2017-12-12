@@ -2854,6 +2854,12 @@ from desktop.views import _ko
 
         self.filteredTables = AssistantUtils.getFilteredTablesPureComputed(self);
 
+        self.someLoading = ko.pureComputed(function () {
+          return self.activeTables().some(function (table) {
+            return table.loading() || (!table.hasEntries() && !table.hasErrors());
+          });
+        });
+
         var navigationSettings = {
           showStats: true,
           rightAssist: true
