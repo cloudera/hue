@@ -169,7 +169,7 @@ except ImportError, e:
     </form>
 
     <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
-      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Export results') }">
+      <a class="inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Export results') }" data-bind="css: {'grid-side-btn': gridSideBtn, 'snippet-side-btn': !gridSideBtn()}">
         <!-- ko ifnot: isDownloading -->
         <i class="fa fa-fw fa-download"></i>
         <!-- /ko -->
@@ -323,6 +323,7 @@ except ImportError, e:
         self.$downloadForm = $(element).find(".download-form");
         self.snippet = params.snippet;
         self.notebook = params.notebook;
+        self.gridSideBtn = ko.observable(params.gridSideBtn);
 
         self.saveTarget = ko.observable('hdfs-file');
         self.savePath = ko.observable('');
