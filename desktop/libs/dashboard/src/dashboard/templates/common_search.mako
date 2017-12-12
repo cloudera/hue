@@ -3635,11 +3635,11 @@ $(document).ready(function () {
     resize: {
       enabled: true,
       start: function (event, ui, $widget) {
-        $widget.find('.card-widget').hide();
+        $widget.find('.card-widget').css('opacity', '.6');
       },
       stop: function (event, ui, $widget) {
         huePubSub.publish('resize.plotly.chart');
-        $widget.find('.card-widget').height($widget.height()).show();
+        $widget.find('.card-widget').height($widget.height()).css('opacity', '1');
       },
     }
   });
