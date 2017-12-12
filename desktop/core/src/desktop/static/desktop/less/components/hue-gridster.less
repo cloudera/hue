@@ -16,15 +16,22 @@
  limitations under the License.
 */
 
+
+
 .gridster {
   & > ul {
     margin: 0;
     list-style-type: none;
     & > li {
-      border: 1px solid @cui-gray-200;
+      border: 1px solid @cui-white;
       background: @cui-white !important;
       overflow-x: hidden;
       overflow-y: auto;
+    }
+  }
+  & > ul.is-editing {
+    & > li {
+      border-color: @cui-gray-200;
     }
   }
   .card-widget {
