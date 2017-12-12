@@ -1379,7 +1379,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </div>
 
         <!-- ko if: $root.collection.engine() != 'solr' -->
-          <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data.queryResult(), notebook: {getContext: function() { return {type: $data.queryResult().type(), id: 1}; }} } }" style="display:inline-block;"></div>
+          <div data-bind="component: { name: 'downloadSnippetResults', params: { gridSideBtn: true, snippet: $data.queryResult(), notebook: {getContext: function() { return {type: $data.queryResult().type(), id: 1}; }} } }" style="display:inline-block;"></div>
         <!-- /ko -->
 
         <!-- ko if: $root.collection.engine() == 'solr' -->
