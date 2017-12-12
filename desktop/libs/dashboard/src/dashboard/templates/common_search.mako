@@ -2946,10 +2946,10 @@ var getDraggableOptions = function(options) {
   return {
     'start': function (event, ui) {
       $(ui.helper).css('z-index','999999');
-      huePubSub.publish('top.widget.drag.start', { event: event, widget: options.data });
+      huePubSub.publish('dashboard.top.widget.drag.start', { event: event, widget: options.data });
     },
     'drag': function (event) {
-      huePubSub.publish('top.widget.drag', { event: event, widgetHeight: options.data.gridsterHeight() });
+      huePubSub.publish('dashboard.top.widget.drag', { event: event, widgetHeight: options.data.gridsterHeight() });
     }
   };
 };
@@ -3658,19 +3658,22 @@ $(document).ready(function () {
   var widgetGridWidth = parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width);
 
   var tempDraggable = null;
-  huePubSub.subscribe('top.widget.drag.start', function (options) {
+  huePubSub.subscribe('dashboard.top.widget.drag.start', function (options) {
     tempDraggable = options.widget;
     addPreviewHolder();
   }, 'dashboard');
 
-  huePubSub.subscribe('top.widget.drag', movePreviewHolder, 'dashboard');
+  huePubSub.subscribe('dashboard.top.widget.drag', movePreviewHolder, 'dashboard');
   huePubSub.subscribe('draggable.text.drag', movePreviewHolder, 'dashboard');
 
   huePubSub.subscribe('draggable.text.meta', addPreviewHolder, 'dashboard');
 
-  huePubSub.subscribe('drop.on.page', function (options) {
+  huePubSub.subscribe('dashboard.gridster.widget.over', removePreviewHolder, 'dashboard');
+  huePubSub.subscribe('dashboard.gridster.widget.out', addPreviewHolder, 'dashboard');
+
+  huePubSub.subscribe('dashboard.drop.on.page', function (options) {
+    removePreviewHolder();
     if (searchViewModel.columns().length > 0) {
-      removePreviewHolder();
       var dropPosition = {
         col: Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))),
         row: Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10)))
@@ -3836,7 +3839,7 @@ $(document).ready(function () {
 
   $('#searchComponents').parents('.embeddable').droppable({
     drop: function( event, ui ) {
-      huePubSub.publish('drop.on.page', {event: event, ui: ui});
+      huePubSub.publish('dashboard.drop.on.page', {event: event, ui: ui});
     }
   });
 
