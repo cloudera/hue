@@ -19,7 +19,9 @@ import logging
 import os
 import sys
 
+from desktop.lib.i18n import force_unicode, smart_str
 from notebook.conf import DBPROXY_EXTRA_CLASSPATH
+from notebook.connectors.base import AuthenticationRequired
 
 LOG = logging.getLogger(__name__)
 
@@ -43,6 +45,11 @@ def query_and_fetch(db, statement, n=None):
       return data, meta
     finally:
       curs.close()
+  except Exception, e:
+    message = force_unicode(smart_str(e))
+    if 'Access denied' in message:
+      raise AuthenticationRequired()
+    raise
   finally:
     db.close()
 
@@ -65,6 +72,21 @@ class Jdbc():
     self.password = password
 
     self.conn = None
+
+  def test_connection(self, throw_exception=True):
+    try:
+      self.connect()
+      return True
+    except Exception, e:
+      message = force_unicode(smart_str(e))
+      if throw_exception:
+        if 'Access denied' in message:
+          raise AuthenticationRequired()
+        raise
+      else:
+        return False
+    finally:
+      self.close()
 
   def connect(self):
     if self.conn is None:

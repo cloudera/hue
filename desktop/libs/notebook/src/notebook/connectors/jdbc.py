@@ -43,6 +43,8 @@ def query_error_handler(func):
       message = force_unicode(smart_str(e))
       if 'error occurred while trying to connect to the Java server' in message:
         raise QueryError(_('%s: is the DB Proxy server running?') % message)
+      elif 'Access denied' in message:
+        raise AuthenticationRequired()
       else:
         raise QueryError(message)
   return decorator
@@ -70,11 +72,12 @@ class JdbcApi(Api):
     properties = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
     props['properties'] = {} # We don't store passwords
 
-    if self.db is None:
+    if self.db is None or not self.db.test_connection(throw_exception='password' not in properties):
       if 'password' in properties:
         user = properties.get('user') or self.options.get('user')
         props['properties'] = {'user': user}
         self.db = API_CACHE[self.cache_key] = Jdbc(self.options['driver'], self.options['url'], user, properties.pop('password'))
+        self.db.test_connection(throw_exception=True)
 
     if self.db is None:
       raise AuthenticationRequired()
