@@ -355,7 +355,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
       cursorwidth: "6px",
       railpadding: { top: 1, right: 1, left: 1, bottom: 1 },
       hidecursordelay: 0,
-      scrollspeed: 100,
+      scrollspeed: 1,
       cursorminheight: 20,
       horizrailenabled: true,
       autohidemode: "leave"
