@@ -930,7 +930,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </div>
           <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
           <!-- ko template: { if: $root.editorMode() && ! $root.isResultFullScreenMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
-          <!-- ko if: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode() -->
+          <!-- ko if: !$root.isResultFullScreenMode() -->
             <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
           <!-- /ko -->
           <!-- ko if: $root.editorMode() -->
