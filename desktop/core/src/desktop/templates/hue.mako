@@ -439,7 +439,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.nicescroll.min.js') }"></script>
+<script src="${ static('desktop/js/jquery.nicescroll.js') }"></script>
 
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
 <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }"></script>
