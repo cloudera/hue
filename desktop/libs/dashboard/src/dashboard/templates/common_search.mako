@@ -4048,6 +4048,13 @@ $(document).ready(function () {
       $("#addFacetDemiModal").modal("hide");
     }
   }
+
+  function addFacetDemiModalFieldCancel() {
+    searchViewModel.gridItems.remove(selectedGridster);
+    searchViewModel.removeWidget(selectedWidget);
+    selectedRow = null;
+  }
+
   %else:
   function showAddFacetDemiModal(widget, row) {
     if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
@@ -4096,12 +4103,12 @@ $(document).ready(function () {
       }
     }
   }
-  %endif
 
   function addFacetDemiModalFieldCancel() {
     searchViewModel.removeWidget(selectedWidget);
     selectedRow = null;
   }
+  %endif
 
   $(document).on("setResultsHeight", function () {
     $('.result-main').each(function(){
