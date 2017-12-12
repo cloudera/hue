@@ -429,13 +429,7 @@ ${ components.menubar(is_embeddable) }
 <script type="text/html" id="metastore-tables">
     <div class="row-fluid">
       <!-- ko with: stats  -->
-      <div class="
-      %if is_optimizer_enabled:
-        span8
-      %else:
-        span12
-      %endif
-       tile">
+      <div class="span12 tile">
           <div class="span6 tile">
             <h4>${ _('Properties') }</h4>
             <div title="${ _('Comment') }"><i class="fa fa-fw fa-comment muted"></i>
@@ -596,7 +590,7 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-databases-parameters">
-  <div data-bind="toggleOverflow: {height: 24}">
+  <div data-bind="toggleOverflow: {height: 24}" style="word-break: break-all">
     <div class="inline margin-right-20"><i class="fa fa-fw fa-cog muted"></i></div>
     <!-- ko foreach: Object.keys($data) -->
       <div class="inline margin-right-20"><strong data-bind="text: $data"></strong>: <span data-bind="text: $parent[$data]"></span></div>
