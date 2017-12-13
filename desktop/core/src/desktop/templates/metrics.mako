@@ -97,13 +97,13 @@ ${layout.menubar(section='metrics')}
         class="input-xlarge pull-right margin-bottom-10" placeholder="${_('Filter metrics...')}">
     </div>
     <div class="margin-top-10">
-      <div data-bind="foreach: {data: Object.keys($root.filteredMetrics()), as: '_masterkey'}">
+      <div data-bind="foreach: {data: Object.keys($root.filteredMetrics()).sort(), as: '_masterkey'}">
        <!-- ko if: ($root.selectedMetric() === 'All' && $root.filteredMetrics()[_masterkey]) || $root.selectedMetric() === _masterkey-->
        <h4 data-bind="text: _masterkey"></h4>
        <table class="table table-condensed">
          <thead>
            <tr>
-            <th>${ _('Name') }</th>
+            <th width="30%">${ _('Name') }</th>
             <th>${ _('Value') }</th>
            </tr>
          </thead>
