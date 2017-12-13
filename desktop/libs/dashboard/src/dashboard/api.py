@@ -35,7 +35,7 @@ from dashboard.data_export import download as export_download
 from dashboard.decorators import allow_viewer_only
 from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
 from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception,\
-  NESTED_FACET_FORM
+  NESTED_FACET_FORM, COMPARE_FACET
 
 
 LOG = logging.getLogger(__name__)
@@ -428,6 +428,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
 
       properties['facets'] = [facet]
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
+      properties['compare'] = COMPARE_FACET
 
       if widget_type == 'hit-widget':
         facet_type = 'function'

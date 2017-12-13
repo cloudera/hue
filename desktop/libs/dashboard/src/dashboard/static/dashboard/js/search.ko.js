@@ -745,6 +745,15 @@ var Collection = function (vm, collection) {
       }
     }
 
+    if (facet.properties.compare) {
+      facet.properties.compare.is_enabled.subscribe(function () {
+        vm.search();
+      });
+      facet.properties.compare.use_percentage.subscribe(function () {
+        vm.search();
+      });
+     }
+
     // For Solr 5+  only
     if (typeof facet.template != 'undefined') {
       facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields

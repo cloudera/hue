@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import division
 
 import collections
 import itertools
@@ -44,6 +45,7 @@ NESTED_FACET_FORM = {
     'isDate': False,
     'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50}
 }
+COMPARE_FACET = {'is_enabled': False, 'gap': '1WEEK', 'use_percentage': False, 'cohort_number': 1}
 
 
 class Collection2(object):
@@ -144,6 +146,9 @@ class Collection2(object):
         facet['type'] = 'pivot'
         properties['facets'] = []
         properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
+
+      if 'compare' not in properties:
+        properties['compare'] = COMPARE_FACET
 
     if 'qdefinitions' not in props['collection']:
       props['collection']['qdefinitions'] = []
@@ -480,8 +485,20 @@ def augment_solr_response(response, collection, query):
       name = facet['id'] # Nested facets can only have one name
 
       if category == 'function' and name in response['facets']:
-        value = response['facets'][name]
         collection_facet = get_facet_field(category, name, collection['facets'])
+
+        if collection_facet['properties']['compare']['is_enabled']:
+          orignal_number, final_number = response['facets'][name]['buckets'][0][name], response['facets'][name]['buckets'][1][name]
+          if collection_facet['properties']['compare']['use_percentage']:
+            if orignal_number != 0:
+              value = (final_number - orignal_number) / orignal_number * 100.0
+            else:
+              value = None 
+          else:
+            value = final_number - orignal_number
+        else:
+          value = response['facets'][name]
+
         facet = {
           'id': collection_facet['id'],
           'query': name,

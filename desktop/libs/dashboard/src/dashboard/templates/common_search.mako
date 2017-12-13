@@ -1525,6 +1525,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- ko if: widgetType() == 'hit-widget' -->
           <!-- ko with: $parent -->
             <!-- ko if: counts().length > 0 -->
+              <i class="fa fa-rotate-90" data-bind="css: { 'fa-caret-down': counts()[0].count < 0, 'fa-caret-up': counts()[0].count >= 0 }"></i>
               <span class="big-counter" data-bind="textSqueezer: counts()[0].count"></span>
             <!-- /ko -->
           <!-- /ko -->
@@ -2010,9 +2011,48 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
+
+      <span class="pull-right" data-bind="template: { name: 'facet-compare', data: properties.compare }"></span>
     </div>
 
+    <i class="fa big-counter" data-bind="css: { 'fa-caret-down': counts() < 0, 'fa-caret-up': counts() >= 0 }"></i>
     <span class="big-counter" data-bind="textSqueezer: counts"></span>
+
+    <span data-bind="with: $root.collection.getFacetById($parent.id())">
+      <span class="big-counter" data-bind="visible: properties.compare.use_percentage">
+        ${ '%' }
+      </span>
+    </span>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="facet-compare">
+  <input type="checkbox" data-bind="checked: is_enabled"/> ${ _('Compare') }
+
+  <!-- ko if: is_enabled -->
+  <div class="facet-field-cnt">
+    <span class="spinedit-cnt">
+      <span class="facet-field-label">
+        ${ _('Cohorts') }
+      </span>
+      <input type="text"/>
+      <input type="number"/>
+    </span>
+  </div>
+
+  <div class="facet-field-cnt">
+    <span class="spinedit-cnt">
+      <span class="facet-field-label">
+        ${ _('Percentage') }
+      </span>
+      <input type="checkbox" data-bind="checked: use_percentage"/>
+      <span class="facet-field-label">
+        ${ _('Display both') }
+      </span>
+      <input type="checkbox"/>
+    </span>
   </div>
   <!-- /ko -->
 </script>
