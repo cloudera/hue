@@ -5994,11 +5994,7 @@
           ghost.height($(element).outerHeight() + (options.jumpCorrection || 0));
         }
         if ($(scrollable).scrollTop() + triggerAdjust > initialTopPosition) {
-          $(element).css({
-            'position': 'fixed',
-            'top': options.topSnap,
-            'width': initialSize.w + 'px'
-          });
+          $(element).attr('style', 'position: fixed!important; top: ' + options.topSnap + '; width: ' + initialSize.w + 'px!important');
           ghost.show();
         }
         else {

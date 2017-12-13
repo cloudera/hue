@@ -22,6 +22,7 @@
 #
 
 <%!
+  from desktop import conf
   from django.utils.translation import ugettext as _
 
   from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED, USE_GRIDSTER
@@ -43,9 +44,9 @@
 
 <%def name="layout_toolbar()">
 
-<div class="card card-toolbar" data-bind="visible: isEditing">
+<div class="card card-toolbar">
   %if not hasattr(caller, "skipLayout"):
-  <div style="float: left" data-bind="visible: columns().length == 0">
+  <div style="float: left" data-bind="visible: columns().length == 0 && isEditing">
     <div class="toolbar-label">${_('LAYOUT')}</div>
     <a href="javascript: magicSearchLayout(searchViewModel)" title="${ _('Dynamic dashboard: multiple interconnected widgets') }" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
@@ -76,24 +77,27 @@
     </a>
   </div>
   %endif
-
-  %if hasattr(caller, "results"):
-  <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
-    <div class="toolbar-label">${_('RESULTS')}</div>
-    ${caller.results()}
-  </div>
-  %endif
-
-  %if hasattr(caller, "widgets"):
-  <div class="card-toolbar-content" style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
-    %if hasattr(caller, "widgetSectionName"):
-      <div class="toolbar-label">${caller.widgetSectionName()}</div>
-    %else:
-      <div class="toolbar-label margin-left-20">${_('WIDGETS')}</div>
+  <!-- ko if: columns().length > 0 && isToolbarVisible -->
+  <div data-bind="dockable: { scrollable: '.page-content', jumpCorrection: 50, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "78px" or "50px" }', triggerAdjust: 0 }">
+    %if hasattr(caller, "results"):
+    <div style="float: left; margin-left: 20px">
+      <div class="toolbar-label">${_('RESULTS')}</div>
+      ${caller.results()}
+    </div>
     %endif
-    ${caller.widgets()}
+
+    %if hasattr(caller, "widgets"):
+    <div class="card-toolbar-content" style="float: left; margin-left: 20px">
+      %if hasattr(caller, "widgetSectionName"):
+        <div class="toolbar-label">${caller.widgetSectionName()}</div>
+      %else:
+        <div class="toolbar-label margin-left-20">${_('WIDGETS')}</div>
+      %endif
+      ${caller.widgets()}
+    </div>
+    %endif
   </div>
-  %endif
+  <!-- /ko -->
   <div class="clearfix"></div>
 </div>
 
