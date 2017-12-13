@@ -43,17 +43,34 @@
 
     self.$sourceTable = $(sourceTable);
     self.$parent = self.$sourceTable.parent();
-    self.$mainScrollable = $(self.options.mainScrollable);
+    self.$mainScrollable = self.options.mainScrollable ? $(self.options.mainScrollable) : self.$parent;
 
     self.$firstCellTable = null;
     self.$firstColumnTable = null;
     self.$headerTable = null;
+    self.updateHeaderWidths = $.noop;
 
     self.initParent();
     self.redraw();
 
+    var widthThrottle = -1;
+
     if (self.options.stickyFirstColumn) {
-      self.$parent.on('scroll.tableExtender', self.repositionLeftColumn.bind(self));
+      self.$parent.on('scroll.tableExtender', function () {
+        self.repositionLeftColumn();
+        if (self.options.stickyHeader) {
+          window.clearTimeout(widthThrottle);
+          widthThrottle = window.setTimeout(self.updateHeaderWidths.bind(self), 50);
+        }
+      });
+    }
+
+    if (self.options.stickyHeader) {
+      self.$mainScrollable.on('scroll.tableExtender', self.repositionHeader.bind(self));
+      var widthInterval = window.setInterval(self.updateHeaderWidths.bind(self), 100);
+      self.disposeFunctions.push(function () {
+        window.clearInterval(widthInterval);
+      })
     }
 
     self.disposeFunctions.push(huePubSub.subscribe('table.extender.redraw', function (parentId) {
@@ -66,6 +83,7 @@
   Plugin.prototype.destroy = function () {
     var self = this;
     self.$parent.off('.tableExtender');
+    self.$mainScrollable.off('.tableExtender');
     self.disposeFunctions.forEach(function (dispose) {
       dispose();
     })
@@ -104,6 +122,50 @@
 
   Plugin.prototype.drawHeader = function () {
     var self = this;
+    var $headerTable = self.createEmptyTableClone().css('z-index', 1);
+
+    // Clone the header
+    var $sourceHeaders = self.$sourceTable.find('thead>tr th');
+    var $clonedHeaders = $sourceHeaders.clone();
+    $clonedHeaders.wrapAll('<tr></tr>').parent().wrap('<thead>').parent().appendTo($headerTable);
+
+    $clonedHeaders.each(function (index, clonedTh) {
+      var $clonedTh = $(clonedTh);
+      var $sourceTh = $sourceHeaders.eq(index);
+      $clonedTh.width($sourceTh.width());
+      $clonedTh.click(function () {
+        $sourceTh.click();
+        window.setTimeout(self.drawHeader.bind(self), 0);
+      })
+    });
+    $headerTable.width(self.$sourceTable.width());
+
+    self.updateHeaderWidths = function () {
+      var sourceTableWidth = self.$sourceTable.width();
+      if (self.$headerTable && sourceTableWidth !== self.$headerTable.width()) {
+        self.$headerTable.width(sourceTableWidth);
+        $clonedHeaders.each(function (index, clonedTh) {
+          var $clonedTh = $(clonedTh);
+          var $sourceTh = $sourceHeaders.eq(index);
+          $clonedTh.width($sourceTh.width());
+        });
+      }
+    };
+
+    if (self.$headerTable) {
+      self.$headerTable.remove();
+    }
+
+    self.$headerTable = $headerTable;
+    self.$headerTable.appendTo(self.$parent);
+  };
+
+  Plugin.prototype.lockRow = function (index) {
+    var self = this;
+  };
+
+  Plugin.prototype.drawLockedRows = function () {
+    var self = this;
   };
 
   Plugin.prototype.drawFirstColumn = function () {
@@ -113,7 +175,6 @@
 
     // Clone the header for the first cell
     var $sourceFirstHeader = self.$sourceTable.find('thead>tr th:eq(0)');
-
     var $clonedFirstHeader = $sourceFirstHeader.clone();
     $clonedFirstHeader.wrap('<tr></tr>').parent().wrap('<thead>').parent().appendTo($firstColumnTable);
     $firstColumnTable.width($sourceFirstHeader.outerWidth(true));
@@ -140,14 +201,14 @@
         return false;
       }
       if (self.options.lockSelectedRow) {
-        $cell.addClass('lockable');
         $('<i>').addClass('fa fa-lock pointer muted').attr('title', self.options.labels.LOCK).on('click', function() {
           self.drawLockedRow(index);
         }).prependTo($cell);
-        $('<i>').addClass('fa fa-expand pointer muted').attr('title', self.options.labels.ROW_DETAILS).on('click', function(){
-          huePubSub.publish('table.row.dblclick', { idx: index, table: self.$sourceTable });
-        }).prependTo($cell);
       }
+      $cell.addClass('lockable');
+      $('<i>').addClass('fa fa-expand pointer muted').attr('title', self.options.labels.ROW_DETAILS).on('click', function(){
+        huePubSub.publish('table.row.dblclick', { idx: index, table: self.$sourceTable });
+      }).prependTo($cell);
     });
 
     if (foundEmptyCell) {
@@ -174,10 +235,6 @@
     self.$firstCellTable.appendTo(self.$parent);
   };
 
-  Plugin.prototype.lockRow = function (index) {
-
-  };
-
   Plugin.prototype.repositionLeftColumn = function () {
     var self = this;
     if (self.$firstColumnTable) {
@@ -187,13 +244,24 @@
   };
 
   Plugin.prototype.repositionHeader = function () {
+    var self = this;
+    if (!self.$firstCellTable || !self.$headerTable) {
+      return;
+    }
+    var diff = self.$sourceTable.offset().top - self.$mainScrollable.offset().top;
 
+    if (self.$firstCellTable && diff < 0) {
+      self.$firstCellTable.css('padding-top', -diff + 'px');
+    } else if (self.$firstCellTable && self.$firstCellTable.position().top !== 0) {
+      self.$firstCellTable.css('padding-top', '0');
+    }
+
+    if (self.$headerTable && diff < 0) {
+      self.$headerTable.css('padding-top', -diff + 'px');
+    } else if (self.$headerTable && self.$headerTable.position().top !== 0) {
+      self.$headerTable.css('padding-top', '0');
+    }
   };
-
-  Plugin.prototype.drawLockedRows = function () {
-
-  };
-
 
   $.fn[PLUGIN_NAME] = function (options) {
     return this.each(function () {
