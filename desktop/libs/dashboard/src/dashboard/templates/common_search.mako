@@ -3662,7 +3662,9 @@ $(document).ready(function () {
 
   var tempDraggable = null;
   huePubSub.subscribe('dashboard.top.widget.drag.start', function (options) {
-    tempDraggable = options.widget;
+    var widgetClone = ko.mapping.toJS(options.widget);
+    widgetClone.id = UUID();
+    tempDraggable = new Widget(widgetClone);
     addPreviewHolder();
   }, 'dashboard');
 
