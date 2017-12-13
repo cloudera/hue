@@ -177,7 +177,15 @@ class SolrApi(object):
             json_facets[facet['id']] = _f['facet'][dim_key]
         elif facet['type'] == 'function':
           if facet['properties']['facets']:
-            json_facets[facet['id']] = self._get_aggregate_function(facet['properties']['facets'][0])
+#             json_facets[facet['id']] = self._get_aggregate_function(facet['properties']['facets'][0])
+            json_facets[facet['id']] = {
+    'type' : "range",
+    'field' : "time",
+    'start' : "2014-05-04T06:35:00Z",
+    'end' : "2014-05-04T14:15:00Z",
+    'gap' : "+30MINUTES",
+    'facet': {facet['id']: self._get_aggregate_function(facet['properties']['facets'][0])}
+  }
             json_facets['processEmpty'] = True
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
