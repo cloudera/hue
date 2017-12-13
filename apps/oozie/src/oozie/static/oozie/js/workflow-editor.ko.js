@@ -512,6 +512,9 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
   };
+  self.isToolbarVisible = ko.pureComputed(function(){
+    return self.isEditing();
+  })
   self.isSaving = ko.observable(false);
 
   self.isInvalid = ko.observable(false);
