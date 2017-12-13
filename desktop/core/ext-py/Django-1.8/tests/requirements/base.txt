@@ -1,0 +1,11 @@
+bcrypt
+docutils
+jinja2
+# move to py2.txt when dropping Python 3.2
+mock
+numpy
+Pillow
+PyYAML
+pytz > dev
+selenium
+sqlparse

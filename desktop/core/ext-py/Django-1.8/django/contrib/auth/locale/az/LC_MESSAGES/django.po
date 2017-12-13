@@ -1,0 +1,232 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Ali Ismayilov <ali@ismailov.info>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Azerbaijani (http://www.transifex.com/projects/p/django/"
+"language/az/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: az\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Şəxsi məlumat"
+
+msgid "Permissions"
+msgstr "İcazələr"
+
+msgid "Important dates"
+msgstr "Vacib tarixlər"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+msgid "Password changed successfully."
+msgstr "Parol uğurla dəyişdirildi"
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Parolu dəyiş: %s"
+
+msgid "Authentication and Authorization"
+msgstr ""
+
+msgid "No password set."
+msgstr ""
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+
+msgid "The two password fields didn't match."
+msgstr "Parollar üst-üstə düşmədi."
+
+msgid "Password"
+msgstr "Parol"
+
+msgid "Password confirmation"
+msgstr "Parolun təsdiqi"
+
+msgid "Enter the same password as above, for verification."
+msgstr "Yuxarıdakı parolu daxil edin ki, dəqiqliyinə əmin olaq."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+
+msgid "This account is inactive."
+msgstr "Bu hesab qeyri-aktivdir."
+
+msgid "Email"
+msgstr ""
+
+msgid "New password"
+msgstr "Yeni parol"
+
+msgid "New password confirmation"
+msgstr "Yeni parolun təsdiqi"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Köhnə parolu səhv daxil etdiniz. Bir daha cəhd etməyinizi xahiş edirik."
+
+msgid "Old password"
+msgstr "Köhnə parol"
+
+msgid "Password (again)"
+msgstr "Parol (bir daha)"
+
+msgid "algorithm"
+msgstr ""
+
+msgid "iterations"
+msgstr ""
+
+msgid "salt"
+msgstr ""
+
+msgid "hash"
+msgstr ""
+
+msgid "work factor"
+msgstr ""
+
+msgid "checksum"
+msgstr ""
+
+msgid "name"
+msgstr "ad"
+
+msgid "codename"
+msgstr "kod adı"
+
+msgid "permission"
+msgstr "icazə"
+
+msgid "permissions"
+msgstr "icazələr"
+
+msgid "group"
+msgstr "qrup"
+
+msgid "groups"
+msgstr "qruplar"
+
+msgid "password"
+msgstr "parol"
+
+msgid "last login"
+msgstr "son dəfə daxil olub"
+
+msgid "superuser status"
+msgstr "superistifadəçi statusu"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "İstifadəçiyə bütün icazələri verir."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+
+msgid "user permissions"
+msgstr "səlahiyyətləri"
+
+msgid "Specific permissions for this user."
+msgstr ""
+
+msgid "username"
+msgstr "istifadəçi adı"
+
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Vacibdir. 30 simvoldan az olmalıdır. Yalnız hərf, rəqəm və @/./+/-/_ "
+"simvollarından istifadə etmək olar."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Bu istifadəçi adı altında başqa istifadəçi var."
+
+msgid "first name"
+msgstr "ad"
+
+msgid "last name"
+msgstr "soyad"
+
+msgid "email address"
+msgstr ""
+
+msgid "staff status"
+msgstr "admin statusu"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "İstifadəçinin admin panelinə daxil olub, olmayacağını təyin edir."
+
+msgid "active"
+msgstr "Aktiv"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"İstifadəçinin aktiv və ya qeyri-aktiv olmasını təyin edir. Hesabları silmək "
+"əvəzinə bundan istifadə edin."
+
+msgid "date joined"
+msgstr "qoşulub"
+
+msgid "user"
+msgstr "istifadəçi"
+
+msgid "users"
+msgstr "istifadəçilər"
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "%(site_name)s, parolun sıfırlanması"
+
+msgid "Logged out"
+msgstr "Çıxdınız"
+
+msgid "Password reset"
+msgstr ""
+
+msgid "Password reset sent"
+msgstr ""
+
+msgid "Enter new password"
+msgstr ""
+
+msgid "Password reset unsuccessful"
+msgstr ""
+
+msgid "Password reset complete"
+msgstr ""
+
+msgid "Password change"
+msgstr ""
+
+msgid "Password change successful"
+msgstr ""

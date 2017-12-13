@@ -1,0 +1,238 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Besnik <besnik@programeshqip.org>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
+"sq/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sq\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Të dhëna personale"
+
+msgid "Permissions"
+msgstr "Leje"
+
+msgid "Important dates"
+msgstr "Të dhëna të rëndësishme"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+msgid "Password changed successfully."
+msgstr "Fjalëkalimi u ndryshua me sukses."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Ndryshoni fjalëkalimin: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Mirëfilltësim dhe Autorizim"
+
+msgid "No password set."
+msgstr "Nuk ka fjalëkalim të caktuar."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Format i pavlefshëm fjalëkalimi ose algoritëm i panjohur hashi."
+
+msgid "The two password fields didn't match."
+msgstr "Dy fushat për fjalëkalim nuk u përputhën."
+
+msgid "Password"
+msgstr "Fjalëkalim"
+
+msgid "Password confirmation"
+msgstr "Ripohim fjalëkalimi"
+
+msgid "Enter the same password as above, for verification."
+msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më sipër."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"Fjalëkalimet shqeto nuk depozitohenm ndaj nuk ka ndonjë mënyrë si të shihet "
+"fjalëkalimi i këtij përdoruesi, por mund ta ndryshoni fjalëkalimin duke "
+"përdorur <a href=\"password/\">këtë formular</a>."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Ju lutemi, jepni një %(username)s dhe një fjalëkalim të saktë. Kini parasysh "
+"se që të dyja fushat mund të jenë të ndjeshme ndaj shkrimit me shkronja të "
+"mëdha ose të vogla."
+
+msgid "This account is inactive."
+msgstr "Kjo llogari nuk është aktive."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "New password"
+msgstr "Fjalëkalim i ri"
+
+msgid "New password confirmation"
+msgstr "Ripohim fjalëkalimi të ri"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Fjalëkalimi juaj i vjetër u dha pasaktësisht. Ju lutem, jepeni sërish."
+
+msgid "Old password"
+msgstr "Fjalëkalim i vjetër"
+
+msgid "Password (again)"
+msgstr "Fjalëkalim (sërish)"
+
+msgid "algorithm"
+msgstr "algoritëm"
+
+msgid "iterations"
+msgstr "përsëritje"
+
+msgid "salt"
+msgstr "kripë"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "work factor"
+msgstr ""
+
+msgid "checksum"
+msgstr ""
+
+msgid "name"
+msgstr "emër"
+
+msgid "codename"
+msgstr "emër i koduar"
+
+msgid "permission"
+msgstr "leje"
+
+msgid "permissions"
+msgstr "leje"
+
+msgid "group"
+msgstr "grup"
+
+msgid "groups"
+msgstr "grupe"
+
+msgid "password"
+msgstr "fjalëkalim"
+
+msgid "last login"
+msgstr "hyrja e fundit"
+
+msgid "superuser status"
+msgstr "gjendje superpërdoruesi"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Përcakton që ky përdorues ka krejt lejet, pa ia akorduar ato shprehimisht."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+
+msgid "user permissions"
+msgstr "leje përdoruesi"
+
+msgid "Specific permissions for this user."
+msgstr "Leje specifike për këtë përdorues."
+
+msgid "username"
+msgstr "emër përdoruesi"
+
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"E domosdoshme. 30 ose më pak shenja. Vetëm shkronja, shifra dhe shenjat @/./"
+"+/-/_ ."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Ka tashmë një emër të tillë përdoruesi."
+
+msgid "first name"
+msgstr "emër"
+
+msgid "last name"
+msgstr "mbiemër"
+
+msgid "email address"
+msgstr "adresë email"
+
+msgid "staff status"
+msgstr "vend në ekip"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Përcakton nëse mund të hyjë ose jo përdoruesi te ky sajt administrimi."
+
+msgid "active"
+msgstr "veprues"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Përcakton nëse ky përdorues do të duhej trajtuar si aktiv. Çpërzgjidhni "
+"këtë, në vend se të fshihni llogarira."
+
+msgid "date joined"
+msgstr "datë anëtarësimi"
+
+msgid "user"
+msgstr "përdorues"
+
+msgid "users"
+msgstr "përdoruesa"
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Ricaktim fjalëkalimi për te %(site_name)s"
+
+msgid "Logged out"
+msgstr "I dalë"
+
+msgid "Password reset"
+msgstr "Ricaktim fjalëkalimi"
+
+msgid "Password reset sent"
+msgstr ""
+
+msgid "Enter new password"
+msgstr "Jepni fjalëkalimin e ri"
+
+msgid "Password reset unsuccessful"
+msgstr "Ricaktimi i fjalëkalimit nuk pati sukses"
+
+msgid "Password reset complete"
+msgstr "Ricaktimi i fjalëkalimit u plotësua"
+
+msgid "Password change"
+msgstr "Ndryshim fjalëkalimi"
+
+msgid "Password change successful"
+msgstr "Ndryshim i suksesshëm fjalëkalimi"
