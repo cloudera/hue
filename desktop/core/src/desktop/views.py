@@ -511,7 +511,7 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
 
 def get_banner_message(request):
   banner_message = None
-  forwarded_host = request.META.get('HTTP_X_FORWARDED_HOST')
+  forwarded_host = request.get_host()
 
   message = None;
   path_info = request.environ.get("PATH_INFO")

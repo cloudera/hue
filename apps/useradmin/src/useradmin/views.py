@@ -33,7 +33,7 @@ from ldap_access import LdapBindException, LdapSearchException
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.forms import ValidationError
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.encoding import smart_str

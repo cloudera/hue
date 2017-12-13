@@ -57,6 +57,7 @@ from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _t
+import django.utils.timezone as dtz
 
 from desktop import appmanager
 from desktop.lib.exceptions_renderable import PopupException
@@ -91,12 +92,12 @@ class UserProfile(models.Model):
   # Enum for describing the creation method of a user.
   CreationMethod = Enum('HUE', 'EXTERNAL')
 
-  user = models.ForeignKey(auth_models.User, unique=True)
+  user = models.OneToOneField(auth_models.User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=str(CreationMethod.HUE))
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
                                    help_text=_t('If this is users first login.'))
-  last_activity = models.DateTimeField(default=datetime.fromtimestamp(0), db_index=True)
+  last_activity = models.DateTimeField(default=dtz.now, db_index=True)
 
   def get_groups(self):
     return self.user.groups.all()
@@ -162,7 +163,7 @@ def group_permissions(group):
 def create_profile_for_user(user):
   p = UserProfile()
   p.user = user
-  p.last_activity = datetime.now()
+  p.last_activity = dtz.now()
   p.home_directory = "/user/%s" % p.user.username
   try:
     p.save()

@@ -210,15 +210,25 @@ LOCALE_PATHS = [
 # Keep default values up to date
 TEMPLATE_CONTEXT_PROCESSORS = (
   'django.contrib.auth.context_processors.auth',
-  'django.core.context_processors.debug',
-  'django.core.context_processors.i18n',
-  'django.core.context_processors.media',
-  'django.core.context_processors.request',
+  'django.template.context_processors.debug',
+  'django.template.context_processors.i18n',
+  'django.template.context_processors.media',
+  'django.template.context_processors.request',
   'django.contrib.messages.context_processors.messages',
    # Not default
   'desktop.context_processors.app_name',
 )
 
+TEMPLATES = [
+  {
+    'BACKEND': 'djangomako.backends.MakoBackend',
+    'DIRS': TEMPLATE_DIRS,
+    'NAME': 'mako',
+    'OPTIONS': {
+      'context_processors': TEMPLATE_CONTEXT_PROCESSORS,
+    },
+  },
+]
 
 # Desktop doesn't use an auth profile module, because
 # because it doesn't mesh very well with the notion
@@ -515,7 +525,7 @@ if desktop.conf.INSTRUMENTATION.get():
 
 if not desktop.conf.DATABASE_LOGGING.get():
   def disable_database_logging():
-    from django.db.backends import BaseDatabaseWrapper
+    from django.db.backends.base.base import BaseDatabaseWrapper
     from django.db.backends.util import CursorWrapper
 
     BaseDatabaseWrapper.make_debug_cursor = lambda self, cursor: CursorWrapper(cursor, self)

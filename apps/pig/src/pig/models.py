@@ -20,7 +20,7 @@ import posixpath
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
@@ -57,7 +57,7 @@ class PigScript(Document):
       'hadoopProperties': []
   }))
 
-  doc = generic.GenericRelation(Doc, related_query_name='pig_doc')
+  doc = GenericRelation(Doc, related_query_name='pig_doc')
 
   isV2 = False
 

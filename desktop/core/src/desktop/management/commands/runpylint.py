@@ -39,23 +39,36 @@ class Command(BaseCommand):
     python core/manage.py runpylint
   """)
 
+  def valid_app(self):
+    from desktop import appmanager
+    apps = ["desktop"]
+    for app in appmanager.DESKTOP_APPS:
+      apps.append(app.name)
+    return apps
+
+  def add_arguments(self, parser):
+    parser.add_argument('-f', '--force', dest='force', default='true', action="store_true")
+    parser.add_argument('--output-format',
+      action='store', dest='outputformat', default='parseable')
+    parser.add_argument('-a', '--app', dest='app', action='store', default='all', choices=self.valid_app())
+
   def handle(self, *args, **options):
     """Check the source code using PyLint."""
 
-    pylint_args = list(args)
-
-    if "all" in pylint_args or len(pylint_args) == 0:
-      if "all" in pylint_args:
-        pylint_args.remove("all")
-      from desktop import appmanager
-      apps = ["desktop"]
-      for app in appmanager.DESKTOP_APPS:
-        apps.append(app.name)
-      pylint_args = apps + pylint_args
-
     # Note that get_build_dir() is suitable for testing use only.
     pylint_prog = paths.get_build_dir('env', 'bin', 'pylint')
-    pylint_args = [pylint_prog, "--rcfile=" + settings.PYLINTRC] + pylint_args
+    pylint_args = [pylint_prog, "--rcfile=" + settings.PYLINTRC]
+
+    if options['app']=='all':
+      pylint_args.extend(self.valid_app())
+    else:
+      pylint_args.append(options['app'])
+
+    if options['force']:
+      pylint_args.append('-f')
+
+    if options['outputformat']:
+      pylint_args.append(options['outputformat'])
 
     if not os.path.exists(pylint_prog):
       msg = _("Cannot find pylint at '%(path)s'. Please install pylint first.") % {'path': pylint_prog}

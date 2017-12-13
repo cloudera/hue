@@ -22,7 +22,7 @@ import json
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
@@ -275,7 +275,7 @@ class SavedQuery(models.Model):
 
   is_redacted = models.BooleanField(default=False)
 
-  doc = generic.GenericRelation(Document, related_query_name='hql_doc')
+  doc = GenericRelation(Document, related_query_name='hql_doc')
 
   class Meta:
     ordering = ['-mtime']

@@ -103,9 +103,11 @@ def render_to_string_test(template_name, django_context):
 
 def render_to_string_normal(template_name, django_context):
   data_dict = dict()
-  if isinstance(django_context, django.template.Context):
+  if isinstance(django_context, django.template.context.Context):
     for d in reversed(django_context.dicts):
-      data_dict.update(d)
+      if d:
+        data_dict.update(d)
+    data_dict.update(django_context.request)
   else:
     data_dict = django_context
 
@@ -130,8 +132,7 @@ def url(view_name, *args, **view_args):
   from django.core.urlresolvers import reverse
   return reverse(view_name, args=args, kwargs=view_args)
 
-
-from django.core.context_processors import csrf
+from django.template.context_processors import csrf
 
 def csrf_token(request):
   """

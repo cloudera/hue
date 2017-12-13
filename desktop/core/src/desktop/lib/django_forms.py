@@ -23,7 +23,7 @@ import urllib
 
 from django.forms import Widget, Field
 from django import forms
-from django.forms.util import ErrorList, ValidationError, flatatt
+from django.forms.utils import ErrorList, ValidationError, flatatt
 from django.forms.fields import MultiValueField, CharField, ChoiceField, BooleanField
 from django.forms.widgets import MultiWidget, Select, TextInput, Textarea, HiddenInput, Input
 from django.utils import formats

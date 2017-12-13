@@ -37,19 +37,21 @@ def entry():
 
   from django.core.exceptions import ImproperlyConfigured
   from django.core.management import execute_from_command_line, find_commands
-  from django.core.management import LaxOptionParser
+  from django.core.management import CommandParser
   from django.core.management.base import BaseCommand
 
   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'desktop.settings')
 
   # What's the subcommand being run?
   # This code uses the same logic from django.core.management to handle command args
-  argv = sys.argv[:]
-  parser = LaxOptionParser(option_list=BaseCommand.option_list)
-  parser.parse_args(argv)
+  subcommand = None
+  if len(sys.argv) > 1:
+    subcommand = sys.argv[1]
+  parser = CommandParser(None, usage="%(prog)s subcommand [options] [args]", add_help=False)
+  parser.parse_known_args(sys.argv[2:])
 
-  if len(argv) > 1:
-    prof_id = subcommand = argv[1]
+  if len(sys.argv) > 1:
+    prof_id = subcommand = sys.argv[1]
     commands_req_db = [ "changepassword", "createsuperuser",
                         "clean_history_docs", "convert_documents", "sync_documents",
                         "dbshell", "dumpdata", "loaddata", "shell",

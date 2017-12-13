@@ -32,11 +32,12 @@ from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import User
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import inlineformset_factory
 from django.utils.encoding import force_unicode, smart_str
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
+import django.utils.timezone as dtz
 
 from desktop.log.access import access_warn
 from desktop.lib import django_mako
@@ -125,7 +126,7 @@ class Job(models.Model):
                                 help_text=_t('Parameters used at the submission time (e.g. market=US, oozie.use.system.libpath=true).'))
   is_trashed = models.BooleanField(default=False, db_index=True, verbose_name=_t('Is trashed'), blank=True, # Deprecated
                                    help_text=_t('If this job is trashed.'))
-  doc = generic.GenericRelation(Document, related_query_name='oozie_doc')
+  doc = GenericRelation(Document, related_query_name='oozie_doc')
   data = models.TextField(blank=True, default=json.dumps({}))  # e.g. data=json.dumps({'sla': [python data], ...})
 
   objects = JobManager()
@@ -1391,9 +1392,9 @@ class Coordinator(Job):
                                     help_text=_t('The unit of the rate at which data is periodically created.')) # unused
   timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
                               help_text=_t('The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators.'))
-  start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
+  start = models.DateTimeField(default=dtz.now, verbose_name=_t('Start'),
                                help_text=_t('When to start the first workflow.'))
-  end = models.DateTimeField(default=datetime.today() + timedelta(days=3), verbose_name=_t('End'),
+  end = models.DateTimeField(default=dtz.now, verbose_name=_t('End'),
                              help_text=_t('When to start the last workflow.'))
   workflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
                                help_text=_t('The workflow to schedule repeatedly.'))
@@ -1654,7 +1655,7 @@ class Dataset(models.Model):
                           help_text=_t('The name of the dataset.'))
   description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
                                  help_text=_t('A description of the dataset.'))
-  start = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
+  start = models.DateTimeField(default=dtz.now, verbose_name=_t('Start'),
                                help_text=_t(' The UTC datetime of the initial instance of the dataset. The initial instance also provides '
                                             'the baseline datetime to compute instances of the dataset using multiples of the frequency.'))
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
@@ -1758,7 +1759,7 @@ class BundledCoordinator(models.Model):
 
 
 class Bundle(Job):
-  kick_off_time = models.DateTimeField(default=datetime.today(), verbose_name=_t('Start'),
+  kick_off_time = models.DateTimeField(default=dtz.now, verbose_name=_t('Start'),
                                        help_text=_t('When to start the first coordinators.'))
   coordinators = models.ManyToManyField(Coordinator, through='BundledCoordinator')
 

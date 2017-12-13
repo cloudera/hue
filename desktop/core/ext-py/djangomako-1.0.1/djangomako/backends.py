@@ -12,7 +12,7 @@ import tempfile
 
 from django.core.urlresolvers import reverse
 from django.contrib.staticfiles.templatetags.staticfiles import static
-from django.template import TemplateDoesNotExist, TemplateSyntaxError
+from django.template.base import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.backends.base import BaseEngine
 from django.template.backends.utils import csrf_input_lazy, \
     csrf_token_lazy

@@ -284,7 +284,7 @@ def edit(request, path, form=None):
         breadcrumbs=parse_breadcrumbs(path),
         is_embeddable=request.GET.get('is_embeddable', False),
         show_download_button=SHOW_DOWNLOAD_BUTTON.get())
-    if request.META.get('HTTP_X_REQUESTED_WITH') != 'XMLHttpRequest':
+    if not request.is_ajax():
         data['stats'] = stats;
         data['form'] = form;
     return render("edit.mako", request, data)
