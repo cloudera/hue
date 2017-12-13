@@ -467,7 +467,7 @@ var AssistDbEntry = (function () {
       hierarchy: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback,
-      silenceErrors: !!silenceErrors
+      silenceErrors: self.navigationSettings.rightAssist || !!silenceErrors
     });
   };
 
