@@ -492,7 +492,11 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/jquery.horizontalscrollbar.js') }"></script>
 <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
+% if IS_EMBEDDED.get():
+<script src="${ static('desktop/js/jquery.tableextender3.js') }"></script>
+% else:
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
+% endif
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
