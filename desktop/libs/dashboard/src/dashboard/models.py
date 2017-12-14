@@ -499,7 +499,8 @@ def augment_solr_response(response, collection, query):
           else:
             value = final_number - orignal_number
         else:
-          value = response['facets'][name]
+          value = response['facets'][name]['count']
+#           value = response['facets'][name]
 
         facet = {
           'id': collection_facet['id'],

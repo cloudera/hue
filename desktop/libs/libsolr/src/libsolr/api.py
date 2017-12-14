@@ -180,11 +180,17 @@ class SolrApi(object):
             if facet['properties']['compare']['is_enabled']:
               # TODO: global compare override
               json_facets[facet['id']] = {
-                'type' : "range",
-                'field' : collection['timeFilter'].get('field'),
-                'start' : "2014-05-04T01:35:00Z/HOURS",
-                'end' : "2014-05-04T14:15:00Z/HOURS",
-                'gap' : "+12HOURS",
+                'type': "range",
+                'field': collection['timeFilter'].get('field'),
+                'start': "2014-05-04T01:35:00Z/HOURS",
+                'end': "2014-05-04T14:15:00Z/HOURS",
+                'gap': "+12HOURS",
+                'facet': {facet['id']: self._get_aggregate_function(facet['properties']['facets'][0])}
+              }
+            elif True:
+              json_facets[facet['id']] = {
+                'type': "query",
+                'q': 'bytes:[1000 TO *]',
                 'facet': {facet['id']: self._get_aggregate_function(facet['properties']['facets'][0])}
               }
             else:
