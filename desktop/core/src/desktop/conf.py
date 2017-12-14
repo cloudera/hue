@@ -1424,7 +1424,7 @@ IS_HUE_4 = Config( # To remove in Hue 5
 
 DISABLE_HUE_3 = Config( # To remove in Hue 5
   key='disable_hue_3',
-  default=False,
+  default=True,
   type=coerce_bool,
   help=_('Choose whether to still allow users to enable the old Hue 3 interface.')
 )
