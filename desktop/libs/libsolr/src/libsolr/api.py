@@ -288,6 +288,7 @@ class SolrApi(object):
 
         # Only on dim 1 currently
         if timeFilter and timeFilter['time_field'] == facet['field'] and (widget['id'] not in timeFilter['time_filter_overrides']): # or facet['widgetType'] != 'bucket-widget'):
+          facet['widgetType'] = widget['widgetType']
           _f[f_name].update(self._get_time_filter_query(timeFilter, facet))
 
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
