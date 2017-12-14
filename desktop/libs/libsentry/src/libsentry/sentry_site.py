@@ -41,7 +41,7 @@ _CONF_SENTRY_SERVER_PRINCIPAL = 'sentry.service.server.principal'
 _CONF_SENTRY_SERVER_SECURITY_MODE = 'sentry.service.security.mode'
 _CONF_SENTRY_SERVER_ADMIN_GROUP = 'sentry.service.admin.group'
 
-_CONF_SENTRY_SERVER_RPC_ADDRESSES = 'sentry.service.client.server.rpc-addresses'
+_CONF_SENTRY_SERVER_RPC_ADDRESSES = 'sentry.service.client.server.rpc-address'
 _CONF_SENTRY_SERVER_RPC_PORT = 'sentry.service.client.server.rpc-port'
 
 
