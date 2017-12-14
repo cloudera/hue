@@ -3748,12 +3748,16 @@ $(document).ready(function () {
     resizeGridsterWidget($(element).parents('li.gs-w'));
   }, 'dashboard');
 
-  huePubSub.subscribe('gridster.remove', function (element) {
-    $(".gridster>ul").data('gridster').remove_widget($(element).parents('li.gs-w'));
+  huePubSub.subscribe('gridster.remove', function (gridElement) {
+    searchViewModel.gridItems.remove(gridElement);
   }, 'dashboard')
 
   huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
-    huePubSub.publish('gridster.remove', "#wdg_" + widgetId);
+    searchViewModel.gridItems().forEach(function (item) {
+      if (item.widgetId() === parseInt($('#wdg_' + widgetId).parents('li.gs-w').attr('data-widgetid'))) {
+        huePubSub.publish('gridster.remove', item);
+      }
+    });
   }, 'dashboard');
 
   huePubSub.subscribe('gridster.add.widget', function (options) {

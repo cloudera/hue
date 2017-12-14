@@ -204,12 +204,12 @@
     <!-- ko ifnot: widget -->
     <div class="empty-gridster-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}">
       <div class="inline pull-right remove-empty-gridster" data-bind="visible: $root.isEditing">
-        <a href="javascript:void(0)" data-bind="click: function(data, e){ huePubSub.publish('gridster.remove', e.target); }"><i class="fa fa-times"></i></a>
+        <a href="javascript:void(0)" data-bind="click: function(data){ huePubSub.publish('gridster.remove', data); }"><i class="fa fa-times"></i></a>
       </div>
     </div>
     <!-- /ko -->
   <!-- ko with: widget -->
-    <span data-bind="template: 'widget-template${ suffix }'"></span>
+    <div data-bind="template: 'widget-template${ suffix }'"></div>
     <div class="clearfix"></div>
   <!-- /ko -->
   </li>
