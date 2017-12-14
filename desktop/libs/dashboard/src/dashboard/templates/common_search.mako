@@ -139,9 +139,11 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
 
     <div class="search-bar-operations">
+      % if USE_GRIDSTER.get():
       <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
         <i class="fa fa-plus"></i>
       </a>
+      % endif
       <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
         <i class="fa fa-pencil"></i>
       </a>
