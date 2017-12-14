@@ -577,7 +577,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     </span>
   </div>
 
-  <ul data-bind="sortable: { data: properties.facets, options: { axis: 'x', containment: 'parent', handle: '.title' }}" class="unstyled pull-left white">
+  <ul data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', containment: 'parent', handle: '.title' }}" class="unstyled pull-left white">
     <li class="filter-box">
       <div class="title move">
         <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }, visible: $parent.properties.facets().length > 1" class="pull-right" href="javascript:void(0)">
@@ -3651,26 +3651,31 @@ $(document).ready(function () {
 
   function movePreviewHolder (options) {
     var coords = {
-      col: Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))),
-      row: Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10)))
+      col: Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10)),
+      row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))
     }
-    var overlaps = false;
-    $('li.gs-w').each(function(){
-      var dimensions = {
-        col: parseInt($(this).attr('data-col')),
-        row: parseInt($(this).attr('data-row')),
-        sizex: parseInt($(this).attr('data-sizex')),
-        sizey: parseInt($(this).attr('data-sizey'))
+    if (coords.row > 0 && coords.col > 0) {
+      var overlaps = false;
+      $('li.gs-w').each(function () {
+        var dimensions = {
+          col: parseInt($(this).attr('data-col')),
+          row: parseInt($(this).attr('data-row')),
+          sizex: parseInt($(this).attr('data-sizex')),
+          sizey: parseInt($(this).attr('data-sizey'))
+        }
+        if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey) {
+          overlaps = true;
+        }
+      });
+      if (!$('.gridster').hasClass('dragging') && !overlaps) {
+        $('.hue-preview-holder').show();
+        $('.hue-preview-holder').attr('data-sizey', options.widgetHeight || 6);
+        $('.hue-preview-holder').attr('data-col', coords.col);
+        $('.hue-preview-holder').attr('data-row', coords.row);
       }
-      if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey){
-        overlaps = true;
+      else {
+        $('.hue-preview-holder').hide();
       }
-    });
-    if (!$('.gridster').hasClass('dragging') && !overlaps) {
-      $('.hue-preview-holder').show();
-      $('.hue-preview-holder').attr('data-sizey', options.widgetHeight || 6);
-      $('.hue-preview-holder').attr('data-col', coords.col);
-      $('.hue-preview-holder').attr('data-row', coords.row);
     }
     else {
       $('.hue-preview-holder').hide();
@@ -3699,37 +3704,39 @@ $(document).ready(function () {
     removePreviewHolder();
     if (searchViewModel.columns().length > 0) {
       var dropPosition = {
-        col: Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))),
-        row: Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10)))
+        col: Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10)),
+        row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))
       }
-      if (tempDraggable) {
-        searchViewModel.gridItems.push(
-            ko.mapping.fromJS({
-              col: dropPosition.col,
-              row: dropPosition.row,
-              size_x: 6,
-              size_y: tempDraggable.gridsterHeight(),
-              widget: null,
-              callback: function (el) {
-                showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
-                tempDraggable = null;
-              }
-            })
-        );
-      }
-      else if (searchViewModel.lastDraggedMeta()) {
-        searchViewModel.gridItems.push(
-            ko.mapping.fromJS({
-              col: dropPosition.col,
-              row: dropPosition.row,
-              size_x: 6,
-              size_y: 6,
-              widget: null,
-              callback: function (el) {
-                showAddFacetDemiModal(null, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
-              }
-            })
-        );
+      if (dropPosition.row > 0 && dropPosition.col > 0) {
+        if (tempDraggable) {
+          searchViewModel.gridItems.push(
+              ko.mapping.fromJS({
+                col: dropPosition.col,
+                row: dropPosition.row,
+                size_x: 6,
+                size_y: tempDraggable.gridsterHeight(),
+                widget: null,
+                callback: function (el) {
+                  showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+                  tempDraggable = null;
+                }
+              })
+          );
+        }
+        else if (searchViewModel.lastDraggedMeta()) {
+          searchViewModel.gridItems.push(
+              ko.mapping.fromJS({
+                col: dropPosition.col,
+                row: dropPosition.row,
+                size_x: 6,
+                size_y: 6,
+                widget: null,
+                callback: function (el) {
+                  showAddFacetDemiModal(null, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+                }
+              })
+          );
+        }
       }
     }
   }, 'dashboard');
@@ -3767,7 +3774,12 @@ $(document).ready(function () {
       if (options.target) {
         searchViewModel.gridItems().forEach(function (item) {
           if (item.col() === options.target.col() && item.row() === options.target.row()) {
-            item.widget(widget);
+            if (ko.isObservable(item.widget)) {
+              item.widget(widget);
+            }
+            else {
+              item.widget = ko.observable(widget);
+            }
             item.size_y(targetHeight);
             $('.gridster ul').data('gridster').resize_widget($(item.gridsterElement), item.size_x(), item.size_y());
           }
