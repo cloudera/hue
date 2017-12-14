@@ -178,9 +178,10 @@ class SolrApi(object):
         elif facet['type'] == 'function':
           if facet['properties']['facets']:
             if facet['properties']['compare']['is_enabled']:
+              # TODO: global compare override
               json_facets[facet['id']] = {
                 'type' : "range",
-                'field' : "time",
+                'field' : collection['timeFilter'].get('field'),
                 'start' : "2014-05-04T01:35:00Z/HOURS",
                 'end' : "2014-05-04T14:15:00Z/HOURS",
                 'gap' : "+12HOURS",
