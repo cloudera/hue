@@ -93,11 +93,13 @@ ko.bindingHandlers.gridster = {
         switch (change.status) {
           case 'added':
             var addedWidget = addWidget(change.value);
+            huePubSub.publish('gridster.added.widget', addedWidget);
             if (change.value.callback) {
               ko.unwrap(change.value.callback)(addedWidget);
             }
             break;
           case 'deleted':
+            huePubSub.publish('gridster.deleted.widget', change.value.gridsterElement);
             gridster.remove_widget(change.value.gridsterElement);
             break;
           default:

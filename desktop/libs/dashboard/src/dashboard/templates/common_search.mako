@@ -3650,10 +3650,30 @@ $(document).ready(function () {
   }
 
   function movePreviewHolder (options) {
-    if (!$('.gridster').hasClass('dragging')) {
+    var coords = {
+      col: Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))),
+      row: Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10)))
+    }
+    var overlaps = false;
+    $('li.gs-w').each(function(){
+      var dimensions = {
+        col: parseInt($(this).attr('data-col')),
+        row: parseInt($(this).attr('data-row')),
+        sizex: parseInt($(this).attr('data-sizex')),
+        sizey: parseInt($(this).attr('data-sizey'))
+      }
+      if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey){
+        overlaps = true;
+      }
+    });
+    if (!$('.gridster').hasClass('dragging') && !overlaps) {
+      $('.hue-preview-holder').show();
       $('.hue-preview-holder').attr('data-sizey', options.widgetHeight || 6);
-      $('.hue-preview-holder').attr('data-col', Math.max(1, Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10))));
-      $('.hue-preview-holder').attr('data-row', Math.max(1, Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))));
+      $('.hue-preview-holder').attr('data-col', coords.col);
+      $('.hue-preview-holder').attr('data-row', coords.row);
+    }
+    else {
+      $('.hue-preview-holder').hide();
     }
   }
 
@@ -3673,8 +3693,7 @@ $(document).ready(function () {
 
   huePubSub.subscribe('draggable.text.meta', addPreviewHolder, 'dashboard');
 
-  huePubSub.subscribe('dashboard.gridster.widget.over', removePreviewHolder, 'dashboard');
-  huePubSub.subscribe('dashboard.gridster.widget.out', addPreviewHolder, 'dashboard');
+  huePubSub.subscribe('gridster.added.widget', removePreviewHolder, 'dashboard');
 
   huePubSub.subscribe('dashboard.drop.on.page', function (options) {
     removePreviewHolder();
