@@ -1525,8 +1525,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- ko if: widgetType() == 'hit-widget' -->
           <!-- ko with: $parent -->
             <!-- ko if: counts().length > 0 -->
-              <i data-bind="css: { 'fa-caret-down': counts()[0].count < 0, 'fa-caret-up': counts()[0].count > 0 }"></i>
-              <span class="big-counter" data-bind="textSqueezer: counts()[0].count"></span>
+              <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts()[0].count, properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
             <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
@@ -2012,19 +2011,23 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
-      <span class="pull-right" data-bind="template: { name: 'facet-compare', data: properties.compare }"></span>
+      <span class="pull-right" data-bind="visible: $root.availableDateFields().length > 0, template: { name: 'facet-compare', data: properties.compare }"></span>
     </div>
 
-    <i class="fa big-counter" data-bind="css: { 'fa-caret-down': counts() < 0, 'fa-caret-up': counts() > 0 }"></i>
-    <span class="big-counter" data-bind="textSqueezer: counts"></span>
-
-    <span data-bind="with: $root.collection.getFacetById($parent.id())">
-      <span class="big-counter" data-bind="visible: properties.compare.use_percentage">
-        ${ '%' }
-      </span>
-    </span>
+    <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts(), properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
   </div>
   <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="counter-form">
+  <i class="fa" data-bind="visible: properties.compare.is_enabled, css: { 'fa-caret-down': counts < 0, 'fa-caret-up': counts > 0 }"></i>
+
+  <span  data-bind="textSqueezer: counts"></span>
+
+  <span  data-bind="visible: properties.compare.use_percentage">
+    ${ '%' }
+  </span>
 </script>
 
 
@@ -2049,7 +2052,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </span>
       <input type="checkbox" data-bind="checked: use_percentage"/>
       <span class="facet-field-label">
-        ${ _('Display both') }
+        ${ _('Hide value') }
       </span>
       <input type="checkbox"/>
     </span>
