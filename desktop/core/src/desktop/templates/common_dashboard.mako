@@ -202,7 +202,7 @@
 <script id="widget-template-gridster${ suffix }" type="text/html">
   <li>
     <!-- ko ifnot: widget -->
-    <div class="empty-gridster-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover', over: function() { huePubSub.publish('dashboard.gridster.widget.over'); }, out: function() { huePubSub.publish('dashboard.gridster.widget.out'); } }}">
+    <div class="empty-gridster-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}">
       <div class="inline pull-right remove-empty-gridster" data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" data-bind="click: function(data, e){ huePubSub.publish('gridster.remove', e.target); }"><i class="fa fa-times"></i></a>
       </div>
