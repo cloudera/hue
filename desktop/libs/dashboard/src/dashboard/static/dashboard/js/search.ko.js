@@ -1803,6 +1803,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.isEditing = ko.observable(false);
     self.toggleEditing = function () {
       self.isEditing(!self.isEditing());
+      self.isToolbarVisible(self.isEditing());
     };
 
     self.isToolbarVisible = ko.observable(false);
@@ -1930,6 +1931,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
     self.init = function (callback) {
       self.isEditing(self.columns().length == 0);
+      self.isToolbarVisible(self.isEditing());
       self.initial.init();
       self.collection.syncFields();
       self.search(callback);
@@ -2671,6 +2673,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.gridItems([]);
     loadSearchLayout(self, self.collectionJson.layout);
     self.isEditing(true);
+    self.isToolbarVisible(true);
     self.isRetrievingResults(false);
     self.hasRetrievedResults(true);
     self.asyncSearchesCounter([]);
