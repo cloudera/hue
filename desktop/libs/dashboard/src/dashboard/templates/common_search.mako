@@ -1525,7 +1525,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- ko if: widgetType() == 'hit-widget' -->
           <!-- ko with: $parent -->
             <!-- ko if: counts().length > 0 -->
-              <i class="fa fa-rotate-90" data-bind="css: { 'fa-caret-down': counts()[0].count < 0, 'fa-caret-up': counts()[0].count >= 0 }"></i>
+              <i data-bind="css: { 'fa-caret-down': counts()[0].count < 0, 'fa-caret-up': counts()[0].count > 0 }"></i>
               <span class="big-counter" data-bind="textSqueezer: counts()[0].count"></span>
             <!-- /ko -->
           <!-- /ko -->
@@ -2015,7 +2015,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <span class="pull-right" data-bind="template: { name: 'facet-compare', data: properties.compare }"></span>
     </div>
 
-    <i class="fa big-counter" data-bind="css: { 'fa-caret-down': counts() < 0, 'fa-caret-up': counts() >= 0 }"></i>
+    <i class="fa big-counter" data-bind="css: { 'fa-caret-down': counts() < 0, 'fa-caret-up': counts() > 0 }"></i>
     <span class="big-counter" data-bind="textSqueezer: counts"></span>
 
     <span data-bind="with: $root.collection.getFacetById($parent.id())">

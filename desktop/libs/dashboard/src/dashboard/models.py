@@ -488,12 +488,14 @@ def augment_solr_response(response, collection, query):
         collection_facet = get_facet_field(category, name, collection['facets'])
 
         if collection_facet['properties']['compare']['is_enabled']:
-          orignal_number, final_number = response['facets'][name]['buckets'][0][name], response['facets'][name]['buckets'][1][name]
-          if collection_facet['properties']['compare']['use_percentage']:
+          orignal_number, final_number = response['facets'][name]['buckets'][0].get(name), response['facets'][name]['buckets'][1].get(name)
+          if orignal_number is None or final_number is None:
+            value = 0
+          elif collection_facet['properties']['compare']['use_percentage']:
             if orignal_number != 0:
               value = (final_number - orignal_number) / orignal_number * 100.0
             else:
-              value = None 
+              value = 0 
           else:
             value = final_number - orignal_number
         else:
