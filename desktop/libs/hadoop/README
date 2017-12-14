@@ -1,7 +1,0 @@
-If you modified any of the thrift files you need to regenerate
-the generated code by running regenerate-thrift.sh, in this
-directory.  Finally, checkin any files that were generated during the previous
-steps.
-
-If you need to install the Thrift compiler, go to http://thrift.apache.org/ and
-pick the version 0.7.0.
