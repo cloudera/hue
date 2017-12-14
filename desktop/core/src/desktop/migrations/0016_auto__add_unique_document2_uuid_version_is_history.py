@@ -14,10 +14,13 @@ class Migration(SchemaMigration):
         # As opposed to Document1, we can't just delete Document2 documents if
         # there is a duplication because it actually holds data. So instead
         # we'll just find duplications and emit a better error message.
+        # Note we reset the `order_by` to make sure to prevent error with mysql:
+        # ORDER BY clause is not in GROUP BY clause and contains nonaggregated column.
         duplicated_records = Document2.objects \
          .values('uuid', 'version', 'is_history') \
          .annotate(id_count=models.Count('id')) \
-         .filter(id_count__gt=1)
+         .filter(id_count__gt=1) \
+         .order_by()
 
 
         duplicated_records = list(duplicated_records)
