@@ -645,7 +645,7 @@ var Collection = function (vm, collection) {
         vm.search();
       });
     }
-    if (facet.properties.aggregate) {
+    if (facet.properties.aggregate && facet.properties.aggregate.function) {
       facet.properties.aggregate.function.subscribe(function () {
         vm.search();
       });
