@@ -2040,21 +2040,25 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <span class="facet-field-label">
         ${ _('Cohorts') }
       </span>
-      <input type="text"/>
-      <input type="number"/>
+      <input type="text" class="input-medium"/>
+      <input type="number" class="input-medium"/>
     </span>
   </div>
 
   <div class="facet-field-cnt">
     <span class="spinedit-cnt">
-      <span class="facet-field-label">
-        ${ _('Percentage') }
-      </span>
-      <input type="checkbox" data-bind="checked: use_percentage"/>
-      <span class="facet-field-label">
-        ${ _('Hide value') }
-      </span>
-      <input type="checkbox"/>
+      <label>
+        <span class="facet-field-label">
+          ${ _('Percentage') }
+        </span>
+        <input type="checkbox" data-bind="checked: use_percentage"/>
+      </label>
+      <label>
+        <span class="facet-field-label">
+          ${ _('Hide value') }
+        </span>
+        <input type="checkbox"/>
+      </label>
     </span>
   </div>
   <!-- /ko -->
