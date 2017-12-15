@@ -36,11 +36,12 @@ from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
 from desktop.auth import forms as auth_forms
+from desktop.auth.forms import ImpersonationAuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.lib.django_util import JsonResponse
 from desktop.log.access import access_warn, last_access_map
-from desktop.conf import LDAP, OAUTH, DEMO_ENABLED
+from desktop.conf import OAUTH
 from desktop.settings import LOAD_BALANCER_COOKIE
 
 from hadoop.fs.exceptions import WebHdfsException
@@ -95,7 +96,10 @@ def dt_login(request, from_modal=False):
     AuthenticationForm = auth_forms.LdapAuthenticationForm
   else:
     UserCreationForm = auth_forms.UserCreationForm
-    AuthenticationForm = auth_forms.AuthenticationForm
+    if 'ImpersonationBackend' in backend_names:
+      AuthenticationForm = ImpersonationAuthenticationForm
+    else:
+      AuthenticationForm = auth_forms.AuthenticationForm
 
   if request.method == 'POST':
     request.audit = {
@@ -111,8 +115,7 @@ def dt_login(request, from_modal=False):
       auth_form = AuthenticationForm(data=request.POST)
 
       if auth_form.is_valid():
-        # Must login by using the AuthenticationForm.
-        # It provides 'backends' on the User object.
+        # Must login by using the AuthenticationForm. It provides 'backends' on the User object.
         user = auth_form.get_user()
         userprofile = get_profile(user)
 
@@ -157,12 +160,6 @@ def dt_login(request, from_modal=False):
         ensure_home_directory(request.fs, request.user)
       except (IOError, WebHdfsException), e:
         LOG.error('Could not create home directory for SAML user %s.' % request.user)
-
-  if DEMO_ENABLED.get() and not 'admin' in request.REQUEST and request.user.username != 'hdfs':
-    user = authenticate(username=request.user.username, password='HueRocks')
-    login(request, user)
-    ensure_home_directory(request.fs, user.username)
-    return HttpResponseRedirect(redirect_to)
 
   if not from_modal:
     request.session.set_test_cookie()

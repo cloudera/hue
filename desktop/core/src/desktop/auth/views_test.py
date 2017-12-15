@@ -769,6 +769,38 @@ class TestLoginNoHadoop(object):
     assert_equal(200, response.status_code, "Expected ok status.")
 
 
+class TestImpersonationBackend(object):
+  test_username = "test_login_impersonation"
+  test_login_as_username = "test_login_as_impersonation"
+
+  @classmethod
+  def setup_class(cls):
+    cls.client = make_logged_in_client(username=cls.test_username, password="test")
+    cls.auth_backends = settings.AUTHENTICATION_BACKENDS
+    settings.AUTHENTICATION_BACKENDS = ('desktop.auth.backend.ImpersonationBackend',)
+
+  @classmethod
+  def teardown_class(cls):
+    settings.AUTHENTICATION_BACKENDS = cls.auth_backends
+
+  def setUp(self):
+    self.reset = [conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.ImpersonationBackend'])]
+
+  def tearDown(self):
+    for finish in self.reset:
+      finish()
+
+  def test_login_does_not_reset_groups(self):
+    self.client.get('/accounts/logout')
+
+    user = User.objects.get(username=self.test_username)
+    group, created = Group.objects.get_or_create(name=self.test_username)
+
+    response = self.client.post('/hue/accounts/login/', dict(username=self.test_username, password="test", login_as=self.test_login_as_username), follow=True)
+    assert_equal(200, response.status_code)
+    assert_equal(self.test_login_as_username, response.context['user'].username)
+
+
 class MockLdapBackend(object):
   settings = django_auth_ldap_backend.LDAPSettings()
 

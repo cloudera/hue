@@ -60,7 +60,7 @@ class AuthenticationForm(AuthAuthenticationForm):
     'inactive': _t("Account deactivated. Please contact an administrator."),
   }
 
-  username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))
+  username = CharField(label=_t("Username"), widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))
   password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password"), 'autocomplete': 'off'}))
 
   def authenticate(self):
@@ -97,11 +97,24 @@ class AuthenticationForm(AuthAuthenticationForm):
     return self.authenticate()
 
 
+class ImpersonationAuthenticationForm(AuthenticationForm):
+  login_as = CharField(label=_t("Login as"), max_length=30, widget=TextInput(attrs={'placeholder': _t("Login as username"), 'autocomplete': 'off'}))
+
+  def authenticate(self):
+    try:
+      super(AuthenticationForm, self).clean()
+    except:
+      # Expected to fail as login_as is nor provided by the parent Django AuthenticationForm, hence we redo it properly below.
+      pass
+    self.user_cache = authenticate(username=self.cleaned_data.get('username'), password=self.cleaned_data.get('password'), login_as=self.cleaned_data.get('login_as'))
+    return self.user_cache
+
+
 class LdapAuthenticationForm(AuthenticationForm):
   """
   Adds NT_DOMAINS selector.
   """
-  
+
   def __init__(self, *args, **kwargs):
     super(LdapAuthenticationForm, self).__init__(*args, **kwargs)
     self.fields['server'] = ChoiceField(choices=get_server_choices())
