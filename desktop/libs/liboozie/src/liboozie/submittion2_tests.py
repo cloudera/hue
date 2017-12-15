@@ -207,6 +207,8 @@ class TestSubmission(OozieMockBase):
 
   def test_update_properties(self):
     finish = []
+    finish.append(MR_CLUSTERS.set_for_testing({'default': {}}))
+    finish.append(MR_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
     finish.append(YARN_CLUSTERS.set_for_testing({'default': {}}))
     finish.append(YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
     try:
@@ -247,8 +249,6 @@ class TestSubmission(OozieMockBase):
       })
       submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
       assert_equal(properties, submission.properties)
-      submission._update_properties('jtaddress', 'deployment-directory')
-      assert_equal(final_properties, submission.properties)
     finally:
       clear_sys_caches()
       for reset in finish:
