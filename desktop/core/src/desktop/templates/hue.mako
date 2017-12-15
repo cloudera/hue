@@ -461,6 +461,9 @@ ${ hueIcons.symbols() }
 ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/hue-bundle.js') }"></script>
+% if IS_EMBEDDED.get():
+<script src="${ static('desktop/ext/js/page.js') }"></script>
+% endif
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
