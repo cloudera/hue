@@ -21,6 +21,7 @@ from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
 
+from desktop.conf import IS_EMBEDDED
 from metadata.conf import has_optimizer, OPTIMIZER
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT, ENABLE_PRESENTATION
 %>
