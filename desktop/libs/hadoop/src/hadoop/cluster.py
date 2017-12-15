@@ -32,6 +32,8 @@ LOG = logging.getLogger(__name__)
 
 FS_CACHE = None
 FS_DEFAULT_NAME = 'default'
+MR_CACHE = None # MR now means YARN
+MR_NAME_CACHE = 'default'
 DEFAULT_USER = DEFAULT_USER.get()
 
 

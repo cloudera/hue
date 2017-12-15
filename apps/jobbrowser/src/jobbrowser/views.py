@@ -38,8 +38,8 @@ from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.views import register_status_bar_view
+
 from hadoop import cluster
-from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
 from hadoop.yarn.clients import get_log_client
 from hadoop.yarn import resource_manager_api as resource_manager_api
 
@@ -55,7 +55,7 @@ except:
 
 from jobbrowser.conf import LOG_OFFSET, SHARE_JOBS
 from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
-from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, LinkJobLogs, can_kill_job
+from jobbrowser.models import can_view_job, can_kill_job
 from jobbrowser.yarn_models import Application
 
 

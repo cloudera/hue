@@ -15,7 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import logging
+import re
 
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
@@ -57,3 +59,48 @@ def can_kill_job(self, user):
     return True
 
   return user.username == self.user
+
+
+class LinkJobLogs(object):
+
+  @classmethod
+  def _make_hdfs_links(cls, log):
+    escaped_logs = escape(log)
+    return re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
+
+  @classmethod
+  def _make_mr_links(cls, log):
+    escaped_logs = escape(log)
+    return re.sub('(job_[0-9]{12,}_[0-9]+)', LinkJobLogs._replace_mr_link, escaped_logs)
+
+  @classmethod
+  def _make_links(cls, log):
+    escaped_logs = escape(log)
+    hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
+    return re.sub('(job_[0-9]{12,}_[0-9]+)', LinkJobLogs._replace_mr_link, hdfs_links)
+
+  @classmethod
+  def _replace_hdfs_link(self, match):
+    try:
+      return '<a href="%s">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
+    except:
+      LOG.exception('failed to replace hdfs links: %s' % (match.groups(),))
+      return match.group(0)
+
+  @classmethod
+  def _replace_mr_link(self, match):
+    try:
+      return '<a href="%s">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
+    except:
+      LOG.exception('failed to replace mr links: %s' % (match.groups(),))
+      return match.group(0)
+
+
+def format_unixtime_ms(unixtime):
+  """
+  Format a unix timestamp in ms to a human readable string
+  """
+  if unixtime:
+    return str(datetime.datetime.fromtimestamp(unixtime/1000).strftime("%x %X %Z"))
+  else:
+    return ""
