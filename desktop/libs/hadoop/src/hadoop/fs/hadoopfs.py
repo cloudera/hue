@@ -30,13 +30,11 @@ import random
 import subprocess
 import urlparse
 
-from thrift.transport import TTransport
-
 from django.utils.encoding import smart_str, force_unicode
 from django.utils.translation import ugettext as _
+
 from desktop.lib import i18n
-from desktop.lib.conf import validate_port
-from hadoop.api.common.ttypes import RequestContext, IOException
+
 import hadoop.conf
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
@@ -71,75 +69,6 @@ def decode_fs_path(path):
   return force_unicode(path, HDFS_ENCODING, errors='strict')
 
 
-def test_fs_configuration(fs_config, hadoop_bin_conf):
-  """Test FS configuration. Returns list of (confvar, error)."""
-  TEST_FILE = '/tmp/.hue_config_test.%s' % (random.randint(0, 9999999999))
-  res = [ ]
-
-  res.extend(validate_port(fs_config.NN_THRIFT_PORT))
-  res.extend(validate_port(fs_config.NN_HDFS_PORT))
-  if res:
-    return res
-
-  # Check thrift plugin
-  try:
-    fs = HadoopFileSystem.from_config(
-      fs_config, hadoop_bin_path=hadoop_bin_conf.get())
-
-    fs.setuser(fs.superuser)
-    ls = fs.listdir('/')
-  except TTransport.TTransportException:
-    msg = 'Failed to contact Namenode plugin at %s:%s.' % \
-            (fs_config.NN_HOST.get(), fs_config.NN_THRIFT_PORT.get())
-    LOG.exception(msg)
-    res.append((fs_config, msg))
-    return res
-  except (IOError, IOException):
-    msg = 'Failed to see HDFS root directory at %s. Please check HDFS configuration.' % (fs.uri,)
-    LOG.exception(msg)
-    res.append((fs_config, msg))
-    return res
-
-  if 'tmp' not in ls:
-    return res
-
-  # Check nn port (via upload)
-  try:
-    w_file = fs.open(TEST_FILE, 'w')
-  except OSError, ex:
-    msg = 'Failed to execute Hadoop (%s)' % (hadoop_bin_conf.get(),)
-    LOG.exception(msg)
-    res.append((hadoop_bin_conf, msg))
-    return res
-
-  try:
-    try:
-      w_file.write('hello world')
-      w_file.close()
-    except IOError:
-      msg = 'Failed to upload files using %s' % (fs.uri,)
-      LOG.exception(msg)
-      res.append((fs_config.NN_HDFS_PORT, msg))
-      return res
-
-    # Check dn plugin (via read)
-    try:
-      r_file = fs.open(TEST_FILE, 'r')
-      r_file.read()
-    except Exception:
-      msg = 'Failed to read file. Are all datanodes configured with the HUE plugin?'
-      LOG.exception(msg)
-      res.append((fs_config, msg))
-  finally:
-    # Cleanup. Ignore if file not found.
-    try:
-      if fs.exists(TEST_FILE):
-        fs.remove(TEST_FILE)
-    except Exception, ex:
-      LOG.error('Failed to cleanup test file "%s:%s": %s' % (fs.uri, TEST_FILE, ex))
-  return res
-
-
 def _coerce_exceptions(function):
   """
   Decorator that causes exceptions thrown by the decorated function
@@ -149,7 +78,7 @@ def _coerce_exceptions(function):
   def wrapper(*args, **kwargs):
     try:
       return function(*args, **kwargs)
-    except IOException, e:
+    except Exception, e:
       e.msg = force_unicode(e.msg, errors='replace')
       e.stack = force_unicode(e.stack, errors='replace')
       LOG.exception("Exception in Hadoop FS call " + function.__name__)
