@@ -37,11 +37,11 @@ from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
 
-from jobbrowser import models, views
+from jobbrowser import views
 from jobbrowser.api import get_api
 from jobbrowser.apis.query_api import QueryApi
 from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.models import can_view_job, can_modify_job, Job, LinkJobLogs
+from jobbrowser.models import can_view_job, can_modify_job, LinkJobLogs
 
 
 LOG = logging.getLogger(__name__)
@@ -49,15 +49,6 @@ _INITIALIZED = False
 
 
 class TestBrowser():
-
-  def test_dots_to_camel_case(self):
-    assert_equal("fooBar", models.dots_to_camel_case("foo.bar"))
-    assert_equal("fooBarBaz", models.dots_to_camel_case("foo.bar.baz"))
-    assert_equal("foo", models.dots_to_camel_case("foo"))
-    assert_equal("foo.", models.dots_to_camel_case("foo."))
-
-  def test_get_path(self):
-    assert_equal("/foo/bar", models.get_path("hdfs://host/foo/bar"))
 
   def test_format_counter_name(self):
     assert_equal("Foo Bar", views.format_counter_name("fooBar"))
@@ -362,29 +353,6 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     assert_true(match and match.group(2), 'Failed to parse log length from syslog')
     log_length = match.group(2)
     assert_true(log_length > 0, 'Log Length is 0, expected content in syslog.')
-
-
-class TestMapReduce1NoHadoop:
-
-  def test_acls_job(self):
-    job = MockMr1Job()
-
-    assert_true(can_view_job('test', job))
-    assert_true(can_modify_job('test', job))
-
-    assert_false(can_view_job('test2', job))
-    assert_false(can_modify_job('test2', job))
-
-
-class MockMr1Job(Job):
-
-  def __init__(self):
-    self.is_mr2 = False
-    self._full_job_conf = {
-      'mapreduce.cluster.acls.enabled': True,
-      'mapreduce.job.acl-modify-job': 'test',
-      'mapreduce.job.acl-view-job': 'test'
-    }
 
 
 class TestMapReduce2NoHadoop:
