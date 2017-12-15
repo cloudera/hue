@@ -22,7 +22,6 @@ from django.utils.functional import wraps
 
 from hadoop import conf
 from hadoop.fs import webhdfs, LocalSubFileSystem
-from hadoop.job_tracker import LiveJobTracker
 
 from desktop.conf import DEFAULT_USER
 from desktop.lib.paths import get_build_dir
@@ -33,31 +32,8 @@ LOG = logging.getLogger(__name__)
 
 FS_CACHE = None
 FS_DEFAULT_NAME = 'default'
-MR_CACHE = None
-MR_NAME_CACHE = 'default'
 DEFAULT_USER = DEFAULT_USER.get()
 
-
-def jt_ha(funct):
-  """
-  Support JT plugin HA by trying other MR cluster.
-
-  This modifies the cached JT and so will happen just once by failover.
-  """
-  def decorate(api, *args, **kwargs):
-    try:
-      return funct(api, *args, **kwargs)
-    except Exception, ex:
-      if 'Could not connect to' in str(ex):
-        LOG.info('JobTracker not available, trying JT plugin HA: %s.' % ex)
-        jt_ha = get_next_ha_mrcluster()
-        if jt_ha is not None:
-          if jt_ha[1].host == api.jt.host:
-            raise ex
-          config, api.jt = jt_ha
-          return funct(api, *args, **kwargs)
-      raise ex
-  return wraps(funct)(decorate)
 
 
 def rm_ha(funct):
@@ -108,24 +84,6 @@ def get_all_hdfs():
   return FS_CACHE
 
 
-def get_default_mrcluster():
-  """
-  Get the default JT (not necessarily HA).
-  """
-  global MR_CACHE
-  global MR_NAME_CACHE
-
-  try:
-    all_mrclusters()
-    return MR_CACHE.get(MR_NAME_CACHE)
-  except KeyError:
-    # Return an arbitrary cluster
-    candidates = all_mrclusters()
-    if candidates:
-      return candidates.values()[0]
-    return None
-
-
 def get_default_yarncluster():
   """
   Get the default RM (not necessarily HA).
@@ -143,61 +101,6 @@ def get_default_fscluster_config():
   Get the default FS config.
   """
   return conf.HDFS_CLUSTERS[FS_DEFAULT_NAME]
-
-
-def get_next_ha_mrcluster():
-  """
-  Return the next available JT instance and cache its name.
-
-  This method currently works for distincting between active/standby JT as a standby JT does not respond.
-  A cleaner but more complicated way would be to do something like the MRHAAdmin tool and
-  org.apache.hadoop.ha.HAServiceStatus#getServiceStatus().
-  """
-  global MR_NAME_CACHE
-  candidates = all_mrclusters()
-  has_ha = sum([conf.MR_CLUSTERS[name].SUBMIT_TO.get() for name in conf.MR_CLUSTERS.keys()]) >= 2
-
-  mrcluster = get_default_mrcluster()
-  if mrcluster is None:
-    return None
-
-  current_user = mrcluster.user
-
-  for name in conf.MR_CLUSTERS.keys():
-    config = conf.MR_CLUSTERS[name]
-    if config.SUBMIT_TO.get():
-      jt = candidates[name]
-      if has_ha:
-        try:
-          jt.setuser(current_user)
-          status = jt.cluster_status()
-          if status.stateAsString == 'RUNNING':
-            MR_NAME_CACHE = name
-            LOG.warn('Picking HA JobTracker: %s' % name)
-            return (config, jt)
-          else:
-            LOG.info('JobTracker %s is not RUNNING, skipping it: %s' % (name, status))
-        except Exception, ex:
-          LOG.exception('JobTracker %s is not available, skipping it: %s' % (name, ex))
-      else:
-        return (config, jt)
-  return None
-
-
-def get_mrcluster(identifier="default"):
-  global MR_CACHE
-  all_mrclusters()
-  return MR_CACHE[identifier]
-
-
-def all_mrclusters():
-  global MR_CACHE
-  if MR_CACHE is not None:
-    return MR_CACHE
-  MR_CACHE = {}
-  for identifier in conf.MR_CLUSTERS.keys():
-    MR_CACHE[identifier] = _make_mrcluster(identifier)
-  return MR_CACHE
 
 
 def get_yarn():
@@ -258,10 +161,6 @@ def get_cluster_for_job_submission():
   if yarn:
     return yarn
 
-  mr = get_next_ha_mrcluster()
-  if mr is not None:
-    return mr
-
   return None
 
 
@@ -299,9 +198,9 @@ def clear_caches():
   Clears cluster's internal caches.  Returns
   something that can be given back to restore_caches.
   """
-  global FS_CACHE, MR_CACHE
-  old = FS_CACHE, MR_CACHE
-  FS_CACHE, MR_CACHE = None, None
+  global FS_CACHE
+  old = FS_CACHE
+  FS_CACHE = None
   return old
 
 
@@ -309,8 +208,8 @@ def restore_caches(old):
   """
   Restores caches from the result of a previous clear_caches call.
   """
-  global FS_CACHE, MR_CACHE
-  FS_CACHE, MR_CACHE = old
+  global FS_CACHE
+  FS_CACHE = old
 
 
 def _make_filesystem(identifier):
@@ -324,8 +223,3 @@ def _make_filesystem(identifier):
   else:
     cluster_conf = conf.HDFS_CLUSTERS[identifier]
     return webhdfs.WebHdfs.from_config(cluster_conf)
-
-
-def _make_mrcluster(identifier):
-  cluster_conf = conf.MR_CLUSTERS[identifier]
-  return LiveJobTracker.from_conf(cluster_conf)
