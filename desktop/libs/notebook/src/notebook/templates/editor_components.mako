@@ -3134,6 +3134,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
+
+  % if not IS_EMBEDDED.get():
       if (window.Worker) {
         // It can take a while before the worker is active
         var whenWorkerIsReady = function (worker, message) {
@@ -3176,6 +3178,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           whenWorkerIsReady(aceSqlLocationWorker, message);
         });
       }
+  % endif
+
 
       if (viewModel.isOptimizerEnabled()) {
         % if OPTIMIZER.AUTO_UPLOAD_QUERIES.get():
