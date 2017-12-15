@@ -207,8 +207,6 @@ class TestSubmission(OozieMockBase):
 
   def test_update_properties(self):
     finish = []
-    finish.append(MR_CLUSTERS.set_for_testing({'default': {}}))
-    finish.append(MR_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
     finish.append(YARN_CLUSTERS.set_for_testing({'default': {}}))
     finish.append(YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
     try:
@@ -228,13 +226,12 @@ class TestSubmission(OozieMockBase):
 
       clear_sys_caches()
       fs = cluster.get_hdfs()
-      jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
       final_properties.update({
         'jobTracker': 'jtaddress',
         'nameNode': fs.fs_defaultfs
       })
-      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=jt)
+      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
       assert_equal(properties, submission.properties)
       submission._update_properties('jtaddress', 'deployment-directory')
       assert_equal(final_properties, submission.properties)
@@ -243,13 +240,12 @@ class TestSubmission(OozieMockBase):
       finish.append(MR_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('jobtracker'))
       clear_sys_caches()
       fs = cluster.get_hdfs()
-      jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
       final_properties.update({
         'jobTracker': 'jobtracker',
         'nameNode': 'namenode'
       })
-      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=jt)
+      submission = Submission(None, properties=properties, oozie_id='test', fs=fs, jt=None)
       assert_equal(properties, submission.properties)
       submission._update_properties('jtaddress', 'deployment-directory')
       assert_equal(final_properties, submission.properties)
