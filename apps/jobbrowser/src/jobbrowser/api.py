@@ -24,9 +24,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paginator import Paginator
 from desktop.lib.rest.http_client import RestException
 
-from hadoop import cluster
-from hadoop.cluster import jt_ha, rm_ha
-from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
+from hadoop.cluster import rm_ha
 
 import hadoop.yarn.history_server_api as history_server_api
 import hadoop.yarn.mapreduce_api as mapreduce_api
@@ -35,7 +33,6 @@ import hadoop.yarn.resource_manager_api as resource_manager_api
 import hadoop.yarn.spark_history_server_api as spark_history_server_api
 
 from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
 from jobbrowser.yarn_models import Application, Job as YarnJob, KilledJob as KilledYarnJob, Container, SparkJob
 
 
@@ -45,10 +42,7 @@ _DEFAULT_OBJ_PER_PAGINATION = 10
 
 
 def get_api(user, jt):
-  if cluster.is_yarn():
-    return YarnApi(user)
-  else:
-    return JtApi(jt)
+  return YarnApi(user)
 
 
 class JobBrowserApi(object):
@@ -56,108 +50,6 @@ class JobBrowserApi(object):
   def paginate_task(self, task_list, pagenum):
     paginator = Paginator(task_list, _DEFAULT_OBJ_PER_PAGINATION)
     return paginator.page(pagenum)
-
-
-class JtApi(JobBrowserApi):
-  def __init__(self, jt):
-    self.jt = jt
-
-  @jt_ha
-  def get_job_link(self, jobid):
-    return JobLinkage(self.jt, jobid)
-
-  @jt_ha
-  def get_job(self, jobid):
-    return Job.from_id(jt=self.jt, jobid=jobid)
-
-  @jt_ha
-  def get_jobs(self, user, **kwargs):
-    """
-    Returns an array of jobs where the returned
-    jobs are matched by the provided filter arguments.
-
-    If a filter argument is in kwargs it will supersede the same argument
-    in the request object.
-
-    Filter arguments may be jobid, pools, user, tasks, text and state.
-
-    Filter by user ownership if check_permission is set to true.
-    """
-    jobfunc = {
-       "completed" : (self.jt.completed_jobs, ThriftJobState.SUCCEEDED),
-       # Succeeded and completed are synonyms here.
-       "succeeded" : (self.jt.completed_jobs, ThriftJobState.SUCCEEDED),
-       "running" : (self.jt.running_jobs, ThriftJobState.RUNNING),
-       "failed" : (self.jt.failed_jobs, ThriftJobState.FAILED),
-       "killed" : (self.jt.killed_jobs, ThriftJobState.KILLED),
-       "all" : (self.jt.all_jobs, None),
-       None : (self.jt.all_jobs, None)
-    }
-
-    selection = kwargs.pop('state')
-    retired = kwargs.pop('retired')
-
-    jobs = jobfunc[selection][0]().jobs
-
-    if retired:
-      jobs += self.jt.retired_jobs(jobfunc[selection][1]).jobs
-
-    return self.filter_jobs(user, jobs, **kwargs)
-
-  @jt_ha
-  def filter_jobs(self, user, jobs, **kwargs):
-    check_permission = not SHARE_JOBS.get() and not user.is_superuser
-
-    limit = kwargs.pop('limit', 10000)
-
-    return [Job.from_thriftjob(self.jt, j)
-            for j in self._filter_jobs(jobs, **kwargs)
-            if not check_permission or user.is_superuser or j.profile.user == user.username][:limit]
-
-  def _filter_jobs(self, jobs, username=None, text=None):
-    def predicate(job):
-      """
-      Return True if a ThriftJobInProgress structure matches the supplied filters.
-
-      If a filter argument is None, everything matches it.
-      """
-      if username and username not in job.profile.user:
-        return False
-
-      if text:
-        search = text.lower()
-        # These fields are chosen to match those displayed by the JT UI
-        saw_text = False
-        for t in [job.profile.user,
-                  job.profile.name,
-                  job.jobID.asString,
-                  job.profile.queueName,
-                  job.priorityAsString
-                  ]:
-          if search in t.lower():
-            saw_text = True
-            break
-
-        if not saw_text:
-          return False
-
-      return True
-
-    return filter(predicate, jobs)
-
-  @jt_ha
-  def get_tasks(self, jobid, **filters):
-    return TaskList.select(self.jt,
-                           jobid,
-                           filters['task_types'],
-                           filters['task_states'],
-                           filters['task_text'],
-                           _DEFAULT_OBJ_PER_PAGINATION,
-                           _DEFAULT_OBJ_PER_PAGINATION * (filters['pagenum'] - 1))
-
-  @jt_ha
-  def get_tracker(self, trackerid):
-    return Tracker.from_name(self.jt, trackerid)
 
 
 class YarnApi(JobBrowserApi):
