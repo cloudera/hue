@@ -45,7 +45,6 @@ import logging
 import sys
 import signal
 import shutil
-import socket
 import time
 import tempfile
 import json
@@ -55,8 +54,6 @@ import urllib2
 from desktop.lib import python_util
 from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 
-from hadoop.fs.hadoopfs import HadoopFileSystem
-from hadoop.job_tracker import LiveJobTracker
 import hadoop.cluster
 
 # Starts mini cluster suspended until a debugger attaches to it.
@@ -334,20 +331,13 @@ rpc.class=org.apache.hadoop.metrics.spi.NoEmitMetricsContext
 
   @property
   def fs(self):
-    """Creates a HadoopFileSystem object configured for this cluster."""
-    if self._fs is None:
-      self._fs = HadoopFileSystem("localhost", 
-        thrift_port=self.namenode_thrift_port,
-        hdfs_port=self.namenode_port,
-        hadoop_bin_path=hadoop.conf.HADOOP_BIN.get())
-    return self._fs
+    # Deprecated
+    return None
 
   @property
   def jt(self):
-    """Creates a LiveJobTracker object configured for this cluster."""
-    if self._jt is None:
-      self._jt = LiveJobTracker("localhost", self.jobtracker_thrift_port)
-    return self._jt
+    # Deprecated
+    return None
 
   @property
   def superuser(self):
