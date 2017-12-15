@@ -1073,8 +1073,8 @@
   ## query_timeout_s=600
 
   # If > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work
-  # (compute or send back results) for that session within QUERY_TIMEOUT_S seconds (default 1 hour).
-  ## session_timeout_s=3600
+  # (compute or send back results) for that session within SESSION_TIMEOUT_S seconds (default 30 min).
+  ## session_timeout_s=1800
 
   # Override the desktop default username and password of the hue user used for authentications with other services.
   # e.g. Used for LDAP/PAM pass-through authentication.
