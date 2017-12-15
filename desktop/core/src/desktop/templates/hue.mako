@@ -307,7 +307,7 @@ ${ hueIcons.symbols() }
 
   <div class="content-wrapper">
 
-    <script type="text/html" id="tmpl-sidebar-link">
+    <script type="text/html" id="hue-tmpl-sidebar-link">
       <a role="button" class="hue-sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
         <span class="hue-sidebar-item-name" data-bind="text: item.displayName"></span>
       </a>
@@ -318,10 +318,10 @@ ${ hueIcons.symbols() }
         <!-- ko foreach: {data: items, as: 'item'} -->
           <!-- ko if: item.isCategory -->
              <h4 class="hue-sidebar-category-item" data-bind="text: item.displayName"></h4>
-             <!-- ko template: {name: 'tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
+             <!-- ko template: {name: 'hue-tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: item.isCategory -->
-             <!-- ko template: { name: 'tmpl-sidebar-link' } --><!-- /ko -->
+             <!-- ko template: { name: 'hue-tmpl-sidebar-link' } --><!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
       </div>
