@@ -1169,6 +1169,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           % endif
         ];
 
+        if (typeof HUE_EMBEDDED_PAGE_MAPPINGS !== 'undefined') {
+          pageMapping = pageMapping.concat(HUE_EMBEDDED_PAGE_MAPPINGS)
+        }
+
         pageMapping.forEach(function (mapping) {
           page(mapping.url, _.isFunction(mapping.app) ? mapping.app : function (ctx) {
             self.currentContextParams(ctx.params);
