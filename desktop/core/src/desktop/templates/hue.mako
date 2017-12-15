@@ -987,7 +987,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $(this).attr('href', link);
         });
 
-        page.base('/hue');
+        page.base(typeof HUE_EMBEDDED_BASE_URL !== 'undefined' ? HUE_EMBEDDED_BASE_URL : '/hue');
 
         self.lastContext = null;
 
