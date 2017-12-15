@@ -127,6 +127,12 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     </div>
     %endif
 
+    %if 'ImpersonationBackend' in backend_names:
+    <div class="text-input">
+      ${ form['login_as'] | n,unicode }
+    </div>
+    %endif
+
     %if login_errors and not form['username'].errors and not form['password'].errors:
       %if form.errors:
         % for error in form.errors:

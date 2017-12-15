@@ -34,7 +34,7 @@ import pam
 
 import django.contrib.auth.backends
 from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.forms import ValidationError
 from django.utils.importlib import import_module
 
@@ -117,21 +117,21 @@ def find_user(username):
     user = None
   return user
 
-def create_user(username, password):
+def create_user(username, password, is_superuser=True):
   LOG.info("Materializing user %s in the database" % username)
   user = User(username=username)
   if password is None:
     user.set_unusable_password()
   else:
     user.set_password(password)
-  user.is_superuser = True
+  user.is_superuser = is_superuser
   user.save()
   return user
 
-def find_or_create_user(username, password=None):
+def find_or_create_user(username, password=None, is_superuser=True):
   user = find_user(username)
   if user is None:
-    user = create_user(username, password)
+    user = create_user(username, password, is_superuser)
   return user
 
 def ensure_has_a_group(user):
@@ -216,6 +216,31 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
     return User.objects.count() == 0
 
 
+class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
+  """
+  Authenticate with a proxy user username/password but then login as another user.
+  Does not support a multiple backends setup.
+  """
+  def authenticate(self, username=None, password=None, login_as=None):
+    if not login_as:
+      return
+
+    authenticated = super(ImpersonationBackend, self).authenticate(username, password)
+
+    if not authenticated:
+      raise PermissionDenied()
+
+    user = find_or_create_user(login_as, password=None, is_superuser=False)
+    ensure_has_a_group(user)
+
+    return rewrite_user(user)
+
+  def get_user(self, user_id):
+    user = super(ImpersonationBackend, self).get_user(user_id)
+    user = rewrite_user(user)
+    return user
+
+
 class OAuthBackend(DesktopBackendBase):
   """
   Deprecated, use liboauth.backend.OAuthBackend instead
@@ -269,41 +294,6 @@ class AllowAllBackend(DesktopBackendBase):
   @classmethod
   def manages_passwords_externally(cls):
     return True
-
-
-class DemoBackend(django.contrib.auth.backends.ModelBackend):
-  """
-  Log automatically users without a session with a new user account.
-  """
-  def authenticate(self, username, password):
-    username = force_username_case(username)
-    user = super(DemoBackend, self).authenticate(username, password)
-
-    if not user:
-      username = self._random_name()
-
-      user = find_or_create_user(username, 'HueRocks')
-
-      user.is_superuser = False
-      user.save()
-
-      ensure_has_a_group(user)
-
-    user = rewrite_user(user)
-
-    return user
-
-  def get_user(self, user_id):
-    user = super(DemoBackend, self).get_user(user_id)
-    user = rewrite_user(user)
-    return user
-
-  def _random_name(self):
-    import string
-    import random
-
-    N = 7
-    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(N))
 
 
 class PamBackend(DesktopBackendBase):
