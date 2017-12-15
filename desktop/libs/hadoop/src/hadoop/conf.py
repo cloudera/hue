@@ -90,32 +90,32 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
   )
 )
 
-MR_CLUSTERS = UnspecifiedConfigSection(
-  "mapred_clusters",
-  help="One entry for each MapReduce cluster",
-  each=ConfigSection(
-    help="Information about a single MapReduce cluster",
-    members=dict(
-      HOST=Config("jobtracker_host", help="Host/IP for JobTracker"),
-      PORT=Config("jobtracker_port",
-                  default=8021,
-                  help="Service port for the JobTracker",
-                  type=int),
-      LOGICAL_NAME=Config('logical_name',
-                          default="",
-                          type=str,
-                          help=_t('JobTracker logical name.')),
-      JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
-                            type=int),
-      JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
-                                   default="mapred", type=str),
-      SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
-                              default=False, type=coerce_bool),
-      SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
-                       default=True, type=coerce_bool), # True here for backward compatibility
-    )
-  )
-)
+# MR_CLUSTERS = UnspecifiedConfigSection(
+#   "mapred_clusters",
+#   help="One entry for each MapReduce cluster",
+#   each=ConfigSection(
+#     help="Information about a single MapReduce cluster",
+#     members=dict(
+#       HOST=Config("jobtracker_host", help="Host/IP for JobTracker"),
+#       PORT=Config("jobtracker_port",
+#                   default=8021,
+#                   help="Service port for the JobTracker",
+#                   type=int),
+#       LOGICAL_NAME=Config('logical_name',
+#                           default="",
+#                           type=str,
+#                           help=_t('JobTracker logical name.')),
+#       JT_THRIFT_PORT=Config("thrift_port", help="Thrift port for JobTracker", default=9290,
+#                             type=int),
+#       JT_KERBEROS_PRINCIPAL=Config("jt_kerberos_principal", help="Kerberos principal for JobTracker",
+#                                    default="mapred", type=str),
+#       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
+#                               default=False, type=coerce_bool),
+#       SUBMIT_TO=Config('submit_to', help="Whether Hue should use this cluster to run jobs",
+#                        default=True, type=coerce_bool), # True here for backward compatibility
+#     )
+#   )
+# )
 
 YARN_CLUSTERS = UnspecifiedConfigSection(
   "yarn_clusters",
