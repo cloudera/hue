@@ -309,30 +309,32 @@ ${ hueIcons.symbols() }
     <%
       view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
     %>
-    % if view_profile:
-      <li class="dropdown">
-        <a title="${ _('Administration') }" href="#" data-rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
-          <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
-          <b class="caret"></b>
+    % if view_profile or conf.IS_HUE_4.get():
+    <li class="dropdown">
+      <a title="${'Administration' if view_profile else ''}" href="#" data-rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
+        <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
+        <b class="caret"></b>
+      </a>
+      <ul class="dropdown-menu pull-right">
+      % if view_profile:
+      <li>
+        <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-fw fa-key"></i>
+          % if is_ldap_setup:
+            ${_('View Profile')}
+          % else:
+            ${_('Edit Profile')}
+          % endif
         </a>
-        <ul class="dropdown-menu pull-right">
-          <li>
-            <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-fw fa-key"></i>
-              % if is_ldap_setup:
-                ${_('View Profile')}
-              % else:
-                ${_('Edit Profile')}
-              % endif
-            </a>
-          </li>
-          % if user.is_superuser:
-            <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
-          % endif
-          % if conf.IS_HUE_4.get():
-          <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 4)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 4')}</a></li>
-          % endif
-        </ul>
       </li>
+        % if user.is_superuser:
+          <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
+        % endif
+      % endif
+      % if conf.IS_HUE_4.get():
+      <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 4)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 4')}</a></li>
+      % endif
+      </ul>
+    </li>
     % else:
       <li><a title="" data-rel="navigator-tooltip" href="#"><i class="fa fa-fw fa-user"></i>&nbsp;${user.username}</a></li>
     % endif
