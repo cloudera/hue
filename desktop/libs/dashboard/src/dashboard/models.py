@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 from __future__ import division
 
 import collections
@@ -45,7 +46,8 @@ NESTED_FACET_FORM = {
     'isDate': False,
     'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50}
 }
-COMPARE_FACET = {'is_enabled': False, 'gap': '1WEEK', 'use_percentage': False, 'cohort_number': 1}
+COMPARE_FACET = {'is_enabled': False, 'gap': '7DAYS', 'use_percentage': False, 'show_both': False, 'cohort_number': 1}
+QUERY_FACET = {'is_enabled': False, 'query': ''}
 
 
 class Collection2(object):
@@ -149,6 +151,8 @@ class Collection2(object):
 
       if 'compare' not in properties:
         properties['compare'] = COMPARE_FACET
+      if 'filter' not in properties:
+        properties['filter'] = QUERY_FACET
 
     if 'qdefinitions' not in props['collection']:
       props['collection']['qdefinitions'] = []
@@ -487,27 +491,29 @@ def augment_solr_response(response, collection, query):
       if category == 'function' and name in response['facets']:
         collection_facet = get_facet_field(category, name, collection['facets'])
 
-        if collection_facet['properties']['compare']['is_enabled']:
-          orignal_number, final_number = response['facets'][name]['buckets'][0].get(name), response['facets'][name]['buckets'][1].get(name)
-          if orignal_number is None or final_number is None:
-            value = 0
-          elif collection_facet['properties']['compare']['use_percentage']:
-            if orignal_number != 0:
-              value = (final_number - orignal_number) / orignal_number * 100.0
-            else:
-              value = 0 
+        value = response['facets'][name]
+        counts = {'value': value, 'percentage': 0}
+
+        if collection_facet['properties']['filter']['is_enabled']:
+          if collection_facet['properties']['compare']['is_enabled']:
+            value = value[name]
           else:
-            value = final_number - orignal_number
-        else:
-          value = response['facets'][name]['count']
-#           value = response['facets'][name]
+            counts['value'] = value['count']
+
+        if collection_facet['properties']['compare']['is_enabled']:
+          orignal_number, final_number = value['buckets'][0].get(name, 0), value['buckets'][1].get(name, 0)
+          if collection_facet['properties']['compare']['use_percentage']:
+            if orignal_number != 0:
+              counts['percentage'] = (final_number - orignal_number) / orignal_number * 100.0
+
+          counts['value'] = final_number - orignal_number
 
         facet = {
           'id': collection_facet['id'],
           'query': name,
           'type': category,
           'label': name,
-          'counts': value,
+          'counts': counts,
         }
         normalized_facets.append(facet)
       elif category == 'nested' and name in response['facets']:
