@@ -300,6 +300,7 @@
     <!-- ko case: 'pyspark' --><svg class="hi"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
     <!-- ko case: 'r' --><svg class="hi"><use xlink:href="#hi-r"></use></svg><!-- /ko -->
     <!-- ko case: 'scala' --><svg class="hi"><use xlink:href="#hi-scala"></use></svg><!-- /ko -->
+    <!-- ko case: 'solr' --><i class="fa fa-fw fa-search-plus"></i><!-- /ko -->
     <!-- ko case: 'scheduler' --><svg class="hi"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
     <!-- ko case: 'security' --><i class="fa fa-fw fa-lock"></i><!-- /ko -->
     <!-- ko case: 'shell' --><i class="fa fa-fw fa-terminal"></i><!-- /ko -->
