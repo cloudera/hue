@@ -40,6 +40,8 @@ def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
+    except QueryError, e:
+      raise e
     except Exception, e:
       message = force_unicode(str(e))
       raise QueryError(message)
