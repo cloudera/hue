@@ -177,24 +177,24 @@ class SolrApi(object):
             json_facets[facet['id']] = _f['facet'][dim_key]
         elif facet['type'] == 'function':
           if facet['properties']['facets']:
+            json_facets[facet['id']] = self._get_aggregate_function(facet['properties']['facets'][0])
             if facet['properties']['compare']['is_enabled']:
               # TODO: global compare override
+              unit = re.split('\d+', facet['properties']['compare']['gap'])[1]
               json_facets[facet['id']] = {
-                'type': "range",
+                'type': 'range',
                 'field': collection['timeFilter'].get('field'),
-                'start': "2014-05-04T01:35:00Z/HOURS",
-                'end': "2014-05-04T14:15:00Z/HOURS",
-                'gap': "+12HOURS",
-                'facet': {facet['id']: self._get_aggregate_function(facet['properties']['facets'][0])}
+                'start': 'NOW/%s-%s-%s' % (unit, facet['properties']['compare']['gap'], facet['properties']['compare']['gap']),
+                'end': 'NOW/%s' % unit,
+                'gap': '+%(gap)s' % facet['properties']['compare'],
+                'facet': {facet['id']: json_facets[facet['id']]}
               }
-            elif True:
+            if facet['properties']['filter']['is_enabled']:
               json_facets[facet['id']] = {
-                'type': "query",
-                'q': 'bytes:[1000 TO *]',
-                'facet': {facet['id']: self._get_aggregate_function(facet['properties']['facets'][0])}
+                'type': 'query',
+                'q': facet['properties']['filter']['query'] or EMPTY_QUERY.get(),
+                'facet': {facet['id']: json_facets[facet['id']]}
               }
-            else:
-              json_facets[facet['id']] = self._get_aggregate_function(facet['properties']['facets'][0])
             json_facets['processEmpty'] = True
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':

@@ -2011,7 +2011,10 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
-      <span class="pull-right" data-bind="visible: $root.availableDateFields().length > 0, template: { name: 'facet-compare', data: properties.compare }"></span>
+      <div class="pull-right">
+        <span data-bind="visible: $root.collection.supportAnalytics(), template: { name: 'facet-filter', data: properties.filter }"></span>
+        <span data-bind="visible: $root.collection.supportAnalytics() && $root.availableDateFields().length > 0, template: { name: 'facet-compare', data: properties.compare }"></span>
+      </div>
     </div>
 
     <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts(), properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
@@ -2020,19 +2023,46 @@ ${ dashboard.layout_skeleton(suffix='search') }
 </script>
 
 
+<script type="text/html" id="facet-filter">
+  <label>
+    <input type="checkbox" data-bind="checked: is_enabled"/> ${ _('Filter') }
+  </label>
+
+  <!-- ko if: is_enabled -->
+  <div class="facet-field-cnt">
+    <span class="spinedit-cnt">
+      <span class="facet-field-label">
+        ${ _('Query') }
+      </span>
+      <div data-bind="component: { name: 'hue-simple-ace-editor', params: {
+        value: query,
+        onExec: $parent.searchBtn,
+        placeHolder: $root.collection.engine() === 'solr' ? '${ _ko('Example: field:value, or press CTRL + space') }' : '${ _ko('Example: col = value, or press CTRL + space') }',
+        autocomplete: { type: $root.collection.engine() + 'Query', support: { collection: $root.collection } },
+        mode: $root.collection.engine(),
+        singleLine: true }
+      }"></div>
+    </span>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="counter-form">
   <i class="fa" data-bind="visible: properties.compare.is_enabled, css: { 'fa-caret-down': counts < 0, 'fa-caret-up': counts > 0 }"></i>
 
-  <span  data-bind="textSqueezer: counts"></span>
+  <span data-bind="textSqueezer: counts.value, visible: !properties.compare.use_percentage() || properties.compare.show_both()"></span>
 
-  <span  data-bind="visible: properties.compare.use_percentage">
-    ${ '%' }
+  <span data-bind="visible: properties.compare.use_percentage">
+    <span data-bind="textSqueezer: counts.percentage"></span> ${ '%' }
   </span>
 </script>
 
 
 <script type="text/html" id="facet-compare">
-  <input type="checkbox" data-bind="checked: is_enabled"/> ${ _('Compare') }
+  <label>
+    <input type="checkbox" data-bind="checked: is_enabled"/> ${ _('Compare') }
+  </label>
 
   <!-- ko if: is_enabled -->
   <div class="facet-field-cnt">
@@ -2040,8 +2070,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <span class="facet-field-label">
         ${ _('Cohorts') }
       </span>
-      <input type="text" class="input-medium"/>
-      <input type="number" class="input-medium"/>
+      <span data-bind="template: {name: 'time-filter-select', data: {gap: gap} }"></span>
+      ## <input type="number" class="input-xsmall" data-bind="value: cohort_number"/>
     </span>
   </div>
 
@@ -2055,9 +2085,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
       </label>
       <label>
         <span class="facet-field-label">
-          ${ _('Hide value') }
+          ${ _('Both values') }
         </span>
-        <input type="checkbox"/>
+        <input type="checkbox" data-bind="checked: show_both, enable: use_percentage"/>
       </label>
     </span>
   </div>
@@ -2656,7 +2686,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="time-filter">
   <span data-bind="visible: $root.availableDateFields().length > 0" >
-    <span data-bind="template: {name: 'time-filter-select'}"></span>
+    <span data-bind="template: {name: 'time-filter-select', data: {gap: collection.timeFilter.value} }"></span>
     <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal">
       <i class="fa fa-calendar"></i>
     </a>
@@ -2675,7 +2705,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="time-filter-select">
-  <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-small" style="margin-right: 4px">
+  <select id="settingstimeinterval" data-bind="value: $data.gap" class="input-small" style="margin-right: 4px">
     <option value="all">${ _('All') }</option>
     <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
     <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
@@ -2719,7 +2749,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'rolling'">
                 <label class="control-label" for="settingstimeinterval">${ _('Interval') }</label>
                 <div class="controls">
-                  <span data-bind="template: {name: 'time-filter-select'}"></span>
+                  <span data-bind="template: {name: 'time-filter-select', data: { gap: collection.timeFilter.value} }"></span>
                 </div>
               </div>
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">

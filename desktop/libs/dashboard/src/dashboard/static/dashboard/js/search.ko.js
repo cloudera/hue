@@ -752,6 +752,9 @@ var Collection = function (vm, collection) {
       facet.properties.compare.use_percentage.subscribe(function () {
         vm.search();
       });
+      facet.properties.compare.gap.subscribe(function () {
+        vm.search();
+      });
      }
 
     // For Solr 5+  only
