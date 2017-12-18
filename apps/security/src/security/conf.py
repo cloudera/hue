@@ -25,13 +25,13 @@ from security.settings import NICE_NAME
 HIVE_V1 = Config(
   key="hive_v1",
   help=_t("Use Sentry API V1 for Hive."),
-  default=True,
+  default=False,
   type=coerce_bool)
 
 HIVE_V2 = Config(
   key="hive_v2",
   help=_t("Use Sentry generic API V2 for Hive."),
-  default=False,
+  default=True,
   type=coerce_bool)
 
 SOLR_V2 = Config(
@@ -49,7 +49,8 @@ def config_validator(user):
   res = []
 
   try:
-    get_api(user).list_sentry_roles_by_group('*')
+    if HIVE_V1.get():
+      get_api(user).list_sentry_roles_by_group('*')
   except Exception, e:
     res.append(('%s: Sentry Service' % NICE_NAME, _("Failed to connect to Sentry API (version 1).")))
 
