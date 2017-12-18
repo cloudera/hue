@@ -21,9 +21,12 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def get_engine(user, engine='solr'):
+def get_engine(user, engine='solr', facet=None):
   if isinstance(engine, dict):
     engine = engine.get('engine', 'solr')
+
+  if engine == 'report' and facet:
+    engine = facet.get('engine')
 
   if engine != 'solr':
     if engine == 'impala':
