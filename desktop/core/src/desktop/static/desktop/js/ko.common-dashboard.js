@@ -136,6 +136,7 @@ var Row = function (widgets, vm, columns) {
       col.percWidth(Math.max(3, (100 - self.columns().length * BOOTSTRAP_RATIOS.margin()) / self.columns().length));
     });
   });
+  self.isOpen = ko.observable(true);
 
   self.addWidget = function (widget) {
     self.widgets.push(widget);
@@ -217,6 +218,10 @@ var Row = function (widgets, vm, columns) {
       widget.size(Math.floor(12 / self.widgets().length));
     });
   }
+
+  self.toggleOpen = function () {
+    self.isOpen(self.isOpen());
+  };
 }
 
 
@@ -230,6 +235,7 @@ var Widget = function (params) {
 
   self.size = ko.observable(params.size).extend({ numeric: 0 });
   self.gridsterHeight = ko.observable(params.gridsterHeight).extend({ numeric: 0 });
+  self.gridsterHeightOpen = ko.observable(params.gridsterHeight).extend({ numeric: 0 });
 
   self.name = ko.observable(params.name);
   self.id = ko.observable(params.id);
@@ -237,9 +243,10 @@ var Widget = function (params) {
   self.properties = ko.observable(typeof params.properties != "undefined" && params.properties != null ? params.properties : {});
   self.offset = ko.observable(typeof params.offset != "undefined" && params.offset != null ? params.offset : 0).extend({ numeric: 0 });
   self.isLoading = ko.observable(typeof params.isLoading != "undefined" && params.isLoading != null ? params.isLoading : false);
+  self.isOpen = ko.observable(typeof params.isOpen != "undefined" ? params.isOpen : true);
 
   self.klass = ko.computed(function () {
-    return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
+    return "card card-widget span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "") + (!self.isOpen() && " widget-collapsed");
   });
 
   self.expand = function () {
@@ -266,6 +273,23 @@ var Widget = function (params) {
     }
     row.widgets.remove(widget);
   }
+
+  self.toggleOpen = function (gridsterElement) {
+    self.isOpen(!self.isOpen());
+    if (gridsterElement) {
+      var $gridsterElement = $(gridsterElement);
+      var grid = $gridsterElement.coords().grid;
+      if (self.isOpen()) {
+        self.gridsterHeight(self.gridsterHeightOpen());
+      } else {
+        self.gridsterHeightOpen(grid.size_y);
+        self.gridsterHeight(1);
+      }
+      var size_x = grid.size_x;
+      var size_y = self.gridsterHeight();
+      $('.gridster ul').data("gridster").resize_widget($gridsterElement, size_x, size_y);
+    }
+  };
 };
 
 Widget.prototype.clone = function () {

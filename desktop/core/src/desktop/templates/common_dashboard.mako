@@ -258,7 +258,7 @@
         <a href="javascript:void(0)" data-bind="visible: $parent.rows().length > 1, click: function(){remove($parent, this)}"><i class="fa fa-times"></i></a>
       </div>
     </div>
-    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
+    <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing, 'widget-collapsed': isOpen},
         sortable: { template: 'widget-template${ suffix }', data: widgets, isEnabled: $root.isEditing,
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
             'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
@@ -276,7 +276,7 @@
 
 <script type="text/html" id="widget-template${ suffix }">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true }}">
-    <h2 class="card-heading simple">
+    <h2 class="card-heading simple" data-bind="style: { marginBottom: !isOpen() ? '0px' : '' }" >
       %if not USE_GRIDSTER.get():
       <span data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
@@ -296,8 +296,11 @@
       <div class="inline pull-right" data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
+      <div class="inline pull-right">
+        <a href="javascript:void(0)" class="remove-widget" data-bind="click: function() { toggleOpen($parent.gridsterElement); if ($parent.toggleOpen) { $parent.toggleOpen(); } }"><i class="fa fa-chevron-down" data-bind="css: { 'fa-rotate-90': !isOpen() }"></i></a>
+      </div>
     </h2>
-    <div class="card-body" style="padding: 5px;">
+    <div class="card-body" style="padding: 5px;" data-bind="visible: isOpen, css: {'widget-collapsed': !isOpen()}">
       <div data-bind="template: { name: function() { return widgetType(); }}" class="widget-main-section"></div>
       <div class="clearfix"></div>
     </div>
