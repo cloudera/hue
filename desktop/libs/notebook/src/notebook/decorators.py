@@ -30,7 +30,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
 from desktop.models import Document2, Document, FilesystemException
-from dashboard.api import extract_solr_exception_message
+from dashboard.models import extract_solr_exception_message
 
 from notebook.conf import check_permissions
 from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired, OperationTimeout,\
