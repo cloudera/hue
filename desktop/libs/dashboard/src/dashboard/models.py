@@ -28,7 +28,7 @@ from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from desktop.lib.i18n import smart_unicode, smart_str
+from desktop.lib.i18n import smart_unicode, smart_str, force_unicode
 from desktop.models import get_data_link
 
 from dashboard.dashboard_api import get_engine
@@ -879,3 +879,19 @@ def augment_solr_exception(response, collection):
       ]
     }
   })
+
+
+
+def extract_solr_exception_message(e):
+  response = {}
+
+  try:
+    message = json.loads(e.message)
+    msg = message['error'].get('msg')
+    response['error'] = msg if msg else message['error']['trace']
+  except Exception, e2:
+    LOG.exception('Failed to extract json message: %s' % force_unicode(e2))
+    LOG.exception('Failed to parse json response: %s' % force_unicode(e))
+    response['error'] = force_unicode(e)
+
+  return response

@@ -35,7 +35,7 @@ from dashboard.data_export import download as export_download
 from dashboard.decorators import allow_viewer_only
 from dashboard.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
 from dashboard.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception,\
-  NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET
+  NESTED_FACET_FORM, COMPARE_FACET, QUERY_FACET, extract_solr_exception_message
 
 
 LOG = logging.getLogger(__name__)
@@ -570,18 +570,3 @@ def get_collections(request):
       result['message'] = force_unicode(e)
 
   return JsonResponse(result)
-
-
-def extract_solr_exception_message(e):
-  response = {}
-
-  try:
-    message = json.loads(e.message)
-    msg = message['error'].get('msg')
-    response['error'] = msg if msg else message['error']['trace']
-  except Exception, e2:
-    LOG.exception('Failed to extract json message: %s' % force_unicode(e2))
-    LOG.exception('Failed to parse json response: %s' % force_unicode(e))
-    response['error'] = force_unicode(e)
-
-  return response
