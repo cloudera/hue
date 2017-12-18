@@ -69,15 +69,6 @@
       </div>
     </a>
     % endif
-    % if HAS_REPORT_ENABLED.get():
-    <a href="javascript: fullLayout(searchViewModel)" title="${ _('Report: static dashboard with multiple widgets executing independent queries') }" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
-      <div class="layout-container">
-        <div class="layout-box" style="width: 100px;">
-          <i class="fa fa-area-chart"></i>
-        </div>
-      </div>
-    </a>
-    % endif
     <a href="javascript: fullLayout(searchViewModel)" title="${ _('Empty dashboard that can be used as a starting point') }" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
