@@ -56,9 +56,9 @@ def search(request):
   if collection:
     try:
       if fetch_result:
-        response = get_engine(request.user, collection).fetch_result(collection, query, facet)
+        response = get_engine(request.user, collection, facet).fetch_result(collection, query, facet)
       else:
-        response = get_engine(request.user, collection).query(collection, query, facet)
+        response = get_engine(request.user, collection, facet).query(collection, query, facet)
     except RestException, e:
       response.update(extract_solr_exception_message(e))
     except Exception, e:
