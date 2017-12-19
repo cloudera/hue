@@ -139,6 +139,8 @@ class Collection2(object):
         properties['domain'] = {'blockParent': [], 'blockChildren': []}
       if 'missing' not in properties:
         properties['missing'] = False
+      if 'fieldLabel' not in properties:
+        properties['fieldLabel'] = None
 
       if facet['widgetType'] == 'histogram-widget':
         if 'timelineChartType' not in properties:
