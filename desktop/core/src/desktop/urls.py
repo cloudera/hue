@@ -169,6 +169,7 @@ dynamic_patterns += patterns('desktop.configuration.api',
 
 dynamic_patterns += patterns('useradmin.views',
   (r'^desktop/api/users/autocomplete', 'list_for_autocomplete'),
+  (r'^desktop/api/users/?$', 'get_users_by_id'),
 )
 
 dynamic_patterns += patterns('desktop.lib.vcs.api',

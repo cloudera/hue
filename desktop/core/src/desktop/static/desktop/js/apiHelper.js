@@ -364,7 +364,30 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.fetchUsersAndGroups = function (options) {
     var self = this;
-    self.simpleGet('/desktop/api/users/autocomplete', {}, options);
+    $.ajax({
+      method: "GET",
+      url: "/desktop/api/users/autocomplete",
+      data: options.data || {},
+      contentType: 'application/json'
+    }).done(function(response) {
+      options.successCallback(response);
+    }).fail(function (response) {
+      options.errorCallback(response);
+    });
+  };
+
+  ApiHelper.prototype.fetchUsersByIds = function (options) {
+    var self = this;
+    $.ajax({
+      method: "GET",
+      url: "/desktop/api/users",
+      data: { userids: options.userids},
+      contentType: 'application/json'
+    }).done(function(response) {
+      options.successCallback(response);
+    }).fail(function (response) {
+      options.errorCallback(response);
+    });
   };
 
   /**

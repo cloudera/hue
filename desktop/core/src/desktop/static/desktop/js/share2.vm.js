@@ -17,12 +17,19 @@
 
 var shareViewModel;
 
+
+var errorCallback = function(response) {
+  $(document).trigger("error", "There was an error processing your action: " + response.responseText);
+};
+
 function ShareViewModel(updateDocF) {
   var self = this;
-
-  self.hasInitBeenCalled = false;
-  self.hasSetupBeenCalled = false;
-
+  self.userMap = {};
+  self.idToUserMap = {};
+  self.groupMap = {};
+  self.items = [];
+  self.apiHelper = ApiHelper.getInstance();
+  self.searchInput = ko.observable();
   self.selectedPerm = ko.observable('read');
   self.selectedPermLabel = ko.computed(function() {
     if (self.selectedPerm() == 'write') {
@@ -52,25 +59,38 @@ function ShareViewModel(updateDocF) {
   self.setDocUuid = function(docUuid) {
     if (docUuid === '') { return false; }
     self.docUuid = docUuid;
-    $.get('/desktop/api2/doc', { uuid : docUuid }, function (data) {
-      shareViewModel.selectedDoc(data.document)
-    }).fail(function (response) {
-      $(document).trigger("error", "There was an error processing your action: " + response.responseText);
+    var fetchDocumentsSuccessCallback = function (data) {
+      readusers = data.document.perms.read.users.map(function(user){return user.id});
+      writeusers = data.document.perms.write.users.map(function(user){return user.id});
+      allusers = readusers.concat(writeusers);
+      if (allusers.length > 0) {
+        var successCallback = function (response) {
+          $.each(response.users, function (i, user) {
+            // Needed for getting prettyusername of already shared users
+            shareViewModel.idToUserMap[user.id] = user;
+          });
+          shareViewModel.selectedDoc(data.document);
+        };
+        shareViewModel.apiHelper.fetchUsersByIds({
+          userids: JSON.stringify(allusers),
+          successCallback: successCallback,
+          errorCallback: errorCallback
+        });
+      } else {
+        shareViewModel.selectedDoc(data.document);
+      }
+    }
+    shareViewModel.apiHelper.fetchDocuments({
+      uuid: docUuid,
+      successCallback: fetchDocumentsSuccessCallback,
+      errorCallback: errorCallback
     });
   }
 }
 
-
 function openShareModal() {
   $("#documentShareModal").modal("show");
-  setupSharing(function(){
-    $("#documentShareAddBtn").removeClass("disabled");
-    $("#documentShareCaret").removeClass("disabled");
-    $("#documentShareTypeahead").removeAttr("disabled");
-    $(".notpretty").each(function(){
-      $(this).text(prettifyUsername($(this).attr("data-id")));
-    });
-  });
+  setupSharing();
 }
 
 function isShared() {
@@ -79,20 +99,18 @@ function isShared() {
   return read.users.length + read.groups.length > 0
 }
 
-function prettifyUsername(userId) {
-  var _user = null;
-  if (self.hasSetupBeenCalled) {
-    for (var i = 0; i < JSON_USERS_GROUPS.users.length; i++) {
-      if (JSON_USERS_GROUPS.users[i].id == userId) {
-        _user = JSON_USERS_GROUPS.users[i];
-      }
-    }
-    if (_user != null) {
-      return (_user.first_name != "" ? _user.first_name + " " : "") + (_user.last_name != "" ? _user.last_name + " " : "") + ((_user.first_name != "" || _user.last_name != "") ? "(" : "") + _user.username + ((_user.first_name != "" || _user.last_name != "") ? ")" : "");
-    }
+function prettifyUsernameById(id) {
+  return prettifyUsername(shareViewModel.idToUserMap[id]);
+}
+
+function prettifyUsername(user) {
+  if (user != null && user.hasOwnProperty("username")) {
+    return (user.first_name != "" ? user.first_name + " " : "") + (user.last_name != "" ? user.last_name + " " : "") + ((user.first_name != "" || user.last_name != "") ? "(" : "") + user.username + ((user.first_name != "" || user.last_name != "") ? ")" : "");
   }
+
   return "";
 }
+
 
 function initSharing(id, updateFunc) {
   if(! updateFunc) {
@@ -101,90 +119,64 @@ function initSharing(id, updateFunc) {
   shareViewModel = new ShareViewModel(updateFunc);
   ko.cleanNode($(id)[0]);
   ko.applyBindings(shareViewModel, $(id)[0]);
-  shareViewModel.hasInitBeenCalled = true;
   return shareViewModel;
 }
 
 function setupSharing(id, updateFunc) {
-  if (shareViewModel == null || !shareViewModel.hasInitBeenCalled) {
+  if (shareViewModel == null ) {
     shareViewModel = initSharing(id, updateFunc);
   }
 
-  if (! self.hasSetupBeenCalled){
-    $.getJSON('/desktop/api/users/autocomplete', function (data) {
-      self.hasSetupBeenCalled = true;
-      JSON_USERS_GROUPS = data;
-      dropdown = [];
-      usermap = {};
-      groupmap = {};
-
-      $.each(JSON_USERS_GROUPS.users, function (i, user) {
-        var _display = prettifyUsername(user.id);
-        usermap[_display] = user;
-        dropdown.push(_display);
-      });
-
-      $.each(JSON_USERS_GROUPS.groups, function (i, group) {
-        groupmap[group.name] = group;
-        dropdown.push(group.name);
-      });
-
-      $("#documentShareTypeahead").typeahead({
-        source: function (query, process) {
-          process(dropdown);
-        },
-        matcher: function (item) {
-          if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
-            return true;
-          }
-        },
-        sorter: function (items) {
-          return items.sort();
-        },
-        highlighter: function (item) {
-          var _icon = "fa";
-          if (usermap[item]) {
-            _icon += " fa-user";
-          }
-          else {
-            _icon += " fa-users";
-          }
-          var regex = new RegExp('(' + this.query + ')', 'gi');
-          return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
-        },
-        updater: function (item) {
-          selectedUserOrGroup = usermap[item] ? usermap[item] : groupmap[item];
-          return item;
-        }
-      });
-
-      $("#documentShareTypeahead").on("keyup", function (e) {
-        var _code = (e.keyCode ? e.keyCode : e.which);
-        if (_code == 13) {
-          handleTypeaheadSelection();
-        }
-      });
-
-      if (typeof id == "function"){
-        id();
-      }
-    }).fail(function (response) {
-      $(document).trigger("error", "There was an error processing your action: " + response.responseText);
-    });
-
-    $("#documentShareAddBtn").on("click", function () {
-      if (! $(this).hasClass("disabled")){
-        handleTypeaheadSelection();  
-      }
-    });
-  }
-  else {
-    if (typeof id == "function"){
-      id();
-    }
-  }
+  $("#documentShareAddBtn").on("click", function () {
+    handleTypeaheadSelection();
+  });
 
   return shareViewModel;
+}
+
+function source(request, callback) {
+
+  var successCallback = function (data) {
+    JSON_USERS_GROUPS = data;
+    shareViewModel.items = [];
+    $.each(JSON_USERS_GROUPS.users, function (i, user) {
+      var label = prettifyUsername(user);
+      shareViewModel.userMap[label] = user;
+      shareViewModel.items.push({
+        data: {
+          "icon": "fa fa-user",
+          "label": label
+        },
+        value: label
+      });
+      shareViewModel.idToUserMap[user.id] = user;
+    });
+    $.each(JSON_USERS_GROUPS.groups, function (i, group) {
+      shareViewModel.groupMap[group.name] = group;
+      shareViewModel.items.push({
+        data: {
+          "icon": "fa fa-users",
+          "label": group.name
+        },
+        value: group.name
+      });
+    });
+
+    if(shareViewModel.items.length == 0){
+     shareViewModel.items.push({
+       'noMatch': true
+     });
+    }
+
+    callback(shareViewModel.items);
+
+    }
+
+  shareViewModel.apiHelper.fetchUsersAndGroups({
+    data: {filter: request.term},
+    successCallback: successCallback,
+    errorCallback: errorCallback
+  });
 }
 
 function updateSharePerm(perms, user) {
@@ -218,6 +210,8 @@ function changeDocumentSharePerm(perm) {
 }
 
 function handleTypeaheadSelection() {
+  searchAutoCompInput = $("#userSearchAutocomp").val();
+  selectedUserOrGroup = shareViewModel.userMap[searchAutoCompInput] ? shareViewModel.userMap[searchAutoCompInput] : shareViewModel.groupMap[searchAutoCompInput];
   if (selectedUserOrGroup != null) {
     if (selectedUserOrGroup.hasOwnProperty("username")) {
       shareViewModel.selectedDoc().perms[shareViewModel.selectedPerm()].users.push(selectedUserOrGroup);
@@ -229,7 +223,7 @@ function handleTypeaheadSelection() {
     shareDocFinal();
   }
   selectedUserOrGroup = null;
-  $("#documentShareTypeahead").val("");
+  $("#userSearchAutocomp").val('');
 }
 
 function shareDocFinal() {
