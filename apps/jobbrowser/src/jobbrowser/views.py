@@ -55,7 +55,7 @@ except:
 
 from jobbrowser.conf import LOG_OFFSET, SHARE_JOBS
 from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
-from jobbrowser.models import can_view_job, can_kill_job
+from jobbrowser.models import can_view_job, can_kill_job, LinkJobLogs
 from jobbrowser.yarn_models import Application
 
 
