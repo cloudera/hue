@@ -370,6 +370,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'stacked': False,
     'limit': 10,
     'mincount': 1,
+    'missing': False,
     'isDate': False,
     'aggregate': {'function': 'unique', 'formula': '', 'plain_formula': '', 'percentile': 50}
   }
