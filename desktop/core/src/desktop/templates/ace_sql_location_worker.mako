@@ -18,14 +18,19 @@
   from desktop import conf
 %>
 
+var scriptPrefix = '';
+% if conf.IS_EMBEDDED.get():
+  scriptPrefix = location.href.substring(0, location.href.indexOf('/desktop/workers/'));
+% endif
+
 % if conf.DEV.get():
-importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?' + Math.random());
-importScripts('${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }' + '?' + Math.random());
-importScripts('${ static('desktop/js/sqlFunctions.js') }' + '?' + Math.random());
+importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?' + Math.random());
+importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }' + '?' + Math.random());
+importScripts(scriptPrefix + '${ static('desktop/js/sqlFunctions.js') }' + '?' + Math.random());
 % else:
-importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }');
-importScripts('${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }');
-importScripts('${ static('desktop/js/sqlFunctions.js') }');
+importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlParseSupport.js') }');
+importScripts(scriptPrefix + '${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }');
+importScripts(scriptPrefix + '${ static('desktop/js/sqlFunctions.js') }');
 % endif
 
 (function () {

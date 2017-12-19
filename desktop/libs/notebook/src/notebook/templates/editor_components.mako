@@ -3187,6 +3187,30 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           whenWorkerIsReady(aceSqlLocationWorker, message);
         });
       }
+  % else:
+    var iframe = document.createElement("iframe");
+    iframe.src = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls('/notebook/workers_embedded') : '/notebook/workers_embedded';
+    iframe.name = "workerFrame";
+    iframe.setAttribute('style', 'display: none;');
+    document.body.appendChild(iframe);
+
+    window.addEventListener("message", function (event) {
+      if (event.data.locationWorkerResponse) {
+        huePubSub.publish('ace.sql.location.worker.message', { data: event.data.locationWorkerResponse });
+      }
+      if (event.data.syntaxWorkerResponse) {
+        huePubSub.publish('ace.sql.syntax.worker.message', { data: event.data.syntaxWorkerResponse });
+      }
+    }, false);
+
+    huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
+      iframe.contentWindow.postMessage({ locationWorkerRequest: message }, '*')
+    });
+
+    huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
+      iframe.contentWindow.postMessage({ syntaxWorkerRequest: message }, '*')
+    });
+
   % endif
 
 
