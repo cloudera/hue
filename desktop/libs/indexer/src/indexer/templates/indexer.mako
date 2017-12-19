@@ -491,7 +491,9 @@ ${ assist.assistPanel() }
 
 <script type="text/javascript">
   (function () {
-    ko.options.deferUpdates = true;
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
 
     var fieldNum = 0;
 

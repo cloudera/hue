@@ -37,7 +37,9 @@
 
   %if with_deferred:
   <script type="text/javascript">
-    ko.options.deferUpdates = true;
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
   </script>
   %endif
 </%def>

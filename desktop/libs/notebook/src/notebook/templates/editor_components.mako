@@ -2689,7 +2689,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   }
 
   (function () {
-    ko.options.deferUpdates = true;
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
 
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode,antixss }, {
       huePubSubId: HUE_PUB_SUB_EDITOR_ID,

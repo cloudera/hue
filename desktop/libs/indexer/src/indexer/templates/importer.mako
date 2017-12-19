@@ -1036,8 +1036,9 @@ ${ assist.assistPanel() }
   % endif
 
   (function () {
-
-    ko.options.deferUpdates = true;
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
 
     var MAPPINGS = {
       SOLR_TO_HIVE: {
