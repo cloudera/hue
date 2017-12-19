@@ -1031,6 +1031,7 @@ var Collection = function (vm, collection) {
 
     pivot = ko.mapping.fromJS({
       'field': ko.mapping.toJS(facet.properties.facets_form.field),
+      'fieldLabel': ko.mapping.toJS(facet.properties.facets_form.field),
       'limit': ko.mapping.toJS(facet.properties.facets_form.limit),
       'mincount': ko.mapping.toJS(facet.properties.facets_form.mincount),
       'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
