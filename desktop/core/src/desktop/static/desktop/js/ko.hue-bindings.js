@@ -254,6 +254,9 @@
               ko.applyBindings(item.data, $li[0]);
             }
           },
+          _resizeMenu: function () {
+            this.menu.element.outerWidth(options.minWidth);
+          },
           _renderMenu: function (ul, items) {
             var self = this;
             hideSpinner();

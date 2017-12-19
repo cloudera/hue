@@ -96,33 +96,40 @@ def list_configurations(request):
 
 
 def list_for_autocomplete(request):
-  if request.ajax:
-    extended_user_object = request.GET.get('extend_user') == 'true'
+  extended_user_object = request.GET.get('extend_user') == 'true'
+  autocomplete_filter = request.GET.get('filter', "")
+  if request.user.is_superuser:
+    users = User.objects.filter(username__icontains=autocomplete_filter).order_by('username')
+    groups = Group.objects.filter(name__icontains=autocomplete_filter).order_by('name')
+    if request.GET.get('only_mygroups'):
+      groups = request.user.groups.filter(name__icontains=autocomplete_filter).order_by('name')
+  else:
+    usergroups = request.user.groups.all()
+    # Get all users in the usergroups he belongs to and then filter by username
+    users = User.objects.filter(groups__in=usergroups, username__icontains=autocomplete_filter).order_by('username').distinct()
+    groups = usergroups.filter(name__icontains=autocomplete_filter).order_by('name')
 
-    if request.user.is_superuser:
-      users = User.objects.all().order_by('username')
-      groups = Group.objects.all().order_by('name')
-      if request.GET.get('only_mygroups'):
-        groups = request.user.groups.all()
-    else:
-      usergroups = request.user.groups.all()
-      users = User.objects.filter(groups__in=usergroups).order_by('username').distinct()
-      groups = usergroups.order_by('name')
+  # Don't include myself by default
+  if not request.GET.get('include_myself'):
+    users = users.exclude(pk=request.user.pk)
 
-    if not request.GET.get('include_myself'):
-      users = users.exclude(pk=request.user.pk)
+  users = users[:100]
+  groups = groups[:100]
 
-    users = users[:2000]
-    groups = groups[:2000]
+  response = {
+    'users': massage_users_for_json(users, extended_user_object),
+    'groups': massage_groups_for_json(groups)
+  }
+  return JsonResponse(response)
 
-    response = {
-      'users': massage_users_for_json(users, extended_user_object),
-      'groups': massage_groups_for_json(groups)
-    }
-    return JsonResponse(response)
-
-  return HttpResponse("")
-
+def get_users_by_id(request):
+  userids = json.loads(request.GET.get('userids', "[]"))
+  userids = userids[:100]
+  users = User.objects.filter(id__in=userids).order_by('username')
+  response = {
+    'users': massage_users_for_json(users)
+  }
+  return JsonResponse(response)
 
 def massage_users_for_json(users, extended=False):
   simple_users = []
