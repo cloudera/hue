@@ -148,6 +148,7 @@ Checked-in frontend third party dependencies
 |Moment.js|2.13.0|MIT|https://momentjs.com|
 |Mustache.js|0.7.2|MIT|http://github.com/janl/mustache.js|
 |nvd3|1.1.15b|Apache|https://github.com/novus/nvd3|
+|page.js|1.7.1|MIT|https://github.com/visionmedia/page.js|
 |Plotly.js|1.31.0|MIT|https://github.com/plotly/plotly.js/|
 |Selectize.js|0.12.3|Apache|https://github.com/selectize/selectize.js|
 |Shepherd|1.8.1|MIT|https://github.com/HubSpot/shepherd|
