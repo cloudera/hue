@@ -979,7 +979,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.subscribe('open.in.importer', openImporter);
 
         // prepend /hue to all the link on this page
-        $('a[href]').each(function () {
+        $('${ '.hue-embedded-container a[href]' if IS_EMBEDDED.get() else 'a[href]' }').each(function () {
           var link = $(this).attr('href');
           if (link.startsWith('/') && !link.startsWith('/hue')){
             link = '/hue' + link;
