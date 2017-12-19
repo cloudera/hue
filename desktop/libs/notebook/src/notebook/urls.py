@@ -45,6 +45,7 @@ urlpatterns = patterns('notebook.views',
   url(r'^editor_m/?$', 'editor_m', name='editor_m'),
   url(r'^browse/(?P<database>\w+)/(?P<table>\w+)/(?P<partition_spec>.+?)?$', 'browse', name='browse'),
   url(r'^execute_and_watch/?$', 'execute_and_watch', name='execute_and_watch'),
+  url(r'^workers_embedded$', 'workers_embedded', name='workers_embedded'),
 )
 
 # APIs

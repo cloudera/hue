@@ -22,6 +22,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from desktop.conf import ENABLE_DOWNLOAD, USE_NEW_EDITOR
 from desktop.lib.django_util import render, JsonResponse
@@ -91,6 +92,9 @@ def notebook(request, is_embeddable=False):
       'is_yarn_mode': is_yarn_mode,
   })
 
+@xframe_options_exempt
+def workers_embedded(request):
+  return render('workers_embedded.mako', request, {})
 
 @check_document_access_permission()
 def notebook_embeddable(request):
