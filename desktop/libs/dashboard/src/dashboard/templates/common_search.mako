@@ -594,7 +594,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }, visible: $parent.properties.facets().length > 1" class="pull-right" href="javascript:void(0)">
           <i class="fa fa-times"></i>
         </a>
-        <div class="hit-title" data-bind="text: field, attr: {'title': field}"></div>
+        <div class="hit-title" data-bind="editable: fieldLabel, editableOptions: { enabled: $root.isEditing(), placement: 'right' }, attr: { 'title': fieldLabel }"></div>
         <div class="clearfix"></div>
       </div>
 
