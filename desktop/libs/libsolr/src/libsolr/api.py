@@ -281,7 +281,8 @@ class SolrApi(object):
           'mincount': int(facet['mincount']),
           'numBuckets': True,
           'allBuckets': True,
-          'sort': sort
+          'sort': sort,
+          'missing': facet.get('missing', False)
           #'prefix': '' # Forbidden on numeric fields
       }
 
@@ -956,12 +957,17 @@ class SolrApi(object):
             values = _filter['value'] if type(_filter['value']) == list else [_filter['value']] # 2D facets support
             if fields.index(field) < len(values): # Lowest common field denominator
               value = values[fields.index(field)]
-              exclude = '-' if _filter['exclude'] else ''
-              if value is not None and ' ' in force_unicode(value):
-                value = force_unicode(value).replace('"', '\\"')
-                f.append('%s%s:"%s"' % (exclude, field, value))
-              else:
-                f.append('%s{!field f=%s}%s' % (exclude, field, value))
+              if value:
+                exclude = '-' if _filter['exclude'] else ''
+                if value is not None and ' ' in force_unicode(value):
+                  value = force_unicode(value).replace('"', '\\"')
+                  f.append('%s%s:"%s"' % (exclude, field, value))
+                else:
+                  f.append('%s{!field f=%s}%s' % (exclude, field, value))
+              else: # Handle empty value selection that are returned using solr facet.missing
+                value = "*"
+                exclude = '-'
+                f.append('%s%s:%s' % (exclude, field, value))
           _params ='{!tag=%(id)s}' % fq + ' '.join(f)
           params += (('fq', urllib.unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':
