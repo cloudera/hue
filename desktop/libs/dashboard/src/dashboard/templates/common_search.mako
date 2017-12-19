@@ -1313,7 +1313,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <div class="dropdown">
           <a class="grid-side-btn" style="padding-right:0" href="javascript:void(0)"
              data-bind="css: {'active': template.showChart() }, click: function(){ template.showChart(true); template.showGrid(false); huePubSub.publish('gridChartForceUpdate'); }">
-            % if HAS_REPORT_ENABLED.get()
+            % if HAS_REPORT_ENABLED.get():
             <i class="fa fa-superscript fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER"></i>
             % endif
             <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
