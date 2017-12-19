@@ -554,7 +554,9 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 <script type="text/javascript">
   (function () {
-    ko.options.deferUpdates = true;
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
 
     huePubSub.subscribe('show.delete.privilege.modal', function () {
       $('#deletePrivilegeModal').modal('show');

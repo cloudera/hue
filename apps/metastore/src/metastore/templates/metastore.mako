@@ -1285,8 +1285,9 @@ ${ components.menubar(is_embeddable) }
 
 
   (function () {
-
-    ko.options.deferUpdates = true;
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
 
     $(document).ready(function () {
       var options = {
