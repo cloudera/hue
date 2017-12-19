@@ -178,7 +178,9 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
 ${ assist.assistJSModels() }
 
 <script type="text/javascript">
-  ko.options.deferUpdates = true;
+  if (ko.options) {
+    ko.options.deferUpdates = true;
+  }
 
   ace.config.set("basePath", "/static/desktop/js/ace");
 

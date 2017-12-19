@@ -222,7 +222,9 @@ ${ assist.assistPanel() }
 
   (function () {
 
-    ko.options.deferUpdates = true;
+    if (ko.options) {
+      ko.options.deferUpdates = true;
+    }
 
     function CreateDatabaseViewModel() {
       var self = this;
