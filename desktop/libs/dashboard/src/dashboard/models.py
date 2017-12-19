@@ -135,6 +135,8 @@ class Collection2(object):
         properties['initial_end'] = properties['end']
       if 'domain' not in properties:
         properties['domain'] = {'blockParent': [], 'blockChildren': []}
+      if 'missing' not in properties:
+        properties['missing'] = False
 
       if facet['widgetType'] == 'histogram-widget':
         if 'timelineChartType' not in properties:
@@ -535,6 +537,9 @@ def augment_solr_response(response, collection, query):
         rows = []
 
         facet_one = collection_facet['properties']['facets'][0]
+
+        if 'missing' in value:
+          counts.append({'val': '', 'count': value['missing']['count']})
 
         # Number or Date range
         if facet_one['canRange'] and not facet_one['type'] == 'field':
