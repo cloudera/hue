@@ -44,6 +44,10 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     height: 6px;
     width: 100%;
   }
+
+  select {
+    width: 100%;
+  }
 </style>
 
 %if not is_hue4():
@@ -114,7 +118,11 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
     ${ form['password'].errors | n,unicode }
 
     %if active_directory:
-    <div>
+    <div
+      %if len(form.fields['server'].choices) == 1:
+        class="hide"
+      %endif
+      >
       ${ form['server'] | n,unicode }
     </div>
     %endif
