@@ -766,6 +766,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         var loadedJs = [];
         var loadedCss = [];
         var loadedApps = [];
+        var head = document.getElementsByTagName('head')[0];
 
         $('script[src]').each(function(){
           loadedJs.push($(this).attr('src'));
@@ -775,63 +776,95 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           loadedCss.push($(this).attr('href'));
         });
 
-        huePubSub.subscribe('hue4.add.global.js', function ($el) {
-          var jsFile = $el.attr('src').split('?')[0];
-          if (loadedJs.indexOf(jsFile) === -1) {
-            loadedJs.push(jsFile);
-            $.ajaxSetup({ cache: true });
-            $el.clone().appendTo($('head'));
-            $.ajaxSetup({ cache: false });
-          }
-          $el.remove();
-        });
+        var loadScriptsSync = function (scriptUrls, promise) {
+          if (scriptUrls.length) {
+            var scriptUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(scriptUrls.shift()) : scriptUrls.shift();
 
-        huePubSub.subscribe('hue4.add.global.css', function ($el) {
+            if (loadedJs.indexOf(scriptUrl) !== -1) {
+              loadScriptsSync(scriptUrls, promise);
+              return;
+            }
+
+            var scriptElement = document.createElement('script');
+            % if conf.DEV.get():
+              scriptElement.src = scriptUrl + '?dev=' + Math.random();
+            % else:
+              scriptElement.src = scriptUrl;
+            % endif
+
+            scriptElement.type = 'text/javascript';
+
+            scriptElement.onload = function () {
+              loadedJs.push(scriptUrl);
+              loadScriptsSync(scriptUrls, promise);
+            };
+
+            scriptElement.onerror = function () {
+              loadScriptsSync(scriptUrls, promise);
+            };
+
+            // Legacy IE not happy with onload
+            scriptElement.onreadystatechange = function() {
+              if (this.readyState === 'complete') {
+                loadedJs.push(scriptUrl);
+                loadScriptsSync(scriptUrls, promise);
+              }
+            };
+            head.appendChild(scriptElement);
+          } else {
+            promise.resolve();
+          }
+        };
+
+        var addGlobalCss = function ($el) {
           var cssFile = $el.attr('href').split('?')[0];
           if (loadedCss.indexOf(cssFile) === -1) {
             loadedCss.push(cssFile);
             $.ajaxSetup({ cache: true });
+            if (typeof adaptHueEmbeddedUrls !== 'undefined') {
+              $el.attr('href', adaptHueEmbeddedUrls($el.attr('href')));
+            }
+            % if conf.DEV.get():
+              $el.attr('href', $el.attr('href') + '?dev=' + Math.random());
+            % endif
             $el.clone().appendTo($('head'));
             $.ajaxSetup({ cache: false });
           }
           $el.remove();
-        });
-
-        huePubSub.subscribe('hue4.get.globals', function(callback){
-          callback(loadedJs, loadedCss);
-        });
+        };
 
         // Only load CSS and JS files that are not loaded before
-        self.processHeaders = function(response){
-          var r = $('<span>').html(response);
-          % if conf.DEV.get():
-          r.find('link').each(function () {
-            $(this).attr('href', $(this).attr('href') + '?' + Math.random())
+        self.processHeaders = function (response){
+          var promise = $.Deferred();
+          var $rawHtml = $('<span>').html(response);
+
+          var $allScripts = $rawHtml.find('script[src]');
+          var scriptsToLoad = $allScripts.map(function () {
+            return $(this).attr('src');
+          }).toArray();
+          $allScripts.remove();
+
+          var scriptsPromise = $.Deferred();
+          loadScriptsSync(scriptsToLoad, scriptsPromise);
+
+          $rawHtml.find('link[href]').each(function () {
+            addGlobalCss($(this)); // Also removes the elements;
           });
-          r.find('script[src]').each(function () {
-            $(this).attr('src', $(this).attr('src') + '?' + Math.random())
-          });
-          % endif
-          r.find('script[src]').each(function () {
-            huePubSub.publish('hue4.add.global.js', $(this));
-          });
-          r.find('link[href]').each(function () {
-            huePubSub.publish('hue4.add.global.css', $(this));
-          });
-          r.find('a[href]').each(function () {
+
+          $rawHtml.find('a[href]').each(function () {
             var link = $(this).attr('href');
             if (link.startsWith('/') && !link.startsWith('/hue')){
               link = '/hue' + link;
             }
             $(this).attr('href', link);
           });
-          r.unwrap('<span>');
-          return r;
-        };
 
-        huePubSub.subscribe('hue4.process.headers', function(opts){
-          opts.callback(self.processHeaders(opts.response));
-        });
+          $rawHtml.unwrap('<span>');
+          scriptsPromise.done(function () {
+            promise.resolve($rawHtml);
+          });
+          return promise;
+        };
 
         self.loadApp = function(app, loadDeep) {
           if (self.currentApp() == 'editor' && $('#editorComponents').length) {
@@ -914,14 +947,16 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                   window.clearAppIntervals(app);
                   huePubSub.clearAppSubscribers(app);
                   self.extraEmbeddableURLParams('');
-                  var r = self.processHeaders(response);
-                  if (SKIP_CACHE.indexOf(app) === -1) {
-                    self.embeddable_cache[app] = r;
-                  }
-                  $('#embeddable_' + app).html(r);
-                  huePubSub.publish('app.dom.loaded', app);
-                }
-                else {
+
+                  self.processHeaders(response).done(function ($rawHtml) {
+                    if (SKIP_CACHE.indexOf(app) === -1) {
+                      self.embeddable_cache[app] = $rawHtml;
+                    }
+                    $('#embeddable_' + app).html($rawHtml);
+                    huePubSub.publish('app.dom.loaded', app);
+
+                  });
+                } else {
                   window.location.href = baseURL;
                 }
                 self.isLoadingEmbeddable(false);
