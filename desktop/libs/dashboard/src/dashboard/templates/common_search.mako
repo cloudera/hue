@@ -1610,7 +1610,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'pie2-widget' -->
-          <!-- ko if: type() == 'range' -->
+          <!-- ko if: properties.facets()[0].type() == 'range' -->
           <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
             transformer: rangePieChartDataTransformer,
             maxWidth: 250,
@@ -1619,7 +1619,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <div class="clearfix"></div>
           <!-- /ko -->
 
-          <!-- ko if: type() == 'range-up' -->
+          <!-- ko if: properties.facets()[0].type() == 'range-up' -->
           <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
             transformer: rangeUpPieChartDataTransformer,
             rangeUp: true,
@@ -1629,7 +1629,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <div class="clearfix"></div>
           <!-- /ko -->
 
-          <!-- ko if: type().indexOf('range') == -1 -->
+          <!-- ko if: properties.facets()[0].type().indexOf('range') == -1 -->
           <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
             transformer: pieChartDataTransformer,
             maxWidth: 250,
