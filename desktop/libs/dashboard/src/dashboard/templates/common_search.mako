@@ -2154,7 +2154,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <!-- /ko -->
       <!-- /ko -->
 
-      <!-- ko if: $parent.widgetType() != 'hit-widget' && type() != 'field' -->
+      <!-- ko if: $parent.widgetType() != 'hit-widget' -->
       <!-- ko if: canRange() -->
         <div class="facet-field-cnt">
           <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
