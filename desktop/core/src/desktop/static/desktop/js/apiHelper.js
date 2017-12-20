@@ -2117,6 +2117,24 @@ var ApiHelper = (function () {
     }).fail(self.assistErrorCallback(options));
   };
 
+  ApiHelper.prototype.navSearch = function (options) {
+    var self = this;
+    var promise = $.Deferred();
+
+    $.post('/desktop/api/search/entities', {
+      query_s: ko.mapping.toJSON(options.query),
+      limit: options.limit || 100,
+      sources: options.sources || '["sql"]'
+	}).done(function (data) {
+      if (data.status === 0) {
+        promise.resolve(data);
+      } else {
+        promise.reject(data);
+      }
+    }).fail(promise.reject);
+    return promise;
+  };
+
   ApiHelper.prototype.formatSql = function (statements) {
     return $.post("/notebook/api/format", {
       statements: statements
