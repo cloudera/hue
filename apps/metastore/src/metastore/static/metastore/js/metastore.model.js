@@ -443,15 +443,34 @@ var MetastoreTable = (function () {
     });
 
     self.comment.subscribe(function (newValue) {
-      $.post('/metastore/table/' + self.database.name + '/' + self.name + '/alter', {
-        source_type: self.sourceType,
-        comment: newValue ? newValue : ""
-      }, function () {
-        huePubSub.publish('assist.clear.db.cache', {
-          sourceType: self.sourceType,
-          databaseName: self.database.name
-        })
-      });
+      var updateCall;
+      var comment = newValue ? newValue : "";
+
+      if (self.navigatorEnabled) {
+        updateCall = $.post('/metadata/api/navigator/update_properties', {
+          id: ko.mapping.toJSON(self.navigatorStats().identity),
+          properties: ko.mapping.toJSON({description: comment})
+        });
+      } else {
+        updateCall = $.post('/metastore/table/' + self.database.name + '/' + self.name + '/alter', {
+          source_type: self.sourceType,
+          comment: comment
+        });
+      }
+
+      updateCall.done(function(data) {
+        if (data && data.status == 0) {
+         huePubSub.publish('assist.clear.db.cache', {
+           sourceType: self.sourceType,
+           databaseName: self.database.name
+         })
+       } else {
+         var message = data.message || data.data;
+         if (message) {
+           $(document).trigger("error", message);
+         }
+       }
+      })
     });
 
     self.refreshTableStats = function () {
