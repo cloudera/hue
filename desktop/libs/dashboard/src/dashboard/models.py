@@ -369,7 +369,7 @@ def range_pair(field, cat, fq_filter, iterable, end, collection_facet):
   return pairs
 
 
-def range_pair2(facet_field, cat, fq_filter, iterable, end, facet):
+def range_pair2(facet_field, cat, fq_filter, iterable, end, facet, collection_facet=None):
   # e.g. counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
   pairs = []
   selected_values = [f['value'] for f in fq_filter]
@@ -393,11 +393,14 @@ def range_pair2(facet_field, cat, fq_filter, iterable, end, facet):
   next(to, None)
   counts = iterable[1::2]
   total_counts = counts.pop(0) if facet['sort'] == 'asc' else 0
+  sum_all = collection_facet and collection_facet['widgetType'] in ('timeline-widget', 'bucket-widget') and facet['type'] == 'range-up'
 
   for element in a:
     next(to, None)
     to_value = next(to, end)
     count = next(a)
+    if sum_all:
+      count = total_counts
 
     pairs.append({
         'field': facet_field, 'from': element, 'value': count, 'to': to_value, 'selected': element in selected_values,
@@ -559,7 +562,7 @@ def augment_solr_response(response, collection, query):
             _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
 
             counts = [_v for _f in counts for _v in (_f['val'], _f[column])]
-            counts = range_pair2(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet['properties']['facets'][0])
+            counts = range_pair2(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet['properties']['facets'][0], collection_facet=collection_facet)
           else:
             # Dimension 1 with counts and 2 with analytics
             agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
