@@ -550,7 +550,7 @@ var MetastoreTable = (function () {
               }, function(data) {
                 if (data && data.status == 0) {
                   self.navigatorStats(ko.mapping.fromJS(data.entity));
-                  self.getRelationships();
+                  //self.getRelationships(); // Off for now
                 } else {
                   //$(document).trigger("info", data.message);
                 }
