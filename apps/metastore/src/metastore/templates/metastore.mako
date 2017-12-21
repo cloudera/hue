@@ -18,7 +18,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
 from desktop import conf
-from desktop.conf import USE_NEW_EDITOR
+from desktop.conf import USE_NEW_EDITOR, IS_EMBEDDED
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
 from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -331,7 +331,11 @@ ${ components.menubar(is_embeddable) }
           ${_('Stored in')} Kudu
         <!-- /ko -->
         <!-- ko if: details.properties.format != 'kudu' -->
+          % if IS_EMBEDDED.get():
+          <span data-bind="attr: {'title': path_location}">${_('Location')}</span>
+          % else:
           <a data-bind="hueLink: hdfs_link, attr: {'rel': path_location}" title="${_('Open data location')}">${_('Location')}</a>
+          % endif
         <!-- /ko -->
       </div>
       <!-- ko with: $parent.tableStats -->
@@ -443,7 +447,12 @@ ${ components.menubar(is_embeddable) }
                 <i class="fa fa-fw fa-user muted"></i>
                 <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
                 <br/>
-                <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
+                <i class="fa fa-fw fa-hdd-o muted"></i>
+                % if IS_EMBEDDED.get():
+                  <span data-bind="attr: {'title': location }"> ${_('Location')}</span>
+                % else:
+                  <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
+                % endif
               </div>
             </div>
           </div>
