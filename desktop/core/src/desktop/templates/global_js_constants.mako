@@ -19,6 +19,7 @@
 
   from desktop import conf
   from desktop.conf import IS_EMBEDDED
+  from desktop.models import hue_version
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -153,6 +154,8 @@
       queryRequire: "${ _('Query requires a select or aggregate.') }"
     }
   };
+
+  window.HUE_VERSION = '${ hue_version() }';
 
   %if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
     window.IS_NEW_INDEXER_ENABLED = true;

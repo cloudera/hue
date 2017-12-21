@@ -14,6 +14,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+<%!
+  from desktop.models import hue_version
+%>
+
 <html>
 <body></body>
 <script type="text/javascript">
@@ -34,7 +38,7 @@
       };
 
       // For syntax checking
-      var aceSqlSyntaxWorker = new Worker(baseUrl + '/desktop/workers/aceSqlSyntaxWorker.js?bust=' + Math.random());
+      var aceSqlSyntaxWorker = new Worker(baseUrl + '/desktop/workers/aceSqlSyntaxWorker.js?v=${ hue_version() }');
       aceSqlSyntaxWorker.onmessage = function (e) {
         if (e.data.ping) {
           aceSqlSyntaxWorker.isReady = true;
@@ -44,7 +48,7 @@
       };
 
       // For location marking
-      var aceSqlLocationWorker = new Worker(baseUrl + '/desktop/workers/aceSqlLocationWorker.js?bust=' + Math.random());
+      var aceSqlLocationWorker = new Worker(baseUrl + '/desktop/workers/aceSqlLocationWorker.js?v=${ hue_version() }');
       aceSqlLocationWorker.onmessage = function (e) {
         if (e.data.ping) {
           aceSqlLocationWorker.isReady = true;
