@@ -511,6 +511,15 @@ var MetastoreTable = (function () {
               table: self
             })
           }));
+/* Get a batch of 500 columns with comments
+          self.apiHelper.navSearch({
+            query: 'parentPath:"/' + self.database.name + '/' + self.name + '" AND type:FIELD AND description:[* TO *]',
+            limit: 500
+          }).done(function (apps) {
+		    console.log(apps);
+		    // For each col update comment
+		  });
+*/
           self.favouriteColumns(self.columns().slice(0, 5));
         },
         errorCallback: function () {
