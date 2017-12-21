@@ -320,18 +320,20 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   </div>
 </div>
 
+<!-- ko if: $root.isResultFullScreenMode() -->
+<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
+  <i class="fa fa-times fa-fw"></i>
+</a>
+<!-- /ko -->
+
+<!-- ko if: $root.isPresentationMode() -->
+<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.isPresentationMode(false); }">
+  <i class="fa fa-times fa-fw"></i>
+</a>
+<!-- /ko -->
+
 <div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode() || $root.isResultFullScreenMode()" style="display: none;">
-  <!-- ko if: $root.isResultFullScreenMode() -->
-    <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
-      <i class="fa fa-times fa-fw"></i>
-    </a>
-  <!-- /ko -->
-
   <!-- ko if: $root.isPresentationMode() -->
-    <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.isPresentationMode(false); }">
-      <i class="fa fa-times fa-fw"></i>
-    </a>
-
     <!-- ko if: $root.selectedNotebook() -->
       <!-- ko if: $root.selectedNotebook().name() || $root.selectedNotebook().description() -->
       <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
