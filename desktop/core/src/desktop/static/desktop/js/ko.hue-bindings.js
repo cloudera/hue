@@ -1230,6 +1230,12 @@
                 $element.popover(options);
                 $element.popover('show');
                 var $tip = $element.data('popover').$tip;
+                if (HUE_CONTAINER !== 'body') {
+                  $tip.appendTo(HUE_CONTAINER);
+                  var tipOffset = $tip.offset();
+                  var containerOffset = $(HUE_CONTAINER).offset();
+                  $tip.offset({ left: tipOffset.left - containerOffset.left, top: tipOffset.top - containerOffset.top });
+                }
                 ko.cleanNode($tip.get(0));
                 ko.applyBindings(viewModel, $tip.get(0));
                 $tip.find(".close-popover").click(hidePopover);
