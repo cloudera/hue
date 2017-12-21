@@ -3160,7 +3160,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         };
 
         // For syntax checking
-        var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?bust=' + Math.random());
+        var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?v=' + HUE_VERSION);
         aceSqlSyntaxWorker.onmessage = function (e) {
           if (e.data.ping) {
             aceSqlSyntaxWorker.isReady = true;
@@ -3174,7 +3174,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         });
 
         // For location marking
-        var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?bust=' + Math.random());
+        var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?v=' + HUE_VERSION);
         aceSqlLocationWorker.onmessage = function (e) {
           if (e.data.ping) {
             aceSqlLocationWorker.isReady = true;
@@ -3189,7 +3189,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       }
   % else:
     var iframe = document.createElement("iframe");
-    iframe.src = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls('/notebook/workers_embedded') : '/notebook/workers_embedded';
+    iframe.src = (typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls('/notebook/workers_embedded?v=') : '/notebook/workers_embedded?v=') + HUE_VERSION;
     iframe.name = "workerFrame";
     iframe.setAttribute('style', 'display: none;');
     document.body.appendChild(iframe);
