@@ -18,6 +18,7 @@ from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escape, escapejs
 
 from desktop import conf
+from desktop.conf import IS_EMBEDDED
 from desktop.lib.i18n import smart_unicode
 
 from beeswax.conf import LIST_PARTITIONS_LIMIT
@@ -559,7 +560,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
   }
 
 
-  %if collect_usage:
+  %if collect_usage and not IS_EMBEDDED.get():
 
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
