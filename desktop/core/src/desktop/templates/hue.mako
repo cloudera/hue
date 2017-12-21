@@ -22,7 +22,7 @@
   from desktop.conf import DEV_EMBEDDED
   from desktop.views import _ko, commonshare, login_modal
   from desktop.lib.i18n import smart_unicode
-  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB
+  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN, ANALYTIC_DB, hue_version
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -109,7 +109,7 @@
 
   ${ commonHeaderFooterComponents.header_i18n_redirection() }
 
-  <script src="/desktop/globalJsConstants.js"></script>
+  <script src="/desktop/globalJsConstants.js?v=${ hue_version() }"></script>
 
   % if not conf.DEV.get():
   <script src="${ static('desktop/js/hue.errorcatcher.js') }"></script>
