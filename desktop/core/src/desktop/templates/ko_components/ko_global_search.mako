@@ -15,10 +15,12 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
+from metadata.conf import has_navigator
+
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
-
-from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 
@@ -30,7 +32,7 @@ from desktop.views import _ko
       params: {
         hasFocus: searchHasFocus,
         disableNavigation: true,
-        placeHolder: '${ _ko('Search data and saved documents...') }',
+        placeHolder: '${ _ko('Search data and saved documents...') if has_navigator(user) else _ko('Search saved documents...') }',
         querySpec: querySpec,
         onClear: function () { selectedIndex(null); searchResultVisible(false); },
         facets: ['type', 'tags'],
