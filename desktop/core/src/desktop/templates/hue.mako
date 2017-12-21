@@ -104,6 +104,11 @@
       }
     }
   }
+
+  // Add modified URL for .clearable background
+  var originalClearableImgUrl = '${ static('desktop/art/clearField@2x.png') }';
+  var clearableImgUrl = typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls(originalClearableImgUrl) : originalClearableImgUrl;
+  document.styleSheets[0].insertRule('.clearable { background: url(' + clearableImgUrl + ') no-repeat right -10px center; }');
 % endif
   </script>
 
