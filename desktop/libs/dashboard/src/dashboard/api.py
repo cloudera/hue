@@ -29,6 +29,7 @@ from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
 
+from dashboard.conf import get_engines
 from dashboard.controller import can_edit_index
 from dashboard.dashboard_api import get_engine
 from dashboard.data_export import download as export_download
@@ -245,9 +246,13 @@ def get_terms(request):
     analysis = json.loads(request.POST.get('analysis', '{}'))
     limit = json.loads(request.POST.get('limit', '25'))
 
+    support_distributed = [engine for engine in get_engines(request.user) if engine['type'] == 'solr'][0]['analytics']
+
     field = analysis['name']
     properties = {
       'terms.limit': limit,
+      'terms.distrib': str(support_distributed).lower(),
+      # terms.regex
       # lower
       # mincount
       # maxcount
@@ -256,6 +261,7 @@ def get_terms(request):
       properties['terms.prefix'] = analysis['terms']['prefix']
 
     result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
+
     result['terms'] = pairwise2(field, [], result['terms']['terms'][field])
     result['status'] = 0
     result['message'] = ''
