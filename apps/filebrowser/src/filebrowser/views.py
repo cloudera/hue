@@ -261,7 +261,7 @@ def edit(request, path, form=None):
         raise PopupException(_("File too big to edit: %(path)s") % {'path': path})
 
     if not form:
-        encoding = request.REQUEST.get('encoding') or i18n.get_site_encoding()
+        encoding = request.GET.get('encoding') or i18n.get_site_encoding()
         if stats:
             f = request.fs.open(path)
             try:
@@ -349,7 +349,7 @@ def listdir(request, path):
     if not request.fs.isdir(path):
         raise PopupException(_("Not a directory: %(path)s") % {'path': path})
 
-    file_filter = request.REQUEST.get('file_filter', 'any')
+    file_filter = request.GET.get('file_filter', 'any')
 
     assert file_filter in ['any', 'file', 'dir']
 
@@ -369,7 +369,7 @@ def listdir(request, path):
         'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': request.user.username == request.fs.superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
         'superuser': request.fs.superuser,
-        'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0],
+        'show_upload': (request.GET.get('show_upload') == 'false' and (False,) or (True,))[0],
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
         'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
         'is_embeddable': request.GET.get('is_embeddable', False),
@@ -1037,7 +1037,7 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
         ret['extra_params'] = extra_params
 
     for p in parameter_names:
-        val = request.REQUEST.get(p)
+        val = request.GET.get(p)
         if val:
             ret[p] = val
 

@@ -1396,7 +1396,7 @@ class Coordinator(Job):
                                help_text=_t('When to start the first workflow.'))
   end = models.DateTimeField(default=dtz.now, verbose_name=_t('End'),
                              help_text=_t('When to start the last workflow.'))
-  workflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
+  coordinatorworkflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
                                help_text=_t('The workflow to schedule repeatedly.'))
   timeout = models.SmallIntegerField(null=True, blank=True, verbose_name=_t('Timeout'),
                                      help_text=_t('Number of minutes the coordinator action will be in '

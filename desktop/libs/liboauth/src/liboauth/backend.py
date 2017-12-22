@@ -198,7 +198,7 @@ class OAuthBackend(DesktopBackendBase):
     response_type = "code"
  
     social = request.GET['social']
-    state = social + "," + request.REQUEST.get('next', '/')
+    state = social + "," + request.GET.get('next', '/')
 
     if social == 'google':
       consumer_key=liboauth.conf.CONSUMER_KEY_GOOGLE.get()

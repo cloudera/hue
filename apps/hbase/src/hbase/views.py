@@ -74,7 +74,7 @@ def api_router(request, url): # On split, deserialize anything
                 for arg in decoded_url_params] # Deserialize later
 
   if request.POST.get('dest', False):
-    url_params += [request.FILES.get(request.REQUEST.get('dest'))]
+    url_params += [request.FILES.get(request.GET.get('dest'))]
 
   return api_dump(HbaseApi(request.user).query(*url_params))
 

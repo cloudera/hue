@@ -200,7 +200,7 @@ def show_tables(request, database=None):
   if database is None:
     database = 'default' # Assume always 'default'
 
-  if request.REQUEST.get("format", "html") == "json":
+  if request.GET.get("format", "html") == "json":
     try:
       databases = db.get_databases()
 
@@ -238,7 +238,7 @@ def show_tables(request, database=None):
     'is_navigator_enabled': has_navigator(request.user),
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
-    'is_embeddable': request.REQUEST.get('is_embeddable', False),
+    'is_embeddable': request.GET.get('is_embeddable', False),
     'source_type': _get_servername(db),
     })
 
@@ -275,7 +275,7 @@ def describe_table(request, database, table):
     LOG.exception("Describe table error")
     raise PopupException(_("DB Error"), detail=e.message if hasattr(e, 'message') and e.message else e)
 
-  if request.REQUEST.get("format", "html") == "json":
+  if request.GET.get("format", "html") == "json":
     return JsonResponse({
         'status': 0,
         'name': table.name,
@@ -316,7 +316,7 @@ def describe_table(request, database, table):
       'is_navigator_enabled': has_navigator(request.user),
       'optimizer_url': get_optimizer_url(),
       'navigator_url': get_navigator_url(),
-      'is_embeddable': request.REQUEST.get('is_embeddable', False),
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'source_type': _get_servername(db),
     })
 
@@ -515,13 +515,13 @@ def describe_partitions(request, database, table):
   if not table_obj.partition_keys:
     raise PopupException(_("Table '%(table)s' is not partitioned.") % {'table': table})
 
-  reverse_sort = request.REQUEST.get("sort", "desc").lower() == "desc"
+  reverse_sort = request.GET.get("sort", "desc").lower() == "desc"
 
   if request.method == "POST":
     partition_filters = {}
     for part in table_obj.partition_keys:
-      if request.REQUEST.get(part.name):
-        partition_filters[part.name] = request.REQUEST.get(part.name)
+      if request.GET.get(part.name):
+        partition_filters[part.name] = request.GET.get(part.name)
     partition_spec = ','.join(["%s='%s'" % (k, v) for k, v in partition_filters.items()])
   else:
     partition_spec = ''
@@ -562,7 +562,7 @@ def describe_partitions(request, database, table):
         'is_navigator_enabled': has_navigator(request.user),
         'optimizer_url': get_optimizer_url(),
         'navigator_url': get_navigator_url(),
-        'is_embeddable': request.REQUEST.get('is_embeddable', False),
+        'is_embeddable': request.GET.get('is_embeddable', False),
         'source_type': _get_servername(db),
     })
 
@@ -595,7 +595,7 @@ def browse_partition(request, database, table, partition_spec):
     decoded_spec = urllib.unquote(partition_spec)
     partition_table = db.describe_partition(database, table, decoded_spec)
     uri_path = location_to_url(partition_table.path_location)
-    if request.REQUEST.get("format", "html") == "json":
+    if request.GET.get("format", "html") == "json":
       return JsonResponse({'uri_path': uri_path})
     else:
       return redirect(uri_path)
@@ -625,7 +625,7 @@ def drop_partition(request, database, table):
     partition_specs = request.POST.getlist('partition_selection')
     partition_specs = [spec for spec in partition_specs]
     try:
-      if request.REQUEST.get("format", "html") == "json":
+      if request.GET.get("format", "html") == "json":
         last_executed = json.loads(request.POST.get('start_time'), '-1')
         sql = db.drop_partitions(database, table, partition_specs, design=None, generate_ddl_only=True)
         job = make_notebook(

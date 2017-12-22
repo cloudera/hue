@@ -32,7 +32,7 @@ from django.conf import settings
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.core.servers.basehttp import FileWrapper
+from wsgiref.util import FileWrapper
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
@@ -463,7 +463,7 @@ def log_frontend_event(request):
   "error", or "critical"), and "message".
   """
   def get(param, default=None):
-    return request.REQUEST.get(param, default)
+    return request.GET.get(param, default)
 
   level = _LOG_LEVELS.get(get("level"), logging.INFO)
   msg = "Untrusted log event from user %s: %s" % (

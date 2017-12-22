@@ -253,7 +253,7 @@ def import_wizard(request, database='default'):
                 'file_format': 'TextFile',
                 'load_data': load_data,
                 'path': path,
-                'skip_header': request.REQUEST.get('removeHeader', 'off').lower() == 'on'
+                'skip_header': request.GET.get('removeHeader', 'off').lower() == 'on'
              },
             'columns': [ f.cleaned_data for f in s3_col_formset.forms ],
             'partition_columns': [],
@@ -482,8 +482,8 @@ def load_after_create(request, database):
   We get here from the create's on_success_url, and expect to find
   ``table`` and ``path`` from the parameters.
   """
-  tablename = request.REQUEST.get('table')
-  path = request.REQUEST.get('path')
+  tablename = request.GET.get('table')
+  path = request.GET.get('path')
 
   if not tablename or not path:
     msg = _('Internal error: Missing needed parameter to load data into table.')

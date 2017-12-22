@@ -48,7 +48,7 @@ from liboauth.backend import OAuthBackend
 @login_notrequired
 def show_login_page(request, login_errors=False):
    """Used by the non-jframe login"""
-   redirect_to = request.REQUEST.get('next', '/')
+   redirect_to = request.GET.get('next', '/')
    is_first_login_ever = OAuthBackend.is_first_login_ever()
 
    request.session.set_test_cookie()

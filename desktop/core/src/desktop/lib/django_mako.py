@@ -107,7 +107,7 @@ def render_to_string_normal(template_name, django_context):
     for d in reversed(django_context.dicts):
       if d:
         data_dict.update(d)
-    data_dict.update(django_context.request)
+    data_dict.update({'request': django_context.request})
   else:
     data_dict = django_context
 

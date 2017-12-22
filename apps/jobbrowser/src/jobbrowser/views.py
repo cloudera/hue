@@ -219,7 +219,7 @@ def massage_task_for_json(task):
 
 
 def single_spark_job(request, job):
-  if request.REQUEST.get('format') == 'json':
+  if request.GET.get('format') == 'json':
     json_job = {
       'job': massage_job_for_json(job, request)
     }
@@ -243,7 +243,7 @@ def single_job(request, job):
   recent_tasks = job.filter_tasks(task_states=('running', 'succeeded',))
   recent_tasks.sort(cmp_exec_time, reverse=True)
 
-  if request.REQUEST.get('format') == 'json':
+  if request.GET.get('format') == 'json':
     json_failed_tasks = [massage_task_for_json(task) for task in failed_tasks]
     json_recent_tasks = [massage_task_for_json(task) for task in recent_tasks]
     json_job = {
@@ -291,9 +291,9 @@ def kill_job(request, job):
       LOG.warn('Failed to get job with ID %s: %s' % (job.jobId, e))
     else:
       if job.status not in ["RUNNING", "QUEUED"]:
-        if request.REQUEST.get("next"):
-          return HttpResponseRedirect(request.REQUEST.get("next"))
-        elif request.REQUEST.get("format") == "json":
+        if request.GET.get("next"):
+          return HttpResponseRedirect(request.GET.get("next"))
+        elif request.GET.get("format") == "json":
           return JsonResponse({'status': 0}, encoder=JSONEncoderForHTML)
         else:
           raise MessageException("Job Killed")

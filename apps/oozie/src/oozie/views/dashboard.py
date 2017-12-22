@@ -651,7 +651,7 @@ def list_oozie_sla(request):
   else:
     oozie_slas = [] # or get latest?
 
-  if request.REQUEST.get('format') == 'json':
+  if request.GET.get('format') == 'json':
     massaged_slas = []
     for sla in oozie_slas:
       massaged_slas.append(massaged_sla_for_json(sla))

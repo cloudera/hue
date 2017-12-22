@@ -37,8 +37,8 @@ def check_document_access_permission():
       doc_id = uuid = doc2 = None
 
       try:
-        if request.REQUEST.get('workflow'):
-          workflow_id = request.REQUEST.get('workflow')
+        if request.GET.get('workflow'):
+          workflow_id = request.GET.get('workflow')
           if workflow_id.isdigit():
             doc_id = workflow_id
           else:

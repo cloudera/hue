@@ -65,7 +65,7 @@ def list_indexes(request):
 def list_index(request):
   response = {'status': -1}
 
-  name = request.REQUEST.get('name')
+  name = request.GET.get('name')
 
   client = SolrClient(user=request.user)
 

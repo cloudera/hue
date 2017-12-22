@@ -152,7 +152,7 @@ class HDFSfileUploadHandler(FileUploadHandler):
     if field_name.upper().startswith('HDFS'):
       LOG.info('Using HDFSfileUploadHandler to handle file upload.')
       try:
-        fs_ref = self.request.REQUEST.get('fs', 'default')
+        fs_ref = self.request.GET.get('fs', 'default')
         self.request.fs = fsmanager.get_filesystem(fs_ref)
         self.request.fs.setuser(self.request.user.username)
         self._file = HDFStemporaryUploadedFile(self.request, file_name, self._destination)
