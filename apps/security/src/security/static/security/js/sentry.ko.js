@@ -936,9 +936,9 @@ var SentryViewModel = (function () {
 
     self.deletePrivilegeModal = function (role) {
       var cascadeDeletes = $.grep(role.privilegesChanged(), function (privilege) {
-          return privilege.status() == 'deleted' && (privilege.privilegeScope() == 'SERVER' || privilege.privilegeScope() == 'DATABASE');
-        }
-      );
+        return privilege.status() == 'deleted' && (privilege.privilegeType() == 'SERVER' || privilege.privilegeType() == 'DATABASE');
+      });
+
       if (cascadeDeletes.length > 0) {
         self.roleToUpdate(role);
         huePubSub.publish('show.delete.privilege.modal');
