@@ -295,7 +295,7 @@ ${ assist.assistPanel() }
     <li class="active"><a href="#index-overview" data-toggle="tab" data-bind="click: function(){ $root.tab('index-overview'); }">${_('Overview')}</a></li>
     <li><a href="#index-columns" data-toggle="tab" data-bind="click: function(){ $root.tab('index-columns'); }">${_('Fields')} (<span data-bind="text: fields().length"></span>)</a></li>
     <li><a href="#index-sample" data-toggle="tab" data-bind="click: function(){ $root.tab('index-sample'); }">${_('Sample')} (<span data-bind="text: sample().length"></span>)</a></li>
-    <li><a href="#index-config" data-toggle="tab" data-bind="click: function(){ if (!config()) { getConfig(); }; $root.tab('index-config'); }">${_('Config')}</a></li>
+    ## <li><a href="#index-config" data-toggle="tab" data-bind="click: function(){ if (!config()) { getConfig(); }; $root.tab('index-config'); }">${_('Config')}</a></li>
   </ul>
 
   <div class="tab-content" style="border: none; overflow: hidden">
