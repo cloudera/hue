@@ -313,6 +313,8 @@
             if (self.options.serverType == "SOLR") {
               if (item.isCollection && !firstSolrCollection) {
                 _currentFiles.push('<li class="hiveAutocompleteItem" data-value="collections.*" title="collections.*"><i class="fa fa-search-plus"></i> collections.*</li>');
+                _currentFiles.push('<li class="hiveAutocompleteItem" data-value="admin.collections" title="admin.collections"><i class="fa fa-database"></i> admin.collections</li>');
+                _currentFiles.push('<li class="hiveAutocompleteItem" data-value="admin.cores" title="admin.collections"><i class="fa fa-database"></i> admin.cores</li>');
                 firstSolrCollection = true;
               }
               if (item.isConfig) {
@@ -339,7 +341,7 @@
             var item = $(this).text().trim();
             var path = autocompleteUrl.substring(BASE_PATH.length);
 
-            if ($(this).html().indexOf("search") > -1 || $(this).html().indexOf("cog") > -1) {
+            if ($(this).html().indexOf("search") > -1 || $(this).html().indexOf("cog") > -1 || $(this).html().indexOf("database") > -1) {
               if ($(this).html().indexOf("search") > -1 && $(this).html().indexOf("search-plus") == -1) {
                 $el.val("collections." + item);
               }

@@ -84,13 +84,15 @@ def _fetch_collections(request):
   api = SolrApi(SOLR_URL.get(), request.user)
 
   if not item:
-    return {"databases": ["collections", "configs"]}
+    return {"databases": ["collections", "configs", "admin"]}
   elif item and name:
     return {"authorizable_link": "/indexer/#edit/%s" % name, "extended_columns": [], "columns": [], "partition_keys": []}
   elif item == 'collections':
     return {"tables_meta": [{"comment": None, "type": "Table", "name": col} for col in api.collections2()]}
   elif item == 'configs':
     return {"tables_meta": [{"comment": None, "type": "Table", "name": conf} for conf in api.configs()]}
+  elif item == 'admin':
+    return {"tables_meta": [{"comment": None, "type": "Table", "name": 'collections'}, {"comment": None, "type": "Table", "name": "cores"}]}
   else:
     raise PopupException(_('Authorizable %s could not be retrieved') % path)
 

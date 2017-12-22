@@ -115,6 +115,9 @@ var SentryViewModel = (function () {
           else if (_parts[0] == 'configs') {
             self.authorizables.push(new Authorizable(vm, self, {type: 'CONFIG', name: _parts[1]}))
           }
+          else if (_parts[0] == 'admin') {
+            self.authorizables.push(new Authorizable(vm, self, {type: 'ADMIN', name: _parts[1]}))
+          }
         } else {
           self.authorizables.push(new Authorizable(vm, self, {type: 'DATABASE', name: _parts[0]}))
           if (_parts.length > 1) {
@@ -1139,7 +1142,9 @@ var SentryViewModel = (function () {
 
       if (self.component() == 'solr') {
         if (paths.length > 1) {
-          if (paths[0] == 'configs') {
+          if (paths[0] == 'admin') {
+            authorizables.push({'type': 'ADMIN', 'name': paths[1]});
+          } else if (paths[0] == 'configs') {
             authorizables.push({'type': 'CONFIG', 'name': paths[1]});
           } else {
             authorizables.push({'type': 'COLLECTION', 'name': paths[1]});
