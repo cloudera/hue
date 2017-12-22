@@ -383,10 +383,18 @@ ${ assist.assistPanel() }
           <th style="width: 2%"></th>
           <th>${ _('Name') }</th>
           <th>${ _('Type') }</th>
-          <th>${ _('Required') }</th>
-          <th>${ _('Stored') }</th>
           <th>${ _('Indexed') }</th>
+          <th>${ _('Stored') }</th>
+          <th>${ _('Required') }</th>
           <th>${ _('Multivalued') }</th>
+          <th>${ _('Term Vectors') }</th>
+          <th>${ _('Tokenized') }</th>
+          <th>${ _('Term Positions') }</th>
+          <th>${ _('Term Offsets') }</th>
+          <th>${ _('Omit Norms') }</th>
+          <th>${ _('Omit TermFreq and Positions') }</th>
+          <th>${ _('Sort Missing Last') }</th>
+          <th>${ _('DocValues') }</th>
         </tr>
       </thead>
       <tbody data-bind="foreach: $data">
@@ -397,10 +405,18 @@ ${ assist.assistPanel() }
           </td>
           <td data-bind="text: name"></td>
           <td data-bind="text: type"></td>
-          <td><i data-bind="visible: $data.required" class="fa fa-check muted"></i></td>
-          <td><i data-bind="visible: $data.stored" class="fa fa-check muted"></i></td>
-          <td><i data-bind="visible: $data.indexed" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: typeof $data.indexed == 'undefined' || $data.indexed" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: typeof $data.stored == 'undefined' || $data.stored" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.required " class="fa fa-check muted"></i></td>
           <td><i data-bind="visible: $data.multiValued" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.termVectors" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.tokenized" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.termPositions" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.termOffsets" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: (typeof $data.omitNorms == 'undefined' && type().indexOf('text') == -1) || $data.omitNorms" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: (typeof $data.omitTermFreqAndPositions == 'undefined' && type().indexOf('text') == -1) || $data.omitTermFreqAndPositions" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: !$data.sortMissingLast" class="fa fa-check muted"></i></td>
+          <td><i data-bind="visible: $data.docValues" class="fa fa-check muted"></i></td>
         </tr>
       </tbody>
     </table>
