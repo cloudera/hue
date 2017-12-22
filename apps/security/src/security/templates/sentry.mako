@@ -80,7 +80,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 
     <!-- ko if: $root.component() == 'solr' -->
       <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path" placeholder="collection or config name <CTRL+SPACE>">
-      <select data-bind="options: privilegeType() == 'CONFIG' ? $root.availableSolrConfigActions : $root.availableActions, value: $data.action, enable: (privilegeType() == 'COLLECTION')" style="width: 100px; margin-bottom: 0"></select>
+      <select data-bind="options: privilegeType() == 'CONFIG' ? $root.availableSolrConfigActions : $root.availableActions, value: $data.action, enable: privilegeType() != 'CONFIG'" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 
     <div class="new-line-if-small">

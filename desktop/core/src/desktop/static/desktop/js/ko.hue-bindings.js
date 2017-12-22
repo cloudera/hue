@@ -3179,6 +3179,7 @@
         showOnFocus: true,
         home: "/",
         serverType: "SOLR",
+        skipTables: true, // No notion of DB actually
         onPathChange: function (path) {
           setPathFromAutocomplete(path);
         },
