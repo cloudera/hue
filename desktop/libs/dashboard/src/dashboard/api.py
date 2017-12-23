@@ -252,13 +252,13 @@ def get_terms(request):
     properties = {
       'terms.limit': limit,
       'terms.distrib': str(support_distributed).lower(),
-      # terms.regex
       # lower
       # mincount
       # maxcount
     }
     if analysis['terms']['prefix']:
-      properties['terms.prefix'] = analysis['terms']['prefix']
+      properties['terms.regex'] = '^%(prefix)s.*' % analysis['terms'] # Case insensitive 'terms.prefix'
+      properties['terms.regex.flag'] = 'case_insensitive'
 
     result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
 
