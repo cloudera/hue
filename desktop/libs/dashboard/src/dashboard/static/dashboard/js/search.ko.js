@@ -609,6 +609,9 @@ var Collection = function (vm, collection) {
 
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
+    if (self.template.moreLikeThis) {
+      self.template.moreLikeThis(false);
+    }
   });
   if (typeof self.template.extracode == 'undefined') {
     self.template.extracode = ko.observable();
@@ -2355,6 +2358,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           childRecords.push(record);
         });
         doc['childDocuments'] = ko.observable(childRecords);
+        doc['numFound'] = ko.observable(item.numFound);
       }
       if (!template.isGridLayout()) {
         // fix the fields that contain dots in the name

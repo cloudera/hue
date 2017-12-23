@@ -105,6 +105,8 @@ class Collection2(object):
       props['collection']['engine'] = 'solr'
     if 'leafletmap' not in props['collection']['template']:
       props['collection']['template']['leafletmap'] = {'latitudeField': None, 'longitudeField': None, 'labelField': None}
+    if 'moreLikeThis' not in props['collection']['template']:
+      props['collection']['template']['moreLikeThis'] = False
     if 'timeFilter' not in props['collection']:
       props['collection']['timeFilter'] = {
         'field': '',
@@ -687,6 +689,11 @@ def augment_response(collection, query, response):
       doc['externalLink'] = link
       doc['details'] = []
       doc['hueId'] = smart_unicode(doc.get(id_field, ''))
+      if 'moreLikeThis' in response and response['moreLikeThis'][doc['hueId']].get('numFound'):
+        _doc = response['moreLikeThis'][doc['hueId']]
+        doc['_childDocuments_'] = _doc['docs']
+        doc['numFound'] = _doc['numFound']
+        del response['moreLikeThis'][doc['hueId']]
 
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields and not query.get('download'):
