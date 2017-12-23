@@ -1145,12 +1145,18 @@ ${ dashboard.layout_skeleton(suffix='search') }
   ${ _(' results') }
 
   <span data-bind="visible: $root.isEditing()">
-    ${ _('Show') }
+    - ${ _('Show') }
     <span class="spinedit-cnt">
       <input type="text" data-bind="spinedit: ($parent.template ? $parent : $root.collection).template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
     </span>
     ${ _('results per page') }
   </span>
+
+  <!-- ko if: $parent == $root.collection && $root.collection.engine() == 'solr'-->
+  <span data-bind="visible: $root.collection.template.fieldsSelected().length > 0, click: function() {$root.collection.template.moreLikeThis(!$root.collection.template.moreLikeThis()); $root.search(); }" title="${ _('Show similar records based on the selected fields') }">
+    - <a href="javascript: void(0)"><span data-bind="text: $root.collection.template.moreLikeThis() ? '${ _ko('Hide') }' : '${ _ko('Show') }'"></span></a> ${ _('More like this') }
+  </span>
+  <!-- /ko -->
 
   <a href="javascript: void(0)" title="${ _('Next') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
@@ -1499,7 +1505,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
                   <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
                     <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
                     <!-- ko if: doc.childDocuments != undefined -->
-                    &nbsp(<span data-bind="text: doc.childDocuments().length"></span>)
+                    &nbsp(<span data-bind="text: doc.numFound || doc.childDocuments().length"></span>)
                     <!-- /ko -->
                   </a>
                 </td>

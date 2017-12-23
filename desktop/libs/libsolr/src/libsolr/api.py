@@ -230,6 +230,21 @@ class SolrApi(object):
     if nested_fields:
       fl += urllib.unquote(utf_quoter(',[child parentFilter="%s"]' % ' OR '.join(nested_fields)))
 
+    if collection['template']['moreLikeThis'] and fl != ['*']: # Potential conflict with nested documents
+      id_field = collection.get('idField', 'id')
+      params += (
+        ('mlt', 'true'),
+        ('mlt.fl', fl.replace(',%s' % id_field, '')),
+        ('mlt.mintf', 1),
+        ('mlt.mindf', 1),
+        ('mlt.maxdf', 50),
+        ('mlt.maxntp', 1000),
+        ('mlt.count', 10),
+        #('mlt.minwl', 1),
+        #('mlt.maxwl', 1),
+      )
+      fl = '*'
+
     params += (('fl', fl),)
 
     params += (
