@@ -237,7 +237,7 @@ ${layout.menubar(section='users')}
               }
               else if (data && data.url) {
                 huePubSub.publish('open.link', data.url);
-                $.jHueNotify.info("${ _('The users and groups were update correctly.') }")
+                $.jHueNotify.info("${ _('The users and groups were updated correctly.') }")
                 $usersComponents.find(".sync-ldap").modal("hide");
               }
             }
