@@ -517,7 +517,7 @@ The default SQLite database used by Hue is located in: `/usr/share/hue/desktop/d
 You can inspect this database from the command line using the `sqlite3`
 program or typing `/usr/share/hue/build/env/bin/hue dbshell'. For example:
 
-  # sqlite3 /usr/share/hue/desktop/desktop.db
+  sqlite3 /usr/share/hue/desktop/desktop.db
   SQLite version 3.6.22
   Enter ".help" for instructions
   Enter SQL statements terminated with a ";"
@@ -574,7 +574,7 @@ To configure Hue to store data in MySQL:
    existing database data to a text file. Note that using the ".json" extension
    is required.
 
-  $ /usr/share/hue/build/env/bin/hue dumpdata > <some-temporary-file>.json
+  /usr/share/hue/build/env/bin/hue dumpdata > <some-temporary-file>.json
 
 4. Open the `hue.ini` file in a text editor. Directly below the
    `[[database]]` line, add the following options (and modify accordingly for
@@ -590,9 +590,9 @@ To configure Hue to store data in MySQL:
 5. As the Hue user, configure Hue to load the existing data and create the
    necessary database tables:
 
-  $ /usr/share/hue/build/env/bin/hue syncdb --noinput
-  $ mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
-  $ /usr/share/hue/build/env/bin/hue loaddata <temporary-file-containing-dumped-data>.json
+  /usr/share/hue/build/env/bin/hue syncdb --noinput
+  mysql -uhue -psecretpassword -e "DELETE FROM hue.django_content_type;"
+  /usr/share/hue/build/env/bin/hue loaddata <temporary-file-containing-dumped-data>.json
 
 Your system is now configured and you can start the Hue server as normal.
 
@@ -602,11 +602,8 @@ Using Hue
 ---------
 
 After installation, you can use Hue by navigating to `http://myserver:8888/`.
-The following login screen appears:
 
-image:images/login.png[]
-
-The Help application guides users through the various installed applications.
+The link:user-guide/index.html[user guide] will help users go through the various installed applications.
 
 Supported Browsers
 ~~~~~~~~~~~~~~~~~~
