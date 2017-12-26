@@ -5,21 +5,14 @@ Introduction
 ------------
 
 Hue is a graphical user interface to operate and develop applications for
-Apache Hadoop. Hue applications are collected into a desktop-style environment
-and delivered as a Web application, requiring no additional installation for
-individual users.
+performing self-service data analytics. Hue applications are delivered as a Web application,
+requiring no additional installation for individual users.
 
-This guide describes how to install and configure a Hue tarball. For
-information about installing Hue packages, see
-http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH5/latest/CDH5-Installation-Guide/cdh5ig_cdh_hue_configure.html[Installing Hue].
+This guide describes how to install and configure a Hue tarball or packages.
 
 There is also a companion SDK guide that describes how to develop
 new Hue applications:
 link:sdk/sdk.html[Hue SDK Documentation]
-
-.Conventions Used in this Guide:
-* Commands that must be run with +root+ permission have a +#+ command prompt.
-* Commands that do not require +root+ permission have a +$+ command prompt.
 
 
 Hue Installation Instructions
@@ -51,29 +44,6 @@ certain development libraries be installed on your system. To install from the
 tarball, you must have the following installed:
 
 .Required Dependencies
-[grid="rows"]
-```~
-Redhat,Ubuntu 10.04,Ubuntu 12.04/14.04
-~~~~~~~~~~
-gcc,gcc,gcc
-g++,g++,g++
-libxml2-devel,libxml2-dev,libxml2-dev
-libxslt-devel,libxslt-dev,libxslt-dev
-cyrus-sasl-devel,libsasl2-dev,libsasl2-dev
-cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit,libsasl2-modules-gssapi-mit
-mysql-devel,libmysqlclient-dev,libmysqlclient-dev
-python-devel,python-dev,python-dev
-python-setuptools,python-setuptools,python-setuptools
-sqlite-devel,libsqlite3-dev,libsqlite3-dev
-ant,ant,ant
-libsasl2-dev,cyrus-sasl-devel,libsasl2-dev
-libsasl2-modules-gssapi-mit,cyrus-sasl-gssapi,libsasl2-modules-gssapi-mit
-libkrb5-dev,krb5-devel,libkrb5-dev
-libtidy-0.99-0,libtidy,libtidy-0.99-0 (For unit tests only)
-mvn,mvn (From maven2 package or tarball),mvn (From maven2/maven3 package or tarball)
-openldap-dev / libldap2-dev,openldap-devel,libldap2-dev
-~~~~~~~~~~
-
 The full list is here: https://github.com/cloudera/hue#development-prerequisites
 
 Build
@@ -81,13 +51,10 @@ Build
 
 Configure `$PREFIX` with the path where you want to install Hue by running:
 
-  $ PREFIX=/usr/share make install
-  $ cd /usr/share/hue
+  PREFIX=/usr/share make install
+  cd /usr/share/hue
 
 You can install Hue anywhere on your system, and run Hue as a non-root user.
-The Shell application needs root privileges to launch various sub-processes as
-the logged in users. `$USER` should be the group of the user running Hue (same as
-its username).
 
 It is a good practice to create a new user for Hue and either install Hue in
 that user's home directory, or in a directory within `/usr/share`.
@@ -103,9 +70,9 @@ A: Due to the use of absolute paths by some Python packages, you must run a
 series of commands if you move your Hue installation. In the new location, run:
 
 ----
-$ rm app.reg
-$ rm -r build
-$ make apps
+rm app.reg
+rm -r build
+make apps
 ----
 
 .Q: Why does "make install" compile other pieces of software?
@@ -125,22 +92,14 @@ are already setup (that way Hue can talk to them).
 
 .Dependency
 [grid="rows"]
-`-----------------------------------------------.------------------------
-  Component      Applications                       Notes
--------------------------------------------------------------------------
-  HDFS        Core, Filebrowser                  HDFS access through WebHdfs or HttpFS
-  MR1         JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
-  MR2/YARN    JobBrowser, JobDesigner, Beeswax   Job information access through hue-plugins
-  Oozie       JobDesigner, Oozie                 Oozie access through REST API
-  Hive        Beeswax                            Requires HiveServer2
-  HBase       HBase Browser                      Requires Thrift 1 service
-  Pig         Pig Editor                         Requires Oozie
-  Sqoop2      Sqoop Editor                       Requires Sqoop2 server
-  Search      Search                             Requires Solr server
-  Impala      Impala Editor                      Requires an Impalad
-  ZooKeeper   ZooKeeper Browser                  Requires ZooKeeper server and REST server
-  Spark       Spark Editor                       Requires Spark Jobserver
---------------------------------------------------------------------------------------
+`-----------------------------------------------------------------------
+  Component      Applications                       
+------------------------------------------------------------------------
+  Editor      SQL (Hive, Impala, any database...), Pig, Spark...
+  Browsers    YARN, Oozie, Impala, HBase, Livy
+  Scheduler   Oozie
+  Dashboard   Solr, SQL (Impala, Hive...)
+------------------------------------------------------------------------
 
 
 Hadoop Configuration
@@ -185,48 +144,6 @@ Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
     </property>
 
 
-Configure MapReduce 0.23+ (MR2)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Hue is using only standard Hadoop APIs.
-
-
-Configure MapReduce 0.20 (MR1)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Hue communicates with the JobTracker via the Hue plugins, which is a jar
-file that you place in your MapReduce `lib` directory.
-
-If you JobTracker and Hue are located on the same host, copy it over.
-
-    $ cd /usr/share/hue
-    $ cp desktop/libs/hadoop/java-lib/hue-plugins-*.jar /usr/lib/hadoop-0.20-mapreduce/lib
-
-If you JobTracker runs on a different host, you need to `scp` the Hue plugins
-jar to the JobTracker host.
-
-Then add this to your `mapred-site.xml` and *restart* your JobTracker.
-Depending on your setup, your `mapred-site.xml` might be in `/etc/hadoop/conf`.
-
-    <property>
-      <name>jobtracker.thrift.address</name>
-      <value>0.0.0.0:9290</value>
-    </property>
-    <property>
-      <name>mapred.jobtracker.plugins</name>
-      <value>org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin</value>
-      <description>Comma-separated list of jobtracker plug-ins to be activated.</description>
-    </property>
-
-You can confirm that the plugins are running correctly by tailing the daemon
-logs:
-
-    $ tail --lines=500 /var/log/hadoop-0.20/hadoop*jobtracker*.log | grep ThriftPlugin
-    2009-09-28 16:30:44,337 INFO org.apache.hadoop.thriftfs.ThriftPluginServer: Starting Thrift server
-    2009-09-28 16:30:44,419 INFO org.apache.hadoop.thriftfs.ThriftPluginServer:
-    Thrift server listening on 0.0.0.0:9290
-
-
 Configure Oozie
 ^^^^^^^^^^^^^^^
 
@@ -244,55 +161,6 @@ your `oozie-site.xml` (even in a non-secure cluster), and restart Oozie:
     </property>
 
 
-
-Further Hadoop Configuration and Caveats
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-`HADOOP_CLASSPATH` Caveat
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If you are setting `$HADOOP_CLASSPATH` in your `hadoop-env.sh`, be sure
-to set it in such a way that user-specified options are preserved.  For example:
-
-Correct:
-
-    # HADOOP_CLASSPATH=<your_additions>:$HADOOP_CLASSPATH
-
-Incorrect:
-
-    # HADOOP_CLASSPATH=<your_additions>
-
-This enables certain components of Hue to add to
-Hadoop's classpath using the environment variable.
-
-`hadoop.tmp.dir`
-^^^^^^^^^^^^^^^^
-
-If your users are likely to be submitting jobs both using Hue and from the
-same machine via the command line interface, they will be doing so as the `hue`
-user if they're using Hue and via their own user account on the command line.
-This leads to some contention on the directory specified by `hadoop.tmp.dir`,
-which defaults to `/tmp/hadoop-${user.name}`. Specifically, `hadoop.tmp.dir`
-is used to unpack jars in `bin/hadoop jar`. One work around to this is
-to set `hadoop.tmp.dir` to `/tmp/hadoop-${user.name}-${hue.suffix}` in the
-core-site.xml file:
-
-    <property>
-      <name>hadoop.tmp.dir</name>
-      <value>/tmp/hadoop-${user.name}${hue.suffix}</value>
-    </property>
-
-Unfortunately, when the variable is unset, you'll end up
-with directories named `/tmp/hadoop-user_name-${hue.suffix}` in
-`/tmp`.  Despite that, Hue will still work.
-
-IMPORTANT: The Beeswax server writes into a local directory on the Hue machine
-that is specified by `hadoop.tmp.dir` to unpack its jars. That directory
-needs to be writable by the `hue` user, which is the default user who starts
-Beeswax Server, or else Beeswax server will not start. You may also make that
-directory world-writable.
-
-
 Configuring Your Firewall for Hue
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -305,7 +173,7 @@ to interact with the system.
 Hive Configuration
 ~~~~~~~~~~~~~~~~~~
 
-Hue's Beeswax application helps you use Hive to query your data.
+Hue's Hive SQL Editor application helps you use Hive to query your data.
 It depends on a Hive Server 2 running in the cluster. Please read
 this section to ensure a proper integration.
 
@@ -347,7 +215,7 @@ and provides help and information on the default values.
 ============================================================
 To view the current configuration from within Hue, open:
 
-    http://<hue>/dump_config
+    http://<hue>/hue/dump_config
 ============================================================
 
 [TIP]
@@ -403,23 +271,15 @@ link:sdk/sdk.html[Hue SDK Documentation].
 Configuring Hue for SSL
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-You can configure Hue to serve over HTTPS.  To do so, you must install
-"pyOpenSSL" within Hue's context and configure your keys.
+You can configure Hue to serve over HTTPS.
 
-To install `pyOpenSSL`, from the root of your Hue installation path,
-do the following steps:
-
-1. Run this command:
-
-    $ ./build/env/bin/easy_install pyOpenSSL
-
-2. Configure Hue to use your private key by adding the following
+1. Configure Hue to use your private key by adding the following
 options to the `hue.ini` configuration file:
 
     ssl_certificate=/path/to/certificate
     ssl_private_key=/path/to/key
 
-3. Ideally, you would have an appropriate key signed by a Certificate Authority.
+2. Ideally, you would have an appropriate key signed by a Certificate Authority.
 If you're just testing, you can create a self-signed key using the `openssl`
 command that may be installed on your system:
 
@@ -447,7 +307,7 @@ the `hue.ini` configuration file.
 HDFS Cluster
 ^^^^^^^^^^^^
 
-Hue only support one HDFS cluster currently. That cluster should be defined
+Hue supports one HDFS cluster. That cluster should be defined
 under the `[[[default]]]` sub-section.
 
 fs_defaultfs::
@@ -458,55 +318,40 @@ webhdfs_url::
   You can also set this to be the HttpFS url. The default value is the HTTP
   port on the NameNode.
 
-hadoop_hdfs_home::
-  This is the home of your Hadoop HDFS installation. It is the
-  root of the Hadoop untarred directory, or usually
-  `/usr/lib/hadoop`.
-
-hadoop_bin::
-  Use this as the HDFS Hadoop launcher script, which is usually
-  `/usr/bin/hadoop`.
-
 hadoop_conf_dir::
   This is the configuration directory of the HDFS, typically
   `/etc/hadoop/conf`.
 
 
-MapReduce (MR1) Cluster
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Hue only support one MapReduce cluster currently. That cluster should be defined
-under the `[[[default]]]` sub-section. Note that JobBrowser only works with MR1.
-
-jobtracker_host::
-  The host running the JobTracker. In a secured environment, this needs to
-  be the FQDN of the JobTracker host, and match the "host" portion of the
-  `mapred' Kerberos principal full name.
-
-jobtracker_port::
-  The port for the JobTracker IPC service.
-
-submit_to::
-  If your Oozie is configured with to talk to a 0.20 MapReduce service, then
-  set this to `true`. Hue will be submitting jobs to this MapReduce cluster.
-
-
 Yarn (MR2) Cluster
 ^^^^^^^^^^^^^^^^^^
 
-Hue only support one Yarn cluster currently. That cluster should be defined
-under the `[[[default]]]` sub-section.
+Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
+under the `[[[default]]]` and `[[[ha]]]` sub-sections.
 
 resourcemanager_host::
   The host running the ResourceManager.
 
 resourcemanager_port::
-  The port for the ResourceManager IPC service.
+  The port for the ResourceManager REST service.
+
+logical_name::
+  NameNode logical name.
 
 submit_to::
-  If your Oozie is configured with to talk to a Yarn cluster, then
-  set this to `true`. Hue will be submitting jobs to this Yarn cluster.
-  But note that JobBrowser will not be able to show MR2 jobs.
+   To enable the section, set to True.
+
+
+Impala Configuration
+~~~~~~~~~~~~~~~~~~~~
+
+In the `[impala]` section of the configuration file, you can
+_optionally_ specify the following:
+
+server_host::
+  The hostname or IP that the Impala Server should bind to. By
+  default it binds to `localhost`, and therefore only serves local
+  IPC clients.
 
 
 Hive Configuration
@@ -520,16 +365,13 @@ beeswax_server_host::
   default it binds to `localhost`, and therefore only serves local
   IPC clients.
 
-hive_home_dir::
-  The base directory of your Hive installation.
-
 hive_conf_dir::
   The directory containing your `hive-site.xml` Hive
   configuration file.
 
 
-JobDesigner and Oozie Configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Oozie Configuration
+~~~~~~~~~~~~~~~~~~~
 
 In the `[liboozie]` section of the configuration file, you should
 specify:
@@ -537,6 +379,26 @@ specify:
 oozie_url::
   The URL of the Oozie service. It is the same as the `OOZIE_URL`
   environment variable for Oozie.
+
+
+Solr Configuration
+~~~~~~~~~~~~~~~~~~
+
+In the `[search]` section of the configuration file, you should
+specify:
+
+solr_url::
+  The URL of the Solr service.
+
+
+HBase Configuration
+~~~~~~~~~~~~~~~~~~~
+
+In the `[hbase]` section of the configuration file, you should
+specify:
+
+hbase_clusters::
+  Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
 
 
 UserAdmin Configuration
@@ -558,7 +420,7 @@ Configuration Validation
 Hue can detect certain invalid configuration.
 
 To view the configuration of a running Hue instance, navigate to
-`http://myserver:8888/dump_config`, also accessible through the About
+`http://myserver:8888/hue/dump_config`, also accessible through the About
 application.
 
 
@@ -568,7 +430,7 @@ Starting Hue from the Tarball
 After your cluster is running with the plugins enabled, you can start Hue on
 your Hue Server by running:
 
-    # build/env/bin/supervisor
+    build/env/bin/supervisor
 
 This will start several subprocesses, corresponding to the different Hue
 components. Your Hue installation is now running.
@@ -584,9 +446,6 @@ section for more details about managing and operating a Hue installation.
 Hue Processes
 ~~~~~~~~~~~~~
 
-Process User
-^^^^^^^^^^^^
-Filebrowser requires Hue to be running as the 'hue' user.
 
 Process Hierarchy
 ^^^^^^^^^^^^^^^^^
@@ -637,7 +496,7 @@ Viewing Recent Log Messages Online
 
 In addition to logging `INFO` level messages to the `logs` directory, the Hue
 web server keeps a small buffer of log messages at all levels in memory. You can
-view these logs by visiting `http://myserver:8888/logs`. The `DEBUG` level
+view these logs by visiting `http://myserver:8888/hue/logs`. The `DEBUG` level
 messages shown can sometimes be helpful in troubleshooting issues.
 
 
@@ -752,9 +611,11 @@ The Help application guides users through the various installed applications.
 Supported Browsers
 ~~~~~~~~~~~~~~~~~~
 
-* Windows: Chrome, Firefox 3.6+, Internet Explorer 9+, Safari 5+
-* Linux : Chrome, Firefox 3.6+
-* Mac: Chrome, Firefox 3.6+, Safari 5+
+The two latest LTS versions of each browsers.
+* IE/Edge
+* Safari
+* Chrome
+* Firefox
 
 Feedback
 ~~~~~~~~
