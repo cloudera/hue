@@ -28,6 +28,35 @@
 
   var location = ('undefined' !== typeof window) && (window.history.location || window.location);
 
+  // Hue specific
+  var winLoc = function (href) {
+    if (href) {
+      if (!paramBased) {
+        location.href = href;
+      }
+      // TODO: When is this called?
+      // console.log('setting: ' + href);
+    } else if (!paramBased) {
+      return location;
+    } else {
+      var hueMatch = location.search.match(/app=\/?([^&#]+)/);
+      var pathname = location.pathname + (hueMatch ? hueMatch[1] : '');
+      var search = hueMatch ? location.search.replace(hueMatch[0], '') : location.search + '';
+      search = search.replace('?&', '?');
+
+      var adaptedLocation = {
+        hash: location.hash + '',
+        search: search === '?' ? '' : search,
+        pathname: pathname,
+        protocol: location.protocol + '',
+        port: location.port + '',
+        hostname: location.hostname + ''
+      };
+
+      return adaptedLocation;
+    }
+  }
+
   /**
    * Perform initial dispatch.
    */
@@ -58,6 +87,12 @@
    */
 
   var hashbang = false;
+
+  /**
+   * paramBased option
+   */
+
+  var paramBased = true; // Hue specific
 
   /**
    * Previous context, for capturing
@@ -166,7 +201,8 @@
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
+    var loc = winLoc();
+    var url = (hashbang && ~loc.hash.indexOf('#!')) ? loc.hash.substr(2) + loc.search : loc.pathname + loc.search + loc.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -328,15 +364,15 @@
     var current;
 
     if (hashbang) {
-      current = base + location.hash.replace('#!', '');
+      current = base + winLoc().hash.replace('#!', '');
     } else {
-      current = location.pathname + location.search;
+      current = winLoc().pathname + winLoc().search;
     }
 
     if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.handled = false;
-    location.href = ctx.canonicalPath;
+    winLoc(ctx.canonicalPath);
   }
 
   /**
@@ -410,6 +446,30 @@
 
   page.Context = Context;
 
+
+  // Hue specific
+  Context.prototype.adaptPath = function (path) {
+    if (!paramBased || ~path.indexOf('app=')) {
+      return path;
+    }
+
+    var adaptedPath = location.pathname + '?app=' + path.replace(base, '').replace('//', '/').replace('?', '&');
+    if (!~path.indexOf('#') && location.hash) {
+      adaptedPath += location.hash;
+    }
+    return adaptedPath;
+  };
+
+  // Hue specific
+  Context.prototype.adaptedState = function () {
+    if (paramBased && this.state && this.state.path) {
+      return {
+        path: this.adaptPath(this.state.path)
+      }
+    }
+    return this.state;
+  };
+
   /**
    * Push state.
    *
@@ -418,7 +478,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    history.pushState(this.adaptedState(), this.title, this.adaptPath(hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath));
   };
 
   /**
@@ -428,7 +488,7 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
+    history.replaceState(this.adaptedState(), this.title, this.adaptPath(hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath));
   };
 
   /**
@@ -532,7 +592,7 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else {
-        page.show(location.pathname + location.hash, undefined, undefined, false);
+        page.show(winLoc().pathname + winLoc().hash, undefined, undefined, false);
       }
     };
   })();
@@ -564,7 +624,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
+    if (!hashbang && el.pathname === winLoc().pathname && (el.hash || '#' === link)) return;
 
 
 
@@ -616,8 +676,9 @@
    */
 
   function sameOrigin(href) {
-    var origin = location.protocol + '//' + location.hostname;
-    if (location.port) origin += ':' + location.port;
+    var loc = winLoc();
+    var origin = loc.protocol + '//' + loc.hostname;
+    if (loc.port) origin += ':' + loc.port;
     return (href && (0 === href.indexOf(origin)));
   }
 
