@@ -157,6 +157,8 @@
 
   window.HUE_VERSION = '${ hue_version() }';
 
+  window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
+
   %if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
     window.IS_NEW_INDEXER_ENABLED = true;
   %else:
