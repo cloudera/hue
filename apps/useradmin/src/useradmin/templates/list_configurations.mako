@@ -126,7 +126,9 @@ ${layout.menubar(section='configurations')}
   <!-- ko template: { if: !loading() && !hasErrors() && selectedApp(), name: 'edit-app' } --><!-- /ko -->
 </div>
 
+%if not is_embeddable:
 ${ configKoComponents.config() }
+%endif
 
 <script type="text/javascript">
   (function () {
