@@ -365,6 +365,69 @@ def delete_document(request):
 
 @api_error_handler
 @require_POST
+def copy_document(request):
+  uuid = json.loads(request.POST.get('uuid'), '""')
+
+  if not uuid:
+    raise PopupException(_('copy_document requires uuid'))
+
+  document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
+
+  if document.type == 'directory':
+    raise PopupException(_('Directory copy is not supported'))
+
+
+  name = document.name + '-copy'
+
+  # Make the copy of the new Document
+  copy_document = document.copy(name=name, owner=request.user)
+
+  # Import workspace for all oozie jobs
+  if document.type == 'oozie-workflow2' or document.type == 'oozie-bundle2' or document.type == 'oozie-coordinator2':
+    from oozie.models2 import Workflow, Coordinator, Bundle, _import_workspace
+    # Update the name field in the json 'data' field
+    if document.type == 'oozie-workflow2':
+      workflow = Workflow(document=document)
+      workflow.update_name(name)
+      workflow.update_uuid(copy_document.uuid)
+      _import_workspace(request.fs, request.user, workflow)
+      copy_document.update_data({'workflow': workflow.get_data()['workflow']})
+      copy_document.save()
+
+    if document.type == 'oozie-bundle2' or document.type == 'oozie-coordinator2':
+      if document.type == 'oozie-bundle2':
+        bundle_or_coordinator = Bundle(document=document)
+      else:
+        bundle_or_coordinator = Coordinator(document=document)
+      json_data = bundle_or_coordinator.get_data_for_json()
+      json_data['name'] = name
+      json_data['uuid'] = copy_document.uuid
+      copy_document.update_data(json_data)
+      copy_document.save()
+      _import_workspace(request.fs, request.user, bundle_or_coordinator)
+  elif document.type == 'search-dashboard':
+    copy_data = copy_document.data_dict
+    copy_data['collection']['name'] = name
+    copy_data['collection']['uuid'] = copy_document.uuid
+    copy_document.update_data(copy_data)
+    copy_document.save()
+  # Keep the document and data in sync
+  else:
+    copy_data = copy_document.data_dict
+    if 'name' in copy_data:
+      copy_data['name'] = name
+    if 'uuid' in copy_data:
+      copy_data['uuid'] = copy_document.uuid
+    copy_document.update_data(copy_data)
+    copy_document.save()
+
+  return JsonResponse({
+    'status': 0,
+    'document': copy_document.to_dict()
+  })
+
+@api_error_handler
+@require_POST
 def restore_document(request):
   """
   Accepts a uuid
