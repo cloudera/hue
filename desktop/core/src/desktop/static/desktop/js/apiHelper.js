@@ -1115,6 +1115,21 @@ var ApiHelper = (function () {
    *
    * @param {string} options.uuid
    */
+  ApiHelper.prototype.copyDocument = function (options) {
+    var self = this;
+    self.simplePost(DOCUMENTS_API + 'copy', {
+      uuid: ko.mapping.toJSON(options.uuid)
+    }, options);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.uuid
+   */
   ApiHelper.prototype.restoreDocument = function (options) {
     var self = this;
     self.simplePost(DOCUMENTS_API + 'restore', {
