@@ -408,8 +408,8 @@ from desktop.views import _ko
                     <i class="fa fa-fw fa-ellipsis-v"></i>
                   </a>
                   <ul class="dropdown-menu">
-                    <li data-bind="css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || !canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }">
-                      <a href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }"><i class="fa fa-fw fa-edit"></i> ${_('Rename folder')}</a>
+                    <li data-bind="css: { 'disabled': directorySelected() || selectedEntries().length < 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }">
+                      <a href="javascript:void(0);" data-bind="click: function () {  copy() }"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
                     </li>
                     <!-- ko if: isTrash() -->
                     <li data-bind="css: { 'disabled': selectedEntries().length === 0 }">
@@ -418,6 +418,9 @@ from desktop.views import _ko
                     <!-- /ko -->
                     <li data-bind="css: { 'disabled': selectedEntries().length === 0 || (sharedWithMeSelected() && !superuser) }">
                       <a href="javascript:void(0);" data-bind="click: function() { getSelectedDocsWithDependents(); showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> <span data-bind="text:  isTrash() || isTrashed() ? '${ _ko('Delete forever') }' : '${ _ko('Move to trash') }'"></span></a>
+                    </li>
+                    <li data-bind="css: { 'disabled': isTrash() || isTrashed() || selectedEntry() === null || !canModify() || (selectedEntry() != null && (!selectedEntry().isDirectory() || !selectedEntry().canModify())) }">
+                      <a href="javascript:void(0);" data-bind="click: function () { showRenameDirectoryModal() }"><i class="fa fa-fw fa-edit"></i> ${_('Rename folder')}</a>
                     </li>
                     <li>
                       <a title="${_('Export all or selected documents')}" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i> ${_('Export')}</a>

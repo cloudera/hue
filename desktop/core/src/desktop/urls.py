@@ -143,8 +143,10 @@ dynamic_patterns += patterns('desktop.api2',
   (r'^desktop/api2/doc/mkdir/?$', 'create_directory'),
   (r'^desktop/api2/doc/update/?$', 'update_document'),
   (r'^desktop/api2/doc/delete/?$', 'delete_document'),
+  (r'^desktop/api2/doc/copy/?$', 'copy_document'),
   (r'^desktop/api2/doc/restore/?$', 'restore_document'),
   (r'^desktop/api2/doc/share/?$', 'share_document'),
+
 
   (r'^desktop/api2/get_config/?$', 'get_config'),
   (r'^desktop/api2/user_preferences/(?P<key>\w+)?$', 'user_preferences'),

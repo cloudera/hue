@@ -477,6 +477,11 @@ class Workflow(Job):
     _data['workflow']['name'] = name
     self.data = json.dumps(_data)
 
+  def update_uuid(self, uuid):
+    _data = self.get_data()
+    _data['workflow']['uuid'] = uuid
+    self.data = json.dumps(_data)
+
   def set_workspace(self, user):
     _data = json.loads(self.data)
 
