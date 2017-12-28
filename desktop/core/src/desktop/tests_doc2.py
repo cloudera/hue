@@ -28,6 +28,7 @@ from django.db.utils import OperationalError
 
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.fs import ProxyFS
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document2
 from notebook.models import import_saved_beeswax_query
@@ -35,7 +36,12 @@ from notebook.models import import_saved_beeswax_query
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
 from useradmin.models import get_default_user_group
+from oozie.models2 import Workflow
 
+
+class MockFs():
+  def __init__(self):
+    pass
 
 class TestDocument2(object):
 
@@ -167,6 +173,54 @@ class TestDocument2(object):
     # Verify that last_modified is intact
     doc = Document2.objects.get(id = doc.id)
     assert_equal(orig_last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+
+  def test_file_copy(self):
+
+    workflow_doc = Document2.objects.create(name='Copy Test', type='oozie-workflow2', owner=self.user, data={},
+                                            parent_directory=self.home_dir)
+
+    workflow = Workflow(user=self.user)
+    workflow.update_name('Copy Test')
+    workflow.set_workspace(self.user)
+
+    # Monkey patch check_workspace for both new wor
+    if not hasattr(Workflow, 'real_check_workspace'):
+      Workflow.real_check_workspace = Workflow.check_workspace
+
+    try:
+      Workflow.check_workspace = lambda a, b, c: None
+      workflow.check_workspace(MockFs(), self.user)
+      workflow_doc.update_data({'workflow': workflow.get_data()['workflow']})
+      workflow_doc.save()
+
+      def copy_remote_dir(self, src, dst, *args, **kwargs):
+        pass
+
+      # Monkey patch as we don't want to do real copy
+      if not hasattr(ProxyFS, 'real_copy_remote_dir'):
+        ProxyFS.real_copy_remote_dir = ProxyFS.copy_remote_dir
+
+      ProxyFS.copy_remote_dir = copy_remote_dir
+      response = self.client.post('/desktop/api2/doc/copy', {
+        'uuid': json.dumps(workflow_doc.uuid)
+      })
+    finally:
+      Workflow.check_workspace = Workflow.real_check_workspace
+      ProxyFS.copy_remote_dir = ProxyFS.real_copy_remote_dir
+
+    copy_doc_json = json.loads(response.content)
+    copy_doc = Document2.objects.get(type='oozie-workflow2', uuid=copy_doc_json['document']['uuid'])
+    copy_workflow = Workflow(document=copy_doc)
+
+    # Check if document2 and data are in sync
+    assert_equal(copy_doc.name, copy_workflow.get_data()['workflow']['name'])
+    assert_equal(copy_doc.uuid, copy_workflow.get_data()['workflow']['uuid'])
+
+    assert_equal(copy_workflow.name, workflow.name + "-copy")
+    assert_not_equal(copy_workflow.deployment_dir, workflow.deployment_dir)
+    assert_not_equal(copy_doc.uuid, workflow_doc.uuid)
+    assert_not_equal(copy_workflow.get_data()['workflow']['uuid'], workflow.get_data()['workflow']['uuid'])
+
 
 
   def test_directory_move(self):

@@ -267,6 +267,12 @@ var HueFileEntry = (function () {
       }).length > 0;
     });
 
+    self.directorySelected = ko.pureComputed(function () {
+      return self.selectedEntries().filter(function (entry) {
+        return entry.isDirectory();
+      }).length > 0;
+    });
+
     self.selectedEntry = ko.pureComputed(function () {
       if (self.selectedEntries().length === 1) {
         return self.selectedEntries()[0];
@@ -372,6 +378,31 @@ var HueFileEntry = (function () {
       self.selectedEntry().loadDocument();
       $('#shareDocumentModal').modal('show');
     }
+  };
+
+  HueFileEntry.prototype.copy = function () {
+    var self = this;
+    if (self.selectedEntries().indexOf(self) !== -1) {
+      self.activeEntry(self.parent);
+    }
+    var copyNext = function () {
+      if (self.selectedEntries().length > 0) {
+        var nextUuid = self.selectedEntries().shift().definition().uuid;
+        self.apiHelper.copyDocument({
+          uuid: nextUuid,
+          successCallback: function () {
+            copyNext();
+          },
+          errorCallback: function () {
+            self.activeEntry().load();
+          }
+        });
+      } else {
+        huePubSub.publish('assist.document.refresh');
+        self.activeEntry().load();
+      }
+    };
+    copyNext();
   };
 
   HueFileEntry.prototype.loadDocument = function () {
