@@ -1,6 +1,11 @@
 image:images/hue_logo.png[Hue Logo]
 ===================================
 
+Hue is a graphical user interface to operate and develop applications for
+performing self-service data analytics. Hue applications are delivered as a Web application,
+requiring no additional installation for individual users.
+
+
 Administrate
 ------------
 The link:admin-manual/manual.html[manual] has instructions to install and administrate Hue.
