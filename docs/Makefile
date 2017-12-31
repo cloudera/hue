@@ -31,14 +31,13 @@ NO_TOC := --xsltproc-opts='--stringparam generate.toc ""'
 # Being lazy/loose with the prerequisite. Include all files except sdk and
 # release notes, which are handled separately below.
 #
-DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -name user-guide -o -print)
-$(BLD_DIR_DOC): sdk release-notes user-guide $(DOC_FILES)
+DOC_FILES := $(shell find . -name sdk -prune -o -name release-notes -name user-guide -name admin-manual -o -print)
+$(BLD_DIR_DOC): sdk release-notes user-guide admin-manual $(DOC_FILES)
 	@echo '--- Generating doc at $@'
 	@mkdir -p $@
 
 	@a2x $(NO_TOC) --icons --icons-dir=images --format=xhtml --stylesheet=docbook.css -D $@ index.txt
-	@a2x --asciidoc-opts="-a toc.max.depth=4" --format=xhtml --icons --icons-dir=images --stylesheet=docbook.css -D $@ manual.txt
-	@rm -f {index,manual}.xml
+	@rm -f index.xml
 
 	@cp docbook.css $@
 	@# Remove intermediate file
@@ -58,6 +57,19 @@ $(BLD_DIR_DOC)/release-notes: $(wildcard release-notes/*.txt)
 	done;
 	@rm release-notes/docbook.css
 	@mv release-notes/*.html $@/
+	@echo "--- Generated $@"
+
+
+.PHONY: admin-manual
+admin-manual: $(BLD_DIR_DOC)/admin-manual
+$(BLD_DIR_DOC)/admin-manual: $(wildcard admin-manual/*.md)
+	@echo '--- Generating admin-manual doc at $@'
+	@mkdir -p $@
+	@cp docbook.css $@
+	@cp bootplus.css $@
+	@PYTHONPATH=$(DESKTOP_DIR)/core/ext-py/markdown:$(DESKTOP_DIR)/core/ext-py/elementtree \
+	  $(DESKTOP_DIR)/core/ext-py/markdown/bin/markdown \
+	  admin-manual/manual.md -x toc > $@/manual.html
 	@echo "--- Generated $@"
 
 
