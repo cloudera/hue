@@ -1,5 +1,17 @@
-Hue Installation Guide
-======================
+<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+
+
+<h1><a href=index.html>Doc</a> > Hue Installation Guide</h1>
+
+
+<div class="row-fluid">
+  <div class="span3">
+
+[TOC]
+
+   </div>
+   <div class="span9">
 
 Introduction
 ------------
@@ -629,3 +641,6 @@ from your server. (See the <<logging,Hue Logging>> section. Please include the
 logs as a zip (or cut and paste the ones that look relevant) and send those with
 your bug reports.
 image:images/logs.png[]
+
+   </div>
+</div>

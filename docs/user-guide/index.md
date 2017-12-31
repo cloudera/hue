@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 
-<h1>Hue User Guide</h1>
+<h1><a href=../index.html>Doc</a> > Hue User Guide</h1>
 
 
 <div class="row-fluid">
