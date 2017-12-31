@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 
-<h1><a href=../index.html>Doc</a> > Hue Installation Guide</h1>
+<h1><a href=../index.html>Doc</a> > Hue Administration Guide</h1>
 
 
 <div class="row-fluid">
@@ -610,7 +610,23 @@ To configure Hue to store data in MySQL:
 Your system is now configured and you can start the Hue server as normal.
 
 
-[[usage]]
+# Reference Architecture
+3 Hues and 1 Load Balancer
+Databases: MySQL InnoDB, PostgreSQL, Oracle
+LDAP
+Monitoring
+Impala HA
+HiveServer2 HA
+Downloads
+
+## Authentication
+
+### Username / Password
+### LDAP
+### SAML
+### OpenId Connect
+
+
 Using Hue
 ---------
 
