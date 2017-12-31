@@ -1,9 +1,9 @@
 image:images/hue_logo.png[Hue Logo]
 ===================================
 
-Installation
+Administrate
 ------------
-The link:manual.html[manual] has instructions to install Hue.
+The link:manual.html[manual] has instructions to install and administrate Hue.
 
 User Guide
 ----------
@@ -11,8 +11,7 @@ The link:user-guide/index.html[user guide] has instructions about how to use Hue
 
 SDK
 ---
-We encourage you to build an application within the Hue environment. See the
-link:sdk/sdk.html[SDK Documentation] to get started.
+We encourage you to link:sdk/sdk.html[build or extend applications] within the Hue environment.
 
 Release Notes
 -------------
