@@ -29,6 +29,104 @@ Each app of Hue can be extended to support your own languages or apps.
 The SDK will be clarified in the upcoming charting revamp.
 
 ## Importer
+
+### Importing Data
+
+If you want to import your own data instead of installing the sample
+tables, follow the procedure in [Creating Tables](#createTables).
+
+<a id="selectDatabase"></a>
+Selecting a Database
+--------------------
+
+1.  In the pane on the left, select the database from the DATABASE
+    drop-down list.
+
+<a id="createDatabase"></a>
+Creating a Database
+-------------------
+
+1.  Click ![image](images/databases.png).
+2.  Click **Create a new database**.
+    1.  Specify a database name and optional description. Database names
+        are not case-sensitive. Click **Next**.
+    2.  Do one of the following:
+        -   Keep the default location in the Hive warehouse folder.
+        -   Specify an external location within HDFS:
+            1.  Uncheck the **Location** checkbox.
+            2.  In the External location field, type a path to a folder
+                on HDFS or click ![image](images/browse.png) to browse
+                to a folder and click **Select this folder**.
+
+    3.  Click the **Create Database** button.
+    
+<a id="selectDatabase"></a>
+Dropping Databases
+------------------
+
+1.  Click ![image](images/databases.png).
+2.  In the list of databases, check the checkbox next to one or more
+    databases.
+3.  Click the ![image](images/trash.png) Drop button.
+4.  Confirm whether you want to delete the databases.
+
+<a id="createTables"></a>
+Creating Tables
+---------------
+
+Although you can create tables by executing the appropriate Hive HQL DDL
+query commands, it is easier to create a table using the Metastore
+Manager table creation wizard.
+
+There are two ways to create a table: from a file or manually. If you
+create a table from a file, the format of the data in the file will
+determine some of the properties of the table, such as the record and
+file formats. The data from the file you specify is imported
+automatically upon table creation. When you create a file manually, you
+specify all the properties of the table, and then execute the resulting
+query to actually create the table. You then import data into the table
+as an additional step.
+
+**From a File**
+
+1.  In the ACTIONS pane in the Metastore Manager window, click **Create
+    a new table from a file**. The table creation wizard starts.
+2.  Follow the instructions in the wizard to create the table. The basic
+    steps are:
+    -   Choose your input file. The input file you specify must exist.
+        Note that you can choose to have Beeswax create the table
+        definition only based on the import file you select, without
+        actually importing data from that file.
+    -   Specify the column delimiter.
+    -   Define your columns, providing a name and selecting the type.
+
+3.  Click **Create Table** to create the table. The new table's metadata
+    displays on the right side of the **Table Metadata** window. At this
+    point, you can view the metadata or a sample of the data in the
+    table. From the ACTIONS pane you can import new data into the table,
+    browse the table, drop it, or go to the File Browser to see the
+    location of the data.
+
+**Manually**
+
+1.  In the ACTIONS pane in the Metastore Manager window, click **Create
+    a new table manually**. The table creation wizard starts.
+2.  Follow the instructions in the wizard to create the table. The basic
+    steps are:
+    -   Name the table.
+    -   Choose the record format.
+    -   Configure record serialization by specifying delimiters for
+        columns, collections, and map keys.
+    -   Choose the file format.
+    -   Specify the location for your table's data.
+    -   Specify the columns, providing a name and selecting the type for
+        each column.
+    -   Specify partition columns, providing a name and selecting the
+        type for each column.
+
+3.  Click **Create table**. The Table Metadata window displays.
+
+
 ### Tables
 ### Indexes
 ### DBMS
@@ -46,29 +144,30 @@ It focuses on SQL but also supports job submissions. It comes with an intelligen
 ### Hive
 ### Impala
 
-The Beeswax application enables you to perform queries on Apache Hive, a
+The Hive Editor enables you to perform queries on Apache Hive, a
 data warehousing system designed to work with Hadoop. For information
-about Hive, see [Hive
-Documentation](http://archive.cloudera.com/cdh4/cdh/4/hive/). You can
+about Hive. You can
 create Hive databases, tables and partitions, load data, create, run,
 and manage queries, and download the results in a Microsoft Office Excel
 worksheet file or a comma-separated values file.
 
 
-Beeswax is installed and configured as part of Hue. For information
+Hive Editor is installed and configured as part of Hue. For information
 about installing and configuring Hue, see the Hue Installation
 manual.
 
-Beeswax assumes an existing Hive installation. The Hue installation
-instructions include the configuration necessary for Beeswax to access
+Hive Editor assumes an existing Hive installation. The Hue installation
+instructions include the configuration necessary for hive to access
 Hive. You can view the current Hive configuration from the **Settings**
-tab in the Beeswax application.
+tab in the Hive Editor.
 
-By default, a Beeswax user can see the saved queries for all users -
-both his/her own queries and those of other Beeswax users. To restrict
+By default, a Hive Editor user can see the saved queries for all users -
+both his/her own queries and those of other Hive Editor users. To restrict
 viewing saved queries to the query owner and Hue administrators, set the
 share\_saved\_queries property under the [beeswax] section in the Hue
 configuration file to false.
+
+![image](images/note.jpg) **Note**: The Hive Editor used to be known as Beeswax.
 
 ### Running Queries
 
@@ -80,20 +179,19 @@ server.
     statements.
 2.  Click **Execute**. The Query Results window appears with the results
     of your query.
-    -   To view a log of the query execution, click **Log** at the top
-        of the results display. You can use the information in this tab
+    -   To view a log of the query execution, toggle the **Log** caret on the
+        left of the progress bar. You can use the information in this tab
         to debug your query.
-    -   To view the query that generated these results, click **Query**
-        at the top of the results display.
-    -   To view the columns of the query, click **Columns**.
-    -   To return to the query in the Query Editor, click **Unsaved
-        Query**.
+    -   To view the columns of the query, expand the **Columns** icon. Clicking
+        on the column label will scroll to the column.
+    -   To expand a row, double click on it or click on the row number.
+    -   To lock a row, click on the lock icon in the row number column.
 
 3.  If there are multiple statements in the query, click Next in the
     Multi-statement query pane to execute the remaining statements.
 
-![image](images/note.jpg) **Note**: Under **MR JOBS**, you can view any
-MapReduce jobs that the query generated.
+![image](images/note.jpg) **Note**: Under the logs panel, you can view any
+MapReduce or Impala jobs that the query generated.
 
 ### Downloading and Saving Query Results
 
@@ -189,93 +287,10 @@ default.</td></tr>
 
 ### Jobs
 
-The Job Designer application enables you to create and submit jobs to
-the Hadoop cluster. You can include variables with your jobs to enable
+The Editor application enables you to create and submit jobs to
+the cluster. You can include variables with your jobs to enable
 you and other users to enter values for the variables when they run your
-job. The Job Designer supports the actions supported by
-[Oozie](http://archive.cloudera.com/cdh4/cdh/4/oozie/):
-[MapReduce](/content/cloudera-content/cloudera-docs/HadoopTutorial/CDH4/index.html),
-Streaming, Java, Pig, Hive, Sqoop, Shell, Ssh, DistCp, Fs, and Email.
-
-Job Designer Installation and Configuration
--------------------------------------------
-
-Job Designer is one of the applications installed as part of Hue. For
-information about installing and configuring Hue, see the Hue Installation
-manual..
-
-In order to run DistCp, Streaming, Pig, Sqoop, and Hive jobs, Oozie must
-be configured to use the Oozie ShareLib. See the Oozie Installation manual.
-
-Starting Job Designer
----------------------
-
-Click the **Job Designer** icon (![image](images/icon_jobsub_24.png)) in
-the navigation bar at the top of the Hue web page. The **Job Designs**
-page opens in the browser.
-
-Installing the Example Job Designs
-----------------------------------
-
-![image](images/note.jpg) **Note**: You must be a superuser to perform
-this task.
-
-1.  Click ![image](images/quick_start.png). The Quick Start Wizard
-    opens.
-2.  Click **Step 2: Examples**.
-3.  Click **Job Designer**.
-
-Job Designs
------------
-
-A job design specifies several meta-level properties of a job, including
-the job design name, description, the executable scripts or classes, and
-any parameters for those scripts or classes.
-
-### Filtering Job Designs
-
-You can filter the job designs that appear in the list by owner, name,
-type, and description.
-
-**To filter the Job Designs list:**
-
-1.  In the **Job Designs** window, click **Designs**.
-2.  Enter text in the Filter text box at the top of the **Job Designs**
-    window. When you type in the Filter field, the designs are
-    dynamically filtered to display only those rows containing text that
-    matches the specified substring.
-
-### Creating a Job Design
-
-1.  In the **Job Designs** window, click New Action \> Action, where
-    Action is MapReduce, Streaming, Java, Pig, Hive, Sqoop, Shell, Ssh,
-    DistCp, Fs, or Email.
-2.  In the **Job Design (Action type)** window, specify the common and
-    job type specific information.
-3.  Click **Save** to save the job settings.
-
-### Deleting and Restoring Job Designs
-
-You can move job designs to the trash and later restore or permanently
-delete them.
-
-#### Deleting Job Designs
-
-1.  In a Manager screen, check the checkbox next to one or more job
-    designs.
-2.  Choose one of the following:
-    -   Delete \> Move to trash
-    -   Delete \> Delete forever
-
-#### Restoring Job Designs
-
-1.  In a Manager screen, click ![image](images/trash.png) **Trash**.
-2.  Check the checkbox next to one or more job designs.
-3.  Click Restore.
-
-### Job Design Settings
-
-#### Job Design Common Settings
+job.
 
 Most job design types support all the settings listed in the following
 table. For job type specific settings, see:
@@ -435,87 +450,47 @@ A Email job design consists of an email message.
 <tr><td>Body</td><td>The body of the email message.</td></tr>
 </table>
 
+### Spark
 
-### Submitting a Job Design
+#### Batch
 
-![image](images/note.jpg) **Note**:
+This is a quick way to submit any Jar or Python jar/script to a cluster via the Scheduler or Editor.
 
-A job's input files must be uploaded to the cluster before you can
-submit the job.
+#### Interactive
 
-**To submit a job design:**
+Hue relies on Livy (http://livy.io/) for the interactive Scala, Python and R snippets.
 
-1.  In the **Job Designs** window, click **Designs** in the upper left
-    corner. Your jobs and other users' jobs are displayed in the **Job
-    Designs** window.
-2.  Check the checkbox next to the job you want to submit.
-3.  Click the **Submit** button.
-    1.  If the job contains variables, enter the information requested
-        in the dialog box that appears. For example, the sample grep
-        MapReduce design displays a dialog where you specify the output
-        directory.
-    2.  Click **Submit** to submit the job.
+Livy got initially developed in the Hue project but got a lot of traction and was moved to its own project on livy.io. Here is a tutorial on how to use a notebook to perform some Bike Data analysis.
 
-After the job is complete, the Job Designer displays the results of the
-job. For information about displaying job results, see [Displaying the
-Results of Submitting a Job](#submitJob).
+Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is up and running:
 
-### Copying, Editing, and Deleting a Job Design
-
-If you want to edit and use a job but you don't own it, you can make a
-copy of it and then edit and use the copied job.
-
-
-**Copy**
-
-1.  In the **Job Designs** window, click **Designs**. The jobs are
-    displayed in the **Job Designs** window.
-2.  Check the checkbox next to the job you want to copy.
-3.  Click the **Copy** button.
-4.  In the **Job Design Editor** window, change the settings and then
-    click **Save** to save the job settings.
-
-**Edit**
-
-1.  In the **Job Designs** window, click **Designs**. The jobs are
-    displayed in the **Job Designs** window.
-2.  Check the checkbox next to the job you want to edit.
-3.  Click the **Edit** button.
-4.  In the **Job Design** window, change the settings and then click
-    **Save** to save the job settings.
-
-Delete
-
-1.  In the **Job Designs** window, click **Designs**. The jobs are
-    displayed in the **Job Designs** window.
-2.  Check the checkbox next to the job you want to delete.
-3.  Click the **Delete** button.
-4.  Click **OK** to confirm the deletion.
-
-<a id="submitJob"></a>
-Displaying Results of Submitting a Job
---------------------------------------
-
-**To display the Job Submission History:**
-
-In the **Job Designs** window, click the **History** tab. The jobs are
-displayed in the **Job Submissions History** listed by Oozie job ID.
-
-**To display Job Details:**
-
-In the **Job Submission History** window, click an Oozie Job ID. The
-results of the job display:
-
--   Actions - a list of actions in the job.
--   Click ![image](images/gear.png) to display the action configuration.
-    In the action configuration for a MapReduce action, click the value
-    of the mapred.output.dir property to display the job output.
--   In the root-node row, click the Id in the External Id column to view
-    the job in the Job Browser.
--   Details - the job details. Click ![image](images/gear.png) to
-    display the Oozie application configuration.
--   Definition - the Oozie application definition.
--   Log - the output log.
+<pre>
+[spark]
+  # Host address of the Livy Server.
+  livy_server_host=localhost
+ 
+[notebook]
+ 
+ ## Show the notebook menu or not
+ show_notebooks=true
+ 
+[[interpreters]]
+    # Define the name and how to connect and execute the language.
+ 
+    [[[hive]]]
+      # The name of the snippet.
+      name=Hive
+      # The backend connection to use to communicate with the server.
+      interface=hiveserver2
+       
+   [[[spark]]]
+     name=Scala
+     interface=livy
+ 
+    [[[pyspark]]]
+      name=PySpark
+      interface=livy
+</pre>
 
 ## SDK
 
@@ -553,121 +528,7 @@ Metastore Manager Installation and Configuration
 ------------------------------------------------
 
 Metastore Manager is one of the applications installed as part of Hue.
-For information about installing and configuring Hue, see the Hue Installation
-manual.
 
-Starting Metastore Manager
---------------------------
-
-Click the **Metastore Manager** icon
-(![image](images/icon_table_browser_24.png)) in the navigation bar at
-the top of the Hue browser page.
-
-### Installing Sample Tables
-
-![image](images/note.jpg) **Note**: You must be a superuser to perform
-this task.
-
-1.  Click ![image](images/quick_start.png). The Quick Start Wizard
-    opens.
-2.  Click **Step 2: Examples**.
-3.  Click **Beeswax (Hive UI)** or **Cloudera Impala Query UI**.
-
-### Importing Data
-
-If you want to import your own data instead of installing the sample
-tables, follow the procedure in [Creating Tables](#createTables).
-
-<a id="selectDatabase"></a>
-Selecting a Database
---------------------
-
-1.  In the pane on the left, select the database from the DATABASE
-    drop-down list.
-
-<a id="createDatabase"></a>
-Creating a Database
--------------------
-
-1.  Click ![image](images/databases.png).
-2.  Click **Create a new database**.
-    1.  Specify a database name and optional description. Database names
-        are not case-sensitive. Click **Next**.
-    2.  Do one of the following:
-        -   Keep the default location in the Hive warehouse folder.
-        -   Specify an external location within HDFS:
-            1.  Uncheck the **Location** checkbox.
-            2.  In the External location field, type a path to a folder
-                on HDFS or click ![image](images/browse.png) to browse
-                to a folder and click **Select this folder**.
-
-    3.  Click the **Create Database** button.
-    
-<a id="selectDatabase"></a>
-Dropping Databases
-------------------
-
-1.  Click ![image](images/databases.png).
-2.  In the list of databases, check the checkbox next to one or more
-    databases.
-3.  Click the ![image](images/trash.png) Drop button.
-4.  Confirm whether you want to delete the databases.
-
-<a id="createTables"></a>
-Creating Tables
----------------
-
-Although you can create tables by executing the appropriate Hive HQL DDL
-query commands, it is easier to create a table using the Metastore
-Manager table creation wizard.
-
-There are two ways to create a table: from a file or manually. If you
-create a table from a file, the format of the data in the file will
-determine some of the properties of the table, such as the record and
-file formats. The data from the file you specify is imported
-automatically upon table creation. When you create a file manually, you
-specify all the properties of the table, and then execute the resulting
-query to actually create the table. You then import data into the table
-as an additional step.
-
-**From a File**
-
-1.  In the ACTIONS pane in the Metastore Manager window, click **Create
-    a new table from a file**. The table creation wizard starts.
-2.  Follow the instructions in the wizard to create the table. The basic
-    steps are:
-    -   Choose your input file. The input file you specify must exist.
-        Note that you can choose to have Beeswax create the table
-        definition only based on the import file you select, without
-        actually importing data from that file.
-    -   Specify the column delimiter.
-    -   Define your columns, providing a name and selecting the type.
-
-3.  Click **Create Table** to create the table. The new table's metadata
-    displays on the right side of the **Table Metadata** window. At this
-    point, you can view the metadata or a sample of the data in the
-    table. From the ACTIONS pane you can import new data into the table,
-    browse the table, drop it, or go to the File Browser to see the
-    location of the data.
-
-**Manually**
-
-1.  In the ACTIONS pane in the Metastore Manager window, click **Create
-    a new table manually**. The table creation wizard starts.
-2.  Follow the instructions in the wizard to create the table. The basic
-    steps are:
-    -   Name the table.
-    -   Choose the record format.
-    -   Configure record serialization by specifying delimiters for
-        columns, collections, and map keys.
-    -   Choose the file format.
-    -   Specify the location for your table's data.
-    -   Specify the columns, providing a name and selecting the type for
-        each column.
-    -   Specify partition columns, providing a name and selecting the
-        type for each column.
-
-3.  Click **Create table**. The Table Metadata window displays.
 
 <a id="browseTables"></a>
 Browsing Tables
@@ -1129,16 +990,6 @@ following screens:
 -   [Bundle Manager](#bundleManager) - shows available bundles and
     allows you to create bundles.
 
-Installing Oozie Editor/Dashboard Examples
-------------------------------------------
-
-![image](images/note.jpg) **Note**: You must be a superuser to perform
-this task.
-
-1.  Click ![image](images/quick_start.png). The Quick Start Wizard
-    opens.
-2.  Click **Step 2: Examples**.
-3.  Click **Oozie Editor/Dashboard**.
 
 Filtering Lists in Oozie Editor/Dashboard
 -----------------------------------------
@@ -1162,28 +1013,6 @@ and bundles are summarized in the following table:
 <tr><td>Submit</td><td>Y.</td><td>Only if "Is shared" is set</td></tr>
 <tr><td>Modify</td><td>Y.</td><td>N</td></tr>
 </table>
-
-
-Deleting and Restoring Workflows, Coordinators, and Bundles
------------------------------------------------------------
-
-You can move workflows, coordinators, and bundles to the trash and later
-restore or permanently delete them.
-
-### Deleting Workflows, Coordinators, and Bundles
-
-1.  In a Manager screen, check the checkbox next to one or more
-    workflows, coordinators or bundles.
-2.  Choose one of the following:
-    -   Delete \> Move to trash
-    -   Delete \> Delete forever
-
-### Restoring Workflows, Coordinators, and Bundles
-
-1.  In a Manager screen, click ![image](images/trash.png) **Trash**.
-2.  Check the checkbox next to one or more workflows, coordinators or
-    bundles.
-3.  Click Restore.
 
 
 <a id="dashboard"></a>
@@ -1265,130 +1094,6 @@ For the selected job, the following information is available.
     appears in the coordinator.xml file (also linked under the
     oozie.coord.application.path property in the **Configuration** tab).
 
-### Bundles
-
-Click the **Bundles** tab to view the running and completed bundle jobs
-for the filters you have specified.
-
-### Oozie
-
-The Oozie tab provides subtabs that give you access to Oozie
-instrumentation and configuration settings.
-
-#### Instrumentation
-
-For information on the instrumentation metrics supported by Oozie, see
-[Oozie
-Monitoring](http://oozie.apache.org/docs/3.3.0/AG_Monitoring.html).
-
-#### Configuration
-
-For information on the configuration properties supported by Oozie, see
-[Oozie
-Configuration](http://oozie.apache.org/docs/3.3.0/AG_Install.html#Oozie_Configuration).
-
-<a id="workflowManager"></a>
-Workflow Manager
-----------------
-
-In Workflow Manager you create Oozie workflows and submit them for
-execution.
-
-Click the **Workflows** tab to open the Workflow Manager.
-
-Each row shows a workflow: its name, description, timestamp of its last
-modification. It also shows:
-
--   **Steps** - the number of steps in the workflow execution path. This
-    is the number of execution steps between the start and end of the
-    workflow. This will not necessarily be the same as the number of
-    actions in the workflow, if there are control flow nodes in the
-    control path.
--   **Status** - who can run the workflow. **shared** means users other
-    than the owner can access the workflow. **personal** means only the
-    owner can modify or submit the workflow. The default is personal.
--   **Owner** - the user that created the workflow.
-
-In Workflow Editor you edit workflows that include MapReduce, Streaming,
-Java, Pig, Hive, Sqoop, Shell, Ssh, DistCp, Fs, Email, Sub-workflow, and
-Generic actions. You can configure these actions in the Workflow Editor,
-or you can import job designs from Job Designer to be used as actions in
-your workflow. For information about defining workflows, see the
-[Workflow
-Specification](http://archive.cloudera.com/cdh4/cdh/4/oozie/WorkflowFunctionalSpec.html).
-
-### Opening a Workflow
-
-To open a workflow, in Workflow Manager, click the workflow. Proceed
-with [Editing a Workflow](#editingWorkflow).
-
-### Creating a Workflow
-
-1.  Click the **Create** button at the top right.
-2.  In the Name field, type a name.
-3.  Check the Is shared checkbox to allow all users to access the
-    workflow.
-4.  Click **advanced** to specify the deployment directory or a job.xml
-    file.
-5.  Click **Save**. The Workflow Editor opens. Proceed with [Editing a
-    Workflow](#editingWorkflow).
-
-### Importing a Workflow
-
-1.  Click the **Import** button at the top right.
-2.  In the Name field, type a name.
-3.  In the **Local workflow.xml file** field, click **Choose File** and
-    select a workflow file.
-4.  Click **advanced** to specify whether the workflow is shared, the
-    deployment directory, or a job.xml file.
-5.  Click **Save**. The Workflow Editor opens. Proceed with [Editing a
-    Workflow](#editingWorkflow).
-
-### Submitting a Workflow
-
-To submit a workflow for execution, do one of the following:
-
--   In the Workflow Manager, click the radio button next to the
-    workflow, and click the **Submit** button.
--   In the Workflow Editor, click the **Submit** button.
-
-The workflow job is submitted and the Dashboard displays the workflow
-job.
-
-To view the output of the job, click ![image](images/log.png) **View the
-logs**.
-
-#### Suspending a Running Job
-
-In the pane on the left, click the **Suspend** button.
-
-1.  Verify that you want to suspend the job.
-
-#### Resuming a Suspended Job
-
-In the pane on the left, click the **Resume** button.
-
-1.  Verify that you want to resume the job.
-
-#### Rerunning a Workflow
-
-In the pane on the left, click the **Rerun** button.
-
-1.  Check the checkboxes next to the actions to rerun.
-2.  Specify required variables.
-3.  Click **Submit**.
-
-### Scheduling a Workflow
-
-To schedule a workflow for recurring execution, do one of the following:
-
--   In the Workflow Manager, check the checkbox next to the workflow and
-    click the **Schedule** button.
--   In the Workflow Editor, click the **Schedule** button.
-
-A coordinator is created and opened in the Coordinator Editor. Proceed
-with [Editing a Coordinator](#editingCoordinator).
-
 <a id="editingWorkflow"></a>
 ### Editing a Workflow
 
@@ -1456,12 +1161,6 @@ put JAR files in a lib directory in the workspace.
     a job.xml file.
 4.  Click **Save**.
 
-### Displaying the History of a Workflow
-
-1.  Click the **Dashboard** tab.
-2.  Click the **Workflows** tab.
-3.  Click a workflow.
-4.  Click the **Actions** tab.
 
 <a id="coordinatorManager"></a>
 Coordinator Manager
@@ -1488,23 +1187,6 @@ In Coordinator Editor, you edit coordinators and the datasets required
 by the coordinators. For information about defining coordinators and
 datasets, see the [Coordinator
 Specification](http://archive.cloudera.com/cdh4/cdh/4/oozie/CoordinatorFunctionalSpec.html).
-
-### Opening a Coordinator
-
-To open a coordinator, in Coordinator Manager, click the coordinator.
-Proceed with [Editing a Coordinator](#editingCoordinator).
-
-### Creating a Coordinator
-
-To create a coordinator, in Coordinator Manager:
-
-1.  Click the **Create** button at the top right. The Coordinator wizard
-    opens. Proceed with [Editing a Coordinator](#editingCoordinator).
-
-### Submitting a Coordinator
-
-To submit a coordinator for execution, check the checkbox next to the
-coordinator and click the **Submit** button.
 
 <a id="editingCoordinator"></a>
 ### Editing a Coordinator
@@ -1643,268 +1325,6 @@ instructions walk you through the wizard.
 5.  Fill in parameters to pass to Oozie.
 6.  Click **Save bundle**.
 
-Displaying the History of a Bundle
-----------------------------------
-
-1.  Click the **Dashboard** tab.
-2.  Click the **Bundles** tab.
-3.  Click a bundle.
-4.  Click the **Actions** tab.
-
-
-
-# Administration
-
-Quick Start Wizard
-------------------
-
-The Quick Start wizard allows you to perform the following Hue setup
-operations by clicking the tab of each step or sequentially by clicking
-Next in each screen:
-
-1.  **Check Configuration** validates your Hue configuration. It will
-    note any potential misconfiguration and provide hints as to how to
-    fix them. You can edit the configuration file described in the next
-    section or use Cloudera Manager, if installed, to manage your
-    changes.
-2.  **Examples** contains links to install examples into the Hive,
-    Impala, MapReduce, Spark, Oozie, Solr Dashboard and Pig Editor applications.
-3.  **Users** contains a link to the User Admin application to create or
-    import users and a checkbox to enable and disable collection of
-    usage information.
-4.  **Go!** - displays the Hue home screen, which contains links to the
-    different categories of applications supported by Hue: Query,
-    Hadoop, and Workflow.
-
-Configuration
--------------
-
-Displays a list of the installed Hue applications and their
-configuration. The location of the folder containing the Hue
-configuration files is shown at the top of the page. Hue configuration
-settings are in the hue.ini configuration file.
-
-Click the tabs under **Configuration Sections and Variables** to see the
-settings configured for each application. For information on configuring
-these settings, see Hue Configuration in the Hue installation manual.
-
-Server Logs
------------
-
-Displays the Hue Server log and allows you to download the log to your
-local system in a zip file.
-
-
-## User management
-
-The User Admin application lets a superuser add, delete, and manage Hue
-users and groups, and configure group permissions. Superusers can add
-users and groups individually, or import them from an LDAP directory.
-Group permissions define the Hue applications visible to group members
-when they log into Hue and the application features available to them.
-
-Starting User Admin
--------------------
-
-Click the **User Admin** icon (![image](images/icon_useradmin_24.png))
-in the navigation bar at the top of the Hue browser page. The Hue Users
-page opens.
-
-Users
------
-
-The User Admin application provides two levels of user privileges:
-superusers and users.
-
--   Superusers — The first user who logs into Hue after its initial
-    installation becomes the first superuser. Superusers have
-    permissions to perform administrative functions:
-    -   Add and delete users
-    -   Add and delete groups
-    -   Assign permissions to groups
-    -   Change a user into a superuser
-    -   Import users and groups from an LDAP server
-
--   Users — can change their name, e-mail address, and password and log
-    in to Hue and run Hue applications, subject to the permissions
-    provided by the Hue groups to which they belong.
-
-### Adding a User
-
-1.  In the **User Admin** page, click **Add User**.
-2.  In the **Credentials** screen, add required information about the
-    user. Once you provide the required information you can click the
-    wizard step tabs to set other information.
-    
- <table>
-<tr><td>Username</td><td>  A user name that contains only letters, numbers, and underscores;
-    blank spaces are not allowed and the name cannot begin with a
-    number. The user name is used to log into Hue and in file
-    permissions and job submissions. This is a required field.
-</td></tr>
-<tr><td>Password and Password confirmation</td><td>    A password for the user. This is a required field.</td></tr>
-<tr><td>Create home directory</td><td>   Indicate whether to create a directory named /user/username in HDFS.
-    For non-superusers, the user and group of the directory are
-    username. For superusers, the user and group are username and
-    supergroup.</td></tr></table>
-
- 
-
-3.  Click **Add User** to save the information you specified and close
-    the **Add User** wizard or click **Next**.
-4.  In the **Names and Groups** screen, add optional information.
-
-<table>
-<tr><td>First name and Last name</td><td> The user's first and last name.
-</td></tr>
-<tr><td>E-mail address</td><td>The user's e-mail address. The e-mail address is used by the Job
-    Designer and Beeswax applications to send users an e-mail message
-    after certain actions have occurred. The Job Designer sends an
-    e-mail message after a job has completed. Beeswax sends a message
-    after a query has completed. If an e-mail address is not specified,
-    the application will not attempt to email the user.</td></tr>
-<tr><td>Groups</td><td> The groups to which the user belongs. By default, a user is assigned
-    to the **default** group, which allows access to all applications.
-    See [Permissions](#permissions).</td></tr></table>
-    
-
-5.  Click **Add User** to save the information you specified and close
-    the **Add User** wizard or click **Next**.
-6.  In the **Advanced** screen, add status information.
-
-<table>
-<tr><td>Active</td><td> Indicate that the user is enabled and allowed to log in. Default: checked.</td></tr>
-<tr><td>Superuser status</td><td> Assign superuser privileges to the user.</td></tr></table>
-
-7.  Click **Add User** to save the information you specified and close
-    the **Add User** wizard.
-
-### Deleting a User
-
-1.  Check the checkbox next to the user name and click **Delete**.
-2.  Click **Yes** to confirm.
-
-### Editing a User
-
-1.  Click the user you want to edit in the **Hue Users** list.
-2.  Make the changes to the user and then click **Update user**.
-
-### Importing Users from an LDAP Directory
-
-Hue must be configured to use an external LDAP directory (OpenLDAP or
-Active Directory). See Hue Installation in [CDH4
-Installation](http://www.cloudera.com/content/cloudera-content/cloudera-docs/CDH4/latest/CDH4-Installation-Guide/CDH4-Installation-Guide.html).
-
-![image](images/note.jpg) **Note**:
-
-Importing users from an LDAP directory does not import any password
-information. You must add passwords manually in order for a user to log
-in.
-
-To add a user from an external LDAP directory:
-
-1.  Click **Add/sync LDAP user**.
-2.  Specify the user properties:
-
-<table>
-<tr><td>Username</td><td>The user name.</td></tr>
-<tr><td>Distinguished name</td><td>Indicate that Hue should use a full distinguished name for the user.
-    This imports the user's first and last name, username, and email,
-    but does not store the user password.</td></tr>
-    <tr><td>Create home directory</td><td> Indicate that Hue should create a home directory for the user in
-    HDFS.</td></tr></table>
-
-
-3.  Click **Add/sync user**.
-
-    If the user already exists in the User Admin, the user information
-    in User Admin is synced with what is currently in the LDAP
-    directory.
-
-### Syncing Users and Groups with an LDAP Directory
-
-You can sync the Hue user database with the current state of the LDAP
-directory using the **Sync LDAP users/groups** function. This updates
-the user and group information for the already imported users and
-groups. It does not import any new users or groups.
-
-1.  Click **Sync LDAP users/groups**.
-2.  The **Create Home Directories** checkbox creates home directories in
-    HDFS for existing imported members that don't have home directories.
-3.  In the **Sync LDAP users and groups** dialog, click **Sync** to
-    perform the sync.
-
-Groups
-------
-
-Superusers can add and delete groups, configure group permissions, and
-assign users to group memberships.
-
-### Adding a Group
-
-You can add groups, and delete the groups you've added. You can also
-import groups from an LDAP directory.
-
-1.  In the **User Admin** window, click **Groups** and then click **Add
-    Group**.
-2.  Specify the group properties:
-
-<table>
-<tr><td>Name</td><td> The name of the group. Group names can only be letters, numbers, and
-    underscores; blank spaces are not allowed.</td></tr>
-<tr><td>Members</td><td>The users in the group. Check user names or check Select all.</td></tr>
-    <tr><td>Permissions</td><td>The applications the users in the group can access. Check
-    application names or check Select all.</td></tr></table>
-
-3.  Click **Add group**.
-
-### Adding Users to a Group
-
-1.  In the **User Admin** window, click **Groups**.
-2.  Click the group.
-3.  To add users to the group, check the names in the list provided or
-    check **Select All**.
-4.  Click **Update group**.
-
-### Deleting a Group
-
-1.  Click **Groups**.
-2.  Check the checkbox next to the group and click **Delete**.
-3.  Click **Yes** to confirm.
-
-### Importing Groups from an LDAP Directory
-
-1.  From the **Groups** tab, click **Add/sync LDAP group**.
-2.  Specify the group properties:
-
-<table>
-<tr><td>Name</td><td> The name of the group.</td></tr>
-<tr><td>Distinguished name</td><td> Indicate that Hue should use a full distinguished name for the
-    group.</td></tr>
-    <tr><td>Import new members</td><td>  Indicate that Hue should import the members of the group.</td></tr>
-        <tr><td>Import new members from all subgroups</td><td>
-    Indicate that Hue should import the members of the subgroups.</td></tr>
-            <tr><td>Create home directories</td><td> Indicate that Hue should create home directories in HDFS for the
-    imported members.</td></tr></table>
-
-3.  Click **Add/sync group**.
-
-<a id="permissions"></a>
-Permissions
------------
-
-Permissions for Hue applications are granted to groups, with users
-gaining permissions based on their group membership. Group permissions
-define the Hue applications visible to group members when they log into
-Hue and the application features available to them.
-
-1.  Click **Permissions**.
-2.  Click the application for which you want to assign permissions.
-3.  Check the checkboxes next to the groups you want to have permission
-    for the application. Check **Select all** to select all groups.
-4.  Click **Update permission**. The new groups will appear in the
-    Groups column in the **Hue Permissions** list.
-
 
 # Contrib
 Those modules are not active enough to be officially maintained in the core Hue but can still
@@ -1926,8 +1346,7 @@ Prerequisites before using the app:
 to point to your Thrift IP/Port
 
 
-SmartView
----------
+## SmartView
 
 The smartview is the view that you land on when you first enter a table.
 On the left hand side are the row keys and hovering over a row reveals a
@@ -2060,9 +1479,6 @@ menu when using the app. These include column prefix, bare columns,
 column range, etc. Remember that if you ever need help with the
 searchbar, you can use the help menu that pops up while typing, which
 will suggest next steps to complete your query.
-
-
-
 
 
 ## Sqoop 2 Editor
