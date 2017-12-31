@@ -41,7 +41,6 @@ $(BLD_DIR_DOC): sdk release-notes user-guide $(DOC_FILES)
 	@rm -f {index,manual}.xml
 
 	@cp docbook.css $@
-	@cp *.repo $@
 	@# Remove intermediate file
 	@rsync -a images $@/
 
@@ -84,6 +83,7 @@ $(BLD_DIR_DOC)/sdk/sdk.html: $(shell find sdk -type f)
 	@mkdir -p $(@D)
 	@cp sdk/*.png $(@D)
 	@cp docbook.css $(@D)
+	@cp bootplus.css $(@D)
 	@# This is somewhat heinous, but works fine and avoids the need
 	@# to install markdown on developer systems, or depend on building
 	@# out the virtual env to build sdk docs
