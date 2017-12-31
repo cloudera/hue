@@ -15,12 +15,71 @@
    <div class="span9">
 
 # Editor / Notebook
+
+The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
+
+It is available in Editor or Notebook mode and will be integrated with the Dashboard soon. The Editor focuses on Apache Hive and Apache Impala but is also compatible with:
+
+    Any SQL databases: MySQL, SparkSQL, Oracle, Apache Phoenix, Apache Presto, Apache Drill, Apache Kylin, PostgreSQL, Redshift, BigQuery…
+    MapReduce
+    Spark
+    Pig
+    Solr SQL
+
 ## SQL
+
+The [http://gethue.com/custom-sql-query-editors/](customer SQL Editor page) also describes the configuration steps.
+
+First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
+
+<pre>
+[librdbms]
+  [[databases]]
+    [[[postgresql]]]
+    nice_name=PostgreSQL
+    name=music
+    engine=postgresql_psycopg2
+    port=5432
+    user=hue
+    password=hue
+    options={}
+</pre>
+
+Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
+
+<pre>
+[notebook]
+  [[interpreters]]
+    [[[postgresql]]]
+    name=PostgreSQL
+    interface=rdbms
+</pre>
+
+
+Other modes like MapReduce, Java, Shell, Sqoop are also available. Here is a list of the [https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors](existing connectors).
+Connectors are pluggable and can new engines can be supported. Feel free to comment on the [https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user](Hue list) of [https://github.com/cloudera/hue/issues](github) about it.
+
 ## Jobs
 
 # Dashboard
+
+Dashboards are generic and support Solr and any SQL: http://gethue.com/search-dashboards/
+
+    API https://github.com/cloudera/hue/blob/master/desktop/libs/dashboard/src/dashboard/dashboard_api.py
+
+Implementation
+
+    Solr https://github.com/cloudera/hue/blob/master/apps/search/src/search/dashboard_api.py
+    SQL https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/dashboard_api.py
+        Impala https://github.com/cloudera/hue/blob/master/apps/impala/src/impala/dashboard_api.py
+        Hive https://github.com/cloudera/hue/blob/master/apps/beeswax/src/beeswax/dashboard_api.py
+
+
 ## SQL
 ## Elastic Search
+
+One could develop a similar backend with Elastic Search
+
 
 # Browsers
 ## Jobs
