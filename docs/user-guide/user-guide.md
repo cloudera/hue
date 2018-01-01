@@ -19,15 +19,24 @@ Hue consists in 4 apps in a single page interface that allow the users to perfor
 analyzes without losing any context. The goal is to promote self service and stay simple like Excel
 so that 80% of the user can find, explore and query data and become more data driven.
 
-1. Find or import your data
+**1. Find or import your data**
 
 Use the left metadata assists to browse your existing data without losing your editor. The top search will look through your saved queries and matching tables, columns and databases. Objects can be tagged for a quick retrieval or assigning a more “humane” name. If the data does not exist yet, just drag & drop it to trigger the Create Table wizard and to import it in just two steps.
 
-2. Query your data
+**2. Query your data**
 
 When you found your data, the Editor’s autocomplete is extremely powerful as they support 90-100% of the language syntax and will highlight any syntax or logical error. The right assistant provides quick previews of the datasets, which columns or JOINs are popular and recommendations on how to type optimized queries. After the querying, refine your results before exporting to S3/HDFS/ADLS or downloaded as CSV/Excel.
 
+** 4 applications**
+
+* Editor: The goal of Hue’s Editor is to make data querying easy and productive. It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
+* Browsers: Hue’s Browsers let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
+* Dashboard: Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
+* Scheduler: The application lets you build workflows and then schedule them to run regularly automatically. A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.
+
+
 Each app of Hue can be extended to support your own languages or apps as detailed in the [SDK](../sdk/sdk.html).
+
 
 ## Interface
 
@@ -43,11 +52,6 @@ From top to bottom we have:
 * The main app area, where the fun is ;)
 * A right Assistant panel for the current application. It’s now enabled for the editors, and in case of Hive for instance, it offers you a live help, a quick browse for the used tables in your query, and much more: if your Hue instance is connected to a SQL Optimizer service like Cloudera Navigator Optimizer, it can offer suggestions on your queries!
 * Various applications have been grouped into 4 main conceptual areas:
-
-* Editor: The goal of Hue’s Editor is to make data querying easy and productive. It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
-* Browsers: Hue’s Browsers let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
-* Dashboard: Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
-* Scheduler: The application lets you build workflows and then schedule them to run regularly automatically. A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.
 
 Learn more on the [The Hue 4 user interface in detail](http://gethue.com/the-hue-4-user-interface-in-detail/).
 
@@ -86,6 +90,8 @@ Data where you need it when you need it
 You can now find your Hue documents, HDFS and S3 files and more in the left assist panel, right-clicking items will show a list of actions, you can also drag-and-drop a file to get the path in your editor and more.
 
 ### Right assist
+This assistant content depends on the context of the application selected and will display the current tables or available UDFs.
+
 ### Sample popup
 
 This popup offers a quick way to see sample of the data and other statistics on databases, tables, and columns. You can open the popup from the SQL Assist or with a right-click on any SQL object (table, column, function…). In this release, it also opens faster and caches the data.
@@ -101,6 +107,8 @@ These visualizations are convenient for plotting chronological data or when subs
 * Maps (Marker and Gradient)
 
 ## Importer
+
+The goal of the importer is to allow ad hoc queries on data not yet in the clusters.
 
 ### Importing Data
 
@@ -162,9 +170,19 @@ In the past, indexing data into Solr has been quite difficult. The task involved
 
 ### DBMS
 
+Read more about [ingesting data from traditional databases](http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/).
+
 ## Documents
+
+Similarly to Google Doc, queries, workflows... can be saved and shared with other.
+
 ### Sharing
+
+Sharing happens on the main page or via the top right menu of the application. Users and groups with Read or Write permissions can be selected.
+
 ### Import / Export
+
+Via the Home page, saved documents can be exported for backups or transferring to another Hue.
 
 # Editors / Notebook
 The goal of Hue’s Editor is to make data querying easy and productive.
@@ -199,7 +217,7 @@ Secondly, we need to add a new interpreter to the notebook app. This will allow 
     interface=rdbms
 </pre>
 
-## Concept
+## Concepts
 ### Running Queries
 
 ![image](images/note.jpg) **Note**: To run a query, you must be logged
@@ -220,7 +238,7 @@ server.
     -   Search either by clicking on the magnifier icon on the results tab, or pressing Ctrl/Cmd + F
     -   [See more how to refine your results](http://gethue.com/new-features-in-the-sql-results-grid-in-hive-and-impala/).
 
-3.  If there are multiple statements in the query, click Next in the
+3.  If there are multiple statements in the query (separated by semi-colons), click Next in the
     Multi-statement query pane to execute the remaining statements.
 
 When you have multiple statements it’s enough to put the cursor in the statement you want to execute, the active statement is indicated with a blue gutter marking.
@@ -254,7 +272,7 @@ MapReduce or [Impala jobs](#impala-queries) that the query generated.
 <a id="advancedQuerySettings"></a>
 ### Advanced Query Settings
 
-The pane to the left of the Query Editor lets you specify the following
+The pane to the top of the Editor lets you specify the following
 options:
 
 
@@ -331,7 +349,7 @@ If multiple tables appear in the FROM clause, including derived and joined table
 The new autocompleter suggests keywords based on where the cursor is positioned in the statement. Where possible it will even suggest more than one word at at time, like in the case of IF NOT EXISTS, no one likes to type too much right? In the parts where order matters but the keywords are optional, for instance after FROM tbl, it will list the keyword suggestions in the order they are expected with the first expected one on top. So after FROM tbl the WHERE keyword is listed above GROUP BY etc.
 
 
-**UDFs, what are the arguments for find_in_set?**
+**UDFs**
 
 The improved autocompleter will now suggest functions, for each function suggestion an additional panel is added in the autocomplete dropdown showing the documentation and the signature of the function. The autocompleter know about the expected types for the arguments and will only suggest the columns or functions that match the argument at the cursor position in the argument list.
 
@@ -354,6 +372,9 @@ Leanr more about it in [Autocompleter for Hive and Impala](http://gethue.com/bra
 Variables can have default values, e.g. ${n=10} instead of just ${n}.
 
 ### Syntax checker
+
+A little red underline will display the incorrect syntax so that the query can be fixed before submitting. A right click offers suggestions.
+
 ### Query Assist
 
 Read more about the [Query Assistant with Navigator Optimizer Integration
@@ -369,6 +390,8 @@ The autocompleter will suggest popular tables, columns, filters, joins, group by
 While editing, Hue will run your queries through Navigator Optimizer in the background to identify potential risks that could affect the performance of your query. If a risk is identified an exclamation mark is shown above the query editor and suggestions on how to improve it is displayed in the lower part of the right assistant panel.
 
 ### Presentation Mode
+
+Turns a list of semi-colon separated queries into an interactive presentation. It is great for doing demos or basic reporting.
 
 ## SQL
 
@@ -579,17 +602,24 @@ Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is
 </pre>
 
 ## SDK
+Read more about extending [connectors](../sdk/sdk.html#spark-livy).
 
 
 # Dashboards
-Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
+Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks. They support Solr and SQL.
+
+Read more about [Dashboards](http://gethue.com/search-dashboards/).
 
 ## Interactive
 
+Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
+
 ## Reports
 
+This is work in progress but dashboards will soon offer a classic reporting option.
+
 ## SDK
-Extend [connectors](../sdk/sdk.html#sql).
+Read more about extending [connectors](../sdk/sdk.html#sql).
 
 
 # Browsers
