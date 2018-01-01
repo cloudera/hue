@@ -1,6 +1,6 @@
 
-<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 <link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 
 <h1><a href=../index.html>Doc</a> > Hue Administration Guide</h1>
@@ -17,14 +17,12 @@
 
 This guide describes how to install and configure a Hue tarball or packages.
 
-# Installation Instructions
+# Installation
 
 The following instructions describe how to install the Hue tarball on a
 multi-node cluster. You need to also install Hadoop and its satellite components
 (Oozie, Hive...) and update some Hadoop configuration files before running Hue.
 
-
-## Install
 
 Hue consists of a web service that runs on a special node in your cluster.
 Choose one node where you want to run Hue. This guide refers to that node as
@@ -34,18 +32,18 @@ overly restrictive firewalls. For small clusters of less than 10 nodes,
 you can use your existing master node as the Hue Server.
 
 You can download the Hue tarball here:
-https://github.com/cloudera/hue/releases
+[https://github.com/cloudera/hue/releases](https://github.com/cloudera/hue/releases)
 
-### Hue Dependencies
+## Hue Dependencies
 
 Hue employs some Python modules which use native code and requires
 certain development libraries be installed on your system. To install from the
 tarball, you must have the following installed:
 
 Required Dependencies
-The full list is here: https://github.com/cloudera/hue#development-prerequisites
+The full list is here: [https://github.com/cloudera/hue#development-prerequisites](https://github.com/cloudera/hue#development-prerequisites)
 
-### Build
+## Build
 
 Configure `$PREFIX` with the path where you want to install Hue by running:
 
@@ -58,7 +56,7 @@ It is a good practice to create a new user for Hue and either install Hue in
 that user's home directory, or in a directory within `/usr/share`.
 
 
-### Troubleshooting the Hue Tarball Installation
+## Troubleshooting the Hue Tarball Installation
 
 .Q: I moved my Hue installation from one directory to another and now Hue no
 longer functions correctly.
@@ -80,7 +78,61 @@ of various Python libraries and you don't have to be concerned about missing
 software components.
 
 
+## Starting Hue from the Tarball
+
+After your cluster is running with the plugins enabled, you can start Hue on
+your Hue Server by running:
+
+    build/env/bin/supervisor
+
+This will start several subprocesses, corresponding to the different Hue
+components. Your Hue installation is now running.
+
+
+# Configuration
+
+
+## Reference Architecture
+3 Hues and 1 Load Balancer
+Databases: MySQL InnoDB, PostgreSQL, Oracle
+LDAP
+Monitoring
+Impala HA
+HiveServer2 HA
+Downloads
+
+
+## Quick Start Wizard
+
+The Quick Start wizard allows you to perform the following Hue setup
+operations by clicking the tab of each step or sequentially by clicking
+Next in each screen:
+
+1.  **Check Configuration** validates your Hue configuration. It will
+    note any potential misconfiguration and provide hints as to how to
+    fix them. You can edit the configuration file described in the next
+    section or use Cloudera Manager, if installed, to manage your
+    changes.
+2.  **Examples** contains links to install examples into the Hive,
+    Impala, MapReduce, Spark, Oozie, Solr Dashboard and Pig Editor applications.
+3.  **Users** contains a link to the User Admin application to create or
+    import users and a checkbox to enable and disable collection of
+    usage information.
+4.  **Go!** - displays the Hue home screen, which contains links to the
+    different categories of applications supported by Hue: Query,
+    Hadoop, and Workflow.
+
 ## Configuration
+
+Displays a list of the installed Hue applications and their
+configuration. The location of the folder containing the Hue
+configuration files is shown at the top of the page. Hue configuration
+settings are in the hue.ini configuration file.
+
+Click the tabs under **Configuration Sections and Variables** to see the
+settings configured for each application. For information on configuring
+these settings, see Hue Configuration in the Hue installation manual.
+
 
 Hue ships with a default configuration that will work for
 pseudo-distributed clusters.  If you are running on a real cluster, you must
@@ -170,10 +222,13 @@ options to the `hue.ini` configuration file:
 If you're just testing, you can create a self-signed key using the `openssl`
 command that may be installed on your system:
 
-    ### Create a key
-    $ openssl genrsa 1024 > host.key
-    ### Create a self-signed certificate
-    $ openssl req -new -x509 -nodes -sha1 -key host.key > host.cert
+Create a key:
+
+    openssl genrsa 1024 > host.key
+
+Create a self-signed certificate:
+
+    openssl req -new -x509 -nodes -sha1 -key host.key > host.cert
 
 
 <div class="note">
@@ -184,7 +239,7 @@ using a proper SSL Certificate.  Self-signed certificates don't
 work.
 </div>
 
-### UserAdmin Configuration
+### User Admin Configuration
 
 In the `[useradmin]` section of the configuration file, you can
 _optionally_ specify the following:
@@ -195,38 +250,226 @@ default_user_group::
   for doing user authentication, new users will automatically be
   members of the default group.
 
+
+### Banner
+You can add a custom banner to the Hue Web UI by applying HTML directly to the property, banner_top_html. For example:
+
+    banner_top_html=<H4>My company's custom Hue Web UI banner</H4>
+
+### Splash Screen
+You can customize a splash screen on the login page by applying HTML directly to the property, login_splash_html. For example:
+
+    [desktop]
+    [[custom]]
+    login_splash_html=WARNING: You are required to have authorization before you proceed.
+
+
+## Configuration for external services
+
+These configuration variables are under the `[hadoop]` section in
+the `hue.ini` configuration file.
+
+### Install Hadoop and other analytic backends
+
+Depending on which apps you need, you need to make sure that some Hadoop services
+are already setup (that way Hue can talk to them).  
+
+<pre>
+|-------------|--------------------------------------------------------|
+|  Component  | Applications                                           |
+|-------------|--------------------------------------------------------|
+|  Editor     | SQL (Hive, Impala, any database...), Pig, Spark...     |
+|  Browsers   | YARN, Oozie, Impala, HBase, Livy                       |
+|  Scheduler  | Oozie                                                  |
+|  Dashboard  | Solr, SQL (Impala, Hive...)                            |
+|-------------|--------------------------------------------------------|
+</pre>
+
+##### Hadoop Configuration
+
+You need to enable WebHdfs or run an HttpFS server. To turn on WebHDFS,
+add this to your `hdfs-site.xml` and *restart* your HDFS cluster.
+Depending on your setup, your `hdfs-site.xml` might be in `/etc/hadoop/conf`.
+
+    <property>
+      <name>dfs.webhdfs.enabled</name>
+      <value>true</value>
+    </property>
+
+You also need to add this to `core-site.xml`.
+
+    <property>
+      <name>hadoop.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
+
+If you place your Hue Server outside the Hadoop cluster, you can run
+an HttpFS server to provide Hue access to HDFS. The HttpFS service requires
+only one port to be opened to the cluster.
+
+Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
+
+    <property>
+      <name>httpfs.proxyuser.hue.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>httpfs.proxyuser.hue.groups</name>
+      <value>*</value>
+    </property>
+
+
+#### Configure Oozie
+
+Hue submits MapReduce jobs to Oozie as the logged in user. You need to
+configure Oozie to accept the `hue` user to be a proxyuser. Specify this in
+your `oozie-site.xml` (even in a non-secure cluster), and restart Oozie:
+
+    <property>
+        <name>oozie.service.ProxyUserService.proxyuser.hue.hosts</name>
+        <value>*</value>
+    </property>
+    <property>
+        <name>oozie.service.ProxyUserService.proxyuser.hue.groups</name>
+        <value>*</value>
+    </property>
+
+
+#### Hive Configuration
+
+Hue's Hive SQL Editor application helps you use Hive to query your data.
+It depends on a Hive Server 2 running in the cluster. Please read
+this section to ensure a proper integration.
+
+Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
+(or any path you specify as `hive.metastore.warehouse.dir` in your
+`hive-site.xml`).  Make sure this location exists and is writable by
+the users whom you expect to be creating tables.  `/tmp` (on the local file
+system) must be world-writable (1777), as Hive makes extensive use of it.
+
+<div class="note">
+  In `hue.ini`, modify `hive_conf_dir` to point to the
+  directory containing `hive-site.xml`.
+</div>
+
+
+### Configuring Your Firewall
+
+Hue currently requires that the machines within your cluster can connect to
+each other freely over TCP. The machines outside your cluster must be able to
+open TCP port 8888 on the Hue Server (or the configured Hue web HTTP port)
+to interact with the system.
+
+
+### HDFS Cluster
+
+Hue supports one HDFS cluster. That cluster should be defined
+under the `[[[default]]]` sub-section.
+
+fs_defaultfs::
+  This is the equivalence of `fs.defaultFS` (aka `fs.default.name`) in
+  Hadoop configuration.
+
+webhdfs_url::
+  You can also set this to be the HttpFS url. The default value is the HTTP
+  port on the NameNode.
+
+hadoop_conf_dir::
+  This is the configuration directory of the HDFS, typically
+  `/etc/hadoop/conf`.
+
+
+### Yarn (MR2) Cluster
+
+Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
+under the `[[[default]]]` and `[[[ha]]]` sub-sections.
+
+resourcemanager_host::
+  The host running the ResourceManager.
+
+resourcemanager_port::
+  The port for the ResourceManager REST service.
+
+logical_name::
+  NameNode logical name.
+
+submit_to::
+   To enable the section, set to True.
+
+
+### Impala Configuration
+
+In the `[impala]` section of the configuration file, you can
+_optionally_ specify the following:
+
+server_host::
+  The hostname or IP that the Impala Server should bind to. By
+  default it binds to `localhost`, and therefore only serves local
+  IPC clients.
+
+
+### Hive Configuration
+
+In the `[beeswax]` section of the configuration file, you can
+_optionally_ specify the following:
+
+beeswax_server_host::
+  The hostname or IP that the Hive Server should bind to. By
+  default it binds to `localhost`, and therefore only serves local
+  IPC clients.
+
+hive_conf_dir::
+  The directory containing your `hive-site.xml` Hive
+  configuration file.
+
+
+### Oozie Configuration
+
+In the `[liboozie]` section of the configuration file, you should
+specify:
+
+oozie_url::
+  The URL of the Oozie service. It is the same as the `OOZIE_URL`
+  environment variable for Oozie.
+
+
+### Solr Configuration
+
+In the `[search]` section of the configuration file, you should
+specify:
+
+solr_url::
+  The URL of the Solr service.
+
+
+### HBase Configuration
+
+In the `[hbase]` section of the configuration file, you should
+specify:
+
+hbase_clusters::
+  Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
+
+
+### Configuration Validation
+
+Hue can detect certain invalid configuration.
+
+To view the configuration of a running Hue instance, navigate to
+`http://myserver:8888/hue/dump_config`, also accessible through the About
+application.
+
+
 # Administration
 
-## Quick Start Wizard
+Now that you've installed and started Hue, you can feel free to skip ahead
+to the <<usage,Using Hue>> section. Administrators may want to refer to this
+section for more details about managing and operating a Hue installation.
 
-The Quick Start wizard allows you to perform the following Hue setup
-operations by clicking the tab of each step or sequentially by clicking
-Next in each screen:
-
-1.  **Check Configuration** validates your Hue configuration. It will
-    note any potential misconfiguration and provide hints as to how to
-    fix them. You can edit the configuration file described in the next
-    section or use Cloudera Manager, if installed, to manage your
-    changes.
-2.  **Examples** contains links to install examples into the Hive,
-    Impala, MapReduce, Spark, Oozie, Solr Dashboard and Pig Editor applications.
-3.  **Users** contains a link to the User Admin application to create or
-    import users and a checkbox to enable and disable collection of
-    usage information.
-4.  **Go!** - displays the Hue home screen, which contains links to the
-    different categories of applications supported by Hue: Query,
-    Hadoop, and Workflow.
-
-## Configuration
-
-Displays a list of the installed Hue applications and their
-configuration. The location of the folder containing the Hue
-configuration files is shown at the top of the page. Hue configuration
-settings are in the hue.ini configuration file.
-
-Click the tabs under **Configuration Sections and Variables** to see the
-settings configured for each application. For information on configuring
-these settings, see Hue Configuration in the Hue installation manual.
 
 ## Server Logs
 
@@ -439,226 +682,7 @@ Hue and the application features available to them.
     Groups column in the **Hue Permissions** list.
 
 
-## Configuration for external services
-
-These configuration variables are under the `[hadoop]` section in
-the `hue.ini` configuration file.
-
-### Install Hadoop and other analytic backends
-
-Depending on which apps you need, you need to make sure that some Hadoop services
-are already setup (that way Hue can talk to them).  
-
-<pre>
-|-------------|--------------------------------------------------------|
-|  Component  | Applications                                           |
-|-------------|--------------------------------------------------------|
-|  Editor     | SQL (Hive, Impala, any database...), Pig, Spark...     |
-|  Browsers   | YARN, Oozie, Impala, HBase, Livy                       |
-|  Scheduler  | Oozie                                                  |
-|  Dashboard  | Solr, SQL (Impala, Hive...)                            |
-|-------------|--------------------------------------------------------|
-</pre>
-
-##### Hadoop Configuration
-
-You need to enable WebHdfs or run an HttpFS server. To turn on WebHDFS,
-add this to your `hdfs-site.xml` and *restart* your HDFS cluster.
-Depending on your setup, your `hdfs-site.xml` might be in `/etc/hadoop/conf`.
-
-    <property>
-      <name>dfs.webhdfs.enabled</name>
-      <value>true</value>
-    </property>
-
-You also need to add this to `core-site.xml`.
-
-    <property>
-      <name>hadoop.proxyuser.hue.hosts</name>
-      <value>*</value>
-    </property>
-    <property>
-      <name>hadoop.proxyuser.hue.groups</name>
-      <value>*</value>
-    </property>
-
-If you place your Hue Server outside the Hadoop cluster, you can run
-an HttpFS server to provide Hue access to HDFS. The HttpFS service requires
-only one port to be opened to the cluster.
-
-Also add this in `httpfs-site.xml` which might be in `/etc/hadoop-httpfs/conf`.
-
-    <property>
-      <name>httpfs.proxyuser.hue.hosts</name>
-      <value>*</value>
-    </property>
-    <property>
-      <name>httpfs.proxyuser.hue.groups</name>
-      <value>*</value>
-    </property>
-
-
-#### Configure Oozie
-
-Hue submits MapReduce jobs to Oozie as the logged in user. You need to
-configure Oozie to accept the `hue` user to be a proxyuser. Specify this in
-your `oozie-site.xml` (even in a non-secure cluster), and restart Oozie:
-
-    <property>
-        <name>oozie.service.ProxyUserService.proxyuser.hue.hosts</name>
-        <value>*</value>
-    </property>
-    <property>
-        <name>oozie.service.ProxyUserService.proxyuser.hue.groups</name>
-        <value>*</value>
-    </property>
-
-
-#### Hive Configuration
-
-Hue's Hive SQL Editor application helps you use Hive to query your data.
-It depends on a Hive Server 2 running in the cluster. Please read
-this section to ensure a proper integration.
-
-Your Hive data is stored in HDFS, normally under `/user/hive/warehouse`
-(or any path you specify as `hive.metastore.warehouse.dir` in your
-`hive-site.xml`).  Make sure this location exists and is writable by
-the users whom you expect to be creating tables.  `/tmp` (on the local file
-system) must be world-writable (1777), as Hive makes extensive use of it.
-
-<div class="note">
-  In `hue.ini`, modify `hive_conf_dir` to point to the
-  directory containing `hive-site.xml`.
-</div>
-
-
-### Configuring Your Firewall
-
-Hue currently requires that the machines within your cluster can connect to
-each other freely over TCP. The machines outside your cluster must be able to
-open TCP port 8888 on the Hue Server (or the configured Hue web HTTP port)
-to interact with the system.
-
-
-### HDFS Cluster
-
-Hue supports one HDFS cluster. That cluster should be defined
-under the `[[[default]]]` sub-section.
-
-fs_defaultfs::
-  This is the equivalence of `fs.defaultFS` (aka `fs.default.name`) in
-  Hadoop configuration.
-
-webhdfs_url::
-  You can also set this to be the HttpFS url. The default value is the HTTP
-  port on the NameNode.
-
-hadoop_conf_dir::
-  This is the configuration directory of the HDFS, typically
-  `/etc/hadoop/conf`.
-
-
-### Yarn (MR2) Cluster
-
-Hue supports one or two Yarn clusters (two for HA). These clusters should be defined
-under the `[[[default]]]` and `[[[ha]]]` sub-sections.
-
-resourcemanager_host::
-  The host running the ResourceManager.
-
-resourcemanager_port::
-  The port for the ResourceManager REST service.
-
-logical_name::
-  NameNode logical name.
-
-submit_to::
-   To enable the section, set to True.
-
-
-### Impala Configuration
-
-In the `[impala]` section of the configuration file, you can
-_optionally_ specify the following:
-
-server_host::
-  The hostname or IP that the Impala Server should bind to. By
-  default it binds to `localhost`, and therefore only serves local
-  IPC clients.
-
-
-### Hive Configuration
-
-In the `[beeswax]` section of the configuration file, you can
-_optionally_ specify the following:
-
-beeswax_server_host::
-  The hostname or IP that the Hive Server should bind to. By
-  default it binds to `localhost`, and therefore only serves local
-  IPC clients.
-
-hive_conf_dir::
-  The directory containing your `hive-site.xml` Hive
-  configuration file.
-
-
-### Oozie Configuration
-
-In the `[liboozie]` section of the configuration file, you should
-specify:
-
-oozie_url::
-  The URL of the Oozie service. It is the same as the `OOZIE_URL`
-  environment variable for Oozie.
-
-
-### Solr Configuration
-
-In the `[search]` section of the configuration file, you should
-specify:
-
-solr_url::
-  The URL of the Solr service.
-
-
-### HBase Configuration
-
-In the `[hbase]` section of the configuration file, you should
-specify:
-
-hbase_clusters::
-  Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
-
-
-### Configuration Validation
-
-Hue can detect certain invalid configuration.
-
-To view the configuration of a running Hue instance, navigate to
-`http://myserver:8888/hue/dump_config`, also accessible through the About
-application.
-
-
-## Starting Hue from the Tarball
-
-After your cluster is running with the plugins enabled, you can start Hue on
-your Hue Server by running:
-
-    build/env/bin/supervisor
-
-This will start several subprocesses, corresponding to the different Hue
-components. Your Hue installation is now running.
-
-
-# Administering Hue
-
-Now that you've installed and started Hue, you can feel free to skip ahead
-to the <<usage,Using Hue>> section. Administrators may want to refer to this
-section for more details about managing and operating a Hue installation.
-
-## Hue Processes
-
-### Process Hierarchy
+## Process Hierarchy
 
 A script called `supervisor` manages all Hue processes. The supervisor is a
 watchdog process -- its only purpose is to spawn and monitor other processes.
@@ -680,7 +704,7 @@ any reason. If the processes fail repeatedly within a short time, the supervisor
 itself shuts down.
 
 [[logging]]
-### Hue Logging
+## Hue Logging
 
 The Hue logs are found in `/var/log/hue`, or in a `logs` directory under your
 Hue installation root. Inside the log directory you can find:
@@ -708,7 +732,7 @@ view these logs by visiting `http://myserver:8888/hue/logs`. The `DEBUG` level
 messages shown can sometimes be helpful in troubleshooting issues.
 
 
-### Database
+## Database
 
 Hue requires a SQL database to store small amounts of data, including user
 account information as well as history of job submissions and Hive queries.
@@ -717,7 +741,7 @@ purpose, and should require no configuration or management by the administrator.
 However, MySQL is the recommended database to use. This section contains
 instructions for configuring Hue to access MySQL and other databases.
 
-#### Inspecting the Hue Database
+### Inspecting the Hue Database
 
 The default SQLite database used by Hue is located in: `/usr/share/hue/desktop/desktop.db`.
 You can inspect this database from the command line using the `sqlite3`
@@ -737,14 +761,14 @@ It is strongly recommended that you avoid making any modifications to the
 database directly using SQLite, though this trick can be useful for management
 or troubleshooting.
 
-#### Backing up the Hue Database
+### Backing up the Hue Database
 
 If you use the default SQLite database, then copy the `desktop.db` file to
 another node for backup. It is recommended that you back it up on a regular
 schedule, and also that you back it up before any upgrade to a new version of
 Hue.
 
-#### Configuring Hue to Access Another Database
+### Configuring Hue to Access Another Database
 
 Although SQLite is the default database type, some advanced users may prefer
 to have Hue access an alternate database type. Note that if you elect to
@@ -759,7 +783,7 @@ Note that Hue has only been tested with SQLite and MySQL database backends.
 </div>
 
 
-#### Configuring Hue to Store Data in MySQL
+### Configuring Hue to Store Data in MySQL
 
 To configure Hue to store data in MySQL:
 
@@ -800,16 +824,6 @@ Your system is now configured and you can start the Hue server as normal.
 
 
 The Quick Start Wizard open
-
-
-# Reference Architecture
-3 Hues and 1 Load Balancer
-Databases: MySQL InnoDB, PostgreSQL, Oracle
-LDAP
-Monitoring
-Impala HA
-HiveServer2 HA
-Downloads
 
 
 # Using Hue
