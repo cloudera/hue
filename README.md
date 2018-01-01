@@ -28,9 +28,9 @@ cd hue
 make apps
 build/env/bin/hue runserver
 ```
-Now Hue should be running on [http://localhost:8000](http://localhost:8000) !
+Now Hue should be running on [http://localhost:8000](http://localhost:8000) ! The configuration in development mode is ``desktop/conf/pseudo-distributed.ini``.
 
-The configuration in development mode is ``desktop/conf/pseudo-distributed.ini``.
+Explore the [latest documentation](http://cloudera.github.io/hue/latest/).
 
 
 Docker
@@ -39,9 +39,11 @@ Start Hue in a single click with the [Docker Guide](https://github.com/cloudera/
 [video blog post](http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/).
 
 
-Development Prerequisites
--------------------------
+Prerequisites
+-------------
 You'll need these library development packages and tools installed on your system:
+
+* Python 2.6.5 - 2.7
 
 __Ubuntu:__
 
@@ -81,15 +83,10 @@ __MacOS:__
 * Required for Mac OS X 10.11+ (El Capitan), after ``brew install openssl``, run: ``export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include``
 
 
-Main Stack
------------
-Hue would not be possible without:
 
-   * Python 2.6.5 - 2.7
-   * Django 1.6 (https://docs.djangoproject.com/)
-   * Knockout.js (http://knockoutjs.com/)
-   * jQuery (http://jquery.com/)
-   * Bootstrap (http://getbootstrap.com/)
+Who is using Hue
+----------------
+Thousands of companies and organizations use Hue to query their data and make smarter decisions. Hue is heavily used by hundreds of Cloudera customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop distributions.
 
 
 Community
