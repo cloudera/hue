@@ -2,8 +2,10 @@ image:images/hue_logo.png[Hue Logo]
 ===================================
 
 Hue is an open source graphical user interface to operate and develop applications for
-performing self-service data analytics. Hue applications are delivered as a Web application,
-requiring no additional installation for individual users.
+performing self-service data analytics: link:http://gethue.com[gethue.com].
+
+Thousands of companies and organizations use Hue to query their data and make smarter decisions. Hue is heavily
+used by hundreds of Cloudera customers executing millions of queries daily.
 
 
 Administrate
@@ -49,3 +51,7 @@ Release Notes
 * March 31, 2010 --- link:release-notes/release-notes-0.4.0.html[Version 0.4.0]
 * November 23, 2009 --- link:release-notes/release-notes-0.3.0.html[Version 0.3.0]
 * October 2, 2009 --- Version 0.2.0
+
+
+
+Documentation improvements? link:https://github.com/cloudera/hue/tree/master/docs[Feel free to send a pull request].

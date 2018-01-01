@@ -258,6 +258,14 @@ pre {
 .toc {
   background-color: #F6F6F6;
   padding: 10px;
+  position: fixed;
+  top: 100px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.fixed2 {
+	position: fixed;
 }
 
 .note {

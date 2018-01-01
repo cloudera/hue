@@ -40,6 +40,7 @@ $(BLD_DIR_DOC): sdk release-notes user-guide admin-manual $(DOC_FILES)
 	@rm -f index.xml
 
 	@cp docbook.css $@
+	@cp images/favicon.ico $@
 	@# Remove intermediate file
 	@rsync -a images $@/
 

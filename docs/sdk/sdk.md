@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 
-<h1><a href=../index.html>Doc</a> > Hue SDK Documentation</h1>
+<h1 class="fixed2"><a href=../index.html>Doc</a> > Hue SDK Documentation</h1>
 
 
 <div class="row-fluid">
@@ -50,6 +50,8 @@ Hive, Impala, SparkSQL
 MySQL, Oracle, PostgreSQL, Phoenix, Presto, Kylin, Redshift, BigQuery, Drill
 
 ### JDBC
+
+Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/) or Django-compatible database.
 
 ### SQL Alchemy
 
@@ -107,9 +109,26 @@ Here is an example on how the Job Browser can list:
 ## Files
 Here is an example on how the File Browser can list HDFS, S3 files and now [ADLS](https://issues.cloudera.org/browse/HUE-7248).
 
+
+# Hue shell
+
+* [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
+* [How to manage the Hue database with the shell
+](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
+
+
 # Metadata
+
+The [metadata API](https://github.com/cloudera/hue/tree/master/desktop/libs/metadata).
+
 ## Data Catalog
+
+Read more about [Search and Tagging here](https://blog.cloudera.com/blog/2017/05/new-in-cloudera-enterprise-5-11-hue-data-search-and-tagging/).
+
 ## Optimization
+
+Read more about the [Query Assistant with Navigator Optimizer Integration
+](https://blog.cloudera.com/blog/2017/08/new-in-cloudera-enterprise-5-12-hue-4-interface-and-query-assistant/).
 
 # New application
 
@@ -758,6 +777,43 @@ list some S3 files, export a document...). Currently this API is private and sub
 can be easily reused. You would need to GET ``/accounts/login`` to get the CSRF token
 and POST it back along ``username`` and ``password`` and reuse the ``sessionid`` cookie in next
 communication calls.
+
+** With Python Request **
+
+Hue is based on the Django Web Framework. Django comes with user authentication system. Django uses sessions and middleware to hook the authentication system into request object. HUE uses stock auth form which uses “username” and “password” and “csrftoken” form variables to authenticate.
+
+In this code snippet, we will use well-known python “requests” library. we will first acquire “csrftoken” by GET “login_url”. We will create python dictionary of form data which contains “username”, “password” and “csrftoken” and the “next_url” and another python dictionary for header which contains the “Referer” url and empty python dictionary for the cookies. After POST request to “login_url” we will get status. Check the r.status_code. If r.status_code!=200 then you have problem in username and/or password.
+
+Once the request is successful then capture headers and cookies for subsequent requests. Subsequent request.session calls can be made by providing cookies=session.cookies and headers=session.headers.
+
+<pre>
+import requests
+ 
+def login_djangosite():
+ next_url = "/"
+ login_url = "http://localhost:8888/accounts/login?next=/"
+ 
+ session = requests.Session()
+ r = session.get(login_url)
+ form_data = dict(username="[your hue username]",password="[your hue password]",
+                  csrfmiddlewaretoken=session.cookies['csrftoken'],next=next_url)
+ r = session.post(login_url, data=form_data, cookies=dict(), headers=dict(Referer=login_url))
+ 
+ # check if request executed successfully?
+ print r.status_code
+ 
+ cookies = session.cookies
+ headers = session.headers
+ 
+ r=session.get('http://localhost:8888/metastore/databases/default/metadata', 
+ cookies=session.cookies, headers=session.headers)
+ print r.status_code
+ 
+ # check metadata output
+ print r.text
+</pre>
+
+[Read more about it here](http://gethue.com/login-into-hue-using-the-python-request-library/).
 
 <div class="note">
   http://issues.cloudera.org/browse/HUE-1450 is tracking a more official public API.
