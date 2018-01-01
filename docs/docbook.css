@@ -47,6 +47,11 @@ h2 {
   margin-top: 24px;
 }
 
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
 a:link, a:visited {
     color: #0B7FAD;
     text-decoration: none;

@@ -38,9 +38,9 @@ Connectors are pluggable and can new engines can be supported. Feel free to comm
 
 ## SQL
 
-The [http://gethue.com/custom-sql-query-editors/](customer SQL Editor page) also describes the configuration steps.
+The [SQL Editor page](http://gethue.com/custom-sql-query-editors/) also describes the configuration steps.
 
-Close to 100% of [desktop/core/src/desktop/static/desktop/js/autocomplete/jison](Hive and Impala grammar) is supported which makes the 
+Close to 100% of [Hive and Impala grammar](desktop/core/src/desktop/static/desktop/js/autocomplete/jison) is supported which makes the 
 autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
 
 ### HiveServer2 API
@@ -52,10 +52,14 @@ MySQL, Oracle, PostgreSQL, Phoenix, Presto, Kylin, Redshift, BigQuery, Drill
 ### JDBC
 
 Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/) or Django-compatible database.
+[JDBC connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/jdbc.py)
+
 
 ### SQL Alchemy
+SQL Alchemy supports comes with [HUE-7621](https://issues.cloudera.org/browse/HUE-7621)
 
 ### Solr SQL
+[Solr connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/solr.py)
 
 ### Others
 
@@ -63,14 +67,16 @@ Use the query editor with any [JDBC](http://gethue.com/custom-sql-query-editors/
 ## Jobs
 
 ### Oozie
-MapReduce, Pig, Java, Shell, Sqoop, DistCp
+MapReduce, Pig, Java, Shell, Sqoop, DistCp [Oozie connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/oozie_batch.py)
 
 ### Spark / Livy
 
+* [Notebook connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/spark_shell.py)
+* [Batch connector](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/connectors/spark_batch.py)
 
 # Dashboard
 
-Dashboards are generic and support Solr and any SQL: http://gethue.com/search-dashboards/
+Dashboards are generic and support [Solr and any SQL](http://gethue.com/search-dashboards):
 
 The API was influenced by Solr but is now generic:
     
@@ -94,7 +100,7 @@ Implementations:
 
 ### Elastic Search
 
-A similar backend to Solr would need to be developed: https://issues.cloudera.org/browse/HUE-7828
+A similar backend to Solr would need to be developed: [HUE-7828](https://issues.cloudera.org/browse/HUE-7828)
 
 
 # Browsers
@@ -113,8 +119,7 @@ Here is an example on how the File Browser can list HDFS, S3 files and now [ADLS
 # Hue shell
 
 * [Hue API: Execute some builtin or shell commands](http://gethue.com/hue-api-execute-some-builtin-commands/).
-* [How to manage the Hue database with the shell
-](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
+* [How to manage the Hue database with the shell](http://gethue.com/how-to-manage-the-hue-database-with-the-shell/).
 
 
 # Metadata

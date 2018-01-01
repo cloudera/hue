@@ -86,7 +86,7 @@ __MacOS:__
 
 Who is using Hue
 ----------------
-Thousands of companies and organizations use Hue to query their data and make smarter decisions. Hue is heavily used by hundreds of Cloudera customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop distributions.
+Thousands of companies and organizations use Hue to open-up and query their data and make smarter decisions. Hue is heavily used by hundreds of Cloudera customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop distributions.
 
 
 Community
