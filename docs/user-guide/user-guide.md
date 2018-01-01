@@ -1,6 +1,6 @@
 
-<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 <link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 
 <h1><a href=../index.html>Doc</a> > Hue User Guide</h1>
@@ -135,40 +135,39 @@ as an additional step.
 ### Sharing
 ### Import / Export
 
-# Editors
+# Editors / Notebook
 The goal of Hue’s Editor is to make data querying easy and productive.
 
 It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
 
-## Languages
-### Hive
-### Impala
+The [http://gethue.com/custom-sql-query-editors/](customer SQL Editor page) also describes the configuration steps.
 
-The Hive Editor enables you to perform queries on Apache Hive, a
-data warehousing system designed to work with Hadoop. For information
-about Hive. You can
-create Hive databases, tables and partitions, load data, create, run,
-and manage queries, and download the results in a Microsoft Office Excel
-worksheet file or a comma-separated values file.
+First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
 
+<pre>
+[librdbms]
+  [[databases]]
+    [[[postgresql]]]
+    nice_name=PostgreSQL
+    name=music
+    engine=postgresql_psycopg2
+    port=5432
+    user=hue
+    password=hue
+    options={}
+</pre>
 
-Hive Editor is installed and configured as part of Hue. For information
-about installing and configuring Hue, see the Hue Installation
-manual.
+Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
 
-Hive Editor assumes an existing Hive installation. The Hue installation
-instructions include the configuration necessary for hive to access
-Hive. You can view the current Hive configuration from the **Settings**
-tab in the Hive Editor.
+<pre>
+[notebook]
+  [[interpreters]]
+    [[[postgresql]]]
+    name=PostgreSQL
+    interface=rdbms
+</pre>
 
-By default, a Hive Editor user can see the saved queries for all users -
-both his/her own queries and those of other Hive Editor users. To restrict
-viewing saved queries to the query owner and Hue administrators, set the
-share\_saved\_queries property under the [beeswax] section in the Hue
-configuration file to false.
-
-![image](images/note.jpg) **Note**: The Hive Editor used to be known as Beeswax.
-
+## Concept
 ### Running Queries
 
 ![image](images/note.jpg) **Note**: To run a query, you must be logged
@@ -279,32 +278,61 @@ a query containing the string $parametername is executed. Enabled by
 default.</td></tr>
 </table>
 
-## Autocomplete
-## Syntax checker
-## Query Assist
-## Risk Alerts
-## Presentation
+### Autocomplete
+### Syntax checker
+### Query Assist
+### Risk Alerts
+### Presentation Mode
 
-### Jobs
+## SQL
+### Hive
+### Impala
+
+The Hive Editor enables you to perform queries on Apache Hive, a
+data warehousing system designed to work with Hadoop. For information
+about Hive. You can
+create Hive databases, tables and partitions, load data, create, run,
+and manage queries, and download the results in a Microsoft Office Excel
+worksheet file or a comma-separated values file.
+
+
+Hive Editor is installed and configured as part of Hue. For information
+about installing and configuring Hue, see the Hue Installation
+manual.
+
+Hive Editor assumes an existing Hive installation. The Hue installation
+instructions include the configuration necessary for hive to access
+Hive. You can view the current Hive configuration from the **Settings**
+tab in the Hive Editor.
+
+By default, a Hive Editor user can see the saved queries for all users -
+both his/her own queries and those of other Hive Editor users. To restrict
+viewing saved queries to the query owner and Hue administrators, set the
+share\_saved\_queries property under the [beeswax] section in the Hue
+configuration file to false.
+
+![image](images/note.jpg) **Note**: The Hive Editor used to be known as Beeswax.
+
+### MySQL
+### SparkSQL
+### Oracle
+### Phoenix
+### Presto
+### Drill
+### Kylin
+### PostgreSQL
+### Redshift
+### BigQuery
+### Solr SQL
+### Others
+Extend [connectors](../sdk/sdk.html#sql).
+
+## Jobs
 
 The Editor application enables you to create and submit jobs to
 the cluster. You can include variables with your jobs to enable
 you and other users to enter values for the variables when they run your
 job.
-
-Most job design types support all the settings listed in the following
-table. For job type specific settings, see:
-[MapReduce](#mapreduce),
-[Streaming](#streaming),
-[Java](#java),
-[Pig](#pig),
-[Hive](#hive),
-[Sqoop](#sqoop),
-[Shell](#shell),
-[Ssh](#ssh),
-[DistCp](#distcp),
-[Fs](#fs), and
-[Email](#email).
 
 All job design settings except Name and Description support the use of
 variables of the form $variable\_name. When you run the job, a dialog
@@ -325,8 +353,7 @@ allowing variables, functions, and complex expressions as parameters.<td></td></
 <tr><td>Files</td><td>Files to pass to the job. Equivalent to the Hadoop -files option.</td></tr>
 <tr><td>Archives</td><td>Files to pass to the job. Archives to pass to the job. Equivalent to the Hadoop -archives option.</td></tr></table>
 
-<a id="mapreduce"></a>
-#### MapReduce Job Design
+### MapReduce
 
 A MapReduce job design consists of MapReduce functions written in Java.
 You can create a MapReduce job design from existing mapper and reducer
@@ -339,26 +366,7 @@ Job Properties setting.
 implement the Mapper and Reducer functions.</td></tr>
 </table>
 
-<a id="streaming"></a>
-#### Streaming Job Design
-
-Hadoop streaming jobs enable you to create MapReduce functions in any
-non-Java language that reads standard Unix input and writes standard
-Unix output. For more information about Hadoop streaming jobs, see
-[Hadoop
-Streaming](http://archive.cloudera.com/cdh/3/hadoop-0.20.2+320/streaming.html).
-
-<table>
-<tr><td>Mapper</td><td>The path to the mapper script or class. If the mapper file is not on the
-machines on the cluster, use the Files option to pass it as a part
-of job submission. Equivalent to the Hadoop -mapper option.</td></tr>
-<tr><td>Reducer</td><td>The path to the reducer script or class. If the reducer file is not on
-the machines on the cluster, use the Files option to pass it as a
-part of job submission. Equivalent to the Hadoop -reducer option.</td></tr>
-</table>
-
-<a id="java"></a>
-#### Java Job Design
+### Java
 
 A Java job design consists of a main class written in Java.
 
@@ -369,9 +377,7 @@ A Java job design consists of a main class written in Java.
 <tr><td>Java opts</td><td>The options to pass to the JVM.</td></tr>
 </table>
 
-<a id="pig"></a>
-#### Pig Job Design
-
+### Pig
 
 A Pig job design consists of a Pig script.
 
@@ -379,18 +385,7 @@ A Pig job design consists of a Pig script.
 <tr><td>Script name</td><td>Script name or path to the Pig script.</td></tr>
 </table>
 
-<a id="hive"></a>
-#### Hive Job Design
-
-A Hive job design consists of a Hive script.
-
-<table>
-<tr><td>Script name</td><td>Script name or path to the Hive script.</td></tr>
-</table>
-
-
-<a id="sqoop"></a>
-#### Sqoop Job Design
+### Sqoop
 
 A Sqoop job design consists of a Sqoop command.
 
@@ -398,8 +393,7 @@ A Sqoop job design consists of a Sqoop command.
 <tr><td>Command</td><td>The Sqoop command.</td></tr>
 </table>
 
-<a id="shell"></a>
-#### Shell Job Design
+### Shell
 
 A Shell job design consists of a shell command.
 
@@ -408,47 +402,10 @@ A Shell job design consists of a shell command.
 <tr><td></td>Capture output<td>Indicate whether to capture the output of the command.</td></tr>
 </table>
 
-<a id="ssh"></a>
-#### Ssh Job Design
-
-A Ssh job design consists of an ssh command.
-
-<table>
-<tr><td>User</td><td>The name of the user to run the command as.</td></tr>
-<tr><td>Host</td><td>The name of the host to run the command on.</td></tr>
-<tr><td>Command</td><td>The ssh command.</td></tr>
-<tr><td></td>Capture output<td>Indicate whether to capture the output of the command.</td></tr>
-</table>
-
-<a id="distcp"></a>
-#### DistCp Job Design
+### DistCp
 
 A DistCp job design consists of a DistCp command.
 
-<a id="fs"></a>
-#### Fs Job Design
-
-A Fs job design consists of a command that operates on HDFS.
-
-<table>
-<tr><td>Delete path</td><td>The path to delete. If it is a directory, it deletes recursively all its
-content and then deletes the directory.</td></tr>
-<tr><td></td>Create directory<td>The path of a directory to create.</td></tr>
-<tr><td>Move file</td><td>The source and destination paths to the file to be moved.</td></tr>
-<tr><td>Change permissions</td><td>The path whose permissions are to be changed, the permissions, and an
-indicator of whether to change permission recursively.</td></tr></table>
-
-<a id="email"></a>
-#### Email Job Design
-
-A Email job design consists of an email message.
-
-<table>
-<tr><td>To addresses</td><td>The recipient of the email message.</td></tr>
-<tr><td>CC addresses (optional)</td><td>The cc recipients of the email message.</td></tr>
-<tr><td>Subject</td><td>The subject of the email message.</td></tr>
-<tr><td>Body</td><td>The body of the email message.</td></tr>
-</table>
 
 ### Spark
 
@@ -498,7 +455,12 @@ Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is
 # Dashboards
 Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
 
-### SDK
+## Interactive
+
+## Reports
+
+## SDK
+Extend [connectors](../sdk/sdk.html#sql).
 
 
 # Browsers
@@ -508,89 +470,22 @@ Hue’s Browsers powers your Data Catalog. They let you easily search, glance an
 
 The Table Browser enables you to manage the databases,
 tables, and partitions of the metastore shared by
-the ([Beeswax](../beeswax.html) and [Cloudera Impala Query
-UI](../impala.html)) applications. You can use Metastore
+the Hive and Impala. You can use Metastore
 Manager to perform the following operations:
 
 -   Databases
-    -   [Select a database](#selectDatabase)
-    -   [Create a database](#createDatabase)
-    -   [Drop databases](#dropDatabase)
+    -   Select a database
+    -   Create a database
+    -   Drop databases
 
 -   Tables
-    -   [Create tables](#createTables)
-    -   [Browse tables](#browseTables)
-    -   [Import data into a table](#importDataIntoTables)
-    -   [Drop tables](#dropTables)
-    -   [View the location of a table](#viewTableLocation)
+    -   Create tables
+    -   Browse tables
+    -   Drop tables
+    -   Browse table data and metadata (columns, partitions...)
+    -   Import data into a table
 
-Metastore Manager Installation and Configuration
-------------------------------------------------
-
-Metastore Manager is one of the applications installed as part of Hue.
-
-
-<a id="browseTables"></a>
-Browsing Tables
----------------
-
-**To browse table data:**
-
-In the Table List window, check the checkbox next to a table name and
-click **Browse Data**. The table's data displays in the Query Results
-window.
-
-**To browse table metadata:**
-
-Do one of the following:
-
--   In the Table List window, click a table name.
--   Check the checkbox next to a table name and click **View**.
-
--   The table's metadata displays in the **Columns** tab. You can view
-    the table data by selecting the **Sample** tab.
--   If the table is partitioned, you can view the partition columns by
-    clicking the **Partition Columns** tab and display the partitions by
-    clicking **Show Partitions(n)**, where n is the number of partitions
-    in the ACTIONS pane on the left.
-
-<a id="importDataIntoTables"></a>
-Importing Data into a Table
----------------------------
-
-When importing data, you can choose to append or overwrite the table's
-data with data from a file.
-
-1.  In the Table List window, click the table name. The Table Metadata
-    window displays.
-2.  In the ACTIONS pane, click **Import Data**.
-3.  For **Path**, enter the path to the file that contains the data you
-    want to import.
-4.  Check **Overwrite existing data** to replace the data in the
-    selected table with the imported data. Leave unchecked to append to
-    the table.
-5.  Click **Submit**.
-
-<a id="dropTables"></a>
-Dropping Tables
----------------
-
-1.  In the Table List window, click the table name. The Table Metadata
-    window displays.
-2.  In the ACTIONS pane, click **Drop Table**.
-3.  Click **Yes** to confirm the deletion.
-
-<a id="viewTableLocation"></a>
-Viewing a Table's Location
---------------------------
-
-1.  In the Table List window, click the table name. The Table Metadata
-    window displays.
-2.  Click **View File Location**. The file location of the selected
-    table displays in its directory in the File Browser window.
-
-
-## File Browser
+## Files
 
 The File Browser application lets you browse and manipulate files and
 directories in the Hadoop Distributed File System (HDFS), S3 or ADLS.
@@ -610,32 +505,22 @@ With File Browser, you can:
 #### S3
 #### ADLS
 
-File Browser Installation and Configuration
--------------------------------------------
-
-File Browser is one of the applications installed as part of Hue. For
-information about installing and configuring Hue, see the Hue Installation
-manual.
-
-Starting File Browser
----------------------
 
 <a id="fileAndDirectories"></a>
-Files and Directories
----------------------
+### Files and Directories
 
 You can use File Browser to view the input and output files of your
 MapReduce jobs. Typically, you can save your output files in /tmp or in
 your home directory if your system administrator set one up for you. You
 must have the proper permissions to manipulate other user's files.
 
-### Creating Directories
+#### Creating Directories
 
 1.  In the File Browser window, select **New > Directory**.
 2.  In the **Create Directory** dialog box, enter a directory name and
     then click **Submit**.
 
-### Changing Directories
+#### Changing Directories
 
 -   Click the directory name or parent directory dots in the **File
     Browser** window.
@@ -650,15 +535,14 @@ the top of the **File Browser** window.
 The **Home** button is disabled if you do not have a home directory. Ask
 a Hue administrator to create a home directory for you.
 
-### Creating Files
+#### Creating Files
 
 1.  In the File Browser window, select **New > File**.
 2.  In the **Create File** dialog box, enter a file name and then click
     **Submit**.
 
 
-<a id="uploadingFiles"></a>
-### Uploading Files
+#### Uploading Files
 
 You can upload text and binary files to the HDFS.
 
@@ -668,13 +552,7 @@ You can upload text and binary files to the HDFS.
 3.  In the box that opens, click **Upload a File** to browse to and
     select the file(s) you want to upload, and then click **Open**.
 
-### Copying a File
-
-1.  In the **File Browser** window, check the checkbox next to the file
-    you want to copy.
-2.  Click the ![image](images/copy.png) Copy button.
-
-### Downloading Files
+#### Downloading Files
 
 You can download text and binary files to the HDFS.
 
@@ -684,7 +562,7 @@ You can download text and binary files to the HDFS.
 
 ### Uploading Zip Archives
 
-You can upload zip archives to the HDFS. The archive is uploaded and
+You can extract zip archives to the HDFS. The archive is
 extracted to a directory named archivename.
 
 1.  In the **File Browser** window, browse to the directory where you
@@ -701,60 +579,10 @@ in the folder have the full path of the deleted files (in order to be
 able to restore them if needed) and checkpoints. The length of time a
 file or directory stays in the trash depends on HDFS properties.
 
-**Open**
-
-1.  In the **File Browser** window, click ![image](images/fbtrash.png).
-
-**Move Files and Directories To**
-
-1.  In the **File Browser** window, check the checkbox next to one or
-    more files and directories.
-2.  Select **Delete > Move to trash**.
-
-**Empty**
-
-1.  In the **File Browser** window, click ![image](images/fbtrash.png).
-2.  Click **Empty**.
-
-### Renaming, Moving, Deleting, and Restoring Files and Directories
+In the **File Browser** window, click ![image](images/fbtrash.png).
 
 
-**Rename**
-
-1.  In the **File Browser** window, check the checkbox next to the file
-    or directory you want to rename.
-2.  Click the **Rename** button.
-3.  Enter the new name and then click **Submit**.
-
-**Move**
-
-1.  In the **File Browser** window, check the checkbox next to the file
-    or directory you want to move.
-2.  Click the **Move** button.
-3.  In the **Move** dialog box, browse to or type the new directory, and
-    then click **Submit**.
-
-**Delete**
-
-1.  In the **File Browser** window, check the checkbox next to the file
-    or directory you want to delete. If you select a directory, all of
-    the files and subdirectories contained within that directory are
-    also deleted.
-2.  Choose one of the following:
-    -   **Delete > Move to trash**
-    -   **Delete > Delete forever**
-
-3.  Click **Yes** to confirm. When you move a file to trash it is stored
-    in the .Trash folder in your home directory.
-
-**Restore**
-
-1.  In the **File Browser** window, open the .Trash folder.
-2.  Navigate to the folder containing the file you want to restore.
-3.  Check the checkbox next to the file.
-4.  Click **Restore**.
-
-### Changing a File's or Directory's Owner, Group, or Permissions
+### Changing Owner, Group, or Permissions
 
 ![image](images/note.jpg) **Note**:
 
@@ -786,18 +614,7 @@ can change a file's or directory's owner, group, or permissions.
 3.  In the **Change Permissions** dialog box, select the permissions you
     want to assign and then click **Submit**.
     
-    
-<a id="searching"></a>
-Searching for Files and Directories
------------------------------------
-
-To search for files or directories by name using the query search box,
-enter the name of the file or directory in the query search box. File
-Browser lists the files or directories matching the search criteria.
-
-<a id="viewAndEdit"></a>
-Viewing and Editing Files
--------------------------
+### Viewing and Editing Files
 
 You can view and edit files as text or binary.
 
@@ -822,45 +639,25 @@ You can view and edit files as text or binary.
 2.  Edit the file and then click **Save** or **Save As** to save the
     file.
 
-**View Location in HDFS**
+## Indexes / Collections
 
-Click **View File Location**. File Browser displays the file's location
-in the **File Browser** window.
+## Sentry roles and privileges
 
-Job Browser
-===========
 
-The Job Browser application lets you to examine the Hadoop MapReduce
-jobs running on your Hadoop cluster. Job Browser presents the job and
+## Jobs
+
+The Job Browser application lets you to examine multiple types of jobs
+jobs running in the cluster. Job Browser presents the job and
 tasks in layers. The top layer is a list of jobs, and you can link to a
 list of that job's tasks. You can then view a task's attempts and the
 properties of each attempt, such as state, start and end time, and
 output size. To troubleshoot failed jobs, you can also view the logs of
 each attempt.
 
-Job Browser Installation and Configuration
-------------------------------------------
-
-Job Browser is one of the applications installed as part of Hue. For
-information about installing and configuring Hue, see the Hue Installation
-manual.
-
-Job Browser can display both MRv1 and MRv2 jobs, but must be configured
-to display one type at a time. 
-
-Starting Job Browser
---------------------
-
-Click the **Job Browser** icon (![image](images/icon_jobbrowser_24.png))
-in the navigation bar at the top of the Hue web page.
-
-If there are no jobs that have been run, the **Welcome to the Job
-Browser** page opens, with links to the Job Designer and Beeswax.
 
 If there are jobs running, then the Job Browser list appears.
 
-Filtering the Job Browser List
-------------------------------
+### Dashboard
 
 -   To filter the jobs by their state (such as **Running** or
     **Completed**), choose a state from the **Job status** drop-down
@@ -871,15 +668,8 @@ Filtering the Job Browser List
 -   To clear the filters, choose **All States** from the **Job status**
     drop-down menu and delete any text in the **User Name** and **Text**
     query boxes.
--   To display retired jobs, check the **Show retired jobs** checkbox.
-    Retired jobs show somewhat limited information – for example,
-    information on maps and reduces and job duration is not available.
-    Jobs are designated as Retired by the JobTracker based on the value
-    of mapred.jobtracker.retirejob.interval. The retired jobs no longer
-    display after the JobTracker is restarted.
 
-Viewing Job Information and Logs
---------------------------------
+### Viewing Job Information
 
 ![image](images/note.jpg) **Note**: At any level you can view the log
 for an object by clicking the ![image](images/log.png) icon in the Logs
@@ -928,34 +718,21 @@ column.
     number in the status panel at the left of the window.
 
 
-### Scheduler
-The application lets you build workflows and then schedule them to run regularly automatically. A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.
-
+# Scheduler
+The application lets you build workflows and then schedule them to run regularly automatically.
+A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.
 
 The Oozie Editor/Dashboard application allows you to define Oozie
 workflow, coordinator, and bundle applications, run workflow,
 coordinator, and bundle jobs, and view the status of jobs. For
 information about Oozie, see [Oozie
-Documentation](http://archive.cloudera.com/cdh4/cdh/4/oozie/).
+Documentation](https://oozie.apache.org/docs/).
 
 A workflow application is a collection of actions arranged in a directed
 acyclic graph (DAG). It includes two types of nodes:
 
 -   Control flow - start, end, fork, join, decision, and kill
--   Action - [MapReduce](../jobdesigner.html#mapreduce),
-[Streaming](../jobdesigner.html#streaming),
-[Java](../jobdesigner.html#java),
-[Pig](../jobdesigner.html#pig),
-[Hive](../jobdesigner.html#hive),
-[Sqoop](../jobdesigner.html#sqoop),
-[Shell](../jobdesigner.html#shell),
-[Ssh](../jobdesigner.html#ssh),
-[DistCp](../jobdesigner.html#distcp),
-[Fs](../jobdesigner.html#fs), and
-[Email](../jobdesigner.html#email).
-    In order to run DistCp, Streaming, Pig, Sqoop, and Hive jobs, Oozie
-    must be configured to use the Oozie ShareLib. See the Oozie Installation
-   manual.
+-   Action - Jobs
 
 A coordinator application allows you to define and execute recurrent and
 interdependent workflow jobs. The coordinator application defines the
@@ -964,143 +741,13 @@ conditions under which the execution of workflows can occur.
 A bundle application allows you to batch a set of coordinator
 applications.
 
-Oozie Editor/Dashboard Installation and Configuration
------------------------------------------------------
 
-Oozie Editor/Dashboard is one of the applications installed as part of
-Hue. For information about installing and configuring Hue, see the Hue Installation
-manual.
-
-Starting Oozie Editor/Dashboard
--------------------------------
-
-Click the **Oozie Editor/Dashboard** icon
-(![image](images/icon_oozie_24.png)) in the navigation bar at the top of
-the Hue browser page. **Oozie Editor/Dashboard** opens with the
-following screens:
-
--   [Dashboard](#dashboard) - shows the running and completed workflow,
-    coordinator, and bundle jobs and information about Oozie
-    instrumentation and configuration. The screen is selected and opened
-    to the Workflows page.
--   [Workflow Manager](#workflowManager) - shows available workflows and
-    allows you to create and import workflows.
--   [Coordinator Manager](#coordinatorManager) - shows available coordinators and
-    allows you to create coordinators.
--   [Bundle Manager](#bundleManager) - shows available bundles and
-    allows you to create bundles.
-
-
-Filtering Lists in Oozie Editor/Dashboard
------------------------------------------
-
-Many screens contain lists. When you type in the Filter field on
-screens, the lists are dynamically filtered to display only those rows
-containing text that matches the specified substring.
-
-Permissions in Oozie Editor/Dashboard
--------------------------------------
-
-In the Dashboard workflows, coordinators, and bundles can only be
-viewed, submitted, and modified by their owner or a superuser.
-
-Editor permissions for performing actions on workflows, coordinators,
-and bundles are summarized in the following table:
-
-<table>
-<th><td>Action</td><td>Superuser or Owner</td><td>All</td></th>
-<tr><td>View</td><td>Y.</td><td>Only if "Is shared" is set</td></tr>
-<tr><td>Submit</td><td>Y.</td><td>Only if "Is shared" is set</td></tr>
-<tr><td>Modify</td><td>Y.</td><td>N</td></tr>
-</table>
-
-
-<a id="dashboard"></a>
-Dashboard
----------
-
-The Dashboard shows a summary of the running and completed workflow,
-coordinator, and bundle jobs.
-
-You can view jobs for a period up to the last 30 days.
-
-You can filter the list by date (1, 7, 15, or 30 days) or status
-(Succeeded, Running, or Killed). The date and status buttons are
-toggles.
-
-
-### Workflows
-
-Click the **Workflows** tab to view the running and completed workflow
-jobs for the filters you have specified.
-
-Click a workflow row in the Running or Completed table to view detailed
-information about that workflow job.
-
-In the left pane contains a link to the workflow and the variable values
-specified.![image](images/workflow.jpg)
-
-For the selected job, the following information is available in the
-right area.
-
--   **Graph** tab shows the workflow DAG.
--   **Actions** tab shows you details about the actions that make up the
-    workflow.
-    -   Click the **Id** link to see additional details about the
-        action.
-    -   Click the **External Id** link to view the job in the Job
-        Browser.
-
--   **Details** tab shows job statistics including start and end times.
--   **Configuration** tab shows selected job configuration settings.
--   **Logs** tab shows log output generated by the workflow job.
--   **Definition** tab shows the Oozie workflow definition, as it
-    appears in the workflow.xml file (also linked under the application
-    path properties in the **Details** tab and the **Configuration**
-    tab).
-
-For each action in the workflow you can:
-
--   Click the ![image](images/eye.png) icon to view the action screen,
-    which contains:
-    -   **Details** tab shows job statistics including start and end
-        times.
-    -   **Configuration** tab shows the action configuration settings.
-    -   **Child Jobs** tab lists jobs generated by the action.
-
--   Click the ![image](images/log.png) icon to view the log in the Job
-    Browser.
-
-
-### Coordinators
-
-Click the **Coordinators** tab to view the running and completed
-coordinator jobs for the filters you have specified.
-
-For the selected job, the following information is available.
-
--   The **Calendar** tab shows the timestamp of the job. Click the
-    timestamp to open the workflow DAG.
--   The **Actions** tab shows you details about the actions that make up
-    the coordinator.
-    -   Click the **Id** link to see additional details about the
-        action.
-    -   Click the **External Id** link to view the job in the Job
-        Browser.
-
--   The **Configuration** tab shows selected job configuration settings.
--   The **Logs** tab shows log output generated by the coordinator.
--   The **Definition** tab shows the Oozie coordinator definition, as it
-    appears in the coordinator.xml file (also linked under the
-    oozie.coord.application.path property in the **Configuration** tab).
-
-<a id="editingWorkflow"></a>
-### Editing a Workflow
+## Workflows
 
 In the Workflow Editor you can easily perform operations on Oozie action
 and control nodes.
 
-#### Action Nodes
+### Action Nodes
 
 The Workflow Editor supports dragging and dropping action nodes. As you
 move the action over other actions and forks, highlights indicate active
@@ -1127,7 +774,7 @@ workflow.
 -   Change the position of an action by left-clicking and dragging an
     action to a new location.
 
-#### Control Nodes
+### Control Nodes
 
 -   Create a fork and join by dropping an action on top of another
     action.
@@ -1141,54 +788,14 @@ workflow.
         and select the default action from the drop-down list.
     3.  Click **Done**.
 
-### Uploading Workflow Files
+![image](images/note.jpg) **Note**: worfklows.xml and their job.properties
+cab also directly be selected and executed via the File Browser.
 
-In the Workflow Editor, click the **Upload** button.
-
-The workspace of the workflow is opened in the File Browser application.
-Follow the procedure in [Uploading
-Files](../filebrowser.html#uploadingFiles) to upload the files. You must
-put JAR files in a lib directory in the workspace.
-
-### Editing Workflow Properties
-
-1.  In the Workflow Editor, click the link under the Name or Description
-    fields in the left pane.
-2.  To share the workflow with all users, check the **Is shared**
-    checkbox.
-3.  To set advanced execution options, click **advanced** and edit the
-    deployment directory, add parameters and job properties, or specify
-    a job.xml file.
-4.  Click **Save**.
-
-
-<a id="coordinatorManager"></a>
-Coordinator Manager
--------------------
+## Schedules
 
 In Coordinator Manager you create Oozie coordinator applications and
 submit them for execution.
 
-Click the **Coordinators** tab to open the Coordinator Manager.
-
-Each row shows a coordinator: its name, description, timestamp of its
-last modification. It also shows:
-
--   **Workflow** - the workflow that will be run by the coordinator.
--   **Frequency** - how often the workflow referenced by the coordinator
-    will be run.
--   **Status** - who can run the coordinator. **shared** means users
-    other than the owner can access the workflow. **personal** means
-    only the owner can modify or submit the workflow. The default is
-    personal.
--   **Owner** - the user that created the coordinator.
-
-In Coordinator Editor, you edit coordinators and the datasets required
-by the coordinators. For information about defining coordinators and
-datasets, see the [Coordinator
-Specification](http://archive.cloudera.com/cdh4/cdh/4/oozie/CoordinatorFunctionalSpec.html).
-
-<a id="editingCoordinator"></a>
 ### Editing a Coordinator
 
 In the Coordinator Editor you specify coordinator properties and the
@@ -1219,7 +826,6 @@ screens. The following instructions walk you through the wizard.
     execution policy.
 7.  Click **Save coordinator**.
 
-<a id="creatingDataset"></a>
 ### Creating a Dataset
 
 1.  In the Coordinator Editor, do one of the following:
@@ -1228,14 +834,6 @@ screens. The following instructions walk you through the wizard.
     -   In the pane at the left, click the **Create new** link. Proceed
         with [Editing a Dataset](#editingDataset).
 
-### Displaying Datasets
-
-1.  In the Coordinator Editor, click **Show existing** in pane at the
-    left.
-2.  To edit a dataset, click the dataset name in the Existing datasets
-    table. Proceed with [Editing a Dataset](#editingDataset).
-
-<a id="editingDataset"></a>
 ### Editing a Dataset
 
 1.  Type a name for the dataset.
@@ -1256,40 +854,10 @@ screens. The following instructions walk you through the wizard.
 6.  In the Done flag field, specify the flag that identifies when input
     datasets are no longer ready.
 
-### Displaying the History of a Coordinator
 
-1.  Click the **Dashboard** tab.
-2.  Click the **Coordinators** tab.
-3.  Click a coordinator.
-4.  Click the **Actions** tab.
+## Bundles
 
-<a id="bundleManager"></a>
-Bundle Manager
---------------
-
-In Bundle Manager you create Oozie bundle applications and submit them
-for execution.
-
-Click the **Bundle** tab to open the Bundle Manager.
-
-Each row shows a bundle: its name, description, timestamp of its last
-modification. It also shows:
-
--   **Coordinators** - the coordinators that will be run by the bundle.
--   **Kick off** - the UTC time when the coordinators referenced by the
-    bundle will be started.
--   **Status** - who can run the bundle. **shared** means users other
-    than the owner can access the workflow. **personal** means only the
-    owner can modify or submit the workflow. The default is personal.
--   **Owner** - the user that created the bundle.
-
-For information about defining bundles, see the [Bundle
-Specification](http://archive.cloudera.com/cdh4/cdh/4/oozie/BundleFunctionalSpec.html).
-
-### Opening a Bundle
-
-To open a bundle, in Bundle Manager, click the bundle. Proceed with
-[Editing a Bundle](#editingBundle).
+A bundle consists in a collection of schedules.
 
 ### Creating a Bundle
 
@@ -1301,12 +869,6 @@ To open a bundle, in Bundle Manager, click the bundle. Proceed with
 5.  Click **Save**. The Bundle Editor opens. Proceed with [Editing a
     Bundle](#editingBundle).
 
-### Submitting a Bundle
-
-To submit a bundle for execution, check the checkbox next to the bundle
-and click the **Submit** button.
-
-<a id="editingBundle"></a>
 ### Editing a Bundle
 
 In the Bundle Editor, you specify properties by stepping through screens
@@ -1327,11 +889,11 @@ instructions walk you through the wizard.
 
 
 # Contrib
-Those modules are not active enough to be officially maintained in the core Hue but can still
-fit your needs. Any [contribution](https://github.com/cloudera/hue/wiki) is still welcomed!
+Those modules are not active enough to be officially maintained in the core Hue but those
+are pretty functional and should still fit your needs. Any [contribution](https://github.com/cloudera/hue/wiki) is welcomed!
 
 ## SDK
-Check the SDK guide or contact the community about how to build your own custom app.
+Check the [SDK guide](../sdk/sdk.html#new-application) or contact the community about how to build your own custom app.
 
 ## HBase Browser
 
@@ -1346,7 +908,11 @@ Prerequisites before using the app:
 to point to your Thrift IP/Port
 
 
-## SmartView
+![image](images/note.jpg) **Note**: With just a few changes in the [Python API](https://github.com/cloudera/hue/blob/master/apps/hbase/src/hbase/api.py),
+the HBase browser could be compatible with Apache Kudu.
+
+
+### SmartView
 
 The smartview is the view that you land on when you first enter a table.
 On the left hand side are the row keys and hovering over a row reveals a
@@ -1487,24 +1053,6 @@ The Sqoop UI enables transfering data from a relational database
 to Hadoop and vice versa. The UI lives uses Apache Sqoop to do this.
 See the [Sqoop Documentation](http://sqoop.apache.org/docs/1.99.2/index.html) for more details on Sqoop.
 
-Installation and Configuration
-------------------------------
-
-The Sqoop UI is one of the applications installed as part of
-Hue. For information about installing and configuring Hue, see the Hue Installation
-manual.
-
-Starting
---------
-
-Click the **Sqoop** icon
-(![image](images/icon_sqoop_24.png)) in the navigation bar at the top of
-the Hue browser page.
-
-Sqoop Jobs
-----------
-Sqoop UI is oriented around jobs in Apache Sqoop.
-
 ### Creating a New Job
 
 1. Click the **New job** button at the top right.
@@ -1517,22 +1065,6 @@ Sqoop UI is oriented around jobs in Apache Sqoop.
    For exporting, the "Table name" and "Input directory" are necessary at a minimum.
 6. Click **save** to finish.
 
-### Editing a Job
-
-1. In the list of jobs, click on the name of the job.
-2. Edit the desired form fields in the job.
-
-### Copying a Job
-
-1. In the list of jobs, click on the name of the job.
-2. On the left hand side of the job editor, there should be a panel containing actions.
-   Click **Copy**.
-
-### Removing a Job
-
-1. In the list of jobs, click on the name of the job.
-2. On the left hand side of the job editor, there should be a panel containing actions.
-   Click **Delete**.
 
 ### Running a Job
 

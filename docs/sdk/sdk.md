@@ -1,6 +1,6 @@
 
-<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 <link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
+<link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
 
 <h1><a href=../index.html>Doc</a> > Hue SDK Documentation</h1>
@@ -14,85 +14,107 @@
    </div>
    <div class="span9">
 
+# Concept
+
+Hue is generic and let's you integrate with other analytics systems so that for example
+your users can explore data with other databases.
+In addition, whole new apps can also be created in order to provide end user solutions.
+
 # Editor / Notebook
 
 The goal of the Editor is to open-up data to more users by making self service querying easy and productive.
 
 It is available in Editor or Notebook mode and will be integrated with the Dashboard soon. The Editor focuses on Apache Hive and Apache Impala but is also compatible with:
 
-    Any SQL databases: MySQL, SparkSQL, Oracle, Apache Phoenix, Apache Presto, Apache Drill, Apache Kylin, PostgreSQL, Redshift, BigQuery…
-    MapReduce
-    Spark
-    Pig
-    Solr SQL
+* Any SQL databases: MySQL, SparkSQL, Oracle, Apache Phoenix, Apache Presto, Apache Drill, Apache Kylin, PostgreSQL, Redshift, BigQuery…
+* MapReduce
+* Spark
+* Pig
+* Solr SQL
+
+Other modes like MapReduce, Java, Shell, Sqoop are also available. Here is a list of the [https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors](existing connectors).
+
+Connectors are pluggable and can new engines can be supported. Feel free to comment on the [https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user](Hue list) of [https://github.com/cloudera/hue/issues](github) about it.
 
 ## SQL
 
 The [http://gethue.com/custom-sql-query-editors/](customer SQL Editor page) also describes the configuration steps.
 
-First, in your hue.ini file, you will need to add the relevant database connection information under the librdbms section:
+Close to 100% of [desktop/core/src/desktop/static/desktop/js/autocomplete/jison](Hive and Impala grammar) is supported which makes the 
+autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
 
-<pre>
-[librdbms]
-  [[databases]]
-    [[[postgresql]]]
-    nice_name=PostgreSQL
-    name=music
-    engine=postgresql_psycopg2
-    port=5432
-    user=hue
-    password=hue
-    options={}
-</pre>
+### HiveServer2 API
+Hive, Impala, SparkSQL
 
-Secondly, we need to add a new interpreter to the notebook app. This will allow the new database type to be registered as a snippet-type in the Notebook app. For query editors that use a Django-compatible database, the name in the brackets should match the database configuration name in the librdbms section (e.g. – postgresql). The interface will be set to rdbms. This tells Hue to use the librdbms driver and corresponding connection information to connect to the database. For example, with the above postgresql connection configuration in the librdbms section, we can add a PostgreSQL interpreter with the following notebook configuration:
+### Python Connectors
+MySQL, Oracle, PostgreSQL, Phoenix, Presto, Kylin, Redshift, BigQuery, Drill
 
-<pre>
-[notebook]
-  [[interpreters]]
-    [[[postgresql]]]
-    name=PostgreSQL
-    interface=rdbms
-</pre>
+### JDBC
 
+### SQL Alchemy
 
-Other modes like MapReduce, Java, Shell, Sqoop are also available. Here is a list of the [https://github.com/cloudera/hue/tree/master/desktop/libs/notebook/src/notebook/connectors](existing connectors).
-Connectors are pluggable and can new engines can be supported. Feel free to comment on the [https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user](Hue list) of [https://github.com/cloudera/hue/issues](github) about it.
+### Solr SQL
+
+### Others
+
 
 ## Jobs
+
+### Oozie
+MapReduce, Pig, Java, Shell, Sqoop, DistCp
+
+### Spark / Livy
+
 
 # Dashboard
 
 Dashboards are generic and support Solr and any SQL: http://gethue.com/search-dashboards/
 
-    API https://github.com/cloudera/hue/blob/master/desktop/libs/dashboard/src/dashboard/dashboard_api.py
-
-Implementation
-
-    Solr https://github.com/cloudera/hue/blob/master/apps/search/src/search/dashboard_api.py
-    SQL https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/dashboard_api.py
-        Impala https://github.com/cloudera/hue/blob/master/apps/impala/src/impala/dashboard_api.py
-        Hive https://github.com/cloudera/hue/blob/master/apps/beeswax/src/beeswax/dashboard_api.py
-
+The API was influenced by Solr but is now generic:
+    
+[Dashboard API](https://github.com/cloudera/hue/blob/master/desktop/libs/dashboard/src/dashboard/dashboard_api.py)
 
 ## SQL
-## Elastic Search
 
-One could develop a similar backend with Elastic Search
+[SQL API](https://github.com/cloudera/hue/blob/master/desktop/libs/notebook/src/notebook/dashboard_api.py)
+
+Implementations:
+
+* [Impala API](https://github.com/cloudera/hue/blob/master/apps/impala/src/impala/dashboard_api.py)
+* [Hive API](https://github.com/cloudera/hue/blob/master/apps/beeswax/src/beeswax/dashboard_api.py)
+
+
+## Search
+
+### Solr
+
+[Solr Dashboard API](https://github.com/cloudera/hue/blob/master/apps/search/src/search/dashboard_api.py)
+
+### Elastic Search
+
+A similar backend to Solr would need to be developed: https://issues.cloudera.org/browse/HUE-7828
 
 
 # Browsers
 ## Jobs
-e.g. Spark Livy, Impala Query Browser
+
+Here is an example on how the Job Browser can list:
+
+* [Livy jobs and sessions](https://issues.cloudera.org/browse/HUE-6908)
+* [Impala queries](https://issues.cloudera.org/browse/HUE-7420)
+
 
 ## Files
-e.g. ADLS
+Here is an example on how the File Browser can list HDFS, S3 files and now [ADLS](https://issues.cloudera.org/browse/HUE-7248).
 
 # Metadata
 ## Data Catalog
 ## Optimization
 
 # New application
+
+Building a brand new application is more work but is ideal for creating a custom solution.
+
 ## Introduction and Overview
 
 Hue leverages the browser to provide users with an environment for exploring
@@ -918,7 +940,7 @@ build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
 
 Jasmine tests (from your browser):
 
-  http://localhost:8000/jasmine
+[http://localhost:8000/jasmine](http://localhost:8000/jasmine)
 
 
 ## Longer story
@@ -981,10 +1003,10 @@ DESKTOP_PROFILE
   Turn on Python profiling. The profile data is saved in a file. See the
   console output for the location of the file.
 
-DESKTOP_LOG_DIR=<dir>
+DESKTOP_LOG_DIR=$dir
   Specify the HUE log directory. Defaults to ./log.
 
-DESKTOP_DB_CONFIG=<db engine:db name:test db name:username:password:host:port>
+DESKTOP_DB_CONFIG=$db engine:db name:test db name:username:password:host:port
   Specify alternate DB connection parameters for HUE to use. Useful for
   testing your changes against, for example, MySQL instead of sqlite. String
   is a colon-delimited list.
@@ -997,17 +1019,17 @@ TEST_IMPALAD_HOST=impalad-01.gethue.com
 
 Use pseudo_hdfs4.py!  You should tag such tests with "requires_hadoop", as follows:
 
-  from nose.plugins.attrib import attr
+    from nose.plugins.attrib import attr
 
-  @attr('requires_hadoop')
-  def your_test():
-    ...
+    @attr('requires_hadoop')
+    def your_test():
+      ...
 
 
 ### Jenkins Configuration
 
 Because building Hadoop (for the tests that require it) is slow, we've
-separated the Hudson builds into "fast" and "slow".  Both are run
+separated the Jenkins builds into "fast" and "slow".  Both are run
 via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.
 
