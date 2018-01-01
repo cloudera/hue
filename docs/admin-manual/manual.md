@@ -14,9 +14,6 @@
    </div>
    <div class="span9">
 
-
-This guide describes how to install and configure a Hue tarball or packages.
-
 # Installation
 
 The following instructions describe how to install the Hue tarball on a
@@ -41,14 +38,14 @@ certain development libraries be installed on your system. To install from the
 tarball, you must have the following installed:
 
 Required Dependencies
-The full list is here: [https://github.com/cloudera/hue#development-prerequisites](https://github.com/cloudera/hue#development-prerequisites)
+The full list is here: [https://github.com/cloudera/hue#prerequisites](https://github.com/cloudera/hue#prerequisites)
 
 ## Build
 
 Configure `$PREFIX` with the path where you want to install Hue by running:
 
-  PREFIX=/usr/share make install
-  cd /usr/share/hue
+    PREFIX=/usr/share make install
+    cd /usr/share/hue
 
 You can install Hue anywhere on your system, and run Hue as a non-root user.
 
@@ -57,7 +54,7 @@ that user's home directory, or in a directory within `/usr/share`.
 
 ## Docker
 
-Alternatively to building Hue, a (Hue Docker image)[http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/] is available.
+Alternatively to building Hue, a [http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/](Hue Docker image) is available.
 
 ## Troubleshooting the Hue Tarball Installation
 

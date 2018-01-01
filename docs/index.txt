@@ -4,7 +4,7 @@ image:images/hue_logo.png[Hue Logo]
 Hue is an open source graphical user interface to operate and develop applications for
 performing self-service data analytics: link:http://gethue.com[gethue.com].
 
-Thousands of companies and organizations use Hue to query their data and make smarter decisions. Hue is heavily
+Thousands of companies and organizations use Hue to open-up and query their data and make smarter decisions. Hue is heavily
 used by hundreds of Cloudera customers executing millions of queries daily.
 
 
