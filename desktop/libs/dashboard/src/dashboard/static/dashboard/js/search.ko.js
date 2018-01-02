@@ -2256,7 +2256,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         $(document).trigger("error", data.error);
       }
       else {
-        var _resultsHash = ko.mapping.toJSON(data.response.docs);
+        var _resultsHash = ko.mapping.toJSON(data.response.docs) + (data.response.moreLikeThis ? '/moreLikeThis' : '');
 
         if (self.resultsHash != _resultsHash) {
           var _docs = [];
