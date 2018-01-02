@@ -25,11 +25,29 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_('Threads'), "about", user, request) | n,unicode }
 %endif
 
+
+<script type="text/javascript">
+  (function () {
+    var ThreadsViewModel = function () {
+      var self = this;
+      self.apiHelper = ApiHelper.getInstance();
+      self.threads = ko.observable();
+      self.fetchThreads = function () {
+        self.apiHelper.simpleGet('/desktop/debug/threads', {}, {successCallback: self.threads});
+      };
+    }
+    $(document).ready(function () {
+      var viewModel = new ThreadsViewModel();
+      ko.applyBindings(viewModel, $('#threadsComponents')[0]);
+    });
+  })();
+</script>
+
 ${layout.menubar(section='threads')}
 
-<div id="logsComponents" class="container-fluid">
+<div id="threadsComponents" class="container-fluid">
   <div class="card card-small" style="padding-top: 10px">
-    <pre>${text}</pre>
+    <pre data-bind="text: $root.threads"></pre>
   </div>
 </div>
 

@@ -39,21 +39,23 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
   (function () {
     var MetricsViewModel = function () {
       var self = this;
-
-      self.metrics = ${metrics | n,unicode};
-      self.metricsKeys = ko.observableArray(Object.keys(self.metrics).sort());
-      self.selectedMetric = ko.observable('All');
+      self.apiHelper = ApiHelper.getInstance();
       self.metricsFilter = ko.observable();
+      self.metrics = ko.observableArray();
+      self.selectedMetric = ko.observable('All');
+      self.metricsKeys = ko.pureComputed(function () {
+        return Object.keys(self.metrics()).sort()
+      });
       self.filteredMetrics = ko.pureComputed(function () {
         if (self.metricsFilter()) {
           var lowerQuery = self.metricsFilter().toLowerCase();
           var result = {};
-          Object.keys(self.metrics).forEach(function (key) {
+          Object.keys(self.metrics()).forEach(function (key) {
             var filteredSubMetric = {};
             var atleastOne = false;
-            Object.keys(self.metrics[key]).forEach(function (subMetricKey) {
+            Object.keys(self.metrics()[key]).forEach(function (subMetricKey) {
               if (subMetricKey.toLowerCase().indexOf(lowerQuery) !== -1) {
-                filteredSubMetric[subMetricKey] = self.metrics[key][subMetricKey];
+                filteredSubMetric[subMetricKey] = self.metrics()[key][subMetricKey];
                 atleastOne = true;
               }
             });
@@ -65,37 +67,40 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
           });
           return result;
         }
-        return self.metrics;
+        return self.metrics();
       });
+      self.fetchMetrics = function () {
+        self.apiHelper.simpleGet('/desktop/metrics/', {}, {successCallback: successCallback});
+      };
     }
 
     $(document).ready(function () {
-      ko.cleanNode(document.getElementById("metricsComponent"));
-      ko.applyBindings(new MetricsViewModel(), document.getElementById('metricsComponent'));
+      var viewModel = new MetricsViewModel();
+      ko.applyBindings(viewModel, $('#metricsComponents')[0]);
     });
   })();
 </script>
 
 ${layout.menubar(section='metrics')}
 
-<div id="metricsComponent" class="container-fluid">
+<div id="metricsComponents" class="container-fluid">
   <div class="card card-small margin-top-10">
+    <!-- ko if: metrics() -->
     <div data-bind="dockable: { scrollable: ${ MAIN_SCROLLABLE }, jumpCorrection: 0,topSnap: '${ TOP_SNAP }', triggerAdjust: ${ is_embeddable and "0" or "106" }}">
-    <!-- ko if: metrics -->
-    <ul class="nav nav-pills">
-      <li data-bind="css: { 'active': $root.selectedMetric() === 'All' }">
-        <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
-      </li>
-      <!-- ko foreach: metricsKeys -->
-      <li data-bind="css: { 'active': $root.selectedMetric() === $data }">
-        <a href="javascript:void(0)" data-bind="text: $data, click: function(){ $root.selectedMetric($data) }"></a>
-      </li>
-      <!-- /ko -->
-    </ul>
-    <!-- /ko -->
-    <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
-        class="input-xlarge pull-right margin-bottom-10" placeholder="${_('Filter metrics...')}">
+      <ul class="nav nav-pills">
+        <li data-bind="css: { 'active': $root.selectedMetric() === 'All' }">
+          <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
+        </li>
+        <!-- ko foreach: metricsKeys -->
+        <li data-bind="css: { 'active': $root.selectedMetric() === $data }">
+          <a href="javascript:void(0)" data-bind="text: $data, click: function(){ $root.selectedMetric($data) }"></a>
+        </li>
+        <!-- /ko -->
+      </ul>
+      <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
+          class="input-xlarge pull-right margin-bottom-10" placeholder="${_('Filter metrics...')}">
     </div>
+
     <div class="margin-top-10">
       <div data-bind="foreach: {data: Object.keys($root.filteredMetrics()).sort(), as: '_masterkey'}">
        <!-- ko if: ($root.selectedMetric() === 'All' && $root.filteredMetrics()[_masterkey]) || $root.selectedMetric() === _masterkey-->
@@ -126,6 +131,7 @@ ${layout.menubar(section='metrics')}
         <!-- /ko -->
       </div>
   </div>
+  <!-- /ko -->
  </div>
 </div>
 
