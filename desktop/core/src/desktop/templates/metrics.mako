@@ -69,6 +69,9 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
         }
         return self.metrics();
       });
+      var successCallback = function (data) {
+        self.metrics(data.metric);
+      }
       self.fetchMetrics = function () {
         self.apiHelper.simpleGet('/desktop/metrics/', {}, {successCallback: successCallback});
       };
