@@ -1045,6 +1045,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         % if IS_EMBEDDED.get():
         page.base(window.location.pathname + '');
+        page.baseHash(window.location.hash.replace(/\/*$/, '').substring(1));
         % else:
         page.base('/hue');
         % endif
