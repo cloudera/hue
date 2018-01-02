@@ -31,11 +31,7 @@
   // Hue specific
   var winLoc = function (href) {
     if (href) {
-      if (!paramBased) {
-        location.href = href;
-      }
-      // TODO: When is this called?
-      // console.log('setting: ' + href);
+      location.href = href;
     } else if (!paramBased) {
       return location;
     } else {
@@ -78,6 +74,9 @@
    */
 
   var base = '';
+
+  // Hue specific
+  var baseHash = '';
 
   /**
    * Running flag.
@@ -177,6 +176,11 @@
   page.base = function(path) {
     if (0 === arguments.length) return base;
     base = path;
+  };
+
+  page.baseHash = function (hash) {
+    if (0 === arguments.length) return baseHash;
+    baseHash = decodeURLEncodedURIComponent(hash);
   };
 
   /**
@@ -329,6 +333,10 @@
       j = 0;
 
     prevContext = ctx;
+
+    if (prev && prev.hash && prev.hash !== baseHash) {
+      return unhandled(ctx);
+    }
 
     function nextExit() {
       var fn = page.exits[j++];
