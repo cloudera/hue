@@ -683,7 +683,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
           'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
-          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
+          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs', 'threads',
           % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
             'indexes',
           % endif
