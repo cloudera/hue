@@ -43,6 +43,9 @@
       var pathname = location.pathname + (hueMatch ? hueMatch[1] : '');
       var search = hueMatch ? location.search.replace(hueMatch[0], '') : location.search + '';
       search = search.replace('?&', '?');
+      if (pathname[0] !== '/') {
+        pathname = '/' + pathname;
+      }
 
       var adaptedLocation = {
         hash: location.hash + '',
@@ -420,6 +423,9 @@
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
+    if (this.path[0] !== '/') {
+      this.path = '/' + this.path;
+    }
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
@@ -453,7 +459,11 @@
       return path;
     }
 
-    var adaptedPath = location.pathname + '?app=' + path.replace(base, '').replace('//', '/').replace('?', '&');
+    var appPath = path.replace(base, '').replace('//', '/').replace('?', '&');
+    if (appPath[0] !== '/') {
+      appPath = appPath + '/';
+    }
+    var adaptedPath = location.pathname + '?app=' + appPath;
     if (!~path.indexOf('#') && location.hash) {
       adaptedPath += location.hash;
     }

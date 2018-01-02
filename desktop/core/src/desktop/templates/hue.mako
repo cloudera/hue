@@ -1043,7 +1043,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $(this).attr('href', link);
         });
 
-        page.base(typeof HUE_EMBEDDED_BASE_URL !== 'undefined' ? HUE_EMBEDDED_BASE_URL : '/hue');
+        % if IS_EMBEDDED.get():
+        page.base(window.location.pathname + '');
+        % else:
+        page.base('/hue');
+        % endif
 
         self.lastContext = null;
 
@@ -1248,13 +1252,16 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         huePubSub.subscribe('open.link', function (href) {
           if (href) {
-            if (href.startsWith('/') && !href.startsWith('/hue')){
-              page('/hue' + href);
-            } else {
+            % if not IS_EMBEDDED.get():
+              if (href.startsWith('/') && !href.startsWith('/hue')){
+                page('/hue' + href);
+              } else {
+                page(href);
+              }
+            % else:
               page(href);
-            }
-          }
-          else {
+            % endif
+          } else {
             console.warn('Received an open.link without href.')
           }
         });
