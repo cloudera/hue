@@ -94,12 +94,14 @@
   // modals, a parent container might have it set to !important which will prevent the modal from showing. This
   // redefines all .hide definitions to exclude .modal.fade
   for (var i = 0; i < document.styleSheets.length; i++) {
-    for (var j = document.styleSheets[i].cssRules.length - 1; j > 0; j--) {
-      if (document.styleSheets[i].cssRules[j].selectorText === '.hide') {
-        var originalCssText = document.styleSheets[i].cssRules[j].cssText;
-        if (originalCssText.indexOf('!important') !== -1) {
-          document.styleSheets[i].deleteRule(j);
-          document.styleSheets[i].insertRule(originalCssText.replace('.hide', '.hide:not(.modal):not(.fade)'));
+    if (document.styleSheets[i] && document.styleSheets[i].cssRules) {
+      for (var j = document.styleSheets[i].cssRules.length - 1; j > 0; j--) {
+        if (document.styleSheets[i] && document.styleSheets[i].cssRules[j] && document.styleSheets[i].cssRules[j].selectorText === '.hide') {
+          var originalCssText = document.styleSheets[i].cssRules[j].cssText;
+          if (originalCssText.indexOf('!important') !== -1) {
+            document.styleSheets[i].deleteRule(j);
+            document.styleSheets[i].insertRule(originalCssText.replace('.hide', '.hide:not(.modal):not(.fade)'));
+          }
         }
       }
     }
