@@ -683,7 +683,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
           'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
-          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs', 'threads',
+          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr', 'logs',
           % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
             'indexes',
           % endif
@@ -1073,8 +1073,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }},
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
-          { url: '/desktop/debug/threads', app: 'threads' },
-          { url: '/desktop/metrics', app: 'metrics' },
+          { url: '/desktop/debug/threads', app: function () {
+            self.loadApp('threads');
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.fetchThreads();
+            });
+          }},
+          { url: '/desktop/metrics', app: function () {
+            self.loadApp('metrics');
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.fetchMetrics();
+            });
+          }},
           { url: '/desktop/download_logs', app: function () {
             location.href = '/desktop/download_logs';
           }},
