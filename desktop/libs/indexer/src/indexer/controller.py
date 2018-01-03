@@ -270,15 +270,16 @@ class CollectionManagerController(object):
 
   def update_data_from_hive(self, collection_or_core_name, columns, fetch_handle):
     MAX_ROWS = 10000
-    ROW_COUNT = 0
     FETCH_BATCH = 1000
+
+    row_count = 0
     has_more = True
 
     client = SolrClient(self.user)
 
     try:
-      while ROW_COUNT < MAX_ROWS and has_more:
-        result = fetch_handle(FETCH_BATCH, ROW_COUNT == 0)
+      while row_count < MAX_ROWS and has_more:
+        result = fetch_handle(FETCH_BATCH, row_count == 0)
         has_more = result['has_more']
 
         if result['data']:
@@ -286,13 +287,13 @@ class CollectionManagerController(object):
           dataset = tablib.Dataset()
           dataset.append(columns)
           for i, row in enumerate(result['data']):
-            dataset.append([ROW_COUNT + i] + [cell if cell else (0 if isinstance(cell, numbers.Number) else '') for cell in row])
+            dataset.append([row_count + i] + [cell if cell else (0 if isinstance(cell, numbers.Number) else '') for cell in row])
 
           if not client.index(name=collection_or_core_name, data=dataset.csv, **kwargs):
             raise PopupException(_('Could not update index. Check error logs for more info.'))
 
-        ROW_COUNT += len(dataset)
+        row_count += len(dataset)
     except Exception, e:
       raise PopupException(_('Could not update index: %s') % e)
 
-    return ROW_COUNT
+    return row_count
