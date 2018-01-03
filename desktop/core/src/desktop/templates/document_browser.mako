@@ -301,7 +301,7 @@ from desktop.views import _ko
                 <div class="doc-browser-action doc-browser-search-container pull-left"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery"></div>
                 <!-- /ko -->
                 <!-- ko with: activeEntry -->
-                <div class="doc-browser-action doc-browser-type-filter margin-right-10 pull-left" data-bind="component: { name: 'hue-drop-down', params: { value: serverTypeFilter, entries: $root.allDocumentTypes, linkTitle: '${ _ko('Type filter') }' } }"></div>
+                <div class="doc-browser-action doc-browser-type-filter margin-right-10 pull-left" data-bind="component: { name: 'hue-drop-down', params: { value: serverTypeFilter, entries: DOCUMENT_TYPES, linkTitle: '${ _ko('Type filter') }' } }"></div>
                 <a class="btn margin-right-20" title="${_('Search')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
                 <!-- ko if: app === 'documents' -->
                 <div class="inline">
