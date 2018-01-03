@@ -53,7 +53,7 @@ $(BLD_DIR_DOC)/release-notes: $(wildcard release-notes/*.txt)
 	@cp docbook.css $@
 	@cp docbook.css release-notes/
 	@for i in $? ; do \
-	  a2x --format=xhtml --stylesheet=docbook.css $$i ; \
+	  a2x $(NO_TOC) --format=xhtml --stylesheet=docbook.css $$i ; \
 	  rm -f $$i.xml ; \
 	done;
 	@rm release-notes/docbook.css
