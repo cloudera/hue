@@ -168,7 +168,7 @@ except ImportError, e:
       <input type="hidden" name="format"/>
     </form>
 
-    <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
+    <div class="hover-dropdown" data-bind="visible: snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
       <a class="inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Export results') }" data-bind="css: {'grid-side-btn': gridSideBtn, 'snippet-side-btn': !gridSideBtn()}">
         <!-- ko ifnot: isDownloading -->
         <i class="fa fa-fw fa-download"></i>
