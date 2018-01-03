@@ -144,9 +144,9 @@ def guess_field_types(request):
             for col in table_metadata.cols
         ]
     }
-  elif file_format['inputFormat'] == 'query': # Only support open query history
-    # TODO get schema from explain query, which is not possible
-    notebook = Notebook(document=Document2.objects.get(id=file_format['query'])).get_data()
+  elif file_format['inputFormat'] == 'query':
+    # Only support non expired query history. Otherwise would need to get schema without executing a query.
+    notebook = Notebook(document=Document2.objects.document(id=file_format['query'])).get_data()
     snippet = notebook['snippets'][0]
     sample = get_api(request, snippet).fetch_result(notebook, snippet, 4, start_over=True)
 
