@@ -202,8 +202,8 @@ except ImportError, e:
         </li>
         % endif
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
-            <i class="fa fa-fw fa-save"></i> ${ _('Save') }
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Export the result into a collection, a new table...') }">
+            <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Export') }
           </a>
         </li>
       </ul>
@@ -217,20 +217,23 @@ except ImportError, e:
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${_('Save query result in a')}</h2>
+        <h2 class="modal-title">${_('Export the query result in a')}</h2>
       </div>
       <div class="modal-body" style="padding-left: 30px">
         <form id="saveResultsForm" method="POST" class="form form-inline">
           ${ csrf_token(request) | n,unicode }
           <fieldset>
+            ${ _('File') }
+            <br>
             <div class="control-group">
               <div class="controls">
                  <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  &nbsp;${ _('File (first %s rows)') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }
+                  &nbsp;
+                  ${ _('First %s rows') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
+                  <input data-bind="value: savePath, valueUpdate: 'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
                 </div>
                 <label class="radio" data-bind="visible: saveTarget() == 'hdfs-file'">
                   <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
@@ -242,16 +245,18 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
-                  &nbsp;${ _('Directory') }
+                  &nbsp;${ _('All') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10 input-xlarge">
                 </div>
-                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save a large result as TSV") }', placement: 'top' }" style="padding: 8px">
+                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save the complete result as TSV") }', placement: 'top' }" style="padding: 8px">
                   <i class="fa fa-fw fa-question-circle muted"></i>
                 </div>
               </div>
             </div>
+            ${ _('Dashboard') }
+            <br>
             <div class="control-group">
               <div class="controls">
                 <label class="radio">
@@ -268,10 +273,13 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="search-index">
-                  &nbsp;${ _('Index') }
+                  &nbsp;${ _('Collection') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
+                  <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Collection name')}">
+                </div>
+                <div class="inline-block" data-bind="visible: saveTarget() == 'search-index', tooltip: { title: '${ _ko("Index the data to make exploration faster") }', placement: 'top' }" style="padding: 8px">
+                  <i class="fa fa-fw fa-question-circle muted"></i>
                 </div>
               </div>
             </div>
@@ -281,7 +289,7 @@ except ImportError, e:
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-        <button data-bind="click: trySaveResults, css: {'disabled': !isValidDestination()}" class="btn btn-primary disable-enter disable-feedback">${_('Save')}</button>
+        <button data-bind="click: trySaveResults, css: {'disabled': !isValidDestination()}" class="btn btn-primary disable-enter disable-feedback">${_('Export')}</button>
       </div>
     </div>
 
