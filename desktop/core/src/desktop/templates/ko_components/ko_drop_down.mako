@@ -157,10 +157,10 @@ from desktop.views import _ko
         });
         self.filteredEntries = ko.pureComputed(function () {
           if (self.filter() === '' || ! self.filterEdited()) {
-            return self.entries();
+            return ko.unwrap(self.entries);
           } else {
             var lowerFilter = self.filter().toLowerCase();
-            return self.entries().filter(function (database) {
+            return ko.unwrap(self.entries).filter(function (database) {
               return database.toLowerCase().indexOf(lowerFilter) !== -1;
             });
           }
