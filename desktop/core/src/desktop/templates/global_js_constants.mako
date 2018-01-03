@@ -167,6 +167,16 @@
 
   window.IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
 
+  var docTypes = [];
+  Object.keys(window.HUE_I18n.documentType).forEach(function (key) {
+    if (key !== 'all') {
+      docTypes.push({ type: key, label: window.HUE_I18n.documentType[key] });
+    }
+  })
+  docTypes.sort(function (a, b) { return a.label.localeCompare(b.label); });
+  docTypes.unshift({ type: 'all', label: window.HUE_I18n.documentType['all'] });
+  window.DOCUMENT_TYPES = docTypes;
+
   window.LEAFLET_DEFAULTS = {
     layer: '${ leaflet['layer'] |n,unicode }',
     attribution: '${ leaflet['attribution'] |n,unicode }',

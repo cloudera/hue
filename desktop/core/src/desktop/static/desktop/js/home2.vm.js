@@ -34,39 +34,19 @@ var HomeViewModel = (function () {
     // self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.serverTypeFilter = ko.observable();
-    self.allDocumentTypes = ko.observableArray();
 
     var initialType = window.location.getParameter('type') !== '' ? window.location.getParameter('type') : 'all';
-    var availableTypes = $.map(HUE_I18n.documentType, function (value, key) {
-      var type = {
-        type: key,
-        label: value
-      };
-      if (initialType === type.type) {
-        self.serverTypeFilter(type);
+
+    DOCUMENT_TYPES.some(function (docType) {
+      if (docType.type === initialType) {
+        self.serverTypeFilter(docType);
+        return true;
       }
-      return type;
     });
 
     if (!self.serverTypeFilter()) {
-      var unknownType = {
-        type: initialType,
-        label: initialType
-      };
-      self.serverTypeFilter(unknownType);
-      availableTypes.push(unknownType);
+      self.serverTypeFilter(DOCUMENT_TYPES[0]);
     }
-
-    availableTypes.sort(function (a, b) {
-      if (a.type === 'all') {
-        return -1;
-      }
-      if (b.type === 'all') {
-        return 1;
-      }
-      return a.label.localeCompare(b.label);
-    });
-    self.allDocumentTypes(availableTypes);
 
     self.activeEntry = ko.observable();
     self.trashEntry = ko.observable();
