@@ -622,6 +622,7 @@ class TestResourceManagerHaNoHadoop:
 
 
 class TestImpalaApi(object):
+
   def setUp(self):
     api = MockImpalaQueryApi('http://url.com')
     self.api = QueryApi(None, impala_api=api)
@@ -636,17 +637,17 @@ class TestImpalaApi(object):
   def test_app(self):
     response = self.api.app('4d497267f34ff17d:817bdfb500000000')
     for key, value in {'status': u'FINISHED', 'name': u'select * from customers',
-     'duration': 3369000.0, 'progress': 66.6667, 'user': u'admin', 'type': 'queries',
-     'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-25 15:38:12.872825000', 'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=4d497267f34ff17d:817bdfb500000000'}.iteritems():
+      'duration': 3369000.0, 'progress': 66.6667, 'user': u'admin', 'type': 'queries',
+      'id': '4d497267f34ff17d:817bdfb500000000', 'submitted': u'2017-10-25 15:38:12.872825000', 'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=4d497267f34ff17d:817bdfb500000000'}.iteritems():
       assert_equal(response.get(key), value)
 
     response = self.api.app('8a46a8865624698f:b80b211500000000')
 
     for key, value in {'status': u'FINISHED',
-     'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...', 'duration': 3355000.0, 'progress': 100.0, 'user': u'admin',
-     'type': 'queries', 'id': '8a46a8865624698f:b80b211500000000', 'submitted': u'2017-10-25 15:38:26.637010000',
-     'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.iteritems():
-     assert_equal(response.get(key), value)
+      'name': u'SELECT sample_07.description, sample_07.salary FROM   sample...', 'duration': 3355000.0, 'progress': 100.0, 'user': u'admin',
+      'type': 'queries', 'id': '8a46a8865624698f:b80b211500000000', 'submitted': u'2017-10-25 15:38:26.637010000',
+      'apiStatus': 'SUCCEEDED', 'doc_url': 'http://url.com/query_plan?query_id=8a46a8865624698f:b80b211500000000'}.iteritems():
+      assert_equal(response.get(key), value)
 
 
 class TestSparkNoHadoop(object):
