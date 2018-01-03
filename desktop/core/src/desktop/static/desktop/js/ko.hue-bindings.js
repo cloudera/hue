@@ -142,6 +142,24 @@
     }
   };
 
+  ko.bindingHandlers.publish = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      ko.bindingHandlers.click.init(element, function () {
+        return function () {
+          var topicDetails = ko.unwrap(valueAccessor());
+          if (typeof topicDetails === 'string') {
+            huePubSub.publish(topicDetails)
+          } else if (typeof topicDetails === 'object') {
+            var keys = Object.keys(topicDetails);
+            if (keys.length === 1) {
+              huePubSub.publish(keys[0], topicDetails[keys[0]]);
+            }
+          }
+        }
+      }, allBindings, viewModel, bindingContext);
+    },
+  };
+
   ko.bindingHandlers.clickToCopy = {
     init: function (element, valueAccessor) {
       $(element).click(function () {
