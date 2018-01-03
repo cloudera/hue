@@ -31,7 +31,7 @@ you can use your existing master node as the Hue Server.
 You can download the Hue tarball here:
 [https://github.com/cloudera/hue/releases](https://github.com/cloudera/hue/releases)
 
-## Hue Dependencies
+## Dependencies
 
 Hue employs some Python modules which use native code and requires
 certain development libraries be installed on your system. To install from the
@@ -56,7 +56,7 @@ that user's home directory, or in a directory within `/usr/share`.
 
 Alternatively to building Hue, a [http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/](Hue Docker image) is available.
 
-## Troubleshooting the Hue Tarball Installation
+## Troubleshooting the tarball Installation
 
 .Q: I moved my Hue installation from one directory to another and now Hue no
 longer functions correctly.
@@ -78,7 +78,7 @@ of various Python libraries and you don't have to be concerned about missing
 software components.
 
 
-## Starting Hue from the Tarball
+## Starting the server
 
 After your cluster is running with the plugins enabled, you can start Hue on
 your Hue Server by running:
@@ -250,6 +250,21 @@ This tells Hue to first check against the configured LDAP directory service, and
 
 [Read more about it here](http://gethue.com/configuring-hue-multiple-authentication-backends-and-ldap/).
 
+### Reset a password
+
+[Read more about it here](http://gethue.com/password-management-in-hue/).
+
+### Change your maps look and feel
+
+The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:
+
+<pre>
+[desktop]
+leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
+leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+</pre>
+
+[Read more about it here](http://gethue.com/change-your-maps-look-and-feel/).
 
 ### Configure Hue with a Proxy
 
@@ -457,14 +472,14 @@ system) must be world-writable (1777), as Hive makes extensive use of it.
 </div>
 
 
-### Configuring Your Firewall
+### Firewall
 
 Hue currently requires that the machines within your cluster can connect to
 each other freely over TCP. The machines outside your cluster must be able to
 open TCP port 8888 on the Hue Server (or the configured Hue web HTTP port)
 to interact with the system.
 
-### Files
+### Files and Object Store
 #### HDFS Cluster
 
 Hue supports one HDFS cluster. That cluster should be defined
@@ -638,22 +653,6 @@ specify:
 
 hbase_clusters::
   Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
-
-### Change your maps look and feel
-
-The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:
-
-<pre>
-[desktop]
-leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
-leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-</pre>
-
-[Read more about it here](http://gethue.com/change-your-maps-look-and-feel/).
-
-### Reset a password
-
-[Read more about it here](http://gethue.com/password-management-in-hue/).
 
 ### Configuration Validation
 
