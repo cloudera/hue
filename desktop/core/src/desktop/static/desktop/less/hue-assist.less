@@ -509,6 +509,21 @@
   padding-left: 10px;
 }
 
+.assist-db-header-actions .highlightable a > span {
+  -webkit-transition: all .6s ease;
+  -moz-transition: all .6s ease;
+  -o-transition: all .6s ease;
+  transition: all .6s ease;
+}
+
+.assist-db-header-actions .highlight {
+  padding-left: 0;
+  a > span {
+    text-shadow: 0 0 0.2em @hue-primary-color-light;
+    color: @hue-primary-color-dark !important;
+  }
+}
+
 .assist-details-header {
   display: table-cell;
   width: 95px;
