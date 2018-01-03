@@ -287,6 +287,8 @@ def download(request):
     if facet:
       response['response']['docs'] = response['normalized_facets'][0]['docs']
       collection = facet
+      if not collection['template']['fieldsSelected']:
+        facet['fields'] = facet['template']['fieldsAttributes']
     else:
       collection = json.loads(request.POST.get('collection', '{}'))
 

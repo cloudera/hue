@@ -52,7 +52,6 @@ def invalidate(request):
   return JsonResponse(response)
 
 
-
 @require_POST
 @error_handler
 def refresh_table(request, database, table):
@@ -109,4 +108,3 @@ def get_runtime_profile(request, query_history_id):
     response['profile'] = profile
 
   return JsonResponse(response)
-
