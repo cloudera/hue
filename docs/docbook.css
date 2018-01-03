@@ -116,6 +116,7 @@ table {
 }
 
 table {
+	font-size: 11px;
   border: 1px solid #e5e5e5;
   border-collapse: separate;
   *border-collapse: collapse;

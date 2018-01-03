@@ -434,19 +434,8 @@ configuration file to false.
 ![image](images/note.jpg) **Note**: The [Job Browser](#impala-queries) integrates nicely with the Impala Query Editor.
 
 ### MySQL
-### SparkSQL
 ### Oracle
-### Phoenix
-### Presto
-### Drill
-### Kylin
-
-Apache Kylin is an open-source online analytical processing (OLAP) engine.
-See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
-
-### PostgreSQL
-### Redshift
-### BigQuery
+### KSQL / Kafka SQL
 ### Solr SQL
 
 With Solr 5+, query collections like we would query a regular Hive or Impala table.
@@ -461,8 +450,19 @@ As Solr SQL is pretty recent, there are some caveats, notably Solr lacks support
 
 which prevents a SQL UX experience comparable to the standard other databases (but we track it in [HUE-3686](https://issues.cloudera.org/browse/HUE-3686)).
 
+### Presto
+### PostgreSQL
+### Redshift
+### BigQuery
+### AWS Athena
+### Spark SQL
+### Phoenix
+### Kylin
+Apache Kylin is an open-source online analytical processing (OLAP) engine.
+See how to configure the [Kylin Query Editor](http://gethue.com/using-hue-to-interact-with-apache-kylin/).
+
 ### Others
-Extend [connectors](../sdk/sdk.html#sql).
+Extend with JDBC or your own [connectors](../sdk/sdk.html#sql).
 
 ## Jobs
 
@@ -536,7 +536,7 @@ A Shell job design consists of a shell command.
 
 <table>
 <tr><td>Command</td><td>The shell command.</td></tr>
-<tr><td></td>Capture output<td>Indicate whether to capture the output of the command.</td></tr>
+<tr><td>Capture output</td><td>Indicate whether to capture the output of the command.</td></tr>
 </table>
 
 [Read more about it here](http://gethue.com/use-the-shell-action-in-oozie/).
@@ -605,7 +605,7 @@ Read more about extending [connectors](../sdk/sdk.html#spark-livy).
 
 
 # Dashboards
-Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks. They support Solr and SQL.
+Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
 
 Read more about [Dashboards](http://gethue.com/search-dashboards/).
 
@@ -613,12 +613,15 @@ Read more about [Dashboards](http://gethue.com/search-dashboards/).
 
 Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
 
+### Solr
+### SQL
+
 ## Reports
 
 This is work in progress but dashboards will soon offer a classic reporting option.
 
 ## SDK
-Read more about extending [connectors](../sdk/sdk.html#sql).
+Read more about extending [connectors](../sdk/sdk.html#dashboard).
 
 
 # Browsers
@@ -920,9 +923,9 @@ column.
 4.  To return to the list of tasks for the current job, click the task
     number in the status panel at the left of the window.
 
-## Types
-### YARN (Spark, MapReduce)
-### Impala Queries
+### Types
+#### YARN (Spark, MapReduce)
+#### Impala Queries
 
 There are three ways to access the new browser:
 
@@ -942,8 +945,13 @@ Query capabilities
 Read more about it on [Browsing Impala Query Execution within the SQL Editor
 ](http://gethue.com/browsing-impala-query-execution-within-the-sql-editor/).
 
-### Workflow / Schedules (Oozie)
-### Livy / Spark
+#### Workflow / Schedules (Oozie)
+
+List submitted workflows, schedules and bundles.
+
+#### Livy / Spark
+
+List Livy sessions and submitted statements.
 
 # Scheduler
 The application lets you build workflows and then schedule them to run regularly automatically.
@@ -1397,6 +1405,9 @@ and specify the correct hostnames and ports:
           ## rest_url=http://localhost:9998
 </pre>
 
+## Git
+
+A basic read only version is done [HUE-951](https://issues.cloudera.org/browse/HUE-951).
 
    </div>
 </div>
