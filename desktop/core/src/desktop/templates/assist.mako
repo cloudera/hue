@@ -639,8 +639,8 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-document-header-actions">
     <div class="assist-db-header-actions">
-      <!-- ko if: !loading() && availableTypeFilters().length > 1 -->
-      <div data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: typeFilter, entries: availableTypeFilters, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
+      <!-- ko if: !loading() -->
+      <div class="highlightable" data-bind="css: { 'highlight': $parent.highlightTypeFilter() }, component: { name: 'hue-drop-down', params: { fixedPosition: true, value: typeFilter, entries: DOCUMENT_TYPES, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
@@ -669,17 +669,22 @@ from desktop.views import _ko
     </div>
     <div class="assist-flex-fill assist-file-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
-         <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 27, container: '.assist-file-scrollable' }">
-           <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable' }, assistFileDroppable, assistFileDraggable, visibleOnHover: { 'selector': '.assist-file-actions' }">
-             <div class="assist-file-actions table-actions">
-               <a class="inactive-action" href="javascript:void(0)" data-bind="click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
-             </div>
-             <a href="javascript:void(0)" class="assist-entry assist-document-link" data-bind="click: open, attr: {'title': name }">
-               <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko -->
-               <span class="highlightable" data-bind="css: { 'highlight': highlight }, text: definition().name"></span>
-             </a>
-           </li>
-         </ul>
+        <!-- ko if: filteredEntries().length == 0 -->
+        <ul class="assist-tables">
+          <li class="assist-entry"><span class="assist-no-entries">${_('No documents found')}</span></li>
+        </ul>
+        <!-- /ko -->
+        <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 27, container: '.assist-file-scrollable' }">
+          <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable' }, assistFileDroppable, assistFileDraggable, visibleOnHover: { 'selector': '.assist-file-actions' }">
+            <div class="assist-file-actions table-actions">
+              <a class="inactive-action" href="javascript:void(0)" data-bind="click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
+            </div>
+            <a href="javascript:void(0)" class="assist-entry assist-document-link" data-bind="click: open, attr: {'title': name }">
+              <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko -->
+              <span class="highlightable" data-bind="css: { 'highlight': highlight }, text: definition().name"></span>
+            </a>
+          </li>
+        </ul>
       </div>
       <div data-bind="visible: !loading() && ! hasErrors() && entries().length === 0">
         <span class="assist-no-entries">${_('Empty directory')}</span>
@@ -1347,10 +1352,9 @@ from desktop.views import _ko
 
         self.activeEntry = ko.observable();
         self.activeSort = ko.observable('defaultAsc');
-        self.typeFilter = ko.observable({
-          type: 'all',
-          label: HUE_I18n.documentType['all']
-        });
+        self.typeFilter = ko.observable(DOCUMENT_TYPES[0]); // all is first
+
+        self.highlightTypeFilter = ko.observable(false);
 
         var lastOpenedUuid = self.apiHelper.getFromTotalStorage('assist', 'last.opened.assist.doc.uuid');
 
@@ -1397,7 +1401,6 @@ from desktop.views import _ko
         });
 
         huePubSub.subscribe('assist.doc.highlight', function (details) {
-          huePubSub.publish('left.assist.show');
           huePubSub.publish('assist.show.documents');
           huePubSub.publish('context.popover.hide');
           var whenLoaded = $.Deferred().done(function () {
@@ -1441,6 +1444,20 @@ from desktop.views import _ko
           }
         });
       }
+
+      AssistDocumentsPanel.prototype.setTypeFilter = function (newType) {
+        var self = this;
+        DOCUMENT_TYPES.some(function (docType) {
+          if (docType.type === newType) {
+            self.typeFilter(docType);
+            return true;
+          }
+        });
+        self.highlightTypeFilter(true);
+        window.setTimeout(function () {
+          self.highlightTypeFilter(false);
+        }, 600)
+      };
 
       AssistDocumentsPanel.prototype.fallbackToRoot = function () {
         var self = this;
@@ -1974,9 +1991,13 @@ from desktop.views import _ko
 
               panels.push(documentsPanel);
 
-              huePubSub.subscribe('assist.show.documents', function () {
+              huePubSub.subscribe('assist.show.documents', function (docType) {
+                huePubSub.publish('left.assist.show');
                 if (self.visiblePanel() !== documentsPanel) {
                   self.visiblePanel(documentsPanel);
+                }
+                if (docType) {
+                  documentsPanel.panelData.setTypeFilter(docType);
                 }
               });
 
