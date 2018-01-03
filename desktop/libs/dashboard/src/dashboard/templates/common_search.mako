@@ -165,7 +165,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
           </li>
           <!-- ko if: IS_HUE_4 -->
           <li>
-            <a href="/home/?type=search-dashboard">
+            <a href="javascript:void(0);" data-bind="publish: { 'assist.show.documents': 'search-dashboard' }">
               <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> ${ _('Dashboards') }
             </a>
           </li>

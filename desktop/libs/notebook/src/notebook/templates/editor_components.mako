@@ -211,7 +211,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             </li>
             <li>
               <!-- ko if: IS_HUE_4 -->
-              <a data-bind="publish: { 'assist.show.documents': 'query-' + editorType() }">
+              <a data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
                 <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
               </a>
               <!-- /ko -->
