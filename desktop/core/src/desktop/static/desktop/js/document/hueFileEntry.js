@@ -101,49 +101,7 @@ var HueFileEntry = (function () {
     self.isFilterVisible = ko.observable(false);
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
-    self.availableTypeFilters = ko.pureComputed(function () {
-      var filters = {};
-
-      self.entries().forEach(function (entry) {
-        var type = entry.definition().type;
-        if (!filters[type] && type !== 'directory') {
-
-          var label = HUE_I18n.documentType[type];
-          if (!label) {
-            if (type.indexOf('query-') === 0) {
-              label = type.substring(6);
-            } else {
-              label = type
-            }
-            if (label.length > 0) {
-              label = label.charAt(0).toUpperCase() + label.slice(1);
-            }
-          }
-          if (label) {
-            filters[type] = {
-              type: type,
-              label: label
-            }
-          }
-        }
-      });
-      var result = [];
-      Object.keys(filters).forEach(function (key) {
-        result.push(filters[key]);
-      });
-      result.sort(function (a, b) {
-        return a.label.localeCompare(b.label);
-      });
-
-      result.unshift({
-        type: 'all',
-        label: HUE_I18n.documentType['all']
-      });
-
-      return result;
-    });
-
-    self.typeFilter = options.typeFilter || ko.observable(self.availableTypeFilters()[0]); // First one is always 'all'
+    self.typeFilter = options.typeFilter || ko.observable(DOCUMENT_TYPES[0]); // First one is always 'all'
 
     self.isFilterVisible.subscribe(function (newValue) {
       if (!newValue && self.filter()) {
