@@ -474,7 +474,111 @@ system) must be world-writable (1777), as Hive makes extensive use of it.
 
 #### Hive and Impala High Availability (HA)
 
-Read more about it in the [How to optimally configure your Analytic Database for High Availability with Hue and other SQL clients](http://gethue.com/how-to-optimally-configure-your-analytic-database-for-high-availability-with-hue-and-other-sql-clients) post.
+HiveServer2 and Impala support High Availability through a “load balancer”.
+One caveat is that Hue’s underlying Thrift libraries reuse TCP connections in a
+pool, a single user session may not have the same Impala or Hive TCP connection.
+If a TCP connection is balanced away from the previously selected  HiveServer2
+or Impalad instance, the user session and its queries can be lost and trigger
+the “Results have expired” or “Invalid session Id” errors.
+
+To prevent sessions from being lost, you need configure the load balancer with
+“source” algorithm to ensure each Hue instance sends all traffic to a single
+HiveServer2/Impalad instance. Yes, this is not true load balancing, but a
+configuration for failover High Availability. HiveSever2 or Impala coordinators
+already distribute the work across the cluster so this is not an issue.
+
+To enable an optimal load distribution that works for everybody, you can create
+multiple profiles in our load balancer, per port for Hue clients and non-Hue
+clients like Hive or Impala. You can configure non-Hue clients to distribute loads
+with “roundrobin” or “leastconn” and configure Hue clients with “source”
+(source IP Persistence) on dedicated ports, for example, 10015 for Hive beeline
+commands, 10016 for Hue, 21051 for Hue-Impala interactions while 25003 for Impala shell.
+
+You can configure the HaProxy to have two different ports associated with
+different load balancing algorithms. Here is a sample configuration (haproxy.cfg)
+for Hive and Impala HA on a secure cluster.
+
+<pre>
+frontend hiveserver2_front
+bind *:10015 ssl crt /path/to/cert_key.pem
+mode tcp
+option tcplog
+default_backend hiveserver2
+backend hiveserver2
+    balance                     roundrobin
+    mode                        tcp
+    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+
+frontend  hivejdbc_front
+    bind                        *:10016 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    stick                       match src
+    stick-table type ip size 200k expire 30m
+    default_backend             hivejdbc
+backend hivejdbc
+    balance                     source
+    mode                        tcp
+    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+</pre>
+And here is an example for impala HA configuration on a secure cluster.
+<pre>
+frontend  impala_front
+    bind                        *:25003 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    default_backend             impala
+backend impala
+    balance                     leastconn
+    mode                        tcp
+    server impalad1 host-3.com:21000 ssl ca-file /path/to/truststore.pem check
+    server impalad2 host-2.com:21000 ssl ca-file /path/to/truststore.pem check
+    server impalad3 host-4.com:21000 ssl ca-file /path/to/truststore.pem check
+
+frontend  impalajdbc_front
+    bind                        *:21051 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    stick                       match src
+    stick-table type ip size 200k expire 30m
+    default_backend             impalajdbc
+backend impalajdbc
+    balance                     source
+    mode                        tcp
+    server impalad1 host-3.com:21050 ssl ca-file /path/to/truststore.pem check
+    server impalad2 host-2.com:21050 ssl ca-file /path/to/truststore.pem check
+    server impalad3 host-4.com:21050 ssl ca-file /path/to/truststore.pem check
+</pre>
+
+Note: “check” is required at end of each line to ensure HaProxy can detect any
+unreachable Impalad/HiveServer2 server, so HA failover can be successful. Without
+ TCP check, you may hit the “TSocket reads 0 byte” error when the
+Impalad/HiveServer2 server Hue tries to connect is down.
+
+After editing the /etc/haproxy/haproxy.cfg file, run following commands to
+restart HaProxy service and check the service restarts successfully.
+
+<pre>
+service haproxy restart
+service haproxy status
+</pre>
+
+Also we need add following blocks into hue.ini.
+<pre>
+[impala]
+server_port=21051
+
+[beeswax]
+hive_server_port=10016
+</pre>
+Read more about it in the [How to optimally configure your Analytic Database for
+High Availability with Hue and other SQL clients](http://gethue.com/how-to-opti
+mally-configure-your-analytic-database-for-high-availability-with-hue-and-other-sql-clients) post.
+
 
 ### Firewall
 
