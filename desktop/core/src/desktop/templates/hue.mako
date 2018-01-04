@@ -889,6 +889,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           return promise;
         };
 
+        huePubSub.subscribe('hue4.process.headers', function(opts){
+          self.processHeaders(opts.response).done(function (rawHtml) {
+            opts.callback(rawHtml);
+          });
+        });
+
         self.loadApp = function(app, loadDeep) {
           if (self.currentApp() == 'editor' && $('#editorComponents').length) {
             var vm = ko.dataFor($('#editorComponents')[0]);
