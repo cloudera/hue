@@ -388,23 +388,20 @@ class SQLDashboardApi(DashboardApi):
       merged_fqs.append(field_fq)
 
     for fq in merged_fqs:
-      field = self._get_field(collection, fq['field'])
       if fq['type'] == 'field':
         f = []
-        if self._is_number(field['type']):
-          sql_condition = "`%s` %s %s"
-        else:
-          sql_condition = "`%s` %s '%s'"
         for _filter in fq['filter']:
           exclude = '!=' if _filter['exclude'] else '='
           value = _filter['value']
           if value is not None:
             if isinstance(value, list):
-              f.append(' AND '.join([sql_condition % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)]))
+              f.append(' AND '.join([self._get_field_condition_formatting(collection, _f) % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)]))
             else:
+              sql_condition = self._get_field_condition_formatting(collection, fq['field'])
               f.append(sql_condition % (fq['field'], exclude, value))
         clauses.append(' OR '.join(f))
       elif fq['type'] == 'range':
+        field = self._get_field(collection, fq['field'])
         if self._is_date(field['type']):
           quote = "'"
         else:
@@ -417,6 +414,10 @@ class SQLDashboardApi(DashboardApi):
         })
 
     return clauses
+
+  def _get_field_condition_formatting(self, table, field_name):
+    field = self._get_field(table, field_name)
+    return "`%s` %s %s" if self._is_number(field['type']) else "`%s` %s '%s'"
 
 
   @classmethod
