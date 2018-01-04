@@ -1531,7 +1531,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- ko if: widgetType() == 'hit-widget' -->
           <!-- ko with: $parent -->
             <!-- ko if: counts().length > 0 -->
-              <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts()[0].count, properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
+              <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts(), properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
             <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->

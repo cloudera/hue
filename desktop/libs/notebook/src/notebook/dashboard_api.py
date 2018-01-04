@@ -734,7 +734,7 @@ class SQLDashboardApi(DashboardApi):
   def _convert_notebook_function_facet(self, result, facet, query):
     rows = list(result['data'])
 
-    response = {"query": facet['id'], "counts": rows[0][0], "type": "function", "id": facet['id'], "label": facet['id']}
+    response = {"query": facet['id'], 'counts': {'percentage': 0, 'value': rows[0][0]}, "type": "function", "id": facet['id'], "label": facet['id']}
 
     return {'normalized_facets': [response]}
 
