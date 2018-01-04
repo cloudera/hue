@@ -211,12 +211,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             </li>
             <li>
               <!-- ko if: IS_HUE_4 -->
-              <a data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
+              <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
                 <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
               </a>
               <!-- /ko -->
               <!-- ko ifnot: IS_HUE_4 -->
-              <a class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType()">
+              <a href="javascript:void(0)" class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType()">
                 <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
               </a>
               <!-- /ko -->
