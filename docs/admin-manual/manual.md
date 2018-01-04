@@ -184,7 +184,7 @@ take precedence.
 These configuration variables are under the `[desktop]` section in
 the `hue.ini` configuration file.
 
-### Specifying the Hue HTTP Address
+### Specifying the HTTP port
 
 Hue uses CherryPy web server.  You can use the following options to
 change the IP address and port that the web server listens on.
@@ -266,7 +266,7 @@ leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed,
 
 [Read more about it here](http://gethue.com/change-your-maps-look-and-feel/).
 
-### Configure Hue with a Proxy
+### Configure a Proxy
 
 We explained how to run Hue with NGINX serving the static files or under Apache. If you use another proxy, you might need to set these options:
 
@@ -279,7 +279,7 @@ use_x_forwarded_host=false
 secure_proxy_ssl_header=false
 </pre>
 
-### Configuring Hue for SSL
+### Configuring SSL
 
 You can configure Hue to serve over HTTPS.
 
@@ -384,7 +384,7 @@ Read more about [Auditing User Administration Operations with Hue and Cloudera N
 These configuration variables are under the `[hadoop]` section in
 the `hue.ini` configuration file.
 
-### Install Hadoop and other analytic backends
+### Hadoop and other services
 
 Depending on which apps you need, you need to make sure that some Hadoop services
 are already setup (that way Hue can talk to them).  
@@ -471,6 +471,10 @@ system) must be world-writable (1777), as Hive makes extensive use of it.
   directory containing `hive-site.xml`.
 </div>
 
+
+#### Hive and Impala High Availability (HA)
+
+Read more about it in the [How to optimally configure your Analytic Database for High Availability with Hue and other SQL clients](http://gethue.com/how-to-optimally-configure-your-analytic-database-for-high-availability-with-hue-and-other-sql-clients) post.
 
 ### Firewall
 
@@ -905,7 +909,7 @@ Note that the supervisor automatically restarts these processes if they fail for
 any reason. If the processes fail repeatedly within a short time, the supervisor
 itself shuts down.
 
-## Hue Logging
+## Logging
 
 The Hue logs are found in `/var/log/hue`, or in a `logs` directory under your
 Hue installation root. Inside the log directory you can find:
