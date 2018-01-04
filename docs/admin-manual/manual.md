@@ -214,7 +214,7 @@ In the Hue ini configuration file, in the [desktop] section, you can enter the n
 [desktop]
 # Comma separated list of apps to not load at server startup.
 app_blacklist=beeswax,impala,security,filebrowser,jobbrowser,rdbms,jobsub,pig,hbase,sqoop,zookeeper,metastore,spark,oozie,indexer
-</pre> 
+</pre>
 
 [Read more about it here](http://gethue.com/mini-how-to-disabling-some-apps-from-showing-up/).
 
@@ -252,7 +252,58 @@ This tells Hue to first check against the configured LDAP directory service, and
 
 ### Reset a password
 
+**Programmatically**
+
+When a Hue administrator loses their password, a more programmatic approach is required to secure the administrator again. Hue comes with a wrapper around the python interpreter called the “shell” command. It loads all the libraries required to work with Hue at a programmatic level. To start the Hue shell, type the following command from the Hue installation root.
+
+Then:
+
+    cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
+    build/env/bin/hue shell
+
+The following is a small script, that can be executed within the Hue shell, to change the password for a user named “example”:
+
+    from django.contrib.auth.models import User
+    user = User.objects.get(username='example')
+    user.set_password('some password')
+    user.save()
+
+The script can also be invoked in the shell by using input redirection (assuming the script is in a file named script.py):
+
+    build/env/bin/hue shell < script.py
+
+How to make a certain user a Hue admin
+
+    build/env/bin/hue  shell
+
+Then set these properties to true:
+
+    from django.contrib.auth.models import User
+
+    a = User.objects.get(username='hdfs')
+    a.is_staff = True
+    a.is_superuser = True
+    a.set_password('my_secret')
+    a.save()
+
+** Via a command**
+
+Go on the Hue machine, then in the Hue home directory and either type:
+
+To change the password of the currently logged in Unix user:
+
+    build/env/bin/hue changepassword
+
+If you don't remember the admin username, create a new Hue admin (you will then also be able to login and could change the password of another user in Hue):
+
+    build/env/bin/hue createsuperuser
+
+
 [Read more about it here](http://gethue.com/password-management-in-hue/).
+
+<div class="note">
+Above works with the `AllowFirstUserBackend`, it might be different if another backend is used.
+</div>
 
 ### Change your maps look and feel
 
@@ -274,7 +325,7 @@ We explained how to run Hue with NGINX serving the static files or under Apache.
 [desktop]
 # Enable X-Forwarded-Host header if the load balancer requires it.
 use_x_forwarded_host=false
- 
+
 # Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER.
 secure_proxy_ssl_header=false
 </pre>
@@ -387,7 +438,7 @@ the `hue.ini` configuration file.
 ### Hadoop and other services
 
 Depending on which apps you need, you need to make sure that some Hadoop services
-are already setup (that way Hue can talk to them).  
+are already setup (that way Hue can talk to them).
 
 <pre>
 |-------------|--------------------------------------------------------|
@@ -663,7 +714,7 @@ These keys can securely stored in a script that outputs the actual access key an
 client_id_script=/path/to/client_id_script.sh
 client_secret_script=/path/to/client_secret_script.sh
 tenant_id_script=/path/to/tenant_id_script.sh
- 
+
 [[adls_clusters]]
 [[[default]]]
 fs_defaultfs=adl://<account_name>.azuredatalakestore.net
@@ -679,7 +730,7 @@ Alternatively (but not recommended for production or secure environments), you c
 client_id=adlsclientid
 client_secret=adlsclientsecret
 tenant_id=adlstenantid
- 
+
 [[adls_clusters]]
 [[[default]]]
 fs_defaultfs=adl://<account_name>.azuredatalakestore.net
@@ -824,7 +875,7 @@ superusers and users.
 2.  In the **Credentials** screen, add required information about the
     user. Once you provide the required information you can click the
     wizard step tabs to set other information.
-    
+
  <table>
 <tr><td>Username</td><td>  A user name that contains only letters, numbers, and underscores;
     blank spaces are not allowed and the name cannot begin with a
@@ -837,7 +888,7 @@ superusers and users.
     username. For superusers, the user and group are username and
     supergroup.</td></tr></table>
 
- 
+
 
 3.  Click **Add User** to save the information you specified and close
     the **Add User** wizard or click **Next**.
@@ -855,7 +906,7 @@ superusers and users.
 <tr><td>Groups</td><td> The groups to which the user belongs. By default, a user is assigned
     to the **default** group, which allows access to all applications.
     See [Permissions](#permissions).</td></tr></table>
-    
+
 
 5.  Click **Add User** to save the information you specified and close
     the **Add User** wizard or click **Next**.
