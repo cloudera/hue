@@ -40,7 +40,7 @@ Connectors are pluggable and can new engines can be supported. Feel free to comm
 
 The [SQL Editor page](http://gethue.com/custom-sql-query-editors/) also describes the configuration steps.
 
-Close to 100% of [Hive and Impala grammar](desktop/core/src/desktop/static/desktop/js/autocomplete/jison) is supported which makes the 
+Close to 100% of [Hive and Impala grammar](desktop/core/src/desktop/static/desktop/js/autocomplete/jison) is supported which makes the
 autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.
 
 ### HiveServer2 API
@@ -79,7 +79,7 @@ MapReduce, Pig, Java, Shell, Sqoop, DistCp [Oozie connector](https://github.com/
 Dashboards are generic and support [Solr and any SQL](http://gethue.com/search-dashboards):
 
 The API was influenced by Solr but is now generic:
-    
+
 [Dashboard API](https://github.com/cloudera/hue/blob/master/desktop/libs/dashboard/src/dashboard/dashboard_api.py)
 
 ## SQL
@@ -793,27 +793,27 @@ Once the request is successful then capture headers and cookies for subsequent r
 
 <pre>
 import requests
- 
+
 def login_djangosite():
  next_url = "/"
  login_url = "http://localhost:8888/accounts/login?next=/"
- 
+
  session = requests.Session()
  r = session.get(login_url)
  form_data = dict(username="[your hue username]",password="[your hue password]",
                   csrfmiddlewaretoken=session.cookies['csrftoken'],next=next_url)
  r = session.post(login_url, data=form_data, cookies=dict(), headers=dict(Referer=login_url))
- 
+
  # check if request executed successfully?
  print r.status_code
- 
+
  cookies = session.cookies
  headers = session.headers
- 
- r=session.get('http://localhost:8888/metastore/databases/default/metadata', 
+
+ r=session.get('http://localhost:8888/metastore/databases/default/metadata',
  cookies=session.cookies, headers=session.headers)
  print r.status_code
- 
+
  # check metadata output
  print r.text
 </pre>
