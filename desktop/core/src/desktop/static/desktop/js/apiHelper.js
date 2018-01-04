@@ -1428,50 +1428,6 @@ var ApiHelper = (function () {
   };
 
   /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {Object} [options.editor] - Ace editor
-   *
-   * @param {string} options.databaseName
-   */
-  ApiHelper.prototype.fetchTables = function (options) {
-    var self = this;
-    return fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: genericCacheCondition
-    }));
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {boolean} [options.cachedOnly] - Default false
-   * @param {Object} [options.editor] - Ace editor
-   *
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
-   * @param {string[]} options.fields
-   */
-  ApiHelper.prototype.fetchFields = function (options) {
-    var self = this;
-    var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
-    return fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart,
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: genericCacheCondition
-    }));
-  };
-
-  /**
    * Returns a promise that will always be resolved with:
    *
    * 1. Cached databases
@@ -1592,13 +1548,14 @@ var ApiHelper = (function () {
    * @param {string} options.defaultDatabase
    * @param {boolean} [options.cachedOnly] - Default false
    *
-   * @param {function} successCallback
+   * @returns {Object} promise
    */
-  ApiHelper.prototype.identifierChainToPath = function (options, successCallback) {
+  ApiHelper.prototype.identifierChainToPath = function (options) {
     var self = this;
+    var promise = $.Deferred();
     if (options.identifierChain.length === 0) {
-      successCallback([options.defaultDatabase]);
-      return;
+      promise.resolve([options.defaultDatabase]);
+      return promise;
     }
 
     var identifierChainClone = options.identifierChain.concat();
@@ -1615,12 +1572,44 @@ var ApiHelper = (function () {
 
       if (identifierChainClone.length > 1) {
         self.expandComplexIdentifierChain(options.sourceType, path[0], identifierChainClone, function (fetchedFields) {
-          successCallback(path.concat(fetchedFields))
+          promise.resolve(path.concat(fetchedFields))
         }, options.errorCallback, options.cachedOnly);
       } else {
-        successCallback(path.concat($.map(identifierChainClone, function (identifier) { return identifier.name })))
+        promise.resolve(path.concat($.map(identifierChainClone, function (identifier) { return identifier.name })))
       }
     });
+    return promise;
+  };
+
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.cachedOnly] - Default false
+   *
+   * @param {string[]} [options.path] - The path to fetch
+   *
+   * @return {Deferred} Promise
+   */
+  ApiHelper.prototype.fetchSqlMetadata = function (options) {
+    var self = this;
+    var promise = $.Deferred();
+
+    fetchAssistData.bind(self)({
+      url: AUTOCOMPLETE_API_PREFIX + options.path.join('/'),
+      sourceType: options.sourceType,
+      silenceErrors: options.silenceErrors,
+      cachedOnly: options.cachedOnly,
+      successCallback: promise.resolve,
+      errorCallback: self.assistErrorCallback({
+        errorCallback: promise.reject,
+        silenceErrors: options.silenceErrors
+      }),
+      cacheCondition: genericCacheCondition
+    });
+
+    return promise;
   };
 
   /**
@@ -1637,15 +1626,83 @@ var ApiHelper = (function () {
    * @param {string} options.identifierChain.name
    * @param {string} options.defaultDatabase
    */
+  // TODO: Drop and use fetchSqlMetadata instead
   ApiHelper.prototype.fetchAutocomplete = function (options) {
     var self = this;
-    self.identifierChainToPath(options, function (path) {
+    self.identifierChainToPath(options).done(function (path) {
       fetchAssistData.bind(self)($.extend({}, options, {
         url: AUTOCOMPLETE_API_PREFIX + path.join('/'),
         errorCallback: self.assistErrorCallback(options),
         cacheCondition: genericCacheCondition
       }));
     });
+  };
+
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string[]} options.hierarchy
+   */
+  // TODO: Drop and use fetchSqlMetadata instead
+  ApiHelper.prototype.fetchPanelData = function (options) {
+    var self = this;
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: genericCacheCondition
+    }));
+  };
+
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {string} options.databaseName
+   */
+  // TODO: Drop and use fetchSqlMetadata instead
+  ApiHelper.prototype.fetchTables = function (options) {
+    var self = this;
+    return fetchAssistData.bind(self)($.extend({}, options, {
+      url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: genericCacheCondition
+    }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   * @param {boolean} [options.cachedOnly] - Default false
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {string} options.databaseName
+   * @param {string} options.tableName
+   * @param {string[]} options.fields
+   */
+  // TODO: Drop and use fetchSqlMetadata instead
+  ApiHelper.prototype.fetchFields = function (options) {
+    var self = this;
+    var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
+    return fetchAssistData.bind(self)($.extend({}, options, {
+      url: AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart,
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: genericCacheCondition
+    }));
   };
 
   /**
@@ -1663,7 +1720,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchSamples = function (options) {
     var self = this;
-    self.identifierChainToPath(options, function (path) {
+    self.identifierChainToPath(options).done(function (path) {
       fetchAssistData.bind(self)($.extend({}, options, {
         url: SAMPLE_API_PREFIX + path.join('/'),
         errorCallback: self.assistErrorCallback(options),
@@ -1751,24 +1808,6 @@ var ApiHelper = (function () {
         fetchFunction: fetchFunction
       }));
     });
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string[]} options.hierarchy
-   */
-  ApiHelper.prototype.fetchPanelData = function (options) {
-    var self = this;
-    fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: genericCacheCondition
-    }));
   };
 
   ApiHelper.prototype.getClusterConfig = function (data) {
@@ -2215,10 +2254,10 @@ var ApiHelper = (function () {
       })
       .fail(self.assistErrorCallback(options))
       .always(function () {
-      if (typeof options.editor !== 'undefined' && options.editor !== null) {
-        options.editor.hideSpinner();
-      }
-    });
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
+        }
+      });
 
     if (!firstInQueue) {
       return;
@@ -2241,6 +2280,7 @@ var ApiHelper = (function () {
       timeout: options.timeout
     }).success(function (data) {
       data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
+
       // TODO: Display warning in autocomplete when an entity can't be found
       // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
       // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'

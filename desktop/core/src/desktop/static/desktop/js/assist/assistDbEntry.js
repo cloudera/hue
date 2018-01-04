@@ -38,21 +38,29 @@ var AssistDbEntry = (function () {
    */
   function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings) {
     var self = this;
-    self.i18n = i18n;
     self.definition = definition;
-    self.assistDbSource = assistDbSource;
-    self.sortFunctions = assistDbSource.sortFunctions;
     self.parent = parent;
+    self.assistDbSource = assistDbSource;
     self.filter = filter;
-    self.filterColumnNames = ko.observable(false);
+    self.i18n = i18n;
+    self.navigationSettings = navigationSettings;
+
+    self.sourceType = assistDbSource.sourceType;
+    self.invalidateOnRefresh =  assistDbSource.invalidateOnRefresh;
+    self.sortFunctions = assistDbSource.sortFunctions;
     self.isSearchVisible = assistDbSource.isSearchVisible;
-    self.sourceType = self.assistDbSource.sourceType;
-    self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
-    self.highlight = ko.observable(false);
-    self.activeSort = self.assistDbSource.activeSort;
-    self.popularity = ko.observable(0);
+    self.activeSort = assistDbSource.activeSort;
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
+
+    self.metadata = new SqlMetadata({
+      sourceType: self.sourceType,
+      path: self.getHierarchy()
+    });
+
+    self.filterColumnNames = ko.observable(false);
+    self.highlight = ko.observable(false);
+    self.popularity = ko.observable(0);
 
     self.loaded = false;
     self.loading = ko.observable(false);
@@ -61,8 +69,6 @@ var AssistDbEntry = (function () {
     self.statsVisible = ko.observable(false);
 
     self.hasErrors = ko.observable(false);
-
-    self.navigationSettings = navigationSettings;
 
     self.open.subscribe(function(newValue) {
       if (newValue && self.entries().length == 0) {
@@ -311,21 +317,16 @@ var AssistDbEntry = (function () {
 
     var loadEntriesDeferred = $.Deferred();
 
-    var successCallback = function(data) {
+    var successCallback = function(sqlMeta) {
       self.entries([]);
       self.hasErrors(false);
       self.loading(false);
       self.loaded = true;
 
-      if (data.status === 0 && data.code === 500 && !data.tables_meta) {
-        self.hasErrors(true);
-        return;
-      }
-
       var newEntries = [];
       var index = 0;
-      if (typeof data.tables_meta !== "undefined") {
-        newEntries = $.map(data.tables_meta, function(table) {
+      if (typeof sqlMeta.meta.tables_meta !== "undefined") {
+        newEntries = $.map(sqlMeta.meta.tables_meta, function(table) {
           table.index = index++;
           table.title = table.name + (table.comment ? ' - ' + table.comment : '');
           table.displayName = table.name;
@@ -333,8 +334,8 @@ var AssistDbEntry = (function () {
           table.isView = /view/i.test(table.type);
           return self.createEntry(table);
         });
-      } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
-        newEntries = $.map(data.extended_columns, function (columnDef) {
+      } else if (typeof sqlMeta.meta.extended_columns !== "undefined" && sqlMeta.meta.extended_columns !== null) {
+        newEntries = $.map(sqlMeta.meta.extended_columns, function (columnDef) {
           var displayName = columnDef.name;
           if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
             displayName += ' (' + columnDef.type + ')'
@@ -354,8 +355,8 @@ var AssistDbEntry = (function () {
           columnDef.type = shortType;
           return self.createEntry(columnDef);
         });
-      } else if (typeof data.columns !== "undefined" && data.columns !== null) {
-        newEntries = $.map(data.columns, function(columnName) {
+      } else if (typeof sqlMeta.meta.columns !== "undefined" && sqlMeta.meta.columns !== null) {
+        newEntries = $.map(sqlMeta.meta.columns, function(columnName) {
           return self.createEntry({
             name: columnName,
             index: index++,
@@ -364,61 +365,59 @@ var AssistDbEntry = (function () {
             isColumn: true
           });
         });
-      } else if (typeof data.type !== "undefined" && data.type !== null) {
-        if (data.type === "map") {
-          newEntries = [
-            self.createEntry({
-              name: "key",
-              index: index++,
-              displayName: "key (" + data.key.type + ")",
-              title: "key (" + data.key.type + ")",
-              type: data.key.type,
-              isComplex: true
-            }),
-            self.createEntry({
-              name: "value",
-              index: index++,
-              displayName: "value (" + data.value.type + ")",
-              title: "value (" + data.value.type + ")",
-              isMapValue: true,
-              type: data.value.type,
-              isComplex: true
-            })
-          ];
-        } else if (data.type == "struct") {
-          newEntries = $.map(data.fields, function(field) {
-            return self.createEntry({
-              name: field.name,
-              index: index++,
-              displayName: field.name + " (" + field.type + ")",
-              title: field.name + " (" + field.type + ")",
-              type: field.type,
-              isComplex: true
-            });
+      } else if (sqlMeta.isMap()) {
+        newEntries = [
+          self.createEntry({
+            name: "key",
+            index: index++,
+            displayName: "key (" + sqlMeta.meta.key.type + ")",
+            title: "key (" + sqlMeta.meta.key.type + ")",
+            type: sqlMeta.meta.key.type,
+            isComplex: true
+          }),
+          self.createEntry({
+            name: "value",
+            index: index++,
+            displayName: "value (" + sqlMeta.meta.value.type + ")",
+            title: "value (" + sqlMeta.meta.value.type + ")",
+            isMapValue: true,
+            type: sqlMeta.meta.value.type,
+            isComplex: true
+          })
+        ];
+      } else if (sqlMeta.isStruct()) {
+        newEntries = $.map(sqlMeta.meta.fields, function(field) {
+          return self.createEntry({
+            name: field.name,
+            index: index++,
+            displayName: field.name + " (" + field.type + ")",
+            title: field.name + " (" + field.type + ")",
+            type: field.type,
+            isComplex: true
           });
-        } else if (data.type == "array") {
-          newEntries = [
-            self.createEntry({
-              name: "item",
-              index: index++,
-              displayName: "item (" + data.item.type + ")",
-              title: "item (" + data.item.type + ")",
-              isArray: true,
-              type: data.item.type,
-              isComplex: true
-            })
-          ];
-        }
+        });
+      } else if (sqlMeta.isArray()) {
+        newEntries = [
+          self.createEntry({
+            name: "item",
+            index: index++,
+            displayName: "item (" + sqlMeta.meta.item.type + ")",
+            title: "item (" + sqlMeta.meta.item.type + ")",
+            isArray: true,
+            type: sqlMeta.meta.item.type,
+            isComplex: true
+          })
+        ];
       }
 
-
-      if (data.type === 'array' || data.type === 'map') {
+      if (sqlMeta.isArray() || sqlMeta.isMap()) {
         self.entries(newEntries);
         self.entries()[0].open(true);
       } else {
         newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
         self.entries(newEntries);
       }
+
       loadEntriesDeferred.resolve(newEntries);
       if (typeof callback === 'function') {
         callback();
@@ -462,13 +461,7 @@ var AssistDbEntry = (function () {
       })
     }
 
-    self.assistDbSource.apiHelper.fetchPanelData({
-      sourceType: self.assistDbSource.sourceType,
-      hierarchy: self.getHierarchy(),
-      successCallback: successCallback,
-      errorCallback: errorCallback,
-      silenceErrors: self.navigationSettings.rightAssist || !!silenceErrors
-    });
+    self.metadata.load(self.navigationSettings.rightAssist || !!silenceErrors, false).done(successCallback).fail(errorCallback);
   };
 
   /**
