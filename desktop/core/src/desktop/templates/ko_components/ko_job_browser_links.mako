@@ -144,8 +144,9 @@ from desktop.views import _ko
           },
           dataType: 'html',
           success: function (response) {
-            var r = params.onePageViewModel.processHeaders(response);
-            $('#mini_jobbrowser').html(r);
+            params.onePageViewModel.processHeaders(response).done(function (rawHtml) {
+              $('#mini_jobbrowser').html(rawHtml);
+            });
           }
         });
 
