@@ -11,7 +11,7 @@ and ``default.css`` revision 3442
 */
 
 @import url(default.css);
-@import url(pysrc.css);
+@import url(pygments.css);
 
 body {
   font-family: Arial, sans-serif;

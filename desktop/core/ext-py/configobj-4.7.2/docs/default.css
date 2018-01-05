@@ -1,8 +1,6 @@
 /*
-:Author: David Goodger
-:Contact: goodger@users.sourceforge.net
-:Date: $Date: 2005-09-25 17:49:54 +0200 (Sun, 25 Sep 2005) $
-:Revision: $Revision: 3901 $
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 5951 2009-05-18 18:03:10Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -11,10 +9,17 @@ See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
 customize this style sheet.
 */
 
-/* "! important" is used here to override other ``margin-top`` and
-   ``margin-bottom`` styles that are later in the stylesheet or 
-   more specific.  See http://www.w3.org/TR/CSS1#the-cascade */
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
 .first {
+  /* Override more specific margin styles with "! important". */
   margin-top: 0 ! important }
 
 .last, .with-subtitle {
@@ -83,7 +88,8 @@ div.dedication p.topic-title {
   font-style: normal }
 
 div.figure {
-  margin-left: 2em }
+  margin-left: 2em ;
+  margin-right: 2em }
 
 div.footer, div.header {
   clear: both;
@@ -100,7 +106,7 @@ div.line-block div.line-block {
   margin-left: 1.5em }
 
 div.sidebar {
-  margin-left: 1em ;
+  margin: 0 0 0.5em 1em ;
   border: medium outset ;
   padding: 1em ;
   background-color: #ffffee ;
@@ -142,14 +148,32 @@ h2.subtitle {
 hr.docutils {
   width: 75% }
 
-img.align-left {
-  clear: left }
+img.align-left, .figure.align-left{
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
 
-img.align-right {
-  clear: right }
+img.align-right, .figure.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
 
-img.borderless {
-  border: 0 }
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: left }
+
+/* div.align-center * { */
+/*   text-align: left } */
 
 ol.simple, ul.simple {
   margin-bottom: 1em }
@@ -204,17 +228,11 @@ p.topic-title {
 pre.address {
   margin-bottom: 0 ;
   margin-top: 0 ;
-  font-family: serif ;
-  font-size: 100% }
-
-pre.line-block {
-  font-family: serif ;
-  font-size: 100% }
+  font: inherit }
 
 pre.literal-block, pre.doctest-block {
   margin-left: 2em ;
-  margin-right: 2em ;
-  background-color: #eeeeee }
+  margin-right: 2em }
 
 span.classifier {
   font-family: sans-serif ;
@@ -230,10 +248,8 @@ span.interpreted {
 span.option {
   white-space: nowrap }
 
- /* 
 span.pre {
   white-space: pre }
-*/
 
 span.problematic {
   color: red }
@@ -243,7 +259,8 @@ span.section-subtitle {
   font-size: 80% }
 
 table.citation {
-  border-left: solid thin gray }
+  border-left: solid 1px gray;
+  margin-left: 1px }
 
 table.docinfo {
   margin: 2em 4em }
@@ -253,7 +270,8 @@ table.docutils {
   margin-bottom: 0.5em }
 
 table.footnote {
-  border-left: solid thin black }
+  border-left: solid 1px black;
+  margin-left: 1px }
 
 table.docutils td, table.docutils th,
 table.docinfo td, table.docinfo th {
@@ -270,9 +288,6 @@ table.docutils th.field-name, table.docinfo th.docinfo-name {
 h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
 h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
   font-size: 100% }
-
-tt.docutils {
-  background-color: #eeeeee }
 
 ul.auto-toc {
   list-style-type: none }

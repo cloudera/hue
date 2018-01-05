@@ -1,6 +1,6 @@
 # validate.py
 # A Validator object
-# Copyright (C) 2005 Michael Foord, Mark Andrews, Nicola Larosa
+# Copyright (C) 2005-2010 Michael Foord, Mark Andrews, Nicola Larosa
 # E-mail: fuzzyman AT voidspace DOT org DOT uk
 #         mark AT la-la DOT com
 #         nico AT tekNico DOT net
@@ -128,11 +128,8 @@
     A badly formatted set of arguments will raise a ``VdtParamError``.
 """
 
-__docformat__ = "restructuredtext en"
+__version__ = '1.0.1'
 
-__version__ = '1.0.0'
-
-__revision__ = '$Id: validate.py 123 2005-09-08 08:54:28Z fuzzyman $'
 
 __all__ = (
     '__version__',
@@ -271,8 +268,6 @@ def dottedQuadToNum(ip):
     16908291
     >>> int(dottedQuadToNum('1.2.3.4'))
     16909060
-    >>> dottedQuadToNum('1.2.3. 4')
-    16909060
     >>> dottedQuadToNum('255.255.255.255')
     4294967295L
     >>> dottedQuadToNum('255.255.255.256')
@@ -287,7 +282,7 @@ def dottedQuadToNum(ip):
         return struct.unpack('!L',
             socket.inet_aton(ip.strip()))[0]
     except socket.error:
-        # bug in inet_aton, corrected in Python 2.3
+        # bug in inet_aton, corrected in Python 2.4
         if ip.strip() == '255.255.255.255':
             return 0xFFFFFFFFL
         else:
@@ -595,7 +590,7 @@ class Validator(object):
                 # no information needed here - to be handled by caller
                 raise VdtMissingValue()
             value = self._handle_none(default)
-                
+        
         if value is None:
             return None
         
@@ -604,7 +599,7 @@ class Validator(object):
 
     def _handle_none(self, value):
         if value == 'None':
-            value = None
+            return None
         elif value in ("'None'", '"None"'):
             # Special case a quoted None
             value = self._unquote(value)
@@ -620,7 +615,7 @@ class Validator(object):
             fun_kwargs = dict(fun_kwargs)
         else:
             fun_name, fun_args, fun_kwargs, default = self._parse_check(check)
-            fun_kwargs = dict((str(key), value) for (key, value) in fun_kwargs.items())
+            fun_kwargs = dict([(str(key), value) for (key, value) in fun_kwargs.items()])
             self._cache[check] = fun_name, list(fun_args), dict(fun_kwargs), default
         return fun_name, fun_args, fun_kwargs, default
         
@@ -670,17 +665,7 @@ class Validator(object):
 
         # Default must be deleted if the value is specified too,
         # otherwise the check function will get a spurious "default" keyword arg
-        try:
-            default = fun_kwargs.pop('default', None)
-        except AttributeError:
-            # Python 2.2 compatibility
-            default = None
-            try:
-                default = fun_kwargs['default']
-                del fun_kwargs['default']
-            except KeyError:
-                pass
-            
+        default = fun_kwargs.pop('default', None)
         return fun_name, fun_args, fun_kwargs, default
 
 
