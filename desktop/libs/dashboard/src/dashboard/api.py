@@ -257,7 +257,7 @@ def get_terms(request):
       # maxcount
     }
     if analysis['terms']['prefix']:
-      properties['terms.regex'] = '^%(prefix)s.*' % analysis['terms'] # Case insensitive 'terms.prefix'
+      properties['terms.regex'] = '.*%(prefix)s.*' % analysis['terms'] # Use regexp instead of case sensitive 'terms.prefix'
       properties['terms.regex.flag'] = 'case_insensitive'
 
     result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
