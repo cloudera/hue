@@ -33,7 +33,7 @@ from desktop.models import Document
 from hadoop import cluster
 from hadoop.conf import YARN_CLUSTERS
 from hadoop.pseudo_hdfs4 import is_live_cluster
-from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
+from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api, spark_history_server_api
 from hadoop.yarn.spark_history_server_api import SparkHistoryServerApi
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
@@ -400,6 +400,9 @@ class TestMapReduce2NoHadoop:
       mapreduce_api.old_get_mapreduce_api = mapreduce_api.get_mapreduce_api
     if not hasattr(history_server_api, 'old_get_history_server_api'):
       history_server_api.old_get_history_server_api = history_server_api.get_history_server_api
+    if not hasattr(spark_history_server_api, 'old_get_spark_history_server_api'):
+      spark_history_server_api.old_get_spark_history_server_api = spark_history_server_api.get_history_server_api
+
 
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "jobbrowser")
@@ -416,6 +419,7 @@ class TestMapReduce2NoHadoop:
     resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
     mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
     history_server_api.get_history_server_api = lambda username: HistoryServerApi(username)
+    spark_history_server_api.get_history_server_api = lambda: MockSparkHistoryApi()
 
     self.finish = [
         YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),
@@ -428,6 +432,7 @@ class TestMapReduce2NoHadoop:
     resource_manager_api.get_resource_manager = getattr(resource_manager_api, 'old_get_resource_manager')
     mapreduce_api.get_mapreduce_api = getattr(mapreduce_api, 'old_get_mapreduce_api')
     history_server_api.get_history_server_api = getattr(history_server_api, 'old_get_history_server_api')
+    spark_history_server_api.get_history_server_api = getattr(spark_history_server_api, 'old_get_spark_history_server_api')
 
     for f in self.finish:
       f()
@@ -1173,6 +1178,9 @@ class MockSparkHistoryApi(SparkHistoryServerApi):
 
   def download_executor_logs(self, user, executor, name, offset):
     return 'dummy_log'
+
+  def get_executors_loglinks(self, job):
+    return None
 
 class HistoryServerApi(MockMapreduce2Api):
 
