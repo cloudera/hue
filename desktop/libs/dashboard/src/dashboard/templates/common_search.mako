@@ -3635,9 +3635,7 @@ function newSearch() {
 }
 
 function loadSearch(collection, query, initial) {
-
   searchViewModel = new SearchViewModel(collection, query, initial);
-
   ko.applyBindings(searchViewModel, $('#searchComponents')[0]);
 
   searchViewModel.timelineChartTypes = ko.observableArray([
@@ -4099,7 +4097,6 @@ $(document).ready(function () {
     if (searchViewModel.collection.getFacetById(widget.id()) == null) {
       showAddFacetDemiModal(widget);
     }
-    searchViewModel.search();
   }
 
   function widgetDraggedAdditionalHandler(widget, row) {
