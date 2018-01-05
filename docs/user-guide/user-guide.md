@@ -25,12 +25,12 @@ Use the left metadata assists to browse your existing data without losing your e
 
 **2. Query your data**
 
-When you found your data, the Editor’s autocomplete is extremely powerful as they support 90-100% of the language syntax and will highlight any syntax or logical error. The right assistant provides quick previews of the datasets, which columns or JOINs are popular and recommendations on how to type optimized queries. After the querying, refine your results before exporting to S3/HDFS/ADLS or downloaded as CSV/Excel.
+When you found your data, the Editor's autocomplete is extremely powerful as they support 90-100% of the language syntax and will highlight any syntax or logical error. The right assistant provides quick previews of the datasets, which columns or JOINs are popular and recommendations on how to type optimized queries. After the querying, refine your results before exporting to S3/HDFS/ADLS or downloaded as CSV/Excel.
 
 ** 4 applications**
 
-* Editor: The goal of Hue’s Editor is to make data querying easy and productive. It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
-* Browsers: Hue’s Browsers let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
+* Editor: The goal of Hue's Editor is to make data querying easy and productive. It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
+* Browsers: Hue's Browsers let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
 * Dashboard: Dashboards are an interactive way to explore your data quickly and easily. No programming is required and the analysis is done by drag & drops and clicks.
 * Scheduler: The application lets you build workflows and then schedule them to run regularly automatically. A monitoring interface shows the progress, logs and allow actions like pausing or stopping jobs.
 
@@ -50,7 +50,7 @@ From top to bottom we have:
 * A collapsible hamburger menu that offers links to the various apps and a quick way to import data
 * An extended quick browse on the left
 * The main app area, where the fun is ;)
-* A right Assistant panel for the current application. It’s now enabled for the editors, and in case of Hive for instance, it offers you a live help, a quick browse for the used tables in your query, and much more: if your Hue instance is connected to a SQL Optimizer service like Cloudera Navigator Optimizer, it can offer suggestions on your queries!
+* A right Assistant panel for the current application. It's now enabled for the editors, and in case of Hive for instance, it offers you a live help, a quick browse for the used tables in your query, and much more: if your Hue instance is connected to a SQL Optimizer service like Cloudera Navigator Optimizer, it can offer suggestions on your queries!
 * Various applications have been grouped into 4 main conceptual areas:
 
 Learn more on the [The Hue 4 user interface in detail](http://gethue.com/the-hue-4-user-interface-in-detail/).
@@ -62,7 +62,7 @@ The new search bar is always accessible on the top of screen, and it offers a do
 
 ** Embedded Search & Tagging **
 
-Have you ever struggled to remember table names related to your project? Does it take much too long to find those columns or views? Hue now lets you easily search for any table, view, or column across all databases in the cluster. With the ability to search across tens of thousands of tables, you’re able to quickly find the tables that are relevant for your needs for faster data discovery.
+Have you ever struggled to remember table names related to your project? Does it take much too long to find those columns or views? Hue now lets you easily search for any table, view, or column across all databases in the cluster. With the ability to search across tens of thousands of tables, you're able to quickly find the tables that are relevant for your needs for faster data discovery.
 
 In addition, you can also now tag objects with names to better categorize them and group them to different projects. These tags are searchable, expediting the exploration process through easier, more intuitive discovery.
 
@@ -72,12 +72,12 @@ A top search bar now appears. The autocomplete offers a list of facets and prefi
 
 ** Granular Search **
 
-By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:’ filter.
+By default, only tables and views are returned. To search for columns, partitions, databases use the ‘type:' filter.
 
 Example of searches:
 
 * table:customer → Find the customer table
-* table:tax* tags:finance → List all the tables starting with tax and tagged with ‘finance’
+* table:tax* tags:finance → List all the tables starting with tax and tagged with ‘finance'
 * owner:admin type:field usage → List all the fields created by the admin user that matches the usage string
 * parentPath:"/default/web_logs" type:FIELD  originalName:b* → List all the columns starting with `b` of the table `web_logs` in the database `default`.
 
@@ -106,47 +106,42 @@ These visualizations are convenient for plotting chronological data or when subs
 * Scattered plot
 * Maps (Marker and Gradient)
 
-## Importer
+## Data Importer
 
-The goal of the importer is to allow ad hoc queries on data not yet in the clusters.
-
-### Importing Data
+The goal of the importer is to allow ad hoc queries on data not yet in the clusters thereby expedite self-service analytics.
 
 If you want to import your own data instead of installing the sample
 tables, open the importer from the left menu or from the little `+` in the left assist.
 
-### Tables
+If you've ever struggled with creating new SQL tables from files, you'll be happy to learn that this is now much easier. The wizard has been revamped to two simple steps and also offers more formats. Now users just need to:
+
+1. Select a source type
+2. Select the type of object for the destination
+
+And that's it!
+
+To learn more, watch the video on [Data Import Wizard](http://gethue.com/import-data-to-be-queried-via-the-self-service-drag-drop-create-table-wizard/).
+
+### SQL Tables
 
 Although you can create tables by executing the appropriate Hive HQL DDL
 query commands, it is easier to create a table using the create table wizard.
 
-There are two ways to create a table: from a file or manually. If you
-create a table from a file, the format of the data in the file will
-determine some of the properties of the table, such as the record and
-file formats. The data from the file you specify is imported
-automatically upon table creation. When you create a file manually, you
-specify all the properties of the table, and then execute the resulting
-query to actually create the table. You then import data into the table
-as an additional step.
-
 **From a File**
 
-If you’ve ever struggled with creating new SQL tables from files, you’ll be happy to learn that this is now much easier. With the latest Hue release, you can now create these in an ad hoc way and thereby expedite self-service analytics. The wizard has been revamped to two simple steps and also offers more formats. Now users just need to:
+If you've ever struggled with creating new SQL tables from files, you'll be happy to learn that this is now much easier. With the latest Hue release, you can now create these in an ad hoc way and thereby expedite self-service analytics. The wizard has been revamped to two simple steps and also offers more formats. Now users just need to:
 
-1.  Select a file
+1. In the Importer Manager selects source from a 'File'
 1. Select the type of table
 
-And that’s it! Files can be dragged & dropped, selected from HDFS or S3 (if configured), and their formats are automatically detected. The wizard also assists when performing advanced functionalities like table partitioning, Kudu tables, and nested types.
-
-Learn more on the [Create table wizard](https://blog.cloudera.com/blog/2017/05/new-in-cloudera-enterprise-5-11-hue-data-search-and-tagging/).
+Files can be dragged & dropped, selected from HDFS or S3 (if configured), and their formats are automatically detected. The wizard also assists when performing advanced functionalities like table partitioning, Kudu tables, and nested types.
 
 
 **Manually**
 
-1.  In the ACTIONS pane in the Metastore Manager window, click **Create
-    a new table manually**. The table creation wizard starts.
+1.  In the Importer Manager selects 'Manually'
 2.  Follow the instructions in the wizard to create the table. The basic
-    steps are:
+    steps are:    
     -   Name the table.
     -   Choose the record format.
     -   Configure record serialization by specifying delimiters for
@@ -158,17 +153,14 @@ Learn more on the [Create table wizard](https://blog.cloudera.com/blog/2017/05/n
     -   Specify partition columns, providing a name and selecting the
         type for each column.
 
-3.  Click **Create table**. The Table Metadata window displays.
 
+### Indexing
 
-
-### Indexes
-
-In the past, indexing data into Solr has been quite difficult. The task involved writing a Solr schema and a morphlines file then submitting a job to YARN to do the indexing. Often times getting this correct for non trivial imports could take a few days of work. Now with Hue’s new feature you can start your YARN indexing job in minutes. This tutorial offers a step by step guide on how to do it.
+In the past, indexing data into Solr to then explore it with a [Dynamic Dashboard](http://gethue.com/search-dashboards/) has been quite difficult. The task involved writing a Solr schema and a Morphlines file then submitting a job to YARN to do the indexing. Often times getting this correct for non trivial imports could take a few days of work. Now with Hue's new feature you can start your YARN indexing job in minutes. This tutorial offers a step by step guide on how to do it.
 
 [Read more about it here](http://gethue.com/easy-indexing-of-data-into-solr/).
 
-### DBMS
+### Traditional Databases
 
 Read more about [ingesting data from traditional databases](http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/).
 
@@ -185,7 +177,7 @@ Sharing happens on the main page or via the top right menu of the application. U
 Via the Home page, saved documents can be exported for backups or transferring to another Hue.
 
 # Editors / Notebook
-The goal of Hue’s Editor is to make data querying easy and productive.
+The goal of Hue's Editor is to make data querying easy and productive.
 
 It focuses on SQL but also supports job submissions. It comes with an intelligent autocomplete, search & tagging of data and query assistance.
 
@@ -241,7 +233,7 @@ server.
 3.  If there are multiple statements in the query (separated by semi-colons), click Next in the
     Multi-statement query pane to execute the remaining statements.
 
-When you have multiple statements it’s enough to put the cursor in the statement you want to execute, the active statement is indicated with a blue gutter marking.
+When you have multiple statements it's enough to put the cursor in the statement you want to execute, the active statement is indicated with a blue gutter marking.
 
 
 ![image](images/note.jpg) **Note**: Under the logs panel, you can view any
@@ -335,7 +327,7 @@ default.</td></tr>
 
 ### Autocomplete
 
-To make your SQL editing experience better we’ve created a  new autocompleter for Hue 3.11. The old one had some limitations and was only aware of parts of the statement being edited. The new autocompleter knows all the ins and outs of the Hive and Impala SQL dialects and will suggest keywords, functions, columns, tables, databases, etc. based on the structure of the statement and the position of the cursor.
+To make your SQL editing experience better we've created a  new autocompleter for Hue 3.11. The old one had some limitations and was only aware of parts of the statement being edited. The new autocompleter knows all the ins and outs of the Hive and Impala SQL dialects and will suggest keywords, functions, columns, tables, databases, etc. based on the structure of the statement and the position of the cursor.
 
 The result is improved completion throughout. We now have completion for more than just SELECT statements, it will help you with the other DDL and DML statements too, INSERT, CREATE, ALTER, DROP etc.
 
@@ -360,11 +352,11 @@ When editing subqueries it will only make suggestions within the scope of the su
 
 **All about quality**
 
-We’ve fine-tuned the live autocompletion for a better experience and we’ve introduced some options under the editor settings where you can turn off live autocompletion or disable the autocompleter altogether (if you’re adventurous). To access these settings open the editor and focus on the code area, press CTRL + , (or on Mac CMD + ,) and the settings will appear.
+We've fine-tuned the live autocompletion for a better experience and we've introduced some options under the editor settings where you can turn off live autocompletion or disable the autocompleter altogether (if you're adventurous). To access these settings open the editor and focus on the code area, press CTRL + , (or on Mac CMD + ,) and the settings will appear.
 
-The autocompleter talks to the backend to get data for tables and databases etc. by default it will timeout after 5 seconds but once it has been fetched it’s cached for the next time around. The timeout can be adjusted in the Hue server configuration.
+The autocompleter talks to the backend to get data for tables and databases etc. by default it will timeout after 5 seconds but once it has been fetched it's cached for the next time around. The timeout can be adjusted in the Hue server configuration.
 
-We’ve got an extensive test suite but not every possible statement is covered, if the autocompleter can’t interpret a statement it will be silent and no drop-down will appear. If you encounter a case where you think it should suggest something but doesn’t or if it gives incorrect suggestions then please let us know.
+We've got an extensive test suite but not every possible statement is covered, if the autocompleter can't interpret a statement it will be silent and no drop-down will appear. If you encounter a case where you think it should suggest something but doesn't or if it gives incorrect suggestions then please let us know.
 
 Leanr more about it in [Autocompleter for Hive and Impala](http://gethue.com/brand-new-autocompleter-for-hive-and-impala/).
 
@@ -623,7 +615,7 @@ Read more about extending [connectors](../sdk/sdk.html#sql).
 
 
 # Browsers
-Hue’s Browsers powers your Data Catalog. They let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
+Hue's Browsers powers your Data Catalog. They let you easily search, glance and perform actions on data or jobs in Cloud or on premise clusters.
 
 ## Tables
 
@@ -670,13 +662,13 @@ Hue can be setup to read and write to a configured S3 account, and users get aut
 [Read more about it](http://gethue.com/introducing-s3-support-in-hue/).
 
 ** Create Hive Tables Directly From S3**
-Hue’s Metastore Import Data Wizard can create external Hive tables directly from data directories in S3. This allows S3 data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse.
+Hue's Metastore Import Data Wizard can create external Hive tables directly from data directories in S3. This allows S3 data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse.
 
 To create an external Hive table from S3, navigate to the Metastore app, select the desired database and then click the “Create a new table from a file” icon in the upper right.
 
 Enter the table name and optional description, and in the “Input File or Directory” filepicker, select the S3A filesystem and navigate to the parent directory containing the desired data files and click the “Select this folder” button. The “Load Data” dropdown should automatically select the “Create External Table” option which indicates that this table will directly reference an external data directory.
 
-Choose your input files’ delimiter and column definition options and finally click “Create Table” when you’re ready to create the Hive table. Once created, you should see the newly created table details in the Metastore.
+Choose your input files' delimiter and column definition options and finally click “Create Table” when you're ready to create the Hive table. Once created, you should see the newly created table details in the Metastore.
 
 **Save Query Results to S3**
 
@@ -694,11 +686,11 @@ Learn more about it on the [ADLS integration post](http://gethue.com/browsing-ad
 
  Users gets autocomplete capabilities and more: 
 
-** Exploring ADLS in Hue’s file browser **
+** Exploring ADLS in Hue's file browser **
 Once Hue is successfully configured to connect to ADLS, we can view all accessible folders within the account by clicking on the ADLS root. From here, we can view the existing keys (both directories and files) and create, rename, move, copy, or delete existing directories and files. Additionally, we can directly upload files to ADLS.
 
 ** Create Hive Tables Directly From ADLS **
-Hue’s table browser import wizard can create external Hive tables directly from files in ADLS. This allows ADLS data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse. To create an external Hive table from ADLS, navigate to the table browser, select the desired database and then click the plus icon in the upper right. Select a file using the file picker and browse to a file on ADLS.
+Hue's table browser import wizard can create external Hive tables directly from files in ADLS. This allows ADLS data to be queried via SQL from Hive or Impala, without moving or copying the data into HDFS or the Hive Warehouse. To create an external Hive table from ADLS, navigate to the table browser, select the desired database and then click the plus icon in the upper right. Select a file using the file picker and browse to a file on ADLS.
 
 ** Save Query Results to ADLS **
 Now that we have created external Hive tables created from our ADLS data, we can jump into either the Hive or Impala editor and start querying the data directly from ADLS seamlessly. These queries can join tables and objects that are backed either by ADLS, HDFS, or both. Query results can then easily be saved back to ADLS.
@@ -933,7 +925,7 @@ Open the job browser and navigate to the queries tab.
 
 Query capabilities
 
-* Display the list of currently running queries on the user’s current Impala coordinator and a certain number of completed queries based on your configuration (25 by default).
+* Display the list of currently running queries on the user's current Impala coordinator and a certain number of completed queries based on your configuration (25 by default).
 * Display the summary report which shows physical timing and memory information of each operation of the explain plan. You can quickly find bottlenecks in the execution of the query which you can resolve by replacing expensive operations, repartitioning, changing file format or moving data.
 * Display the query plan which is a condensed version of the summary report in graphical form
 * Display the memory profile which contains information about the memory usage during the execution of the query. You can use this to determine if the memory available to your query is sufficient.
@@ -1277,7 +1269,7 @@ will suggest next steps to complete your query.
 ## Sqoop 1 Importer
 Iport data from relational databases to HDFS file or Hive table using Apache Sqoop 1. It enables us to bring large amount of data into the cluster in just few clicks via interactive UI. This Sqoop connector was added to the existing import data wizard of Hue.
 
-In the past, importing data using Sqoop command line interface could be a cumbersome and inefficient process. The task expected users to have a good knowledge of Sqoop . For example they would need put together a series of required parameters with specific syntax that would result in errors easy to make. Often times getting those correctly can take a few hours of work. Now with Hue’s new feature you can submityour Sqoop job in minutes. The imports run on YARN and are scheduled by Oozie. This tutorial offers a step by step guide on how to do it.
+In the past, importing data using Sqoop command line interface could be a cumbersome and inefficient process. The task expected users to have a good knowledge of Sqoop . For example they would need put together a series of required parameters with specific syntax that would result in errors easy to make. Often times getting those correctly can take a few hours of work. Now with Hue's new feature you can submityour Sqoop job in minutes. The imports run on YARN and are scheduled by Oozie. This tutorial offers a step by step guide on how to do it.
 
 Leanr more about it on the [Importing data from traditional databases into HDFS/Hive in just a few clicks
 ](http://gethue.com/importing-data-from-traditional-databases-into-hdfshive-in-just-a-few-clicks/) post.
