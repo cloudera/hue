@@ -23,7 +23,7 @@
 
   from beeswax.conf import LIST_PARTITIONS_LIMIT
   from indexer.conf import ENABLE_NEW_INDEXER
-  from metadata.conf import has_optimizer, OPTIMIZER
+  from metadata.conf import has_navigator, has_optimizer, OPTIMIZER
 %>
 
 (function () {
@@ -43,6 +43,8 @@
   window.DROPZONE_HOME_DIR = '${ user.get_home_directory() if not user.is_anonymous() else "" }';
 
   window.ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
+
+  window.HAS_NAVIGATOR = '${ has_navigator(request.user) }' === 'True';
 
   window.HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
