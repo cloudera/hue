@@ -82,19 +82,20 @@ from django.utils.translation import ugettext as _
 
         var fetchNavEntity = function () {
           var fetchDeferral = $.Deferred();
-          apiHelper.fetchNavEntity({
-            sourceType: ko.unwrap(params.sourceType),
-            identifierChain: identifierChain,
-            isView: typeof params.fetchedData !== 'undefined' && typeof params.fetchedData() !== 'undefined' && params.fetchedData().is_view,
-            defaultDatabase: ko.unwrap(params.defaultDatabase),
-            silenceErrors: true,
-            noCache: true,
-            successCallback: function (data) {
-              fetchDeferral.resolve(data.entity);
-            },
-            errorCallback: function (error) {
-              fetchDeferral.reject()
+          var path = $.map(identifierChain, function (identifier) { return identifier.name });
+
+          apiHelper.containsDatabase(params.sourceType, path[0]).done(function (firstIsDatabase) {
+            if (!firstIsDatabase) {
+              path.unshift(ko.unwrap(params.defaultDatabase));
             }
+            apiHelper.fetchNavigatorMetadata({
+              path: path,
+              isView: typeof params.fetchedData !== 'undefined' && typeof params.fetchedData() !== 'undefined' && params.fetchedData().is_view,
+              silenceErrors: true,
+              noCache: true
+            }).done(function (data) {
+              fetchDeferral.resolve(data.entity);
+            }).fail(fetchDeferral.reject);
           });
           return fetchDeferral;
         };
