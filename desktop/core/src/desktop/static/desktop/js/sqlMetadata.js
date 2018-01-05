@@ -24,35 +24,55 @@ var SqlMetadata = (function () {
     self.sourceType = options.sourceType;
     self.path = options.path;
 
-    self.meta;
+    self.sourceMeta;
+    self.navigatorMeta;
   }
+
+  SqlMetadata.prototype.isDatabase = function () {
+    var self = this;
+    return self.path.length === 1;
+  };
+
+  SqlMetadata.prototype.isTable = function () {
+    var self = this;
+    return self.sourceMeta && typeof self.sourceMeta.columns !== 'undefined' && !self.sourceMeta.is_view;
+  };
+
+  SqlMetadata.prototype.isView = function () {
+    var self = this;
+    return self.sourceMeta && typeof self.sourceMeta.columns !== 'undefined' && self.sourceMeta.is_view;
+  };
+
+  SqlMetadata.prototype.isField = function () {
+    var self = this;
+    return self.path.length > 2
+  };
 
   SqlMetadata.prototype.isMap = function () {
     var self = this;
-    return self.meta && self.meta.type === 'map';
+    return self.sourceMeta && self.sourceMeta.type === 'map';
   };
 
   SqlMetadata.prototype.isStruct = function () {
     var self = this;
-    return self.meta && self.meta.type === 'struct';
+    return self.sourceMeta && self.sourceMeta.type === 'struct';
   };
 
   SqlMetadata.prototype.isArray = function () {
     var self = this;
-    return self.meta && self.meta.type === 'array';
+    return self.sourceMeta && self.sourceMeta.type === 'array';
   };
 
-  SqlMetadata.prototype.load = function (silenceErrors, cachedOnly) {
+  SqlMetadata.prototype.loadSourceMeta = function (silenceErrors, cachedOnly) {
     var self = this;
     var promise = $.Deferred();
-    ApiHelper.getInstance().fetchSqlMetadata({
+    ApiHelper.getInstance().fetchSourceMetadata({
       sourceType: self.sourceType,
       path: self.path,
       silenceErrors: silenceErrors,
       cachedOnly: cachedOnly
-    })
-    .done(function (data) {
-      self.meta = data;
+    }).done(function (data) {
+      self.sourceMeta = data;
       self.loaded = true;
       promise.resolve(self);
     }).fail(function (message) {
@@ -60,6 +80,23 @@ var SqlMetadata = (function () {
       promise.reject(message);
     });
 
+    return promise;
+  };
+  
+  SqlMetadata.prototype.loadNavigatorMeta = function (silenceErrors) {
+    var self = this;
+    var promise = $.Deferred();
+    if (HAS_NAVIGATOR) {
+      ApiHelper.getInstance().fetchNavigatorMetadata({
+        path: self.path,
+        silenceErrors: silenceErrors,
+      }).done(function (data) {
+        self.navigatorMeta = data;
+        promise.resolve(self);
+      }).fail(promise.reject);
+    } else {
+      promise.resolve();
+    }
     return promise;
   };
 

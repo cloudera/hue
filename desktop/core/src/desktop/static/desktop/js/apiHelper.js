@@ -1592,7 +1592,7 @@ var ApiHelper = (function () {
    *
    * @return {Deferred} Promise
    */
-  ApiHelper.prototype.fetchSqlMetadata = function (options) {
+  ApiHelper.prototype.fetchSourceMetadata = function (options) {
     var self = this;
     var promise = $.Deferred();
 
@@ -1601,6 +1601,46 @@ var ApiHelper = (function () {
       sourceType: options.sourceType,
       silenceErrors: options.silenceErrors,
       cachedOnly: options.cachedOnly,
+      successCallback: promise.resolve,
+      errorCallback: self.assistErrorCallback({
+        errorCallback: promise.reject,
+        silenceErrors: options.silenceErrors
+      }),
+      cacheCondition: genericCacheCondition
+    });
+
+    return promise;
+  };
+
+
+  /**
+   * Fetches a navigator entity for the given source and path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.noCache]
+   *
+   * @param {boolean} [options.isView] - Default false
+   * @param {string[]} options.path
+   */
+  ApiHelper.prototype.fetchNavigatorMetadata = function (options) {
+    var self = this;
+    var promise = $.Deferred();
+    var url = NAV_URLS.FIND_ENTITY;
+
+    if (options.path.length === 1) {
+      url += '?type=database&name=' + options.path[0];
+    } else if (options.path.length === 2) {
+      url +=  (options.isView ? '?type=view' : '?type=table') + '&database=' + options.path[0] + '&name=' + options.path[1];
+    } else if (options.path.length === 3) {
+      url +=  '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
+    }
+
+    fetchAssistData.bind(self)({
+      url: url,
+      sourceType: 'nav',
+      noCache: options.noCache,
+      silenceErrors: options.silenceErrors,
       successCallback: promise.resolve,
       errorCallback: self.assistErrorCallback({
         errorCallback: promise.reject,
@@ -1637,27 +1677,6 @@ var ApiHelper = (function () {
       }));
     });
   };
-
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string[]} options.hierarchy
-   */
-  // TODO: Drop and use fetchSqlMetadata instead
-  ApiHelper.prototype.fetchPanelData = function (options) {
-    var self = this;
-    fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
-      errorCallback: self.assistErrorCallback(options),
-      cacheCondition: genericCacheCondition
-    }));
-  };
-
 
   /**
    * @param {Object} options
@@ -1812,49 +1831,6 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.getClusterConfig = function (data) {
     return $.post(FETCH_CONFIG, data);
-  };
-
-  /**
-   * Fetches a navigator entity for the given identifierChain
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {boolean} [options.isView] - Default false
-   * @param {Object[]} options.identifierChain
-   * @param {string} options.identifierChain.name
-   * @param {string} [options.defaultDatabase]
-   */
-  ApiHelper.prototype.fetchNavEntity = function (options) {
-    var self = this;
-
-    var clonedIdentifierChain = options.identifierChain.concat();
-
-    var dpPromise = self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name);
-
-    dpPromise.done(function (firstIsDatabase) {
-      var database = options.defaultDatabase && !firstIsDatabase ? options.defaultDatabase : clonedIdentifierChain.shift().name;
-      var url = NAV_URLS.FIND_ENTITY + '?type=database&name=' + database;
-
-      var isView = !!options.isView;
-
-      if (clonedIdentifierChain.length > 0) {
-        var table = clonedIdentifierChain.shift().name;
-        url = NAV_URLS.FIND_ENTITY + (isView ? '?type=view' : '?type=table') + '&database=' + database + '&name=' + table;
-        if (clonedIdentifierChain.length > 0) {
-          url = NAV_URLS.FIND_ENTITY + '?type=field&database=' + database + '&table=' + table + '&name=' + clonedIdentifierChain.shift().name;
-        }
-      }
-
-      fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
-        url: url,
-        errorCallback: self.assistErrorCallback(options),
-        noCache: true
-      }));
-    });
   };
 
   ApiHelper.prototype.addNavTags = function (entityId, tags) {
