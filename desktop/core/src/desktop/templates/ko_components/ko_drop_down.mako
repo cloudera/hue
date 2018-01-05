@@ -35,7 +35,7 @@ from desktop.views import _ko
     </a>
     <!-- /ko -->
     <!-- ko if: !menuOnly && (dropDownVisible() && searchable) -->
-    <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': value }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
+    <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
     <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition }">
@@ -78,6 +78,10 @@ from desktop.views import _ko
         self.foreachVisible = params.foreachVisible || false;
         self.linkTitle = params.linkTitle || '${ _('Selected entry') }';
         self.fixedPosition = !!params.fixedPosition;
+
+        self.inputPlaceHolder = ko.pureComputed(function () {
+          return typeof self.value() === 'object' ? self.value().label : self.value();
+        });
 
         var closeOnOutsideClick = function (e) {
           var $input = $(element).find('.hue-drop-down-input');
@@ -160,8 +164,11 @@ from desktop.views import _ko
             return ko.unwrap(self.entries);
           } else {
             var lowerFilter = self.filter().toLowerCase();
-            return ko.unwrap(self.entries).filter(function (database) {
-              return database.toLowerCase().indexOf(lowerFilter) !== -1;
+            return ko.unwrap(self.entries).filter(function (entry) {
+              if (typeof entry === 'object') {
+                return entry.label.toLowerCase().indexOf(lowerFilter) !== -1;
+              }
+              return entry.toLowerCase().indexOf(lowerFilter) !== -1;
             });
           }
         });
