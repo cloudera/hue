@@ -24,9 +24,55 @@ var SqlMetadata = (function () {
     self.sourceType = options.sourceType;
     self.path = options.path;
 
-    self.sourceMeta;
-    self.navigatorMeta;
+    self.sourceMeta = undefined;
+    self.navigatorMeta = undefined;
+    self.commentObservable = undefined;
+
+    self.lastNavigatorPromise = undefined;
+    self.lastSourcePromise = undefined;
+
+    self.silenceErrors = options.silenceErrors;
+    self.cachedOnly = options.cachedOnly;
   }
+
+  var refreshCommentObservable = function (sqlMeta) {
+    if (sqlMeta.commentObservable) {
+      if (HAS_NAVIGATOR) {
+        sqlMeta.getNavigatorMeta().done(function () {
+          if (sqlMeta.navigatorMeta && sqlMeta.navigatorMeta.entity) {
+            sqlMeta.commentObservable(sqlMeta.navigatorMeta.entity.description || sqlMeta.navigatorMeta.entity.originalDescription);
+          } else {
+            sqlMeta.getSourceMeta().done(function () {
+              sqlMeta.commentObservable(sqlMeta.sourceMeta ? (sqlMeta.sourceMeta.comment || '') : '');
+            });
+          }
+        })
+      } else {
+        sqlMeta.getSourceMeta().done(function () {
+          sqlMeta.commentObservable(sqlMeta.sourceMeta ? (sqlMeta.sourceMeta.comment || '') : '');
+        });
+      }
+    }
+  };
+
+  SqlMetadata.prototype.getCommentObservable = function () {
+    var self = this;
+    if (!self.commentObservable) {
+      self.commentObservable = ko.observable();
+      refreshCommentObservable(self);
+    }
+    return self.commentObservable;
+  };
+
+  SqlMetadata.prototype.getSourceMeta = function () {
+    var self = this;
+    return self.lastSourcePromise || self.loadSourceMeta()
+  };
+
+  SqlMetadata.prototype.getNavigatorMeta = function () {
+    var self = this;
+    return self.lastNavigatorPromise || self.loadNavigatorMeta()
+  };
 
   SqlMetadata.prototype.isDatabase = function () {
     var self = this;
@@ -63,41 +109,41 @@ var SqlMetadata = (function () {
     return self.sourceMeta && self.sourceMeta.type === 'array';
   };
 
-  SqlMetadata.prototype.loadSourceMeta = function (silenceErrors, cachedOnly) {
+  SqlMetadata.prototype.loadSourceMeta = function () {
     var self = this;
-    var promise = $.Deferred();
+    self.lastSourcePromise = $.Deferred();
     ApiHelper.getInstance().fetchSourceMetadata({
       sourceType: self.sourceType,
       path: self.path,
-      silenceErrors: silenceErrors,
-      cachedOnly: cachedOnly
+      silenceErrors: self.silenceErrors,
+      cachedOnly: self.cachedOnly
     }).done(function (data) {
       self.sourceMeta = data;
       self.loaded = true;
-      promise.resolve(self);
+      self.lastSourcePromise.resolve(self);
     }).fail(function (message) {
       self.hasErrors = true;
-      promise.reject(message);
+      self.lastSourcePromise.reject(message);
     });
 
-    return promise;
+    return self.lastSourcePromise.promise();
   };
   
-  SqlMetadata.prototype.loadNavigatorMeta = function (silenceErrors) {
+  SqlMetadata.prototype.loadNavigatorMeta = function () {
     var self = this;
-    var promise = $.Deferred();
+    self.lastNavigatorPromise = $.Deferred();
     if (HAS_NAVIGATOR) {
       ApiHelper.getInstance().fetchNavigatorMetadata({
         path: self.path,
-        silenceErrors: silenceErrors,
+        silenceErrors: self.silenceErrors,
       }).done(function (data) {
         self.navigatorMeta = data;
-        promise.resolve(self);
-      }).fail(promise.reject);
+        self.lastNavigatorPromise.resolve(self);
+      }).fail(self.lastNavigatorPromise.reject);
     } else {
-      promise.resolve();
+      self.lastNavigatorPromise.resolve();
     }
-    return promise;
+    return self.lastNavigatorPromise.promise();
   };
 
   return SqlMetadata;
