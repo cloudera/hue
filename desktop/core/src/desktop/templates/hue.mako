@@ -882,6 +882,13 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             $(this).attr('href', link);
           });
 
+          if (typeof adaptHueEmbeddedUrls !== 'undefined') {
+            $rawHtml.find('img[src]').each(function () {
+              var $img = $(this);
+              $img.attr('src', adaptHueEmbeddedUrls($img.attr('src')));
+            })
+          }
+
           $rawHtml.unwrap('<span>');
           scriptsPromise.done(function () {
             promise.resolve($rawHtml);
