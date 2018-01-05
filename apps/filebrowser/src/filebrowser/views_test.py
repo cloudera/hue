@@ -27,7 +27,7 @@ from avro import schema, datafile, io
 from aws.s3.s3fs import S3FileSystemException
 from aws.s3.s3test_utils import get_test_bucket
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest

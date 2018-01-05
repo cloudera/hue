@@ -20,7 +20,7 @@ import logging
 import urllib
 
 from django.db.models import Q
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import redirect
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _

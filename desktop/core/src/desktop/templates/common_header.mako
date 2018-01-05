@@ -22,9 +22,9 @@ from desktop.lib.i18n import smart_unicode
 
 from metadata.conf import has_optimizer, OPTIMIZER
 
-home_url = url('desktop.views.home')
+home_url = url('desktop_views_home')
 if USE_NEW_EDITOR.get():
-  home_url = url('desktop.views.home2')
+  home_url = url('desktop_views_home2')
 %>
 
 <%namespace name="charting" file="/charting.mako" />

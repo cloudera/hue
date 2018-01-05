@@ -37,7 +37,7 @@ from nose.plugins.skip import SkipTest
 from django.utils.encoding import smart_str
 from django.utils.html import escape
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import transaction
 
 from desktop.lib.exceptions_renderable import PopupException

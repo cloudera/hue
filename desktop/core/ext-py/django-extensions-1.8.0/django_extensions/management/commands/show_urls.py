@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand, CommandError
 try:
     from django.urls import RegexURLPattern, RegexURLResolver, LocaleRegexURLResolver
 except ImportError:
-    from django.core.urlresolvers import RegexURLPattern, RegexURLResolver, LocaleRegexURLResolver
+    from django.urls import RegexURLPattern, RegexURLResolver, LocaleRegexURLResolver
 from django.utils import translation
 
 from django_extensions.management.color import color_style, no_style

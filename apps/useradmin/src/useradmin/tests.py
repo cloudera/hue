@@ -30,7 +30,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.sessions.models import Session
 from django.db.models import Q
 from django.utils.encoding import smart_unicode
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.client import Client
 
 import desktop.conf
@@ -46,7 +46,7 @@ import useradmin.ldap_access
 from useradmin.middleware import ConcurrentUserSessionMiddleware
 from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
-from useradmin.password_policy import reset_password_policy
+from useradmin.hue_password_policy import reset_password_policy
 
 
 def reset_all_users():

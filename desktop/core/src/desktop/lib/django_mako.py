@@ -129,7 +129,7 @@ def render_to_response(template_name, data_dictionary, **kwargs):
 
 def url(view_name, *args, **view_args):
   """URL tag for use in templates - like {% url ... %} in django"""
-  from django.core.urlresolvers import reverse
+  from django.urls import reverse
   return reverse(view_name, args=args, kwargs=view_args)
 
 from django.template.context_processors import csrf

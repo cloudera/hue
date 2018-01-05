@@ -21,7 +21,7 @@ import logging
 import re
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises

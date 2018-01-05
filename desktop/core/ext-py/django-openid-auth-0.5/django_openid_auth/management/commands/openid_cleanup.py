@@ -26,12 +26,12 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from django_openid_auth.store import DjangoOpenIDStore
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = 'Clean up stale OpenID associations and nonces'
 
     def handle_noargs(self, **options):

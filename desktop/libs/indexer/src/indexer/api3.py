@@ -21,7 +21,7 @@ import logging
 import urllib
 import StringIO
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from simple_salesforce.api import Salesforce
 

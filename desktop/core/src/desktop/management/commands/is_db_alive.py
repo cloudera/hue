@@ -19,7 +19,7 @@
 import logging
 import sys
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connections
 from django.db.utils import OperationalError
@@ -28,7 +28,7 @@ from django.db.utils import OperationalError
 LOG = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
   help = """Check if Hue can is configured properly to use its database.
 

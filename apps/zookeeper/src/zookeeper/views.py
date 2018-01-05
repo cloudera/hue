@@ -20,7 +20,7 @@ import json
 import logging
 
 from django.http import Http404
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse, render

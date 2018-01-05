@@ -20,7 +20,10 @@ import logging
 import functools
 import re
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
+from desktop.conf import REST_CONN_TIMEOUT
+from desktop.lib.view_util import format_duration_in_millis
+from desktop.lib import i18n
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 

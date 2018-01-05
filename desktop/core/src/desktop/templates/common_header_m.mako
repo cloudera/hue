@@ -19,10 +19,10 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 from metadata.conf import has_optimizer, OPTIMIZER
 
-home_url = url('desktop.views.home')
+home_url = url('desktop_views_home')
 from desktop.conf import USE_NEW_EDITOR
 if USE_NEW_EDITOR.get():
-  home_url = url('desktop.views.home2')
+  home_url = url('desktop_views_home2')
 %>
 <!DOCTYPE html>
 <%def name="is_selected(selected)">
@@ -139,7 +139,7 @@ if USE_NEW_EDITOR.get():
   <!--[if lt IE 9]>
   <script type="text/javascript">
     if (document.documentMode && document.documentMode < 9){
-      location.href = "${ url('desktop.views.unsupported') }";
+      location.href = "${ url('desktop_views_unsupported') }";
     }
   </script>
   <![endif]-->
@@ -149,13 +149,13 @@ if USE_NEW_EDITOR.get():
     var _UA = navigator.userAgent.toLowerCase();
     for (var i = 1; i < 7; i++) {
       if (_UA.indexOf("firefox/" + i + ".") > -1) {
-        location.href = "${ url('desktop.views.unsupported') }";
+        location.href = "${ url('desktop_views_unsupported') }";
       }
     }
 
     // check for IE document modes
     if (document.documentMode && document.documentMode < 9){
-      location.href = "${ url('desktop.views.unsupported') }";
+      location.href = "${ url('desktop_views_unsupported') }";
     }
   </script>
 

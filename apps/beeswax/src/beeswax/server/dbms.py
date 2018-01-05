@@ -20,7 +20,7 @@ import re
 import threading
 import time
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 

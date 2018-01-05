@@ -28,7 +28,7 @@ from lxml import html
 from django.http import HttpResponseRedirect
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from desktop.log.access import access_log_level
 from desktop.lib.rest.http_client import RestException

@@ -10,7 +10,7 @@ from django.template.context import RequestContext
 from django.template import loader
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse as reverseURL
+from django.urls import reverse as reverseURL
 from django.views.generic.simple import direct_to_template
 
 from django.conf import settings

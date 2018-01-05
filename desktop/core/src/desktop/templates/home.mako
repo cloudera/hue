@@ -89,7 +89,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
       <div class="nav-collapse">
         <ul class="nav">
           <li class="app-header">
-            <a href="${ url('desktop.views.home') }">
+            <a href="${ url('desktop_views_home') }">
               <img src="${ static('desktop/art/home.png') }" class="app-icon" alt="${ _('Home icon') }" />
               ${ _('My documents') }
             </a>
@@ -100,7 +100,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
       <div class="nav-collapse pull-right">
         <ul class="nav">
           <li class="app-header">
-            <a href="${ url('desktop.views.home2') }">
+            <a href="${ url('desktop_views_home2') }">
               <img src="${ static('desktop/art/home.png') }" class="app-icon" alt="${ _('Home icon') }" />
               ${ _('New Home') }
             </a>

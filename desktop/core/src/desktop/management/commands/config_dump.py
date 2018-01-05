@@ -21,7 +21,7 @@ Note that this dump representation is not machine readable;
 this command is still a few steps away from dumping a ConfigObj-compatible,
 textual representation.
 """
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 import desktop.appmanager
 import textwrap
 
@@ -29,7 +29,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.conf import BoundContainer, is_anonymous
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
   def __init__(self, *args, **kwargs):
     super(Command, self).__init__(*args, **kwargs)
     self.indent = 0

@@ -23,7 +23,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client

@@ -18,7 +18,7 @@
 
 import json
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal
 

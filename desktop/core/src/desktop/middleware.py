@@ -36,7 +36,7 @@ from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
 import django.db
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden
-from django.core.urlresolvers import resolve
+from django.urls import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url

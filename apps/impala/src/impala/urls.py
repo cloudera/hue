@@ -15,16 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
 from beeswax.urls import urlpatterns as beeswax_urls
+from impala import api as impala_api
 
-
-urlpatterns = patterns('impala.api',
-  url(r'^api/invalidate$', 'invalidate', name='invalidate'),
-  url(r'^api/refresh/(?P<database>\w+)/(?P<table>\w+)$', 'refresh_table', name='refresh_table'),
-  url(r'^api/query/(?P<query_history_id>\d+)/exec_summary$', 'get_exec_summary', name='get_exec_summary'),
-  url(r'^api/query/(?P<query_history_id>\d+)/runtime_profile', 'get_runtime_profile', name='get_runtime_profile'),
-)
+urlpatterns = [
+  url(r'^api/invalidate$', impala_api.invalidate, name='invalidate'),
+  url(r'^api/refresh/(?P<database>\w+)/(?P<table>\w+)$', impala_api.refresh_table, name='refresh_table'),
+  url(r'^api/query/(?P<query_history_id>\d+)/exec_summary$', impala_api.get_exec_summary, name='get_exec_summary'),
+  url(r'^api/query/(?P<query_history_id>\d+)/runtime_profile', impala_api.get_runtime_profile, name='get_runtime_profile'),
+]
 
 urlpatterns += beeswax_urls

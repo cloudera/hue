@@ -17,12 +17,12 @@
 
 import logging
 
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 from desktop.models import Document
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
   def handle_noargs(self, **options):
     logging.info('Running syncing document command.')

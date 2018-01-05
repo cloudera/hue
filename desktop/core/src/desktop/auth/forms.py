@@ -27,7 +27,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop import conf
-from useradmin.password_policy import get_password_validators
+from useradmin.hue_password_policy import hue_get_password_validators
 
 
 LOG = logging.getLogger(__name__)
@@ -171,7 +171,7 @@ class UserCreationForm(AuthUserCreationForm):
   """
   password = CharField(label=_t("Password"),
                        widget=PasswordInput(attrs={'class': 'input-large'}),
-                       validators=get_password_validators())
+                       validators=hue_get_password_validators())
 
   def __init__(self, data=None, *args, **kwargs):
     if data and 'password' in data:

@@ -18,7 +18,7 @@ import logging
 import urllib
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib import django_mako

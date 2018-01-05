@@ -27,7 +27,7 @@ from dateutil.parser import parse
 from string import Template
 from xml.sax.saxutils import escape
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models import Q
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _

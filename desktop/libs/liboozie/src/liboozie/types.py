@@ -37,7 +37,7 @@ import hadoop.confparse
 from liboozie.utils import parse_timestamp, format_time, catch_unicode_time
 
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 LOG = logging.getLogger(__name__)
 

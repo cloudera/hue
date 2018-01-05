@@ -30,7 +30,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
   <!--[if lt IE 9]>
   <script type="text/javascript">
     if (document.documentMode && document.documentMode < 9){
-      location.href = "${ url('desktop.views.unsupported') }";
+      location.href = "${ url('desktop_views_unsupported') }";
     }
   </script>
   <![endif]-->
@@ -41,13 +41,13 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var _UA = navigator.userAgent.toLowerCase();
     for (var i = 1; i < 7; i++) {
       if (_UA.indexOf("firefox/" + i + ".") > -1) {
-        location.href = "${ url('desktop.views.unsupported') }";
+        location.href = "${ url('desktop_views_unsupported') }";
       }
     }
 
     // check for IE document modes
     if (document.documentMode && document.documentMode < 9){
-      location.href = "${ url('desktop.views.unsupported') }";
+      location.href = "${ url('desktop_views_unsupported') }";
     }
 
     // sets a global variable to see if it's IE11 or not

@@ -20,7 +20,7 @@ import logging
 import os
 
 from django.core import management
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
@@ -39,7 +39,7 @@ from pig.conf import LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR
 LOG = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
   def install_pig_script(self, sample_user):
     doc2 = None

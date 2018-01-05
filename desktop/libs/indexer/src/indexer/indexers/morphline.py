@@ -20,7 +20,7 @@ import os
 from collections import deque
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
 

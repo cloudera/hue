@@ -31,7 +31,7 @@ import ldap_access
 from ldap_access import LdapBindException, LdapSearchException
 
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.forms import ValidationError
 from django.forms.utils import ErrorList
 from django.http import HttpResponse
@@ -364,7 +364,7 @@ def edit_user(request, username=None):
         if request.user.is_superuser:
           return redirect(reverse('about:index'))
         else:
-          return redirect(reverse('desktop.views.home'))
+          return redirect(reverse('desktop_views_home'))
       elif request.user.is_superuser:
         if is_embeddable:
           return JsonResponse({'url': '/hue' + reverse(list_users)})

@@ -90,7 +90,9 @@ class UserProfile(models.Model):
   PROPERLY
   """
   # Enum for describing the creation method of a user.
-  CreationMethod = Enum('HUE', 'EXTERNAL')
+  class CreationMethod(Enum):
+    HUE = 1
+    EXTERNAL = 2
 
   user = models.OneToOneField(auth_models.User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)

@@ -31,7 +31,7 @@ from desktop.settings import LANGUAGES
 
 from useradmin.models import GroupPermission, HuePermission
 from useradmin.models import get_default_user_group
-from useradmin.password_policy import get_password_validators
+from useradmin.hue_password_policy import hue_get_password_validators
 
 
 
@@ -96,11 +96,11 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                               widget=forms.
                               PasswordInput,
                               required=False,
-                              validators=get_password_validators())
+                              validators=hue_get_password_validators())
   password2 = forms.CharField(label=_t("Password confirmation"),
                               widget=forms.PasswordInput,
                               required=False,
-                              validators=get_password_validators())
+                              validators=hue_get_password_validators())
   password_old = forms.CharField(label=_t("Current password"), widget=forms.PasswordInput, required=False)
   ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
                                             help_text=_t("Create home directory if one doesn't already exist."),

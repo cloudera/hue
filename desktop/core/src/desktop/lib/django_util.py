@@ -222,9 +222,10 @@ def render(template, request, data, json=None, template_lib=None, force_template
     else:
       return render_json(data, request.GET.get("callback"), status=status)
   else:
+    x=RequestContext(request, data)
     return _render_to_response(template,
                                request,
-                               RequestContext(request, data),
+                               x,
                                template_lib=template_lib,
                                status=status,
                                **kwargs)

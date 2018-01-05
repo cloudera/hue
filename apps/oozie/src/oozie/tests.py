@@ -31,7 +31,7 @@ from itertools import chain
 from nose.plugins.skip import SkipTest
 from nose.tools import raises, assert_true, assert_false, assert_equal, assert_not_equal
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml

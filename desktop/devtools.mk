@@ -19,21 +19,24 @@
 
 # May require download from PyPI or whereever
 DEVTOOLS += \
-	nose[1.0.0] \
-	coverage[3.7.1] \
+	ipython[5.2.0] \
+	ipdb[0.10.3] \
+	nose[1.3.7] \
+	coverage[4.4.2] \
 	nosetty[0.4] \
-	werkzeug[0.6] \
-	windmill[1.3] \
-	pylint[0.28.0]
-
-PYPI_MIRROR ?= https://pypi.python.org/simple/
+	werkzeug[0.14.1] \
+	windmill[1.6] \
+	pylint[1.7.1] \
+        astroid[1.5.3] \
+        isort[4.2.5] \
+        six[1.10.0]
 
 # Install/download dev tools for SDK into the virtual environment
 .PHONY: $(DEVTOOLS)
 $(DEVTOOLS):
 	@echo "--- Installing development tool: $@"
-	$(ENV_EASY_INSTALL) -i $(PYPI_MIRROR) \
-	   -H *.cloudera.com,pypi.python.org,files.pythonhosted.org $(SETUPTOOLS_OPTS) $(subst ],,$(subst [,==,$@))
+	$(ENV_EASY_INSTALL) -f http://archive.cloudera.com/desktop-sdk-python-packages/ -i https://pypi.infra.cloudera.com/api/pypi/pypi-public/simple/ \
+	   -H archive.cloudera.com,pypi.infra.cloudera.com,pypi.python.org $(SETUPTOOLS_OPTS) $(subst ],,$(subst [,==,$@))
 
 $(BLD_DIR):
 	@mkdir -p $@

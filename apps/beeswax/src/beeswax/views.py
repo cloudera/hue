@@ -29,7 +29,7 @@ from django.http import HttpResponse, QueryDict
 from django.shortcuts import redirect
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from desktop.appmanager import get_apps_dict
 from desktop.conf import ENABLE_DOWNLOAD, REDIRECT_WHITELIST

@@ -172,7 +172,7 @@ def dt_login(request, from_modal=False):
     renderable_path = 'login_modal.mako'
 
   response = render(renderable_path, request, {
-    'action': urlresolvers.reverse('desktop.auth.views.dt_login'),
+    'action': urlresolvers.reverse('desktop_auth_views_dt_login'),
     'form': first_user_form or auth_form,
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,

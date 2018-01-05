@@ -22,7 +22,7 @@ import json
 import logging
 import re
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import QueryDict
 from django.utils.translation import ugettext as _
 

@@ -20,12 +20,12 @@ import sys
 import time
 
 from django.contrib.auth.models import User
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.db import transaction
 
 from desktop.converters import DocumentConverter
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
   def handle_noargs(self, **options):
     print 'Starting document conversions...\n'

@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 
@@ -190,7 +190,7 @@ ${ layout.menubar(section='quick_start') }
                 <i class="fa fa-home"></i> ${ _('Landing page') }
               </a>
               % else:
-                <a href="${ url('desktop.views.home2') }">
+                <a href="${ url('desktop_views_home2') }">
                   <i class="fa fa-home"></i> ${ _('Home') }
                 </a>
               % endif
@@ -227,7 +227,7 @@ ${ layout.menubar(section='quick_start') }
           <span class="muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
           % if not user.is_authenticated():
             <br/>
-            <a href="${ url('desktop.views.home2') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
+            <a href="${ url('desktop_views_home2') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
           % endif
         </p>
        </div>
@@ -378,7 +378,7 @@ $(document).ready(function(){
   });
 
   $("#doneBtn").click(function () {
-    location.href = "${ is_embeddable and '/' or url('desktop.views.home2') }";
+    location.href = "${ is_embeddable and '/' or url('desktop_views_home2') }";
   });
 
   $(".updatePreferences").click(function () {

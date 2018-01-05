@@ -32,7 +32,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
 from django.conf.urls import patterns, url
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 

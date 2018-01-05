@@ -21,7 +21,7 @@ import os
 from lxml import etree
 
 from django.core import management
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
@@ -43,7 +43,7 @@ from oozie.importlib.bundles import import_bundle_root
 LOG = logging.getLogger(__name__)
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
 
   def _import_workflows(self, directory, managed=True):
 

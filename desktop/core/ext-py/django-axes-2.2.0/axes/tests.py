@@ -7,8 +7,8 @@ import datetime
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import NoReverseMatch
-from django.core.urlresolvers import reverse
+from django.urls import NoReverseMatch
+from django.urls import reverse
 from django.utils import six
 
 from axes.decorators import COOLOFF_TIME

@@ -25,7 +25,7 @@ from nose.tools import assert_true, assert_equal, assert_false
 
 from django.utils.encoding import smart_str
 from django.contrib.auth.models import User, Group
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import add_permission, grant_access

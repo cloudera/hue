@@ -65,7 +65,7 @@ def reset_password_policy():
   _PASSWORD_POLICY = None
 
 
-def get_password_validators():
+def hue_get_password_validators():
   def validate_against_policy(password):
     get_password_policy().validate_password(password)
 
