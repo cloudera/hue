@@ -1,0 +1,542 @@
+Babel Changelog
+===============
+
+Version 2.5.1
+-------------
+
+Minor Improvements and bugfixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Use a fixed datetime to avoid test failures (#520) (@narendravardi)
+* Parse multi-line __future__ imports better (#519) (@akx)
+* Fix validate_currency docstring (#522)
+* Allow normalize_locale and exists to handle various unexpected inputs (#523) (@suhojm)
+* Make PyInstaller support more robust (#525, #526) (@thijstriemstra, @akx)
+
+
+Version 2.5.0
+-------------
+
+New Features
+~~~~~~~~~~~~
+
+* Numbers: Add currency utilities and helpers (#491) (@kdeldycke)
+* Support PyInstaller (#500, #505) (@wodo)
+
+Minor Improvements and bugfixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Dates: Add __str__ to DateTimePattern (#515) (@sfermigier)
+* Dates: Fix an invalid string to bytes comparison when parsing TZ files on Py3 (#498) (@rowillia)
+* Dates: Formatting zero-padded components of dates is faster (#517) (@akx)
+* Documentation: Fix "Good Commits" link in CONTRIBUTING.md (#511) (@naryanacharya6)
+* Documentation: Fix link to Python gettext module (#512) (@Linkid)
+* Messages: Allow both dash and underscore separated locale identifiers in pofiles (#489, #490) (@akx)
+* Messages: Extract Python messages in nested gettext calls (#488) (@sublee)
+* Messages: Fix in-place editing of dir list while iterating (#476, #492) (@MarcDufresne)
+* Messages: Stabilize sort order (#482) (@xavfernandez)
+* Time zones: Honor the no-inherit marker for metazone names (#405) (@akx)
+
+
+Version 2.4.0
+-------------
+
+New Features
+~~~~~~~~~~~~
+
+Some of these changes might break your current code and/or tests.
+
+* CLDR: CLDR 29 is now used instead of CLDR 28 (#405) (@akx)
+* Messages: Add option 'add_location' for location line formatting (#438, #459) (@rrader, @alxpy)
+* Numbers: Allow full control of decimal behavior (#410) (@etanol)
+
+Minor Improvements and bugfixes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Documentation: Improve Date Fields descriptions (#450) (@ldwoolley)
+* Documentation: Typo fixes and documentation improvements (#406, #412, #403, #440, #449, #463) (@zyegfryed, @adamchainz, @jwilk, @akx, @roramirez, @abhishekcs10)
+* Messages: Default to UTF-8 source encoding instead of ISO-8859-1 (#399) (@asottile)
+* Messages: Ensure messages are extracted in the order they were passed in (#424) (@ngrilly)
+* Messages: Message extraction for JSX files is improved (#392, #396, #425) (@karloskar, @georgschoelly)
+* Messages: PO file reading supports multi-line obsolete units (#429) (@mbirtwell)
+* Messages: Python message extractor respects unicode_literals in __future__ (#427) (@sublee)
+* Messages: Roundtrip Language headers (#420) (@kruton)
+* Messages: units before obsolete units are no longer erroneously marked obsolete (#452) (@mbirtwell)
+* Numbers: `parse_pattern` now preserves the full original pattern (#414) (@jtwang)
+* Numbers: Fix float conversion in `extract_operands` (#435) (@akx)
+* Plurals: Fix plural forms for Czech and Slovak locales (#373) (@ykshatroff)
+* Plurals: More plural form fixes based on Mozilla and CLDR references (#431) (@mshenfield)
+
+
+Internal improvements
+~~~~~~~~~~~~~~~~~~~~~
+
+* Local times are constructed correctly in tests (#411) (@etanol)
+* Miscellaneous small improvements (#437) (@scop)
+* Regex flags are extracted from the regex strings (#462) (@singingwolfboy)
+* The PO file reader is now a class and has seen some refactoring (#429, #452) (@mbirtwell)
+
+
+Version 2.3.4
+-------------
+
+(Bugfix release, released on April 22th)
+
+Bugfixes
+~~~~~~~~
+
+* CLDR: The lxml library is no longer used for CLDR importing, so it should not cause strange failures either. Thanks to @aronbierbaum for the bug report and @jtwang for the fix. (https://github.com/python-babel/babel/pull/393)
+* CLI: Every last single CLI usage regression should now be gone, and both distutils and stand-alone CLIs should work as they have in the past. Thanks to @paxswill and @ajaeger for bug reports. (https://github.com/python-babel/babel/pull/389)
+
+Version 2.3.3
+-------------
+
+(Bugfix release, released on April 12th)
+
+Bugfixes
+~~~~~~~~
+
+* CLI: Usage regressions that had snuck in between 2.2 and 2.3 should be no more. (https://github.com/python-babel/babel/pull/386) Thanks to @ajaeger, @sebdiem and @jcristovao for bug reports and patches.
+
+Version 2.3.2
+-------------
+
+(Bugfix release, released on April 9th)
+
+Bugfixes
+~~~~~~~~
+
+* Dates: Period (am/pm) formatting was broken in certain locales (namely zh_TW). Thanks to @jun66j5 for the bug report. (https://github.com/python-babel/babel/issues/378, https://github.com/python-babel/babel/issues/379)
+
+Version 2.3.1
+-------------
+
+(Bugfix release because of deployment problems, released on April 8th)
+
+Version 2.3
+-----------
+
+(Feature release, released on April 8th)
+
+Internal improvements
+~~~~~~~~~~~~~~~~~~~~~
+
+* The CLI frontend and Distutils commands use a shared implementation (https://github.com/python-babel/babel/pull/311)
+* PyPy3 is supported (https://github.com/python-babel/babel/pull/343)
+
+Features
+~~~~~~~~
+
+* CLDR: Add an API for territory language data (https://github.com/python-babel/babel/pull/315)
+* Core: Character order and measurement system data is imported and exposed (https://github.com/python-babel/babel/pull/368)
+* Dates: Add an API for time interval formatting (https://github.com/python-babel/babel/pull/316)
+* Dates: More pattern formats and lengths are supported (https://github.com/python-babel/babel/pull/347)
+* Dates: Period IDs are imported and exposed (https://github.com/python-babel/babel/pull/349)
+* Dates: Support for date-time skeleton formats has been added (https://github.com/python-babel/babel/pull/265)
+* Dates: Timezone formatting has been improved (https://github.com/python-babel/babel/pull/338)
+* Messages: JavaScript extraction now supports dotted names, ES6 template strings and JSX tags (https://github.com/python-babel/babel/pull/332)
+* Messages: npgettext is recognized by default (https://github.com/python-babel/babel/pull/341)
+* Messages: The CLI learned to accept multiple domains (https://github.com/python-babel/babel/pull/335)
+* Messages: The extraction commands now accept filenames in addition to directories (https://github.com/python-babel/babel/pull/324)
+* Units: A new API for unit formatting is implemented (https://github.com/python-babel/babel/pull/369)
+
+Bugfixes
+~~~~~~~~
+
+* Core: Mixed-case locale IDs work more reliably (https://github.com/python-babel/babel/pull/361)
+* Dates: S...S formats work correctly now (https://github.com/python-babel/babel/pull/360)
+* Messages: All messages are now sorted correctly if sorting has been specified (https://github.com/python-babel/babel/pull/300)
+* Messages: Fix the unexpected behavior caused by catalog header updating (e0e7ef1) (https://github.com/python-babel/babel/pull/320)
+* Messages: Gettext operands are now generated correctly (https://github.com/python-babel/babel/pull/295)
+* Messages: Message extraction has been taught to detect encodings better (https://github.com/python-babel/babel/pull/274)
+
+Version 2.2
+-----------
+
+(Feature release, released on January 2nd 2016)
+
+Bugfixes
+~~~~~~~~
+
+* General: Add __hash__ to Locale. (#303) (2aa8074)
+* General: Allow files with BOM if they're UTF-8 (#189) (da87edd)
+* General: localedata directory is now locale-data (#109) (2d1882e)
+* General: odict: Fix pop method (0a9e97e)
+* General: Removed uses of datetime.date class from *.dat files (#174) (94f6830)
+* Messages: Fix plural selection for Chinese (531f666)
+* Messages: Fix typo and add semicolon in plural_forms (5784501)
+* Messages: Flatten NullTranslations.files into a list (ad11101)
+* Times: FixedOffsetTimezone: fix display of negative offsets (d816803)
+
+Features
+~~~~~~~~
+
+* CLDR: Update to CLDR 28 (#292) (9f7f4d0)
+* General: Add __copy__ and __deepcopy__ to LazyProxy. (a1cc3f1)
+* General: Add official support for Python 3.4 and 3.5
+* General: Improve odict performance by making key search O(1) (6822b7f)
+* Locale: Add an ordinal_form property to Locale (#270) (b3f3430)
+* Locale: Add support for list formatting (37ce4fa, be6e23d)
+* Locale: Check inheritance exceptions first (3ef0d6d)
+* Messages: Allow file locations without line numbers (#279) (79bc781)
+* Messages: Allow passing a callable to `extract()` (#289) (3f58516)
+* Messages: Support 'Language' header field of PO files (#76) (3ce842b)
+* Messages: Update catalog headers from templates (e0e7ef1)
+* Numbers: Properly load and expose currency format types (#201) (df676ab)
+* Numbers: Use cdecimal by default when available (b6169be)
+* Numbers: Use the CLDR's suggested number of decimals for format_currency (#139) (201ed50)
+* Times: Add format_timedelta(format='narrow') support (edc5eb5)
+
+Version 2.1
+-----------
+
+(Bugfix/minor feature release, released on September 25th 2015)
+
+- Parse and honour the locale inheritance exceptions
+  (https://github.com/python-babel/babel/issues/97)
+- Fix Locale.parse using ``global.dat`` incompatible types 
+  (https://github.com/python-babel/babel/issues/174)
+- Fix display of negative offsets in ``FixedOffsetTimezone``
+  (https://github.com/python-babel/babel/issues/214)
+- Improved odict performance which is used during localization file
+  build, should improve compilation time for large projects
+- Add support for "narrow" format for ``format_timedelta``
+- Add universal wheel support
+- Support 'Language' header field in .PO files 
+  (fixes https://github.com/python-babel/babel/issues/76)
+- Test suite enhancements (coverage, broken tests fixed, etc)
+- Documentation updated
+
+Version 2.0
+-----------
+
+(Released on July 27th 2015, codename Second Coming)
+
+- Added support for looking up currencies that belong to a territory
+  through the :func:`babel.numbers.get_territory_currencies`
+  function.
+- Improved Python 3 support.
+- Fixed some broken tests for timezone behavior.
+- Improved various smaller things for dealing with dates.
+
+Version 1.4
+-----------
+
+(bugfix release, release date to be decided)
+
+- Fixed a bug that caused deprecated territory codes not being
+  converted properly by the subtag resolving.  This for instance
+  showed up when trying to use ``und_UK`` as a language code
+  which now properly resolves to ``en_GB``.
+- Fixed a bug that made it impossible to import the CLDR data
+  from scratch on windows systems.
+
+Version 1.3
+-----------
+
+(bugfix release, released on July 29th 2013)
+
+- Fixed a bug in likely-subtag resolving for some common locales.
+  This primarily makes ``zh_CN`` work again which was broken
+  due to how it was defined in the likely subtags combined with
+  our broken resolving.  This fixes :gh:`37`.
+- Fixed a bug that caused pybabel to break when writing to stdout
+  on Python 3.
+- Removed a stray print that was causing issues when writing to
+  stdout for message catalogs.
+
+Version 1.2
+-----------
+
+(bugfix release, released on July 27th 2013)
+
+- Included all tests in the tarball.  Previously the include
+  skipped past recursive folders.
+- Changed how tests are invoked and added separate standalone
+  test command.  This simplifies testing of the package for
+  linux distributors.
+
+Version 1.1
+-----------
+
+(bugfix release, released on July 27th 2013)
+
+- added dummy version requirements for pytz so that it installs
+  on pip 1.4.
+- Included tests in the tarball.
+
+Version 1.0
+-----------
+
+(Released on July 26th 2013, codename Revival)
+
+- support python 2.6, 2.7, 3.3+ and pypy - drop all other versions
+- use tox for testing on different pythons
+- Added support for the locale plural rules defined by the CLDR.
+- Added `format_timedelta` function to support localized formatting of
+  relative times with strings such as "2 days" or "1 month" (:trac:`126`).
+- Fixed negative offset handling of Catalog._set_mime_headers (:trac:`165`).
+- Fixed the case where messages containing square brackets would break with
+  an unpack error.
+- updated to CLDR 23
+- Make the CLDR import script work with Python 2.7.
+- Fix various typos.
+- Sort output of list-locales.
+- Make the POT-Creation-Date of the catalog being updated equal to
+  POT-Creation-Date of the template used to update (:trac:`148`).
+- Use a more explicit error message if no option or argument (command) is
+  passed to pybabel (:trac:`81`).
+- Keep the PO-Revision-Date if it is not the default value (:trac:`148`).
+- Make --no-wrap work by reworking --width's default and mimic xgettext's
+  behaviour of always wrapping comments (:trac:`145`).
+- Add --project and --version options for commandline (:trac:`173`).
+- Add a __ne__() method to the Local class.
+- Explicitly sort instead of using sorted() and don't assume ordering
+  (Jython compatibility).
+- Removed ValueError raising for string formatting message checkers if the
+  string does not contain any string formattings (:trac:`150`).
+- Fix Serbian plural forms (:trac:`213`).
+- Small speed improvement in format_date() (:trac:`216`).
+- Fix so frontend.CommandLineInterface.run does not accumulate logging 
+  handlers (:trac:`227`, reported with initial patch by dfraser)
+- Fix exception if environment contains an invalid locale setting
+  (:trac:`200`)
+- use cPickle instead of pickle for better performance (:trac:`225`)
+- Only use bankers round algorithm as a tie breaker if there are two nearest
+  numbers, round as usual if there is only one nearest number (:trac:`267`,
+  patch by Martin)
+- Allow disabling cache behaviour in LazyProxy (:trac:`208`, initial patch
+  from Pedro Algarvio)
+- Support for context-aware methods during message extraction (:trac:`229`,
+  patch from David Rios)
+- "init" and "update" commands support "--no-wrap" option (:trac:`289`)
+- fix formatting of fraction in format_decimal() if the input value is a float
+  with more than 7 significant digits (:trac:`183`)
+- fix format_date() with datetime parameter (:trac:`282`, patch from Xavier
+  Morel)
+- fix format_decimal() with small Decimal values (:trac:`214`, patch from
+  George Lund)
+- fix handling of messages containing '\\n' (:trac:`198`)
+- handle irregular multi-line msgstr (no "" as first line) gracefully
+  (:trac:`171`)
+- parse_decimal() now returns Decimals not floats, API change (:trac:`178`)
+- no warnings when running setup.py without installed setuptools (:trac:`262`)
+- modified Locale.__eq__ method so Locales are only equal if all of their
+  attributes (language, territory, script, variant) are equal
+- resort to hard-coded message extractors/checkers if pkg_resources is
+  installed but no egg-info was found (:trac:`230`)
+- format_time() and format_datetime() now accept also floats (:trac:`242`)
+- add babel.support.NullTranslations class similar to gettext.NullTranslations
+  but with all of Babel's new gettext methods (:trac:`277`)
+- "init" and "update" commands support "--width" option (:trac:`284`)
+- fix 'input_dirs' option for setuptools integration (:trac:`232`, initial
+  patch by Étienne Bersac)
+- ensure .mo file header contains the same information as the source .po file
+  (:trac:`199`)
+- added support for get_language_name() on the locale objects.
+- added support for get_territory_name() on the locale objects.
+- added support for get_script_name() on the locale objects.
+- added pluralization support for currency names and added a '¤¤¤'
+  pattern for currencies that includes the full name.
+- depend on pytz now and wrap it nicer.  This gives us improved support
+  for things like timezone transitions and an overall nicer API.
+- Added support for explicit charset to PO file reading.
+- Added experimental Python 3 support.
+- Added better support for returning timezone names.
+- Don't throw away a Catalog's obsolete messages when updating it.
+- Added basic likelySubtag resolving when doing locale parsing and no
+  match can be found.
+
+
+Version 0.9.6
+-------------
+
+(released on March 17th 2011)
+
+- Backport r493-494: documentation typo fixes.
+- Make the CLDR import script work with Python 2.7.
+- Fix various typos.
+- Fixed Python 2.3 compatibility (:trac:`146`, :trac:`233`).
+- Sort output of list-locales.
+- Make the POT-Creation-Date of the catalog being updated equal to
+  POT-Creation-Date of the template used to update (:trac:`148`).
+- Use a more explicit error message if no option or argument (command) is
+  passed to pybabel (:trac:`81`).
+- Keep the PO-Revision-Date if it is not the default value (:trac:`148`).
+- Make --no-wrap work by reworking --width's default and mimic xgettext's
+  behaviour of always wrapping comments (:trac:`145`).
+- Fixed negative offset handling of Catalog._set_mime_headers (:trac:`165`).
+- Add --project and --version options for commandline (:trac:`173`).
+- Add a __ne__() method to the Local class.
+- Explicitly sort instead of using sorted() and don't assume ordering
+  (Python 2.3 and Jython compatibility).
+- Removed ValueError raising for string formatting message checkers if the
+  string does not contain any string formattings (:trac:`150`).
+- Fix Serbian plural forms (:trac:`213`).
+- Small speed improvement in format_date() (:trac:`216`).
+- Fix number formatting for locales where CLDR specifies alt or draft 
+  items (:trac:`217`)
+- Fix bad check in format_time (:trac:`257`, reported with patch and tests by
+  jomae)
+- Fix so frontend.CommandLineInterface.run does not accumulate logging 
+  handlers (:trac:`227`, reported with initial patch by dfraser)
+- Fix exception if environment contains an invalid locale setting
+  (:trac:`200`)
+
+
+Version 0.9.5
+-------------
+
+(released on April 6th 2010)
+
+- Fixed the case where messages containing square brackets would break with
+  an unpack error.
+- Backport of r467: Fuzzy matching regarding plurals should *NOT* be checked
+  against len(message.id)  because this is always 2, instead, it's should be
+  checked against catalog.num_plurals (:trac:`212`).
+
+
+Version 0.9.4
+-------------
+
+(released on August 25th 2008)
+
+- Currency symbol definitions that is defined with choice patterns in the
+  CLDR data are no longer imported, so the symbol code will be used instead.
+- Fixed quarter support in date formatting.
+- Fixed a serious memory leak that was introduces by the support for CLDR
+  aliases in 0.9.3 (:trac:`128`).
+- Locale modifiers such as "@euro" are now stripped from locale identifiers
+  when parsing (:trac:`136`).
+- The system locales "C" and "POSIX" are now treated as aliases for
+  "en_US_POSIX", for which the CLDR provides the appropriate data. Thanks to
+  Manlio Perillo for the suggestion.
+- Fixed JavaScript extraction for regular expression literals (:trac:`138`)
+  and concatenated strings.
+- The `Translation` class in `babel.support` can now manage catalogs with
+  different message domains, and exposes the family of `d*gettext` functions
+  (:trac:`137`).
+
+
+Version 0.9.3
+-------------
+
+(released on July 9th 2008)
+
+- Fixed invalid message extraction methods causing an UnboundLocalError.
+- Extraction method specification can now use a dot instead of the colon to
+  separate module and function name (:trac:`105`).
+- Fixed message catalog compilation for locales with more than two plural
+  forms (:trac:`95`).
+- Fixed compilation of message catalogs for locales with more than two plural
+  forms where the translations were empty (:trac:`97`).
+- The stripping of the comment tags in comments is optional now and
+  is done for each line in a comment.
+- Added a JavaScript message extractor.
+- Updated to CLDR 1.6.
+- Fixed timezone calculations when formatting datetime and time values.
+- Added a `get_plural` function into the plurals module that returns the
+  correct plural forms for a locale as tuple.
+- Added support for alias definitions in the CLDR data files, meaning that
+  the chance for items missing in certain locales should be greatly reduced
+  (:trac:`68`).
+
+
+Version 0.9.2
+-------------
+
+(released on February 4th 2008)
+
+- Fixed catalogs' charset values not being recognized (:trac:`66`).
+- Numerous improvements to the default plural forms.
+- Fixed fuzzy matching when updating message catalogs (:trac:`82`).
+- Fixed bug in catalog updating, that in some cases pulled in translations
+  from different catalogs based on the same template.
+- Location lines in PO files do no longer get wrapped at hyphens in file
+  names (:trac:`79`).
+- Fixed division by zero error in catalog compilation on empty catalogs
+  (:trac:`60`).
+
+
+Version 0.9.1
+-------------
+
+(released on September 7th 2007)
+
+- Fixed catalog updating when a message is merged that was previously simple
+  but now has a plural form, for example by moving from `gettext` to
+  `ngettext`, or vice versa.
+- Fixed time formatting for 12 am and 12 pm.
+- Fixed output encoding of the `pybabel --list-locales` command.
+- MO files are now written in binary mode on windows (:trac:`61`).
+
+
+Version 0.9
+-----------
+
+(released on August 20th 2007)
+
+- The `new_catalog` distutils command has been renamed to `init_catalog` for
+  consistency with the command-line frontend.
+- Added compilation of message catalogs to MO files (:trac:`21`).
+- Added updating of message catalogs from POT files (:trac:`22`).
+- Support for significant digits in number formatting.
+- Apply proper "banker's rounding" in number formatting in a cross-platform
+  manner.
+- The number formatting functions now also work with numbers represented by
+  Python `Decimal` objects (:trac:`53`).
+- Added extensible infrastructure for validating translation catalogs.
+- Fixed the extractor not filtering out messages that didn't validate against
+  the keyword's specification (:trac:`39`).
+- Fixed the extractor raising an exception when encountering an empty string
+  msgid. It now emits a warning to stderr.
+- Numerous Python message extractor fixes: it now handles nested function
+  calls within a gettext function call correctly, uses the correct line number
+  for multi-line function calls, and other small fixes (tickets :trac:`38` and
+  :trac:`39`).
+- Improved support for detecting Python string formatting fields in message
+  strings (:trac:`57`).
+- CLDR upgraded to the 1.5 release.
+- Improved timezone formatting.
+- Implemented scientific number formatting.
+- Added mechanism to lookup locales by alias, for cases where browsers insist
+  on including only the language code in the `Accept-Language` header, and
+  sometimes even the incorrect language code.
+
+
+Version 0.8.1
+-------------
+
+(released on July 2nd 2007)
+
+- `default_locale()` would fail when the value of the `LANGUAGE` environment
+  variable contained multiple language codes separated by colon, as is
+  explicitly allowed by the GNU gettext tools. As the `default_locale()`
+  function is called at the module level in some modules, this bug would
+  completely break importing these modules on systems where `LANGUAGE` is set
+  that way.
+- The character set specified in PO template files is now respected when
+  creating new catalog files based on that template. This allows the use of
+  characters outside the ASCII range in POT files (:trac:`17`).
+- The default ordering of messages in generated POT files, which is based on
+  the order those messages are found when walking the source tree, is no
+  longer subject to differences between platforms; directory and file names
+  are now always sorted alphabetically.
+- The Python message extractor now respects the special encoding comment to be
+  able to handle files containing non-ASCII characters (:trac:`23`).
+- Added ``N_`` (gettext noop) to the extractor's default keywords.
+- Made locale string parsing more robust, and also take the script part into
+  account (:trac:`27`).
+- Added a function to list all locales for which locale data is available.
+- Added a command-line option to the `pybabel` command which prints out all
+  available locales (:trac:`24`).
+- The name of the command-line script has been changed from just `babel` to
+  `pybabel` to avoid a conflict with the OpenBabel project (:trac:`34`).
+
+
+Version 0.8
+-----------
+
+(released on June 20th 2007)
+
+- First public release
