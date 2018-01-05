@@ -640,7 +640,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-document-header-actions">
     <div class="assist-db-header-actions">
       <!-- ko if: !loading() -->
-      <div class="highlightable" data-bind="css: { 'highlight': $parent.highlightTypeFilter() }, component: { name: 'hue-drop-down', params: { fixedPosition: true, value: typeFilter, entries: DOCUMENT_TYPES, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
+      <div class="highlightable" data-bind="css: { 'highlight': $parent.highlightTypeFilter() }, component: { name: 'hue-drop-down', params: { fixedPosition: true, value: typeFilter, searchable: true, entries: DOCUMENT_TYPES, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.document.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
