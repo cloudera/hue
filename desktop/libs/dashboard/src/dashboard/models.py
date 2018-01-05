@@ -626,6 +626,7 @@ def augment_solr_response(response, collection, query):
 
           if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
             agg_keys.insert(0, 'count')
+
           counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
           actual_dimension = sum([_f['aggregate']['function'] == 'count' for _f in collection_facet['properties']['facets']])
 
@@ -754,7 +755,7 @@ def _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows):
   fq_values = []
   fq_filter = []
   _selected_values = [f['value'] for f in selected_values.get(facet['id'], [])]
-  _fields = [facet['field']] + [facet['field'] for facet in facet['properties']['facets']]
+  _fields = [facet['field'] for facet in facet['properties']['facets']]
 
   return __augment_stats_2d(counts, facet['field'], fq_fields, fq_values, fq_filter, _selected_values, _fields, agg_keys, rows)
 
