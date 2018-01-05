@@ -755,9 +755,10 @@ def _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows):
   fq_values = []
   fq_filter = []
   _selected_values = [f['value'] for f in selected_values.get(facet['id'], [])]
-  _fields = [facet['field'] for facet in facet['properties']['facets']]
+  label = facet['properties']['facets'][0]['field']
+  _dim_fields = [_f['field'] for _f in facet['properties']['facets'] if _f['aggregate']['function'] == 'count']
 
-  return __augment_stats_2d(counts, facet['field'], fq_fields, fq_values, fq_filter, _selected_values, _fields, agg_keys, rows)
+  return __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected_values, _dim_fields, agg_keys, rows)
 
 
 # Clear one dimension
@@ -769,7 +770,7 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
     count = bucket['count']
     dim_row = [val]
 
-    _fq_fields = fq_fields + _fields[1:2] # Pick dim 2 if there is one
+    _fq_fields = fq_fields + _fields[0:1] # Pick dim field if there is one
     _fq_values = fq_values + [val]
 
     for agg_key in agg_keys:
