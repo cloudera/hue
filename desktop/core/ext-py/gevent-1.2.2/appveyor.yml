@@ -1,0 +1,164 @@
+environment:
+  global:
+    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
+    # /E:ON and /V:ON options are not enabled in the batch script intepreter
+    # See: http://stackoverflow.com/a/13751649/163740
+    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
+
+  matrix:
+
+    # Pre-installed Python versions, which Appveyor may upgrade to
+    # a later point release.
+
+    # XXX: Sadly, PyPy won't link CFFI on Win32
+    # - PYTHON: "C:\\pypy-4.0.1-win32"
+    #   PYTHON_ID: "pypy"
+    #   PYTHON_EXE: pypy
+    #   PYTHON_VERSION: "2.7.x"
+    #   PYTHON_ARCH: "32"
+
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.x" # currently 3.6.0
+      PYTHON_ARCH: "64"
+      PYTHON_EXE: python
+
+    - PYTHON: "C:\\Python27-x64"
+      PYTHON_VERSION: "2.7.x" # currently 2.7.13
+      PYTHON_ARCH: "64"
+      PYTHON_EXE: python
+
+    - PYTHON: "C:\\Python34-x64"
+      PYTHON_VERSION: "3.4.x" # currently 3.4.4
+      PYTHON_ARCH: "64"
+      PYTHON_EXE: python
+
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5.x" # currently 3.5.2
+      PYTHON_ARCH: "64"
+      PYTHON_EXE: python
+
+    - PYTHON: "C:\\Python35"
+      PYTHON_VERSION: "3.5.x" # currently 3.5.2
+      PYTHON_ARCH: "32"
+      PYTHON_EXE: python
+
+    - PYTHON: "C:\\Python27"
+      PYTHON_VERSION: "2.7.x" # currently 2.7.13
+      PYTHON_ARCH: "32"
+      PYTHON_EXE: python
+
+    - PYTHON: "C:\\Python34"
+      PYTHON_VERSION: "3.4.x" # currently 3.4.3
+      PYTHON_ARCH: "32"
+      PYTHON_EXE: python
+
+    - PYTHON: "C:\\Python36"
+      PYTHON_VERSION: "3.6.x" # currently 3.6.0
+      PYTHON_ARCH: "32"
+      PYTHON_EXE: python
+
+
+    # Also test a Python version not pre-installed
+    # See: https://github.com/ogrisel/python-appveyor-demo/issues/10
+
+    # - PYTHON: "C:\\Python266"
+    #   PYTHON_VERSION: "2.6.6"
+    #   PYTHON_ARCH: "32"
+    #   PYTHON_EXE: python
+
+install:
+  # If there is a newer build queued for the same PR, cancel this one.
+  # The AppVeyor 'rollout builds' option is supposed to serve the same
+  # purpose but it is problematic because it tends to cancel builds pushed
+  # directly to master instead of just PR builds (or the converse).
+  # credits: JuliaLang developers.
+  - ps: if ($env:APPVEYOR_PULL_REQUEST_NUMBER -and $env:APPVEYOR_BUILD_NUMBER -ne ((Invoke-RestMethod `
+        https://ci.appveyor.com/api/projects/$env:APPVEYOR_ACCOUNT_NAME/$env:APPVEYOR_PROJECT_SLUG/history?recordsNumber=50).builds | `
+        Where-Object pullRequestId -eq $env:APPVEYOR_PULL_REQUEST_NUMBER)[0].buildNumber) { `
+          throw "There are newer queued builds for this pull request, failing early." }
+  - ECHO "Filesystem root:"
+  - ps: "ls \"C:/\""
+
+  - ECHO "Installed SDKs:"
+  - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
+
+  # Install Python (from the official .msi of http://python.org) and pip when
+  # not already installed.
+  # PyPy portion based on https://github.com/wbond/asn1crypto/blob/master/appveyor.yml
+  - ps:
+      $env:PYTMP = "${env:TMP}\py";
+      if (!(Test-Path "$env:PYTMP")) {
+        New-Item -ItemType directory -Path "$env:PYTMP" | Out-Null;
+      }
+      if ("${env:PYTHON_ID}" -eq "pypy") {
+        if (!(Test-Path "${env:PYTMP}\pypy-4.0.1-win32.zip")) {
+          (New-Object Net.WebClient).DownloadFile('https://bitbucket.org/pypy/pypy/downloads/pypy-4.0.1-win32.zip', "${env:PYTMP}\pypy-4.0.1-win32.zip");
+        }
+        7z x -y "${env:PYTMP}\pypy-4.0.1-win32.zip" -oC:\ | Out-Null;
+        if (!(Test-Path "${env:PYTMP}\get-pip.py")) {
+          (New-Object Net.WebClient).DownloadFile('https://bootstrap.pypa.io/get-pip.py', "${env:PYTMP}\get-pip.py");
+        }
+        & "${env:PYTHON}\pypy.exe" "${env:PYTMP}\get-pip.py";
+
+      }
+      elseif (-not(Test-Path($env:PYTHON))) {
+        & appveyor\install.ps1;
+      }
+
+  # Prepend newly installed Python to the PATH of this build (this cannot be
+  # done from inside the powershell script as it would require to restart
+  # the parent CMD process).
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PYTHON%\\bin;%PATH%"
+  - "SET PYEXE=%PYTHON%\\%PYTHON_EXE%.exe"
+
+  # Check that we have the expected version and architecture for Python
+  - "%PYEXE% --version"
+  - "%PYEXE% -c \"import struct; print(struct.calcsize('P') * 8)\""
+
+  # Upgrade to the latest version of pip to avoid it displaying warnings
+  # about it being out of date.
+  - "%CMD_IN_ENV% pip install --disable-pip-version-check --user --upgrade pip"
+
+  # Install the build dependencies of the project. If some dependencies contain
+  # compiled extensions and are not provided as pre-built wheel packages,
+  # pip will build them from source using the MSVC compiler matching the
+  # target Python version and architecture
+  # NOTE: psutil won't install under PyPy.
+  - "%CMD_IN_ENV% pip install -U wheel cython greenlet psutil"
+
+  - ps: "if(Test-Path(\"${env:PYTHON}\\bin\")) {ls ${env:PYTHON}\\bin;}"
+  - ps: "if(Test-Path(\"${env:PYTHON}\\Scripts\")) {ls ${env:PYTHON}\\Scripts;}"
+
+cache:
+  - "%TMP%\\py\\"
+
+build_script:
+  # Build the compiled extension
+  - "%CMD_IN_ENV% %PYEXE% setup.py bdist_wheel bdist_wininst"
+  - ps: "ls dist"
+  # Now install the wheel.
+  # I couldn't get wildcards to work for pip install, so stuff it
+  # into a variable, using python to glob.
+  - "%PYEXE% -c \"import glob; print(glob.glob('dist/*whl')[0])\" > whl.txt"
+  - set /p PYWHL=<whl.txt
+  - pip install %PYWHL%
+
+test_script:
+  # Run the project tests
+  - "cd src/greentest && %PYEXE% testrunner.py --config known_failures.py --quiet && cd ../.."
+
+after_test:
+  # We already built the wheel during build_script, because it's
+  # much faster to do that and install from the wheel than to
+  # rebuild it here (because we wind up re-building all the cython
+  # code, even though it's already built on disk; our make.cmd is not smart)
+  #- "%CMD_IN_ENV% %PYEXE% setup.py bdist_wheel bdist_wininst"
+  - ps: "ls dist"
+
+artifacts:
+  # Archive the generated wheel package in the ci.appveyor.com build report.
+  - path: dist\*
+
+#on_success:
+#  - TODO: upload the content of dist/*.whl to a public wheelhouse
+#

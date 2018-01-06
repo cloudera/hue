@@ -1,0 +1,1134 @@
+# Copyright (c) 2009-2012 Denis Bilenko. See LICENSE for details.
+# This directive, supported in Cython 0.24+, causes sources files to be
+# much smaller and thus cythonpp.py to be slightly faster. But it does make
+# debugging more difficult.
+# cython: emit_code_comments=False
+cimport cython
+cimport libev
+# Note this is not the standard cython 'cpython' (which has a backwards compat alias of 'python')
+# it's our custom def. If it's not on the include path, we get warned.
+from python cimport *
+
+# Work around lack of absolute_import in Cython
+# Note for PY3: not doing so will leave reference to locals() on import
+# (reproducible under Python 3.3, not under Python 3.4; see test__refcount_core.py)
+sys = __import__('sys', level=0)
+os = __import__('os', level=0)
+traceback = __import__('traceback', level=0)
+signalmodule = __import__('signal', level=0)
+
+
+__all__ = ['get_version',
+           'get_header_version',
+           'supported_backends',
+           'recommended_backends',
+           'embeddable_backends',
+           'time',
+           'loop']
+
+cdef tuple integer_types
+
+if sys.version_info[0] >= 3:
+    integer_types = int,
+else:
+    integer_types = (int, long)
+
+
+cdef extern from "callbacks.h":
+    void gevent_callback_io(libev.ev_loop, void*, int)
+    void gevent_callback_timer(libev.ev_loop, void*, int)
+    void gevent_callback_signal(libev.ev_loop, void*, int)
+    void gevent_callback_idle(libev.ev_loop, void*, int)
+    void gevent_callback_prepare(libev.ev_loop, void*, int)
+    void gevent_callback_check(libev.ev_loop, void*, int)
+    void gevent_callback_fork(libev.ev_loop, void*, int)
+    void gevent_callback_async(libev.ev_loop, void*, int)
+    void gevent_callback_child(libev.ev_loop, void*, int)
+    void gevent_callback_stat(libev.ev_loop, void*, int)
+    void gevent_run_callbacks(libev.ev_loop, void*, int)
+    void gevent_periodic_signal_check(libev.ev_loop, void*, int)
+    void gevent_call(loop, callback)
+    void gevent_noop(libev.ev_loop, void*, int)
+
+cdef extern from *:
+    int errno
+
+cdef extern from "stathelper.c":
+    object _pystat_fromstructstat(void*)
+
+
+UNDEF = libev.EV_UNDEF
+NONE = libev.EV_NONE
+READ = libev.EV_READ
+WRITE = libev.EV_WRITE
+TIMER = libev.EV_TIMER
+PERIODIC = libev.EV_PERIODIC
+SIGNAL = libev.EV_SIGNAL
+CHILD = libev.EV_CHILD
+STAT = libev.EV_STAT
+IDLE = libev.EV_IDLE
+PREPARE = libev.EV_PREPARE
+CHECK = libev.EV_CHECK
+EMBED = libev.EV_EMBED
+FORK = libev.EV_FORK
+CLEANUP = libev.EV_CLEANUP
+ASYNC = libev.EV_ASYNC
+CUSTOM = libev.EV_CUSTOM
+ERROR = libev.EV_ERROR
+
+READWRITE = libev.EV_READ | libev.EV_WRITE
+
+MINPRI = libev.EV_MINPRI
+MAXPRI = libev.EV_MAXPRI
+
+BACKEND_PORT = libev.EVBACKEND_PORT
+BACKEND_KQUEUE = libev.EVBACKEND_KQUEUE
+BACKEND_EPOLL = libev.EVBACKEND_EPOLL
+BACKEND_POLL = libev.EVBACKEND_POLL
+BACKEND_SELECT = libev.EVBACKEND_SELECT
+FORKCHECK = libev.EVFLAG_FORKCHECK
+NOINOTIFY = libev.EVFLAG_NOINOTIFY
+SIGNALFD = libev.EVFLAG_SIGNALFD
+NOSIGMASK = libev.EVFLAG_NOSIGMASK
+
+
+@cython.internal
+cdef class _EVENTSType:
+
+    def __repr__(self):
+        return 'gevent.core.EVENTS'
+
+
+cdef public object GEVENT_CORE_EVENTS = _EVENTSType()
+EVENTS = GEVENT_CORE_EVENTS
+
+
+def get_version():
+    return 'libev-%d.%02d' % (libev.ev_version_major(), libev.ev_version_minor())
+
+
+def get_header_version():
+    return 'libev-%d.%02d' % (libev.EV_VERSION_MAJOR, libev.EV_VERSION_MINOR)
+
+
+# This list backends in the order they are actually tried by libev
+_flags = [(libev.EVBACKEND_PORT, 'port'),
+          (libev.EVBACKEND_KQUEUE, 'kqueue'),
+          (libev.EVBACKEND_EPOLL, 'epoll'),
+          (libev.EVBACKEND_POLL, 'poll'),
+          (libev.EVBACKEND_SELECT, 'select'),
+          (libev.EVFLAG_NOENV, 'noenv'),
+          (libev.EVFLAG_FORKCHECK, 'forkcheck'),
+          (libev.EVFLAG_NOINOTIFY, 'noinotify'),
+          (libev.EVFLAG_SIGNALFD, 'signalfd'),
+          (libev.EVFLAG_NOSIGMASK, 'nosigmask')]
+
+
+_flags_str2int = dict((string, flag) for (flag, string) in _flags)
+
+
+_events = [(libev.EV_READ,     'READ'),
+           (libev.EV_WRITE,    'WRITE'),
+           (libev.EV__IOFDSET, '_IOFDSET'),
+           (libev.EV_PERIODIC, 'PERIODIC'),
+           (libev.EV_SIGNAL,   'SIGNAL'),
+           (libev.EV_CHILD,    'CHILD'),
+           (libev.EV_STAT,     'STAT'),
+           (libev.EV_IDLE,     'IDLE'),
+           (libev.EV_PREPARE,  'PREPARE'),
+           (libev.EV_CHECK,    'CHECK'),
+           (libev.EV_EMBED,    'EMBED'),
+           (libev.EV_FORK,     'FORK'),
+           (libev.EV_CLEANUP,  'CLEANUP'),
+           (libev.EV_ASYNC,    'ASYNC'),
+           (libev.EV_CUSTOM,   'CUSTOM'),
+           (libev.EV_ERROR,    'ERROR')]
+
+
+cpdef _flags_to_list(unsigned int flags):
+    cdef list result = []
+    for code, value in _flags:
+        if flags & code:
+            result.append(value)
+        flags &= ~code
+        if not flags:
+            break
+    if flags:
+        result.append(flags)
+    return result
+
+
+if sys.version_info[0] >= 3:
+    basestring = (bytes, str)
+else:
+    basestring = __builtins__.basestring
+
+
+cpdef unsigned int _flags_to_int(object flags) except? -1:
+    # Note, that order does not matter, libev has its own predefined order
+    if not flags:
+        return 0
+    if isinstance(flags, integer_types):
+        return flags
+    cdef unsigned int result = 0
+    try:
+        if isinstance(flags, basestring):
+            flags = flags.split(',')
+        for value in flags:
+            value = value.strip().lower()
+            if value:
+                result |= _flags_str2int[value]
+    except KeyError as ex:
+        raise ValueError('Invalid backend or flag: %s\nPossible values: %s' % (ex, ', '.join(sorted(_flags_str2int.keys()))))
+    return result
+
+
+cdef str _str_hex(object flag):
+    if isinstance(flag, integer_types):
+        return hex(flag)
+    return str(flag)
+
+
+cpdef _check_flags(unsigned int flags):
+    cdef list as_list
+    flags &= libev.EVBACKEND_MASK
+    if not flags:
+        return
+    if not (flags & libev.EVBACKEND_ALL):
+        raise ValueError('Invalid value for backend: 0x%x' % flags)
+    if not (flags & libev.ev_supported_backends()):
+        as_list = [_str_hex(x) for x in _flags_to_list(flags)]
+        raise ValueError('Unsupported backend: %s' % '|'.join(as_list))
+
+
+cpdef _events_to_str(int events):
+    cdef list result = []
+    cdef int c_flag
+    for (flag, string) in _events:
+        c_flag = flag
+        if events & c_flag:
+            result.append(string)
+            events = events & (~c_flag)
+        if not events:
+            break
+    if events:
+        result.append(hex(events))
+    return '|'.join(result)
+
+
+def supported_backends():
+    return _flags_to_list(libev.ev_supported_backends())
+
+
+def recommended_backends():
+    return _flags_to_list(libev.ev_recommended_backends())
+
+
+def embeddable_backends():
+    return _flags_to_list(libev.ev_embeddable_backends())
+
+
+def time():
+    return libev.ev_time()
+
+
+#define LOOP_PROPERTY(NAME) property NAME:  \
+                                            \
+        def __get__(self):                  \
+            CHECK_LOOP3(self)               \
+            return self._ptr.NAME
+
+
+cdef bint _default_loop_destroyed = False
+
+
+#define CHECK_LOOP2(LOOP)                                   \
+        if not LOOP._ptr:                                   \
+            raise ValueError('operation on destroyed loop')
+
+
+#define CHECK_LOOP3(LOOP)                                       \
+            if not LOOP._ptr:                                   \
+                raise ValueError('operation on destroyed loop')
+
+
+
+cdef public class loop [object PyGeventLoopObject, type PyGeventLoop_Type]:
+    cdef libev.ev_loop* _ptr
+    cdef public object error_handler
+    cdef libev.ev_prepare _prepare
+    cdef public list _callbacks
+    cdef libev.ev_timer _timer0
+#ifdef _WIN32
+    cdef libev.ev_timer _periodic_signal_checker
+#endif
+
+    def __init__(self, object flags=None, object default=None, size_t ptr=0):
+        cdef unsigned int c_flags
+        cdef object old_handler = None
+        libev.ev_prepare_init(&self._prepare, <void*>gevent_run_callbacks)
+#ifdef _WIN32
+        libev.ev_timer_init(&self._periodic_signal_checker, <void*>gevent_periodic_signal_check, 0.3, 0.3)
+#endif
+        libev.ev_timer_init(&self._timer0, <void*>gevent_noop, 0.0, 0.0)
+        if ptr:
+            self._ptr = <libev.ev_loop*>ptr
+        else:
+            c_flags = _flags_to_int(flags)
+            _check_flags(c_flags)
+            c_flags |= libev.EVFLAG_NOENV
+            c_flags |= libev.EVFLAG_FORKCHECK
+            if default is None:
+                default = True
+                if _default_loop_destroyed:
+                    default = False
+            if default:
+                self._ptr = libev.gevent_ev_default_loop(c_flags)
+                if not self._ptr:
+                    raise SystemError("ev_default_loop(%s) failed" % (c_flags, ))
+#ifdef _WIN32
+                libev.ev_timer_start(self._ptr, &self._periodic_signal_checker)
+                libev.ev_unref(self._ptr)
+#endif
+            else:
+                self._ptr = libev.ev_loop_new(c_flags)
+                if not self._ptr:
+                    raise SystemError("ev_loop_new(%s) failed" % (c_flags, ))
+            if default or __SYSERR_CALLBACK is None:
+                set_syserr_cb(self._handle_syserr)
+            libev.ev_prepare_start(self._ptr, &self._prepare)
+            libev.ev_unref(self._ptr)
+        self._callbacks = []
+
+    cdef _run_callbacks(self):
+        cdef callback cb
+        cdef object callbacks
+        cdef int count = 1000
+        libev.ev_timer_stop(self._ptr, &self._timer0)
+        while self._callbacks and count > 0:
+            callbacks = self._callbacks
+            self._callbacks = []
+            for cb in callbacks:
+                libev.ev_unref(self._ptr)
+                gevent_call(self, cb)
+                count -= 1
+        if self._callbacks:
+            libev.ev_timer_start(self._ptr, &self._timer0)
+
+    def _stop_watchers(self):
+        if libev.ev_is_active(&self._prepare):
+            libev.ev_ref(self._ptr)
+            libev.ev_prepare_stop(self._ptr, &self._prepare)
+#ifdef _WIN32
+        if libev.ev_is_active(&self._periodic_signal_checker):
+            libev.ev_ref(self._ptr)
+            libev.ev_timer_stop(self._ptr, &self._periodic_signal_checker)
+#endif
+
+    def destroy(self):
+        global _default_loop_destroyed
+        if self._ptr:
+            self._stop_watchers()
+            if __SYSERR_CALLBACK == self._handle_syserr:
+                set_syserr_cb(None)
+            if libev.ev_is_default_loop(self._ptr):
+                _default_loop_destroyed = True
+            libev.ev_loop_destroy(self._ptr)
+            self._ptr = NULL
+
+    def __dealloc__(self):
+        if self._ptr:
+            self._stop_watchers()
+            if not libev.ev_is_default_loop(self._ptr):
+                libev.ev_loop_destroy(self._ptr)
+            self._ptr = NULL
+
+    property ptr:
+
+        def __get__(self):
+            return <size_t>self._ptr
+
+    property WatcherType:
+
+        def __get__(self):
+            return watcher
+
+    property MAXPRI:
+
+       def __get__(self):
+           return libev.EV_MAXPRI
+
+    property MINPRI:
+
+        def __get__(self):
+            return libev.EV_MINPRI
+
+    def _handle_syserr(self, message, errno):
+        if sys.version_info[0] >= 3:
+            message = message.decode()
+        self.handle_error(None, SystemError, SystemError(message + ': ' + os.strerror(errno)), None)
+
+    cpdef handle_error(self, context, type, value, tb):
+        cdef object handle_error
+        cdef object error_handler = self.error_handler
+        if error_handler is not None:
+            # we do want to do getattr every time so that setting Hub.handle_error property just works
+            handle_error = getattr(error_handler, 'handle_error', error_handler)
+            handle_error(context, type, value, tb)
+        else:
+            self._default_handle_error(context, type, value, tb)
+
+    cpdef _default_handle_error(self, context, type, value, tb):
+        # note: Hub sets its own error handler so this is not used by gevent
+        # this is here to make core.loop usable without the rest of gevent
+        traceback.print_exception(type, value, tb)
+        if self._ptr:
+            libev.ev_break(self._ptr, libev.EVBREAK_ONE)
+
+    def run(self, nowait=False, once=False):
+        CHECK_LOOP2(self)
+        cdef unsigned int flags = 0
+        if nowait:
+            flags |= libev.EVRUN_NOWAIT
+        if once:
+            flags |= libev.EVRUN_ONCE
+        with nogil:
+            libev.ev_run(self._ptr, flags)
+
+    def reinit(self):
+        if self._ptr:
+            libev.ev_loop_fork(self._ptr)
+
+    def ref(self):
+        CHECK_LOOP2(self)
+        libev.ev_ref(self._ptr)
+
+    def unref(self):
+        CHECK_LOOP2(self)
+        libev.ev_unref(self._ptr)
+
+    def break_(self, int how=libev.EVBREAK_ONE):
+        CHECK_LOOP2(self)
+        libev.ev_break(self._ptr, how)
+
+    def verify(self):
+        CHECK_LOOP2(self)
+        libev.ev_verify(self._ptr)
+
+    def now(self):
+        CHECK_LOOP2(self)
+        return libev.ev_now(self._ptr)
+
+    def update(self):
+        CHECK_LOOP2(self)
+        libev.ev_now_update(self._ptr)
+
+    def __repr__(self):
+        return '<%s at 0x%x %s>' % (self.__class__.__name__, id(self), self._format())
+
+    property default:
+
+        def __get__(self):
+            CHECK_LOOP3(self)
+            return True if libev.ev_is_default_loop(self._ptr) else False
+
+    property iteration:
+
+        def __get__(self):
+            CHECK_LOOP3(self)
+            return libev.ev_iteration(self._ptr)
+
+    property depth:
+
+        def __get__(self):
+            CHECK_LOOP3(self)
+            return libev.ev_depth(self._ptr)
+
+    property backend_int:
+
+        def __get__(self):
+            CHECK_LOOP3(self)
+            return libev.ev_backend(self._ptr)
+
+    property backend:
+
+        def __get__(self):
+            CHECK_LOOP3(self)
+            cdef unsigned int backend = libev.ev_backend(self._ptr)
+            for key, value in _flags:
+                if key == backend:
+                    return value
+            return backend
+
+    property pendingcnt:
+
+        def __get__(self):
+            CHECK_LOOP3(self)
+            return libev.ev_pending_count(self._ptr)
+
+#ifdef _WIN32
+    def io(self, libev.vfd_socket_t fd, int events, ref=True, priority=None):
+        return io(self, fd, events, ref, priority)
+#else
+    def io(self, int fd, int events, ref=True, priority=None):
+        return io(self, fd, events, ref, priority)
+#endif
+
+    def timer(self, double after, double repeat=0.0, ref=True, priority=None):
+        return timer(self, after, repeat, ref, priority)
+
+    def signal(self, int signum, ref=True, priority=None):
+        return signal(self, signum, ref, priority)
+
+    def idle(self, ref=True, priority=None):
+        return idle(self, ref, priority)
+
+    def prepare(self, ref=True, priority=None):
+        return prepare(self, ref, priority)
+
+    def check(self, ref=True, priority=None):
+        return check(self, ref, priority)
+
+    def fork(self, ref=True, priority=None):
+        return fork(self, ref, priority)
+
+    def async(self, ref=True, priority=None):
+        return async(self, ref, priority)
+
+#ifdef _WIN32
+#else
+
+    def child(self, int pid, bint trace=0, ref=True):
+        return child(self, pid, trace, ref)
+
+    def install_sigchld(self):
+        libev.gevent_install_sigchld_handler()
+
+    def reset_sigchld(self):
+        libev.gevent_reset_sigchld_handler()
+
+#endif
+
+    def stat(self, str path, float interval=0.0, ref=True, priority=None):
+        return stat(self, path, interval, ref, priority)
+
+    def run_callback(self, func, *args):
+        CHECK_LOOP2(self)
+        cdef callback cb = callback(func, args)
+        self._callbacks.append(cb)
+        libev.ev_ref(self._ptr)
+        return cb
+
+    def _format(self):
+        if not self._ptr:
+            return 'destroyed'
+        cdef object msg = self.backend
+        if self.default:
+            msg += ' default'
+        msg += ' pending=%s' % self.pendingcnt
+#ifdef LIBEV_EMBED
+        msg += self._format_details()
+#endif
+        return msg
+
+#ifdef LIBEV_EMBED
+
+    def _format_details(self):
+        cdef str msg = ''
+        cdef object fileno = self.fileno()
+        cdef object sigfd = None
+        cdef object activecnt = None
+        try:
+            sigfd = self.sigfd
+        except AttributeError:
+            sigfd = None
+        try:
+            activecnt = self.activecnt
+        except AttributeError:
+            pass
+        if activecnt is not None:
+            msg += ' ref=' + repr(activecnt)
+        if fileno is not None:
+            msg += ' fileno=' + repr(fileno)
+        if sigfd is not None and sigfd != -1:
+            msg += ' sigfd=' + repr(sigfd)
+        return msg
+
+    def fileno(self):
+        cdef int fd
+        if self._ptr:
+            fd = self._ptr.backend_fd
+            if fd >= 0:
+                return fd
+
+    LOOP_PROPERTY(activecnt)
+
+    LOOP_PROPERTY(sig_pending)
+
+#if EV_USE_SIGNALFD
+    LOOP_PROPERTY(sigfd)
+#endif
+
+    property origflags:
+
+        def __get__(self):
+            CHECK_LOOP3(self)
+            return _flags_to_list(self._ptr.origflags)
+
+    property origflags_int:
+
+        def __get__(self):
+            CHECK_LOOP3(self)
+            return self._ptr.origflags
+
+#endif
+
+
+cdef public class callback [object PyGeventCallbackObject, type PyGeventCallback_Type]:
+    cdef public object callback
+    cdef public tuple args
+
+    def __init__(self, callback, args):
+        self.callback = callback
+        self.args = args
+
+    def stop(self):
+        self.callback = None
+        self.args = None
+
+    # Note, that __nonzero__ and pending are different
+    # nonzero is used in contexts where we need to know whether to schedule another callback,
+    # so it's true if it's pending or currently running
+    # 'pending' has the same meaning as libev watchers: it is cleared before entering callback
+
+    def __nonzero__(self):
+        # it's nonzero if it's pending or currently executing
+        return self.args is not None
+
+    property pending:
+
+        def __get__(self):
+            return self.callback is not None
+
+    def __repr__(self):
+        if Py_ReprEnter(<PyObjectPtr>self) != 0:
+            return "<...>"
+        try:
+            format = self._format()
+            result = "<%s at 0x%x%s" % (self.__class__.__name__, id(self), format)
+            if self.pending:
+                result += " pending"
+            if self.callback is not None:
+                result += " callback=%r" % (self.callback, )
+            if self.args is not None:
+                result += " args=%r" % (self.args, )
+            if self.callback is None and self.args is None:
+                result += " stopped"
+            return result + ">"
+        finally:
+            Py_ReprLeave(<PyObjectPtr>self)
+
+    def _format(self):
+        return ''
+
+
+#define PYTHON_INCREF if not self._flags & 1:  \
+            Py_INCREF(<PyObjectPtr>self)       \
+            self._flags |= 1
+
+#define LIBEV_UNREF if self._flags & 6 == 4:   \
+            libev.ev_unref(self.loop._ptr)     \
+            self._flags |= 2
+
+# about readonly _flags attribute:
+# bit #1 set if object owns Python reference to itself (Py_INCREF was called and we must call Py_DECREF later)
+# bit #2 set if ev_unref() was called and we must call ev_ref() later
+# bit #3 set if user wants to call ev_unref() before start()
+
+#define WATCHER_BASE(TYPE)                                                              \
+    cdef public loop loop                                                               \
+    cdef object _callback                                                               \
+    cdef public tuple args                                                              \
+    cdef readonly int _flags                                                            \
+    cdef libev.ev_##TYPE _watcher                                                       \
+                                                                                        \
+    property ref:                                                                       \
+                                                                                        \
+        def __get__(self):                                                              \
+            return False if self._flags & 4 else True                                   \
+                                                                                        \
+        def __set__(self, object value):                                                \
+            CHECK_LOOP3(self.loop)                                                      \
+            if value:                                                                   \
+                if not self._flags & 4:                                                 \
+                    return  # ref is already True                                       \
+                if self._flags & 2:  # ev_unref was called, undo                        \
+                    libev.ev_ref(self.loop._ptr)                                        \
+                self._flags &= ~6  # do not want unref, no outstanding unref            \
+            else:                                                                       \
+                if self._flags & 4:                                                     \
+                    return  # ref is already False                                      \
+                self._flags |= 4                                                        \
+                if not self._flags & 2 and libev.ev_is_active(&self._watcher):          \
+                    libev.ev_unref(self.loop._ptr)                                      \
+                    self._flags |= 2                                                    \
+                                                                                        \
+    property callback:                                                                  \
+                                                                                        \
+        def __get__(self):                                                              \
+            return self._callback                                                       \
+                                                                                        \
+        def __set__(self, object callback):                                             \
+            if not PyCallable_Check(<PyObjectPtr>callback) and callback is not None:    \
+                raise TypeError("Expected callable, not %r" % (callback, ))             \
+            self._callback = callback                                                   \
+                                                                                        \
+    def stop(self):                                                                     \
+        CHECK_LOOP2(self.loop)                                                          \
+        if self._flags & 2:                                                             \
+            libev.ev_ref(self.loop._ptr)                                                \
+            self._flags &= ~2                                                           \
+        libev.ev_##TYPE##_stop(self.loop._ptr, &self._watcher)                          \
+        self._callback = None                                                           \
+        self.args = None                                                                \
+        if self._flags & 1:                                                             \
+            Py_DECREF(<PyObjectPtr>self)                                                \
+            self._flags &= ~1                                                           \
+                                                                                        \
+    property priority:                                                                  \
+                                                                                        \
+        def __get__(self):                                                              \
+            return libev.ev_priority(&self._watcher)                                    \
+                                                                                        \
+        def __set__(self, int priority):                                                \
+            if libev.ev_is_active(&self._watcher):                                      \
+                raise AttributeError("Cannot set priority of an active watcher")        \
+            libev.ev_set_priority(&self._watcher, priority)                             \
+                                                                                        \
+    def feed(self, int revents, object callback, *args):                                \
+        CHECK_LOOP2(self.loop)                                                          \
+        self.callback = callback                                                        \
+        self.args = args                                                                \
+        LIBEV_UNREF                                                                     \
+        libev.ev_feed_event(self.loop._ptr, &self._watcher, revents)                    \
+        PYTHON_INCREF
+
+#define ACTIVE property active:                                             \
+                                                                            \
+        def __get__(self):                                                  \
+            return True if libev.ev_is_active(&self._watcher) else False
+
+#define START(TYPE) def start(self, object callback, *args):       \
+        CHECK_LOOP2(self.loop)                                     \
+        if callback is None:                                       \
+            raise TypeError('callback must be callable, not None') \
+        self.callback = callback                                   \
+        self.args = args                                           \
+        LIBEV_UNREF                                                \
+        libev.ev_##TYPE##_start(self.loop._ptr, &self._watcher)    \
+        PYTHON_INCREF
+
+
+#define PENDING                                                            \
+    property pending:                                                      \
+                                                                           \
+        def __get__(self):                                                 \
+            return True if libev.ev_is_pending(&self._watcher) else False
+
+
+
+#define WATCHER(TYPE) WATCHER_BASE(TYPE) \
+                                         \
+    START(TYPE)                          \
+                                         \
+    ACTIVE                               \
+                                         \
+    PENDING
+
+
+#define COMMA ,
+
+
+#define INIT(TYPE, ARGS_INITIALIZERS, ARGS)                                                \
+    def __init__(self, loop loop ARGS_INITIALIZERS, ref=True, priority=None):              \
+        libev.ev_##TYPE##_init(&self._watcher, <void *>gevent_callback_##TYPE ARGS)        \
+        self.loop = loop                                                                   \
+        if ref:                                                                            \
+            self._flags = 0                                                                \
+        else:                                                                              \
+            self._flags = 4                                                                \
+        if priority is not None:                                                           \
+            libev.ev_set_priority(&self._watcher, priority)
+
+
+cdef public class watcher [object PyGeventWatcherObject, type PyGeventWatcher_Type]:
+    """Abstract base class for all the watchers"""
+
+    def __repr__(self):
+        if Py_ReprEnter(<PyObjectPtr>self) != 0:
+            return "<...>"
+        try:
+            format = self._format()
+            result = "<%s at 0x%x%s" % (self.__class__.__name__, id(self), format)
+            if self.active:
+                result += " active"
+            if self.pending:
+                result += " pending"
+            if self.callback is not None:
+                result += " callback=%r" % (self.callback, )
+            if self.args is not None:
+                result += " args=%r" % (self.args, )
+            return result + ">"
+        finally:
+            Py_ReprLeave(<PyObjectPtr>self)
+
+    def _format(self):
+        return ''
+
+
+cdef public class io(watcher) [object PyGeventIOObject, type PyGeventIO_Type]:
+
+    WATCHER_BASE(io)
+
+    def start(self, object callback, *args, pass_events=False):
+        CHECK_LOOP2(self.loop)
+        if callback is None:
+            raise TypeError('callback must be callable, not None')
+        self.callback = callback
+        if pass_events:
+            self.args = (GEVENT_CORE_EVENTS, ) + args
+        else:
+            self.args = args
+        LIBEV_UNREF
+        libev.ev_io_start(self.loop._ptr, &self._watcher)
+        PYTHON_INCREF
+
+    ACTIVE
+
+    PENDING
+
+#ifdef _WIN32
+
+    def __init__(self, loop loop, libev.vfd_socket_t fd, int events, ref=True, priority=None):
+        if events & ~(libev.EV__IOFDSET | libev.EV_READ | libev.EV_WRITE):
+            raise ValueError('illegal event mask: %r' % events)
+        cdef int vfd = libev.vfd_open(fd)
+        libev.vfd_free(self._watcher.fd)
+        libev.ev_io_init(&self._watcher, <void *>gevent_callback_io, vfd, events)
+        self.loop = loop
+        if ref:
+            self._flags = 0
+        else:
+            self._flags = 4
+        if priority is not None:
+            libev.ev_set_priority(&self._watcher, priority)
+
+#else
+
+    def __init__(self, loop loop, int fd, int events, ref=True, priority=None):
+        if fd < 0:
+            raise ValueError('fd must be non-negative: %r' % fd)
+        if events & ~(libev.EV__IOFDSET | libev.EV_READ | libev.EV_WRITE):
+            raise ValueError('illegal event mask: %r' % events)
+        libev.ev_io_init(&self._watcher, <void *>gevent_callback_io, fd, events)
+        self.loop = loop
+        if ref:
+            self._flags = 0
+        else:
+            self._flags = 4
+        if priority is not None:
+            libev.ev_set_priority(&self._watcher, priority)
+
+#endif
+
+    property fd:
+
+        def __get__(self):
+            return libev.vfd_get(self._watcher.fd)
+
+        def __set__(self, long fd):
+            if libev.ev_is_active(&self._watcher):
+                raise AttributeError("'io' watcher attribute 'fd' is read-only while watcher is active")
+            cdef int vfd = libev.vfd_open(fd)
+            libev.vfd_free(self._watcher.fd)
+            libev.ev_io_init(&self._watcher, <void *>gevent_callback_io, vfd, self._watcher.events)
+
+    property events:
+
+        def __get__(self):
+            return self._watcher.events
+
+        def __set__(self, int events):
+            if libev.ev_is_active(&self._watcher):
+                raise AttributeError("'io' watcher attribute 'events' is read-only while watcher is active")
+            libev.ev_io_init(&self._watcher, <void *>gevent_callback_io, self._watcher.fd, events)
+
+    property events_str:
+
+        def __get__(self):
+            return _events_to_str(self._watcher.events)
+
+    def _format(self):
+        return ' fd=%s events=%s' % (self.fd, self.events_str)
+
+#ifdef _WIN32
+
+    def __cinit__(self):
+        self._watcher.fd = -1;
+
+    def __dealloc__(self):
+        libev.vfd_free(self._watcher.fd)
+
+#endif
+
+
+cdef public class timer(watcher) [object PyGeventTimerObject, type PyGeventTimer_Type]:
+
+    WATCHER_BASE(timer)
+
+    def start(self, object callback, *args, update=True):
+        CHECK_LOOP2(self.loop)
+        if callback is None:
+            raise TypeError('callback must be callable, not None')
+        self.callback = callback
+        self.args = args
+        LIBEV_UNREF
+        if update:
+            libev.ev_now_update(self.loop._ptr)
+        libev.ev_timer_start(self.loop._ptr, &self._watcher)
+        PYTHON_INCREF
+
+    ACTIVE
+
+    PENDING
+
+    def __init__(self, loop loop, double after=0.0, double repeat=0.0, ref=True, priority=None):
+        if repeat < 0.0:
+            raise ValueError("repeat must be positive or zero: %r" % repeat)
+        libev.ev_timer_init(&self._watcher, <void *>gevent_callback_timer, after, repeat)
+        self.loop = loop
+        if ref:
+            self._flags = 0
+        else:
+            self._flags = 4
+        if priority is not None:
+            libev.ev_set_priority(&self._watcher, priority)
+
+    property at:
+
+        def __get__(self):
+            return self._watcher.at
+
+    # QQQ: add 'after' and 'repeat' properties?
+
+    def again(self, object callback, *args, update=True):
+        CHECK_LOOP2(self.loop)
+        self.callback = callback
+        self.args = args
+        LIBEV_UNREF
+        if update:
+            libev.ev_now_update(self.loop._ptr)
+        libev.ev_timer_again(self.loop._ptr, &self._watcher)
+        PYTHON_INCREF
+
+
+cdef public class signal(watcher) [object PyGeventSignalObject, type PyGeventSignal_Type]:
+
+    WATCHER(signal)
+
+    def __init__(self, loop loop, int signalnum, ref=True, priority=None):
+        if signalnum < 1 or signalnum >= signalmodule.NSIG:
+            raise ValueError('illegal signal number: %r' % signalnum)
+        # still possible to crash on one of libev's asserts:
+        # 1) "libev: ev_signal_start called with illegal signal number"
+        #    EV_NSIG might be different from signal.NSIG on some platforms
+        # 2) "libev: a signal must not be attached to two different loops"
+        #    we probably could check that in LIBEV_EMBED mode, but not in general
+        libev.ev_signal_init(&self._watcher, <void *>gevent_callback_signal, signalnum)
+        self.loop = loop
+        if ref:
+            self._flags = 0
+        else:
+            self._flags = 4
+        if priority is not None:
+            libev.ev_set_priority(&self._watcher, priority)
+
+
+cdef public class idle(watcher) [object PyGeventIdleObject, type PyGeventIdle_Type]:
+
+    WATCHER(idle)
+
+    INIT(idle,,)
+
+
+cdef public class prepare(watcher) [object PyGeventPrepareObject, type PyGeventPrepare_Type]:
+
+    WATCHER(prepare)
+
+    INIT(prepare,,)
+
+
+cdef public class check(watcher) [object PyGeventCheckObject, type PyGeventCheck_Type]:
+
+    WATCHER(check)
+
+    INIT(check,,)
+
+
+cdef public class fork(watcher) [object PyGeventForkObject, type PyGeventFork_Type]:
+
+    WATCHER(fork)
+
+    INIT(fork,,)
+
+
+cdef public class async(watcher) [object PyGeventAsyncObject, type PyGeventAsync_Type]:
+
+    WATCHER_BASE(async)
+
+    START(async)
+
+    ACTIVE
+
+    property pending:
+
+        def __get__(self):
+            return True if libev.ev_async_pending(&self._watcher) else False
+
+    INIT(async,,)
+
+    def send(self):
+        CHECK_LOOP2(self.loop)
+        libev.ev_async_send(self.loop._ptr, &self._watcher)
+
+#ifdef _WIN32
+#else
+
+cdef public class child(watcher) [object PyGeventChildObject, type PyGeventChild_Type]:
+
+    WATCHER(child)
+
+    def __init__(self, loop loop, int pid, bint trace=0, ref=True):
+        if not loop.default:
+            raise TypeError('child watchers are only available on the default loop')
+        libev.gevent_install_sigchld_handler()
+        libev.ev_child_init(&self._watcher, <void *>gevent_callback_child, pid, trace)
+        self.loop = loop
+        if ref:
+            self._flags = 0
+        else:
+            self._flags = 4
+
+    def _format(self):
+        return ' pid=%r rstatus=%r' % (self.pid, self.rstatus)
+
+    property pid:
+
+        def __get__(self):
+            return self._watcher.pid
+
+    property rpid:
+
+        def __get__(self):
+            return self._watcher.rpid
+
+        def __set__(self, int value):
+            self._watcher.rpid = value
+
+    property rstatus:
+
+        def __get__(self):
+            return self._watcher.rstatus
+
+        def __set__(self, int value):
+            self._watcher.rstatus = value
+
+#endif
+
+
+cdef public class stat(watcher) [object PyGeventStatObject, type PyGeventStat_Type]:
+
+    WATCHER(stat)
+    cdef readonly str path
+    cdef readonly bytes _paths
+
+    def __init__(self, loop loop, str path, float interval=0.0, ref=True, priority=None):
+        self.path = path
+        cdef bytes paths
+        if isinstance(path, unicode):
+            # the famous Python3 filesystem encoding debacle hits us here. Can we do better?
+            # We must keep a reference to the encoded string so that its bytes don't get freed
+            # and overwritten, leading to strange errors from libev ("no such file or directory")
+            paths = (<unicode>path).encode(sys.getfilesystemencoding())
+            self._paths = paths
+        else:
+            paths = <bytes>path
+            self._paths = paths
+        libev.ev_stat_init(&self._watcher, <void *>gevent_callback_stat, <char*>paths, interval)
+        self.loop = loop
+        if ref:
+            self._flags = 0
+        else:
+            self._flags = 4
+        if priority is not None:
+            libev.ev_set_priority(&self._watcher, priority)
+
+    property attr:
+
+        def __get__(self):
+            if not self._watcher.attr.st_nlink:
+                return
+            return _pystat_fromstructstat(&self._watcher.attr)
+
+    property prev:
+
+       def __get__(self):
+            if not self._watcher.prev.st_nlink:
+                return
+            return _pystat_fromstructstat(&self._watcher.prev)
+
+    property interval:
+
+        def __get__(self):
+            return self._watcher.interval
+
+
+__SYSERR_CALLBACK = None
+
+
+cdef void _syserr_cb(char* msg) with gil:
+    try:
+        __SYSERR_CALLBACK(msg, errno)
+    except:
+        set_syserr_cb(None)
+        print_exc = getattr(traceback, 'print_exc', None)
+        if print_exc is not None:
+            print_exc()
+
+
+cpdef set_syserr_cb(callback):
+    global __SYSERR_CALLBACK
+    if callback is None:
+        libev.ev_set_syserr_cb(NULL)
+        __SYSERR_CALLBACK = None
+    elif callable(callback):
+        libev.ev_set_syserr_cb(<void *>_syserr_cb)
+        __SYSERR_CALLBACK = callback
+    else:
+        raise TypeError('Expected callable or None, got %r' % (callback, ))
+
+
+#ifdef LIBEV_EMBED
+LIBEV_EMBED = True
+EV_USE_FLOOR = libev.EV_USE_FLOOR
+EV_USE_CLOCK_SYSCALL = libev.EV_USE_CLOCK_SYSCALL
+EV_USE_REALTIME = libev.EV_USE_REALTIME
+EV_USE_MONOTONIC = libev.EV_USE_MONOTONIC
+EV_USE_NANOSLEEP = libev.EV_USE_NANOSLEEP
+EV_USE_INOTIFY = libev.EV_USE_INOTIFY
+EV_USE_SIGNALFD = libev.EV_USE_SIGNALFD
+EV_USE_EVENTFD = libev.EV_USE_EVENTFD
+EV_USE_4HEAP = libev.EV_USE_4HEAP
+#else
+LIBEV_EMBED = False
+#endif
