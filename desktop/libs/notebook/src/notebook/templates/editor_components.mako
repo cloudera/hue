@@ -597,7 +597,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           %else:
             <a data-bind="text: $.trim($data.name), hueLink: $data.url"></a>
           %endif
-          <!-- ko if: typeof percentJob !== 'undefined' && percentJob() > -1 -->
+          <!-- ko if: typeof percentJob === 'function' && percentJob() > -1 -->
           <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
             <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
           </div>
