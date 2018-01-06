@@ -529,16 +529,19 @@ def augment_solr_response(response, collection, query):
         extraSeries = []
         counts = response['facets'][name]['buckets']
 
+        # Give humane names to the columns
         cols = ['%(field)s' % facet, 'count(%(field)s)' % facet]
-        last_x_col = 0
-        last_xx_col = 0
+        last_seen_dim_col_index = 0
+        prev_last_seen_dim_col_index = 0
         for i, f in enumerate(facet['properties']['facets'][1:]):
           if f['aggregate']['function'] == 'count':
             cols.append(f['field'])
-            last_xx_col = last_x_col
-            last_x_col = i + 2
+            prev_last_seen_dim_col_index = last_seen_dim_col_index
+            last_seen_dim_col_index = i + 2
+            print prev_last_seen_dim_col_index
           from libsolr.api import SolrApi
-          cols.append(SolrApi._get_aggregate_function(f))
+          aggregate_name = SolrApi._get_aggregate_function(f)
+          cols.append(aggregate_name + ('_%(field)s' % facet['properties']['facets'][last_seen_dim_col_index - 1] if aggregate_name in cols else ''))
         rows = []
 
         facet_one = collection_facet['properties']['facets'][0]
@@ -578,11 +581,11 @@ def augment_solr_response(response, collection, query):
 
             for row in rows:
               for i, cell in enumerate(row):
-                if i > last_x_col:
+                if i > last_seen_dim_col_index:
                   legend = cols[i]
-                  if last_xx_col != last_x_col:
-                    legend = '%s %s' % (cols[i], row[last_x_col])
-                  _series[legend].append(row[last_xx_col])
+                  if prev_last_seen_dim_col_index != last_seen_dim_col_index:
+                    legend = '%s %s' % (cols[i], row[last_seen_dim_col_index])
+                  _series[legend].append(row[prev_last_seen_dim_col_index])
                   _series[legend].append(cell)
 
             for _name, val in _series.iteritems():
