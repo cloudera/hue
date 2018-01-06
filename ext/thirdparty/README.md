@@ -28,7 +28,11 @@ Checked-in third party dependencies
 |Y|djangosaml2|0.16.4|Apache ||
 |Y|elementtree|1.2.6-20050316|Python(MIT)|http://effbot.org/downloads#elementtree|
 |Y|enum|0.4.4|Python|http://pypi.python.org/pypi/enum/|
+|Y|enum-compat|0.0.2|Python|https://pypi.python.org/pypi/enum-compat/0.0.2|
+|Y|eventlet|0.21.0|Python|https://pypi.python.org/pypi/eventlet/0.21.0|
 |Y|future|0.16.0|MIT|https://github.com/PythonCharmers/python-future|
+|Y|greenlet|0.4.12|MIT|https://pypi.python.org/pypi/greenlet/0.4.12|
+|Y|gunicorn|19.7.1|MIT|https://pypi.python.org/pypi/gunicorn/19.7.1|
 |Y|guppy|0.1.10|MIT|http://guppy-pe.sourceforge.net|
 |Y|httplib2|0.8| |http://bitworking.org/projects/httplib2/|
 |Y|importlib|1.0.3|Python|http://docs.python.org/2.7/library/importlib.html|
