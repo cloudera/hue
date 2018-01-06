@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+export PYTHONUNBUFFERED=1
+export PYTHONDONTWRITEBYTECODE=1
+
+if [ -d /greenlet -a -d /opt/python ]; then
+    # Running inside docker
+    cd /greenlet
+    rm -rf wheelhouse
+    for variant in /opt/python/*; do
+        rm -rf dist build *.egg-info
+        $variant/bin/python setup.py clean --all bdist_wheel
+        auditwheel repair dist/*.whl
+    done
+    rm -rf dist build *.egg-info
+    exit 0
+fi
+
+docker run --rm -ti -v "$(pwd):/greenlet:Z" quay.io/pypa/manylinux1_x86_64 /greenlet/$(basename $0)
