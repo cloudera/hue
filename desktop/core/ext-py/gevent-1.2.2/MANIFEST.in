@@ -1,0 +1,59 @@
+recursive-include src/greentest *
+recursive-include examples *
+recursive-include src/gevent *
+recursive-include doc *
+recursive-include deps *
+recursive-include util *
+
+include LICENSE
+include NOTICE
+include README.rst
+include CONTRIBUTING.rst
+include TODO
+include changelog.rst
+include MANIFEST.in
+include AUTHORS
+include Makefile.ext
+include known_failures.py
+include *.yml
+include *.txt
+include _setup*.py
+include CHANGES.rst
+
+include tox.ini
+include .pep8
+include .pylintrc
+recursive-include .github *.md
+recursive-include benchmarks *.sh
+recursive-include appveyor *.cmd
+recursive-include appveyor *.ps1
+recursive-include scripts *.sh *.py
+include scripts/releases/make-manylinux
+
+### Artifacts of configuring/building in place
+# These we want, they come from the Makefile step
+#- recursive-exclude gevent corecext.pyx *.c *.h
+# This we want if we're on PyPy it's moved there ahead of time
+# by setup.py
+#- prune gevent/libev
+prune */__pycache__
+global-exclude *.so
+global-exclude *.o
+global-exclude *.lo
+global-exclude *.la
+global-exclude config.log config.status
+prune doc/_build
+global-exclude *.pyc
+recursive-exclude src/greentest .coverage
+prune src/greentest/htmlcov
+recursive-exclude deps/c-ares stamp-h? ares_build.h.orig
+prune deps/libev/.deps
+recursive-exclude deps/libev Makefile libtool stamp-h? config.h
+# This is the output of _corecffi_build.py and may be particular
+# to each CFFI version/platform
+recursive-exclude src/gevent _corecffi.c
+# See comments in Makefile; this is renamed to Makefile.ext
+# this exclude keeps check-manifest from complaining
+exclude Makefile
+exclude configure-output
+include Makefile.ext

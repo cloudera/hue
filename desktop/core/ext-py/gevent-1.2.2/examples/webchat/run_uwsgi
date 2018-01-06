@@ -1,0 +1,3 @@
+#!/bin/sh
+# see http://projects.unbit.it/uwsgi and http://projects.unbit.it/uwsgi/wiki/Gevent
+exec uwsgi --loop gevent --http-socket :8000 --module application --async 1000

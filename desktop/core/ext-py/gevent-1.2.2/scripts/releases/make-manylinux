@@ -1,0 +1,24 @@
+#!/bin/bash
+# Initially based on a snippet from the greenlet project.
+# This needs to be run from the root of the project.
+set -e
+export PYTHONUNBUFFERED=1
+export PYTHONDONTWRITEBYTECODE=1
+
+if [ -d /gevent -a -d /opt/python ]; then
+    # Running inside docker
+    yum -y install libffi-devel
+    cd /gevent
+    rm -rf wheelhouse
+    for variant in `ls -d /opt/python/cp{27,3}*`; do
+        rm -rf dist build *.egg-info
+        make clean
+        $variant/bin/pip install -U cython cffi setuptools greenlet wheel
+        PATH=$variant/bin:$PATH $variant/bin/python setup.py bdist_wheel
+        auditwheel repair dist/*.whl
+    done
+    rm -rf dist build *.egg-info
+    exit 0
+fi
+
+docker run --rm -ti -v "$(pwd):/gevent" quay.io/pypa/manylinux1_x86_64 /gevent/scripts/releases/$(basename $0)
