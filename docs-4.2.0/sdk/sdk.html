@@ -150,7 +150,7 @@ In addition, whole new apps can also be created in order to provide end user sol
 <p>Connectors are pluggable and can new engines can be supported. Feel free to comment on the <a href="Hue list">https://groups.google.com/a/cloudera.org/forum/#!forum/hue-user</a> of <a href="github">https://github.com/cloudera/hue/issues</a> about it.</p>
 <h2 id="sql">SQL</h2>
 <p>The <a href="http://gethue.com/custom-sql-query-editors/">SQL Editor page</a> also describes the configuration steps.</p>
-<p>Close to 100% of <a href="desktop/core/src/desktop/static/desktop/js/autocomplete/jison">Hive and Impala grammar</a> is supported which makes the 
+<p>Close to 100% of <a href="desktop/core/src/desktop/static/desktop/js/autocomplete/jison">Hive and Impala grammar</a> is supported which makes the
 autocomplete extremly powerful. Other languages defaults to a generic SQL grammar.</p>
 <h3 id="hiveserver2-api">HiveServer2 API</h3>
 <p>Hive, Impala, SparkSQL</p>
@@ -768,7 +768,7 @@ session = requests.Session()
 cookies = session.cookies
  headers = session.headers
 
-r=session.get('http://localhost:8888/metastore/databases/default/metadata', 
+r=session.get('http://localhost:8888/metastore/databases/default/metadata',
  cookies=session.cookies, headers=session.headers)
  print r.status_code
 
@@ -980,3 +980,12 @@ via scripts/jenkins.sh, which should be kept updated with the latest
 and greatest in build technologies.</p>
 <p></div>
 </div></p>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+gtag('config', 'UA-37637545-1');
+</script>

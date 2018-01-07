@@ -9,11 +9,11 @@
 <div class="toc">
 <ul>
 <li><a href="#installation">Installation</a><ul>
-<li><a href="#hue-dependencies">Hue Dependencies</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
 <li><a href="#build">Build</a></li>
 <li><a href="#docker">Docker</a></li>
-<li><a href="#troubleshooting-the-hue-tarball-installation">Troubleshooting the Hue Tarball Installation</a></li>
-<li><a href="#starting-hue-from-the-tarball">Starting Hue from the Tarball</a></li>
+<li><a href="#troubleshooting-the-tarball-installation">Troubleshooting the tarball Installation</a></li>
+<li><a href="#starting-the-server">Starting the server</a></li>
 </ul>
 </li>
 <li><a href="#configuration">Configuration</a><ul>
@@ -25,7 +25,7 @@
 <li><a href="#quick-start-wizard">Quick Start Wizard</a></li>
 <li><a href="#configuration_1">Configuration</a><ul>
 <li><a href="#web-server-configuration">Web Server Configuration</a></li>
-<li><a href="#specifying-the-hue-http-address">Specifying the Hue HTTP Address</a></li>
+<li><a href="#specifying-the-http-port">Specifying the HTTP port</a></li>
 <li><a href="#specifying-the-secret-key">Specifying the Secret Key</a></li>
 <li><a href="#disabling-some-apps">Disabling some apps</a></li>
 <li><a href="#authentication">Authentication</a><ul>
@@ -36,8 +36,10 @@
 <li><a href="#multiple-authentication-backends">Multiple Authentication Backends</a></li>
 </ul>
 </li>
-<li><a href="#configure-hue-with-a-proxy">Configure Hue with a Proxy</a></li>
-<li><a href="#configuring-hue-for-ssl">Configuring Hue for SSL</a></li>
+<li><a href="#reset-a-password">Reset a password</a></li>
+<li><a href="#change-your-maps-look-and-feel">Change your maps look and feel</a></li>
+<li><a href="#configure-a-proxy">Configure a Proxy</a></li>
+<li><a href="#configuring-ssl">Configuring SSL</a></li>
 <li><a href="#user-admin-configuration">User Admin Configuration</a></li>
 <li><a href="#banner">Banner</a></li>
 <li><a href="#splash-screen">Splash Screen</a></li>
@@ -48,14 +50,15 @@
 </ul>
 </li>
 <li><a href="#configuration-for-external-services">Configuration for external services</a><ul>
-<li><a href="#install-hadoop-and-other-analytic-backends">Install Hadoop and other analytic backends</a><ul>
+<li><a href="#hadoop-and-other-services">Hadoop and other services</a><ul>
 <li><a href="#hadoop-configuration">Hadoop Configuration</a></li>
 <li><a href="#configure-oozie">Configure Oozie</a></li>
 <li><a href="#hive-configuration">Hive Configuration</a></li>
+<li><a href="#hive-and-impala-high-availability-ha">Hive and Impala High Availability (HA)</a></li>
 </ul>
 </li>
-<li><a href="#configuring-your-firewall">Configuring Your Firewall</a></li>
-<li><a href="#files">Files</a><ul>
+<li><a href="#firewall">Firewall</a></li>
+<li><a href="#files-and-object-store">Files and Object Store</a><ul>
 <li><a href="#hdfs-cluster">HDFS Cluster</a></li>
 <li><a href="#s3">S3</a></li>
 <li><a href="#adls">ADLS</a></li>
@@ -68,8 +71,6 @@
 <li><a href="#oozie-configuration">Oozie Configuration</a></li>
 <li><a href="#solr-configuration">Solr Configuration</a></li>
 <li><a href="#hbase-configuration">HBase Configuration</a></li>
-<li><a href="#change-your-maps-look-and-feel">Change your maps look and feel</a></li>
-<li><a href="#reset-a-password">Reset a password</a></li>
 <li><a href="#configuration-validation">Configuration Validation</a></li>
 </ul>
 </li>
@@ -97,7 +98,7 @@
 </ul>
 </li>
 <li><a href="#process-hierarchy">Process Hierarchy</a></li>
-<li><a href="#hue-logging">Hue Logging</a><ul>
+<li><a href="#logging">Logging</a><ul>
 <li><a href="#viewing-recent-log-messages">Viewing Recent Log Messages</a></li>
 </ul>
 </li>
@@ -132,7 +133,7 @@ overly restrictive firewalls. For small clusters of less than 10 nodes,
 you can use your existing master node as the Hue Server.</p>
 <p>You can download the Hue tarball here:
 <a href="https://github.com/cloudera/hue/releases">https://github.com/cloudera/hue/releases</a></p>
-<h2 id="hue-dependencies">Hue Dependencies</h2>
+<h2 id="dependencies">Dependencies</h2>
 <p>Hue employs some Python modules which use native code and requires
 certain development libraries be installed on your system. To install from the
 tarball, you must have the following installed:</p>
@@ -148,7 +149,7 @@ cd /usr/share/hue
 that user's home directory, or in a directory within <code>/usr/share</code>.</p>
 <h2 id="docker">Docker</h2>
 <p>Alternatively to building Hue, a <a href="Hue Docker image">http://gethue.com/getting-started-with-hue-in-2-minutes-with-docker/</a> is available.</p>
-<h2 id="troubleshooting-the-hue-tarball-installation">Troubleshooting the Hue Tarball Installation</h2>
+<h2 id="troubleshooting-the-tarball-installation">Troubleshooting the tarball Installation</h2>
 <p>.Q: I moved my Hue installation from one directory to another and now Hue no
 longer functions correctly.</p>
 <p>A: Due to the use of absolute paths by some Python packages, you must run a
@@ -163,7 +164,7 @@ architectures, it installs a Python virtual environment which includes its
 dependencies. This ensures that the software can depend on specific versions
 of various Python libraries and you don't have to be concerned about missing
 software components.</p>
-<h2 id="starting-hue-from-the-tarball">Starting Hue from the Tarball</h2>
+<h2 id="starting-the-server">Starting the server</h2>
 <p>After your cluster is running with the plugins enabled, you can start Hue on
 your Hue Server by running:</p>
 <pre><code>build/env/bin/supervisor
@@ -247,7 +248,7 @@ take precedence.
 <h3 id="web-server-configuration">Web Server Configuration</h3>
 <p>These configuration variables are under the <code>[desktop]</code> section in
 the <code>hue.ini</code> configuration file.</p>
-<h3 id="specifying-the-hue-http-address">Specifying the Hue HTTP Address</h3>
+<h3 id="specifying-the-http-port">Specifying the HTTP port</h3>
 <p>Hue uses CherryPy web server.  You can use the following options to
 change the IP address and port that the web server listens on.
 The default setting is port 8888 on all configured IP addresses.</p>
@@ -296,7 +297,57 @@ stored in the Django database in the Django backend.</p>
 
 <p>This tells Hue to first check against the configured LDAP directory service, and if the username is not found in the directory, then attempt to authenticate the user with the Django user manager.</p>
 <p><a href="http://gethue.com/configuring-hue-multiple-authentication-backends-and-ldap/">Read more about it here</a>.</p>
-<h3 id="configure-hue-with-a-proxy">Configure Hue with a Proxy</h3>
+<h3 id="reset-a-password">Reset a password</h3>
+<p><strong>Programmatically</strong></p>
+<p>When a Hue administrator loses their password, a more programmatic approach is required to secure the administrator again. Hue comes with a wrapper around the python interpreter called the “shell” command. It loads all the libraries required to work with Hue at a programmatic level. To start the Hue shell, type the following command from the Hue installation root.</p>
+<p>Then:</p>
+<pre><code>cd /usr/lib/hue (or /opt/cloudera/parcels/CDH-XXXXX/share/hue if using parcels and CM)
+build/env/bin/hue shell
+</code></pre>
+<p>The following is a small script, that can be executed within the Hue shell, to change the password for a user named “example”:</p>
+<pre><code>from django.contrib.auth.models import User
+user = User.objects.get(username='example')
+user.set_password('some password')
+user.save()
+</code></pre>
+<p>The script can also be invoked in the shell by using input redirection (assuming the script is in a file named script.py):</p>
+<pre><code>build/env/bin/hue shell &lt; script.py
+</code></pre>
+<p>How to make a certain user a Hue admin</p>
+<pre><code>build/env/bin/hue  shell
+</code></pre>
+<p>Then set these properties to true:</p>
+<pre><code>from django.contrib.auth.models import User
+
+a = User.objects.get(username='hdfs')
+a.is_staff = True
+a.is_superuser = True
+a.set_password('my_secret')
+a.save()
+</code></pre>
+<p><strong> Via a command</strong></p>
+<p>Go on the Hue machine, then in the Hue home directory and either type:</p>
+<p>To change the password of the currently logged in Unix user:</p>
+<pre><code>build/env/bin/hue changepassword
+</code></pre>
+<p>If you don't remember the admin username, create a new Hue admin (you will then also be able to login and could change the password of another user in Hue):</p>
+<pre><code>build/env/bin/hue createsuperuser
+</code></pre>
+<p><a href="http://gethue.com/password-management-in-hue/">Read more about it here</a>.</p>
+<div class="note">
+Above works with the `AllowFirstUserBackend`, it might be different if another backend is used.
+</div>
+
+<h3 id="change-your-maps-look-and-feel">Change your maps look and feel</h3>
+<p>The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:</p>
+<pre>
+[desktop]
+leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
+leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+</pre>
+
+<p><a href="http://gethue.com/change-your-maps-look-and-feel/">Read more about it here</a>.</p>
+<h3 id="configure-a-proxy">Configure a Proxy</h3>
 <p>We explained how to run Hue with NGINX serving the static files or under Apache. If you use another proxy, you might need to set these options:</p>
 <pre>
 [desktop]
@@ -307,7 +358,7 @@ use_x_forwarded_host=false
 secure_proxy_ssl_header=false
 </pre>
 
-<h3 id="configuring-hue-for-ssl">Configuring Hue for SSL</h3>
+<h3 id="configuring-ssl">Configuring SSL</h3>
 <p>You can configure Hue to serve over HTTPS.</p>
 <ol>
 <li>
@@ -386,10 +437,9 @@ idle_session_timeout=600
 <h2 id="configuration-for-external-services">Configuration for external services</h2>
 <p>These configuration variables are under the <code>[hadoop]</code> section in
 the <code>hue.ini</code> configuration file.</p>
-<h3 id="install-hadoop-and-other-analytic-backends">Install Hadoop and other analytic backends</h3>
+<h3 id="hadoop-and-other-services">Hadoop and other services</h3>
 <p>Depending on which apps you need, you need to make sure that some Hadoop services
-are already setup (that way Hue can talk to them).<br />
-</p>
+are already setup (that way Hue can talk to them).</p>
 <pre>
 |-------------|--------------------------------------------------------|
 |  Component  | Applications                                           |
@@ -460,12 +510,108 @@ system) must be world-writable (1777), as Hive makes extensive use of it.</p>
   directory containing `hive-site.xml`.
 </div>
 
-<h3 id="configuring-your-firewall">Configuring Your Firewall</h3>
+<h4 id="hive-and-impala-high-availability-ha">Hive and Impala High Availability (HA)</h4>
+<p>HiveServer2 and Impala support High Availability through a “load balancer”.
+One caveat is that Hue’s underlying Thrift libraries reuse TCP connections in a
+pool, a single user session may not have the same Impala or Hive TCP connection.
+If a TCP connection is balanced away from the previously selected  HiveServer2
+or Impalad instance, the user session and its queries can be lost and trigger
+the “Results have expired” or “Invalid session Id” errors.</p>
+<p>To prevent sessions from being lost, you need configure the load balancer with
+“source” algorithm to ensure each Hue instance sends all traffic to a single
+HiveServer2/Impalad instance. Yes, this is not true load balancing, but a
+configuration for failover High Availability. HiveSever2 or Impala coordinators
+already distribute the work across the cluster so this is not an issue.</p>
+<p>To enable an optimal load distribution that works for everybody, you can create
+multiple profiles in our load balancer, per port for Hue clients and non-Hue
+clients like Hive or Impala. You can configure non-Hue clients to distribute loads
+with “roundrobin” or “leastconn” and configure Hue clients with “source”
+(source IP Persistence) on dedicated ports, for example, 10015 for Hive beeline
+commands, 10016 for Hue, 21051 for Hue-Impala interactions while 25003 for Impala shell.</p>
+<p>You can configure the HaProxy to have two different ports associated with
+different load balancing algorithms. Here is a sample configuration (haproxy.cfg)
+for Hive and Impala HA on a secure cluster.</p>
+<pre>
+frontend hiveserver2_front
+bind *:10015 ssl crt /path/to/cert_key.pem
+mode tcp
+option tcplog
+default_backend hiveserver2
+backend hiveserver2
+    balance                     roundrobin
+    mode                        tcp
+    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+
+frontend  hivejdbc_front
+    bind                        *:10016 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    stick                       match src
+    stick-table type ip size 200k expire 30m
+    default_backend             hivejdbc
+backend hivejdbc
+    balance                     source
+    mode                        tcp
+    server hs2_1 host-2.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_2 host-3.com:10000 ssl ca-file /path/to/truststore.pem check
+    server hs2_3 host-1.com:10000 ssl ca-file /path/to/truststore.pem check
+</pre>
+And here is an example for impala HA configuration on a secure cluster.
+<pre>
+frontend  impala_front
+    bind                        *:25003 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    default_backend             impala
+backend impala
+    balance                     leastconn
+    mode                        tcp
+    server impalad1 host-3.com:21000 ssl ca-file /path/to/truststore.pem check
+    server impalad2 host-2.com:21000 ssl ca-file /path/to/truststore.pem check
+    server impalad3 host-4.com:21000 ssl ca-file /path/to/truststore.pem check
+
+<p>frontend  impalajdbc_front
+    bind                        *:21051 ssl crt /path/to/cert_key.pem
+    mode                        tcp
+    option                      tcplog
+    stick                       match src
+    stick-table type ip size 200k expire 30m
+    default_backend             impalajdbc
+backend impalajdbc
+    balance                     source
+    mode                        tcp
+    server impalad1 host-3.com:21050 ssl ca-file /path/to/truststore.pem check
+    server impalad2 host-2.com:21050 ssl ca-file /path/to/truststore.pem check
+    server impalad3 host-4.com:21050 ssl ca-file /path/to/truststore.pem check
+</pre></p>
+<p>Note: “check” is required at end of each line to ensure HaProxy can detect any
+unreachable Impalad/HiveServer2 server, so HA failover can be successful. Without
+ TCP check, you may hit the “TSocket reads 0 byte” error when the
+Impalad/HiveServer2 server Hue tries to connect is down.</p>
+<p>After editing the /etc/haproxy/haproxy.cfg file, run following commands to
+restart HaProxy service and check the service restarts successfully.</p>
+<pre>
+service haproxy restart
+service haproxy status
+</pre>
+
+<p>Also we need add following blocks into hue.ini.
+<pre>
+[impala]
+server_port=21051</p>
+<p>[beeswax]
+hive_server_port=10016
+</pre>
+Read more about it in the <a href="http://gethue.com/how-to-opti&#10;mally-configure-your-analytic-database-for-high-availability-with-hue-and-other-sql-clients">How to optimally configure your Analytic Database for
+High Availability with Hue and other SQL clients</a> post.</p>
+<h3 id="firewall">Firewall</h3>
 <p>Hue currently requires that the machines within your cluster can connect to
 each other freely over TCP. The machines outside your cluster must be able to
 open TCP port 8888 on the Hue Server (or the configured Hue web HTTP port)
 to interact with the system.</p>
-<h3 id="files">Files</h3>
+<h3 id="files-and-object-store">Files and Object Store</h3>
 <h4 id="hdfs-cluster">HDFS Cluster</h4>
 <p>Hue supports one HDFS cluster. That cluster should be defined
 under the <code>[[[default]]]</code> sub-section.</p>
@@ -593,17 +739,6 @@ specify:</p>
 specify:</p>
 <p>hbase_clusters::
   Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".</p>
-<h3 id="change-your-maps-look-and-feel">Change your maps look and feel</h3>
-<p>The properties we need to tweak are leaflet_tile_layer and leaflet_tile_layer_attribution, that can be configured in the hue.ini file:</p>
-<pre>
-[desktop]
-leaflet_tile_layer=https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
-leaflet_tile_layer_attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-</pre>
-
-<p><a href="http://gethue.com/change-your-maps-look-and-feel/">Read more about it here</a>.</p>
-<h3 id="reset-a-password">Reset a password</h3>
-<p><a href="http://gethue.com/password-management-in-hue/">Read more about it here</a>.</p>
 <h3 id="configuration-validation">Configuration Validation</h3>
 <p>Hue can detect certain invalid configuration.</p>
 <p>To view the configuration of a running Hue instance, navigate to
@@ -830,7 +965,7 @@ hue       8685  8679  0 Aug05 ?        00:01:39 /usr/share/hue/build/env/bin/pyt
 <p>Note that the supervisor automatically restarts these processes if they fail for
 any reason. If the processes fail repeatedly within a short time, the supervisor
 itself shuts down.</p>
-<h2 id="hue-logging">Hue Logging</h2>
+<h2 id="logging">Logging</h2>
 <p>The Hue logs are found in <code>/var/log/hue</code>, or in a <code>logs</code> directory under your
 Hue installation root. Inside the log directory you can find:</p>
 <ul>
@@ -955,3 +1090,12 @@ logs as a zip (or cut and paste the ones that look relevant) and send those with
 your bug reports.</p>
 <p></div>
 </div></p>
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37637545-1"></script>
+
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+gtag('config', 'UA-37637545-1');
+</script>
