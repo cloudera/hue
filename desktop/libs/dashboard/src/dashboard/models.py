@@ -615,7 +615,7 @@ def augment_solr_response(response, collection, query):
             column = agg_keys[0]
           else:
             agg_keys = [column]
-          legend = facet['field']
+          legend = collection_facet['properties']['facets'][0]['field']
 
           _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
 
