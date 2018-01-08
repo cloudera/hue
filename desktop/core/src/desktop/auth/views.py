@@ -91,8 +91,8 @@ def dt_login(request, from_modal=False):
   is_first_login_ever = first_login_ever()
   backend_names = auth_forms.get_backend_names()
   is_active_directory = auth_forms.is_active_directory()
-  is_ldap_option_selected = 'server' not in request.POST or request.POST['server'] == 'LDAP' \
-                            or request.POST['server'] in auth_forms.get_ldap_server_keys()
+  is_ldap_option_selected = 'server' not in request.POST or request.POST.get('server') == 'LDAP' \
+                            or request.POST.get('server') in auth_forms.get_ldap_server_keys()
 
   if is_active_directory and is_ldap_option_selected:
     UserCreationForm = auth_forms.LdapUserCreationForm

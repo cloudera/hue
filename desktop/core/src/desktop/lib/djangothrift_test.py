@@ -29,6 +29,8 @@ configure_django_for_test()
 from django.db import models
 from djangothrift import ThriftField
 
+from desktop.lib import django_util
+
 class ThriftTestModel(models.Model):
   class Meta:
     app_label = "TEST_THRIFT_APP"
@@ -49,7 +51,7 @@ class TestThriftField(unittest.TestCase):
 
     y = ThriftTestModel.objects.all()[0]
     self.assertEqual(x.my_int, y.my_int)
-    self.assertEqual(x.my_struct, y.my_struct)
+    self.assertEqual(django_util.encode_json(x.my_struct), y.my_struct)
     y.delete()
 
 if __name__ == '__main__':

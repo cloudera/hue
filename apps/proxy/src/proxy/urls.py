@@ -20,5 +20,5 @@ from proxy import views as proxy_views
 
 urlpatterns = [
   # Prefix the names of your views with the app name.
-  url(r'^(?P<host>[^/]+)/(?P<port>\d+)(?P<path>/.*)$', proxy_views.proxy),
+  url(r'^(?P<host>[^/]+)/(?P<port>\d+)(?P<path>/.*)$', proxy_views.proxy, name="proxy.views.proxy"),
 ]

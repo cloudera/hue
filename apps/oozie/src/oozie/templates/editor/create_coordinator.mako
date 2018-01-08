@@ -71,7 +71,7 @@ ${ layout.menubar(section='coordinators') }
             <div class="fieldWrapper">
               ${ utils.render_field_no_popover(coordinator_form['name'], extra_attrs = {'validate':'true'}) }
               ${ utils.render_field_no_popover(coordinator_form['description']) }
-              ${ utils.render_field_no_popover(coordinator_form['workflow'], extra_attrs = {'validate':'true'}) }
+              ${ utils.render_field_no_popover(coordinator_form['coordinatorworkflow'], extra_attrs = {'validate':'true'}) }
               ${ coordinator_form['parameters'] | n,unicode }
               ${ coordinator_form['job_properties'] | n,unicode }
               <div class="hide">

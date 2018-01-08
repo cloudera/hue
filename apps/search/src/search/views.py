@@ -38,7 +38,7 @@ def install_examples(request):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      data = request.POST['data']
+      data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
       if 'log_analytics_demo' == data: # Hue documents installed only one time
         search_setup.Command().handle_noargs()

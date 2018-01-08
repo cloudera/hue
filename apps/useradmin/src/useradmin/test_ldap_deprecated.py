@@ -465,7 +465,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
       assert_true('/useradmin/users' in response['Location'], response)
 
       response = c.post(URL, dict(username_pattern='bad_name', password1='test', password2='test'))
-      assert_true('Could not' in response.context['form'].errors['username_pattern'][0], response)
+      assert_true('Could not' in response.context[0]['form'].errors['username_pattern'][0], response)
 
       # Test wild card
       response = c.post(URL, dict(username_pattern='*rr*', password1='test', password2='test'))
@@ -473,7 +473,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
 
       # Test regular with spaces (should fail)
       response = c.post(URL, dict(username_pattern='user with space', password1='test', password2='test'))
-      assert_true("Username must not contain whitespaces and ':'" in response.context['form'].errors['username_pattern'][0], response)
+      assert_true("Username must not contain whitespaces and ':'" in response.context[0]['form'].errors['username_pattern'][0], response)
 
       # Test dn with spaces in username and dn (should fail)
       response = c.post(URL, dict(username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
@@ -556,7 +556,7 @@ class TestUserAdminLdapDeprecated(BaseUserAdminTests):
                                                   'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'
                                                   'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'
                                                   'toolongnametoolongnametoolongnametoolongnametoolongnametoolongname'))
-    assert_true('Ensure this value has at most 256 characters' in response.context['form'].errors['groupname_pattern'][0], response)
+    assert_true('Ensure this value has at most 256 characters' in response.context[0]['form'].errors['groupname_pattern'][0], response)
 
     # Test wild card
     response = c.post(URL, dict(groupname_pattern='*r*'))
@@ -611,7 +611,7 @@ class TestUserAdminLdapDeprecatedWithHadoop(BaseUserAdminTests):
       assert_true(cluster.fs.exists('/user/curly'))
 
       response = c.post(URL, dict(username_pattern='bad_name', password1='test', password2='test'))
-      assert_true('Could not' in response.context['form'].errors['username_pattern'][0])
+      assert_true('Could not' in response.context[0]['form'].errors['username_pattern'][0])
       assert_false(cluster.fs.exists('/user/bad_name'))
 
       # See if moe, who did not ask for his home directory, has a home directory.

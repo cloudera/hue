@@ -24,21 +24,21 @@ username_re = get_username_re_rule()
 groupname_re = get_groupname_re_rule()
 
 urlpatterns = [
-  url(r'^$', useradmin_views.list_users),
-  url(r'^users/?$', useradmin_views.list_users),
-  url(r'^groups/?$', useradmin_views.list_groups),
-  url(r'^permissions/?$', useradmin_views.list_permissions),
+  url(r'^$', useradmin_views.list_users, name="useradmin.views.list_users"),
+  url(r'^users/?$', useradmin_views.list_users, name="useradmin.views.list_users"),
+  url(r'^groups/?$', useradmin_views.list_groups, name="useradmin.views.list_groups"),
+  url(r'^permissions/?$', useradmin_views.list_permissions, name="useradmin.views.list_permissions"),
   url(r'^configurations/?$', useradmin_views.list_configurations),
-  url(r'^users/edit/(?P<username>%s)$' % (username_re,), useradmin_views.edit_user),
-  url(r'^users/add_ldap_users$', useradmin_views.add_ldap_users),
-  url(r'^users/add_ldap_groups$', useradmin_views.add_ldap_groups),
+  url(r'^users/edit/(?P<username>%s)$' % (username_re,), useradmin_views.edit_user, name="useradmin.views.edit_user"),
+  url(r'^users/add_ldap_users$', useradmin_views.add_ldap_users, name="useradmin.views.add_ldap_users"),
+  url(r'^users/add_ldap_groups$', useradmin_views.add_ldap_groups, name="useradmin.views.add_ldap_groups"),
   url(r'^users/sync_ldap_users_groups$', useradmin_views.sync_ldap_users_groups),
-  url(r'^groups/edit/(?P<name>%s)$' % (groupname_re,), useradmin_views.edit_group),
-  url(r'^permissions/edit/(?P<app>.+?)/(?P<priv>.+?)/?$', useradmin_views.edit_permission),
-  url(r'^users/new$', useradmin_views.edit_user, name="useradmin.new"),
-  url(r'^groups/new$', useradmin_views.edit_group, name="useradmin.new_group"),
-  url(r'^users/delete', useradmin_views.delete_user),
-  url(r'^groups/delete$', useradmin_views.delete_group),
+  url(r'^groups/edit/(?P<name>%s)$' % (groupname_re,), useradmin_views.edit_group, name="useradmin.views.edit_group"),
+  url(r'^permissions/edit/(?P<app>.+?)/(?P<priv>.+?)/?$', useradmin_views.edit_permission, name="useradmin.views.edit_permission"),
+  url(r'^users/new$', useradmin_views.edit_user, name="useradmin.views.edit_user"),
+  url(r'^groups/new$', useradmin_views.edit_group, name="useradmin.views.edit_group"),
+  url(r'^users/delete', useradmin_views.delete_user, name="useradmin.views.delete_user"),
+  url(r'^groups/delete$', useradmin_views.delete_group, name="useradmin.views.delete_group"),
 ]
 
 urlpatterns += [

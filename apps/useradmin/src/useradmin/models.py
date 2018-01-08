@@ -99,7 +99,7 @@ class UserProfile(models.Model):
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=str(CreationMethod.HUE))
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
                                    help_text=_t('If this is users first login.'))
-  last_activity = models.DateTimeField(default=dtz.now, db_index=True)
+  last_activity = models.DateTimeField(auto_now=True, db_index=True)
 
   def get_groups(self):
     return self.user.groups.all()

@@ -25,7 +25,7 @@
   path_enc = path
   dirname_enc = urlencode(view['dirname'])
   base_url = url('filebrowser.views.view', path=path_enc)
-  edit_url = url('filebrowser.views.edit', path=path_enc)
+  edit_url = url('filebrowser_views_edit', path=path_enc)
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 

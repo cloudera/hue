@@ -109,7 +109,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                                       u'form-0-value': [u'1'],
                                       u'form-TOTAL_FORMS': [u'1']},
                                 follow=True)
-    oozie_jobid = response.context['oozie_workflow'].id
+    oozie_jobid = response.context[0]['oozie_workflow'].id
     OozieServerProvider.wait_until_completion(oozie_jobid)
 
     cls.hadoop_job_id = get_hadoop_job_id(cls.oozie, oozie_jobid, 1)
@@ -213,7 +213,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                                       u'form-0-value': [u'1'],
                                       u'form-TOTAL_FORMS': [u'1']},
                                 follow=True)
-    oozie_jobid = response.context['oozie_workflow'].id
+    oozie_jobid = response.context[0]['oozie_workflow'].id
     job = OozieServerProvider.wait_until_completion(oozie_jobid)
     hadoop_job_id = get_hadoop_job_id(TestJobBrowserWithHadoop.oozie, oozie_jobid, 1)
     hadoop_job_id_short = views.get_shorter_id(hadoop_job_id)
@@ -319,7 +319,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Single job page
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s' % TestJobBrowserWithHadoop.hadoop_job_id)
     # Check some counters for single job.
-    counters = response.context['job'].counters
+    counters = response.context[0]['job'].counters
     counters_file_bytes_written = counters['org.apache.hadoop.mapreduce.FileSystemCounter']['counters']['FILE_BYTES_WRITTEN']
     assert_true(counters_file_bytes_written['map'] > 0)
     assert_true(counters_file_bytes_written['reduce'] > 0)
@@ -328,16 +328,16 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     raise SkipTest
 
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context['page'].object_list), 4)
+    assert_true(len(response.context[0]['page'].object_list), 4)
     # Select by tasktype
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktype=reduce' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context['page'].object_list), 1)
+    assert_true(len(response.context[0]['page'].object_list), 1)
     # Select by taskstate
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?taskstate=succeeded' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context['page'].object_list), 4)
+    assert_true(len(response.context[0]['page'].object_list), 4)
     # Select by text
     response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktext=clean' % (TestJobBrowserWithHadoop.hadoop_job_id,))
-    assert_true(len(response.context['page'].object_list), 1)
+    assert_true(len(response.context[0]['page'].object_list), 1)
 
   def test_job_single_logs(self):
     if not is_live_cluster():
@@ -442,23 +442,23 @@ class TestMapReduce2NoHadoop:
 
   def test_finished_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0009')
-    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009')
-    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
 
   def test_spark_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0006')
-    assert_equal(response.context['job'].jobId, 'application_1428442704693_0006')
+    assert_equal(response.context[0]['job'].jobId, 'application_1428442704693_0006')
 
   def test_yarn_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007')
-    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+    assert_equal(response.context[0]['job'].jobId, 'job_1356251510842_0009')
 
   def job_not_assigned(self):
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url')
-    assert_equal(response.context['jobid'], 'job_1356251510842_0009')
-    assert_equal(response.context['path'], '/my_url')
+    assert_equal(response.context[0]['jobid'], 'job_1356251510842_0009')
+    assert_equal(response.context[0]['path'], '/my_url')
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url?format=json')
     result = json.loads(response.content)
@@ -466,14 +466,14 @@ class TestMapReduce2NoHadoop:
 
   def test_acls_job(self):
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054') # Check in perm decorator
-    assert_true(can_view_job('test', response.context['job']))
-    assert_true(can_modify_job('test', response.context['job']))
+    assert_true(can_view_job('test', response.context[0]['job']))
+    assert_true(can_modify_job('test', response.context[0]['job']))
 
-    assert_true(can_view_job('test2', response.context['job']))
-    assert_false(can_modify_job('test2', response.context['job']))
+    assert_true(can_view_job('test2', response.context[0]['job']))
+    assert_false(can_modify_job('test2', response.context[0]['job']))
 
-    assert_false(can_view_job('test3', response.context['job']))
-    assert_false(can_modify_job('test3', response.context['job']))
+    assert_false(can_view_job('test3', response.context[0]['job']))
+    assert_false(can_modify_job('test3', response.context[0]['job']))
 
     response2 = self.c3.get('/jobbrowser/jobs/job_1356251510842_0054')
     assert_true('don&#39;t have permission to access job' in response2.content, response2.content)

@@ -73,7 +73,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   def test_basic_flow(self):
     # Default database should exist
     response = self.client.get("/metastore/databases")
-    assert_true(self.db_name in response.context["databases"])
+    assert_true(self.db_name in response.context[0]["databases"])
 
     # Table should have been created
     response = self.client.get("/metastore/tables/")
@@ -100,7 +100,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     # Show table data.
     response = self.client.get("/metastore/table/%s/test/read" % self.db_name, follow=True)
-    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
+    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context[0]['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     # Note that it may not return all rows at once. But we expect at least 10.
     results = fetch_query_result_data(self.client, response)
@@ -182,7 +182,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     finish = LIST_PARTITIONS_LIMIT.set_for_testing("1")
     try:
       response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
-      partition_values_json = json.loads(response.context['partition_values_json'])
+      partition_values_json = json.loads(response.context[0]['partition_values_json'])
       assert_equal(1, len(partition_values_json))
     finally:
       finish()
@@ -190,7 +190,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     finish = LIST_PARTITIONS_LIMIT.set_for_testing("3")
     try:
       response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
-      partition_values_json = json.loads(response.context['partition_values_json'])
+      partition_values_json = json.loads(response.context[0]['partition_values_json'])
       assert_equal(2, len(partition_values_json))
     finally:
       finish()
@@ -201,7 +201,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     partition_spec = "baz='baz_one',boom=12345"
     response = self.client.get("/metastore/table/%s/test_partitions/partitions/%s/read" % (self.db_name, partition_spec), follow=True)
-    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
+    response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context[0]['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     results = fetch_query_result_data(self.client, response)
     assert_true(len(results['results']) > 0, results)

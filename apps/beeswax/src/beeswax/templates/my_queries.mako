@@ -110,7 +110,7 @@ ${layout.menubar(section='my queries')}
         % endfor
         </tbody>
       </table>
-      % if q_page.number != q_page.num_pages():
+      % if q_page.number != q_paginator.num_pages:
         <a href="${ url(app_name + ':list_designs') }?q-user=${request.user.username|u}" >${_('View all my queries')} &raquo;</a>
       % endif
     </div>
@@ -154,7 +154,7 @@ ${layout.menubar(section='my queries')}
         % endfor
         </tbody>
       </table>
-      % if h_page.number != h_page.num_pages():
+      % if h_page.number != h_paginator.num_pages:
         <a href="${ url(app_name + ':list_query_history') }">${_('View my entire query history')} &raquo;</a>
       % endif
     </div>

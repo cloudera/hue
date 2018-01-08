@@ -65,7 +65,7 @@ ${ comps.menubar() }
             <li class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
             <li><a href="#counters" data-toggle="tab">${_('Counters')}</a></li>
             <li><a
-                href="${ url('jobbrowser.views.single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a>
+                href="${ url('single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=attempt.attemptId) }">${_('Logs')}</a>
             </li>
           </ul>
 

@@ -333,7 +333,12 @@ class SubmitButton(Input):
   def render(self, name, value, attrs=None):
     if value is None:
       value = 'True'
-    final_attrs = self.build_attrs(attrs, type=self.input_type, name=name, value=value)
+
+    extra_attrs = dict(type=self.input_type, name=name)
+    if self.attrs:
+      extra_attrs.update(self.attrs)
+    final_attrs = self.build_attrs(attrs, extra_attrs=extra_attrs)
+
     if value != '':
       # Only add the 'value' attribute if a value is non-empty.
       final_attrs['value'] = force_unicode(value)

@@ -226,7 +226,7 @@ def test_invalid_username():
   for bad_name in BAD_NAMES:
     assert_true(c.get('/useradmin/users/new'))
     response = c.post('/useradmin/users/new', dict(username=bad_name, password1="test", password2="test"))
-    assert_true('not allowed' in response.context["form"].errors['username'][0])
+    assert_true('not allowed' in response.context[0]["form"].errors['username'][0])
 
 
 class BaseUserAdminTests(object):
@@ -347,12 +347,12 @@ class TestUserAdmin(BaseUserAdminTests):
     c = make_logged_in_client(username="test", is_superuser=True)
     response = c.get('/useradmin/groups')
     # No groups just yet
-    assert_true(len(response.context["groups"]) == 0)
+    assert_true(len(response.context[0]["groups"]) == 0)
     assert_true("Hue Groups" in response.content)
 
     # Create a group
     response = c.get('/useradmin/groups/new')
-    assert_equal('/useradmin/groups/new', response.context['action'])
+    assert_equal('/useradmin/groups/new', response.context[0]['action'])
     c.post('/useradmin/groups/new', dict(name="testgroup"))
 
     # We should have an empty group in the DB now
@@ -424,11 +424,11 @@ class TestUserAdmin(BaseUserAdminTests):
 
       response = c.get('/hue/accounts/login/')
       assert_equal(200, response.status_code)
-      assert_true(response.context['first_login_ever'])
+      assert_true(response.context[0]['first_login_ever'])
 
       response = c.post('/hue/accounts/login/', dict(username="test_first_login", password="foo"))
-      assert_true(response.context['first_login_ever'])
-      assert_equal([password_error_msg], response.context["form"]["password"].errors)
+      assert_true(response.context[0]['first_login_ever'])
+      assert_equal([password_error_msg], response.context[0]["form"]["password"].errors)
 
       response = c.post('/hue/accounts/login/', dict(username="test_first_login", password="foobarTest1["), follow=True)
       assert_equal(200, response.status_code)
@@ -450,7 +450,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              is_superuser=True,
                              password1="foo",
                              password2="foo"))
-      assert_equal([password_error_msg], response.context["form"]["password1"].errors)
+      assert_equal([password_error_msg], response.context[0]["form"]["password1"].errors)
 
       # Password is more than 8 characters long but does not have a special character
       response = c.post('/useradmin/users/edit/superuser',
@@ -458,7 +458,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              is_superuser=True,
                              password1="foobarTest1",
                              password2="foobarTest1"))
-      assert_equal([password_error_msg], response.context["form"]["password1"].errors)
+      assert_equal([password_error_msg], response.context[0]["form"]["password1"].errors)
 
       # Password1 and Password2 are valid but they do not match
       response = c.post('/useradmin/users/edit/superuser',
@@ -468,7 +468,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              password2="foobarTest1?",
                              password_old="foobarTest1[",
                              is_active=True))
-      assert_equal(["Passwords do not match."], response.context["form"]["password2"].errors)
+      assert_equal(["Passwords do not match."], response.context[0]["form"]["password2"].errors)
 
       # Password is valid now
       c.post('/useradmin/users/edit/superuser',
@@ -492,7 +492,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              password1="foo",
                              password2="foo"))
       assert_equal({'password1': [password_error_msg], 'password2': [password_error_msg]},
-                   response.context["form"].errors)
+                   response.context[0]["form"].errors)
 
       # Password is more than 8 characters long but does not have a special character
       response = c.post('/useradmin/users/new',
@@ -502,7 +502,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              password2="foobarTest1"))
 
       assert_equal({'password1': [password_error_msg], 'password2': [password_error_msg]},
-                   response.context["form"].errors)
+                   response.context[0]["form"].errors)
 
       # Password1 and Password2 are valid but they do not match
       response = c.post('/useradmin/users/new',
@@ -510,7 +510,7 @@ class TestUserAdmin(BaseUserAdminTests):
                              is_superuser=False,
                              password1="foobarTest1[",
                              password2="foobarTest1?"))
-      assert_equal({'password2': ["Passwords do not match."]}, response.context["form"].errors)
+      assert_equal({'password2': ["Passwords do not match."]}, response.context[0]["form"].errors)
 
       # Password is valid now
       c.post('/useradmin/users/new',
@@ -542,7 +542,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Test basic output.
       response = c.get('/useradmin/')
-      assert_true(len(response.context["users"]) > 0)
+      assert_true(len(response.context[0]["users"]) > 0)
       assert_true("Hue Users" in response.content)
 
       # Test editing a superuser
@@ -569,7 +569,7 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_true("You cannot change a username" in response.content)
       # Now make sure that those were materialized
       response = c.get('/useradmin/users/edit/test')
-      assert_equal(smart_unicode("Inglés"), response.context["form"].instance.first_name)
+      assert_equal(smart_unicode("Inglés"), response.context[0]["form"].instance.first_name)
       assert_true("Español" in response.content)
       # Shouldn't be able to demote to non-superuser
       response = c.post('/useradmin/users/edit/test', dict(username="test",
@@ -584,10 +584,10 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Let's try changing the password
       response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", is_superuser=True, password1="foo", password2="foobar"))
-      assert_equal(["Passwords do not match."], response.context["form"]["password2"].errors, "Should have complained about mismatched password")
+      assert_equal(["Passwords do not match."], response.context[0]["form"]["password2"].errors, "Should have complained about mismatched password")
       # Old password not confirmed
       response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", is_active=True, is_superuser=True))
-      assert_equal([UserChangeForm.GENERIC_VALIDATION_ERROR], response.context["form"]["password_old"].errors, "Should have complained about old password")
+      assert_equal([UserChangeForm.GENERIC_VALIDATION_ERROR], response.context[0]["form"]["password_old"].errors, "Should have complained about old password")
       # Good now
       response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", password_old="test", is_active=True, is_superuser=True))
       assert_true(User.objects.get(username="test").is_superuser)
@@ -605,7 +605,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
-      assert_equal({ 'username': [UserChangeForm.GENERIC_VALIDATION_ERROR]}, response.context["form"].errors)
+      assert_equal({ 'username': [UserChangeForm.GENERIC_VALIDATION_ERROR]}, response.context[0]["form"].errors)
 
       # Create a new regular user (for real)
       response = c.post('/useradmin/users/new', dict(username=FUNNY_NAME,
@@ -614,7 +614,7 @@ class TestUserAdmin(BaseUserAdminTests):
                                                is_active="True"))
       response = c.get('/useradmin/')
       assert_true(FUNNY_NAME_QUOTED in response.content)
-      assert_true(len(response.context["users"]) > 1)
+      assert_true(len(response.context[0]["users"]) > 1)
       assert_true("Hue Users" in response.content)
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
@@ -646,7 +646,7 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_equal(response.status_code, 200)
       response = c_reg.get('/useradmin/users/edit/%s' % (FUNNY_NAME_QUOTED,), follow=True)
       assert_equal(response.status_code, 200)
-      assert_equal("Hello", response.context["form"].instance.first_name)
+      assert_equal("Hello", response.context[0]["form"].instance.first_name)
       funny_user = User.objects.get(username=FUNNY_NAME)
       # Can't edit other people.
       response = c_reg.post("/useradmin/users/delete", {u'user_ids': [funny_user.id]})
@@ -672,7 +672,7 @@ class TestUserAdmin(BaseUserAdminTests):
                                                      is_active="True"))
       response = c.get('/useradmin/')
       assert_true('christian_häusler' in response.content)
-      assert_true(len(response.context["users"]) > 1)
+      assert_true(len(response.context[0]["users"]) > 1)
 
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username='christian_häusler').exists())
@@ -717,7 +717,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
 
     # c1 users should list only 'user_test_list_for_autocomplete2' and group should not list 'group_test_list_for_autocomplete_other_group'
-    response = c1.get(reverse('useradmin.views.list_for_autocomplete'))
+    response = c1.get(reverse('useradmin_views_list_for_autocomplete'))
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
@@ -728,7 +728,7 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_false(u'group_test_list_for_autocomplete_other_group' in groups, groups)
 
     # only_mygroups has no effect if user is not super user
-    response = c1.get(reverse('useradmin.views.list_for_autocomplete'), {'include_myself': True})
+    response = c1.get(reverse('useradmin_views_list_for_autocomplete'), {'include_myself': True})
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]
@@ -739,7 +739,7 @@ class TestUserAdmin(BaseUserAdminTests):
     assert_false(u'group_test_list_for_autocomplete_other_group' in groups, groups)
 
     # c3 is alone
-    response = c3_other_group.get(reverse('useradmin.views.list_for_autocomplete'), {'include_myself': True})
+    response = c3_other_group.get(reverse('useradmin_views_list_for_autocomplete'), {'include_myself': True})
     content = json.loads(response.content)
 
     users = [smart_unicode(user['username']) for user in content['users']]

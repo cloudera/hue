@@ -130,7 +130,7 @@ def install_examples(request, is_redirect=False):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      data = request.POST['data']
+      data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
       result['status'] = 0
     except Exception, e:

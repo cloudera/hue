@@ -26,11 +26,11 @@ urlpatterns = [
   url(r'^not_available$', jobsub_views.not_available),
 
   # Actions: get, save, clone, delete, submit, new.
-  url(r'^designs$', jobsub_views.list_designs),
-  url(r'^designs/(?P<design_id>\d+)$', jobsub_views.get_design),
-  url(r'^designs/(?P<node_type>\w+)/new$', jobsub_views.new_design),
-  url(r'^designs/(?P<design_id>\d+)/save$', jobsub_views.save_design),
-  url(r'^designs/(?P<design_id>\d+)/clone$', jobsub_views.clone_design),
-  url(r'^designs/(?P<design_id>\d+)/delete$', jobsub_views.delete_design),
-  url(r'^designs/(?P<design_id>\d+)/restore$', jobsub_views.restore_design),
+  url(r'^designs$', jobsub_views.list_designs, name="jobsub.views.list_designs"),
+  url(r'^designs/(?P<design_id>\d+)$', jobsub_views.get_design, name="jobsub.views.get_design"),
+  url(r'^designs/(?P<node_type>\w+)/new$', jobsub_views.new_design, name="jobsub.views.new_design"),
+  url(r'^designs/(?P<design_id>\d+)/save$', jobsub_views.save_design, name="jobsub.views.save_design"),
+  url(r'^designs/(?P<design_id>\d+)/clone$', jobsub_views.clone_design, name="jobsub.views.clone_design"),
+  url(r'^designs/(?P<design_id>\d+)/delete$', jobsub_views.delete_design, name="jobsub.views.delete_design"),
+  url(r'^designs/(?P<design_id>\d+)/restore$', jobsub_views.restore_design, name="jobsub.views.restore_design"),
 ]

@@ -39,7 +39,7 @@
             <tr>
                 <td data-row-selector-exclude="true">
                 %if task.taskAttemptIds:
-                    <a href="${ url('jobbrowser.views.single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=task.taskAttemptIds[-1]) }"
+                    <a href="${ url('single_task_attempt_logs', job=task.jobId, taskid=task.taskId, attemptid=task.taskAttemptIds[-1]) }"
                         data-row-selector="true"><i class="fa fa-tasks"></i>
                     </a>
                 %endif
@@ -308,7 +308,7 @@ ${ comps.menubar() }
                       % for attempt in job.job_attempts['jobAttempt']:
                       <tr>
                         <td>
-                          <a href="${ url('jobbrowser.views.job_attempt_logs', job=job.jobId, attempt_index=loop.index) }" data-row-selector="true">
+                          <a href="${ url('job_attempt_logs', job=job.jobId, attempt_index=loop.index) }" data-row-selector="true">
                             <i class="fa fa-tasks"></i>
                           </a>
                         </td>

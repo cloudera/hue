@@ -88,7 +88,19 @@ def format_time(time, format='%d %b %Y %H:%M:%S'):
   if time is None:
     return ''
 
+  fmt_time = None
   if type(time) == unicode:
     return time
   else:
-    return strftime(format, time)
+    try:
+      fmt_time = strftime(format, time)
+    except:
+      fmt_time = None
+
+    if fmt_time is None:
+      try:
+        fmt_time = strftime(format+" %f", time)
+      except:
+        fmt_time = None
+
+    return fmt_time

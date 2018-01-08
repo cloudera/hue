@@ -202,17 +202,25 @@ ${field.label_tag() | n}
 </%def>
 
 <%def name="bottompage(page)">
-  ${pageref(page.num_pages())}
+  ${pageref(paginator.num_pages)}
 </%def>
 
 <%def name="pagination(page)">
     <div class="pagination">
         <ul class="pull-right">
             <li class="prev"><a title="${_('Beginning of List')}" ${toppage(page)}>&larr; ${_('Beginning of List')}</a></li>
+            % if page and page.has_previous():
             <li><a title="${_('Previous Page')}" ${prevpage(page)}>${_('Previous Page')}</a></li>
+            % endif
+            % if page and page.has_next():
             <li><a title="${_('Next page')}" ${nextpage(page)}>${_('Next Page')}</a></li>
+            % endif
             <li class="next"><a title="${_('End of List')}" ${bottompage(page)}>${_('End of List')} &rarr;</a></li>
         </ul>
-        <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=page.total_count(),page=page.number,pages=page.num_pages())}</p>
+        % if page:
+          <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=paginator.count,page=page.number,pages=paginator.num_pages)}</p>
+        % else:
+          <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=0,end=0,count=paginator.count,page=0,pages=paginator.num_pages)}</p>
+        % endif
     </div>
 </%def>

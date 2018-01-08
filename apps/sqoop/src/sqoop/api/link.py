@@ -62,7 +62,7 @@ def create_link(request):
   if 'link' not in request.POST:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving link'), data={'errors': 'Link is missing.'}, error_code=400)
 
-  d = json.loads(smart_str(request.POST['link']))
+  d = json.loads(smart_str(request.POST.get('link')))
   link = client.Link.from_dict(d)
 
   try:
@@ -86,7 +86,7 @@ def update_link(request, link):
   if 'link' not in request.POST:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving link'), data={'errors': 'Link is missing.'}, error_code=400)
 
-  link.update_from_dict(json.loads(smart_str(request.POST['link'])))
+  link.update_from_dict(json.loads(smart_str(request.POST.get('link'))))
 
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)

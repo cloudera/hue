@@ -271,7 +271,7 @@ def status_bar(request):
   for view in _status_bar_views:
     try:
       r = view(request)
-      if r.status_code == 200:
+      if r and r.status_code == 200:
         resp += r.content
       else:
         LOG.warning("Failed to execute status_bar view %s" % (view,))

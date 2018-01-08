@@ -264,6 +264,7 @@ class WorkflowManager(models.Manager):
 
   def new_workflow(self, owner):
     workflow = Workflow(owner=owner, schema_version=WorkflowManager.SCHEMA_VERSION['0.4'])
+    workflow.save()
 
     kill = Kill(name='kill', workflow=workflow, node_type=Kill.node_type)
     end = End(name='end', workflow=workflow, node_type=End.node_type)
@@ -273,14 +274,16 @@ class WorkflowManager(models.Manager):
     related = Link(parent=start, child=end, name='related')
 
     workflow.start = start
+    workflow.start.save()
     workflow.end = end
+    workflow.end.save()
 
     return workflow
 
   def initialize(self, workflow, fs=None):
     Kill.objects.create(name='kill', workflow=workflow, node_type=Kill.node_type)
-    end = End.objects.create(name='end', workflow=workflow, node_type=End.node_type)
-    start = Start.objects.create(name='start', workflow=workflow, node_type=Start.node_type)
+    end = End.objects.get(workflow=workflow)
+    start = Start.objects.get(workflow=workflow)
 
     link = Link(parent=start, child=end, name='to')
     link.save()
@@ -373,6 +376,7 @@ class Workflow(Job):
         name=copy.name,
         description=copy.description)
 
+    copy_doc.save()
     copy.doc.all().delete()
     copy.doc.add(copy_doc)
 
@@ -453,7 +457,7 @@ class Workflow(Job):
 
   @property
   def actions(self):
-    return Action.objects.filter(workflow=self, node_type__in=Action.types)
+    return Node.objects.filter(workflow=self, node_type__in=Action.types)
 
   @property
   def node_list(self):
@@ -1392,9 +1396,9 @@ class Coordinator(Job):
                                     help_text=_t('The unit of the rate at which data is periodically created.')) # unused
   timezone = models.CharField(max_length=24, choices=TIMEZONES, default='America/Los_Angeles', verbose_name=_t('Timezone'),
                               help_text=_t('The timezone of the coordinator. Only used for managing the daylight saving time changes when combining several coordinators.'))
-  start = models.DateTimeField(default=dtz.now, verbose_name=_t('Start'),
+  start = models.DateTimeField(auto_now=True, verbose_name=_t('Start'),
                                help_text=_t('When to start the first workflow.'))
-  end = models.DateTimeField(default=dtz.now, verbose_name=_t('End'),
+  end = models.DateTimeField(auto_now=True, verbose_name=_t('End'),
                              help_text=_t('When to start the last workflow.'))
   coordinatorworkflow = models.ForeignKey(Workflow, null=True, verbose_name=_t('Workflow'),
                                help_text=_t('The workflow to schedule repeatedly.'))
@@ -1505,7 +1509,7 @@ class Coordinator(Job):
     props = json.loads(self.job_properties)
     index = [prop['name'] for prop in props]
 
-    for prop in self.workflow.get_parameters():
+    for prop in self.coordinatorworkflow.get_parameters():
       if not prop['name'] in index:
         props.append(prop)
         index.append(prop['name'])
@@ -1542,7 +1546,7 @@ class Coordinator(Job):
     return '%(number)d %(unit)s' % {'unit': self.frequency_unit, 'number': self.frequency_number}
 
   def find_parameters(self):
-    params = self.workflow.find_parameters()
+    params = self.coordinatorworkflow.find_parameters()
 
     for param in find_parameters(self, ['job_properties']):
       params[param] = ''
@@ -1655,7 +1659,7 @@ class Dataset(models.Model):
                           help_text=_t('The name of the dataset.'))
   description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
                                  help_text=_t('A description of the dataset.'))
-  start = models.DateTimeField(default=dtz.now, verbose_name=_t('Start'),
+  start = models.DateTimeField(auto_now=True, verbose_name=_t('Start'),
                                help_text=_t(' The UTC datetime of the initial instance of the dataset. The initial instance also provides '
                                             'the baseline datetime to compute instances of the dataset using multiples of the frequency.'))
   frequency_number = models.SmallIntegerField(default=1, choices=FREQUENCY_NUMBERS, verbose_name=_t('Frequency number'),
@@ -1759,7 +1763,7 @@ class BundledCoordinator(models.Model):
 
 
 class Bundle(Job):
-  kick_off_time = models.DateTimeField(default=dtz.now, verbose_name=_t('Start'),
+  kick_off_time = models.DateTimeField(auto_now=True, verbose_name=_t('Start'),
                                        help_text=_t('When to start the first coordinators.'))
   coordinators = models.ManyToManyField(Coordinator, through='BundledCoordinator')
 

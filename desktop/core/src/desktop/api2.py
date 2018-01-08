@@ -518,7 +518,7 @@ def export_documents(request):
 
   if doc_ids:
     doc_ids = ','.join(map(str, doc_ids))
-    management.call_command('dumpdata', 'desktop.Document2', primary_keys=doc_ids, indent=2, use_natural_keys=True, verbosity=2, stdout=f)
+    management.call_command('dumpdata', 'desktop.Document2', primary_keys=doc_ids, indent=2, use_natural_foreign_keys=True, verbosity=2, stdout=f)
 
   if request.GET.get('format') == 'json':
     return JsonResponse(f.getvalue(), safe=False)

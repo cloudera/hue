@@ -101,8 +101,8 @@ def index_fields_dynamic(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    name = request.POST['name']
-    engine = request.POST['engine']
+    name = request.POST.get('name')
+    engine = request.POST.get('engine')
     source = request.POST.get('source')
 
     dynamic_fields = get_engine(request.user, engine, source=source).luke(name)
@@ -358,10 +358,10 @@ def new_facet(request):
   try:
     collection = json.loads(request.POST.get('collection', '{}'))
 
-    facet_id = request.POST['id']
-    facet_label = request.POST['label']
-    facet_field = request.POST['field']
-    widget_type = request.POST['widget_type']
+    facet_id = request.POST.get('id')
+    facet_label = request.POST.get('label')
+    facet_field = request.POST.get('field')
+    widget_type = request.POST.get('widget_type')
 
     result['message'] = ''
     result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type)
@@ -551,8 +551,8 @@ def get_collection(request):
   result = {'status': -1, 'message': ''}
 
   try:
-    name = request.POST['name']
-    engine = request.POST['engine']
+    name = request.POST.get('name')
+    engine = request.POST.get('engine')
     source = request.POST.get('source')
 
     collection = Collection2(request.user, name=name, engine=engine, source=source)

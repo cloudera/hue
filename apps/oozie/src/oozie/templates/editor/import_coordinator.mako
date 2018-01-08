@@ -47,7 +47,7 @@ ${ layout.menubar(section='coordinators') }
             ${ utils.render_field(coordinator_form['description']) }
             ${ utils.render_field(coordinator_form['definition_file']) }
             ${ utils.render_field(coordinator_form['resource_archive']) }
-            ${ utils.render_field(coordinator_form['workflow']) }
+            ${ utils.render_field(coordinator_form['coordinatorworkflow']) }
             ${ utils.render_field(coordinator_form['is_shared']) }
            </fieldset>
           </div>

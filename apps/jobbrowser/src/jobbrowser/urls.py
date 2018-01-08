@@ -24,18 +24,18 @@ urlpatterns = [
   # "Default"
   url(r'^$', jobbrowser_views.jobs),
   url(r'^jobs/$', jobbrowser_views.jobs, name='jobs'),
-  url(r'^jobs/(?P<job>\w+)$', jobbrowser_views.single_job, name='single_job'),
+  url(r'^jobs/(?P<job>\w+)$', jobbrowser_views.single_job, name='jobbrowser.views.single_job'),
   url(r'^jobs/(?P<job>\w+)/counters$', jobbrowser_views.job_counters, name='job_counters'),
   url(r'^jobs/(?P<job>\w+)/kill$', jobbrowser_views.kill_job, name='kill_job'),
-  url(r'^jobs/(?P<job>\w+)/single_logs$', jobbrowser_views.job_single_logs, name='job_single_logs'),
-  url(r'^jobs/(?P<job>\w+)/tasks$', jobbrowser_views.tasks, name='tasks'),
-  url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)$', jobbrowser_views.single_task, name='single_task'), # TODO s/single// ?
+  url(r'^jobs/(?P<job>\w+)/single_logs$', jobbrowser_views.job_single_logs, name='jobbrowser.views.job_single_logs'),
+  url(r'^jobs/(?P<job>\w+)/tasks$', jobbrowser_views.tasks, name='jobbrowser.views.tasks'),
+  url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)$', jobbrowser_views.single_task, name='jobbrowser.views.single_task'), # TODO s/single// ?
   url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)$', jobbrowser_views.single_task_attempt, name='single_task_attempt'),
   url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/counters$', jobbrowser_views.task_attempt_counters, name='task_attempt_counters'),
   url(r'^jobs/(?P<job>\w+)/tasks/(?P<taskid>\w+)/attempts/(?P<attemptid>\w+)/logs$', jobbrowser_views.single_task_attempt_logs, name='single_task_attempt_logs'),
   url(r'^jobs/(\w+)/tasks/(\w+)/attempts/(?P<attemptid>\w+)/kill$', jobbrowser_views.kill_task_attempt, name='kill_task_attempt'),
   url(r'^trackers/(?P<trackerid>.+)$', jobbrowser_views.single_tracker, name='single_tracker'),
-  url(r'^container/(?P<node_manager_http_address>.+)/(?P<containerid>.+)$', jobbrowser_views.container, name='container'),
+  url(r'^container/(?P<node_manager_http_address>.+)/(?P<containerid>.+)$', jobbrowser_views.container, name='jobbrowser.views.container'),
 
   # MR2 specific
   url(r'^jobs/(?P<job>\w+)/job_attempt_logs/(?P<attempt_index>\d+)$', jobbrowser_views.job_attempt_logs, name='job_attempt_logs'),

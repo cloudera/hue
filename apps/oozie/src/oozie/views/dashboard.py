@@ -762,7 +762,7 @@ def rerun_oozie_job(request, job_id, app_path=None):
     if sum([rerun_form.is_valid(), params_form.is_valid()]) == 2:
       args = {}
 
-      if request.POST['rerun_form_choice'] == 'fail_nodes':
+      if request.POST.get('rerun_form_choice') == 'fail_nodes':
         args['fail_nodes'] = 'true'
       else:
         args['skip_nodes'] = ','.join(rerun_form.cleaned_data['skip_nodes'])

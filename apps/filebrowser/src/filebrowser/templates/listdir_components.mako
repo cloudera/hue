@@ -1140,7 +1140,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.showSummary = function () {
         self.isLoadingSummary(true);
         $("#contentSummaryModal").modal("show");
-        $.getJSON("${url('filebrowser.views.content_summary', path='')}" + self.selectedFile().path, function (data) {
+        $.getJSON("${url('content_summary', path='')}" + self.selectedFile().path, function (data) {
           if (data.status == 0) {
             self.contentSummary(ko.mapping.fromJS(data.summary));
             self.isLoadingSummary(false);

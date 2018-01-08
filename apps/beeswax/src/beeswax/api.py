@@ -339,7 +339,7 @@ def execute(request, design_id=None):
         # Parameterized query
         parameterization_form_cls = make_parameterization_form(query_str)
         if parameterization_form_cls:
-          parameterization_form = parameterization_form_cls(request.REQUEST, prefix="parameterization")
+          parameterization_form = parameterization_form_cls(request.POST.get('query-query', ''), prefix="parameterization")
 
           if parameterization_form.is_valid():
             parameters = parameterization_form.cleaned_data

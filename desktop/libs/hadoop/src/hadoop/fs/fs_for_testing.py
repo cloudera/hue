@@ -22,7 +22,7 @@ import tempfile
 import logging
 import os
 
-from django.contrib.webdesign import lorem_ipsum
+from django.utils import lorem_ipsum
 from hadoop.fs import LocalSubFileSystem
 
 logger = logging.getLogger(__name__)

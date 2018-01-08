@@ -81,7 +81,7 @@ ${ layout.menubar(section='saved queries') }
     <table class="table table-condensed datatables">
     <thead>
       <tr>
-        <th width="1%"><div class="hue-checkbox selectAll fa" data-selectables="savedCheck"></div></th>
+        <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="savedCheck"></div></th>
         <th>${_('Name')}</th>
         <th>${_('Description')}</th>
         <th>${_('Owner')}</th>
@@ -89,32 +89,34 @@ ${ layout.menubar(section='saved queries') }
       </tr>
     </thead>
     <tbody>
-      % for design in page.object_list:
-        <%
-          may_edit = design.doc.get().can_write(user)
-        %>
-      <tr>
-        <td data-row-selector-exclude="true">
-          <div class="hue-checkbox savedCheck fa"
-              data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
-              data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
-            % if may_edit:
-              data-delete-name="${ design.id }"
-            % endif
-            data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
-        </td>
-        <td>
-          <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
-        </td>
-        <td>
-        % if design.desc:
-          ${ force_unicode(design.desc) }
-        % endif
-        </td>
-        <td>${ design.owner.username }</td>
-        <td data-sort-value="${time.mktime(design.mtime.timetuple())}"></td>
-      </tr>
-      % endfor
+      % if page:
+        % for design in page.object_list:
+          <%
+            may_edit = design.doc.get().can_write(user)
+          %>
+        <tr>
+          <td data-row-selector-exclude="true">
+            <div class="hueCheckbox savedCheck fa"
+                data-edit-url="${ url(app_name + ':execute_design', design_id=design.id) }"
+                data-history-url="${ url(app_name + ':list_query_history') }?q-design_id=${design.id}"
+              % if may_edit:
+                data-delete-name="${ design.id }"
+              % endif
+              data-clone-url="${ url(app_name + ':clone_design', design_id=design.id) }" data-row-selector-exclude="true"></div>
+          </td>
+          <td>
+            <a href="${ url(app_name + ':execute_design', design_id=design.id) }" data-row-selector="true">${ force_unicode(design.name) }</a>
+          </td>
+          <td>
+          % if design.desc:
+            ${ force_unicode(design.desc) }
+          % endif
+          </td>
+          <td>${ design.owner.username }</td>
+          <td data-sort-value="${time.mktime(design.mtime.timetuple())}"></td>
+        </tr>
+        % endfor
+      % endif
     </tbody>
   </table>
     <div class="card-body">
@@ -204,7 +206,7 @@ ${ layout.menubar(section='saved queries') }
     function toggleActions() {
       $(".toolbarBtn").attr("disabled", "disabled");
 
-      var selector = $(".hue-checkbox[checked='checked']:not(.selectAll)");
+      var selector = $(".hueCheckbox[checked='checked']:not(.selectAll)");
       if (selector.length == 1) {
         if (selector.data("edit-url")) {
           $("#editBtn").removeAttr("disabled").click(function () {
@@ -223,7 +225,7 @@ ${ layout.menubar(section='saved queries') }
         }
       }
 
-      var can_delete = $(".hue-checkbox[checked='checked'][data-delete-name]");
+      var can_delete = $(".hueCheckbox[checked='checked'][data-delete-name]");
       if (can_delete.length > 0 && can_delete.length == selector.length) {
         $("#trashQueryBtn").removeAttr("disabled");
         $("#trashQueryCaretBtn").removeAttr("disabled");
@@ -232,7 +234,7 @@ ${ layout.menubar(section='saved queries') }
 
     function deleteQueries() {
       viewModel.chosenSavedQueries.removeAll();
-      $(".hue-checkbox[checked='checked']").each(function( index ) {
+      $(".hueCheckbox[checked='checked']").each(function( index ) {
         viewModel.chosenSavedQueries.push($(this).data("delete-name"));
       });
 

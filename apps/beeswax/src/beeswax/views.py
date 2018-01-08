@@ -22,6 +22,7 @@ import sys
 import time
 
 from django import forms
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -34,7 +35,7 @@ from django.urls import reverse
 from desktop.appmanager import get_apps_dict
 from desktop.conf import ENABLE_DOWNLOAD, REDIRECT_WHITELIST
 from desktop.context_processors import get_app_name
-from desktop.lib.paginator import Paginator
+
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
@@ -229,14 +230,18 @@ def list_designs(request):
   if search_filter is not None:
     querydict_query[ prefix + 'text' ] = search_filter
 
-  page, filter_params = _list_designs(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
+  paginator, page, filter_params = _list_designs(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
+  designs_json = []
+  if page:
+    designs_json = [query.id for query in page.object_list]
 
   return render('list_designs.mako', request, {
     'page': page,
+    'paginator': paginator,
     'filter_params': filter_params,
     'prefix': prefix,
     'user': request.user,
-    'designs_json': json.dumps([query.id for query in page.object_list])
+    'designs_json': json.dumps(designs_json)
   })
 
 
@@ -256,14 +261,18 @@ def list_trashed_designs(request):
   if search_filter is not None:
     querydict_query[ prefix + 'text' ] = search_filter
 
-  page, filter_params = _list_designs(user, querydict_query, DEFAULT_PAGE_SIZE, prefix, is_trashed=True)
+  paginator, page, filter_params = _list_designs(user, querydict_query, DEFAULT_PAGE_SIZE, prefix, is_trashed=True)
+  designs_json = []
+  if page:
+    designs_json = [query.id for query in page.object_list]
 
   return render('list_trashed_designs.mako', request, {
     'page': page,
+    'paginator': paginator,
     'filter_params': filter_params,
     'prefix': prefix,
     'user': request.user,
-    'designs_json': json.dumps([query.id for query in page.object_list])
+    'designs_json': json.dumps(designs_json)
   })
 
 
@@ -284,7 +293,7 @@ def my_queries(request):
   querydict_history[ prefix + 'user' ] = request.user
   querydict_history[ prefix + 'type' ] = app_name
 
-  hist_page, hist_filter = _list_query_history(request.user,
+  hist_paginator, hist_page, hist_filter = _list_query_history(request.user,
                                                querydict_history,
                                                DEFAULT_PAGE_SIZE,
                                                prefix)
@@ -295,7 +304,10 @@ def my_queries(request):
   querydict_query[ prefix + 'user' ] = request.user
   querydict_query[ prefix + 'type' ] = app_name
 
-  query_page, query_filter = _list_designs(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
+  query_paginator, query_page, query_filter = _list_designs(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
+  designs_json = []
+  if query_page:
+    designs_json = [query.id for query in query_page.object_list]
 
   filter_params = hist_filter
   filter_params.update(query_filter)
@@ -303,9 +315,11 @@ def my_queries(request):
   return render('my_queries.mako', request, {
     'request': request,
     'h_page': hist_page,
+    'h_paginator': hist_paginator,
     'q_page': query_page,
+    'q_paginator': query_paginator,
     'filter_params': filter_params,
-    'designs_json': json.dumps([query.id for query in query_page.object_list])
+    'designs_json': json.dumps(designs_json)
   })
 
 
@@ -336,7 +350,7 @@ def list_query_history(request):
   app_name = get_app_name(request)
   querydict_query[prefix + 'type'] = app_name
 
-  page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
+  paginator, page, filter_params = _list_query_history(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
   filter = request.GET.get(prefix + 'search') and request.GET.get(prefix + 'search') or ''
 
@@ -350,6 +364,7 @@ def list_query_history(request):
   return render('list_history.mako', request, {
     'request': request,
     'page': page,
+    'paginator': paginator,
     'filter_params': filter_params,
     'share_queries': share_queries,
     'prefix': prefix,
@@ -727,7 +742,7 @@ def make_parameterization_form(query_str):
   if len(variables) > 0:
     class Form(forms.Form):
       for name in sorted(variables):
-        locals()[name] = forms.CharField(required=True)
+        locals()[name] = forms.CharField(widget=forms.TextInput(attrs={'required': True}))
     return Form
   else:
     return None
@@ -850,14 +865,17 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
   designs = [job.content_object for job in db_queryset.all() if job.content_object and job.content_object.is_auto == False]
 
   pagenum = int(querydict.get(prefix + 'page', 1))
-  paginator = Paginator(designs, page_size)
-  page = paginator.page(pagenum)
+  paginator = Paginator(designs, page_size, allow_empty_first_page=True)
+  try:
+    page = paginator.page(pagenum)
+  except EmptyPage:
+    page = None
 
   # We need to pass the parameters back to the template to generate links
   keys_to_copy = [ prefix + key for key in ('user', 'type', 'sort', 'text') ]
   filter_params = copy_query_dict(querydict, keys_to_copy)
 
-  return page, filter_params
+  return paginator, page, filter_params
 
 
 def _get_query_handle_and_state(query_history):
@@ -1017,19 +1035,24 @@ def _list_query_history(user, querydict, page_size, prefix=""):
   if pagenum < 1:
     pagenum = 1
   db_queryset = db_queryset[ page_size * (pagenum - 1) : page_size * pagenum ]
-  paginator = Paginator(db_queryset, page_size, total=total_count)
-  page = paginator.page(pagenum)
+  paginator = Paginator(db_queryset, page_size, allow_empty_first_page=True)
+
+  try:
+    page = paginator.page(pagenum)
+  except EmptyPage:
+    page = None
 
   # We do slicing ourselves, rather than letting the Paginator handle it, in order to
   # update the last_state on the running queries
-  for history in page.object_list:
-    _update_query_state(history.get_full_object())
+  if page:
+    for history in page.object_list:
+      _update_query_state(history.get_full_object())
 
   # We need to pass the parameters back to the template to generate links
   keys_to_copy = [ prefix + key for key in ('user', 'type', 'sort', 'design_id', 'auto_query', 'search') ]
   filter_params = copy_query_dict(querydict, keys_to_copy)
 
-  return page, filter_params
+  return paginator, page, filter_params
 
 
 def _update_query_state(query_history):

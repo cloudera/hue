@@ -368,7 +368,7 @@ class CoordinatorForm(forms.ModelForm):
       if workflow.can_read(user):
         workflows.append(workflow.id)
     qs = Workflow.objects.filter(id__in=workflows)
-    self.fields['workflow'].queryset = qs
+    self.fields['coordinatorworkflow'].queryset = qs
 
 
 class ImportCoordinatorForm(CoordinatorForm):
@@ -414,8 +414,8 @@ class DataInputForm(forms.ModelForm):
     del kwargs['coordinator']
     super(DataInputForm, self).__init__(*args, **kwargs)
     self.fields['dataset'].queryset = Dataset.objects.filter(coordinator=coordinator)
-    if coordinator.workflow:
-      self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.workflow.find_parameters())))
+    if coordinator.coordinatorworkflow:
+      self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.coordinatorworkflow.find_parameters())))
 
 
 class DataOutputForm(forms.ModelForm):
@@ -428,8 +428,8 @@ class DataOutputForm(forms.ModelForm):
     del kwargs['coordinator']
     super(DataOutputForm, self).__init__(*args, **kwargs)
     self.fields['dataset'].queryset = Dataset.objects.filter(coordinator=coordinator)
-    if coordinator.workflow:
-      self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.workflow.find_parameters())))
+    if coordinator.coordinatorworkflow:
+      self.fields['name'].widget = forms.Select(choices=((param, param) for param in set(coordinator.coordinatorworkflow.find_parameters())))
 
 
 _node_type_TO_FORM_CLS = {

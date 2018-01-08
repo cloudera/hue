@@ -31,5 +31,5 @@
         <li><a title="{{ next }}" ${nextpage(page)}>{{ next }}</a></li>
         <li class="next"><a title="{{ last }}" ${bottompage(page)}>{{ last }} &rarr;</a></li>
     </ul>
-    <!-- <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=page.total_count(),page=page.number,pages=page.num_pages())}</p> -->
+    <p>${_('Showing %(start)s to %(end)s of %(count)s items, page %(page)s of %(pages)s') % dict(start=page.start_index(),end=page.end_index(),count=paginator.total_count,page=page.number,pages=paginator.num_pages)}</p> 
 </div>

@@ -34,7 +34,7 @@ from django.template.context import RequestContext
 from django.template.loader import render_to_string as django_render_to_string
 from django.utils.http import urlencode # this version is unicode-friendly
 from django.utils.translation import ungettext, ugettext
-from django.utils.timezone import LocalTimezone
+from django.utils.timezone import get_current_timezone
 
 import desktop.conf
 import desktop.lib.thrift_util
@@ -222,10 +222,9 @@ def render(template, request, data, json=None, template_lib=None, force_template
     else:
       return render_json(data, request.GET.get("callback"), status=status)
   else:
-    x=RequestContext(request, data)
     return _render_to_response(template,
                                request,
-                               x,
+                               RequestContext(request, data),
                                template_lib=template_lib,
                                status=status,
                                **kwargs)
@@ -422,7 +421,7 @@ def timesince(d=None, now=None, abbreviate=False, separator=','):
 
   if not now:
     if d.tzinfo:
-      now = datetime.datetime.now(LocalTimezone(d))
+      now = datetime.datetime.now(tz=get_current_timezone())
     else:
       now = datetime.datetime.now()
 

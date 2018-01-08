@@ -201,7 +201,7 @@ def massage_job_for_json(job, request=None, user=None):
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
     'canKill': can_kill_job(job, request.user if request else user),
-    'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or '',
+    'killUrl': job.jobId and reverse('kill_job', kwargs={'job': job.jobId}) or '',
     'diagnostics': hasattr(job, 'diagnostics') and job.diagnostics or '',
   }
   return job
@@ -212,7 +212,7 @@ def massage_task_for_json(task):
     'id': task.taskId,
     'shortId': task.taskId_short,
     'url': task.taskId and reverse('jobbrowser.views.single_task', kwargs={'job': task.jobId, 'taskid': task.taskId}) or '',
-    'logs': task.taskAttemptIds and reverse('jobbrowser.views.single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]}) or '',
+    'logs': task.taskAttemptIds and reverse('single_task_attempt_logs', kwargs={'job': task.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]}) or '',
     'type': task.taskType
   }
   return task

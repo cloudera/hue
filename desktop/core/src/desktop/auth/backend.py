@@ -185,7 +185,8 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
   """
   def authenticate(self, username=None, password=None):
     username = force_username_case(username)
-    user = super(AllowFirstUserDjangoBackend, self).authenticate(username, password)
+    request = None
+    user = super(AllowFirstUserDjangoBackend, self).authenticate(request, username=username, password=password)
 
     if user is not None:
       if user.is_active:
@@ -225,7 +226,8 @@ class ImpersonationBackend(django.contrib.auth.backends.ModelBackend):
     if not login_as:
       return
 
-    authenticated = super(ImpersonationBackend, self).authenticate(username, password)
+    request = None
+    authenticated = super(ImpersonationBackend, self).authenticate(request, username, password)
 
     if not authenticated:
       raise PermissionDenied()
@@ -434,7 +436,7 @@ class LdapBackend(object):
       self.add_ldap_config(desktop.conf.LDAP)
 
   @metrics.ldap_authentication_time
-  def authenticate(self, username=None, password=None, server=None):
+  def authenticate(self, request=None, username=None, password=None, server=None):
     self.add_ldap_config_for_server(server)
 
     username_filter_kwargs = ldap_access.get_ldap_user_kwargs(username)

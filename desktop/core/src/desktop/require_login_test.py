@@ -32,7 +32,7 @@ def test_require_login():
 
   response = c.get('/profile')
   assert_true(isinstance(response, django.http.HttpResponseRedirect), "Expected redirect")
-  assert_equal("http://testserver/hue/accounts/login?next=/profile", response["Location"])
+  assert_equal("/hue/accounts/login?next=/profile", response["Location"])
 
   # AllowAllBackend should let us in.
   c.login(username="test", password="test")

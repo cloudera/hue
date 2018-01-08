@@ -228,6 +228,25 @@ class RenderContext(BaseContext):
                 self.pop()
 
 
+from django.utils.module_loading import import_string
+_standard_context_processors = None
+
+# This is a function rather than module-level procedural code because we only
+# want it to execute if somebody uses RequestContext.
+def get_standard_processors():
+    from django.conf import settings
+    global _standard_context_processors
+    if _standard_context_processors is None:
+        processors = []
+        collect = []
+        collect.extend(_builtin_context_processors)
+        collect.extend(settings.GTEMPLATE_CONTEXT_PROCESSORS)
+        for path in collect:
+            func = import_string(path)
+            processors.append(func)
+        _standard_context_processors = tuple(processors)
+    return _standard_context_processors
+
 class RequestContext(Context):
     """
     This subclass of template.Context automatically populates itself using
@@ -242,12 +261,17 @@ class RequestContext(Context):
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
 
-        # placeholder for context processors output
-        self.update({})
+        updates = dict()
+        for processor in get_standard_processors():
+            updates.update(processor(request))
+        self.update(updates)
 
-        # empty dict for any new modifications
-        # (so that context processors don't overwrite them)
-        self.update({})
+        # # placeholder for context processors output
+        # self.update({})
+
+        # # empty dict for any new modifications
+        # # (so that context processors don't overwrite them)
+        # self.update({})
 
     @contextmanager
     def bind_template(self, template):

@@ -66,7 +66,7 @@ def create_job(request):
   if 'job' not in request.POST:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving job'), data={'errors': 'job is missing.'}, error_code=400)
 
-  d = json.loads(smart_str(request.POST['job']))
+  d = json.loads(smart_str(request.POST.get('job')))
   job = client.Job.from_dict(d)
 
   try:
@@ -93,7 +93,7 @@ def update_job(request, job):
   if 'job' not in request.POST:
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving job'), data={'errors': 'job is missing.'}, error_code=400)
 
-  job.update_from_dict(json.loads(smart_str(request.POST['job'])))
+  job.update_from_dict(json.loads(smart_str(request.POST.get('job'))))
 
   try:
     c = client.SqoopClient(conf.SERVER_URL.get(), request.user.username, request.LANGUAGE_CODE)
