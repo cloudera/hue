@@ -2519,7 +2519,7 @@ from desktop.views import _ko
                 if (!table.loaded && !table.hasErrors() && !table.loading()) {
                   table.loadEntries(function () {
                     loadEntries(count);
-                  }, true);
+                  });
                   return false;
                 }
                 return !table.loading();
