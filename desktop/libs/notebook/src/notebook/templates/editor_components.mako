@@ -156,10 +156,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
-<div class="print-logo">
-  <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }"  alt="${ _('Hue logo') }"/>
-</div>
-
 <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
   <div class="navbar-inner">
     <div class="container-fluid">

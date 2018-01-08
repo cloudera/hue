@@ -699,49 +699,8 @@
     font-style: normal !important;
   }
 
-  .print-logo {
-    display: none;
-  }
-
-  .print-logo img {
-    width: 24px;
-    height: 24px;
-  }
-
   .card-heading-print {
     display: none;
-  }
-
-  @media print {
-    .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .add-snippet, .card-heading.simple, .alert, .show-assist, .snippet-footer-actions-bar, .player-toolbar h4, .player-toolbar div {
-      display: none !important;
-    }
-    .content-panel {
-      width: 100% !important;
-      left: 0 !important;
-    }
-    * {
-      border: none !important;
-    }
-    .editable {
-      font-size: 20px;
-      font-weight: bold;
-      border-bottom: 2px solid @cui-default-border-color !important;
-    }
-    .tab-content, .content-panel {
-      overflow: visible;
-    }
-    .ace_scroller {
-      border-left: 4px solid @cui-gray-300 !important;
-      padding-left: 10px;
-    }
-    .print-logo {
-      display: block;
-    }
-    .card-heading-print.visible {
-      display: block;
-      font-weight: bold;
-    }
   }
 
   .no-underline:hover {
