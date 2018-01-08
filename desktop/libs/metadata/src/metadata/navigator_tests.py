@@ -118,7 +118,7 @@ class TestNavigator(object):
     props.update({'hue': 'test'})
     assert_equal(props, json_resp['entity']['properties'])
 
-    resp = self.client.post(reverse('metadata:delete_properties'), self._format_json_body({'id': entity_id, 'keys': ['hue']}))
+    resp = self.client.post(reverse('metadata:delete_metadata_properties'), self._format_json_body({'id': entity_id, 'keys': ['hue']}))
     json_resp = json.loads(resp.content)
     assert_equal(0, json_resp['status'], json_resp)
     del props['hue']
