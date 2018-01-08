@@ -94,15 +94,17 @@ def search_entities(request):
 
   offset = request.POST.get('offset', 0)
   limit = int(request.POST.get('limit', 100))
+  raw_query = request.POST.get('raw_query', False)
   sources = json.loads(request.POST.get('sources') or '[]')
   if sources and not has_navigator_file_search(request.user):
     sources = ['sql']
 
   query_s = query_s.strip() or '*'
 
-  entities = api.search_entities(query_s, limit=limit, offset=offset, sources=sources)
+  entities = api.search_entities(query_s, limit=limit, offset=offset, raw_query=raw_query, sources=sources)
 
-  _augment_highlighting(query_s, entities)
+  if not raw_query:
+    _augment_highlighting(query_s, entities)
 
   response = {
     'entities': entities,
