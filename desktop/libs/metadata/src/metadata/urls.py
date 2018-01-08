@@ -29,7 +29,7 @@ urlpatterns = patterns('metadata.navigator_api',
   url(r'^api/navigator/list_tags/?$', 'list_tags', name='list_tags'),
   url(r'^api/navigator/suggest/?$', 'suggest', name='suggest'),
   url(r'^api/navigator/update_properties/?$', 'update_properties', name='update_properties'),
-  url(r'^api/navigator/delete_properties/?$', 'delete_properties', name='delete_properties'),
+  url(r'^api/navigator/delete_metadata_properties/?$', 'delete_metadata_properties', name='delete_metadata_properties'),
   url(r'^api/navigator/lineage/?$', 'get_lineage', name='get_lineage'),
 )
 
