@@ -22,46 +22,75 @@ var SqlMetadata = (function () {
     self.hasErrors = false;
 
     self.sourceType = options.sourceType;
-    self.path = options.path;
+    self.path = typeof options.path === 'string' ? options.path.split('.') : options.path;
 
     self.sourceMeta = undefined;
     self.navigatorMeta = undefined;
-    self.commentObservable = undefined;
 
-    self.lastNavigatorPromise = undefined;
     self.lastSourcePromise = undefined;
+    self.lastNavigatorPromise = undefined;
 
     self.silenceErrors = options.silenceErrors;
     self.cachedOnly = options.cachedOnly;
   }
 
-  var refreshCommentObservable = function (sqlMeta) {
-    if (sqlMeta.commentObservable) {
-      if (HAS_NAVIGATOR) {
-        sqlMeta.getNavigatorMeta().done(function () {
-          if (sqlMeta.navigatorMeta && sqlMeta.navigatorMeta.entity) {
-            sqlMeta.commentObservable(sqlMeta.navigatorMeta.entity.description || sqlMeta.navigatorMeta.entity.originalDescription);
-          } else {
-            sqlMeta.getSourceMeta().done(function () {
-              sqlMeta.commentObservable(sqlMeta.sourceMeta ? (sqlMeta.sourceMeta.comment || '') : '');
-            });
-          }
-        })
-      } else {
-        sqlMeta.getSourceMeta().done(function () {
-          sqlMeta.commentObservable(sqlMeta.sourceMeta ? (sqlMeta.sourceMeta.comment || '') : '');
-        });
-      }
+  SqlMetadata.prototype.getComment = function () {
+    var self = this;
+    var deferred = $.Deferred();
+
+    var resolveWithSourceMeta = function () {
+      self.getSourceMeta().done(function () {
+        deferred.resolve(self.sourceMeta && self.sourceMeta.comment || '');
+      });
+    };
+
+    if (HAS_NAVIGATOR) {
+      self.getNavigatorMeta().done(function () {
+        if (self.navigatorMeta && self.navigatorMeta.entity) {
+          deferred.resolve(self.navigatorMeta.entity.description || self.navigatorMeta.entity.originalDescription || '');
+        } else {
+          resolveWithSourceMeta();
+        }
+      }).fail(resolveWithSourceMeta)
+    } else {
+      resolveWithSourceMeta();
     }
+
+    return deferred.promise();
   };
 
-  SqlMetadata.prototype.getCommentObservable = function () {
+  SqlMetadata.prototype.setComment = function (comment) {
     var self = this;
-    if (!self.commentObservable) {
-      self.commentObservable = ko.observable();
-      refreshCommentObservable(self);
+    var deferred = $.Deferred();
+
+    if (HAS_NAVIGATOR) {
+      self.getNavigatorMeta().done(function () {
+        if (self.navigatorMeta && self.navigatorMeta.entity) {
+          ApiHelper.getInstance().updateNavigatorMetadata({
+            identity: self.navigatorMeta.entity.identity,
+            properties: {
+              description: comment
+            }
+          }).done(function () {
+            self.loadNavigatorMeta();
+            self.getComment().done(deferred.resolve);
+          }).fail(deferred.reject);
+        }
+      }).fail(deferred.reject);
+    } else {
+      ApiHelper.getInstance().updateSourceMetadata({
+        sourceType: self.sourceType,
+        path: self.path,
+        properties: {
+          comment: comment
+        }
+      }).done(function () {
+        self.loadSourceMeta(true);
+        self.getComment().done(deferred.resolve);
+      }).fail(deferred.reject);
     }
-    return self.commentObservable;
+
+    return deferred.promise();
   };
 
   SqlMetadata.prototype.getSourceMeta = function () {
@@ -109,14 +138,15 @@ var SqlMetadata = (function () {
     return self.sourceMeta && self.sourceMeta.type === 'array';
   };
 
-  SqlMetadata.prototype.loadSourceMeta = function () {
+  SqlMetadata.prototype.loadSourceMeta = function (refreshCache) {
     var self = this;
     self.lastSourcePromise = $.Deferred();
     ApiHelper.getInstance().fetchSourceMetadata({
       sourceType: self.sourceType,
       path: self.path,
       silenceErrors: self.silenceErrors,
-      cachedOnly: self.cachedOnly
+      cachedOnly: self.cachedOnly,
+      refreshCache: refreshCache
     }).done(function (data) {
       self.sourceMeta = data;
       self.loaded = true;

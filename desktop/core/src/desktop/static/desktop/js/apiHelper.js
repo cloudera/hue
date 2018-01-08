@@ -74,8 +74,9 @@ var ApiHelper = (function () {
   var NAV_URLS = {
     ADD_TAGS: '/metadata/api/navigator/add_tags',
     DELETE_TAGS: '/metadata/api/navigator/delete_tags',
+    FIND_ENTITY: '/metadata/api/navigator/find_entity',
     LIST_TAGS: '/metadata/api/navigator/list_tags',
-    FIND_ENTITY: '/metadata/api/navigator/find_entity'
+    UPDATE_PROPERTIES: '/metadata/api/navigator/update_properties',
   };
 
   var NAV_OPT_URLS = {
@@ -318,7 +319,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.simplePost = function (url, data, options) {
     var self = this;
-    $.post(url, data, function (data) {
+    return $.post(url, data, function (data) {
       if (self.successResponseIsError(data)) {
         self.assistErrorCallback(options)(data);
       } else if (typeof options.successCallback !== 'undefined') {
@@ -1587,6 +1588,7 @@ var ApiHelper = (function () {
    * @param {string} options.sourceType
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly] - Default false
+   * @param {boolean} [options.refreshCache] - Default false
    *
    * @param {string[]} [options.path] - The path to fetch
    *
@@ -1601,6 +1603,7 @@ var ApiHelper = (function () {
       sourceType: options.sourceType,
       silenceErrors: options.silenceErrors,
       cachedOnly: options.cachedOnly,
+      refreshCache: options.refreshCache,
       successCallback: promise.resolve,
       errorCallback: self.assistErrorCallback({
         errorCallback: promise.reject,
@@ -1610,6 +1613,47 @@ var ApiHelper = (function () {
     });
 
     return promise;
+  };
+
+
+  ApiHelper.prototype.updateSourceMetadata = function (options) {
+    var self = this;
+    var url;
+    var data = {
+      source_type: options.sourceType
+    };
+    if (options.path.length === 1) {
+      url = '/metastore/databases/' + options.path[1] + '/alter';
+      data.properties = ko.mapping.toJSON(options.properties);
+    } else if (options.path.length === 2) {
+      url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter';
+      if (options.properties) {
+        if (options.properties.comment) {
+          data.comment = options.properties.comment;
+        }
+        if (options.properties.name) {
+          data.new_table_name = options.properties.name;
+        }
+      }
+    } else if (options.path > 2) {
+      url = '/metastore/table/' + options.path[0] + '/' + options.path[1] + '/alter_column';
+      data.column = options.path.slice(2).join('.');
+      if (options.properties) {
+        if (options.properties.comment) {
+          data.comment = options.properties.comment;
+        }
+        if (options.properties.name) {
+          data.new_column_name = options.properties.name;
+        }
+        if (options.properties.type) {
+          data.new_column_type = options.properties.name;
+        }
+        if (options.properties.partitions) {
+          data.partition_spec = ko.mapping.toJSON(options.properties.partitions);
+        }
+      }
+    }
+    return self.simplePost(url, data, options);
   };
 
 
@@ -1651,6 +1695,47 @@ var ApiHelper = (function () {
 
     return promise;
   };
+
+  ApiHelper.prototype.updateNavigatorMetadata = function (options) {
+    var self = this;
+    return self.simplePost(NAV_URLS.UPDATE_PROPERTIES, {
+      id: ko.mapping.toJSON(options.identity),
+      properties: ko.mapping.toJSON(options.properties)
+    }, options)
+  };
+
+
+  ApiHelper.prototype.addNavTags = function (entityId, tags) {
+    return $.post(NAV_URLS.ADD_TAGS, {
+      id: ko.mapping.toJSON(entityId),
+      tags: ko.mapping.toJSON(tags)
+    });
+  };
+
+  ApiHelper.prototype.deleteNavTags = function (entityId, tags) {
+    return $.post(NAV_URLS.DELETE_TAGS, {
+      id: ko.mapping.toJSON(entityId),
+      tags: ko.mapping.toJSON(tags)
+    });
+  };
+
+  /**
+   * Lists all available navigator tags
+   *
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.listNavTags = function (options) {
+    var self = this;
+    fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
+      url: NAV_URLS.LIST_TAGS,
+      errorCallback: self.assistErrorCallback(options),
+      noCache: true
+    }));
+  };
+
 
   /**
    * @param {Object} options
@@ -1831,37 +1916,6 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.getClusterConfig = function (data) {
     return $.post(FETCH_CONFIG, data);
-  };
-
-  ApiHelper.prototype.addNavTags = function (entityId, tags) {
-    return $.post(NAV_URLS.ADD_TAGS, {
-      id: ko.mapping.toJSON(entityId),
-      tags: ko.mapping.toJSON(tags)
-    });
-  };
-
-  ApiHelper.prototype.deleteNavTags = function (entityId, tags) {
-    return $.post(NAV_URLS.DELETE_TAGS, {
-      id: ko.mapping.toJSON(entityId),
-      tags: ko.mapping.toJSON(tags)
-    });
-  };
-
-  /**
-   * Lists all available navigator tags
-   *
-   * @param {Object} options
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   */
-  ApiHelper.prototype.listNavTags = function (options) {
-    var self = this;
-    fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
-      url: NAV_URLS.LIST_TAGS,
-      errorCallback: self.assistErrorCallback(options),
-      noCache: true
-    }));
   };
 
   ApiHelper.prototype.createNavOptDbTablesJson = function (options) {
@@ -2184,6 +2238,7 @@ var ApiHelper = (function () {
    * @param {string} options.sourceType
    * @param {string} options.url
    * @param {boolean} [options.noCache]
+   * @param {boolean} [options.refreshCache] - Default false
    * @param {Function} options.cacheCondition - Determines whether it should be cached or not
    * @param {Function} options.successCallback
    * @param {Function} options.errorCallback
@@ -2200,7 +2255,7 @@ var ApiHelper = (function () {
       return
     }
 
-    if (!options.noCache) {
+    if (!options.noCache && !options.refreshCache) {
       var cachedData = $.totalStorage(self.getAssistCacheIdentifier(options)) || {};
       if (typeof cachedData[options.url] !== "undefined" && ! self.hasExpired(cachedData[options.url].timestamp, options.cacheType || 'default')) {
         options.successCallback(cachedData[options.url].data);
