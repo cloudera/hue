@@ -68,6 +68,9 @@ var ApiHelper = (function () {
   var DASHBOARD_TERMS_API = '/dashboard/get_terms';
   var DASHBOARD_STATS_API = '/dashboard/get_stats';
 
+  var SEARCH_API = '/desktop/api/search/entities';
+  var INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
+
   var HBASE_API_PREFIX = '/hbase/api/';
   var SAVE_TO_FILE = '/filebrowser/save';
 
@@ -2127,7 +2130,7 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
     var promise = $.Deferred();
-    $.post('/desktop/api/search/entities_interactive', {
+    $.post(INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(query),
       limit: 5,
       sources: '["documents"]'
@@ -2143,7 +2146,7 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.fetchNavEntitiesInteractive = function (query) {
     var promise = $.Deferred();
-    $.post('/desktop/api/search/entities_interactive', {
+    $.post(INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(query),
       limit: 5,
       sources: '["sql", "hdfs", "s3"]'
@@ -2161,12 +2164,12 @@ var ApiHelper = (function () {
     var self = this;
 
     $.when.apply($, [
-      $.post('/desktop/api/search/entities_interactive', {
+      $.post(INTERACTIVE_SEARCH_API, {
         query_s: ko.mapping.toJSON(options.query),
         limit: 5,
         sources: '["sql", "hdfs", "s3"]'
       }),
-      $.post('/desktop/api/search/entities_interactive', {
+      $.post(INTERACTIVE_SEARCH_API, {
           query_s: ko.mapping.toJSON(options.query),
           limit: 5,
           sources: '["documents"]'
@@ -2184,47 +2187,29 @@ var ApiHelper = (function () {
     }).fail(self.assistErrorCallback(options));
   };
 
-  ApiHelper.prototype.navSearchAutocomplete = function (options) {
+  ApiHelper.prototype.searchEntities = function (options) {
     var self = this;
-    return $.post('/desktop/api/search/entities_interactive', {
-      query_s: ko.mapping.toJSON(options.query),
-      limit: 10,
-      sources: '["' + options.source + '"]'
-    }).done(function (data) {
-      if (data.status === 0 && !self.successResponseIsError(data)) {
-        options.successCallback(data);
-      } else if (data.status === -2 && typeof data.message !== 'undefined' && typeof data.message.message !== 'undefined') {
-        options.errorCallback({
-          source: 'navigator',
-          message: data.message.message
-        })
-      } else if (data.status === -2 && typeof data.message !== 'undefined') {
-        options.errorCallback({
-          source: 'navigator',
-          message: data.message
-        })
-      } else {
-        self.assistErrorCallback(options)(data);
-      }
-    }).fail(self.assistErrorCallback(options));
-  };
+    var deferred = $.Deferred();
 
-  ApiHelper.prototype.navSearch = function (options) {
-    var self = this;
-    var promise = $.Deferred();
-
-    $.post('/desktop/api/search/entities', {
+    $.post(SEARCH_API, {
       query_s: ko.mapping.toJSON(options.query),
       limit: options.limit || 100,
-      sources: options.sources || '["sql"]'
-	}).done(function (data) {
-      if (data.status === 0) {
-        promise.resolve(data);
+      raw_query: !!options.rawQuery,
+      sources: options.sources ? ko.mapping.toJSON(options.sources) : '["sql"]'
+	  }).done(function (data) {
+      if (data.status === 0 && !self.successResponseIsError(data)) {
+        deferred.resolve(data);
       } else {
-        promise.reject(data);
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(data);
       }
-    }).fail(promise.reject);
-    return promise;
+    }).fail(self.assistErrorCallback({
+      silenceErrors: options.silenceErrors,
+      errorCallback: deferred.reject
+    }));
+    return deferred.promise();
   };
 
   ApiHelper.prototype.formatSql = function (statements) {

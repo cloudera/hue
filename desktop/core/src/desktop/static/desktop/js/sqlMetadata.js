@@ -16,38 +16,143 @@
 
 var SqlMetadata = (function () {
 
+  var reloadSourceMeta = function (sqlMetadata, refreshCache) {
+    sqlMetadata.lastSourcePromise = $.Deferred();
+    ApiHelper.getInstance().fetchSourceMetadata({
+      sourceType: sqlMetadata.sourceType,
+      path: sqlMetadata.path,
+      silenceErrors: sqlMetadata.silenceErrors,
+      cachedOnly: sqlMetadata.cachedOnly,
+      refreshCache: refreshCache
+    }).done(function (data) {
+      sqlMetadata.lastSourcePromise.resolve(data);
+    }).fail(function (message) {
+      sqlMetadata.lastSourcePromise.reject(message);
+    });
+    return sqlMetadata.lastSourcePromise.promise();
+  };
+
+  var reloadNavigatorMeta = function (sqlMetadata) {
+    sqlMetadata.lastNavigatorPromise = $.Deferred();
+    if (HAS_NAVIGATOR) {
+      ApiHelper.getInstance().fetchNavigatorMetadata({
+        path: sqlMetadata.path,
+        silenceErrors: sqlMetadata.silenceErrors,
+      }).done(function (data) {
+        sqlMetadata.lastNavigatorPromise.resolve(data);
+      }).fail(sqlMetadata.lastNavigatorPromise.reject);
+    } else {
+      sqlMetadata.lastNavigatorPromise.reject();
+    }
+    return sqlMetadata.lastNavigatorPromise.promise();
+  };
+
   function SqlMetadata (options) {
     var self = this;
-    self.loaded = false;
-    self.hasErrors = false;
 
     self.sourceType = options.sourceType;
-    self.path = typeof options.path === 'string' ? options.path.split('.') : options.path;
+    self.path = typeof options.path === 'string' && options.path ? options.path.split('.') : options.path || [];
 
-    self.sourceMeta = undefined;
-    self.navigatorMeta = undefined;
-
+    self.partialSourceMeta = options.partialSourceMeta;
     self.lastSourcePromise = undefined;
     self.lastNavigatorPromise = undefined;
+
+    self.children = undefined;
+    self.lastNavigatorChildrenPromise = undefined;
 
     self.silenceErrors = options.silenceErrors;
     self.cachedOnly = options.cachedOnly;
   }
+
+  SqlMetadata.prototype.getChildren = function () {
+    var self = this;
+    var deferred = $.Deferred();
+    if (self.children) {
+      deferred.resolve(self.children);
+    } else {
+      self.getSourceMeta().done(function (sourceMeta) {
+        if (self.children) {
+          deferred.resolve(self.children);
+        } else {
+          self.children = [];
+          var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields;
+          if (entities) {
+            entities.forEach(function (entity) {
+              self.children.push(new SqlMetadata({
+                sourceType: self.sourceType,
+                path: self.path.concat(entity.name || entity),
+                silenceErrors: self.silenceErrors,
+                cachedOnly: self.cachedOnly,
+                partialSourceMeta: typeof entity === 'object' ? entity : undefined
+              }))
+            });
+          } else {
+            (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
+              if (sourceMeta[path]) {
+                self.children.push(new SqlMetadata({
+                  sourceType: self.sourceType,
+                  path: self.path.concat(path),
+                  silenceErrors: self.silenceErrors,
+                  cachedOnly: self.cachedOnly,
+                  partialSourceMeta: sourceMeta[path]
+                }));
+              }
+            })
+          }
+          deferred.resolve(self.children);
+        }
+      })
+    }
+    return deferred.promise();
+  };
+
+  SqlMetadata.prototype.loadNavigatorMetaForChildren = function () {
+    var self = this;
+    self.getChildren().done(function (children) {
+      var query;
+
+      // TODO: Add sourceType to nav search query
+      if (self.path.length) {
+        query = 'parentPath:"/' + self.path.join('/') + '" AND type:(table view field)';
+      } else {
+        query = 'type:database'
+      }
+
+      ApiHelper.getInstance().searchEntities({
+        query: query,
+        rawQuery: true,
+        limit: children.length
+      }).done(function (result) {
+        if (result && result.entities && result.entities.length > 0) {
+          var entityIndex = {};
+          result.entities.forEach(function (entity) {
+            entityIndex[entity.name || entity.originalName] = entity;
+          });
+          children.forEach(function (child) {
+            var name = child.path[child.path.length - 1];
+            if (entityIndex[name]) {
+              child.lastNavigatorPromise = $.Deferred().resolve(entityIndex[name]).promise();
+            }
+          });
+        }
+      })
+    })
+  };
 
   SqlMetadata.prototype.getComment = function () {
     var self = this;
     var deferred = $.Deferred();
 
     var resolveWithSourceMeta = function () {
-      self.getSourceMeta().done(function () {
-        deferred.resolve(self.sourceMeta && self.sourceMeta.comment || '');
-      });
+      self.getSourceMeta().done(function (sourceMeta) {
+        deferred.resolve(sourceMeta && sourceMeta.comment || '');
+      }).fail(deferred.reject);
     };
 
     if (HAS_NAVIGATOR) {
-      self.getNavigatorMeta().done(function () {
-        if (self.navigatorMeta && self.navigatorMeta.entity) {
-          deferred.resolve(self.navigatorMeta.entity.description || self.navigatorMeta.entity.originalDescription || '');
+      self.getNavigatorMeta().done(function (navigatorMeta) {
+        if (navigatorMeta && navigatorMeta.entity) {
+          deferred.resolve(navigatorMeta.entity.description || navigatorMeta.entity.originalDescription || '');
         } else {
           resolveWithSourceMeta();
         }
@@ -64,15 +169,15 @@ var SqlMetadata = (function () {
     var deferred = $.Deferred();
 
     if (HAS_NAVIGATOR) {
-      self.getNavigatorMeta().done(function () {
-        if (self.navigatorMeta && self.navigatorMeta.entity) {
+      self.getNavigatorMeta().done(function (navigatorMeta) {
+        if (navigatorMeta && navigatorMeta.entity) {
           ApiHelper.getInstance().updateNavigatorMetadata({
-            identity: self.navigatorMeta.entity.identity,
+            identity: navigatorMeta.entity.identity,
             properties: {
               description: comment
             }
           }).done(function () {
-            self.loadNavigatorMeta();
+            reloadNavigatorMeta(self);
             self.getComment().done(deferred.resolve);
           }).fail(deferred.reject);
         }
@@ -85,7 +190,7 @@ var SqlMetadata = (function () {
           comment: comment
         }
       }).done(function () {
-        self.loadSourceMeta(true);
+        reloadSourceMeta(self, true);
         self.getComment().done(deferred.resolve);
       }).fail(deferred.reject);
     }
@@ -95,85 +200,12 @@ var SqlMetadata = (function () {
 
   SqlMetadata.prototype.getSourceMeta = function () {
     var self = this;
-    return self.lastSourcePromise || self.loadSourceMeta()
+    return self.lastSourcePromise || reloadSourceMeta(self)
   };
 
   SqlMetadata.prototype.getNavigatorMeta = function () {
     var self = this;
-    return self.lastNavigatorPromise || self.loadNavigatorMeta()
-  };
-
-  SqlMetadata.prototype.isDatabase = function () {
-    var self = this;
-    return self.path.length === 1;
-  };
-
-  SqlMetadata.prototype.isTable = function () {
-    var self = this;
-    return self.sourceMeta && typeof self.sourceMeta.columns !== 'undefined' && !self.sourceMeta.is_view;
-  };
-
-  SqlMetadata.prototype.isView = function () {
-    var self = this;
-    return self.sourceMeta && typeof self.sourceMeta.columns !== 'undefined' && self.sourceMeta.is_view;
-  };
-
-  SqlMetadata.prototype.isField = function () {
-    var self = this;
-    return self.path.length > 2
-  };
-
-  SqlMetadata.prototype.isMap = function () {
-    var self = this;
-    return self.sourceMeta && self.sourceMeta.type === 'map';
-  };
-
-  SqlMetadata.prototype.isStruct = function () {
-    var self = this;
-    return self.sourceMeta && self.sourceMeta.type === 'struct';
-  };
-
-  SqlMetadata.prototype.isArray = function () {
-    var self = this;
-    return self.sourceMeta && self.sourceMeta.type === 'array';
-  };
-
-  SqlMetadata.prototype.loadSourceMeta = function (refreshCache) {
-    var self = this;
-    self.lastSourcePromise = $.Deferred();
-    ApiHelper.getInstance().fetchSourceMetadata({
-      sourceType: self.sourceType,
-      path: self.path,
-      silenceErrors: self.silenceErrors,
-      cachedOnly: self.cachedOnly,
-      refreshCache: refreshCache
-    }).done(function (data) {
-      self.sourceMeta = data;
-      self.loaded = true;
-      self.lastSourcePromise.resolve(self);
-    }).fail(function (message) {
-      self.hasErrors = true;
-      self.lastSourcePromise.reject(message);
-    });
-
-    return self.lastSourcePromise.promise();
-  };
-  
-  SqlMetadata.prototype.loadNavigatorMeta = function () {
-    var self = this;
-    self.lastNavigatorPromise = $.Deferred();
-    if (HAS_NAVIGATOR) {
-      ApiHelper.getInstance().fetchNavigatorMetadata({
-        path: self.path,
-        silenceErrors: self.silenceErrors,
-      }).done(function (data) {
-        self.navigatorMeta = data;
-        self.lastNavigatorPromise.resolve(self);
-      }).fail(self.lastNavigatorPromise.reject);
-    } else {
-      self.lastNavigatorPromise.resolve();
-    }
-    return self.lastNavigatorPromise.promise();
+    return self.lastNavigatorPromise || reloadNavigatorMeta(self)
   };
 
   return SqlMetadata;
