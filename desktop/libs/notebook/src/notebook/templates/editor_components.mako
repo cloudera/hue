@@ -2545,16 +2545,16 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         // fills in missing values
         var longestSerie = 0;
         _datum.forEach(function (d) {
-          if (d.values.length > longestSerie) {
-            longestSerie = d.values.length;
+          if (d.values.length > longestSerie.length) {
+            longestSerie = d.values;
           }
         });
         _datum.forEach(function (d) {
-          if (d.values.length < longestSerie) {
+          if (d.values.length < longestSerie.length) {
             var zeroObj = jQuery.extend({}, d.values[0]);
-            zeroObj.x = '';
             zeroObj.y = 0;
-            for (var i = d.values.length; i < longestSerie; i++) {
+            for (var i = d.values.length; i < longestSerie.length; i++) {
+              zeroObj.x = longestSerie[i].x;
               d.values.push(zeroObj)
             }
           }
