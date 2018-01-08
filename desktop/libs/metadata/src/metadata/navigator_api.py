@@ -407,8 +407,8 @@ def add_tags(request):
   response = {'status': -1}
 
   api = NavigatorApi(request.user)
-  entity_id = json.loads(request.POST.get('id', ''))
-  tags = json.loads(request.POST.get('tags', []))
+  entity_id = json.loads(request.POST.get('id', '""'))
+  tags = json.loads(request.POST.get('tags', "[]"))
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
@@ -433,8 +433,8 @@ def delete_tags(request):
   response = {'status': -1}
 
   api = NavigatorApi(request.user)
-  entity_id = json.loads(request.POST.get('id', ''))
-  tags = json.loads(request.POST.get('tags', []))
+  entity_id = json.loads(request.POST.get('id', '""'))
+  tags = json.loads(request.POST.get('tags', '[]'))
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
@@ -459,21 +459,22 @@ def update_properties(request):
   response = {'status': -1}
 
   api = NavigatorApi(request.user)
-  entity_id = json.loads(request.POST.get('id', ''))
-  properties = json.loads(request.POST.get('properties', {}))
+  entity_id = json.loads(request.POST.get('id', '""'))
+  properties = json.loads(request.POST.get('properties', '{}')) # Entity properties
+  metadata = json.loads(request.POST.get('metadata', '{}')) # Aka "Custom Metadata"
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
   request.audit = {
     'allowed': is_allowed,
     'operation': 'NAVIGATOR_UPDATE_PROPERTIES',
-    'operationText': 'Updating property %s of entity %s' % (properties, entity_id)
+    'operationText': 'Updating metadata %s properties %s of entity %s' % (metadata, properties, entity_id)
   }
 
-  if not entity_id or not properties or not isinstance(properties, dict) or not is_allowed:
-    response['error'] = _("update_properties requires an 'id' parameter and 'properties' parameter that is a non-empty dict")
+  if not entity_id or (not properties and not metadata) or not is_allowed:
+    response['error'] = _("update_properties requires an 'id' parameter and 'properties' or 'metadata' parameters that are non-empty dicts")
   else:
-    response['entity'] = api.update_properties(entity_id, properties)
+    response['entity'] = api.update_properties(entity_id, properties, metadata)
     response['status'] = 0
 
   return JsonResponse(response)
@@ -481,25 +482,25 @@ def update_properties(request):
 
 @require_POST
 @error_handler
-def delete_properties(request):
+def delete_metadata_properties(request):
   response = {'status': -1}
 
   api = NavigatorApi(request.user)
-  entity_id = json.loads(request.POST.get('id', ''))
-  keys = json.loads(request.POST.get('keys', []))
+  entity_id = json.loads(request.POST.get('id', '""'))
+  keys = json.loads(request.POST.get('keys', '[]'))
 
   is_allowed = request.user.has_hue_permission(action='write', app='metadata')
 
   request.audit = {
     'allowed': is_allowed,
-    'operation': 'NAVIGATOR_DELETE_PROPERTIES',
-    'operationText': 'Deleting property %s of entity %s' % (keys, entity_id)
+    'operation': 'NAVIGATOR_DELETE_METADATA_PROPERTIES',
+    'operationText': 'Deleting metadata %s of entity %s' % (keys, entity_id)
   }
 
   if not entity_id or not keys or not isinstance(keys, list):
     response['error'] = _("update_properties requires an 'id' parameter and 'keys' parameter that is a non-empty list")
   else:
-    response['entity'] = api.delete_properties(entity_id, keys)
+    response['entity'] = api.delete_metadata_properties(entity_id, keys)
     response['status'] = 0
 
   return JsonResponse(response)
