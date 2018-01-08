@@ -983,12 +983,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                     }
                     $('#embeddable_' + app).html($rawHtml);
                     huePubSub.publish('app.dom.loaded', app);
-
+                    self.isLoadingEmbeddable(false);
                   });
                 } else {
                   window.location.href = baseURL;
                 }
-                self.isLoadingEmbeddable(false);
               },
               error: function (xhr) {
                 console.error('Route loading problem', xhr);
