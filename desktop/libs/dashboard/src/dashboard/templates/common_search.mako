@@ -1648,7 +1648,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
             transformer: pieChartDataTransformer,
             maxWidth: 250,
-            onClick: function(d){ searchViewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
+            onClick: function(d){ $parent.dimension() == 2 ? $root.query.togglePivotFacet({facet: d.data.obj, widget_id: id()}) : searchViewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
             onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
           <div class="clearfix"></div>
           <!-- /ko -->
