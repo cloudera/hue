@@ -1622,6 +1622,14 @@ var Collection = function (vm, collection) {
     vm.search();
   };
 
+  self.name.subscribe(function(newValue) { // New Dashboard
+    if (newValue && (self.engine() == 'solr' || /^[^\.]+\.[^\.]+$/.test(newValue))) {
+      self.label(newValue);
+      self.switchCollection();
+      vm.search();
+    }
+  });
+
   huePubSub.publish('set.active.dashboard.collection', self);
 };
 
@@ -1635,16 +1643,7 @@ var NewTemplate = function (vm, initial) {
   self.inited = ko.observable(self.collections().length > 0); // No collection if not a new dashboard
 
   self.init = function() {
-    if (self.inited()) {
-      // If new dashboard
-      vm.collection.name.subscribe(function(newValue) {
-        if (newValue && (vm.collection.engine() == 'solr' || /^[^\.]+\.[^\.]+$/.test(newValue))) {
-          vm.collection.label(newValue);
-          vm.collection.switchCollection();
-          vm.search();
-        }
-      });
-    } else {
+    if (!self.inited()) {
       self.syncCollections();
     }
 
