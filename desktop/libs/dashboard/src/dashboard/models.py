@@ -538,7 +538,7 @@ def augment_solr_response(response, collection, query):
             cols.append(f['field'])
             prev_last_seen_dim_col_index = last_seen_dim_col_index
             last_seen_dim_col_index = i + 2
-            print prev_last_seen_dim_col_index
+
           from libsolr.api import SolrApi
           aggregate_name = SolrApi._get_aggregate_function(f)
           cols.append(aggregate_name + ('_%(field)s' % facet['properties']['facets'][last_seen_dim_col_index - 1] if aggregate_name in cols else ''))
