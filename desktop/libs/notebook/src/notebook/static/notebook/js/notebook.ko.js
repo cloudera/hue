@@ -2015,6 +2015,16 @@ var EditorViewModel = (function() {
         self.execute();
       }
     };
+
+    self.onKeydownInVariable = function (context, e) {
+      if ((e.ctrlKey || e.metaKey) && e.which === 13) { // Ctrl-enter
+        self.ace().commands.commands['execute'].exec();
+      } else if ((e.ctrlKey || e.metaKey) && e.which === 83) { // Ctrl-s
+        self.ace().commands.commands['save'].exec();
+        e.preventDefault(); // Prevent browser page save dialog
+      }
+      return true;
+    };
   };
 
   var Session = function(vm, session) {
