@@ -55,7 +55,9 @@ var AssistDbEntry = (function () {
 
     self.metadata = new SqlMetadata({
       sourceType: self.sourceType,
-      path: self.getHierarchy()
+      path: self.getHierarchy(),
+      silenceErrors: self.navigationSettings.rightAssist,
+      cachedOnly: false
     });
 
     self.filterColumnNames = ko.observable(false);
@@ -317,7 +319,7 @@ var AssistDbEntry = (function () {
 
     var loadEntriesDeferred = $.Deferred();
 
-    var successCallback = function(sqlMeta) {
+    var successCallback = function(sourceMeta) {
       self.entries([]);
       self.hasErrors(false);
       self.loading(false);
@@ -325,8 +327,8 @@ var AssistDbEntry = (function () {
 
       var newEntries = [];
       var index = 0;
-      if (typeof sqlMeta.sourceMeta.tables_meta !== "undefined") {
-        newEntries = $.map(sqlMeta.sourceMeta.tables_meta, function(table) {
+      if (typeof sourceMeta.tables_meta !== "undefined") {
+        newEntries = $.map(sourceMeta.tables_meta, function(table) {
           table.index = index++;
           table.title = table.name + (table.comment ? ' - ' + table.comment : '');
           table.displayName = table.name;
@@ -334,8 +336,8 @@ var AssistDbEntry = (function () {
           table.isView = /view/i.test(table.type);
           return self.createEntry(table);
         });
-      } else if (typeof sqlMeta.sourceMeta.extended_columns !== "undefined" && sqlMeta.sourceMeta.extended_columns !== null) {
-        newEntries = $.map(sqlMeta.sourceMeta.extended_columns, function (columnDef) {
+      } else if (typeof sourceMeta.extended_columns !== "undefined" && sourceMeta.extended_columns !== null) {
+        newEntries = $.map(sourceMeta.extended_columns, function (columnDef) {
           var displayName = columnDef.name;
           if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
             displayName += ' (' + columnDef.type + ')'
@@ -355,8 +357,8 @@ var AssistDbEntry = (function () {
           columnDef.type = shortType;
           return self.createEntry(columnDef);
         });
-      } else if (typeof sqlMeta.sourceMeta.columns !== "undefined" && sqlMeta.sourceMeta.columns !== null) {
-        newEntries = $.map(sqlMeta.sourceMeta.columns, function(columnName) {
+      } else if (typeof sourceMeta.columns !== "undefined" && sourceMeta.columns !== null) {
+        newEntries = $.map(sourceMeta.columns, function(columnName) {
           return self.createEntry({
             name: columnName,
             index: index++,
@@ -365,28 +367,28 @@ var AssistDbEntry = (function () {
             isColumn: true
           });
         });
-      } else if (sqlMeta.isMap()) {
+      } else if (sourceMeta.type === 'map') {
         newEntries = [
           self.createEntry({
             name: "key",
             index: index++,
-            displayName: "key (" + sqlMeta.sourceMeta.key.type + ")",
-            title: "key (" + sqlMeta.sourceMeta.key.type + ")",
-            type: sqlMeta.sourceMeta.key.type,
+            displayName: "key (" + sourceMeta.key.type + ")",
+            title: "key (" + sourceMeta.key.type + ")",
+            type: sourceMeta.key.type,
             isComplex: true
           }),
           self.createEntry({
             name: "value",
             index: index++,
-            displayName: "value (" + sqlMeta.sourceMeta.value.type + ")",
-            title: "value (" + sqlMeta.sourceMeta.value.type + ")",
+            displayName: "value (" + sourceMeta.value.type + ")",
+            title: "value (" + sourceMeta.value.type + ")",
             isMapValue: true,
-            type: sqlMeta.sourceMeta.value.type,
+            type: sourceMeta.value.type,
             isComplex: true
           })
         ];
-      } else if (sqlMeta.isStruct()) {
-        newEntries = $.map(sqlMeta.sourceMeta.fields, function(field) {
+      } else if (sourceMeta.type === 'struct') {
+        newEntries = $.map(sourceMeta.fields, function(field) {
           return self.createEntry({
             name: field.name,
             index: index++,
@@ -396,21 +398,21 @@ var AssistDbEntry = (function () {
             isComplex: true
           });
         });
-      } else if (sqlMeta.isArray()) {
+      } else if (sourceMeta.type === 'array') {
         newEntries = [
           self.createEntry({
             name: "item",
             index: index++,
-            displayName: "item (" + sqlMeta.sourceMeta.item.type + ")",
-            title: "item (" + sqlMeta.sourceMeta.item.type + ")",
+            displayName: "item (" + sourceMeta.item.type + ")",
+            title: "item (" + sourceMeta.item.type + ")",
             isArray: true,
-            type: sqlMeta.sourceMeta.item.type,
+            type: sourceMeta.item.type,
             isComplex: true
           })
         ];
       }
 
-      if (sqlMeta.isArray() || sqlMeta.isMap()) {
+      if (sourceMeta.type === 'array' || sourceMeta.type === 'map') {
         self.entries(newEntries);
         self.entries()[0].open(true);
       } else {
@@ -461,7 +463,7 @@ var AssistDbEntry = (function () {
       })
     }
 
-    self.metadata.loadSourceMeta(self.navigationSettings.rightAssist || !!silenceErrors, false).done(successCallback).fail(errorCallback);
+    self.metadata.getSourceMeta().done(successCallback).fail(errorCallback);
   };
 
   /**
