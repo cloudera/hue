@@ -145,7 +145,7 @@ class NavigatorApi(object):
     return default_entity_types, entity_types
 
 
-  def search_entities(self, query_s, limit=100, offset=0, **filters):
+  def search_entities(self, query_s, limit=100, offset=0, raw_query=False, **filters):
     """
     Solr edismax query parser syntax.
 
@@ -159,50 +159,53 @@ class NavigatorApi(object):
     default_entity_types, entity_types = self._get_types_from_sources(sources)
 
     try:
-      query_s = query_s.replace('{', '\\{').replace('}', '\\}').replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
       params = self.__params
+      if not raw_query:
+        query_s = query_s.replace('{', '\\{').replace('}', '\\}').replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
 
-      search_terms = [term for term in query_s.strip().split()]
+        search_terms = [term for term in query_s.strip().split()]
 
-      query_clauses = []
-      user_filters = []
-      source_type_filter = []
+        query_clauses = []
+        user_filters = []
+        source_type_filter = []
 
-      for term in search_terms:
-        if ':' not in term:
-          if ('sql' in sources or 'hive' in sources or 'impala' in sources):
-            if '.' in term:
-              parent, term = term.rsplit('.', 1)
-              user_filters.append('parentPath:"/%s"' % parent.replace('.', '/'))
-          query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
-        else:
-          name, val = term.split(':')
-          if val:
-            if name == 'type':
-              term = '%s:%s' % (name, val.upper().strip('*'))
-              default_entity_types = entity_types # Make sure type value still makes sense for the source
-            user_filters.append(term + '*') # Manual filter allowed e.g. type:VIE* ca
+        for term in search_terms:
+          if ':' not in term:
+            if ('sql' in sources or 'hive' in sources or 'impala' in sources):
+              if '.' in term:
+                parent, term = term.rsplit('.', 1)
+                user_filters.append('parentPath:"/%s"' % parent.replace('.', '/'))
+            query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
+          else:
+            name, val = term.split(':')
+            if val:
+              if name == 'type':
+                term = '%s:%s' % (name, val.upper().strip('*'))
+                default_entity_types = entity_types # Make sure type value still makes sense for the source
+              user_filters.append(term + '*') # Manual filter allowed e.g. type:VIE* ca
 
-      filter_query = '*'
+        filter_query = '*'
 
-      if query_clauses:
-        filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
+        if query_clauses:
+          filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
 
-      user_filter_clause = 'AND '.join(['(%s)' % f for f in user_filters]) or '*'
-      source_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
+        user_filter_clause = 'AND '.join(['(%s)' % f for f in user_filters]) or '*'
+        source_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
 
-      if 's3' in sources:
-        source_type_filter.append('sourceType:s3')
-      elif 'sql' in sources or 'hive' in sources or 'impala' in sources:
-        source_type_filter.append('sourceType:HIVE OR sourceType:IMPALA')
+        if 's3' in sources:
+          source_type_filter.append('sourceType:s3')
+        elif 'sql' in sources or 'hive' in sources or 'impala' in sources:
+          source_type_filter.append('sourceType:HIVE OR sourceType:IMPALA')
 
-      filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
-      if source_type_filter:
-        filter_query += ' AND (%s)' % 'OR '.join(source_type_filter)
+        filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
+        if source_type_filter:
+          filter_query += ' AND (%s)' % 'OR '.join(source_type_filter)
 
-      source_ids = get_cluster_source_ids(self)
-      if source_ids:
-        filter_query = source_ids + '(' + filter_query + ')'
+        source_ids = get_cluster_source_ids(self)
+        if source_ids:
+          filter_query = source_ids + '(' + filter_query + ')'
+      else:
+        filter_query = query_s
 
       params += (
         ('query', filter_query),
