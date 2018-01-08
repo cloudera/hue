@@ -384,7 +384,7 @@ def test_paginator():
 
 def test_thread_dump():
   c = make_logged_in_client()
-  response = c.get("/desktop/debug/threads")
+  response = c.get("/desktop/debug/threads", HTTP_X_REQUESTED_WITH='XMLHttpRequest')
   assert_true("test_thread_dump" in response.content)
 
 def test_truncating_model():
