@@ -235,6 +235,7 @@ server.
 
 When you have multiple statements it's enough to put the cursor in the statement you want to execute, the active statement is indicated with a blue gutter marking.
 
+![image](images/note.jpg) **Note**: Use CTRL/Cmd + ENTER to execute queries.
 
 ![image](images/note.jpg) **Note**: Under the logs panel, you can view any
 MapReduce or [Impala jobs](#impala-queries) that the query generated.
