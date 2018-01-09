@@ -25,11 +25,14 @@ var DataCatalog = (function () {
 
   DataCatalog.prototype.getEntry = function (options) {
     var self = this;
+    if (typeof options === 'string') {
+      return new DataCatalogEntry(self, { path: options ? options.split('.') : [] })
+    }
     return new DataCatalogEntry(self, options);
   };
 
   var reloadSourceMeta = function (dataCatalogEntry, refreshCache) {
-    dataCatalogEntry.lastSourcePromise = $.Deferred();
+    var deferred = $.Deferred();
     ApiHelper.getInstance().fetchSourceMetadata({
       sourceType: dataCatalogEntry.dataCatalog.sourceType,
       path: dataCatalogEntry.path,
@@ -37,26 +40,27 @@ var DataCatalog = (function () {
       cachedOnly: dataCatalogEntry.cachedOnly,
       refreshCache: refreshCache
     }).done(function (data) {
-      dataCatalogEntry.lastSourcePromise.resolve(data);
-    }).fail(function (message) {
-      dataCatalogEntry.lastSourcePromise.reject(message);
-    });
-    return dataCatalogEntry.lastSourcePromise.promise();
+      deferred.resolve(data);
+    }).fail(deferred.reject);
+    dataCatalogEntry.lastSourcePromise = deferred.promise();
+    return dataCatalogEntry.lastSourcePromise;
   };
 
-  var reloadNavigatorMeta = function (dataCatalogEntry) {
-    dataCatalogEntry.lastNavigatorPromise = $.Deferred();
+  var reloadNavigatorMeta = function (dataCatalogEntry, refreshCache) {
+    var deferred = $.Deferred();
     if (HAS_NAVIGATOR) {
       ApiHelper.getInstance().fetchNavigatorMetadata({
         path: dataCatalogEntry.path,
         silenceErrors: dataCatalogEntry.silenceErrors,
+        refreshCache: refreshCache
       }).done(function (data) {
-        dataCatalogEntry.lastNavigatorPromise.resolve(data);
-      }).fail(dataCatalogEntry.lastNavigatorPromise.reject);
+        deferred.resolve(data);
+      }).fail(deferred.reject);
     } else {
-      dataCatalogEntry.lastNavigatorPromise.reject();
+      deferred.reject();
     }
-    return dataCatalogEntry.lastNavigatorPromise.promise();
+    dataCatalogEntry.lastNavigatorPromise = deferred.promise();
+    return dataCatalogEntry.lastNavigatorPromise;
   };
 
   function DataCatalogEntry(dataCatalog, options) {
@@ -187,7 +191,7 @@ var DataCatalog = (function () {
               description: comment
             }
           }).done(function () {
-            reloadNavigatorMeta(self);
+            reloadNavigatorMeta(self, true);
             self.getComment().done(deferred.resolve);
           }).fail(deferred.reject);
         }
