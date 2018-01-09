@@ -2527,6 +2527,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       return _analyse;
     };
 
+    self.canSave = function () {
+      return self.collection.id();
+    };
+
     self.save = function () {
       $.post("/dashboard/save", {
         collection: ko.mapping.toJSON(self.collection),
@@ -2537,9 +2541,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           if (! self.collection.id()) {
             huePubSub.publish('assist.document.refresh');
           }
+          var oldId  = self.collection.id();
           self.collection.id(data.id);
           $(document).trigger("info", data.message);
-          if (window.location.search.indexOf("collection") == -1) {
+          if (oldId !== data.id) {
             hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/?collection=' + data.id);
           }
         }
@@ -2549,6 +2554,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
+    };
+
+    self.saveAs = function() {
+      self.collection.id(null);
+      self.collection.uuid(UUID());
+      self.save();
     };
 
     loadSearchLayout(self, self.collectionJson.layout);

@@ -148,9 +148,18 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
         <i class="fa fa-pencil"></i>
       </a>
       % if is_owner:
-        <a class="btn pointer" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}, visible: columns().length != 0">
-          <i class="fa fa-save"></i>
-        </a>
+        <div class="btn-group" data-bind="visible: columns().length">
+          <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if (canSave()) { save() } else { $('#saveAsModalDashboard').modal('show'); } }, attr: { title: canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
+
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" data-bind="visible: canSave()"><span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="pointer" data-bind="click: function() { $('#saveAsModalDashboard').modal('show'); }">
+                <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
+              </a>
+            </li>
+          </ul>
+        </div>
       % endif
 
       <div class="dropdown pull-right margin-left-10">
@@ -2806,6 +2815,27 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
+<div id="saveAsModalDashboard" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Save dashboard as...')}</h2>
+  </div>
+
+  <div class="modal-body">
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label">${_('Name')}</label>
+        <div class="controls">
+          <input type="text" class="input-xlarge" data-bind="value: collection.label, valueUpdate:'afterkeydown'"/>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: saveAs, enable: collection.label().length"/>
+  </div>
+</div>
 
 <script type="text/html" id="nested-document-filter">
   <!-- ko if: $root.collection.supportAnalytics -->
