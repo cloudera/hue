@@ -211,7 +211,7 @@ if USE_NEW_EDITOR.get():
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
-  <script src="${ static('desktop/js/sqlMetadata.js') }"></script>
+  <script src="${ static('desktop/js/dataCatalog.js') }"></script>
   <script src="${ static('desktop/js/apiHelper.js') }"></script>
   <script src="${ static('desktop/js/clusterConfig.js') }"></script>
 

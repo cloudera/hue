@@ -53,11 +53,10 @@ var AssistDbEntry = (function () {
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
-    self.metadata = new SqlMetadata({
+    self.metadata = DataCatalog.getEntry({
       sourceType: self.sourceType,
       path: self.getHierarchy(),
-      silenceErrors: self.navigationSettings.rightAssist,
-      cachedOnly: false
+      silenceErrors: self.navigationSettings.rightAssist
     });
 
     self.filterColumnNames = ko.observable(false);

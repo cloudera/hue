@@ -14,43 +14,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SqlMetadata = (function () {
+var DataCatalog = (function () {
 
-  var reloadSourceMeta = function (sqlMetadata, refreshCache) {
-    sqlMetadata.lastSourcePromise = $.Deferred();
+
+  function DataCatalog(sourceType) {
+    var self = this;
+    self.sourceType = sourceType;
+
+  }
+
+  DataCatalog.prototype.getEntry = function (options) {
+    var self = this;
+    return new DataCatalogEntry(self, options);
+  };
+
+  var reloadSourceMeta = function (dataCatalogEntry, refreshCache) {
+    dataCatalogEntry.lastSourcePromise = $.Deferred();
     ApiHelper.getInstance().fetchSourceMetadata({
-      sourceType: sqlMetadata.sourceType,
-      path: sqlMetadata.path,
-      silenceErrors: sqlMetadata.silenceErrors,
-      cachedOnly: sqlMetadata.cachedOnly,
+      sourceType: dataCatalogEntry.dataCatalog.sourceType,
+      path: dataCatalogEntry.path,
+      silenceErrors: dataCatalogEntry.silenceErrors,
+      cachedOnly: dataCatalogEntry.cachedOnly,
       refreshCache: refreshCache
     }).done(function (data) {
-      sqlMetadata.lastSourcePromise.resolve(data);
+      dataCatalogEntry.lastSourcePromise.resolve(data);
     }).fail(function (message) {
-      sqlMetadata.lastSourcePromise.reject(message);
+      dataCatalogEntry.lastSourcePromise.reject(message);
     });
-    return sqlMetadata.lastSourcePromise.promise();
+    return dataCatalogEntry.lastSourcePromise.promise();
   };
 
-  var reloadNavigatorMeta = function (sqlMetadata) {
-    sqlMetadata.lastNavigatorPromise = $.Deferred();
+  var reloadNavigatorMeta = function (dataCatalogEntry) {
+    dataCatalogEntry.lastNavigatorPromise = $.Deferred();
     if (HAS_NAVIGATOR) {
       ApiHelper.getInstance().fetchNavigatorMetadata({
-        path: sqlMetadata.path,
-        silenceErrors: sqlMetadata.silenceErrors,
+        path: dataCatalogEntry.path,
+        silenceErrors: dataCatalogEntry.silenceErrors,
       }).done(function (data) {
-        sqlMetadata.lastNavigatorPromise.resolve(data);
-      }).fail(sqlMetadata.lastNavigatorPromise.reject);
+        dataCatalogEntry.lastNavigatorPromise.resolve(data);
+      }).fail(dataCatalogEntry.lastNavigatorPromise.reject);
     } else {
-      sqlMetadata.lastNavigatorPromise.reject();
+      dataCatalogEntry.lastNavigatorPromise.reject();
     }
-    return sqlMetadata.lastNavigatorPromise.promise();
+    return dataCatalogEntry.lastNavigatorPromise.promise();
   };
 
-  function SqlMetadata (options) {
+  function DataCatalogEntry(dataCatalog, options) {
     var self = this;
 
-    self.sourceType = options.sourceType;
+    self.dataCatalog = dataCatalog;
     self.path = typeof options.path === 'string' && options.path ? options.path.split('.') : options.path || [];
 
     self.partialSourceMeta = options.partialSourceMeta;
@@ -64,7 +76,7 @@ var SqlMetadata = (function () {
     self.cachedOnly = options.cachedOnly;
   }
 
-  SqlMetadata.prototype.getChildren = function () {
+  DataCatalogEntry.prototype.getChildren = function () {
     var self = this;
     var deferred = $.Deferred();
     if (self.children) {
@@ -78,8 +90,7 @@ var SqlMetadata = (function () {
           var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields;
           if (entities) {
             entities.forEach(function (entity) {
-              self.children.push(new SqlMetadata({
-                sourceType: self.sourceType,
+              self.children.push(new DataCatalogEntry(self.dataCatalog, {
                 path: self.path.concat(entity.name || entity),
                 silenceErrors: self.silenceErrors,
                 cachedOnly: self.cachedOnly,
@@ -89,8 +100,7 @@ var SqlMetadata = (function () {
           } else {
             (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
               if (sourceMeta[path]) {
-                self.children.push(new SqlMetadata({
-                  sourceType: self.sourceType,
+                self.children.push(new DataCatalogEntry(self.dataCatalog, {
                   path: self.path.concat(path),
                   silenceErrors: self.silenceErrors,
                   cachedOnly: self.cachedOnly,
@@ -106,7 +116,7 @@ var SqlMetadata = (function () {
     return deferred.promise();
   };
 
-  SqlMetadata.prototype.loadNavigatorMetaForChildren = function () {
+  DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function () {
     var self = this;
     self.getChildren().done(function (children) {
       var query;
@@ -139,7 +149,7 @@ var SqlMetadata = (function () {
     })
   };
 
-  SqlMetadata.prototype.getComment = function () {
+  DataCatalogEntry.prototype.getComment = function () {
     var self = this;
     var deferred = $.Deferred();
 
@@ -164,7 +174,7 @@ var SqlMetadata = (function () {
     return deferred.promise();
   };
 
-  SqlMetadata.prototype.setComment = function (comment) {
+  DataCatalogEntry.prototype.setComment = function (comment) {
     var self = this;
     var deferred = $.Deferred();
 
@@ -184,7 +194,7 @@ var SqlMetadata = (function () {
       }).fail(deferred.reject);
     } else {
       ApiHelper.getInstance().updateSourceMetadata({
-        sourceType: self.sourceType,
+        sourceType: self.dataCatalog.sourceType,
         path: self.path,
         properties: {
           comment: comment
@@ -198,15 +208,27 @@ var SqlMetadata = (function () {
     return deferred.promise();
   };
 
-  SqlMetadata.prototype.getSourceMeta = function () {
+  DataCatalogEntry.prototype.getSourceMeta = function () {
     var self = this;
     return self.lastSourcePromise || reloadSourceMeta(self)
   };
 
-  SqlMetadata.prototype.getNavigatorMeta = function () {
+  DataCatalogEntry.prototype.getNavigatorMeta = function () {
     var self = this;
     return self.lastNavigatorPromise || reloadNavigatorMeta(self)
   };
 
-  return SqlMetadata;
+
+  var instances = {};
+
+  var getCatalog = function (sourceType) {
+    return instances[sourceType] || (instances[sourceType] = new DataCatalog(sourceType));
+  };
+
+  return {
+    getCatalog: getCatalog,
+    getEntry: function (options) {
+      return getCatalog(options.sourceType).getEntry(options);
+    }
+  };
 })();
