@@ -1666,6 +1666,7 @@ var ApiHelper = (function () {
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.noCache]
+   * @param {boolean} [options.refreshCache] - Default false
    *
    * @param {boolean} [options.isView] - Default false
    * @param {string[]} options.path
@@ -1687,6 +1688,7 @@ var ApiHelper = (function () {
       url: url,
       sourceType: 'nav',
       noCache: options.noCache,
+      refreshCache: options.refreshCache,
       silenceErrors: options.silenceErrors,
       successCallback: promise.resolve,
       errorCallback: self.assistErrorCallback({
