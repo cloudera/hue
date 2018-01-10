@@ -1057,12 +1057,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $(this).attr('href', link);
         });
 
-        % if IS_EMBEDDED.get():
-        page.base(window.location.pathname + '');
-        page.baseHash(window.location.hash.replace(/\/*$/, '').substring(1));
-        % else:
-        page.base('/hue');
-        % endif
+        page.base(typeof HUE_EMBEDDED_BASE_URL !== 'undefined' ? HUE_EMBEDDED_BASE_URL : '/hue');
 
         self.lastContext = null;
 
@@ -1277,15 +1272,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         huePubSub.subscribe('open.link', function (href) {
           if (href) {
-            % if not IS_EMBEDDED.get():
-              if (href.startsWith('/') && !href.startsWith('/hue')){
-                page('/hue' + href);
-              } else {
-                page(href);
-              }
-            % else:
+            var prefix = typeof HUE_EMBEDDED_BASE_URL !== 'undefined' ? HUE_EMBEDDED_BASE_URL : '/hue';
+            if (href.startsWith('/') && !href.startsWith(prefix)){
+              page(prefix + href);
+            } else {
               page(href);
-            % endif
+            }
           } else {
             console.warn('Received an open.link without href.')
           }
