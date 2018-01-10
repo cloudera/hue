@@ -64,7 +64,7 @@ class QueryApi(Api):
         'apiStatus': self._api_status(job['state']),
         'type': job['stmt_type'],
         'user': job['effective_user'],
-        'queue': job['resource_pool'],
+        'queue': job.get('resource_pool'),
         'progress': job['progress'],
         'canWrite': job in jobs['in_flight_queries'],
         'duration': self._time_in_ms_groups(re.search(r"\s*(([\d.]*)([a-z]*))(([\d.]*)([a-z]*))?(([\d.]*)([a-z]*))?", job['duration'], re.MULTILINE).groups()),
