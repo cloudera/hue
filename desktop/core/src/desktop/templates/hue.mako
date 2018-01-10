@@ -165,7 +165,8 @@ ${ hueIcons.symbols() }
       ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
     </div>
   % endif
-  <nav class="navbar ${ '' if IS_EMBEDDED.get() else 'navbar-default' }">
+  % if not IS_EMBEDDED.get():
+  <nav class="navbar navbar-default">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
         % if not IS_EMBEDDED.get():
@@ -327,6 +328,8 @@ ${ hueIcons.symbols() }
     </ul>
     <div id="mini_jobbrowser"></div>
   </div>
+
+  % endif
 
   <div class="content-wrapper">
 
@@ -1555,7 +1558,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       }
 
       var topNavViewModel = new TopNavViewModel(onePageViewModel);
+      % if not IS_EMBEDDED.get():
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
+      % endif
 
       return topNavViewModel;
     })(onePageViewModel);
