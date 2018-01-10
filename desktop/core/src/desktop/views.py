@@ -26,6 +26,7 @@ import tempfile
 import time
 import traceback
 import zipfile
+import validate
 
 from django.conf import settings
 from django.shortcuts import render_to_response
@@ -35,6 +36,7 @@ from django.core.servers.basehttp import FileWrapper
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
+from configobj import ConfigObj, get_extra_values, ConfigObjError
 
 import django.views.debug
 
@@ -49,7 +51,8 @@ from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _ge
 
 from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, get_clusters, DISABLE_HUE_3
 from desktop.lib import django_mako
-from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
+from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig, _configs_from_dir
+from desktop.lib.config_spec_dump import ConfigSpec
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
@@ -57,6 +60,7 @@ from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences, Cluster
+
 
 
 LOG = logging.getLogger(__name__)
@@ -597,8 +601,79 @@ def _get_config_errors(request, cache=True):
           error_list.append(error)
       except Exception, ex:
         LOG.exception("Error in config validation by %s: %s" % (module.nice_name, ex))
+
+    validate_by_spec(error_list)
+
     _CONFIG_ERROR_LIST = error_list
+
+  if _CONFIG_ERROR_LIST:
+    LOG.warn("Errors in config : %s" % _CONFIG_ERROR_LIST)
+
   return _CONFIG_ERROR_LIST
+
+def validate_by_spec(error_list):
+  try:
+    # Generate the spec file
+    configspec = generate_configspec()
+    # Load the .ini files
+    conf = load_confs(configspec.name)
+    # Validate after merging all the confs
+    collect_validation_messages(conf, error_list)
+  finally:
+    os.remove(configspec.name)
+
+
+def load_confs(configspecpath):
+  conf_source = _configs_from_dir(get_desktop_root("conf"))
+  conf = ConfigObj(configspec=configspecpath)
+  for in_conf in conf_source:
+    conf.merge(in_conf)
+  return conf
+
+
+def generate_configspec():
+  configspec = tempfile.NamedTemporaryFile(delete=False)
+  cs = ConfigSpec(configspec)
+  cs.generate()
+  return configspec
+
+
+def collect_validation_messages(conf, error_list):
+  validator = validate.Validator()
+  conf.validate(validator, preserve_errors=True)
+  message = []
+  for sections, name in get_extra_values(conf):
+    the_section = conf
+    hierarchy_sections_string = ''
+    try:
+      parent = conf
+      for section in sections:
+        the_section = parent[section]
+        hierarchy_sections_string += "[" * the_section.depth + section + "]" * the_section.depth + " "
+        parent = the_section
+    except KeyError, ex:
+      LOG.warn("Section %s not found: %s" % (section, str(ex)))
+
+    the_value = ''
+    try:
+      # the_value may be a section or a value
+      the_value = the_section[name]
+    except KeyError, ex:
+      LOG.warn("Error in accessing Section or Value %s: %s" % (name, str(ex)))
+
+    section_or_value = 'keyvalue'
+    if isinstance(the_value, dict):
+      # Sections are subclasses of dict
+      section_or_value = 'section'
+
+    section_string = hierarchy_sections_string or "top level"
+    message.append('Extra %s, %s in the section: %s' % (section_or_value, name, section_string))
+  if message:
+    error = {
+      'name': 'Desktop',
+      'message': ', '.join(message),
+    }
+    error_list.append(error)
 
 
 def check_config(request):
