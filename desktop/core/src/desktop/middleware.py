@@ -35,7 +35,7 @@ from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
 import django.db
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponseForbidden
 from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
@@ -44,6 +44,7 @@ import django.views.static
 
 import desktop.views
 import desktop.conf
+from desktop.conf import IS_EMBEDDED
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
 from desktop.lib.django_util import render, render_json
@@ -330,7 +331,10 @@ class LoginAndPermissionMiddleware(object):
       response[MIDDLEWARE_HEADER] = 'LOGIN_REQUIRED'
       return response
     else:
-      return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
+      if IS_EMBEDDED.get():
+        return HttpResponseForbidden()
+      else:
+        return HttpResponseRedirect("%s?%s=%s" % (settings.LOGIN_URL, REDIRECT_FIELD_NAME, urlquote(request.get_full_path())))
 
   def process_response(self, request, response):
     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
