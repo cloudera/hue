@@ -692,8 +692,17 @@ class SolrApi(object):
       params = self._get_params() + (
           ('wt', 'json'),
       )
-      response = self._root.get('%(core)s/schema/fields' % {'core': core}, params=params)
-      return self._get_json(response)
+      response = self._root.get('%(core)s/schema' % {'core': core}, params=params)
+      response_json = self._get_json(response)
+      fields = response_json['schema']['fields']
+      if response_json['schema'].get('uniqueKey'):
+        for field in fields:
+          if field['name'] == response_json['schema']['uniqueKey']:
+            field['primary_key'] = 'true'
+      return {
+        'fields': fields,
+        'responseHeader': response_json['responseHeader']
+      }
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
