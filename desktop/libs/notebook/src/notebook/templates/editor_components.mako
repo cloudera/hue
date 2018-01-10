@@ -159,90 +159,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <div class="navbar hue-title-bar" data-bind="visible: ! $root.isPresentationMode() && ! $root.isResultFullScreenMode()">
   <div class="navbar-inner">
     <div class="container-fluid">
-      <div class="pull-right margin-right-10">
-      % if ENABLE_PRESENTATION.get():
-        <!-- ko if: $root.isPresentationModeEnabled -->
-        <div class="btn-group">
-          <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
-            css: {'btn-inverse': $root.isPresentationMode(), 'btn': true}">
-            <i class="fa fa-line-chart"></i>
-          </a>
-        </div>
-        <!-- /ko -->
-      % endif
 
-      % if IS_EMBEDDED.get():
-        <div class="btn-group">
-          <a class="btn" rel="tooltip" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }"><i class="fa fa-fw fa-file-o"></i></a>
-        </div>
-        <div class="btn-group">
-          <a class="btn" rel="tooltip" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }"><i class="fa fa-fw fa-cogs"></i></a>
-        </div>
-      %else:
-        <div class="btn-group">
-          <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
-
-          <!-- ko if: $root.canSave -->
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li>
-              <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
-                <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
-              </a>
-            </li>
-          </ul>
-          <!-- /ko -->
-        </div>
-
-        <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
-
-        <div class="dropdown pull-right margin-left-10">
-          <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
-            <i class="fa fa-fw fa-ellipsis-v"></i>
-          </a>
-          <ul class="dropdown-menu">
-            <li>
-            <!-- ko if: editorMode -->
-              <a href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
-                <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
-              </a>
-            <!-- /ko -->
-            <!-- ko ifnot: editorMode -->
-              <a href="javascript:void(0)" data-bind="click: newNotebook">
-                <i class="fa fa-fw fa-file-o"></i> ${ _('New Notebook') }
-              </a>
-            <!-- /ko -->
-            </li>
-            <li>
-              <!-- ko if: IS_HUE_4 -->
-              <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
-                <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
-              </a>
-              <!-- /ko -->
-              <!-- ko ifnot: IS_HUE_4 -->
-              <a href="javascript:void(0)" class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType()">
-                <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
-              </a>
-              <!-- /ko -->
-            </li>
-            <li class="divider"></li>
-            <!-- ko if: $root.canSave -->
-            <li>
-              <a class="share-link" data-bind="click: prepareShareModal,
-                css: {'isShared': isShared()}">
-                <i class="fa fa-fw fa-users"></i> ${ _('Share') }
-              </a>
-            </li>
-            <!-- /ko -->
-            <li>
-              <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
-                <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
-              </a>
-            </li>
-          </ul>
-        </div>
-      % endif
-      </div>
+      <!-- ko template: { name: 'notebook-menu-buttons-${ suffix }' } --><!-- /ko -->
 
       <div class="nav-collapse">
         <ul class="nav editor-nav">
@@ -327,6 +245,101 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   </div>
 </div>
 
+
+<script type="text/html" id="notebook-menu-buttons-${ suffix }">
+  <div class="pull-right margin-right-10">
+  % if ENABLE_PRESENTATION.get():
+    <!-- ko if: $root.isPresentationModeEnabled -->
+    <div class="btn-group">
+      <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
+        css: {'btn-inverse': $root.isPresentationMode(), 'btn': true}">
+        <i class="fa fa-line-chart"></i>
+      </a>
+    </div>
+    <!-- /ko -->
+  % endif
+
+    % if IS_EMBEDDED.get():
+      <div class="btn-group">
+        <a class="btn" rel="tooltip" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+          <i class="fa fa-fw fa-file-o"></i>
+        </a>
+      </div>
+      <div class="btn-group">
+        <a class="btn" rel="tooltip" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+          <i class="fa fa-fw fa-cogs"></i>
+        </a>
+      </div>
+    % else:
+      <div class="btn-group">
+        <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }">
+          <i class="fa fa-save"></i>
+        </a>
+
+        <!-- ko if: $root.canSave -->
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li>
+            <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
+              <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
+            </a>
+          </li>
+        </ul>
+        <!-- /ko -->
+      </div>
+
+      <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
+
+      <div class="dropdown pull-right margin-left-10">
+        <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
+          <i class="fa fa-fw fa-ellipsis-v"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+          <!-- ko if: editorMode -->
+            <a href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
+              <i class="fa fa-fw fa-file-o"></i> ${ _('New') }
+            </a>
+          <!-- /ko -->
+          <!-- ko ifnot: editorMode -->
+            <a href="javascript:void(0)" data-bind="click: newNotebook">
+              <i class="fa fa-fw fa-file-o"></i> ${ _('New Notebook') }
+            </a>
+          <!-- /ko -->
+          </li>
+          <li>
+            <!-- ko if: IS_HUE_4 -->
+            <a href="javascript:void(0)" data-bind="publish: { 'assist.show.documents': editorMode() ? 'query-' + editorType() : editorType() }">
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
+            </a>
+            <!-- /ko -->
+            <!-- ko ifnot: IS_HUE_4 -->
+            <a href="javascript:void(0)" class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType()">
+              <svg class="hi hi-fw hi-bigger"><use xlink:href="#hi-documents"></use></svg> <span data-bind="text: editorMode() ? '${ _ko('Queries') }' : '${ _ko('Notebooks') }'"></span>
+            </a>
+            <!-- /ko -->
+          </li>
+          <li class="divider"></li>
+          <!-- ko if: $root.canSave -->
+          <li>
+            <a class="share-link" data-bind="click: prepareShareModal,
+              css: {'isShared': isShared()}">
+              <i class="fa fa-fw fa-users"></i> ${ _('Share') }
+            </a>
+          </li>
+          <!-- /ko -->
+          <li>
+            <a class="pointer" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }">
+              <i class="fa fa-fw fa-cogs"></i> ${ _('Session') }
+            </a>
+          </li>
+        </ul>
+      </div>
+    % endif
+  </div>
+</script>
+
+
 <!-- ko if: $root.isResultFullScreenMode() -->
 <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
   <i class="fa fa-times fa-fw"></i>
@@ -346,6 +359,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
       <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
       <div class="clearfix"></div>
+      <!-- ko template: { name: 'notebook-menu-buttons-${ suffix }' } --><!-- /ko -->
       <!-- /ko -->
 
       <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
@@ -3283,11 +3297,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           $(".jHueNotify").remove();
           isAssistAvailable = viewModel.assistAvailable();
           wasLeftPanelVisible = viewModel.isLeftPanelVisible();
+          console.log(viewModel.isPresentationMode());
           wasRightPanelVisible = viewModel.isRightPanelVisible();
-          huePubSub.publish('side.panels.hide', true);
+          //huePubSub.publish('side.panels.hide', true);
           viewModel.assistWithoutStorage(true);
           viewModel.assistAvailable(false);
-          viewModel.isLeftPanelVisible(false);
+          viewModel.isLeftPanelVisible(true);
           viewModel.isRightPanelVisible(false);
           window.setTimeout(function(){
             viewModel.assistWithoutStorage(false);
