@@ -36,6 +36,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 
+from configobj import ConfigObj
+
 from settings import HUE_DESKTOP_VERSION
 
 from beeswax.conf import HIVE_SERVER_HOST
@@ -60,7 +62,7 @@ from desktop.models import Directory, Document, Document2, get_data_link, _versi
   ClusterConfig
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
-from desktop.views import check_config, home
+from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages
 from desktop.auth.backend import rewrite_user
 from dashboard.conf import HAS_SQL_ENABLED
 
@@ -1388,3 +1390,53 @@ def test_get_dn():
   assert_equal(['.hue.com'], desktop.conf.get_dn('sql.hue.com'))
   assert_equal(['.hue.com'], desktop.conf.get_dn('finance.sql.hue.com'))
   assert_equal(['.hue.com'], desktop.conf.get_dn('bank.finance.sql.hue.com'))
+
+def test_collect_validation_messages_default():
+  try:
+    # Generate the spec file
+    configspec = generate_configspec()
+    # Load the .ini files
+    conf = load_confs(configspec.name)
+    # This is for the hue.ini file only
+    error_list = []
+    collect_validation_messages(conf, error_list)
+    assert_equal(len(error_list), 0)
+  finally:
+    os.remove(configspec.name)
+
+def test_collect_validation_messages_extras():
+  try:
+    # Generate the spec file
+    configspec = generate_configspec()
+    # Load the .ini files
+    conf = load_confs(configspec.name)
+
+    test_conf = ConfigObj()
+    test_conf['extrasection'] = {
+      'key1': 'value1',
+      'key2': 'value1'
+    }
+    extrasubsection = {
+      'key1': 'value1',
+      'key2': 'value1'
+    }
+    # Test with extrasections as well as existing subsection, keyvalues in existing section [desktop]
+    test_conf['desktop'] = {
+      'extrasubsection': extrasubsection,
+      'extrakey': 'value1',
+      'auth': {
+        'ignore_username_case': 'true',
+        'extrasubsubsection': {
+          'extrakey': 'value1'
+        }
+      }
+    }
+    conf.merge(test_conf)
+    error_list = []
+    collect_validation_messages(conf, error_list)
+  finally:
+    os.remove(configspec.name)
+  assert_equal(len(error_list), 1)
+  assert_equal(u'Extra section, extrasection in the section: top level, Extra keyvalue, extrakey in the section: [desktop] , Extra section, extrasubsection in the section: [desktop] , Extra section, extrasubsubsection in the section: [desktop] [[auth]] ', error_list[0]['message'])
+
+
