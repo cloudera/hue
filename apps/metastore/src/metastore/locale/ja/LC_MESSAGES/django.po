@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2017-12-04 10:45-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -21,104 +21,104 @@ msgstr ""
 msgid "Flag to turn on the new version of the create table wizard."
 msgstr "テーブル作成ウィザードの新しいバージョンをオンにするフラグです。"
 
-#: src/metastore/forms.py:46
+#: src/metastore/forms.py:45
 msgid "Path"
 msgstr "パス"
 
-#: src/metastore/forms.py:47
+#: src/metastore/forms.py:46
 msgid "Overwrite?"
 msgstr "上書きしますか。"
 
-#: src/metastore/forms.py:61
+#: src/metastore/forms.py:60
 #, python-format
 msgid "%(column_name)s (partition key with type %(column_type)s)"
 msgstr "%(column_name)s（%(column_type)s タイプのパーティションキー）"
 
-#: src/metastore/views.py:58
+#: src/metastore/views.py:59
 msgid "You are not allowed to modify the metastore."
 msgstr "メタストアの変更は許可されません。"
 
-#: src/metastore/views.py:58
+#: src/metastore/views.py:59
 msgid "You have must have metastore:write permissions"
 msgstr "metastore:write パーミッションが必要です"
 
-#: src/metastore/views.py:107
+#: src/metastore/views.py:108
 #, python-format
 msgid "Drop database %s"
 msgstr "データベース %s をドロップ"
 
-#: src/metastore/views.py:124
+#: src/metastore/views.py:125
 #, python-format
 msgid "Failed to remove %(databases)s.  Error: %(error)s"
 msgstr "%(databases)s を削除できませんでした。エラー：%(error)s"
 
-#: src/metastore/views.py:125 src/metastore/views.py:274
-#: src/metastore/views.py:427 src/metastore/views.py:650
+#: src/metastore/views.py:126 src/metastore/views.py:275
+#: src/metastore/views.py:428 src/metastore/views.py:650
 msgid "DB Error"
 msgstr "DB エラー"
 
-#: src/metastore/views.py:127
+#: src/metastore/views.py:128
 msgid "Do you really want to delete the database(s)?"
 msgstr "データベースを削除してもよろしいですか?"
 
-#: src/metastore/views.py:143
+#: src/metastore/views.py:144
 msgid "Alter database requires a properties value of key-value pairs."
 msgstr "データベースを変更するには、キーと値のペアのプロパティの値が必要です。"
 
-#: src/metastore/views.py:154
+#: src/metastore/views.py:155
 #, python-format
 msgid "Failed to alter database `%s`: %s"
 msgstr "データベース `%s` の変更に失敗しました：%s"
 
-#: src/metastore/views.py:171
+#: src/metastore/views.py:172
 #, python-format
 msgid "Cannot get metadata for database %s: %s"
 msgstr "データベース %s：%s のメタデータを取得できません"
 
-#: src/metastore/views.py:187
+#: src/metastore/views.py:188
 #, python-format
 msgid "Cannot get queries related to table %s.%s: %s"
 msgstr "テーブル %s.%s: %s に関連するクエリを取得できません"
 
-#: src/metastore/views.py:220
+#: src/metastore/views.py:221
 #, python-format
 msgid "Failed to retrieve tables for database: %s"
 msgstr "データベース %s のテーブルの取得に失敗しました"
 
-#: src/metastore/views.py:350
+#: src/metastore/views.py:351
 #, python-format
 msgid "Failed to alter table `%s`.`%s`: %s"
 msgstr "テーブル `%s`.`%s`: %s の変更に失敗しました"
 
-#: src/metastore/views.py:367
+#: src/metastore/views.py:368
 msgid "alter_column requires a column parameter"
 msgstr "alter_column には列パラメーターが必要です"
 
-#: src/metastore/views.py:385
+#: src/metastore/views.py:386
 #, python-format
 msgid "Column `%s`.`%s` `%s` not found"
 msgstr "列 `%s`.`%s` `%s` が見つかりませんでした"
 
-#: src/metastore/views.py:388
+#: src/metastore/views.py:389
 #, python-format
 msgid "Failed to alter column `%s`.`%s` `%s`: %s"
 msgstr "列 `%s`.`%s` `%s`: %s の変更に失敗しました"
 
-#: src/metastore/views.py:408
+#: src/metastore/views.py:409
 #, python-format
 msgid "Drop table %s"
 msgstr "テーブル %s をドロップ"
 
-#: src/metastore/views.py:426
+#: src/metastore/views.py:427
 #, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
 msgstr "%(tables)s を削除できませんでした。エラー：%(error)s"
 
-#: src/metastore/views.py:429
+#: src/metastore/views.py:430
 msgid "Do you really want to delete the table(s)?"
 msgstr "テーブルを削除してもよろしいですか?"
 
-#: src/metastore/views.py:444
+#: src/metastore/views.py:445
 msgid "Cannot read table"
 msgstr "テーブルを読み取ることができません"
 
@@ -176,30 +176,30 @@ msgid "Databases"
 msgstr "データベース"
 
 #: src/metastore/templates/confirm.mako:24
-#: src/metastore/templates/metastore.mako:374
-#: src/metastore/templates/metastore.mako:559
-#: src/metastore/templates/metastore.mako:788
-#: src/metastore/templates/metastore.mako:1208
+#: src/metastore/templates/metastore.mako:383
+#: src/metastore/templates/metastore.mako:568
+#: src/metastore/templates/metastore.mako:799
+#: src/metastore/templates/metastore.mako:1221
 #: src/metastore/templates/popups/load_data.mako:25
 msgid "Close"
 msgstr "閉じる"
 
 #: src/metastore/templates/confirm.mako:25
-#: src/metastore/templates/metastore.mako:789
+#: src/metastore/templates/metastore.mako:800
 msgid "Confirm action"
 msgstr "アクションを確認"
 
 #: src/metastore/templates/confirm.mako:33
-#: src/metastore/templates/metastore.mako:390
-#: src/metastore/templates/metastore.mako:579
-#: src/metastore/templates/metastore.mako:793
+#: src/metastore/templates/metastore.mako:399
+#: src/metastore/templates/metastore.mako:588
+#: src/metastore/templates/metastore.mako:804
 msgid "Yes"
 msgstr "はい"
 
 #: src/metastore/templates/confirm.mako:34
-#: src/metastore/templates/metastore.mako:389
-#: src/metastore/templates/metastore.mako:578
-#: src/metastore/templates/metastore.mako:1216
+#: src/metastore/templates/metastore.mako:398
+#: src/metastore/templates/metastore.mako:587
+#: src/metastore/templates/metastore.mako:1229
 msgid "No"
 msgstr "いいえ"
 
@@ -212,32 +212,32 @@ msgid "Edit path"
 msgstr "パスを編集"
 
 #: src/metastore/templates/metastore.mako:125
-#: src/metastore/templates/metastore.mako:179
+#: src/metastore/templates/metastore.mako:181
 msgid "Name"
 msgstr "名前"
 
 #: src/metastore/templates/metastore.mako:126
-#: src/metastore/templates/metastore.mako:180
-#: src/metastore/templates/metastore.mako:287
-#: src/metastore/templates/metastore.mako:494
+#: src/metastore/templates/metastore.mako:182
+#: src/metastore/templates/metastore.mako:289
+#: src/metastore/templates/metastore.mako:503
 msgid "Type"
 msgstr "タイプ"
 
 #: src/metastore/templates/metastore.mako:128
-#: src/metastore/templates/metastore.mako:491
-#: src/metastore/templates/metastore.mako:829
-#: src/metastore/templates/metastore.mako:1051
+#: src/metastore/templates/metastore.mako:500
+#: src/metastore/templates/metastore.mako:840
+#: src/metastore/templates/metastore.mako:1062
 msgid "Popularity"
 msgstr "使用率"
 
 #: src/metastore/templates/metastore.mako:130
-#: src/metastore/templates/metastore.mako:432
-#: src/metastore/templates/metastore.mako:489
+#: src/metastore/templates/metastore.mako:441
+#: src/metastore/templates/metastore.mako:498
 msgid "Comment"
 msgstr "コメント"
 
 #: src/metastore/templates/metastore.mako:136
-#: src/metastore/templates/metastore.mako:502
+#: src/metastore/templates/metastore.mako:511
 msgid "Show details"
 msgstr "詳細を表示"
 
@@ -245,476 +245,479 @@ msgstr "詳細を表示"
 msgid "Scroll to the column"
 msgstr "列までスクロール"
 
-#: src/metastore/templates/metastore.mako:159
+#: src/metastore/templates/metastore.mako:157
 msgid "Edit the comment"
 msgstr "コメントを編集"
 
-#: src/metastore/templates/metastore.mako:161
+#: src/metastore/templates/metastore.mako:159
 msgid "Add a comment..."
 msgstr "コメントを追加..."
 
-#: src/metastore/templates/metastore.mako:209
+#: src/metastore/templates/metastore.mako:211
 msgid "Values"
 msgstr "値"
 
-#: src/metastore/templates/metastore.mako:210
+#: src/metastore/templates/metastore.mako:212
 msgid "Spec"
 msgstr "仕様"
 
-#: src/metastore/templates/metastore.mako:211
+#: src/metastore/templates/metastore.mako:213
 msgid "Browse"
 msgstr "参照"
 
-#: src/metastore/templates/metastore.mako:225
+#: src/metastore/templates/metastore.mako:227
 msgid "Query partition data"
 msgstr "クエリパーティションデータ"
 
-#: src/metastore/templates/metastore.mako:236
-#: src/metastore/templates/metastore.mako:241
+#: src/metastore/templates/metastore.mako:238
+#: src/metastore/templates/metastore.mako:243
 msgid "Browse partition files"
 msgstr "パーティションファイルを参照"
 
-#: src/metastore/templates/metastore.mako:237
-#: src/metastore/templates/metastore.mako:241
+#: src/metastore/templates/metastore.mako:239
+#: src/metastore/templates/metastore.mako:243
 msgid "Files"
 msgstr "ファイル"
 
-#: src/metastore/templates/metastore.mako:275
+#: src/metastore/templates/metastore.mako:277
 msgid "Did you know?"
 msgstr "便利な使い方"
 
-#: src/metastore/templates/metastore.mako:277
+#: src/metastore/templates/metastore.mako:279
 msgid ""
 "If the sample contains a large number of columns, click a row to select a"
 " column to jump to"
 msgstr "サンプルに多くの列が含まれている場合、行をクリックしてジャンプ先の列を選択します"
 
-#: src/metastore/templates/metastore.mako:285
-#: src/metastore/templates/metastore.mako:431
+#: src/metastore/templates/metastore.mako:287
+#: src/metastore/templates/metastore.mako:440
 msgid "Properties"
 msgstr "プロパティ"
 
-#: src/metastore/templates/metastore.mako:289
-#: src/metastore/templates/metastore.mako:474
-#: src/metastore/templates/metastore.mako:528
+#: src/metastore/templates/metastore.mako:291
+#: src/metastore/templates/metastore.mako:483
+#: src/metastore/templates/metastore.mako:537
 msgid "View"
 msgstr "表示"
 
-#: src/metastore/templates/metastore.mako:292
-#: src/metastore/templates/metastore.mako:525
+#: src/metastore/templates/metastore.mako:294
+#: src/metastore/templates/metastore.mako:534
 msgid "Table"
 msgstr "テーブル"
 
-#: src/metastore/templates/metastore.mako:295
-#: src/metastore/templates/metastore.mako:439
+#: src/metastore/templates/metastore.mako:297
+#: src/metastore/templates/metastore.mako:448
 msgid "Owner"
 msgstr "所有者"
 
-#: src/metastore/templates/metastore.mako:298
+#: src/metastore/templates/metastore.mako:300
 msgid "Created"
 msgstr "作成済み"
 
-#: src/metastore/templates/metastore.mako:299
+#: src/metastore/templates/metastore.mako:301
 msgid "Format"
 msgstr "フォーマット"
 
-#: src/metastore/templates/metastore.mako:302
+#: src/metastore/templates/metastore.mako:304
 msgid "Managed"
 msgstr "管理"
 
-#: src/metastore/templates/metastore.mako:303
+#: src/metastore/templates/metastore.mako:305
 msgid "External"
 msgstr "外部"
 
-#: src/metastore/templates/metastore.mako:312
+#: src/metastore/templates/metastore.mako:314
 msgid "Stats"
 msgstr "統計"
 
-#: src/metastore/templates/metastore.mako:322
+#: src/metastore/templates/metastore.mako:324
 msgid "The column stats for this table are not accurate"
 msgstr "このテーブルの列の統計は正確ではありません"
 
-#: src/metastore/templates/metastore.mako:329
+#: src/metastore/templates/metastore.mako:331
 msgid "Stored in"
 msgstr "保存場所"
 
-#: src/metastore/templates/metastore.mako:332
+#: src/metastore/templates/metastore.mako:334
 msgid "Open data location"
 msgstr "データ保存場所を開く"
 
-#: src/metastore/templates/metastore.mako:332
-#: src/metastore/templates/metastore.mako:443
+#: src/metastore/templates/metastore.mako:334
+#: src/metastore/templates/metastore.mako:452
 msgid "Location"
 msgstr "場所"
 
-#: src/metastore/templates/metastore.mako:337
-msgid "Last modified by"
-msgstr "前回の変更者"
+#: src/metastore/templates/metastore.mako:339
+msgid "Last data update"
+msgstr "前回のデータ更新"
 
-#: src/metastore/templates/metastore.mako:340
-msgid "Last modified time"
-msgstr "前回の変更時間"
+#: src/metastore/templates/metastore.mako:344
+msgid "Last DDL modified time"
+msgstr "前回の DDL 変更時間"
 
-#: src/metastore/templates/metastore.mako:343
+#: src/metastore/templates/metastore.mako:347
+msgid "Last DDL modified by"
+msgstr "前回の DDL 変更者"
+
+#: src/metastore/templates/metastore.mako:352
 msgid "Number of files"
 msgstr "ファイルの数"
 
-#: src/metastore/templates/metastore.mako:343
+#: src/metastore/templates/metastore.mako:352
 msgid "files"
 msgstr "ファイル"
 
-#: src/metastore/templates/metastore.mako:346
+#: src/metastore/templates/metastore.mako:355
 msgid "Number of rows"
 msgstr "行数"
 
-#: src/metastore/templates/metastore.mako:346
+#: src/metastore/templates/metastore.mako:355
 msgid "rows"
 msgstr "行"
 
-#: src/metastore/templates/metastore.mako:349
+#: src/metastore/templates/metastore.mako:358
 msgid "Total size"
 msgstr "合計サイズ"
 
-#: src/metastore/templates/metastore.mako:359
+#: src/metastore/templates/metastore.mako:368
 msgid "Search for a database..."
 msgstr "データベースを検索..."
 
-#: src/metastore/templates/metastore.mako:361
+#: src/metastore/templates/metastore.mako:370
 msgid "Drop the selected databases"
 msgstr "選択したデータベースをドロップ"
 
-#: src/metastore/templates/metastore.mako:361
-#: src/metastore/templates/metastore.mako:479
+#: src/metastore/templates/metastore.mako:370
+#: src/metastore/templates/metastore.mako:488
 msgid "Drop"
 msgstr "ドロップ"
 
-#: src/metastore/templates/metastore.mako:375
+#: src/metastore/templates/metastore.mako:384
 msgid "Do you really want to delete the following database(s)?"
 msgstr "次のデータベースを削除してもよろしいですか?"
 
-#: src/metastore/templates/metastore.mako:388
+#: src/metastore/templates/metastore.mako:397
 msgid "Warning: This will drop all tables and objects within the database."
 msgstr "警告：データベース内のすべてのテーブルとオブジェクトがドロップされます。"
 
-#: src/metastore/templates/metastore.mako:403
+#: src/metastore/templates/metastore.mako:412
 msgid "Database Name"
 msgstr "データベース名"
 
-#: src/metastore/templates/metastore.mako:417
+#: src/metastore/templates/metastore.mako:426
 msgid "No databases found"
 msgstr "データベースが見つかりません"
 
-#: src/metastore/templates/metastore.mako:437
+#: src/metastore/templates/metastore.mako:446
 msgid "No comment."
 msgstr "コメントがありません。"
 
-#: src/metastore/templates/metastore.mako:449
-#: src/metastore/templates/metastore.mako:665
+#: src/metastore/templates/metastore.mako:458
+#: src/metastore/templates/metastore.mako:676
 msgid "Tags"
 msgstr "タグ"
 
-#: src/metastore/templates/metastore.mako:459
+#: src/metastore/templates/metastore.mako:468
 msgid "Parameters"
 msgstr "パラメーター"
 
-#: src/metastore/templates/metastore.mako:471
+#: src/metastore/templates/metastore.mako:480
 msgid "Tables"
 msgstr "テーブル"
 
-#: src/metastore/templates/metastore.mako:473
+#: src/metastore/templates/metastore.mako:482
 msgid "Search for a table..."
 msgstr "テーブルを検索..."
 
-#: src/metastore/templates/metastore.mako:474
+#: src/metastore/templates/metastore.mako:483
 msgid "Browse the selected table"
 msgstr "選択されているテーブルを参照"
 
-#: src/metastore/templates/metastore.mako:475
+#: src/metastore/templates/metastore.mako:484
 msgid "Query the selected table"
 msgstr "選択したテーブルを照会"
 
-#: src/metastore/templates/metastore.mako:476
-#: src/metastore/templates/metastore.mako:831
+#: src/metastore/templates/metastore.mako:485
+#: src/metastore/templates/metastore.mako:842
 msgid "Query"
 msgstr "クエリ"
 
-#: src/metastore/templates/metastore.mako:479
+#: src/metastore/templates/metastore.mako:488
 msgid "Delete the selected tables"
 msgstr "選択したテーブルを削除"
 
-#: src/metastore/templates/metastore.mako:488
-#: src/metastore/templates/metastore.mako:1052
+#: src/metastore/templates/metastore.mako:497
+#: src/metastore/templates/metastore.mako:1063
 msgid "Table Name"
 msgstr "テーブル名"
 
-#: src/metastore/templates/metastore.mako:492
-#: src/metastore/templates/metastore.mako:676
-#: src/metastore/templates/metastore.mako:730
-#: src/metastore/templates/metastore.mako:895
+#: src/metastore/templates/metastore.mako:501
+#: src/metastore/templates/metastore.mako:687
+#: src/metastore/templates/metastore.mako:741
+#: src/metastore/templates/metastore.mako:906
 msgid "Columns"
 msgstr "列"
 
-#: src/metastore/templates/metastore.mako:533
+#: src/metastore/templates/metastore.mako:542
 msgid "Fact table"
 msgstr "ファクトテーブル"
 
-#: src/metastore/templates/metastore.mako:536
+#: src/metastore/templates/metastore.mako:545
 msgid "Dimension table"
 msgstr "寸法テーブル"
 
-#: src/metastore/templates/metastore.mako:543
+#: src/metastore/templates/metastore.mako:552
 msgid "No tables found."
 msgstr "テーブルが見つかりません。"
 
-#: src/metastore/templates/metastore.mako:560
+#: src/metastore/templates/metastore.mako:569
 msgid "Do you really want to drop the selected table(s)?"
 msgstr "選択したテーブルをドロップしてもよろしいですか？"
 
-#: src/metastore/templates/metastore.mako:571
+#: src/metastore/templates/metastore.mako:580
 msgid "and"
 msgstr "および"
 
-#: src/metastore/templates/metastore.mako:571
+#: src/metastore/templates/metastore.mako:580
 msgid "others"
 msgstr "その他"
 
-#: src/metastore/templates/metastore.mako:574
+#: src/metastore/templates/metastore.mako:583
 msgid "Skip the trash"
 msgstr "ゴミ箱をスキップ"
 
-#: src/metastore/templates/metastore.mako:600
-#: src/metastore/templates/metastore.mako:615
-#: src/metastore/templates/metastore.mako:643
+#: src/metastore/templates/metastore.mako:610
+#: src/metastore/templates/metastore.mako:626
+#: src/metastore/templates/metastore.mako:654
 msgid "Refresh"
 msgstr "更新"
 
-#: src/metastore/templates/metastore.mako:603
-#: src/metastore/templates/metastore.mako:605
-#: src/metastore/templates/metastore.mako:607
+#: src/metastore/templates/metastore.mako:614
+#: src/metastore/templates/metastore.mako:616
+#: src/metastore/templates/metastore.mako:618
 msgid "Create a new database"
 msgstr "新しいデータベースを作成"
 
-#: src/metastore/templates/metastore.mako:618
-#: src/metastore/templates/metastore.mako:620
+#: src/metastore/templates/metastore.mako:629
+#: src/metastore/templates/metastore.mako:631
 msgid "Create a new table"
 msgstr "新しいテーブルを作成"
 
-#: src/metastore/templates/metastore.mako:622
+#: src/metastore/templates/metastore.mako:633
 msgid "Create a new table from a file"
 msgstr "ファイルから新しいテーブルを作成"
 
-#: src/metastore/templates/metastore.mako:623
+#: src/metastore/templates/metastore.mako:634
 msgid "Create a new table manually"
 msgstr "手動で新しいテーブルを作成"
 
-#: src/metastore/templates/metastore.mako:635
-#: src/metastore/templates/metastore.mako:638
+#: src/metastore/templates/metastore.mako:646
+#: src/metastore/templates/metastore.mako:649
 msgid "Query the table"
 msgstr "テーブルを照会"
 
-#: src/metastore/templates/metastore.mako:641
+#: src/metastore/templates/metastore.mako:652
 msgid "Browse Data"
 msgstr "データを参照"
 
-#: src/metastore/templates/metastore.mako:645
+#: src/metastore/templates/metastore.mako:656
 #: src/metastore/templates/popups/load_data.mako:26
 msgid "Import Data"
 msgstr "データをインポート"
 
-#: src/metastore/templates/metastore.mako:648
+#: src/metastore/templates/metastore.mako:659
 msgid "Drop View"
 msgstr "ビューをドロップ"
 
-#: src/metastore/templates/metastore.mako:648
-#: src/metastore/templates/metastore.mako:1209
+#: src/metastore/templates/metastore.mako:659
+#: src/metastore/templates/metastore.mako:1222
 msgid "Drop Table"
 msgstr "テーブルをドロップ"
 
-#: src/metastore/templates/metastore.mako:682
 #: src/metastore/templates/metastore.mako:693
-#: src/metastore/templates/metastore.mako:712
+#: src/metastore/templates/metastore.mako:704
+#: src/metastore/templates/metastore.mako:723
 msgid "View more..."
 msgstr "詳細を表示..."
 
-#: src/metastore/templates/metastore.mako:687
-#: src/metastore/templates/metastore.mako:899
+#: src/metastore/templates/metastore.mako:698
+#: src/metastore/templates/metastore.mako:910
 msgid "Sample"
 msgstr "サンプル"
 
-#: src/metastore/templates/metastore.mako:696
-#: src/metastore/templates/metastore.mako:813
+#: src/metastore/templates/metastore.mako:707
+#: src/metastore/templates/metastore.mako:824
 msgid "The view does not contain any data."
 msgstr "ビューには何もデータが含まれていません。"
 
-#: src/metastore/templates/metastore.mako:697
-#: src/metastore/templates/metastore.mako:814
+#: src/metastore/templates/metastore.mako:708
+#: src/metastore/templates/metastore.mako:825
 msgid "The table does not contain any data."
 msgstr "テーブルにデータが格納されていません。"
 
-#: src/metastore/templates/metastore.mako:700
-#: src/metastore/templates/metastore.mako:817
+#: src/metastore/templates/metastore.mako:711
 msgid "Could not load the sample, see the server log for details."
 msgstr "サンプルをロードできませんでした。詳細はサーバーログを参照してください。"
 
-#: src/metastore/templates/metastore.mako:707
-#: src/metastore/templates/metastore.mako:734
-#: src/metastore/templates/metastore.mako:897
+#: src/metastore/templates/metastore.mako:718
+#: src/metastore/templates/metastore.mako:745
+#: src/metastore/templates/metastore.mako:908
 msgid "Partitions"
 msgstr "パーティション"
 
-#: src/metastore/templates/metastore.mako:715
-#: src/metastore/templates/metastore.mako:771
+#: src/metastore/templates/metastore.mako:726
+#: src/metastore/templates/metastore.mako:782
 msgid "The partition does not contain any values"
 msgstr "パーティションに値が含まれていません"
 
-#: src/metastore/templates/metastore.mako:746
+#: src/metastore/templates/metastore.mako:757
 msgid "Value to filter..."
 msgstr "フィルター処理する値..."
 
-#: src/metastore/templates/metastore.mako:751
+#: src/metastore/templates/metastore.mako:762
 msgid "Add"
 msgstr "追加"
 
-#: src/metastore/templates/metastore.mako:753
+#: src/metastore/templates/metastore.mako:764
 msgid "Sort Desc"
 msgstr "降順でソート"
 
-#: src/metastore/templates/metastore.mako:754
+#: src/metastore/templates/metastore.mako:765
 msgid "Filter"
 msgstr "フィルター"
 
-#: src/metastore/templates/metastore.mako:758
+#: src/metastore/templates/metastore.mako:769
 msgid "Add a filter"
 msgstr "フィルターを追加"
 
-#: src/metastore/templates/metastore.mako:765
+#: src/metastore/templates/metastore.mako:776
 msgid "Delete the selected partitions"
 msgstr "選択したパーティションを削除"
 
-#: src/metastore/templates/metastore.mako:765
+#: src/metastore/templates/metastore.mako:776
 msgid "Drop partition(s)"
 msgstr "パーティションをドロップ"
 
-#: src/metastore/templates/metastore.mako:792
+#: src/metastore/templates/metastore.mako:803
 #: src/metastore/templates/popups/load_data.mako:63
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/metastore/templates/metastore.mako:828
-#: src/metastore/templates/metastore.mako:1050
+#: src/metastore/templates/metastore.mako:839
+#: src/metastore/templates/metastore.mako:1061
 msgid "Id"
 msgstr "ID"
 
-#: src/metastore/templates/metastore.mako:830
+#: src/metastore/templates/metastore.mako:841
 msgid "Character"
 msgstr "文字"
 
-#: src/metastore/templates/metastore.mako:832
+#: src/metastore/templates/metastore.mako:843
 msgid "Complexity"
 msgstr "複雑さ"
 
-#: src/metastore/templates/metastore.mako:833
+#: src/metastore/templates/metastore.mako:844
 msgid "Hive Compatible"
 msgstr "Hive 対応"
 
-#: src/metastore/templates/metastore.mako:834
+#: src/metastore/templates/metastore.mako:845
 msgid "Impala Compatible"
 msgstr "Impala 対応"
 
-#: src/metastore/templates/metastore.mako:852
+#: src/metastore/templates/metastore.mako:863
 msgid "No queries found for the current table."
 msgstr "現在のテーブルのクエリが見つかりません。"
 
-#: src/metastore/templates/metastore.mako:882
+#: src/metastore/templates/metastore.mako:893
 msgid "Edit the description"
 msgstr "説明を編集"
 
-#: src/metastore/templates/metastore.mako:885
+#: src/metastore/templates/metastore.mako:896
 msgid "Add a description..."
 msgstr "説明を追加..."
 
-#: src/metastore/templates/metastore.mako:894
+#: src/metastore/templates/metastore.mako:905
 msgid "Overview"
 msgstr "概要"
 
-#: src/metastore/templates/metastore.mako:910
+#: src/metastore/templates/metastore.mako:921
 msgid "Details"
 msgstr "詳細"
 
-#: src/metastore/templates/metastore.mako:922
+#: src/metastore/templates/metastore.mako:933
 msgid "Search for a column..."
 msgstr "列を検索..."
 
-#: src/metastore/templates/metastore.mako:1053
+#: src/metastore/templates/metastore.mako:1064
 msgid "Join Column"
 msgstr "列を結合"
 
-#: src/metastore/templates/metastore.mako:1054
+#: src/metastore/templates/metastore.mako:1065
 msgid "Join counts"
 msgstr "結合カウント"
 
-#: src/metastore/templates/metastore.mako:1076
+#: src/metastore/templates/metastore.mako:1087
 msgid "Inputs"
 msgstr "入力"
 
-#: src/metastore/templates/metastore.mako:1082
+#: src/metastore/templates/metastore.mako:1093
 msgid "Not inputs"
 msgstr "入力がありません"
 
-#: src/metastore/templates/metastore.mako:1088
+#: src/metastore/templates/metastore.mako:1099
 msgid "Targets"
 msgstr "ターゲット"
 
-#: src/metastore/templates/metastore.mako:1094
+#: src/metastore/templates/metastore.mako:1105
 msgid "Not targets"
 msgstr "ターゲットがありません"
 
-#: src/metastore/templates/metastore.mako:1100
+#: src/metastore/templates/metastore.mako:1111
 msgid "Source query"
 msgstr "ソースクエリ"
 
-#: src/metastore/templates/metastore.mako:1106
+#: src/metastore/templates/metastore.mako:1117
 msgid "No source query"
 msgstr "ソースクエリがありません"
 
-#: src/metastore/templates/metastore.mako:1112
+#: src/metastore/templates/metastore.mako:1123
 msgid "Target queries"
 msgstr "ターゲットクエリ"
 
-#: src/metastore/templates/metastore.mako:1120
+#: src/metastore/templates/metastore.mako:1131
 msgid "Not target queries"
 msgstr "ターゲットクエリではありません"
 
-#: src/metastore/templates/metastore.mako:1126
+#: src/metastore/templates/metastore.mako:1137
 msgid "Lineage"
 msgstr "系列"
 
-#: src/metastore/templates/metastore.mako:1128
+#: src/metastore/templates/metastore.mako:1139
 msgid "Open in Navigator "
 msgstr "Navigator で開く "
 
-#: src/metastore/templates/metastore.mako:1129
+#: src/metastore/templates/metastore.mako:1140
 msgid "View in Navigator"
 msgstr "Navigator で表示"
 
-#: src/metastore/templates/metastore.mako:1146
-#: src/metastore/templates/metastore.mako:1156
+#: src/metastore/templates/metastore.mako:1157
+#: src/metastore/templates/metastore.mako:1167
 msgid "Toggle Assist"
 msgstr "アシストを切り替え"
 
-#: src/metastore/templates/metastore.mako:1212
+#: src/metastore/templates/metastore.mako:1225
 msgid "Do you really want to drop the table"
 msgstr "テーブルをドロップしてもよろしいですか？"
 
-#: src/metastore/templates/metastore.mako:1217
+#: src/metastore/templates/metastore.mako:1230
 msgid "Yes, drop this table"
 msgstr "はい。このテーブルをドロップします"
 
-#: src/metastore/templates/metastore.mako:1331
+#: src/metastore/templates/metastore.mako:1344
 msgid "No data available"
 msgstr "利用可能なデータがありません"
 
-#: src/metastore/templates/metastore.mako:1332
+#: src/metastore/templates/metastore.mako:1345
 msgid "No matching records"
 msgstr "一致するレコードがありません"
 
@@ -740,23 +743,8 @@ msgstr "データを読み込むと、データの場所からテーブルの保
 msgid "Submit"
 msgstr "サブミット"
 
-#~ msgid "Hive Error"
+#~ msgid "Last modified by"
 #~ msgstr ""
 
-#~ msgid "Table Partitions: %(tableName)s"
-#~ msgstr ""
-
-#~ msgid "View Partition Files"
-#~ msgstr ""
-
-#~ msgid "The table %s has no partitions."
-#~ msgstr ""
-
-#~ msgid "Compressed"
-#~ msgstr ""
-
-#~ msgid "Not compressed"
-#~ msgstr ""
-
-#~ msgid "Show Partitions"
+#~ msgid "Last modified time"
 #~ msgstr ""

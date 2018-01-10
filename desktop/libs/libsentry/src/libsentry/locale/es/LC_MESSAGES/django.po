@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2017-12-04 10:44-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -31,19 +31,19 @@ msgstr "Error al buscar un servidor Sentry disponible."
 msgid "Encountered unexpected error in SentryApi."
 msgstr "Se ha producido un error inesperado en la API de Sentry."
 
-#: src/libsentry/conf.py:29
+#: src/libsentry/conf.py:30
 msgid "Hostname or IP of server."
 msgstr "Nombre de host o IP de servidor."
 
-#: src/libsentry/conf.py:36
+#: src/libsentry/conf.py:37
 msgid "Port the sentry service is running on."
 msgstr "Puerto en el que se ejecuta el servicio de Sentry."
 
-#: src/libsentry/conf.py:43
+#: src/libsentry/conf.py:44
 msgid "Sentry configuration directory, where sentry-site.xml is located."
 msgstr "Directorio de configuración de Sentry, donde está sentry-site.xml."
 
-#: src/libsentry/conf.py:49
+#: src/libsentry/conf.py:50
 msgid "Number of seconds when the privilege list of a user is cached."
 msgstr "Tiempo en segundos durante el que se guarda en caché la lista de privilegios de un usuario."
 

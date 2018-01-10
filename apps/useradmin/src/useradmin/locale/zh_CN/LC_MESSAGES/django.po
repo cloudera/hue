@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2017-12-04 10:45-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -484,7 +484,7 @@ msgstr "添加/同步用户"
 #: src/useradmin/templates/add_ldap_users.mako:56
 #: src/useradmin/templates/edit_group.mako:82
 #: src/useradmin/templates/edit_permissions.mako:65
-#: src/useradmin/templates/list_configurations.mako:118
+#: src/useradmin/templates/list_configurations.mako:117
 #: src/useradmin/templates/sync_ldap_users_groups.mako:55
 msgid "Cancel"
 msgstr "取消"
@@ -675,8 +675,8 @@ msgid "Users"
 msgstr "用户"
 
 #: src/useradmin/templates/layout.mako:65
-#: src/useradmin/templates/list_configurations.mako:48
-#: src/useradmin/templates/list_configurations.mako:87
+#: src/useradmin/templates/list_configurations.mako:47
+#: src/useradmin/templates/list_configurations.mako:86
 #: src/useradmin/templates/list_permissions.mako:44
 #: src/useradmin/templates/list_users.mako:78
 msgid "Groups"
@@ -689,44 +689,44 @@ msgstr "权限"
 
 #: src/useradmin/templates/layout.mako:68
 #: src/useradmin/templates/list_configurations.mako:28
-#: src/useradmin/templates/list_configurations.mako:42
+#: src/useradmin/templates/list_configurations.mako:41
 msgid "Configurations"
 msgstr "配置"
 
-#: src/useradmin/templates/list_configurations.mako:47
+#: src/useradmin/templates/list_configurations.mako:46
 #: src/useradmin/templates/list_permissions.mako:42
 msgid "Application"
 msgstr "应用程序"
 
-#: src/useradmin/templates/list_configurations.mako:66
+#: src/useradmin/templates/list_configurations.mako:65
 msgid "There are no configurations matching the search criteria."
 msgstr "没有符合搜索条件的配置。"
 
-#: src/useradmin/templates/list_configurations.mako:78
+#: src/useradmin/templates/list_configurations.mako:77
 msgid "configuration"
 msgstr "配置"
 
-#: src/useradmin/templates/list_configurations.mako:81
+#: src/useradmin/templates/list_configurations.mako:80
 msgid "Role"
 msgstr "角色"
 
-#: src/useradmin/templates/list_configurations.mako:83
+#: src/useradmin/templates/list_configurations.mako:82
 msgid "Remove"
 msgstr "删除"
 
-#: src/useradmin/templates/list_configurations.mako:102
+#: src/useradmin/templates/list_configurations.mako:101
 msgid "Properties"
 msgstr "属性"
 
-#: src/useradmin/templates/list_configurations.mako:111
+#: src/useradmin/templates/list_configurations.mako:110
 msgid "Add role"
 msgstr "添加角色"
 
-#: src/useradmin/templates/list_configurations.mako:117
+#: src/useradmin/templates/list_configurations.mako:116
 msgid "Update configuration"
 msgstr "更新配置"
 
-#: src/useradmin/templates/list_configurations.mako:124
+#: src/useradmin/templates/list_configurations.mako:123
 msgid "There was an error loading the configurations"
 msgstr "加载配置时出错"
 

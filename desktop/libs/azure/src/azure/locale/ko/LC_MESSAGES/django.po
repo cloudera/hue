@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-09-22 10:22-0700\n"
+"POT-Creation-Date: 2017-12-04 10:44-0800\n"
 "PO-Revision-Date: 2017-09-22 10:22-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -18,23 +18,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/azure/conf.py:94
-msgid "Proxy address to use for the S3 connection."
-msgstr ""
+#: src/azure/conf.py:108
+msgid "Execute this script to produce the ADLS client secret."
+msgstr "ADLS 클라이언트 암호를 생성하려면 이 스크립트를 실행합니다."
 
-#: src/azure/conf.py:100
-msgid "Proxy port to use for the S3 connection."
-msgstr ""
+#: src/azure/conf.py:120
+msgid "Execute this script to produce the ADLS tenant id."
+msgstr "ADLS 테넌트 ID를 생성하려면 이 스크립트를 실행합니다."
 
-#: src/azure/conf.py:106
-msgid "Proxy user to use for the S3 connection."
+#: src/azure/conf.py:144
+msgid ""
+"Failed to obtain Azure authorization token, check your azure "
+"configuration."
 msgstr ""
+"Azure 인증 토큰을 가져오지 못했습니다. Azure 구성을 "
+"확인하십시오."
 
-#: src/azure/conf.py:112
-msgid "Proxy password to use for the S3 connection."
-msgstr ""
+#~ msgid "Proxy address to use for the S3 connection."
+#~ msgstr ""
 
-#: src/azure/conf.py:137
-msgid "Failed to connect to azure, check your azure credentials."
-msgstr ""
+#~ msgid "Proxy port to use for the S3 connection."
+#~ msgstr ""
 
+#~ msgid "Proxy user to use for the S3 connection."
+#~ msgstr ""
+
+#~ msgid "Proxy password to use for the S3 connection."
+#~ msgstr ""
+
+#~ msgid "Failed to connect to azure, check your azure credentials."
+#~ msgstr ""

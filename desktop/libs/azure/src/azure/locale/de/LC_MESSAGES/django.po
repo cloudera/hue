@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-09-22 10:22-0700\n"
+"POT-Creation-Date: 2017-12-04 10:44-0800\n"
 "PO-Revision-Date: 2017-09-22 10:22-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -18,23 +18,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/azure/conf.py:94
-msgid "Proxy address to use for the S3 connection."
-msgstr ""
+#: src/azure/conf.py:108
+msgid "Execute this script to produce the ADLS client secret."
+msgstr "Führen Sie dieses Skript aus, um den geheimen ADLS-Clientschlüssel zu erstellen."
 
-#: src/azure/conf.py:100
-msgid "Proxy port to use for the S3 connection."
-msgstr ""
+#: src/azure/conf.py:120
+msgid "Execute this script to produce the ADLS tenant id."
+msgstr "Führen Sie dieses Skript aus, um die ADLS-Mandanten-ID zu erstellen."
 
-#: src/azure/conf.py:106
-msgid "Proxy user to use for the S3 connection."
+#: src/azure/conf.py:144
+msgid ""
+"Failed to obtain Azure authorization token, check your azure "
+"configuration."
 msgstr ""
+"Das Azure-Authentifizierungstoken konnte nicht abgerufen werden. Prüfen Sie Ihre Azure-"
+"Konfiguration."
 
-#: src/azure/conf.py:112
-msgid "Proxy password to use for the S3 connection."
-msgstr ""
+#~ msgid "Proxy address to use for the S3 connection."
+#~ msgstr ""
 
-#: src/azure/conf.py:137
-msgid "Failed to connect to azure, check your azure credentials."
-msgstr ""
+#~ msgid "Proxy port to use for the S3 connection."
+#~ msgstr ""
 
+#~ msgid "Proxy user to use for the S3 connection."
+#~ msgstr ""
+
+#~ msgid "Proxy password to use for the S3 connection."
+#~ msgstr ""
+
+#~ msgid "Failed to connect to azure, check your azure credentials."
+#~ msgstr ""
