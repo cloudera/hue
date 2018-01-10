@@ -75,6 +75,17 @@
   # Email backend
   ## django_email_backend=django.core.mail.backends.smtp.EmailBackend
 
+  # Set to true to use CherryPy as the webserver, set to false
+  # to use Gunicorn as the webserver. Defaults to CherryPy if
+  # key is not specified.
+  ## use_cherrypy_server=true
+
+  # Gunicorn work class: gevent or evenlet, gthread or sync.
+  ## gunicorn_work_class=eventlet
+
+  # The number of Gunicorn worker processes. If not specified, it uses: (number of CPU * 2) + 1.
+  ## gunicorn_number_of_workers=None
+
   # Webserver runs as this user
   ## server_user=hue
   ## server_group=hue
