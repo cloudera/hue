@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:34-0700\n"
+"POT-Creation-Date: 2017-12-04 10:44-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -58,22 +58,22 @@ msgstr "Oozie Share Lib 경로를 사용할 수 없음"
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie Share Lib가 기본 위치에 설치되어 있지 않습니다."
 
-#: src/liboozie/submission2.py:47 src/liboozie/submittion.py:43
+#: src/liboozie/submission2.py:48 src/liboozie/submittion.py:43
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "이미 제출됨(Oozie Job ID %s)"
 
-#: src/liboozie/submission2.py:187 src/liboozie/submittion.py:151
+#: src/liboozie/submission2.py:188 src/liboozie/submittion.py:151
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "배포 디렉토리 %s을(를) 생성하지 못했습니다."
 
-#: src/liboozie/submission2.py:413 src/liboozie/submittion.py:252
+#: src/liboozie/submission2.py:420 src/liboozie/submittion.py:252
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "경로가 디렉토리가 아닙니다: %s."
 
-#: src/liboozie/submission2.py:418 src/liboozie/submittion.py:257
+#: src/liboozie/submission2.py:425 src/liboozie/submittion.py:257
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "디렉토리 '%s'에 액세스하는 중 오류 발생: %s"

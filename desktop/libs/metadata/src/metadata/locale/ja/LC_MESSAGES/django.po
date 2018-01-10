@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2017-12-04 10:45-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -59,7 +59,7 @@ msgstr ""
 "テナント ID が指定されていない場合に特定するために使用されるクラスタの名前です。"
 "デフォルトはクラスタ ID または 'default' です。"
 
-#: src/metadata/conf.py:124 src/metadata/conf.py:265
+#: src/metadata/conf.py:124 src/metadata/conf.py:277
 msgid ""
 "Perform Sentry privilege filtering. Default to true automatically if the "
 "cluster is secure."
@@ -85,33 +85,47 @@ msgstr ""
 
 #: src/metadata/conf.py:141
 msgid ""
+"Automatically upload queried tables DDL in order to improve "
+"recommendations."
+msgstr "<Hi_break/>クエリを実行したテーブルの DDL が自動的にアップロードされ、推奨事項の精度が"
+"高まります。"
+
+#: src/metadata/conf.py:147
+msgid ""
+"Automatically upload queried tables and columns stats in order to improve"
+" recommendations."
+msgstr "<Hi_break/>クエリを実行したテーブルと列の統計が自動的にアップロードされ、推奨事項の精度が"
+"高まります。"
+
+#: src/metadata/conf.py:153
+msgid ""
 "Allow admins to upload the last N executed queries in the quick start "
 "wizard. Use 0 to disable."
 msgstr ""
 "最近実行した N 件のクエリをクイックスタートウィザードでアップロードできるように"
 "管理者に許可します。無効にする場合は 0 を使用します。"
 
-#: src/metadata/conf.py:199
+#: src/metadata/conf.py:211
 msgid "Configuration options for Navigator API"
 msgstr "Navigator API の設定オプション"
 
-#: src/metadata/conf.py:203
+#: src/metadata/conf.py:215
 msgid "Base URL to Navigator API."
 msgstr "Navigator API のベース URL です。"
 
-#: src/metadata/conf.py:207
+#: src/metadata/conf.py:219
 msgid "Which authentication to use: CM or external via LDAP or SAML."
 msgstr "使用する認証を指定します。CM か外部（LDAP または SAML）を指定できます。"
 
-#: src/metadata/conf.py:212
+#: src/metadata/conf.py:224
 msgid "Username of the CM user used for authentication."
 msgstr "認証に使用する CM ユーザーのユーザー名です。"
 
-#: src/metadata/conf.py:216
+#: src/metadata/conf.py:228
 msgid "CM password of the user used for authentication."
 msgstr "認証に使用する CM ユーザーのパスワードです。"
 
-#: src/metadata/conf.py:221
+#: src/metadata/conf.py:233
 msgid ""
 "Execute this script to produce the CM password. This will be used when "
 "the plain password is not set."
@@ -119,15 +133,15 @@ msgstr ""
 "このスクリプトを実行して CM パスワードを作成します。これはプレーンパスワードが"
 "設定されていない場合に利用されます。"
 
-#: src/metadata/conf.py:228
+#: src/metadata/conf.py:240
 msgid "Username of the LDAP user used for authentication."
 msgstr "認証に使用する LDAP ユーザーのユーザー名です。"
 
-#: src/metadata/conf.py:232
+#: src/metadata/conf.py:244
 msgid "LDAP password of the user used for authentication."
 msgstr "認証に使用する LDAP ユーザーのパスワードです。"
 
-#: src/metadata/conf.py:237
+#: src/metadata/conf.py:249
 msgid ""
 "Execute this script to produce the LDAP password. This will be used when "
 "the plain password is not set."
@@ -135,15 +149,15 @@ msgstr ""
 "このスクリプトを実行して LDAP パスワードを作成します。これはプレーンパスワードが"
 "設定されていない場合に利用されます。"
 
-#: src/metadata/conf.py:244
+#: src/metadata/conf.py:256
 msgid "Username of the SAML user used for authentication."
 msgstr "認証に使用する SAML ユーザーのユーザー名です。"
 
-#: src/metadata/conf.py:248
+#: src/metadata/conf.py:260
 msgid "SAML password of the user used for authentication."
 msgstr "認証に使用する SAML ユーザーのパスワードです。"
 
-#: src/metadata/conf.py:253
+#: src/metadata/conf.py:265
 msgid ""
 "Execute this script to produce the SAML password. This will be used when "
 "the plain password  is not set."
@@ -151,7 +165,7 @@ msgstr ""
 "このスクリプトを実行して SAML パスワードを作成します。これはプレーンパスワードが"
 "設定されていない場合に利用されます。"
 
-#: src/metadata/conf.py:260
+#: src/metadata/conf.py:272
 msgid ""
 "Navigator configuration directory, where navigator.client.properties is "
 "located."
@@ -159,15 +173,15 @@ msgstr ""
 "navigator.client.properties が格納されている Navigator 設定"
 "ディレクトリです。"
 
-#: src/metadata/conf.py:271
+#: src/metadata/conf.py:283
 msgid "Max number of items to fetch in one call in object search."
 msgstr "オブジェクト検索の 1 回のコールでフェッチされるアイテムの最大数。"
 
-#: src/metadata/conf.py:277
+#: src/metadata/conf.py:289
 msgid "Max number of items to fetch in one call in object search autocomplete."
 msgstr "オブジェクト検索のオートコンプリートの 1 回のコールでフェッチされるアイテムの最大数。"
 
-#: src/metadata/conf.py:284
+#: src/metadata/conf.py:296
 msgid "Enable to search HDFS, S3 files."
 msgstr "HDFS の S3 ファイルの検索を有効にします。"
 
@@ -189,12 +203,12 @@ msgid ""
 " a non-empty list"
 msgstr "update_properties には、id パラメーターと keys パラメーターが指定された空ではないリストが必要です"
 
-#: src/metadata/navigator_client.py:79 src/metadata/navigator_client.py:90
-#: src/metadata/navigator_client.py:101 src/metadata/optimizer_client.py:50
+#: src/metadata/navigator_client.py:81 src/metadata/navigator_client.py:92
+#: src/metadata/navigator_client.py:103 src/metadata/optimizer_client.py:51
 msgid "No error message, please check the logs."
 msgstr "エラーメッセージがありません。ログを確認してください。"
 
-#: src/metadata/navigator_client.py:220 src/metadata/navigator_client.py:293
+#: src/metadata/navigator_client.py:222 src/metadata/navigator_client.py:295
 msgid "Failed to authenticate."
 msgstr "認証に失敗しました。"
 
@@ -202,19 +216,23 @@ msgstr "認証に失敗しました。"
 msgid "Query history upload requires Admin privileges or feature is disabled."
 msgstr "クエリの履歴をアップロードできません。管理者権限がないか、機能が無効になっています。"
 
-#: src/metadata/optimizer_api.py:375
+#: src/metadata/optimizer_api.py:376
+msgid "Skipped as task query"
+msgstr "タスククエリとしてスキップ"
+
+#: src/metadata/optimizer_api.py:378
 msgid "Skipped"
 msgstr "スキップ"
 
-#: src/metadata/optimizer_client.py:173
+#: src/metadata/optimizer_client.py:176
 msgid "Error while accessing Optimizer"
 msgstr "Optimizer へのアクセス中にエラーが発生しました"
 
-#: src/metadata/optimizer_client.py:232
+#: src/metadata/optimizer_client.py:235
 msgid "Call not supported"
 msgstr "サポートされていない呼び出しです"
 
-#: src/metadata/optimizer_client.py:403
+#: src/metadata/optimizer_client.py:406
 #, python-format
 msgid "Could not get tenant id from cluster id %s: %s"
 msgstr "テナント ID をクラスタ ID %s から取得できませんでした：%s"
@@ -222,11 +240,3 @@ msgstr "テナント ID をクラスタ ID %s から取得できませんでし�
 #: src/metadata/workload_analytics_client.py:39
 msgid "Error accessing"
 msgstr "アクセス時にエラーが発生しました"
-
-#~ msgid ""
-#~ "Base URL to Optimizer API (e.g. -"
-#~ " https://alpha.optimizer.cloudera.com/)"
-#~ msgstr ""
-
-#~ msgid "The email of the Optimizer account to use (deprecated)."
-#~ msgstr ""

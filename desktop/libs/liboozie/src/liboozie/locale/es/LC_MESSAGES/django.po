@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:34-0700\n"
+"POT-Creation-Date: 2017-12-04 10:44-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -63,22 +63,22 @@ msgstr "La ruta a Share Lib de Oozie no está disponible"
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Share Lib de Oozie no instalada en la ubicación predeterminada."
 
-#: src/liboozie/submission2.py:47 src/liboozie/submittion.py:43
+#: src/liboozie/submission2.py:48 src/liboozie/submittion.py:43
 #, python-format
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "Envío ya enviado (ID de trabajo de Oozie %s)"
 
-#: src/liboozie/submission2.py:187 src/liboozie/submittion.py:151
+#: src/liboozie/submission2.py:188 src/liboozie/submittion.py:151
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "Error al crear al directorio de implementación: %s"
 
-#: src/liboozie/submission2.py:413 src/liboozie/submittion.py:252
+#: src/liboozie/submission2.py:420 src/liboozie/submittion.py:252
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "La ruta no es un directorio: %s."
 
-#: src/liboozie/submission2.py:418 src/liboozie/submittion.py:257
+#: src/liboozie/submission2.py:425 src/liboozie/submittion.py:257
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "Error al acceder al directorio '%s': %s."
