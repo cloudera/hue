@@ -1974,6 +1974,7 @@ from desktop.views import _ko
                 }));
               }
 
+              % if not IS_EMBEDDED.get():
               var documentsPanel = new AssistInnerPanel({
                 panelData: new AssistDocumentsPanel({
                   user: params.user,
@@ -2000,6 +2001,7 @@ from desktop.views import _ko
                   documentsPanel.panelData.setTypeFilter(docType);
                 }
               });
+              % endif
 
               var vcsKeysLength = ${ len(VCS.keys()) };
               if (vcsKeysLength > 0) {
