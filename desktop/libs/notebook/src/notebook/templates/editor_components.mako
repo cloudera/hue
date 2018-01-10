@@ -171,6 +171,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- /ko -->
       % endif
 
+      % if IS_EMBEDDED.get():
+        <div class="btn-group">
+          <a class="btn" rel="tooltip" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }"><i class="fa fa-fw fa-file-o"></i></a>
+        </div>
+        <div class="btn-group">
+          <a class="btn" rel="tooltip" data-bind="css: {'active': $root.isContextPanelVisible }, click: function() { $root.isContextPanelVisible(!$root.isContextPanelVisible()); }"><i class="fa fa-fw fa-cogs"></i></a>
+        </div>
+      %else:
         <div class="btn-group">
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
 
@@ -233,6 +241,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             </li>
           </ul>
         </div>
+      % endif
       </div>
 
       <div class="nav-collapse">
@@ -645,12 +654,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
+        % if not IS_EMBEDDED.get():
         <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, onClickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
           <a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the saved queries')}" data-bind="visible: !queriesHasErrors(), click: function(data, e){ queriesFilterVisible(!queriesFilterVisible()); if (queriesFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { queriesFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: queriesFilterVisible, clearable: queriesFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
           </a>
         </li>
+        % endif
         % if ENABLE_QUERY_BUILDER.get():
         <!-- ko if: isSqlDialect -->
         <li data-bind="click: function(){ currentQueryTab('queryBuilderTab'); }, css: {'active': currentQueryTab() == 'queryBuilderTab'}"><a class="inactive-action" href="#queryBuilderTab" data-toggle="tab">${_('Query Builder')}</a></li>
