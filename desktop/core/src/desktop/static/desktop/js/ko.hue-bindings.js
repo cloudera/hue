@@ -2144,9 +2144,10 @@
       var editorHeight = Math.floor(lastEditorSize / 16);
       $target.height(lastEditorSize);
       var autoExpand = true;
+      var draggedOnce = false;
 
       function throttleChange() {
-        if (autoExpand) {
+        if (autoExpand && !draggedOnce) {
           var maxAutoLines = Math.floor((($(window).height() - 80) / 2) / 16);
           var resized = false;
           if (ace().session.getLength() > editorHeight) {
@@ -2180,11 +2181,17 @@
         changeTimeout = window.setTimeout(throttleChange, 10)
       });
 
+      var setAutoExpandSubscription = huePubSub.subscribe('ace.set.autoexpand', function (options) {
+        if (ace().container.id === options.snippet.id()) {
+          autoExpand = options.autoExpand;
+        }
+      });
+
       $resizer.draggable({
         axis: "y",
         start: options.onStart ? options.onStart : function(){},
         drag: function (event, ui) {
-          autoExpand = false;
+          draggedOnce = true;
           var currentHeight = ui.offset.top + $contentPanel.scrollTop() - (125 + $execStatus.outerHeight(true) + $variables.outerHeight(true));
           $target.css("height", currentHeight + "px");
           ace().resize();
@@ -2198,6 +2205,10 @@
           huePubSub.publish('redraw.fixed.headers');
           $(document).trigger("editorSizeChanged");
         }
+      });
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        skipAutoExpandSubscription.remove();
       });
     }
   };
