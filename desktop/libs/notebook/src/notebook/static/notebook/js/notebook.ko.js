@@ -1268,6 +1268,7 @@ var EditorViewModel = (function() {
       }
 
       if (self.ace()) {
+        huePubSub.publish('ace.set.autoexpand', { autoExpand: false, snippet: self });
         var selectionRange = self.ace().getSelectionRange();
         self.lastAceSelectionRowOffset(Math.min(selectionRange.start.row, selectionRange.end.row));
       }
@@ -1325,6 +1326,7 @@ var EditorViewModel = (function() {
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         self.statusForButtons('executed');
+        huePubSub.publish('ace.set.autoexpand', { autoExpand: true, snippet: self });
         stopLongOperationTimeout();
 
         if (vm.editorMode() && data.history_id) {
