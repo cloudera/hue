@@ -203,7 +203,7 @@ class Assist():
     ]
 
   def get_columns(self, database, table):
-    return [{'name': field['name'], 'type': field['type'], 'comment': ''} for field in self.db.schema_fields(table)['fields']]
+    return [{'name': field['name'], 'type': field['type'], 'comment': '', 'primary_key': field.get('primary_key')} for field in self.db.schema_fields(table)['fields']]
 
   def get_sample_data(self, database, table, column=None):
     # Note: currently ignores dynamic fields
