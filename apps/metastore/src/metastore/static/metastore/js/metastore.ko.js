@@ -137,22 +137,17 @@ var MetastoreViewModel = (function () {
 
     huePubSub.subscribe('metastore.url.change', function () {
       var prefix = '/metastore/';
-      if (self.isHue4() && !IS_EMBEDDED){
+      if (self.isHue4()){
         prefix = '/hue' + prefix;
       }
-      var newUrl;
       if (self.database() && self.database().table()) {
-        newUrl = prefix + 'table/' + self.database().name + '/' + self.database().table().name;
-      } else if (self.database()) {
-        newUrl = prefix + 'tables/' + self.database().name;
-      } else {
-        newUrl = prefix + 'databases';
+        hueUtils.changeURL(prefix + 'table/' + self.database().name + '/' + self.database().table().name);
       }
-
-      if (IS_EMBEDDED) {
-        hueUtils.changeURLParameter('app', newUrl);
-      } else {
-        hueUtils.changeURL(newUrl);
+      else if (self.database()) {
+        hueUtils.changeURL(prefix + 'tables/' + self.database().name);
+      }
+      else {
+        hueUtils.changeURL(prefix + 'databases');
       }
     });
 
@@ -301,16 +296,7 @@ var MetastoreViewModel = (function () {
   MetastoreViewModel.prototype.loadURL = function () {
     var self = this;
 
-    var path;
-
-    if (IS_EMBEDDED) {
-      var appMatch = location.search.match(/app=\/?([^&#]+)/);
-      if (appMatch) {
-        path = '/' + appMatch[1];
-      }
-    } else {
-      path = (IS_HUE_4 ? window.location.pathname.substr(4) : window.location.pathname);
-    }
+    var path = (IS_HUE_4 ? window.location.pathname.substr(4) : window.location.pathname);
     if (!path) {
       path = '/metastore/tables';
     }

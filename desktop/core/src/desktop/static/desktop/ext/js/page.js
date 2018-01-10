@@ -28,34 +28,6 @@
 
   var location = ('undefined' !== typeof window) && (window.history.location || window.location);
 
-  // Hue specific
-  var winLoc = function (href) {
-    if (href) {
-      location.href = href;
-    } else if (!paramBased) {
-      return location;
-    } else {
-      var hueMatch = location.search.match(/app=\/?([^&#]+)/);
-      var pathname = location.pathname + (hueMatch ? hueMatch[1] : '');
-      var search = hueMatch ? location.search.replace(hueMatch[0], '') : location.search + '';
-      search = search.replace('?&', '?');
-      if (pathname[0] !== '/') {
-        pathname = '/' + pathname;
-      }
-
-      var adaptedLocation = {
-        hash: location.hash + '',
-        search: search === '?' ? '' : search,
-        pathname: pathname,
-        protocol: location.protocol + '',
-        port: location.port + '',
-        hostname: location.hostname + ''
-      };
-
-      return adaptedLocation;
-    }
-  }
-
   /**
    * Perform initial dispatch.
    */
@@ -75,9 +47,6 @@
 
   var base = '';
 
-  // Hue specific
-  var baseHash = '';
-
   /**
    * Running flag.
    */
@@ -89,12 +58,6 @@
    */
 
   var hashbang = false;
-
-  /**
-   * paramBased option
-   */
-
-  var paramBased = true; // Hue specific
 
   /**
    * Previous context, for capturing
@@ -178,11 +141,6 @@
     base = path;
   };
 
-  page.baseHash = function (hash) {
-    if (0 === arguments.length) return baseHash;
-    baseHash = decodeURLEncodedURIComponent(hash);
-  };
-
   /**
    * Bind with the given `options`.
    *
@@ -208,8 +166,7 @@
     }
     if (true === options.hashbang) hashbang = true;
     if (!dispatch) return;
-    var loc = winLoc();
-    var url = (hashbang && ~loc.hash.indexOf('#!')) ? loc.hash.substr(2) + loc.search : loc.pathname + loc.search + loc.hash;
+    var url = (hashbang && ~location.hash.indexOf('#!')) ? location.hash.substr(2) + location.search : location.pathname + location.search + location.hash;
     page.replace(url, null, true, dispatch);
   };
 
@@ -334,10 +291,6 @@
 
     prevContext = ctx;
 
-    if (prev && prev.hash && prev.hash !== baseHash) {
-      return unhandled(ctx);
-    }
-
     function nextExit() {
       var fn = page.exits[j++];
       if (!fn) return nextEnter();
@@ -375,15 +328,15 @@
     var current;
 
     if (hashbang) {
-      current = base + winLoc().hash.replace('#!', '');
+      current = base + location.hash.replace('#!', '');
     } else {
-      current = winLoc().pathname + winLoc().search;
+      current = location.pathname + location.search;
     }
 
     if (current === ctx.canonicalPath) return;
     page.stop();
     ctx.handled = false;
-    winLoc(ctx.canonicalPath);
+    location.href = ctx.canonicalPath;
   }
 
   /**
@@ -431,9 +384,6 @@
 
     this.canonicalPath = path;
     this.path = path.replace(base, '') || '/';
-    if (this.path[0] !== '/') {
-      this.path = '/' + this.path;
-    }
     if (hashbang) this.path = this.path.replace('#!', '') || '/';
 
     this.title = document.title;
@@ -460,34 +410,6 @@
 
   page.Context = Context;
 
-
-  // Hue specific
-  Context.prototype.adaptPath = function (path) {
-    if (!paramBased || ~path.indexOf('app=')) {
-      return path;
-    }
-
-    var appPath = path.replace(base, '').replace('//', '/').replace('?', '&');
-    if (appPath[0] !== '/') {
-      appPath = appPath + '/';
-    }
-    var adaptedPath = location.pathname + '?app=' + appPath;
-    if (!~path.indexOf('#') && location.hash) {
-      adaptedPath += location.hash;
-    }
-    return adaptedPath;
-  };
-
-  // Hue specific
-  Context.prototype.adaptedState = function () {
-    if (paramBased && this.state && this.state.path) {
-      return {
-        path: this.adaptPath(this.state.path)
-      }
-    }
-    return this.state;
-  };
-
   /**
    * Push state.
    *
@@ -496,7 +418,7 @@
 
   Context.prototype.pushState = function() {
     page.len++;
-    history.pushState(this.adaptedState(), this.title, this.adaptPath(hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath));
+    history.pushState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -506,7 +428,7 @@
    */
 
   Context.prototype.save = function() {
-    history.replaceState(this.adaptedState(), this.title, this.adaptPath(hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath));
+    history.replaceState(this.state, this.title, hashbang && this.path !== '/' ? '#!' + this.path : this.canonicalPath);
   };
 
   /**
@@ -610,7 +532,7 @@
         var path = e.state.path;
         page.replace(path, e.state);
       } else {
-        page.show(winLoc().pathname + winLoc().hash, undefined, undefined, false);
+        page.show(location.pathname + location.hash, undefined, undefined, false);
       }
     };
   })();
@@ -642,7 +564,7 @@
 
     // ensure non-hash for the same path
     var link = el.getAttribute('href');
-    if (!hashbang && el.pathname === winLoc().pathname && (el.hash || '#' === link)) return;
+    if (!hashbang && el.pathname === location.pathname && (el.hash || '#' === link)) return;
 
 
 
@@ -694,9 +616,8 @@
    */
 
   function sameOrigin(href) {
-    var loc = winLoc();
-    var origin = loc.protocol + '//' + loc.hostname;
-    if (loc.port) origin += ':' + loc.port;
+    var origin = location.protocol + '//' + location.hostname;
+    if (location.port) origin += ':' + location.port;
     return (href && (0 === href.indexOf(origin)));
   }
 
