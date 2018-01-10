@@ -128,6 +128,24 @@ def is_https_enabled():
   """Hue is configured for HTTPS."""
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
 
+USE_CHERRYPY_SERVER = Config(
+  key="use_cherrypy_server",
+  help=_("If set to true, CherryPy will be used. Otherwise, Gunicorn will be used as the webserver."),
+  type=coerce_bool,
+  default=True)
+
+GUNICORN_WORKER_CLASS = Config(
+  key="gunicorn_work_class",
+  help=_("Gunicorn work class: gevent or evenlet, gthread or sync."),
+  type=str,
+  default="eventlet")
+
+GUNICORN_NUMBER_OF_WORKERS = Config(
+  key="gunicorn_number_of_workers",
+  help=_("The number of Gunicorn worker processes. If not specified, it uses: (number of CPU * 2) + 1."),
+  type=int,
+  default=None)
+
 HTTP_HOST = Config(
   key="http_host",
   help=_("HTTP host to bind to."),
