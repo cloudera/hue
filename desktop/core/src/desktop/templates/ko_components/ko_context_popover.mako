@@ -19,6 +19,7 @@ from django.utils.translation import ugettext as _
 
 from dashboard.conf import HAS_SQL_ENABLED
 from desktop import conf
+from desktop.conf import IS_EMBEDDED
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
@@ -37,11 +38,13 @@ from metadata.conf import has_navigator
           <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
         </a>
         % endif
+        % if not IS_EMBEDDED.get():
         <!-- ko if: typeof sourceType === 'undefined' || sourceType !== 'solr' -->
         <a class="inactive-action pointer" data-bind="visible: openInTableBrowserEnabled, click: function() { huePubSub.publish('context.popover.open.in.metastore', isTable || isView ? 'table' : 'db') }">
           <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
         </a>
         <!-- /ko -->
+        % endif
         <a class="inactive-action pointer" data-bind="visible: replaceEditorContentEnabled, click: function() { huePubSub.publish('context.popover.replace.in.editor') }">
           <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
         </a>
