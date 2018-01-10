@@ -46,6 +46,8 @@ def get_app_for_module(module):
   for app in settings.INSTALLED_APPS:
     # TODO(philip): This is quite hacky.  If desktop becomes a more
     # full application, we'll want to separate this out more cleanly.
+    if module.__name__.startswith('desktop.lib.metrics.views'):
+      return app
     if module.__name__.startswith(app) and not module.__name__.startswith("desktop.lib"):
       return app
   return None
