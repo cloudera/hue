@@ -150,8 +150,8 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
       % if is_owner:
         <div class="btn-group" data-bind="visible: columns().length">
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if (canSave()) { save() } else { $('#saveAsModalDashboard').modal('show'); } }, attr: { title: canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
-
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#" data-bind="visible: canSave()"><span class="caret"></span></a>
+          <!-- ko if: canSave() -->
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li>
               <a class="pointer" data-bind="click: function() { $('#saveAsModalDashboard').modal('show'); }">
@@ -159,6 +159,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
               </a>
             </li>
           </ul>
+          <!-- /ko -->
         </div>
       % endif
 
@@ -4029,7 +4030,11 @@ $(document).ready(function () {
   % if is_owner:
   $(window).bind("keydown", "ctrl+s alt+s meta+s", function(e){
     e.preventDefault();
-    searchViewModel.save();
+    if (searchViewModel.canSave()) {
+      searchViewModel.save();
+    } else {
+      $('#saveAsModalDashboard').modal('show');
+    }
     return false;
   });
   % endif
