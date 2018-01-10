@@ -70,7 +70,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.paths import get_desktop_root, get_build_dir
 
-import configobj
+from configobj import ConfigObj, ConfigObjError
 import json
 import logging
 import os
@@ -508,8 +508,8 @@ def _configs_from_dir(conf_dir):
       continue
     LOG.debug("Loading configuration from: %s" % filename)
     try:
-      conf = configobj.ConfigObj(os.path.join(conf_dir, filename))
-    except configobj.ConfigObjError, ex:
+      conf = ConfigObj(os.path.join(conf_dir, filename))
+    except ConfigObjError, ex:
       LOG.error("Error in configuration file '%s': %s" % (os.path.join(conf_dir, filename), ex))
       raise
     conf['DEFAULT'] = dict(desktop_root=get_desktop_root(), build_dir=get_build_dir())
@@ -526,7 +526,7 @@ def load_confs(conf_source=None):
   if conf_source is None:
     conf_source = _configs_from_dir(get_desktop_root("conf"))
 
-  conf = configobj.ConfigObj()
+  conf = ConfigObj()
   for in_conf in conf_source:
     conf.merge(in_conf)
   return conf
