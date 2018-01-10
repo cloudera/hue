@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:36-0700\n"
+"POT-Creation-Date: 2017-12-04 10:46-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -219,9 +219,3 @@ msgstr "出现服务器错误："
 #: src/rdbms/templates/execute.mako:916
 msgid "Unmanageable server error occurred: "
 msgstr "出现无法管理的服务器错误："
-
-#~ msgid "Server error occured: "
-#~ msgstr ""
-
-#~ msgid "Unmanageable server error occured: "
-#~ msgstr ""

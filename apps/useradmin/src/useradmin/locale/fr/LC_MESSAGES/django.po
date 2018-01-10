@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2017-12-04 10:45-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -507,7 +507,7 @@ msgstr "Ajouter/Synchroniser un utilisateur"
 #: src/useradmin/templates/add_ldap_users.mako:56
 #: src/useradmin/templates/edit_group.mako:82
 #: src/useradmin/templates/edit_permissions.mako:65
-#: src/useradmin/templates/list_configurations.mako:118
+#: src/useradmin/templates/list_configurations.mako:117
 #: src/useradmin/templates/sync_ldap_users_groups.mako:55
 msgid "Cancel"
 msgstr "Annuler"
@@ -698,8 +698,8 @@ msgid "Users"
 msgstr "Utilisateurs"
 
 #: src/useradmin/templates/layout.mako:65
-#: src/useradmin/templates/list_configurations.mako:48
-#: src/useradmin/templates/list_configurations.mako:87
+#: src/useradmin/templates/list_configurations.mako:47
+#: src/useradmin/templates/list_configurations.mako:86
 #: src/useradmin/templates/list_permissions.mako:44
 #: src/useradmin/templates/list_users.mako:78
 msgid "Groups"
@@ -712,44 +712,44 @@ msgstr "Autorisations"
 
 #: src/useradmin/templates/layout.mako:68
 #: src/useradmin/templates/list_configurations.mako:28
-#: src/useradmin/templates/list_configurations.mako:42
+#: src/useradmin/templates/list_configurations.mako:41
 msgid "Configurations"
 msgstr "Configurations"
 
-#: src/useradmin/templates/list_configurations.mako:47
+#: src/useradmin/templates/list_configurations.mako:46
 #: src/useradmin/templates/list_permissions.mako:42
 msgid "Application"
 msgstr "Application"
 
-#: src/useradmin/templates/list_configurations.mako:66
+#: src/useradmin/templates/list_configurations.mako:65
 msgid "There are no configurations matching the search criteria."
 msgstr "Aucune configuration ne correspond aux critères de recherche."
 
-#: src/useradmin/templates/list_configurations.mako:78
+#: src/useradmin/templates/list_configurations.mako:77
 msgid "configuration"
 msgstr "configuration"
 
-#: src/useradmin/templates/list_configurations.mako:81
+#: src/useradmin/templates/list_configurations.mako:80
 msgid "Role"
 msgstr "Rôle"
 
-#: src/useradmin/templates/list_configurations.mako:83
+#: src/useradmin/templates/list_configurations.mako:82
 msgid "Remove"
 msgstr "Supprimer"
 
-#: src/useradmin/templates/list_configurations.mako:102
+#: src/useradmin/templates/list_configurations.mako:101
 msgid "Properties"
 msgstr "Propriétés"
 
-#: src/useradmin/templates/list_configurations.mako:111
+#: src/useradmin/templates/list_configurations.mako:110
 msgid "Add role"
 msgstr "Ajouter un rôle"
 
-#: src/useradmin/templates/list_configurations.mako:117
+#: src/useradmin/templates/list_configurations.mako:116
 msgid "Update configuration"
 msgstr "Modifier la configuration"
 
-#: src/useradmin/templates/list_configurations.mako:124
+#: src/useradmin/templates/list_configurations.mako:123
 msgid "There was an error loading the configurations"
 msgstr "Une erreur s'est produite lors du chargement des configurations"
 

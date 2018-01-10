@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:34-0700\n"
+"POT-Creation-Date: 2017-12-04 10:44-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/aws/conf.py:88
+#: src/aws/conf.py:89
 msgid "One entry for each AWS account"
 msgstr "각 AWS 계정마다 하나의 항목"
 
-#: src/aws/conf.py:90
+#: src/aws/conf.py:91
 msgid "Information about single AWS account"
 msgstr "단일 AWS 계정에 대한 정보"
 
-#: src/aws/conf.py:103
+#: src/aws/conf.py:104
 msgid "Execute this script to produce the AWS access key ID."
 msgstr "AWS 액세스 키 ID를 생성하려면 이 스크립트를 실행합니다."
 
-#: src/aws/conf.py:115
+#: src/aws/conf.py:116
 msgid "Execute this script to produce the AWS secret access key."
 msgstr "AWS 암호 액세스 키를 생성하려면 이 스크립트를 실행합니다."
 
-#: src/aws/conf.py:123
+#: src/aws/conf.py:124
 msgid ""
 "Allow to use environment sources of credentials (environment variables, "
 "EC2 profile)."
@@ -41,27 +41,27 @@ msgstr ""
 "자격 증명의 환경 소스 사용을 허용합니다(환경 변수, "
 "EC2 프로필)."
 
-#: src/aws/conf.py:134
+#: src/aws/conf.py:135
 msgid "Alternate address for the S3 endpoint."
 msgstr "S3 끝점에 대한 대체 주소입니다."
 
-#: src/aws/conf.py:140
+#: src/aws/conf.py:141
 msgid "Proxy address to use for the S3 connection."
 msgstr "S3 연결에 사용할 프록시 주소입니다."
 
-#: src/aws/conf.py:146
+#: src/aws/conf.py:147
 msgid "Proxy port to use for the S3 connection."
 msgstr "S3 연결에 사용할 프록시 포트입니다."
 
-#: src/aws/conf.py:152
+#: src/aws/conf.py:153
 msgid "Proxy user to use for the S3 connection."
 msgstr "S3 연결에 사용할 프록시 사용자입니다."
 
-#: src/aws/conf.py:158
+#: src/aws/conf.py:159
 msgid "Proxy password to use for the S3 connection."
 msgstr "S3 연결에 사용할 프록시 암호입니다."
 
-#: src/aws/conf.py:200
+#: src/aws/conf.py:201
 msgid "Failed to connect to S3, check your AWS credentials."
 msgstr "S3에 연결하지 못했습니다. AWS 자격 증명을 확인하십시오."
 
@@ -82,17 +82,17 @@ msgstr ""
 "%s 경로를 쓰거나 수정할 권한이 사용자에게 없습니다. "
 "사용자에게 쓰기 권한이 있는지 확인하십시오."
 
-#: src/aws/s3/s3fs.py:87 src/aws/s3/s3fs.py:89
+#: src/aws/s3/s3fs.py:88 src/aws/s3/s3fs.py:90
 #, python-format
 msgid "Failed to initialize bucket cache: %s"
 msgstr "버킷 캐시를 초기화하지 못함: %s"
 
-#: src/aws/s3/s3fs.py:104 src/aws/s3/s3fs.py:116
+#: src/aws/s3/s3fs.py:105 src/aws/s3/s3fs.py:117
 #, python-format
 msgid "Failed to create bucket named \"%s\": %s"
 msgstr "이름이 \"%s\"인 버킷을 생성하지 못함: %s"
 
-#: src/aws/s3/s3fs.py:107 src/aws/s3/s3fs.py:145
+#: src/aws/s3/s3fs.py:108 src/aws/s3/s3fs.py:146
 #, python-format
 msgid ""
 "User is not authorized to access bucket named \"%s\". If you are "
@@ -101,12 +101,12 @@ msgstr ""
 "이름이 \"%s\"인 버킷에 액세스할 권한이 사용자에게 없습니다. "
 "버킷 생성을 시도하고 있다면 이 버킷 이름이 이미 예약되었습니다."
 
-#: src/aws/s3/s3fs.py:156
+#: src/aws/s3/s3fs.py:157
 #, python-format
 msgid "Failed to access path at \"%s\": %s"
 msgstr "\"%s\"의 경로에 액세스하지 못함: %s"
 
-#: src/aws/s3/s3fs.py:159
+#: src/aws/s3/s3fs.py:160
 #, python-format
 msgid ""
 "Failed to access path: \"%s\" Check that you have access to read this "
@@ -115,40 +115,40 @@ msgstr ""
 "\"%s\" 경로에 액세스하지 못함: 이 버킷을 읽을 권한이 "
 "있는지 그리고 영역이 올바른지 확인하십시오. %s"
 
-#: src/aws/s3/s3fs.py:162
+#: src/aws/s3/s3fs.py:163
 #, python-format
 msgid "User is not authorized to access path at \"%s\"."
 msgstr "사용자에게 \"%s\" 경로에 액세스할 권한이 없습니다."
 
-#: src/aws/s3/s3fs.py:179 src/aws/s3/s3fs.py:186
+#: src/aws/s3/s3fs.py:180 src/aws/s3/s3fs.py:187
 #, python-format
 msgid "Failed to access path \"%s\": %s"
 msgstr "경로 \"%s\"에 액세스하지 못함: %s"
 
-#: src/aws/s3/s3fs.py:184
+#: src/aws/s3/s3fs.py:185
 #, python-format
 msgid "User is not authorized to access path: \"%s\""
 msgstr "사용자에게 경로에 액세스할 권한이 없음: \"%s\""
 
-#: src/aws/s3/s3fs.py:281
+#: src/aws/s3/s3fs.py:285
 msgid "Option `glob` is not implemented"
 msgstr "옵션 `glob`가 구현되지 않음"
 
-#: src/aws/s3/s3fs.py:308 src/aws/s3/s3fs.py:340
+#: src/aws/s3/s3fs.py:312 src/aws/s3/s3fs.py:344
 msgid "Moving to trash is not implemented for S3"
 msgstr "휴지통으로 이동하는 기능은 S3에서 구현되지 않음"
 
-#: src/aws/s3/s3fs.py:352
+#: src/aws/s3/s3fs.py:360
 #, python-format
 msgid "Invalid bucket name: %s"
 msgstr "잘못된 버킷 이름: %s"
 
-#: src/aws/s3/s3fs.py:359 src/aws/s3/s3fs.py:361
+#: src/aws/s3/s3fs.py:367 src/aws/s3/s3fs.py:369
 #, python-format
 msgid "Failed to create S3 bucket \"%s\": %s"
 msgstr "S3 버킷 \"%s\"을(를) 생성하지 못함: %s"
 
-#: src/aws/s3/s3fs.py:417
+#: src/aws/s3/s3fs.py:425
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "변환할 키가 올바르지 않음: %s"
@@ -156,10 +156,3 @@ msgstr "변환할 키가 올바르지 않음: %s"
 #: src/aws/s3/upload.py:124
 msgid "No S3 filesystem found."
 msgstr "S3 파일 시스템이 없습니다."
-
-#~ msgid ""
-#~ "Failed to access path: \"%s\" Check "
-#~ "that you have access to read this"
-#~ " bucket and that the region is "
-#~ "correct."
-#~ msgstr ""

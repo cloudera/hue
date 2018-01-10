@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2017-12-04 10:45-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -59,7 +59,7 @@ msgstr ""
 "Nom du cluster utilisé pour déterminer l’ID de locataire lorsque celui-ci n’est "
 "pas spécifié. Utilise par défaut l’ID de cluster ou « default »."
 
-#: src/metadata/conf.py:124 src/metadata/conf.py:265
+#: src/metadata/conf.py:124 src/metadata/conf.py:277
 msgid ""
 "Perform Sentry privilege filtering. Default to true automatically if the "
 "cluster is secure."
@@ -85,33 +85,49 @@ msgstr ""
 
 #: src/metadata/conf.py:141
 msgid ""
+"Automatically upload queried tables DDL in order to improve "
+"recommendations."
+msgstr ""
+"Chargez automatiquement les DDL des tables pour améliorer les "
+"recommandations."
+
+#: src/metadata/conf.py:147
+msgid ""
+"Automatically upload queried tables and columns stats in order to improve"
+" recommendations."
+msgstr ""
+"Chargez automatiquement les tables interrogées et les statistiques de colonnes pour améliorer les"
+" recommandations."
+
+#: src/metadata/conf.py:153
+msgid ""
 "Allow admins to upload the last N executed queries in the quick start "
 "wizard. Use 0 to disable."
 msgstr ""
 "Autoriser les administrateurs à charger les N dernières requêtes exécutées dans l’assistant de "
 "démarrage rapide. Utilisez la valeur 0 pour désactiver cette option."
 
-#: src/metadata/conf.py:199
+#: src/metadata/conf.py:211
 msgid "Configuration options for Navigator API"
 msgstr "Options de configuration pour l'API de navigateur"
 
-#: src/metadata/conf.py:203
+#: src/metadata/conf.py:215
 msgid "Base URL to Navigator API."
 msgstr "URL de base vers l'API de navigateur."
 
-#: src/metadata/conf.py:207
+#: src/metadata/conf.py:219
 msgid "Which authentication to use: CM or external via LDAP or SAML."
 msgstr "Authentification à utiliser : CM ou externe via LDAP ou SAML."
 
-#: src/metadata/conf.py:212
+#: src/metadata/conf.py:224
 msgid "Username of the CM user used for authentication."
 msgstr "Nom de l’utilisateur CM utilisé pour l’authentification."
 
-#: src/metadata/conf.py:216
+#: src/metadata/conf.py:228
 msgid "CM password of the user used for authentication."
 msgstr "Mot de passe CM de l’utilisateur utilisé pour l’authentification."
 
-#: src/metadata/conf.py:221
+#: src/metadata/conf.py:233
 msgid ""
 "Execute this script to produce the CM password. This will be used when "
 "the plain password is not set."
@@ -119,15 +135,15 @@ msgstr ""
 "Exécutez ce script pour générer le mot de passe CM. Il sera utilisé si "
 "le mot de passe normal n'est pas défini."
 
-#: src/metadata/conf.py:228
+#: src/metadata/conf.py:240
 msgid "Username of the LDAP user used for authentication."
 msgstr "Nom de l’utilisateur LDAP utilisé pour l’authentification."
 
-#: src/metadata/conf.py:232
+#: src/metadata/conf.py:244
 msgid "LDAP password of the user used for authentication."
 msgstr "Mot de passe LDAP de l’utilisateur utilisé pour l’authentification."
 
-#: src/metadata/conf.py:237
+#: src/metadata/conf.py:249
 msgid ""
 "Execute this script to produce the LDAP password. This will be used when "
 "the plain password is not set."
@@ -135,15 +151,15 @@ msgstr ""
 "Exécutez ce script pour générer le mot de passe LDAP. Il sera utilisé si "
 "le mot de passe normal n'est pas défini."
 
-#: src/metadata/conf.py:244
+#: src/metadata/conf.py:256
 msgid "Username of the SAML user used for authentication."
 msgstr "Nom de l’utilisateur SAML utilisé pour l’authentification."
 
-#: src/metadata/conf.py:248
+#: src/metadata/conf.py:260
 msgid "SAML password of the user used for authentication."
 msgstr "Mot de passe SAML de l’utilisateur utilisé pour l’authentification."
 
-#: src/metadata/conf.py:253
+#: src/metadata/conf.py:265
 msgid ""
 "Execute this script to produce the SAML password. This will be used when "
 "the plain password  is not set."
@@ -151,7 +167,7 @@ msgstr ""
 "Exécutez ce script pour générer le mot de passe SAML. Il sera utilisé si "
 "le mot de passe normal n'est pas défini."
 
-#: src/metadata/conf.py:260
+#: src/metadata/conf.py:272
 msgid ""
 "Navigator configuration directory, where navigator.client.properties is "
 "located."
@@ -159,15 +175,15 @@ msgstr ""
 "Répertoire de configuration du navigateur, dans lequel se trouve "
 "navigator.client.properties."
 
-#: src/metadata/conf.py:271
+#: src/metadata/conf.py:283
 msgid "Max number of items to fetch in one call in object search."
 msgstr "Nombre maximal d'éléments à récupérer lors d'un appel de recherche d'objets."
 
-#: src/metadata/conf.py:277
+#: src/metadata/conf.py:289
 msgid "Max number of items to fetch in one call in object search autocomplete."
 msgstr "Nombre maximal d'éléments à récupérer lors d'un appel de remplissage automatique de recherche d'objets."
 
-#: src/metadata/conf.py:284
+#: src/metadata/conf.py:296
 msgid "Enable to search HDFS, S3 files."
 msgstr "Activez cette option pour rechercher des fichiers S3 HDFS."
 
@@ -195,12 +211,12 @@ msgstr ""
 "update_properties requiert un paramètre 'id' et un paramètre 'keys' "
 "constitué d'une liste non vide"
 
-#: src/metadata/navigator_client.py:79 src/metadata/navigator_client.py:90
-#: src/metadata/navigator_client.py:101 src/metadata/optimizer_client.py:50
+#: src/metadata/navigator_client.py:81 src/metadata/navigator_client.py:92
+#: src/metadata/navigator_client.py:103 src/metadata/optimizer_client.py:51
 msgid "No error message, please check the logs."
 msgstr "Aucun message d'erreur. Consultez les fichiers journaux."
 
-#: src/metadata/navigator_client.py:220 src/metadata/navigator_client.py:293
+#: src/metadata/navigator_client.py:222 src/metadata/navigator_client.py:295
 msgid "Failed to authenticate."
 msgstr "Echec de l’authentification."
 
@@ -208,19 +224,23 @@ msgstr "Echec de l’authentification."
 msgid "Query history upload requires Admin privileges or feature is disabled."
 msgstr "Le chargement de l’historique des requêtes nécessite des privilèges d’administrateur ou la fonctionnalité est désactivée."
 
-#: src/metadata/optimizer_api.py:375
+#: src/metadata/optimizer_api.py:376
+msgid "Skipped as task query"
+msgstr "Ignoré, car il s'agit d'une requête relative à une tâche"
+
+#: src/metadata/optimizer_api.py:378
 msgid "Skipped"
 msgstr "Ignoré"
 
-#: src/metadata/optimizer_client.py:173
+#: src/metadata/optimizer_client.py:176
 msgid "Error while accessing Optimizer"
 msgstr "Erreur lors de l'accès à Optimizer"
 
-#: src/metadata/optimizer_client.py:232
+#: src/metadata/optimizer_client.py:235
 msgid "Call not supported"
 msgstr "Appel non pris en charge"
 
-#: src/metadata/optimizer_client.py:403
+#: src/metadata/optimizer_client.py:406
 #, python-format
 msgid "Could not get tenant id from cluster id %s: %s"
 msgstr "Impossible d'obtenir l'ID de locataire à partir de l'ID de cluster %s : %s"
@@ -228,11 +248,3 @@ msgstr "Impossible d'obtenir l'ID de locataire à partir de l'ID de cluster %s 
 #: src/metadata/workload_analytics_client.py:39
 msgid "Error accessing"
 msgstr "Erreur d'accès"
-
-#~ msgid ""
-#~ "Base URL to Optimizer API (e.g. -"
-#~ " https://alpha.optimizer.cloudera.com/)"
-#~ msgstr ""
-
-#~ msgid "The email of the Optimizer account to use (deprecated)."
-#~ msgstr ""
