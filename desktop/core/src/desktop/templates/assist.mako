@@ -26,7 +26,7 @@ from dashboard.conf import HAS_SQL_ENABLED
 
 from desktop import appmanager
 from desktop import conf
-from desktop.conf import USE_NEW_SIDE_PANELS, VCS
+from desktop.conf import IS_EMBEDDED, USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 %>
@@ -101,9 +101,11 @@ from desktop.views import _ko
         <!-- ko if: !definition.isDatabase && $currentApp() === 'editor' -->
         <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
         <!-- /ko -->
+        % if not IS_EMBEDDED.get():
         <!-- ko if: definition.isView || definition.isTable || definition.isDatabase -->
         <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
         <!-- /ko -->
+        % endif
         <!-- ko if: definition.isView || definition.isTable -->
         <li>
           <a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }">
