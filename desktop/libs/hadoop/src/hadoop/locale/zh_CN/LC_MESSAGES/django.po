@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:34-0700\n"
+"POT-Creation-Date: 2017-12-04 10:44-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -62,122 +62,122 @@ msgstr "跳过 %s （并非文件）。"
 msgid "%(function)s has not been implemented."
 msgstr "未执行 %(function)s。"
 
-#: src/hadoop/fs/upload.py:66
+#: src/hadoop/fs/upload.py:69
 msgid "No HDFS found"
 msgstr "未找到 HDFS"
 
-#: src/hadoop/fs/upload.py:77
+#: src/hadoop/fs/upload.py:80
 #, python-format
 msgid "User %s does not have permissions to write to path \"%s\"."
 msgstr "用户 %s 没有写入路径“%s”的权限。"
 
-#: src/hadoop/fs/webhdfs.py:252 src/hadoop/fs/webhdfs.py:288
+#: src/hadoop/fs/webhdfs.py:294 src/hadoop/fs/webhdfs.py:331
 #, python-format
 msgid "File %s not found"
 msgstr "未找到文件 %s"
 
-#: src/hadoop/fs/webhdfs.py:291
+#: src/hadoop/fs/webhdfs.py:334
 #, python-format
 msgid "File %s is a directory"
 msgstr "文件 %s 为目录"
 
-#: src/hadoop/fs/webhdfs.py:294
+#: src/hadoop/fs/webhdfs.py:337
 #, python-format
 msgid "File %s is already trashed"
 msgstr "文件 %s 已删除"
 
-#: src/hadoop/fs/webhdfs.py:321
+#: src/hadoop/fs/webhdfs.py:365
 #, python-format
 msgid "Delete failed: %s"
 msgstr "删除失败：%s"
 
-#: src/hadoop/fs/webhdfs.py:350
+#: src/hadoop/fs/webhdfs.py:394
 #, python-format
 msgid "File %s is not in trash"
 msgstr "文件 %s 不在垃圾桶中"
 
-#: src/hadoop/fs/webhdfs.py:364
+#: src/hadoop/fs/webhdfs.py:408
 #, python-format
 msgid "Path %s already exists."
 msgstr "路径 %s 已存在。"
 
-#: src/hadoop/fs/webhdfs.py:392
+#: src/hadoop/fs/webhdfs.py:436
 #, python-format
 msgid "Mkdir failed: %s"
 msgstr "Mkdir 失败：%s"
 
-#: src/hadoop/fs/webhdfs.py:406
+#: src/hadoop/fs/webhdfs.py:451
 #, python-format
 msgid "Rename failed: %s -> %s"
 msgstr "重命名失败：%s -> %s"
 
-#: src/hadoop/fs/webhdfs.py:412 src/hadoop/fs/webhdfs.py:416
+#: src/hadoop/fs/webhdfs.py:457 src/hadoop/fs/webhdfs.py:461
 #, python-format
 msgid "'%s' is not a directory"
 msgstr "“%s”不是目录"
 
-#: src/hadoop/fs/webhdfs.py:609
+#: src/hadoop/fs/webhdfs.py:670
 #, python-format
 msgid "Copy src '%s' does not exist"
 msgstr "复制源“%s”不存在"
 
-#: src/hadoop/fs/webhdfs.py:611
+#: src/hadoop/fs/webhdfs.py:672
 #, python-format
 msgid "Copy src '%s' is a directory"
 msgstr "复制源“%s”为目录"
 
-#: src/hadoop/fs/webhdfs.py:613
+#: src/hadoop/fs/webhdfs.py:674
 #, python-format
 msgid "Copy dst '%s' is a directory"
 msgstr "复制目标“%s”为目录"
 
-#: src/hadoop/fs/webhdfs.py:694
+#: src/hadoop/fs/webhdfs.py:755
 #, python-format
 msgid "File not found: %s"
 msgstr "未找到文件：%s"
 
-#: src/hadoop/fs/webhdfs.py:710
+#: src/hadoop/fs/webhdfs.py:771
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr "目标文件 %s 存在，但不是目录。"
 
-#: src/hadoop/fs/webhdfs.py:752
+#: src/hadoop/fs/webhdfs.py:813
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr "无法创建“%s”。HDFS 未返回重定向"
 
-#: src/hadoop/fs/webhdfs.py:818
+#: src/hadoop/fs/webhdfs.py:881
 msgid "Failed to upload file. WebHdfs requires a valid username to upload files."
 msgstr "无法上传文件。WebHdfs 需要有效的用户名才可上传文件。"
 
-#: src/hadoop/fs/webhdfs.py:842
+#: src/hadoop/fs/webhdfs.py:908
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr "为目录：“%s”"
 
-#: src/hadoop/fs/webhdfs.py:860
+#: src/hadoop/fs/webhdfs.py:926
 msgid "Invalid argument to seek for whence"
 msgstr "用于寻找位置的自变量无效"
 
-#: src/hadoop/fs/webhdfs.py:880
+#: src/hadoop/fs/webhdfs.py:946
 msgid "File not open for writing"
 msgstr "未打开要写入的文件"
 
-#: src/hadoop/fs/webhdfs.py:926
+#: src/hadoop/fs/webhdfs.py:992
 #, python-format
 msgid "Filesystem root '/' should be owned by '%s'"
 msgstr "文件系统根目录“/”应归属于 '%s'"
 
-#: src/hadoop/fs/webhdfs.py:929
+#: src/hadoop/fs/webhdfs.py:995
 msgid "Failed to access filesystem root"
 msgstr "无法访问文件系统根目录"
 
-#: src/hadoop/fs/webhdfs.py:937
+#: src/hadoop/fs/webhdfs.py:1003
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr "无法创建临时文件 \"%s\""
 
-#: src/hadoop/fs/webhdfs.py:953
+#: src/hadoop/fs/webhdfs.py:1019
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr "无法删除临时文件 \"%s\""
@@ -187,15 +187,15 @@ msgid "YARN cluster is not available."
 msgstr "无 YARN 群集可用。"
 
 #: src/hadoop/yarn/mapreduce_api.py:47
-#: src/hadoop/yarn/resource_manager_api.py:50
+#: src/hadoop/yarn/resource_manager_api.py:52
 msgid "No Resource Manager are available."
 msgstr "无可用资源管理器。"
 
-#: src/hadoop/yarn/resource_manager_api.py:134
+#: src/hadoop/yarn/resource_manager_api.py:135
 msgid "YARN did not return any token field."
 msgstr "YARN 未返回任何令牌字段。"
 
-#: src/hadoop/yarn/resource_manager_api.py:161
+#: src/hadoop/yarn/resource_manager_api.py:162
 #, python-format
 msgid "YARN RM returned a failed response: %s"
 msgstr "YARN RM 返回失败的响应：%s"

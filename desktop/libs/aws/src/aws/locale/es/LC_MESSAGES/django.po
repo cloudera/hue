@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:34-0700\n"
+"POT-Creation-Date: 2017-12-04 10:44-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/aws/conf.py:88
+#: src/aws/conf.py:89
 msgid "One entry for each AWS account"
 msgstr "Una entrada para cada cuenta AWS"
 
-#: src/aws/conf.py:90
+#: src/aws/conf.py:91
 msgid "Information about single AWS account"
 msgstr "Información sobre una única cuenta AWS"
 
-#: src/aws/conf.py:103
+#: src/aws/conf.py:104
 msgid "Execute this script to produce the AWS access key ID."
 msgstr "Ejecute esta secuencia de comandos para generar el ID de clave de acceso de AWS."
 
-#: src/aws/conf.py:115
+#: src/aws/conf.py:116
 msgid "Execute this script to produce the AWS secret access key."
 msgstr "Ejecute esta secuencia de comandos para generar la clave de acceso secreta de AWS."
 
-#: src/aws/conf.py:123
+#: src/aws/conf.py:124
 msgid ""
 "Allow to use environment sources of credentials (environment variables, "
 "EC2 profile)."
@@ -41,27 +41,27 @@ msgstr ""
 "Permita el uso de orígenes de entorno de credenciales (variables de entorno, "
 "perfil de EC2)."
 
-#: src/aws/conf.py:134
+#: src/aws/conf.py:135
 msgid "Alternate address for the S3 endpoint."
 msgstr "Dirección alternativa para el extremo de S3."
 
-#: src/aws/conf.py:140
+#: src/aws/conf.py:141
 msgid "Proxy address to use for the S3 connection."
 msgstr "Dirección del proxy que se usará para la conexión S3."
 
-#: src/aws/conf.py:146
+#: src/aws/conf.py:147
 msgid "Proxy port to use for the S3 connection."
 msgstr "Puerto del proxy que se usará para la conexión S3."
 
-#: src/aws/conf.py:152
+#: src/aws/conf.py:153
 msgid "Proxy user to use for the S3 connection."
 msgstr "Usuario del proxy que se usará para la conexión S3."
 
-#: src/aws/conf.py:158
+#: src/aws/conf.py:159
 msgid "Proxy password to use for the S3 connection."
 msgstr "Contraseña del proxy que se usará para la conexión S3."
 
-#: src/aws/conf.py:200
+#: src/aws/conf.py:201
 msgid "Failed to connect to S3, check your AWS credentials."
 msgstr "No se ha podido establecer la conexión con S3, compruebe sus credenciales de AWS."
 
@@ -82,17 +82,17 @@ msgstr ""
 "El usuario no está autorizado para escribir o modificar la ruta: %s. Compruebe que el"
 " usuario cuenta con permisos de escritura."
 
-#: src/aws/s3/s3fs.py:87 src/aws/s3/s3fs.py:89
+#: src/aws/s3/s3fs.py:88 src/aws/s3/s3fs.py:90
 #, python-format
 msgid "Failed to initialize bucket cache: %s"
 msgstr "No se ha podido iniciar la caché del contenedor: %s."
 
-#: src/aws/s3/s3fs.py:104 src/aws/s3/s3fs.py:116
+#: src/aws/s3/s3fs.py:105 src/aws/s3/s3fs.py:117
 #, python-format
 msgid "Failed to create bucket named \"%s\": %s"
 msgstr "Error al crear el contenedor llamado \"%s\": %s"
 
-#: src/aws/s3/s3fs.py:107 src/aws/s3/s3fs.py:145
+#: src/aws/s3/s3fs.py:108 src/aws/s3/s3fs.py:146
 #, python-format
 msgid ""
 "User is not authorized to access bucket named \"%s\". If you are "
@@ -101,12 +101,12 @@ msgstr ""
 "El usuario no está autorizado para acceder al contenedor llamado \"%s\". Si está "
 "intentando crear un contenedor, este nombre de contenedor ya está reservado."
 
-#: src/aws/s3/s3fs.py:156
+#: src/aws/s3/s3fs.py:157
 #, python-format
 msgid "Failed to access path at \"%s\": %s"
 msgstr "No se ha podido acceder a la ruta \"%s\": %s."
 
-#: src/aws/s3/s3fs.py:159
+#: src/aws/s3/s3fs.py:160
 #, python-format
 msgid ""
 "Failed to access path: \"%s\" Check that you have access to read this "
@@ -115,40 +115,40 @@ msgstr ""
 "No se ha podido acceder a la ruta: \"%s\" Compruebe que tiene acceso para leer este "
 "contenedor y que la región es correcta: %s."
 
-#: src/aws/s3/s3fs.py:162
+#: src/aws/s3/s3fs.py:163
 #, python-format
 msgid "User is not authorized to access path at \"%s\"."
 msgstr "El usuario no tiene autorización para acceder a la ruta \"%s\"."
 
-#: src/aws/s3/s3fs.py:179 src/aws/s3/s3fs.py:186
+#: src/aws/s3/s3fs.py:180 src/aws/s3/s3fs.py:187
 #, python-format
 msgid "Failed to access path \"%s\": %s"
 msgstr "Error al acceder a la ruta \"%s\": %s"
 
-#: src/aws/s3/s3fs.py:184
+#: src/aws/s3/s3fs.py:185
 #, python-format
 msgid "User is not authorized to access path: \"%s\""
 msgstr "El usuario no está autorizado para acceder a la ruta: \"%s\""
 
-#: src/aws/s3/s3fs.py:281
+#: src/aws/s3/s3fs.py:285
 msgid "Option `glob` is not implemented"
 msgstr "La opción `glob` no está implementada"
 
-#: src/aws/s3/s3fs.py:308 src/aws/s3/s3fs.py:340
+#: src/aws/s3/s3fs.py:312 src/aws/s3/s3fs.py:344
 msgid "Moving to trash is not implemented for S3"
 msgstr "El desplazamiento a la basura no está implementado en S3"
 
-#: src/aws/s3/s3fs.py:352
+#: src/aws/s3/s3fs.py:360
 #, python-format
 msgid "Invalid bucket name: %s"
 msgstr "Nombre de contenedor no válido: %s"
 
-#: src/aws/s3/s3fs.py:359 src/aws/s3/s3fs.py:361
+#: src/aws/s3/s3fs.py:367 src/aws/s3/s3fs.py:369
 #, python-format
 msgid "Failed to create S3 bucket \"%s\": %s"
 msgstr "Error al crear el contenedor S3 \"%s\": %s"
 
-#: src/aws/s3/s3fs.py:417
+#: src/aws/s3/s3fs.py:425
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "Clave para transformar no válida: %s"
@@ -156,10 +156,3 @@ msgstr "Clave para transformar no válida: %s"
 #: src/aws/s3/upload.py:124
 msgid "No S3 filesystem found."
 msgstr "No se encontró ningún sistema de archivos S3."
-
-#~ msgid ""
-#~ "Failed to access path: \"%s\" Check "
-#~ "that you have access to read this"
-#~ " bucket and that the region is "
-#~ "correct."
-#~ msgstr ""

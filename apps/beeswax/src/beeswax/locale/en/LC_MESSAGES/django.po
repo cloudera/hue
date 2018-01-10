@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-21 22:35-0700\n"
+"POT-Creation-Date: 2017-12-04 10:45-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,92 +17,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/beeswax/api.py:165 src/beeswax/api.py:284 src/beeswax/api.py:315
-#: src/beeswax/api.py:382 src/beeswax/api.py:442 src/beeswax/api.py:471
-#: src/beeswax/api.py:520 src/beeswax/api.py:586 src/beeswax/api.py:633
-#: src/beeswax/api.py:749 src/beeswax/views.py:596
+#: src/beeswax/api.py:166 src/beeswax/api.py:285 src/beeswax/api.py:316
+#: src/beeswax/api.py:383 src/beeswax/api.py:443 src/beeswax/api.py:472
+#: src/beeswax/api.py:521 src/beeswax/api.py:587 src/beeswax/api.py:634
+#: src/beeswax/api.py:750 src/beeswax/views.py:600
 msgid "A POST request is required."
 msgstr ""
 
-#: src/beeswax/api.py:259
+#: src/beeswax/api.py:260
 #, python-format
 msgid ""
 "Bad status for request %s:\n"
 "%s"
 msgstr ""
 
-#: src/beeswax/api.py:364
+#: src/beeswax/api.py:365
 msgid "There was an error with your query."
 msgstr ""
 
-#: src/beeswax/api.py:414 src/beeswax/api.py:429
+#: src/beeswax/api.py:415 src/beeswax/api.py:430
 msgid "A GET request is required."
 msgstr ""
 
-#: src/beeswax/api.py:474 src/beeswax/api.py:523 src/beeswax/api.py:589
+#: src/beeswax/api.py:475 src/beeswax/api.py:524 src/beeswax/api.py:590
 #, python-format
 msgid "This query is %(state)s. Results unavailable."
 msgstr ""
 
-#: src/beeswax/api.py:496 src/beeswax/api.py:562 src/beeswax/api.py:618
+#: src/beeswax/api.py:497 src/beeswax/api.py:563 src/beeswax/api.py:619
 #, python-format
 msgid "The result could not be saved: %s."
 msgstr ""
 
-#: src/beeswax/api.py:541 src/beeswax/api.py:604
+#: src/beeswax/api.py:542 src/beeswax/api.py:605
 #, python-format
 msgid "Cannot find query handle and state: %s"
 msgstr ""
 
-#: src/beeswax/api.py:550
+#: src/beeswax/api.py:551
 msgid "The target path is a directory"
 msgstr ""
 
-#: src/beeswax/api.py:671
+#: src/beeswax/api.py:672
 msgid "Failed to get sample data."
 msgstr ""
 
-#: src/beeswax/api.py:688
+#: src/beeswax/api.py:689
 msgid "Failed to get indexes."
 msgstr ""
 
-#: src/beeswax/api.py:704
+#: src/beeswax/api.py:705
 msgid "Failed to get settings."
 msgstr ""
 
-#: src/beeswax/api.py:722
+#: src/beeswax/api.py:723
 msgid "Failed to get functions."
 msgstr ""
 
-#: src/beeswax/api.py:814
+#: src/beeswax/api.py:815
 msgid "Could not find session or no open sessions found."
 msgstr ""
 
-#: src/beeswax/api.py:833
+#: src/beeswax/api.py:834
 msgid ""
 "Session does not exist or you do not have permissions to close the "
 "session."
 msgstr ""
 
-#: src/beeswax/api.py:838
+#: src/beeswax/api.py:839
 msgid "Session successfully closed."
 msgstr ""
 
-#: src/beeswax/api.py:851
+#: src/beeswax/api.py:852
 msgid "Problem accessing table metadata"
 msgstr ""
 
-#: src/beeswax/api.py:898
+#: src/beeswax/api.py:899
 msgid ""
 "Failed to authenticate to query server, check authentication "
 "configurations."
 msgstr ""
 
-#: src/beeswax/api.py:902
+#: src/beeswax/api.py:903
 msgid "Unable to access databases, Query Server or Metastore may be down."
 msgstr ""
 
-#: src/beeswax/api.py:905
+#: src/beeswax/api.py:906
 msgid "No databases are available. Permissions could be missing."
 msgstr ""
 
@@ -529,12 +529,12 @@ msgid "Specify if column_is varchar"
 msgstr ""
 
 #: src/beeswax/forms.py:400
-#: src/beeswax/templates/create_table_manually.mako:413
+#: src/beeswax/templates/create_table_manually.mako:412
 msgid "Column Name"
 msgstr ""
 
 #: src/beeswax/forms.py:401
-#: src/beeswax/templates/import_wizard_define_columns.mako:142
+#: src/beeswax/templates/import_wizard_define_columns.mako:141
 msgid "Column Type"
 msgstr ""
 
@@ -547,12 +547,12 @@ msgid "Specify if column_type is map."
 msgstr ""
 
 #: src/beeswax/forms.py:421
-#: src/beeswax/templates/create_table_manually.mako:364
+#: src/beeswax/templates/create_table_manually.mako:363
 msgid "Add a column"
 msgstr ""
 
 #: src/beeswax/forms.py:423
-#: src/beeswax/templates/create_table_manually.mako:380
+#: src/beeswax/templates/create_table_manually.mako:379
 msgid "Add a partition"
 msgstr ""
 
@@ -565,8 +565,8 @@ msgstr ""
 msgid "Database Name"
 msgstr ""
 
-#: src/beeswax/forms.py:445 src/beeswax/templates/create_database.mako:143
-#: src/beeswax/templates/create_table_manually.mako:318
+#: src/beeswax/forms.py:445 src/beeswax/templates/create_database.mako:142
+#: src/beeswax/templates/create_table_manually.mako:317
 msgid "Use default location"
 msgstr ""
 
@@ -635,29 +635,29 @@ msgstr ""
 msgid "Application we communicate with."
 msgstr ""
 
-#: src/beeswax/views.py:98
+#: src/beeswax/views.py:99
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr ""
 
-#: src/beeswax/views.py:166
+#: src/beeswax/views.py:167
 msgid "Delete design(s)?"
 msgstr ""
 
-#: src/beeswax/views.py:182
+#: src/beeswax/views.py:183
 msgid "Restore design(s)?"
 msgstr ""
 
-#: src/beeswax/views.py:199
+#: src/beeswax/views.py:200
 #, python-format
 msgid "Copied design: %(name)s"
 msgstr ""
 
-#: src/beeswax/views.py:623
+#: src/beeswax/views.py:627
 msgid "Beeswax query completed."
 msgstr ""
 
-#: src/beeswax/views.py:631
+#: src/beeswax/views.py:635
 #, python-format
 msgid ""
 "%(subject)s. See the results here: %(link)s\n"
@@ -666,35 +666,35 @@ msgid ""
 "%(query)s"
 msgstr ""
 
-#: src/beeswax/views.py:666
+#: src/beeswax/views.py:670
 #, python-format
 msgid "Design %(id)s does not exist."
 msgstr ""
 
-#: src/beeswax/views.py:686
+#: src/beeswax/views.py:690
 #, python-format
 msgid "QueryHistory %(id)s does not exist."
 msgstr ""
 
-#: src/beeswax/views.py:693
+#: src/beeswax/views.py:697
 #, python-format
 msgid "Permission denied to read QueryHistory %(id)s"
 msgstr ""
 
-#: src/beeswax/views.py:866
+#: src/beeswax/views.py:870
 msgid "Failed to retrieve query state from the Query Server."
 msgstr ""
 
-#: src/beeswax/views.py:871
+#: src/beeswax/views.py:875
 msgid "Failed to contact Server to check query status."
 msgstr ""
 
-#: src/beeswax/views.py:906
+#: src/beeswax/views.py:910
 #, python-format
 msgid "Cannot parse job IDs for execution engine %(engine)s"
 msgstr ""
 
-#: src/beeswax/views.py:974
+#: src/beeswax/views.py:978
 #, python-format
 msgid "list_query_history requires design_id parameter to be an integer: %s"
 msgstr ""
@@ -747,66 +747,72 @@ msgstr ""
 msgid "Error loading table %(table)s: %(error)s."
 msgstr ""
 
-#: src/beeswax/server/dbms.py:180
+#: src/beeswax/server/dbms.py:178
 #, python-format
 msgid "Failed to execute alter database statement: %s"
 msgstr ""
 
-#: src/beeswax/server/dbms.py:245
+#: src/beeswax/server/dbms.py:228
+#, python-format
+msgid "Failed to find the table: %s"
+msgstr ""
+
+#: src/beeswax/server/dbms.py:250
 #, python-format
 msgid "Failed to execute alter table statement: %s"
 msgstr ""
 
-#: src/beeswax/server/dbms.py:281
+#: src/beeswax/server/dbms.py:285
 #, python-format
 msgid "Failed to execute alter column statement: %s"
 msgstr ""
 
-#: src/beeswax/server/dbms.py:339
+#: src/beeswax/server/dbms.py:343
 msgid ""
 "Failed to close session, session handle may already be closed or timed "
 "out."
 msgstr ""
 
-#: src/beeswax/server/dbms.py:618
+#: src/beeswax/server/dbms.py:622
 #, python-format
 msgid "Only SELECT statements can be saved. Provided query: %(query)s"
 msgstr ""
 
-#: src/beeswax/server/dbms.py:680
+#: src/beeswax/server/dbms.py:684
 #, python-format
 msgid "Saved query results as new table %(table)s."
 msgstr ""
 
-#: src/beeswax/server/dbms.py:788
+#: src/beeswax/server/dbms.py:792
 #, python-format
 msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
 msgstr ""
 
-#: src/beeswax/server/dbms.py:834
-msgid "Query did not return exactly one partition result"
+#: src/beeswax/server/dbms.py:841
+#, python-format
+msgid "Query did not return exactly one partition result: %s"
 msgstr ""
 
-#: src/beeswax/server/dbms.py:941
+#: src/beeswax/server/dbms.py:948
 #, python-format
 msgid "Could not retrieve logs: %s."
 msgstr ""
 
-#: src/beeswax/server/dbms.py:944
+#: src/beeswax/server/dbms.py:951
 msgid "Unknown exception."
 msgstr ""
 
-#: src/beeswax/server/hive_server2_lib.py:568
+#: src/beeswax/server/hive_server2_lib.py:567
 #, python-format
 msgid "%s server authentication not supported. Valid are %s."
 msgstr ""
 
-#: src/beeswax/server/hive_server2_lib.py:761
+#: src/beeswax/server/hive_server2_lib.py:760
 #, python-format
 msgid "%(query)s returned more than 1 row"
 msgstr ""
 
-#: src/beeswax/server/hive_server2_lib.py:1017
+#: src/beeswax/server/hive_server2_lib.py:1015
 #, python-format
 msgid "Failed to determine partition keys for Impala table: `%s`.`%s`"
 msgstr ""
@@ -921,115 +927,115 @@ msgid "No"
 msgstr ""
 
 #: src/beeswax/templates/create_database.mako:26
-#: src/beeswax/templates/create_database.mako:172
+#: src/beeswax/templates/create_database.mako:171
 msgid "Create database"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:58
-#: src/beeswax/templates/create_database.mako:68
-#: src/beeswax/templates/create_table_manually.mako:57
-#: src/beeswax/templates/create_table_manually.mako:67
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:56
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:67
-#: src/beeswax/templates/import_wizard_choose_file.mako:55
-#: src/beeswax/templates/import_wizard_choose_file.mako:65
-#: src/beeswax/templates/import_wizard_define_columns.mako:56
-#: src/beeswax/templates/import_wizard_define_columns.mako:67
+#: src/beeswax/templates/create_database.mako:57
+#: src/beeswax/templates/create_database.mako:67
+#: src/beeswax/templates/create_table_manually.mako:56
+#: src/beeswax/templates/create_table_manually.mako:66
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:55
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:66
+#: src/beeswax/templates/import_wizard_choose_file.mako:54
+#: src/beeswax/templates/import_wizard_choose_file.mako:64
+#: src/beeswax/templates/import_wizard_define_columns.mako:55
+#: src/beeswax/templates/import_wizard_define_columns.mako:66
 msgid "Toggle Assist"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:91
+#: src/beeswax/templates/create_database.mako:90
 msgid "Create a new database"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:94
-#: src/beeswax/templates/create_table_manually.mako:108
+#: src/beeswax/templates/create_database.mako:93
+#: src/beeswax/templates/create_table_manually.mako:107
 msgid "Step 1: Name"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:95
+#: src/beeswax/templates/create_database.mako:94
 msgid "Step 2: Location"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:103
+#: src/beeswax/templates/create_database.mako:102
 msgid "Create a database"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:103
-#: src/beeswax/templates/create_table_manually.mako:122
+#: src/beeswax/templates/create_database.mako:102
+#: src/beeswax/templates/create_table_manually.mako:121
 msgid "Let's start with a name and description for where we'll store your data."
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:108
+#: src/beeswax/templates/create_database.mako:107
 msgid "database_name"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:111
-#: src/beeswax/templates/create_table_manually.mako:130
-#: src/beeswax/templates/create_table_manually.mako:199
-#: src/beeswax/templates/create_table_manually.mako:209
-#: src/beeswax/templates/create_table_manually.mako:219
-#: src/beeswax/templates/create_table_manually.mako:284
-#: src/beeswax/templates/create_table_manually.mako:297
-#: src/beeswax/templates/create_table_manually.mako:417
+#: src/beeswax/templates/create_database.mako:110
+#: src/beeswax/templates/create_table_manually.mako:129
+#: src/beeswax/templates/create_table_manually.mako:198
+#: src/beeswax/templates/create_table_manually.mako:208
+#: src/beeswax/templates/create_table_manually.mako:218
+#: src/beeswax/templates/create_table_manually.mako:283
+#: src/beeswax/templates/create_table_manually.mako:296
+#: src/beeswax/templates/create_table_manually.mako:416
 msgid "This field is required. Spaces are not allowed."
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:113
+#: src/beeswax/templates/create_database.mako:112
 msgid ""
 "Name of the new database. Database names must be globally unique. "
 "Database names tend to correspond to the directory where the data will be"
 " stored."
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:121
-#: src/beeswax/templates/create_table_manually.mako:140
-#: src/beeswax/templates/import_wizard_choose_file.mako:128
+#: src/beeswax/templates/create_database.mako:120
+#: src/beeswax/templates/create_table_manually.mako:139
+#: src/beeswax/templates/import_wizard_choose_file.mako:127
 msgid "Optional"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:125
+#: src/beeswax/templates/create_database.mako:124
 msgid ""
 "Use a database comment to describe the database. For example, note the "
 "data's provenance and any caveats users need to know."
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:134
+#: src/beeswax/templates/create_database.mako:133
 msgid "Choose Where Your Database's Data is Stored"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:137
-#: src/beeswax/templates/create_table_manually.mako:312
+#: src/beeswax/templates/create_database.mako:136
+#: src/beeswax/templates/create_table_manually.mako:311
 msgid "Location"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:146
+#: src/beeswax/templates/create_database.mako:145
 msgid ""
 "Store your database in the default location (controlled by Hive, and "
 "typically"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:160
+#: src/beeswax/templates/create_database.mako:159
 #: src/beeswax/templates/execute.mako:1786
 msgid "This field is required."
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:162
+#: src/beeswax/templates/create_database.mako:161
 msgid "Enter the path (on HDFS) to your database's data location."
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:170
-#: src/beeswax/templates/create_table_manually.mako:385
+#: src/beeswax/templates/create_database.mako:169
+#: src/beeswax/templates/create_table_manually.mako:384
 #: src/beeswax/templates/list_trashed_designs.mako:59
 msgid "Back"
 msgstr ""
 
-#: src/beeswax/templates/create_database.mako:171
-#: src/beeswax/templates/create_table_manually.mako:386
+#: src/beeswax/templates/create_database.mako:170
+#: src/beeswax/templates/create_table_manually.mako:385
 #: src/beeswax/templates/execute.mako:327
 #: src/beeswax/templates/execute.mako:1335
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:164
-#: src/beeswax/templates/import_wizard_choose_file.mako:167
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:163
+#: src/beeswax/templates/import_wizard_choose_file.mako:166
 #: src/beeswax/templates/list_history.mako:199
 msgid "Next"
 msgstr ""
@@ -1038,76 +1044,76 @@ msgstr ""
 msgid "Create table manually"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:92
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:91
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:103
-#: src/beeswax/templates/import_wizard_choose_file.mako:100
-#: src/beeswax/templates/import_wizard_define_columns.mako:91
-#: src/beeswax/templates/import_wizard_define_columns.mako:103
+#: src/beeswax/templates/create_table_manually.mako:91
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:90
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:102
+#: src/beeswax/templates/import_wizard_choose_file.mako:99
+#: src/beeswax/templates/import_wizard_define_columns.mako:90
+#: src/beeswax/templates/import_wizard_define_columns.mako:102
 msgid "Create a new table from a file"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:96
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:97
-#: src/beeswax/templates/import_wizard_choose_file.mako:94
-#: src/beeswax/templates/import_wizard_define_columns.mako:97
+#: src/beeswax/templates/create_table_manually.mako:95
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:96
+#: src/beeswax/templates/import_wizard_choose_file.mako:93
+#: src/beeswax/templates/import_wizard_define_columns.mako:96
 msgid "Databases"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:102
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:92
-#: src/beeswax/templates/import_wizard_choose_file.mako:89
-#: src/beeswax/templates/import_wizard_define_columns.mako:92
+#: src/beeswax/templates/create_table_manually.mako:101
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:91
+#: src/beeswax/templates/import_wizard_choose_file.mako:88
+#: src/beeswax/templates/import_wizard_define_columns.mako:91
 msgid "Create a new table manually"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:109
+#: src/beeswax/templates/create_table_manually.mako:108
 msgid "Step 2: Record Format"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:110
+#: src/beeswax/templates/create_table_manually.mako:109
 msgid "Step 3: Serialization"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:111
+#: src/beeswax/templates/create_table_manually.mako:110
 msgid "Step 4: File Format"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:112
+#: src/beeswax/templates/create_table_manually.mako:111
 msgid "Step 5: Location"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:113
+#: src/beeswax/templates/create_table_manually.mako:112
 msgid "Step 6: Columns"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:122
+#: src/beeswax/templates/create_table_manually.mako:121
 msgid "Create a table"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:127
-#: src/beeswax/templates/import_wizard_choose_file.mako:117
+#: src/beeswax/templates/create_table_manually.mako:126
+#: src/beeswax/templates/import_wizard_choose_file.mako:116
 msgid "table_name"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:132
-#: src/beeswax/templates/import_wizard_choose_file.mako:120
+#: src/beeswax/templates/create_table_manually.mako:131
+#: src/beeswax/templates/import_wizard_choose_file.mako:119
 msgid ""
 "Name of the new table. Table names must be globally unique. Table names "
 "tend to correspond to the directory where the data will be stored."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:144
+#: src/beeswax/templates/create_table_manually.mako:143
 msgid ""
 "Use a table comment to describe your table.  For example, note the data's"
 " provenance and any caveats users need to know."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:153
+#: src/beeswax/templates/create_table_manually.mako:152
 msgid "Choose Your Record Format"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:154
+#: src/beeswax/templates/create_table_manually.mako:153
 msgid ""
 "Individual records are broken up into columns either with delimiters "
 "(e.g., CSV or TSV) or using a specific serialization/deserialization "
@@ -1115,139 +1121,139 @@ msgid ""
 "columns with a regular expression.)"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:160
+#: src/beeswax/templates/create_table_manually.mako:159
 msgid "Record format"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:168
+#: src/beeswax/templates/create_table_manually.mako:167
 msgid "Delimited"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:170
+#: src/beeswax/templates/create_table_manually.mako:169
 msgid "(Data files use delimiters, like commas (CSV) or tabs.)"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:179
+#: src/beeswax/templates/create_table_manually.mako:178
 msgid "SerDe"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:181
+#: src/beeswax/templates/create_table_manually.mako:180
 msgid "(Enter a specialized serialization implementation.)"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:192
-#: src/beeswax/templates/create_table_manually.mako:227
+#: src/beeswax/templates/create_table_manually.mako:191
+#: src/beeswax/templates/create_table_manually.mako:226
 msgid "Configure Record Serialization"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:193
+#: src/beeswax/templates/create_table_manually.mako:192
 msgid "Only supports single-character delimiters."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:201
+#: src/beeswax/templates/create_table_manually.mako:200
 msgid ""
 "Enter the column delimiter. Must be a single character. Use syntax like "
 "\"\\001\" or \"\t\" for special characters."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:211
+#: src/beeswax/templates/create_table_manually.mako:210
 msgid "Use for array types."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:221
+#: src/beeswax/templates/create_table_manually.mako:220
 msgid "Use for map types."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:237
+#: src/beeswax/templates/create_table_manually.mako:236
 msgid "The Java class name of your SerDe."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:237
-#: src/beeswax/templates/create_table_manually.mako:249
-#: src/beeswax/templates/create_table_manually.mako:371
+#: src/beeswax/templates/create_table_manually.mako:236
+#: src/beeswax/templates/create_table_manually.mako:248
+#: src/beeswax/templates/create_table_manually.mako:370
 msgid "e.g."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:249
+#: src/beeswax/templates/create_table_manually.mako:248
 msgid "Properties to pass to the (de)serialization mechanism."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:259
+#: src/beeswax/templates/create_table_manually.mako:258
 msgid "Choose a File Format"
 msgstr ""
 
+#: src/beeswax/templates/create_table_manually.mako:259
 #: src/beeswax/templates/create_table_manually.mako:260
 #: src/beeswax/templates/create_table_manually.mako:261
-#: src/beeswax/templates/create_table_manually.mako:262
 msgid "Use"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:260
+#: src/beeswax/templates/create_table_manually.mako:259
 msgid "for newline-delimited text files."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:261
+#: src/beeswax/templates/create_table_manually.mako:260
 msgid "for Hadoop's binary serialization format."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:262
+#: src/beeswax/templates/create_table_manually.mako:261
 msgid "to choose a custom implementation."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:267
+#: src/beeswax/templates/create_table_manually.mako:266
 msgid "File format"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:286
+#: src/beeswax/templates/create_table_manually.mako:285
 msgid "Java class used to read data."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:299
+#: src/beeswax/templates/create_table_manually.mako:298
 msgid "Java class used to write data."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:309
+#: src/beeswax/templates/create_table_manually.mako:308
 msgid "Choose Where Your Table's Data is Stored"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:321
+#: src/beeswax/templates/create_table_manually.mako:320
 msgid ""
 "Store your table in the default location (controlled by Hive, and "
 "typically"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:336
+#: src/beeswax/templates/create_table_manually.mako:335
 msgid "Enter the path (on HDFS) to your table's data location"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:345
+#: src/beeswax/templates/create_table_manually.mako:344
 msgid "Configure Table Columns"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:348
+#: src/beeswax/templates/create_table_manually.mako:347
 msgid "Table Properties"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:354
+#: src/beeswax/templates/create_table_manually.mako:353
 msgid "Skip Header Row?"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:368
+#: src/beeswax/templates/create_table_manually.mako:367
 msgid "Configure Partitions"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:369
+#: src/beeswax/templates/create_table_manually.mako:368
 msgid ""
 "If your data is naturally partitioned (by date, for example), partitions "
 "are a way to tell the query server that data for a specific partition "
 "value are stored together."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:370
+#: src/beeswax/templates/create_table_manually.mako:369
 msgid "The query server establishes a mapping between directories on disk"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:372
+#: src/beeswax/templates/create_table_manually.mako:371
 msgid ""
 "and the data for that day.  Partitions are virtual columns; they are not "
 "represented in the data itself, but are determined by the data location. "
@@ -1256,84 +1262,84 @@ msgid ""
 "partitions."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:387
+#: src/beeswax/templates/create_table_manually.mako:386
 msgid "Create table"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:406
+#: src/beeswax/templates/create_table_manually.mako:405
 msgid "Delete this column"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:411
-#: src/beeswax/templates/import_wizard_define_columns.mako:141
-#: src/beeswax/templates/import_wizard_define_columns.mako:151
+#: src/beeswax/templates/create_table_manually.mako:410
+#: src/beeswax/templates/import_wizard_define_columns.mako:140
+#: src/beeswax/templates/import_wizard_define_columns.mako:150
 msgid "Column name"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:418
+#: src/beeswax/templates/create_table_manually.mako:417
 msgid "There is another field with the same name."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:420
+#: src/beeswax/templates/create_table_manually.mako:419
 msgid "Column name must be single words that start with a letter or a digit."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:425
+#: src/beeswax/templates/create_table_manually.mako:424
 msgid "Column type"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:431
+#: src/beeswax/templates/create_table_manually.mako:430
 msgid ""
 "Type for this column. Certain advanced types (namely, structs) are not "
 "exposed in this interface."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:438
+#: src/beeswax/templates/create_table_manually.mako:437
 msgid "Array value type"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:442
+#: src/beeswax/templates/create_table_manually.mako:441
 msgid "Type of the array values."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:449
+#: src/beeswax/templates/create_table_manually.mako:448
 msgid "Map Key type"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:453
+#: src/beeswax/templates/create_table_manually.mako:452
 msgid "Type of the map keys."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:458
+#: src/beeswax/templates/create_table_manually.mako:457
 msgid "Map Value type"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:462
+#: src/beeswax/templates/create_table_manually.mako:461
 msgid "Type of the map values."
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:470
-#: src/beeswax/templates/create_table_manually.mako:481
+#: src/beeswax/templates/create_table_manually.mako:469
+#: src/beeswax/templates/create_table_manually.mako:480
 msgid "Size"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:474
+#: src/beeswax/templates/create_table_manually.mako:473
 msgid "Length of char value (1~255)"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:485
+#: src/beeswax/templates/create_table_manually.mako:484
 msgid "Length of varchar value (1~65355)"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:640
+#: src/beeswax/templates/create_table_manually.mako:639
 msgid "Type your field terminator here"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:649
+#: src/beeswax/templates/create_table_manually.mako:648
 msgid "Type your collection terminator here"
 msgstr ""
 
-#: src/beeswax/templates/create_table_manually.mako:658
+#: src/beeswax/templates/create_table_manually.mako:657
 msgid "Type your map key terminator here"
 msgstr ""
 
@@ -1679,7 +1685,7 @@ msgid "There is currently no data to build a chart on."
 msgstr ""
 
 #: src/beeswax/templates/execute.mako:499
-#: src/beeswax/templates/import_wizard_choose_file.mako:160
+#: src/beeswax/templates/import_wizard_choose_file.mako:159
 #: src/beeswax/templates/watch_results.mako:170
 msgid "Warning:"
 msgstr ""
@@ -1867,8 +1873,8 @@ msgid "Last"
 msgstr ""
 
 #: src/beeswax/templates/execute.mako:1336
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:163
-#: src/beeswax/templates/import_wizard_define_columns.mako:169
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:162
+#: src/beeswax/templates/import_wizard_define_columns.mako:168
 #: src/beeswax/templates/list_history.mako:200
 msgid "Previous"
 msgstr ""
@@ -1978,99 +1984,99 @@ msgstr ""
 msgid "Create table from file"
 msgstr ""
 
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:108
+#: src/beeswax/templates/import_wizard_choose_file.mako:105
+#: src/beeswax/templates/import_wizard_define_columns.mako:107
+msgid "Step 1: Choose File"
+msgstr ""
+
 #: src/beeswax/templates/import_wizard_choose_delimiter.mako:109
 #: src/beeswax/templates/import_wizard_choose_file.mako:106
 #: src/beeswax/templates/import_wizard_define_columns.mako:108
-msgid "Step 1: Choose File"
+msgid "Step 2: Choose Delimiter"
 msgstr ""
 
 #: src/beeswax/templates/import_wizard_choose_delimiter.mako:110
 #: src/beeswax/templates/import_wizard_choose_file.mako:107
 #: src/beeswax/templates/import_wizard_define_columns.mako:109
-msgid "Step 2: Choose Delimiter"
-msgstr ""
-
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:111
-#: src/beeswax/templates/import_wizard_choose_file.mako:108
-#: src/beeswax/templates/import_wizard_define_columns.mako:110
 msgid "Step 3: Define Columns"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:120
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:119
 msgid "Choose a Delimiter"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:122
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:121
 msgid "Beeswax has determined that this file is delimited by"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:129
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:128
 msgid "Preview"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:131
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:130
 msgid ""
 "Enter the column delimiter which must be a single character. Use syntax "
 "like \"\\001\" or \"\t\" for special characters."
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:136
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:135
 msgid "Table preview"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:222
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:221
 msgid "Type your delimiter here"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_file.mako:113
+#: src/beeswax/templates/import_wizard_choose_file.mako:112
 msgid "Name Your Table and Choose A File"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_file.mako:134
+#: src/beeswax/templates/import_wizard_choose_file.mako:133
 msgid ""
 "Use a table comment to describe the table.  For example, note the data's "
 "provenance and any caveats users need to know."
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_file.mako:149
+#: src/beeswax/templates/import_wizard_choose_file.mako:148
 msgid ""
 "The path to the file(s) or directory on which to base this new table "
 "definition. It can be compressed (gzip) or not."
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_file.mako:158
+#: src/beeswax/templates/import_wizard_choose_file.mako:157
 msgid "Select whether table data should be imported, external or empty."
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_choose_file.mako:160
+#: src/beeswax/templates/import_wizard_choose_file.mako:159
 msgid "The selected file is going to be moved during the import."
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_define_columns.mako:125
+#: src/beeswax/templates/import_wizard_define_columns.mako:124
 msgid "Define your columns"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_define_columns.mako:130
+#: src/beeswax/templates/import_wizard_define_columns.mako:129
 msgid "Use first row as column names"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_define_columns.mako:133
+#: src/beeswax/templates/import_wizard_define_columns.mako:132
 msgid "Bulk edit column names"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_define_columns.mako:144
+#: src/beeswax/templates/import_wizard_define_columns.mako:143
 msgid "Sample Row"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_define_columns.mako:170
+#: src/beeswax/templates/import_wizard_define_columns.mako:169
 msgid "Create Table"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_define_columns.mako:185
+#: src/beeswax/templates/import_wizard_define_columns.mako:184
 msgid "Write or paste comma separated column names"
 msgstr ""
 
-#: src/beeswax/templates/import_wizard_define_columns.mako:193
+#: src/beeswax/templates/import_wizard_define_columns.mako:192
 msgid "e.g. id, name, salary"
 msgstr ""
 
@@ -2454,6 +2460,6 @@ msgstr ""
 msgid "Download results from the left."
 msgstr ""
 
-#~ msgid "Choose a file"
+#~ msgid "Query did not return exactly one partition result"
 #~ msgstr ""
 
