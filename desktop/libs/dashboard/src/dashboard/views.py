@@ -52,7 +52,7 @@ DEFAULT_LAYOUT = [
         "drops":["temp"],"klass":"card card-home card-column span10"},
 ]
 
-QUEERY_BUILDER_LAYOUT = [
+QUERY_BUILDER_LAYOUT = [
   {u'klass': u'card card-home card-column span12', u'rows': [
     {u'widgets': [
         {u'name': u'Filter Bar', u'widgetType': u'filter-widget', u'properties': {}, u'isLoading': False, u'offset': 0, u'klass': u'card card-widget span12', u'id': u'abe50df3-a5a0-408a-8122-019d779b4354', u'size': 12}],
@@ -101,7 +101,7 @@ def index(request, is_mobile=False):
     'initial': json.dumps({
         'collections': [],
         'layout': DEFAULT_LAYOUT,
-        'qb_layout': QUEERY_BUILDER_LAYOUT,
+        'qb_layout': QUERY_BUILDER_LAYOUT,
         'is_latest': _get_latest(),
         'engines': get_engines(request.user)
     }),
@@ -133,7 +133,7 @@ def new_search(request):
       'initial': {
           'collections': collections,
           'layout': DEFAULT_LAYOUT,
-          'qb_layout': QUEERY_BUILDER_LAYOUT,
+          'qb_layout': QUERY_BUILDER_LAYOUT,
           'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }
@@ -145,7 +145,7 @@ def new_search(request):
       'initial': json.dumps({
           'collections': collections,
           'layout': DEFAULT_LAYOUT,
-          'qb_layout': QUEERY_BUILDER_LAYOUT,
+          'qb_layout': QUERY_BUILDER_LAYOUT,
           'is_latest': _get_latest(),
           'engines': get_engines(request.user)
        }),
@@ -179,7 +179,7 @@ def browse(request, name, is_mobile=False):
                "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
           "drops":["temp"],"klass":"card card-home card-column span10"}
       ],
-      'qb_layout': QUEERY_BUILDER_LAYOUT,
+      'qb_layout': QUERY_BUILDER_LAYOUT,
       'is_latest': _get_latest(),
       'engines': get_engines(request.user)
     }),
