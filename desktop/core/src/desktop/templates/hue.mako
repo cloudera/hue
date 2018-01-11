@@ -1060,7 +1060,32 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           $(this).attr('href', link);
         });
 
-        page.base(typeof HUE_EMBEDDED_BASE_URL !== 'undefined' ? HUE_EMBEDDED_BASE_URL : '/hue');
+        % if IS_EMBEDDED.get():
+        page.base(window.location.pathname);
+        page({ hashbang: true });
+        if (!window.location.hash) {
+          window.location.hash = '#!'
+        }
+        % else:
+        page.base('/hue');
+        % endif
+
+        var getUrlParameter = function (name) {
+          % if IS_EMBEDDED.get():
+            if (~window.location.hash.indexOf('?')) {
+              var paramString = window.location.hash.substring(window.location.hash.indexOf('?'));
+              var params = paramString.split('&');
+              for (var i = 0; i < params.length; i++) {
+                if (~params[i].indexOf(name + '=')) {
+                  return params[i].substring(name.length + 2);
+                }
+              }
+            }
+            return '';
+          % else:
+          return window.location.getParameter(name) || '';
+          % endif
+        };
 
         self.lastContext = null;
 
@@ -1096,20 +1121,20 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             // Defer to allow window.location param update
             _.defer(function () {
               if (typeof self.embeddable_cache['editor'] === 'undefined'){
-                if (window.location.getParameter('editor') !== '') {
-                  self.extraEmbeddableURLParams('&editor=' + window.location.getParameter('editor'));
-                } else if (window.location.getParameter('type') !== '' && window.location.getParameter('type') !== 'notebook') {
-                  self.extraEmbeddableURLParams('&type=' + window.location.getParameter('type'));
+                if (getUrlParameter('editor') !== '') {
+                  self.extraEmbeddableURLParams('&editor=' + getUrlParameter('editor'));
+                } else if (getUrlParameter('type') !== '' && getUrlParameter('type') !== 'notebook') {
+                  self.extraEmbeddableURLParams('&type=' + getUrlParameter('type'));
                 }
                 self.loadApp('editor');
               } else {
                 self.loadApp('editor');
-                if (window.location.getParameter('editor') !== '') {
+                if (getUrlParameter('editor') !== '') {
                   self.getActiveAppViewModel(function (viewModel) {
-                    viewModel.openNotebook(window.location.getParameter('editor'));
+                    viewModel.openNotebook(getUrlParameter('editor'));
                   });
-                } else if (window.location.getParameter('type') !== '') {
-                  self.changeEditorType(window.location.getParameter('type'));
+                } else if (getUrlParameter('type') !== '') {
+                  self.changeEditorType(getUrlParameter('type'));
                 }
               }
             });
@@ -1275,7 +1300,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         huePubSub.subscribe('open.link', function (href) {
           if (href) {
-            var prefix = typeof HUE_EMBEDDED_BASE_URL !== 'undefined' ? HUE_EMBEDDED_BASE_URL : '/hue';
+            var prefix = '${ '' if IS_EMBEDDED.get() else '/hue' }';
             if (href.startsWith('/') && !href.startsWith(prefix)){
               page(prefix + href);
             } else {
