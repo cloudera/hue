@@ -48,9 +48,9 @@ ko.bindingHandlers.gridster = {
 
       // Update the col and row based on it being added
       if (widget.col === undefined)
-        widget.col = ko.observable(addedWidget.attr('data-col'));
+        widget.col = ko.observable(parseInt(addedWidget.attr('data-col')));
       if (widget.row === undefined)
-        widget.row = ko.observable(addedWidget.attr('data-row'));
+        widget.row = ko.observable(parseInt(addedWidget.attr('data-row')));
 
       // Keep an id for each widget so we can keep our sanity
       if (widget.widgetId === undefined) {
@@ -114,8 +114,8 @@ ko.bindingHandlers.gridster = {
       // Loop through all model items
       for (var i = 0; i < itemsArray.length; i++) {
         var item = itemsArray[i];
-        var eleColValue = $(item.gridsterElement).attr('data-col');
-        var eleRowValue = $(item.gridsterElement).attr('data-row');
+        var eleColValue = parseInt($(item.gridsterElement).attr('data-col'));
+        var eleRowValue = parseInt($(item.gridsterElement).attr('data-row'));
         item.col(eleColValue);
         item.row(eleRowValue);
       }
@@ -124,9 +124,9 @@ ko.bindingHandlers.gridster = {
     // Just in case the consumer set up their own resize handler, we need to chain the calls
     var oldOnResize = gridster.options.resize.stop;
     gridster.options.resize.stop = function (event, ui, $widget) {
-      var widgetId = $widget.attr('data-widgetid');
-      var newSizeX = $widget.attr('data-sizex');
-      var newSizeY = $widget.attr('data-sizey');
+      var widgetId = parseInt($widget.attr('data-widgetid'));
+      var newSizeX = parseInt($widget.attr('data-sizex'));
+      var newSizeY = parseInt($widget.attr('data-sizey'));
 
       var widgetModel = getWidgetModelById(widgetId);
       widgetModel.size_x(newSizeX);
