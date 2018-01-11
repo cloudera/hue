@@ -972,7 +972,7 @@ class SolrApi(object):
             values = _filter['value'] if type(_filter['value']) == list else [_filter['value']] # 2D facets support
             if fields.index(field) < len(values): # Lowest common field denominator
               value = values[fields.index(field)]
-              if value:
+              if value or value is False:
                 exclude = '-' if _filter['exclude'] else ''
                 if value is not None and ' ' in force_unicode(value):
                   value = force_unicode(value).replace('"', '\\"')
