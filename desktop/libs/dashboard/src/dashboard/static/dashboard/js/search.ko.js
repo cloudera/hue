@@ -59,10 +59,10 @@ function loadDashboardLayout(viewModel, grister_layout) {
   $.each(grister_layout, function(index, item) {
     viewModel.gridItems.push(
       ko.mapping.fromJS({
-        col: item.col,
-        row: item.row,
-        size_x: item.size_x,
-        size_y: item.size_y,
+        col: parseInt(item.col),
+        row: parseInt(item.row),
+        size_x: parseInt(item.size_x),
+        size_y: parseInt(item.size_y),
         widget: item.widget ? viewModel.getWidgetById(item.widget.id) : null,
         callback: function (el) {
           $('.gridster ul').data('gridster').move_widget(el, 1, 1);
@@ -84,20 +84,20 @@ function layoutToGridster(vm) {
       $.each(row.widgets(), function (indexW, widget) {
         var targetHeight = vm.draggableWidgets[widget.widgetType()].gridsterHeight() || 6;
         layout.push(ko.mapping.fromJS({
-          col: startingCol,
-          row: startingRow,
-          size_x: column.size(),
-          size_y: targetHeight,
+          col: parseInt(startingCol),
+          row: parseInt(startingRow),
+          size_x: parseInt(column.size()),
+          size_y: parseInt(targetHeight),
           widget: vm.getWidgetById(widget.id())
         }));
         startingRow += targetHeight;
       });
       if (row.widgets().length === 0) {
         layout.push(ko.mapping.fromJS({
-          col: startingCol,
-          row: startingRow,
-          size_x: column.size(),
-          size_y: emptyWidgetHeight,
+          col: parseInt(startingCol),
+          row: parseInt(startingRow),
+          size_x: parseInt(column.size()),
+          size_y: parseInt(emptyWidgetHeight),
           widget: null
         }));
         startingRow += emptyWidgetHeight;
@@ -1740,12 +1740,14 @@ var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];
 var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget'];
 
 
-var SearchViewModel = function (collection_json, query_json, initial_json) {
+var SearchViewModel = function (collection_json, query_json, initial_json, is_gridster) {
   var self = this;
 
   self.collectionJson = collection_json;
   self.queryJson = query_json;
   self.initialJson = initial_json;
+
+  self.isGridster = !!is_gridster;
 
   self.build = function () {
     self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
