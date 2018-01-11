@@ -25,7 +25,7 @@
   from desktop import conf
   from django.utils.translation import ugettext as _
 
-  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED, USE_GRIDSTER
+  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, USE_GRIDSTER
 %>
 
 <%def name="import_layout(with_deferred=False)">
@@ -50,16 +50,22 @@
   %if not hasattr(caller, "skipLayout"):
   <div style="float: left" data-bind="visible: columns().length == 0 && isEditing">
     <div class="toolbar-label">${_('LAYOUT')}</div>
+    % if not HAS_QUERY_BUILDER_ENABLED.get():
     <a href="javascript: magicSearchLayout(searchViewModel)" title="${ _('Dynamic dashboard: multiple interconnected widgets') }" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
         <div class="layout-box" style="width: 72px; margin-left: 4px"><i class="fa fa-line-chart"></i></div>
       </div>
-    </a>
-    % if HAS_QUERY_BUILDER_ENABLED.get():
-    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Query Builder: Single widget for easily analysing data in multiple dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
+    </a>    
+    % else:
+    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Explore with multiple interconnected widgets') }" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
-        <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
+        <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-line-chart"></i></div>
+      </div>
+    </a>
+    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Query Builder to slice and dice dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
+      <div class="layout-container">
+        <div class="layout-box" style="width: 100px;"><i class="fa fa-superscript"></i></div>
       </div>
     </a>
     % endif
@@ -79,6 +85,7 @@
     </a>
   </div>
   %endif
+
   <!-- ko if: columns().length > 0 && isToolbarVisible -->
   <div data-bind="dockable: { scrollable: '.page-content', jumpCorrection: 50, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "78px" or "50px" }', triggerAdjust: 0 }">
     %if hasattr(caller, "results"):
@@ -141,6 +148,21 @@
         </div>
       </div>
 
+      <div class="row-fluid" data-bind="visible: previewColumns() == 'dashboard'">
+        <div class="span12">
+          <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
+            <i class="fa fa-filter"></i>
+          </div>
+          <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
+            <i class="fa fa-area-chart" style="padding-top: 10px"></i>
+          </div>
+          <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
+            <i class="fa fa-table" style="font-size: 120px"></i><br/>
+            <div style="font-size: 80px; padding-top: 20px">${ _('Explore') }</div>
+          </div>
+        </div>
+      </div>
+
       <div class="row-fluid" data-bind="visible: previewColumns() == 'qbuilder'">
         <div class="span12">
           <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
@@ -151,18 +173,6 @@
           <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
             <i class="fa fa-table" style="font-size: 120px"></i><br/>
             <div style="font-size: 80px; padding-top: 20px">${ _('Query Builder') }</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row-fluid" data-bind="visible: previewColumns() == 'dashboard'">
-        <div class="span12">
-          <div class="preview-row" style="font-size: 120px; min-height: 50px !important;">
-            <i class="fa fa-pie-chart"></i>
-          </div>
-          <div class="preview-row" style="margin-top: 40px; padding-top: 40px; padding-bottom: 0; min-height: 200px !important;">
-            <i class="fa fa-area-chart" style="font-size: 120px"></i><br/>
-            <div style="font-size: 80px; padding-top: 20px">${ _('Report') }</div>
           </div>
         </div>
       </div>
