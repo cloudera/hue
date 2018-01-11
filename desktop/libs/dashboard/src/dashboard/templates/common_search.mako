@@ -3666,7 +3666,7 @@ function newSearch() {
 }
 
 function loadSearch(collection, query, initial) {
-  searchViewModel = new SearchViewModel(collection, query, initial);
+  searchViewModel = new SearchViewModel(collection, query, initial, ${ USE_GRIDSTER.get() and 'true' or 'false' });
   ko.applyBindings(searchViewModel, $('#searchComponents')[0]);
 
   searchViewModel.timelineChartTypes = ko.observableArray([
@@ -3853,19 +3853,83 @@ $(document).ready(function () {
       }
       if (dropPosition.row > 0 && dropPosition.col > 0) {
         if (tempDraggable) {
-          searchViewModel.gridItems.push(
-              ko.mapping.fromJS({
-                col: dropPosition.col,
-                row: dropPosition.row,
-                size_x: 6,
-                size_y: tempDraggable.gridsterHeight(),
-                widget: null,
-                callback: function (el) {
-                  showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
-                  tempDraggable = null;
+          var optimalWidgetWidth = 12;
+          var queueLength = 0;
+
+          function decreaseQueue() {
+            queueLength--;
+          }
+
+          function resizeAndMove(widget, width, col) {
+            var $gridster = $(".gridster>ul").data('gridster');
+            queueLength += 2;
+            $gridster.resize_widget($(widget.gridsterElement), width, widget.size_y(), decreaseQueue);
+            widget.size_x(width);
+            $gridster.move_widget($(widget.gridsterElement), col, widget.row(), decreaseQueue);
+            widget.col(col);
+          }
+
+          // automatically resize the width of all the widgets that collide
+          var collindingWidgets = [];
+          searchViewModel.gridItems().forEach(function (existingWidget) {
+            if (existingWidget.row() >= dropPosition.row && existingWidget.row() < dropPosition.row + tempDraggable.gridsterHeight() && !existingWidget.hasBeenTouched) {
+              collindingWidgets.push(existingWidget);
+              var parallelWidgets = [];
+              searchViewModel.gridItems().forEach(function (siblingWidget) {
+                if (siblingWidget.row() >= existingWidget.row() && siblingWidget.row() < existingWidget.row() + existingWidget.size_y() && existingWidget.widgetId() !== siblingWidget.widgetId()) {
+                  siblingWidget.hasBeenTouched = true;
+                  parallelWidgets.push(siblingWidget);
                 }
-              })
-          );
+              });
+              var newOptimalWidth = Math.floor(12 / (parallelWidgets.length + 2)); // 2 is the colliding widget + the dropped widget itself
+              if (newOptimalWidth < optimalWidgetWidth && newOptimalWidth > 0) {
+                var siblings = [];
+                siblings.push(existingWidget);
+                siblings = siblings.concat(parallelWidgets);
+
+                siblings.sort(function (a, b) {
+                  return a.col() > b.col()
+                });
+
+                optimalWidgetWidth = newOptimalWidth;
+
+                // yay for Gridster starting arrays at 1
+                var droppedWidgetFauxColumn = Math.floor((dropPosition.col - 1) / optimalWidgetWidth) + 1;
+                var adjustedDropPosition = (Math.floor((dropPosition.col - 1) / optimalWidgetWidth) * optimalWidgetWidth) + 1;
+                dropPosition.col = adjustedDropPosition;
+
+                var siblingCounter = 0;
+                for (var i = 1; i <= 12 / optimalWidgetWidth; i++) {
+                  if (i !== droppedWidgetFauxColumn) {
+                    resizeAndMove(siblings[siblingCounter], optimalWidgetWidth, ((i - 1) * optimalWidgetWidth) + 1)
+                    siblingCounter++;
+                  }
+                }
+              }
+            }
+          });
+          searchViewModel.gridItems().forEach(function (existingWidget) {
+            existingWidget.hasBeenTouched = false;
+          });
+
+          var canDrop = window.setInterval(function () {
+            if (queueLength === 0) {
+              window.clearInterval(canDrop);
+              searchViewModel.gridItems.push(
+                  ko.mapping.fromJS({
+                    col: dropPosition.col,
+                    row: dropPosition.row,
+                    size_x: optimalWidgetWidth,
+                    size_y: tempDraggable.gridsterHeight(),
+                    widget: null,
+                    callback: function (el) {
+                      showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+                      tempDraggable = null;
+                    }
+                  })
+              );
+            }
+          }, 100);
         }
         else if (searchViewModel.lastDraggedMeta()) {
           searchViewModel.gridItems.push(
