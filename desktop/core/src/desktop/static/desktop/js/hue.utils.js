@@ -119,8 +119,10 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
  * Add utility methods to the HUE object
 */
 
-(function (hueUtils) {
+window.hueUtils = window.hueUtils || (function () {
   'use strict';
+
+  var hueUtils = {};
 
   hueUtils.bootstrapRatios = {
     span3: function () {
@@ -222,8 +224,12 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
   };
 
   hueUtils.changeURL = function (newURL) {
-    if (window.location.hash !== '' && newURL.indexOf('#') === -1){
-      newURL = newURL + window.location.hash;
+    if (IS_EMBEDDED) {
+      newURL = window.location.pathname + window.location.search + '#!' + newURL;
+    } else {
+      if (window.location.hash !== '' && newURL.indexOf('#') === -1){
+        newURL = newURL + window.location.hash;
+      }
     }
     window.history.pushState(null, null, newURL);
   };
@@ -233,27 +239,52 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
   };
 
   hueUtils.changeURLParameter = function (param, value) {
-    var newSearch = '';
-    if (window.location.getParameter(param, true) !== null) {
-      newSearch += '?';
-      window.location.search.replace(/\?/gi, '').split('&').forEach(function (p) {
-        if (p.split('=')[0] !== param) {
-          newSearch += p;
-        }
-      });
-      if (value){
-        newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
+    if (IS_EMBEDDED) {
+      var currentUrl = window.location.hash.replace('#!', '');
+      var parts = currentUrl.split('?');
+      var path = parts[0];
+      var search = parts.length > 1 ? parts[1] : '';
+      if (~search.indexOf(param + '=' + value)) {
+        return;
       }
-    }
-    else {
-      newSearch = window.location.search + (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '' );
-    }
+      if (~search.indexOf(param + '=')) {
+        if (!value) {
+          search = search.replace(new RegExp(param + '=[^&]*&?'), '');
+        } else {
+          search = search.replace(new RegExp(param + '=[^&]*'), param + '=' + value);
+        }
+      } else if (value) {
+        if (search) {
+          search += '&';
+        }
+        search += param + '=' + value;
+      } else {
+        return;
+      }
 
-    if (newSearch === '?') {
-      newSearch = '';
-    }
+      hueUtils.changeURL(search ? path + '?' + search : path);
+    } else {
+      var newSearch = '';
+      if (window.location.getParameter(param, true) !== null) {
+        newSearch += '?';
+        window.location.search.replace(/\?/gi, '').split('&').forEach(function (p) {
+          if (p.split('=')[0] !== param) {
+            newSearch += p;
+          }
+        });
+        if (value){
+          newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
+        }
+      } else {
+        newSearch = window.location.search + (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '' );
+      }
 
-    hueUtils.changeURL(window.location.pathname + newSearch);
+      if (newSearch === '?') {
+        newSearch = '';
+      }
+
+      hueUtils.changeURL(window.location.pathname + newSearch);
+    }
   };
 
   hueUtils.removeURLParameter = function (param) {
@@ -409,9 +440,11 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
         }
       }
     }
-  }
+  };
 
-}(hueUtils = window.hueUtils || {}));
+  return hueUtils;
+
+})();
 
 if (!Object.keys) {
 
