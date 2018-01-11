@@ -48,6 +48,8 @@
 
   window.HUE_CONTAINER = '${ IS_EMBEDDED.get() }' === 'True' ? '.hue-embedded-container' : 'body';
 
+  window.IS_EMBEDDED = '${ IS_EMBEDDED.get() }' === 'True';
+
   window.HUE_I18n = {
     autocomplete: {
       category: {
