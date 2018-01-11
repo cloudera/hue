@@ -2823,7 +2823,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   </div>
 
   <div class="modal-body">
-    <form class="form-horizontal">
+    <form class="singleValued form-horizontal">
       <div class="control-group">
         <label class="control-label">${_('Name')}</label>
         <div class="controls">
