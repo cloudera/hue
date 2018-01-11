@@ -2208,7 +2208,7 @@
       });
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        skipAutoExpandSubscription.remove();
+        setAutoExpandSubscription.remove();
       });
     }
   };
