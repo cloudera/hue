@@ -176,6 +176,12 @@ Sharing happens on the main page or via the top right menu of the application. U
 
 Via the Home page, saved documents can be exported for backups or transferring to another Hue.
 
+## Changing the language
+
+The language is automatically detected from the Browser or OS. English, Spanish, French, German, Korean, Japanese and Chinese are supported.
+
+The language can be manual set by a user in the "My Profile" page. Please go to My Profile > Step2 Profile and Groups > Language Preference and choose the language you want.
+
 # Editors / Notebook
 The goal of Hue's Editor is to make data querying easy and productive.
 
