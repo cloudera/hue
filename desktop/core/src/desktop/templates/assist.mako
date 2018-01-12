@@ -2300,7 +2300,7 @@ from desktop.views import _ko
         <div class="assist-flex-header">
           <div class="assist-inner-header">
             <!-- ko if: isSolr -->
-            <div data-bind="appAwareTemplateContextMenu: { template: 'collection-title-context-items', scrollContainer: '.assist-db-scrollable' }">${_('Collections')}</div>
+            ${ _('Collections') }
             <!-- /ko -->
             <!-- ko ifnot: isSolr  -->
             ${ _('Tables') }
