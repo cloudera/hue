@@ -113,5 +113,5 @@ class DashboardController(object):
     return result
 
 
-def can_edit_index(user):
-  return user.is_superuser
+def can_edit_index(user): # Deprecated by Sentry now
+  return True

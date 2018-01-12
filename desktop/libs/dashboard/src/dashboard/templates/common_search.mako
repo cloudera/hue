@@ -1048,7 +1048,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <i class="fa fa-spinner fa-spin"></i>
   <!-- /ko -->
   <!-- ko if: $data.details().length > 0 -->
-    <div class="document-details-actions pull-left" data-bind="visible: ${ 'true' if can_edit_index else 'false' } || externalLink()">
+    <div class="document-details-actions pull-left" data-bind="visible: $root.collection.idField() || externalLink()">
       <a href="javascript:void(0)" data-bind="visible: ! showEdit(), click: function() { showEdit(true); }" title="${ _('Edit this document') }">
         <i class="fa fa-edit fa-fw"></i>
       </a>
