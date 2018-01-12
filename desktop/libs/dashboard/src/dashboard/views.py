@@ -156,11 +156,14 @@ def new_search(request):
 
 def browse(request, name, is_mobile=False):
   engine = request.GET.get('engine', 'solr')
-  collections = get_engine(request.user, engine).datasets()
+  source = request.GET.get('source', 'data')
+  # get engine
+  # get name
+  collections = get_engine(request.user, engine, source=source).datasets()
   if not collections and engine == 'solr':
     return no_collections(request)
 
-  collection = Collection2(user=request.user, name=name, engine=engine)
+  collection = Collection2(user=request.user, name=name, engine=engine, source=source)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
   template = 'search.mako'
