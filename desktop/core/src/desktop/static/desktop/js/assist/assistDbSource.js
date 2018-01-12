@@ -18,11 +18,11 @@ var AssistDbSource = (function () {
 
   var sortFunctions = {
     alpha: function (a, b) {
-      return a.definition.name.localeCompare(b.definition.name);
+      return a.catalogEntry.name.localeCompare(b.catalogEntry.name);
     },
     creation: function (a, b) {
-      if (a.definition.isColumn || a.definition.isComplex) {
-        return a.definition.index - b.definition.index;
+      if (a.catalogEntry.isField()) {
+        return a.catalogEntry.getIndex() - b.catalogEntry.getIndex();
       }
       return sortFunctions.alpha(a, b);
     },
@@ -99,7 +99,7 @@ var AssistDbSource = (function () {
       }
       var result = [];
       $.each(self.databases(), function (index, database) {
-        if (database.definition.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
+        if (database.catalogEntry.name.toLowerCase().indexOf(self.filter.querySpec().query.toLowerCase()) > -1) {
           result.push(database);
         }
       });
@@ -110,8 +110,8 @@ var AssistDbSource = (function () {
       var result = [];
       var partialLower = partial.toLowerCase();
       self.databases().forEach(function (db) {
-        if (db.definition.name.toLowerCase().indexOf(partialLower) === 0) {
-          result.push(nonPartial + partial + db.definition.name.substring(partial.length))
+        if (db.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
+          result.push(nonPartial + partial + db.catalogEntry.name.substring(partial.length))
         }
       });
       return result;
@@ -124,7 +124,7 @@ var AssistDbSource = (function () {
       if (HAS_OPTIMIZER && db && !db.popularityIndexSet && self.sourceType !== 'solr') {
         self.apiHelper.fetchNavOptTopTables({
           sourceType: self.sourceType,
-          database: db.definition.name,
+          database: db.catalogEntry.name,
           silenceErrors: true,
           timeout: AUTOCOMPLETE_TIMEOUT,
           successCallback: function (data) {
@@ -136,8 +136,8 @@ var AssistDbSource = (function () {
             });
             var applyPopularity = function () {
               db.entries().forEach(function (entry) {
-                if (popularityIndex[entry.definition.name]) {
-                  entry.popularity(popularityIndex[entry.definition.name]);
+                if (popularityIndex[entry.catalogEntry.name]) {
+                  entry.popularity(popularityIndex[entry.catalogEntry.name]);
                 }
               });
               if (self.activeSort() === 'popular') {
@@ -183,10 +183,10 @@ var AssistDbSource = (function () {
         if (!self.selectedDatabase().hasEntries() && !self.selectedDatabase().loading()) {
           self.selectedDatabase().loadEntries()
         }
-        self.apiHelper.setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', self.selectedDatabase().definition.name)
+        self.apiHelper.setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name)
         huePubSub.publish("assist.database.set", {
           source: self.sourceType,
-          name: self.selectedDatabase().definition.name
+          name: self.selectedDatabase().catalogEntry.name
         })
       }
     };
@@ -218,12 +218,9 @@ var AssistDbSource = (function () {
     var updateDatabases = function (names, lastSelectedDb) {
       dbIndex = {};
       var dbs = $.map(names, function(name) {
-        var database = new AssistDbEntry({
-          name: name,
-          displayName: name,
-          title: name,
-          isDatabase: true
-        }, null, self, nestedFilter, self.i18n, self.navigationSettings, sortFunctions);
+        var catalogEntry = DataCatalog.getEntry({ sourceType: self.sourceType, path: name });
+
+        var database = new AssistDbEntry(catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
         dbIndex[name] = database;
         if (name === lastSelectedDb) {
           self.selectedDatabase(database);
@@ -240,7 +237,7 @@ var AssistDbSource = (function () {
     };
 
     self.setDatabase = function (databaseName) {
-      if (databaseName && self.selectedDatabase() && databaseName === self.selectedDatabase().definition.name) {
+      if (databaseName && self.selectedDatabase() && databaseName === self.selectedDatabase().catalogEntry.name) {
         return;
       }
       if (databaseName && dbIndex[databaseName]) {
@@ -263,7 +260,7 @@ var AssistDbSource = (function () {
         return;
       }
       self.loading(true);
-      var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
+      var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().catalogEntry.name : null;
       self.selectedDatabase(null);
       self.databases([]);
       self.apiHelper.loadDatabases({
@@ -294,7 +291,7 @@ var AssistDbSource = (function () {
       if (self.invalidateOnRefresh() !== 'cache') {
         huePubSub.publish('assist.invalidate.impala', {
           flush: self.invalidateOnRefresh() === 'invalidateAndFlush',
-          database: self.selectedDatabase() ? self.selectedDatabase().definition.name : null
+          database: self.selectedDatabase() ? self.selectedDatabase().catalogEntry.name : null
         });
       }
 
