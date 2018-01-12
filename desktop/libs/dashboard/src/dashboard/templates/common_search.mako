@@ -1058,7 +1058,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <a href="javascript:void(0)" data-bind="visible: showEdit() && originalDetails() != ko.toJSON(details), click: $root.updateDocument" title="${ _('Update this document') }">
         <i class="fa fa-save fa-fw"></i>
       </a>
-      <a href="javascript:void(0)" data-bind="visible: externalLink(), attr: { href: externalLink}" target="_blank" title="${ _('Show original document') }">
+      <a href="javascript:void(0)" data-bind="visible: externalLink(), attr: { href: externalLink }" target="_blank" title="${ _('Show original document') }">
         <i class="fa fa-external-link fa-fw"></i>
       </a>
     </div>
