@@ -997,6 +997,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="queries-page${ SUFFIX }">
 
   <div class="row-fluid" data-jobType="queries">
+    <!-- ko if: id() -->
     <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list data-list">
@@ -1091,6 +1092,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
       </div>
     </div>
+    <!-- /ko -->
   </div>
 </script>
 
