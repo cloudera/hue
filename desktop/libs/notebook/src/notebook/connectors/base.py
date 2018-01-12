@@ -211,16 +211,7 @@ class Notebook(object):
 
 
 def get_api(request, snippet):
-  from notebook.connectors.dataeng import DataEngApi
-  from notebook.connectors.hbase import HBaseApi
-  from notebook.connectors.hiveserver2 import HS2Api
-  from notebook.connectors.jdbc import JdbcApi
-  from notebook.connectors.rdbms import RdbmsApi
   from notebook.connectors.oozie_batch import OozieApi
-  from notebook.connectors.solr import SolrApi
-  from notebook.connectors.spark_shell import SparkApi
-  from notebook.connectors.spark_batch import SparkBatchApi
-  from notebook.connectors.text import TextApi
 
   if snippet.get('wasBatchExecuted'):
     return OozieApi(user=request.user, request=request)
@@ -254,24 +245,33 @@ def get_api(request, snippet):
     interface = 'dataeng'
 
   if interface == 'hiveserver2':
+    from notebook.connectors.hiveserver2 import HS2Api
     return HS2Api(user=request.user, request=request)
   elif interface == 'oozie':
     return OozieApi(user=request.user, request=request)
   elif interface == 'livy':
+    from notebook.connectors.spark_shell import SparkApi
     return SparkApi(request.user)
   elif interface == 'livy-batch':
+    from notebook.connectors.spark_batch import SparkBatchApi
     return SparkBatchApi(request.user)
   elif interface == 'text' or interface == 'markdown':
+    from notebook.connectors.text import TextApi
     return TextApi(request.user)
   elif interface == 'rdbms':
+    from notebook.connectors.rdbms import RdbmsApi
     return RdbmsApi(request.user, interpreter=snippet['type'])
   elif interface == 'dataeng':
+    from notebook.connectors.dataeng import DataEngApi
     return DataEngApi(user=request.user, request=request, cluster_name=cluster.get_interface())
   elif interface == 'jdbc' or interface == 'teradata':
+    from notebook.connectors.jdbc import JdbcApi
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
+    from notebook.connectors.solr import SolrApi
     return SolrApi(request.user, interpreter=interpreter)
   elif interface == 'hbase':
+    from notebook.connectors.hbase import HBaseApi
     return HBaseApi(request.user)
   elif interface == 'pig':
     return OozieApi(user=request.user, request=request) # Backward compatibility until Hue 4

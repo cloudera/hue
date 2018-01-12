@@ -45,9 +45,10 @@ class MockRequest():
 
 class SQLDashboardApi(DashboardApi):
 
-  def __init__(self, user, engine):
-    self.user = user
+  def __init__(self, user, engine, source='data'):
+    super(SQLDashboardApi, self).__init__(user)
     self.engine = engine
+    self.source = source
     self.async = engine == 'hive' or engine == 'impala'
 
   def query(self, dashboard, query, facet=None):
@@ -203,6 +204,7 @@ class SQLDashboardApi(DashboardApi):
     return self._convert_result(result, dashboard, facet, query)
 
 
+  # This method currently behaves more like a static method
   def datasets(self, show_all=False):
     snippet = {'type': self.engine}
     # Ideally from left assist at some point instead
@@ -211,8 +213,11 @@ class SQLDashboardApi(DashboardApi):
     return [table['name'] for table in get_api(MockRequest(self.user), snippet).autocomplete(snippet, database=database)['tables_meta']]
 
 
-  def fields(self, dashboard):
-    database, table = self._get_database_table_names(dashboard)
+  # This method currently behaves more like a static method
+  def fields(self, name):
+    # self.source
+    # get query if source == 'query' + default DB
+    database, table = self._get_database_table_names(name)
     snippet = {'type': self.engine}
 
     table_metadata = get_api(MockRequest(self.user), snippet).autocomplete(snippet, database, table)

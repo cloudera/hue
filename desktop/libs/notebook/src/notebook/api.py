@@ -703,8 +703,15 @@ def export_result(request):
       'allowed': True
     }
   elif data_format == 'search-index':
+    ## Get query history id
+
     if is_embedded:
       if destination == '__hue__':
+        notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+        response['watch_url'] = reverse('search:browse', kwargs={'name': notebook_id, 'source': 'query'})
+        response['status'] = 0        
+        return JsonResponse(response)
+
         destination = _get_snippet_name(notebook, unique=True, table_format=True)
         live_indexing = True
       else:
@@ -739,6 +746,7 @@ def export_result(request):
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
       response['status'] = 0
+
     request.audit = {
       'operation': 'EXPORT',
       'operationText': 'User %s exported to Search index: %s' % (request.user.username, destination),
