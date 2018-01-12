@@ -230,7 +230,7 @@ from metadata.conf import has_navigator
         <div data-bind="with: stats">
         <!-- ko hueSpinner: { spin:  $parent.loadingStats, center: true, size: 'large' } --><!-- /ko -->
         <div class="alert" data-bind="visible: !$parent.loadingStats() && !$parent.statsSupported()">${ _('This field does not support stats') }</div>
-        <div class="alert" data-bind="visible: !$parent.loadingStats() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
+        <div class="alert" data-bind="visible: !$parent.loadingStats() && $parent.statsSupported() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
         <table style="width: 100%" data-bind="visible: !$parent.loadingStats() && $data.data().length > 0" class="table table-condensed">
           <tbody data-bind="foreach: $data.data">
           <tr>
