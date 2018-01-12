@@ -108,7 +108,23 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
       tables_meta = db.get_tables_meta(database=database)
       response['tables_meta'] = tables_meta
     elif column is None:
-      table = db.get_table(database, table)
+      if False:
+        class SubQueryTable():
+          def __init__(self, db, query):
+            self.query = query
+            # Table Properties below            
+            self.name = 'Test'
+            # TODO Replace 't.', type different too?
+            self.cols =  db.get_query_metadata(query).data_table.cols()
+            self.hdfs_link = None
+            self.comment = None
+            self.is_impala_only = False
+            self.is_view = False
+            self.partition_keys = []
+            self.properties = {}
+        table = SubQueryTable(db, 'SELECT app, bytes, concat(\'http://\', url) as url2 FROM web_logs')
+      else:
+        table = db.get_table(database, table)
       response['hdfs_link'] = table.hdfs_link
       response['comment'] = table.comment
 
