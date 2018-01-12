@@ -203,6 +203,15 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-value">
+    <!-- ko if: value.length > 31 -->
+    <div class="autocompleter-details">
+      <div class="autocompleter-header">${ _('Value')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" style="word-wrap: break-word; white-space: normal" data-bind="text: value">
+        </div>
+      </div>
+    </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="autocomplete-details-identifier">
