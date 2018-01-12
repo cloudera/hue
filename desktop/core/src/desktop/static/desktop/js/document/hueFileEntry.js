@@ -261,7 +261,7 @@ var HueFileEntry = (function () {
 
   HueFileEntry.prototype.highlightInside = function (uuid) {
     var self = this;
-    self.typeFilter(self.availableTypeFilters()[0]);
+    self.typeFilter(DOCUMENT_TYPES[0]);
     var foundEntry;
     self.entries().forEach(function (entry) {
       entry.highlight(false);
@@ -270,16 +270,23 @@ var HueFileEntry = (function () {
       }
     });
     if (foundEntry) {
-      window.setTimeout(function () {
-        huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
-          foundEntry.highlight(true);
-          // Timeout is for animation effect
-          window.setTimeout(function () {
-            foundEntry.highlight(false);
-          }, 1800);
-        });
-        huePubSub.publish('assist.db.scrollTo', foundEntry);
-      }, 0);
+      if (foundEntry.definition().type === 'directory') {
+        self.activeEntry(foundEntry);
+        if (!foundEntry.entries().length) {
+          foundEntry.load();
+        }
+      } else {
+        window.setTimeout(function () {
+          huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
+            foundEntry.highlight(true);
+            // Timeout is for animation effect
+            window.setTimeout(function () {
+              foundEntry.highlight(false);
+            }, 1800);
+          });
+          huePubSub.publish('assist.db.scrollTo', foundEntry);
+        }, 0);
+      }
     }
   };
 
