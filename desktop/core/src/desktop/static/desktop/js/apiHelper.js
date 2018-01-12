@@ -788,17 +788,13 @@ var ApiHelper = (function () {
       timeout: options.timeout,
       success: function (data) {
         if (!data.error && !self.successResponseIsError(data) && data.status === 0) {
-          if (data.status === 0){
-            options.successCallback(data);
-          }
-          else if (data.status === 1) {
+          options.successCallback(data);
+        } else {
+          if (data.status === 1) {
             options.notSupportedCallback(data);
-          }
-          else {
+          } else {
             self.assistErrorCallback(options)(data);
           }
-        } else {
-          self.assistErrorCallback(options)(data);
         }
       }
     })
