@@ -1,0 +1,19 @@
+[
+{
+  "pk": 1, 
+  "model": "testapp.question", 
+  "fields": {
+    "question_text": "What is your favorite color?", 
+    "pub_date": "1975-04-09T00:00:00"
+  }
+},
+{
+  "pk": 1, 
+  "model": "testapp.choice", 
+  "fields": {
+    "choice_text": "Blue.", 
+    "question": 1, 
+    "votes": 3
+  }
+}
+]

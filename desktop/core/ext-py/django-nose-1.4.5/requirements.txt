@@ -1,0 +1,39 @@
+#
+# Requirements for running django-nose testapp
+#
+
+# Latest Django
+Django>=1.11,<2.0
+
+# This project
+-e .
+
+# Load database config from environment
+dj-database-url==0.4.2
+
+# Packaging
+wheel==0.29.0
+twine==1.9.1
+
+# PEP8, PEP257, and static analysis
+flake8==3.4.1
+flake8-docstrings==1.1.0
+
+# Code coverage
+coverage==4.4.1
+
+# Documentation
+Sphinx==1.6.3
+
+# Packaging Linters
+check-manifest==0.35
+pyroma==2.2
+
+# Multi-env test runner
+tox==2.7.0
+
+# Better interactive debugging
+gnureadline==6.3.3
+ipython==5.4.1
+ipdb==0.10.3
+ipdbplugin==1.4.5

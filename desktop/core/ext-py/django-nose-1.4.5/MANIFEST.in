@@ -1,0 +1,20 @@
+include AUTHORS.rst
+include CONTRIBUTING.rst
+include LICENSE
+include Makefile
+include README.rst
+include changelog.rst
+include contribute.json
+include manage.py
+include requirements.txt
+include requirements-rtd.txt
+include runtests.sh
+
+recursive-include docs Makefile conf.py *.rst make.bat .keep
+recursive-include django_nose *.py
+recursive-include testapp *.py
+recursive-include testapp/fixtures *.json
+recursive-include unittests *.py
+
+recursive-exclude * *.py[co]
+recursive-exclude * __pycache__
