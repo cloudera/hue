@@ -110,8 +110,7 @@ class QueryApi(Api):
 
     if not apps.get('apps'):
       return {
-        'status': -1,
-        'message': _('Unknown or expired query id %s') % appid
+        'name': _('Unknown or expired query id %s') % appid
       }
     app = apps.get('apps')[0]
     progress_groups = re.search(r"([\d\.\,]+)%", app.get('progress'))
