@@ -2744,7 +2744,9 @@
 
       if (options.title) {
         var title = ko.unwrap(options.title); // Not always an observable
-        options.title = escapeOutput(title);
+        if (typeof title === 'string') {
+          options.title = escapeOutput(title);
+        }
       }
 
       $(element).tooltip(options);
