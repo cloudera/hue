@@ -598,7 +598,6 @@ from metadata.conf import has_navigator
         });
       };
 
-
       function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn, isComplex) {
         var self = this;
         self.tabs = ko.observableArray();
@@ -929,11 +928,9 @@ from metadata.conf import has_navigator
         self.disposals = [];
         self.dbComment = ko.observable('');
         var dbName = data.identifierChain[data.identifierChain.length - 1].name;
-        $.getJSON('/metastore/databases/' + dbName + '/metadata', function (data) {
-          if (data && data.status == 0 && data.data.comment) {
-              self.dbComment(data.data.comment);
-          }
-        });
+        var catalogEntry = DataCatalog.getEntry({ sourceType: sourceType, path: [dbName], definition: { type: 'database' }})
+
+        catalogEntry.getComment().done(self.dbComment);
         self.tabs = [
           { id: 'details', label: '${ _("Details") }', comment : self.dbComment, template: 'context-popover-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, ApiHelper.getInstance().fetchAutocomplete) }
         ];
@@ -942,7 +939,7 @@ from metadata.conf import has_navigator
         var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
           huePubSub.publish('assist.db.highlight', {
             sourceType: sourceType,
-            path: [ dbName ]
+            path: catalogEntry.path
           });
         });
 
