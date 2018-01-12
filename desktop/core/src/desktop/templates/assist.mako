@@ -203,7 +203,11 @@ from desktop.views import _ko
   <script type="text/html" id="assist-database-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
       <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
-      <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }, attr: {'title': catalogEntry.getTitle() }, draggableText: { text: editorText,  meta: {'type': 'sql', 'database': databaseName} }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: catalogEntry.name, css: { 'highlight': highlight() }"></span></a>
+      <a class="assist-table-link" href="javascript: void(0);" data-bind="
+        click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); },
+        draggableText: { text: editorText,  meta: {'type': 'sql', 'database': databaseName} },
+        tooltip: { placement: navigationSettings.rightAssist ? 'left' : 'right', title: catalogEntry.getTooltip.bind(catalogEntry), delay: 500 }
+      "><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: catalogEntry.name, css: { 'highlight': highlight() }"></span></a>
     </li>
   </script>
 
@@ -213,9 +217,12 @@ from desktop.views import _ko
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle() }, draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': catalogEntry.isView(), 'table': tableName, 'database': databaseName} }">
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="
+          click: toggleOpen,
+          draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': catalogEntry.isView(), 'table': tableName, 'database': databaseName} },
+          tooltip: { placement: navigationSettings.rightAssist ? 'left' : 'right', title: catalogEntry.getTooltip.bind(catalogEntry), delay: 500 }">
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': catalogEntry.isView() && !navigationSettings.rightAssist, 'fa-table': catalogEntry.isTable() && sourceType !== 'solr' && !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
-        <span class="highlightable" data-bind="text: catalogEntry.getDisplayName(), css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
+        <span class="highlightable" data-bind="text: catalogEntry.getDisplayName(navigationSettings.rightAssist), css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </a>
       <div class="center assist-spinner" data-bind="visible: loading() && open()"><i class="fa fa-spinner fa-spin"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
@@ -228,12 +235,20 @@ from desktop.views import _ko
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
       </div>
       <!-- ko if: expandable -->
-      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle() }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
+      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="
+          click: toggleOpen,
+          css: { 'assist-entry-left-action': navigationSettings.rightAssist },
+          tooltip: { placement: navigationSettings.rightAssist ? 'left' : 'right', title: catalogEntry.getTooltip.bind(catalogEntry), delay: 500 }
+        ">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle() }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
+      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="
+          event: { dblclick: dblClick },
+          css: { 'assist-entry-left-action': navigationSettings.rightAssist },
+          tooltip: { placement: navigationSettings.rightAssist ? 'left' : 'right', title: catalogEntry.getTooltip.bind(catalogEntry), delay: 500 }
+        ">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey()  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
@@ -248,15 +263,22 @@ from desktop.views import _ko
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
       </div>
       <!-- ko if: expandable -->
-      <a class="assist-entry assist-field-link assist-field-link-dark assist-entry-left-action assist-ellipsis" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle() }">
+      <a class="assist-entry assist-field-link assist-field-link-dark assist-entry-left-action assist-ellipsis" href="javascript:void(0)" data-bind="
+          click: toggleOpen,
+          tooltip: { placement: navigationSettings.rightAssist ? 'left' : 'right', title: catalogEntry.getTooltip.bind(catalogEntry), delay: 500 }
+        ">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div class="assist-entry assist-field-link assist-field-link-dark default-cursor assist-ellipsis" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
+      <div class="assist-entry assist-field-link assist-field-link-dark default-cursor assist-ellipsis" href="javascript:void(0)" data-bind="
+          event: { dblclick: dblClick },
+          css: { 'assist-entry-left-action': navigationSettings.rightAssist },
+          tooltip: { placement: navigationSettings.rightAssist ? 'left' : 'right', title: catalogEntry.getTooltip.bind(catalogEntry), delay: 500 }
+        ">
         <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -2580,41 +2602,37 @@ from desktop.views import _ko
               if (location.type === 'table' && (location.identifierChain.length !== 1 || !ctes[location.identifierChain[0].name.toLowerCase()])) {
                 var database = location.identifierChain.length === 2 ? location.identifierChain[0].name : activeLocations.defaultDatabase;
                 database = database.toLowerCase();
+                var catalogEntry = DataCatalog.getEntry({ sourceType: activeLocations.type, path: [database], definition: { type: 'database' }});
                 if (!databaseIndex[database]) {
                   databaseIndex[database] = new AssistDbEntry(
-                    {
-                      name: database,
-                      type: 'database',
-                      isDatabase: true
-                    },
+                    DataCatalog.getEntry({
+                      sourceType: activeLocations.type,
+                      path: [database],
+                      definition: { type: 'database' }
+                    }),
                     null,
                     assistDbSource,
                     self.filter,
                     i18n,
-                    navigationSettings,
-                    {}
+                    navigationSettings
                   );
                 }
                 var qid = createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase);
                 tableQidIndex[qid] = true;
                 if (!activeTableIndex[qid]) {
                   var tableName = location.identifierChain[location.identifierChain.length - 1].name;
-                  var displayName = database + '.' + tableName;
 
                   activeTableIndex[createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase)] = new AssistDbEntry(
-                    {
-                      name: tableName,
-                      type: 'table',
-                      isTable: true,
-                      displayName: displayName.toLowerCase(),
-                      title: displayName
-                    },
+                    DataCatalog.getEntry({
+                      sourceType: activeLocations.type,
+                      path: [database, tableName],
+                      definition: { type: 'table' }
+                    }),
                     databaseIndex[database],
                     assistDbSource,
                     self.filter,
-                    {},
-                    navigationSettings,
-                    {}
+                    i18n,
+                    navigationSettings
                   );
                   updateTables = true;
                 }
@@ -2901,12 +2919,13 @@ from desktop.views import _ko
             navigationSettings: navigationSettings
           });
 
+          var fakeParentName = collectionName.indexOf('.') > -1 ? collectionName.split('.')[0] : 'default';
           var assistFakeDb = new AssistDbEntry(
-              {
-                name: collectionName.indexOf('.') > -1 ? collectionName.split('.')[0] : 'default',
-                type: 'database',
-                isDatabase: true
-              },
+              DataCatalog.getEntry({
+                sourceType: collection.engine(),
+                path: [fakeParentName],
+                definition: { type: 'database' }
+              }),
               null,
               assistDbSource,
               self.filter,
@@ -2915,12 +2934,11 @@ from desktop.views import _ko
           );
 
           var collectionEntry = new AssistDbEntry(
-              {
-                name: collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName,
-                type: 'table',
-                isTable: true,
-                displayName: collectionName.toLowerCase()
-              },
+              DataCatalog.getEntry({
+                sourceType: collection.engine(),
+                path: [fakeParentName, collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName],
+                definition: { type: 'table' }
+              }),
               assistFakeDb,
               assistDbSource,
               self.filter,
