@@ -2731,7 +2731,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="time-filter-select">
-  <select id="settingstimeinterval" data-bind="value: $data.gap" class="input-small" style="margin-right: 4px">
+  <select data-bind="value: $data.gap" class="input-small" style="margin-right: 4px">
     <option value="all">${ _('All') }</option>
     <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
     <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
@@ -2760,34 +2760,34 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
             <span data-bind="visible: $root.availableDateFields().length > 0">
               <div class="control-group">
-                <label class="control-label" for="settingstimefield">${ _('Date/time field') }</label>
+                <label class="control-label">${ _('Date/time field') }</label>
                 <div class="controls">
-                  <select id="settingstimefield" data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name'" class="input-medium"></select>
+                  <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name'" class="input-medium"></select>
                 </div>
               </div>
               <div class="control-group">
-                <label class="control-label" for="settingstimetype">${ _('Type') }</label>
+                <label class="control-label">${ _('Type') }</label>
                 <div class="controls">
                   <label class="radio inline"><input type="radio" name="settingstimetype" value="rolling" data-bind="checked: collection.timeFilter.type" /> ${ _('Rolling') }</label>
                   <label class="radio inline"><input type="radio" name="settingstimetype" value="fixed" data-bind="checked: collection.timeFilter.type" /> ${ _('Fixed') }</label>
                 </div>
               </div>
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'rolling'">
-                <label class="control-label" for="settingstimeinterval">${ _('Interval') }</label>
+                <label class="control-label">${ _('Interval') }</label>
                 <div class="controls">
                   <span data-bind="template: {name: 'time-filter-select', data: { gap: collection.timeFilter.value} }"></span>
                 </div>
               </div>
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
-                <label class="control-label" for="settingstimestart">${ _('Start date/time') }</label>
+                <label class="control-label">${ _('Start date/time') }</label>
                 <div class="controls">
-                  <input id="settingstimestart" type="text" data-bind="value: collection.timeFilter.from, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]', disableUTC: true}" />
+                  <input type="text" data-bind="value: collection.timeFilter.from, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]', disableUTC: true}" />
                 </div>
               </div>
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
-                <label class="control-label" for="settingstimeend">${ _('End date/time') }</label>
+                <label class="control-label">${ _('End date/time') }</label>
                 <div class="controls">
-                  <input id="settingstimeend" type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]', disableUTC: true}" />
+                  <input type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]', disableUTC: true}" />
                 </div>
               </div>
               <!-- ko if: collection.timeFilter.type() == 'rolling' -->
