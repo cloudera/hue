@@ -21,7 +21,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-def get_engine(user, engine='solr', facet=None):
+def get_engine(user, engine='solr', facet=None, source='data'):
   if isinstance(engine, dict):
     engine = engine.get('engine', 'solr')
 
@@ -31,15 +31,16 @@ def get_engine(user, engine='solr', facet=None):
   if engine != 'solr':
     if engine == 'impala':
       from impala.dashboard_api import ImpalaDashboardApi
-      return ImpalaDashboardApi(user, engine)
+      return ImpalaDashboardApi(user, engine, source=source)
     elif engine == 'hive':
       from beeswax.dashboard_api import HiveDashboardApi
-      return HiveDashboardApi(user, engine)
+      return HiveDashboardApi(user, engine, source=source)
     else:
       from notebook.dashboard_api import SQLDashboardApi
-      return SQLDashboardApi(user, engine)
+      return SQLDashboardApi(user, engine, source=source)
   else:
     from search.dashboard_api import SearchApi
+    # Could add source to Solr at some point, to behave like a 'view', but need state in query history or URL params
     return SearchApi(user)
 
 

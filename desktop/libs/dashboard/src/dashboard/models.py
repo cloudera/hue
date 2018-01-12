@@ -52,7 +52,7 @@ QUERY_FACET = {'is_enabled': False, 'query': ''}
 
 class Collection2(object):
 
-  def __init__(self, user, name='Default', data=None, document=None, engine='solr'):
+  def __init__(self, user, name='Default', data=None, document=None, engine='solr', source='data'):
     self.document = document
 
     if document is not None:
@@ -61,7 +61,7 @@ class Collection2(object):
       self.data = json.loads(data)
     else:
       self.data = {
-          'collection': self.get_default(user, name, engine),
+          'collection': self.get_default(user, name, engine, source=source),
           'layout': []
       }
 
@@ -103,6 +103,8 @@ class Collection2(object):
       props['collection']['enabled'] = True
     if 'engine' not in props['collection']:
       props['collection']['engine'] = 'solr'
+    if 'source' not in props['collection']:
+      props['collection']['source'] = 'data'
     if 'leafletmap' not in props['collection']['template']:
       props['collection']['template']['leafletmap'] = {'latitudeField': None, 'longitudeField': None, 'labelField': None}
     if 'moreLikeThis' not in props['collection']['template']:
@@ -168,7 +170,7 @@ class Collection2(object):
 
     return props
 
-  def get_default(self, user, name, engine='solr'):
+  def get_default(self, user, name, engine='solr', source='data'):
     fields = self.fields_data(user, name, engine)
     id_field = [field['name'] for field in fields if field.get('isId')]
 
@@ -216,6 +218,7 @@ class Collection2(object):
       'id': None,
       'name': name,
       'engine': engine,
+      'source': source,
       'label': name,
       'enabled': False,
       'template': TEMPLATE,
@@ -256,8 +259,8 @@ class Collection2(object):
   def fields(self, user):
     return sorted([str(field.get('name', '')) for field in self.fields_data(user)])
 
-  def fields_data(self, user, name, engine='solr'):
-    api = get_engine(user, engine)
+  def fields_data(self, user, name, engine='solr', source='data'):
+    api = get_engine(user, engine, source=source)
     try:
       schema_fields = api.fields(name)
       schema_fields = schema_fields['schema']['fields']

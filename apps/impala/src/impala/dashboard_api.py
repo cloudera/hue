@@ -24,7 +24,6 @@ LOG = logging.getLogger(__name__)
 
 
 class ImpalaDashboardApi(SQLDashboardApi):
-  pass
 
   @classmethod
   def _supports_median(self):
