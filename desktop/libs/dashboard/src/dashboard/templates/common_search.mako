@@ -1068,7 +1068,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
           <tr data-bind="css: {'readonly': ! $parent.showEdit()}">
              <th class="grid-th" data-bind="text: key"></th>
              <td width="100%">
-               <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
+               <!-- ko if: typeof value() == 'string' && value().match(/^https?:\/\//i) -->
+               <a data-bind="attr: { href: escapeOutput(value()) }" target="_blank">
+                 <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
+               </a>
+               <!-- /ko -->
+               <!-- ko ifnot: typeof value() == 'string' && value().match(/^https?:\/\//i) -->
+                 <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
+               <!-- /ko -->
                <input data-bind="value: value, visible: $parent.showEdit, valueUpdate: 'afterkeydown',
                click: function(detail, e){
                 var target = $(e.currentTarget);
