@@ -369,7 +369,12 @@ from metadata.conf import has_navigator
   <script type="text/html" id="generic-document-context-template">
     <div style="width:100%; text-align: center; margin-top: 30px; font-size: 100px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
     <div style="width: 100%; margin-top: 20px; text-align:center">
+      <!-- ko if: type === 'directory' -->
+      <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, publish: 'context.popover.show.in.assist'"></a>
+      <!-- /ko -->
+      <!-- ko if: type !== 'directory' -->
       <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, hueLink: link, click: function () { $parents[1].close(); }"></a>
+      <!-- /ko -->
       <br/>
       <span data-bind="text: HUE_I18n.documentType[type] || type"></span>
       <!-- ko if: description -->
