@@ -218,7 +218,7 @@ var AssistDbSource = (function () {
     var updateDatabases = function (names, lastSelectedDb) {
       dbIndex = {};
       var dbs = $.map(names, function(name) {
-        var catalogEntry = DataCatalog.getEntry({ sourceType: self.sourceType, path: name });
+        var catalogEntry = DataCatalog.getEntry({ sourceType: self.sourceType, path: name, definition: { type: 'database' }});
 
         var database = new AssistDbEntry(catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
         dbIndex[name] = database;

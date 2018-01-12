@@ -28,13 +28,15 @@ var DataCatalog = (function () {
   }
 
   /**
-   * @param {string|string[]} path
+   * @param {Object} options
+   * @param {string|string[]} options.path
+   * @param {Object} [options.definition] - The initial definition if not already set on the entry
    * @return {DataCatalogEntry}
    */
-  DataCatalog.prototype.getEntry = function (path) {
+  DataCatalog.prototype.getEntry = function (options) {
     var self = this;
-    var identifier = typeof path === 'string' ? path : (typeof path === 'string' ? path : path.join('.'));
-    return self.entries[identifier] || (self.entries[identifier] = new DataCatalogEntry(self, path));
+    var identifier = typeof options.path === 'string' ? options.path : (typeof options.path === 'string' ? options.path : options.path.join('.'));
+    return self.entries[identifier] || (self.entries[identifier] = new DataCatalogEntry(self, options.path, options.definition));
   };
 
   /**
@@ -78,8 +80,8 @@ var DataCatalog = (function () {
         cachedOnly: apiOptions && apiOptions.cachedOnly,
         refreshCache: apiOptions && apiOptions.refreshCache
       }).done(function (data) {
-        dataCatalogEntry.navigatorMeta = data;
-        deferred.resolve(data);
+        dataCatalogEntry.navigatorMeta = data.entity || data;
+        deferred.resolve(dataCatalogEntry.navigatorMeta);
       }).fail(deferred.reject);
     } else {
       deferred.reject();
@@ -91,16 +93,17 @@ var DataCatalog = (function () {
   /**
    * @param {DataCatalog} dataCatalog
    * @param {string|string[]} path
+   * @param {Object} definition
    * @constructor
    */
-  function DataCatalogEntry(dataCatalog, path) {
+  function DataCatalogEntry(dataCatalog, path, definition) {
     var self = this;
 
     self.dataCatalog = dataCatalog;
     self.path = typeof path === 'string' && path ? path.split('.') : path || [];
     self.name = self.path.length ? self.path[self.path.length - 1] : dataCatalog.sourceType;
 
-    self.definition = undefined;
+    self.definition = definition;
     self.lastSourceMetaPromise = undefined;
     self.sourceMeta = undefined;
     self.lastNavigatorMetaPromise = undefined;
@@ -131,22 +134,18 @@ var DataCatalog = (function () {
           var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields;
           if (entities) {
             entities.forEach(function (entity) {
-              var catalogEntry = self.dataCatalog.getEntry(self.path.concat(entity.name || entity));
-              if (!catalogEntry.definition && typeof entity === 'object') {
-                catalogEntry.definition = entity;
-                catalogEntry.definition.index = index++;
-              }
+              var definition = typeof entity === 'object' ? entity : {};
+              definition.index = index++;
+              var catalogEntry = self.dataCatalog.getEntry({ path: self.path.concat(entity.name || entity), definition: definition });
               self.children.push(catalogEntry);
             });
           } else {
             (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
               if (sourceMeta[path]) {
-                var catalogEntry = self.dataCatalog.getEntry(self.path.concat(path));
-                if (!catalogEntry.definition) {
-                  catalogEntry.definition = sourceMeta[path];
-                  catalogEntry.definition.index = index++;
-                  catalogEntry.definition.isMapValue = path === 'value'
-                }
+                var definition = sourceMeta[path];
+                definition.index = index++;
+                definition.isMapValue = path === 'value'
+                var catalogEntry = self.dataCatalog.getEntry({ path: self.path.concat(path), definition: definition.isMapValue = path === 'value' });
                 self.children.push(catalogEntry);
               }
             })
@@ -201,8 +200,16 @@ var DataCatalog = (function () {
     return deferred.promise();
   };
 
+  DataCatalogEntry.prototype.getKnownComment = function () {
+    var self = this;
+    if (self.navigatorMeta) {
+      return self.navigatorMeta.description || self.navigatorMeta.originalDescription || ''
+    }
+    return self.sourceMeta && self.sourceMeta.comment || '';
+  };
+
   /**
-   * @param {Object} [apiOptions]
+   * @param {Object|boolean} [apiOptions] -
    * @param {boolean} [apiOptions.silenceErrors]
    * @param {boolean} [apiOptions.cachedOnly]
    * @param {boolean} [apiOptions.refreshCache]
@@ -223,12 +230,12 @@ var DataCatalog = (function () {
     };
 
     if (HAS_NAVIGATOR) {
-      if (self.navigatorMeta && self.navigatorMeta.entity) {
-        deferred.resolve(self.navigatorMeta.entity.description || self.navigatorMeta.entity.originalDescription || '');
+      if (self.navigatorMeta) {
+        deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
       } else {
         self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
-          if (navigatorMeta && navigatorMeta.entity) {
-            deferred.resolve(navigatorMeta.entity.description || navigatorMeta.entity.originalDescription || '');
+          if (navigatorMeta) {
+            deferred.resolve(navigatorMeta.description || navigatorMeta.originalDescription || '');
           } else {
             resolveWithSourceMeta();
           }
@@ -255,9 +262,9 @@ var DataCatalog = (function () {
 
     if (HAS_NAVIGATOR) {
       self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
-        if (navigatorMeta && navigatorMeta.entity) {
+        if (navigatorMeta) {
           ApiHelper.getInstance().updateNavigatorMetadata({
-            identity: navigatorMeta.entity.identity,
+            identity: navigatorMeta.identity,
             properties: {
               description: comment
             }
@@ -294,8 +301,8 @@ var DataCatalog = (function () {
   DataCatalogEntry.prototype.hasPossibleChildren = function () {
     var self = this;
     return (!self.definition && !self.sourceMeta) ||
-      (self.sourceMeta && /^(?:table|view|struct|array|map)/i.test(self.sourceMeta.type)) ||
-      (self.definition && /^(?:table|view|struct|array|map)/i.test(self.definition.type));
+      (self.sourceMeta && /^(?:database|table|view|struct|array|map)/i.test(self.sourceMeta.type)) ||
+      (self.definition && /^(?:database|table|view|struct|array|map)/i.test(self.definition.type));
   };
 
   DataCatalogEntry.prototype.getIndex = function () {
@@ -313,6 +320,10 @@ var DataCatalog = (function () {
     return self.path.length === 2;
   };
 
+  DataCatalogEntry.prototype.getTooltip = function () {
+    var self = this;
+    return self.getKnownComment() || self.getTitle();
+  };
 
   DataCatalogEntry.prototype.getTitle = function () {
     var self = this;
@@ -320,24 +331,18 @@ var DataCatalog = (function () {
     if (self.isField()) {
       var type = self.getType();
       if (type) {
-        if (~type.indexOf('<')) {
-          type = type.substring(0, type.indexOf('<'));
-        }
         title += ' (' + type + ')';
       }
     }
     return title;
   };
 
-  DataCatalogEntry.prototype.getDisplayName = function () {
+  DataCatalogEntry.prototype.getDisplayName = function (qualified) {
     var self = this;
-    var displayName = self.name;
+    var displayName = qualified ? self.path.join('.') : self.name;
     if (self.isField()) {
       var type = self.getType();
       if (type) {
-        if (~type.indexOf('<')) {
-          type = type.substring(0, type.indexOf('<'));
-        }
         displayName += ' (' + type + ')';
       }
     }
@@ -400,12 +405,11 @@ var DataCatalog = (function () {
 
   DataCatalogEntry.prototype.getType = function () {
     var self = this;
-    if (self.sourceMeta) {
-      return self.sourceMeta.type;
+    var type = self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
+    if (~type.indexOf('<')) {
+      type = type.substring(0, type.indexOf('<'));
     }
-    if (self.definition) {
-      return self.definition.type;
-    }
+    return type;
   };
 
   /**
@@ -445,7 +449,7 @@ var DataCatalog = (function () {
 
   return {
     getEntry: function (options) {
-      return getCatalog(options.sourceType).getEntry(options.path);
+      return getCatalog(options.sourceType).getEntry(options);
     }
   };
 })();
