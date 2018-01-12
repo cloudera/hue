@@ -87,7 +87,7 @@ from desktop.views import _ko
     <!-- ko if: typeof definition !== 'undefined' -->
       <!-- ko if: sourceType === 'solr' -->
         <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
-        <!-- ko if: definition.isView || definition.isTable -->
+        <!-- ko if: catalogEntry.isTableOrView() -->
         <li><a href="javascript:void(0);" data-bind="click: openInIndexer"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
         <li>
           <a href="javascript: void(0);" data-bind="click: function() { explore(true); }">
@@ -98,7 +98,7 @@ from desktop.views import _ko
       <!-- /ko -->
       <!-- ko ifnot: sourceType === 'solr' -->
         <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
-        <!-- ko if: !definition.isDatabase && $currentApp() === 'editor' -->
+        <!-- ko if: !catalogEntry.isDatabase() && $currentApp() === 'editor' -->
         <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
         <!-- /ko -->
         % if not IS_EMBEDDED.get():
@@ -106,7 +106,7 @@ from desktop.views import _ko
         <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
         <!-- /ko -->
         % endif
-        <!-- ko if: definition.isView || definition.isTable -->
+        <!-- ko if: catalogEntry.isTableOrView() -->
         <li>
           <a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }">
             <i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }
@@ -121,7 +121,7 @@ from desktop.views import _ko
         % endif
         <!-- /ko -->
         %if ENABLE_QUERY_BUILDER.get():
-        <!-- ko if: definition.isColumn && $currentApp() === 'editor' -->
+        <!-- ko if: catalogEntry.isColumn() && $currentApp() === 'editor' -->
         <li class="divider"></li>
         <!-- ko template: { name: 'query-builder-context-items' } --><!-- /ko -->
         <!-- /ko -->
@@ -203,7 +203,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-database-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
       <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
-      <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'database': databaseName} }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: definition.name, css: { 'highlight': highlight() }"></span></a>
+      <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }, attr: {'title': catalogEntry.getTitle() }, draggableText: { text: editorText,  meta: {'type': 'sql', 'database': databaseName} }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: catalogEntry.name, css: { 'highlight': highlight() }"></span></a>
     </li>
   </script>
 
@@ -213,9 +213,9 @@ from desktop.views import _ko
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': definition.isView, 'table': tableName, 'database': databaseName} }">
-        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView && !navigationSettings.rightAssist, 'fa-table': definition.isTable && sourceType !== 'solr' && !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
-        <span class="highlightable" data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle() }, draggableText: { text: editorText,  meta: {'type': 'sql', 'isView': catalogEntry.isView(), 'table': tableName, 'database': databaseName} }">
+        <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': catalogEntry.isView() && !navigationSettings.rightAssist, 'fa-table': catalogEntry.isTable() && sourceType !== 'solr' && !navigationSettings.rightAssist, 'fa-search': sourceType === 'solr' }"></i>
+        <span class="highlightable" data-bind="text: catalogEntry.getDisplayName(), css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </a>
       <div class="center assist-spinner" data-bind="visible: loading() && open()"><i class="fa fa-spinner fa-spin"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
@@ -223,18 +223,18 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-column-entry">
-    <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn || definition.isComplex }">
+    <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: catalogEntry.isView() ? '.table-actions' : '.column-actions' }, css: { 'assist-table': catalogEntry.isView(), 'assist-column': catalogEntry.isField() }">
       <div class="assist-actions column-actions" data-bind="css: { 'assist-actions-left': navigationSettings.rightAssist }" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
       </div>
       <!-- ko if: expandable -->
-      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: definition.primary_key === 'true' --> <i class="fa fa-key"></i><!-- /ko -->
+      <a class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle() }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key === 'true'  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
+      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': catalogEntry.getTitle() }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getDisplayName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey()  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -243,20 +243,20 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-column-entry-assistant">
-    <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn || definition.isComplex }">
+    <li data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visible: ! hasErrors(), visibleOnHover: { childrenOnly: true, override: statsVisible, selector: catalogEntry.isView() ? '.table-actions' : '.column-actions' }, css: { 'assist-table': catalogEntry.isView(), 'assist-column': catalogEntry.isField() }">
       <div class="assist-actions column-actions assist-actions-left" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: showContextPopover, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
       </div>
       <!-- ko if: expandable -->
-      <a class="assist-entry assist-field-link assist-field-link-dark assist-entry-left-action assist-ellipsis" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }">
-        <span data-bind="text: definition.type" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: definition.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: definition.primary_key === 'true' --> <i class="fa fa-key"></i><!-- /ko -->
+      <a class="assist-entry assist-field-link assist-field-link-dark assist-entry-left-action assist-ellipsis" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': catalogEntry.getTitle() }">
+        <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName }, text: catalogEntry.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName } }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko -->
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div class="assist-entry assist-field-link assist-field-link-dark default-cursor assist-ellipsis" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }, css: { 'assist-entry-left-action': navigationSettings.rightAssist }">
-        <span data-bind="text: definition.type" class="muted pull-right margin-right-20"></span>
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.name, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key === 'true'  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
+        <span data-bind="text: catalogEntry.getType()" class="muted pull-right margin-right-20"></span>
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: catalogEntry.getName(), draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: catalogEntry.isPrimaryKey() --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center assist-spinner" data-bind="visible: loading"><i class="fa fa-spinner fa-spin"></i></div>
@@ -267,28 +267,28 @@ from desktop.views import _ko
   <script type="text/html" id="assist-db-entries">
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length == 0 -->
     <ul class="assist-tables">
-      <li class="assist-entry assist-no-entries"><!-- ko if: definition.isTable -->${_('No columns found')}<!--/ko--><!-- ko if: definition.isDatabase -->${_('No tables found')}<!--/ko--><!-- ko if: !definition.isTable && !definition.isDatabase -->${_('No results found')}<!--/ko--></li>
+      <li class="assist-entry assist-no-entries"><!-- ko if: catalogEntry.isTable() -->${_('No columns found')}<!--/ko--><!-- ko if: catalogEntry.isDatabase() -->${_('No tables found')}<!--/ko--><!-- ko if: catalogEntry.isField() -->${_('No results found')}<!--/ko--></li>
     </ul>
     <!-- /ko -->
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length > 0 -->
-    <ul class="database-tree" data-bind="foreachVisible: { data: filteredEntries, minHeight: navigationSettings.rightAssist ? 22 : 23, container: '.assist-db-scrollable', skipScrollEvent: navigationSettings.rightAssist }, css: { 'assist-tables': definition.isDatabase }">
-      <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
+    <ul class="database-tree" data-bind="foreachVisible: { data: filteredEntries, minHeight: navigationSettings.rightAssist ? 22 : 23, container: '.assist-db-scrollable', skipScrollEvent: navigationSettings.rightAssist }, css: { 'assist-tables': catalogEntry.isDatabase() }">
+      <!-- ko template: { if: catalogEntry.isTableOrView(), name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko if: navigationSettings.rightAssist -->
-        <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry-assistant' } --><!-- /ko -->
+        <!-- ko template: { ifnot: catalogEntry.isTableOrView(), name: 'assist-column-entry-assistant' } --><!-- /ko -->
       <!-- /ko -->
       <!-- ko ifnot: navigationSettings.rightAssist -->
-        <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry' } --><!-- /ko -->
+        <!-- ko template: { ifnot: catalogEntry.isTableOrView(), name: 'assist-column-entry' } --><!-- /ko -->
       <!-- /ko -->
     </ul>
     <!-- /ko -->
-    <!-- ko template: { if: ! hasErrors() && ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
-    <!-- ko template: { if: ! hasErrors() && ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
+    <!-- ko template: { if: ! hasErrors() && ! hasEntries() && ! loading() && (catalogEntry.isTableOrView()), name: 'assist-no-table-entries' } --><!-- /ko -->
+    <!-- ko template: { if: ! hasErrors() && ! hasEntries() && ! loading() && catalogEntry.isDatabase(), name: 'assist-no-database-entries' } --><!-- /ko -->
     <!-- ko if: hasErrors -->
     <ul class="assist-tables">
-      <!-- ko if: definition.isTable -->
+      <!-- ko if: catalogEntry.isTableOrView() -->
       <li class="assist-errors">${ _('Error loading columns.') }</li>
       <!-- /ko -->
-      <!-- ko ifnot: definition.isTable -->
+      <!-- ko if: catalogEntry.isField() -->
       <li class="assist-errors">${ _('Error loading fields.') }</li>
       <!-- /ko -->
     </ul>
@@ -1301,7 +1301,7 @@ from desktop.views import _ko
         self.breadcrumb = ko.computed(function () {
           if (self.selectedSource()) {
             if (self.selectedSource().selectedDatabase()) {
-              return self.selectedSource().selectedDatabase().definition.name;
+              return self.selectedSource().selectedDatabase().catalogEntry.name;
             }
             return self.selectedSource().name;
           }
@@ -2319,13 +2319,13 @@ from desktop.views import _ko
             <li class="assist-table hue-warning" data-bind="attr: { 'title': $parent.isSolr() ? '${ _ko('Error loading collection details.') }' : '${ _ko('Error loading table details.') }'}">
               <span class="assist-entry">
                 <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
-                <span data-bind="text: definition.displayName"></span>
+                <span data-bind="text: catalogEntry.getDisplayName()"></span>
               </span>
             </li>
             <!-- /ko -->
             <!-- ko ifnot: hasErrors -->
-            <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
-            <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry-assistant' } --><!-- /ko -->
+            <!-- ko template: { if: catalogEntry.isTableOrView(), name: 'assist-table-entry' } --><!-- /ko -->
+            <!-- ko template: { if: catalogEntry.isField(), name: 'assist-column-entry-assistant' } --><!-- /ko -->
             <!-- /ko -->
           </ul>
           <!-- /ko -->
@@ -2387,15 +2387,15 @@ from desktop.views import _ko
                 $.each(vm.activeTables(), function (index, entry) {
                   var facetMatch = !facets || !facets['type'] || (!facets['type']['table'] && !facets['type']['view']);
                   if (!facetMatch && facets['type']['table']) {
-                    facetMatch = entry.definition.isTable;
+                    facetMatch = entry.catalogEntry.isTable();
                   }
                   if (!facetMatch && facets['type']['view']) {
-                    facetMatch = entry.definition.isView;
+                    facetMatch = entry.catalogEntry.isView();
                   }
 
                   var textMatch = !vm.filter.querySpec().text || vm.filter.querySpec().text.length === 0;
                   if (!textMatch) {
-                    var nameLower = entry.definition.name.toLowerCase();
+                    var nameLower = entry.catalogEntry.name.toLowerCase();
                     textMatch = vm.filter.querySpec().text.every(function (text) {
                       return nameLower.indexOf(text.toLowerCase()) !== -1;
                     });
@@ -2533,14 +2533,14 @@ from desktop.views import _ko
           var result = [];
           var partialLower = partial.toLowerCase();
           self.activeTables().forEach(function (table) {
-            if (!added[table.definition.name] && table.definition.name.toLowerCase().indexOf(partialLower) === 0) {
-              added[table.definition.name] = true;
-              result.push(nonPartial + partial + table.definition.name.substring(partial.length))
+            if (!added[table.catalogEntry.name] && table.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
+              added[table.catalogEntry.name] = true;
+              result.push(nonPartial + partial + table.catalogEntry.name.substring(partial.length))
             }
             table.entries().forEach(function (col) {
-              if (!added[col.definition.name] && col.definition.name.toLowerCase().indexOf(partialLower) === 0) {
-                added[col.definition.name] = true;
-                result.push(nonPartial + partial + col.definition.name.substring(partial.length))
+              if (!added[col.catalogEntry.name] && col.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
+                added[col.catalogEntry.name] = true;
+                result.push(nonPartial + partial + col.catalogEntry.name.substring(partial.length))
               }
             })
           });
@@ -2634,7 +2634,7 @@ from desktop.views import _ko
               });
 
               tables.sort(function (a, b) {
-                return a.definition.name.localeCompare(b.definition.name);
+                return a.catalogEntry.name.localeCompare(b.catalogEntry.name);
               });
               self.activeTables(tables);
             }
@@ -2935,14 +2935,14 @@ from desktop.views import _ko
             var result = [];
             var partialLower = partial.toLowerCase();
             self.activeTables().forEach(function (table) {
-              if (!added[table.definition.name] && table.definition.name.toLowerCase().indexOf(partialLower) === 0) {
-                added[table.definition.name] = true;
-                result.push(nonPartial + partial + table.definition.name.substring(partial.length))
+              if (!added[table.catalogEntry.name] && table.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
+                added[table.catalogEntry.name] = true;
+                result.push(nonPartial + partial + table.catalogEntry.name.substring(partial.length))
               }
               table.entries().forEach(function (col) {
-                if (!added[col.definition.name] && col.definition.name.toLowerCase().indexOf(partialLower) === 0) {
-                  added[col.definition.name] = true;
-                  result.push(nonPartial + partial + col.definition.name.substring(partial.length))
+                if (!added[col.catalogEntry.name] && col.catalogEntry.name.toLowerCase().indexOf(partialLower) === 0) {
+                  added[col.catalogEntry.name] = true;
+                  result.push(nonPartial + partial + col.catalogEntry.name.substring(partial.length))
                 }
               })
             });
