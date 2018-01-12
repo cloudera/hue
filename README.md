@@ -19,6 +19,11 @@ It features:
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/dashboard.png "Hue Dashboard")
 
 
+Who is using Hue
+----------------
+Thousands of companies and organizations use Hue to open-up and query their data in order to make smarter decisions. Just at Cloudera, Hue is heavily used by hundreds of customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop and is compatible with the other distributions.
+
+
 Getting Started
 ---------------
 Add the development packages, build and get the development server running:
@@ -81,12 +86,6 @@ __MacOS:__
 * gmp (Homebrew)
 * openssl (Homebrew)
 * Required for Mac OS X 10.11+ (El Capitan), after ``brew install openssl``, run: ``export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include``
-
-
-
-Who is using Hue
-----------------
-Thousands of companies and organizations use Hue to open-up and query their data and make smarter decisions. Hue is heavily used by hundreds of Cloudera customers executing millions of queries daily. Hue directly ships in Cloudera, Amazon, MapR, BigTop distributions.
 
 
 Community
