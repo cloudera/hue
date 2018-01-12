@@ -217,9 +217,10 @@ var AssistDbSource = (function () {
 
     var updateDatabases = function (names, lastSelectedDb) {
       dbIndex = {};
+      var hasNavMeta = false;
       var dbs = $.map(names, function(name) {
         var catalogEntry = DataCatalog.getEntry({ sourceType: self.sourceType, path: name, definition: { type: 'database' }});
-
+        hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
         var database = new AssistDbEntry(catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
         dbIndex[name] = database;
         if (name === lastSelectedDb) {
@@ -228,6 +229,10 @@ var AssistDbSource = (function () {
         }
         return database;
       });
+
+      if (!hasNavMeta) {
+        DataCatalog.getEntry({ sourceType: self.sourceType, path: [], definition: { type: 'source' } }).loadNavigatorMetaForChildren({ silenceErrors: true });
+      }
 
       dbs.sort(sortFunctions[self.activeSort()]);
       self.databases(dbs);
