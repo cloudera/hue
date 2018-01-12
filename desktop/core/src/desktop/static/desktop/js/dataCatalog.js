@@ -17,99 +17,137 @@
 var DataCatalog = (function () {
 
 
+  /**
+   * @param {String} sourceType
+   * @constructor
+   */
   function DataCatalog(sourceType) {
     var self = this;
     self.sourceType = sourceType;
-
+    self.entries = {};
   }
 
-  DataCatalog.prototype.getEntry = function (options) {
+  /**
+   * @param {string|string[]} path
+   * @return {DataCatalogEntry}
+   */
+  DataCatalog.prototype.getEntry = function (path) {
     var self = this;
-    if (typeof options === 'string') {
-      return new DataCatalogEntry(self, { path: options ? options.split('.') : [] })
-    }
-    return new DataCatalogEntry(self, options);
+    var identifier = typeof path === 'string' ? path : (typeof path === 'string' ? path : path.join('.'));
+    return self.entries[identifier] || (self.entries[identifier] = new DataCatalogEntry(self, path));
   };
 
-  var reloadSourceMeta = function (dataCatalogEntry, refreshCache) {
+  /**
+   * @param {DataCatalogEntry} dataCatalogEntry
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  var reloadSourceMeta = function (dataCatalogEntry, apiOptions) {
     var deferred = $.Deferred();
     ApiHelper.getInstance().fetchSourceMetadata({
       sourceType: dataCatalogEntry.dataCatalog.sourceType,
       path: dataCatalogEntry.path,
-      silenceErrors: dataCatalogEntry.silenceErrors,
-      cachedOnly: dataCatalogEntry.cachedOnly,
-      refreshCache: refreshCache
+      silenceErrors: apiOptions && apiOptions.silenceErrors,
+      cachedOnly: apiOptions && apiOptions.cachedOnly,
+      refreshCache: apiOptions && apiOptions.refreshCache
     }).done(function (data) {
+      dataCatalogEntry.sourceMeta = data;
       deferred.resolve(data);
     }).fail(deferred.reject);
-    dataCatalogEntry.lastSourcePromise = deferred.promise();
-    return dataCatalogEntry.lastSourcePromise;
+    dataCatalogEntry.lastSourceMetaPromise = deferred.promise();
+    return dataCatalogEntry.lastSourceMetaPromise;
   };
 
-  var reloadNavigatorMeta = function (dataCatalogEntry, refreshCache) {
+  /**
+   * @param {DataCatalogEntry} dataCatalogEntry
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
     var deferred = $.Deferred();
     if (HAS_NAVIGATOR) {
       ApiHelper.getInstance().fetchNavigatorMetadata({
         path: dataCatalogEntry.path,
-        silenceErrors: dataCatalogEntry.silenceErrors,
-        refreshCache: refreshCache
+        silenceErrors: apiOptions && apiOptions.silenceErrors,
+        cachedOnly: apiOptions && apiOptions.cachedOnly,
+        refreshCache: apiOptions && apiOptions.refreshCache
       }).done(function (data) {
+        dataCatalogEntry.navigatorMeta = data;
         deferred.resolve(data);
       }).fail(deferred.reject);
     } else {
       deferred.reject();
     }
-    dataCatalogEntry.lastNavigatorPromise = deferred.promise();
-    return dataCatalogEntry.lastNavigatorPromise;
+    dataCatalogEntry.lastNavigatorMetaPromise = deferred.promise();
+    return dataCatalogEntry.lastNavigatorMetaPromise;
   };
 
-  function DataCatalogEntry(dataCatalog, options) {
+  /**
+   * @param {DataCatalog} dataCatalog
+   * @param {string|string[]} path
+   * @constructor
+   */
+  function DataCatalogEntry(dataCatalog, path) {
     var self = this;
 
     self.dataCatalog = dataCatalog;
-    self.path = typeof options.path === 'string' && options.path ? options.path.split('.') : options.path || [];
+    self.path = typeof path === 'string' && path ? path.split('.') : path || [];
+    self.name = self.path.length ? self.path[self.path.length - 1] : dataCatalog.sourceType;
 
-    self.partialSourceMeta = options.partialSourceMeta;
-    self.lastSourcePromise = undefined;
-    self.lastNavigatorPromise = undefined;
+    self.definition = undefined;
+    self.lastSourceMetaPromise = undefined;
+    self.sourceMeta = undefined;
+    self.lastNavigatorMetaPromise = undefined;
+    self.navigatorMeta = undefined;
 
     self.children = undefined;
-    self.lastNavigatorChildrenPromise = undefined;
-
-    self.silenceErrors = options.silenceErrors;
-    self.cachedOnly = options.cachedOnly;
   }
 
-  DataCatalogEntry.prototype.getChildren = function () {
+  /**
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  DataCatalogEntry.prototype.getChildren = function (apiOptions) {
     var self = this;
     var deferred = $.Deferred();
     if (self.children) {
       deferred.resolve(self.children);
     } else {
-      self.getSourceMeta().done(function (sourceMeta) {
+      self.getSourceMeta(apiOptions).done(function (sourceMeta) {
         if (self.children) {
           deferred.resolve(self.children);
         } else {
           self.children = [];
+          var index = 0;
           var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields;
           if (entities) {
             entities.forEach(function (entity) {
-              self.children.push(new DataCatalogEntry(self.dataCatalog, {
-                path: self.path.concat(entity.name || entity),
-                silenceErrors: self.silenceErrors,
-                cachedOnly: self.cachedOnly,
-                partialSourceMeta: typeof entity === 'object' ? entity : undefined
-              }))
+              var catalogEntry = self.dataCatalog.getEntry(self.path.concat(entity.name || entity));
+              if (!catalogEntry.definition && typeof entity === 'object') {
+                catalogEntry.definition = entity;
+                catalogEntry.definition.index = index++;
+              }
+              self.children.push(catalogEntry);
             });
           } else {
             (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
               if (sourceMeta[path]) {
-                self.children.push(new DataCatalogEntry(self.dataCatalog, {
-                  path: self.path.concat(path),
-                  silenceErrors: self.silenceErrors,
-                  cachedOnly: self.cachedOnly,
-                  partialSourceMeta: sourceMeta[path]
-                }));
+                var catalogEntry = self.dataCatalog.getEntry(self.path.concat(path));
+                if (!catalogEntry.definition) {
+                  catalogEntry.definition = sourceMeta[path];
+                  catalogEntry.definition.index = index++;
+                  catalogEntry.definition.isMapValue = path === 'value'
+                }
+                self.children.push(catalogEntry);
               }
             })
           }
@@ -120,8 +158,14 @@ var DataCatalog = (function () {
     return deferred.promise();
   };
 
-  DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function () {
+  /**
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @return {Promise}
+   */
+  DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function (apiOptions) {
     var self = this;
+    var deferred = $.Deferred();
     self.getChildren().done(function (children) {
       var query;
 
@@ -135,7 +179,8 @@ var DataCatalog = (function () {
       ApiHelper.getInstance().searchEntities({
         query: query,
         rawQuery: true,
-        limit: children.length
+        limit: children.length,
+        silenceErrors: apiOptions && apiOptions.silenceErrors
       }).done(function (result) {
         if (result && result.entities && result.entities.length > 0) {
           var entityIndex = {};
@@ -145,32 +190,50 @@ var DataCatalog = (function () {
           children.forEach(function (child) {
             var name = child.path[child.path.length - 1];
             if (entityIndex[name]) {
-              child.lastNavigatorPromise = $.Deferred().resolve(entityIndex[name]).promise();
+              child.navigatorMeta = entityIndex[name];
+              child.lastNavigatorMetaPromise = $.Deferred().resolve(child.navigatorMeta).promise();
             }
           });
+          deferred.resolve(children);
         }
-      })
-    })
+      }).fail(deferred.reject);
+    });
+    return deferred.promise();
   };
 
-  DataCatalogEntry.prototype.getComment = function () {
+  /**
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  DataCatalogEntry.prototype.getComment = function (apiOptions) {
     var self = this;
     var deferred = $.Deferred();
 
     var resolveWithSourceMeta = function () {
-      self.getSourceMeta().done(function (sourceMeta) {
-        deferred.resolve(sourceMeta && sourceMeta.comment || '');
-      }).fail(deferred.reject);
+      if (self.sourceMeta) {
+        deferred.resolve(self.sourceMeta && self.sourceMeta.comment || '');
+      } else {
+        self.getSourceMeta(apiOptions).done(function (sourceMeta) {
+          deferred.resolve(sourceMeta && sourceMeta.comment || '');
+        }).fail(deferred.reject);
+      }
     };
 
     if (HAS_NAVIGATOR) {
-      self.getNavigatorMeta().done(function (navigatorMeta) {
-        if (navigatorMeta && navigatorMeta.entity) {
-          deferred.resolve(navigatorMeta.entity.description || navigatorMeta.entity.originalDescription || '');
-        } else {
-          resolveWithSourceMeta();
-        }
-      }).fail(resolveWithSourceMeta)
+      if (self.navigatorMeta && self.navigatorMeta.entity) {
+        deferred.resolve(self.navigatorMeta.entity.description || self.navigatorMeta.entity.originalDescription || '');
+      } else {
+        self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
+          if (navigatorMeta && navigatorMeta.entity) {
+            deferred.resolve(navigatorMeta.entity.description || navigatorMeta.entity.originalDescription || '');
+          } else {
+            resolveWithSourceMeta();
+          }
+        }).fail(resolveWithSourceMeta)
+      }
     } else {
       resolveWithSourceMeta();
     }
@@ -178,12 +241,20 @@ var DataCatalog = (function () {
     return deferred.promise();
   };
 
-  DataCatalogEntry.prototype.setComment = function (comment) {
+  /**
+   * @param {string} comment
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  DataCatalogEntry.prototype.setComment = function (comment, apiOptions) {
     var self = this;
     var deferred = $.Deferred();
 
     if (HAS_NAVIGATOR) {
-      self.getNavigatorMeta().done(function (navigatorMeta) {
+      self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
         if (navigatorMeta && navigatorMeta.entity) {
           ApiHelper.getInstance().updateNavigatorMetadata({
             identity: navigatorMeta.entity.identity,
@@ -191,8 +262,12 @@ var DataCatalog = (function () {
               description: comment
             }
           }).done(function () {
-            reloadNavigatorMeta(self, true);
-            self.getComment().done(deferred.resolve);
+            reloadNavigatorMeta(self, {
+              silenceErrors: apiOptions && apiOptions.silenceErrors,
+              refreshCache: true
+            }).done(function() {
+              self.getComment(apiOptions).done(deferred.resolve);
+            });
           }).fail(deferred.reject);
         }
       }).fail(deferred.reject);
@@ -204,35 +279,173 @@ var DataCatalog = (function () {
           comment: comment
         }
       }).done(function () {
-        reloadSourceMeta(self, true);
-        self.getComment().done(deferred.resolve);
+        reloadSourceMeta(self, {
+          silenceErrors: apiOptions && apiOptions.silenceErrors,
+          refreshCache: true
+        }).done(function () {
+          self.getComment(apiOptions).done(deferred.resolve);
+        });
       }).fail(deferred.reject);
     }
 
     return deferred.promise();
   };
 
-  DataCatalogEntry.prototype.getSourceMeta = function () {
+  DataCatalogEntry.prototype.hasPossibleChildren = function () {
     var self = this;
-    return self.lastSourcePromise || reloadSourceMeta(self)
+    return (!self.definition && !self.sourceMeta) ||
+      (self.sourceMeta && /^(?:table|view|struct|array|map)/i.test(self.sourceMeta.type)) ||
+      (self.definition && /^(?:table|view|struct|array|map)/i.test(self.definition.type));
   };
 
-  DataCatalogEntry.prototype.getNavigatorMeta = function () {
+  DataCatalogEntry.prototype.getIndex = function () {
     var self = this;
-    return self.lastNavigatorPromise || reloadNavigatorMeta(self)
+    return self.definition && self.definition.index ? self.definition.index : 0;
+  };
+
+  DataCatalogEntry.prototype.isDatabase = function () {
+    var self = this;
+    return self.path.length === 1;
+  };
+
+  DataCatalogEntry.prototype.isTableOrView = function () {
+    var self = this;
+    return self.path.length === 2;
+  };
+
+
+  DataCatalogEntry.prototype.getTitle = function () {
+    var self = this;
+    var title = self.path.join('.');
+    if (self.isField()) {
+      var type = self.getType();
+      if (type) {
+        if (~type.indexOf('<')) {
+          type = type.substring(0, type.indexOf('<'));
+        }
+        title += ' (' + type + ')';
+      }
+    }
+    return title;
+  };
+
+  DataCatalogEntry.prototype.getDisplayName = function () {
+    var self = this;
+    var displayName = self.name;
+    if (self.isField()) {
+      var type = self.getType();
+      if (type) {
+        if (~type.indexOf('<')) {
+          type = type.substring(0, type.indexOf('<'));
+        }
+        displayName += ' (' + type + ')';
+      }
+    }
+    return displayName;
+  };
+
+  DataCatalogEntry.prototype.isPrimaryKey = function () {
+    var self = this;
+    return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
+  };
+
+  DataCatalogEntry.prototype.isTable = function () {
+    var self = this;
+    if (self.path.length === 2) {
+      if (self.sourceMeta) {
+        return !self.sourceMeta.is_view;
+      }
+      if (self.definition && self.definition.type) {
+        return self.definition.type.toLowerCase() === 'table';
+      }
+      return true;
+    }
+    return false;
+  };
+
+  DataCatalogEntry.prototype.isView = function () {
+    var self = this;
+    return self.path.length === 2 &&
+      ((self.sourceMeta && self.sourceMeta.is_view) ||
+      (self.definition && self.definition.type && self.definition.type.toLowerCase() === 'view'));
+  };
+
+  DataCatalogEntry.prototype.isColumn = function () {
+    var self = this;
+    return self.path.length === 3;
+  };
+
+  DataCatalogEntry.prototype.isComplex = function () {
+    var self = this;
+    return self.path.length > 2 && (
+      (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type)) ||
+      (self.definition && /^(?:struct|array|map)/i.test(self.definition.type)));
+  };
+
+  DataCatalogEntry.prototype.isField = function () {
+    var self = this;
+    return self.path.length > 2;
+  };
+
+  DataCatalogEntry.prototype.isArray = function () {
+    var self = this;
+    return (self.definition && self.definition.type && self.definition.type.toLowerCase() === 'array') ||
+      (self.sourceMeta && self.sourceMeta.type && self.sourceMeta.type.toLowerCase() === 'array');
+  };
+
+  DataCatalogEntry.prototype.isMapValue = function () {
+    var self = this;
+    return self.definition && self.definition.isMapValue;
+  };
+
+  DataCatalogEntry.prototype.getType = function () {
+    var self = this;
+    if (self.sourceMeta) {
+      return self.sourceMeta.type;
+    }
+    if (self.definition) {
+      return self.definition.type;
+    }
+  };
+
+  /**
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  DataCatalogEntry.prototype.getSourceMeta = function (apiOptions) {
+    var self = this;
+    return self.lastSourceMetaPromise || reloadSourceMeta(self, apiOptions);
+  };
+
+  /**
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  DataCatalogEntry.prototype.getNavigatorMeta = function (apiOptions) {
+    var self = this;
+    return self.lastNavigatorMetaPromise || reloadNavigatorMeta(self, apiOptions)
   };
 
 
   var instances = {};
 
+  /**
+   * @param {string} sourceType
+   * @return {DataCatalog}
+   */
   var getCatalog = function (sourceType) {
     return instances[sourceType] || (instances[sourceType] = new DataCatalog(sourceType));
   };
 
   return {
-    getCatalog: getCatalog,
     getEntry: function (options) {
-      return getCatalog(options.sourceType).getEntry(options);
+      return getCatalog(options.sourceType).getEntry(options.path);
     }
   };
 })();
