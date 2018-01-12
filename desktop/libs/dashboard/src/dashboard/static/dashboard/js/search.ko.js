@@ -2438,8 +2438,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json, is_gr
         data = JSON.bigdataParse(data);
         var details = [];
         doc.details.removeAll();
-        if (data.status == 0) {
 
+        if (data.status == 0) {
           $.each(data.doc.doc, function (key, val) {
             var _field = ko.mapping.fromJS({
               key: key,
@@ -2452,17 +2452,24 @@ var SearchViewModel = function (collection_json, query_json, initial_json, is_gr
             });
             details.push(_field);
           });
-        }
-        else if (data.status == 1) {
-          $(document).trigger("info", data.message);
+        } else if (data.status == 1) {
           details.push(ko.mapping.fromJS({
-            key: '',
-            value: ''
+            key: 'Warning',
+            value: data.message
           }));
-        }
-        else {
+          $.each(doc.item, function (key, val) {
+            if (key != '__ko_mapping__') {
+              details.push(ko.mapping.fromJS({
+                key: key,
+                value: val,
+                hasChanged: false
+              }));
+            }
+          });
+        } else {
           $(document).trigger("error", data.message);
         }
+
         doc.details(details);
         doc.originalDetails(ko.toJSON(doc.details()));
         if (callback) {
