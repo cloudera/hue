@@ -904,6 +904,19 @@ class HiveServer2Dbms(object):
     return result
 
 
+  def get_query_metadata(self, query):
+    hql = 'SELECT * FROM ( %(query)s ) t LIMIT 0' % {'query': query}
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=15.0)
+
+    if handle:
+      result = self.fetch(handle, rows=5000)
+      self.close(handle)
+
+    return result
+
+
   def explain(self, query):
     return self.client.explain(query)
 
