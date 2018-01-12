@@ -266,7 +266,11 @@ from desktop.views import _ko
         if (['database', 'table', 'field', 'view'].indexOf(selectedResult.type) !== -1) {
           huePubSub.publish('context.popover.show.in.assist');
         } else if (selectedResult.type === 'document') {
-          huePubSub.publish('open.link', '/hue' + selectedResult.data.link);
+          if (selectedResult.data.doc_type === 'directory') {
+            huePubSub.publish('context.popover.show.in.assist');
+          } else {
+            huePubSub.publish('open.link', '/hue' + selectedResult.data.link);
+          }
         } else if (selectedResult.type === 'hueApp' && selectedResult.data.interpreter && selectedResult.data.interpreter.page) {
           huePubSub.publish('open.link', selectedResult.data.interpreter.page);
         } else if (selectedResult.type === 'hueApp' && selectedResult.data.app && selectedResult.data.app.page) {
