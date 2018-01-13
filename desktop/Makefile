@@ -98,9 +98,9 @@ $(DESKTOP_DB): $(BLD_DIR_BIN)/hue
 	  echo 'Removing old database (DESKTOP_DEBUG is set)' ; \
 	  rm -f $@ ; \
 	fi
-	@echo "--- Syncing/updating database at $@"
-	@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue makemigrations --noinput
-	@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue migrate
+	#@echo "--- Syncing/updating database at $@"
+	#@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue makemigrations --noinput
+	#@$(ENV_PYTHON) $(BLD_DIR_BIN)/hue migrate
 
 # Targets that simply recurse into all of the applications
 ENV_INSTALL_TARGETS := $(APPS:%=.recursive-env-install/%)
