@@ -295,6 +295,21 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <div id="rerun-modal${ SUFFIX }" class="modal hide" data-bind="htmlUnsecure: $root.job().rerunModalContent"></div>
 <!-- /ko -->
 
+<!-- ko if: ($root.job() && $root.job().hasKill()) || (!$root.job() && $root.jobs.hasKill()) -->
+  <div id="killModal${ SUFFIX }" class="modal hide">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Confirm Kill')}</h2>
+    </div>
+    <div class="modal-body">
+      <p>${_('Are you sure you want to kill the selected job(s)?')}</p>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a id="killJobBtn" class="btn btn-danger disable-feedback" data-dismiss="modal" data-bind="click: function(){ if (job()) { job().control('kill'); } else { jobs.control('kill'); } }">${_('Yes')}</a>
+    </div>
+  </div>
+<!-- /ko -->
 </div>
 
 
@@ -1181,8 +1196,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     % if not DISABLE_KILLING_JOBS.get():
     <!-- ko if: hasKill -->
-    <button class="btn btn-danger disable-feedback" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
-      ## TODO confirmation
+    <button class="btn btn-danger disable-feedback" title="${_('Stop selected')}" data-bind="click: function() { $('#killModal${ SUFFIX }').modal('show'); }, enable: killEnabled">
       <i class="fa fa-times"></i> <!-- ko ifnot: $root.isMini -->${_('Kill')}<!-- /ko -->
     </button>
     <!-- /ko -->
@@ -1787,6 +1801,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
+
+
 <script type="text/html" id="link-or-text${ SUFFIX }">
   <!-- ko if: typeof $data.value === 'string' -->
     <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
@@ -1800,8 +1816,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <span data-bind="text: $data.value"></span>
   <!-- /ko -->
 </script>
-
-
 
 <script type="text/javascript">
 
