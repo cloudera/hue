@@ -49,6 +49,70 @@ var ApiQueueManager = (function () {
   };
 })();
 
+var CancellablePromise = (function () {
+
+  function CancellablePromise(promise, request, otherCancellables) {
+    var self = this;
+    self.promise = promise;
+    self.request = request;
+    self.otherCancellables = otherCancellables;
+  }
+
+  CancellablePromise.prototype.cancel = function () {
+    var self = this;
+    if (self.request) {
+      ApiHelper.getInstance().cancelActiveRequest(self.request);
+    }
+    if (self.otherCancellables) {
+      self.otherCancellables.forEach(function (cancellable) { cancellable.cancel() });
+    }
+    return this;
+  };
+
+  CancellablePromise.prototype.then = function () {
+    var self = this;
+    self.promise.then.apply(self.promise, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.done = function (callback) {
+    var self = this;
+    self.promise.done.apply(self.promise, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.fail = function (callback) {
+    var self = this;
+    self.promise.fail.apply(self.promise, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.always = function (callback) {
+    var self = this;
+    self.promise.always.apply(self.promise, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.pipe = function (callback) {
+    var self = this;
+    self.promise.pipe.apply(self.promise, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.progress = function (callback) {
+    var self = this;
+    self.promise.progress.apply(self.promise, arguments);
+    return self;
+  };
+
+  CancellablePromise.prototype.state = function () {
+    var self = this;
+    return self.promise.state();
+  };
+
+  return CancellablePromise;
+})();
+
 var ApiHelper = (function () {
 
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
@@ -1477,27 +1541,27 @@ var ApiHelper = (function () {
    *
    * @param {string[]} [options.path] - The path to fetch
    *
-   * @return {Deferred} Promise
+   * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchSourceMetadata = function (options) {
     var self = this;
-    var promise = $.Deferred();
+    var deferred = $.Deferred();
 
-    fetchAssistData.bind(self)({
+    var request = fetchAssistData.bind(self)({
       url: AUTOCOMPLETE_API_PREFIX + options.path.join('/'),
       sourceType: options.sourceType,
       silenceErrors: options.silenceErrors,
       cachedOnly: options.cachedOnly,
       refreshCache: options.refreshCache,
-      successCallback: promise.resolve,
+      successCallback: deferred.resolve,
       errorCallback: self.assistErrorCallback({
-        errorCallback: promise.reject,
+        errorCallback: deferred.reject,
         silenceErrors: options.silenceErrors
       }),
       cacheCondition: genericCacheCondition
     });
 
-    return promise;
+    return new CancellablePromise(deferred.promise(), request);
   };
 
 
@@ -1551,11 +1615,13 @@ var ApiHelper = (function () {
    *
    * @param {string} options.sourceType
    * @param {string[]} options.path
+   *
+   * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchSample = function (options) {
     var self = this;
     var deferred = $.Deferred();
-    fetchAssistData.bind(self)({
+    var request = fetchAssistData.bind(self)({
       url: SAMPLE_API_PREFIX + options.path.join('/'),
       sourceType: options.sourceType,
       noCache: options.noCache,
@@ -1568,7 +1634,7 @@ var ApiHelper = (function () {
       }),
       cacheCondition: genericCacheCondition
     });
-    return deferred.promise();
+    return new CancellablePromise(deferred.promise(), request);
   };
 
   /**
@@ -1581,6 +1647,8 @@ var ApiHelper = (function () {
    *
    * @param {boolean} [options.isView] - Default false
    * @param {string[]} options.path
+   *
+   * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchNavigatorMetadata = function (options) {
     var self = this;
@@ -1595,7 +1663,7 @@ var ApiHelper = (function () {
       url +=  '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
     }
 
-    fetchAssistData.bind(self)({
+    var request = fetchAssistData.bind(self)({
       url: url,
       sourceType: 'nav',
       noCache: options.noCache,
@@ -1611,7 +1679,7 @@ var ApiHelper = (function () {
       cacheCondition: genericCacheCondition
     });
 
-    return deferred.promise();
+    return new CancellablePromise(deferred.promise(), request);
   };
 
   ApiHelper.prototype.updateNavigatorMetadata = function (options) {
@@ -1636,6 +1704,32 @@ var ApiHelper = (function () {
       tags: ko.mapping.toJSON(tags)
     });
   };
+
+  /**
+   * Fetches navOpt metadata for the children of the given path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.refreshCache] - Default false
+   * @param {string[]} options.path
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptMetadata = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+    var url = options.path.length === 1 ? NAV_OPT_URLS.TOP_TABLES : NAV_OPT_URLS.TOP_COLUMNS;
+    return self.fetchNavOptCached(url, {
+      path: options.path,
+      refreshCache: options.refreshCache,
+      silenceErrors: options.silenceErrors,
+      successCallback: deferred.resolve,
+      errorCallback: deferred.reject
+    }, function (data) {
+      return data.status === 0;
+    });
+  };
+
+
 
   /**
    * Lists all available navigator tags
@@ -1989,21 +2083,19 @@ var ApiHelper = (function () {
     var self = this;
 
     var performFetch = function (data, hash) {
-      var promise = self.queueManager.getQueued(url, hash);
-      var firstInQueue = typeof promise === 'undefined';
-      if (firstInQueue) {
-        promise = $.Deferred();
-        self.queueManager.addToQueue(promise, url, hash);
-      }
+      var queuedPromise = self.queueManager.getQueued(url, hash);
 
-      promise.done(options.successCallback).fail(self.assistErrorCallback(options)).always(function () {
-        if (typeof options.editor !== 'undefined' && options.editor !== null) {
-          options.editor.hideSpinner();
+      if (queuedPromise) {
+        if (options.successCallback) {
+          queuedPromise.done(options.successCallback);
         }
-      });
-
-      if (!firstInQueue) {
-        return;
+        queuedPromise.fail(self.assistErrorCallback(options));
+        if (options.editor) {
+          queuedPromise.always(function () {
+            options.editor.hideSpinner();
+          })
+        }
+        return queuedPromise;
       }
 
       var fetchFunction = function (storeInCache) {
@@ -2016,43 +2108,70 @@ var ApiHelper = (function () {
           type: 'post',
           url: url,
           data: data,
-          timeout: options.timeout
-        })
-          .done(function (data) {
-            if (data.status === 0) {
-              if (cacheCondition(data)) {
-                storeInCache(data);
-              }
-              promise.resolve(data);
-            } else {
-              promise.reject(data);
+          timeout: options.timeout || AUTOCOMPLETE_TIMEOUT
+        }).done(function (data) {
+          if (data.status === 0) {
+            if (cacheCondition(data)) {
+              storeInCache(data);
             }
-          })
-          .fail(promise.reject);
+            promise.resolve(data);
+          } else {
+            promise.reject(data);
+          }
+        })
+        .fail(promise.reject);
       };
 
-      return fetchCached.bind(self)($.extend({}, options, {
+      var deferred = $.Deferred();
+
+      var request = fetchCached.bind(self)($.extend({}, options, {
         url: url,
         hash: hash,
         cacheType: 'optimizer',
         fetchFunction: fetchFunction,
-        promise: promise
+        promise: deferred
       }));
-    }
 
-    var promise = $.Deferred();
-    if (options.tables) {
+      var promise = new CancellablePromise(deferred.promise(), request);
+
+      self.queueManager.addToQueue(promise, url, hash);
+      return promise;
+    };
+
+    var deferred = $.Deferred();
+    var request;
+
+    if (options.tables && options.tables.identifierChain) {
       self.createNavOptDbTablesJson(options).done(function (json) {
-        promise.resolve(performFetch({
+        deferred.resolve(performFetch({
           dbTables: json
         }, json.hashCode()))
       });
     } else if (options.database) {
-      promise.resolve(performFetch({
+      request = performFetch({
         database: options.database
-      }, options.database));
+      }, options.database).done(deferred.resolve);
+      deferred.resolve();
+    } else if (options.path) {
+      var data, hash;
+      if (options.path.length === 1) {
+        data = {
+          database: options.path[0]
+        };
+        hash = data.database;
+      } else if (options.path.length === 2) {
+        data = {
+          dbTables: ko.mapping.toJSON([options.path.join('.')])
+        };
+        hash = data.dbTables.hashCode();
+      } else {
+        deferred.reject();
+        return deferred.promise();
+      }
+      request = performFetch(data, hash).done(deferred.resolve);
     }
-    return promise;
+
+    return new CancellablePromise(deferred.promise(), request);
   };
 
   ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
@@ -2091,7 +2210,7 @@ var ApiHelper = (function () {
     var self = this;
     var deferred = $.Deferred();
 
-    $.post(SEARCH_API, {
+    var request = $.post(SEARCH_API, {
       query_s: ko.mapping.toJSON(options.query),
       limit: options.limit || 100,
       raw_query: !!options.rawQuery,
@@ -2109,7 +2228,7 @@ var ApiHelper = (function () {
       silenceErrors: options.silenceErrors,
       errorCallback: deferred.reject
     }));
-    return deferred.promise();
+    return new CancellablePromise(deferred.promise(), request);
   };
 
   ApiHelper.prototype.formatSql = function (statements) {
@@ -2224,6 +2343,7 @@ var ApiHelper = (function () {
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} options.url
+   * @param {boolean} options.refreshCache
    * @param {string} [options.hash] - Optional hash to use as well as the url
    * @param {Function} options.fetchFunction
    * @param {Function} options.successCallback
@@ -2237,7 +2357,7 @@ var ApiHelper = (function () {
     var cachedData = $.totalStorage(cacheIdentifier) || {};
     var cachedId = options.hash ? options.url + options.hash : options.url;
 
-    if (typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
+    if (options.refreshCache || typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
       if (typeof options.editor !== 'undefined' && options.editor !== null) {
         options.editor.showSpinner();
       }
