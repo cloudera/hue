@@ -611,98 +611,6 @@ var ApiHelper = (function () {
 
   /**
    * @param {Object} options
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   * @param {Object} [options.editor] - Ace editor
-   *
-   */
-  ApiHelper.prototype.fetchSolrCollections = function (options) {
-    var self = this;
-    var url = SOLR_COLLECTIONS_API;
-    var fetchFunction = function (storeInCache) {
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({ status: -1 });
-        return;
-      }
-      $.ajax({
-        dataType: "json",
-        url: url,
-        type: 'POST',
-        timeout: options.timeout,
-        success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.collections !== 'undefined' && data.collections !== null) {
-            storeInCache(data);
-            options.successCallback(data);
-          } else {
-            self.assistErrorCallback(options)(data);
-          }
-        }
-      })
-      .fail(self.assistErrorCallback(options))
-      .always(function () {
-        if (typeof options.editor !== 'undefined' && options.editor !== null) {
-          options.editor.hideSpinner();
-        }
-      });
-    };
-
-    fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 'collections',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
-
-  /**
-   * @param {Object} options
-   * @param {String} options.collectionName
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   * @param {Number} [options.timeout]
-   *
-   */
-  ApiHelper.prototype.fetchSolrCollection = function (options) {
-    var self = this;
-    var url = SOLR_FIELDS_API  + '?name=' + options.collectionName;
-    var fetchFunction = function (storeInCache) {
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({ status: -1 });
-        return;
-      }
-      $.ajax({
-        dataType: "json",
-        url: url,
-        type: 'GET',
-        timeout: options.timeout,
-        success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.schema !== 'undefined' && data.schema !== null) {
-            storeInCache(data);
-            options.successCallback(data);
-          } else {
-            self.assistErrorCallback(options)(data);
-          }
-        }
-      })
-      .fail(self.assistErrorCallback(options))
-      .always(function () {
-        if (typeof options.editor !== 'undefined' && options.editor !== null) {
-          options.editor.hideSpinner();
-        }
-      });
-    };
-
-    fetchCached.bind(self)($.extend({}, options, {
-      sourceType: 'collections',
-      url: url,
-      fetchFunction: fetchFunction
-    }));
-  };
-
-  /**
-   * @param {Object} options
    * @param {String} options.collectionName
    * @param {String} options.fieldName
    * @param {String} options.prefix
@@ -1239,6 +1147,7 @@ var ApiHelper = (function () {
    * @param {Object[]} options.identifierChain
    * @param {string} options.defaultDatabase
    */
+  // TODO: Move to DataCatalog
   ApiHelper.prototype.fetchPartitions = function (options) {
     var self = this;
 
@@ -1281,6 +1190,7 @@ var ApiHelper = (function () {
    * @param {string} options.databaseName
    * @param {string} options.tableName
    */
+  // TODO: Move to DataCatalog
   ApiHelper.prototype.fetchTableDetails = function (options) {
     var self = this;
     $.ajax({
@@ -1304,6 +1214,8 @@ var ApiHelper = (function () {
 
 
   /**
+   * Deprecated, use DataCatalog.getEntry(...).getSample()
+   *
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
@@ -1316,6 +1228,7 @@ var ApiHelper = (function () {
    * @param {string} [options.columnName]
    * @param {Object} [options.editor] - Ace editor
    */
+  // TODO: Delete once DataCatalog is used throughout
   ApiHelper.prototype.fetchTableSample = function (options) {
     var self = this;
     var url = SAMPLE_API_PREFIX + options.databaseName + '/' + options.tableName + (options.columnName ? '/' + options.columnName : '');
@@ -1398,37 +1311,6 @@ var ApiHelper = (function () {
         self.assistErrorCallback(options)(data);
       }
     }).fail(self.assistErrorCallback(options));
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
-   * @param {string} options.columnName
-   */
-  ApiHelper.prototype.fetchStats = function (options) {
-    var self = this;
-    $.ajax({
-      url: "/" + options.sourceType + "/api/table/" + options.databaseName + "/" + options.tableName + "/stats/" + ( options.columnName || ""),
-      data: {},
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader("X-Requested-With", "Hue");
-      },
-      dataType: "json",
-      success: function (response) {
-        if (! self.successResponseIsError(response)) {
-          options.successCallback(response)
-        } else {
-          self.assistErrorCallback(options)(response);
-        }
-      },
-      error: self.assistErrorCallback(options)
-    });
   };
 
   /**
@@ -1659,6 +1541,35 @@ var ApiHelper = (function () {
     return self.simplePost(url, data, options);
   };
 
+  /**
+   * Fetches samples for the given source and path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.noCache]
+   * @param {boolean} [options.refreshCache] - Default false
+   *
+   * @param {string} options.sourceType
+   * @param {string[]} options.path
+   */
+  ApiHelper.prototype.fetchSample = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+    fetchAssistData.bind(self)({
+      url: SAMPLE_API_PREFIX + options.path.join('/'),
+      sourceType: options.sourceType,
+      noCache: options.noCache,
+      refreshCache: options.refreshCache,
+      silenceErrors: options.silenceErrors,
+      successCallback: deferred.resolve,
+      errorCallback: self.assistErrorCallback({
+        errorCallback: deferred.reject,
+        silenceErrors: options.silenceErrors
+      }),
+      cacheCondition: genericCacheCondition
+    });
+    return deferred.promise();
+  };
 
   /**
    * Fetches a navigator entity for the given source and path
@@ -1673,7 +1584,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavigatorMetadata = function (options) {
     var self = this;
-    var promise = $.Deferred();
+    var deferred = $.Deferred();
     var url = NAV_URLS.FIND_ENTITY;
 
     if (options.path.length === 1) {
@@ -1690,15 +1601,17 @@ var ApiHelper = (function () {
       noCache: options.noCache,
       refreshCache: options.refreshCache,
       silenceErrors: options.silenceErrors,
-      successCallback: promise.resolve,
+      successCallback: function (data) {
+        deferred.resolve(data.entity || data);
+      },
       errorCallback: self.assistErrorCallback({
-        errorCallback: promise.reject,
+        errorCallback: deferred.reject,
         silenceErrors: options.silenceErrors
       }),
       cacheCondition: genericCacheCondition
     });
 
-    return promise;
+    return deferred.promise();
   };
 
   ApiHelper.prototype.updateNavigatorMetadata = function (options) {
@@ -1743,6 +1656,8 @@ var ApiHelper = (function () {
 
 
   /**
+   * Deprecated, use DataCatalog.getEntry(...).getSourceDetails()
+   *
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
@@ -1756,7 +1671,7 @@ var ApiHelper = (function () {
    * @param {string} options.identifierChain.name
    * @param {string} options.defaultDatabase
    */
-  // TODO: Drop and use fetchSqlMetadata instead
+  // TODO: Drop and use DataCatalog.getEntry(...).getSourceDetails() throughout
   ApiHelper.prototype.fetchAutocomplete = function (options) {
     var self = this;
     self.identifierChainToPath(options).done(function (path) {
@@ -1769,6 +1684,8 @@ var ApiHelper = (function () {
   };
 
   /**
+   * Deprecated, use DataCatalog.getEntry(...).getSourceDetails()
+   *
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
@@ -1779,7 +1696,7 @@ var ApiHelper = (function () {
    *
    * @param {string} options.databaseName
    */
-  // TODO: Drop and use fetchSqlMetadata instead
+  // TODO: Drop and use DataCatalog.getEntry(...).getSourceDetails() throughout
   ApiHelper.prototype.fetchTables = function (options) {
     var self = this;
     return fetchAssistData.bind(self)($.extend({}, options, {
@@ -1790,6 +1707,8 @@ var ApiHelper = (function () {
   };
 
   /**
+   * Deprecated, use DataCatalog.getEntry(...).getSourceDetails()
+   *
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
@@ -1803,7 +1722,7 @@ var ApiHelper = (function () {
    * @param {string} options.tableName
    * @param {string[]} options.fields
    */
-  // TODO: Drop and use fetchSqlMetadata instead
+  // TODO: Drop and use DataCatalog.getEntry(...).getSourceDetails() throughout
   ApiHelper.prototype.fetchFields = function (options) {
     var self = this;
     var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
@@ -1815,6 +1734,8 @@ var ApiHelper = (function () {
   };
 
   /**
+   * Deprecated, use DataCatalog.getEntry(...).getSample()
+   *
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
@@ -1827,6 +1748,7 @@ var ApiHelper = (function () {
    * @param {string} options.identifierChain.name
    * @param {string} options.defaultDatabase
    */
+  // TODO: Drop and use DataCatalog.getEntry(...).getSample() throughout
   ApiHelper.prototype.fetchSamples = function (options) {
     var self = this;
     self.identifierChainToPath(options).done(function (path) {
@@ -1852,6 +1774,7 @@ var ApiHelper = (function () {
    * @param {string} options.identifierChain.name
    * @param {string} options.defaultDatabase
    */
+  // TODO: Add to DataCatalog
   ApiHelper.prototype.fetchAnalysis = function (options) {
     var self = this;
     var clonedIdentifierChain = options.identifierChain.concat();
@@ -1968,6 +1891,7 @@ var ApiHelper = (function () {
    *
    * @param {Object[]} options.database
    */
+  // TODO: Add to DataCatalog
   ApiHelper.prototype.fetchNavOptTopTables = function (options) {
     var self = this;
     return self.fetchNavOptCached(NAV_OPT_URLS.TOP_TABLES, options, function (data) {
@@ -1989,6 +1913,7 @@ var ApiHelper = (function () {
    * @param {string} options.tables.identifierChain.name
    * @param {string} [options.defaultDatabase]
    */
+  // TODO: Add to DataCatalog
   ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
     var self = this;
     return self.fetchNavOptCached(NAV_OPT_URLS.TOP_COLUMNS, options, function (data) {
@@ -2160,33 +2085,6 @@ var ApiHelper = (function () {
       }
     }).fail(promise.reject);
     return promise;
-  };
-
-  ApiHelper.prototype.globalSearchAutocomplete = function (options) {
-    var self = this;
-
-    $.when.apply($, [
-      $.post(INTERACTIVE_SEARCH_API, {
-        query_s: ko.mapping.toJSON(options.query),
-        limit: 5,
-        sources: '["sql", "hdfs", "s3"]'
-      }),
-      $.post(INTERACTIVE_SEARCH_API, {
-          query_s: ko.mapping.toJSON(options.query),
-          limit: 5,
-          sources: '["documents"]'
-        })
-      ]
-    ).done(function (metadata, documents) {
-      if (metadata[0].status === 0 || documents[0].status === 0) {
-        if (documents[0].status === 0) {
-           metadata[0].resultsHuedocuments = documents[0].results;
-        }
-        options.successCallback(metadata[0]);
-      } else {
-        self.assistErrorCallback(options)(metadata);
-      }
-    }).fail(self.assistErrorCallback(options));
   };
 
   ApiHelper.prototype.searchEntities = function (options) {
