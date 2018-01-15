@@ -39,6 +39,16 @@ var DataCatalog = (function () {
     return self.entries[identifier] || (self.entries[identifier] = new DataCatalogEntry(self, options.path, options.definition));
   };
 
+  var fetchMeta = function (apiHelperFunction, dataCatalogEntry, apiOptions) {
+    return ApiHelper.getInstance()[apiHelperFunction]({
+      sourceType: dataCatalogEntry.dataCatalog.sourceType,
+      path: dataCatalogEntry.path,
+      silenceErrors: apiOptions && apiOptions.silenceErrors,
+      cachedOnly: apiOptions && apiOptions.cachedOnly,
+      refreshCache: apiOptions && apiOptions.refreshCache
+    })
+  };
+
   /**
    * @param {DataCatalogEntry} dataCatalogEntry
    * @param {Object} [apiOptions]
@@ -48,18 +58,10 @@ var DataCatalog = (function () {
    * @return {Promise}
    */
   var reloadSourceMeta = function (dataCatalogEntry, apiOptions) {
-    var deferred = $.Deferred();
-    ApiHelper.getInstance().fetchSourceMetadata({
-      sourceType: dataCatalogEntry.dataCatalog.sourceType,
-      path: dataCatalogEntry.path,
-      silenceErrors: apiOptions && apiOptions.silenceErrors,
-      cachedOnly: apiOptions && apiOptions.cachedOnly,
-      refreshCache: apiOptions && apiOptions.refreshCache
-    }).done(function (data) {
-      dataCatalogEntry.sourceMeta = data;
-      deferred.resolve(data);
-    }).fail(deferred.reject);
-    dataCatalogEntry.lastSourceMetaPromise = deferred.promise();
+    dataCatalogEntry.lastSourceMetaPromise = fetchMeta('fetchSourceMetadata', dataCatalogEntry, apiOptions);
+    dataCatalogEntry.lastSourceMetaPromise.done(function (sourceMeta) {
+      dataCatalogEntry.sourceMeta = sourceMeta;
+    });
     return dataCatalogEntry.lastSourceMetaPromise;
   };
 
@@ -72,28 +74,37 @@ var DataCatalog = (function () {
    * @return {Promise}
    */
   var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
-    var deferred = $.Deferred();
     if (HAS_NAVIGATOR) {
-      ApiHelper.getInstance().fetchNavigatorMetadata({
-        path: dataCatalogEntry.path,
-        silenceErrors: apiOptions && apiOptions.silenceErrors,
-        cachedOnly: apiOptions && apiOptions.cachedOnly,
-        refreshCache: apiOptions && apiOptions.refreshCache
-      }).done(function (data) {
-        dataCatalogEntry.navigatorMeta = data.entity || data;
-        deferred.resolve(dataCatalogEntry.navigatorMeta);
-      }).fail(deferred.reject);
+      dataCatalogEntry.lastNavigatorMetaPromise = fetchMeta('fetchNavigatorMetadata', dataCatalogEntry, apiOptions);
+      dataCatalogEntry.lastNavigatorMetaPromise.done(function (navigatorMeta) {
+        dataCatalogEntry.navigatorMeta = navigatorMeta;
+      });
     } else {
-      deferred.reject();
+      dataCatalogEntry.lastNavigatorMetaPromise =  $.Deferred.reject().promise();
     }
-    dataCatalogEntry.lastNavigatorMetaPromise = deferred.promise();
     return dataCatalogEntry.lastNavigatorMetaPromise;
+  };
+
+  /**
+   * @param {DataCatalogEntry} dataCatalogEntry
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  var reloadSample = function (dataCatalogEntry, apiOptions) {
+    dataCatalogEntry.lastSamplePromise = fetchMeta('fetchSample', dataCatalogEntry, apiOptions);
+    dataCatalogEntry.lastSamplePromise.done(function (sample) {
+      dataCatalogEntry.sample = sample;
+    });
+    return dataCatalogEntry.lastSamplePromise;
   };
 
   /**
    * @param {DataCatalog} dataCatalog
    * @param {string|string[]} path
-   * @param {Object} definition
+   * @param {Object} definition - Initial known metadata on creation
    * @constructor
    */
   function DataCatalogEntry(dataCatalog, path, definition) {
@@ -104,10 +115,15 @@ var DataCatalog = (function () {
     self.name = self.path.length ? self.path[self.path.length - 1] : dataCatalog.sourceType;
 
     self.definition = definition;
+
     self.lastSourceMetaPromise = undefined;
     self.sourceMeta = undefined;
+
     self.lastNavigatorMetaPromise = undefined;
     self.navigatorMeta = undefined;
+
+    self.lastSamplePromise = undefined;
+    self.sample = undefined;
 
     self.children = undefined;
   }
@@ -184,10 +200,10 @@ var DataCatalog = (function () {
         if (result && result.entities && result.entities.length > 0) {
           var entityIndex = {};
           result.entities.forEach(function (entity) {
-            entityIndex[entity.name || entity.originalName] = entity;
+            entityIndex[(entity.name || entity.originalName).toLowerCase()] = entity;
           });
           children.forEach(function (child) {
-            var name = child.path[child.path.length - 1];
+            var name = child.name.toLowerCase();
             if (entityIndex[name]) {
               child.navigatorMeta = entityIndex[name];
               child.lastNavigatorMetaPromise = $.Deferred().resolve(child.navigatorMeta).promise();
@@ -435,6 +451,20 @@ var DataCatalog = (function () {
     var self = this;
     return self.lastNavigatorMetaPromise || reloadNavigatorMeta(self, apiOptions)
   };
+
+  /**
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.cachedOnly]
+   * @param {boolean} [apiOptions.refreshCache]
+   * @return {Promise}
+   */
+  DataCatalogEntry.prototype.getSample = function () {
+    var self = this;
+    return self.lastSamplePromise || reloadSample(self, options)
+  };
+
+
 
 
   var instances = {};
