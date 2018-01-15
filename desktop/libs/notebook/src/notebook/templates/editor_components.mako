@@ -2077,6 +2077,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
   function createHueDatatable(el, snippet, vm) {
     var DATATABLES_MAX_HEIGHT = 330;
+    var invisibleRows = 10;
+    if (snippet.result && snippet.result.data() && snippet.result.data().length) {
+      var cols = snippet.result.data()[0].length;
+      invisibleRows = cols > 200 ? 10 : (cols > 30 ? 50 : 100);
+    }
     var _dt = $(el).hueDataTable({
       i18n: {
         NO_RESULTS: "${_('No results found.')}",
@@ -2100,7 +2105,8 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         }
       },
       scrollable: vm.editorMode() && !vm.isPresentationMode() ? MAIN_SCROLLABLE : '.dataTables_wrapper',
-      contained: !vm.editorMode() || vm.isPresentationMode()
+      contained: !vm.editorMode() || vm.isPresentationMode(),
+      forceInvisible: invisibleRows
     });
 
     window.setTimeout(function () {
