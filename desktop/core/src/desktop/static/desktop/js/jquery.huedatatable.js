@@ -359,7 +359,11 @@
             }
           });
           startCol = Math.max(1, startCol - 1);
-          endCol = Math.min(aoColumns.length, endCol + 1);
+          endCol = Math.min(aoColumns.length, endCol + 3); // avoid loading just after the col
+          // for tables under the 30 columns, display them all at once
+          if (aoColumns.length <= 30) {
+            endCol = aoColumns.length;
+          }
 
           var rowHeight = 32;
           var invisibleOffset = $t.data('oInit')['forceInvisible'] ? $t.data('oInit')['forceInvisible'] : (aoColumns.length < 100 ? 10 : 1);
