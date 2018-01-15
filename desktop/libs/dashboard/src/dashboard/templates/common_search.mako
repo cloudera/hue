@@ -3798,7 +3798,7 @@ $(document).ready(function () {
       col: Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10)),
       row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))
     }
-    if (coords.row > 0 && coords.col > 0) {
+    if (coords.row > 0 && coords.col > 0 && coords.col < 13) {
       var overlaps = false;
       $('li.gs-w').each(function () {
         var dimensions = {
@@ -3851,7 +3851,7 @@ $(document).ready(function () {
         col: Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10)),
         row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))
       }
-      if (dropPosition.row > 0 && dropPosition.col > 0) {
+      if (dropPosition.row > 0 && dropPosition.col > 0 && dropPosition.col < 13) {
         if (tempDraggable) {
           var optimalWidgetWidth = 12;
           var queueLength = 0;
