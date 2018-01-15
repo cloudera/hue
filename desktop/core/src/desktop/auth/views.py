@@ -40,7 +40,7 @@ from desktop.auth.forms import ImpersonationAuthenticationForm
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.lib.django_util import JsonResponse
-from desktop.log.access import access_warn, last_access_map
+from desktop.log.access import access_log, access_warn, last_access_map
 from desktop.conf import OAUTH
 from desktop.settings import LOAD_BALANCER_COOKIE
 
@@ -138,7 +138,7 @@ def dt_login(request, from_modal=False):
 
         msg = 'Successful login for user: %s' % user.username
         request.audit['operationText'] = msg
-        access_warn(request, msg)
+        access_log(request, msg)
         if from_modal or request.REQUEST.get('fromModal', 'false') == 'true':
           return JsonResponse({'auth': True})
         else:
