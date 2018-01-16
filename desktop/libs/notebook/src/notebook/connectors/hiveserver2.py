@@ -444,7 +444,7 @@ class HS2Api(Api):
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet)
-    return _autocomplete(db, database, table, column, nested)
+    return _autocomplete(db, database, table, column, nested, query=snippet.get('query'))
 
 
   @query_error_handler

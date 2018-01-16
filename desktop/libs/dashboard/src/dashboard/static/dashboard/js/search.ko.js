@@ -515,6 +515,7 @@ var Collection = function (vm, collection) {
   self.engine.subscribe(function() {
     self.name(null);
   });
+  self.source = ko.observable(typeof collection.source != "undefined" && collection.source != null ? collection.source : "data");
   self.async = ko.computed(function() {
     return ['impala', 'hive'].indexOf(self.engine()) != -1;
   });

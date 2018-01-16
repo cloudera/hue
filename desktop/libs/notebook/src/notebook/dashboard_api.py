@@ -93,7 +93,7 @@ class SQLDashboardApi(DashboardApi):
             mincount_field_name = 'count__' + '_'.join(mincount_fields_name)
             mincount_fields_operation.append('COUNT(*) OVER (PARTITION BY %s) AS %s' % (', '.join(mincount_fields_name), mincount_field_name) )
             mincount_where.append('%s >= %s' % (mincount_field_name, str(f['mincount'])))
-          sql_mincount = '''(SELECT * FROM (SELECT *, %(fields)s
+          sql_from = '''(SELECT * FROM (SELECT *, %(fields)s
           FROM %(database)s.%(table)s) default
           WHERE %(where)s) default''' % {
             'fields': ', '.join(mincount_fields_operation),
@@ -102,7 +102,7 @@ class SQLDashboardApi(DashboardApi):
             'where': ' AND '.join(mincount_where)
           }
         else:
-          sql_mincount = '%(database)s.%(table)s' % {
+          sql_from = '%(database)s.%(table)s' % {
             'database': database,
             'table': table
           }
@@ -110,14 +110,12 @@ class SQLDashboardApi(DashboardApi):
         order_by = ', '.join([self._get_dimension_field(f)['order_by'] for f in reversed(facet['properties']['facets']) if f['sort'] != 'default'])
 
         sql = '''SELECT %(fields)s
-        FROM %(sql_mincount)s
+        FROM %(sql_from)s
         %(filters)s
         GROUP BY %(fields_dimensions)s
         %(order_by)s
         LIMIT %(limit)s''' % {
-            'sql_mincount': sql_mincount,
-            'database': database,
-            'table': table,
+            'sql_from': sql_from,
             'fields': ', '.join(fields),
             'fields_dimensions': ', '.join(fields_dimensions),
             'order_by': 'ORDER BY %s' % order_by if order_by else '',
@@ -150,8 +148,6 @@ class SQLDashboardApi(DashboardApi):
         sql = '''SELECT %(fields)s
         FROM %(sql_from)s
         %(filters)s''' % {
-            'database': database,
-            'table': table,
             'sql_from': sql_from,
             'fields': self._get_aggregate_function(facet['properties']['facets'][0]),
             'filters': self._convert_filters_to_where(filters),
@@ -159,10 +155,20 @@ class SQLDashboardApi(DashboardApi):
       elif facet['type'] == 'statement':
         sql = facet['properties']['statement']
     else:
+      print '==================================================================== ', self.source
+      print '===================================================================='
       fields = Collection2.get_field_list(dashboard)
-      sql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
+      if self.source == 'query':
+        # Open snippet and get statement
+        sql_from = '(select app from web_logs) t'
+        database, table = '', ''
+      else:
+        sql_from = '`%(database)s`.`%(table)s`' % {
           'database': database,
-          'table': table,
+          'table': table
+        }
+      sql = "SELECT %(fields)s FROM %(sql_from)s" % {
+          'sql_from': sql_from,
           'fields': ', '.join(['`%s`' % f if f != '*' else '*' for f in fields])
       }
       if filters:
@@ -217,8 +223,14 @@ class SQLDashboardApi(DashboardApi):
   def fields(self, name):
     # self.source
     # get query if source == 'query' + default DB
-    database, table = self._get_database_table_names(name)
     snippet = {'type': self.engine}
+
+    if self.source == 'query':
+      # Open snippet and get statement
+      snippet['query'] = 'select app from web_logs'
+      database, table = '', ''
+    else:
+      database, table = self._get_database_table_names(name)
 
     table_metadata = get_api(MockRequest(self.user), snippet).autocomplete(snippet, database, table)
 

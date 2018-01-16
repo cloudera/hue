@@ -98,7 +98,7 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
   return JsonResponse(response)
 
 
-def _autocomplete(db, database=None, table=None, column=None, nested=None):
+def _autocomplete(db, database=None, table=None, column=None, nested=None, query=None):
   response = {}
 
   try:
@@ -108,11 +108,12 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
       tables_meta = db.get_tables_meta(database=database)
       response['tables_meta'] = tables_meta
     elif column is None:
-      if False:
+      print 'aaaaaaaaaaaaaaaaaaaaaaaaaa ', query
+      if query is not None:
         class SubQueryTable():
           def __init__(self, db, query):
             self.query = query
-            # Table Properties below            
+            # Table Properties            
             self.name = 'Test'
             # TODO Replace 't.', type different too?
             self.cols =  db.get_query_metadata(query).data_table.cols()
@@ -122,7 +123,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
             self.is_view = False
             self.partition_keys = []
             self.properties = {}
-        table = SubQueryTable(db, 'SELECT app, bytes, concat(\'http://\', url) as url2 FROM web_logs')
+        table = SubQueryTable(db, query)
       else:
         table = db.get_table(database, table)
       response['hdfs_link'] = table.hdfs_link
