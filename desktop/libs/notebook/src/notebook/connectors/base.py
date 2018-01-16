@@ -341,7 +341,7 @@ class Api(object):
 
 
 def _get_snippet_name(notebook, unique=False, table_format=False):
-  name = (('%(name)s' + ('%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
+  name = (('%(name)s' + ('-%(id)s' if unique else '') if notebook.get('name') else '%(type)s-%(id)s') % notebook)
   if table_format:
     name = re.sub('[-|\s:]', '_', name)
   return name
