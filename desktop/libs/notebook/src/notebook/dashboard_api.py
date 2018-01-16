@@ -207,8 +207,6 @@ class SQLDashboardApi(DashboardApi):
 
   # This method currently behaves more like a static method
   def fields(self, name):
-    # self.source
-    # get query if source == 'query' + default DB
     snippet = {'type': self.engine}
 
     if self.source == 'query':

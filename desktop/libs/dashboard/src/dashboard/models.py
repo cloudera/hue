@@ -29,7 +29,8 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode, smart_str, force_unicode
-from desktop.models import get_data_link
+from desktop.models import get_data_link, Document2
+from notebook.connectors.base import Notebook, _get_snippet_name
 
 from dashboard.dashboard_api import get_engine
 
@@ -179,6 +180,13 @@ class Collection2(object):
     else:
       id_field = '' # Schemaless might not have an id
 
+    if source == 'query':
+      nb_doc = Document2.objects.document(user=user, doc_id=name)
+      notebook = Notebook(document=nb_doc).get_data()
+      label = _get_snippet_name(notebook, unique=True)
+    else:
+      label = name
+
     TEMPLATE = {
       "extracode": escape("<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>\n\n<script>\n</script>"),
       "highlighting": [""],
@@ -219,7 +227,7 @@ class Collection2(object):
       'name': name,
       'engine': engine,
       'source': source,
-      'label': name,
+      'label': label,
       'enabled': False,
       'template': TEMPLATE,
       'facets': FACETS,
