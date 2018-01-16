@@ -158,3 +158,4 @@ Checked-in frontend third party dependencies
 |tzdetect.js|?|MIT|https://github.com/Canop/tzdetect.js|
 |wysihtml5|0.3.0|MIT|https://github.com/xing/wysihtml5|
 |Select2|3.5.1|MIT|https://github.com/select2/select2|
+|LocalForage|1.5.4|Apache|https://github.com/localForage/localForage|
