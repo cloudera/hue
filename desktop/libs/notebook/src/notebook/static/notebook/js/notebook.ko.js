@@ -2070,6 +2070,17 @@ var EditorViewModel = (function() {
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
     self.pubSubUrl = ko.observable(typeof notebook.pubSubUrl != "undefined" && notebook.pubSubUrl != null ? notebook.pubSubUrl : null);
     self.isPresentationMode = ko.observable(typeof notebook.isPresentationMode != "undefined" && notebook.isPresentationMode != null ? notebook.isPresentationMode : false);
+    self.isPresentationMode.subscribe(function(newValue) {
+        wasResultFullScreenMode = false;
+        if (! newValue) {
+          self.cancelExecutingAll();
+        }
+        huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
+        vm.togglePresentationMode();
+        if (newValue) {
+          hueAnalytics.convert('editor', 'presentation');
+        }
+      });
     self.presentationSnippets = ko.observable({});
 
     self.snippets = ko.observableArray();
@@ -2844,6 +2855,9 @@ var EditorViewModel = (function() {
       return self.selectedNotebook() && self.selectedNotebook().snippets().length === 1 && self.selectedNotebook().snippets()[0].isSqlDialect()
     });
     self.isResultFullScreenMode = ko.observable(false);
+    self.isPresentationMode = ko.computed(function() {
+      return self.selectedNotebook() && self.selectedNotebook().isPresentationMode();
+    })
     self.isHidingCode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url); // Deprecated
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);

@@ -250,12 +250,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <div class="pull-right margin-right-10">
   % if ENABLE_PRESENTATION.get():
     <div class="btn-group" data-bind="visible: $root.isPresentationMode()">
-      <a class="btn" title="${ _ko('Open document as presentation by default') }" data-bind="click: function() { $root.isPresentationMode(true); }">
+      <a class="btn" title="${ _ko('Open document as presentation by default') }" data-bind="click: function() { $root.selectedNotebook().isPresentationMode(true); }">
         <i class="fa" data-bind="css: {'fa-toggle-off': $root.isPresentationMode()}"></i>
       </a>
     </div>
     <div class="btn-group">
-      <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
+      <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.selectedNotebook().isPresentationMode(true); },
         css: {'btn-inverse': $root.isPresentationMode()}">
         <i class="fa fa-line-chart"></i>
       </a>
@@ -350,7 +350,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <!-- /ko -->
 
 <!-- ko if: $root.isPresentationMode() -->
-<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.isPresentationMode(false); }">
+<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
   <i class="fa fa-times fa-fw"></i>
 </a>
 <!-- /ko -->
@@ -1181,7 +1181,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </a>
       <!-- /ko -->
     <!-- /ko -->
-    <!-- /ko -->
 
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
       <span class="caret"></span>
@@ -1205,6 +1204,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         </a>
       </li>
     </ul>
+    <!-- /ko -->
   </div>
 </script>
 
@@ -1522,7 +1522,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 
 <script type="text/html" id="text-snippet-body${ suffix }">
-  <div data-bind="attr:{'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
+  <div data-bind="attr: {'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
 </script>
 
 
@@ -1536,7 +1536,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       }"></div>
     </div>
     <div class="span6">
-      <div data-bind="html: renderMarkdown(statement_raw(), id()), attr: {'id': 'liveMD'+id()}"></div>
+      <div data-bind="html: renderMarkdown(statement_raw(), id()), attr: {'id': 'liveMD' + id()}"></div>
     </div>
   </div>
   <!-- /ko -->
@@ -2049,7 +2049,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   var shareViewModel = initSharing("#documentShareModal");
   % endif
 
-
+function togglePresentation(value) {};
 
   var isLeftNavOpen = false;
   huePubSub.subscribe('left.nav.open.toggle', function (val) {
@@ -3177,75 +3177,73 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       viewModel.init();
 
 
-  % if not IS_EMBEDDED.get():
-      if (window.Worker) {
-        // It can take a while before the worker is active
-        var whenWorkerIsReady = function (worker, message) {
-          if (!worker.isReady) {
-            window.clearTimeout(worker.pingTimeout);
-            worker.postMessage({ ping: true });
-            worker.pingTimeout = window.setTimeout(function () {
-              whenWorkerIsReady(worker, message);
-            }, 500);
-          } else {
-            worker.postMessage(message);
+      % if not IS_EMBEDDED.get():
+        if (window.Worker) {
+          // It can take a while before the worker is active
+          var whenWorkerIsReady = function (worker, message) {
+            if (!worker.isReady) {
+              window.clearTimeout(worker.pingTimeout);
+              worker.postMessage({ ping: true });
+              worker.pingTimeout = window.setTimeout(function () {
+                whenWorkerIsReady(worker, message);
+              }, 500);
+            } else {
+              worker.postMessage(message);
+            }
+          };
+  
+          // For syntax checking
+          var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?v=' + HUE_VERSION);
+          aceSqlSyntaxWorker.onmessage = function (e) {
+            if (e.data.ping) {
+              aceSqlSyntaxWorker.isReady = true;
+            } else {
+              huePubSub.publish('ace.sql.syntax.worker.message', e);
+            }
+          };
+  
+          huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
+            whenWorkerIsReady(aceSqlSyntaxWorker, message);
+          });
+  
+          // For location marking
+          var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?v=' + HUE_VERSION);
+          aceSqlLocationWorker.onmessage = function (e) {
+            if (e.data.ping) {
+              aceSqlLocationWorker.isReady = true;
+            } else {
+              huePubSub.publish('ace.sql.location.worker.message', e);
+            }
+          };
+  
+          huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
+            whenWorkerIsReady(aceSqlLocationWorker, message);
+          });
+        }
+      % else:
+        var iframe = document.createElement("iframe");
+        iframe.src = (typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls('/notebook/workers_embedded?v=') : '/notebook/workers_embedded?v=') + HUE_VERSION;
+        iframe.name = "workerFrame";
+        iframe.setAttribute('style', 'display: none;');
+        document.body.appendChild(iframe);
+    
+        window.addEventListener("message", function (event) {
+          if (event.data.locationWorkerResponse) {
+            huePubSub.publish('ace.sql.location.worker.message', { data: event.data.locationWorkerResponse });
           }
-        };
-
-        // For syntax checking
-        var aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?v=' + HUE_VERSION);
-        aceSqlSyntaxWorker.onmessage = function (e) {
-          if (e.data.ping) {
-            aceSqlSyntaxWorker.isReady = true;
-          } else {
-            huePubSub.publish('ace.sql.syntax.worker.message', e);
+          if (event.data.syntaxWorkerResponse) {
+            huePubSub.publish('ace.sql.syntax.worker.message', { data: event.data.syntaxWorkerResponse });
           }
-        };
-
-        huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
-          whenWorkerIsReady(aceSqlSyntaxWorker, message);
-        });
-
-        // For location marking
-        var aceSqlLocationWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?v=' + HUE_VERSION);
-        aceSqlLocationWorker.onmessage = function (e) {
-          if (e.data.ping) {
-            aceSqlLocationWorker.isReady = true;
-          } else {
-            huePubSub.publish('ace.sql.location.worker.message', e);
-          }
-        };
-
+        }, false);
+    
         huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
-          whenWorkerIsReady(aceSqlLocationWorker, message);
+          iframe.contentWindow.postMessage({ locationWorkerRequest: message }, '*')
         });
-      }
-  % else:
-    var iframe = document.createElement("iframe");
-    iframe.src = (typeof adaptHueEmbeddedUrls !== 'undefined' ? adaptHueEmbeddedUrls('/notebook/workers_embedded?v=') : '/notebook/workers_embedded?v=') + HUE_VERSION;
-    iframe.name = "workerFrame";
-    iframe.setAttribute('style', 'display: none;');
-    document.body.appendChild(iframe);
-
-    window.addEventListener("message", function (event) {
-      if (event.data.locationWorkerResponse) {
-        huePubSub.publish('ace.sql.location.worker.message', { data: event.data.locationWorkerResponse });
-      }
-      if (event.data.syntaxWorkerResponse) {
-        huePubSub.publish('ace.sql.syntax.worker.message', { data: event.data.syntaxWorkerResponse });
-      }
-    }, false);
-
-    huePubSub.subscribe('ace.sql.location.worker.post', function (message) {
-      iframe.contentWindow.postMessage({ locationWorkerRequest: message }, '*')
-    });
-
-    huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
-      iframe.contentWindow.postMessage({ syntaxWorkerRequest: message }, '*')
-    });
-
-  % endif
-
+    
+        huePubSub.subscribe('ace.sql.syntax.worker.post', function (message) {
+          iframe.contentWindow.postMessage({ syntaxWorkerRequest: message }, '*')
+        });
+      % endif
 
       if (viewModel.isOptimizerEnabled()) {
         % if OPTIMIZER.AUTO_UPLOAD_QUERIES.get():
@@ -3288,19 +3286,18 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
       function exitPlayerMode() {
         if (! wasResultFullScreenMode) {
-          viewModel.isPresentationMode(false);
+          viewModel.selectedNotebook().isPresentationMode(false);
         } else {
           viewModel.isResultFullScreenMode(false);
         }
       }
 
-      function togglePresentation(value) {
+       huePubSub.subscribe('editor.presentation.operate.toggle', function (value) {
         viewModel.isEditing(! viewModel.isEditing());
         if (value) {
           $(".jHueNotify").remove();
           isAssistAvailable = viewModel.assistAvailable();
           wasLeftPanelVisible = viewModel.isLeftPanelVisible();
-          console.log(viewModel.isPresentationMode());
           wasRightPanelVisible = viewModel.isRightPanelVisible();
 
           if (wasResultFullScreenMode) {
@@ -3345,22 +3342,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           redrawFixedHeaders(200);
           $(window).unbind("keydown", exitPlayerMode);
         }
-      }
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       viewModel.isResultFullScreenMode.subscribe(function(newValue) {
         wasResultFullScreenMode = true;
         togglePresentation(newValue);
-      });
-      viewModel.isPresentationMode.subscribe(function(newValue) {
-        wasResultFullScreenMode = false;
-        if (! newValue) {
-          viewModel.selectedNotebook().cancelExecutingAll();
-        }
-        togglePresentation(newValue);
-        viewModel.togglePresentationMode();
-        if (newValue) {
-          hueAnalytics.convert('editor', 'presentation');
-        }
       });
 
       huePubSub.subscribe('assist.set.manual.visibility', function () {
@@ -3423,7 +3409,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       });
 
       huePubSub.subscribe('editor.presentation.toggle', function () {
-        viewModel.isPresentationMode(!viewModel.isPresentationMode());
+        viewModel.selectedNotebook().isPresentationMode(!viewModel.isPresentationMode());
       }, HUE_PUB_SUB_EDITOR_ID);
 
       $(window).bind("keydown", "ctrl+shift+p alt+shift+p meta+shift+p", function (e) {

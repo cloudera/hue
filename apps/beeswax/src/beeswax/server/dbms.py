@@ -839,10 +839,10 @@ class HiveServer2Dbms(object):
     else:
       table = self.get_table(db_name, table_name)
       partitions = self.get_partitions(db_name, table, partition_spec=partition_spec)
-  
+
       if len(partitions) != 1:
         raise QueryServerException(_("Query did not return exactly one partition result: %s") % partitions)
-  
+
       partition = partitions[0]
       partition_query = " AND ".join(partition.partition_spec.split(','))
 
@@ -954,7 +954,7 @@ class SubQueryTable:
 
   def __init__(self, db, query):
     self.query = query
-    # Table Properties            
+    # Table Properties
     self.name = 'Test'
     cols = db.get_query_metadata(query).data_table.cols()
     for col in cols:
