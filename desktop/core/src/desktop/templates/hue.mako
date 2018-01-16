@@ -532,6 +532,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
 % endif
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
+<script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
 <script src="${ static('desktop/js/dataCatalog.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
