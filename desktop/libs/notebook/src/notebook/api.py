@@ -703,14 +703,15 @@ def export_result(request):
       'allowed': True
     }
   elif data_format == 'search-index':
-    ## Get query history id
+    # Open results in a Dashboard via either: a SQL sub-query or a Solr index via the wizard (and its quick indexing or Morphline job)
 
     if is_embedded:
       if destination == '__hue__':
         notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-        response['watch_url'] = reverse('dashboard:browse', kwargs={'name': notebook_id}) + '?source=query'
-        response['status'] = 0        
-        return JsonResponse(response)
+        engine = notebook['type'].replace('query-', '')
+        response['watch_url'] = reverse('dashboard:browse', kwargs={'name': notebook_id}) + '?source=query&engine=%(engine)s' % {'engine': engine}
+        response['status'] = 0
+        return JsonResponse(response) # Currently do not live index into Solr, but uses a SQL sub-query
 
         destination = _get_snippet_name(notebook, unique=True, table_format=True)
         live_indexing = True

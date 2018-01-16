@@ -1369,7 +1369,8 @@ var Collection = function (vm, collection) {
   self.syncDynamicFields = function () {
     $.post("/dashboard/index/fields/dynamic", {
         name: self.name(),
-        engine: self.engine()
+        engine: self.engine(),
+        source: self.source()
       }, function (data) {
         if (data.status == 0) {
           syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);

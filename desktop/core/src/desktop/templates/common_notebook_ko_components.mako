@@ -196,13 +196,13 @@ except ImportError, e:
         </li>
         % if ENABLE_SQL_INDEXER.get():
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Explore result in a dashboard') }">
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Visually explore the result') }">
             <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
           </a>
         </li>
         % endif
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Export the result into a collection, a new table...') }">
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
             <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Export') }
           </a>
         </li>
@@ -275,11 +275,11 @@ except ImportError, e:
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="search-index">
                   &nbsp;${ _('Collection') }
                 </label>
+                <div class="inline-block" data-bind="tooltip: { title: '${ _ko("Index the data to make Dashboard explorations faster") }', placement: 'top' }">
+                  <i class="fa fa-fw fa-question-circle muted"></i>
+                </div>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Collection name')}">
-                </div>
-                <div class="inline-block" data-bind="visible: saveTarget() == 'search-index', tooltip: { title: '${ _ko("Index the data to make exploration faster") }', placement: 'top' }" style="padding: 8px">
-                  <i class="fa fa-fw fa-question-circle muted"></i>
                 </div>
               </div>
             </div>

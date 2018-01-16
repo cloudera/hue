@@ -34,6 +34,7 @@ from desktop.lib.i18n import force_unicode
 from desktop.lib.parameterization import substitute_variables
 from metastore import parser
 from notebook.models import escape_rows
+from indexer.file_format import HiveFormat
 
 import beeswax.models
 
@@ -108,15 +109,17 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
       tables_meta = db.get_tables_meta(database=database)
       response['tables_meta'] = tables_meta
     elif column is None:
-      print 'aaaaaaaaaaaaaaaaaaaaaaaaaa ', query
       if query is not None:
         class SubQueryTable():
           def __init__(self, db, query):
             self.query = query
             # Table Properties            
             self.name = 'Test'
-            # TODO Replace 't.', type different too?
-            self.cols =  db.get_query_metadata(query).data_table.cols()
+            cols = db.get_query_metadata(query).data_table.cols()
+            for col in cols:
+              col.name = re.sub('^t\.', '', col.name)
+              col.type = HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')
+            self.cols =  cols
             self.hdfs_link = None
             self.comment = None
             self.is_impala_only = False
