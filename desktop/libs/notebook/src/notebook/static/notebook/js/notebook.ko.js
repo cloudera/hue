@@ -305,7 +305,7 @@ var EditorViewModel = (function() {
     self.ace = function (newVal) {
       if (newVal) {
         aceEditor = newVal;
-        if (!vm.isPresentationMode()) {
+        if (!notebook.isPresentationMode()) {
           aceEditor.focus();
         }
       }
@@ -1635,7 +1635,7 @@ var EditorViewModel = (function() {
         setTimeout(function () {
           self.fetchResultData(rows, false);
         }, 500);
-      } else if (! vm.editorMode() && ! vm.isPresentationMode() && notebook.snippets()[notebook.snippets().length - 1] == self) {
+      } else if (! vm.editorMode() && ! notebook.isPresentationMode() && notebook.snippets()[notebook.snippets().length - 1] == self) {
         notebook.newSnippet();
       }
     };
@@ -2069,6 +2069,7 @@ var EditorViewModel = (function() {
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
     self.pubSubUrl = ko.observable(typeof notebook.pubSubUrl != "undefined" && notebook.pubSubUrl != null ? notebook.pubSubUrl : null);
+    self.isPresentationMode = ko.observable(typeof notebook.isPresentationMode != "undefined" && notebook.isPresentationMode != null ? notebook.isPresentationMode : false);
     self.presentationSnippets = ko.observable({});
 
     self.snippets = ko.observableArray();
@@ -2839,7 +2840,6 @@ var EditorViewModel = (function() {
     self.selectedNotebook = ko.observable();
 
     self.combinedContent = ko.observable();
-    self.isPresentationMode = ko.observable(false);
     self.isPresentationModeEnabled = ko.pureComputed(function () {
       return self.selectedNotebook() && self.selectedNotebook().snippets().length === 1 && self.selectedNotebook().snippets()[0].isSqlDialect()
     });
