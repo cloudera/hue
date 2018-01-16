@@ -16,7 +16,6 @@
 
 var DataCatalog = (function () {
 
-
   /**
    * @param {String} sourceType
    * @constructor
@@ -25,7 +24,43 @@ var DataCatalog = (function () {
     var self = this;
     self.sourceType = sourceType;
     self.entries = {};
+    self.store = localforage.createInstance({
+      name: "HueDataCatalog_" + self.sourceType + '_' + LOGGED_USERNAME // TODO: Add flag for embedded mode
+    });
   }
+
+  DataCatalog.prototype.clearStorage = function () {
+    var self = this;
+    self.store.clear()
+  };
+
+  DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
+    var self = this;
+    self.store.setItem(dataCatalogEntry.path.join('.'), {
+      definition: dataCatalogEntry.definition,
+      sourceMeta: dataCatalogEntry.sourceMeta,
+      sample: dataCatalogEntry.sample,
+      navigatorMeta: dataCatalogEntry.navigatorMeta,
+      navOptMeta: dataCatalogEntry.navOptMeta
+    });
+  };
+
+  var mergeFromStoreEntry = function (dataCatalogEntry, storeEntry) {
+    var mergeAttribute = function (attributeName, ttl, promiseName) {
+      if (storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
+        dataCatalogEntry[attributeName] = storeEntry[attributeName];
+        if (promiseName) {
+          dataCatalogEntry[promiseName] = $.Deferred().resolve(dataCatalogEntry[attributeName]).promise();
+        }
+      }
+    };
+
+    mergeAttribute('definition', CACHEABLE_TTL.default);
+    mergeAttribute('sourceMeta', CACHEABLE_TTL.default, 'sourceMetaPromise');
+    mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
+    mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
+    mergeAttribute('navOptMeta', CACHEABLE_TTL.optimizer);
+  };
 
   /**
    * @param {Object} options
@@ -35,17 +70,44 @@ var DataCatalog = (function () {
    */
   DataCatalog.prototype.getEntry = function (options) {
     var self = this;
+    var deferred = $.Deferred();
     var identifier = typeof options.path === 'string' ? options.path : (typeof options.path === 'string' ? options.path : options.path.join('.'));
-    return self.entries[identifier] || (self.entries[identifier] = new DataCatalogEntry(self, options.path, options.definition));
+    if (self.entries[identifier]) {
+      deferred.resolve(self.entries[identifier]);
+    } else {
+      deferred.done(function (entry) {
+        self.entries[identifier] = entry;
+      });
+      self.store.getItem(identifier).then(function (storeEntry) {
+        var definition = storeEntry ? storeEntry.definition : options.definition;
+        if (self.entries[identifier]) {
+          deferred.resolve(self.entries[identifier]);
+          return;
+        }
+        var entry = new DataCatalogEntry(self, options.path, definition);
+        if (storeEntry) {
+          mergeFromStoreEntry(entry, storeEntry);
+        } else {
+          entry.saveLater();
+        }
+        deferred.resolve(entry);
+      }).catch(function (error) {
+        console.warn(error);
+        var entry = new DataCatalogEntry(self, options.path, definition);
+        entry.saveLater();
+        deferred.resolve(entry);
+      })
+    }
+    return deferred.promise();
   };
 
   var fetchMeta = function (apiHelperFunction, dataCatalogEntry, apiOptions) {
     return ApiHelper.getInstance()[apiHelperFunction]({
       sourceType: dataCatalogEntry.dataCatalog.sourceType,
       path: dataCatalogEntry.path,
-      silenceErrors: apiOptions && apiOptions.silenceErrors,
-      cachedOnly: apiOptions && apiOptions.cachedOnly,
-      refreshCache: apiOptions && apiOptions.refreshCache
+      silenceErrors: apiOptions && apiOptions.silenceErrors
+    }).done(function () {
+      dataCatalogEntry.saveLater();
     })
   };
 
@@ -59,11 +121,11 @@ var DataCatalog = (function () {
    * @return {CancellablePromise}
    */
   var reloadSourceMeta = function (dataCatalogEntry, apiOptions) {
-    dataCatalogEntry.lastSourceMetaPromise = fetchMeta('fetchSourceMetadata', dataCatalogEntry, apiOptions);
-    dataCatalogEntry.lastSourceMetaPromise.done(function (sourceMeta) {
+    dataCatalogEntry.sourceMetaPromise = fetchMeta('fetchSourceMetadata', dataCatalogEntry, apiOptions);
+    dataCatalogEntry.sourceMetaPromise.done(function (sourceMeta) {
       dataCatalogEntry.sourceMeta = sourceMeta;
     });
-    return dataCatalogEntry.lastSourceMetaPromise;
+    return dataCatalogEntry.sourceMetaPromise;
   };
 
   /**
@@ -76,15 +138,15 @@ var DataCatalog = (function () {
    * @return {CancellablePromise}
    */
   var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
-    if (HAS_NAVIGATOR) {
-      dataCatalogEntry.lastNavigatorMetaPromise = fetchMeta('fetchNavigatorMetadata', dataCatalogEntry, apiOptions);
-      dataCatalogEntry.lastNavigatorMetaPromise.done(function (navigatorMeta) {
+    if (HAS_NAVIGATOR && (dataCatalogEntry.dataCatalog.sourceType === 'hive' || dataCatalogEntry.dataCatalog.sourceType === 'impala')) {
+      dataCatalogEntry.navigatorMetaPromise = fetchMeta('fetchNavigatorMetadata', dataCatalogEntry, apiOptions);
+      dataCatalogEntry.navigatorMetaPromise.done(function (navigatorMeta) {
         dataCatalogEntry.navigatorMeta = navigatorMeta;
       });
     } else {
-      dataCatalogEntry.lastNavigatorMetaPromise =  $.Deferred.reject().promise();
+      dataCatalogEntry.navigatorMetaPromise =  $.Deferred.reject().promise();
     }
-    return dataCatalogEntry.lastNavigatorMetaPromise;
+    return dataCatalogEntry.navigatorMetaPromise;
   };
 
   /**
@@ -97,11 +159,11 @@ var DataCatalog = (function () {
    * @return {CancellablePromise}
    */
   var reloadSample = function (dataCatalogEntry, apiOptions) {
-    dataCatalogEntry.lastSamplePromise = fetchMeta('fetchSample', dataCatalogEntry, apiOptions);
-    dataCatalogEntry.lastSamplePromise.done(function (sample) {
+    dataCatalogEntry.samplePromise = fetchMeta('fetchSample', dataCatalogEntry, apiOptions);
+    dataCatalogEntry.samplePromise.done(function (sample) {
       dataCatalogEntry.sample = sample;
     });
-    return dataCatalogEntry.lastSamplePromise;
+    return dataCatalogEntry.samplePromise;
   };
 
   /**
@@ -119,21 +181,31 @@ var DataCatalog = (function () {
 
     self.definition = definition;
 
-    self.lastSourceMetaPromise = undefined;
+    self.sourceMetaPromise = undefined;
     self.sourceMeta = undefined;
 
-    self.lastNavigatorMetaPromise = undefined;
+    self.navigatorMetaPromise = undefined;
     self.navigatorMeta = undefined;
-    self.navigatorMetaForChildrenPromise = undefined;
 
-    self.lastSamplePromise = undefined;
+    self.samplePromise = undefined;
     self.sample = undefined;
 
     self.navOptMeta = undefined;
+
+    self.navigatorMetaForChildrenPromise = undefined;
     self.navOptMetaForChildrenPromise = undefined;
 
-    self.children = undefined;
+    self.childrenPromise = undefined;
+    self.saveTimeout = -1;
   }
+
+  DataCatalogEntry.prototype.saveLater = function () {
+    var self = this;
+    window.clearTimeout(self.saveTimeout);
+    self.saveTimeout = window.setTimeout(function () {
+      self.dataCatalog.updateStore(self);
+    }, 1000);
+  };
 
   /**
    * @param {Object} [apiOptions]
@@ -141,47 +213,53 @@ var DataCatalog = (function () {
    * @param {boolean} [apiOptions.cachedOnly]
    * @param {boolean} [apiOptions.refreshCache]
    *
-   * @return {CancellablePromise}
+   * @return {Promise}
    */
   DataCatalogEntry.prototype.getChildren = function (apiOptions) {
     var self = this;
+    if (self.childrenPromise && (!apiOptions || !apiOptions.refreshCache)) {
+      return self.childrenPromise;
+    }
     var deferred = $.Deferred();
-    var cancellablePromises = [];
-    if (self.children) {
-      deferred.resolve(self.children);
-    } else {
-      self.getSourceMeta(apiOptions).done(function (sourceMeta) {
-        if (self.children) {
-          deferred.resolve(self.children);
-        } else {
-          self.children = [];
-          var index = 0;
-          var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields;
-          if (entities) {
-            entities.forEach(function (entity) {
-              var catalogEntry = self.dataCatalog.getEntry({ path: self.path.concat(entity.name || entity) });
+    self.childrenPromise = deferred.promise();
+    self.getSourceMeta(apiOptions).done(function (sourceMeta) {
+      var promises = [];
+      var index = 0;
+      var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields;
+      if (entities) {
+        entities.forEach(function (entity) {
+          promises.push(self.dataCatalog.getEntry({ path: self.path.concat(entity.name || entity) }).done(function (catalogEntry) {
+            if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
               var definition = typeof entity === 'object' ? entity : {};
+              if (typeof entity !== 'object' && self.path.length === 0) {
+                definition.type = 'database';
+              }
               definition.index = index++;
-              catalogEntry.definition = definition; // Override any existing definition as parent might know more
-              self.children.push(catalogEntry);
-            });
-          } else {
-            (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
-              if (sourceMeta[path]) {
-                var catalogEntry = self.dataCatalog.getEntry({ path: self.path.concat(path) });
+              catalogEntry.definition = definition;
+              catalogEntry.saveLater();
+            }
+          }));
+        });
+      } else {
+        (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
+          if (sourceMeta[path]) {
+            promises.push(self.dataCatalog.getEntry({ path: self.path.concat(path) }).done(function (catalogEntry) {
+              if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
                 var definition = sourceMeta[path];
                 definition.index = index++;
                 definition.isMapValue = path === 'value';
-                catalogEntry.definition = definition; // Override any existing definition as parent might know more
-                self.children.push(catalogEntry);
+                catalogEntry.definition = definition;
+                catalogEntry.saveLater();
               }
-            })
+            }));
           }
-          deferred.resolve(self.children);
-        }
-      })
-    }
-    return deferred.promise();
+        })
+      }
+      $.when.apply($, promises).done(function () {
+        deferred.resolve(Array.prototype.slice.call(arguments));
+      });
+    }).fail(deferred.reject);
+    return self.childrenPromise;
   };
 
   /**
@@ -193,6 +271,10 @@ var DataCatalog = (function () {
    */
   DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function (apiOptions) {
     var self = this;
+
+    if (self.dataCatalog.sourceType !== 'hive' && self.dataCatalog.sourceType !== 'impala') {
+      return $.Deferred().reject().promise();
+    }
 
     if (self.navigatorMetaForChildrenPromise && (!apiOptions || !apiOptions.refreshCache)) {
       return self.navigatorMetaForChildrenPromise;
@@ -217,16 +299,23 @@ var DataCatalog = (function () {
         limit: children.length,
         silenceErrors: apiOptions && apiOptions.silenceErrors
       }).done(function (result) {
-        var entriesWithNavMeta = [];
         if (result && result.entities && result.entities.length > 0) {
+          var entryPromises = [];
           result.entities.forEach(function (entity) {
-            var entry = self.dataCatalog.getEntry({ path: self.path.concat((entity.name || entity.originalName).toLowerCase())});
-            entry.navigatorMeta = entity;
-            entry.lastNavigatorMetaPromise = $.Deferred().resolve(entry.navigatorMeta).promise();
-            entriesWithNavMeta.push(entry);
+            var entryPromise = self.dataCatalog.getEntry({ path: self.path.concat((entity.name || entity.originalName).toLowerCase())}).done(function(catalogEntry) {
+              catalogEntry.navigatorMeta = entity;
+              catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta).promise();
+              catalogEntry.saveLater();
+            });
+            entryPromises.push(entryPromise);
+            cancellablePromises.push(entryPromise);
           });
+          $.when.apply($, entryPromises).done(function () {
+            deferred.resolve(Array.prototype.slice.call(arguments));
+          });
+        } else {
+          deferred.resolve([]);
         }
-        deferred.resolve(entriesWithNavMeta);
       }).fail(deferred.reject));
     }).fail(deferred.reject));
 
@@ -244,6 +333,9 @@ var DataCatalog = (function () {
    */
   DataCatalogEntry.prototype.loadNavOptMetaForChildren = function (apiOptions) {
     var self = this;
+    if (self.dataCatalog.sourceType !== 'hive' && self.dataCatalog.sourceType !== 'impala') {
+      return $.Deferred().reject().promise();
+    }
     if (self.navOptMetaForChildrenPromise && (!apiOptions || !apiOptions.refreshCache)) {
       return self.navOptMetaForChildrenPromise;
     }
@@ -255,21 +347,29 @@ var DataCatalog = (function () {
         refreshCache: apiOptions && apiOptions.refreshCache,
         path: self.path
       }).done(function (data) {
-        var entriesWithNavOptMeta = [];
+        var entryPromises = [];
         if (self.isDatabase() && data.top_tables) {
           data.top_tables.forEach(function (topTable) {
-            var entry = self.dataCatalog.getEntry({ path: self.path.concat(topTable.name.toLowerCase()) });
-            entry.navOptMeta = topTable;
-            entriesWithNavOptMeta.push(entry);
+            var entryPromise = self.dataCatalog.getEntry({ path: self.path.concat(topTable.name.toLowerCase()) }).done(function (entry) {
+              entry.navOptMeta = topTable;
+              entry.saveLater();
+            });
+            entryPromises.push(entryPromise);
+            cancellablePromises.push(entryPromise);
           });
         } else if (self.isTableOrView() && data.values && data.values.selectColumns) {
           data.values.selectColumns.forEach(function (selectColumn) {
-            var entry = self.dataCatalog.getEntry({ path: self.path.concat(selectColumn.columnName.toLowerCase().split('.')) });
-            entry.navOptMeta = selectColumn;
-            entriesWithNavOptMeta.push(entry);
+            var entryPromise = self.dataCatalog.getEntry({ path: self.path.concat(selectColumn.columnName.toLowerCase().split('.')) }).done(function (entry) {
+              entry.navOptMeta = selectColumn;
+              entry.saveLater();
+            });
+            entryPromises.push(entryPromise);
+            cancellablePromises.push(entryPromise);
           })
         }
-        deferred.resolve(entriesWithNavOptMeta);
+        $.when.apply($, entryPromises).done(function () {
+          deferred.resolve(Array.prototype.slice.call(arguments));
+        });
       }).fail(deferred.reject));
     } else {
       deferred.resolve([]);
@@ -280,7 +380,7 @@ var DataCatalog = (function () {
 
   DataCatalogEntry.prototype.getKnownComment = function () {
     var self = this;
-    if (self.navigatorMeta) {
+    if (self.navigatorMeta && (self.dataCatalog.sourceType === 'hive' || self.dataCatalog.sourceType === 'impala')) {
       return self.navigatorMeta.description || self.navigatorMeta.originalDescription || ''
     }
     return self.sourceMeta && self.sourceMeta.comment || '';
@@ -309,7 +409,7 @@ var DataCatalog = (function () {
       }
     };
 
-    if (HAS_NAVIGATOR) {
+    if (HAS_NAVIGATOR && (self.dataCatalog.sourceType === 'hive' || self.dataCatalog.sourceType === 'impala')) {
       if (self.navigatorMeta) {
         deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
       } else {
@@ -341,7 +441,7 @@ var DataCatalog = (function () {
     var self = this;
     var deferred = $.Deferred();
 
-    if (HAS_NAVIGATOR) {
+    if (HAS_NAVIGATOR && (self.dataCatalog.sourceType === 'hive' || self.dataCatalog.sourceType === 'impala')) {
       self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
         if (navigatorMeta) {
           ApiHelper.getInstance().updateNavigatorMetadata({
@@ -494,39 +594,60 @@ var DataCatalog = (function () {
   };
 
   /**
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   * @param {boolean} [apiOptions.cachedOnly]
-   * @param {boolean} [apiOptions.refreshCache]
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.refreshCache]
    * @return {CancellablePromise}
    */
-  DataCatalogEntry.prototype.getSourceMeta = function (apiOptions) {
+  DataCatalogEntry.prototype.getSourceMeta = function (options) {
     var self = this;
-    return self.lastSourceMetaPromise || reloadSourceMeta(self, apiOptions);
+    if (options && options.cachedOnly) {
+      return self.sourceMetaPromise || $.Deferred().reject(false).promise();
+    }
+    if (options && options.refreshCache) {
+      return reloadSourceMeta(self, options);
+    }
+    return self.sourceMetaPromise || reloadSourceMeta(self, options);
   };
 
   /**
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   * @param {boolean} [apiOptions.cachedOnly]
-   * @param {boolean} [apiOptions.refreshCache]
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.refreshCache]
    * @return {CancellablePromise}
    */
-  DataCatalogEntry.prototype.getNavigatorMeta = function (apiOptions) {
+  DataCatalogEntry.prototype.getNavigatorMeta = function (options) {
     var self = this;
-    return self.lastNavigatorMetaPromise || reloadNavigatorMeta(self, apiOptions)
+    if (self.dataCatalog.sourceType !== 'hive' && self.dataCatalog.sourceType !== 'impala') {
+      return $.Deferred().reject().promise();
+    }
+    if (options && options.cachedOnly) {
+      return self.navigatorMetaPromise || $.Deferred().reject(false).promise();
+    }
+    if (options && options.refreshCache) {
+      return reloadNavigatorMeta(self, options);
+    }
+    return self.navigatorMetaPromise || reloadNavigatorMeta(self, options)
   };
 
   /**
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   * @param {boolean} [apiOptions.cachedOnly]
-   * @param {boolean} [apiOptions.refreshCache]
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.refreshCache]
    * @return {CancellablePromise}
    */
-  DataCatalogEntry.prototype.getSample = function () {
+  DataCatalogEntry.prototype.getSample = function (options) {
     var self = this;
-    return self.lastSamplePromise || reloadSample(self, options)
+    if (options && options.cachedOnly) {
+      return self.samplePromise || $.Deferred().reject(false).promise();
+    }
+    if (options && options.refreshCache) {
+      return reloadSample(self, options);
+    }
+    return self.samplePromise || reloadSample(self, options)
   };
 
   var instances = {};

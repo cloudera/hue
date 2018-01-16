@@ -2579,7 +2579,15 @@ from desktop.views import _ko
 
         var updateOnVisible = false;
 
+        var runningPromises = [];
+
         var handleLocationUpdate = function (activeLocations) {
+          while (runningPromises.length) {
+            var promise = runningPromises.pop();
+            if (promise.cancel) {
+              promise.cancel();
+            }
+          }
           updateOnVisible = false;
           assistDbSource.sourceType = activeLocations.type;
           if (!activeLocations) {
@@ -2602,62 +2610,82 @@ from desktop.views import _ko
 
             activeLocations.activeStatementLocations.forEach(function (location) {
               if (location.type === 'table' && (location.identifierChain.length !== 1 || !ctes[location.identifierChain[0].name.toLowerCase()])) {
-                var database = location.identifierChain.length === 2 ? location.identifierChain[0].name : activeLocations.defaultDatabase;
-                database = database.toLowerCase();
-                var catalogEntry = DataCatalog.getEntry({ sourceType: activeLocations.type, path: [database], definition: { type: 'database' }});
-                if (!databaseIndex[database]) {
-                  databaseIndex[database] = new AssistDbEntry(
+                var tableDeferred = $.Deferred();
+                var dbDeferred = $.Deferred();
+                runningPromises.push(tableDeferred);
+                runningPromises.push(dbDeferred);
+
+                var qid = createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase);
+                if (activeTableIndex[qid]) {
+                  tableQidIndex[qid] = true;
+                  tableDeferred.resolve(activeTableIndex[qid]);
+                  dbDeferred.resolve(activeTableIndex[qid].parent);
+                } else {
+                  var database = location.identifierChain.length === 2 ? location.identifierChain[0].name : activeLocations.defaultDatabase;
+                  database = database.toLowerCase();
+                  if (databaseIndex[database]) {
+                    dbDeferred.resolve(databaseIndex[database]);
+                  } else {
                     DataCatalog.getEntry({
                       sourceType: activeLocations.type,
-                      path: [database],
+                      path: [ database ],
                       definition: { type: 'database' }
-                    }),
-                    null,
-                    assistDbSource,
-                    self.filter,
-                    i18n,
-                    navigationSettings
-                  );
-                }
-                var qid = createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase);
-                tableQidIndex[qid] = true;
-                if (!activeTableIndex[qid]) {
-                  var tableName = location.identifierChain[location.identifierChain.length - 1].name;
+                    }).done(function (catalogEntry) {
+                      databaseIndex[database] = new AssistDbEntry(catalogEntry, null, assistDbSource, self.filter, i18n,navigationSettings);
+                      updateTables = true;
+                      dbDeferred.resolve(databaseIndex[database])
+                    }).fail(function () {
+                      console.log('reject 1');
+                      dbDeferred.reject();
+                    });
+                  }
 
-                  activeTableIndex[createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase)] = new AssistDbEntry(
+                  dbDeferred.done(function (dbEntry) {
+                    var tableName = location.identifierChain[location.identifierChain.length - 1].name;
                     DataCatalog.getEntry({
                       sourceType: activeLocations.type,
                       path: [database, tableName],
                       definition: { type: 'table' }
-                    }),
-                    databaseIndex[database],
-                    assistDbSource,
-                    self.filter,
-                    i18n,
-                    navigationSettings
-                  );
-                  updateTables = true;
+                    }).done(function (catalogEntry) {
+                      var tableEntry = new AssistDbEntry(
+                              catalogEntry,
+                              dbEntry,
+                              assistDbSource,
+                              self.filter,
+                              i18n,
+                              navigationSettings
+                      );
+                      activeTableIndex[createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase)] = tableEntry;
+                      tableQidIndex[qid] = true;
+                      updateTables = true;
+                      tableDeferred.resolve(tableEntry)
+                    }).fail(tableDeferred.reject);
+                  }).fail(tableDeferred.reject);
                 }
               }
             });
-            Object.keys(activeTableIndex).forEach(function (key) {
-              if (!tableQidIndex[key]) {
-                delete activeTableIndex[key];
-                updateTables = true;
+
+            $.when.apply($, runningPromises).always(function () {
+              runningPromises.length = 0;
+              Object.keys(activeTableIndex).forEach(function (key) {
+                if (!tableQidIndex[key]) {
+                  delete activeTableIndex[key];
+                  updateTables = true;
+                }
+              });
+
+              if (updateTables) {
+                var tables = [];
+                Object.keys(activeTableIndex).forEach(function (key) {
+                  tables.push(activeTableIndex[key]);
+                });
+
+                tables.sort(function (a, b) {
+                  return a.catalogEntry.name.localeCompare(b.catalogEntry.name);
+                });
+                self.activeTables(tables);
               }
             });
-
-            if (updateTables) {
-              var tables = [];
-              Object.keys(activeTableIndex).forEach(function (key) {
-                tables.push(activeTableIndex[key]);
-              });
-
-              tables.sort(function (a, b) {
-                return a.catalogEntry.name.localeCompare(b.catalogEntry.name);
-              });
-              self.activeTables(tables);
-            }
           }
         };
 
@@ -2922,33 +2950,22 @@ from desktop.views import _ko
           });
 
           var fakeParentName = collectionName.indexOf('.') > -1 ? collectionName.split('.')[0] : 'default';
-          var assistFakeDb = new AssistDbEntry(
-              DataCatalog.getEntry({
-                sourceType: collection.engine(),
-                path: [fakeParentName],
-                definition: { type: 'database' }
-              }),
-              null,
-              assistDbSource,
-              self.filter,
-              i18n,
-              navigationSettings
-          );
 
-          var collectionEntry = new AssistDbEntry(
-              DataCatalog.getEntry({
-                sourceType: collection.engine(),
-                path: [fakeParentName, collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName],
-                definition: { type: 'table' }
-              }),
-              assistFakeDb,
-              assistDbSource,
-              self.filter,
-              i18n,
-              navigationSettings
-          );
-
-          self.activeTables([collectionEntry]);
+          DataCatalog.getEntry({
+            sourceType: collection.engine(),
+            path: [fakeParentName],
+            definition: { type: 'database' }
+          }).done(function (fakeDbCatalogEntry) {
+            var assistFakeDb = new AssistDbEntry(fakeDbCatalogEntry, null, assistDbSource, self.filter, i18n, navigationSettings);
+            DataCatalog.getEntry({
+              sourceType: collection.engine(),
+              path: [fakeParentName, collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName],
+              definition: { type: 'table' }
+            }).done(function (collectionCatalogEntry) {
+              var collectionEntry = new AssistDbEntry(collectionCatalogEntry, assistFakeDb, assistDbSource, self.filter, i18n, navigationSettings);
+              self.activeTables([collectionEntry]);
+            });
+          });
 
           self.autocompleteFromEntries = function (nonPartial, partial) {
             var added = {};
