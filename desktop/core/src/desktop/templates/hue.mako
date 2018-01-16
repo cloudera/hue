@@ -1412,6 +1412,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
 
+        huePubSub.subscribe('side.panel.right.hide', function(withoutStorage){
+          previousVisibilityValues = {
+            left: self.leftAssistVisible(),
+            right: self.rightAssistVisible()
+          };
+          self.assistWithoutStorage(withoutStorage);
+          self.rightAssistVisible(false);
+          window.setTimeout(function(){
+            self.assistWithoutStorage(false);
+          }, 0);
+        });
+
         huePubSub.subscribe('side.panels.show', function(withoutStorage){
           self.assistWithoutStorage(withoutStorage);
           self.leftAssistVisible(previousVisibilityValues.left);

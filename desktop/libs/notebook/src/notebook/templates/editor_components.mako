@@ -3299,7 +3299,14 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           wasLeftPanelVisible = viewModel.isLeftPanelVisible();
           console.log(viewModel.isPresentationMode());
           wasRightPanelVisible = viewModel.isRightPanelVisible();
-          //huePubSub.publish('side.panels.hide', true);
+          
+          if (wasResultFullScreenMode) {
+            huePubSub.publish('side.panels.hide', true);
+          } else {
+            huePubSub.publish('side.panel.right.hide', true);
+          }
+          
+          
           viewModel.assistWithoutStorage(true);
           viewModel.assistAvailable(false);
           viewModel.isLeftPanelVisible(true);
