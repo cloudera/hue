@@ -410,7 +410,7 @@ except ImportError, e:
             if (resp.status == 0) {
               if (IS_HUE_4) {
                 $(".modal-backdrop").remove();
-                if (self.saveTarget() == 'hdfs-file' || (self.saveTarget() == 'search-index' && typeof resp.rowcount !== 'undefined')) {
+                if (self.saveTarget() == 'hdfs-file' || self.saveTarget() == 'search-index') {
                   $("#saveResultsModal").modal("hide");
                   huePubSub.publish('open.link', resp.watch_url);
                 } else {
