@@ -103,8 +103,9 @@ def index_fields_dynamic(request):
   try:
     name = request.POST['name']
     engine = request.POST['engine']
+    source = request.POST.get('source')
 
-    dynamic_fields = get_engine(request.user, engine).luke(name)
+    dynamic_fields = get_engine(request.user, engine, source=source).luke(name)
 
     result['message'] = ''
     result['fields'] = [

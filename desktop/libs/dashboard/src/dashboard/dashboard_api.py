@@ -22,7 +22,7 @@ LOG = logging.getLogger(__name__)
 
 
 def get_engine(user, engine='solr', facet=None, source='data'):
-  if isinstance(engine, dict):    
+  if isinstance(engine, dict):
     if source == 'data':
       source = engine.get('source')
     engine = engine.get('engine', 'solr')
