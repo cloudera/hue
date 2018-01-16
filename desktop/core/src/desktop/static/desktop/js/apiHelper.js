@@ -1536,8 +1536,6 @@ var ApiHelper = (function () {
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.cachedOnly] - Default false
-   * @param {boolean} [options.refreshCache] - Default false
    *
    * @param {string[]} [options.path] - The path to fetch
    *
@@ -1547,19 +1545,35 @@ var ApiHelper = (function () {
     var self = this;
     var deferred = $.Deferred();
 
-    var request = fetchAssistData.bind(self)({
+    var request = $.ajax({
+      type: 'POST',
       url: AUTOCOMPLETE_API_PREFIX + options.path.join('/'),
-      sourceType: options.sourceType,
+      data: {
+        notebook: {},
+        snippet: ko.mapping.toJSON({
+          type: options.sourceType
+        })
+      },
+      timeout: options.timeout
+    }).success(function (data) {
+      data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
+      data.hueTimestamp = Date.now();
+
+      // TODO: Display warning in autocomplete when an entity can't be found
+      // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
+      // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
+      if (!data.notFound && self.successResponseIsError(data)) {
+        self.assistErrorCallback({
+          silenceErrors: options.silenceErrors,
+          errorCallback: deferred.reject
+        })(data);
+      } else {
+        deferred.resolve(data);
+      }
+    }).fail(self.assistErrorCallback({
       silenceErrors: options.silenceErrors,
-      cachedOnly: options.cachedOnly,
-      refreshCache: options.refreshCache,
-      successCallback: deferred.resolve,
-      errorCallback: self.assistErrorCallback({
-        errorCallback: deferred.reject,
-        silenceErrors: options.silenceErrors
-      }),
-      cacheCondition: genericCacheCondition
-    });
+      errorCallback: deferred.reject
+    }));
 
     return new CancellablePromise(deferred.promise(), request);
   };
@@ -1610,8 +1624,6 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.noCache]
-   * @param {boolean} [options.refreshCache] - Default false
    *
    * @param {string} options.sourceType
    * @param {string[]} options.path
@@ -1621,19 +1633,20 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchSample = function (options) {
     var self = this;
     var deferred = $.Deferred();
-    var request = fetchAssistData.bind(self)({
-      url: SAMPLE_API_PREFIX + options.path.join('/'),
-      sourceType: options.sourceType,
-      noCache: options.noCache,
-      refreshCache: options.refreshCache,
+
+    var request = self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
+      notebook: {},
+      snippet: ko.mapping.toJSON({
+        type: options.sourceType
+      })
+    }, {
       silenceErrors: options.silenceErrors,
-      successCallback: deferred.resolve,
-      errorCallback: self.assistErrorCallback({
-        errorCallback: deferred.reject,
-        silenceErrors: options.silenceErrors
-      }),
-      cacheCondition: genericCacheCondition
-    });
+      successCallback: function (data) {
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
+      }
+    }).done().fail(deferred.reject);
+
     return new CancellablePromise(deferred.promise(), request);
   };
 
@@ -1642,8 +1655,6 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.noCache]
-   * @param {boolean} [options.refreshCache] - Default false
    *
    * @param {boolean} [options.isView] - Default false
    * @param {string[]} options.path
@@ -1663,20 +1674,19 @@ var ApiHelper = (function () {
       url +=  '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
     }
 
-    var request = fetchAssistData.bind(self)({
-      url: url,
-      sourceType: 'nav',
-      noCache: options.noCache,
-      refreshCache: options.refreshCache,
+    var request = self.simplePost(url, {
+      notebook: {},
+      snippet: ko.mapping.toJSON({
+        type: 'nav'
+      })
+    }, {
       silenceErrors: options.silenceErrors,
       successCallback: function (data) {
-        deferred.resolve(data.entity || data);
+        data = data.entity || data;
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
       },
-      errorCallback: self.assistErrorCallback({
-        errorCallback: deferred.reject,
-        silenceErrors: options.silenceErrors
-      }),
-      cacheCondition: genericCacheCondition
+      errorCallback: deferred.reject
     });
 
     return new CancellablePromise(deferred.promise(), request);
@@ -1710,23 +1720,39 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.refreshCache] - Default false
    * @param {string[]} options.path
    * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchNavOptMetadata = function (options) {
     var self = this;
     var deferred = $.Deferred();
-    var url = options.path.length === 1 ? NAV_OPT_URLS.TOP_TABLES : NAV_OPT_URLS.TOP_COLUMNS;
-    return self.fetchNavOptCached(url, {
-      path: options.path,
-      refreshCache: options.refreshCache,
+    var url, data;
+
+    if (options.path.length === 1) {
+      url = NAV_OPT_URLS.TOP_TABLES;
+      data = {
+        database: options.path[0]
+      };
+    } else if (options.path.length > 1) {
+      url = NAV_OPT_URLS.TOP_COLUMNS;
+      data = {
+        dbTables: ko.mapping.toJSON([options.path.join('.')])
+      };
+    } else {
+      deferred.reject();
+      return new CancellablePromise(deferred.promise());
+    }
+
+    var request = self.simplePost(url, data, {
       silenceErrors: options.silenceErrors,
-      successCallback: deferred.resolve,
+      successCallback: function (data) {
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
+      },
       errorCallback: deferred.reject
-    }, function (data) {
-      return data.status === 0;
     });
+
+    return new CancellablePromise(deferred.promise(), request);
   };
 
 
@@ -2210,24 +2236,17 @@ var ApiHelper = (function () {
     var self = this;
     var deferred = $.Deferred();
 
-    var request = $.post(SEARCH_API, {
+    var request = self.simplePost(SEARCH_API, {
       query_s: ko.mapping.toJSON(options.query),
       limit: options.limit || 100,
       raw_query: !!options.rawQuery,
       sources: options.sources ? ko.mapping.toJSON(options.sources) : '["sql"]'
-	  }).done(function (data) {
-      if (data.status === 0 && !self.successResponseIsError(data)) {
-        deferred.resolve(data);
-      } else {
-        self.assistErrorCallback({
-          silenceErrors: options.silenceErrors,
-          errorCallback: deferred.reject
-        })(data);
-      }
-    }).fail(self.assistErrorCallback({
+    }, {
       silenceErrors: options.silenceErrors,
+      successCallback: deferred.resolve,
       errorCallback: deferred.reject
-    }));
+    });
+
     return new CancellablePromise(deferred.promise(), request);
   };
 

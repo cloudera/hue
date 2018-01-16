@@ -122,44 +122,32 @@ var AssistDbSource = (function () {
     self.selectedDatabase.subscribe(function () {
       var db = self.selectedDatabase();
       if (HAS_OPTIMIZER && db && !db.popularityIndexSet && self.sourceType !== 'solr') {
-        self.apiHelper.fetchNavOptTopTables({
-          sourceType: self.sourceType,
-          database: db.catalogEntry.name,
-          silenceErrors: true,
-          timeout: AUTOCOMPLETE_TIMEOUT,
-          successCallback: function (data) {
-            var popularityIndex = {};
-            data.top_tables.forEach(function (topTable) {
-              if (topTable.popularity >= 5) {
-                popularityIndex[topTable.name] = topTable.popularity;
+        db.catalogEntry.loadNavOptMetaForChildren({ silenceErrors: true }).done(function () {
+          var applyPopularity = function () {
+            db.entries().forEach(function (entry) {
+              if (entry.catalogEntry.navOptMeta && entry.catalogEntry.navOptMeta.popularity >= 5) {
+                entry.popularity(entry.catalogEntry.navOptMeta.popularity )
               }
             });
-            var applyPopularity = function () {
-              db.entries().forEach(function (entry) {
-                if (popularityIndex[entry.catalogEntry.name]) {
-                  entry.popularity(popularityIndex[entry.catalogEntry.name]);
-                }
-              });
-              if (self.activeSort() === 'popular') {
-                db.entries.sort(sortFunctions.popular);
-              }
-            };
+            if (self.activeSort() === 'popular') {
+              db.entries.sort(sortFunctions.popular);
+            }
+          };
 
-            if (db.loading()) {
-              var subscription = db.loading.subscribe(function () {
+          if (db.loading()) {
+            var subscription = db.loading.subscribe(function () {
+              subscription.dispose();
+              applyPopularity();
+            });
+          } else if (db.entries().length == 0) {
+            var subscription = db.entries.subscribe(function (newEntries) {
+              if (newEntries.length > 0) {
                 subscription.dispose();
                 applyPopularity();
-              });
-            } else if (db.entries().length == 0) {
-              var subscription = db.entries.subscribe(function (newEntries) {
-                if (newEntries.length > 0) {
-                  subscription.dispose();
-                  applyPopularity();
-                }
-              });
-            } else {
-              applyPopularity();
-            }
+              }
+            });
+          } else {
+            applyPopularity();
           }
         });
       }
@@ -218,27 +206,35 @@ var AssistDbSource = (function () {
     var updateDatabases = function (names, lastSelectedDb) {
       dbIndex = {};
       var hasNavMeta = false;
-      var dbs = $.map(names, function(name) {
-        var catalogEntry = DataCatalog.getEntry({ sourceType: self.sourceType, path: name, definition: { type: 'database' }});
-        hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
-        var database = new AssistDbEntry(catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
-        dbIndex[name] = database;
-        if (name === lastSelectedDb) {
-          self.selectedDatabase(database);
-          self.selectedDatabaseChanged();
-        }
-        return database;
+      var dbPromises = [];
+      var dbs = [];
+
+      names.forEach(function (name) {
+        dbPromises.push(DataCatalog.getEntry({ sourceType: self.sourceType, path: name, definition: { type: 'database' }}).done( function (catalogEntry) {
+          hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
+          var database = new AssistDbEntry(catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
+          dbIndex[name] = database;
+          if (name === lastSelectedDb) {
+            self.selectedDatabase(database);
+            self.selectedDatabaseChanged();
+          }
+          dbs.push(database);
+        }));
       });
 
-      if (!hasNavMeta) {
-        DataCatalog.getEntry({ sourceType: self.sourceType, path: [], definition: { type: 'source' } }).loadNavigatorMetaForChildren({ silenceErrors: true });
-      }
-
-      dbs.sort(sortFunctions[self.activeSort()]);
-      self.databases(dbs);
-      self.reloading(false);
-      self.loading(false);
-      self.loaded(true);
+      $.when.apply($, dbPromises).always(function () {
+        if (!hasNavMeta) {
+          if (self.sourceType !== 'solr') {
+            DataCatalog.getEntry({ sourceType: self.sourceType, path: [], definition: { type: 'source' } })
+              .done(function (catalogEntry) { catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true }) });
+          }
+        }
+        dbs.sort(sortFunctions[self.activeSort()]);
+        self.databases(dbs);
+        self.reloading(false);
+        self.loading(false);
+        self.loaded(true);
+      });
     };
 
     self.setDatabase = function (databaseName) {

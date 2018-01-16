@@ -218,6 +218,11 @@ if USE_NEW_EDITOR.get():
 
   <script type="text/javascript">
     $(document).ready(function () {
+      localforage.config({
+        version     : 1.0,
+        storeName   : 'hue_store',
+      });
+
       huePubSub.subscribe('get.current.app.name', function () {
         var appName = '';
         if ('${ 'metastore' in apps }' === 'True' && location.href.indexOf('${"metastore" in apps and apps["metastore"].display_name}') !== -1) {

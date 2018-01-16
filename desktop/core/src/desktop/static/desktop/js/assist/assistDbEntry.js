@@ -306,12 +306,10 @@ var AssistDbEntry = (function () {
 
     var successCallback = function(sourceMeta) {
       self.entries([]);
-      self.hasErrors(false);
-      self.loading(false);
-      self.loaded = true;
-
-
       self.catalogEntry.getChildren().done(function (catalogEntries) {
+        self.hasErrors(false);
+        self.loading(false);
+        self.loaded = true;
         var newEntries = [];
         catalogEntries.forEach(function (catalogEntry) {
           newEntries.push(self.createEntry(catalogEntry));
@@ -330,7 +328,9 @@ var AssistDbEntry = (function () {
         }
       });
 
-      self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: self.navigationSettings.rightAssist });
+      if (self.assistDbSource.sourceType !== 'solr') {
+        self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: self.navigationSettings.rightAssist });
+      }
     };
 
     var errorCallback = function () {
@@ -341,33 +341,21 @@ var AssistDbEntry = (function () {
     };
 
     if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && self.catalogEntry.isTable() && self.assistDbSource.sourceType !== 'solr') {
-      self.assistDbSource.apiHelper.fetchNavOptTopColumns({
-        sourceType: self.assistDbSource.sourceType,
-        successCallback: function (data) {
-          if (data.status === 0 && data.values && data.values.selectColumns && data.values.selectColumns.length > 0) {
-            var colIndex = {};
-            data.values.selectColumns.forEach(function (col) {
-              colIndex[col.columnName] = col;
-            });
-            $.when(loadEntriesDeferred).done(function () {
-              if (!self.hasErrors()) {
-                self.entries().forEach(function (entry) {
-                  if (colIndex[entry.catalogEntry.name]) {
-                    entry.popularity(colIndex[entry.catalogEntry.name].columnCount);
-                  }
-                });
-
-                if (self.assistDbSource.activeSort() === 'popular') {
-                  self.entries.sort(self.sortFunctions.popular);
-                }
+      self.catalogEntry.loadNavOptMetaForChildren({ silenceErrors: true }).done(function () {
+        loadEntriesDeferred.done(function () {
+          if (!self.hasErrors()) {
+            self.entries().forEach(function (entry) {
+              if (entry.catalogEntry.navOptMeta) {
+                entry.popularity(entry.catalogEntry.navOptMeta.columnCount)
               }
-            })
+            });
+
+            if (self.assistDbSource.activeSort() === 'popular') {
+              self.entries.sort(self.sortFunctions.popular);
+            }
           }
-        },
-        silenceErrors: true,
-        tables: [{ identifierChain: [{ name: self.catalogEntry.name }] }],
-        defaultDatabase: self.parent.catalogEntry.name
-      })
+        })
+      });
     }
 
     self.catalogEntry.getSourceMeta({ silenceErrors: self.navigationSettings.rightAssist }).done(successCallback).fail(errorCallback);
