@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import re
 import threading
 import time
 
@@ -28,6 +29,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.models import Cluster, ANALYTIC_DB
 from filebrowser.views import location_to_url
+from indexer.file_format import HiveFormat
 
 from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
@@ -36,6 +38,7 @@ from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
+
 
 LOG = logging.getLogger(__name__)
 
@@ -945,6 +948,25 @@ class DataTable:
   If the dataset has more rows, a new fetch should be done in order to return a new data table with the next rows.
   """
   pass
+
+
+class SubQueryTable:
+
+  def __init__(self, db, query):
+    self.query = query
+    # Table Properties            
+    self.name = 'Test'
+    cols = db.get_query_metadata(query).data_table.cols()
+    for col in cols:
+      col.name = re.sub('^t\.', '', col.name)
+      col.type = HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')
+    self.cols =  cols
+    self.hdfs_link = None
+    self.comment = None
+    self.is_impala_only = False
+    self.is_view = False
+    self.partition_keys = []
+    self.properties = {}
 
 
 # TODO decorator?

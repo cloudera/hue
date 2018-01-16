@@ -34,7 +34,6 @@ from desktop.lib.i18n import force_unicode
 from desktop.lib.parameterization import substitute_variables
 from metastore import parser
 from notebook.models import escape_rows
-from indexer.file_format import HiveFormat
 
 import beeswax.models
 
@@ -44,7 +43,8 @@ from beeswax.conf import USE_GET_LOG_API
 from beeswax.forms import QueryForm
 from beeswax.models import Session, QueryHistory
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException,\
+  SubQueryTable
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
                           parse_out_jobs
@@ -110,22 +110,6 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None, query
       response['tables_meta'] = tables_meta
     elif column is None:
       if query is not None:
-        class SubQueryTable():
-          def __init__(self, db, query):
-            self.query = query
-            # Table Properties            
-            self.name = 'Test'
-            cols = db.get_query_metadata(query).data_table.cols()
-            for col in cols:
-              col.name = re.sub('^t\.', '', col.name)
-              col.type = HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')
-            self.cols =  cols
-            self.hdfs_link = None
-            self.comment = None
-            self.is_impala_only = False
-            self.is_view = False
-            self.partition_keys = []
-            self.properties = {}
         table = SubQueryTable(db, query)
       else:
         table = db.get_table(database, table)
