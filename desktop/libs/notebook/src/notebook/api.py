@@ -624,7 +624,7 @@ def format(request):
 @check_document_access_permission()
 @api_error_handler
 def export_result(request):
-  response = {'status': -1, 'message': _('Exporting result failed.')}
+  response = {'status': -1, 'message': _('Success')}
 
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
@@ -708,7 +708,7 @@ def export_result(request):
     if is_embedded:
       if destination == '__hue__':
         notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-        response['watch_url'] = reverse('search:browse', kwargs={'name': notebook_id, 'source': 'query'})
+        response['watch_url'] = reverse('dashboard:browse', kwargs={'name': notebook_id}) + '?source=query'
         response['status'] = 0        
         return JsonResponse(response)
 
@@ -746,6 +746,9 @@ def export_result(request):
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
       response['status'] = 0
+
+    if response.get('status') != 0:
+      response['message'] =  _('Exporting result failed.')
 
     request.audit = {
       'operation': 'EXPORT',

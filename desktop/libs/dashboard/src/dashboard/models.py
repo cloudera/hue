@@ -171,7 +171,7 @@ class Collection2(object):
     return props
 
   def get_default(self, user, name, engine='solr', source='data'):
-    fields = self.fields_data(user, name, engine)
+    fields = self.fields_data(user, name, engine, source=source)
     id_field = [field['name'] for field in fields if field.get('isId')]
 
     if id_field:

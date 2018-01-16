@@ -549,8 +549,11 @@ def get_collection(request):
   try:
     name = request.POST['name']
     engine = request.POST['engine']
+    source = request.POST.get('source')
 
-    collection = Collection2(request.user, name=name, engine=engine)
+    source = 'query'
+
+    collection = Collection2(request.user, name=name, engine=engine, source=source)
     collection_json = collection.get_json(request.user)
 
     result['collection'] = json.loads(collection_json)
