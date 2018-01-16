@@ -249,14 +249,17 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="notebook-menu-buttons-${ suffix }">
   <div class="pull-right margin-right-10">
   % if ENABLE_PRESENTATION.get():
-    <!-- ko if: $root.isPresentationModeEnabled -->
+    <div class="btn-group" data-bind="visible: $root.isPresentationMode()">
+      <a class="btn" title="${ _ko('Open document as presentation by default') }" data-bind="click: function() { $root.isPresentationMode(true); }">
+        <i class="fa" data-bind="css: {'fa-toggle-off': $root.isPresentationMode()}"></i>
+      </a>
+    </div>
     <div class="btn-group">
       <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.isPresentationMode(true); },
-        css: {'btn-inverse': $root.isPresentationMode(), 'btn': true}">
+        css: {'btn-inverse': $root.isPresentationMode()}">
         <i class="fa fa-line-chart"></i>
       </a>
     </div>
-    <!-- /ko -->
   % endif
 
     % if IS_EMBEDDED.get():
@@ -352,21 +355,21 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </a>
 <!-- /ko -->
 
-<div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode() || $root.isResultFullScreenMode()" style="display: none;">
+<div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode()" style="display: none">
   <!-- ko if: $root.isPresentationMode() -->
     <!-- ko if: $root.selectedNotebook() -->
       <!-- ko if: $root.selectedNotebook().name() || $root.selectedNotebook().description() -->
-      <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
-      <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
-      <div class="clearfix"></div>
-      <!-- ko template: { name: 'notebook-menu-buttons-${ suffix }' } --><!-- /ko -->
+        <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
+        <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
+        <div class="clearfix"></div>
+        <!-- ko template: { name: 'notebook-menu-buttons-${ suffix }' } --><!-- /ko -->
       <!-- /ko -->
 
       <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
-      <!-- ko template: { name: 'notebook-actions' }--><!-- /ko -->
-      <!-- ko if: $root.preEditorTogglingSnippet -->
-        <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: $root.preEditorTogglingSnippet }--><!-- /ko -->
-      <!-- /ko -->
+        <!-- ko template: { name: 'notebook-actions' } --><!-- /ko -->
+        <!-- ko if: $root.preEditorTogglingSnippet -->
+          <!-- ko template: { if: $root.isPresentationMode(), name: 'snippet-variables', data: $root.preEditorTogglingSnippet }--><!-- /ko -->
+        <!-- /ko -->
       </div>
 
     <!-- /ko -->
@@ -3299,14 +3302,13 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           wasLeftPanelVisible = viewModel.isLeftPanelVisible();
           console.log(viewModel.isPresentationMode());
           wasRightPanelVisible = viewModel.isRightPanelVisible();
-          
+
           if (wasResultFullScreenMode) {
             huePubSub.publish('side.panels.hide', true);
           } else {
             huePubSub.publish('side.panel.right.hide', true);
           }
-          
-          
+
           viewModel.assistWithoutStorage(true);
           viewModel.assistAvailable(false);
           viewModel.isLeftPanelVisible(true);
