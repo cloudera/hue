@@ -27,10 +27,11 @@ from itertools import groupby
 from django.utils.html import escape
 
 from notebook.models import make_notebook
-from notebook.connectors.base import get_api, OperationTimeout
+from notebook.connectors.base import get_api, OperationTimeout, Notebook
 
 from dashboard.dashboard_api import DashboardApi
 from dashboard.models import Collection2, augment_response
+from desktop.models import Document2
 
 
 LOG = logging.getLogger(__name__)
@@ -52,8 +53,6 @@ class SQLDashboardApi(DashboardApi):
     self.async = engine == 'hive' or engine == 'impala'
 
   def query(self, dashboard, query, facet=None):
-    database, table = self._get_database_table_names(dashboard['name'])
-
     if query['qs'] == [{'q': '_root_:*'}]:
       return {'response': {'numFound': 0}}
 
@@ -63,6 +62,16 @@ class SQLDashboardApi(DashboardApi):
     timeFilter = self._get_time_filter_query(dashboard, query)
     if timeFilter:
       filters.append(timeFilter)
+
+    if self.source == 'query':
+      sql_from = '(%(query)s) t' % {'query': self._get_query(dashboard['name'])}
+      database, table = '', ''
+    else:
+      database, table = self._get_database_table_names(dashboard['name'])
+      sql_from = '`%(database)s`.`%(table)s`' % {
+        'database': database,
+        'table': table
+      }
 
     if facet and facet['properties']['facets']:
       for i, _facet in enumerate(facet['properties']['facets']):
@@ -94,17 +103,11 @@ class SQLDashboardApi(DashboardApi):
             mincount_fields_operation.append('COUNT(*) OVER (PARTITION BY %s) AS %s' % (', '.join(mincount_fields_name), mincount_field_name) )
             mincount_where.append('%s >= %s' % (mincount_field_name, str(f['mincount'])))
           sql_from = '''(SELECT * FROM (SELECT *, %(fields)s
-          FROM %(database)s.%(table)s) default
+          FROM %(sql_from)s) default
           WHERE %(where)s) default''' % {
             'fields': ', '.join(mincount_fields_operation),
-            'database': database,
-            'table': table,
+            'sql_from': sql_from,
             'where': ' AND '.join(mincount_where)
-          }
-        else:
-          sql_from = '%(database)s.%(table)s' % {
-            'database': database,
-            'table': table
           }
 
         order_by = ', '.join([self._get_dimension_field(f)['order_by'] for f in reversed(facet['properties']['facets']) if f['sort'] != 'default'])
@@ -130,19 +133,13 @@ class SQLDashboardApi(DashboardApi):
           FROM
           (
             SELECT %(field)s, cume_dist() OVER (ORDER BY %(field)s) * 100 AS cume_dist__%(field)s
-            FROM %(database)s.%(table)s
+            FROM %(sql_from)s
           ) DEFAULT
           WHERE cume_dist__%(field)s >= %(value)s) DEFAULT
           ''' % {
             'field': facet['properties']['facets'][0]['field'],
             'value': facet['properties']['facets'][0]['aggregate']['percentile'] if aggregate_function == 'percentile' else 50,
-            'database': database,
-            'table': table
-          }
-        else:
-          sql_from = '%(database)s.%(table)s' % {
-            'database': database,
-            'table': table
+            'sql_from': sql_from,
           }
 
         sql = '''SELECT %(fields)s
@@ -155,21 +152,10 @@ class SQLDashboardApi(DashboardApi):
       elif facet['type'] == 'statement':
         sql = facet['properties']['statement']
     else:
-      print '==================================================================== ', self.source
-      print '===================================================================='
       fields = Collection2.get_field_list(dashboard)
-      if self.source == 'query':
-        # Open snippet and get statement
-        sql_from = '(select app from web_logs) t'
-        database, table = '', ''
-      else:
-        sql_from = '`%(database)s`.`%(table)s`' % {
-          'database': database,
-          'table': table
-        }
       sql = "SELECT %(fields)s FROM %(sql_from)s" % {
           'sql_from': sql_from,
-          'fields': ', '.join(['`%s`' % f if f != '*' else '*' for f in fields])
+          'fields': ', '.join(['`%s` as `%s`' % (f, f) if f != '*' else '*' for f in fields])
       }
       if filters:
         sql += ' ' + self._convert_filters_to_where(filters)
@@ -226,8 +212,7 @@ class SQLDashboardApi(DashboardApi):
     snippet = {'type': self.engine}
 
     if self.source == 'query':
-      # Open snippet and get statement
-      snippet['query'] = 'select app from web_logs'
+      snippet['query'] = self._get_query(name)
       database, table = '', ''
     else:
       database, table = self._get_database_table_names(name)
@@ -653,6 +638,13 @@ class SQLDashboardApi(DashboardApi):
     return database, table_name
 
 
+  def _get_query(self, name):
+    nb_doc = Document2.objects.document(user=self.user, doc_id=name)
+    notebook = Notebook(document=nb_doc).get_data()
+    snippet = notebook['snippets'][0]
+    return snippet['statement']
+
+
   def _convert_notebook_facet(self, result, facet, query):
     response = json.loads('''{
    "fieldsAttributes":[],
@@ -757,7 +749,7 @@ class SQLDashboardApi(DashboardApi):
 
 
   def _convert_notebook_results(self, result, dashboard, query):
-    cols = [col['name'] for col in result['meta']]
+    cols = [col['name'] if self.source == 'data' else re.sub('^t\.', '', col['name']) for col in result['meta']]
 
     docs = []
     for row in result['data']:
