@@ -1716,7 +1716,7 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {string[]} options.path
+   * @param {string[string[]]} options.paths
    * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchNavOptMetadata = function (options) {
@@ -1724,19 +1724,20 @@ var ApiHelper = (function () {
     var deferred = $.Deferred();
     var url, data;
 
-    if (options.path.length === 1) {
+    if (options.paths.length === 1 && options.paths[0].length === 1) {
       url = NAV_OPT_URLS.TOP_TABLES;
       data = {
-        database: options.path[0]
-      };
-    } else if (options.path.length > 1) {
-      url = NAV_OPT_URLS.TOP_COLUMNS;
-      data = {
-        dbTables: ko.mapping.toJSON([options.path.join('.')])
+        database: options.paths[0][0]
       };
     } else {
-      deferred.reject();
-      return new CancellablePromise(deferred.promise());
+      url = NAV_OPT_URLS.TOP_COLUMNS;
+      var dbTables = [];
+      options.paths.forEach(function (path) {
+        dbTables.push(path.join('.'));
+      });
+      data = {
+        dbTables: ko.mapping.toJSON(dbTables)
+      };
     }
 
     var request = self.simplePost(url, data, {
