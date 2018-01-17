@@ -29,7 +29,7 @@ ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
 
 ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
 
-<span id="securityHiveComponents">
+<span id="securityHiveComponents" class="security-components">
 
 <script type="text/html" id="role">
   <div class="acl-block-title">
