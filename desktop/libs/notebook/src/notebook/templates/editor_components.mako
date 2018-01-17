@@ -249,17 +249,19 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="notebook-menu-buttons-${ suffix }">
   <div class="pull-right margin-right-10">
   % if ENABLE_PRESENTATION.get():
-    <div class="btn-group" data-bind="visible: $root.isPresentationMode()">
-      <a class="btn" title="${ _ko('Open document as presentation by default') }" data-bind="click: function() { $root.selectedNotebook().isPresentationMode(true); }">
-        <i class="fa" data-bind="css: {'fa-toggle-off': $root.isPresentationMode()}"></i>
+    <!-- ko with: selectedNotebook() -->
+    <div class="btn-group" data-bind="visible: $root.isPresentationMode() && $root.canSave()">
+      <a class="btn" title="${ _ko('Wether to open the document in presentation mode by default') }" data-bind="click: function() { isPresentationModeDefault(!isPresentationModeDefault()); }">
+        <i class="fa" data-bind="css: {'fa-toggle-on': isPresentationModeDefault(), 'fa-toggle-off': !isPresentationModeDefault()}"></i>
       </a>
     </div>
     <div class="btn-group">
-      <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { $root.selectedNotebook().isPresentationMode(true); },
+      <a class="btn" title="${ _ko('View as a presentation') }" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
         css: {'btn-inverse': $root.isPresentationMode()}">
         <i class="fa fa-line-chart"></i>
       </a>
     </div>
+    <!-- /ko -->
   % endif
 
     % if IS_EMBEDDED.get():
@@ -291,7 +293,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- /ko -->
       </div>
 
-      <!-- ko template: { ifnot: editorMode, name: 'notebook-actions' }--><!-- /ko -->
+      <!-- ko template: { ifnot: editorMode() || isPresentationMode(), name: 'notebook-actions' }--><!-- /ko -->
 
       <div class="dropdown pull-right margin-left-10">
         <a class="btn" data-toggle="dropdown" href="javascript: void(0)">

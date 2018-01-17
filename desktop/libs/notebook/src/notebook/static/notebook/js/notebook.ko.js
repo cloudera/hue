@@ -2069,18 +2069,20 @@ var EditorViewModel = (function() {
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
     self.pubSubUrl = ko.observable(typeof notebook.pubSubUrl != "undefined" && notebook.pubSubUrl != null ? notebook.pubSubUrl : null);
-    self.isPresentationMode = ko.observable(typeof notebook.isPresentationMode != "undefined" && notebook.isPresentationMode != null ? notebook.isPresentationMode : false);
+    self.isPresentationModeDefault = ko.observable(typeof notebook.isPresentationModeDefault != "undefined" && notebook.isPresentationModeDefault != null ? notebook.isPresentationModeDefault : false);
+    self.isPresentationMode = ko.observable(false);
     self.isPresentationMode.subscribe(function(newValue) {
-        wasResultFullScreenMode = false;
-        if (! newValue) {
-          self.cancelExecutingAll();
-        }
-        huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
-        vm.togglePresentationMode();
-        if (newValue) {
-          hueAnalytics.convert('editor', 'presentation');
-        }
-      });
+      wasResultFullScreenMode = false;
+      if (! newValue) {
+        self.cancelExecutingAll();
+      }
+      huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
+      vm.togglePresentationMode();
+      if (newValue) {
+        hueAnalytics.convert('editor', 'presentation');
+      }
+    });
+//    self.isPresentationMode(self.isPresentationModeDefault());
     self.presentationSnippets = ko.observable({});
 
     self.snippets = ko.observableArray();
