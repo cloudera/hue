@@ -295,8 +295,8 @@ class TestWithMockedSolr(TestSearchBase):
     })
 
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], response.content)
-    assert_true('denied' in data['message'], response.content)
+    assert_equal(0, data['status'], response.content)
+    assert_true('no modifications to change' in data['message'], response.content)
 
     # Admin
     c = make_logged_in_client(username='admin', is_superuser=True, recreate=True)
