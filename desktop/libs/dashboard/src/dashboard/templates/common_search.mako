@@ -3960,12 +3960,12 @@ $(document).ready(function () {
             var collindingWidgets = [];
             searchViewModel.gridItems().forEach(function (existingWidget) {
               var existingWidgetFauxRow = parseInt($(existingWidget.gridsterElement).attr('data-row'));
-              if (existingWidgetFauxRow >= dropPosition.row && existingWidgetFauxRow < dropPosition.row + tempDraggable.gridsterHeight() && !existingWidget.hasBeenTouched) {
+              if (existingWidgetFauxRow === dropPosition.row && !existingWidget.hasBeenTouched) {
                 collindingWidgets.push(existingWidget);
                 var parallelWidgets = [];
                 searchViewModel.gridItems().forEach(function (siblingWidget) {
                   var siblingWidgetFauxRow = parseInt($(siblingWidget.gridsterElement).attr('data-row'));
-                  if (siblingWidgetFauxRow >= existingWidgetFauxRow && siblingWidgetFauxRow < existingWidgetFauxRow + existingWidget.size_y() && existingWidget.widgetId() !== siblingWidget.widgetId()) {
+                  if (siblingWidgetFauxRow === existingWidgetFauxRow && existingWidget.widgetId() !== siblingWidget.widgetId()) {
                     siblingWidget.hasBeenTouched = true;
                     parallelWidgets.push(siblingWidget);
                   }
@@ -3987,6 +3987,8 @@ $(document).ready(function () {
                   var adjustedDropPosition = (Math.floor((dropPosition.col - 1) / optimalWidgetWidth) * optimalWidgetWidth) + 1;
                   dropPosition.col = adjustedDropPosition;
 
+                  restoreWidgetSizes();
+
                   var siblingCounter = 0;
                   for (var i = 1; i <= 12 / optimalWidgetWidth; i++) {
                     if (i !== droppedWidgetFauxColumn) {
@@ -3997,7 +3999,7 @@ $(document).ready(function () {
                 }
               }
             });
-            if (isShrinking) {
+            if (isShrinking && dropPosition.row === 2) {
               dropPosition.row--;
             }
           }
@@ -4021,7 +4023,6 @@ $(document).ready(function () {
                     }
                   })
               );
-              restoreWidgetSizes();
             }
           }, 100);
         }
@@ -4040,6 +4041,9 @@ $(document).ready(function () {
           );
           restoreWidgetSizes();
         }
+      }
+      else {
+        restoreWidgetSizes();
       }
     }
   }, 'dashboard');
