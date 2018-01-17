@@ -225,7 +225,7 @@ window.hueUtils = window.hueUtils || (function () {
 
   hueUtils.changeURL = function (newURL) {
     if (IS_EMBEDDED) {
-      newURL = window.location.pathname + window.location.search + '#!' + newURL;
+      newURL = window.location.pathname + window.location.search + '#!' + newURL.replace('/hue', '');
     } else {
       if (window.location.hash !== '' && newURL.indexOf('#') === -1){
         newURL = newURL + window.location.hash;
