@@ -25,7 +25,7 @@
   from desktop import conf
   from django.utils.translation import ugettext as _
 
-  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, USE_GRIDSTER
+  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED, USE_GRIDSTER
 %>
 
 <%def name="import_layout(with_deferred=False)">
