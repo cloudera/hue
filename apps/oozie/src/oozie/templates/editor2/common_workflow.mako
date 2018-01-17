@@ -1611,6 +1611,8 @@
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="text: $root.workflow_properties.propagate_configuration.label"></span>
           <input type="checkbox" data-bind="checked: properties.propagate_configuration" />
+
+          <span data-bind="template: { name: 'common-properties-retry' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -1774,6 +1776,8 @@
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="text: $root.workflow_properties.capture_output.label"></span>
           <input type="checkbox" data-bind="checked: properties.capture_output" />
+
+          <span data-bind="template: { name: 'common-properties-retry' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
