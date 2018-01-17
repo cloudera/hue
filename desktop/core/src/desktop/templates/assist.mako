@@ -1801,7 +1801,9 @@ from desktop.views import _ko
         self.HBaseLoaded = false;
 
         huePubSub.subscribeOnce('hbase.app.loaded', function() {
-          delayChangeHash(self.selectedHBaseEntry().definition.name + '/' + self.lastClickeHBaseEntry.definition.name);
+          if (self.selectedHBaseEntry() && self.lastClickeHBaseEntry) {
+            delayChangeHash(self.selectedHBaseEntry().definition.name + '/' + self.lastClickeHBaseEntry.definition.name);
+          }
           self.HBaseLoaded = true;
         });
 
