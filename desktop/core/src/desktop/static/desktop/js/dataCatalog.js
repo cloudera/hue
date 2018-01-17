@@ -45,6 +45,110 @@ var DataCatalog = (function () {
     });
   };
 
+  /**
+   *
+   * @param {object} options
+   * @param {string[string[]] options.paths
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @return {CancellablePromise}
+   */
+  DataCatalog.prototype.loadNavOptMetaForTables = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+    var cancellablePromises = [];
+    var entriesWithNavOptMeta = [];
+    var pathsToLoad = [];
+
+    var existingPromises = [];
+    options.paths.forEach(function (path) {
+      var existingDeferred = $.Deferred();
+      self.getEntry({ path: path }).done(function (tableEntry) {
+        if (tableEntry.navOptMetaForChildrenPromise) {
+          tableEntry.navOptMetaForChildrenPromise.done(function (existingNavOptMetaEntries) {
+            entriesWithNavOptMeta = entriesWithNavOptMeta.concat(existingNavOptMetaEntries);
+            existingDeferred.resolve();
+          }).fail(existingDeferred.reject);
+        } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
+          tableEntry.getChildren({silenceErrors: options.silenceErrors}).done(function (childEntries) {
+            childEntries.forEach(function (childEntry) {
+              if (childEntry.navOptMeta) {
+                entriesWithNavOptMeta.push(childEntry);
+              }
+            });
+            existingDeferred.resolve();
+          });
+        } else {
+          pathsToLoad.push(path);
+          existingDeferred.resolve();
+        }
+      }).fail(existingDeferred.reject);
+      existingPromises.push(existingDeferred.promise());
+    });
+
+    $.when.apply($, existingPromises).always(function () {
+      var loadDeferred = $.Deferred();
+      if (pathsToLoad.length) {
+        cancellablePromises.push(ApiHelper.getInstance().fetchNavOptMetadata({
+          silenceErrors: options.silenceErrors,
+          paths: pathsToLoad
+        }).done(function (data) {
+          var perTable = {};
+
+          var splitNavOptValuesPerTable = function (listName) {
+            if (data.values[listName]) {
+              data.values[listName].forEach(function (column) {
+                var tableMeta = perTable[column.dbName + '.' + column.tableName];
+                if (!tableMeta) {
+                  tableMeta = { values: [] };
+                  perTable[column.dbName + '.' + column.tableName] = tableMeta;
+                }
+                if (!tableMeta.values[listName]) {
+                  tableMeta.values[listName] = [];
+                }
+                tableMeta.values[listName].push(column);
+              });
+            }
+          };
+
+          if (data.values) {
+            splitNavOptValuesPerTable('filterColumns');
+            splitNavOptValuesPerTable('groupbyColumns');
+            splitNavOptValuesPerTable('joinColumns');
+            splitNavOptValuesPerTable('orderbyColumns');
+            splitNavOptValuesPerTable('selectColumns');
+          }
+
+          var tablePromises = [];
+
+          Object.keys(perTable).forEach(function (path) {
+            var tableDeferred = $.Deferred();
+            self.getEntry({ path: path }).done(function (entry) {
+              entry.navOptMetaForChildrenPromise = entry.applyNavOptResponseToChildren(perTable[path]).done(function (entries) {
+                entriesWithNavOptMeta = entriesWithNavOptMeta.concat(entries);
+                tableDeferred.resolve();
+              }).fail(tableDeferred.resolve);
+            }).fail(tableDeferred.reject);
+            tablePromises.push(tableDeferred.promise());
+          });
+
+          $.when.apply($, tablePromises).always(function () {
+            loadDeferred.resolve();
+          });
+        }).fail(loadDeferred.reject));
+      } else {
+        loadDeferred.resolve();
+      }
+      loadDeferred.always(function () {
+        $.when.apply($, cancellablePromises).done(function () {
+          deferred.resolve(entriesWithNavOptMeta);
+        }).fail(deferred.reject);
+      });
+    });
+
+    return new CancellablePromise(deferred.promise(), cancellablePromises);
+  };
+
   var mergeFromStoreEntry = function (dataCatalogEntry, storeEntry) {
     var mergeAttribute = function (attributeName, ttl, promiseName) {
       if (storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
@@ -71,7 +175,7 @@ var DataCatalog = (function () {
   DataCatalog.prototype.getEntry = function (options) {
     var self = this;
     var deferred = $.Deferred();
-    var identifier = typeof options.path === 'string' ? options.path : (typeof options.path === 'string' ? options.path : options.path.join('.'));
+    var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
     if (self.entries[identifier]) {
       deferred.resolve(self.entries[identifier]);
     } else {
@@ -225,14 +329,20 @@ var DataCatalog = (function () {
     self.getSourceMeta(apiOptions).done(function (sourceMeta) {
       var promises = [];
       var index = 0;
-      var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields;
+      var entities = sourceMeta.databases || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields || sourceMeta.columns;
       if (entities) {
         entities.forEach(function (entity) {
           promises.push(self.dataCatalog.getEntry({ path: self.path.concat(entity.name || entity) }).done(function (catalogEntry) {
             if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
               var definition = typeof entity === 'object' ? entity : {};
-              if (typeof entity !== 'object' && self.path.length === 0) {
-                definition.type = 'database';
+              if (typeof entity !== 'object') {
+                if (self.path.length === 0) {
+                  definition.type = 'database';
+                } else if (self.path.length === 1) {
+                  definition.type = 'table';
+                } else if (self.path.length === 2) {
+                  definition.type = 'column';
+                }
               }
               definition.index = index++;
               catalogEntry.definition = definition;
@@ -324,6 +434,60 @@ var DataCatalog = (function () {
     return self.navigatorMetaForChildrenPromise;
   };
 
+  DataCatalogEntry.prototype.applyNavOptResponseToChildren = function (response) {
+    var self = this;
+    var deferred = $.Deferred();
+    if (!self.definition) {
+      self.definition = {};
+    }
+    self.definition.navOptLoaded = true;
+    self.saveLater();
+
+    var entryIndex = {};
+    var entryPromises = [];
+    if (self.isDatabase() && response.top_tables) {
+      response.top_tables.forEach(function (topTable) {
+        var path =  self.path.concat(topTable.name.toLowerCase());
+        var entryPromise = self.dataCatalog.getEntry({ path: path }).done(function (entry) {
+          entryIndex[path.join('.')] = entry;
+          entry.navOptMeta = topTable;
+          entry.saveLater();
+        });
+        entryPromises.push(entryPromise);
+      });
+    } else if (self.isTableOrView() && response.values) {
+      var addNavOptMeta = function (columns, type) {
+        if (columns) {
+          columns.forEach(function (column) {
+            var path = self.path.concat(column.columnName.toLowerCase().split('.'));
+            var entryPromise = self.dataCatalog.getEntry({ path: path }).done(function (entry) {
+              entry.navOptMeta = entry.navOptMeta || {};
+              entry.navOptMeta[type] = column;
+              entry.saveLater();
+              entryIndex[path.join('.')] = entry;
+            });
+            entryPromises.push(entryPromise);
+          });
+        }
+      };
+
+      addNavOptMeta(response.values.filterColumns, 'filterColumn');
+      addNavOptMeta(response.values.groupbyColumns, 'groupByColumn');
+      addNavOptMeta(response.values.joinColumns, 'joinColumn');
+      addNavOptMeta(response.values.orderbyColumns, 'orderByColumn');
+      addNavOptMeta(response.values.selectColumns, 'selectColumn');
+    }
+    $.when.apply($, entryPromises).done(function () {
+      var entriesWithNavOptMeta = [];
+      Object.keys(entryIndex).forEach(function(path) {
+        entriesWithNavOptMeta.push(entryIndex[path]);
+      });
+      deferred.resolve(entriesWithNavOptMeta);
+    }).fail(deferred.reject);
+
+    return deferred.promise();
+  }
+
   /**
    * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.refreshCache]
@@ -345,31 +509,9 @@ var DataCatalog = (function () {
       cancellablePromises.push(ApiHelper.getInstance().fetchNavOptMetadata({
         silenceErrors: apiOptions && apiOptions.silenceErrors,
         refreshCache: apiOptions && apiOptions.refreshCache,
-        path: self.path
+        paths: [self.path]
       }).done(function (data) {
-        var entryPromises = [];
-        if (self.isDatabase() && data.top_tables) {
-          data.top_tables.forEach(function (topTable) {
-            var entryPromise = self.dataCatalog.getEntry({ path: self.path.concat(topTable.name.toLowerCase()) }).done(function (entry) {
-              entry.navOptMeta = topTable;
-              entry.saveLater();
-            });
-            entryPromises.push(entryPromise);
-            cancellablePromises.push(entryPromise);
-          });
-        } else if (self.isTableOrView() && data.values && data.values.selectColumns) {
-          data.values.selectColumns.forEach(function (selectColumn) {
-            var entryPromise = self.dataCatalog.getEntry({ path: self.path.concat(selectColumn.columnName.toLowerCase().split('.')) }).done(function (entry) {
-              entry.navOptMeta = selectColumn;
-              entry.saveLater();
-            });
-            entryPromises.push(entryPromise);
-            cancellablePromises.push(entryPromise);
-          })
-        }
-        $.when.apply($, entryPromises).done(function () {
-          deferred.resolve(Array.prototype.slice.call(arguments));
-        });
+        self.applyNavOptResponseToChildren(data).done(deferred.resolve).fail(deferred.reject);
       }).fail(deferred.reject));
     } else {
       deferred.resolve([]);
@@ -575,8 +717,14 @@ var DataCatalog = (function () {
 
   DataCatalogEntry.prototype.isArray = function () {
     var self = this;
-    return (self.definition && self.definition.type && self.definition.type.toLowerCase() === 'array') ||
-      (self.sourceMeta && self.sourceMeta.type && self.sourceMeta.type.toLowerCase() === 'array');
+    return (self.sourceMeta && /^array/i.test(self.sourceMeta.type)) ||
+      (self.definition && /^array/i.test(self.definition.type));
+  };
+
+  DataCatalogEntry.prototype.isMap = function () {
+    var self = this;
+    return (self.sourceMeta && /^map/i.test(self.sourceMeta.type)) ||
+      (self.definition && /^map/i.test(self.definition.type));
   };
 
   DataCatalogEntry.prototype.isMapValue = function () {
@@ -663,6 +811,7 @@ var DataCatalog = (function () {
   return {
     getEntry: function (options) {
       return getCatalog(options.sourceType).getEntry(options);
-    }
+    },
+    getCatalog : getCatalog
   };
 })();
