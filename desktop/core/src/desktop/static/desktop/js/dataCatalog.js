@@ -330,6 +330,13 @@ var DataCatalog = (function () {
     self.getSourceMeta(apiOptions).done(function (sourceMeta) {
       var promises = [];
       var index = 0;
+      var partitionKeys = {};
+      if (sourceMeta.partition_keys) {
+        sourceMeta.partition_keys.forEach(function (partitionKey) {
+          partitionKeys[partitionKey.name] = true;
+        })
+      }
+
       var entities = sourceMeta.databases
         || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields || sourceMeta.columns
         || (sourceMeta.value && sourceMeta.value.fields);
@@ -346,6 +353,9 @@ var DataCatalog = (function () {
                 } else if (self.path.length === 2) {
                   definition.type = 'column';
                 }
+              }
+              if (sourceMeta.partition_keys) {
+                definition.partitionKey = !!partitionKeys[entity.name];
               }
               definition.index = index++;
               catalogEntry.definition = definition;
@@ -693,6 +703,11 @@ var DataCatalog = (function () {
   DataCatalogEntry.prototype.isPrimaryKey = function () {
     var self = this;
     return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
+  };
+
+  DataCatalogEntry.prototype.isPartitionKey = function () {
+    var self = this;
+    return self.definition && !!self.definition.partitionKey;
   };
 
   DataCatalogEntry.prototype.isTable = function () {
