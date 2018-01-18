@@ -48,7 +48,7 @@ from desktop.views import _ko
         </div>
       </div>
       <!-- ko if: focusedEntry() && focusedEntry().details -->
-      <!-- ko template: { name: 'autocomplete-details-' + focusedEntry().category.detailsTemplate, data: focusedEntry } --><!-- /ko -->
+      <!-- ko template: { name: 'autocomplete-' + (focusedEntry().hasCatalogEntry ? 'catalog-details-' : 'details-') + focusedEntry().category.detailsTemplate, data: focusedEntry } --><!-- /ko -->
       <!-- /ko -->
     </div>
     <!-- /ko -->
@@ -58,6 +58,9 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-solr-field">
+  </script>
+
+  <script type="text/html" id="autocomplete-catalog-details-solr-field">
   </script>
 
   <script type="text/html" id="autocomplete-details-udf">
@@ -88,6 +91,9 @@ from desktop.views import _ko
   <script type="text/html" id="autocomplete-details-database">
   </script>
 
+  <script type="text/html" id="autocomplete-catalog-details-database">
+  </script>
+
   <script type="text/html" id="autocomplete-details-table">
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type.toLowerCase() !== 'table', 'fa-table': details.type.toLowerCase() === 'table' }"></i> <span data-bind="text: details.name"></span></div>
@@ -107,6 +113,9 @@ from desktop.views import _ko
         </div>
       </div>
     </div>
+  </script>
+
+  <script type="text/html" id="autocomplete-catalog-details-table">
   </script>
 
   <script type="text/html" id="autocomplete-details-column">
@@ -139,6 +148,9 @@ from desktop.views import _ko
       </div>
     </div>
     <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="autocomplete-catalog-details-column">
   </script>
 
   <script type="text/html" id="autocomplete-details-variable">
@@ -236,6 +248,9 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="autocomplete-catalog-details-group-by">
+  </script>
+
   <script type="text/html" id="autocomplete-details-order-by">
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular order by')}</div>
@@ -250,6 +265,9 @@ from desktop.views import _ko
         </div>
       </div>
     </div>
+  </script>
+
+  <script type="text/html" id="autocomplete-catalog-details-order-by">
   </script>
 
   <script type="text/html" id="autocomplete-details-filter">
