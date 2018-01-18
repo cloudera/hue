@@ -1355,7 +1355,8 @@ var Collection = function (vm, collection) {
   self.syncFields = function() {
     $.post("/dashboard/get_collection", {
         name: self.name(),
-        engine: self.engine()
+        engine: self.engine(),
+        source: self.source()
       }, function (data) {
         if (data.status == 0) {
           self.idField(data.collection.collection.idField);
@@ -2026,7 +2027,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, is_gr
           $(document).trigger("error", xhr.responseText);
           self.queryResult().status('failed');
         }).always(function () {
-          // self.isCanceling(false);
+          self.isCanceling(false);
         });
       });
     };
