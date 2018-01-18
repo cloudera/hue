@@ -64,7 +64,7 @@ var CancellablePromise = (function () {
       ApiHelper.getInstance().cancelActiveRequest(self.request);
     }
     if (self.otherCancellables) {
-      self.otherCancellables.forEach(function (cancellable) { cancellable.cancel() });
+      self.otherCancellables.forEach(function (cancellable) { if (cancellable.cancel) { cancellable.cancel() } });
     }
     return this;
   };
@@ -2106,19 +2106,21 @@ var ApiHelper = (function () {
     var self = this;
 
     var performFetch = function (data, hash) {
-      var queuedPromise = self.queueManager.getQueued(url, hash);
+      var promise = self.queueManager.getQueued(url, hash);
+      var firstInQueue = typeof promise === 'undefined';
+      if (firstInQueue) {
+        promise = $.Deferred();
+        self.queueManager.addToQueue(promise, url, hash);
+      }
 
-      if (queuedPromise) {
-        if (options.successCallback) {
-          queuedPromise.done(options.successCallback);
+      promise.done(options.successCallback).fail(self.assistErrorCallback(options)).always(function () {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
+          options.editor.hideSpinner();
         }
-        queuedPromise.fail(self.assistErrorCallback(options));
-        if (options.editor) {
-          queuedPromise.always(function () {
-            options.editor.hideSpinner();
-          })
-        }
-        return queuedPromise;
+      });
+
+      if (!firstInQueue) {
+        return;
       }
 
       var fetchFunction = function (storeInCache) {
@@ -2131,70 +2133,43 @@ var ApiHelper = (function () {
           type: 'post',
           url: url,
           data: data,
-          timeout: options.timeout || AUTOCOMPLETE_TIMEOUT
-        }).done(function (data) {
-          if (data.status === 0) {
-            if (cacheCondition(data)) {
-              storeInCache(data);
-            }
-            promise.resolve(data);
-          } else {
-            promise.reject(data);
-          }
+          timeout: options.timeout
         })
-        .fail(promise.reject);
+          .done(function (data) {
+            if (data.status === 0) {
+              if (cacheCondition(data)) {
+                storeInCache(data);
+              }
+              promise.resolve(data);
+            } else {
+              promise.reject(data);
+            }
+          })
+          .fail(promise.reject);
       };
 
-      var deferred = $.Deferred();
-
-      var request = fetchCached.bind(self)($.extend({}, options, {
+      return fetchCached.bind(self)($.extend({}, options, {
         url: url,
         hash: hash,
         cacheType: 'optimizer',
         fetchFunction: fetchFunction,
-        promise: deferred
+        promise: promise
       }));
+    }
 
-      var promise = new CancellablePromise(deferred.promise(), request);
-
-      self.queueManager.addToQueue(promise, url, hash);
-      return promise;
-    };
-
-    var deferred = $.Deferred();
-    var request;
-
-    if (options.tables && options.tables.identifierChain) {
+    var promise = $.Deferred();
+    if (options.tables) {
       self.createNavOptDbTablesJson(options).done(function (json) {
-        deferred.resolve(performFetch({
+        promise.resolve(performFetch({
           dbTables: json
         }, json.hashCode()))
       });
     } else if (options.database) {
-      request = performFetch({
+      promise.resolve(performFetch({
         database: options.database
-      }, options.database).done(deferred.resolve);
-      deferred.resolve();
-    } else if (options.path) {
-      var data, hash;
-      if (options.path.length === 1) {
-        data = {
-          database: options.path[0]
-        };
-        hash = data.database;
-      } else if (options.path.length === 2) {
-        data = {
-          dbTables: ko.mapping.toJSON([options.path.join('.')])
-        };
-        hash = data.dbTables.hashCode();
-      } else {
-        deferred.reject();
-        return deferred.promise();
-      }
-      request = performFetch(data, hash).done(deferred.resolve);
+      }, options.database));
     }
-
-    return new CancellablePromise(deferred.promise(), request);
+    return promise;
   };
 
   ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
