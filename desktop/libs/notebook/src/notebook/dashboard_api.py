@@ -640,7 +640,7 @@ class SQLDashboardApi(DashboardApi):
     nb_doc = Document2.objects.document(user=self.user, doc_id=name)
     notebook = Notebook(document=nb_doc).get_data()
     snippet = notebook['snippets'][0]
-    return snippet['statement']
+    return snippet['statement'].strip(';')
 
 
   def _convert_notebook_facet(self, result, facet, query):
