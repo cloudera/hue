@@ -733,13 +733,6 @@ var AutocompleteResults = (function () {
     } else if (typeof table.identifierChain !== 'undefined') {
       var addColumnsFromEntry = function (dataCatalogEntry) {
         self.cancellablePromises.push(dataCatalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
-          var partitionKeys = {};
-          if (sourceMeta.partition_keys) {
-            sourceMeta.partition_keys.forEach(function (partitionKey) {
-              partitionKeys[partitionKey.name] = true;
-            })
-          }
-
           self.cancellablePromises.push(dataCatalogEntry.getChildren({ silenceErrors: true })
             .done(function (childEntries) {
               childEntries.forEach(function (childEntry) {
@@ -758,7 +751,6 @@ var AutocompleteResults = (function () {
                     category: CATEGORIES.COLUMN,
                     popular: ko.observable(false),
                     weightAdjust: types[0].toUpperCase() !== 'T' && types.some(function (type) { return hueUtils.equalIgnoreCase(type, childEntry.getType()) }) ? 1 : 0,
-                    partitionKey: !!partitionKeys[childEntry.name],
                     hasCatalogEntry: true,
                     details: childEntry
                   });
@@ -1416,11 +1408,11 @@ var AutocompleteResults = (function () {
           });
           if (totalColumnCount > 0) {
             matchedSuggestions.forEach(function (matchedSuggestion) {
-              var relativePopularity = Math.round(100 * matchedSuggestion.details.navOptMeta[valueAttribute].columnCount / totalColumnCount);
-              if (relativePopularity >= 5) {
+              matchedSuggestion.relativePopularity = Math.round(100 * matchedSuggestion.details.navOptMeta[valueAttribute].columnCount / totalColumnCount);
+              if (matchedSuggestion.relativePopularity  >= 5) {
                 matchedSuggestion.popular(true);
               }
-              matchedSuggestion.weightAdjust = relativePopularity;
+              matchedSuggestion.weightAdjust = matchedSuggestion.relativePopularity ;
             });
           }
           popularColumnsDeferred.resolve();

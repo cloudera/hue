@@ -92,6 +92,15 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-catalog-details-database">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header">
+        <i class="fa fa-fw fa-database"></i> <span data-bind="text: details.getTitle()"></span>
+      </div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details } }">
+        </div>
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-table">
@@ -116,6 +125,18 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-catalog-details-table">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header">
+        <i class="fa fa-fw" data-bind="css: { 'fa-eye': details.isView(), 'fa-table': details.isTable() }"></i> <span data-bind="text: details.getTitle()"></span>
+        <!-- ko if: popular() && relativePopularity -->
+        <div class="autocompleter-header-popularity" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i></div>
+        <!-- /ko -->
+      </div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details } }">
+        </div>
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-column">
@@ -151,6 +172,18 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-catalog-details-column">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header">
+        <i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span>
+        <!-- ko if: popular() && relativePopularity -->
+        <div class="autocompleter-header-popularity" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i></div>
+        <!-- /ko -->
+      </div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details } }">
+        </div>
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-variable">
@@ -249,6 +282,12 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-catalog-details-group-by">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular group by')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details, showTitle: true } }"></div>
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-order-by">
@@ -268,6 +307,12 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-catalog-details-order-by">
+    <div class="autocompleter-details">
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular order by')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="autocompleter-details-contents-inner" data-bind="component: { name: 'dataCatalogMiniContext', params: { catalogEntry: details, showTitle: true } }"></div>
+      </div>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-filter">
@@ -609,6 +654,20 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="data-catalog-mini-context">
+    <!-- ko if: catalogEntry.isColumn() -->
+    <!-- ko ifnot: showTitle -->
+    <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: catalogEntry.path[0]"></span>.<span data-bind="text: catalogEntry.path[1]"></span></div>
+    <!-- /ko -->
+    <!-- ko if: showTitle -->
+    <div class="details-attribute" ><i class="fa fa-columns fa-fw"></i> <span data-bind="text: catalogEntry.getTitle()"></span></div>
+    <!-- /ko -->
+    <!-- ko if: catalogEntry.isPartitionKey() -->
+    <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Partition key') }</div>
+    <!-- /ko -->
+    <!-- ko if: catalogEntry.isPrimaryKey() -->
+    <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
+    <!-- /ko -->
+    <!-- /ko -->
     <!-- ko if: comment() -->
     <div class="details-comment" data-bind="html: comment"></div>
     <!-- /ko -->
@@ -619,21 +678,21 @@ from desktop.views import _ko
     <!-- /ko -->
   </script>
 
-
   <script type="text/javascript">
     (function () {
       function DataCatalogMiniContext (params) {
         var self = this;
-        var catalogEntry = params.catalogEntry;
+        self.catalogEntry = params.catalogEntry;
         self.filter = params.filter;
         self.comment = ko.observable();
         self.popularity = ko.observable();
+        self.showTitle = !!params.showTitle;
 
         // TODO: Load nav comment with 1 sec delay if not there
-        catalogEntry.getComment({ cacheOnly: true }).done(self.comment);
+        self.catalogEntry .getComment({ cacheOnly: true }).done(self.comment);
 
-        if (catalogEntry.navOptMeta && catalogEntry.navOptMeta.relativePopularity) {
-          self.popularity(catalogEntry.navOptMeta.relativePopularity);
+        if (self.catalogEntry .navOptMeta && self.catalogEntry .navOptMeta.relativePopularity) {
+          self.popularity(self.catalogEntry .navOptMeta.relativePopularity);
         }
       }
 
