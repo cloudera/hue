@@ -94,7 +94,7 @@ from django.utils.translation import ugettext as _
               silenceErrors: true,
               noCache: true
             }).done(function (data) {
-              fetchDeferral.resolve(data.entity);
+              fetchDeferral.resolve(data);
             }).fail(fetchDeferral.reject);
           });
           return fetchDeferral;

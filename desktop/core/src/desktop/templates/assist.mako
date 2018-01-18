@@ -84,7 +84,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="sql-context-items">
-    <!-- ko if: typeof definition !== 'undefined' -->
+    <!-- ko if: typeof catalogEntry !== 'undefined' -->
       <!-- ko if: sourceType === 'solr' -->
         <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
         <!-- ko if: catalogEntry.isTableOrView() -->
@@ -102,7 +102,7 @@ from desktop.views import _ko
         <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
         <!-- /ko -->
         % if not IS_EMBEDDED.get():
-        <!-- ko if: definition.isView || definition.isTable || definition.isDatabase -->
+        <!-- ko if: catalogEntry.path.length <=2 -->
         <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
         <!-- /ko -->
         % endif
