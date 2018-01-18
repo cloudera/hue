@@ -607,4 +607,40 @@ from desktop.views import _ko
       });
     })();
   </script>
+
+  <script type="text/html" id="data-catalog-mini-context">
+    <!-- ko if: comment() -->
+    <div class="details-comment" data-bind="html: comment"></div>
+    <!-- /ko -->
+    <!-- ko ifnot: comment() -->
+    <div class="details-no-comment">
+      ${ _('No description') }
+    </div>
+    <!-- /ko -->
+  </script>
+
+
+  <script type="text/javascript">
+    (function () {
+      function DataCatalogMiniContext (params) {
+        var self = this;
+        var catalogEntry = params.catalogEntry;
+        self.filter = params.filter;
+        self.comment = ko.observable();
+        self.popularity = ko.observable();
+
+        // TODO: Load nav comment with 1 sec delay if not there
+        catalogEntry.getComment({ cacheOnly: true }).done(self.comment);
+
+        if (catalogEntry.navOptMeta && catalogEntry.navOptMeta.relativePopularity) {
+          self.popularity(catalogEntry.navOptMeta.relativePopularity);
+        }
+      }
+
+      ko.components.register('dataCatalogMiniContext', {
+        viewModel: DataCatalogMiniContext,
+        template: { element: 'data-catalog-mini-context' }
+      });
+    })();
+  </script>
 </%def>
