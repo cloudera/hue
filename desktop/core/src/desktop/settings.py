@@ -384,6 +384,8 @@ TIME_ZONE = desktop.conf.TIME_ZONE.get()
 
 if desktop.conf.DEMO_ENABLED.get():
   AUTHENTICATION_BACKENDS = ('desktop.auth.backend.DemoBackend',)
+elif desktop.conf.IS_EMBEDDED.get():
+  AUTHENTICATION_BACKENDS = ('desktop.auth.backend.ImpersonationBackend',)
 else:
   AUTHENTICATION_BACKENDS = tuple(desktop.conf.AUTH.BACKEND.get())
 
