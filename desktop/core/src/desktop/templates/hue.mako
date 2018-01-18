@@ -1843,5 +1843,10 @@ ${ commonHeaderFooterComponents.footer(messages) }
 </div>
 % endif
 
+<div class="monospace-preload" style="opacity: 0">
+  ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
+  <b>Query. Explore. Repeat.</b>
+</div>
+
 </body>
 </html>
