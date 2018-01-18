@@ -1341,11 +1341,11 @@ var AutocompleteResults = (function () {
             tablesDeferred.done(function (tableSuggestions) {
               tableSuggestions.forEach(function (suggestion) {
                 if (popularityIndex[suggestion.details.name]) {
-                  var relativePopularity = Math.round(100 * suggestion.details.navOptMeta.popularity / totalPopularity);
-                  if (relativePopularity >= 5) {
+                  suggestion.relativePopularity = Math.round(100 * suggestion.details.navOptMeta.popularity / totalPopularity);
+                  if (suggestion.relativePopularity >= 5) {
                     suggestion.popular(true);
                   }
-                  suggestion.weightAdjust = relativePopularity;
+                  suggestion.weightAdjust = suggestion.relativePopularity;
                 }
               });
               popularTablesDeferred.resolve();
