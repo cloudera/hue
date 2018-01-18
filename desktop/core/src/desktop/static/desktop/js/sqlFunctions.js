@@ -3679,6 +3679,9 @@ var SqlFunctions = (function () {
     if (dialect !== 'hive') {
       dialect = 'impala';
     }
+    if (expectedTypes.length === 1 && expectedTypes[0] === 'T') {
+      return true;
+    }
     var actualTypes = stripPrecision(actualRawTypes);
     if (actualTypes.indexOf('ARRAY') !== -1 || actualTypes.indexOf('MAP') !== -1 || actualTypes.indexOf('STRUCT') !== -1) {
       return true;
