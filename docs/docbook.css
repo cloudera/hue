@@ -1,45 +1,45 @@
-
 /* ---------------------------------------------------------------------------
    Hue Docs styles
 --------------------------------------------------------------------------- */
 
+@import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono:300,400,500,700');
+
 body {
   background-color: #FFFFFF;
-  border-top: 3px solid #287DBD;
   padding: 30px;
-  font-family: 'Open Sans',sans-serif;
+  font-family: 'Roboto', sans-serif;
   color: #333333;
-  margin:0;
+  margin: 0;
   line-height: 1.1em;
 }
 
 hr {
-    border-color: #EEEEEE -moz-use-text-color #FFFFFF;
-    border-bottom: 1px solid #FFFFFF;
-    border-top: 1px solid #CCCCCC;
-    border-image: none;
-    border-left: 0 none;
-    border-right: 0 none;
-    margin: 20px 0;
+  border-color: #EEEEEE;
+  border-bottom: 1px solid #FFFFFF;
+  border-top: 1px solid #CCCCCC;
+  border-image: none;
+  border-left: 0 none;
+  border-right: 0 none;
+  margin: 20px 0;
 }
 
 .section {
-    border: 1px solid #EEEEEE;
-    box-shadow: none;
-    color: #333333;
-    margin-bottom: 20px;
-    margin-top: 15px;
-    padding: 20px;
-    padding-top: 5px;
-    position: relative;
+  border: 1px solid #EEEEEE;
+  box-shadow: none;
+  color: #333333;
+  margin-bottom: 20px;
+  margin-top: 15px;
+  padding: 20px;
+  padding-top: 5px;
+  position: relative;
 }
 
 .title, h1, .toc p, h2 {
-    color: #0B7FAD;
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    margin-top: 15px;
+  color: #0B7FAD;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  margin-top: 15px;
 }
 
 h2 {
@@ -53,12 +53,13 @@ h3 {
 }
 
 a:link, a:visited {
-    color: #0B7FAD;
-    text-decoration: none;
+  color: #0B7FAD;
+  text-decoration: none;
 }
+
 a:hover {
-    color: #3799CA;
-    text-decoration: underline;
+  color: #3799CA;
+  text-decoration: underline;
 }
 
 .table {
@@ -66,7 +67,7 @@ a:hover {
 }
 
 table {
-  border: none!important;
+  border: none !important;
 }
 
 table {
@@ -122,14 +123,14 @@ table {
   *border-collapse: collapse;
   border-left: 0;
   -webkit-border-radius: 2px;
-     -moz-border-radius: 2px;
-          border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
 }
 
 table th,
 table td {
   border-left: 1px solid #e5e5e5;
-  border-bottom: 1px solid #FFFFFF!important;
+  border-bottom: 1px solid #FFFFFF !important;
 }
 
 table caption + thead tr:first-child th,
@@ -148,7 +149,7 @@ table thead:first-child tr:first-child > th:first-child,
 table tbody:first-child tr:first-child > td:first-child,
 table tbody:first-child tr:first-child > th:first-child {
   -webkit-border-top-left-radius: 2px;
-          border-top-left-radius: 2px;
+  border-top-left-radius: 2px;
   -moz-border-radius-topleft: 2px;
 }
 
@@ -156,7 +157,7 @@ table thead:first-child tr:first-child > th:last-child,
 table tbody:first-child tr:first-child > td:last-child,
 table tbody:first-child tr:first-child > th:last-child {
   -webkit-border-top-right-radius: 2px;
-          border-top-right-radius: 2px;
+  border-top-right-radius: 2px;
   -moz-border-radius-topright: 2px;
 }
 
@@ -166,7 +167,7 @@ table tbody:last-child tr:last-child > th:first-child,
 table tfoot:last-child tr:last-child > td:first-child,
 table tfoot:last-child tr:last-child > th:first-child {
   -webkit-border-bottom-left-radius: 2px;
-          border-bottom-left-radius: 2px;
+  border-bottom-left-radius: 2px;
   -moz-border-radius-bottomleft: 2px;
 }
 
@@ -176,19 +177,19 @@ table tbody:last-child tr:last-child > th:last-child,
 table tfoot:last-child tr:last-child > td:last-child,
 table tfoot:last-child tr:last-child > th:last-child {
   -webkit-border-bottom-right-radius: 2px;
-          border-bottom-right-radius: 2px;
+  border-bottom-right-radius: 2px;
   -moz-border-radius-bottomright: 2px;
 }
 
 table tfoot + tbody:last-child tr:last-child td:first-child {
   -webkit-border-bottom-left-radius: 0;
-          border-bottom-left-radius: 0;
+  border-bottom-left-radius: 0;
   -moz-border-radius-bottomleft: 0;
 }
 
 table tfoot + tbody:last-child tr:last-child td:last-child {
   -webkit-border-bottom-right-radius: 0;
-          border-bottom-right-radius: 0;
+  border-bottom-right-radius: 0;
   -moz-border-radius-bottomright: 0;
 }
 
@@ -197,7 +198,7 @@ table caption + tbody tr:first-child td:first-child,
 table colgroup + thead tr:first-child th:first-child,
 table colgroup + tbody tr:first-child td:first-child {
   -webkit-border-top-left-radius: 2px;
-          border-top-left-radius: 2px;
+  border-top-left-radius: 2px;
   -moz-border-radius-topleft: 2px;
 }
 
@@ -206,7 +207,7 @@ table caption + tbody tr:first-child td:last-child,
 table colgroup + thead tr:first-child th:last-child,
 table colgroup + tbody tr:first-child td:last-child {
   -webkit-border-top-right-radius: 2px;
-          border-top-right-radius: 2px;
+  border-top-right-radius: 2px;
   -moz-border-radius-topright: 2px;
 }
 
@@ -223,12 +224,12 @@ table tbody tr:hover > th {
 code,
 pre {
   padding: 0 3px 2px;
-  font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+  font-family: 'Roboto Mono', Monaco, Menlo, Consolas, "Courier New", monospace;
   font-size: 11px;
   color: #444444;
   -webkit-border-radius: 3px;
-     -moz-border-radius: 3px;
-          border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
 }
 
 code {
@@ -253,8 +254,8 @@ pre {
   border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, 0.15);
   -webkit-border-radius: 2px;
-     -moz-border-radius: 2px;
-          border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
 }
 
 .toc .section {
@@ -265,13 +266,9 @@ pre {
   background-color: #F6F6F6;
   padding: 10px;
   position: fixed;
-  top: 100px;
   overflow-y: auto;
-  height: 100%;
-}
-
-.fixed2 {
-	position: fixed;
+  height: calc(100% - 95px);
+  width: 22%;
 }
 
 .note {
@@ -279,4 +276,13 @@ pre {
   border: 1px solid #fbeed5;
   border-left-width: 5px;
   padding: 10px;
+}
+
+.doc-title {
+  border-top: 3px solid #287DBD;
+  position: fixed;
+  background-color: #FFF;
+  z-index: 1000;
+  padding-left: 30px;
+  top: 0;
 }
