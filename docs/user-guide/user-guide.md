@@ -845,10 +845,25 @@ You can view and edit files as text or binary.
 
 ## Indexes / Collections
 
-## Sentry roles and privileges
+## Sentry Permissions
 
-[SQL](http://gethue.com/apache-sentry-made-easy-with-the-new-hue-security-app/) and
+Sentry roles and privileges can directly be edited in the Security interface.
+
+### SQL
+
+[Hive UI](http://gethue.com/apache-sentry-made-easy-with-the-new-hue-security-app/).
+
+### Solr
+
 [Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges can be edited directly via the interface. 
+
+For listing collections, query and creating collection:
+
+    Admin=*->action=*
+    Collection=*->action=*
+    Schema=*->action=*
+    Config=*->action=*
+
 
 ## Jobs
 
