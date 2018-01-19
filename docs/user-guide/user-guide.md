@@ -141,7 +141,7 @@ Files can be dragged & dropped, selected from HDFS or S3 (if configured), and th
 
 1.  In the Importer Manager selects 'Manually'
 2.  Follow the instructions in the wizard to create the table. The basic
-    steps are:    
+    steps are:
     -   Name the table.
     -   Choose the record format.
     -   Configure record serialization by specifying delimiters for
@@ -576,25 +576,25 @@ Make sure that the Notebook and interpreters are set in the hue.ini, and Livy is
 [spark]
   # Host address of the Livy Server.
   livy_server_host=localhost
- 
+
 [notebook]
- 
+
  ## Show the notebook menu or not
  show_notebooks=true
- 
+
 [[interpreters]]
     # Define the name and how to connect and execute the language.
- 
+
     [[[hive]]]
       # The name of the snippet.
       name=Hive
       # The backend connection to use to communicate with the server.
       interface=hiveserver2
-       
+
    [[[spark]]]
      name=Scala
      interface=livy
- 
+
     [[[pyspark]]]
       name=PySpark
       interface=livy
@@ -609,11 +609,33 @@ Dashboards are an interactive way to explore your data quickly and easily. No pr
 
 Read more about [Dashboards](http://gethue.com/search-dashboards/).
 
-## Interactive
+## Concepts
 
 Simply drag & drop widgets that are interconnected together. This is great for exploring new datasets or monitoring without having to type.
 
+### Importing
+
+Any CSV file can be dragged & dropped and ingested into an index in a few clicks via the Data Import Wizard [link]. The indexed data is immediately queryable and its facets/dimensions will be very fast to explore.
+
+### Browsing
+
+The Collection browser got polished in the last releases and provide more information on the columns. The left metadata assist of Hue 4 makes it handy to list them and peak at their content via the sample popup.
+
+### Querying
+
+The search box support live prefix filtering of field data and comes with a Solr syntax autocomplete in order to make the querying intuitive and quick. Any field can be inspected for its top values of statistic. This analysis happens very fast as the data is indexed.
+
+## Databases
+
 ### Solr
+
+#### Autocomplete
+
+The top search bar offers a [full autocomplete](http://gethue.com/intuitively-discovering-and-exploring-a-wine-dataset-with-the-dynamic-dashboards/) on all the values of the index.
+
+#### More Like This
+The “More like This” feature lets you selected fields you would like to use to find similar records. This is a great way to find similar issues, customers, people... with regard to a list of attributes.
+
 ### SQL
 
 ## Reports
@@ -646,7 +668,7 @@ Manager to perform the following operations:
     -   Browse table data and metadata (columns, partitions...)
     -   Import data into a table
     -   [Filter, Sort and Browse Partitions](http://gethue.com/filter-sort-browse-hive-partitions-with-hues-metastore/)
-    
+
 
 ## Files
 
@@ -694,7 +716,7 @@ Now that we have created external Hive tables created from our S3 data, we can j
 
 Learn more about it on the [ADLS integration post](http://gethue.com/browsing-adls-data-querying-it-with-sql-and-exporting-the-results-back-in-hue-4-2/).
 
- Users gets autocomplete capabilities and more: 
+ Users gets autocomplete capabilities and more:
 
 ** Exploring ADLS in Hue's file browser **
 Once Hue is successfully configured to connect to ADLS, we can view all accessible folders within the account by clicking on the ADLS root. From here, we can view the existing keys (both directories and files) and create, rename, move, copy, or delete existing directories and files. Additionally, we can directly upload files to ADLS.
@@ -817,7 +839,7 @@ can change a file's or directory's owner, group, or permissions.
 2.  Click the **Change Permissions** button.
 3.  In the **Change Permissions** dialog box, select the permissions you
     want to assign and then click **Submit**.
-    
+
 ### Viewing and Editing Files
 
 You can view and edit files as text or binary.
@@ -855,7 +877,7 @@ Sentry roles and privileges can directly be edited in the Security interface.
 
 ### Solr
 
-[Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges can be edited directly via the interface. 
+[Solr](http://gethue.com/ui-to-edit-sentry-privilege-of-solr-collections/) privileges can be edited directly via the interface.
 
 For listing collections, query and creating collection:
 
