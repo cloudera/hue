@@ -2,8 +2,15 @@
 <link rel="stylesheet" href="bootplus.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 <link rel="stylesheet" href="docbook.css" type="text/css" media="screen" title="no title" charset="utf-8"></link>
 
+<style>
+body {
+  padding: 75px 0 0 0 !important;
+}
+</style>
 
-<h1 class="fixed2"><a href=../index.html>Doc</a> > Hue User Guide</h1>
+<div class="row-fluid doc-title">
+  <h1><a href=../index.html>Doc</a> > Hue User Guide</h1>
+</div>
 
 
 <div class="row-fluid">
