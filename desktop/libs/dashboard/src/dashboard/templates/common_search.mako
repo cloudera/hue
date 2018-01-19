@@ -4230,8 +4230,12 @@ $(document).ready(function () {
     }
   });
 
+  huePubSub.subscribe('open.link', function(link) {
+    $(window).unbind("keydown.search");
+  });
+
   % if is_owner:
-  $(window).bind("keydown", "ctrl+s alt+s meta+s", function(e){
+  $(window).bind("keydown.search", "ctrl+s alt+s meta+s", function(e){
     e.preventDefault();
     if (searchViewModel.canSave()) {
       searchViewModel.save();
@@ -4241,13 +4245,13 @@ $(document).ready(function () {
     return false;
   });
   % endif
-  $(window).bind("keydown", "esc", function () {
+  $(window).bind("keydown.search", "esc", function () {
     if ($(".demi-modal.fade.in").length > 0) {
       $(".demi-modal.fade.in .demi-modal-chevron").click();
     }
   });
 
-  $("#newqname").bind("keydown", "return", function (e) {
+  $("#newqname").bind("keydown.search", "return", function (e) {
     e.preventDefault();
     searchViewModel.collection.addQDefinition();
   });

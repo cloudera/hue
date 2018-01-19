@@ -3415,21 +3415,38 @@ function togglePresentation(value) {};
         }
       }
 
-      $(window).bind("keydown", "ctrl+s alt+s meta+s", function (e) {
-        e.preventDefault();
-        saveKeyHandler();
-        return false;
+      huePubSub.subscribe('open.link', function(link) {
+        $(window).unbind("keydown.editor");
+        if (link.indexOf("editor") >= 0) {
+          initKeydownBindings();
+        }
       });
+
+      function initKeydownBindings() {
+        $(window).bind("keydown.editor", "ctrl+s alt+s meta+s", function (e) {
+          e.preventDefault();
+          saveKeyHandler();
+          return false;
+        });
+        $(window).bind("keydown.editor", "ctrl+shift+p alt+shift+p meta+shift+p", function (e) {
+          e.preventDefault();
+          huePubSub.publish('editor.presentation.toggle');
+          return false;
+        });
+        $(window).bind("keydown.editor", "ctrl+e alt+e meta+e", function (e) {
+          e.preventDefault();
+          newKeyHandler();
+          return false;
+        });
+      }
+
+      if (document.location.href.indexOf("editor") >= 0) {
+        initKeydownBindings();
+      }
 
       huePubSub.subscribe('editor.presentation.toggle', function () {
         viewModel.selectedNotebook().isPresentationMode(!viewModel.isPresentationMode());
       }, HUE_PUB_SUB_EDITOR_ID);
-
-      $(window).bind("keydown", "ctrl+shift+p alt+shift+p meta+shift+p", function (e) {
-        e.preventDefault();
-        huePubSub.publish('editor.presentation.toggle');
-        return false;
-      });
 
       huePubSub.subscribe('editor.save', saveKeyHandler, HUE_PUB_SUB_EDITOR_ID);
 
@@ -3456,12 +3473,6 @@ function togglePresentation(value) {};
           viewModel.newNotebook(viewModel.editorType(), null, viewModel.selectedNotebook() ? viewModel.selectedNotebook().snippets()[0].currentQueryTab() : null);
         }
       }
-
-      $(window).bind("keydown", "ctrl+e alt+e meta+e", function (e) {
-        e.preventDefault();
-        newKeyHandler();
-        return false;
-      });
 
       huePubSub.subscribe('editor.create.new', newKeyHandler, HUE_PUB_SUB_EDITOR_ID);
 
