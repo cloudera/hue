@@ -224,7 +224,7 @@ window.hueUtils = window.hueUtils || (function () {
   };
 
   hueUtils.changeURL = function (newURL) {
-    if (IS_EMBEDDED) {
+    if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
       newURL = window.location.pathname + window.location.search + '#!' + newURL.replace('/hue', '');
     } else {
       if (window.location.hash !== '' && newURL.indexOf('#') === -1){
@@ -239,7 +239,7 @@ window.hueUtils = window.hueUtils || (function () {
   };
 
   hueUtils.changeURLParameter = function (param, value) {
-    if (IS_EMBEDDED) {
+    if (typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) {
       var currentUrl = window.location.hash.replace('#!', '');
       var parts = currentUrl.split('?');
       var path = parts[0];

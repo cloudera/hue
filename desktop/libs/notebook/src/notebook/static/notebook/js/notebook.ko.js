@@ -2090,7 +2090,7 @@ var EditorViewModel = (function() {
     self.history = ko.observableArray(vm.selectedNotebook() && vm.selectedNotebook().history().length > 0 && vm.selectedNotebook().history()[0].type == self.type() ? vm.selectedNotebook().history() : []);
     self.history.subscribe(function(val) {
       if (self.id() == null && val.length == 0 && self.historyFilter() === '' && ! vm.isNotificationManager()) {
-        self.snippets()[0].currentQueryTab(IS_EMBEDDED ? 'queryHistory' : 'savedQueries');
+        self.snippets()[0].currentQueryTab((typeof IS_EMBEDDED !== 'undefined' && IS_EMBEDDED) ? 'queryHistory' : 'savedQueries');
       }
     });
     self.historyFilter = ko.observable('');
