@@ -818,7 +818,7 @@ var DataCatalog = (function () {
   DataCatalogEntry.prototype.getType = function () {
     var self = this;
     var type = self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
-    if (~type.indexOf('<')) {
+    if (type.indexOf('<') !== -1) {
       type = type.substring(0, type.indexOf('<'));
     }
     return type;
