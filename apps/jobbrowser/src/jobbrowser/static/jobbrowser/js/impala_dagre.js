@@ -33,7 +33,7 @@ function impalaDagre(id) {
 
   // Set of colours to use, with the same colour used for every node in the same plan
   // fragment.
-  var colours = ["#A9A9A9", "#FF8C00", "#8A2BE2", "#A52A2A", "#00008B", "#006400",
+  var colours = ["#A0A0A0", "#E99F01", "#7B46AD", "#A60115", "#00008B", "#006400",
                  "#228B22", "#4B0082", "#DAA520", "#008B8B", "#000000", "#DC143C"];
 
   // Shades of red in order of intensity, used for colouring nodes by time taken
