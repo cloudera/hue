@@ -1167,7 +1167,7 @@ var EditorViewModel = (function() {
       } else if (data.status == -3) { // Statement expired
         self.status('expired');
         if (data.message) {
-          self.errors.push({message: data.message, line: null, col: null});
+          self.errors.push({message: data.message, help: null, line: null, col: null});
           huePubSub.publish('editor.snippet.result.normal', self);
         }
       } else if (data.status == -4) { // Operation timed out
