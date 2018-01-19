@@ -644,6 +644,56 @@ var DataCatalog = (function () {
     return deferred.promise();
   };
 
+  DataCatalogEntry.prototype.addNavMetaTags = function (tags) {
+    var self = this;
+    var deferred = $.Deferred();
+    if (HAS_NAVIGATOR) {
+      self.getNavigatorMeta().done(function (navMeta) {
+        if (navMeta && typeof navMeta.identity !== 'undefined') {
+        ApiHelper.getInstance().addNavTags(navMeta.identity, tags).done(function (response) {
+          if (response && response.entity) {
+            self.navigatorMeta = response.entity;
+            self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+          } else {
+            deferred.reject();
+          }
+          deferred.resolve(self.navigatorMeta);
+        });
+        } else {
+          deferred.reject();
+        }
+      }).fail(deferred.reject);
+    } else {
+      deferred.reject();
+    }
+    return deferred.promise();
+  };
+
+  DataCatalogEntry.prototype.deleteNavMetaTags = function (tags) {
+    var self = this;
+    var deferred = $.Deferred();
+    if (HAS_NAVIGATOR) {
+      self.getNavigatorMeta().done(function (navMeta) {
+        if (navMeta && typeof navMeta.identity !== 'undefined') {
+          ApiHelper.getInstance().deleteNavTags(navMeta.identity, tags).done(function (response) {
+            if (response && response.entity) {
+              self.navigatorMeta = response.entity;
+              self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+            } else {
+              deferred.reject();
+            }
+            deferred.resolve(self.navigatorMeta);
+          });
+        } else {
+          deferred.reject();
+        }
+      }).fail(deferred.reject);
+    } else {
+      deferred.reject();
+    }
+    return deferred.promise();
+  };
+
   DataCatalogEntry.prototype.hasPossibleChildren = function () {
     var self = this;
     return (!self.definition && !self.sourceMeta) ||
