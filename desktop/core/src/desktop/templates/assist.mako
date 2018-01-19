@@ -2942,6 +2942,10 @@ from desktop.views import _ko
             }).done(function (collectionCatalogEntry) {
               var collectionEntry = new AssistDbEntry(collectionCatalogEntry, assistFakeDb, assistDbSource, self.filter, i18n, navigationSettings);
               self.activeTables([collectionEntry]);
+
+              if (!collectionEntry.loaded && !collectionEntry.hasErrors() && !collectionEntry.loading()) {
+                collectionEntry.loadEntries(function() { collectionEntry.toggleOpen(); });
+              }
             });
           });
 
@@ -2963,10 +2967,6 @@ from desktop.views import _ko
             });
             return result;
           };
-
-          if (!collectionEntry.loaded && !collectionEntry.hasErrors() && !collectionEntry.loading()) {
-            collectionEntry.loadEntries(function() { collectionEntry.toggleOpen(); });
-          }
         });
 
         self.disposals.push(function () {
