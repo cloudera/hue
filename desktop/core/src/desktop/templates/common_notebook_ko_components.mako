@@ -516,34 +516,171 @@ except ImportError, e:
 
 <%def name="aceKeyboardShortcuts()">
   <script type="text/html" id="ace-keyboard-shortcuts-template">
-    <div class="editor-help">
-      <input class="clearable pull-right margin-right-5" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
-      <!-- ko if: activeCategory() &&  activeCategory().filteredShortcuts().length === 0 -->
-        <em>${ _('No matches found for your search.') }</em>
-      <!-- /ko -->
-      <ul class="nav nav-pills" data-bind="foreach: categories">
-        <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }, visible: filteredShortcuts().length > 0"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
-      </ul>
-      <div class="tab-content" data-bind="with: activeCategory">
-        <div class="tab-pane active">
-          <!-- ko if: filteredShortcuts().length > 0 -->
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>${ _('Windows/Linux')}</th>
-                <th>${ _('Mac')}</th>
-                <th>${ _('Action')}</th>
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: filteredShortcuts">
-              <tr>
-                <td data-bind="text: shortcut"></td>
-                <td data-bind="text: macShortcut"></td>
-                <td data-bind="text: description"></td>
-              </tr>
-            </tbody>
-          </table>
+    <div class="editor-help two-pane">
+      <div class="two-pane-left">
+        <ul class="nav nav-list">
+          <li class="active">
+            <a href="#help-editor-syntax" data-bind="click: function(){ $('a[href=\'#help-editor-syntax\']').tab('show'); }">
+            ${ _('Syntax')}
+            </a>
+          </li>
+          <li>
+            <a href="#help-editor-shortcut" data-bind="click: function(){ $('a[href=\'#help-editor-shortcut\']').tab('show'); }">
+            ${ _('Keyboard Shortcuts')}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane" id="help-editor-shortcut">
+          <input class="clearable pull-right margin-right-5" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          <!-- ko if: activeCategory() &&  activeCategory().filteredShortcuts().length === 0 -->
+            <em>${ _('No matches found for your search.') }</em>
           <!-- /ko -->
+          <ul class="nav nav-pills" data-bind="foreach: categories">
+            <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }, visible: filteredShortcuts().length > 0"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
+          </ul>
+          <div class="tab-content" data-bind="with: activeCategory">
+            <div class="tab-pane active">
+              <!-- ko if: filteredShortcuts().length > 0 -->
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>${ _('Windows/Linux')}</th>
+                    <th>${ _('Mac')}</th>
+                    <th>${ _('Action')}</th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: filteredShortcuts">
+                  <tr>
+                    <td data-bind="text: shortcut"></td>
+                    <td data-bind="text: macShortcut"></td>
+                    <td data-bind="text: description"></td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- /ko -->
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane active" id="help-editor-syntax">
+          <ul class="nav nav-pills">
+           <li class="active">
+              <a href="#help-editor-syntax-comment" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-comment\']').tab('show'); }">
+                ${ _('Comments')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-click" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-click\']').tab('show'); }">
+                ${ _('Click')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-multiquery" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-multiquery\']').tab('show'); }">
+                ${ _('Multi Query')}
+              </a>
+            </li>
+            <li>
+              <a href="#help-editor-syntax-variable" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-variable\']').tab('show'); }">
+                ${ _('Variables')}
+              </a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="help-editor-syntax-comment">
+              <div>${ _('A comment is text that is not executed. It can be of two types:')}</div>
+              <ul class="nav help-list-spacing">
+                <li>
+                <b>${ _('Single Line')}</b>
+                <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                  value: ko.observable('${ _('-- Comment')}'),
+                  lines: 1,
+                  mode: 'impala' }
+                }" style="width: calc(100% - 5px);"></div>
+                </li>
+                <li>
+                <b>${ _('Multi Line')}</b>
+                <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                  value: ko.observable('${ _('/* Multi Line\\n  Comment */')}'),
+                  lines: 2,
+                  mode: 'impala' }
+                }" style="width: calc(100% - 5px);"></div>
+                </li>
+              </ul>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-click">
+              <ul class="nav help-list-spacing">
+                <li>
+                  <b>${ _('Double Click')}</b>
+                  <div>${ _('Double clicking the row number selects all rows.')}</div>
+                </li>
+                <li>
+                  <b>${ _('Drag & Drop')}</b>
+                  <div>${ _('Dragging and dropping a table name from the assistant onto the editor inserts sample queries in the editor.')}</div>
+                </li>
+                <li>
+                  <b>${ _('Right Click')}</b>
+                  <div>${ _('Right clicking on an element of a query will bring up the appropriate browser for that element.')}</div>
+                  <div>${ _('Items that are right clickable highlight when mousing over them.')}</div>
+                  <div>${ _('e.g.: column names, table names, *')}</div>
+                </li>
+                <li>
+                  <b>${ _('Single Click')}</b>
+                  <div>${ _('Single clicking the row number selects the whole row.')}</div>
+                </li>
+              </ul>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-multiquery">
+              <div>${ _('Multiple queries can be embedded in a single editor and separated via semicolon.')}</div>
+              <div>${ _('The cursor points to the query that will be executed.')}</div>
+              <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                  value: ko.observable('${ _('select * from customers;\\nselect * from web_logs;')}'),
+                  lines: 2,
+                  mode: 'impala' }
+                }" style="width: calc(100% - 5px);"></div>
+            </div>
+            <div class="tab-pane" id="help-editor-syntax-variable">
+              <ul class="nav help-list-spacing">
+                <div>${ _('Variables are used to easily configure parameters in a query. They can be of two types:')}</div>
+                <li>
+                  <b>${ _('Single Valued')}</b>
+                  <div>${ _('${variable_name=variable_value}')}</div>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where bytes = ${bytes}')}'),
+                    lines: 1,
+                    mode: 'impala' }
+                  }" style="width: calc(100% - 5px);"></div>
+                  <div>${ _('The variable_value is optional.')}</div>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where bytes = ${bytes=search}')}'),
+                    lines: 1,
+                    mode: 'impala' }
+                  }" style="width: calc(100% - 5px);"></div>
+                  <div>${ _('A string should be wrapped in quotes.')}</pre>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where app = "${app=search}"')}'),
+                    lines: 1,
+                    mode: 'impala' }
+                  }" style="width: calc(100% - 5px);"></div>
+                </li>
+                <li>
+                  <b>${ _('Multi Valued')}</b>
+                  <div>${ _('${variable_name=variable_value1(variable_text1), variable_value2(variable_text2),...}')}</div>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where app = "${app=search, metastore(meta), hbase}"')}'),
+                    lines: 1,
+                    mode: 'impala' }
+                  }" style="width: calc(100% - 5px);"></div>
+                  <div>${ _('The variable_text is optional.')}</div>
+                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
+                    value: ko.observable('${ _('select * from web_logs where app = "${app=search(solr), metastore(meta)}"')}'),
+                    lines: 1,
+                    mode: 'impala' }
+                  }" style="width: calc(100% - 5px);"></div>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>

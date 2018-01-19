@@ -314,6 +314,24 @@
     border: none;
   }
 
+  .two-pane {
+    .display-flex();
+
+    .tab-content {
+      .flex(1);
+    }
+  }
+
+  .two-pane-left {
+    .flex(0 0 150px);
+    border-right: 1px solid @cui-gray-100;
+    margin-right: 10px;
+  }
+
+  .help-list-spacing li {
+    margin-top: 10px;
+  }
+
   .empty-title {
     font-weight: normal;
   }

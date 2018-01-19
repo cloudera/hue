@@ -25,15 +25,18 @@ from desktop.views import _ko
 <%def name="simpleAceEditor()">
 
   <script type="text/html" id="hue-simple-ace-editor-template">
-    <!-- ko if: singleLine -->
     <div class="simple-ace-single-line">
       <div class="ace-clearable" data-bind="css: { 'visible': value() !== '' }, click: clear"><i class="fa fa-times-circle"></i></div>
       <div class="ace-editor"></div>
     </div>
+    <!-- ko if: autocompleter !== null -->
+    <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace, autocompleter: autocompleter } } --><!-- /ko -->
     <!-- /ko -->
-    <!-- ko ifnot: singleLine -->
-    <div class="ace-editor"></div>
-    <!-- /ko -->
+  </script>
+  <script type="text/html" id="hue-simple-ace-editor-multi-template">
+    <div class="simple-ace-multi-line">
+      <div class="ace-editor"></div>
+    </div>
     <!-- ko if: autocompleter !== null -->
     <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace, autocompleter: autocompleter } } --><!-- /ko -->
     <!-- /ko -->
@@ -832,6 +835,10 @@ from desktop.views import _ko
             printMargin: false,
             showGutter: false
           });
+        } else {
+          aceOptions = $.extend(aceOptions, {
+            maxLines: params.lines || 2
+          });
         }
 
         if (params.autocomplete) {
@@ -982,6 +989,7 @@ from desktop.views import _ko
         })
       };
 
+      // Ace requires that the child to clone is first child, so we need separate components for single line & multi line
       ko.components.register('hue-simple-ace-editor', {
         viewModel: {
           createViewModel: function(params, componentInfo) {
@@ -989,6 +997,14 @@ from desktop.views import _ko
           }
         },
         template: {element: 'hue-simple-ace-editor-template'}
+      });
+      ko.components.register('hue-simple-ace-editor-multi', {
+        viewModel: {
+          createViewModel: function(params, componentInfo) {
+            return new SimpleAceEditor(params, componentInfo.element);
+          }
+        },
+        template: {element: 'hue-simple-ace-editor-multi-template'}
       });
     })();
   </script>
