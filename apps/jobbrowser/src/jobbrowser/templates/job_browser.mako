@@ -1000,9 +1000,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- ko if: id() -->
     <div data-bind="css: {'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
-        <ul class="nav nav-list data-list">
+        <ul class="nav nav-list">
           <!-- ko if: doc_url -->
-          <li class="nav-header data-header">${ _('Id') }</li>
+          <li class="nav-header">${ _('Id') }</li>
           <li>
             <a data-bind="attr: {href: doc_url}" target="_blank" title="${ _('Open in impalad') }">
               <span data-bind="text: id"></span>
@@ -1010,25 +1010,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </li>
           <!-- /ko -->
           <!-- ko ifnot: doc_url -->
-          <li class="nav-header data-header">${ _('Id') }</li>
+          <li class="nav-header">${ _('Id') }</li>
           <li class="break-word"><span data-bind="text: id"></span></li>
           <!-- /ko -->
-          <li class="nav-header data-header">${ _('Status') }</li>
+          <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
-          <li class="nav-header data-header">${ _('User') }</li>
+          <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
-          <li class="nav-header data-header">${ _('Progress') }</li>
+          <li class="nav-header">${ _('Progress') }</li>
           <li>
           <span data-bind="text: progress"></span>%
           </li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: calc(100% - 72px); margin-left: 72px" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header data-header">${ _('Duration') }</li>
+          <li class="nav-header">${ _('Duration') }</li>
           <li><span data-bind="text: duration() && duration().toHHMMSS()"></span></li>
-          <li class="nav-header data-header">${ _('Submitted') }</li>
+          <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
         </ul>
       </div>
