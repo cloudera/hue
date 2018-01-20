@@ -22,7 +22,7 @@ import sys
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.lib.conf import Config, validate_thrift_transport, coerce_bool
-from desktop.lib.exceptions import StructuredThriftTransportException
+
 
 LOG = logging.getLogger(__name__)
 
@@ -44,10 +44,9 @@ TRUNCATE_LIMIT = Config(
 
 THRIFT_TRANSPORT = Config(
   key="thrift_transport",
-  default="buffered",
-  help=_t("'buffered' is the default of the HBase Thrift Server and supports security. " +
-       "'framed' can be used to chunk up responses, " +
-       "which is useful when used in conjunction with the nonblocking server in Thrift."),
+  default="framed",
+  help=_t("'framed' is used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
+       "'buffered' used to be the default of the HBase Thrift Server."),
   type=str
 )
 
