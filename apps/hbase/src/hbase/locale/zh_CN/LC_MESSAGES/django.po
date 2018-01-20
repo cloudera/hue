@@ -125,7 +125,7 @@ msgstr "主页"
 
 #: src/hbase/templates/app.mako:141
 msgid "Switch Cluster"
-msgstr "交换机集群"
+msgstr "切换集群"
 
 #: src/hbase/templates/app.mako:160
 msgid "Search for Table Name"
