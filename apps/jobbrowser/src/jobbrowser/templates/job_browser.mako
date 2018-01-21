@@ -775,10 +775,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Duration') }</li>
+          <!-- ko if: !$root.isMini() -->
+          <li class="nav-header">${ _('Open Duration') }</li>
           <li><span data-bind="text: duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="text: submitted"></span></li>
+          <!-- /ko -->
         </ul>
       </div>
     </div>
@@ -811,10 +813,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
+          <!-- ko if: !$root.isMini() -->
           <li class="nav-header">${ _('Duration') }</li>
           <li><span data-bind="text: duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="text: submitted"></span></li>
+          <!-- /ko -->
         </ul>
       </div>
     </div>
@@ -1026,10 +1030,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Duration') }</li>
+          <!-- ko if: !$root.isMini() -->
+          <li class="nav-header">${ _('Open Duration') }</li>
           <li><span data-bind="text: duration() && duration().toHHMMSS()"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
+          <!-- /ko -->
         </ul>
       </div>
     </div>
@@ -1931,7 +1937,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle', 'QUERY'].indexOf(self.type()) != -1;
       });
       self.killEnabled = ko.pureComputed(function() {
-        //Impala can kill queries that are finished, but not yet terminated
+        // Impala can kill queries that are finished, but not yet terminated
         return self.hasKill() && self.canWrite() && (vm.interface() === 'queries' || (self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED'));
       });
 
@@ -2062,7 +2068,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             }
             vm.resetBreadcrumbs(crumbs);
-            //show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
+            // Show is still bound to old job, setTimeout allows knockout model change event done at begining of this method to sends it's notification
             setTimeout(function () {
               if (vm.job().type() === 'queries' && !$("#queries-page-plan${ SUFFIX }").parent().children().hasClass("active")) {
                 $("a[href=\'#queries-page-plan${ SUFFIX }\']").tab("show");
