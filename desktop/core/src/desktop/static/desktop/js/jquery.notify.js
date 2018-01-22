@@ -48,7 +48,7 @@
     var _this = this;
     var MARGIN = 4;
 
-    _this.options.message = $.trim($("<span>").text(_this.options.message).html()); // escape HTML messages
+    _this.options.message = _this.options.message.replace(/(<([^>]+)>)/ig, ''); // escape HTML messages
 
     if (_this.options.message !== '' && $(".jHueNotify .message").last().text() !== _this.options.message) {
 
