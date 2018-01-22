@@ -2104,6 +2104,7 @@ var EditorViewModel = (function() {
       }
     });
     self.loadingHistory = ko.observable(self.history().length == 0);
+    self.historyInitialHeight = ko.observable(0);
     self.historyCurrentPage = ko.observable(vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1);
     self.historyCurrentPage.subscribe(function(val) {
       self.fetchHistory();
@@ -2715,6 +2716,7 @@ var EditorViewModel = (function() {
       }
       if (vm.editorMode() && self.history().length == 0) {
         self.fetchHistory(function() {
+          self.historyInitialHeight((self.history().length * 32) + 80); // add pagination too
           self.updateHistory(['starting', 'running'], 30000);
           self.updateHistory(['available'], 60000 * 5);
         });
