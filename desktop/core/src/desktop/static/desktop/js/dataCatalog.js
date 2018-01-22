@@ -38,7 +38,7 @@ var DataCatalog = (function () {
 
   DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
     var self = this;
-    self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
+    return self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
       version: DATA_CATALOG_VERSION,
       definition: dataCatalogEntry.definition,
       sourceMeta: dataCatalogEntry.sourceMeta,
@@ -211,7 +211,7 @@ var DataCatalog = (function () {
 
   var fetchMeta = function (apiHelperFunction, dataCatalogEntry, apiOptions) {
     return ApiHelper.getInstance()[apiHelperFunction]({
-      sourceType: dataCatalogEntry.dataCatalog.sourceType,
+      sourceType: dataCatalogEntry.getSourceType(),
       path: dataCatalogEntry.path,
       silenceErrors: apiOptions && apiOptions.silenceErrors
     }).done(function () {
@@ -246,7 +246,7 @@ var DataCatalog = (function () {
    * @return {CancellablePromise}
    */
   var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
-    if (HAS_NAVIGATOR && (dataCatalogEntry.dataCatalog.sourceType === 'hive' || dataCatalogEntry.dataCatalog.sourceType === 'impala')) {
+    if (HAS_NAVIGATOR && (dataCatalogEntry.getSourceType() === 'hive' || dataCatalogEntry.getSourceType() === 'impala')) {
       dataCatalogEntry.navigatorMetaPromise = fetchMeta('fetchNavigatorMetadata', dataCatalogEntry, apiOptions);
       dataCatalogEntry.navigatorMetaPromise.done(function (navigatorMeta) {
         dataCatalogEntry.navigatorMeta = navigatorMeta;
@@ -307,11 +307,44 @@ var DataCatalog = (function () {
     self.saveTimeout = -1;
   }
 
+  DataCatalogEntry.prototype.clear = function () {
+    var self = this;
+    var deferred = $.Deferred();
+
+    self.sourceMetaPromise = undefined;
+    self.sourceMeta = undefined;
+
+    self.navigatorMeta = undefined;
+    self.navigatorMetaPromise = undefined;
+
+    self.samplePromise = undefined;
+    self.sample = undefined;
+
+    self.navOptMeta = undefined;
+
+    self.navigatorMetaForChildrenPromise = undefined;
+    self.navOptMetaForChildrenPromise = undefined;
+
+    self.childrenPromise = undefined;
+
+    self.save().then(deferred.resolve).catch(deferred.reject);
+
+    deferred.always(function () {
+      huePubSub.publish('data.catalog.entry.refreshed', self);
+    });
+    return deferred.promise();
+  };
+
+  DataCatalogEntry.prototype.save = function () {
+    var self = this;
+    return self.dataCatalog.updateStore(self);
+  };
+
   DataCatalogEntry.prototype.saveLater = function () {
     var self = this;
     window.clearTimeout(self.saveTimeout);
     self.saveTimeout = window.setTimeout(function () {
-      self.dataCatalog.updateStore(self);
+      self.save();
     }, 1000);
   };
 
@@ -367,7 +400,7 @@ var DataCatalog = (function () {
           }));
         });
       }
-      if (self.dataCatalog.sourceType === 'impala' && self.isComplex()) {
+      if (self.getSourceType() === 'impala' && self.isComplex()) {
         (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
           if (sourceMeta[path]) {
             promises.push(self.dataCatalog.getEntry({ path: self.path.concat(path) }).done(function (catalogEntry) {
@@ -399,7 +432,7 @@ var DataCatalog = (function () {
   DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function (apiOptions) {
     var self = this;
 
-    if (self.dataCatalog.sourceType !== 'hive' && self.dataCatalog.sourceType !== 'impala') {
+    if (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala') {
       return $.Deferred().reject().promise();
     }
 
@@ -461,7 +494,7 @@ var DataCatalog = (function () {
     self.saveLater();
 
 
-    var childPromise = self.getChildren({ silenceErrors: options.silenceErrors }).done(function (childEntries) {
+    var childPromise = self.getChildren({ silenceErrors: options && options.silenceErrors }).done(function (childEntries) {
       var entriesByName = {};
       childEntries.forEach(function (childEntry) {
         entriesByName[childEntry.name.toLowerCase()] = childEntry;
@@ -519,7 +552,7 @@ var DataCatalog = (function () {
    */
   DataCatalogEntry.prototype.loadNavOptMetaForChildren = function (options) {
     var self = this;
-    if (self.dataCatalog.sourceType !== 'hive' && self.dataCatalog.sourceType !== 'impala') {
+    if (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala') {
       return $.Deferred().reject().promise();
     }
     if (self.navOptMetaForChildrenPromise && (!options || !options.refreshCache)) {
@@ -548,7 +581,7 @@ var DataCatalog = (function () {
 
   DataCatalogEntry.prototype.getKnownComment = function () {
     var self = this;
-    if (self.navigatorMeta && (self.dataCatalog.sourceType === 'hive' || self.dataCatalog.sourceType === 'impala')) {
+    if (self.navigatorMeta && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
       return self.navigatorMeta.description || self.navigatorMeta.originalDescription || ''
     }
     return self.sourceMeta && self.sourceMeta.comment || '';
@@ -577,7 +610,7 @@ var DataCatalog = (function () {
       }
     };
 
-    if (HAS_NAVIGATOR && (self.dataCatalog.sourceType === 'hive' || self.dataCatalog.sourceType === 'impala')) {
+    if (HAS_NAVIGATOR && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
       if (self.navigatorMeta) {
         deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
       } else {
@@ -609,7 +642,7 @@ var DataCatalog = (function () {
     var self = this;
     var deferred = $.Deferred();
 
-    if (HAS_NAVIGATOR && (self.dataCatalog.sourceType === 'hive' || self.dataCatalog.sourceType === 'impala')) {
+    if (HAS_NAVIGATOR && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
       self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
         if (navigatorMeta) {
           ApiHelper.getInstance().updateNavigatorMetadata({
@@ -629,7 +662,7 @@ var DataCatalog = (function () {
       }).fail(deferred.reject);
     } else {
       ApiHelper.getInstance().updateSourceMetadata({
-        sourceType: self.dataCatalog.sourceType,
+        sourceType: self.getSourceType(),
         path: self.path,
         properties: {
           comment: comment
@@ -699,14 +732,25 @@ var DataCatalog = (function () {
 
   DataCatalogEntry.prototype.hasPossibleChildren = function () {
     var self = this;
-    return (!self.definition && !self.sourceMeta) ||
-      (self.sourceMeta && /^(?:database|table|view|struct|array|map)/i.test(self.sourceMeta.type)) ||
-      (self.definition && /^(?:database|table|view|struct|array|map)/i.test(self.definition.type));
+    return (self.path.length < 2) ||
+      (!self.definition && !self.sourceMeta) ||
+      (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type)) ||
+      (self.definition && /^(?:struct|array|map)/i.test(self.definition.type));
   };
 
   DataCatalogEntry.prototype.getIndex = function () {
     var self = this;
     return self.definition && self.definition.index ? self.definition.index : 0;
+  };
+
+  DataCatalogEntry.prototype.getSourceType = function () {
+    var self = this;
+    return self.dataCatalog.sourceType;
+  }
+
+  DataCatalogEntry.prototype.isSource = function () {
+    var self = this;
+    return self.path.length === 0;
   };
 
   DataCatalogEntry.prototype.isDatabase = function () {
@@ -854,7 +898,7 @@ var DataCatalog = (function () {
    */
   DataCatalogEntry.prototype.getNavigatorMeta = function (options) {
     var self = this;
-    if (self.dataCatalog.sourceType !== 'hive' && self.dataCatalog.sourceType !== 'impala') {
+    if (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala') {
       return $.Deferred().reject().promise();
     }
     if (options && options.cachedOnly) {
@@ -930,6 +974,22 @@ var DataCatalog = (function () {
     });
     return deferred.promise();
   };
+
+  huePubSub.subscribe('data.catalog.refresh.entry', function (options) {
+    if (options.catalogEntry) {
+      if (options.invalidate && options.catalogEntry.getSourceType() === 'impala') {
+        huePubSub.publish('assist.invalidate.on.refresh'); // TODO: Replace with invalidate call as no need for pubsub
+      }
+      options.catalogEntry.clear();
+    } else if (options.sourceType && options.path) {
+      if (options.invalidate && options.sourceType === 'impala') {
+        huePubSub.publish('assist.invalidate.on.refresh'); // TODO: Replace with invalidate call as no need for pubsub
+      }
+      getCatalog(options.sourceType).getEntry({ path: options.path }).done(function (entry) {
+        entry.clear()
+      })
+    }
+  });
 
   return {
     getEntry: function (options) {
