@@ -27,8 +27,8 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="user-search-autocomp-no-match">
-   <div>
-     <div>${ _('No match found') }</div>
+   <div class="no-match">
+     <span>${ _('No match found') }</span>
    </div>
  </script>
 
@@ -40,7 +40,7 @@ from django.utils.translation import ugettext as _
     <h2 class="modal-title">${_('Sharing settings')}</h2>
   </div>
   <div class="modal-body" style="overflow-y: visible; height: 240px">
-    <div class="row-fluid">
+    <div class="row-fluid" data-bind="niceScroll" style="max-height: 114px">
       <div class="span6">
         <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
         <div data-bind="visible: (selectedDoc().perms.read.users.length == 0 && selectedDoc().perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
@@ -65,9 +65,9 @@ from django.utils.translation import ugettext as _
     <div class="clearfix"></div>
     <div style="margin-top: 20px">
       <div class="input-append">
-      <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match',valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', limitWidthToInput: true, minWidth: 160, onEnter: handleTypeaheadSelection }, clearable: { value: searchInput }, textInput: searchInput" class="ui-autocomplete-input" autocomplete="off" style="width: 460px">
+      <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: source, itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match',valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: handleTypeaheadSelection }, clearable: { value: searchInput }, textInput: searchInput" class="ui-autocomplete-input" autocomplete="off" style="width: 460px">
         <div class="btn-group">
-          <a id="documentShareAddBtn" class="btn"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPermLabel"></span></a>
+          <a id="documentShareAddBtn" class="btn"><span data-bind="text: selectedPermLabel"></span></a>
           <a id="documentShareCaret" class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </a>

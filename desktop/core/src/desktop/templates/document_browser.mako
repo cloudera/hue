@@ -34,7 +34,7 @@ from desktop.views import _ko
       <i class="fa fa-fw"></i><span class="drag-text">4 entries</span>
     </div>
 
-    <div id="shareDocumentModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
+    <div id="shareDocumentModal"  class="modal hide fade">
       <!-- ko with: activeEntry -->
       <!-- ko with: selectedEntry -->
       <!-- ko with: document -->
@@ -42,15 +42,15 @@ from desktop.views import _ko
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Sharing')} - <span data-bind="text: $parent.definition().name"></span></h2>
       </div>
-      <div class="modal-body" style="overflow-y: visible; height: 240px">
+      <div class="modal-body" style="overflow: visible; height: 240px">
         <!-- ko with: definition -->
-        <div class="row-fluid" data-bind="visible: !$parent.hasErrors()">
+        <div class="row-fluid" data-bind="niceScroll: {'autohidemode': 'hidden'}, visible: !$parent.hasErrors()" style="max-height: 114px" id="scrolldiv">
           <div class="span6">
             <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
             <div data-bind="visible: (perms.read.users.length == 0 && perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.read.users">
               <li>
-                <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{ 'notpretty': prettyName === '' }, attr:{ 'data-id': id }"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
             <ul class="unstyled airy" data-bind="foreach: perms.read.groups">
@@ -65,7 +65,7 @@ from desktop.views import _ko
             <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${_('The document is not shared for modify.')}</div>
             <ul class="unstyled airy" data-bind="foreach: perms.write.users">
               <li>
-                <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{'notpretty': prettyName == ''}, attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
+                <span class="badge badge-info badge-left" data-bind="css: { 'badge-left' : $parents[1].fileEntry.canModify() }"><i class="fa fa-user"></i> <span data-bind="text: $parents[1].prettifyUsernameById(id), attr:{'data-id': id}"></span></span><span class="badge badge-right trash-share" data-bind="visible: $parents[1].fileEntry.canModify(), click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
               </li>
             </ul>
             <ul class="unstyled airy" data-bind="foreach: perms.write.groups">
@@ -84,13 +84,16 @@ from desktop.views import _ko
         </div>
         <div style="margin-top: 20px" data-bind="visible: fileEntry.canModify() && ! hasErrors() && ! loading()">
           <div class="input-append">
-            <input id="documentShareTypeahead" type="text" style="width: 420px" placeholder="${_('Type a username or a group name')}">
+             <div id="menu" style="z-index: 9999"></div>
+              <input id="userSearchAutocomp" placeholder="${_('Type a username or a group name')}" type="text" data-bind="autocomplete: { source: autocompleteSource.bind($data), itemTemplate: 'user-search-autocomp-item', noMatchTemplate: 'user-search-autocomp-no-match', valueObservable: searchInput, showSpinner: true, classPrefix: 'hue-', onEnter: onAutocompleteEnter.bind($data), appendTo: $('#menu') }, clearable: { value: searchInput, textInput: searchInput }" class="ui-autocomplete-input" autocomplete="off" style="width: 420px">
             <div class="btn-group" style="overflow:visible">
-              <a class="btn btn-primary" data-bind="click: function () { if (selectedUserOrGroup()) { handleTypeAheadSelection() }}, css: { 'disabled': !selectedUserOrGroup() }"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
-              <a class="btn btn-primary dropdown-toggle" data-bind="css: { 'disabled': !selectedUserOrGroup() }" data-toggle="dropdown"><span class="caret"></span></a>
+              <a id="documentShareAddBtn" class="btn" data-bind="click: function () {  onEnter.bind($data) }"><span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
+              <a id="documentShareCaret" class="btn dropdown-toggle" data-toggle="dropdown">
+               <span class="caret"></span>
+              </a>
               <ul class="dropdown-menu">
-                <li><a data-bind="click: function () { selectedPerm('read'); handleTypeAheadSelection() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Read') }</a></li>
-                <li><a data-bind="click: function () { selectedPerm('write'); handleTypeAheadSelection() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Modify') }</a></li>
+                <li><a data-bind="click: function () { selectedPerm('read'); onEnter.bind($data) }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Read') }</a></li>
+                <li><a data-bind="click: function () { selectedPerm('write'); onEnter.bind($data) }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Modify') }</a></li>
               </ul>
             </div>
           </div>

@@ -606,16 +606,28 @@ ul.errorlist {
 
 .hue-autocomplete {
   border-radius: @hue-panel-border-radius;
+  max-height: 162px;
+  z-index: 9999 !important;
 }
 
 .hue-autocomplete-item {
   a {
-    height: 40px;
-    padding-left: 20px !important;
-    padding-top: 10px !important;
+    display: block;
+    clear: both;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 20px;
+    color: @cui-gray-800;
+    white-space: nowrap;
+    padding: 6px 20px !important;
     span{
       font-size: 15px;
-      font-weight: bold;
     }
   }
+  div.no-match {
+    width: 200px;
+    height: 25px;
+    font-size : 15px
+  }
 }
+

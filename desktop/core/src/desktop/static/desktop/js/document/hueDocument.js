@@ -32,93 +32,86 @@ var HueDocument = (function() {
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
     self.hasErrors = ko.observable(false);
-
+    self.searchInput = ko.observable();
     self.selectedUserOrGroup = ko.observable();
     self.selectedPerm = ko.observable('read');
 
-    self.availableUsersAndGroups = {};
+
+    self.userMap = {};
+    self.idToUserMap = {};
+    self.groupMap = {};
+    self.items = [];
   };
 
-  HueDocument.prototype.initUserTypeahead = function (callback) {
+  HueDocument.prototype.onAutocompleteEnter = function () {
     var self = this;
-    $.getJSON('/desktop/api/users/autocomplete', function (data) {
-      self.availableUsersAndGroups = data;
-      self.prettifyUserNames(self.availableUsersAndGroups.users);
-      var dropdown = [];
-      var usermap = {};
-      var groupmap = {};
 
-      $.each(self.availableUsersAndGroups.users, function (i, user) {
-        usermap[user.prettyName] = user;
-        dropdown.push(user.prettyName);
-      });
-
-      $.each(self.availableUsersAndGroups.groups, function (i, group) {
-        groupmap[group.name] = group;
-        dropdown.push(group.name);
-      });
-
-      $("#documentShareTypeahead").typeahead({
-        source: function (query, process) {
-          process(dropdown);
-        },
-        matcher: function (item) {
-          if (item.toLowerCase() === this.query.trim().toLowerCase()) {
-            self.selectedUserOrGroup(usermap[item] ? usermap[item] : groupmap[item]);
-            return true;
-          } else if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
-            self.selectedUserOrGroup(undefined);
-            return true;
-          }
-        },
-        sorter: function (items) {
-          return items.sort();
-        },
-        highlighter: function (item) {
-          var _icon = "fa";
-          if (usermap[item]) {
-            _icon += " fa-user";
-          }
-          else {
-            _icon += " fa-users";
-          }
-          var regex = new RegExp('(' + this.query + ')', 'gi');
-          return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
-        },
-        updater: function (item) {
-          self.selectedUserOrGroup(usermap[item] ? usermap[item] : groupmap[item]);
-          return item;
-        }
-      });
-
-      $("#documentShareTypeahead").on("keyup", function (e) {
-        var _code = (e.keyCode ? e.keyCode : e.which);
-        if (_code == 13) {
-          self.handleTypeAheadSelection();
-        }
-      });
-
-      if (typeof id == "function"){
-        id();
-      }
-      callback();
-    }).fail(function (response) {
-      $(document).trigger("error", "There was an error processing your action: " + response.responseText);
-    });
-  };
-
-  HueDocument.prototype.handleTypeAheadSelection = function () {
-    var self = this;
-    if (self.selectedUserOrGroup()) {
-      if (typeof self.selectedUserOrGroup().username !== 'undefined') {
-        self.definition().perms[self.selectedPerm()].users.push(self.selectedUserOrGroup());
+    searchAutoCompInput = $("#userSearchAutocomp").val();
+    selectedUserOrGroup = self.userMap[searchAutoCompInput] ? self.userMap[searchAutoCompInput] : self.groupMap[searchAutoCompInput];
+    if (selectedUserOrGroup != null) {
+      if (typeof selectedUserOrGroup.username !== 'undefined') {
+        self.definition().perms[self.selectedPerm()].users.push(selectedUserOrGroup);
       } else {
-        self.definition().perms[self.selectedPerm()].groups.push(self.selectedUserOrGroup());
+        self.definition().perms[self.selectedPerm()].groups.push(selectedUserOrGroup);
       }
       self.persistPerms();
     }
-    self.selectedUserOrGroup(null);
-    $("#documentShareTypeahead").val("");
+    $("#userSearchAutocomp").val("");
+
+  };
+
+
+
+  HueDocument.prototype.autocompleteSource = function(request, callback) {
+    var self = this;
+
+    var highLight = function (label, replacement) {
+      return label.split(request.term).join("<strong>" + request.term + "</strong>");
+    }
+
+    var successCallback = function (data) {
+      var JSON_USERS_GROUPS = data;
+      self.items = [];
+      $.each(JSON_USERS_GROUPS.users, function (i, user) {
+        var label = prettifyUsername(user);
+        var highLightedLabel = highLight(label, request.term);
+        self.userMap[label] = user;
+        self.items.push({
+          data: {
+            "icon": "fa fa-user",
+            "label": highLightedLabel
+          },
+          value: label
+        });
+        self.idToUserMap[user.id] = user;
+      });
+      $.each(JSON_USERS_GROUPS.groups, function (i, group) {
+        self.groupMap[group.name] = group;
+        var highLightedLabel = highLight(group.name, request.term);
+        self.items.push({
+          data: {
+            "icon": "fa fa-users",
+            "label": highLightedLabel
+          },
+          value: group.name
+        });
+      });
+
+      if(self.items.length == 0){
+       self.items.push({
+         'noMatch': true
+       });
+      }
+
+      callback(self.items);
+
+      }
+
+    self.apiHelper.fetchUsersAndGroups({
+      data: {filter: request.term},
+      successCallback: successCallback,
+      errorCallback: errorCallback
+    });
   };
 
   HueDocument.prototype.persistPerms = function () {
@@ -159,13 +152,33 @@ var HueDocument = (function() {
     self.loading(true);
     self.hasErrors(false);
 
+    var fetchDocumentsSuccessCallback = function (data) {
+      readusers = data.document.perms.read.users.map(function(user){return user.id});
+      writeusers = data.document.perms.write.users.map(function(user){return user.id});
+      allusers = readusers.concat(writeusers);
+      if (allusers.length > 0) {
+        var successCallback = function (response) {
+          $.each(response.users, function (i, user) {
+            // Needed for getting prettyusername of already shared users
+            self.idToUserMap[user.id] = user;
+          });
+          self.definition(data.document);
+        };
+        self.apiHelper.fetchUsersByIds({
+          userids: JSON.stringify(allusers),
+          successCallback: successCallback,
+          errorCallback: errorCallback
+        });
+      } else {
+        self.definition(data.document);
+      }
+    }
+
     var fetchFunction = function () {
       self.apiHelper.fetchDocument({
         uuid: self.fileEntry.definition().uuid
       }).done(function (data) {
-        self.prettifyUserNames(data.document.perms.write.users);
-        self.prettifyUserNames(data.document.perms.read.users);
-        self.definition(data.document);
+        fetchDocumentsSuccessCallback(data);
         self.loading(false);
         self.loaded(true);
       }).fail(function () {
@@ -175,24 +188,29 @@ var HueDocument = (function() {
       })
     };
 
-    self.initUserTypeahead(fetchFunction);
+    fetchFunction();
   };
 
-  HueDocument.prototype.prettifyUserNames = function (users) {
-    $.each(users, function (idx, user) {
-      user.prettyName = '';
-      if (user.first_name) {
-        user.prettyName += user.first_name + ' ';
-      }
-      if (user.last_name) {
-        user.prettyName += user.last_name + ' ';
-      }
-      if (user.prettyName) {
-        user.prettyName += '(' + user.username + ')';
-      } else {
-        user.prettyName += user.username;
-      }
-    });
+
+  HueDocument.prototype.prettifyUsernameById = function (id) {
+    var self = this
+    return self.prettifyUserName(self.idToUserMap[id]);
+  }
+
+  HueDocument.prototype.prettifyUserName = function (user) {
+    user.prettyName = '';
+    if (user.first_name) {
+      user.prettyName += user.first_name + ' ';
+    }
+    if (user.last_name) {
+      user.prettyName += user.last_name + ' ';
+    }
+    if (user.prettyName) {
+      user.prettyName += '(' + user.username + ')';
+    } else {
+      user.prettyName += user.username;
+    }
+    return user.prettyName;
   };
 
   HueDocument.prototype.removeFromPerms = function (perms, id) {

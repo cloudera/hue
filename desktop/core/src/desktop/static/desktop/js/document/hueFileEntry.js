@@ -394,8 +394,10 @@ var HueFileEntry = (function () {
       entry.selected(true);
     }
     if (self.selectedEntry()) {
+      $('#ascrail2006').css({'display': 'none'})
       self.selectedEntry().loadDocument();
       $('#shareDocumentModal').modal('show');
+
     }
   };
 
