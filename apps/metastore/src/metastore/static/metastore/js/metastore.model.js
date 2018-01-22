@@ -133,7 +133,12 @@ var MetastoreDatabase = (function () {
 
   MetastoreDatabase.prototype.setTableByName = function (tableName) {
     var self = this;
-    var foundTables = $.grep(self.tables(), function (metastoreTable) {
+
+    if (self.table() && self.table().catalogEntry.name === tableName) {
+      return;
+    }
+
+    var foundTables = self.tables().filter(function (metastoreTable) {
       return metastoreTable.catalogEntry.name === tableName;
     });
 
@@ -407,7 +412,7 @@ var MetastoreTable = (function () {
       self.apiHelper.refreshTableStats({
         tableName: self.catalogEntry.name,
         databaseName: self.database.catalogEntry.name,
-        sourceType: self.catalogEntry.dataCatalog.sourceType,
+        sourceType: self.catalogEntry.getSourceType(),
         successCallback: function () {
           self.fetchDetails();
         },
@@ -443,7 +448,7 @@ var MetastoreTable = (function () {
 
       // TODO: Move to DataCatalogEntry
       self.apiHelper.fetchTableDetails({
-        sourceType: self.catalogEntry.dataCatalog.sourceType,
+        sourceType: self.catalogEntry.getSourceType(),
         databaseName: self.database.catalogEntry.name,
         tableName: self.catalogEntry.name,
         successCallback: function (data) {
@@ -573,6 +578,7 @@ var MetastoreTable = (function () {
     }
     self.loading(true);
     self.fetchFields();
+    self.refreshTableStats();
     self.fetchDetails();
     huePubSub.publish('metastore.loaded.table');
   };
@@ -590,7 +596,7 @@ var MetastoreTable = (function () {
         identifierChain: [{ name: entry.catalogEntry.name }]
       },
       orientation: orientation || 'right',
-      sourceType: entry.catalogEntry.dataCatalog.sourceType,
+      sourceType: entry.catalogEntry.getSourceType(),
       defaultDatabase: entry.database.catalogEntry.name,
       source: {
         element: event.target,
@@ -656,7 +662,7 @@ var MetastoreColumn = (function () {
         identifierChain: [{ name: entry.table.catalogEntry.name }, { name: entry.catalogEntry.name }]
       },
       orientation: 'right',
-      sourceType: entry.catalogEntry.dataCatalog.sourceType,
+      sourceType: entry.catalogEntry.getSourceType(),
       defaultDatabase: entry.table.database.catalogEntry.name,
       source: {
         element: event.target,
