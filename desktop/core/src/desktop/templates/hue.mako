@@ -1755,16 +1755,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     $('.page-content').jHueScrollUp();
 
-    window.hueDebug = {
-      viewModel: function (element) {
-        if (typeof element !== 'undefined' && typeof element === 'string') {
-          element = $(element)[0];
-        }
-        return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
-      },
-      onePageViewModel: onePageViewModel,
-      sidePanelViewModel: sidePanelViewModel,
-      topNavViewModel: topNavViewModel
+    if (typeof window.hueDebug === 'undefined') {
+      window.hueDebug = {};
+    }
+
+    window.hueDebug.onePageViewModel = onePageViewModel;
+    window.hueDebug.sidePanelViewModel = sidePanelViewModel;
+    window.hueDebug.topNavViewModel = topNavViewModel;
+    window.hueDebug.viewModel = function (element) {
+      if (typeof element !== 'undefined' && typeof element === 'string') {
+        element = $(element)[0];
+      }
+      return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
     };
 
     var tour = new Shepherd.Tour({
