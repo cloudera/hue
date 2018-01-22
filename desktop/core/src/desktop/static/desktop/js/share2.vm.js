@@ -137,15 +137,16 @@ function setupSharing(id, updateFunc) {
 function source(request, callback) {
 
   var successCallback = function (data) {
-    JSON_USERS_GROUPS = data;
+    var JSON_USERS_GROUPS = data;
     shareViewModel.items = [];
     $.each(JSON_USERS_GROUPS.users, function (i, user) {
       var label = prettifyUsername(user);
+      var highLightedLabel = hueUtils.highlight(label, request.term);
       shareViewModel.userMap[label] = user;
       shareViewModel.items.push({
         data: {
           "icon": "fa fa-user",
-          "label": label
+          "label": highLightedLabel
         },
         value: label
       });
@@ -153,19 +154,20 @@ function source(request, callback) {
     });
     $.each(JSON_USERS_GROUPS.groups, function (i, group) {
       shareViewModel.groupMap[group.name] = group;
+      var highLightedLabel = hueUtils.highlight(group.name, request.term);
       shareViewModel.items.push({
         data: {
           "icon": "fa fa-users",
-          "label": group.name
+          "label": highLightedLabel
         },
         value: group.name
       });
     });
 
     if(shareViewModel.items.length == 0){
-     shareViewModel.items.push({
-       'noMatch': true
-     });
+      shareViewModel.items.push({
+        'noMatch': true
+      });
     }
 
     callback(shareViewModel.items);
@@ -263,7 +265,7 @@ function shareDocFinal() {
         $(document).trigger("error", "There was an error processing your action: " + response.message);
       }
       else {
-        shareViewModel.updateDoc(response.doc);
+        shareViewModel.setDocUuid(shareViewModel.docUuid);
       }
     }
   }).fail(function (response) {

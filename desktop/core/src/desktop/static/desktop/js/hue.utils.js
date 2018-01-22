@@ -442,6 +442,28 @@ window.hueUtils = window.hueUtils || (function () {
     }
   };
 
+  hueUtils.highlight = function (text, searchTerm) {
+    if(searchTerm === '' || text === '') return text;
+
+    var remText = text;
+    var highLightedText = '';
+    searchTerm = searchTerm.toLowerCase();
+
+    do {
+      var remLowerText = remText.toLowerCase();
+      var startIndex = remLowerText.indexOf(searchTerm);
+      if(startIndex >= 0) {
+        highLightedText += remText.substring(0, startIndex) + '<strong>' + remText.substring(startIndex, startIndex + searchTerm.length) + '</strong>';
+        remText = remText.substring(startIndex + searchTerm.length);
+      } else {
+         highLightedText += remText;
+      }
+
+    } while (startIndex >= 0);
+
+    return highLightedText;
+  };
+
   return hueUtils;
 
 })();
