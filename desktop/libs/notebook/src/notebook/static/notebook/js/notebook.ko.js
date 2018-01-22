@@ -3170,6 +3170,7 @@ var EditorViewModel = (function() {
     };
 
     self.openNotebook = function (uuid, queryTab, skipUrlChange, callback) {
+      var deferredOpen = new $.Deferred();
       $.get('/desktop/api2/doc/', {
         uuid: uuid,
         data: true,
@@ -3200,12 +3201,15 @@ var EditorViewModel = (function() {
           if (typeof callback !== 'undefined'){
             callback();
           }
+          deferredOpen.resolve();
         }
         else {
           $(document).trigger("error", data.message);
+          deferredOpen.reject();
           self.newNotebook();
         }
       });
+      return deferredOpen.promise();
     };
 
     self.newNotebook = function (editorType, callback, queryTab) {
