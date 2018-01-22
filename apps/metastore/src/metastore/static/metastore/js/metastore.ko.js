@@ -76,47 +76,66 @@ var MetastoreViewModel = (function () {
 
     self.loadDatabases();
 
-    self.refresh = function () {
-      if (self.sourceType() === 'impala') {
-        huePubSub.publish('assist.invalidate.on.refresh');
-      }
-      huePubSub.publish('assist.db.refresh', { sourceTypes: [ self.sourceType() ] });
-    };
+    huePubSub.subscribe('data.catalog.entry.refreshed', function (refreshedEntry) {
 
-    huePubSub.subscribe('assist.db.refresh', function (options) {
-      if (typeof options.sourceTypes !== 'undefined' && options.sourceTypes.indexOf('hive') === -1 && options.sourceTypes.indexOf('impala') === -1 ) {
+      if (refreshedEntry.getSourceType() !== self.sourceType()) {
         return;
       }
-      self.reloading(true);
-      huePubSub.publish('assist.clear.db.cache', {
-        sourceType: 'hive',
-        clearAll: true
-      });
-      huePubSub.publish('assist.clear.db.cache', {
-        sourceType: 'impala',
-        clearAll: true
-      });
-      var currentDatabase = null;
-      var currentTable = null;
+
+      var prevDbName = null;
+      var prevTableName = null;
       if (self.database()) {
-        currentDatabase = self.database().catalogEntry.name;
+        prevDbName = self.database().catalogEntry.name;
         if (self.database().table()) {
-          currentTable = self.database().table().catalogEntry.name;
-          self.database().table(null);
+          prevTableName = self.database().table().catalogEntry.name;
         }
-        self.database(null);
       }
-      self.loadDatabases.done(function () {
-        if (currentDatabase) {
-          self.setDatabaseByName(currentDatabase, function () {
-            if (self.database() && currentTable) {
-              self.database().setTableByName(currentTable);
+
+      var setPrevious = function () {
+        if (prevDbName) {
+          self.setDatabaseByName(prevDbName, function () {
+            if (self.database() && prevTableName) {
+              self.database().setTableByName(prevTableName);
             }
           });
         }
-      }).always(function () {
-        self.reloading(false);
-      });
+      };
+
+      var completeRefresh = function () {
+        self.reloading(true);
+        if (self.database() && self.database().table()) {
+          self.database().table(null);
+        }
+        if (self.database()) {
+          self.database(null);
+        }
+        self.loadDatabases().done(setPrevious).always(function () {
+          self.reloading(false);
+        });
+      };
+
+      if (refreshedEntry.isSource()) {
+        completeRefresh();
+      } else if (refreshedEntry.isDatabase()) {
+        self.databases().some(function (database) {
+          if (database.catalogEntry === refreshedEntry) {
+            database.load(setPrevious, self.optimizerEnabled(), self.navigatorEnabled());
+            return true;
+          }
+        })
+      } else if (refreshedEntry.isTable()) {
+        self.databases().some(function (database) {
+          if (database.catalogEntry.name === refreshedEntry.path[0]) {
+            database.tables().some(function (table) {
+              if (table.catalogEntry.name === refreshedEntry.name) {
+                table.load();
+                return true;
+              }
+            });
+            return true;
+          }
+        })
+      }
     });
 
     huePubSub.subscribe("assist.table.selected", function (tableDef) {

@@ -282,9 +282,8 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-table-properties">
-  <i data-bind="visible: loadingDetails" class="fa fa-spinner fa-spin fa-2x muted" style="display: none;"></i>
   <!-- ko with: tableDetails -->
-  <h4>${ _('Properties') }</h4>
+  <h4>${ _('Properties') } <i data-bind="visible: $parent.loadingDetails()" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
   <div class="row-fluid">
     <div title="${ _('Type') }">
       <!-- ko if: is_view -->
@@ -609,7 +608,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceTypes: [sourceType()] }); }">
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, publish: { 'data.catalog.refresh.entry': { invalidate: true, sourceType: sourceType(), path: [] }}">
       <i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i>
     </a>
     % if has_write_access:
@@ -626,7 +625,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-tables-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: refresh" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, publish: { 'data.catalog.refresh.entry': { invalidate: true, catalogEntry: database().catalogEntry } }" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     % if has_write_access:
       % if is_embeddable:
         <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().catalogEntry.name ); }" title="${_('Create a new table')}" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
@@ -654,7 +653,7 @@ ${ components.menubar(is_embeddable) }
     % else:
       <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/'+ catalogEntry.path.join('/') + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i></a>
     % endif
-    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceTypes: [$root.sourceType()] }); }" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, publish: { 'data.catalog.refresh.entry': { invalidate: true, catalogEntry: catalogEntry } }" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     % if has_write_access:
       <a class="inactive-action" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i></a>
     % endif
@@ -1414,7 +1413,7 @@ ${ components.menubar(is_embeddable) }
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
       if (location.getParameter('refresh') === 'true') {
-        huePubSub.publish('assist.db.refresh', { sourceTypes: [viewModel.sourceType()] });
+        huePubSub.publish('data.catalog.refresh.entry', { sourceType: viewModel.sourceType(), path: [] });
         hueUtils.replaceURL('?');
       }
 
