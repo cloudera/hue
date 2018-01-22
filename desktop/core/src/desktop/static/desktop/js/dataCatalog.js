@@ -16,6 +16,8 @@
 
 var DataCatalog = (function () {
 
+  var DATA_CATALOG_VERSION = 1;
+
   /**
    * @param {String} sourceType
    * @constructor
@@ -37,6 +39,7 @@ var DataCatalog = (function () {
   DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
     var self = this;
     self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
+      version: DATA_CATALOG_VERSION,
       definition: dataCatalogEntry.definition,
       sourceMeta: dataCatalogEntry.sourceMeta,
       sample: dataCatalogEntry.sample,
@@ -152,7 +155,7 @@ var DataCatalog = (function () {
 
   var mergeFromStoreEntry = function (dataCatalogEntry, storeEntry) {
     var mergeAttribute = function (attributeName, ttl, promiseName) {
-      if (storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
+      if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
         dataCatalogEntry[attributeName] = storeEntry[attributeName];
         if (promiseName) {
           dataCatalogEntry[promiseName] = $.Deferred().resolve(dataCatalogEntry[attributeName]).promise();
@@ -889,6 +892,43 @@ var DataCatalog = (function () {
    */
   var getCatalog = function (sourceType) {
     return instances[sourceType] || (instances[sourceType] = new DataCatalog(sourceType));
+  };
+
+  if (typeof window.hueDebug === 'undefined') {
+    window.hueDebug = {};
+  }
+
+  window.hueDebug.fillDataCatalog = function (sourceType, path) {
+    if (!path) {
+      path = [];
+    }
+
+    var options = { silenceErrors: true };
+
+    var loadRecursive = function (entry) {
+      var deferred = $.Deferred();
+      var promises = [];
+      promises.push(entry.getSourceMeta(options));
+      promises.push(entry.getSample(options));
+      if (entry.hasPossibleChildren()) {
+        //promises.push(entry.loadNavOptMetaForChildren(options));
+        promises.push(entry.loadNavigatorMetaForChildren(options));
+        promises.push(entry.getChildren(options).done(function (childEntries) {
+          promises.push(childEntries.forEach(function (childEntry) {
+            loadRecursive(childEntry);
+          }));
+        }));
+      }
+      $.when.apply($, promises).always(deferred.resolve);
+      return deferred.promise();
+    };
+
+    var deferred = $.Deferred();
+    getCatalog(sourceType).getEntry({ path: path }).done(function (startEntry) {
+      startEntry.loadNavigatorMetaForChildren(options);
+      loadRecursive(startEntry).always(deferred.resolve);
+    });
+    return deferred.promise();
   };
 
   return {

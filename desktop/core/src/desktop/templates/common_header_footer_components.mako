@@ -256,13 +256,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
         }
       });
 
-      window.hueDebug = {
-        viewModel: function (element) {
-          if (typeof element !== 'undefined' && typeof element === 'string') {
-            element = $(element)[0];
-          }
-          return ko.dataFor(element || document.body);
+      if (typeof window.hueDebug === 'undefined') {
+        window.hueDebug = {};
+      }
+      window.hueDebug.viewModel = function (element) {
+        if (typeof element !== 'undefined' && typeof element === 'string') {
+          element = $(element)[0];
         }
+        return ko.dataFor(element || document.body);
       }
     });
   </script>
