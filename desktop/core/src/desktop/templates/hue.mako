@@ -393,7 +393,7 @@ ${ hueIcons.symbols() }
 
 
     <div class="page-content">
-      <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge' } --><!-- /ko -->
+      <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge', blackout: true } --><!-- /ko -->
       <div id="embeddable_editor" class="embeddable"></div>
       <div id="embeddable_notebook" class="embeddable"></div>
       <div id="embeddable_metastore" class="embeddable"></div>
@@ -1133,7 +1133,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 self.loadApp('editor');
                 if (getUrlParameter('editor') !== '') {
                   self.getActiveAppViewModel(function (viewModel) {
-                    viewModel.openNotebook(getUrlParameter('editor'));
+                    self.isLoadingEmbeddable(true);
+                    viewModel.openNotebook(getUrlParameter('editor')).always(function () {
+                      self.isLoadingEmbeddable(false);
+                    });
                   });
                 } else if (getUrlParameter('type') !== '') {
                   self.changeEditorType(getUrlParameter('type'));
@@ -1191,7 +1194,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             var notebookId = hueUtils.getSearchParameter('?' + ctx.querystring, 'notebook');
             if (notebookId !== '') {
               self.getActiveAppViewModel(function (viewModel) {
-                viewModel.openNotebook(notebookId);
+                self.isLoadingEmbeddable(true);
+                viewModel.openNotebook(notebookId).always(function () {
+                  self.isLoadingEmbeddable(false);
+                });
               });
             } else {
               self.getActiveAppViewModel(function (viewModel) {
