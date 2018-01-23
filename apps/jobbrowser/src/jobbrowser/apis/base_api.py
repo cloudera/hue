@@ -73,7 +73,7 @@ class Api(object):
 
   def action(self, app_ids, operation): return {}
 
-  def logs(self, appid, app_type, log_name): return {'progress': 0, 'logs': ''}
+  def logs(self, appid, app_type, log_name, is_embeddable=False): return {'progress': 0, 'logs': ''}
 
   def profile(self, appid, app_type, app_property, app_filters): return {} # Tasks, XML, counters...
 

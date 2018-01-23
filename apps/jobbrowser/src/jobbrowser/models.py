@@ -18,6 +18,7 @@
 import datetime
 import logging
 import lxml.html
+import functools
 import re
 import urllib2
 
@@ -563,9 +564,9 @@ class Cluster(object):
 class LinkJobLogs(object):
 
   @classmethod
-  def _make_hdfs_links(cls, log):
+  def _make_hdfs_links(cls, log, is_embeddable=False):
     escaped_logs = escape(log)
-    return re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
+    return re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', functools.partial(LinkJobLogs._replace_hdfs_link, is_embeddable), escaped_logs)
 
   @classmethod
   def _make_mr_links(cls, log):
@@ -573,15 +574,15 @@ class LinkJobLogs(object):
     return re.sub('(job_[0-9]{12,}_[0-9]+)', LinkJobLogs._replace_mr_link, escaped_logs)
 
   @classmethod
-  def _make_links(cls, log):
+  def _make_links(cls, log, is_embeddable=False):
     escaped_logs = escape(log)
-    hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
+    hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', functools.partial(LinkJobLogs._replace_hdfs_link, is_embeddable), escaped_logs)
     return re.sub('(job_[0-9]{12,}_[0-9]+)', LinkJobLogs._replace_mr_link, hdfs_links)
 
   @classmethod
-  def _replace_hdfs_link(self, match):
+  def _replace_hdfs_link(self, is_embeddable=False, match=None):
     try:
-      return '<a href="%s">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
+      return '<a href="%s">%s</a>' % (location_to_url(match.group(0), strict=False, is_embeddable=is_embeddable), match.group(0))
     except:
       LOG.exception('failed to replace hdfs links: %s' % (match.groups(),))
       return match.group(0)
