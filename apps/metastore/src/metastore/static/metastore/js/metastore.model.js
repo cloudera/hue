@@ -435,6 +435,33 @@ var MetastoreTable = (function () {
           })
         }));
         self.favouriteColumns(self.columns().slice(0, 5));
+
+        self.catalogEntry.getNavOptMeta().done(function (navOptMeta) {
+          self.optimizerDetails(navOptMeta);
+
+          var topFiveIndex = {};
+          var topColIndex = {};
+          for (var i = 0; i < navOptMeta.topCols.length; i++) {
+            var topCol = navOptMeta.topCols[i];
+            if (i < 5) {
+              topFiveIndex[topCol.name] = topCol;
+            }
+            topColIndex[topCol.name] = topCol;
+          }
+
+          var favorites = [];
+          self.columns().forEach(function (column) {
+            if (topColIndex[column.catalogEntry.name]) {
+              favorites.push(column);
+            }
+            if (topColIndex[column.catalogEntry.name]) {
+              column.popularity(topColIndex[column.catalogEntry.name].score);
+            }
+          });
+          self.favouriteColumns(favorites);
+        }).always(function () {
+          self.loadingQueries(false);
+        });
       }).fail(function () {
         self.columns([]);
         self.favouriteColumns([]);
@@ -446,61 +473,21 @@ var MetastoreTable = (function () {
     self.fetchDetails = function () {
       self.loadingDetails(true);
 
-      // TODO: Load in parallel
+      self.catalogEntry.getComment().done(self.comment);
+
       self.catalogEntry.getAnalysis().done(function (analysis) {
         self.loadingDetails(false);
-        if ((typeof analysis === 'object') && (analysis !== null)) {
-          self.tableDetails(analysis);
-          self.tableStats(analysis.details.stats);
-          self.refreshingTableStats(false);
-          self.samples.load();
-          self.loaded(true);
-          self.loading(false);
-          if (analysis.partition_keys.length) {
-            self.partitions.detailedKeys(analysis.partition_keys);
-            self.partitions.load();
-          } else {
-            self.partitions.loading(false);
-            self.partitions.loaded(true);
-          }
-
-          self.catalogEntry.getComment().done(self.comment);
-
-          // TODO: Move to DataCatalogEntry
-          if (self.optimizerEnabled) {
-            $.post('/metadata/api/optimizer/table_details', {
-              databaseName: self.database.catalogEntry.name,
-              tableName: self.catalogEntry.name
-            }, function(data){
-              self.loadingQueries(false);
-              if (data && data.status == 0) {
-                self.optimizerDetails(ko.mapping.fromJS(data.details));
-
-                // Bump the most important columns first
-                var topCols = $.map(self.optimizerDetails().topCols().slice(0, 5), function(item) { return item.name(); });
-                if (topCols.length >= 3 && self.favouriteColumns().length > 0) {
-                  self.favouriteColumns(self.columns().filter(function(col) {
-                    return topCols.indexOf(col.catalogEntry.name) !== -1;
-                  }));
-                }
-
-                // Column popularity, stats
-                $.each(self.optimizerDetails().topCols(), function(index, optimizerCol) {
-                  var metastoreCol = $.grep(self.columns(), function(col) {
-                    return col.catalogEntry.name == optimizerCol.name();
-                  });
-                  if (metastoreCol.length > 0) {
-                    metastoreCol[0].popularity(optimizerCol.score())
-                  }
-                });
-              } else {
-                $(document).trigger("info", data.message);
-              }
-            });
-          }
+        self.tableDetails(analysis);
+        self.tableStats(analysis.details.stats);
+        self.refreshingTableStats(false);
+        self.loaded(true);
+        self.loading(false);
+        if (analysis.partition_keys.length) {
+          self.partitions.detailedKeys(analysis.partition_keys);
+          self.partitions.load();
         } else {
-          self.refreshingTableStats(false);
-          self.loading(false);
+          self.partitions.loading(false);
+          self.partitions.loaded(true);
         }
       }).fail(function () {
         self.refreshingTableStats(false);
@@ -508,6 +495,8 @@ var MetastoreTable = (function () {
       }).always(function () {
         self.loadingDetails(false)
       });
+
+      self.samples.load();
     };
 
     self.drop = function () {
