@@ -55,7 +55,7 @@ var DataCatalog = (function () {
    *
    * @param {object} options
    * @param {string[][]} options.paths
-   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.silenceErrors] - Default true
    *
    * @return {CancellablePromise}
    */
@@ -65,6 +65,13 @@ var DataCatalog = (function () {
     var cancellablePromises = [];
     var popularEntries = [];
     var pathsToLoad = [];
+
+    if (!options) {
+      options = {};
+    }
+    if (typeof options.silenceErrors === 'undefined') {
+      options.silenceErrors = true;
+    }
 
     var existingPromises = [];
     options.paths.forEach(function (path) {
@@ -241,7 +248,7 @@ var DataCatalog = (function () {
   /**
    * @param {DataCatalogEntry} dataCatalogEntry
    * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.silenceErrors] - Default true
    *
    * @return {CancellablePromise}
    */
@@ -284,7 +291,7 @@ var DataCatalog = (function () {
   /**
    * @param {DataCatalogEntry} dataCatalogEntry
    * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {boolean} [apiOptions.silenceErrors] - Default true
    *
    * @return {CancellablePromise}
    */
@@ -459,20 +466,28 @@ var DataCatalog = (function () {
   };
 
   /**
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.refreshCache]
-   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {Object} [options]
+   * @param {boolean} [options.refreshCache]
+   * @param {boolean} [options.silenceErrors] - Default true
    *
    * @return {CancellablePromise}
    */
-  DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function (apiOptions) {
+  DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function (options) {
     var self = this;
+
+    if (!options) {
+      options = {};
+    }
+
+    if (typeof options.silenceErrors === 'undefined') {
+      options.silenceErrors = true;
+    }
 
     if (!HAS_NAVIGATOR || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
       return $.Deferred().reject().promise();
     }
 
-    if (self.navigatorMetaForChildrenPromise && (!apiOptions || !apiOptions.refreshCache)) {
+    if (self.navigatorMetaForChildrenPromise && (!options || !options.refreshCache)) {
       return self.navigatorMetaForChildrenPromise;
     }
 
@@ -480,7 +495,7 @@ var DataCatalog = (function () {
 
     var cancellablePromises = [];
 
-    cancellablePromises.push(self.getChildren(apiOptions).done(function (children) {
+    cancellablePromises.push(self.getChildren(options).done(function (children) {
       var query;
       // TODO: Add sourceType to nav search query
       if (self.path.length) {
@@ -493,7 +508,7 @@ var DataCatalog = (function () {
         query: query,
         rawQuery: true,
         limit: children.length,
-        silenceErrors: apiOptions && apiOptions.silenceErrors
+        silenceErrors: options && options.silenceErrors
       }).done(function (result) {
         if (result && result.entities && result.entities.length > 0) {
           var entryPromises = [];
@@ -582,12 +597,19 @@ var DataCatalog = (function () {
   /**
    * @param {Object} [options]
    * @param {boolean} [options.refreshCache]
-   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.silenceErrors] - Default true
    *
    * @return {CancellablePromise}
    */
   DataCatalogEntry.prototype.loadNavOptPopularityForChildren = function (options) {
     var self = this;
+    if (!options) {
+      options = {};
+    }
+    if (typeof options.silenceErrors === 'undefined') {
+      options.silenceErrors = true;
+    }
+
     if (!HAS_OPTIMIZER || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
       return $.Deferred().reject().promise();
     }
@@ -967,7 +989,7 @@ var DataCatalog = (function () {
 
   /**
    * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cachedOnly]
    * @param {boolean} [options.refreshCache]
    *
@@ -975,6 +997,13 @@ var DataCatalog = (function () {
    */
   DataCatalogEntry.prototype.getNavigatorMeta = function (options) {
     var self = this;
+
+    if (!options) {
+      options = {};
+    }
+    if (typeof options.silenceErrors === 'undefined') {
+      options.silenceErrors = true;
+    }
     if (!HAS_NAVIGATOR || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
       return $.Deferred().reject().promise();
     }
@@ -989,7 +1018,7 @@ var DataCatalog = (function () {
 
   /**
    * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cachedOnly]
    * @param {boolean} [options.refreshCache]
    *
@@ -997,6 +1026,13 @@ var DataCatalog = (function () {
    */
   DataCatalogEntry.prototype.getNavOptMeta = function (options) {
     var self = this;
+
+    if (!options) {
+      options = {};
+    }
+    if (typeof options.silenceErrors === 'undefined') {
+      options.silenceErrors = true;
+    }
     if (!self.isTableOrView() || !HAS_OPTIMIZER || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
       return $.Deferred().reject().promise();
     }
