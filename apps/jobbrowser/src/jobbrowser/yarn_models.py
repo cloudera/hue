@@ -428,7 +428,6 @@ class Attempt:
     setattr(self, 'shuffleFinishTimeFormatted', None)
     setattr(self, 'sortFinishTimeFormatted', None)
     setattr(self, 'mapFinishTimeFormatted', None)
-    setattr(self, 'progress', self.progress / 100)
     if not hasattr(self, 'diagnostics'):
       self.diagnostics = ''
     if not hasattr(self, 'assignedContainerId'):
