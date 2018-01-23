@@ -418,7 +418,7 @@ var DataCatalog = (function () {
 
       var entities = sourceMeta.databases
         || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields || sourceMeta.columns
-        || (sourceMeta.value && sourceMeta.value.fields);
+        || (sourceMeta.value && sourceMeta.value.fields) || (sourceMeta.item && sourceMeta.item.fields);
       if (entities) {
         entities.forEach(function (entity) {
           promises.push(self.dataCatalog.getEntry({ path: self.path.concat(entity.name || entity) }).done(function (catalogEntry) {
@@ -809,7 +809,7 @@ var DataCatalog = (function () {
 
   DataCatalogEntry.prototype.hasPossibleChildren = function () {
     var self = this;
-    return (self.path.length < 2) ||
+    return (self.path.length < 3) ||
       (!self.definition && !self.sourceMeta) ||
       (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type)) ||
       (self.definition && /^(?:struct|array|map)/i.test(self.definition.type));
