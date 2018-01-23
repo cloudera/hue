@@ -310,6 +310,10 @@ var AssistDbEntry = (function () {
         self.hasErrors(false);
         self.loading(false);
         self.loaded = true;
+        if (catalogEntries.length === 0) {
+          self.entries([]);
+          return;
+        }
         var newEntries = [];
         catalogEntries.forEach(function (catalogEntry) {
           newEntries.push(self.createEntry(catalogEntry));
