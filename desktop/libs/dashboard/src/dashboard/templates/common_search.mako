@@ -3772,7 +3772,7 @@ $(document).ready(function () {
 
 %if USE_GRIDSTER.get():
   var WIDGET_BASE_HEIGHT = 50;
-  $(".gridster>ul").gridster({
+  $('.gridster>ul').gridster({
     widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     shift_widgets_up: false,
@@ -3917,6 +3917,20 @@ $(document).ready(function () {
 
   huePubSub.subscribe('gridster.added.widget', removePreviewHolder, 'dashboard');
 
+  huePubSub.subscribe('gridster.clean.whitespace', function () {
+    var maxRow = 0;
+    var $gridster = $('.gridster>ul').data('gridster');
+    searchViewModel.gridItems().forEach(function (existingWidget) {
+      var tempRow = existingWidget.row() + existingWidget.size_y();
+      if (tempRow > maxRow) {
+        maxRow = tempRow;
+      }
+    });
+    for (var i = 0; i < maxRow; i++) {
+      $gridster.remove_empty_cells(1, i, 12, 1);
+    }
+  }, 'dashboard');
+
   huePubSub.subscribe('dashboard.drop.on.page', function (options) {
     skipRestoreOnStop = true;
     window.clearTimeout(widgetShrinkTimeout);
@@ -3936,7 +3950,7 @@ $(document).ready(function () {
           }
 
           function resizeAndMove(widget, width, col) {
-            var $gridster = $(".gridster>ul").data('gridster');
+            var $gridster = $('.gridster>ul').data('gridster');
             queueLength += 2;
             $gridster.resize_widget($(widget.gridsterElement), width, widget.size_y(), decreaseQueue);
             widget.size_x(width);
@@ -4055,7 +4069,7 @@ $(document).ready(function () {
 
   function resizeGridsterWidget($el) {
     if ($el.find('.card-widget').length > 0) {
-      $(".gridster>ul").data('gridster').resize_widget($el, $el.data('sizex'), Math.ceil($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+      $('.gridster>ul').data('gridster').resize_widget($el, $el.data('sizex'), Math.ceil($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
     }
   }
 
@@ -4079,7 +4093,7 @@ $(document).ready(function () {
       return a.col() > b.col()
     });
     var optimalWidgetWidth = Math.floor(12 / siblings.length);
-    var $gridster = $(".gridster>ul").data('gridster');
+    var $gridster = $('.gridster>ul').data('gridster');
     for (var i = 1; i <= siblings.length; i++) {
       var widget = siblings[i - 1];
       $gridster.resize_widget($(widget.gridsterElement), optimalWidgetWidth, widget.size_y());
