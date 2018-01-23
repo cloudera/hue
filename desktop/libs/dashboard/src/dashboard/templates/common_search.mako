@@ -4068,6 +4068,23 @@ $(document).ready(function () {
   }, 'dashboard');
 
   huePubSub.subscribe('gridster.remove', function (gridElement) {
+    // resize the siblings to the max of the avail space
+    var siblings = [];
+    searchViewModel.gridItems().forEach(function (siblingWidget) {
+      if (siblingWidget.row() === gridElement.row() && gridElement.widgetId() !== siblingWidget.widgetId()) {
+        siblings.push(siblingWidget);
+      }
+    });
+    siblings.sort(function (a, b) {
+      return a.col() > b.col()
+    });
+    var optimalWidgetWidth = Math.floor(12 / siblings.length);
+    var $gridster = $(".gridster>ul").data('gridster');
+    for (var i = 1; i <= siblings.length; i++) {
+      var widget = siblings[i - 1];
+      $gridster.resize_widget($(widget.gridsterElement), optimalWidgetWidth, widget.size_y());
+      $gridster.move_widget($(widget.gridsterElement), ((i - 1) * optimalWidgetWidth) + 1, widget.row());
+    }
     searchViewModel.gridItems.remove(gridElement);
   }, 'dashboard')
 
