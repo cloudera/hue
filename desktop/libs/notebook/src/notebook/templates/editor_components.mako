@@ -580,9 +580,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <a class="margin-left-10" data-bind="attr: {'href': http_addr()}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
         <!-- /ko -->
       </div>
+      % if conf.USE_DEFAULT_CONFIGURATION.get():
       <div style="width:100%;">
         <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
       </div>
+      % endif
       <div style="clear:both; padding-left: 120px;">
         <!-- ko if: availableNewProperties().length -->
         <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
