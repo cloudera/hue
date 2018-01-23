@@ -122,11 +122,11 @@ var AssistDbSource = (function () {
     self.selectedDatabase.subscribe(function () {
       var db = self.selectedDatabase();
       if (HAS_OPTIMIZER && db && !db.popularityIndexSet && self.sourceType !== 'solr') {
-        db.catalogEntry.loadNavOptMetaForChildren({ silenceErrors: true }).done(function () {
+        db.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function () {
           var applyPopularity = function () {
             db.entries().forEach(function (entry) {
-              if (entry.catalogEntry.navOptMeta && entry.catalogEntry.navOptMeta.popularity >= 5) {
-                entry.popularity(entry.catalogEntry.navOptMeta.popularity )
+              if (entry.catalogEntry.navOptPopularity && entry.catalogEntry.navOptPopularity.popularity >= 5) {
+                entry.popularity(entry.catalogEntry.navOptPopularity.popularity )
               }
             });
             if (self.activeSort() === 'popular') {
