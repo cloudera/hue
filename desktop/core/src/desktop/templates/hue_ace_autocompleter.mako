@@ -689,10 +689,10 @@ from desktop.views import _ko
         self.showTitle = !!params.showTitle;
 
         // TODO: Load nav comment with 1 sec delay if not there
-        self.catalogEntry .getComment({ cacheOnly: true }).done(self.comment);
+        self.catalogEntry.getComment({ cacheOnly: true }).done(self.comment);
 
-        if (self.catalogEntry .navOptMeta && self.catalogEntry .navOptMeta.relativePopularity) {
-          self.popularity(self.catalogEntry .navOptMeta.relativePopularity);
+        if (self.catalogEntry.navOptPopularity && self.catalogEntry.navOptPopularity.relativePopularity) {
+          self.popularity(self.catalogEntry.navOptPopularity.relativePopularity);
         }
       }
 

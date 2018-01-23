@@ -1183,27 +1183,27 @@ var AutocompleteResults = (function () {
     });
 
     self.cancellablePromises.push(DataCatalog.getCatalog(self.snippet.type())
-      .loadNavOptMetaForTables({ paths: paths, silenceErrors: true }).done(function (entries) {
+      .loadNavOptPopularityForTables({ paths: paths, silenceErrors: true }).done(function (entries) {
         var totalColumnCount = 0;
         var matchedEntries = [];
         var prefix = suggestSpec.prefix ? (self.parseResult.lowerCase ? suggestSpec.prefix.toLowerCase() : suggestSpec.prefix) + ' ' : '';
 
         entries.forEach(function (entry) {
-          if (entry.navOptMeta[navOptAttribute]) {
-            totalColumnCount += entry.navOptMeta[navOptAttribute].columnCount;
+          if (entry.navOptPopularity[navOptAttribute]) {
+            totalColumnCount += entry.navOptPopularity[navOptAttribute].columnCount;
             matchedEntries.push(entry);
           }
         });
         if (totalColumnCount > 0) {
           var suggestions = [];
           matchedEntries.forEach(function (entry) {
-            var filterValue = self.createNavOptIdentifierForColumn(entry.navOptMeta[navOptAttribute], suggestSpec.tables);
+            var filterValue = self.createNavOptIdentifierForColumn(entry.navOptPopularity[navOptAttribute], suggestSpec.tables);
             suggestions.push({
               value: prefix + filterValue,
               filterValue: filterValue,
               meta: navOptAttribute === 'groupByColumn' ? HUE_I18n.autocomplete.meta.groupBy : HUE_I18n.autocomplete.meta.orderBy,
               category: navOptAttribute === 'groupByColumn' ? CATEGORIES.POPULAR_GROUP_BY : CATEGORIES.POPULAR_ORDER_BY,
-              weightAdjust:  Math.round(100 * entry.navOptMeta[navOptAttribute].columnCount / totalColumnCount),
+              weightAdjust:  Math.round(100 * entry.navOptPopularity[navOptAttribute].columnCount / totalColumnCount),
               popular: ko.observable(true),
               hasCatalogEntry: true,
               details: entry
@@ -1320,20 +1320,20 @@ var AutocompleteResults = (function () {
         && self.parseResult.suggestTables.identifierChain[0].name ? self.parseResult.suggestTables.identifierChain[0].name : self.activeDatabase;
 
       DataCatalog.getEntry({sourceType: self.snippet.type(), path: [db]}).done(function (entry) {
-        self.cancellablePromises.push(entry.loadNavOptMetaForChildren({ silenceErrors: true }).done(function (childEntries) {
+        self.cancellablePromises.push(entry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function (childEntries) {
           var totalPopularity = 0;
           var popularityIndex = {};
           childEntries.forEach(function (childEntry) {
-            if (childEntry.navOptMeta && childEntry.navOptMeta.popularity) {
+            if (childEntry.navOptPopularity && childEntry.navOptPopularity.popularity) {
               popularityIndex[childEntry.name] = true;
-              totalPopularity += childEntry.navOptMeta.popularity;
+              totalPopularity += childEntry.navOptPopularity.popularity;
             }
           });
           if (totalPopularity > 0 && Object.keys(popularityIndex).length) {
             tablesDeferred.done(function (tableSuggestions) {
               tableSuggestions.forEach(function (suggestion) {
                 if (popularityIndex[suggestion.details.name]) {
-                  suggestion.relativePopularity = Math.round(100 * suggestion.details.navOptMeta.popularity / totalPopularity);
+                  suggestion.relativePopularity = Math.round(100 * suggestion.details.navOptPopularity.popularity / totalPopularity);
                   if (suggestion.relativePopularity >= 5) {
                     suggestion.popular(true);
                   }
@@ -1371,7 +1371,7 @@ var AutocompleteResults = (function () {
         }
       });
 
-      self.cancellablePromises.push(DataCatalog.getCatalog(self.snippet.type()).loadNavOptMetaForTables({ paths: paths, silenceErrors: true }).done(function (navOptMetaEntries) {
+      self.cancellablePromises.push(DataCatalog.getCatalog(self.snippet.type()).loadNavOptPopularityForTables({ paths: paths, silenceErrors: true }).done(function (popularEntries) {
         var valueAttribute = '';
         switch (suggestColumns.source) {
           case 'select':
@@ -1386,9 +1386,9 @@ var AutocompleteResults = (function () {
 
         var popularityIndex = {};
 
-        navOptMetaEntries.forEach(function (navOptMetaEntry) {
-          if (navOptMetaEntry.navOptMeta && navOptMetaEntry.navOptMeta[valueAttribute]) {
-            popularityIndex[navOptMetaEntry.getQualifiedPath()] = true;
+        popularEntries.forEach(function (popularEntry) {
+          if (popularEntry.navOptPopularity && popularEntry.navOptPopularity[valueAttribute]) {
+            popularityIndex[popularEntry.getQualifiedPath()] = true;
           }
         });
 
@@ -1403,12 +1403,12 @@ var AutocompleteResults = (function () {
           columns.forEach(function (suggestion) {
             if (suggestion.hasCatalogEntry && popularityIndex[suggestion.details.getQualifiedPath()]) {
               matchedSuggestions.push(suggestion);
-              totalColumnCount += suggestion.details.navOptMeta[valueAttribute].columnCount;
+              totalColumnCount += suggestion.details.navOptPopularity[valueAttribute].columnCount;
             }
           });
           if (totalColumnCount > 0) {
             matchedSuggestions.forEach(function (matchedSuggestion) {
-              matchedSuggestion.relativePopularity = Math.round(100 * matchedSuggestion.details.navOptMeta[valueAttribute].columnCount / totalColumnCount);
+              matchedSuggestion.relativePopularity = Math.round(100 * matchedSuggestion.details.navOptPopularity[valueAttribute].columnCount / totalColumnCount);
               if (matchedSuggestion.relativePopularity  >= 5) {
                 matchedSuggestion.popular(true);
               }

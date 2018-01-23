@@ -341,12 +341,12 @@ var AssistDbEntry = (function () {
     };
 
     if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && self.catalogEntry.isTable() && self.assistDbSource.sourceType !== 'solr') {
-      self.catalogEntry.loadNavOptMetaForChildren({ silenceErrors: true }).done(function () {
+      self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function () {
         loadEntriesDeferred.done(function () {
           if (!self.hasErrors()) {
             self.entries().forEach(function (entry) {
-              if (entry.catalogEntry.navOptMeta) {
-                entry.popularity(entry.catalogEntry.navOptMeta.columnCount)
+              if (entry.catalogEntry.navOptPopularity) {
+                entry.popularity(entry.catalogEntry.navOptPopularity.columnCount)
               }
             });
 
