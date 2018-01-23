@@ -3667,12 +3667,7 @@ function queryTypeahead(query, process) {
 }
 
 function newSearch() {
-  $.getJSON('/search/new_search?format=json', function(data){
-    searchViewModel.collectionJson = data.collection;
-    searchViewModel.queryJson = data.query;
-    searchViewModel.initialJson = data.initial;
-    searchViewModel.reset();
-  });
+  huePubSub.publish('open.link', '/dashboard/new_search?engine=' + searchViewModel.collection.engine());
 }
 
 function loadSearch(collection, query, initial) {
