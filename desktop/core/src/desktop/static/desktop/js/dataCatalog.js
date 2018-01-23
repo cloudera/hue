@@ -496,6 +496,12 @@ var DataCatalog = (function () {
     var cancellablePromises = [];
 
     cancellablePromises.push(self.getChildren(options).done(function (children) {
+      var someHaveNavMeta = children.some(function (childEntry) { return childEntry.navigatorMeta });
+      if (someHaveNavMeta && (!options || !options.refreshCache)) {
+        deferred.resolve(children);
+        return;
+      }
+
       var query;
       // TODO: Add sourceType to nav search query
       if (self.path.length) {
@@ -529,7 +535,6 @@ var DataCatalog = (function () {
         }
       }).fail(deferred.reject));
     }).fail(deferred.reject));
-
 
     self.navigatorMetaForChildrenPromise = new CancellablePromise(deferred.promise(), null, cancellablePromises);
     return self.navigatorMetaForChildrenPromise;
