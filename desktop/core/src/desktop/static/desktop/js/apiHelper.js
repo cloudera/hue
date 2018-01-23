@@ -151,7 +151,8 @@ var ApiHelper = (function () {
     TOP_COLUMNS: '/metadata/api/optimizer/top_columns',
     TOP_FILTERS: '/metadata/api/optimizer/top_filters',
     TOP_JOINS: '/metadata/api/optimizer/top_joins',
-    TOP_TABLES: '/metadata/api/optimizer/top_tables'
+    TOP_TABLES: '/metadata/api/optimizer/top_tables',
+    TABLE_DETAILS: '/metadata/api/optimizer/table_details'
   };
 
   var genericCacheCondition = function (data) {
@@ -1851,6 +1852,37 @@ var ApiHelper = (function () {
       successCallback: function (data) {
         data.hueTimestamp = Date.now();
         deferred.resolve(data);
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred.promise(), request);
+  };
+
+  /**
+   * Fetches navOpt meta for the given path, only possible for tables atm.
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[]} options.path
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptMeta = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+
+    var request = self.simplePost(NAV_OPT_URLS.TABLE_DETAILS, {
+      databaseName: options.path[0],
+      tableName: options.path[1]
+    }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (response) {
+        if (response.status === 0 && response.details) {
+          deferred.resolve(response.details);
+        } else {
+          deferred.reject();
+        }
       },
       errorCallback: deferred.reject
     });
