@@ -56,8 +56,8 @@ class JobApi(Api):
   def action(self, app_ids, operation):
     return self._get_api(app_ids).action(operation, app_ids)
 
-  def logs(self, appid, app_type, log_name):
-    return self._get_api(appid).logs(appid, app_type, log_name)
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
+    return self._get_api(appid).logs(appid, app_type, log_name, is_embeddable)
 
   def profile(self, appid, app_type, app_property, app_filters):
     return self._get_api(appid).profile(appid, app_type, app_property, app_filters)
@@ -203,7 +203,7 @@ class YarnApi(Api):
       return {}
 
 
-  def logs(self, appid, app_type, log_name):
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
     logs = ''
     try:
       if app_type == 'MAPREDUCE':
@@ -213,7 +213,7 @@ class YarnApi(Api):
           if logs and len(logs) == 4:
             logs = logs[1]
         else:
-          response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
+          response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name, is_embeddable=is_embeddable)
           logs = json.loads(response.content).get('log')
       elif app_type == 'SPARK':
         response = job_executor_logs(MockDjangoRequest(self.user), job=appid, name=log_name)
@@ -309,12 +309,12 @@ class YarnMapReduceTaskApi(Api):
     return common
 
 
-  def logs(self, appid, app_type, log_name):
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
     if log_name == 'default':
       log_name = 'stdout'
 
     try:
-      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name)
+      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name, is_embeddable=is_embeddable)
       logs = json.loads(response.content)['log']
     except PopupException, e:
       LOG.warn('No task attempt found for default logs: %s' % e)
@@ -386,7 +386,7 @@ class YarnMapReduceTaskAttemptApi(Api):
     return common
 
 
-  def logs(self, appid, app_type, log_name):
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
     if log_name == 'default':
       log_name = 'stdout'
 
@@ -487,7 +487,7 @@ class SparkExecutorApi(Api):
        "logs": executor['logs']
     }
 
-  def logs(self, appid, app_type, log_name, offset=LOG_OFFSET_BYTES):
+  def logs(self, appid, app_type, log_name, offset=LOG_OFFSET_BYTES, is_embeddable=False):
     log = ""
 
     if self._executors and self._executors[0]:
