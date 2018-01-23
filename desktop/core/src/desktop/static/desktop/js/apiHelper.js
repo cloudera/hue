@@ -420,7 +420,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.simpleGet = function (url, data, options) {
     var self = this;
-    $.get(url, data, function (data) {
+    return $.get(url, data, function (data) {
       if (self.successResponseIsError(data)) {
         self.assistErrorCallback(options)(data);
       } else if (typeof options.successCallback !== 'undefined') {
@@ -1631,6 +1631,96 @@ var ApiHelper = (function () {
   };
 
   /**
+   * Fetches the analysis for the given source and path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.sourceType
+   * @param {string[]} options.path
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchAnalysis = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+
+    var url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/table/' + options.path[0];
+
+    if (options.path.length > 1) {
+      url += '/' + options.path[1];
+    }
+
+    if (options.path.length > 2) {
+      url += '/stats/' + options.path.slice(2).join('/');
+    }
+
+    var request = self.simpleGet(url, {
+      'format' : 'json'
+    }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: deferred.resolve,
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred.promise(), request);
+  };
+
+  /**
+   * Refreshes the analysis for the given source and path
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.sourceType
+   * @param {string[]} options.path
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.refreshAnalysis = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+
+    var promises = [];
+
+    var pollForAnalysis = function (url, delay) {
+      window.setTimeout(function () {
+        promises.push(self.simplePost(url, undefined, {
+          silenceErrors: options.silenceErrors,
+          successCallback: function (data) {
+            promises.pop();
+            if (data.isSuccess) {
+              promises.push(self.fetchAnalysis(options).done(deferred.resolve).fail(deferred.reject));
+            } else if (data.isFailure) {
+              deferred.reject(data);
+            } else {
+              pollForAnalysis(url, 1000);
+            }
+          },
+          errorCallback: deferred.reject
+        }));
+      }, delay);
+    };
+
+    var url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/analyze/' + options.path.join('/') + '/';
+
+    promises.push(self.simplePost(url, undefined, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (data) {
+        promises.pop();
+        if (data.status === 0 && data.watch_url) {
+          pollForAnalysis(data.watch_url, 500);
+        } else {
+          deferred.reject();
+        }
+      },
+      errorCallback: deferred.reject
+    }));
+
+    return new CancellablePromise(deferred.promise(), undefined, promises);
+  };
+
+  /**
    * Fetches samples for the given source and path
    *
    * @param {Object} options
@@ -1655,7 +1745,8 @@ var ApiHelper = (function () {
       successCallback: function (data) {
         data.hueTimestamp = Date.now();
         deferred.resolve(data);
-      }
+      },
+      errorCallback: deferred.reject
     }).done().fail(deferred.reject);
 
     return new CancellablePromise(deferred.promise(), request);
@@ -1727,14 +1818,14 @@ var ApiHelper = (function () {
   };
 
   /**
-   * Fetches navOpt metadata for the children of the given path
+   * Fetches navOpt popularity for the children of the given path
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    * @param {string[string[]]} options.paths
    * @return {CancellablePromise}
    */
-  ApiHelper.prototype.fetchNavOptMetadata = function (options) {
+  ApiHelper.prototype.fetchNavOptPopularity = function (options) {
     var self = this;
     var deferred = $.Deferred();
     var url, data;
@@ -1907,7 +1998,7 @@ var ApiHelper = (function () {
    * @param {string} options.defaultDatabase
    */
   // TODO: Add to DataCatalog
-  ApiHelper.prototype.fetchAnalysis = function (options) {
+  ApiHelper.prototype.fetchAnalysis_OLD = function (options) {
     var self = this;
     var clonedIdentifierChain = options.identifierChain.concat();
 

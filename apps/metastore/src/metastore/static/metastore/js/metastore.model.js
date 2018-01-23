@@ -104,9 +104,9 @@ var MetastoreDatabase = (function () {
         })
       }
       if (optimizerEnabled) {
-        self.catalogEntry.loadNavOptMetaForChildren().done(function () {
+        self.catalogEntry.loadNavOptPopularityForChildren().done(function () {
           self.tables().forEach(function (table) {
-            table.optimizerStats(table.catalogEntry.navOptMeta);
+            table.optimizerStats(table.catalogEntry.navOptPopularity);
           })
         });
       }
