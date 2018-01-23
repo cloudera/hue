@@ -446,90 +446,68 @@ var MetastoreTable = (function () {
     self.fetchDetails = function () {
       self.loadingDetails(true);
 
-      // TODO: Move to DataCatalogEntry
-      self.apiHelper.fetchTableDetails({
-        sourceType: self.catalogEntry.getSourceType(),
-        databaseName: self.database.catalogEntry.name,
-        tableName: self.catalogEntry.name,
-        successCallback: function (data) {
-          self.loadingDetails(false);
-          if ((typeof data === 'object') && (data !== null)) {
-            self.tableDetails(data);
-            self.tableStats(data.details.stats);
-            self.refreshingTableStats(false);
-            self.samples.load();
-            self.loaded(true);
-            self.loading(false);
-            if (data.partition_keys.length) {
-              self.partitions.detailedKeys(data.partition_keys);
-              self.partitions.load();
-            } else {
-              self.partitions.loading(false);
-              self.partitions.loaded(true);
-            }
-
-            self.catalogEntry.getComment().done(self.comment);
-            // TODO: Verify that Nav stuff is loaded from parent
-            // if (self.navigatorEnabled) {
-            //   $.get('/metadata/api/navigator/find_entity', {
-            //     type: 'table',
-            //     database: self.database.name,
-            //     name: self.name
-            //   }, function(data) {
-            //     if (data && data.status == 0) {
-            //       self.navigatorMeta(ko.mapping.fromJS(data.entity));
-            //       //self.getRelationships(); // Off for now
-            //     } else {
-            //       //$(document).trigger("info", data.message);
-            //     }
-            //   }).fail(function (xhr, textStatus, errorThrown) {
-            //     $(document).trigger("error", xhr.responseText);
-            //   });
-            // }
-
-            // TODO: Move to DataCatalogEntry
-            if (self.optimizerEnabled) {
-              $.post('/metadata/api/optimizer/table_details', {
-                databaseName: self.database.catalogEntry.name,
-                tableName: self.catalogEntry.name
-              }, function(data){
-                self.loadingQueries(false);
-                if (data && data.status == 0) {
-                  self.optimizerDetails(ko.mapping.fromJS(data.details));
-
-                  // Bump the most important columns first
-                  var topCols = $.map(self.optimizerDetails().topCols().slice(0, 5), function(item) { return item.name(); });
-                  if (topCols.length >= 3 && self.favouriteColumns().length > 0) {
-                    self.favouriteColumns(self.columns().filter(function(col) {
-                      return topCols.indexOf(col.catalogEntry.name) !== -1;
-                    }));
-                  }
-
-                  // Column popularity, stats
-                  $.each(self.optimizerDetails().topCols(), function(index, optimizerCol) {
-                    var metastoreCol = $.grep(self.columns(), function(col) {
-                      return col.catalogEntry.name == optimizerCol.name();
-                    });
-                    if (metastoreCol.length > 0) {
-                      metastoreCol[0].popularity(optimizerCol.score())
-                    }
-                  });
-                } else {
-                  $(document).trigger("info", data.message);
-                }
-              });
-            }
-          } else {
-            self.refreshingTableStats(false);
-            self.loading(false);
-          }
-        },
-        errorCallback: function (data) {
+      // TODO: Load in parallel
+      self.catalogEntry.getAnalysis().done(function (analysis) {
+        self.loadingDetails(false);
+        if ((typeof analysis === 'object') && (analysis !== null)) {
+          self.tableDetails(analysis);
+          self.tableStats(analysis.details.stats);
           self.refreshingTableStats(false);
-          self.loadingDetails(false);
+          self.samples.load();
+          self.loaded(true);
+          self.loading(false);
+          if (analysis.partition_keys.length) {
+            self.partitions.detailedKeys(analysis.partition_keys);
+            self.partitions.load();
+          } else {
+            self.partitions.loading(false);
+            self.partitions.loaded(true);
+          }
+
+          self.catalogEntry.getComment().done(self.comment);
+
+          // TODO: Move to DataCatalogEntry
+          if (self.optimizerEnabled) {
+            $.post('/metadata/api/optimizer/table_details', {
+              databaseName: self.database.catalogEntry.name,
+              tableName: self.catalogEntry.name
+            }, function(data){
+              self.loadingQueries(false);
+              if (data && data.status == 0) {
+                self.optimizerDetails(ko.mapping.fromJS(data.details));
+
+                // Bump the most important columns first
+                var topCols = $.map(self.optimizerDetails().topCols().slice(0, 5), function(item) { return item.name(); });
+                if (topCols.length >= 3 && self.favouriteColumns().length > 0) {
+                  self.favouriteColumns(self.columns().filter(function(col) {
+                    return topCols.indexOf(col.catalogEntry.name) !== -1;
+                  }));
+                }
+
+                // Column popularity, stats
+                $.each(self.optimizerDetails().topCols(), function(index, optimizerCol) {
+                  var metastoreCol = $.grep(self.columns(), function(col) {
+                    return col.catalogEntry.name == optimizerCol.name();
+                  });
+                  if (metastoreCol.length > 0) {
+                    metastoreCol[0].popularity(optimizerCol.score())
+                  }
+                });
+              } else {
+                $(document).trigger("info", data.message);
+              }
+            });
+          }
+        } else {
+          self.refreshingTableStats(false);
           self.loading(false);
         }
-      })
+      }).fail(function () {
+        self.refreshingTableStats(false);
+        self.loading(false);
+      }).always(function () {
+        self.loadingDetails(false)
+      });
     };
 
     self.drop = function () {
