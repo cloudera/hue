@@ -557,9 +557,11 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </a>
         <!-- /ko -->
       </div>
+      % if conf.USE_DEFAULT_CONFIGURATION.get():
       <div style="width:100%;">
         <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
       </div>
+      % endif
       <div style="clear:both; padding-left: 120px;">
         <!-- ko if: availableNewProperties().length -->
         <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
