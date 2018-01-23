@@ -101,7 +101,7 @@ class WorkflowApi(Api):
     return _manage_oozie_job(self.user, action, app_ids)
 
 
-  def logs(self, appid, app_type, log_name=None):
+  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     if '@' in appid:
       return WorkflowActionApi(self.user).logs(appid, app_type)
 

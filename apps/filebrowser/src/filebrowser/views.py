@@ -1366,7 +1366,7 @@ def status(request):
     return render("status.mako", request, data)
 
 
-def location_to_url(location, strict=True):
+def location_to_url(location, strict=True, is_embeddable=False):
     """
     If possible, returns a file browser URL to the location.
     Prunes HDFS URI to path.
@@ -1384,7 +1384,11 @@ def location_to_url(location, strict=True):
     path = location
     if split_path[0] == 'hdfs':
       path = split_path[2]
-    return reverse("filebrowser.views.view", kwargs=dict(path=path))
+
+    filebrowser_path = reverse("filebrowser.views.view", kwargs=dict(path=path))
+    if is_embeddable and not filebrowser_path.startswith('/hue'):
+        filebrowser_path = '/hue' + filebrowser_path
+    return filebrowser_path
 
 
 def truncate(toTruncate, charsToKeep=50):

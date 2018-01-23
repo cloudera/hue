@@ -62,7 +62,7 @@ class DataEngClusterApi(Api):
     return {}
 
 
-  def logs(self, appid, app_type, log_name=None):
+  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
 
 
@@ -143,7 +143,7 @@ class DataEngJobApi(Api):
     return {}
 
 
-  def logs(self, appid, app_type, log_name=None):
+  def logs(self, appid, app_type, log_name=None, is_embeddable=False):
     return {'logs': ''}
 
 
