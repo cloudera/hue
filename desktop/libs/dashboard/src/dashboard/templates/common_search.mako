@@ -3767,6 +3767,7 @@ $(document).ready(function () {
     window.setTimeout(function(){
       resizeFieldsList();
     }, 200);
+    huePubSub.publish('dashboard.window.resize');
   });
 
 %if USE_GRIDSTER.get():
@@ -3838,6 +3839,10 @@ $(document).ready(function () {
 
   var widgetGridHeight = parseInt(hueUtils.getStyleFromCSSClass('[data-sizey="1"]').height);
   var widgetGridWidth = parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width);
+
+  huePubSub.subscribe('dashboard.window.resize', function () {
+    widgetGridWidth = parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width);
+  }, 'dashboard');
 
   function restoreWidgetSizes() {
     $('li.gs-w').each(function () {
