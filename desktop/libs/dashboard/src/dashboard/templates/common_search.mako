@@ -3789,8 +3789,14 @@ $(document).ready(function () {
       },
       stop: function (event, ui, $widget) {
         huePubSub.publish('resize.plotly.chart');
+        huePubSub.publish('gridster.clean.whitespace');
         $widget.find('.card-widget').height($widget.height()).css('opacity', '1');
       },
+    },
+    draggable: {
+      stop: function (e, ui, $widget) {
+        huePubSub.publish('gridster.clean.whitespace');
+      }
     }
   });
 
@@ -4100,6 +4106,7 @@ $(document).ready(function () {
       $gridster.move_widget($(widget.gridsterElement), ((i - 1) * optimalWidgetWidth) + 1, widget.row());
     }
     searchViewModel.gridItems.remove(gridElement);
+    huePubSub.publish('gridster.clean.whitespace');
   }, 'dashboard')
 
   huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
@@ -4125,6 +4132,7 @@ $(document).ready(function () {
             }
             item.size_y(targetHeight);
             $('.gridster ul').data('gridster').resize_widget($(item.gridsterElement), item.size_x(), item.size_y());
+            huePubSub.publish('gridster.clean.whitespace');
           }
         });
       }
@@ -4139,6 +4147,7 @@ $(document).ready(function () {
             widget: widget,
             callback: function (el) {
               $('.gridster ul').data('gridster').move_widget(el, 1, 1);
+              huePubSub.publish('gridster.clean.whitespace');
             }
           })
         );
