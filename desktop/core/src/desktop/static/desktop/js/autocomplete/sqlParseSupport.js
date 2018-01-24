@@ -1525,12 +1525,21 @@ var SqlParseSupport = (function () {
     };
 
     parser.addColumnLocation = function (location, identifierChain) {
-      parser.yy.locations.push({
-        type: 'column',
-        location: adjustLocationForCursor(location),
-        identifierChain: identifierChain,
-        qualified: identifierChain.length > 1
-      });
+      var isVariable = identifierChain.length && /\$\{[^}]*\}/.test(identifierChain[identifierChain.length - 1].name);
+      if (isVariable) {
+        parser.yy.locations.push({
+          type: 'variable',
+          location: adjustLocationForCursor(location),
+          value: identifierChain[identifierChain.length - 1].name
+        });
+      } else {
+        parser.yy.locations.push({
+          type: 'column',
+          location: adjustLocationForCursor(location),
+          identifierChain: identifierChain,
+          qualified: identifierChain.length > 1
+        });
+      }
     };
 
     parser.addCteAliasLocation = function (location, alias) {
@@ -1543,14 +1552,24 @@ var SqlParseSupport = (function () {
     };
 
     parser.addUnknownLocation = function (location, identifierChain) {
-      var unknownLoc = {
-        type: 'unknown',
-        location: adjustLocationForCursor(location),
-        identifierChain: identifierChain,
-        qualified: identifierChain.length > 1
-      };
-      parser.yy.locations.push(unknownLoc);
-      return unknownLoc;
+      var isVariable = identifierChain.length && /\$\{[^}]*\}/.test(identifierChain[identifierChain.length - 1].name);
+      var loc;
+      if (isVariable) {
+        loc = {
+          type: 'variable',
+          location: adjustLocationForCursor(location),
+          value: identifierChain[identifierChain.length - 1].name
+        };
+      } else {
+        loc = {
+          type: 'unknown',
+          location: adjustLocationForCursor(location),
+          identifierChain: identifierChain,
+          qualified: identifierChain.length > 1
+        };
+      }
+      parser.yy.locations.push(loc);
+      return loc;
     };
 
     parser.suggestDatabases = function (details) {
