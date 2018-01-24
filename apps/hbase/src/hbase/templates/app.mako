@@ -2515,7 +2515,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       $(this).trigger('reset');
     });
 
-    var prepareNewTableForm = function () {
+    window.prepareNewTableForm = function () {
       $("#new_table_modal .modal-body ul").empty();
       addColumnToNewTableForm();
     }
