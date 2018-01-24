@@ -691,8 +691,11 @@ var Collection = function (vm, collection) {
 
   if (collection.facets.length > 0) {
     collection.facets.forEach(function (f) {
-      if (f.properties.facets_form && typeof f.properties.facets_form.field === 'undefined') {
-        f.properties.facets_form.field = null;
+      if (f.properties.facets_form) {
+        if (typeof f.properties.facets_form.field === 'undefined') {
+          f.properties.facets_form.field = null;
+        }
+        f.properties.facets_form.isEditing = ko.observable(true);
       }
     });
   }
@@ -815,6 +818,8 @@ var Collection = function (vm, collection) {
       }));
     }
 
+    facet.isAdding = ko.observable(false);
+
     if (facet.properties.facets) { // Sub facet
       $.each(facet.properties.facets(), function (index, nestedFacet) {
         self._addObservablesToNestedFacet(self, nestedFacet, vm);
@@ -843,6 +848,8 @@ var Collection = function (vm, collection) {
         return self._get_field_operations(_field, facet);
       });
     }
+
+    nestedFacet.isEditing = ko.observable(false);
   }
 
   self.facets = ko.mapping.fromJS(collection.facets);
@@ -1038,7 +1045,8 @@ var Collection = function (vm, collection) {
       'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
       'sort': ko.mapping.toJS(facet.properties.facets_form.aggregate.function == 'count' ? 'desc' : 'default'),
       'canRange': ko.mapping.toJS(facet.properties.facets_form.canRange),
-      'type': ko.mapping.toJS(facet.properties.facets_form.type)
+      'type': ko.mapping.toJS(facet.properties.facets_form.type),
+      'isEditing': false
     });
     pivot.aggregate.metrics = ko.computed(function() {
       var _field = self.getTemplateField(pivot.field(), self.template.fieldsAttributes());

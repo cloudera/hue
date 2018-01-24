@@ -99,7 +99,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
         <div class="search-bar-query-container">
           <div class="search-bar-collection">
             <div class="selectMask">
-              <span data-bind="editable: collection.label, editableOptions: { enabled: $root.isEditing(), placement: 'right' }"></span>
+              <span data-bind="editable: collection.label, editableOptions: { enabled: true, placement: 'right' }"></span>
             </div>
           </div>
           <div class="search-bar-query" data-bind="foreach: query.qs">
@@ -143,10 +143,11 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
       <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
         <i class="fa fa-plus"></i>
       </a>
-      % endif
+      % else:
       <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
         <i class="fa fa-pencil"></i>
       </a>
+      % endif
       % if is_owner:
         <div class="btn-group" data-bind="visible: columns().length">
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if (canSave()) { save() } else { $('#saveAsModalDashboard').modal('show'); } }, attr: { title: canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
@@ -595,7 +596,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }, visible: $parent.properties.facets().length > 1" class="pull-right" href="javascript:void(0)">
           <i class="fa fa-times"></i>
         </a>
-        <div class="hit-title" data-bind="editable: fieldLabel, editableOptions: { enabled: $root.isEditing(), placement: 'right' }, attr: { 'title': fieldLabel }"></div>
+        <div class="hit-title" data-bind="editable: fieldLabel, editableOptions: { enabled: true, placement: 'right' }, attr: { 'title': fieldLabel }"></div>
         <div class="clearfix"></div>
       </div>
 
@@ -611,16 +612,30 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <!-- /ko -->
 
   <!-- ko ifnot: $root.isEditing -->
-  <span data-bind="foreach: properties.facets, visible: ! $parents[1].isLoading()">
-    <div class="filter-box" style="opacity: 0.7">
-      <div class="content content-readonly">
-        <strong class="hit-title" data-bind="text: field, attr: {'title': field}"></strong>
-        <span class="spinedit-cnt">
-          <span data-bind="template: { name: 'metric-form' }"></span>
-        </span>
+    <!-- ko ifnot: $parents[1].isLoading() -->
+    <div class="edit-dimensions">
+      <div data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', containment: 'parent'}}" class="inline-block">
+        <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }">
+          <span data-bind="text: getPrettyMetric($data)"></span>
+          <span class="badge badge-info dimensions-badge" data-bind="text: field, attr: {'title': field}"></span>
+          <!-- ko if: aggregate.function() != 'field' && aggregate.metrics -->
+            <i class="fa" data-bind="css: { 'fa-long-arrow-down': sort() == 'desc', 'fa-long-arrow-up': sort() == 'asc' }"></i>
+          <!-- /ko -->
+          <div class="action-icon margin-left-5" data-bind="click: function(){ $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }"><i class="fa fa-pencil"></i></div>
+          <!-- ko if: isEditing -->
+          <div class="metric-form" data-bind="template: { name: 'metric-form' }"></div>
+          <!-- /ko -->
+        </div>
       </div>
+      <div class="badge dimensions-badge-container dimensions-badge-container-add" data-bind="css: { 'is-adding': isAdding }">
+        <div class="action-icon" data-bind="click: function(){ isAdding(true); properties.facets().forEach(function(f){ f.isEditing(false); });  }, visible: properties.facets().length < 15 && widgetType() != 'hit-widget'"><i class="fa fa-plus"></i> ${ _('Add') }</div>
+        <!-- ko if: isAdding -->
+          <div class="metric-form" data-bind="template: { name: 'metric-form', data: properties.facets_form }"></div>
+        <!-- /ko -->
+      </div>
+      <div class="clearfix"></div>
     </div>
-  </span>
+    <!-- /ko -->
   <!-- /ko -->
 
   <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15 && widgetType() != 'hit-widget'" style="opacity: 0.7">
@@ -2119,9 +2134,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="metric-form">
-
-    <!-- ko if: $root.isEditing -->
+    <!-- ko if: typeof isEditing !== 'undefined' && isEditing() -->
     <div>
+      <!-- ko if: typeof $parents[0].isAdding === 'undefined' || !$parents[0].isAdding() -->
+      <a href="javascript:void(0)" data-bind="toggle: isEditing" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
+      <!-- /ko -->
+      <!-- ko if: typeof $parents[0].isAdding !== 'undefined' && $parents[0].isAdding() -->
+      <a href="javascript:void(0)" data-bind="toggle: $parents[0].isAdding" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
+      <!-- /ko -->
       <!-- ko with: aggregate -->
       <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0 && !$parent.isFacetForm" class="input-small"></select>
 
@@ -2134,7 +2154,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="clearfix"></div>
       <br/>
 
-      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: plain_formula, parsedValue: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true, mode: $root.collection.engine() } }, visible: $parent.field() == 'formula'"></div>
+      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: plain_formula, parsedValue: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true, mode: $root.collection.engine() } }, visible: $parent.field() == 'formula'" class="margin-bottom-10"></div>
 
       <!-- ko if: $parents[1].widgetType() != 'hit-widget' -->
         <div class="facet-field-cnt">
@@ -2149,7 +2169,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
         <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count' && !$parent.canRange() && $root.collection.engine() == 'solr'">
           <span class="spinedit-cnt">
-            <span class="facet-field-label">
+            <span class="facet-field-label facet-field-label-fixed-width">
               ${ _('Limit') }
             </span>
             <input type="text" class="input-medium" data-bind="spinedit: $parent.limit"/>
@@ -2158,7 +2178,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
         <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count'">
           <span class="spinedit-cnt">
-            <span class="facet-field-label">
+            <span class="facet-field-label facet-field-label-fixed-width">
               ${ _('Min Count') }
             </span>
             <input type="text" class="input-medium" data-bind="spinedit: $parent.mincount"/>
@@ -2199,16 +2219,19 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
         <!-- /ko -->
         <!-- /ko -->
-      </div>
-    <!-- /ko -->
 
-    <!-- ko if: !$root.isEditing() -->
-    <div class="content" style="border: 1px solid #d8d8d8;">
-      <div data-bind="text: getPrettyMetric($data)" class="muted"></div>
-      <!-- ko if: aggregate.function() != 'field' && aggregate.metrics -->
-      <i class="fa" data-bind="css: { 'fa-long-arrow-down': sort() == 'desc', 'fa-long-arrow-up': sort() == 'asc' }"></i>
-      <!-- /ko -->
-    </div>
+        <!-- ko if: typeof $parents[0].isAdding === 'undefined' || !$parents[0].isAdding() -->
+        <a href="javascript: void(0)" class="pull-right" data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }, visible: $parent.properties.facets().length > 1">
+          <i class="fa fa-trash"></i> ${ _('Remove') }
+        </a>
+        <!-- /ko -->
+        <!-- ko if: typeof $parents[0].isAdding !== 'undefined' && $parents[0].isAdding() -->
+        <a data-bind="visible: field() && field() != 'formula' || aggregate.formula(), click: function() { $root.collection.addPivotFacetValue2($parents[0]) }" class="pull-right" href="javascript:void(0)">
+          <i class="fa fa-plus"></i> ${ _('Add') }
+        </a>
+        <!-- /ko -->
+        <div class="clearfix"></div>
+      </div>
     <!-- /ko -->
 </script>
 
