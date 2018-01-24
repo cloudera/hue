@@ -2082,7 +2082,7 @@ var EditorViewModel = (function() {
         hueAnalytics.convert('editor', 'presentation');
       }
     });
-//    self.isPresentationMode(self.isPresentationModeDefault());
+    self.isPresentationMode(self.isPresentationModeDefault());
     self.presentationSnippets = ko.observable({});
 
     self.snippets = ko.observableArray();
