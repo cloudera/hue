@@ -2084,6 +2084,7 @@ var EditorViewModel = (function() {
     });
     self.isPresentationMode(self.isPresentationModeDefault());
     self.presentationSnippets = ko.observable({});
+    self.isHidingCode = ko.observable(typeof notebook.isHidingCode != "undefined" && notebook.isHidingCode != null ? notebook.isHidingCode : false);
 
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
@@ -2860,8 +2861,10 @@ var EditorViewModel = (function() {
     self.isResultFullScreenMode = ko.observable(false);
     self.isPresentationMode = ko.computed(function() {
       return self.selectedNotebook() && self.selectedNotebook().isPresentationMode();
+    });
+    self.isHidingCode = ko.computed(function() {
+      return self.selectedNotebook() && self.selectedNotebook().isHidingCode();
     })
-    self.isHidingCode = ko.observable(false);
     self.successUrl = ko.observable(options.success_url); // Deprecated
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
