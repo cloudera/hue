@@ -18,6 +18,8 @@ var DataCatalog = (function () {
 
   var DATA_CATALOG_VERSION = 1;
 
+  var cacheEnabled = true;
+
   /**
    * @param {String} sourceType
    *
@@ -32,6 +34,14 @@ var DataCatalog = (function () {
     });
   }
 
+  DataCatalog.prototype.disableCache = function () {
+    cacheEnabled = false;
+  };
+
+  DataCatalog.prototype.enableCache = function () {
+    cacheEnabled = true;
+  };
+
   DataCatalog.prototype.clearStorage = function () {
     var self = this;
     self.store.clear()
@@ -39,6 +49,9 @@ var DataCatalog = (function () {
 
   DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
     var self = this;
+    if (!cacheEnabled) {
+      return $.Deferred().resolve().promise();
+    }
     return self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
       version: DATA_CATALOG_VERSION,
       definition: dataCatalogEntry.definition,
@@ -187,7 +200,7 @@ var DataCatalog = (function () {
    * @param {string|string[]} options.path
    * @param {Object} [options.definition] - The initial definition if not already set on the entry
    *
-   * @return {DataCatalogEntry}
+   * @return {Promise}
    */
   DataCatalog.prototype.getEntry = function (options) {
     var self = this;
@@ -199,6 +212,9 @@ var DataCatalog = (function () {
       deferred.done(function (entry) {
         self.entries[identifier] = entry;
       });
+      if (!cacheEnabled) {
+        return deferred.resolve(new DataCatalogEntry(self, options.path, options.definition)).promise();
+      }
       self.store.getItem(identifier).then(function (storeEntry) {
         var definition = storeEntry ? storeEntry.definition : options.definition;
         if (self.entries[identifier]) {
@@ -1147,6 +1163,14 @@ var DataCatalog = (function () {
      *
      * @return {DataCatalog}
      */
-    getCatalog : getCatalog
+    getCatalog : getCatalog,
+
+    enableCache: function () {
+      cacheEnabled = true
+    },
+
+    disableCache: function () {
+      cacheEnabled = false;
+    }
   };
 })();
