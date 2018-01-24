@@ -532,12 +532,15 @@ except ImportError, e:
         </ul>
       </div>
       <div class="tab-content">
-        <div class="tab-pane" id="help-editor-shortcut">
+        <div class="tab-pane" id="help-editor-shortcut" style="min-height: 500px">
           <input class="clearable pull-right margin-right-5" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          <div class="clearfix"></div>
           <!-- ko if: activeCategory() &&  activeCategory().filteredShortcuts().length === 0 -->
+          <div class="margin-top-30 margin-left-10">
             <em>${ _('No matches found for your search.') }</em>
+          </div>
           <!-- /ko -->
-          <ul class="nav nav-pills" data-bind="foreach: categories">
+          <ul class="nav nav-tabs" data-bind="foreach: categories">
             <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }, visible: filteredShortcuts().length > 0"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
           </ul>
           <div class="tab-content" data-bind="with: activeCategory">
@@ -564,7 +567,7 @@ except ImportError, e:
           </div>
         </div>
         <div class="tab-pane active" id="help-editor-syntax">
-          <ul class="nav nav-pills">
+          <ul class="nav nav-tabs">
            <li class="active">
               <a href="#help-editor-syntax-comment" data-bind="click: function(){ $('a[href=\'#help-editor-syntax-comment\']').tab('show'); }">
                 ${ _('Comments')}
@@ -589,22 +592,26 @@ except ImportError, e:
           <div class="tab-content">
             <div class="tab-pane active" id="help-editor-syntax-comment">
               <div>${ _('A comment is text that is not executed. It can be of two types:')}</div>
-              <ul class="nav help-list-spacing">
+              <ul class="nav help-list-spacing margin-top-10">
                 <li>
                 <b>${ _('Single Line')}</b>
                 <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: ko.observable('${ _('-- Comment')}'),
                   lines: 1,
-                  mode: 'impala' }
-                }" style="width: calc(100% - 5px);"></div>
+                  mode: 'impala',
+                  aceOptions: {
+                    readOnly: true
+                  }}}" class="margin-top-10 margin-bottom-20"></div>
                 </li>
                 <li>
                 <b>${ _('Multi Line')}</b>
                 <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: ko.observable('${ _('/* Multi Line\\n  Comment */')}'),
                   lines: 2,
-                  mode: 'impala' }
-                }" style="width: calc(100% - 5px);"></div>
+                  mode: 'impala',
+                  aceOptions: {
+                    readOnly: true
+                  }}}" class="margin-top-10 margin-bottom-20"></div>
                 </li>
               </ul>
             </div>
@@ -636,47 +643,57 @@ except ImportError, e:
               <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                   value: ko.observable('${ _('select * from customers;\\nselect * from web_logs;')}'),
                   lines: 2,
-                  mode: 'impala' }
-                }" style="width: calc(100% - 5px);"></div>
+                  mode: 'impala',
+                  aceOptions: {
+                    readOnly: true
+                  }}}" class="margin-top-10 margin-bottom-20"></div>
             </div>
             <div class="tab-pane" id="help-editor-syntax-variable">
+              <div>${ _('Variables are used to easily configure parameters in a query. They can be of two types:')}</div>
               <ul class="nav help-list-spacing">
-                <div>${ _('Variables are used to easily configure parameters in a query. They can be of two types:')}</div>
                 <li>
-                  <b>${ _('Single Valued')}</b>
-                  <div>${ _('${variable_name=variable_value}')}</div>
+                  <div class="margin-top-20"><b>${ _('Single Valued')}</b><span class="muted padding-left-20">${ _('${variable_name=variable_value}')}</span></div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                     value: ko.observable('${ _('select * from web_logs where bytes = ${bytes}')}'),
                     lines: 1,
-                    mode: 'impala' }
-                  }" style="width: calc(100% - 5px);"></div>
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-10"></div>
                   <div>${ _('The variable_value is optional.')}</div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                     value: ko.observable('${ _('select * from web_logs where bytes = ${bytes=search}')}'),
                     lines: 1,
-                    mode: 'impala' }
-                  }" style="width: calc(100% - 5px);"></div>
-                  <div>${ _('A string should be wrapped in quotes.')}</pre>
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-10"></div>
+                  <div>${ _('A string should be wrapped in quotes.')}</div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                     value: ko.observable('${ _('select * from web_logs where app = "${app=search}"')}'),
                     lines: 1,
-                    mode: 'impala' }
-                  }" style="width: calc(100% - 5px);"></div>
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
                 </li>
                 <li>
-                  <b>${ _('Multi Valued')}</b>
-                  <div>${ _('${variable_name=variable_value1(variable_text1), variable_value2(variable_text2),...}')}</div>
+                  <div class="margin-top-30"><b>${ _('Multi Valued')}</b><span class="muted padding-left-20">${ _('${variable_name=variable_value1(variable_text1), variable_value2(variable_text2),...}')}</span></div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                     value: ko.observable('${ _('select * from web_logs where app = "${app=search, metastore(meta), hbase}"')}'),
                     lines: 1,
-                    mode: 'impala' }
-                  }" style="width: calc(100% - 5px);"></div>
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-10"></div>
                   <div>${ _('The variable_text is optional.')}</div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
                     value: ko.observable('${ _('select * from web_logs where app = "${app=search(solr), metastore(meta)}"')}'),
                     lines: 1,
-                    mode: 'impala' }
-                  }" style="width: calc(100% - 5px);"></div>
+                    mode: 'impala',
+                    aceOptions: {
+                      readOnly: true
+                    }}}" class="margin-top-10 margin-bottom-20"></div>
                 </li>
               </ul>
             </div>

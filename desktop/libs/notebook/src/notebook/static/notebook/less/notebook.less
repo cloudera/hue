@@ -310,8 +310,26 @@
     border-right: 1px solid @cui-default-border-color;
   }
 
-  .editor-help .tab-content {
-    border: none;
+  .editor-help {
+    b {
+      font-weight: 500;
+    }
+    .nav-list > li > a {
+      padding: 8px 15px !important;
+      margin-bottom: 2px;
+      margin-top: 2px !important;
+      margin-left: -15px;
+    }
+    .help-list-spacing li {
+      margin-bottom: 15px;
+    }
+    .tab-content {
+      border: none;
+    }
+    .tab-pane > .tab-content {
+      padding: 20px 10px;
+      line-height: 24px;
+    }
   }
 
   .two-pane {
@@ -326,10 +344,6 @@
     .flex(0 0 150px);
     border-right: 1px solid @cui-gray-100;
     margin-right: 10px;
-  }
-
-  .help-list-spacing li {
-    margin-top: 10px;
   }
 
   .empty-title {
