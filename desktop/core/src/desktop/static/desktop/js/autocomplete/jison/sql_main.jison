@@ -2492,7 +2492,9 @@ ColumnOrArbitraryFunctionRef
  : BasicIdentifierChain
    {
      var lastLoc = parser.yy.locations[parser.yy.locations.length - 1];
-     lastLoc.type = 'column';
+     if (lastLoc.type !== 'variable') {
+       lastLoc.type = 'column';
+     }
      // used for function references with db prefix
      var firstLoc = parser.yy.locations[parser.yy.locations.length - $1.length];
      $$ = { chain: $1, firstLoc: firstLoc, lastLoc: lastLoc }
