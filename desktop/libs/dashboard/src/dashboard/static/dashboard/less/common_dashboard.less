@@ -72,16 +72,22 @@
     padding-top: 0;
     border: 0;
     min-height: 100px;
+    .editable-click.editable-disabled {
+      color: @cui-gray-600 !important;
+    }
   }
 
   .card-widget .card-heading {
-    font-size: 12px !important;
+    font-size: 16px !important;
     font-weight: bold !important;
-    line-height: 24px !important;
+    line-height: 30px !important;
     padding-left: 3px !important;
     padding-right: 3px !important;
     background-color: @cui-white;
     border-bottom: 1px solid @cui-gray-100;
+    color: @cui-gray-400;
+    text-align: center;
+    margin-bottom: 0;
   }
 
   .card-widget .card-body {
@@ -464,4 +470,80 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .dimensions-badge-container {
+    background-color: @cui-gray-050;
+    text-shadow: none;
+    color: @cui-gray-700;
+    border: 1px solid @cui-gray-050;
+    margin-right: 10px;
+    position: relative;
+    &.is-editing {
+      border-color: @cui-blue-700;
+    }
+  }
+
+  .dimensions-badge-container-add {
+    padding: 4px;
+    opacity: 0;
+    &.is-adding {
+      opacity: 1;
+      .action-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  .dimensions-badge {
+    display: inline-block;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+
+  .edit-dimensions {
+    padding: 6px;
+    margin-bottom: 20px;
+    .action-icon {
+      opacity: 0;
+      display: inline-block;
+      color: @cui-gray-500;
+      cursor: pointer;
+      &:hover {
+        color: @cui-gray-700;
+      }
+    }
+    &:hover {
+      .action-icon {
+        opacity: 1;
+      }
+      .dimensions-badge-container {
+        cursor: move;
+        border-color: @cui-gray-200;
+        &.is-editing {
+          border-color: @cui-blue-700;
+        }
+      }
+      .dimensions-badge-container-add {
+        opacity: 1;
+        cursor: pointer;
+        border-color: @cui-gray-050;
+      }
+    }
+  }
+
+  .metric-form {
+    position: absolute;
+    z-index: 10;
+    background-color: @cui-white;
+    .hue-box-shadow-bottom;
+    padding: 10px;
+    margin-top: 8px;
+    margin-left: -5px;
+    .selectize-control {
+      margin-right: 10px;
+    }
+  }
+
 }

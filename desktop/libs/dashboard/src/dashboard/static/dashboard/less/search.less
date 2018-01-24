@@ -298,8 +298,12 @@
     cursor: pointer;
   }
 
-  .editable-click {
+  .editable-click, a.editable-click {
     cursor: pointer;
+    border-bottom-color: transparent !important;
+    &:hover {
+      border-bottom-color: @cui-blue-700 !important;
+    }
   }
 
   .CodeMirror {
@@ -802,9 +806,9 @@
         opacity: 1;
       }
     }
-    .card-heading {
-      border-bottom: none !important;
-      padding-left: 6px !important;
+    .ui-sortable {
+      background-color: transparent !important;
+      min-height: auto !important;
     }
   }
 
