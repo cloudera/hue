@@ -1115,7 +1115,7 @@
         });
       });
 
-      it('should suggest tables for "SELECT * FROM testTable WHERE ${some_variable} |"', function() {
+      it('should suggest keywords for "SELECT * FROM testTable WHERE ${some_variable} |"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ${some_variable} ',
           afterCursor: '',
@@ -1130,7 +1130,7 @@
         });
       });
 
-      it('should suggest tables for "SELECT * FROM testTable WHERE ${some_variable} + 1 = |"', function() {
+      it('should suggest columns for "SELECT * FROM testTable WHERE ${some_variable} + 1 = |"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ${some_variable} + 1 = ',
           afterCursor: '',
