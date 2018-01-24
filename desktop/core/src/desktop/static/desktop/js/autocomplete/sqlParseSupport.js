@@ -431,6 +431,10 @@ var SqlParseSupport = (function () {
 
       while (i--) {
         var location = parser.yy.locations[i];
+        if (location.type === 'variable' && location.colRef) {
+          parser.expandIdentifierChain({ wrapper: location.colRef, tablePrimaries: tablePrimaries, isColumnWrapper: true });
+          delete location.colRef.linked;
+        }
 
         // Impala can have references to previous tables after FROM, i.e. FROM testTable t, t.testArray
         // In this testArray would be marked a type table so we need to switch it to column.
@@ -1570,6 +1574,29 @@ var SqlParseSupport = (function () {
       }
       parser.yy.locations.push(loc);
       return loc;
+    };
+
+    parser.addColRefToVariableIfExists = function (left, right) {
+      if (left && left.columnReference && left.columnReference.length && right && right.columnReference && right.columnReference.length && parser.yy.locations.length > 1) {
+
+        var addColRefToVariableLocation = function (variableValue, colRef) {
+          for (var i = parser.yy.locations.length - 1; i > 0; i--) {
+            var location = parser.yy.locations[i];
+            if (location.type === 'variable' && location.value === variableValue) {
+              location.colRef = { identifierChain: colRef };
+              break;
+            }
+          }
+        };
+
+        if (/\$\{[^}]*\}/.test(left.columnReference[0].name)) {
+          // left is variable
+          addColRefToVariableLocation(left.columnReference[0].name, right.columnReference);
+        } else if (/\$\{[^}]*\}/.test(right.columnReference[0].name)) {
+          // right is variable
+          addColRefToVariableLocation(right.columnReference[0].name, left.columnReference);
+        }
+      }
     };
 
     parser.suggestDatabases = function (details) {

@@ -177,22 +177,6 @@
       });
     });
 
-    it('should report locations for "select * from tbl where col = ${var_name=10}; |"', function() {
-      assertLocations({
-        beforeCursor: 'select * from tbl where col = ${var_name=10}; ',
-        expectedLocations: [
-          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 45 } },
-          { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
-          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
-          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'tbl' }] },
-          { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 19, last_column: 45 } },
-          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'tbl' }] }], qualified: false },
-          { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 45 }, value: '${var_name=10}' },
-          { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 45, last_column: 45 } }
-        ]
-      });
-    });
-
     it('should report locations for "SELECT * FROM testTable1 JOIN db1.table2; |"', function() {
       assertLocations({
         beforeCursor: 'SELECT * FROM testTable1 JOIN db1.table2; ',
@@ -970,6 +954,23 @@
       });
 
       describe('variable references', function () {
+
+        it('should variable location for "select * from tbl where col = ${var_name=10}; |"', function() {
+          assertLocations({
+            beforeCursor: 'select * from tbl where col = ${var_name=10}; ',
+            expectedLocations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 45 } },
+              { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+              { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'tbl' }] },
+              { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 19, last_column: 45 } },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'tbl' }] }], qualified: false },
+              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 45 }, value: '${var_name=10}', colRef: { identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'tbl' }] }] } },
+              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 45, last_column: 45 } }
+            ]
+          });
+        });
+
         it('should report variable location for "SELECT * FROM testTable WHERE foo = ${some_var}; |"', function () {
           assertLocations({
             dialect: 'impala',
@@ -982,8 +983,68 @@
               { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 24 }, identifierChain: [{ name: 'testTable' }] },
               { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 25, last_column: 48 } },
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 34 }, identifierChain: [{ name: 'foo' }], qualified: false, tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 48 }, value: '${some_var}' },
+              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 48 }, value: '${some_var}', colRef: { identifierChain: [{ name: 'foo' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] } },
               { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 48, last_column: 48 } }
+            ]
+          });
+        });
+
+        it('should report variable location for "SELECT * FROM tbl1, tbl2 WHERE foo = ${some_var}; |"', function () {
+          assertLocations({
+            dialect: 'impala',
+            beforeCursor: 'SELECT * FROM tbl1, tbl2 WHERE foo = ${some_var}; ',
+            afterCursor: '',
+            expectedLocations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 49 } },
+              { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+              { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'tbl2' }] }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 19 }, identifierChain: [{ name: 'tbl1' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 25 }, identifierChain: [{ name: 'tbl2' }] },
+              { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 26, last_column: 49 } },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column: 35 }, identifierChain: [{ name: 'foo' }], qualified: false, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'tbl2' }] }] },
+              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 38, last_column: 49 }, value: '${some_var}', colRef: { identifierChain: [{ name: 'foo' }], tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'tbl2' }] }] } },
+              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 49, last_column: 49 } }
+            ]
+          });
+        });
+
+        it('should report variable location for "SELECT * FROM tbl1, tbl2 WHERE tbl1.foo = ${some_var}; |"', function () {
+          assertLocations({
+            dialect: 'impala',
+            beforeCursor: 'SELECT * FROM tbl1, tbl2 WHERE tbl1.foo = ${some_var}; ',
+            afterCursor: '',
+            expectedLocations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 54 } },
+              { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+              { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'tbl2' }] }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 19 }, identifierChain: [{ name: 'tbl1' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 25 }, identifierChain: [{ name: 'tbl2' }] },
+              { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 26, last_column: 54 } },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 32, last_column: 36 }, identifierChain: [{ name: 'tbl1' }] },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 40 }, identifierChain: [{ name: 'foo' }], qualified: true, tables: [{ identifierChain: [{ name: 'tbl1' }] }] },
+              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 43, last_column: 54 }, value: '${some_var}', colRef: { identifierChain: [{ name: 'foo' }], tables: [{ identifierChain: [{ name: 'tbl1' }] }] } },
+              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 54, last_column: 54 } }
+            ]
+          });
+        });
+
+        it('should report variable location for "SELECT * FROM tbl1, somedb.tbl2 WHERE ${some_var} > foo.bar; |"', function () {
+          assertLocations({
+            dialect: 'impala',
+            beforeCursor: 'SELECT * FROM tbl1, somedb.tbl2 WHERE ${some_var} > foo.bar; ',
+            afterCursor: '',
+            expectedLocations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 60 } },
+              { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+              { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'somedb' }, { name: 'tbl2' }] }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 19 }, identifierChain: [{ name: 'tbl1' }] },
+              { type: 'database', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 27 }, identifierChain: [{ name: 'somedb' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 28, last_column: 32 }, identifierChain: [{ name: 'somedb' }, { name: 'tbl2' }] },
+              { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 33, last_column: 60 } },
+              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 50 }, value: '${some_var}', colRef: { identifierChain: [{ name: 'foo' }, { name: 'bar' }], tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'somedb' }, { name: 'tbl2' }] }] } },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 53, last_column: 56 }, identifierChain: [{ name: 'foo' }], qualified: false, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'somedb' }, { name: 'tbl2' }] }] },
+              { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 57, last_column: 60 }, identifierChain: [{ name: 'foo' }, { name: 'bar' }], qualified: true, tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'somedb' }, { name: 'tbl2' }] }] },
+              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 60, last_column: 60 } }
             ]
           });
         });
