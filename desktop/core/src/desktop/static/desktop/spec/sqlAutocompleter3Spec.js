@@ -41,8 +41,8 @@
 
       describe('Test a whole lot of different parse results', function () {
 
-
         beforeEach(function() {
+          DataCatalog.disableCache();
           AUTOCOMPLETE_TIMEOUT = 1;
           jasmine.Ajax.install();
 
@@ -266,6 +266,7 @@
 
         afterEach(function() {
           AUTOCOMPLETE_TIMEOUT = 0;
+          DataCatalog.enableCache();
           jasmine.Ajax.uninstall();
         });
 
@@ -300,7 +301,6 @@
           // }
         });
       });
-
 
       it('should handle parse results with keywords', function () {
         subject.entries([]);
@@ -348,6 +348,56 @@
 
     describe('SqlAutocomplete3', function () {
 
+      var subject;
+
+      beforeEach(function() {
+        DataCatalog.disableCache();
+        AUTOCOMPLETE_TIMEOUT = 1;
+        jasmine.Ajax.install();
+
+        jasmine.Ajax.stubRequest(
+          /.*\/notebook\/api\/autocomplete\/$/
+        ).andReturn({
+          status: 200,
+          statusText: 'HTTP/1.1 200 OK',
+          contentType: 'application/json',
+          responseText: '{"status": 0, "databases": ["default"]}'
+        });
+
+        jasmine.Ajax.stubRequest(
+          /.*\/notebook\/api\/autocomplete\/[^/]+$/
+        ).andReturn({
+          status: 200,
+          statusText: 'HTTP/1.1 200 OK',
+          contentType: 'application/json',
+          responseText: '{"status": 0, "tables_meta": [' +
+          '{"comment": "comment", "type": "Table", "name": "foo"}, ' +
+          '{"comment": null, "type": "View", "name": "bar_view"}, ' +
+          '{"comment": null, "type": "Table", "name": "bar"}]}'
+        });
+
+        jasmine.Ajax.stubRequest(
+          /.*\/notebook\/api\/autocomplete\/[^/]+\/[^/]+$/
+        ).andReturn({
+          status: 200,
+          statusText: 'HTTP/1.1 200 OK',
+          contentType: 'application/json',
+          responseText: '{"status": 0, "support_updates": false, "hdfs_link": "/filebrowser/view=/user/hive/warehouse/customers", "extended_columns": [{"comment": "", "type": "int", "name": "id"}, {"comment": "", "type": "string", "name": "name"}, {"comment": "", "type": "struct<email_format:string,frequency:string,categories:struct<promos:boolean,surveys:boolean>>", "name": "email_preferences"}, {"comment": "", "type": "map<string,struct<street_1:string,street_2:string,city:string,state:string,zip_code:string>>", "name": "addresses"}, {"comment": "", "type": "array<struct<order_id:string,order_date:string,items:array<struct<product_id:int,sku:string,name:string,price:double,qty:int>>>>", "name": "orders"}], "columns": ["id", "name", "email_preferences", "addresses", "orders"], "partition_keys": []}'
+        });
+      });
+
+      afterEach(function() {
+        if (subject.suggestions.loading()) {
+          for (var i = 0; i < jasmine.Ajax.requests.count(); i++) {
+            console.log(jasmine.Ajax.requests.at(i));
+          }
+          fail('Still loading, missing ajax spec?')
+        }
+        AUTOCOMPLETE_TIMEOUT = 0;
+        DataCatalog.enableCache();
+        jasmine.Ajax.uninstall();
+      });
+
       var createSubject = function (dialect, textBeforeCursor, textAfterCursor, positionStatement) {
         var editor = ace.edit();
         editor.setValue(textBeforeCursor);
@@ -361,7 +411,7 @@
               return dialect;
             },
             database: function () {
-              'default'
+              return 'default';
             },
             positionStatement: ko.observable(positionStatement)
           },
@@ -372,47 +422,42 @@
       };
 
       it('should create suggestions for Hive', function () {
-        var subject = createSubject('hive', '', '');
+        subject = createSubject('hive', '', '');
         expect(subject.suggestions.filtered().length).toBe(0);
         subject.autocomplete();
         expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
       });
 
       it('should create suggestions for Impala', function () {
-        var subject = createSubject('impala', '', '');
+        subject = createSubject('impala', '', '');
         expect(subject.suggestions.filtered().length).toBe(0);
         subject.autocomplete();
         expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
       });
 
       it('should fallback to the active query when there are surrounding errors', function () {
-        var subject = createSubject('hive', 'SELECT FROMzzz bla LIMIT 1; SELECT ', ' FROM bla', { location: { first_line: 1, last_line: 1, first_column: 27, last_column: 52 }});
+        subject = createSubject('hive', 'SELECT FROMzzz bla LIMIT 1; SELECT ', ' FROM bla', { location: { first_line: 1, last_line: 1, first_column: 27, last_column: 52 }});
         expect(subject.suggestions.filtered().length).toBe(0);
         subject.autocomplete();
         expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
       });
 
       it('should only fallback to the active query when there are surrounding errors if there\'s an active query', function () {
-        var subject = createSubject('hive', 'SELECT FROMzzz bla LIMIT 1; SELECT ', ' FROM bla');
+        subject = createSubject('hive', 'SELECT FROMzzz bla LIMIT 1; SELECT ', ' FROM bla');
         expect(subject.suggestions.filtered().length).toBe(0);
         subject.autocomplete();
         expect(subject.suggestions.filtered().length).toBe(0);
       });
 
       it('should suggest columns from subqueries', function () {
-        var subject = createSubject('hive', 'SELECT ', ' FROM customers, (SELECT app FROM web_logs) AS subQ;');
+        subject = createSubject('hive', 'SELECT ', ' FROM customers, (SELECT app FROM web_logs) AS subQ;');
         expect(subject.suggestions.filtered().length).toBe(0);
         subject.autocomplete();
         expect(subject.suggestions.filtered().length).toBeGreaterThan(0);
 
-        var appFound = false;
 
-        subject.suggestions.filtered().every(function (suggestion) {
-          if (suggestion.isColumn && suggestion.value === 'app') {
-            appFound = true;
-            return false;
-          }
-          return true;
+        var appFound = subject.suggestions.filtered().some(function (suggestion) {
+          return suggestion.category.id === 'column' && suggestion.value === 'app';
         });
 
         expect(appFound).toBeTruthy();
