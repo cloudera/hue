@@ -2364,10 +2364,11 @@ var EditorViewModel = (function() {
       if (cp.schedulerViewModel) {
         cp.schedulerViewModel.availableTimezones = [];
       }
+      var editorMode = vm.editorMode() || (self.isPresentationMode() && vm.editorType() != 'notebook'); // Editor should not convert to Notebook in presentation mode
 
       $.post("/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(cp, NOTEBOOK_MAPPING),
-        "editorMode": vm.editorMode()
+        "editorMode": editorMode
       }, function (data) {
         if (data.status == 0) {
           self.id(data.id);
@@ -2375,7 +2376,7 @@ var EditorViewModel = (function() {
           var wasHistory = self.isHistory();
           self.isHistory(false);
           $(document).trigger("info", data.message);
-          if (vm.editorMode()) {
+          if (editorMode) {
             if (! data.save_as) {
               var existingQuery = self.snippets()[0].queries().filter(function (item) {
                 return item.uuid() === data.uuid
