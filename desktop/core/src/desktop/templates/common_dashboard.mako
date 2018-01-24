@@ -186,7 +186,7 @@
     <!-- ko if: $root.selectedQDefinition() != null -->
     <div class="row-fluid">
       <div class="card card-additional card-home span12" style="background-color: #F5F5F5">
-        <strong data-bind="editable: $root.selectedQDefinition().name, editableOptions: {enabled: true, placement: 'right'}"></strong>
+        <strong data-bind="editable: $root.selectedQDefinition().name, editableOptions: { enabled: true, placement: 'right' }"></strong>
         <!-- ko if: $root.selectedQDefinition().hasChanged() -->
         &nbsp;&nbsp;
         <a class="pointer" data-bind="click: $root.collection.reloadQDefinition" title="${ _('Reload this definition') }"><i class="fa fa-undo"></i></a> <a class="pointer" data-bind="click: $root.collection.updateQDefinition" title="${ _('Update the definition') }"><i class="fa fa-save"></i></a>
@@ -289,11 +289,11 @@
       %endif
       <!-- ko if: $root.collection && $root.collection.getFacetById(id()) -->
       <span data-bind="with: $root.collection.getFacetById(id())">
-        <span data-bind="editable: label, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+        <span data-bind="editable: label, editableOptions: { enabled: true, placement: 'right' }"></span>
       </span>
       <!-- /ko -->
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
-        <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+        <span data-bind="editable: name, editableOptions: { enabled: true, placement: 'right' }"></span>
       <!-- /ko -->
       <div class="inline pull-right" data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
