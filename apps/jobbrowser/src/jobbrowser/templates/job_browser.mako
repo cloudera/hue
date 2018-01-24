@@ -1789,6 +1789,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <form class="form-search">
     <input type="text" data-bind="clearable: $parent.metadataFilter, valueUpdate: 'afterkeydown'" class="input-xlarge search-query" placeholder="${_('Text Filter')}">
   </form>
+  %if not is_mini:
+  <div id="job-mapreduce-page-metadata-template${ SUFFIX }" style="overflow-y: hidden; height: calc(100vh - 350px);">
+  % else:
+  <div id="job-mapreduce-page-metadata-template${ SUFFIX }" style="overflow-y: hidden; height: 400px;">
+  %endif
   <table id="jobbrowserJobMetadataTable" class="table table-condensed">
     <thead>
     <tr>
@@ -1796,7 +1801,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <th width="50%">${ _('Value') }</th>
     </tr>
     </thead>
-    <tbody data-bind="foreach: property">
+    <tbody data-bind="foreachVisible: { data: property, minHeight: 20, container: '#job-mapreduce-page-metadata-template${ SUFFIX }'}">
       <tr>
         <td data-bind="text: name"></td>
         <td>
@@ -1805,6 +1810,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </tr>
     </tbody>
   </table>
+  </div>
   <!-- /ko -->
 </script>
 
