@@ -911,7 +911,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (self.currentApp() == 'editor' && $('#editorComponents').length) {
             var vm = ko.dataFor($('#editorComponents')[0]);
             if (vm.isPresentationMode()) {
-              vm.isPresentationMode(false);
+              vm.selectedNotebook().isPresentationMode(false);
             }
           }
 
