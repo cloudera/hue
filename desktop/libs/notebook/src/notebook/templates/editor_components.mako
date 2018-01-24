@@ -256,7 +256,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <i class="fa fa-line-chart"></i>
         </a>
 
-        <!-- ko if: $root.isPresentationMode() && $root.canSave() -->
+        <!-- ko if: $root.canSave() -->
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
         <ul class="dropdown-menu">
           <li>
@@ -894,7 +894,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <script type="text/html" id="notebook-snippet-header${ suffix }">
   <!-- ko if: $root.isPresentationMode() || $root.isResultFullScreenMode() -->
   <div class="inline">
-    <span data-bind="text: name"></span>
+    <!-- ko if: name() -->
+      <span data-bind="text: name"></span>
+    <!-- /ko -->
+    <!-- ko if: !name() && !$root.isHidingCode() -->
+      <span>${ _("Add -- comments on top of the SQL statement to display a title") }</span>
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 
@@ -1195,15 +1200,15 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     </a>
     <ul class="dropdown-menu">
       <li>
-        <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-          <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
-        </a>
-      </li>
-      <li>
-        <a class="pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show code') }' : '${ _ko('Hide code') }' }">
+        <a class="pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.selectedNotebook().isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show the logic') }' : '${ _ko('Hide the logic') }' }">
           <i class="fa fa-fw" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
           <span data-bind="visible: $root.isHidingCode">${ _('Show the code') }</span>
           <span data-bind="visible: ! $root.isHidingCode()">${ _('Hide the code') }</span>
+        </a>
+      </li>
+      <li>
+        <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+          <i class="fa fa-fw fa-eraser"></i> ${ _('Clear results') }
         </a>
       </li>
       <li>
