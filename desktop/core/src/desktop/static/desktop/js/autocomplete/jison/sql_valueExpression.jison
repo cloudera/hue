@@ -140,10 +140,26 @@ ValueExpression_EDIT
 // ------------------  COMPARISON ------------------
 
 ValueExpression
- : ValueExpression '=' ValueExpression                    -> { types: [ 'BOOLEAN' ] }
- | ValueExpression '<' ValueExpression  -> { types: [ 'BOOLEAN' ] }
- | ValueExpression '>' ValueExpression  -> { types: [ 'BOOLEAN' ] }
- | ValueExpression 'COMPARISON_OPERATOR' ValueExpression  -> { types: [ 'BOOLEAN' ] }
+ : ValueExpression '=' ValueExpression
+   {
+     parser.addColRefToVariableIfExists($1, $3);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression '<' ValueExpression
+   {
+     parser.addColRefToVariableIfExists($1, $3);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression '>' ValueExpression
+   {
+     parser.addColRefToVariableIfExists($1, $3);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'COMPARISON_OPERATOR' ValueExpression
+   {
+     parser.addColRefToVariableIfExists($1, $3);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
  ;
 
 ValueExpression_EDIT
