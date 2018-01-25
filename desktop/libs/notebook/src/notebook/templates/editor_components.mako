@@ -392,7 +392,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 <div id="helpModal${ suffix }" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${_('Editor keyboard shortcuts')}</h2>
+    <h2 class="modal-title">${_('Editor help')}</h2>
   </div>
   <div class="modal-body">
     <!-- ko component: 'aceKeyboardShortcuts' --><!-- /ko -->
@@ -936,7 +936,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
    <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
 
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Query settings') }"><i class="fa fa-cog"></i></a>
-    <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor shortcuts') }" data-toggle="modal" data-target="#helpModal${ suffix }"><i class="fa fa-question"></i></a>
+    <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor help') }" data-toggle="modal" data-target="#helpModal${ suffix }"><i class="fa fa-question"></i></a>
   </div>
 </script>
 
