@@ -1528,6 +1528,16 @@ var SqlParseSupport = (function () {
       });
     };
 
+    parser.addVariableLocation = function (location, value) {
+      if (/\$\{[^}]*\}/.test(value)) {
+        parser.yy.locations.push({
+          type: 'variable',
+          location: adjustLocationForCursor(location),
+          value: value
+        });
+      }
+    };
+
     parser.addColumnLocation = function (location, identifierChain) {
       var isVariable = identifierChain.length && /\$\{[^}]*\}/.test(identifierChain[identifierChain.length - 1].name);
       if (isVariable) {
@@ -1578,7 +1588,6 @@ var SqlParseSupport = (function () {
 
     parser.addColRefToVariableIfExists = function (left, right) {
       if (left && left.columnReference && left.columnReference.length && right && right.columnReference && right.columnReference.length && parser.yy.locations.length > 1) {
-
         var addColRefToVariableLocation = function (variableValue, colRef) {
           for (var i = parser.yy.locations.length - 1; i > 0; i--) {
             var location = parser.yy.locations[i];
@@ -1836,8 +1845,8 @@ var SqlParseSupport = (function () {
     'suggestKeywords', 'suggestColRefKeywords', 'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions',
     'suggestColumns', 'suggestGroupBys', 'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation',
     'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addColumnAliasLocation', 'addTableAliasLocation',
-    'addSubqueryAliasLocation', 'addTableLocation', 'addAsteriskLocation', 'addColumnLocation', 'addCteAliasLocation', 'addUnknownLocation',
-    'suggestDatabases', 'suggestHdfs', 'suggestValues'];
+    'addSubqueryAliasLocation', 'addTableLocation', 'addAsteriskLocation', 'addVariableLocation', 'addColumnLocation', 'addCteAliasLocation', 'addUnknownLocation',
+    'addColRefToVariableIfExists', 'suggestDatabases', 'suggestHdfs', 'suggestValues'];
 
   var SYNTAX_PARSER_NOOP = function () {};
 

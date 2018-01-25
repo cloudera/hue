@@ -1048,6 +1048,38 @@
             ]
           });
         });
+
+        it('should variable location for "select * from tbl where col = \'${var_name=10}\'; |"', function() {
+          assertLocations({
+            beforeCursor: 'select * from tbl where col = \'${var_name=10}\'; ',
+            expectedLocations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 47 } },
+              { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+              { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'tbl' }] },
+              { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 19, last_column: 47 } },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain: [{ name: 'col' }], qualified: false, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 47 }, value: '${var_name=10}', colRef: { identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'tbl' }] }] } },
+              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 47, last_column: 47 } }
+            ]
+          });
+        });
+
+        it('should variable location for "select * from tbl where col = "${var_name=10}"; |"', function() {
+          assertLocations({
+            beforeCursor: 'select * from tbl where col = "${var_name=10}"; ',
+            expectedLocations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 47 } },
+              { type: 'selectList', missing: false, location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 } },
+              { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'tbl' }] },
+              { type: 'whereClause', missing: false, location: { first_line: 1, last_line: 1, first_column: 19, last_column: 47 } },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain: [{ name: 'col' }], qualified: false, tables: [{ identifierChain: [{ name: 'tbl' }] }] },
+              { type: 'variable', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 47 }, value: '${var_name=10}', colRef: { identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'tbl' }] }] } },
+              { type: 'limitClause', missing: true, location: { first_line: 1, last_line: 1, first_column: 47, last_column: 47 } }
+            ]
+          });
+        });
       });
     })
   });
