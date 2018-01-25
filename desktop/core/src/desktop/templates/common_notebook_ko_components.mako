@@ -202,14 +202,14 @@ except ImportError, e:
         </li>
         % endif
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal').modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { savePath(''); $('#saveResultsModal' + snippet.id()).modal('show'); }" title="${ _('Export the result into a file, an index, a new table...') }">
             <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Export') }
           </a>
         </li>
       </ul>
     </div>
 
-    <div id="saveResultsModal" class="modal hide fade">
+    <div class="modal hide fade saveResultsModal" data-bind="attr: { 'id': 'saveResultsModal' + snippet.id() }">
       <div class="loader hide">
         <div class="overlay"></div>
         <i class="fa fa-spinner fa-spin"></i>
@@ -217,10 +217,10 @@ except ImportError, e:
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-        <h2 class="modal-title">${_('Export the query result in a')}</h2>
+        <h2 class="modal-title">${_('Export the query result in a')} </h2>
       </div>
       <div class="modal-body" style="padding-left: 30px">
-        <form id="saveResultsForm" method="POST" class="form form-inline">
+        <form method="POST" class="form form-inline">
           ${ csrf_token(request) | n,unicode }
           <fieldset>
             ${ _('File') }
@@ -293,7 +293,7 @@ except ImportError, e:
       </div>
     </div>
 
-    <div id="downloadProgressModal" class="modal hide fade">
+    <div class="modal hide fade downloadProgressModal" data-bind="attr: { 'id': 'downloadProgressModal' + snippet.id() }">
       <div class="modal-header">
         <!-- ko if: isDownloading -->
         <h2 class="modal-title">${_('Your download is being prepared')}</h2>
@@ -343,11 +343,14 @@ except ImportError, e:
 
         self.checkDownloadInterval = -1;
 
-        $('#saveResultsModal, #downloadProgressModal').on('show', function () {
+        self.saveResultsModalId = '#saveResultsModal' + self.snippet.id();
+        self.downloadProgressModalId = '#downloadProgressModal' + self.snippet.id();
+
+        $('.saveResultsModal, .downloadProgressModal').on('show', function () {
           self.snippet.saveResultsModalVisible(true);
         });
 
-        $('#saveResultsModal, #downloadProgressModal').on('hide', function () {
+        $('.saveResultsModal, .downloadProgressModal').on('hide', function () {
           self.snippet.saveResultsModalVisible(false);
         });
 
@@ -389,8 +392,8 @@ except ImportError, e:
         self.trySaveResults = function () {
           if (self.isValidDestination()) {
             self.saveResults();
-            $("#saveResultsModal button.btn-primary").button('loading');
-            $("#saveResultsModal .loader").show();
+            $(self.saveResultsModalId + ' button.btn-primary').button('loading');
+            $(self.saveResultsModalId + ' .loader').show();
           }
         };
 
@@ -411,11 +414,11 @@ except ImportError, e:
               if (IS_HUE_4) {
                 $(".modal-backdrop").remove();
                 if (self.saveTarget() == 'hdfs-file' || self.saveTarget() == 'search-index') {
-                  $("#saveResultsModal").modal("hide");
+                  $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('open.link', resp.watch_url);
                 } else {
                   if (resp.history_uuid) {
-                    $("#saveResultsModal").modal("hide");
+                    $(self.saveResultsModalId).modal('hide');
                     huePubSub.publish('notebook.task.submitted', resp.history_uuid);
                   } else if (resp && resp.message) {
                     $(document).trigger("error", resp.message);
@@ -430,8 +433,8 @@ except ImportError, e:
           }).fail(function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
           }).done(function() {
-            $("#saveResultsModal button.btn-primary").button('reset');
-            $("#saveResultsModal .loader").hide();
+            $(self.saveResultsModalId + ' button.btn-primary').button('reset');
+            $(self.saveResultsModalId + ' .loader').hide();
           });
         };
 
@@ -439,7 +442,7 @@ except ImportError, e:
           console.log('Cancel download');
           self.isDownloading(false);
           window.clearInterval(self.checkDownloadInterval);
-          $('#downloadProgressModal').modal('hide');
+          $(self.downloadProgressModalId).modal('hide');
         };
       }
 
@@ -462,7 +465,7 @@ except ImportError, e:
         self.checkDownloadInterval = window.setInterval(function () {
           if ($.cookie('download-' + self.snippet.id()) === null || typeof $.cookie('download-' + self.snippet.id()) === 'undefined') {
             if (timesChecked == 10) {
-              $('#downloadProgressModal').modal('show');
+              $(self.downloadProgressModalId).modal('show');
             }
           }
           else {
@@ -475,15 +478,15 @@ except ImportError, e:
               self.isDownloading(false);
               self.notebook.avoidClosing = false;
               if (self.downloadTruncated()) {
-                $('#downloadProgressModal').modal('show');
+                $(self.downloadProgressModalId).modal('show');
               }
               else {
-                $('#downloadProgressModal').modal('hide');
+                $(self.downloadProgressModalId).modal('hide');
               }
             }
             catch (e) {
               self.isDownloading(false);
-              $('#downloadProgressModal').modal('hide');
+              $(self.downloadProgressModalId).modal('hide');
               self.notebook.avoidClosing = false;
             }
           }
