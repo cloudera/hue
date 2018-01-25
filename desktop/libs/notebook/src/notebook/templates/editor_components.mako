@@ -370,8 +370,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <h2 class="margin-left-30 margin-right-10 inline padding-left-5" data-bind="text: $root.selectedNotebook().name"></h2>
         <h2 class="muted inline" data-bind="text: $root.selectedNotebook().description"></h2>
         <div class="clearfix"></div>
-        <!-- ko template: { name: 'notebook-menu-buttons-${ suffix }' } --><!-- /ko -->
       <!-- /ko -->
+
+      <!-- ko template: { name: 'notebook-menu-buttons-${ suffix }' } --><!-- /ko -->
 
       <div class="margin-left-30 margin-top-10 padding-left-5 margin-bottom-20">
         <!-- ko template: { name: 'notebook-actions' } --><!-- /ko -->
