@@ -16,6 +16,8 @@
 
 var DataCatalog = (function () {
 
+  var STORAGE_POSTFIX = LOGGED_USERNAME // TODO: Add flag for embedded mode
+
   var DATA_CATALOG_VERSION = 1;
 
   var cacheEnabled = true;
@@ -30,7 +32,7 @@ var DataCatalog = (function () {
     self.sourceType = sourceType;
     self.entries = {};
     self.store = localforage.createInstance({
-      name: "HueDataCatalog_" + self.sourceType + '_' + LOGGED_USERNAME // TODO: Add flag for embedded mode
+      name: 'HueDataCatalog_' + self.sourceType + '_' + STORAGE_POSTFIX
     });
   }
 
@@ -771,7 +773,7 @@ var DataCatalog = (function () {
    *
    * @return {Promise}
    */
-  DataCatalogEntry.prototype.addNavMetaTags = function (tags) {
+  DataCatalogEntry.prototype.addNavigatorTags = function (tags) {
     var self = this;
     var deferred = $.Deferred();
     if (HAS_NAVIGATOR) {
@@ -803,7 +805,7 @@ var DataCatalog = (function () {
    *
    * @return {Promise}
    */
-  DataCatalogEntry.prototype.deleteNavMetaTags = function (tags) {
+  DataCatalogEntry.prototype.deleteNavigatorTags = function (tags) {
     var self = this;
     var deferred = $.Deferred();
     if (HAS_NAVIGATOR) {
@@ -1148,6 +1150,12 @@ var DataCatalog = (function () {
     }
   });
 
+  var allNavigatorTagsPromise = undefined;
+
+  var sharedDataCalogStore = localforage.createInstance({
+    name: 'HueDataCatalog_' + STORAGE_POSTFIX
+  });
+
   return {
     /**
      * @param options
@@ -1164,6 +1172,68 @@ var DataCatalog = (function () {
      * @return {DataCatalog}
      */
     getCatalog : getCatalog,
+
+    /**
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.refreshCache]
+     *
+     * @return {CancellablePromise}
+     */
+    getAllNavigatorTags: function (options) {
+      if (allNavigatorTagsPromise && (!options || !options.refreshCache)) {
+        return allNavigatorTagsPromise;
+      }
+
+      var deferred = $.Deferred();
+      allNavigatorTagsPromise = deferred.promise();
+
+      var reloadAllTags = function () {
+        ApiHelper.getInstance().fetchAllNavigatorTags({
+          silenceErrors: options && options.silenceErrors,
+        }).done(deferred.resolve).fail(deferred.reject);
+
+        deferred.done(function (allTags) {
+          sharedDataCalogStore.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
+        })
+      };
+
+      if (!options || !options.refreshCache) {
+        sharedDataCalogStore.getItem('hue.dataCatalog.allNavTags').then(function (storeEntry) {
+          if (storeEntry && storeEntry.version === DATA_CATALOG_VERSION && (!storeEntry.hueTimestamp || (Date.now() - storeEntry.hueTimestamp) < CACHEABLE_TTL.default)) {
+            deferred.resolve(storeEntry.allTags);
+          } else {
+            reloadAllTags();
+          }
+        }).catch(reloadAllTags);
+      } else {
+        reloadAllTags();
+      }
+
+      return allNavigatorTagsPromise;
+    },
+
+    updateAllNavigatorTags: function (tagsToAdd, tagsToRemove) {
+      if (allNavigatorTagsPromise) {
+        allNavigatorTagsPromise.done(function (allTags) {
+          tagsToAdd.forEach(function (newTag) {
+            if (!allTags[newTag]) {
+              allTags[newTag] = 0;
+            }
+            allTags[newTag]++;
+          });
+          tagsToRemove.forEach(function (newTag) {
+            if (!allTags[tagsToRemove]) {
+              allTags[tagsToRemove]--;
+              if (allTags[tagsToRemove] === 0) {
+                delete allTags[tagsToRemove];
+              }
+            }
+          });
+          sharedDataCalogStore.setItem('hue.dataCatalog.allNavTags', allTags);
+        });
+      }
+    },
 
     enableCache: function () {
       cacheEnabled = true
