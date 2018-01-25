@@ -169,7 +169,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         % endif
         % if can_write:
         <span class="pull-right">
-          <a href="#new_table_modal" role="button" data-bind="click: function(){prepareNewTableForm(); hbaseApp.focusModel(hbaseApp.views.tables);}" class="btn" data-toggle="modal"><i class='fa fa-plus-circle'></i> ${_('New Table')}</a>
+          <a href="#new_table_modal" role="button" data-bind="click: function(){ huePubSub.publish('hbase.prepare.new.form'); hbaseApp.focusModel(hbaseApp.views.tables);}" class="btn" data-toggle="modal"><i class='fa fa-plus-circle'></i> ${_('New Table')}</a>
         </span>
         % endif
       </div>
@@ -2515,10 +2515,10 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       $(this).trigger('reset');
     });
 
-    var prepareNewTableForm = function () {
+    huePubSub.subscribe('hbase.prepare.new.form', function () {
       $("#new_table_modal .modal-body ul").empty();
       addColumnToNewTableForm();
-    }
+    }, 'hbase');
 
     var addColumnToNewTableForm = function () {
       var $li = $("<li>").addClass("column").css("marginBottom", "10px").html($("#columnTemplate").html());
