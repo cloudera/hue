@@ -850,7 +850,7 @@ CUSTOM = ConfigSection(
                    help=_("The login splash HTML code. This code will be placed in the login page, "
                         "useful for security warning messages.")),
     CACHEABLE_TTL=Config("cacheable_ttl",
-                   default=86400000,
+                   default=10 * 24 * 60 * 60 * 1000,
                    type=int,
                    help=_("The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 it disables the cache.")),
     LOGO_SVG=Config("logo_svg",
