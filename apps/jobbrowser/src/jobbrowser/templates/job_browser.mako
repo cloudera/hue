@@ -2763,8 +2763,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               format: 'link'
             },
             function(data) {
-              if (data.attemptid) {
-                openJob(data.attemptid);
+              var id = data.attemptid || data.job;
+              if (id) {
+                openJob(id);
               } else {
                 $(document).trigger("error", '${ _("No log available") }');
               }

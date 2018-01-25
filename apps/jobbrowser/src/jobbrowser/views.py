@@ -413,9 +413,12 @@ def job_single_logs(request, job, offset=LOG_OFFSET_BYTES):
       task = recent_tasks[0]
 
   if task is None or not task.taskAttemptIds:
-    raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
-
-  params = {'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1], 'offset': offset}
+    if request.GET.get('format') == 'link':
+      params = {'job': job.jobId, 'offset': offset}
+    else:
+      raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
+  else:
+    params = {'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1], 'offset': offset}
 
   if request.GET.get('format') == 'link':
     return JsonResponse(params)
