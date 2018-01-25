@@ -33,10 +33,10 @@ from django.utils.translation import ugettext as _
           hasErrors: hasErrors,
           errorMessage: '${_ko("Tags could not be loaded.")}',
           setTags: currentTags,
-          onSave: onSave,
+          onSave: saveTags.bind($data),
           validRegExp: '^[a-zA-z0-9_\-]{1,50}$',
           invalidMessage: '${_ko("Tags can only contain 1 to 50 alphanumeric characters, '_' or '-'.")}',
-          load: loadTags
+          load: getSelectizeTags
         }"></textarea>
        <div class="selectize-error" style="display: none;"><i class="fa fa-exclamation-triangle"></i> <span class="message"></span></div>
      </div>
@@ -46,162 +46,98 @@ from django.utils.translation import ugettext as _
     (function () {
       /**
        * @param {object} params
-       * @param {String} sourceType
-       * @param {String} defaultDatabase
-       * @param {object[]} [params.identifierChain]
-       * @param {String} [params.database]
-       * @param {String} [params.table]
-       * @param {String} [params.column]
+       * @param {DataCatalogEntry} [params.catalogEntry]
        *
        * @constructor
        */
       function NavTags(params) {
         var self = this;
-        var apiHelper = ApiHelper.getInstance();
 
-        var identifierChain = ko.unwrap(params.identifierChain);
-        if (! params.identifierChain) {
-          identifierChain = [];
-          if (params.database) {
-            identifierChain.push({ name: ko.unwrap(params.database) });
-          }
-          if (params.table) {
-            identifierChain.push({ name: ko.unwrap(params.table) });
-          }
-          if (params.column) {
-            identifierChain.push({ name: ko.unwrap(params.column) });
-          }
-        }
-
-        self.identity;
         self.hasErrors = ko.observable(false);
         self.loading = ko.observable(true);
-        self.navEntity = ko.observable();
+
         self.currentTags = ko.observableArray();
         self.allTags = ko.observableArray();
 
-        var fetchNavEntity = function () {
-          var fetchDeferral = $.Deferred();
-          var path = $.map(identifierChain, function (identifier) { return identifier.name });
+        self.catalogEntry = params.catalogEntry;
 
-          apiHelper.containsDatabase(params.sourceType, path[0]).done(function (firstIsDatabase) {
-            if (!firstIsDatabase) {
-              path.unshift(ko.unwrap(params.defaultDatabase));
-            }
-            apiHelper.fetchNavigatorMetadata({
-              path: path,
-              isView: typeof params.fetchedData !== 'undefined' && typeof params.fetchedData() !== 'undefined' && params.fetchedData().is_view,
-              silenceErrors: true,
-              noCache: true
-            }).done(function (data) {
-              fetchDeferral.resolve(data);
-            }).fail(fetchDeferral.reject);
-          });
-          return fetchDeferral;
-        };
-
-
-        var fetchAllTags = function () {
-          var fetchDeferral = $.Deferred();
-          apiHelper.listNavTags({
-            successCallback: function (data) {
-              fetchDeferral.resolve(Object.keys(data.tags));
-            },
-            silenceErrors: true,
-            errorCallback: function (error) {
-              hueUtils.logError(error);
-              fetchDeferral.reject()
-            }
-          });
-          return fetchDeferral;
-        };
-
-        self.loading(true);
-        $.when(fetchNavEntity(), fetchAllTags()).done(function (entity, allTags) {
-          self.identity = entity.identity;
-          self.currentTags(entity.tags);
-          self.allTags(allTags);
-        }).fail(function () {
-          self.hasErrors(true);
-        }).always(function () {
-          self.loading(false);
-        });
-
-        self.loadTags = function (query, callback) {
+        self.getSelectizeTags = function (query, callback) {
           callback($.map(self.allTags(), function (tag) { return { value: tag, text: tag }}));
         };
 
-        self.onSave = function (value) {
-          self.loading(true);
-          var newTags = value.length > 0 ? value.split(',') : [];
-          var tagsToRemove = [];
-          var tagsToAdd = [];
-          var tagIndex = {};
-          self.currentTags().forEach(function (tag) {
-            tagIndex[tag] = false;
-          });
-          newTags.forEach(function (newTag) {
-            if (typeof tagIndex[newTag] !== 'undefined') {
-              tagIndex[newTag] = true;
-            } else {
-              tagsToAdd.push(newTag);
-            }
-          });
-          Object.keys(tagIndex).forEach(function (oldTag) {
-            if (! tagIndex[oldTag]) {
-              tagsToRemove.push(oldTag);
-            }
-          });
-
-          self.loading(true);
-          self.hasErrors(false);
-          var addTagsDeferral = $.Deferred();
-          if (tagsToAdd.length > 0) {
-            if (typeof self.identity === 'undefined' || self.identity === null) {
-              addTagsDeferral.reject('${ _("Can\'t add tags without an entity.") }');
-            } else {
-              addTagsDeferral = apiHelper.addNavTags(self.identity, tagsToAdd);
-            }
-          } else {
-            addTagsDeferral.resolve();
-          }
-
-          var removeTagsDeferral = $.Deferred();
-          if (tagsToRemove.length > 0) {
-            if (typeof self.identity === 'undefined' || self.identity === null) {
-              removeTagsDeferral.reject('Can\'t remove tags without an entity');
-            } else {
-              removeTagsDeferral = apiHelper.deleteNavTags(self.identity, tagsToRemove);
-            }
-          } else {
-            removeTagsDeferral.resolve();
-          }
-
-          var fetchAllTagsDeferral = $.Deferred();
-
-          $.when(addTagsDeferral, removeTagsDeferral).done(function () {
-            self.currentTags(newTags);
-            fetchAllTags().done(function (tags) {
-              self.allTags(tags);
-              fetchAllTagsDeferral.resolve();
-            }).fail(fetchAllTagsDeferral.reject);
-          }).fail(fetchAllTagsDeferral.reject);
-
-          $.when(addTagsDeferral, removeTagsDeferral, fetchAllTagsDeferral).fail(function (addTagsError, removeTagsError) {
-            if (typeof addTagsError !== 'undefined') {
-              hueUtils.logError(addTagsError);
-              $(document).trigger('error', '${ _("Could not add tags, see the server log for details.") }');
-            }
-            if (typeof removeTagsError !== 'undefined') {
-              hueUtils.logError(removeTagsError);
-              $(document).trigger('error', '${ _("Could not remove tags, see the server log for details.") }');
-            }
-            self.hasErrors(true);
-          }).always(function () {
-            self.loading(false);
-          });
-        };
+        self.loadTags();
       }
+
+      NavTags.prototype.loadTags = function () {
+        var self = this;
+        self.loading(true);
+        self.hasErrors(false);
+
+        var currentTagsPromise = self.catalogEntry.getNavigatorMeta().done(function (navigatorMeta) {
+          self.currentTags((navigatorMeta && navigatorMeta.tags) || []);
+        }).fail(function () {
+          self.hasErrors(true);
+        });
+
+        var allTagsPromise = DataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(function (tagList) {
+          self.allTags(Object.keys(tagList));
+        }).fail(function () {
+          self.allTags([]);
+        });
+
+        $.when(currentTagsPromise, allTagsPromise).always(function () {
+          self.loading(false);
+        });
+      };
+
+      NavTags.prototype.saveTags = function (value) {
+        var self = this;
+        var newTags = value.length > 0 ? value.split(',') : [];
+        var tagsToRemove = [];
+        var tagsToAdd = [];
+
+        var tagIndex = {};
+        self.currentTags().forEach(function (tag) {
+          tagIndex[tag] = false;
+        });
+        newTags.forEach(function (newTag) {
+          if (typeof tagIndex[newTag] !== 'undefined') {
+            tagIndex[newTag] = true;
+          } else {
+            tagsToAdd.push(newTag);
+          }
+        });
+        Object.keys(tagIndex).forEach(function (oldTag) {
+          if (!tagIndex[oldTag]) {
+            tagsToRemove.push(oldTag);
+          }
+        });
+
+        self.loading(true);
+        self.hasErrors(false);
+
+        var addTagsPromise = tagsToAdd.length > 0 ? self.catalogEntry.addNavigatorTags(tagsToAdd) : $.Deferred().resolve().promise();
+
+        var deleteTagsPromise = tagsToRemove.length > 0 ? self.catalogEntry.deleteNavigatorTags(tagsToRemove) : $.Deferred().resolve().promise();
+
+        addTagsPromise.fail(function (error) {
+          hueUtils.logError(error);
+          $(document).trigger('error', '${ _("Could not add tags, see the server log for details.") }');
+        });
+
+        deleteTagsPromise.fail(function (error) {
+          hueUtils.logError(error);
+          $(document).trigger('error', '${ _("Could not remove tags, see the server log for details.") }');
+        });
+
+        $.when(addTagsPromise, deleteTagsPromise).done(function () {
+          if (tagsToAdd.length || tagsToRemove.length) {
+            DataCatalog.updateAllNavigatorTags(tagsToAdd, tagsToRemove);
+          }
+          self.loading(false);
+          self.loadTags();
+        });
+      };
 
       ko.components.register('nav-tags', {
         viewModel: NavTags,

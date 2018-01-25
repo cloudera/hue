@@ -677,9 +677,7 @@ ${ components.menubar(is_embeddable) }
     <div class="span6 tile">
       <h4>${ _('Tags') }</h4>
       <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-        sourceType: catalogEntry.dataCatalog.sourceType,
-        database: database.catalogEntry.name,
-        table: catalogEntry.name
+        catalogEntry: catalogEntry
       }}"></div>
     </div>
     <!-- /ko -->

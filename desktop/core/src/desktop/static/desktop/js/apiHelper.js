@@ -1803,6 +1803,35 @@ var ApiHelper = (function () {
     }, options)
   };
 
+  /**
+   * Lists all available navigator tags
+   *
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchAllNavigatorTags = function (options) {
+    var self = this;
+
+    var deferred = $.Deferred();
+
+    var request = self.simplePost(NAV_URLS.LIST_TAGS, undefined, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (data) {
+        if (data && data.tags) {
+          deferred.resolve(data.tags);
+        } else {
+          deferred.resolve({});
+        }
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred.promise(), request);
+  };
 
   ApiHelper.prototype.addNavTags = function (entityId, tags) {
     return $.post(NAV_URLS.ADD_TAGS, {
@@ -1889,26 +1918,6 @@ var ApiHelper = (function () {
 
     return new CancellablePromise(deferred.promise(), request);
   };
-
-
-
-  /**
-   * Lists all available navigator tags
-   *
-   * @param {Object} options
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   */
-  ApiHelper.prototype.listNavTags = function (options) {
-    var self = this;
-    fetchAssistData.bind(self)($.extend({ sourceType: 'nav' }, options, {
-      url: NAV_URLS.LIST_TAGS,
-      errorCallback: self.assistErrorCallback(options),
-      noCache: true
-    }));
-  };
-
 
   /**
    * Deprecated, use DataCatalog.getEntry(...).getSourceDetails()
