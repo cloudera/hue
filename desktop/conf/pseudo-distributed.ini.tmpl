@@ -298,8 +298,8 @@
     ## login_splash_html=<h4>GetHue.com</h4><br/><br/>WARNING: You have accessed a computer managed by GetHue. You are required to have authorization from GetHue before you proceed.
 
     # Cache timeout in milliseconds for the assist, autocomplete, etc.
-    # defaults to 86400000 (1 day), set to 0 to disable caching
-    ## cacheable_ttl=86400000
+    # defaults to 10 days, set to 0 to disable caching
+    ## cacheable_ttl=864000000
 
     # SVG code to replace the default Hue logo in the top bar and sign in screen
     # e.g. <image xlink:href="/static/desktop/art/hue-logo-mini-white.png" x="0" y="0" height="40" width="160" />
@@ -1719,8 +1719,8 @@
     ## apply_sentry_permissions=False
 
     # Cache timeout in milliseconds for the Optimizer metadata used in assist, autocomplete, etc.
-    # Defaults to 1 week, set to 0 to disable caching.
-    ## cacheable_ttl=604800000
+    # Defaults to 10 days, set to 0 to disable caching.
+    ## cacheable_ttl=864000000
 
     # Automatically upload queries after their execution in order to improve recommendations.
     ## auto_upload_queries=true
