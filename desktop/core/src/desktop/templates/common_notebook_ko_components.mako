@@ -652,46 +652,38 @@ except ImportError, e:
                   }}}" class="margin-top-10 margin-bottom-20"></div>
             </div>
             <div class="tab-pane" id="help-editor-syntax-variable">
-              <div>${ _('Variables are used to easily configure parameters in a query. They can be of two types:')}</div>
+              <span>${ _('Variables are used to easily configure parameters in a query. They can be of two types:')}</span>
               <ul class="nav help-list-spacing">
                 <li>
-                  <div class="margin-top-20"><b>${ _('Single Valued')}</b><span class="muted padding-left-20">${ _('${variable_name=variable_value}')}</span></div>
+                  <div class="margin-top-20"><b>${ _('Single Valued')}</b><span class="muted padding-left-20">${ _('${variable_name}')}</span></div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
-                    value: ko.observable('${ _('select * from web_logs where bytes = ${bytes}')}'),
+                    value: ko.observable('${ _('select * from web_logs where country_code = "${country_code}"')}'),
                     lines: 1,
                     mode: 'impala',
                     aceOptions: {
                       readOnly: true
                     }}}" class="margin-top-10 margin-bottom-10"></div>
-                  <div>${ _('The variable_value is optional.')}</div>
+                  <div>${ _('The variable can have a default value.')}</div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
-                    value: ko.observable('${ _('select * from web_logs where bytes = ${bytes=search}')}'),
+                    value: ko.observable('${ _('select * from web_logs where country_code = "${country_code=US}"')}'),
                     lines: 1,
                     mode: 'impala',
                     aceOptions: {
                       readOnly: true
                     }}}" class="margin-top-10 margin-bottom-10"></div>
-                  <div>${ _('A string should be wrapped in quotes.')}</div>
-                  <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
-                    value: ko.observable('${ _('select * from web_logs where app = "${app=search}"')}'),
-                    lines: 1,
-                    mode: 'impala',
-                    aceOptions: {
-                      readOnly: true
-                    }}}" class="margin-top-10 margin-bottom-20"></div>
                 </li>
                 <li>
-                  <div class="margin-top-30"><b>${ _('Multi Valued')}</b><span class="muted padding-left-20">${ _('${variable_name=variable_value1(variable_text1), variable_value2(variable_text2),...}')}</span></div>
+                  <div class="margin-top-30"><b>${ _('Multi Valued')}</b><span class="muted padding-left-20">${ _('${variable_name=variable_value1, variable_value2,...}')}</span></div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
-                    value: ko.observable('${ _('select * from web_logs where app = "${app=search, metastore(meta), hbase}"')}'),
+                    value: ko.observable('${ _('select * from web_logs where country_code = "${country_code=CA, FR, US}"')}'),
                     lines: 1,
                     mode: 'impala',
                     aceOptions: {
                       readOnly: true
                     }}}" class="margin-top-10 margin-bottom-10"></div>
-                  <div>${ _('The variable_text is optional.')}</div>
+                  <div>${ _('The displayed text can be changed.')}</div>
                   <div data-bind="component: { name: 'hue-simple-ace-editor-multi', params: {
-                    value: ko.observable('${ _('select * from web_logs where app = "${app=search(solr), metastore(meta)}"')}'),
+                    value: ko.observable('${ _('select * from web_logs where country_code = "${country_code=CA(Canada), FR(France), US(United States)}"')}'),
                     lines: 1,
                     mode: 'impala',
                     aceOptions: {
