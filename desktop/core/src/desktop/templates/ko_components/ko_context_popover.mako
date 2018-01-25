@@ -96,9 +96,9 @@ from metadata.conf import has_navigator
       <div class="context-popover-section" style="font-style: italic;" data-bind="text: comment"></div>
       <!-- /ko -->
       %if has_navigator(user):
-        <!-- ko if: $parent.sourceType === 'hive' || $parent.sourceType === 'impala' -->
+        <!-- ko if: ($parent.sourceType === 'hive' || $parent.sourceType === 'impala') && $parent.catalogEntry() -->
         <div class="context-popover-header">${ _("Tags") }</div>
-        <div class="context-popover-section" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+        <div class="context-popover-section" data-bind="component: { name: 'nav-tags', params: { catalogEntry: $parent.catalogEntry() } } "></div>
         <!-- /ko -->
       %endif
       <!-- ko if: typeof viewSql !== 'undefined' -->
@@ -524,6 +524,13 @@ from metadata.conf import has_navigator
         self.fetchedData = ko.observable();
         self.loading = ko.observable(false);
         self.hasErrors = ko.observable(false);
+
+        self.catalogEntry = ko.observable();
+
+        if (self.identifierChain.length > 0) {
+          var path = $.map(self.identifierChain, function (identifier) { return identifier.name });
+          DataCatalog.getEntry({ sourceType: sourceType, path: path }).done(self.catalogEntry);
+        }
       }
 
       GenericTabContents.prototype.formatAnalysisValue = function (type, val) {
