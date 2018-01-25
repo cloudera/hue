@@ -2565,8 +2565,24 @@ ApproximateNumericLiteral
  ;
 
 GeneralLiteral
- : SingleQuotedValue  -> { types: [ 'STRING' ] }
- | DoubleQuotedValue  -> { types: [ 'STRING' ] }
+ : SingleQuotedValue
+   {
+     if (/\$\{[^}]*\}/.test($1)) {
+       parser.addVariableLocation(@1, $1);
+       $$ = { types: [ 'STRING' ], columnReference: [{ name: $1 }] }
+     } else {
+       $$ = { types: [ 'STRING' ] }
+     }
+   }
+ | DoubleQuotedValue
+   {
+     if (/\$\{[^}]*\}/.test($1)) {
+       parser.addVariableLocation(@1, $1);
+       $$ = { types: [ 'STRING' ], columnReference: [{ name: $1 }] }
+     } else {
+       $$ = { types: [ 'STRING' ] }
+     }
+   }
  | TruthValue         -> { types: [ 'BOOLEAN' ] }
  ;
 
