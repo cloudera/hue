@@ -3974,6 +3974,7 @@ $(document).ready(function () {
             if (isShrinking && dropPosition.row > 1) {
               dropPosition.row++;
             }
+            restoreWidgetSizes();
           }
           else {
             // automatically resize the width of all the widgets that collide
