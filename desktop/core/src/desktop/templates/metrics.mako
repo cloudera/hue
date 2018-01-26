@@ -46,6 +46,11 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
       self.metricsKeys = ko.pureComputed(function () {
         return Object.keys(self.metrics()).sort()
       });
+      self.isMasterEmpty = ko.pureComputed(function () {
+        return self.filteredMetrics().length === 0 || Object.keys(self.filteredMetrics()).filter(function (key) {
+            return self.filteredMetrics()[key] !== null
+          }).length === 0;
+      });
       self.filteredMetrics = ko.pureComputed(function () {
         if (self.metricsFilter()) {
           var lowerQuery = self.metricsFilter().toLowerCase();
@@ -110,6 +115,21 @@ ${layout.menubar(section='metrics')}
     </div>
 
     <div class="margin-top-10">
+      <!-- ko if: $root.selectedMetric() === 'All' && $root.isMasterEmpty()-->
+      <table class="table table-condensed">
+        <thead>
+          <tr>
+            <th width="30%">${ _('Name') }</th>
+            <th>${ _('Value') }</th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+             <td colspan="2">${ _('There are no metrics matching your filter') }</td>
+          </tr>
+        </tfoot>
+      </table>
+      <!-- /ko -->
       <div data-bind="foreach: {data: Object.keys($root.filteredMetrics()).sort(), as: '_masterkey'}">
        <!-- ko if: ($root.selectedMetric() === 'All' && $root.filteredMetrics()[_masterkey]) || $root.selectedMetric() === _masterkey-->
        <!-- ko ifnot: $root.isUnusedMetric(_masterkey)-->
