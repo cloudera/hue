@@ -75,6 +75,9 @@ ${ commonheader(_('Metrics'), "about", user, request) | n,unicode }
       self.fetchMetrics = function () {
         self.apiHelper.simpleGet('/desktop/metrics/', {}, {successCallback: successCallback});
       };
+      self.isUnusedMetric = function (metricKey) {
+        return metricKey.startsWith("auth") || metricKey.startsWith("multiprocessing") || metricKey.startsWith("python.gc");
+      }
     }
 
     $(document).ready(function () {
@@ -95,9 +98,11 @@ ${layout.menubar(section='metrics')}
           <a href="javascript:void(0)" data-bind="text: 'All', click: function(){ $root.selectedMetric('All') }"></a>
         </li>
         <!-- ko foreach: metricsKeys -->
+        <!-- ko ifnot: $root.isUnusedMetric($data)-->
         <li data-bind="css: { 'active': $root.selectedMetric() === $data }">
           <a href="javascript:void(0)" data-bind="text: $data, click: function(){ $root.selectedMetric($data) }"></a>
         </li>
+        <!-- /ko -->
         <!-- /ko -->
       </ul>
       <input type="text" data-bind="clearable: metricsFilter, valueUpdate: 'afterkeydown'"
@@ -107,6 +112,7 @@ ${layout.menubar(section='metrics')}
     <div class="margin-top-10">
       <div data-bind="foreach: {data: Object.keys($root.filteredMetrics()).sort(), as: '_masterkey'}">
        <!-- ko if: ($root.selectedMetric() === 'All' && $root.filteredMetrics()[_masterkey]) || $root.selectedMetric() === _masterkey-->
+       <!-- ko ifnot: $root.isUnusedMetric(_masterkey)-->
        <h4 data-bind="text: _masterkey"></h4>
        <table class="table table-condensed">
          <thead>
@@ -131,6 +137,7 @@ ${layout.menubar(section='metrics')}
            </tfoot>
          <!-- /ko -->
         </table>
+        <!-- /ko -->
         <!-- /ko -->
       </div>
   </div>
