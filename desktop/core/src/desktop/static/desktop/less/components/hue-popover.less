@@ -1,0 +1,159 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+.hue-popover {
+  .display-flex;
+  position: absolute;
+  .flex-direction(column);
+  top: 0;
+  left: 0;
+  z-index: 1039;
+  padding: 1px;
+  background-color: @cui-white;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid transparent;
+}
+
+.hue-context-popover {
+  padding: 0;
+  border: none;
+}
+
+.hue-popover.hue-popover-top {
+  margin-top: -5px;
+}
+
+.hue-popover.hue-popover-top .hue-popover-arrow {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -6px;
+  border-top-color: @hue-primary-color-dark;
+  border-bottom-width: 0;
+}
+
+.hue-popover.hue-popover-top .hue-popover-arrow::after {
+  bottom: 1px;
+  margin-left: -3px;
+  content: "";
+  border-top-color: @hue-primary-color-dark;
+  border-bottom-width: 0;
+}
+
+.hue-popover.hue-popover-right {
+  margin-left: 5px;
+}
+
+.hue-popover.hue-popover-right .hue-popover-arrow {
+  top: 50%;
+  left: -6px;
+  margin-top: -6px;
+  border-right-color: @hue-primary-color-dark;
+  border-left-width: 0;
+}
+
+.hue-popover.hue-popover-right .hue-popover-arrow::after {
+  bottom: -3px;
+  left: 1px;
+  content: "";
+  border-right-color: @hue-primary-color-dark;
+  border-left-width: 0;
+}
+
+.hue-popover.hue-popover-bottom {
+  margin-top: 7px;
+}
+
+.hue-popover.hue-popover-bottom .hue-popover-arrow {
+  top: -6px;
+  left: 50%;
+  margin-left: -6px;
+  border-top-width: 0;
+  border-bottom-color: @hue-primary-color-dark;
+}
+
+.hue-popover.hue-popover-bottom .hue-popover-arrow::after {
+  top: 3px;
+  margin-left: -3px;
+  content: "";
+  border-top-width: 0;
+  border-bottom-color: @hue-primary-color-dark;
+}
+
+.hue-popover.hue-popover-left {
+  margin-left: -5px;
+}
+
+.hue-popover.hue-popover-left .hue-popover-arrow {
+  top: 50%;
+  right: -6px;
+  margin-top: -3px;
+  border-right-width: 0;
+  border-left-color: @hue-primary-color-dark;
+}
+
+.hue-popover.hue-popover-left .hue-popover-arrow::after {
+  right: 2px;
+  bottom: -3px;
+  content: "";
+  border-right-width: 0;
+  border-left-color: @hue-primary-color-dark;
+}
+
+.hue-popover-title {
+  .flex(0 1 auto);
+  padding: 6px 10px;
+  margin: 0;
+  font-size: 14px;
+  background-color: @cui-white;
+}
+
+.hue-popover-title:empty {
+  display: none;
+}
+
+.hue-popover-arrow, .hue-popover-arrow::after {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+}
+
+.hue-popover-arrow {
+  border-width: 6px;
+}
+
+.hue-popover-top {
+  border-radius: @hue-panel-border-radius;
+  background-color: @cui-white;
+  .hue-box-shadow-bottom;
+}
+
+.hue-popover-right {
+  border-radius: @hue-panel-border-radius;
+  background-color: @cui-white;
+  .hue-box-shadow-right;
+}
+
+.hue-popover-left {
+  border-radius: @hue-panel-border-radius;
+  background-color: @cui-white;
+  .hue-box-shadow-left;
+}
