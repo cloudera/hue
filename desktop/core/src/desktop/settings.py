@@ -122,6 +122,13 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'desktop', 'libs', 'liboauth', 'src', 'liboauth', 'static'),
 )
 
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+
+    'compressor.finders.CompressorFinder',
+)
+
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.CachedStaticFilesStorage'
 
 # For Django admin interface
@@ -201,7 +208,9 @@ INSTALLED_APPS = [
 
     # App that keeps track of failed logins.
     'axes',
+    'compressor'
 ]
+
 
 LOCALE_PATHS = [
   get_desktop_root('core/src/desktop/locale')
@@ -234,6 +243,10 @@ PYLINTRC = get_desktop_root('.pylintrc')
 
 # Custom CSRF Failure View
 CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
+
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
+
 
 ############################################################
 # Part 4: Installation of apps
