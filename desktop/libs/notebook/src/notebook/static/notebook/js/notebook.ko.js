@@ -2061,6 +2061,7 @@ var EditorViewModel = (function() {
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
+    self.initialType = self.type();
     self.coordinatorUuid = ko.observable(typeof notebook.coordinatorUuid != "undefined" && notebook.coordinatorUuid != null ? notebook.coordinatorUuid : null);
     self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
     self.isManaged = ko.observable(typeof notebook.isManaged != "undefined" && notebook.isManaged != null ? notebook.isManaged : false);
@@ -2815,8 +2816,8 @@ var EditorViewModel = (function() {
               } else {
                 _statement.push(line);
               }
-            });
-            _snippet = new Snippet(self, _notebook, {type: options.editor_type, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n'), variables: ko.mapping.toJS(_variables)}, skipSession=true);
+            });console.log(_notebook.initialType);
+            _snippet = new Snippet(self, _notebook, {type: _notebook.initialType, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n'), variables: ko.mapping.toJS(_variables)}, skipSession=true);
             _snippet.init();
             _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
           }
@@ -2829,10 +2830,10 @@ var EditorViewModel = (function() {
           }
         });
       } else {
-        self.editorType(options.editor_type);
+        self.editorType(_notebook.initialType);
         // Revert to one statement
         _newSnippets.push(self.preEditorTogglingSnippet());
-        _notebook.type('query-' + options.editor_type);
+        _notebook.type('query-' + _notebook.initialType);
       }
       _notebook.snippets(_newSnippets);
       _newSnippets.forEach(function (snippet) {
@@ -2840,7 +2841,7 @@ var EditorViewModel = (function() {
       });
     };
     self.togglePresentationMode = function() {
-      if (options.editor_type != 'notebook') {
+      if (self.selectedNotebook().initialType != 'notebook') {
         self.toggleEditorMode();
       }
     };
