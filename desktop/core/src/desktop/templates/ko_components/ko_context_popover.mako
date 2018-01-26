@@ -121,9 +121,9 @@ from metadata.conf import has_navigator
         <div class="context-popover-section" data-bind="text: comment"></div>
         <!-- /ko -->
         %if has_navigator(user):
-          <!-- ko if: $parent.sourceType === 'hive' || $parent.sourceType === 'impala' -->
+          <!-- ko if: ($parent.sourceType === 'hive' || $parent.sourceType === 'impala') && $parent.catalogEntry() -->
           <div class="context-popover-header">${ _("Tags") }</div>
-          <div class="context-popover-section" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+          <div class="context-popover-section" data-bind="component: { name: 'nav-tags', params: { catalogEntry: $parent.catalogEntry() } }"></div>
           <!-- /ko -->
         %endif
       </div>
@@ -206,10 +206,12 @@ from metadata.conf import has_navigator
           <div class="context-popover-header">${ _("Comment") }</div>
           <div class="context-popover-section" style="font-style: italic;" data-bind="text: $parent.comment"></div>
         </div>
+        <!-- ko if: catalogEntry() -->
         <div class="context-popover-header">${_('Tags')}</div>
         <div class="context-popover-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
-          <div data-bind="component: { name: 'nav-tags', params: $data } "></div>
+          <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: catalogEntry() }}"></div>
         </div>
+        <!-- /ko -->
       </div>
     </div>
   </script>
@@ -935,19 +937,24 @@ from metadata.conf import has_navigator
         self.disposals = [];
         self.dbComment = ko.observable('');
         var dbName = data.identifierChain[data.identifierChain.length - 1].name;
-        var catalogEntry = DataCatalog.getEntry({ sourceType: sourceType, path: [dbName], definition: { type: 'database' }})
+        self.catalogEntry = ko.observable();
+        DataCatalog.getEntry({ sourceType: sourceType, path: [dbName], definition: { type: 'database' }}).done(function (entry) {
+          entry.getComment().done(self.dbComment);
+          self.catalogEntry(entry);
+        });
 
-        catalogEntry.getComment().done(self.dbComment);
         self.tabs = [
           { id: 'details', label: '${ _("Details") }', comment : self.dbComment, template: 'context-popover-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, ApiHelper.getInstance().fetchAutocomplete) }
         ];
         self.activeTab = ko.observable('details');
 
         var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
-          huePubSub.publish('assist.db.highlight', {
-            sourceType: sourceType,
-            path: catalogEntry.path
-          });
+          if (self.catalogEntry()) {
+            huePubSub.publish('assist.db.highlight', {
+              sourceType: sourceType,
+              path: self.catalogEntry().path
+            });
+          }
         });
 
         self.disposals.push(function () {
