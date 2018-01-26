@@ -32,7 +32,7 @@ var MetastoreDatabase = (function () {
 
     self.comment = ko.observable();
 
-    self.stats = ko.observable(); // TODO: add to DataCatalogEntry
+    self.stats = ko.observable();
     self.navigatorMeta = ko.observable();
 
     self.showAddTagName = ko.observable(false);
@@ -120,12 +120,7 @@ var MetastoreDatabase = (function () {
       }
     });
 
-    // TODO: Move to ApiHelper (via DataCatalogEntry)
-    $.getJSON('/metastore/databases/' + self.catalogEntry.name + '/metadata', function (data) {
-      if (data && data.status == 0) {
-        self.stats(data.data);
-      }
-    });
+    self.catalogEntry.getAnalysis().done(self.stats);
 
 
     self.apiHelper.setInTotalStorage('metastore', 'last.selected.database', self.name);
@@ -403,26 +398,19 @@ var MetastoreTable = (function () {
       });
     });
 
-    // TODO: Move stats to DataCatalogEntry
     self.refreshTableStats = function () {
       if (self.refreshingTableStats()) {
         return;
       }
       self.refreshingTableStats(true);
-      self.apiHelper.refreshTableStats({
-        tableName: self.catalogEntry.name,
-        databaseName: self.database.catalogEntry.name,
-        sourceType: self.catalogEntry.getSourceType(),
-        successCallback: function () {
-          self.fetchDetails();
-        },
-        errorCallback: function (data) {
-          self.refreshingTableStats(false);
-          $.jHueNotify.error(HUE_I18n.metastore.errorRefreshingTableStats);
-          console.error('apiHelper.refreshTableStats error');
-          console.error(data);
-        }
-      })
+      self.catalogEntry.getAnalysis({ refreshAnalysis: true, silenceErrors: true }).done(function () {
+        self.fetchDetails();
+      }).fail(function () {
+        self.refreshingTableStats(false);
+        $.jHueNotify.error(HUE_I18n.metastore.errorRefreshingTableStats);
+        console.error('apiHelper.refreshTableStats error');
+        console.error(data);
+      });
     };
 
     self.fetchFields = function () {
@@ -545,7 +533,6 @@ var MetastoreTable = (function () {
     }
     self.loading(true);
     self.fetchFields();
-    self.refreshTableStats();
     self.fetchDetails();
     huePubSub.publish('metastore.loaded.table');
   };
