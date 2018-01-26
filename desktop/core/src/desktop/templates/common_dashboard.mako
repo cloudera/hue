@@ -277,7 +277,7 @@
 </script>
 
 <script type="text/html" id="widget-template${ suffix }">
-  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true }}">
+  <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true, drop: function(event, ui) { huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui } } }}">
     <h2 class="card-heading simple">
       %if not USE_GRIDSTER.get():
       <span data-bind="visible: $root.isEditing">
