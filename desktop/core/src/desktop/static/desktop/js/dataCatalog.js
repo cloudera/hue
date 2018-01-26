@@ -395,6 +395,7 @@ var DataCatalog = (function () {
    */
   DataCatalogEntry.prototype.save = function () {
     var self = this;
+    window.clearTimeout(self.saveTimeout);
     return self.dataCatalog.updateStore(self);
   };
 
@@ -783,6 +784,7 @@ var DataCatalog = (function () {
           if (response && response.entity) {
             self.navigatorMeta = response.entity;
             self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+            self.saveLater();
           } else {
             deferred.reject();
           }
@@ -815,6 +817,7 @@ var DataCatalog = (function () {
             if (response && response.entity) {
               self.navigatorMeta = response.entity;
               self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+              self.saveLater();
             } else {
               deferred.reject();
             }
@@ -1230,7 +1233,7 @@ var DataCatalog = (function () {
               }
             }
           });
-          sharedDataCalogStore.setItem('hue.dataCatalog.allNavTags', allTags);
+          sharedDataCalogStore.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
         });
       }
     },
