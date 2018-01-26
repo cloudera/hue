@@ -3963,9 +3963,15 @@ $(document).ready(function () {
           // checks if it has been dropped on an empty row
           searchViewModel.gridItems().forEach(function (existingWidget) {
             var existingWidgetFauxRow = parseInt($(existingWidget.gridsterElement).attr('data-row'));
+            var existingWidgetFauxCol = parseInt($(existingWidget.gridsterElement).attr('data-row'));
             var existingWidgetFauxHeight = parseInt($(existingWidget.gridsterElement).attr('data-sizey'));
+            var existingWidgetFauxWidth = parseInt($(existingWidget.gridsterElement).attr('data-sizex'));
             if (dropPosition.row >= existingWidgetFauxRow && dropPosition.row < existingWidgetFauxRow + existingWidgetFauxHeight) {
               dropOnEmptyRow = false;
+            }
+            if (existingWidgetFauxRow == dropPosition.row + 1 && (dropPosition.col < existingWidgetFauxCol || dropPosition.col >= existingWidgetFauxCol + existingWidgetFauxWidth)) {
+              dropOnEmptyRow = false;
+              restoreWidgetSizes();
             }
           });
 
