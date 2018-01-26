@@ -133,6 +133,7 @@ from django.utils.translation import ugettext as _
         $.when(addTagsPromise, deleteTagsPromise).done(function () {
           if (tagsToAdd.length || tagsToRemove.length) {
             DataCatalog.updateAllNavigatorTags(tagsToAdd, tagsToRemove);
+            self.catalogEntry.save();
           }
           self.loading(false);
           self.loadTags();

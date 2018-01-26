@@ -1646,21 +1646,37 @@ var ApiHelper = (function () {
     var self = this;
     var deferred = $.Deferred();
 
-    var url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/table/' + options.path[0];
+    var url;
 
-    if (options.path.length > 1) {
-      url += '/' + options.path[1];
-    }
+    if (options.path.length === 1) {
+      url = '/metastore/databases/' + options.path[0] + '/metadata';
+    } else {
+      url = '/' + (options.sourceType === 'hive' ? 'beeswax' : options.sourceType) + '/api/table/' + options.path[0];
 
-    if (options.path.length > 2) {
-      url += '/stats/' + options.path.slice(2).join('/');
+      if (options.path.length > 1) {
+        url += '/' + options.path[1];
+      }
+
+      if (options.path.length > 2) {
+        url += '/stats/' + options.path.slice(2).join('/');
+      }
     }
 
     var request = self.simpleGet(url, {
       'format' : 'json'
     }, {
       silenceErrors: options.silenceErrors,
-      successCallback: deferred.resolve,
+      successCallback: function (response) {
+        if (options.path.length === 1) {
+          if (response.data) {
+            deferred.resolve(response.data);
+          } else {
+            deferred.reject();
+          }
+        } else {
+          deferred.resolve(response)
+        }
+      },
       errorCallback: deferred.reject
     });
 
@@ -1680,6 +1696,10 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.refreshAnalysis = function (options) {
     var self = this;
+
+    if (options.path.length === 1) {
+      return self.fetchAnalysis(options);
+    }
     var deferred = $.Deferred();
 
     var promises = [];

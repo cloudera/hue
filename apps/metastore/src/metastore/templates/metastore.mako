@@ -459,8 +459,7 @@ ${ components.menubar(is_embeddable) }
             <!-- ko if: $root.navigatorEnabled()  -->
             <h4>${ _('Tags') }</h4>
             <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-              sourceType: $root.sourceType(),
-              database: db_name
+              catalogEntry: $parent.catalogEntry
             }}"></div>
             <!-- /ko -->
         </div>
