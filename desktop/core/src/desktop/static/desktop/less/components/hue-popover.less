@@ -117,10 +117,25 @@
 
 .hue-popover-title {
   .flex(0 1 auto);
+  .nowrap-ellipsis;
   padding: 6px 10px;
-  margin: 0;
+  margin: 0 30px 0 0;
   font-size: 14px;
   background-color: @cui-white;
+
+  .hue-popover-title-icon {
+    margin-top: 3px;
+  }
+
+  .hue-popover-title-text {
+    padding-left: 4px;
+  }
+
+  .hue-popover-title-actions {
+    position: absolute;
+    right: 6px;
+    top: 8px;
+  }
 }
 
 .hue-popover-title:empty {
@@ -156,4 +171,209 @@
   border-radius: @hue-panel-border-radius;
   background-color: @cui-white;
   .hue-box-shadow-left;
+}
+
+.context-popover-content {
+  .display-flex();
+  .flex(1 1 100%);
+  .flex-direction(column);
+  padding: 0;
+  overflow: hidden;
+}
+
+.context-popover-tab-pane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.context-popover-tabs {
+  .flex(0 1 auto);
+  border-bottom: 1px solid @cui-default-border-color;
+  margin-left: -1px;
+  margin-right: -1px;
+  padding-left: 15px;
+}
+
+.context-popover-tab-container {
+  position: relative;
+  .flex(1 1 100%);
+  border: none;
+  overflow: auto;
+}
+
+.context-popover-tab {
+  padding-top: 0 !important;
+  padding-bottom: 5px !important;
+  margin-bottom: -1px !important
+}
+
+.context-popover-flex {
+  .display-flex();
+  .flex-flow(column nowrap);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.context-popover-flex-header {
+  .flex(0 0 35px);
+}
+
+.context-popover-flex-fill {
+  overflow: hidden;
+  position: relative;
+  margin: 0 10px;
+  .flex(1 1 100%);
+
+  .alert {
+    margin: 0 5px;
+  }
+}
+
+.context-popover-table-details {
+  .flex(1);
+  padding: 10px 10px 0 10px;
+}
+
+.context-popover-header {
+  font-size: 15px;
+  margin: 10px;
+}
+
+.context-popover-section {
+  margin-left: 15px;
+}
+.context-popover-doc-header-link {
+  font-size: 18px;
+}
+
+.context-popover-doc-description {
+  margin-top: 5px;
+
+  > em {
+    font-style: normal;
+    font-weight: bold;
+  }
+}
+
+.context-popover-flex-bottom-links {
+  .flex(0 0 35px);
+  border-top: 1px solid @cui-default-border-color;
+  z-index: 100;
+  background-color: @cui-white;
+}
+
+.context-popover-link-row {
+  float: right;
+  margin: 8px 15px 0 10px;
+}
+
+.context-popover-link-row a {
+  margin-left: 10px;
+}
+
+.context-popover-inline-search {
+  border-radius: 8px !important;
+  min-height: 18px !important;
+  height: 18px !important;
+  margin: 0 5px 0 5px !important;
+  padding-right: 18px !important;
+}
+
+.context-popover-inline-autocomplete {
+  height: 26px;
+  margin: 0 10px 10px 10px;
+
+  .inline-autocomplete-container {
+    height: 26px;
+
+    > div {
+      right: 10px !important;
+    }
+
+    > div input {
+      padding: 3px 5px;
+      font-size: 14px !important;
+      line-height: 14px !important;
+    }
+  }
+
+}
+
+.context-popover-empty-columns {
+  letter-spacing: 0.035em;
+  margin-top: 50px;
+  font-size: 14px;
+  color: @cui-gray-700;
+  text-align: center;
+}
+
+.context-popover-sample {
+  text-align: left;
+  padding: 3px;
+  overflow: hidden;
+  height: 100%;
+
+  th {
+    border-right: 1px solid @cui-gray-200;
+  }
+
+  td {
+    border-right: 1px solid @cui-gray-200;
+    white-space: nowrap;
+  }
+
+  .fixed-first-column {
+    margin-left: 0 !important;
+    table>tbody>tr>td:first-child {
+      background-color: @cui-gray-050;
+    }
+  }
+
+  .fixed-header-row {
+    border-bottom: 1px solid @cui-gray-200;
+  }
+
+  .fixed-first-cell {
+    border-right: 1px solid @cui-gray-200;
+
+    thead th {
+      height: 23px;
+      border-bottom: 1px solid @cui-gray-200 !important;
+    }
+  }
+}
+
+.context-popover-flex-fill.context-popover-sample-container {
+  margin: 0;
+}
+
+#contextPopover .hue-popover {
+  position: fixed;
+}
+
+.context-popover-title {
+  .display-flex;
+  .flex-direction(row);
+  width: 100%;
+  padding:0;
+  background-color: @cui-gray-050;
+}
+
+.context-popover-breadcrumbs {
+  .flex(1 1 100%);
+  .nowrap-ellipsis();
+  padding: 5px;
+}
+
+.context-popover-close {
+  .flex(1 0 15px);
+  padding: 5px;
+}
+
+.context-popover-content {
+  padding: 5px;
 }

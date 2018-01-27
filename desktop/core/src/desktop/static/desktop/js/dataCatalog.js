@@ -569,6 +569,16 @@ var DataCatalog = (function () {
 
       self.definition = definition;
 
+      if (!self.definition) {
+        if (self.path.length === 0) {
+          self.definition = { type: 'source' }
+        } else if (self.path.length === 1) {
+          self.definition = { type: 'database' }
+        } else if (self.path.length === 2) {
+          self.definition = { type: 'table' }
+        }
+      }
+
       self.reset();
     }
 

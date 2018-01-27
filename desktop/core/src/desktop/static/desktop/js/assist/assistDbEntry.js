@@ -215,13 +215,11 @@ var AssistDbEntry = (function () {
     self.statsVisible(true);
     huePubSub.publish('context.popover.show', {
       data: {
-        type: type,
-        identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
+        type: 'catalogEntry',
+        catalogEntry: self.catalogEntry
       },
       showInAssistEnabled: self.navigationSettings.rightAssist,
       orientation: self.navigationSettings.rightAssist ? 'left' : 'right',
-      sourceType: self.sourceType,
-      defaultDatabase: self.databaseName,
       pinEnabled: self.navigationSettings.pinEnabled,
       source: {
         element: event.target,

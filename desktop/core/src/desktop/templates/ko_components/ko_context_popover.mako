@@ -278,7 +278,6 @@ from metadata.conf import has_navigator
     </table>
   </script>
 
-
   <script type="text/html" id="context-popover-collection-terms-details">
     <div class="context-popover-flex-fill" data-bind="niceScroll">
       <input type="text" data-bind="value: terms.prefix, clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Filter...') }" class="pull-right">
@@ -440,6 +439,10 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-contents">
+    <!-- ko if: isCatalogEntry -->
+    <!-- ko template: { name: 'context-popover-data-catalog-entry', data: contents } --><!-- /ko -->
+    <!-- /ko -->
+    <!-- ko ifnot: isCatalogEntry -->
     <div class="context-popover-content">
       <!-- ko with: contents -->
       <!-- ko if: typeof tabs !== 'undefined' -->
@@ -486,10 +489,119 @@ from metadata.conf import has_navigator
       <!-- /ko -->
       <!-- /ko -->
     </div>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="context-popover-data-catalog-entry">
+    <div class="hue-popover" data-bind="css: popover.orientationClass,
+        style: { 'left': popover.left() + 'px', 'top': popover.top() + 'px', 'width': popover.width() + 'px', 'height': popover.height() + 'px' },
+        resizable: { containment: 'document', handles: popover.resizeHelper.resizableHandles, start: popover.resizeHelper.resizeStart, stop: popover.resizeHelper.resizeStop, resize: popover.resizeHelper.resize }">
+      <div class="hue-popover-arrow" data-bind="style: { 'margin-left': popover.leftAdjust() + 'px',  'margin-top': popover.topAdjust() + 'px' }"></div>
+      <div class="hue-popover-title">
+        <i class="hue-popover-title-icon fa muted" data-bind="css: catalogEntry().isView() ? 'fa-eye' : 'fa-table'"></i>
+        <span class="hue-popover-title-text" data-bind="foreach: breadCrumbs"><!-- ko ifnot: isActive --><a href="javascript: void(0);" data-bind="click: makeActive, text: name"></a>.<!-- /ko --><!-- ko if: isActive --><span data-bind="text: name"></span><!-- /ko --></span>
+        <div class="hue-popover-title-actions">
+          <a class="pointer inactive-action" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+          <a class="pointer inactive-action" data-bind="click: popover.close"><i class="fa fa-fw fa-times"></i></a>
+        </div>
+      </div>
+      <div class="context-popover-content">
+        <div class="context-popover-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
+        <!-- ko if: !loading() && hasErrors() -->
+        <div class="context-popover-flex-fill">
+          <div class="alert" data-bind="text: errorText"></div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: !loading() && !hasErrors() -->
+          <div class="context-popover-flex-fill">
+
+            <a href="javascript: void(0);" data-bind="click: function () { console.log($data); }">Click me!</a>
+
+          </div>
+          <div class="context-popover-flex-bottom-links">
+            <div class="context-popover-link-row">
+              <!-- ko if: catalogEntry -->
+              <a class="inactive-action pointer" data-bind="click: showInAssist">
+                <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
+              </a>
+              % if HAS_SQL_ENABLED.get():
+                <a class="inactive-action pointer" data-bind="visible: popover.openInDashboardEnabled, click: openInDashboard">
+                  <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
+                </a>
+              % endif
+              % if not IS_EMBEDDED.get():
+                <!-- ko if: catalogEntry().getSourceType() !== 'solr' -->
+                <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
+                  <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
+                </a>
+                <!-- /ko -->
+              % endif
+              <a class="inactive-action pointer" data-bind="visible: popover.insertInEditorEnabled, click: insertInEditor" style="display: none;">
+                <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
+              </a>
+              <!-- /ko -->
+            </div>
+          </div>
+        <!-- /ko -->
+      </div>
+    </div>
   </script>
 
   <script type="text/javascript">
     (function () {
+
+      var DataCatalogContext = function (options) {
+        var self = this;
+        self.popover = options.popover;
+        self.catalogEntry = ko.observable(options.catalogEntry);
+        self.loading = ko.observable(false);
+        self.hasErrors = ko.observable(false);
+        self.insertInEditorEnabled = ko.observable(true);
+        self.pinEnabled = ko.observable(false);
+
+        self.breadCrumbs = ko.pureComputed(function () {
+          var result = [];
+          if (self.catalogEntry()) {
+            console.log(self.catalogEntry().path);
+            for (var i = 0; i < self.catalogEntry().path.length; i++) {
+              result.push({
+                name: self.catalogEntry().path[i],
+                isActive: i === self.catalogEntry().path.length - 1,
+                makeActive: function () {
+                  self.catalogEntry().dataCatalog.getEntry({ path: self.catalogEntry().path.slice(self.catalogEntry().path.length - i - 1) }).done(self.catalogEntry);
+                }
+              })
+            }
+          }
+          console.log(result);
+          return result;
+        });
+      };
+
+      DataCatalogContext.prototype.close = function () {
+
+      };
+
+      DataCatalogContext.prototype.showInAssist = function () {
+        var self = this;
+        //huePubSub.publish('context.popover.show.in.assist')
+      };
+
+      DataCatalogContext.prototype.openInDashboard = function() {
+        var self = this;
+        //huePubSub.publish('context.popover.open.in.dashboard')
+      };
+
+      DataCatalogContext.prototype.openInTableBrowser = function () {
+        var self = this;
+        //huePubSub.publish('context.popover.open.in.metastore', isTable || isView ? 'table' : 'db')
+      };
+
+      DataCatalogContext.prototype.insertInEditor = function () {
+        var self = this;
+        //huePubSub.publish('context.popover.replace.in.editor')
+      };
+
 
       var HALF_SIZE_LIMIT_X = 130;
       var HALF_SIZE_LIMIT_Y = 100;
@@ -1598,6 +1710,7 @@ from metadata.conf import has_navigator
         self.isView = params.data.type === 'view';
         self.isDocument = params.data.type.toLowerCase() === 'hue';
         self.isCollection = params.data.type === 'collection';
+        self.isCatalogEntry = !!params.data.catalogEntry;
 
         self.showInAssistEnabled = (typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true) && (self.isDocument || self.isDatabase || self.isTable || self.isColumn || self.isCollection);
         self.openInDashboardEnabled = self.isTable || self.isView || self.isDatabase;
@@ -1637,7 +1750,9 @@ from metadata.conf import has_navigator
           }
         }
 
-        if (self.isDatabase) {
+        if (self.isCatalogEntry) {
+          self.contents = new DataCatalogContext({ popover: self, catalogEntry: params.data.catalogEntry })
+        } if (self.isDatabase) {
           self.contents = new DatabaseContextTabs(self.data, self.sourceType, self.defaultDatabase);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-database';
@@ -1808,6 +1923,7 @@ from metadata.conf import has_navigator
 
         self.disposals = [];
 
+        self.isCatalogEntry = params.data.type === 'catalogEntry';
         self.isDatabase = params.data.type.toLowerCase() === 'database';
         self.isTable = params.data.type.toLowerCase() === 'table';
         self.isColumn = params.data.type.toLowerCase() === 'field';
@@ -1858,7 +1974,9 @@ from metadata.conf import has_navigator
           }
         }
 
-        if (self.isDatabase) {
+        if (self.isCatalogEntry) {
+          self.contents = new DataCatalogContext({ popover: self, catalogEntry: params.data.catalogEntry });
+        } else if (self.isDatabase) {
           self.contents = new DatabaseContextTabs(adaptedData, sqlSourceType, 'default');
         } else if (self.isTable) {
           self.contents = new TableAndColumnContextTabs(adaptedData, sqlSourceType, 'default', false, false);
