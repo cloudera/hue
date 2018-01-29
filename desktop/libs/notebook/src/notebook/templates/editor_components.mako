@@ -2597,72 +2597,70 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   }
 
   function scatterChartDataTransformer(rawDatum) {
-    var _datum = [];
+    var datum = {};
 
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
-      function addToDatum(col) {
-        var _idxX = -1;
-        var _idxY = -1;
-        var _idxSize = -1;
-        var _idxGroup = -1;
-        rawDatum.snippet.result.meta().forEach(function (icol, idx) {
-          if (icol.name == rawDatum.snippet.chartX()) {
-            _idxX = idx;
-          }
-          if (icol.name == rawDatum.snippet.chartYSingle()) {
-            _idxY = idx;
-          }
-          if (icol.name == rawDatum.snippet.chartScatterSize()) {
-            _idxSize = idx;
-          }
-          if (icol.name == rawDatum.snippet.chartScatterGroup()) {
-            _idxGroup = idx;
-          }
-        });
+      var idxX = -1;
+      var idxY = -1;
+      var idxSize = -1;
+      var idxGroup = -1;
+      rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+        if (icol.name == rawDatum.snippet.chartX()) {
+          idxX = idx;
+        }
+        if (icol.name == rawDatum.snippet.chartYSingle()) {
+          idxY = idx;
+        }
+        if (icol.name == rawDatum.snippet.chartScatterSize()) {
+          idxSize = idx;
+        }
+        if (icol.name == rawDatum.snippet.chartScatterGroup()) {
+          idxGroup = idx;
+        }
+      });
 
-        if (_idxX > -1 && _idxY > -1) {
-          var _data = [];
-          $(rawDatum.counts()).each(function (cnt, item) {
-            if (_idxGroup == -1 || item[_idxGroup] == col) {
-              if (isNotNullForCharts(item[_idxX]) && isNotNullForCharts(item[_idxY])) {
-                _data.push({
-                  x: item[_idxX],
-                  y: item[_idxY],
-                  shape: 'circle',
-                  size: _idxSize > -1 ? item[_idxSize] : 100,
-                  obj: item
-                });
-              }
-            }
-          });
-          if (rawDatum.snippet.chartLimit()) {
-            _data = _data.slice(0, rawDatum.snippet.chartLimit());
+      if (idxX > -1 && idxY > -1) {
+
+        function createAndAddToArray(key, item) {
+          if (!datum[key]) {
+            datum[key] = [];
           }
-          _datum.push({
-            key: col,
-            values: _data
+          if (isNotNullForCharts(item[idxX]) && isNotNullForCharts(item[idxY])) {
+            datum[key].push({
+              x: item[idxX],
+              y: item[idxY],
+              shape: 'circle',
+              size: idxSize > -1 ? item[idxSize] : 100,
+              obj: item
+            });
+          }
+        }
+
+        if (idxGroup > -1) {
+          $(rawDatum.counts()).each(function (cnt, item) {
+            createAndAddToArray(item[idxGroup], item)
+          });
+        }
+        else {
+          $(rawDatum.counts()).each(function (cnt, item) {
+            createAndAddToArray('distro', item)
           });
         }
       }
 
-      if (rawDatum.snippet.chartScatterGroup() != null) {
-        var _idxGroup = -1;
-        rawDatum.snippet.result.meta().forEach(function (icol, idx) {
-          if (icol.name == rawDatum.snippet.chartScatterGroup()) {
-            _idxGroup = idx;
-          }
-        });
-        if (_idxGroup > -1) {
-          $(rawDatum.counts()).each(function (cnt, item) {
-            addToDatum(hueUtils.html2text(item[_idxGroup]));
-          });
-        }
-      } else {
-        addToDatum('${ _('Distribution') }');
-      }
 
     }
-    return _datum;
+
+    var returndDatum = [];
+    Object.keys(datum).forEach(function (key) {
+      returndDatum.push({
+        key: key,
+        values: rawDatum.snippet.chartLimit() ? datum[key].slice(0, rawDatum.snippet.chartLimit()) : datum[key]
+      });
+    });
+
+
+    return returndDatum;
   }
 
   (function () {
