@@ -667,7 +667,8 @@
           nv.addGraph(function () {
             var _chart = nv.models.scatterChart()
                 .transitionDuration(350)
-                .color(d3v3.scale.category10().range());
+                .color(d3v3.scale.category10().range())
+                .useVoronoi(false);
 
             _chart.tooltipContent(function (key, x, y, obj) {
               return '<h3>' + key + '</h3><div class="center">' + obj.point.size + '</div>';
