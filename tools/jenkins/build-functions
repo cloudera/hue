@@ -141,7 +141,7 @@ build_oozie() {
 
 
 ##########
-SQOOP_URL=${SQOOP_URL:-http://repos.jenkins.cloudera.com/cdh5.14.x-nightly/cdh/5/sqoop-1.4.6-cdh5.14.1-SNAPSHOT.tar.gz}
+SQOOP_URL=${SQOOP_URL:-http://repos.jenkins.cloudera.com/cdh5.14.x-nightly/cdh/5/sqoop2-1.99.5-cdh5.14.1-SNAPSHOT.tar.gz}
 
 SQOOP_TGZ=$(basename $SQOOP_URL)
 SQOOP_VERSION=${SQOOP_TGZ/.tar.gz/}
