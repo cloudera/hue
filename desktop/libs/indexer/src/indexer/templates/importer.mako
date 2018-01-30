@@ -383,7 +383,7 @@ ${ assist.assistPanel() }
             </tr>
             </tbody>
             <!-- ko if: createWizard.source.inputFormat() == 'query' -->
-              ${ _('Execute query to add sample data') }
+              ${ _('Add sample data') } <i class="fa fa-fw fa-play"></i>
             <!-- /ko -->
           </table>
         </div>
@@ -1247,7 +1247,7 @@ ${ assist.assistPanel() }
           % endif
           % if ENABLE_SQL_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
-          {'value': 'table', 'name': 'Table'},
+          ##{'value': 'table', 'name': 'Table'},
           % endif
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);

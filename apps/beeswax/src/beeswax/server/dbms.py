@@ -911,7 +911,7 @@ class HiveServer2Dbms(object):
 
 
   def get_query_metadata(self, query):
-    hql = 'SELECT * FROM ( %(query)s ) t LIMIT 0' % {'query': query}
+    hql = 'SELECT * FROM ( %(query)s ) t LIMIT 0' % {'query': query.strip(';')}
 
     query = hql_query(hql)
     handle = self.execute_and_wait(query, timeout_sec=15.0)
