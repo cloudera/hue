@@ -751,12 +751,6 @@ def export_result(request):
     if response.get('status') != 0:
       response['message'] =  _('Exporting result failed.')
 
-    request.audit = {
-      'operation': 'EXPORT',
-      'operationText': 'User %s exported to Search index: %s' % (request.user.username, destination),
-      'allowed': True
-    }
-
   return JsonResponse(response)
 
 
