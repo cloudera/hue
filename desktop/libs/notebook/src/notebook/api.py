@@ -703,7 +703,7 @@ def export_result(request):
       'allowed': True
     }
   elif data_format == 'search-index':
-    # Open results in a Dashboard via either: a SQL sub-query or a Solr index via the wizard (and its quick indexing or Morphline job)
+    # Open the result in the Dashboard via a SQL sub-query or the Import wizard (and its quick  or scalable indexer)
 
     if is_embedded:
       if destination == '__hue__':
