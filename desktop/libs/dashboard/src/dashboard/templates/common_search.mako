@@ -590,69 +590,32 @@ ${ dashboard.layout_skeleton(suffix='search') }
     </span>
   </div>
 
-  <ul data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', containment: 'parent', handle: '.title' }}" class="unstyled pull-left white">
-    <li class="filter-box">
-      <div class="title move">
-        <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }, visible: $parent.properties.facets().length > 1" class="pull-right" href="javascript:void(0)">
-          <i class="fa fa-times"></i>
-        </a>
-        <div class="hit-title" data-bind="editable: fieldLabel, editableOptions: { enabled: true, placement: 'right' }, attr: { 'title': fieldLabel }"></div>
-        <div class="clearfix"></div>
-      </div>
-
-      <div class="content">
-        <div class="facet-field-cnt">
-          <span class="spinedit-cnt">
-            <span data-bind="template: { name: 'metric-form' }"></span>
-          </span>
-        </div>
-      </div>
-    </li>
-  </ul>
   <!-- /ko -->
 
-  <!-- ko ifnot: $root.isEditing -->
-    <!-- ko ifnot: $parents[1].isLoading() -->
-    <div class="edit-dimensions">
-      <div data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', containment: 'parent'}}" class="inline-block">
-        <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }">
-          <span data-bind="text: getPrettyMetric($data)"></span>
-          <span class="badge badge-info dimensions-badge" data-bind="text: field, attr: {'title': field}"></span>
-          <!-- ko if: aggregate.function() != 'field' && aggregate.metrics -->
-            <i class="fa" data-bind="css: { 'fa-long-arrow-down': sort() == 'desc', 'fa-long-arrow-up': sort() == 'asc' }"></i>
-          <!-- /ko -->
-          <div class="action-icon margin-left-5" data-bind="click: function(){ $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }"><i class="fa fa-pencil"></i></div>
-          <!-- ko if: isEditing -->
-          <div class="metric-form" data-bind="template: { name: 'metric-form' }"></div>
-          <!-- /ko -->
-        </div>
-      </div>
-      <div class="badge dimensions-badge-container dimensions-badge-container-add" data-bind="css: { 'is-adding': isAdding }">
-        <div class="action-icon" data-bind="click: function(){ isAdding(true); properties.facets().forEach(function(f){ f.isEditing(false); });  }, visible: properties.facets().length < 15 && widgetType() != 'hit-widget'"><i class="fa fa-plus"></i> ${ _('Add') }</div>
-        <!-- ko if: isAdding -->
-          <div class="metric-form" data-bind="template: { name: 'metric-form', data: properties.facets_form }"></div>
+  <!-- ko ifnot: $parents[1].isLoading() -->
+  <div class="edit-dimensions">
+    <div data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', containment: 'parent'}}" class="inline-block">
+      <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }">
+        <span data-bind="text: getPrettyMetric($data)"></span>
+        <span class="badge badge-info dimensions-badge" data-bind="text: field, attr: {'title': field}"></span>
+        <!-- ko if: aggregate.function() != 'field' && aggregate.metrics -->
+          <i class="fa" data-bind="css: { 'fa-long-arrow-down': sort() == 'desc', 'fa-long-arrow-up': sort() == 'asc' }"></i>
+        <!-- /ko -->
+        <div class="action-icon margin-left-5" data-bind="click: function(){ $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }"><i class="fa fa-pencil"></i></div>
+        <!-- ko if: isEditing -->
+        <div class="metric-form" data-bind="template: { name: 'metric-form' }"></div>
         <!-- /ko -->
       </div>
-      <div class="clearfix"></div>
     </div>
-    <!-- /ko -->
-  <!-- /ko -->
-
-  <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15 && widgetType() != 'hit-widget'" style="opacity: 0.7">
-    <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
-      <a data-bind="visible: properties.facets_form.field() && properties.facets_form.field() != 'formula' || properties.facets_form.aggregate.formula(), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
-        <i class="fa fa-fw fa-plus"></i> ${ _('Add') }
-      </a>
+    <div class="badge dimensions-badge-container dimensions-badge-container-add" data-bind="css: { 'is-adding': isAdding }, visible: properties.facets().length < 15 && widgetType() != 'hit-widget'">
+      <div class="action-icon" data-bind="click: function(){ isAdding(true); properties.facets().forEach(function(f){ f.isEditing(false); });  }"><i class="fa fa-plus"></i> ${ _('Add') }</div>
+      <!-- ko if: isAdding -->
+        <div class="metric-form" data-bind="template: { name: 'metric-form', data: properties.facets_form }"></div>
+      <!-- /ko -->
     </div>
-    <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
-      <div class="facet-field-cnt">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label"></span>
-          <span data-bind="template: { name: 'metric-form', data: properties.facets_form }"></span>
-        </span>
-      </div>
-    </div>
+    <div class="clearfix"></div>
   </div>
+  <!-- /ko -->
 
   <div class="clearfix"></div>
 </script>
