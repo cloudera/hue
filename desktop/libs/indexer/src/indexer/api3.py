@@ -148,7 +148,6 @@ def guess_field_types(request):
   elif file_format['inputFormat'] == 'query':
     query_id = file_format['query']['id'] if file_format['query'].get('id') else file_format['query']
 
-    # Only support non expired query history. Otherwise would need to get schema without executing a query.
     notebook = Notebook(document=Document2.objects.document(user=request.user, doc_id=query_id)).get_data()
     snippet = notebook['snippets'][0]
     db = get_api(request, snippet)
@@ -157,7 +156,7 @@ def guess_field_types(request):
       snippet['query'] = snippet['statement'] #self._get_current_statement(db, snippet) # TODO multi statement
       sample = db.autocomplete(snippet=snippet, database='', table='')
       format_ = {
-          "sample": [[], [], [], [], []],
+          "sample": [[], [], [], [], []], # TODO manual exec and try/catch on query handle
           "columns": [
               Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
               for col in sample['extended_columns']

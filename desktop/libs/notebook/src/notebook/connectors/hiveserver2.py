@@ -450,7 +450,7 @@ class HS2Api(Api):
   def get_sample_data(self, snippet, database=None, table=None, column=None):
     try:
       db = self._get_db(snippet)
-      return _get_sample_data(db, database, table, column)
+      return _get_sample_data(db, database, table, column) # TODO async in all signatures
     except QueryServerException, ex:
       raise QueryError(ex.message)
 

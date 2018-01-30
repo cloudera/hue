@@ -358,7 +358,7 @@ class HiveServer2Dbms(object):
     return resp
 
 
-  def get_sample(self, database, table, column=None, nested=None, limit=100):
+  def get_sample(self, database, table, column=None, nested=None, limit=100, async=False):
     result = None
     hql = None
 
@@ -379,11 +379,14 @@ class HiveServer2Dbms(object):
 
     if hql:
       query = hql_query(hql)
-      handle = self.execute_and_wait(query, timeout_sec=5.0)
+      if async:
+        return self.execute_and_watch(query)
+      else:
+        handle = self.execute_and_wait(query, timeout_sec=5.0)
 
-      if handle:
-        result = self.fetch(handle, rows=100)
-        self.close(handle)
+        if handle:
+          result = self.fetch(handle, rows=100)
+          self.close(handle)
 
     return result
 
