@@ -590,6 +590,8 @@ var EditorViewModel = (function() {
       snippet.variables.forEach(function (variable) {
         variable.meta = (typeof variable.defaultValue === "object" && variable.defaultValue) || {type: "text", placeholder: ""};
         variable.value = variable.value || "";
+        variable.sample = variable.entry || [];
+        variable.type = variable.type || "";
         delete variable.defaultValue;
       });
     }
@@ -679,13 +681,13 @@ var EditorViewModel = (function() {
 
           //If 1 match, text value
           //If multiple matches, list value
-          var value = {type:"text"};
+          var value = { type: "text" };
           while (matchList = reList.exec(match[2])) {
             var option = {text:matchList[2] || matchList[3], value:matchList[3] || matchList[1]};
             option.text = option.text && option.text.trim();
             option.value = option.value && option.value.trim();
 
-            if (value.placeholder || matchList[2]){
+            if (value.placeholder || matchList[2]) {
               if (!value.options) {
                 value.options = [];
                 value.type = "select";
@@ -698,15 +700,15 @@ var EditorViewModel = (function() {
             return current.value == value.placeholder;
           });
           if (!isPlaceholderInOptions) {
-            value.options.push({text: value.placeholder, value: value.placeholder});
+            value.options.push({ text: value.placeholder, value: value.placeholder });
           }
           matches[match[1]] = matches[match[1]] || value;
         }
       }
       return $.map(matches, function (match, key) {
         var isMatchObject = typeof matches[key] === "object";
-        var meta = isMatchObject ? matches[key] : {type: "text", placeholder: matches[key]};
-        return {name: key, meta: meta};
+        var meta = isMatchObject ? matches[key] : { type: "text", placeholder: matches[key] };
+        return { name: key, meta: meta };
       });
     });
     self.variableValues = {};
@@ -716,12 +718,15 @@ var EditorViewModel = (function() {
       var needsMore = diffLengthVariables < 0;
       var needsLess = diffLengthVariables > 0;
       self.variableValues = self.variables().reduce(function (variableValues, variable) {
-        variableValues[variable.name()] = {value:variable.value()};
+        if (!variableValues[variable.name()]) {
+          variableValues[variable.name()] = { sample: [] };
+        }
+        variableValues[variable.name()].value = variable.value();
         return variableValues;
       }, self.variableValues);
       if (needsMore) {
         for (var i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
-          self.variables.push(ko.mapping.fromJS({ name: "", value: "", meta: {type: "text", placeholder: ""}}));
+          self.variables.push(ko.mapping.fromJS({ name: "", value: "", meta: { type: "text", placeholder: "" }, sample: [], type: "text", step: ""}));
         }
       } else if (needsLess) {
         self.variables.splice(self.variables().length - diffLengthVariables, diffLengthVariables);
@@ -729,9 +734,117 @@ var EditorViewModel = (function() {
       newVal.forEach(function (item, index) {
         var variable = self.variables()[index];
         variable.name(item.name);
-        variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || "");
+        variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || '');
         variable.meta = ko.mapping.fromJS(item.meta, {}, variable.meta);
+        variable.sample(self.variableValues[item.name] ? self.variableValues[item.name].sample : []);
+        variable.type(self.variableValues[item.name] ? self.variableValues[item.name].type : 'text');
       });
+    });
+    huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
+      var variables = e.data.locations.reduce(function (variables, location) {
+        var re = /\${(\w*)\=?([^{}]*)}/g;
+        if (location.type === 'table') {
+          variables.table = location.identifierChain;
+          variables.column = null;
+          variables.complex = null;
+        } else if (location.type === 'column') {
+          variables.column = location.identifierChain;
+        } else if (location.type === 'complex') {
+          variables.complex = location.identifierChain;
+        } else if (location.type === 'variable') {
+          var column;
+          if (!location.colRef) {
+            column = variables.complex || variables.column;
+            if (!column) {
+              return variables;
+            }
+          } else {
+            column = location.colRef.identifierChain;
+          }
+          var identifierChain = variables.table.slice().concat(column);
+          var value = re.exec(location.value);
+          variables.push({
+            path: identifierChain.map(function (identifier) {
+              return identifier.name;
+            }),
+            name: value[1]
+          });
+        }
+        return variables;
+      }, []);
+      var sourceType = self.type();
+      for (var i = 0; i < variables.length; i++) {
+        DataCatalog.getEntry({ sourceType: sourceType, path: variables[i].path })
+        .done(function (variable, entry) {
+          entry.getSample({ silenceErrors: true })
+          .then(function (variable, sample) {
+            if (!self.variableValues[variable.name]) {
+              self.variableValues[variable.name] = {};
+            }
+            var variablesValues = self.variableValues[variable.name];
+            var type = sample.full_headers[0].type;
+            switch (type) {
+              case 'TIMESTAMP_TYPE':
+                variablesValues.type = 'datetime-local';
+                variablesValues.step = '1';
+                variablesValues.sample = sample.rows.map(function (row) {
+                  var date = Date.parse(row[0]);
+                  if (Number.isNaN(date)) {
+                    return row[0];
+                  } else {
+                    return moment(date).format().substring(0,19); // Input options only accept date in ISO format with 20 characters (no timezone)
+                  }
+                });
+                break;
+              case 'DECIMAL_TYPE':
+              case 'DOUBLE_TYPE':
+              case 'FLOAT_TYPE':
+                variablesValues.step = '0.01';
+                variablesValues.type = 'number';
+                variablesValues.sample = sample.rows.map(function (row) { return row[0]; });
+                break;
+              case 'INT_TYPE':
+              case 'SMALLINT_TYPE':
+              case 'TINYINT_TYPE':
+              case 'BIGINT_TYPE':
+                variablesValues.type = 'number';
+                variablesValues.step = '1';
+                variablesValues.sample = sample.rows.map(function (row) { return row[0]; });
+                break;
+              case 'DATE_TYPE':
+                variablesValues.type = 'date';
+                variablesValues.step = '';
+                variablesValues.sample = sample.rows.map(function (row) {
+                  var date = Date.parse(row[0]);
+                  if (Number.isNaN(date)) {
+                    return row[0];
+                  } else {
+                    return moment(date).format().substring(0,10); // Input options only accept date in ISO format with 11 characters
+                  }
+                });
+                break;
+              case 'BOOLEAN_TYPE':
+                variablesValues.type = 'checkbox';
+                variablesValues.sample = [];
+                variablesValues.step = '';
+                break;
+              default:
+                variablesValues.sample = sample.rows.map(function (row) { return row[0]; });
+                variablesValues.type = 'text';
+                variablesValues.step = '';
+            }
+
+            var currentVariables = self.variables();
+            for (var i = 0; i < currentVariables.length; i++) {
+              if (currentVariables[i].name() === variable.name) {
+                currentVariables[i].sample(variablesValues.sample);
+                currentVariables[i].type(variablesValues.type);
+                currentVariables[i].step(variablesValues.step);
+              }
+            }
+          }.bind(null, variable));
+        }.bind(null, variables[i]));
+      }
     });
     self.statement = ko.computed(function () {
       var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
@@ -743,7 +856,8 @@ var EditorViewModel = (function() {
         var variablesString = self.variables().map(function(variable) { return variable.name(); }).join("|");
         statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{(" : "(") + variablesString + ")(=[^}]*)?" + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), function(match, p1, p2){
           var variable = variables[p2];
-          return p1 + (variable && (variable.value() || (variable.meta.placeholder && variable.meta.placeholder())));
+          var pad = variable.type() == 'datetime-local' && variable.value().length == 16 ? ':00' : ''; // Chrome drops the seconds from the timestamp when it's at 0 second.
+          return p1 + (variable.value() != null ? variable.value() + pad : variable.meta.placeholder && variable.meta.placeholder());
         });
       }
       return statement;
