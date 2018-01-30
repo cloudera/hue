@@ -154,20 +154,26 @@ def guess_field_types(request):
 
     if file_format['query'].get('id'):
       snippet['query'] = snippet['statement'] #self._get_current_statement(db, snippet) # TODO multi statement
-      sample = db.autocomplete(snippet=snippet, database='', table='')
+      try:
+        sample = db.fetch_result(notebook, snippet, 4, start_over=True)['rows'][:4]
+      except Exception, e:
+        LOG.warn('Skipping sample data as query handle might be expired: %s' % e)
+        sample = [[], [], [], [], []]
+      columns = db.autocomplete(snippet=snippet, database='', table='')
       format_ = {
-          "sample": [[], [], [], [], []], # TODO manual exec and try/catch on query handle
+          "sample": sample,
           "columns": [
               Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-              for col in sample['extended_columns']
-          ]
+              for col in columns['extended_columns']
+          ],
+          "hs2_handle": None # HS2 there and valid? add sample
       }
     else:
       sample = db.fetch_result(notebook, snippet, 4, start_over=True)
 
       format_ = {
           "sample": sample['rows'][:4],
-          "sample_cols": sample.meta,
+          #"sample_cols": sample.meta,
           "columns": [
               Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
               for col in sample.meta
@@ -209,10 +215,10 @@ def importer_submit(request):
 
     if destination['indexerRunJob']:
       _convert_format(source["format"], inverse=True)
-      job_handle = _index(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'])
+      job_handle = _large_indexing(request, source, index_name, start_time=start_time, lib_path=destination['indexerJobLibPath'])
     else:
       client = SolrClient(request.user)
-      job_handle = _create_index(request.user, request.fs, client, source, destination, index_name)
+      job_handle = _small_indexing(request.user, request.fs, client, source, destination, index_name)
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
   elif source['inputFormat'] == 'rdbms':
@@ -235,13 +241,13 @@ def importer_submit(request):
   return JsonResponse(job_handle)
 
 
-def _create_index(user, fs, client, source, destination, index_name):
+def _small_indexing(user, fs, client, source, destination, index_name):
   unique_key_field = destination['indexerPrimaryKey'] and destination['indexerPrimaryKey'][0] or None
   df = destination['indexerDefaultField'] and destination['indexerDefaultField'][0] or None
   kwargs = {}
   errors = []
 
-  if source['inputFormat'] not in ('manual', 'table'):
+  if source['inputFormat'] not in ('manual', 'table', 'query_handle'):
     stats = fs.stats(source["path"])
     if stats.size > MAX_UPLOAD_SIZE:
       raise PopupException(_('File size is too large to handle!'))
@@ -276,13 +282,21 @@ def _create_index(user, fs, client, source, destination, index_name):
         replication=destination['indexerReplicationFactor']
     )
 
-  if source['inputFormat'] not in ('manual', 'table'):
+  if source['inputFormat'] == 'file':
     data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
+    
     try:
-      if client.is_solr_six_or_more():
-        kwargs['processor'] = 'tolerant'
-      response = client.index(name=index_name, data=data, **kwargs)
-      errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
+      if source['inputFormat'] == 'query':
+        #   elif file_format['inputFormat'] == 'hs2_handle':
+        searcher = CollectionManagerController(user)
+        columns = fields#['_uuid'] + [field['name'] for field in file_format['columns']]
+        return searcher.update_data_from_hive(index_name, columns, fetch_handle=file_format['fetch_handle'])
+        ## live HS2
+      else:      
+        if client.is_solr_six_or_more():
+          kwargs['processor'] = 'tolerant'
+        response = client.index(name=index_name, data=data, **kwargs)
+        errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
     except Exception, e:
       try:
         client.delete_index(index_name, keep_config=False)
@@ -331,7 +345,7 @@ def _create_table(request, source, destination, start_time=-1):
   return notebook.execute(request, batch=False)
 
 
-def _index(request, file_format, collection_name, query=None, start_time=None, lib_path=None):
+def _large_indexing(request, file_format, collection_name, query=None, start_time=None, lib_path=None):
   indexer = MorphlineIndexer(request.user, request.fs)
 
   unique_field = indexer.get_unique_field(file_format)
@@ -357,10 +371,6 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'file':
     input_path = '${nameNode}%s' % file_format["path"]
-  elif file_format['inputFormat'] == 'hs2_handle':
-    searcher = CollectionManagerController(request.user)
-    columns = ['_uuid'] + [field['name'] for field in file_format['columns']]
-    return searcher.update_data_from_hive(collection_name, columns, fetch_handle=file_format['fetch_handle'])
   else:
     input_path = None
 
