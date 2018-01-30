@@ -1232,10 +1232,30 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <div class="input-prepend margin-top-10">
           <span class="muted add-on" data-bind="text: name"></span>
           <!-- ko if: meta.type() == 'text' -->
-          <input class="input-medium" type="text" data-bind="value: value, attr: { placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }, event: { 'keydown': $parent.onKeydownInVariable }">
+            <!-- ko if: meta.placeholder() -->
+              <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }">
+            <!-- /ko -->
+            <!-- ko ifnot: meta.placeholder() -->
+              <!-- ko if: type() == 'checkbox' -->
+              <input list="input-medium" type="text" data-bind="checked: value, attr: { type: type }, event: { 'keydown': $parent.onKeydownInVariable }" />
+              <!-- /ko -->
+              <!-- ko ifnot: type() == 'checkbox' -->
+                <!-- ko if: sample().length -->
+                  <!-- ko if: type() == 'text' -->
+                  <select data-bind="selectize: sample, selectizeOptions: { create: true }, value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
+                  <!-- /ko -->
+                  <!-- ko ifnot: type() == 'text' -->
+                  <input list="input-medium" type="text" data-bind="datalist: { options: sample, value: value }, valueUpdate: 'afterkeydown', attr: { type: type, step: step }, event: { 'keydown': $parent.onKeydownInVariable }" />
+                  <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko ifnot: sample().length -->
+                  <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }">
+                <!-- /ko -->
+              <!-- /ko -->
+            <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: meta.type() == 'select' -->
-          <select data-bind="selectize: meta.options(), optionsText: 'text', optionsValue:'value', value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
+          <select data-bind="selectize: meta.options(), optionsText: 'text', optionsValue:'value', selectizeOptions: { create: true }, value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
           <!-- /ko -->
         </div>
       </li>
