@@ -37,6 +37,7 @@ from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
+from beeswax.api import _autocomplete
 
 
 LOG = logging.getLogger(__name__)
@@ -145,19 +146,34 @@ def guess_field_types(request):
         ]
     }
   elif file_format['inputFormat'] == 'query':
-    # Only support non expired query history. Otherwise would need to get schema without executing a query.
-    notebook = Notebook(document=Document2.objects.document(id=file_format['query'])).get_data()
-    snippet = notebook['snippets'][0]
-    sample = get_api(request, snippet).fetch_result(notebook, snippet, 4, start_over=True)
+    query_id = file_format['query']['id'] if file_format['query'].get('id') else file_format['query']
 
-    format_ = {
-        "sample": sample['rows'][:4],
-        "sample_cols": sample.meta,
-        "columns": [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-            for col in sample.meta
-        ]
-    }
+    # Only support non expired query history. Otherwise would need to get schema without executing a query.
+    notebook = Notebook(document=Document2.objects.document(user=request.user, doc_id=query_id)).get_data()
+    snippet = notebook['snippets'][0]
+    db = get_api(request, snippet)
+
+    if file_format['query'].get('id'):
+      snippet['query'] = snippet['statement'] #self._get_current_statement(db, snippet) # TODO multi statement
+      sample = db.autocomplete(snippet=snippet, database='', table='')
+      format_ = {
+          "sample": [[], [], [], [], []],
+          "columns": [
+              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+              for col in sample['extended_columns']
+          ]
+      }
+    else:
+      sample = db.fetch_result(notebook, snippet, 4, start_over=True)
+
+      format_ = {
+          "sample": sample['rows'][:4],
+          "sample_cols": sample.meta,
+          "columns": [
+              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+              for col in sample.meta
+          ]
+      }
   elif file_format['inputFormat'] == 'rdbms':
     query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
     db = rdbms.get(request.user, query_server=query_server)
