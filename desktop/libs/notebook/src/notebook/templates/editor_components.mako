@@ -2503,16 +2503,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                   }
                 }
               });
-              if (rawDatum.sorting == "asc") {
-                _data.sort(function (a, b) {
-                  return a.y - b.y
-                });
-              }
-              if (rawDatum.sorting == "desc") {
-                _data.sort(function (a, b) {
-                  return b.y - a.y
-                });
-              }
               _datum.push({
                 key: hueUtils.html2text(val),
                 values: _data
@@ -2520,26 +2510,53 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             });
           }
         });
+
         // fills in missing values
-        var longestSerie = 0;
+        var allXValues = [];
         _datum.forEach(function (d) {
-          if (d.values.length > longestSerie) {
-            longestSerie = d.values.length;
-          }
+          d.values.forEach(function (val) {
+            if (allXValues.indexOf(val.x) === -1) {
+              allXValues.push(val.x);
+            }
+          });
         });
+
         _datum.forEach(function (d) {
-          if (d.values.length < longestSerie) {
-            var zeroObj = jQuery.extend({}, d.values[0]);
-            zeroObj.x = '';
-            zeroObj.y = 0;
-            for (var i = d.values.length; i < longestSerie; i++) {
+          allXValues.forEach(function (val) {
+            if (!d.values.some(function (item) {
+                  return item.x === val
+                })) {
+              var zeroObj = jQuery.extend({}, d.values[0]);
+              zeroObj.y = 0;
+              zeroObj.x = val;
               d.values.push(zeroObj)
             }
-          }
+          });
         });
+
         if (rawDatum.snippet.chartLimit()) {
           _datum = _datum.slice(0, rawDatum.snippet.chartLimit());
         }
+
+        if (rawDatum.sorting == "desc") {
+          _datum.forEach(function (d) {
+            d.values.sort(function (a, b) {
+              if (a.x > b.x) return -1;
+              if (a.x < b.x) return 1;
+              return 0;
+            });
+          });
+        }
+        else {
+          _datum.forEach(function (d) {
+            d.values.sort(function (a, b) {
+              if (a.x > b.x) return 1;
+              if (a.x < b.x) return -1;
+              return 0;
+            });
+          });
+        }
+
       }
       else {
         rawDatum.snippet.result.meta().forEach(function (meta) {
