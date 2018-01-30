@@ -731,6 +731,8 @@ var Collection = function (vm, collection) {
         return self._get_field_operations(_field, facet);
       });
 
+      facet.properties.facets_form.isEditing = ko.observable(true);
+
       if (facet.properties.facets) {
         facet.properties.facets.subscribe(function(newValue) {
           vm.search();
