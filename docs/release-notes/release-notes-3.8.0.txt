@@ -216,7 +216,7 @@ List of 1121 Commits
 * c14b4c2 [search] Remove Job collection and prettify Twitter dashboard
 * 10c8a7f [oozie] Adding new properties to the Oozie mini cluster
 * 1cefd92 [spark] Add an experimental config option to launch livy
-* 93455b8 [livy] Update spark version to 1.3.0-cdh5.13.2-SNAPSHOT
+* 93455b8 [livy] Update spark version to 1.3.0-cdh5.13.2
 * 92cef00 [spark] Make the livy-assembly.jar not include the maven version
 * de699c6 [oozie] Switch workflow integration tests to the new editor
 * 5c1a734 [oozie] Add a Fork Example with Pig and Sub-workflow
