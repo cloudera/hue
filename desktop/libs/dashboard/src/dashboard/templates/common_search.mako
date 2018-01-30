@@ -743,47 +743,63 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div class="clearfix"></div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: properties.facets()[0].type() == 'field' -->
-        <div data-bind="foreach: $parent.counts">
-          <div class="trigger-exclude">
-              <!-- ko if: $index() < $parent.properties.limit() -->
-                <!-- ko if: ! $data.selected -->
-                  <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
-                  <div class="hellip">
-                    <a class="pointer" dir="ltr" data-bind="html: prettifyDate($data.value), click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
-                    <span class="pointer counter" dir="rtl" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
-                  </div>
-                <!-- /ko -->
-                <!-- ko if: $data.selected -->
-                  <span class="pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
-                    <a class="include pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
-                    <a class="include pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
-                    <div class="hellip">
-                      <strong data-bind="html: prettifyDate($data.value), attr: {'title': $data.value}"></strong>
-                    </div>
-                  </span>
-                <!-- /ko -->
-              <!-- /ko -->
-              <!-- ko if: $index() == $parent.properties.limit() -->
-                <!-- ko if: $parent.properties.prevLimit == undefined || $parent.properties.prevLimit == $parent.properties.limit() -->
-                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
-                    ${ _('Show more...') }
-                  </a>
-                <!-- /ko -->
-                <!-- ko if: $parent.properties.prevLimit != undefined && $parent.properties.prevLimit != $parent.properties.limit() -->
-                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
-                    ${ _('Show more') }
-                  </a>
-                  /
-                  <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'down') }">
-                    ${ _('less...') }
-                  </a>
-                <!-- /ko -->
-              <!-- /ko -->
+        <!-- ko if: properties.facets()[0].multiselect -->
+          <div class="text-widget-filter">
+            <!-- ko component: {
+              name: 'inline-autocomplete',
+              params: {
+                querySpec: $parent.querySpec,
+                facets: [],
+                knownFacetValues: {},
+                autocompleteFromEntries: $parent.autocompleteFromEntries
+              }
+            } --><!-- /ko -->
           </div>
-        </div>
+          <div data-bind="foreach: $parent.countsFiltered" class="facet-count">
+            <div class="trigger-exclude">
+                <!-- ko if: $index() < $parent.properties.limit() -->
+                  <!-- ko if: ! $data.selected -->
+                    <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
+                    <div class="hellip">
+                      <a class="pointer" dir="ltr" data-bind="html: prettifyDate($data.value), click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
+                      <span class="pointer counter" dir="rtl" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
+                    </div>
+                  <!-- /ko -->
+                  <!-- ko if: $data.selected -->
+                    <span class="pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }">
+                      <a class="include pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
+                      <a class="include pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
+                      <div class="hellip">
+                        <strong data-bind="html: prettifyDate($data.value), attr: {'title': $data.value}"></strong>
+                      </div>
+                    </span>
+                  <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: $index() == $parent.properties.limit() -->
+                  <!-- ko if: $parent.properties.prevLimit == undefined || $parent.properties.prevLimit == $parent.properties.limit() -->
+                    <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
+                      ${ _('Show more...') }
+                    </a>
+                  <!-- /ko -->
+                  <!-- ko if: $parent.properties.prevLimit != undefined && $parent.properties.prevLimit != $parent.properties.limit() -->
+                    <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'up') }">
+                      ${ _('Show more') }
+                    </a>
+                    /
+                    <a class="pointer" data-bind="click: function(){ $root.collection.upDownFacetLimit($parent.id(), 'down') }">
+                      ${ _('less...') }
+                    </a>
+                  <!-- /ko -->
+                <!-- /ko -->
+            </div>
+          </div>
+       <!-- /ko -->
+       <!-- ko ifnot: properties.facets()[0].multiselect -->
+        <select data-bind="selectize: $parent.counts, optionsText: 'text', optionsValue:'value', value: $parent.countsSelected"/>
+       <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: properties.facets()[0].type() == 'range' -->
-        <div data-bind="foreach: $parent.counts">
+        <div data-bind="foreach: $parent.counts" class="facet-count">
           <div class="trigger-exclude">
               <!-- ko if: ! selected -->
                 <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
@@ -805,7 +821,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         </div>
       <!-- /ko -->
       <!-- ko if: properties.facets()[0].type() == 'range-up' -->
-        <div data-bind="foreach: $parent.counts">
+        <div data-bind="foreach: $parent.counts" class="facet-count">
           <div class="trigger-exclude">
               <!-- ko if: ! selected -->
                 <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true, is_up: $data.is_up}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
@@ -2165,6 +2181,16 @@ ${ dashboard.layout_skeleton(suffix='search') }
 ##            </span>
 ##          </div>
 ##        <!-- /ko -->
+        <!-- ko if: $parentContext.$data.type() == 'field' -->
+        <div class="facet-field-cnt" data-bind="visible: $parent == $parentContext.$parentContext.$data.properties.facets()[0]"> <!-- visible on first element only -->
+          <span class="spinedit-cnt">
+            <span class="facet-field-label facet-field-label-fixed-width">
+              ${ _('Multi select') }
+            </span>
+            <input type="checkbox" data-bind="checked: $parent.multiselect"/>
+          </span>
+        </div>
+        <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
 
