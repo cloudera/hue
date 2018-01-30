@@ -422,6 +422,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       facet['field'] = facet_field
       facet['limit'] = 10
       facet['fieldLabel'] = facet_field
+      facet['multiselect'] = True
 
       if range_properties:
         # TODO: timeline still uses properties from top properties
