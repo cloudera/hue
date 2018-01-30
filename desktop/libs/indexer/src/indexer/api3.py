@@ -221,6 +221,17 @@ def importer_submit(request):
   else:
     job_handle = _create_table(request, source, destination, start_time)
 
+  request.audit = {
+    'operation': 'EXPORT',
+    'operationText': 'User %(username)s exported %(inputFormat)s to %(ouputFormat)s: %(name)s' % {
+        'username': request.user.username,
+        'inputFormat': source['inputFormat'],
+        'ouputFormat': destination['ouputFormat'],
+        'name': destination['name'],
+    },
+    'allowed': True
+  }
+
   return JsonResponse(job_handle)
 
 
