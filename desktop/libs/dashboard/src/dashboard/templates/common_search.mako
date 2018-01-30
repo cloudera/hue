@@ -2183,13 +2183,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
         <!-- /ko -->
         <!-- /ko -->
 
+
         <!-- ko if: typeof $parents[0].isAdding === 'undefined' || !$parents[0].isAdding() -->
         <a href="javascript: void(0)" class="pull-right" data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }, visible: $parent.properties.facets().length > 1">
           <i class="fa fa-trash"></i> ${ _('Remove') }
         </a>
         <!-- /ko -->
         <!-- ko if: typeof $parents[0].isAdding !== 'undefined' && $parents[0].isAdding() -->
-        <a data-bind="visible: field() && field() != 'formula' || aggregate.formula(), click: function() { $root.collection.addPivotFacetValue2($parents[0]) }" class="pull-right" href="javascript:void(0)">
+        <a data-bind="visible: (typeof field !== 'undefined' && field() != 'formula') || aggregate.formula(), click: function() { $root.collection.addPivotFacetValue2($parents[0]) }" class="pull-right" href="javascript:void(0)">
           <i class="fa fa-plus"></i> ${ _('Add') }
         </a>
         <!-- /ko -->
