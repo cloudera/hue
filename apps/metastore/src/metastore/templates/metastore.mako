@@ -699,7 +699,9 @@ ${ components.menubar(is_embeddable) }
     <!-- ko with: samples -->
       <!-- ko if: loaded() && !hasErrors() -->
         <!-- ko with: preview -->
+        <div style="overflow: auto">
         <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
+        </div>
         <a class="pointer" data-bind="visible: rows().length >= 3, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">
           ${_('View more...')}
         </a>
