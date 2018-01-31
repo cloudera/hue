@@ -65,6 +65,12 @@ USE_GRIDSTER = Config(
   type=coerce_bool
 )
 
+HAS_WIDGET_FILTER = Config(
+  key="has_widget_filter",
+  help=_t("Activate the widget filter and comparison (beta)."),
+  default=False,
+  type=coerce_bool
+)
 
 def get_properties():
   if ENGINES.get():
