@@ -26,3 +26,10 @@ ENABLE_NEW_CREATE_TABLE = Config(
   type=bool,
   default=True
 )
+
+FORCE_HS2_METADATA = Config(
+  key="force_hs2_metadata",
+  help=_("Flag to force all metadata calls (e.g. list tables, table or column details...) to happen via HiveServer2 if available instead of Impala."),
+  type=bool,
+  default=False
+)
