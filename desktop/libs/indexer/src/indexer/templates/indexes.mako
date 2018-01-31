@@ -375,7 +375,7 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="indexes-index-fields-fields">
-  <div>
+  <div style="overflow: auto">
     <table class="table table-condensed table-nowrap">
       <thead>
         <tr>
