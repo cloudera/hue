@@ -48,6 +48,8 @@ from beeswax.server.dbms import expand_exception, get_query_server_config, Query
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
                           parse_out_jobs
+from metastore.conf import FORCE_HS2_METADATA
+from metastore.views import _get_db
 
 
 LOG = logging.getLogger(__name__)
@@ -88,12 +90,13 @@ def error_handler(view_fn):
 
 @error_handler
 def autocomplete(request, database=None, table=None, column=None, nested=None):
-  app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
+  app_name = None if FORCE_HS2_METADATA.get() else get_app_name(request)
+
   do_as = request.user
   if (request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security")) and 'doas' in request.GET:
     do_as = User.objects.get(username=request.GET.get('doas'))
-  db = dbms.get(do_as, query_server)
+
+  db = _get_db(user=do_as, source_type=app_name)
 
   response = _autocomplete(db, database, table, column, nested)
   return JsonResponse(response)
