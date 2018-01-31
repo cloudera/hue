@@ -3766,6 +3766,7 @@ $(document).ready(function () {
     max_cols: 12,
     max_rows: 6000,
     resize: {
+      axes: ['x'],
       enabled: true,
       start: function (event, ui, $widget) {
         $widget.find('.card-widget').css('opacity', '.6');
