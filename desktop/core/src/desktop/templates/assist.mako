@@ -808,12 +808,12 @@ from desktop.views import _ko
       % if hasattr(ENABLE_NEW_CREATE_TABLE, 'get') and ENABLE_NEW_CREATE_TABLE.get():
         <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
         <!-- ko if: typeof databaseName !== 'undefined' -->
-          <a class="inactive-action" data-bind="hueLink: '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + databaseName + '/?sourceType=' + sourceType" title="${_('Create table')}" href="javascript:void(0)">
+          <a class="inactive-action" data-bind="hueLink: '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + databaseName + '?sourceType=' + sourceType" title="${_('Create table')}" href="javascript:void(0)">
             <i class="pointer fa fa-plus" title="${_('Create table')}"></i>
           </a>
         <!-- /ko -->
         <!-- ko if: typeof databases !== 'undefined' -->
-          <a class="inactive-action" data-bind="hueLink: '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '/?sourceType=' + sourceType" href="javascript:void(0)">
+          <a class="inactive-action" data-bind="hueLink: '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' + '?sourceType=' + sourceType" href="javascript:void(0)">
             <i class="pointer fa fa-plus" title="${ _('Create database') }"></i>
           </a>
         <!-- /ko -->
