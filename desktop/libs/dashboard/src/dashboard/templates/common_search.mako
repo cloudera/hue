@@ -598,7 +598,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
   <!-- /ko -->
 
-  <!-- ko ifnot: $parents[1].isLoading() -->
+  <!-- ko if: !$parents[1].isLoading() || widgetType() == 'hit-widget' -->
   <div class="edit-dimensions">
     <div data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', containment: 'parent'}}" class="inline-block">
       <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }">
