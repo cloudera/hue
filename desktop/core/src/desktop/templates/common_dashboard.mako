@@ -25,7 +25,7 @@
   from desktop import conf
   from django.utils.translation import ugettext as _
 
-  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED, USE_GRIDSTER
+  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED
 %>
 
 <%def name="import_layout(with_deferred=False)">
@@ -174,15 +174,15 @@
 
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
-  %if USE_GRIDSTER.get():
-
+  <!-- ko if: $root.isGridster -->
     <div class="gridster">
       <!-- ko if: typeof gridItems !== 'undefined' -->
       <ul class="unstyled" data-bind="css: { 'is-editing': $root.isEditing }, gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
       <!-- /ko -->
     </div>
+  <!-- /ko -->
 
-  %else:
+  <!-- ko ifnot: $root.isGridster -->
     <!-- ko if: $root.selectedQDefinition() != null -->
     <div class="row-fluid">
       <div class="card card-additional card-home span12" style="background-color: #F5F5F5">
@@ -199,7 +199,7 @@
     <div class="row-fluid" data-bind="template: { name: 'column-template${ suffix }', foreach: columns}">
     </div>
     <div class="clearfix"></div>
-  %endif
+  <!-- /ko -->
   </div>
 </div>
 
@@ -279,14 +279,14 @@
 <script type="text/html" id="widget-template${ suffix }">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true, drop: function(event, ui) { huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui } } }}">
     <h2 class="card-heading simple">
-      %if not USE_GRIDSTER.get():
+      <!-- ko ifnot: $root.isGridster -->
       <span data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
         <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
         <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
         &nbsp;
       </span>
-      %endif
+      <!-- /ko -->
       <!-- ko if: $root.collection && $root.collection.getFacetById(id()) -->
       <span data-bind="with: $root.collection.getFacetById(id())">
         <span data-bind="editable: label, editableOptions: { enabled: true, placement: 'right' }"></span>

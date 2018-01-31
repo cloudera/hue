@@ -1754,14 +1754,18 @@ var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];
 var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget'];
 
 
-var SearchViewModel = function (collection_json, query_json, initial_json, is_gridster) {
+var SearchViewModel = function (collection_json, query_json, initial_json, has_gridster_enabled) {
   var self = this;
 
   self.collectionJson = collection_json;
   self.queryJson = query_json;
   self.initialJson = initial_json;
 
-  self.isGridster = !!is_gridster;
+  self.isGridster = ko.observable(!!has_gridster_enabled && (collection_json.layout.length === 0 || (collection_json.layout.length && collection_json.gridItems.length)));
+
+  if ($.totalStorage('hue.enable.gridster') === false) {
+    self.isGridster(false);
+  }
 
   self.build = function () {
     self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
@@ -2555,11 +2559,14 @@ var SearchViewModel = function (collection_json, query_json, initial_json, is_gr
     };
 
     self.save = function () {
-      $.post("/dashboard/save", {
+      var saveObj = {
         collection: ko.mapping.toJSON(self.collection),
-        layout: ko.mapping.toJSON(self.columns),
-        gridItems: ko.mapping.toJSON(self.gridItems)
-      }, function (data) {
+        layout: ko.mapping.toJSON(self.columns)
+      }
+      if (self.isGridster()) {
+        saveObj.gridItems = ko.mapping.toJSON(self.gridItems);
+      }
+      $.post("/dashboard/save", saveObj, function (data) {
         if (data.status == 0) {
           if (! self.collection.id()) {
             huePubSub.publish('assist.document.refresh');

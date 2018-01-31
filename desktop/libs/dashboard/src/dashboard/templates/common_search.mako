@@ -139,15 +139,17 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
     </div>
 
     <div class="search-bar-operations">
-      % if USE_GRIDSTER.get():
+      <!-- ko if: $root.isGridster -->
       <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
         <i class="fa fa-plus"></i>
       </a>
-      % else:
+      <!-- /ko -->
+      <!-- ko ifnot: $root.isGridster -->
       <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
         <i class="fa fa-pencil"></i>
       </a>
-      % endif
+      <!-- /ko -->
+
       % if is_owner:
         <div class="btn-group" data-bind="visible: columns().length">
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if (canSave()) { save() } else { $('#saveAsModalDashboard').modal('show'); } }, attr: { title: canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
@@ -2870,9 +2872,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
-%if USE_GRIDSTER.get():
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.gridster.min.css') }">
-%endif
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -2894,10 +2894,8 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
-%if USE_GRIDSTER.get():
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.gridster.with-extras.min.js') }"></script>
 <script src="${ static('desktop/js/gridster-knockout.js') }"></script>
-%endif
 
 ${ dashboard.import_bindings() }
 
@@ -3084,23 +3082,22 @@ function getFormat(format, minMaxDiff, widget) {
 
 
 var lastWindowScrollPosition = 0;
-%if USE_GRIDSTER.get():
-var getDraggableOptions = function(options) {
-  return {
-    'start': function (event, ui) {
-      $(ui.helper).css('z-index','999999');
-      huePubSub.publish('dashboard.top.widget.drag.start', { event: event, widget: options.data });
-    },
-    'drag': function (event) {
-      huePubSub.publish('dashboard.top.widget.drag', { event: event, widgetHeight: options.data.gridsterHeight() });
-    },
-    'stop': function (event, ui) {
-      huePubSub.publish('dashboard.top.widget.drag.stop', { event: event, widget: options.data });
-    },
-  };
-};
-%else:
-  var getDraggableOptions = function (options) {
+var getDraggableOptions = function (options) {
+  if (searchViewModel && searchViewModel.isGridster()) {
+    return {
+      'start': function (event, ui) {
+        $(ui.helper).css('z-index', '999999');
+        huePubSub.publish('dashboard.top.widget.drag.start', {event: event, widget: options.data});
+      },
+      'drag': function (event) {
+        huePubSub.publish('dashboard.top.widget.drag', {event: event, widgetHeight: options.data.gridsterHeight()});
+      },
+      'stop': function (event, ui) {
+        huePubSub.publish('dashboard.top.widget.drag.stop', {event: event, widget: options.data});
+      },
+    };
+  }
+  else {
     return {
       'start': function (event, ui) {
         lastWindowScrollPosition = $(window).scrollTop();
@@ -3119,7 +3116,7 @@ var getDraggableOptions = function(options) {
       }
     }
   }
-%endif
+};
 
 function pieChartDataTransformer(data) {
   var _data = [];
@@ -3752,7 +3749,7 @@ $(document).ready(function () {
     huePubSub.publish('dashboard.window.resize');
   });
 
-%if USE_GRIDSTER.get():
+
   var WIDGET_BASE_HEIGHT = 50;
   $('.gridster>ul').gridster({
     widget_margins: [10, 10],
@@ -4143,7 +4140,7 @@ $(document).ready(function () {
       }
     }
   }, 'dashboard');
-%endif
+
 
   $(document).on("click", ".widget-settings-pill", function(){
     $(this).parents(".card-body").find(".widget-section").hide();
@@ -4220,7 +4217,9 @@ $(document).ready(function () {
 
   $('#searchComponents').parents('.embeddable').droppable({
     drop: function( event, ui ) {
-      huePubSub.publish('dashboard.drop.on.page', {event: event, ui: ui});
+      if (searchViewModel.isGridster()) {
+        huePubSub.publish('dashboard.drop.on.page', {event: event, ui: ui});
+      }
     }
   });
 
@@ -4358,21 +4357,69 @@ $(document).ready(function () {
 
   var selectedWidget = null;
   var selectedRow = null;
-  %if USE_GRIDSTER.get():
   var selectedGridster = null;
-  function showAddFacetDemiModal(widget, gridsterTarget) {
-    selectedGridster = gridsterTarget;
-    if (widget && widget.id) {
-      var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
-      fakeRow.addWidget(widget);
 
+  function showAddFacetDemiModal(widget, target) {
+    if (searchViewModel.isGridster()) {
+      selectedGridster = target;
+      if (widget && widget.id) {
+        var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
+        fakeRow.addWidget(widget);
+
+        if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
+          searchViewModel.collection.template.fieldsModalFilter("");
+          searchViewModel.collection.template.fieldsModalType(widget.widgetType());
+
+          selectedWidget = widget;
+
+          if (searchViewModel.collection.template.availableWidgetFields().length == 1) {
+            addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
+          }
+          else {
+            $('#addFacetInput').typeahead({
+              'source': searchViewModel.collection.template.availableWidgetFieldsNames(),
+              'updater': function (item) {
+                addFacetDemiModalFieldPreview({
+                  'name': function () {
+                    return item
+                  }
+                });
+                return item;
+              }
+            });
+            $("#addFacetDemiModal").modal("show");
+            $("#addFacetDemiModal input[type='text']").focus();
+          }
+        }
+        else {
+          huePubSub.publish('gridster.add.widget', {id: widget.id(), target: target});
+        }
+      }
+      else if (searchViewModel.lastDraggedMeta() && searchViewModel.lastDraggedMeta().type === 'sql' && searchViewModel.lastDraggedMeta().column && searchViewModel.collection.template.availableWidgetFieldsNames().indexOf(searchViewModel.lastDraggedMeta().column) > -1) {
+        if (searchViewModel.collection.supportAnalytics()) {
+          selectedWidget = searchViewModel.draggableTextFacet();
+        }
+        else {
+          selectedWidget = searchViewModel.draggableFacet();
+        }
+        var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
+        fakeRow.addWidget(selectedWidget);
+        addFacetDemiModalFieldPreview({
+          'name': function () {
+            return searchViewModel.lastDraggedMeta().column
+          }
+        });
+      }
+    }
+    else {
       if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
         searchViewModel.collection.template.fieldsModalFilter("");
         searchViewModel.collection.template.fieldsModalType(widget.widgetType());
 
         selectedWidget = widget;
+        selectedRow = target;
 
-        if (searchViewModel.collection.template.availableWidgetFields().length == 1) {
+        if (searchViewModel.collection.template.availableWidgetFields().length == 1 || widget.widgetType() == 'document-widget') {
           addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
         }
         else {
@@ -4392,23 +4439,8 @@ $(document).ready(function () {
         }
       }
       else {
-        huePubSub.publish('gridster.add.widget', {id: widget.id(), target: gridsterTarget});
+        distributeRowWidgetsSize(target, true);
       }
-    }
-    else if (searchViewModel.lastDraggedMeta() && searchViewModel.lastDraggedMeta().type === 'sql' && searchViewModel.lastDraggedMeta().column && searchViewModel.collection.template.availableWidgetFieldsNames().indexOf(searchViewModel.lastDraggedMeta().column) > -1) {
-      if (searchViewModel.collection.supportAnalytics()) {
-        selectedWidget = searchViewModel.draggableTextFacet();
-      }
-      else {
-        selectedWidget = searchViewModel.draggableFacet();
-      }
-      var fakeRow = searchViewModel.columns()[0].addEmptyRow(true);
-      fakeRow.addWidget(selectedWidget);
-      addFacetDemiModalFieldPreview({
-        'name': function () {
-          return searchViewModel.lastDraggedMeta().column
-        }
-      });
     }
   }
 
@@ -4422,76 +4454,28 @@ $(document).ready(function () {
         'widget_id': selectedWidget.id(),
         'widgetType': selectedWidget.widgetType()
       }, function () {
-        huePubSub.publish('gridster.add.widget', {id: selectedWidget.id(), target: selectedGridster});
+        if (searchViewModel.isGridster()) {
+          huePubSub.publish('gridster.add.widget', {id: selectedWidget.id(), target: selectedGridster});
+        }
       });
       if (_existingFacet != null) {
         _existingFacet.label(field.name());
         _existingFacet.field(field.name());
       }
       $("#addFacetDemiModal").modal("hide");
-    }
-  }
-
-  function addFacetDemiModalFieldCancel() {
-    searchViewModel.gridItems.remove(selectedGridster);
-    searchViewModel.removeWidget(selectedWidget);
-    selectedRow = null;
-  }
-
-  %else:
-  function showAddFacetDemiModal(widget, row) {
-    if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
-      searchViewModel.collection.template.fieldsModalFilter("");
-      searchViewModel.collection.template.fieldsModalType(widget.widgetType());
-
-      selectedWidget = widget;
-      selectedRow = row;
-
-      if (searchViewModel.collection.template.availableWidgetFields().length == 1 || widget.widgetType() == 'document-widget'){
-        addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
-      }
-      else {
-        $('#addFacetInput').typeahead({
-          'source': searchViewModel.collection.template.availableWidgetFieldsNames(),
-          'updater': function (item) {
-            addFacetDemiModalFieldPreview({'name': function () {
-              return item
-            }});
-            return item;
-          }
-        });
-        $("#addFacetDemiModal").modal("show");
-        $("#addFacetDemiModal input[type='text']").focus();
-      }
-    }
-    else {
-      distributeRowWidgetsSize(row, true);
-    }
-  }
-
-
-  function addFacetDemiModalFieldPreview(field) {
-    var _existingFacet = searchViewModel.collection.getFacetById(selectedWidget.id());
-    if (selectedWidget != null) {
-      selectedWidget.hasBeenSelected = true;
-      selectedWidget.isLoading(true);
-      searchViewModel.collection.addFacet({'name': field.name(), 'widget_id': selectedWidget.id(), 'widgetType': selectedWidget.widgetType()});
-      if (_existingFacet != null) {
-        _existingFacet.label(field.name());
-        _existingFacet.field(field.name());
-      }
-      $("#addFacetDemiModal").modal("hide");
-      if (selectedRow != null) {
+      if (!searchViewModel.isGridster() && selectedRow != null) {
         distributeRowWidgetsSize(selectedRow);
       }
     }
   }
 
   function addFacetDemiModalFieldCancel() {
+    if (searchViewModel.isGridster()) {
+      searchViewModel.gridItems.remove(selectedGridster);
+    }
     searchViewModel.removeWidget(selectedWidget);
     selectedRow = null;
   }
-  %endif
 
   $(document).on("setResultsHeight", function () {
     $('.result-main').each(function(){
