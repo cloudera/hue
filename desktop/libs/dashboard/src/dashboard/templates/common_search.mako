@@ -3896,9 +3896,17 @@ $(document).ready(function () {
     movePreviewHolder(options);
   }, 'dashboard');
 
-  huePubSub.subscribe('draggable.text.drag', movePreviewHolder, 'dashboard');
+  huePubSub.subscribe('draggable.text.drag', function(options) {
+    if (searchViewModel.isGridster()) {
+      movePreviewHolder(options);
+    }
+  }, 'dashboard');
 
-  huePubSub.subscribe('draggable.text.meta', addPreviewHolder, 'dashboard');
+  huePubSub.subscribe('draggable.text.meta', function(options) {
+    if (searchViewModel.isGridster()) {
+      addPreviewHolder(options);
+    }
+  }, 'dashboard');
 
   huePubSub.subscribe('gridster.added.widget', removePreviewHolder, 'dashboard');
 
@@ -4096,11 +4104,13 @@ $(document).ready(function () {
   }, 'dashboard')
 
   huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
-    searchViewModel.gridItems().forEach(function (item) {
-      if (item.widgetId() === parseInt($('#wdg_' + widgetId).parents('li.gs-w').attr('data-widgetid'))) {
-        huePubSub.publish('gridster.remove', item);
-      }
-    });
+    if (searchViewModel.isGridster()) {
+      searchViewModel.gridItems().forEach(function (item) {
+        if (item.widgetId() === parseInt($('#wdg_' + widgetId).parents('li.gs-w').attr('data-widgetid'))) {
+          huePubSub.publish('gridster.remove', item);
+        }
+      });
+    }
   }, 'dashboard');
 
   huePubSub.subscribe('gridster.add.widget', function (options) {
