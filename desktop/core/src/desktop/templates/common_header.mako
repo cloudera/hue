@@ -27,10 +27,11 @@ if USE_NEW_EDITOR.get():
   home_url = url('desktop.views.home2')
 %>
 
-<%namespace name="koComponents" file="/ko_components.mako" />
-<%namespace name="hueIcons" file="/hue_icons.mako" />
+<%namespace name="charting" file="/charting.mako" />
 <%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
 <%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
+<%namespace name="hueIcons" file="/hue_icons.mako" />
+<%namespace name="koComponents" file="/ko_components.mako" />
 
 <!DOCTYPE html>
 <%def name="is_selected(selected)">
@@ -199,18 +200,15 @@ if USE_NEW_EDITOR.get():
   </script>
 
   <script src="${ static('metastore/js/metastore.model.js') }"></script>
-  %endif
 
-  <%namespace name="charting" file="/charting.mako" />
   ${ charting.import_charts() }
-
-  % if user.is_authenticated():
   ${ koComponents.all() }
   ${ hueAceAutocompleter.hueAceAutocompleter() }
-  %endif
+%endif
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
+% if user.is_authenticated():
   <script src="${ static('desktop/ext/js/localforage.min.js') }"></script>
   <script src="${ static('desktop/js/dataCatalog.js') }"></script>
   <script src="${ static('desktop/js/apiHelper.js') }"></script>
@@ -238,6 +236,7 @@ if USE_NEW_EDITOR.get():
       });
     });
   </script>
+%endif
 
 </head>
 <body>
