@@ -140,14 +140,18 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
 
     <div class="search-bar-operations">
       <!-- ko if: $root.isGridster -->
-      <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
-        <i class="fa fa-plus"></i>
-      </a>
+      <div class="btn-group">
+        <a class="btn pointer" title="${ _('Add widget') }" rel="tooltip" data-placement="bottom" data-bind="visible: columns().length, click: function() { isToolbarVisible(!isToolbarVisible()) }, css: {'btn': true, 'btn-inverse': isToolbarVisible }">
+          <i class="fa fa-plus"></i>
+        </a>
+      </div>
       <!-- /ko -->
       <!-- ko ifnot: $root.isGridster -->
-      <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
-        <i class="fa fa-pencil"></i>
-      </a>
+      <div class="btn-group">
+        <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+          <i class="fa fa-pencil"></i>
+        </a>
+      </div>
       <!-- /ko -->
 
       % if is_owner:
