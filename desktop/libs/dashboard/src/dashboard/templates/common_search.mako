@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.views import commonheader, commonfooter, _ko, commonshare
 
-from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED
+from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
@@ -2018,10 +2018,12 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
+      % if HAS_WIDGET_FILTER.get():      
       <div class="pull-right">
         <span data-bind="visible: $root.collection.supportAnalytics(), template: { name: 'facet-filter', data: properties.filter }"></span>
         <span data-bind="visible: $root.collection.supportAnalytics() && $root.availableDateFields().length > 0, template: { name: 'facet-compare', data: properties.compare }"></span>
       </div>
+      % endif
     </div>
 
     <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts(), properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
