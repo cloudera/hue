@@ -487,11 +487,11 @@ class SparkExecutorApi(Api):
        "logs": executor['logs']
     }
 
-  def logs(self, appid, app_type, log_name, offset=LOG_OFFSET_BYTES, is_embeddable=False):
+  def logs(self, appid, app_type, log_name, is_embeddable=False):
     log = ""
 
     if self._executors and self._executors[0]:
-      log = self.history_server_api.download_executor_logs(self.user, self._executors[0], log_name, offset)
+      log = self.history_server_api.download_executor_logs(self.user, self._executors[0], log_name, LOG_OFFSET_BYTES)
     return {
        "logs": log
     }

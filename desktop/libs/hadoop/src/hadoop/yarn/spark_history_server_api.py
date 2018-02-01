@@ -100,6 +100,7 @@ class SparkHistoryServerApi(object):
     return self._root.get('applications/%(app_id)s/stages' % {'app_id': app_id}, headers=self.headers)
 
   def executors(self, job):
+    LOG.debug("Getting executors for Spark job %s" % job.jobId)
     app_id = self.get_real_app_id(job)
     if not app_id:
       return []
@@ -174,24 +175,23 @@ class SparkHistoryServerApi(object):
     # When running job as cluster mode, an attempt number is part of application ID, but proxy URL can't be resolved to match
     # Spark history URL. In the applications list, each job's attampt list shows if attempt ID is used and how many attempts.
 
-    app_id = job.jobId if job.jobId == job.attempt_id else job.jobId + '/' + job.attempt_id
-    if job.status not in ('SUCCEEDED', 'FAILED'):
-      try:
-        jobs_json = self.applications()
-        job_filtered_json = [x for x in jobs_json if x['id'] == job.jobId]
+    try:
+      jobs_json = self.applications()
+      job_filtered_json = [x for x in jobs_json if x['id'] == job.jobId]
 
-        if not job_filtered_json:
-          return {}
+      if not job_filtered_json:
+        return {}
 
-        attempts = job_filtered_json[0]['attempts']
+      attempts = job_filtered_json[0]['attempts']
 
-        if len(attempts) == 1:
-          app_id = job.jobId if 'attemptId' not in attempts[0] else job.jobId + '/' + attempts[0]['attemptId']
-        else:
-          app_id = job.jobId + '/%d' % len(attempts)
+      if len(attempts) == 1:
+        app_id = job.jobId if 'attemptId' not in attempts[0] else job.jobId + '/' + attempts[0]['attemptId']
+      else:
+        app_id = job.jobId + '/%d' % len(attempts)
 
-      except Exception as e:
-        LOG.error('Cannot get executors %s' % e)
-        app_id = None
+      LOG.debug("Getting real spark app id %s for Spark job %s" % (app_id, job.jobId))
+    except Exception as e:
+      LOG.error('Cannot get real app id %s: %s' % (job.jobId, e))
+      app_id = None
 
     return app_id

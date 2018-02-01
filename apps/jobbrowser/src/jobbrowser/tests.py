@@ -1119,7 +1119,7 @@ class MockSparkHistoryApi(SparkHistoryServerApi):
 
   def executors(self, job):
     EXECUTORS_LISTS = {
-      u'application_1513618343677_0018': [{
+      u'application_1513618343677_0018/1': [{
         u'diskUsed': 0,
         u'totalShuffleWrite': 0,
         u'totalCores': 0,
