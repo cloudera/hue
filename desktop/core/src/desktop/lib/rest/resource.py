@@ -66,6 +66,19 @@ class Resource(object):
       return resp.content
 
   def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False, log_response=True):
+    resp = self._invoke(method=method,
+                        relpath=relpath,
+                        params=params,
+                        data=data,
+                        headers=headers,
+                        files=files,
+                        allow_redirects=allow_redirects,
+                        clear_cookies=clear_cookies,
+                        log_response=log_response)
+
+    return self._format_response(resp)
+
+  def _invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False, clear_cookies=False, log_response=True):
     """
     Invoke an API method.
     @return: Raw body or JSON dictionary (if response content type is JSON).
@@ -92,7 +105,8 @@ class Resource(object):
            len(resp.content) > 1000 and "..." or "")
       )
 
-    return self._format_response(resp)
+    return resp
+
 
   def get(self, relpath=None, params=None, headers=None, clear_cookies=False):
     """
@@ -161,3 +175,16 @@ class Resource(object):
       headers.update({'Content-Type': contenttype})
 
     return headers
+
+  def resolve_redirect_url(self, method="GET", relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=True, clear_cookies=False, log_response=True):
+    resp = self._invoke(method=method,
+                        relpath=relpath,
+                        params=params,
+                        data=data,
+                        headers=headers,
+                        files=files,
+                        allow_redirects=allow_redirects,
+                        clear_cookies=clear_cookies,
+                        log_response=log_response)
+
+    return resp.url.encode("utf-8")
