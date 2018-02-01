@@ -52,7 +52,7 @@ from oozie.conf import REMOTE_SAMPLE_DIR
 from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
 
-
+WORKFLOW_DEPTH_LIMIT = 24
 LOG = logging.getLogger(__name__)
 
 
@@ -205,6 +205,8 @@ class WorkflowConfiguration(object):
     }
   ]
 
+class WorkflowDepthReached(Exception):
+  pass
 
 class Workflow(Job):
   XML_FILE_NAME = 'workflow.xml'
@@ -260,21 +262,25 @@ class Workflow(Job):
     adj_list = _create_graph_adjaceny_list(node_list)
 
     node_hierarchy = ['start']
-    _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
-
-    _update_adj_list(adj_list)
-
-    nodes_uuid_set = set()
-    wf_rows = _create_workflow_layout(node_hierarchy, adj_list, nodes_uuid_set)
-
     data = {'layout': [{}], 'workflow': {}}
-    if wf_rows:
-      data['layout'][0]['rows'] = wf_rows
+    data['workflow']['nodes'] = []
 
-    wf_nodes = []
-    nodes_uuid_set = set()
-    _dig_nodes(node_hierarchy, adj_list, user, wf_nodes, nodes_uuid_set)
-    data['workflow']['nodes'] = wf_nodes
+    try:
+      _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
+      _update_adj_list(adj_list)
+
+      nodes_uuid_set = set()
+      wf_rows = _create_workflow_layout(node_hierarchy, adj_list, nodes_uuid_set)
+      if wf_rows:
+        data['layout'][0]['rows'] = wf_rows
+
+      wf_nodes = []
+      nodes_uuid_set = set()
+      _dig_nodes(node_hierarchy, adj_list, user, wf_nodes, nodes_uuid_set)
+      data['workflow']['nodes'] = wf_nodes
+    except WorkflowDepthReached:
+      LOG.warn("The Workflow: %s with id: %s, has reached the maximum allowed depth for Graph display " % (oozie_workflow.appName, oozie_workflow.id))
+
     data['workflow']['id'] = '123'
     data['workflow']['properties'] = cls.get_workflow_properties_for_user(user, workflow=None)
     data['workflow']['properties'].update({
@@ -702,7 +708,7 @@ def _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id, row):
 
 def _get_hierarchy_from_adj_list(adj_list, curr_node, node_hierarchy):
 
-  _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy)
+  _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy, WORKFLOW_DEPTH_LIMIT)
 
   # Add End and Kill nodes to node_hierarchy
   for key in adj_list.keys():
@@ -711,7 +717,10 @@ def _get_hierarchy_from_adj_list(adj_list, curr_node, node_hierarchy):
   node_hierarchy.append([adj_list[key]['name'] for key in adj_list.keys() if adj_list[key]['node_type'] == 'end'])
 
 
-def _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy):
+def _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy, workflow_depth):
+
+  if workflow_depth <= 0:
+    raise WorkflowDepthReached()
 
   if not curr_node or adj_list[curr_node]['node_type'] in ('join', 'end', 'kill'):
     return curr_node
@@ -725,7 +734,7 @@ def _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy):
     for key in adj_list[curr_node].keys():
       if key.startswith('path') or key == 'default':
         child = []
-        return_node = _get_hierarchy_from_adj_list_helper(adj_list, adj_list[curr_node][key], child)
+        return_node = _get_hierarchy_from_adj_list_helper(adj_list, adj_list[curr_node][key], child, workflow_depth - 1)
         join_node = return_node if not join_node else join_node
         if child:
           children.append(child)
@@ -734,15 +743,14 @@ def _get_hierarchy_from_adj_list_helper(adj_list, curr_node, node_hierarchy):
     if adj_list[curr_node]['node_type'] == 'fork':
       branch_nodes.append(join_node)
       node_hierarchy.append(branch_nodes)
-      return _get_hierarchy_from_adj_list_helper(adj_list, adj_list[join_node]['ok_to'], node_hierarchy)
+      return _get_hierarchy_from_adj_list_helper(adj_list, adj_list[join_node]['ok_to'], node_hierarchy, workflow_depth - 1)
 
     node_hierarchy.append(branch_nodes)
     return join_node
 
   else:
     node_hierarchy.append(curr_node)
-    return _get_hierarchy_from_adj_list_helper(adj_list, adj_list[curr_node]['ok_to'], node_hierarchy)
-
+    return _get_hierarchy_from_adj_list_helper(adj_list, adj_list[curr_node]['ok_to'], node_hierarchy, workflow_depth - 1)
 
 def _create_graph_adjaceny_list(nodes):
   start_node = [node for node in nodes if node.get('node_type') == 'start'][0]
