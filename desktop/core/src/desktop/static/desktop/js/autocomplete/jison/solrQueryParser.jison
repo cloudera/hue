@@ -165,7 +165,7 @@ KeywordMatch
 
 KeywordMatch_EDIT
  : 'TERM' ':' 'CURSOR'                                         --> { suggestValues: { field: $1 } }
- | 'TERM' ':' QuotedValue_EDIT                                 --> { suggestValues: { field: $1, quotePresent: true } }
+ | 'TERM' ':' QuotedValue_EDIT                                 --> { suggestValues: { field: $1, quotePresent: true, partial: $3 } }
  ;
 
 // ======= Common constructs =======
