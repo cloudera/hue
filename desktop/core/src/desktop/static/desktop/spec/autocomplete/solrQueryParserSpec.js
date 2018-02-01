@@ -57,19 +57,25 @@
 
     it('should suggest values for "field:"some Val|"', function () {
       testAutocomplete('field:"some Val', '', {
-        suggestValues: { field: 'field', quotePresent: true }
+        suggestValues: { field: 'field', quotePresent: true, partial: 'some ' }
       });
     });
 
     it('should suggest values for "field:"a|"', function () {
       testAutocomplete('field:"a', '', {
-        suggestValues: { field: 'field', quotePresent: true }
+        suggestValues: { field: 'field', quotePresent: true, partial: '' }
+      });
+    });
+
+    it('should suggest values for "field:"Cabernet |"', function () {
+      testAutocomplete('field:"Cabernet ', '', {
+        suggestValues: { field: 'field', quotePresent: true, partial: 'Cabernet ' }
       });
     });
 
     it('should suggest values for "field:"some Val| foo"', function () {
       testAutocomplete('field:"some Val', ' foo"', {
-        suggestValues: { field: 'field', quotePresent: true }
+        suggestValues: { field: 'field', quotePresent: true, partial: 'some ' }
       });
     });
 
