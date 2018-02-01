@@ -1195,9 +1195,8 @@ ${ assist.assistPanel() }
 
         for (var i = 0; i < type.args.length; i++) {
           self[type.args[i].name].subscribe(function(newVal) {
-            if (newVal) { // Double call on non File selection otherwise
-              viewModel.createWizard.guessFieldTypes();
-            }
+            // Update the data preview when tweaking Format options on step 1
+            viewModel.createWizard.guessFieldTypes();
           });
         }
       }
