@@ -604,7 +604,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }">
         <span data-bind="text: getPrettyMetric($data)"></span>
         <span class="badge badge-info dimensions-badge" data-bind="text: field, attr: {'title': field}"></span>
-        <!-- ko if: aggregate.function() != 'field' && aggregate.metrics -->
+        <!-- ko if: aggregate.function() != 'field' && aggregate.metrics && $parent.widgetType() != 'hit-widget' -->
           <i class="fa" data-bind="css: { 'fa-long-arrow-down': sort() == 'desc', 'fa-long-arrow-up': sort() == 'asc' }"></i>
         <!-- /ko -->
         <div class="action-icon margin-left-5" data-bind="click: function(){ $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }"><i class="fa fa-pencil"></i></div>
@@ -2018,7 +2018,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
 
-      % if HAS_WIDGET_FILTER.get():      
+      % if HAS_WIDGET_FILTER.get():
       <div class="pull-right">
         <span data-bind="visible: $root.collection.supportAnalytics(), template: { name: 'facet-filter', data: properties.filter }"></span>
         <span data-bind="visible: $root.collection.supportAnalytics() && $root.availableDateFields().length > 0, template: { name: 'facet-compare', data: properties.compare }"></span>
