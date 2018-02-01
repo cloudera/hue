@@ -19,16 +19,18 @@ import logging
 import os
 import re
 import time
-import urllib2
 import urlparse
 
 from lxml import html
 
 from django.utils.translation import ugettext as _
 
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 from desktop.lib.view_util import big_filesizeformat, format_duration_in_millis
 
+from hadoop import cluster
 from hadoop.yarn.clients import get_log_client
 
 from itertools import izip
@@ -129,16 +131,33 @@ class SparkJob(Application):
   def _resolve_tracking_url(self):
     resp = None
     try:
-      resp = urllib2.urlopen(self.trackingUrl, timeout=5.0)
-      actual_url = resp.url
+      self._client = HttpClient(self.trackingUrl, logger=LOG)
+      self._root = Resource(self._client)
+      yarn_cluster = cluster.get_cluster_conf_for_job_submission()
+      self._security_enabled = yarn_cluster.SECURITY_ENABLED.get()
+      if self._security_enabled:
+        self._client.set_kerberos_auth()
+
+      self._client.set_verify(yarn_cluster.SSL_CERT_CA_VERIFY.get())
+      actual_url = self._execute(self._root.resolve_redirect_url())
+
       if actual_url.strip('/').split('/')[-1] == 'jobs':
         actual_url = actual_url.strip('/').replace('jobs', '')
       self.trackingUrl = actual_url
+      LOG.debug("SparkJob tracking URL: %s" % self.trackingUrl)
     except Exception, e:
       LOG.warn("Failed to resolve Spark Job's actual tracking URL: %s" % e)
     finally:
       if resp is not None:
         resp.close()
+
+  def _execute(self, function, *args, **kwargs):
+    response = None
+    try:
+      response = function(*args, **kwargs)
+    except Exception, e:
+      LOG.warn('Spark resolve tracking URL returned a failed response: %s' % e)
+    return response
 
   def _get_metrics(self):
     self.metrics = {}
