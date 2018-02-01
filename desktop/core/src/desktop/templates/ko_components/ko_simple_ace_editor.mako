@@ -656,6 +656,9 @@ from desktop.views import _ko
             var aceUtil = ace.require('ace/autocomplete/util');
             var pos = self.editor.getCursorPosition();
             var partial = aceUtil.retrievePrecedingIdentifier(self.editor.session.getLine(pos.row), pos.column);
+            if (self.parseResult.suggestValues.partial) {
+              partial = self.parseResult.suggestValues.partial + partial;
+            }
 
             var valuesPromise = self.handleSampleSuggestions(partial);
             self.loading(true);
@@ -691,8 +694,14 @@ from desktop.views import _ko
                     if (maxCount < result.terms[i].count) {
                       maxCount = result.terms[i].count;
                     }
+                    var value = '';
+                    if (self.parseResult.suggestValues.partial && !shouldQuote && sampleValue.toLowerCase().indexOf(self.parseResult.suggestValues.partial.toLowerCase()) === 0) {
+                      value = sampleValue.substring(self.parseResult.suggestValues.partial.length);
+                    } else {
+                      value = shouldQuote ? '"' + sampleValue + '"' : sampleValue;
+                    }
                     sampleSuggestions.push({
-                      value: shouldQuote ? '"' + sampleValue + '"' : sampleValue,
+                      value: value,
                       meta: HUE_I18n.autocomplete.meta.sample,
                       category: CATEGORIES.SAMPLE,
                       popular: DEFAULT_POPULAR,
