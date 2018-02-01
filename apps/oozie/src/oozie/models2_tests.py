@@ -24,7 +24,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
+from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
 from desktop.conf import USE_DEFAULT_CONFIGURATION, USE_NEW_EDITOR
 from desktop.lib.django_test_util import make_logged_in_client
@@ -34,7 +34,7 @@ from desktop.models import DefaultConfiguration, Document, Document2
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
 from oozie.models2 import Node, Workflow, WorkflowConfiguration, find_dollar_variables, find_dollar_braced_variables, \
-    _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, WorkflowBuilder
+    _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, WorkflowBuilder, WorkflowDepthReached
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
 from notebook.models import make_notebook, make_notebook2
 from notebook.api import _save_notebook
@@ -1230,6 +1230,447 @@ class TestExternalWorkflowGraph(object):
     assert_true(len(workflow_data['workflow']['nodes']) == 5)
     assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'generic-widget')
     assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)
+
+  def test_get_hierarchy_from_adj_list_throws_exception(self):
+      self.wf.definition = """<workflow-app
+    name="${Payer} ${Project_Name} Sub Workflow Group7_8 ${YYYYMMDDHHMM}"
+    xmlns="uri:oozie:workflow:0.5">
+    <global>
+    <job-tracker>${JobTracker}</job-tracker>
+    <name-node>${NameNode}</name-node>
+    <configuration>
+      <property>
+        <name>mapred.job.queue.name</name>
+        <value>${QueueName}</value>
+      </property>
+      <property>
+        <name>oozie.launcher.mapred.map.child.java.opts</name>
+        <value>-Xmx2048m</value>
+      </property>
+      <property>
+        <name>mapred.map.child.java.opts</name>
+        <value>-Xmx8192m</value>
+      </property>
+      <property>
+        <name>mapred.reduce.child.java.opts</name>
+        <value>-Xmx6144m</value>
+      </property>
+    </configuration>
+    </global>
+    <start to="AAA_Check"/>
+    <decision name="AAA_Check">
+    <switch>
+      <case to="Sqoop_AAA_Sub_WF1a">${fs:dirSize(AAA_WC_Path) eq 6 }</case>
+      <case to="Sqoop_AAA_Sub_WF1b">${fs:dirSize(AAA_WC_Path) gt 0 }</case>
+      <default to="BBB_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_AAA_Sub_WF1a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="BBB_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_AAA_Sub_WF1b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="BBB_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="BBB_Check">
+    <switch>
+      <case to="Sqoop_BBB_Sub_WF2a">${fs:dirSize(BBB_WC_Path) eq 6 }</case>
+      <case to="Sqoop_BBB_Sub_WF2b">${fs:dirSize(BBB_WC_Path) gt 0 }</case>
+      <default to="CCC_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_BBB_Sub_WF2a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="CCC_Check" />
+    <error to="kill" />
+    </action>
+
+    <action name="Sqoop_BBB_Sub_WF2b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="CCC_Check" />
+    <error to="kill" />
+    </action>
+
+    <decision name="CCC_Check">
+    <switch>
+      <case to="Sqoop_CCC_Sub_WF3a">${fs:dirSize(CCC_WC_Path) eq 6 }</case>
+      <case to="Sqoop_CCC_Sub_WF3b">${fs:dirSize(CCC_WC_Path) gt 0 }</case>
+      <default to="DDD_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_CCC_Sub_WF3a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="DDD_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_CCC_Sub_WF3b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="DDD_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="DDD_Check">
+    <switch>
+      <case to="Sqoop_DDD_Sub_WF4a">${fs:dirSize(DDD_WC_Path) eq 6 }</case>
+      <case to="Sqoop_DDD_Sub_WF4b">${fs:dirSize(DDD_WC_Path) gt 0 }</case>
+      <default to="EEE_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_DDD_Sub_WF4a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="EEE_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_DDD_Sub_WF4b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="EEE_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="EEE_Check">
+    <switch>
+      <case to="Sqoop_EEE_Sub_WF5a">${fs:dirSize(EEE_WC_Path) eq 6 }</case>
+      <case to="Sqoop_EEE_Sub_WF5b">${fs:dirSize(EEE_WC_Path) gt 0 }</case>
+      <default to="FFF_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_EEE_Sub_WF5a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="FFF_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_EEE_Sub_WF5b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="FFF_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="FFF_Check">
+    <switch>
+      <case to="Sqoop_FFF_Sub_WF6a">${fs:dirSize(FFF_WC_Path) eq 6 }</case>
+      <case to="Sqoop_FFF_Sub_WF6b">${fs:dirSize(FFF_WC_Path) gt 0 }</case>
+      <default to="GGG_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_FFF_Sub_WF6a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="GGG_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_FFF_Sub_WF6b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="GGG_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="GGG_Check">
+    <switch>
+      <case to="Sqoop_GGG_Sub_WF7a">${fs:dirSize(GGG_WC_Path) eq 6 }</case>
+      <case to="Sqoop_GGG_Sub_WF7b">${fs:dirSize(GGG_WC_Path) gt 0 }</case>
+      <default to="HHH_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_GGG_Sub_WF7a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="HHH_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_GGG_Sub_WF7b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="HHH_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="HHH_Check">
+    <switch>
+      <case to="Sqoop_HHH_Sub_WF8a">${fs:dirSize(HHH_WC_Path) eq 6 }</case>
+      <case to="Sqoop_HHH_Sub_WF8b">${fs:dirSize(HHH_WC_Path) gt 0 }</case>
+      <default to="IIII_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_HHH_Sub_WF8a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="IIII_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_HHH_Sub_WF8b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="IIII_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="IIII_Check">
+    <switch>
+      <case to="Sqoop_IIII_Sub_WF9a">${fs:dirSize(IIII_WC_Path) eq 6 }</case>
+      <case to="Sqoop_IIII_Sub_WF9b">${fs:dirSize(IIII_WC_Path) gt 0 }</case>
+      <default to="JJJ_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_IIII_Sub_WF9a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="JJJ_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_IIII_Sub_WF9b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="JJJ_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="JJJ_Check">
+    <switch>
+      <case to="Sqoop_JJJ_Sub_WF10a">${fs:dirSize(JJJ_WC_Path) eq 6 }</case>
+      <case to="Sqoop_JJJ_Sub_WF10b">${fs:dirSize(JJJ_WC_Path) gt 0 }</case>
+      <default to="KKK_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_JJJ_Sub_WF10a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="KKK_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_JJJ_Sub_WF10b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="KKK_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="KKK_Check">
+    <switch>
+      <case to="Sqoop_KKK_Sub_WF11a">${fs:dirSize(KKK_WC_Path) eq 6 }</case>
+      <case to="Sqoop_KKK_Sub_WF11b">${fs:dirSize(KKK_WC_Path) gt 0 }</case>
+      <default to="LLL_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_KKK_Sub_WF11a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="LLL_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_KKK_Sub_WF11b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="LLL_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="LLL_Check">
+    <switch>
+      <case to="Sqoop_LLL_Sub_WF12a">${fs:dirSize(LLL_WC_Path) eq 6 }</case>
+      <case to="Sqoop_LLL_Sub_WF12b">${fs:dirSize(LLL_WC_Path) gt 0 }</case>
+      <default to="MMM_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_LLL_Sub_WF12a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="MMM_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_LLL_Sub_WF12b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="MMM_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="MMM_Check">
+    <switch>
+      <case to="Sqoop_MMM_Sub_WF13a">${fs:dirSize(MMM_WC_Path) eq 6 }</case>
+      <case to="Sqoop_MMM_Sub_WF13b">${fs:dirSize(MMM_WC_Path) gt 0 }</case>
+      <default to="MMMDxcd_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_MMM_Sub_WF13a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="MMMDxcd_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_MMM_Sub_WF13b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="MMMDxcd_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="MMMDxcd_Check">
+    <switch>
+      <case to="Sqoop_MMMDxcd_Sub_WF14a">${fs:dirSize(MMMDxcd_WC_Path) eq 6 }</case>
+      <case to="Sqoop_MMMDxcd_Sub_WF14b">${fs:dirSize(MMMDxcd_WC_Path) gt 0 }</case>
+      <default to="NNN_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_MMMDxcd_Sub_WF14a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="NNN_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_MMMDxcd_Sub_WF14b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="NNN_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="NNN_Check">
+    <switch>
+      <case to="Sqoop_NNN_Sub_WF15a">${fs:dirSize(NNN_WC_Path) eq 6 }</case>
+      <case to="Sqoop_NNN_Sub_WF15b">${fs:dirSize(NNN_WC_Path) gt 0 }</case>
+      <default to="VCHI_HomeHealthMedicare_Check"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_NNN_Sub_WF15a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="OOO_Check" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_NNN_Sub_WF15b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="OOO_Check" />
+    <error to="kill" />
+    </action>
+    <decision name="OOO_Check">
+    <switch>
+      <case to="Sqoop_OOO_Sub_WF18a">${fs:dirSize(OOO_WC_Path) eq 6 }</case>
+      <case to="Sqoop_OOO_Sub_WF18b">${fs:dirSize(OOO_WC_Path) gt 0 }</case>
+      <default to="end"/>
+    </switch>
+    </decision>
+    <action name="Sqoop_OOO_Sub_WF18a">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="end" />
+    <error to="kill" />
+    </action>
+    <action name="Sqoop_OOO_Sub_WF18b">
+    <sub-workflow>
+    <app-path>${APP_PATH}/ABC_Sqoop_Sub_WF.xml</app-path>
+    <propagate-configuration/>
+      <configuration/>
+    </sub-workflow>
+    <ok to="end" />
+    <error to="kill" />
+    </action>
+    <kill name="kill">
+    <message>"Killed job due to error: ${wf:errorMessage(wf:lastErrorNode())}"</message>
+    </kill>
+    <end name="end" />
+    </workflow-app>
+    """
+      self.node_list = generate_v2_graph_nodes(self.wf.definition)
+      adj_list = _create_graph_adjaceny_list(self.node_list)
+      node_hierarchy = ['start']
+      assert_raises(WorkflowDepthReached, _get_hierarchy_from_adj_list, adj_list, adj_list['start']['ok_to'],
+                    node_hierarchy)
 
 class TestModelAPI(OozieMockBase):
 
