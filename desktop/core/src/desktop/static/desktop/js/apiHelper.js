@@ -1581,13 +1581,17 @@ var ApiHelper = (function () {
     var self = this;
     var deferred = $.Deferred();
 
+    var isQuery = options.sourceType.indexOf('-query') !== -1;
+    var sourceType = isQuery ? options.sourceType.replace('-query', '') : options.sourceType;
+
     var request = $.ajax({
       type: 'POST',
-      url: AUTOCOMPLETE_API_PREFIX + options.path.join('/'),
+      url: AUTOCOMPLETE_API_PREFIX + (isQuery ? options.path.slice(1) : options.path).join('/'),
       data: {
         notebook: {},
         snippet: ko.mapping.toJSON({
-          type: options.sourceType
+          type: sourceType,
+          source: isQuery ? 'query' : 'data'
         })
       },
       timeout: options.timeout
