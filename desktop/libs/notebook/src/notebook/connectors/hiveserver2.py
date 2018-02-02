@@ -459,10 +459,10 @@ class HS2Api(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False):
     try:
       db = self._get_db(snippet)
-      return _get_sample_data(db, database, table, column) # TODO async in all signatures
+      return _get_sample_data(db, database, table, column, async)
     except QueryServerException, ex:
       raise QueryError(ex.message)
 

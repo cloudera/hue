@@ -358,7 +358,7 @@ class HiveServer2Dbms(object):
     return resp
 
 
-  def get_sample(self, database, table, column=None, nested=None, limit=100, async=False):
+  def get_sample(self, database, table, column=None, nested=None, limit=100, generate_sql_only=False):
     result = None
     hql = None
 
@@ -378,10 +378,10 @@ class HiveServer2Dbms(object):
       # TODO: Add nested select support for HS2
 
     if hql:
-      query = hql_query(hql)
-      if async:
-        return self.execute_and_watch(query)
+      if generate_sql_only:
+        return hql
       else:
+        query = hql_query(hql)
         handle = self.execute_and_wait(query, timeout_sec=5.0)
 
         if handle:
