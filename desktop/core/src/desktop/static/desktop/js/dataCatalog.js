@@ -46,7 +46,7 @@ var DataCatalog = (function () {
 
   DataCatalog.prototype.clearStorage = function () {
     var self = this;
-    self.store.clear()
+    return self.store.clear()
   };
 
   DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
@@ -259,7 +259,17 @@ var DataCatalog = (function () {
    * @return {CancellablePromise}
    */
   var reloadSourceMeta = function (dataCatalogEntry, apiOptions) {
-    dataCatalogEntry.sourceMetaPromise = fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, apiOptions);
+    if (dataCatalogEntry.dataCatalog.invalidatePromise) {
+      var deferred = $.Deferred();
+
+      var cancellablePromises = [];
+      dataCatalogEntry.dataCatalog.invalidatePromise.always(function () {
+        cancellablePromises.push(fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, apiOptions).done(deferred.resolve).fail(deferred.reject))
+      });
+      dataCatalogEntry.sourceMetaPromise = new CancellablePromise(deferred.promise(), undefined, cancellablePromises);
+    } else {
+      dataCatalogEntry.sourceMetaPromise = fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, apiOptions);
+    }
     return dataCatalogEntry.sourceMetaPromise;
   };
 
@@ -372,20 +382,62 @@ var DataCatalog = (function () {
   /**
    * Resets the entry and clears the cache
    *
-   * @return {Promise}
+   * @param {string} [invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
+   * @param {boolean} [cascade] - Default false, only used when the entry is for the source
+   * @return {CancellablePromise}
    */
-  DataCatalogEntry.prototype.clear = function () {
+  DataCatalogEntry.prototype.clear = function (invalidate, cascade) {
     var self = this;
-    var deferred = $.Deferred();
+
+    var invalidatePromise;
+
+    if (!invalidate) {
+      invalidate = 'cache';
+    }
+
+    if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
+      if (self.dataCatalog.invalidatePromise) {
+        invalidatePromise = self.dataCatalog.invalidatePromise;
+      } else {
+        if (self.path.length) {
+          invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
+            sourceType: self.getSourceType(),
+            invalidate: invalidate,
+            database: self.path[0]
+          });
+        } else {
+          invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
+            sourceType: self.getSourceType(),
+            invalidate: invalidate
+          });
+        }
+        self.dataCatalog.invalidatePromise = invalidatePromise;
+        invalidatePromise.always(function () {
+          delete self.dataCatalog.invalidatePromise;
+        });
+      }
+    } else {
+      invalidatePromise = $.Deferred().resolve().promise();
+    }
 
     self.reset();
 
-    self.save().then(deferred.resolve).catch(deferred.reject);
+    var saveDeferred = $.Deferred();
 
-    deferred.always(function () {
+    if (self.isSource() && cascade) {
+      self.dataCatalog.entries = {};
+      self.dataCatalog.clearStorage().then(saveDeferred.resolve).catch(saveDeferred.reject);
+    } else {
+      self.save().then(saveDeferred.resolve).catch(saveDeferred.reject);
+    }
+
+    var clearPromise = $.when(invalidatePromise, saveDeferred);
+
+    clearPromise.always(function () {
       huePubSub.publish('data.catalog.entry.refreshed', self);
     });
-    return deferred.promise();
+
+    return new CancellablePromise(clearPromise, undefined, [invalidatePromise]);
   };
 
   /**
@@ -440,26 +492,28 @@ var DataCatalog = (function () {
         || (sourceMeta.value && sourceMeta.value.fields) || (sourceMeta.item && sourceMeta.item.fields);
       if (entities) {
         entities.forEach(function (entity) {
-          promises.push(self.dataCatalog.getEntry({ path: self.path.concat(entity.name || entity) }).done(function (catalogEntry) {
-            if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
-              var definition = typeof entity === 'object' ? entity : {};
-              if (typeof entity !== 'object') {
-                if (self.path.length === 0) {
-                  definition.type = 'database';
-                } else if (self.path.length === 1) {
-                  definition.type = 'table';
-                } else if (self.path.length === 2) {
-                  definition.type = 'column';
+          if (!sourceMeta.databases || ((entity || entity.name) !== '_impala_builtins')) {
+            promises.push(self.dataCatalog.getEntry({path: self.path.concat(entity.name || entity)}).done(function (catalogEntry) {
+              if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
+                var definition = typeof entity === 'object' ? entity : {};
+                if (typeof entity !== 'object') {
+                  if (self.path.length === 0) {
+                    definition.type = 'database';
+                  } else if (self.path.length === 1) {
+                    definition.type = 'table';
+                  } else if (self.path.length === 2) {
+                    definition.type = 'column';
+                  }
                 }
+                if (sourceMeta.partition_keys) {
+                  definition.partitionKey = !!partitionKeys[entity.name];
+                }
+                definition.index = index++;
+                catalogEntry.definition = definition;
+                catalogEntry.saveLater();
               }
-              if (sourceMeta.partition_keys) {
-                definition.partitionKey = !!partitionKeys[entity.name];
-              }
-              definition.index = index++;
-              catalogEntry.definition = definition;
-              catalogEntry.saveLater();
-            }
-          }));
+            }));
+          }
         });
       }
       if (self.getSourceType() === 'impala' && self.isComplex()) {
@@ -1138,19 +1192,11 @@ var DataCatalog = (function () {
   };
 
   huePubSub.subscribe('data.catalog.refresh.entry', function (options) {
-    if (options.catalogEntry) {
-      if (options.invalidate && options.catalogEntry.getSourceType() === 'impala') {
-        huePubSub.publish('assist.invalidate.on.refresh'); // TODO: Replace with invalidate call as no need for pubsub
+    options.catalogEntry.clear(options.invalidate).always(function () {
+      if (options.callback) {
+        options.callback();
       }
-      options.catalogEntry.clear();
-    } else if (options.sourceType && options.path) {
-      if (options.invalidate && options.sourceType === 'impala') {
-        huePubSub.publish('assist.invalidate.on.refresh'); // TODO: Replace with invalidate call as no need for pubsub
-      }
-      getCatalog(options.sourceType).getEntry({ path: options.path }).done(function (entry) {
-        entry.clear()
-      })
-    }
+    });
   });
 
   var allNavigatorTagsPromise = undefined;

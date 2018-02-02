@@ -1543,6 +1543,34 @@ var ApiHelper = (function () {
     return promise;
   };
 
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {string} options.invalidate - [invalidate|invalidateAndFlush]
+   * @param {string} [options.database]
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.invalidateSourceMetadata = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+
+    if (options.sourceType === 'impala' && (options.invalidate === 'invalidate' || options.invalidate === 'invalidateAndFlush')) {
+      var data = {
+        flush_all: options.invalidate === 'invalidateAndFlush'
+      };
+
+      if (options.database) {
+        data.database = options.database;
+      }
+
+      var request = self.simplePost(IMPALA_INVALIDATE_API, data, options).done(deferred.resolve).fail(deferred.reject);
+
+      return new CancellablePromise(deferred.promise(), request);
+    }
+
+    return deferred.resolve().promise();
+  };
+
 
   /**
    * @param {Object} options

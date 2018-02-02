@@ -607,8 +607,8 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, publish: { 'data.catalog.refresh.entry': { invalidate: true, sourceType: sourceType(), path: [] }}">
-      <i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: reload">
+      <i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i>
     </a>
     % if has_write_access:
       % if is_embeddable:
@@ -624,7 +624,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-tables-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, publish: { 'data.catalog.refresh.entry': { invalidate: true, catalogEntry: database().catalogEntry } }" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: reload" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     % if has_write_access:
       % if is_embeddable:
         <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().catalogEntry.name ); }" title="${_('Create a new table')}" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
@@ -652,7 +652,7 @@ ${ components.menubar(is_embeddable) }
     % else:
       <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/'+ catalogEntry.path.join('/') + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i></a>
     % endif
-    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, publish: { 'data.catalog.refresh.entry': { invalidate: true, catalogEntry: catalogEntry } }" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: reload" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     % if has_write_access:
       <a class="inactive-action" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i></a>
     % endif
@@ -1412,10 +1412,11 @@ ${ components.menubar(is_embeddable) }
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
       if (location.getParameter('refresh') === 'true') {
-        huePubSub.publish('data.catalog.refresh.entry', { sourceType: viewModel.sourceType(), path: [] });
-        hueUtils.replaceURL('?');
+        DataCatalog.getEntry({ sourceType: viewModel.sourceType(), path: [], definition: { type: 'source' }}).done(function (entry) {
+          huePubSub.publish('data.catalog.refresh.entry', { invalidate: sourceType() === 'impala' ? 'invalidate' : 'cache', catalogEntry: entry });
+          hueUtils.replaceURL('?');
+        });
       }
-
     });
   })();
 </script>
