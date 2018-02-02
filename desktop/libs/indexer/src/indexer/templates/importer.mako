@@ -1228,7 +1228,7 @@ ${ assist.assistPanel() }
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
 
-      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : 'file');
+      self.inputFormat = ko.observable(wizard.prefill.source_type() ? wizard.prefill.source_type() : 'file');
 
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
@@ -1614,6 +1614,9 @@ ${ assist.assistPanel() }
           if (wizard.source.query()) {
             name = wizard.source.name();
           }
+          if (wizard.prefill.target_path().length > 0) {
+            name = wizard.prefill.target_path();
+          }
         } else if (wizard.source.inputFormat() == 'manual') {
           name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
         }
@@ -1790,7 +1793,7 @@ ${ assist.assistPanel() }
       self.prefill = ko.mapping.fromJS(${prefill | n});
 
       self.prefill.source_type.subscribe(function(newValue) {
-        self.source.inputFormat(newValue == 'manual' ? 'manual' : 'file');
+        self.source.inputFormat(newValue ? newValue : 'file');
       });
 
       self.show = ko.observable(true);
@@ -1904,17 +1907,7 @@ ${ assist.assistPanel() }
         guessFieldTypesXhr = $.post("${ url('indexer:guess_field_types') }", {
           "fileFormat": ko.mapping.toJSON(self.source)
         }, function (resp) {
-          resp.columns.forEach(function (entry, i, arr) {
-            if (self.destination.outputFormat() === 'table') {
-              entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
-            } else if (self.destination.outputFormat() === 'index') {
-              entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);
-            }
-            arr[i] = loadField(entry, self.destination, i);
-          });
-          self.source.sampleCols(resp.sample_cols ? resp.sample_cols : resp.columns);
-          self.source.sample(resp.sample);
-          self.destination.columns(resp.columns);
+          self.loadSampleData(resp);
           self.isGuessingFieldTypes(false);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
@@ -1922,7 +1915,19 @@ ${ assist.assistPanel() }
           viewModel.isLoading(false);
         });
       };
-
+      self.loadSampleData = function(resp) {
+        resp.columns.forEach(function (entry, i, arr) {
+          if (self.destination.outputFormat() === 'table') {
+            entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
+          } else if (self.destination.outputFormat() === 'index') {
+            entry.type = MAPPINGS.get(MAPPINGS.HIVE_TO_SOLR, entry.type, entry.type);
+          }
+          arr[i] = loadField(entry, self.destination, i);
+        });
+        self.source.sampleCols(resp.sample_cols ? resp.sample_cols : resp.columns);
+        self.source.sample(resp.sample);
+        self.destination.columns(resp.columns);
+      };
       self.isIndexing = ko.observable(false);
       self.indexingError = ko.observable(false);
       self.indexingSuccess = ko.observable(false);

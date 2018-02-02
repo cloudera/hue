@@ -152,7 +152,10 @@ def guess_field_types(request):
     snippet = notebook['snippets'][0]
     db = get_api(request, snippet)
 
-    if file_format['query'].get('id'):
+    if file_format.get('sampleCols'):
+      columns = file_format.get('sampleCols')
+      sample = file_format.get('sample')
+    else:
       snippet['query'] = snippet['statement'] #self._get_current_statement(db, snippet) # TODO multi statement
       try:
         sample = db.fetch_result(notebook, snippet, 4, start_over=True)['rows'][:4]
@@ -160,25 +163,27 @@ def guess_field_types(request):
         LOG.warn('Skipping sample data as query handle might be expired: %s' % e)
         sample = [[], [], [], [], []]
       columns = db.autocomplete(snippet=snippet, database='', table='')
-      format_ = {
-          "sample": sample,
-          "columns": [
-              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-              for col in columns['extended_columns']
-          ],
-          "hs2_handle": None # HS2 there and valid? add sample
-      }
-    else:
-      sample = db.fetch_result(notebook, snippet, 4, start_over=True)
-
-      format_ = {
-          "sample": sample['rows'][:4],
-          #"sample_cols": sample.meta,
-          "columns": [
-              Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-              for col in sample.meta
-          ]
-      }
+      columns = [
+          Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+          for col in columns['extended_columns']
+      ]
+    format_ = {
+        "sample": sample,
+        "columns": columns,
+        "hs2_handle": None # HS2 there and valid? add sample
+    }
+#     else:
+#       format_ = {'status': 3}
+#       sample = db.fetch_result(notebook, snippet, 4, start_over=True)
+# 
+#       format_ = {
+#           "sample": sample['rows'][:4],
+#           #"sample_cols": sample.meta,
+#           "columns": [
+#               Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+#               for col in sample.meta
+#           ]
+#       }
   elif file_format['inputFormat'] == 'rdbms':
     query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
     db = rdbms.get(request.user, query_server=query_server)
@@ -284,25 +289,25 @@ def _small_indexing(user, fs, client, source, destination, index_name):
 
   if source['inputFormat'] == 'file':
     data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
-    
+
+  try:
+    if source['inputFormat'] == 'query':
+      #   elif file_format['inputFormat'] == 'hs2_handle':
+      searcher = CollectionManagerController(user)
+      columns = fields#['_uuid'] + [field['name'] for field in file_format['columns']]
+      return searcher.update_data_from_hive(index_name, columns, fetch_handle=file_format['fetch_handle'])
+      ## live HS2
+    else:      
+      if client.is_solr_six_or_more():
+        kwargs['processor'] = 'tolerant'
+      response = client.index(name=index_name, data=data, **kwargs)
+      errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
+  except Exception, e:
     try:
-      if source['inputFormat'] == 'query':
-        #   elif file_format['inputFormat'] == 'hs2_handle':
-        searcher = CollectionManagerController(user)
-        columns = fields#['_uuid'] + [field['name'] for field in file_format['columns']]
-        return searcher.update_data_from_hive(index_name, columns, fetch_handle=file_format['fetch_handle'])
-        ## live HS2
-      else:      
-        if client.is_solr_six_or_more():
-          kwargs['processor'] = 'tolerant'
-        response = client.index(name=index_name, data=data, **kwargs)
-        errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
-    except Exception, e:
-      try:
-        client.delete_index(index_name, keep_config=False)
-      except Exception, e2:
-        LOG.warn('Error while cleaning-up config of failed collection creation %s: %s' % (index_name, e2))
-      raise e
+      client.delete_index(index_name, keep_config=False)
+    except Exception, e2:
+      LOG.warn('Error while cleaning-up config of failed collection creation %s: %s' % (index_name, e2))
+    raise e
 
   return {'status': 0, 'on_success_url': reverse('indexer:indexes', kwargs={'index': index_name}), 'pub_sub_url': 'assist.collections.refresh', 'errors': errors}
 
