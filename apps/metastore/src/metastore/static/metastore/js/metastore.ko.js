@@ -254,14 +254,11 @@ var MetastoreViewModel = (function () {
             self.loadingTable(false);
             self.database().setTable(foundTables[0], callback);
           } else if (clearDbCacheOnMissing) {
-            huePubSub.publish('assist.clear.db.cache', {
-              sourceType: self.sourceType(),
-              clearAll: false,
-              databaseName: self.database().catalogEntry.name
+            self.database().catalogEntry.clear('invalidate').done(function () {
+              self.database().load(function () {
+                setTableAfterLoad(false);
+              });
             });
-            self.database().load(function () {
-              setTableAfterLoad(false);
-            }, self.optimizerEnabled(), self.navigatorEnabled(), self.sourceType());
           } else {
             self.loadingTable(false);
           }
@@ -282,7 +279,7 @@ var MetastoreViewModel = (function () {
   MetastoreViewModel.prototype.setDatabaseByName = function (databaseName, callback) {
     var self = this;
 
-    var whenLoaded = function () {
+    var whenLoaded = function (clearCacheOnMissing) {
       if (databaseName === '') {
         databaseName = self.apiHelper.getFromTotalStorage('editor', 'last.selected.database') ||
             self.apiHelper.getFromTotalStorage('metastore', 'last.selected.database') || 'default';
@@ -298,6 +295,12 @@ var MetastoreViewModel = (function () {
       });
       if (foundDatabases.length === 1) {
         self.setDatabase(foundDatabases[0], callback);
+      } else if (clearCacheOnMissing) {
+        self.catalogEntry().clear('invalidate').done(function () {
+          self.loadDatabases().done(function () {
+            whenLoaded(false)
+          })
+        })
       } else {
         foundDatabases = self.databases().filter(function (database) {
           return database.catalogEntry.name === 'default';
@@ -311,9 +314,11 @@ var MetastoreViewModel = (function () {
     };
 
     if (self.loadingDatabases() && lastLoadDatabasesPromise !== null) {
-      lastLoadDatabasesPromise.done(whenLoaded);
+      lastLoadDatabasesPromise.done(function () {
+        whenLoaded(true);
+      });
     } else {
-      whenLoaded();
+      whenLoaded(true);
     }
   };
 

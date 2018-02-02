@@ -169,10 +169,6 @@ var ApiHelper = (function () {
       self.invalidateImpala = details;
     });
 
-    huePubSub.subscribe('assist.clear.db.cache', function (options) {
-      self.clearDbCache(options);
-    });
-
     huePubSub.subscribe('assist.clear.hdfs.cache', function () {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
     });
