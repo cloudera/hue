@@ -94,16 +94,16 @@ def rungunicornserver():
       'accesslog': '-',
       'backlog': None,
       'bind': [bind_addr],
-      'ca_certs': None,
+      'ca_certs': conf.SSL_CACERTS.get(),     # CA certificates file
       'capture_output': None,
-      'cert_reqs': None,
-      'certfile': None,
+      'cert_reqs': None,                      # Whether client certificate is required (see stdlib ssl module)
+      'certfile': conf.SSL_CERTIFICATE.get(), # SSL certificate file
       'chdir': None,
       'check_config': None,
-      'ciphers': None,
+      'ciphers': conf.SSL_CIPHER_LIST.get(),  # Ciphers to use (see stdlib ssl module)
       'config': None,
       'daemon': None,
-      'do_handshake_on_connect': None,
+      'do_handshake_on_connect': None,        # Whether to perform SSL handshake on socket connect (see stdlib ssl module)
       'enable_stdio_inheritance': None,
       'errorlog': '-',
       'forwarded_allow_ips': None,
@@ -111,7 +111,7 @@ def rungunicornserver():
       'group': None,
       'initgroups': None,
       'keepalive': None,
-      'keyfile': None,
+      'keyfile': conf.SSL_PRIVATE_KEY.get(),  # SSL key file
       'limit_request_field_size': None,
       'limit_request_fields': None,
       'limit_request_line': None,
@@ -133,10 +133,10 @@ def rungunicornserver():
       'reload_engine': None,
       'sendfile': None,
       'spew': None,
-      'ssl_version': None,
+      'ssl_version': None,                    # SSL version to use (see stdlib ssl module) [ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_TLSv1]
       'statsd_host': None,
       'statsd_prefix': None,
-      'suppress_ragged_eofs': None,
+      'suppress_ragged_eofs': None,           # Suppress ragged EOFs (see stdlib ssl module)
       'syslog': None,
       'syslog_addr': None,
       'syslog_facility': None,
