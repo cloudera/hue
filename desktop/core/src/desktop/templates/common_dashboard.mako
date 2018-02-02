@@ -207,7 +207,7 @@
   <li>
     <!-- ko ifnot: widget -->
     <div class="empty-gridster-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}">
-      <div class="inline pull-right remove-empty-gridster" data-bind="visible: $root.isEditing">
+      <div class="inline pull-right remove-empty-gridster" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
         <a href="javascript:void(0)" data-bind="click: function(data){ huePubSub.publish('gridster.remove', data); }"><i class="fa fa-times"></i></a>
       </div>
     </div>
@@ -295,7 +295,7 @@
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
         <span data-bind="editable: name, editableOptions: { enabled: true, placement: 'right' }"></span>
       <!-- /ko -->
-      <div class="inline pull-right" data-bind="visible: $root.isEditing">
+      <div class="inline pull-right" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
     </h2>
