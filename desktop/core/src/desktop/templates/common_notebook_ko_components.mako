@@ -279,7 +279,7 @@ except ImportError, e:
                   <i class="fa fa-fw fa-question-circle muted"></i>
                 </div>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Collection name')}">
+                  <input data-bind="value: savePath, valueUpdate: 'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Collection name')}">
                 </div>
               </div>
             </div>
@@ -413,16 +413,16 @@ except ImportError, e:
             if (resp.status == 0) {
               if (IS_HUE_4) {
                 $(".modal-backdrop").remove();
-                if (self.saveTarget() == 'hdfs-file' || self.saveTarget() == 'search-index') {
+                if (self.saveTarget() == 'hdfs-file') {
                   $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('open.link', resp.watch_url);
-                } else {
-                  if (resp.history_uuid) {
+                } else if (self.saveTarget() == 'search-index') {
+                  huePubSub.publish('open.importer.query', resp);
+                } else if (resp.history_uuid) {
                     $(self.saveResultsModalId).modal('hide');
                     huePubSub.publish('notebook.task.submitted', resp.history_uuid);
-                  } else if (resp && resp.message) {
-                    $(document).trigger("error", resp.message);
-                  }
+                } else if (resp && resp.message) {
+                  $(document).trigger("error", resp.message);
                 }
               } else {
                 window.location.href = resp.watch_url;
