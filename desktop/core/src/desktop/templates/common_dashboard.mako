@@ -177,7 +177,7 @@
   <!-- ko if: $root.isGridster -->
     <div class="gridster">
       <!-- ko if: typeof gridItems !== 'undefined' -->
-      <ul class="unstyled" data-bind="css: { 'is-editing': $root.isEditing }, gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
+      <ul class="unstyled" data-bind="css: { 'is-adding': $root.isToolbarVisible }, gridster: { items: gridItems, template: 'widget-template-gridster${ suffix }' }"></ul>
       <!-- /ko -->
     </div>
   <!-- /ko -->
