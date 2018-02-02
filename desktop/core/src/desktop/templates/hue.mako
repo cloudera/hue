@@ -915,6 +915,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }
           }
 
+          if (self.currentApp() == 'editor' && self.embeddable_cache['editor'] && !$('#editorComponents').length) {
+            self.embeddable_cache['editor'] = undefined;
+          }
+
           self.currentApp(app);
           if (!app.startsWith('security')) {
             self.lastContext = null;
