@@ -23,17 +23,23 @@
     margin: 0;
     list-style-type: none;
     & > li {
-      border: 1px solid @cui-gray-100;
+      border: 1px solid @cui-white;
       background: @cui-white !important;
       overflow-x: hidden;
       overflow-y: auto;
+      .grid-left-bar {
+        opacity: 0;
+        .hue-ease-transition(opacity);
+      }
+    }
+    & > li:hover {
+      border-color: @cui-gray-100;
+      .grid-left-bar {
+        opacity: 1;
+      }
     }
   }
-  & > ul.is-editing {
-    & > li {
-      //border-color: @cui-gray-200;
-    }
-  }
+
   .card-widget {
     width: 100% !important;
     margin: 0 !important;
