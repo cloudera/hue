@@ -367,6 +367,9 @@ ${ assist.assistPanel() }
       <!-- /ko -->
       <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
       <h4>${_('Preview')}</h4>
+      <!-- ko if: createWizard.source.inputFormat() == 'query' -->
+        ${ _('Add sample data') } <i class="fa fa-fw fa-play"></i>
+      <!-- /ko -->
       <div class="card-body">
         <div style="overflow: auto">
           <table class="table table-condensed table-preview">
@@ -382,9 +385,6 @@ ${ assist.assistPanel() }
               <td data-bind="truncatedText: $data"></td>
             </tr>
             </tbody>
-            <!-- ko if: createWizard.source.inputFormat() == 'query' -->
-              ${ _('Add sample data') } <i class="fa fa-fw fa-play"></i>
-            <!-- /ko -->
           </table>
         </div>
       </div>
