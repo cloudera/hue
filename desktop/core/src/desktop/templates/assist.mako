@@ -2931,14 +2931,16 @@ from desktop.views import _ko
 
           var fakeParentName = collectionName.indexOf('.') > -1 ? collectionName.split('.')[0] : 'default';
 
+          var sourceType = collection.source() === 'query' ? collection.engine() + '-query' : collection.engine();
+
           DataCatalog.getEntry({
-            sourceType: collection.engine(),
-            path: [fakeParentName],
+            sourceType: sourceType,
+            path: [ fakeParentName ],
             definition: { type: 'database' }
           }).done(function (fakeDbCatalogEntry) {
             var assistFakeDb = new AssistDbEntry(fakeDbCatalogEntry, null, assistDbSource, self.filter, i18n, navigationSettings);
             DataCatalog.getEntry({
-              sourceType: collection.engine(),
+              sourceType: sourceType,
               path: [fakeParentName, collectionName.indexOf('.') > -1 ? collectionName.split('.')[1] : collectionName],
               definition: { type: 'table' }
             }).done(function (collectionCatalogEntry) {
