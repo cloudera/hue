@@ -3796,36 +3796,169 @@ $(document).ready(function () {
     $('.hue-preview-holder').remove();
   }
 
-  function movePreviewHolder (options) {
+  var overlapZone = null;
+
+  function movePreviewHolder(options) {
     var coords = {
       col: Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10)),
       row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))
     }
+    var $huePreviewHolder = $('.hue-preview-holder');
     if (coords.row > 0 && coords.col > 0 && coords.col < 13) {
       var overlaps = false;
       $('li.gs-w').each(function () {
         var dimensions = {
-          col: parseInt($(this).attr('data-col')),
-          row: parseInt($(this).attr('data-row')),
-          sizex: parseInt($(this).attr('data-sizex')),
-          sizey: parseInt($(this).attr('data-sizey'))
+          col: parseInt($(this).attr('data-immutable-col')),
+          row: parseInt($(this).attr('data-immutable-row')),
+          sizex: parseInt($(this).attr('data-immutable-sizex')),
+          sizey: parseInt($(this).attr('data-immutable-sizey'))
         }
+        var $widget = $(this);
         if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey) {
           overlaps = true;
+          var sidesWidth = Math.floor(dimensions.sizex / 3);
+          var centerWidth = dimensions.sizex - sidesWidth * 2;
+          var sidesHeight = Math.floor(dimensions.sizey / 3);
+          var centerHeight = dimensions.sizey - sidesHeight * 2;
+          var overlapZoneSideToSide = '';
+          var overlapZoneTopDown = '';
+          if (coords.col < dimensions.col + sidesWidth) {
+            overlapZoneSideToSide = 'W';
+          }
+          else if (coords.col >= (dimensions.col + sidesWidth) && coords.col < (dimensions.col + sidesWidth + centerWidth)) {
+            overlapZoneSideToSide = '';
+          }
+          else {
+            overlapZoneSideToSide = 'E';
+          }
+
+          if (coords.row < dimensions.row + sidesHeight) {
+            overlapZoneTopDown = 'N';
+          }
+          else if (coords.row >= (dimensions.row + sidesHeight) && coords.row < (dimensions.row + sidesHeight + centerHeight)) {
+            overlapZoneTopDown = '';
+          }
+          else {
+            overlapZoneTopDown = 'S';
+          }
+
+          if (overlapZoneTopDown + overlapZoneSideToSide != overlapZone) {
+            restoreWidgetSizes();
+          }
+
+          overlapZone = overlapZoneTopDown + overlapZoneSideToSide;
+
+          if (['NW', 'W', 'SW'].indexOf(overlapZone) > -1) {
+            if (!$widget.attr('data-original-col')) {
+              $widget.attr('data-original-col', $widget.attr('data-col'));
+              $widget.attr('data-col', dimensions.col + 1);
+            }
+            $huePreviewHolder.attr('data-col', dimensions.col);
+            $huePreviewHolder.attr('data-row', dimensions.row);
+            $huePreviewHolder.attr('data-sizex', 1);
+            $huePreviewHolder.attr('data-sizey', dimensions.sizey);
+          }
+          else if (overlapZone === 'N') {
+            if (!$widget.attr('data-original-row')) {
+              $widget.attr('data-original-row', $widget.attr('data-row'));
+              $widget.attr('data-row', dimensions.row + 1);
+            }
+            $huePreviewHolder.attr('data-col', dimensions.col);
+            $huePreviewHolder.attr('data-row', dimensions.row);
+            $huePreviewHolder.attr('data-sizex', dimensions.sizex);
+            $huePreviewHolder.attr('data-sizey', 1);
+          }
+          else if (overlapZone === 'S') {
+            if (!$widget.attr('data-original-sizey')) {
+              $widget.attr('data-original-sizey', $widget.attr('data-sizey'));
+              $widget.attr('data-sizey', dimensions.sizey - 1);
+            }
+            $huePreviewHolder.attr('data-col', dimensions.col);
+            $huePreviewHolder.attr('data-row', dimensions.row + dimensions.sizey - 1);
+            $huePreviewHolder.attr('data-sizex', dimensions.sizex);
+            $huePreviewHolder.attr('data-sizey', 1);
+          }
+          else {
+            if (!$widget.attr('data-original-sizex')) {
+              $widget.attr('data-original-sizex', $widget.attr('data-sizex'));
+              $widget.attr('data-sizex', dimensions.sizex - 1);
+            }
+            $huePreviewHolder.attr('data-col', dimensions.col + dimensions.sizex - 1);
+            $huePreviewHolder.attr('data-row', dimensions.row);
+            $huePreviewHolder.attr('data-sizex', 1);
+            $huePreviewHolder.attr('data-sizey', dimensions.sizey);
+          }
+          $huePreviewHolder.attr('data-overlapzone', overlapZone);
+          $huePreviewHolder.attr('data-widgetid', $widget.attr('data-widgetid'));
+          $huePreviewHolder.attr('data-widgetrow', $widget.attr('data-immutable-row'));
+          $huePreviewHolder.attr('data-widgetcol', $widget.attr('data-immutable-col'));
         }
       });
-      if (!$('.gridster').hasClass('dragging') && !overlaps) {
-        $('.hue-preview-holder').show();
-        $('.hue-preview-holder').attr('data-sizey', options.widgetHeight || 6);
-        $('.hue-preview-holder').attr('data-col', coords.col);
-        $('.hue-preview-holder').attr('data-row', coords.row);
+      if (!$('.gridster').hasClass('dragging')) {
+        $huePreviewHolder.show();
+        if (!overlaps) {
+          restoreWidgetSizes();
+
+          // find out avail space
+          var $gridster = $('.gridster ul').data('gridster');
+          var availCoords = {
+            col: coords.col,
+            row: coords.row,
+            sizex: 1,
+            sizey: 1
+          }
+
+          // find left border
+          for (var i = coords.col; i >= 1; i--) {
+            if ($gridster.is_empty(i, coords.row)) {
+              availCoords.col = i;
+            }
+          }
+          // find right border
+          for (var i = coords.col; i <= 12; i++) {
+            if ($gridster.is_empty(i, coords.row)) {
+              availCoords.sizex = i - availCoords.col + 1;
+            }
+          }
+
+          // find top border
+          for (var i = coords.row; i >= 1; i--) {
+            if ($gridster.is_empty(coords.col, i)) {
+              availCoords.row = i;
+            }
+          }
+
+          // find bottom border
+          // get the end of the grid, makes no sense to iterate till max rows
+          var maxRow = 1;
+          $('li.gs-w').each(function () {
+            var $widget = $(this);
+            if (parseInt($widget.attr('data-immutable-row')) + parseInt($widget.attr('data-immutable-sizey')) - 1 > maxRow) {
+              maxRow = parseInt($widget.attr('data-immutable-row')) + parseInt($widget.attr('data-immutable-sizey')) - 1;
+            }
+          });
+          for (var i = coords.row; i <= maxRow; i++) {
+            if ($gridster.is_empty(coords.col, i)) {
+              availCoords.sizey = i - availCoords.row + 1;
+            }
+          }
+
+          $huePreviewHolder.attr('data-col', availCoords.col);
+          $huePreviewHolder.attr('data-row', availCoords.row);
+          $huePreviewHolder.attr('data-sizex', availCoords.sizex);
+          $huePreviewHolder.attr('data-sizey', availCoords.sizey);
+          $huePreviewHolder.removeAttr('data-overlapzone');
+          $huePreviewHolder.removeAttr('data-widgetid');
+          $huePreviewHolder.removeAttr('data-widgetrow');
+          $huePreviewHolder.removeAttr('data-widgetcol');
+        }
       }
       else {
-        $('.hue-preview-holder').hide();
+        $huePreviewHolder.hide();
       }
     }
     else {
-      $('.hue-preview-holder').hide();
+      $huePreviewHolder.hide();
     }
   }
 
@@ -3839,50 +3972,28 @@ $(document).ready(function () {
   function restoreWidgetSizes() {
     $('li.gs-w').each(function () {
       var $widget = $(this);
-      $widget.attr('data-sizex', $widget.attr('data-original-sizex'));
-      $widget.attr('data-sizey', $widget.attr('data-original-sizey'));
-      if ($widget.attr('data-original-row') === '1') {
-        $widget.attr('data-row', $widget.attr('data-original-row'));
-      }
-      if ($widget.attr('data-original-col') === '1') {
-        $widget.attr('data-col', $widget.attr('data-original-col'));
-      }
+      $widget.attr('data-sizex', $widget.attr('data-immutable-sizex'));
+      $widget.attr('data-sizey', $widget.attr('data-immutable-sizey'));
+      $widget.attr('data-col', $widget.attr('data-immutable-col'));
+      $widget.attr('data-row', $widget.attr('data-immutable-row'));
+      $widget.removeAttr('data-original-sizex');
+      $widget.removeAttr('data-original-sizey');
+      $widget.removeAttr('data-original-col');
+      $widget.removeAttr('data-original-row');
     });
-  }
-
-  var widgetShrinkTimeout;
-  var isShrinking = false;
-
-  function delayedShrinkWidgets() {
-    window.clearTimeout(widgetShrinkTimeout);
-    widgetShrinkTimeout = window.setTimeout(function () {
-      if (!isShrinking) {
-        isShrinking = true;
-        $('li.gs-w').each(function () {
-          var $widget = $(this);
-          $widget.attr('data-original-sizex', $widget.attr('data-sizex'));
-          $widget.attr('data-original-sizey', $widget.attr('data-sizey'));
-          $widget.attr('data-sizex', parseInt($widget.attr('data-sizex')) - 1);
-          $widget.attr('data-sizey', parseInt($widget.attr('data-sizey')) - 1);
-          if ($widget.attr('data-row') === '1') {
-            $widget.attr('data-original-row', $widget.attr('data-row'));
-            $widget.attr('data-sizey', parseInt($widget.attr('data-sizey')) - 1);
-            $widget.attr('data-row', parseInt($widget.attr('data-row')) + 1);
-          }
-          if ($widget.attr('data-col') === '1') {
-            $widget.attr('data-original-col', $widget.attr('data-col'));
-            $widget.attr('data-sizex', parseInt($widget.attr('data-sizex')) - 1);
-            $widget.attr('data-col', parseInt($widget.attr('data-col')) + 1);
-          }
-        });
-      }
-    }, 400);
   }
 
   var tempDraggable = null;
   var skipRestoreOnStop = false;
   huePubSub.subscribe('dashboard.top.widget.drag.start', function (options) {
-    delayedShrinkWidgets();
+    $('li.gs-w').each(function () {
+      var $widget = $(this);
+      $widget.attr('data-immutable-sizex', $widget.attr('data-sizex'));
+      $widget.attr('data-immutable-sizey', $widget.attr('data-sizey'));
+      $widget.attr('data-immutable-col', $widget.attr('data-col'));
+      $widget.attr('data-immutable-row', $widget.attr('data-row'));
+    });
+
     skipRestoreOnStop = false;
     var widgetClone = ko.mapping.toJS(options.widget);
     widgetClone.id = UUID();
@@ -3891,17 +4002,12 @@ $(document).ready(function () {
   }, 'dashboard');
 
   huePubSub.subscribe('dashboard.top.widget.drag.stop', function () {
-    isShrinking = false;
-    window.clearTimeout(widgetShrinkTimeout);
     if (!skipRestoreOnStop) {
       restoreWidgetSizes();
     }
   }, 'dashboard');
 
-  huePubSub.subscribe('dashboard.top.widget.drag', function (options) {
-    delayedShrinkWidgets();
-    movePreviewHolder(options);
-  }, 'dashboard');
+  huePubSub.subscribe('dashboard.top.widget.drag', movePreviewHolder, 'dashboard');
 
   huePubSub.subscribe('draggable.text.drag', function(options) {
     if (searchViewModel.isGridster()) {
@@ -3933,145 +4039,93 @@ $(document).ready(function () {
 
   huePubSub.subscribe('dashboard.drop.on.page', function (options) {
     skipRestoreOnStop = true;
-    window.clearTimeout(widgetShrinkTimeout);
+
+    var $preview = $('.hue-preview-holder');
+    var dimensions = {
+      col: parseInt($preview.attr('data-col')),
+      row: parseInt($preview.attr('data-row')),
+      sizex: parseInt($preview.attr('data-sizex')),
+      sizey: parseInt($preview.attr('data-sizey')),
+      overlap: $preview.attr('data-overlapzone'),
+      widgetId: parseInt($preview.attr('data-widgetid')),
+      widgetRow: parseInt($preview.attr('data-widgetrow')),
+      widgetCol: parseInt($preview.attr('data-widgetcol'))
+    }
+
     removePreviewHolder();
+
+    function resizeAndMove(widget, width, col) {
+      var $gridster = $('.gridster>ul').data('gridster');
+      $gridster.resize_widget($(widget.gridsterElement), width, widget.size_y());
+      widget.size_x(width);
+      $gridster.move_widget($(widget.gridsterElement), col, widget.row());
+      widget.col(col);
+    }
+
     if (searchViewModel.columns().length > 0) {
-      var dropPosition = {
-        col: Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10)),
-        row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))
+
+      if (dimensions.overlap === 'N') {
+        dimensions.row = dimensions.widgetRow;
       }
-      if (dropPosition.row > 0 && dropPosition.col > 0 && dropPosition.col < 13) {
-        if (tempDraggable) {
-          var optimalWidgetWidth = 12;
-          var queueLength = 0;
-
-          function decreaseQueue() {
-            queueLength--;
+      else if (dimensions.overlap !== 'S') {
+        var collindingWidgets = [];
+        searchViewModel.gridItems().forEach(function (existingWidget) {
+          var existingWidgetRow = parseInt($(existingWidget.gridsterElement).attr('data-row'));
+          if (existingWidgetRow === dimensions.widgetRow) {
+            collindingWidgets.push(existingWidget);
           }
+        });
+        var newOptimalWidth = Math.floor(12 / (collindingWidgets.length + 1));
+        collindingWidgets.sort(function (a, b) {
+          return a.col() > b.col()
+        });
 
-          function resizeAndMove(widget, width, col) {
-            var $gridster = $('.gridster>ul').data('gridster');
-            queueLength += 2;
-            $gridster.resize_widget($(widget.gridsterElement), width, widget.size_y(), decreaseQueue);
-            widget.size_x(width);
-            $gridster.move_widget($(widget.gridsterElement), col, widget.row(), decreaseQueue);
-            widget.col(col);
+        // yay for Gridster starting arrays at 1
+        var droppedWidgetFauxColumn = Math.floor((dimensions.col - 1) / newOptimalWidth) + 1;
+        var adjustedDropPosition = (Math.floor((dimensions.col - 1) / newOptimalWidth) * newOptimalWidth) + 1;
+        dimensions.col = adjustedDropPosition;
+        dimensions.sizex = newOptimalWidth;
+
+        var siblingCounter = 0;
+        for (var i = 1; i <= 12 / newOptimalWidth; i++) {
+          if (i !== droppedWidgetFauxColumn) {
+            resizeAndMove(collindingWidgets[siblingCounter], newOptimalWidth, ((i - 1) * newOptimalWidth) + 1)
+            siblingCounter++;
           }
+        }
+      }
 
-          var dropOnEmptyRow = true;
-          // checks if it has been dropped on an empty row
-          searchViewModel.gridItems().forEach(function (existingWidget) {
-            var existingWidgetFauxRow = parseInt($(existingWidget.gridsterElement).attr('data-row'));
-            var existingWidgetFauxCol = parseInt($(existingWidget.gridsterElement).attr('data-row'));
-            var existingWidgetFauxHeight = parseInt($(existingWidget.gridsterElement).attr('data-sizey'));
-            var existingWidgetFauxWidth = parseInt($(existingWidget.gridsterElement).attr('data-sizex'));
-            if (dropPosition.row >= existingWidgetFauxRow && dropPosition.row < existingWidgetFauxRow + existingWidgetFauxHeight) {
-              dropOnEmptyRow = false;
-            }
-            if (existingWidgetFauxRow == dropPosition.row + 1 && (dropPosition.col < existingWidgetFauxCol || dropPosition.col >= existingWidgetFauxCol + existingWidgetFauxWidth)) {
-              dropOnEmptyRow = false;
-              restoreWidgetSizes();
-            }
-          });
-
-          if (dropOnEmptyRow) {
-            dropPosition.col = 1;
-            if (isShrinking && dropPosition.row > 1) {
-              dropPosition.row++;
-            }
-            restoreWidgetSizes();
-          }
-          else {
-            // automatically resize the width of all the widgets that collide
-            var collindingWidgets = [];
-            searchViewModel.gridItems().forEach(function (existingWidget) {
-              var existingWidgetFauxRow = parseInt($(existingWidget.gridsterElement).attr('data-row'));
-              if (existingWidgetFauxRow === dropPosition.row && !existingWidget.hasBeenTouched) {
-                collindingWidgets.push(existingWidget);
-                var parallelWidgets = [];
-                searchViewModel.gridItems().forEach(function (siblingWidget) {
-                  var siblingWidgetFauxRow = parseInt($(siblingWidget.gridsterElement).attr('data-row'));
-                  if (siblingWidgetFauxRow === existingWidgetFauxRow && existingWidget.widgetId() !== siblingWidget.widgetId()) {
-                    siblingWidget.hasBeenTouched = true;
-                    parallelWidgets.push(siblingWidget);
-                  }
-                });
-                var newOptimalWidth = Math.floor(12 / (parallelWidgets.length + 2)); // 2 is the colliding widget + the dropped widget itself
-                if (newOptimalWidth < optimalWidgetWidth && newOptimalWidth > 0) {
-                  var siblings = [];
-                  siblings.push(existingWidget);
-                  siblings = siblings.concat(parallelWidgets);
-
-                  siblings.sort(function (a, b) {
-                    return a.col() > b.col()
-                  });
-
-                  optimalWidgetWidth = newOptimalWidth;
-
-                  // yay for Gridster starting arrays at 1
-                  var droppedWidgetFauxColumn = Math.floor((dropPosition.col - 1) / optimalWidgetWidth) + 1;
-                  var adjustedDropPosition = (Math.floor((dropPosition.col - 1) / optimalWidgetWidth) * optimalWidgetWidth) + 1;
-                  dropPosition.col = adjustedDropPosition;
-
-                  restoreWidgetSizes();
-
-                  var siblingCounter = 0;
-                  for (var i = 1; i <= 12 / optimalWidgetWidth; i++) {
-                    if (i !== droppedWidgetFauxColumn) {
-                      resizeAndMove(siblings[siblingCounter], optimalWidgetWidth, ((i - 1) * optimalWidgetWidth) + 1)
-                      siblingCounter++;
-                    }
-                  }
-                }
+      if (tempDraggable) {
+        searchViewModel.gridItems.push(
+            ko.mapping.fromJS({
+              col: dimensions.col,
+              row: dimensions.row,
+              size_x: dimensions.sizex,
+              size_y: tempDraggable.gridsterHeight(),
+              widget: null,
+              callback: function (el) {
+                showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+                tempDraggable = null;
               }
-            });
-            if (isShrinking && dropPosition.row === 2) {
-              dropPosition.row--;
-            }
-          }
-          searchViewModel.gridItems().forEach(function (existingWidget) {
-            existingWidget.hasBeenTouched = false;
-          });
-
-          var canDrop = window.setInterval(function () {
-            if (queueLength === 0) {
-              window.clearInterval(canDrop);
-              searchViewModel.gridItems.push(
-                  ko.mapping.fromJS({
-                    col: dropPosition.col,
-                    row: dropPosition.row,
-                    size_x: optimalWidgetWidth,
-                    size_y: tempDraggable.gridsterHeight(),
-                    widget: null,
-                    callback: function (el) {
-                      showAddFacetDemiModal(tempDraggable, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
-                      tempDraggable = null;
-                    }
-                  })
-              );
-            }
-          }, 100);
-        }
-        else if (searchViewModel.lastDraggedMeta()) {
-          searchViewModel.gridItems.push(
-              ko.mapping.fromJS({
-                col: dropPosition.col,
-                row: dropPosition.row,
-                size_x: 6,
-                size_y: 6,
-                widget: null,
-                callback: function (el) {
-                  showAddFacetDemiModal(null, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
-                }
-              })
-          );
-          restoreWidgetSizes();
-        }
+            })
+        );
       }
-      else {
-        restoreWidgetSizes();
+      else if (searchViewModel.lastDraggedMeta()) {
+        searchViewModel.gridItems.push(
+            ko.mapping.fromJS({
+              col: dimensions.col,
+              row: dimensions.row,
+              size_x: dimensions.sizex,
+              size_y: 6,
+              widget: null,
+              callback: function (el) {
+                showAddFacetDemiModal(null, searchViewModel.gridItems()[searchViewModel.gridItems().length - 1]);
+              }
+            })
+        );
       }
     }
+
   }, 'dashboard');
 
   function resizeGridsterWidget($el) {
