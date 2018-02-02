@@ -1979,28 +1979,36 @@ ${ assist.assistPanel() }
 
             self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
               self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
-                if (val == 100) {
+                if (val === 100) {
                   self.indexingStarted(false);
                   self.isIndexing(false);
                   self.indexingSuccess(true);
                 }
               });
               self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
-                if (val == 'failed') {
+                if (val === 'failed') {
                   self.isIndexing(false);
                   self.indexingStarted(false);
                   self.indexingError(true);
-                } else if (val == 'available') {
+                } else if (val === 'available') {
                   var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
                   if (!snippet.result.handle().has_more_statements) {
                     if (self.editorVM.selectedNotebook().onSuccessUrl()) {
                       var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
                       if (match) {
                         var db = match[1];
-                        huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
+                        DataCatalog.getEntry({ sourceType: snippet.type(), path: [ db ]}).done(function (dbEntry) {
+                          dbEntry.clear('invalidate').done(function () {
+                            window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                          })
+                        });
+                      } else {
+                        DataCatalog.getEntry({ sourceType: snippet.type(), path: []}).done(function (sourceEntry) {
+                          sourceEntry.clear().done(function () {
+                            window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                          })
+                        });
                       }
-                      huePubSub.publish('assist.clear.db.cache', { sourceType: self.source.apiHelperType() });
-                      window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                     }
                   } else { // Perform last DROP statement execute
                     snippet.execute();

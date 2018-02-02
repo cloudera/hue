@@ -281,34 +281,6 @@ var AssistDbSource = (function () {
       $container.find(".assist-actions, .assist-db-header-actions").css('right', -$container.scrollLeft() + 'px');
     };
 
-    self.reload = function(allCacheTypes) {
-      if (self.invalidateOnRefresh() !== 'cache') {
-        huePubSub.publish('assist.invalidate.impala', {
-          flush: self.invalidateOnRefresh() === 'invalidateAndFlush',
-          database: self.selectedDatabase() ? self.selectedDatabase().catalogEntry.name : null
-        });
-      }
-
-      self.reloading(true);
-      huePubSub.publish('assist.clear.db.cache', {
-        sourceType: self.sourceType,
-        clearAll: true
-      });
-      if (allCacheTypes) {
-        huePubSub.publish('assist.clear.db.cache', {
-          sourceType: self.sourceType,
-          cacheType: 'optimizer',
-          clearAll: true
-        });
-      }
-      self.invalidateOnRefresh('cache');
-      self.initDatabases();
-    };
-
-    huePubSub.subscribe('assist.invalidate.on.refresh', function () {
-      self.invalidateOnRefresh('invalidate');
-    });
-
     huePubSub.subscribe('data.catalog.entry.refreshed', function (refreshedEntry) {
       if (self.catalogEntry === refreshedEntry) {
         self.initDatabases();

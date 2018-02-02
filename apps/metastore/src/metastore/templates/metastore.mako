@@ -550,7 +550,7 @@ ${ components.menubar(is_embeddable) }
             </tr>
           </tbody>
         </table>
-        <span data-bind="visible: filteredTables().length === 0, css: { 'margin-left-10': tables().length > 0 }" style="font-style: italic; display: none;">${_('No tables found.')}</span>
+        <div data-bind="visible: filteredTables().length === 0, css: { 'margin-left-10': tables().length > 0 }" style="font-style: italic; display: none;">${_('No tables found.')}</div>
       </div>
     </div>
 
@@ -705,8 +705,10 @@ ${ components.menubar(is_embeddable) }
           ${_('View more...')}
         </a>
         <!-- /ko -->
+        <!-- ko if: metastoreTable.tableDetails() -->
         <div data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data.') }</div>
         <div data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data.') }</div>
+        <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: hasErrors() -->
       <div>${ _('Could not load the sample, see the server log for details.') }</div>
