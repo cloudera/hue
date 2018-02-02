@@ -368,10 +368,16 @@ var EditorViewModel = (function() {
 
     self.updateDatabases = function () {
       if (self.isSqlDialect()) {
-        self.getApiHelper().loadDatabases({
-          sourceType: self.type(),
-          silenceErrors: true,
-          successCallback: self.availableDatabases
+        DataCatalog.getEntry({ sourceType: self.type(), path: [], definition: { type: 'source' }}).done(function (sourceEntry) {
+          sourceEntry.getChildren({ silenceErrors: true }).done(function (databaseEntries) {
+            var databaseNames = [];
+            databaseEntries.forEach(function (databaseEntry) {
+              databaseNames.push(databaseEntry.name);
+            });
+            self.availableDatabases(databaseNames);
+          }).fail(function () {
+            self.availableDatabases([]);
+          });
         });
       } else {
         self.availableDatabases([]);
@@ -767,7 +773,9 @@ var EditorViewModel = (function() {
           huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
         }
         ignoreNextAssistDatabaseUpdate = true;
-        huePubSub.publish('assist.db.refresh', { sourceTypes: [self.type()] });
+        DataCatalog.getEntry({ sourceType: self.type(), path: [] }).done(function (entry) {
+          entry.clear('cache', true);
+        });
       });
     }, 0);
 
@@ -3020,11 +3028,11 @@ var EditorViewModel = (function() {
       })
     }, self.huePubSubId);
 
-    huePubSub.subscribe('assist.db.refresh', function (options) {
+    huePubSub.subscribe('data.catalog.entry.refreshed', function (catalogEntry) {
       var notebook = self.selectedNotebook();
-      if (notebook) {
+      if (catalogEntry.isSource() && notebook) {
         notebook.snippets().forEach(function (snippet) {
-          if (options.sourceTypes.indexOf(snippet.type()) !== -1) {
+          if (catalogEntry.getSourceType() === snippet.type()) {
             snippet.updateDatabases();
           }
         });

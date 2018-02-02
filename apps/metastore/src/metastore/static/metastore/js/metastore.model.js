@@ -73,11 +73,17 @@ var MetastoreDatabase = (function () {
     self.table = ko.observable(null);
   }
 
+  MetastoreDatabase.prototype.reload = function () {
+    var self = this;
+    if (!self.loading()) {
+      self.loading(true);
+      // Clear will publish when done
+      self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
+    }
+  };
+
   MetastoreDatabase.prototype.load = function (callback, optimizerEnabled, navigatorEnabled) {
     var self = this;
-    if (self.loading()) {
-      return;
-    }
 
     self.loading(true);
 
@@ -516,6 +522,15 @@ var MetastoreTable = (function () {
     };
   }
 
+  MetastoreTable.prototype.reload = function () {
+    var self = this;
+    if (!self.loading()) {
+      self.loading(true);
+      // Clear will publish when done
+      self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
+    }
+  };
+
   MetastoreTable.prototype.showImportData = function () {
     var self = this;
     $("#import-data-modal").empty().html('<div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button><h2 class="modal-title"></h2></div><div class="modal-body"><i class="fa fa-spinner fa-spin fa-2x muted"></i></div>').modal("show");
@@ -528,9 +543,6 @@ var MetastoreTable = (function () {
 
   MetastoreTable.prototype.load = function () {
     var self = this;
-    if (self.loading()) {
-      return;
-    }
     self.loading(true);
     self.fetchFields();
     self.fetchDetails();

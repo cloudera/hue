@@ -229,8 +229,10 @@ from desktop.views import _ko
                     huePubSub.publish('open.link', notebook.onSuccessUrl());
                   }
 
-                  if (notebook.onSuccessUrl() == 'assist.db.refresh') {
-                    huePubSub.publish('assist.db.refresh', {sourceTypes: [snippet.type()]});
+                  if (notebook.onSuccessUrl() === 'assist.db.refresh') {
+                    DataCatalog.getEntry({ sourceType: snippet.type(), path: [] }).done(function (entry) {
+                      entry.clear('cache', true);
+                    });
                   } else if (notebook.onSuccessUrl()) {
                     huePubSub.publish(notebook.pubSubUrl());
                   }
