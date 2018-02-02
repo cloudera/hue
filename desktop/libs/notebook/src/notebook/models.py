@@ -192,6 +192,17 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
   return editor
 
 
+class MockedDjangoRequest():
+
+  def __init__(self, user, get=None, post=None, method='POST'):
+    self.user = user
+    self.jt = None
+    self.GET = get if get is not None else {'format': 'json'}
+    self.POST = post if post is not None else {}
+    self.REQUEST = {}
+    self.method = method
+
+
 def import_saved_beeswax_query(bquery):
   design = bquery.get_design()
 

@@ -159,7 +159,7 @@ class SolrApi(Api):
 
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False):
     from search.conf import SOLR_URL
     db = NativeSolrApi(SOLR_URL.get(), self.user)
 

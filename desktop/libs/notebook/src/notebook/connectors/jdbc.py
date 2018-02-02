@@ -158,7 +158,7 @@ class JdbcApi(Api):
     return response
 
   @query_error_handler
-  def get_sample_data(self, snippet, database=None, table=None, column=None):
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False):
     if self.db is None:
       raise AuthenticationRequired()
 

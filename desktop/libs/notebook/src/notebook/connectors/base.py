@@ -327,6 +327,8 @@ class Api(object):
   def get_jobs(self, notebook, snippet, logs):
     return []
 
+  def get_sample_data(self, snippet, database=None, table=None, column=None, async=False): raise NotImplementedError()
+
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()
 
   def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None): raise NotImplementedError()

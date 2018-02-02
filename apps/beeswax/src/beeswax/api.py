@@ -33,7 +33,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.parameterization import substitute_variables
 from metastore import parser
-from notebook.models import escape_rows
+from notebook.models import escape_rows, MockedDjangoRequest, make_notebook
 
 import beeswax.models
 
@@ -656,25 +656,37 @@ def get_sample_data(request, database, table, column=None):
   return JsonResponse(response)
 
 
-def _get_sample_data(db, database, table, column):
+def _get_sample_data(db, database, table, column, async=False):
   table_obj = db.get_table(database, table)
   if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':
     query_server = get_query_server_config('impala')
     db = dbms.get(db.client.user, query_server)
 
-  sample_data = db.get_sample(database, table_obj, column)
+  sample_data = db.get_sample(database, table_obj, column, generate_sql_only=async)
   response = {'status': -1}
 
   if sample_data:
-    sample = escape_rows(sample_data.rows(), nulls_only=True)
-    if column:
-      sample = set([row[0] for row in sample])
-      sample = [[item] for item in sorted(list(sample))]
+    if async:
+      notebook = make_notebook(
+          name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
+          editor_type=db.server_name,
+          statement=sample_data,
+          status='ready',
+          is_task=False
+      )
+      task = notebook.execute(request=MockedDjangoRequest(user=db.client.user), batch=False)
+      response['history_id'] = task['history_id']
+      response['history_uuid'] = task['history_uuid']
+    else:
+      sample = escape_rows(sample_data.rows(), nulls_only=True)
+      if column:
+        sample = set([row[0] for row in sample])
+        sample = [[item] for item in sorted(list(sample))]
 
-    response['status'] = 0
-    response['headers'] = sample_data.cols()
-    response['full_headers'] = sample_data.full_cols()
-    response['rows'] = sample
+      response['status'] = 0
+      response['headers'] = sample_data.cols()
+      response['full_headers'] = sample_data.full_cols()
+      response['rows'] = sample
   else:
     response['message'] = _('Failed to get sample data.')
 
