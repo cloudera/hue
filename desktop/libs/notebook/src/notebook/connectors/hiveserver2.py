@@ -34,10 +34,10 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.rest.http_client import RestException
-from desktop.models import DefaultConfiguration
+from desktop.models import DefaultConfiguration, Document2
 from metadata.optimizer_client import OptimizerApi
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name
+from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name, Notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -443,7 +443,19 @@ class HS2Api(Api):
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet)
-    return _autocomplete(db, database, table, column, nested, query=snippet.get('query'))
+    query = None
+
+    if snippet.get('query'):
+      query = snippet.get('query')
+    elif snippet.get('source') == 'query':
+      document = Document2.objects.get(id=database)
+      document.can_read_or_exception(self.user)
+      notebook = Notebook(document=document).get_data()
+      snippet = notebook['snippets'][0]
+      query = self._get_current_statement(db, snippet)['statement']
+      database, table = '', ''
+
+    return _autocomplete(db, database, table, column, nested, query=query)
 
 
   @query_error_handler
