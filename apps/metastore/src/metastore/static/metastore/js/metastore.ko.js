@@ -33,6 +33,8 @@ var MetastoreViewModel = (function () {
     self.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
     self.sourceType = ko.observable(options.sourceType || 'hive');
 
+    self.catalogEntry = ko.observable();
+
     self.navigatorEnabled.subscribe(function (newValue) {
       huePubSub.publish('meta.navigator.enabled', newValue);
     });
@@ -193,6 +195,15 @@ var MetastoreViewModel = (function () {
 
   var lastLoadDatabasesPromise = null;
 
+  MetastoreViewModel.prototype.reload = function () {
+    var self = this;
+    if (!self.reloading() && self.catalogEntry()) {
+      self.reloading(true);
+      // Clear will publish when done
+      self.catalogEntry().clear(self.catalogEntry().getSourceType() === 'impala' ? 'invalidate' : 'cache');
+    }
+  };
+
   MetastoreViewModel.prototype.loadDatabases = function () {
     var self = this;
     if (self.loadingDatabases() && lastLoadDatabasesPromise) {
@@ -209,14 +220,15 @@ var MetastoreViewModel = (function () {
       self.loadingDatabases(false);
     });
 
-    DataCatalog.getEntry({ sourceType: self.sourceType(), path: [] }).done(function (sourceEntry) {
-      sourceEntry.getChildren().done(function (databaseEntries) {
+    DataCatalog.getEntry({ sourceType: self.sourceType(), path: [], definition: { type: 'source' } }).done(function (entry) {
+      self.catalogEntry(entry);
+      entry.getChildren().done(function (databaseEntries) {
         self.databases($.map(databaseEntries, function (databaseEntry) {
           return new MetastoreDatabase({ catalogEntry: databaseEntry, optimizerEnabled: self.optimizerEnabled });
         }));
         deferred.resolve();
       }).fail(deferred.reject);
-    }).fail(deferred.reject);
+    });
 
     return lastLoadDatabasesPromise;
   };

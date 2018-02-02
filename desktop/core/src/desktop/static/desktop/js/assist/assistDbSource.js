@@ -51,6 +51,7 @@ var AssistDbSource = (function () {
     self.apiHelper = ApiHelper.getInstance();
     self.sourceType = options.type;
     self.name = options.name;
+    self.catalogEntry;
 
     self.hasErrors = ko.observable(false);
     self.simpleStyles = ko.observable(false);
@@ -181,7 +182,8 @@ var AssistDbSource = (function () {
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
-    var dbIndex = {};
+    self.dbIndex = {};
+
     var nestedFilter = {
       querySpec: ko.observable({}),
       showTables: ko.observable(true),
@@ -203,52 +205,18 @@ var AssistDbSource = (function () {
       nestedFilter.activeEditorTables(activeTables);
     });
 
-    var updateDatabases = function (names, lastSelectedDb) {
-      dbIndex = {};
-      var hasNavMeta = false;
-      var dbPromises = [];
-      var dbs = [];
-
-      names.forEach(function (name) {
-        dbPromises.push(DataCatalog.getEntry({ sourceType: self.sourceType, path: name, definition: { type: 'database' }}).done( function (catalogEntry) {
-          hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
-          var database = new AssistDbEntry(catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
-          dbIndex[name] = database;
-          if (name === lastSelectedDb) {
-            self.selectedDatabase(database);
-            self.selectedDatabaseChanged();
-          }
-          dbs.push(database);
-        }));
-      });
-
-      $.when.apply($, dbPromises).always(function () {
-        if (!hasNavMeta) {
-          if (self.sourceType !== 'solr') {
-            DataCatalog.getEntry({ sourceType: self.sourceType, path: [], definition: { type: 'source' } })
-              .done(function (catalogEntry) { catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true }) });
-          }
-        }
-        dbs.sort(sortFunctions[self.activeSort()]);
-        self.databases(dbs);
-        self.reloading(false);
-        self.loading(false);
-        self.loaded(true);
-      });
-    };
-
     self.setDatabase = function (databaseName) {
       if (databaseName && self.selectedDatabase() && databaseName === self.selectedDatabase().catalogEntry.name) {
         return;
       }
-      if (databaseName && dbIndex[databaseName]) {
-        self.selectedDatabase(dbIndex[databaseName]);
+      if (databaseName && self.dbIndex[databaseName]) {
+        self.selectedDatabase(self.dbIndex[databaseName]);
         self.selectedDatabaseChanged();
         return;
       }
       var lastSelectedDb = self.apiHelper.getFromTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', 'default');
-      if (lastSelectedDb && dbIndex[lastSelectedDb]) {
-        self.selectedDatabase(dbIndex[lastSelectedDb]);
+      if (lastSelectedDb && self.dbIndex[lastSelectedDb]) {
+        self.selectedDatabase(self.dbIndex[lastSelectedDb]);
         self.selectedDatabaseChanged();
       } else if (self.databases().length > 0) {
         self.selectedDatabase(self.databases()[0]);
@@ -261,23 +229,48 @@ var AssistDbSource = (function () {
         return;
       }
       self.loading(true);
-      var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().catalogEntry.name : null;
+      self.hasErrors(false);
+
+      var lastSelectedDbName = self.selectedDatabase() ? self.selectedDatabase().catalogEntry.name : null;
+
       self.selectedDatabase(null);
       self.databases([]);
-      self.apiHelper.loadDatabases({
-        sourceType: self.sourceType,
-        successCallback: function(data) {
-          self.hasErrors(false);
-          updateDatabases(data, lastSelectedDb);
+
+      DataCatalog.getEntry({ sourceType: self.sourceType, path : [], definition: { type: 'source' }}).done(function (catalogEntry) {
+        self.catalogEntry = catalogEntry;
+        self.catalogEntry.getChildren().done(function (databaseEntries) {
+          self.dbIndex = {};
+          var hasNavMeta = false;
+          var dbs = [];
+
+          databaseEntries.forEach(function (catalogEntry) {
+            hasNavMeta = hasNavMeta || !!catalogEntry.navigatorMeta;
+            var database = new AssistDbEntry(catalogEntry, null, self, nestedFilter, self.i18n, self.navigationSettings);
+            self.dbIndex[catalogEntry.name] = database;
+            if (catalogEntry.name === lastSelectedDbName) {
+              self.selectedDatabase(database);
+              self.selectedDatabaseChanged();
+            }
+            dbs.push(database);
+          });
+
+          if (!hasNavMeta && self.sourceType !== 'solr') {
+            self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
+          }
+          dbs.sort(sortFunctions[self.activeSort()]);
+          self.databases(dbs);
+
           if (typeof callback === 'function') {
             callback();
           }
-        },
-        errorCallback: function() {
+        }).fail(function () {
           self.hasErrors(true);
-          updateDatabases([]);
-        },
-        database: lastSelectedDb
+        }).always(function () {
+          self.loaded(true);
+          self.loading(false);
+          self.reloading(false);
+        });
+
       });
     };
 
@@ -316,13 +309,22 @@ var AssistDbSource = (function () {
       self.invalidateOnRefresh('invalidate');
     });
 
-    huePubSub.subscribe('assist.db.refresh', function (options) {
-      if (typeof options.sourceTypes === 'undefined' || options.sourceTypes.indexOf(self.sourceType) !== -1) {
-        window.setTimeout(function () {
-          self.reload(options.allCacheTypes);
-        }, 0);
+    huePubSub.subscribe('data.catalog.entry.refreshed', function (refreshedEntry) {
+      if (self.catalogEntry === refreshedEntry) {
+        self.initDatabases();
+      } else if (refreshedEntry.getSourceType() === self.sourceType) {
+        var findAndReloadInside = function (entries) {
+          return entries.some(function (entry) {
+            if (entry.catalogEntry === refreshedEntry) {
+              entry.loadEntries();
+              return true;
+            }
+            return findAndReloadInside(entry.entries());
+          })
+        };
+        findAndReloadInside(self.databases());
       }
-    });
+    })
   }
 
   AssistDbSource.prototype.highlightInside = function (path) {
@@ -386,7 +388,9 @@ var AssistDbSource = (function () {
 
   AssistDbSource.prototype.triggerRefresh = function (data, event) {
     var self = this;
-    huePubSub.publish('assist.db.refresh', { sourceTypes: [self.sourceType], allCacheTypes: event.shiftKey });
+    if (self.catalogEntry) {
+      self.catalogEntry.clear(self.invalidateOnRefresh());
+    }
   };
 
   return AssistDbSource;

@@ -241,9 +241,9 @@ var AssistDbEntry = (function () {
     self.isSearchVisible(!self.isSearchVisible());
   };
 
-  AssistDbEntry.prototype.triggerRefresh = function (data, event) {
+  AssistDbEntry.prototype.triggerRefresh = function () {
     var self = this;
-    self.assistDbSource.triggerRefresh(data, event);
+    self.catalogEntry.clear(self.invalidateOnRefresh());
   };
 
   AssistDbEntry.prototype.highlightInside = function (path) {

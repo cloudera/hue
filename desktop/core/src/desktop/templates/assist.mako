@@ -1179,7 +1179,9 @@ from desktop.views import _ko
         });
 
         huePubSub.subscribe('assist.collections.refresh', function() {
-          huePubSub.publish('assist.db.refresh', { sourceTypes: ['solr'], allCacheTypes: false });
+          DataCatalog.getEntry({ sourceType: 'solr', path: [] }).done(function (entry) {
+            entry.clear('cache', true);
+          });
         });
 
         self.selectedSource = ko.observable(null);
