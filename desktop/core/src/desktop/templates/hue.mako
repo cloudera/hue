@@ -757,6 +757,25 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           })
         });
 
+        huePubSub.subscribe('open.importer.query', function (data) {
+          self.loadApp('importer');
+          self.getActiveAppViewModel(function (viewModel) {
+            hueUtils.waitForVariable(viewModel.createWizard, function(){
+              hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
+                viewModel.createWizard.prefill.source_type(data['source_type']);
+                viewModel.createWizard.prefill.target_type(data['target_type']);
+                viewModel.createWizard.prefill.target_path(data['target_path']);
+              });
+              hueUtils.waitForVariable(viewModel.createWizard.source.query, function(){
+                viewModel.createWizard.source.query({"id": data.id}); // TODO load in dropdown to be cleaner
+              });
+              hueUtils.waitForVariable(viewModel.createWizard.loadSampleData, function(){
+                viewModel.createWizard.loadSampleData(data);
+              });
+            });
+          })
+        });
+
         huePubSub.subscribe('resize.form.actions', function () {
           document.styleSheets[0].addRule('.form-actions','width: ' + $('.page-content').width() + 'px');
           if ($('.content-panel:visible').length > 0) {
