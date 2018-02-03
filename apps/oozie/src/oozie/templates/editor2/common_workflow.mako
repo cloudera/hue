@@ -687,7 +687,7 @@
     <!-- /ko -->
   <!-- /ko -->
   <!-- ko if: $parent.widgetType() == 'subworkflow-widget' && $parent.externalIdUrl()-->
-    <a class="pull-right pointer logs-icon" data-bind="hueLink: $parent.externalIdUrl" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon" alt="${ _('Oozie workflow icon') }"/></a>
+    <a class="pull-right pointer logs-icon" data-bind="click: function(){ huePubSub.publish('oozie.action.click', $parent); }" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon" alt="${ _('Oozie workflow icon') }"/></a>
   <!-- /ko -->
 </script>
 
