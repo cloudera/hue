@@ -740,22 +740,46 @@ var AutocompleteResults = (function () {
                 if (self.snippet.type() === 'hive' && (childEntry.isArray() || childEntry.isMap())) {
                   name += '[]';
                 }
-                if (SqlFunctions.matchesType(self.snippet.type(), types, [childEntry.getType().toUpperCase()])
-                    || SqlFunctions.matchesType(self.snippet.type(), [childEntry.getType().toUpperCase()], types)
-                    || childEntry.getType === 'column'
-                    || childEntry.isComplex()) {
+                  if (SqlFunctions.matchesType(self.snippet.type(), types, [childEntry.getType().toUpperCase()])
+                      || SqlFunctions.matchesType(self.snippet.type(), [childEntry.getType().toUpperCase()], types)
+                      || childEntry.getType === 'column'
+                      || childEntry.isComplex()) {
+                    columnSuggestions.push({
+                      value: name,
+                      meta: childEntry.getType(),
+                      table: table,
+                      category: CATEGORIES.COLUMN,
+                      popular: ko.observable(false),
+                      weightAdjust: types[0].toUpperCase() !== 'T' && types.some(function (type) { return hueUtils.equalIgnoreCase(type, childEntry.getType()) }) ? 1 : 0,
+                      hasCatalogEntry: true,
+                      details: childEntry
+                    });
+                  }
+              });
+              if (self.snippet.type() === 'hive' && (dataCatalogEntry.isArray() || dataCatalogEntry.isMap()) ) {
+                // Remove 'item' or 'value' and 'key' for Hive
+                columnSuggestions.pop();
+                if (dataCatalogEntry.isMap()) {
+                  columnSuggestions.pop();
+                }
+              }
+
+              var complexExtras = sourceMeta.value && sourceMeta.value.fields || sourceMeta.item && sourceMeta.item.fields;
+              if ((self.snippet.type() === 'impala' || self.snippet.type() === 'hive') && complexExtras) {
+                complexExtras.forEach(function (field) {
+                  var fieldType = field.type.indexOf('<') !== -1 ? field.type.substring(0, field.type.indexOf('<')) : field.type;
                   columnSuggestions.push({
-                    value: name,
-                    meta: childEntry.getType(),
+                    value: field.name,
+                    meta: fieldType,
                     table: table,
                     category: CATEGORIES.COLUMN,
                     popular: ko.observable(false),
-                    weightAdjust: types[0].toUpperCase() !== 'T' && types.some(function (type) { return hueUtils.equalIgnoreCase(type, childEntry.getType()) }) ? 1 : 0,
-                    hasCatalogEntry: true,
-                    details: childEntry
+                    weightAdjust: types[0].toUpperCase() !== 'T' && types.some(function (type) { return hueUtils.equalIgnoreCase(type, fieldType) }) ? 1 : 0,
+                    hasCatalogEntry: false,
+                    details: field
                   });
-                }
-              });
+                });
+              }
               addColumnsDeferred.resolve();
             }).fail(addColumnsDeferred.reject));
         }).fail(addColumnsDeferred.reject));
