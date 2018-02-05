@@ -1211,7 +1211,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
         onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); $root.collection.getFacetById($parent.id()).properties.enableSelection(state.selectionEnabled); },
         onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
-        onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+        onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
       <div class="clearfix"></div>
     <!-- /ko -->
   </div>
@@ -1296,7 +1296,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         }
       },
       onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
+      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); } }"
     />
     <div class="clearfix"></div>
     <!-- /ko -->
@@ -1557,7 +1557,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
                 }
               },
               onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
+              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); } }"
             />
             <div class="clearfix"></div>
           <!-- /ko -->
@@ -1571,7 +1571,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               onClick: function(d) {
                 $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
               },
-              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
+              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); } }"
             />
             <div class="clearfix"></div>
           <!-- /ko -->
@@ -1583,7 +1583,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
             onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
             onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
-            onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+            onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
             <div class="clearfix"></div>
           <!-- /ko -->
 
@@ -1599,7 +1599,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               onClick: function(d) {
                 $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
               },
-              onComplete: function(){ var widget = searchViewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
+              onComplete: function(){ var widget = searchViewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; huePubSub.publish('gridster.autoheight'); }}" />
            <!-- /ko -->
         <!-- /ko -->
 
@@ -1611,7 +1611,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             onSelectRange: function(from, to){ $root.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
             onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
             onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
-            onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+            onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
           <div class="clearfix"></div>
           <!-- /ko -->
         <!-- /ko -->
@@ -1622,7 +1622,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             transformer: rangePieChartDataTransformer,
             maxWidth: 250,
             onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
-            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
           <div class="clearfix"></div>
           <!-- /ko -->
 
@@ -1632,7 +1632,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             rangeUp: true,
             maxWidth: 250,
             onClick: function(d){ searchViewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
-            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
           <div class="clearfix"></div>
           <!-- /ko -->
 
@@ -1641,7 +1641,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             transformer: pieChartDataTransformer,
             maxWidth: 250,
             onClick: function(d){ $parent.dimension() == 2 ? $root.query.togglePivotFacet({facet: d.data.obj, widget_id: id()}) : searchViewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
-            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+            onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
           <div class="clearfix"></div>
           <!-- /ko -->
         <!-- /ko -->
@@ -1768,7 +1768,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       transformer: lineChartDataTransformer,
       onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
       onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
+      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}"
     />
     <div class="clearfix"></div>
   </div>
@@ -1790,7 +1790,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         transformer: rangePieChartDataTransformer,
         maxWidth: 250,
         onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
-        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
       <div class="clearfix"></div>
       <!-- /ko -->
       <!-- ko if: type() == 'range-up' -->
@@ -1799,7 +1799,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         rangeUp: true,
         maxWidth: 250,
         onClick: function(d){ searchViewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
-        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
       <div class="clearfix"></div>
       <!-- /ko -->
       <!-- ko if: type().indexOf('range') == -1 -->
@@ -1807,7 +1807,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         transformer: pieChartDataTransformer,
         maxWidth: 250,
         onClick: function(d){ searchViewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
-        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}" />
       <div class="clearfix"></div>
       <!-- /ko -->
     </div>
@@ -1895,7 +1895,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
-          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
+          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}"
         />
       <div class="clearfix"></div>
       <!-- /ko -->
@@ -1926,7 +1926,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
-          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
+          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}"
         />
       <div class="clearfix"></div>
       <!-- /ko -->
@@ -1994,7 +1994,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
-          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
+          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); }}"
         />
       <div class="clearfix"></div>
       <!-- /ko -->
@@ -2372,7 +2372,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
         onClick: function(d) {
           $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
         },
-        onComplete: function(){ var widget = searchViewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
+        onComplete: function(){ var widget = searchViewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; huePubSub.publish('gridster.autoheight'); } }" />
       <div class="clearfix"></div>
     </div>
   </div>
@@ -2451,7 +2451,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
     <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _ko('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
       onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: id(), 'bounds': ko.toJS(bounds, null, 2), lat: $root.collection.template.leafletmap.latitudeField(), lon: $root.collection.template.leafletmap.longitudeField()}); },
-      onComplete: function(){ var widget = searchViewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
+      onComplete: function(){ var widget = searchViewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; huePubSub.publish('gridster.autoheight'); } }">
     </div>
     <div class="clearfix"></div>
   </div>
@@ -4129,19 +4129,20 @@ $(document).ready(function () {
 
   }, 'dashboard');
 
-  function resizeGridsterWidget($el) {
-    if ($el.find('.card-widget').length > 0) {
-      $('.gridster>ul').data('gridster').resize_widget($el, $el.data('sizex'), Math.ceil($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
-    }
+  function resizeGridsterWidgets() {
+    var $gridster = $('.gridster>ul').data('gridster');
+    $('.gridster>ul>li.gs-w').each(function () {
+      var $el = $(this);
+      $gridster.resize_widget($el, parseInt($el.data('sizex')), Math.floor($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+    });
+    huePubSub.publish('gridster.clean.whitespace');
   }
 
-  huePubSub.subscribe('plotly.afterplot', function (element) {
-    resizeGridsterWidget($(element).parents('li.gs-w'));
-  }, 'dashboard');
+  huePubSub.subscribe('gridster.autoheight', resizeGridsterWidgets, 'dashboard');
 
-  huePubSub.subscribe('leaflet.afterplot', function (element) {
-    resizeGridsterWidget($(element).parents('li.gs-w'));
-  }, 'dashboard');
+  huePubSub.subscribe('plotly.afterplot', resizeGridsterWidgets, 'dashboard');
+
+  huePubSub.subscribe('leaflet.afterplot', resizeGridsterWidgets, 'dashboard');
 
   huePubSub.subscribe('gridster.remove', function (gridElement) {
     // resize the siblings to the max of the avail space
