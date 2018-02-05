@@ -669,7 +669,7 @@ from desktop.views import _ko
     <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: loading -->
-    <!-- ko hueSpinner: { spin: loading, size: 'small', inline: true } --><!-- /ko -->
+    <div class="details-comment" ><!-- ko hueSpinner: { spin: loading, size: 'small', inline: true } --><!-- /ko --></div>
     <!-- /ko -->
     <!-- ko ifnot: loading -->
     <!-- ko if: comment() -->
