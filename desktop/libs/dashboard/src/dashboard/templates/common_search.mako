@@ -4025,16 +4025,18 @@ $(document).ready(function () {
   huePubSub.subscribe('gridster.added.widget', removePreviewHolder, 'dashboard');
 
   huePubSub.subscribe('gridster.clean.whitespace', function () {
-    var maxRow = 0;
-    var $gridster = $('.gridster>ul').data('gridster');
-    searchViewModel.gridItems().forEach(function (existingWidget) {
-      var tempRow = existingWidget.row() + existingWidget.size_y();
-      if (tempRow > maxRow) {
-        maxRow = tempRow;
+    if (searchViewModel.isGridster()) {
+      var maxRow = 0;
+      var $gridster = $('.gridster>ul').data('gridster');
+      searchViewModel.gridItems().forEach(function (existingWidget) {
+        var tempRow = existingWidget.row() + existingWidget.size_y();
+        if (tempRow > maxRow) {
+          maxRow = tempRow;
+        }
+      });
+      for (var i = 0; i < maxRow; i++) {
+        $gridster.remove_empty_cells(1, i, 12, 1);
       }
-    });
-    for (var i = 0; i < maxRow; i++) {
-      $gridster.remove_empty_cells(1, i, 12, 1);
     }
   }, 'dashboard');
 
@@ -4130,12 +4132,14 @@ $(document).ready(function () {
   }, 'dashboard');
 
   function resizeGridsterWidgets() {
-    var $gridster = $('.gridster>ul').data('gridster');
-    $('.gridster>ul>li.gs-w').each(function () {
-      var $el = $(this);
-      $gridster.resize_widget($el, parseInt($el.data('sizex')), Math.floor($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
-    });
-    huePubSub.publish('gridster.clean.whitespace');
+    if (searchViewModel.isGridster()) {
+      var $gridster = $('.gridster>ul').data('gridster');
+      $('.gridster>ul>li.gs-w').each(function () {
+        var $el = $(this);
+        $gridster.resize_widget($el, parseInt($el.data('sizex')), Math.floor($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+      });
+      huePubSub.publish('gridster.clean.whitespace');
+    }
   }
 
   huePubSub.subscribe('gridster.autoheight', resizeGridsterWidgets, 'dashboard');

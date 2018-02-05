@@ -1878,8 +1878,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
 
     self.draggableHit = ko.observable(bareWidgetBuilder("Hit Count", "hit-widget", 6)); // Not used
     self.draggableFacet = ko.observable(bareWidgetBuilder("Facet", "facet-widget", 6)); // Deprecated
-    self.draggableResultset = ko.observable(bareWidgetBuilder("Grid Results", "resultset-widget", 21));
-    self.draggableHtmlResultset = ko.observable(bareWidgetBuilder("HTML Results", "html-resultset-widget", 21));
+    self.draggableResultset = ko.observable(bareWidgetBuilder("Grid Results", "resultset-widget", 16));
+    self.draggableHtmlResultset = ko.observable(bareWidgetBuilder("HTML Results", "html-resultset-widget", 16));
     self.draggableHistogram = ko.observable(bareWidgetBuilder("Histogram", "histogram-widget", 6)); // Deprecated
     self.draggableBar = ko.observable(bareWidgetBuilder("Bar Chart", "bar-widget", 6)); // Deprecated
     self.draggableMap = ko.observable(bareWidgetBuilder("Map", "map-widget", 6)); // Deprecated
