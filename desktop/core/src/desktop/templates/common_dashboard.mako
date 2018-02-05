@@ -210,7 +210,7 @@
       <h2 class="card-heading simple">
         ${ _('Empty widget') }
         <div class="inline pull-right" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
-          <a href="javascript:void(0)" class="remove-widget" data-bind="click: function(data){ huePubSub.publish('gridster.remove', data); }"><i class="fa fa-times"></i></a>
+          <a href="javascript:void(0)" class="remove-widget" data-bind="publish: { 'gridster.remove': $data }"><i class="fa fa-times"></i></a>
         </div>
       </h2>
     </div>
