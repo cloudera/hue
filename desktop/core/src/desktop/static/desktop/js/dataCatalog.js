@@ -750,12 +750,20 @@ var DataCatalog = (function () {
    *
    * @return {string}
    */
-  DataCatalogEntry.prototype.getKnownComment = function () {
+  DataCatalogEntry.prototype.getResolvedComment = function () {
     var self = this;
     if (self.navigatorMeta && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
       return self.navigatorMeta.description || self.navigatorMeta.originalDescription || ''
     }
     return self.sourceMeta && self.sourceMeta.comment || '';
+  };
+
+  DataCatalogEntry.prototype.hasResolvedComment = function () {
+    var self = this;
+    if (HAS_NAVIGATOR && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
+      return typeof self.navigatorMeta !== 'undefined';
+    }
+    return typeof self.sourceMeta !== 'undefined';
   };
 
   /**
@@ -952,7 +960,7 @@ var DataCatalog = (function () {
 
   DataCatalogEntry.prototype.getTooltip = function () {
     var self = this;
-    return self.getKnownComment() || self.getTitle();
+    return self.getResolvedComment() || self.getTitle();
   };
 
   DataCatalogEntry.prototype.getTitle = function () {
