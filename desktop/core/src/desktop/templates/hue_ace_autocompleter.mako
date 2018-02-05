@@ -668,6 +668,10 @@ from desktop.views import _ko
     <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
     <!-- /ko -->
     <!-- /ko -->
+    <!-- ko if: loading -->
+    <!-- ko hueSpinner: { spin: loading, size: 'small', inline: true } --><!-- /ko -->
+    <!-- /ko -->
+    <!-- ko ifnot: loading -->
     <!-- ko if: comment() -->
     <div class="details-comment" data-bind="html: comment"></div>
     <!-- /ko -->
@@ -676,10 +680,14 @@ from desktop.views import _ko
       ${ _('No description') }
     </div>
     <!-- /ko -->
+    <!-- /ko -->
   </script>
 
   <script type="text/javascript">
     (function () {
+
+      var COMMENT_LOAD_DELAY = 1500;
+
       function DataCatalogMiniContext (params) {
         var self = this;
         self.catalogEntry = params.catalogEntry;
@@ -687,14 +695,37 @@ from desktop.views import _ko
         self.comment = ko.observable();
         self.popularity = ko.observable();
         self.showTitle = !!params.showTitle;
+        self.loading = ko.observable(false);
 
-        // TODO: Load nav comment with 1 sec delay if not there
-        self.catalogEntry.getComment({ cacheOnly: true }).done(self.comment);
+        self.loadTimeout = -1;
+        self.activePromises = [];
+
+        if (self.catalogEntry.hasResolvedComment()) {
+          self.comment(self.catalogEntry.getResolvedComment());
+        } else {
+          self.loading(true);
+          self.loadTimeout = window.setTimeout(function () {
+            self.activePromises.push(self.catalogEntry.getComment({ silenceErrors: true }).done(self.comment).always(function () {
+              self.loading(false);
+            }));
+          }, COMMENT_LOAD_DELAY);
+        }
 
         if (self.catalogEntry.navOptPopularity && self.catalogEntry.navOptPopularity.relativePopularity) {
           self.popularity(self.catalogEntry.navOptPopularity.relativePopularity);
         }
       }
+
+      DataCatalogMiniContext.prototype.dispose = function () {
+        var self = this;
+        window.clearTimeout(self.loadTimeout);
+        while (self.activePromises.length) {
+          var promise = self.activePromises.pop();
+          if (promise.cancel) {
+            promise.cancel();
+          }
+        }
+      };
 
       ko.components.register('dataCatalogMiniContext', {
         viewModel: DataCatalogMiniContext,
