@@ -3028,11 +3028,11 @@ var EditorViewModel = (function() {
       })
     }, self.huePubSubId);
 
-    huePubSub.subscribe('data.catalog.entry.refreshed', function (catalogEntry) {
+    huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
       var notebook = self.selectedNotebook();
-      if (catalogEntry.isSource() && notebook) {
+      if (details.entry.isSource() && notebook) {
         notebook.snippets().forEach(function (snippet) {
-          if (catalogEntry.getSourceType() === snippet.type()) {
+          if (details.entry.getSourceType() === snippet.type()) {
             snippet.updateDatabases();
           }
         });

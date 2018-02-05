@@ -44,9 +44,37 @@ var DataCatalog = (function () {
     cacheEnabled = true;
   };
 
-  DataCatalog.prototype.clearStorage = function () {
+  DataCatalog.prototype.clearStorageCascade = function (rootPath) {
     var self = this;
-    return self.store.clear()
+    var deferred = $.Deferred();
+    if (rootPath.length === 0) {
+      self.entries = {};
+      self.store.clear().then(deferred.resolve).catch(deferred.reject);
+      return deferred.promise();
+    }
+
+    var keyPrefix = rootPath.join('.');
+    Object.keys(self.entries).forEach(function (key) {
+      if (key.indexOf(keyPrefix) === 0) {
+        delete self.entries[key];
+      }
+    });
+
+    var deletePromises = [];
+    var keysDeferred = $.Deferred();
+    deletePromises.push(keysDeferred.promise());
+    self.store.keys().then(function (keys) {
+      keys.forEach(function (key) {
+        if (key.indexOf(keyPrefix) === 0) {
+          var deleteDeferred = $.Deferred();
+          deletePromises.push(deleteDeferred.promise());
+          self.store.removeItem(key).then(deleteDeferred.resolve).catch(deleteDeferred.reject);
+        }
+      });
+      keysDeferred.resolve();
+    }).catch(keysDeferred.reject);
+
+    return $.when.apply($, deletePromises);
   };
 
   DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
@@ -54,7 +82,8 @@ var DataCatalog = (function () {
     if (!cacheEnabled) {
       return $.Deferred().resolve().promise();
     }
-    return self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
+    var deferred = $.Deferred();
+    self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
       version: DATA_CATALOG_VERSION,
       definition: dataCatalogEntry.definition,
       sourceMeta: dataCatalogEntry.sourceMeta,
@@ -63,7 +92,8 @@ var DataCatalog = (function () {
       navigatorMeta: dataCatalogEntry.navigatorMeta,
       navOptMeta:  dataCatalogEntry.navOptMeta,
       navOptPopularity: dataCatalogEntry.navOptPopularity,
-    });
+    }).then(deferred.resolve).catch(deferred.reject);
+    return deferred.promise();
   };
 
   /**
@@ -420,21 +450,15 @@ var DataCatalog = (function () {
       invalidatePromise = $.Deferred().resolve().promise();
     }
 
+
+
     self.reset();
-
-    var saveDeferred = $.Deferred();
-
-    if (self.isSource() && cascade) {
-      self.dataCatalog.entries = {};
-      self.dataCatalog.clearStorage().then(saveDeferred.resolve).catch(saveDeferred.reject);
-    } else {
-      self.save().then(saveDeferred.resolve).catch(saveDeferred.reject);
-    }
+    var saveDeferred = cascade ? self.dataCatalog.clearStorageCascade(self.path) : self.save();
 
     var clearPromise = $.when(invalidatePromise, saveDeferred);
 
     clearPromise.always(function () {
-      huePubSub.publish('data.catalog.entry.refreshed', self);
+      huePubSub.publish('data.catalog.entry.refreshed', { entry: self, cascade: cascade });
     });
 
     return new CancellablePromise(clearPromise, undefined, [invalidatePromise]);
