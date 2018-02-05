@@ -4310,6 +4310,7 @@ $(document).ready(function () {
   });
 
   $('#searchComponents').parents('.embeddable').droppable({
+    accept: '.draggable-widget, .draggableText',
     drop: function( event, ui ) {
       if (searchViewModel.isGridster()) {
         huePubSub.publish('dashboard.drop.on.page', {event: event, ui: ui});
