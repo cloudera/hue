@@ -1823,6 +1823,8 @@ var ApiHelper = (function () {
       url +=  (options.isView ? '?type=view' : '?type=table') + '&database=' + options.path[0] + '&name=' + options.path[1];
     } else if (options.path.length === 3) {
       url +=  '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
+    } else {
+      return new CancellablePromise($.Deferred().reject().promise());
     }
 
     var request = self.simplePost(url, {

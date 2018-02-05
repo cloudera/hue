@@ -23,7 +23,7 @@ var DataCatalog = (function () {
   var cacheEnabled = true;
 
   /**
-   * @param {String} sourceType
+   * @param {string} sourceType
    *
    * @constructor
    */
@@ -36,14 +36,25 @@ var DataCatalog = (function () {
     });
   }
 
+  /**
+   * Disables the caching for subsequent operations, mainly used for test purposes
+   */
   DataCatalog.prototype.disableCache = function () {
     cacheEnabled = false;
   };
 
+  /**
+   * Enables the cache for subsequent operations, mainly used for test purposes
+   */
   DataCatalog.prototype.enableCache = function () {
     cacheEnabled = true;
   };
 
+  /**
+   * Clears the data catalog and cache for the given path and any children thereof.
+   *
+   * @param {string[]} rootPath - The path to clear
+   */
   DataCatalog.prototype.clearStorageCascade = function (rootPath) {
     var self = this;
     var deferred = $.Deferred();
@@ -77,6 +88,11 @@ var DataCatalog = (function () {
     return $.when.apply($, deletePromises);
   };
 
+  /**
+   * Updates the cache for the given entry
+   *
+   * @param {DataCatalogEntry} dataCatalogEntry
+   */
   DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
     var self = this;
     if (!cacheEnabled) {
@@ -97,8 +113,9 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Loads Navigator Optimizer popularity for multiple tables in one go.
    *
-   * @param {object} options
+   * @param {Object} options
    * @param {string[][]} options.paths
    * @param {boolean} [options.silenceErrors] - Default true
    *
@@ -208,6 +225,12 @@ var DataCatalog = (function () {
     return new CancellablePromise(deferred.promise(), cancellablePromises);
   };
 
+  /**
+   * Helper function to fill a catalog entry with cached metadata.
+   *
+   * @param {DataCatalogEntry} dataCatalogEntry - The entry to fill
+   * @param {Object} storeEntry - The cached version
+   */
   var mergeFromStoreEntry = function (dataCatalogEntry, storeEntry) {
     var mergeAttribute = function (attributeName, ttl, promiseName) {
       if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
@@ -270,6 +293,15 @@ var DataCatalog = (function () {
     return deferred.promise();
   };
 
+  /**
+   * Wrapper function around ApiHelper calls, it will also save the entry on success.
+   *
+   * @param {string} apiHelperFunction - The name of the ApiHelper function to call
+   * @param {string} attributeName - The attribute to set
+   * @param {DataCatalogEntry} dataCatalogEntry - The catalog entry
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   */
   var fetchAndSave = function (apiHelperFunction, attributeName, dataCatalogEntry, apiOptions) {
     return ApiHelper.getInstance()[apiHelperFunction]({
       sourceType: dataCatalogEntry.getSourceType(),
@@ -278,10 +310,14 @@ var DataCatalog = (function () {
     }).done(function (data) {
       dataCatalogEntry[attributeName] = data;
       dataCatalogEntry.saveLater();
+    }).fail(function () {
+      dataCatalogEntry[attributeName] = {};
     })
   };
 
   /**
+   * Helper function to reload the source meta for the given entry
+   *
    * @param {DataCatalogEntry} dataCatalogEntry
    * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.silenceErrors]
@@ -304,6 +340,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Helper function to reload the navigator meta for the given entry
+   *
    * @param {DataCatalogEntry} dataCatalogEntry
    * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.silenceErrors] - Default true
@@ -311,7 +349,7 @@ var DataCatalog = (function () {
    * @return {CancellablePromise}
    */
   var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
-    if (HAS_NAVIGATOR && (dataCatalogEntry.getSourceType() === 'hive' || dataCatalogEntry.getSourceType() === 'impala')) {
+    if (dataCatalogEntry.canHaveNavigatorMetadata()) {
       dataCatalogEntry.navigatorMetaPromise = fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions);
     } else {
       dataCatalogEntry.navigatorMetaPromise =  $.Deferred.reject().promise();
@@ -320,6 +358,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Helper function to reload the analysis for the given entry
+   *
    * @param {DataCatalogEntry} dataCatalogEntry
    * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.silenceErrors]
@@ -333,11 +373,11 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Helper function to reload the sample for the given entry
+   *
    * @param {DataCatalogEntry} dataCatalogEntry
    * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.silenceErrors]
-   * @param {boolean} [apiOptions.cachedOnly]
-   * @param {boolean} [apiOptions.refreshCache]
    *
    * @return {CancellablePromise}
    */
@@ -347,6 +387,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Helper function to reload the nav opt metadata for the given entry
+   *
    * @param {DataCatalogEntry} dataCatalogEntry
    * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.silenceErrors] - Default true
@@ -365,7 +407,7 @@ var DataCatalog = (function () {
   /**
    * @param {DataCatalog} dataCatalog
    * @param {string|string[]} path
-   * @param {Object} definition - Initial known metadata on creation
+   * @param {Object} definition - Initial known metadata on creation (normally comes from the parent entry)
    *
    * @constructor
    */
@@ -450,8 +492,6 @@ var DataCatalog = (function () {
       invalidatePromise = $.Deferred().resolve().promise();
     }
 
-
-
     self.reset();
     var saveDeferred = cascade ? self.dataCatalog.clearStorageCascade(self.path) : self.save();
 
@@ -487,6 +527,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Get the children of the catalog entry, columns for a table entry etc.
+   *
    * @param {Object} [options]
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly]
@@ -569,6 +611,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Loads navigator metdata for children, only applicable to databases and tables
+   *
    * @param {Object} [options]
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.silenceErrors] - Default true
@@ -586,7 +630,7 @@ var DataCatalog = (function () {
       options.silenceErrors = true;
     }
 
-    if (!HAS_NAVIGATOR || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
+    if (!self.canHaveNavigatorMetadata() || self.isField()) {
       return $.Deferred().reject().promise();
     }
 
@@ -643,6 +687,13 @@ var DataCatalog = (function () {
     return self.navigatorMetaForChildrenPromise;
   };
 
+  /**
+   * Helper function used when loading navopt metdata for children
+   *
+   * @param {Object} response
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   */
   DataCatalogEntry.prototype.applyNavOptResponseToChildren = function (response, options) {
     var self = this;
     var deferred = $.Deferred();
@@ -703,6 +754,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Loads nav opt popularity for the children of this entry.
+   *
    * @param {Object} [options]
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.silenceErrors] - Default true
@@ -746,6 +799,18 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Returns true if the catalog entry can have navigator metadata
+   *
+   * @return {boolean}
+   */
+  DataCatalogEntry.prototype.canHaveNavigatorMetadata = function () {
+    var self = this;
+    return HAS_NAVIGATOR
+      && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')
+      && self.isDatabase() || self.isTableOrView() || self.isColumn();
+  };
+
+  /**
    * Returns the currently known comment without loading any additional metadata
    *
    * @return {string}
@@ -758,16 +823,23 @@ var DataCatalog = (function () {
     return self.sourceMeta && self.sourceMeta.comment || '';
   };
 
+  /**
+   * Checks whether the comment is known and has been loaded from the proper source
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.hasResolvedComment = function () {
     var self = this;
-    if (HAS_NAVIGATOR && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
+    if (self.canHaveNavigatorMetadata()) {
       return typeof self.navigatorMeta !== 'undefined';
     }
     return typeof self.sourceMeta !== 'undefined';
   };
 
   /**
-   * @param {Object|boolean} [apiOptions] -
+   * Gets the comment for this entry, fetching it if necessary from the proper source.
+   *
+   * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.silenceErrors]
    * @param {boolean} [apiOptions.cachedOnly]
    * @param {boolean} [apiOptions.refreshCache]
@@ -789,7 +861,7 @@ var DataCatalog = (function () {
       }
     };
 
-    if (HAS_NAVIGATOR && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
+    if (self.canHaveNavigatorMetadata()) {
       if (self.navigatorMeta) {
         deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
       } else {
@@ -809,6 +881,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Sets the comment in the proper source
+   *
    * @param {string} comment
    * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.silenceErrors]
@@ -821,7 +895,7 @@ var DataCatalog = (function () {
     var self = this;
     var deferred = $.Deferred();
 
-    if (HAS_NAVIGATOR && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
+    if (self.canHaveNavigatorMetadata()) {
       self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
         if (navigatorMeta) {
           ApiHelper.getInstance().updateNavigatorMetadata({
@@ -869,7 +943,7 @@ var DataCatalog = (function () {
   DataCatalogEntry.prototype.addNavigatorTags = function (tags) {
     var self = this;
     var deferred = $.Deferred();
-    if (HAS_NAVIGATOR) {
+    if (self.canHaveNavigatorMetadata()) {
       self.getNavigatorMeta().done(function (navMeta) {
         if (navMeta && typeof navMeta.identity !== 'undefined') {
         ApiHelper.getInstance().addNavTags(navMeta.identity, tags).done(function (response) {
@@ -902,7 +976,7 @@ var DataCatalog = (function () {
   DataCatalogEntry.prototype.deleteNavigatorTags = function (tags) {
     var self = this;
     var deferred = $.Deferred();
-    if (HAS_NAVIGATOR) {
+    if (self.canHaveNavigatorMetadata()) {
       self.getNavigatorMeta().done(function (navMeta) {
         if (navMeta && typeof navMeta.identity !== 'undefined') {
           ApiHelper.getInstance().deleteNavTags(navMeta.identity, tags).done(function (response) {
@@ -925,6 +999,11 @@ var DataCatalog = (function () {
     return deferred.promise();
   };
 
+  /**
+   * Checks if the entry can have children or not without fetching additional metadata.
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.hasPossibleChildren = function () {
     var self = this;
     return (self.path.length < 3) ||
@@ -933,36 +1012,71 @@ var DataCatalog = (function () {
       (self.definition && /^(?:struct|array|map)/i.test(self.definition.type));
   };
 
+  /**
+   * Returns the index representing the order in which the backend returned this entry.
+   *
+   * @return {number}
+   */
   DataCatalogEntry.prototype.getIndex = function () {
     var self = this;
     return self.definition && self.definition.index ? self.definition.index : 0;
   };
 
+  /**
+   * Returns the source type of this entry.
+   *
+   * @return {string} - 'impala', 'hive', 'solr', etc.
+   */
   DataCatalogEntry.prototype.getSourceType = function () {
     var self = this;
     return self.dataCatalog.sourceType;
-  }
+  };
 
+  /**
+   * Returns true if the entry represents a data source.
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isSource = function () {
     var self = this;
     return self.path.length === 0;
   };
 
+  /**
+   * Returns true if the entry is a database.
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isDatabase = function () {
     var self = this;
     return self.path.length === 1;
   };
 
+  /**
+   * Returns true if the entry is a table or a view.
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isTableOrView = function () {
     var self = this;
     return self.path.length === 2;
   };
 
+  /**
+   * Returns the default tooltip to use for the entry, either the comment if known or the qualified path.
+   *
+   * @return {string}
+   */
   DataCatalogEntry.prototype.getTooltip = function () {
     var self = this;
     return self.getResolvedComment() || self.getTitle();
   };
 
+  /**
+   * Returns the default title used for the entry, the qualified path with type for fields.
+   *
+   * @return {string}
+   */
   DataCatalogEntry.prototype.getTitle = function () {
     var self = this;
     var title = self.getQualifiedPath();
@@ -975,11 +1089,22 @@ var DataCatalog = (function () {
     return title;
   };
 
+  /**
+   * Returns the fully qualified path for this entry.
+   *
+   * @return {string}
+   */
   DataCatalogEntry.prototype.getQualifiedPath = function () {
     var self = this;
     return self.path.join('.');
-  }
+  };
 
+  /**
+   * Returns the display name for the entry, name or qualified path plus type for fields
+   *
+   * @param {boolean} qualified - Whether to use the qualified path or not, default false
+   * @return {string}
+   */
   DataCatalogEntry.prototype.getDisplayName = function (qualified) {
     var self = this;
     var displayName = qualified ? self.getQualifiedPath() : self.name;
@@ -992,16 +1117,33 @@ var DataCatalog = (function () {
     return displayName;
   };
 
+  /**
+   * Returns true for columns that are a primary key. Note that the definition has to come from a parent entry, i.e.
+   * getChildren().
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isPrimaryKey = function () {
     var self = this;
     return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
   };
 
+  /**
+   * Returns true if the entry is a partition key. Note that the definition has to come from a parent entry, i.e.
+   * getChildren().
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isPartitionKey = function () {
     var self = this;
     return self.definition && !!self.definition.partitionKey;
   };
 
+  /**
+   * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isTable = function () {
     var self = this;
     if (self.path.length === 2) {
@@ -1016,6 +1158,11 @@ var DataCatalog = (function () {
     return false;
   };
 
+  /**
+   * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isView = function () {
     var self = this;
     return self.path.length === 2 &&
@@ -1023,11 +1170,22 @@ var DataCatalog = (function () {
       (self.definition && self.definition.type && self.definition.type.toLowerCase() === 'view'));
   };
 
+  /**
+   * Returns true if the entry is a column.
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isColumn = function () {
     var self = this;
     return self.path.length === 3;
   };
 
+  /**
+   * Returns true if the entry is a column. It will be accurate once the source meta has been loaded or if loaded from
+   * a parent entry via getChildren().
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isComplex = function () {
     var self = this;
     return self.path.length > 2 && (
@@ -1035,28 +1193,59 @@ var DataCatalog = (function () {
       (self.definition && /^(?:struct|array|map)/i.test(self.definition.type)));
   };
 
+  /**
+   * Returns true if the entry is a field, i.e. column or child of a complex type.
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isField = function () {
     var self = this;
     return self.path.length > 2;
   };
 
+  /**
+   * Returns true if the entry is an array. It will be accurate once the source meta has been loaded or if loaded from
+   * a parent entry via getChildren().
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isArray = function () {
     var self = this;
     return (self.sourceMeta && /^array/i.test(self.sourceMeta.type)) ||
       (self.definition && /^array/i.test(self.definition.type));
   };
 
+  /**
+   * Returns true if the entry is a map. It will be accurate once the source meta has been loaded or if loaded from
+   * a parent entry via getChildren().
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isMap = function () {
     var self = this;
     return (self.sourceMeta && /^map/i.test(self.sourceMeta.type)) ||
       (self.definition && /^map/i.test(self.definition.type));
   };
 
+  /**
+   * Returns true if the entry is a map value. It will be accurate once the source meta has been loaded or if loaded
+   * from a parent entry via getChildren().
+   *
+   * @return {boolean}
+   */
   DataCatalogEntry.prototype.isMapValue = function () {
     var self = this;
     return self.definition && self.definition.isMapValue;
   };
 
+  /**
+   * Returns the type of the entry. It will be accurate once the source meta has been loaded or if loaded from
+   * a parent entry via getChildren().
+   *
+   * For complex entries the type definition is stripped to either 'array', 'map' or 'struct'
+   *
+   * @return {string}
+   */
   DataCatalogEntry.prototype.getType = function () {
     var self = this;
     var type = self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
@@ -1067,6 +1256,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Gets the source metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+   *
    * @param {Object} [options]
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly]
@@ -1086,6 +1277,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Gets the analysis for the entry. It will fetch it if not cached or if the refresh option is set.
+   *
    * @param {Object} [options]
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly]
@@ -1106,6 +1299,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Gets the Navigator metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+   *
    * @param {Object} [options]
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cachedOnly]
@@ -1135,6 +1330,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Gets the Nav Opt metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+   *
    * @param {Object} [options]
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cachedOnly]
@@ -1164,6 +1361,8 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Gets the sample for the entry. It will fetch it if not cached or if the refresh option is set.
+   *
    * @param {Object} [options]
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly]
@@ -1185,8 +1384,9 @@ var DataCatalog = (function () {
   var instances = {};
 
   /**
-   * @param {string} sourceType
+   * Helepr function to get the DataCatalog instance for a given data source.
    *
+   * @param {string} sourceType
    * @return {DataCatalog}
    */
   var getCatalog = function (sourceType) {
