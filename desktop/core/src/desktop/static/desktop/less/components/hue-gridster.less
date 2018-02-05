@@ -27,13 +27,16 @@
       background: @cui-white !important;
       overflow-x: hidden;
       overflow-y: auto;
-      .grid-left-bar {
+      h2 {
+        cursor: move;
+      }
+      .grid-left-bar, .edit-dimensions {
         opacity: 0;
         .hue-ease-transition(opacity);
       }
     }
     & > li:hover {
-      .grid-left-bar {
+      .grid-left-bar, .edit-dimensions {
         opacity: 1;
       }
     }
@@ -42,12 +45,6 @@
   & > ul.is-adding {
     & > li:hover {
       border-color: @cui-gray-100;
-    }
-  }
-
-  &:not(.disabled) {
-    h2 {
-      cursor: move;
     }
   }
 
