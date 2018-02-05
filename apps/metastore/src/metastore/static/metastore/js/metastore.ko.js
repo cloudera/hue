@@ -78,7 +78,8 @@ var MetastoreViewModel = (function () {
 
     self.loadDatabases();
 
-    huePubSub.subscribe('data.catalog.entry.refreshed', function (refreshedEntry) {
+    huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+      var refreshedEntry = details.entry;
 
       if (refreshedEntry.getSourceType() !== self.sourceType()) {
         return;

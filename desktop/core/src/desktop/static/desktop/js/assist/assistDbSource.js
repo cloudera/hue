@@ -281,13 +281,13 @@ var AssistDbSource = (function () {
       $container.find(".assist-actions, .assist-db-header-actions").css('right', -$container.scrollLeft() + 'px');
     };
 
-    huePubSub.subscribe('data.catalog.entry.refreshed', function (refreshedEntry) {
-      if (self.catalogEntry === refreshedEntry) {
+    huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+      if (self.catalogEntry === details.entry) {
         self.initDatabases();
-      } else if (refreshedEntry.getSourceType() === self.sourceType) {
+      } else if (details.entry.getSourceType() === self.sourceType) {
         var findAndReloadInside = function (entries) {
           return entries.some(function (entry) {
-            if (entry.catalogEntry === refreshedEntry) {
+            if (entry.catalogEntry === details.entry) {
               entry.loadEntries();
               return true;
             }
