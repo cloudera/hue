@@ -2621,24 +2621,49 @@ from desktop.views import _ko
                   }
 
                   dbDeferred.done(function (dbEntry) {
-                    var tableName = location.identifierChain[location.identifierChain.length - 1].name;
-                    DataCatalog.getEntry({
-                      sourceType: activeLocations.type,
-                      path: [database, tableName],
-                      definition: { type: 'table' }
-                    }).done(function (catalogEntry) {
-                      var tableEntry = new AssistDbEntry(
-                              catalogEntry,
-                              dbEntry,
-                              assistDbSource,
-                              self.filter,
-                              i18n,
-                              navigationSettings
-                      );
-                      activeTableIndex[createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase)] = tableEntry;
-                      tableQidIndex[qid] = true;
-                      updateTables = true;
-                      tableDeferred.resolve(tableEntry)
+                    dbEntry.catalogEntry.getChildren().done(function (tableEntries) {
+                      var tableName = location.identifierChain[location.identifierChain.length - 1].name;
+                      var found = tableEntries.some(function (tableEntry) {
+                        if (tableEntry.name === tableName) {
+                          var assistTableEntry = new AssistDbEntry(
+                            tableEntry,
+                            dbEntry,
+                            assistDbSource,
+                            self.filter,
+                            i18n,
+                            navigationSettings
+                          );
+                          activeTableIndex[createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase)] = assistTableEntry;
+                          tableQidIndex[qid] = true;
+                          updateTables = true;
+                          tableDeferred.resolve(assistTableEntry);
+                          return true;
+                        }
+                      });
+
+                      if (!found) {
+                        var missingEntry = new AssistDbEntry(
+                          {
+                            path: [dbEntry.catalogEntry.name, tableName],
+                            name: tableName,
+                            isTableOrView: function () { return true; },
+                            getType: function () { return 'table' },
+                            hasPossibleChildren: function () { return true; },
+                            getSourceMeta: function () { return $.Deferred().resolve({ notFound: true }).promise() },
+                            getDisplayName: function () { return dbEntry.catalogEntry.name + '.' + tableName }
+                          },
+                          dbEntry,
+                          assistDbSource,
+                          self.filter,
+                          i18n,
+                          navigationSettings
+                        );
+                        activeTableIndex[createQualifiedIdentifier(location.identifierChain, activeLocations.defaultDatabase)] = missingEntry;
+                        tableQidIndex[qid] = true;
+                        updateTables = true;
+                        missingEntry.hasErrors(true);
+                        tableDeferred.resolve(missingEntry);
+                      }
                     }).fail(tableDeferred.reject);
                   }).fail(tableDeferred.reject);
                 }
