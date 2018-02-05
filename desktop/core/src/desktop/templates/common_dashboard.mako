@@ -206,10 +206,13 @@
 <script id="widget-template-gridster${ suffix }" type="text/html">
   <li>
     <!-- ko ifnot: widget -->
-    <div class="empty-gridster-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}">
-      <div class="inline pull-right remove-empty-gridster" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
-        <a href="javascript:void(0)" data-bind="click: function(data){ huePubSub.publish('gridster.remove', data); }"><i class="fa fa-times"></i></a>
-      </div>
+    <div class="empty-gridster-widget card card-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}">
+      <h2 class="card-heading simple">
+        ${ _('Empty widget') }
+        <div class="inline pull-right" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
+          <a href="javascript:void(0)" class="remove-widget" data-bind="click: function(data){ huePubSub.publish('gridster.remove', data); }"><i class="fa fa-times"></i></a>
+        </div>
+      </h2>
     </div>
     <!-- /ko -->
   <!-- ko with: widget -->
