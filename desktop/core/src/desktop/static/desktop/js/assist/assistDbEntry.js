@@ -306,34 +306,47 @@ var AssistDbEntry = (function () {
 
     var successCallback = function(sourceMeta) {
       self.entries([]);
-      self.catalogEntry.getChildren().done(function (catalogEntries) {
-        self.hasErrors(false);
+      if (!sourceMeta.notFound) {
+        self.catalogEntry.getChildren().done(function (catalogEntries) {
+          self.hasErrors(false);
+          self.loading(false);
+          self.loaded = true;
+          if (catalogEntries.length === 0) {
+            self.entries([]);
+            return;
+          }
+          var newEntries = [];
+          catalogEntries.forEach(function (catalogEntry) {
+            newEntries.push(self.createEntry(catalogEntry));
+          });
+          if (sourceMeta.type === 'array' || sourceMeta.type === 'map') {
+            self.entries(newEntries);
+            self.entries()[0].open(true);
+          } else {
+            newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
+            self.entries(newEntries);
+          }
+
+          loadEntriesDeferred.resolve(newEntries);
+          if (typeof callback === 'function') {
+            callback();
+          }
+        }).fail(function () {
+          self.loading(false);
+          self.loaded = true;
+          self.hasErrors(true);
+        });
+
+        if (self.assistDbSource.sourceType !== 'solr') {
+          self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: self.navigationSettings.rightAssist });
+        }
+      } else {
+        self.hasErrors(true);
         self.loading(false);
         self.loaded = true;
-        if (catalogEntries.length === 0) {
-          self.entries([]);
-          return;
-        }
-        var newEntries = [];
-        catalogEntries.forEach(function (catalogEntry) {
-          newEntries.push(self.createEntry(catalogEntry));
-        });
-        if (sourceMeta.type === 'array' || sourceMeta.type === 'map') {
-          self.entries(newEntries);
-          self.entries()[0].open(true);
-        } else {
-          newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
-          self.entries(newEntries);
-        }
-
-        loadEntriesDeferred.resolve(newEntries);
         if (typeof callback === 'function') {
           callback();
         }
-      });
-
-      if (self.assistDbSource.sourceType !== 'solr') {
-        self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: self.navigationSettings.rightAssist });
       }
     };
 

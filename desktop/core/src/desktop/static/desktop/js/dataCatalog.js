@@ -478,6 +478,10 @@ var DataCatalog = (function () {
     var deferred = $.Deferred();
     self.childrenPromise = deferred.promise();
     self.getSourceMeta(apiOptions).done(function (sourceMeta) {
+      if (sourceMeta.notFound) {
+        deferred.reject();
+        return;
+      }
       var promises = [];
       var index = 0;
       var partitionKeys = {};
