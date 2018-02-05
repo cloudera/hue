@@ -3780,6 +3780,7 @@ $(document).ready(function () {
       },
     },
     draggable: {
+      handle: 'h2',
       stop: function (e, ui, $widget) {
         huePubSub.publish('gridster.clean.whitespace');
       }
