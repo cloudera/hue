@@ -487,21 +487,21 @@ var DataCatalog = (function () {
   };
 
   /**
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   * @param {boolean} [apiOptions.cachedOnly]
-   * @param {boolean} [apiOptions.refreshCache]
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.refreshCache]
    *
    * @return {Promise}
    */
-  DataCatalogEntry.prototype.getChildren = function (apiOptions) {
+  DataCatalogEntry.prototype.getChildren = function (options) {
     var self = this;
-    if (self.childrenPromise && (!apiOptions || !apiOptions.refreshCache)) {
+    if (self.childrenPromise && (!options || !options.refreshCache)) {
       return self.childrenPromise;
     }
     var deferred = $.Deferred();
     self.childrenPromise = deferred.promise();
-    self.getSourceMeta(apiOptions).done(function (sourceMeta) {
+    self.getSourceMeta(options).done(function (sourceMeta) {
       if (sourceMeta.notFound) {
         deferred.reject();
         return;
@@ -516,12 +516,14 @@ var DataCatalog = (function () {
       }
 
       var entities = sourceMeta.databases
-        || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields || sourceMeta.columns
-        || (sourceMeta.value && sourceMeta.value.fields) || (sourceMeta.item && sourceMeta.item.fields);
+        || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields || sourceMeta.columns;
+
       if (entities) {
         entities.forEach(function (entity) {
-          if (!sourceMeta.databases || ((entity || entity.name) !== '_impala_builtins')) {
-            promises.push(self.dataCatalog.getEntry({path: self.path.concat(entity.name || entity)}).done(function (catalogEntry) {
+          if (!sourceMeta.databases || ((entity.name || entity) !== '_impala_builtins')) {
+            promises.push(self.dataCatalog.getEntry({
+              path: self.path.concat(entity.name || entity)
+            }).done(function (catalogEntry) {
               if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
                 var definition = typeof entity === 'object' ? entity : {};
                 if (typeof entity !== 'object') {
@@ -544,7 +546,7 @@ var DataCatalog = (function () {
           }
         });
       }
-      if (self.getSourceType() === 'impala' && self.isComplex()) {
+      if ((self.getSourceType() === 'impala' || self.getSourceType() === 'hive') && self.isComplex()) {
         (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
           if (sourceMeta[path]) {
             promises.push(self.dataCatalog.getEntry({ path: self.path.concat(path) }).done(function (catalogEntry) {

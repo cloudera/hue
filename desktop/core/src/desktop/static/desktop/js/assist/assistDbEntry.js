@@ -202,14 +202,14 @@ var AssistDbEntry = (function () {
       type = 'collection';
     } else if (self.catalogEntry.isColumn()) {
       type = 'column';
-    } else if (self.catalogEntry.isComplex()) {
-      type = 'complex';
+    } else if (self.catalogEntry.isDatabase()) {
+      type = 'database';
     } else if (self.catalogEntry.isTable()) {
       type = 'table';
     } else if (self.catalogEntry.isView()) {
       type = 'view';
     } else {
-      type = 'database';
+      type = 'complex';
     }
 
     self.statsVisible(true);
@@ -319,7 +319,7 @@ var AssistDbEntry = (function () {
           catalogEntries.forEach(function (catalogEntry) {
             newEntries.push(self.createEntry(catalogEntry));
           });
-          if (sourceMeta.type === 'array' || sourceMeta.type === 'map') {
+          if (sourceMeta.type === 'array') {
             self.entries(newEntries);
             self.entries()[0].open(true);
           } else {
