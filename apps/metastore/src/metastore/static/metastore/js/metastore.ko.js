@@ -281,9 +281,10 @@ var MetastoreViewModel = (function () {
     var self = this;
 
     var whenLoaded = function (clearCacheOnMissing) {
-      if (databaseName === '') {
+      if (!databaseName) {
         databaseName = self.apiHelper.getFromTotalStorage('editor', 'last.selected.database') ||
             self.apiHelper.getFromTotalStorage('metastore', 'last.selected.database') || 'default';
+        clearCacheOnMissing = false;
       }
       if (self.database() && self.database().catalogEntry.name === databaseName) {
         if (callback) {
