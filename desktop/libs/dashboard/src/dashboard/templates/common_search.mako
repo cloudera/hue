@@ -3760,6 +3760,7 @@ $(document).ready(function () {
   $('.gridster>ul').gridster({
     widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
+    autogenerate_stylesheet: true,
     shift_widgets_up: false,
     shift_larger_widgets_down: false,
     collision: {
