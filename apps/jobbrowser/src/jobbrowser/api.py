@@ -33,7 +33,7 @@ import hadoop.yarn.resource_manager_api as resource_manager_api
 import hadoop.yarn.spark_history_server_api as spark_history_server_api
 
 from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.yarn_models import Application, Job as YarnJob, KilledJob as KilledYarnJob, Container, SparkJob
+from jobbrowser.yarn_models import Application, OozieYarnJob, Job as YarnJob, KilledJob as KilledYarnJob, Container, SparkJob
 
 
 LOG = logging.getLogger(__name__)
@@ -149,10 +149,14 @@ class YarnApi(JobBrowserApi):
           job = SparkJob(app, rm_api=self.resource_manager_api, hs_api=self.spark_history_server_api)
         elif app['state'] in ('KILLED', 'FAILED'):
           job = KilledYarnJob(self.resource_manager_api, app)
+        elif app['applicationType'] == 'Oozie Launcher':
+          job = OozieYarnJob(self.resource_manager_api, app)
         else:  # Job succeeded, attempt to fetch from JHS
           job = self._get_job_from_history_server(job_id)
       else:
-        if app['state'] == 'ACCEPTED':
+        if app['applicationType'] == 'Oozie Launcher':
+          job = OozieYarnJob(self.resource_manager_api, app)
+        elif app['state'] == 'ACCEPTED':
           raise ApplicationNotRunning(app_id, app)
         # The MapReduce API only returns JSON when the application is in a RUNNING state
         elif app['state'] in ('NEW', 'SUBMITTED', 'RUNNING') and app['applicationType'] == 'MAPREDUCE':

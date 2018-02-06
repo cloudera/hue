@@ -128,6 +128,10 @@ class ResourceManagerApi(object):
     params = self._get_params()
     return self._execute(self._root.get, 'cluster/apps/%(app_id)s/appattempts' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE})
 
+  def appattempts_attempt(self, app_id, attempt_id):
+    params = self._get_params()
+    return self._execute(self._root.get, 'cluster/apps/%(app_id)s/appattempts/%(attempt_id)s' % {'app_id': app_id, 'attempt_id': attempt_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE})
+
   def kill(self, app_id):
     data = {'state': 'KILLED'}
     token = None
