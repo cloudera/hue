@@ -367,7 +367,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
       <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
       <h4>${_('Preview')}</h4>
-      <!-- ko if: createWizard.source.inputFormat() == 'query' -->
+      <!-- ko if: createWizard.source.inputFormat() == 'query' && createWizard.source.sample().length == 0 -->
         ${ _('Add sample data') } <i class="fa fa-fw fa-play"></i>
       <!-- /ko -->
       <div class="card-body">
@@ -582,7 +582,7 @@ ${ assist.assistPanel() }
           <div class="card-body">
             % if ENABLE_SCALABLE_INDEXER.get():
             <div class="control-group">
-              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
+              <label class="checkbox inline-block" title="${ _('Execute a cluster job to index a large dataset.') }" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
                 <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Index with a job')}
               </label>
 
