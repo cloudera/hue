@@ -1057,6 +1057,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         huePubSub.subscribe('open.in.importer', openImporter);
 
+        huePubSub.subscribe('assist.dropzone.complete', self.dropzoneComplete);
+
         // prepend /hue to all the link on this page
         $('${ '.hue-embedded-container a[href]' if IS_EMBEDDED.get() else 'a[href]' }').each(function () {
           var link = $(this).attr('href');

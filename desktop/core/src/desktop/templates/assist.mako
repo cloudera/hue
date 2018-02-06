@@ -966,7 +966,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div class="assist-panel">
+    <div class="assist-panel" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DROPZONE_HOME_DIR, params: {dest: DROPZONE_HOME_DIR}, paramName: 'hdfs_file', onComplete: function(path){ huePubSub.publish('assist.dropzone.complete', path); } }">
       <!-- ko if: availablePanels().length > 1 -->
       <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
