@@ -4137,7 +4137,13 @@ $(document).ready(function () {
       var $gridster = $('.gridster>ul').data('gridster');
       $('.gridster>ul>li.gs-w').each(function () {
         var $el = $(this);
-        $gridster.resize_widget($el, parseInt($el.data('sizex')), Math.floor($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT));
+        var newYSize = Math.floor($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT);
+        $gridster.resize_widget($el, parseInt($el.data('sizex')), newYSize, function() {
+          var scrollableDifference = $el[0].scrollHeight - $el[0].clientHeight;
+          if (scrollableDifference > 0) {
+            $gridster.resize_widget($el, parseInt($el.data('sizex')), newYSize + Math.ceil(scrollableDifference / WIDGET_BASE_HEIGHT));
+          }
+        });
       });
       huePubSub.publish('gridster.clean.whitespace');
     }
