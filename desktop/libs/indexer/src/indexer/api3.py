@@ -28,7 +28,7 @@ from desktop.models import Document2
 from librdbms.server import dbms as rdbms
 from notebook.connectors.base import get_api, Notebook
 from notebook.decorators import api_error_handler
-from notebook.models import make_notebook
+from notebook.models import make_notebook, MockedDjangoRequest
 
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
@@ -156,7 +156,7 @@ def guess_field_types(request):
       columns = file_format.get('sampleCols')
       sample = file_format.get('sample')
     else:
-      snippet['query'] = snippet['statement'] #self._get_current_statement(db, snippet) # TODO multi statement
+      snippet['query'] = snippet['statement']
       try:
         sample = db.fetch_result(notebook, snippet, 4, start_over=True)['rows'][:4]
       except Exception, e:
@@ -170,20 +170,7 @@ def guess_field_types(request):
     format_ = {
         "sample": sample,
         "columns": columns,
-        "hs2_handle": None # HS2 there and valid? add sample
     }
-#     else:
-#       format_ = {'status': 3}
-#       sample = db.fetch_result(notebook, snippet, 4, start_over=True)
-# 
-#       format_ = {
-#           "sample": sample['rows'][:4],
-#           #"sample_cols": sample.meta,
-#           "columns": [
-#               Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-#               for col in sample.meta
-#           ]
-#       }
   elif file_format['inputFormat'] == 'rdbms':
     query_server = rdbms.get_query_server_config(server=file_format['rdbmsType'])
     db = rdbms.get(request.user, query_server=query_server)
@@ -290,16 +277,23 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   if source['inputFormat'] == 'file':
     data = fs.read(source["path"], 0, MAX_UPLOAD_SIZE)
 
+  if client.is_solr_six_or_more():
+    kwargs['processor'] = 'tolerant'
+
   try:
     if source['inputFormat'] == 'query':
-      #   elif file_format['inputFormat'] == 'hs2_handle':
+      query_id = source['query']['id'] if source['query'].get('id') else source['query']
+
+      notebook = Notebook(document=Document2.objects.document(user=user, doc_id=query_id)).get_data()
+      request = MockedDjangoRequest(user=user)
+      snippet = notebook['snippets'][0]
+
       searcher = CollectionManagerController(user)
-      columns = fields#['_uuid'] + [field['name'] for field in file_format['columns']]
-      return searcher.update_data_from_hive(index_name, columns, fetch_handle=file_format['fetch_handle'])
-      ## live HS2
-    else:      
-      if client.is_solr_six_or_more():
-        kwargs['processor'] = 'tolerant'
+      columns = [field['name'] for field in fields if field['name'] != 'hue_id']
+      fetch_handle = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over) # Assumes handle still live
+      rows = searcher.update_data_from_hive(index_name, columns, fetch_handle=fetch_handle, indexing_options=kwargs)
+      # TODO if rows == MAX_ROWS truncation warning
+    else:
       response = client.index(name=index_name, data=data, **kwargs)
       errors = [error.get('message', '') for error in response['responseHeader'].get('errors', [])]
   except Exception, e:

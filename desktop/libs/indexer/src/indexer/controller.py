@@ -268,12 +268,14 @@ class CollectionManagerController(object):
     else:
       raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)
 
-  def update_data_from_hive(self, collection_or_core_name, columns, fetch_handle):
+  def update_data_from_hive(self, collection_or_core_name, columns, fetch_handle, indexing_options=None):
     MAX_ROWS = 10000
     FETCH_BATCH = 1000
 
     row_count = 0
     has_more = True
+    if indexing_options is None:
+      indexing_options = {}
 
     client = SolrClient(self.user)
 
@@ -283,14 +285,13 @@ class CollectionManagerController(object):
         has_more = result['has_more']
 
         if result['data']:
-          kwargs = {}
           dataset = tablib.Dataset()
           dataset.append(columns)
           for i, row in enumerate(result['data']):
-            dataset.append([row_count + i] + [cell if cell else (0 if isinstance(cell, numbers.Number) else '') for cell in row])
+            dataset.append([cell if cell else (0 if isinstance(cell, numbers.Number) else '') for cell in row])
 
-          if not client.index(name=collection_or_core_name, data=dataset.csv, **kwargs):
-            raise PopupException(_('Could not update index. Check error logs for more info.'))
+          if not client.index(name=collection_or_core_name, data=dataset.csv, **indexing_options):
+            raise PopupException(_('Could not index the data. Check error logs for more info.'))
 
         row_count += len(dataset)
     except Exception, e:
