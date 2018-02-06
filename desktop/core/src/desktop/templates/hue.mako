@@ -1069,11 +1069,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         % if IS_EMBEDDED.get():
-        page.base(window.location.pathname);
-        page({ hashbang: true });
+        page.base(window.location.pathname + window.location.search);
+        page.baseSearch = window.location.search.replace('?', '');
         if (!window.location.hash) {
-          window.location.hash = '#!'
+          window.location.hash = '#!/editor?type=impala'
         }
+        page({ hashbang: true });
         % else:
         page.base('/hue');
         % endif
