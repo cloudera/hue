@@ -418,8 +418,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'job-yarn-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'IMPALA' -->
-    <div data-bind="template: { name: 'job-impala-page${ SUFFIX }', data: $root.job() }"></div>
+  <!-- ko if: type() == 'Oozie Launcher' -->
+    <div data-bind="template: { name: 'job-oozie-page${ SUFFIX }', data: $root.job() }"></div>
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'Oozie Launcher_ATTEMPT' -->
+    <div data-bind="template: { name: 'job-oozie-attempt-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
   <!-- ko if: type() == 'SPARK' -->
@@ -687,6 +691,127 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 </script>
 
+<script type="text/html" id="job-oozie-page${ SUFFIX }">
+
+  <div class="row-fluid">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span>%</li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() == 'RUNNING', 'progress-success': apiStatus() == 'SUCCEEDED', 'progress-danger': apiStatus() == 'FAILED'}, attr: {title: status}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <!-- ko if: !$root.isMini() -->
+          <li class="nav-header">${ _('State') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <!-- ko with: properties -->
+            <li class="nav-header">${ _('Start time') }</li>
+            <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
+            <li class="nav-header">${ _('Finish time') }</li>
+            <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
+            <li class="nav-header">${ _('Elapsed time') }</li>
+            <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
+          <!-- /ko -->
+          <!-- /ko -->
+        </ul>
+      </div>
+    </div>
+
+    <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
+
+      <ul class="nav nav-pills margin-top-20">
+        <li class="active"><a class="jb-logs-link" href="#job-oozie-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-oozie-page-attempts${ SUFFIX }" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-oozie-page-attempts${ SUFFIX }\']').tab('show'); }">${ _('Attempts') }</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="job-oozie-page-logs${ SUFFIX }">
+          <ul class="nav nav-tabs">
+          % for name in ['stdout', 'stderr']:
+            <li class="${ name == 'stdout' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+          % endfor
+          </ul>
+          <pre data-bind="html: logs, logScroller: logs"></pre>
+        </div>
+
+        <div class="tab-pane" id="job-oozie-page-attempts${ SUFFIX }">
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th>${_('Assigned Container Id')}</th>
+              <th>${_('Node Id')}</th>
+              <th>${_('appAttemptId')}</th>
+              <th>${_('Start Time')}</th>
+              <th>${_('Finish Time')}</th>
+              <th>${_('Node Http Address')}</th>
+              <th>${_('Blacklisted Nodes')}</th>
+              <th>${_('Nodes Blacklisted By System')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['attempts']()['task_list']">
+              <tr class="pointer" data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
+                <td data-bind="text: containerId"></td>
+                <td data-bind="text: nodeId"></td>
+                <td data-bind="text: appAttemptId"></td>
+                <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
+                <td data-bind="moment: {data: finishedTime, format: 'LLL'}"></td>
+                <td data-bind="text: nodeHttpAddress"></td>
+                <td data-bind="text: blacklistedNodes"></td>
+                <td data-bind="text: nodesBlacklistedBySystem"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</script>
+
+<script type="text/html" id="job-oozie-attempt-page${ SUFFIX }">
+
+  <div class="row-fluid">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li class="break-word"><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <!-- ko with: properties -->
+          <li class="nav-header">${ _('State') }</li>
+          <li><span data-bind="text: state"></span></li>
+          <!-- ko if: !$root.isMini() -->
+          <li class="nav-header">${ _('Finish time') }</li>
+          <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
+          <li class="nav-header">${ _('Assigned Container ID') }</li>
+          <li><span data-bind="text: assignedContainerId"></span></li>
+          <li class="nav-header">${ _('Host') }</li>
+          <li><span data-bind="text: host"></span></li>
+          <li class="nav-header">${ _('RPC Port') }</li>
+          <li><span data-bind="text: rpcPort"></span></li>
+          <li class="nav-header">${ _('Diagnostics Info') }</li>
+          <li><span data-bind="text: diagnosticsInfo"></span></li>
+          <!-- /ko -->
+          <!-- /ko -->
+        </ul>
+      </div>
+    </div>
+
+    <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    </div>
+  </div>
+
+</script>
 
 <script type="text/html" id="job-mapreduce-task-attempt-page${ SUFFIX }">
 
@@ -753,43 +878,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </div>
 
 </script>
-
-
-<script type="text/html" id="job-impala-page${ SUFFIX }">
-   <div class="row-fluid">
-    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
-      <div class="sidebar-nav">
-        <ul class="nav nav-list">
-          <li class="nav-header">${ _('Id') }</li>
-          <li class="break-word"><span data-bind="text: id"></span></li>
-          <li class="nav-header">${ _('Type') }</li>
-          <li><span data-bind="text: type"></span></li>
-          <li class="nav-header">${ _('Status') }</li>
-          <li><span data-bind="text: status"></span></li>
-          <li class="nav-header">${ _('User') }</li>
-          <li><span data-bind="text: user"></span></li>
-          <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span>%</li>
-          <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
-              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
-            </div>
-          </li>
-          <!-- ko if: !$root.isMini() -->
-          <li class="nav-header">${ _('Open Duration') }</li>
-          <li><span data-bind="text: duration().toHHMMSS()"></span></li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="text: submitted"></span></li>
-          <!-- /ko -->
-        </ul>
-      </div>
-    </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
-      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
-    </div>
-  </div>
-</script>
-
 
 <script type="text/html" id="job-spark-page${ SUFFIX }">
    <div class="row-fluid">
@@ -1863,6 +1951,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.canWrite = ko.observableDefault(job.canWrite == true);
 
       self.logs = ko.observable('');
+
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
 
@@ -2034,7 +2123,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               hueUtils.changeURL('#!id=' + vm.job().id());
             }
             var crumbs = [];
-
+            if (/^appattempt_/.test(vm.job().id())) {
+              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
+            }
             if (/^attempt_/.test(vm.job().id())) {
               crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
               crumbs.push({'id': vm.job().properties['task_id'], 'name': vm.job().properties['task_id'], 'type': 'task'});

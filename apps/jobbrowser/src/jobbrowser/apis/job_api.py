@@ -67,7 +67,7 @@ class JobApi(Api):
       return self.yarn_api
     elif appid.startswith('task_'):
       return YarnMapReduceTaskApi(self.user, appid)
-    elif appid.startswith('attempt_'):
+    elif appid.startswith('attempt_') or appid.startswith('appattempt_'):
       return YarnMapReduceTaskAttemptApi(self.user, appid)
     elif appid.find('_executor_') > 0:
       return SparkExecutorApi(self.user, appid)
@@ -147,7 +147,7 @@ class YarnApi(Api):
         'name': app['name'],
         'type': app['applicationType'],
         'status': app['status'],
-        'apiStatus': self._api_status(app['status']),
+        'apiStatus': self._api_status(app['status'], app['applicationType']),
         'user': app['user'],
         'progress': app['progress'],
         'duration': app['durationMs'],
@@ -186,6 +186,13 @@ class YarnApi(Api):
       }
       if hasattr(job, 'metrics'):
         common['metrics'] = job.metrics
+    elif app['applicationType'] == 'Oozie Launcher':
+      common['properties'] = {
+        'startTime': job.startTime,
+        'finishTime': job.finishTime,
+        'elapsedTime': job.duration,
+        'attempts': []
+      }
 
     return common
 
@@ -206,7 +213,7 @@ class YarnApi(Api):
   def logs(self, appid, app_type, log_name, is_embeddable=False):
     logs = ''
     try:
-      if app_type == 'MAPREDUCE':
+      if app_type == 'MAPREDUCE' or app_type == 'Oozie Launcher':
         if log_name == 'default':
           response = job_single_logs(MockDjangoRequest(self.user), job=appid)
           logs = json.loads(response.content).get('logs')
@@ -242,12 +249,18 @@ class YarnApi(Api):
           'executor_list': NativeYarnApi(self.user).get_job(jobid=appid).get_executors(),
           'filter_text': ''
         }
+    elif app_type == 'Oozie Launcher':
+      if app_property == 'attempts':
+        return {
+          'task_list': NativeYarnApi(self.user).get_job(jobid=appid).job_attempts['jobAttempt'],
+          'filter_text': ''
+        }
     return {}
 
-  def _api_status(self, status):
+  def _api_status(self, status, app_type=None):
     if status in ['NEW', 'NEW_SAVING', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
       return 'RUNNING'
-    elif status == 'SUCCEEDED':
+    elif status == 'SUCCEEDED' or (app_type == 'Oozie Launcher' and status == 'FINISHED'):
       return 'SUCCEEDED'
     else:
       return 'FAILED' # FAILED, KILLED
@@ -359,8 +372,9 @@ class YarnMapReduceTaskAttemptApi(Api):
 
   def __init__(self, user, app_id):
     Api.__init__(self, user)
-    self.app_id = '_'.join(app_id.replace('task_', 'application_').replace('attempt_', 'application_').split('_')[:3])
-    self.task_id = '_'.join(app_id.replace('attempt_', 'task_').split('_')[:5])
+    start = 'appattempt_' if app_id.startswith('appattempt_') else 'attempt_'
+    self.app_id = '_'.join(app_id.replace('task_', 'application_').replace(start, 'application_').split('_')[:3])
+    self.task_id = '_'.join(app_id.replace(start, 'task_').split('_')[:5])
     self.attempt_id = app_id
 
 
@@ -416,22 +430,25 @@ class YarnMapReduceTaskAttemptApi(Api):
     return {
         #"elapsedMergeTime" : task.elapsedMergeTime,
         #"shuffleFinishTime" : task.shuffleFinishTime,
-        "assignedContainerId" : task.assignedContainerId,
-        "progress" : task.progress,
-        "elapsedTime" : task.elapsedTime,
-        "state" : task.state,
+        "assignedContainerId" : task.assignedContainerId if hasattr(task, 'assignedContainerId') else task.amContainerId if hasattr(task, 'amContainerId') else '',
+        "progress" : task.progress if hasattr(task, 'progress') else '',
+        "elapsedTime" : task.elapsedTime if hasattr(task, 'elapsedTime') else '',
+        "state" : task.state if hasattr(task, 'state') else task.appAttemptState if hasattr(task, 'appAttemptState') else '',
         #"elapsedShuffleTime" : task.elapsedShuffleTime,
         #"mergeFinishTime" : task.mergeFinishTime,
-        "rack" : task.rack,
+        "rack" : task.rack if hasattr(task, 'rack') else '',
         #"elapsedReduceTime" : task.elapsedReduceTime,
-        "nodeHttpAddress" : task.nodeHttpAddress,
-        "type" : task.type + '_ATTEMPT',
-        "startTime" : task.startTime,
-        "id" : task.id,
-        "finishTime" : task.finishTime,
+        "nodeHttpAddress" : task.nodeHttpAddress if hasattr(task, 'nodeHttpAddress') else '',
+        "type" : task.type + '_ATTEMPT' if hasattr(task, 'type') else '',
+        "startTime" : task.startTime if hasattr(task, 'startTime') else '',
+        "id" : task.id if hasattr(task, 'id') else task.appAttemptId if hasattr(task, 'appAttemptId') else '',
+        "finishTime" : task.finishTime if hasattr(task, 'finishTime') else long(task.finishedTime) if hasattr(task, 'finishedTime') else '',
         "app_id": self.app_id,
         "task_id": self.task_id,
-        'apiStatus': self._api_status(task.state),
+        'apiStatus': self._api_status(task.state) if hasattr(task, 'state') else self._api_status(task.appAttemptState) if hasattr(task, 'appAttemptState') else '',
+        'host': task.host if hasattr(task, 'host') else '',
+        'rpcPort': task.rpcPort if hasattr(task, 'rpcPort') else '',
+        'diagnosticsInfo': task.diagnosticsInfo if hasattr(task, 'diagnosticsInfo') else ''
     }
 
 

@@ -179,7 +179,7 @@ def massage_job_for_json(job, request=None, user=None):
     'user': job.user,
     'isRetired': job.is_retired,
     'isMR2': job.is_mr2,
-    'progress': hasattr(job, 'progress') and job.progress or '',
+    'progress': hasattr(job, 'progress') and job.progress or 0,
     'mapProgress': hasattr(job, 'mapProgress') and job.mapProgress or '',
     'reduceProgress': hasattr(job, 'reduceProgress') and job.reduceProgress or '',
     'setupProgress': hasattr(job, 'setupProgress') and job.setupProgress or '',
@@ -348,6 +348,8 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
           log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
       elif app['state'] == 'RUNNING':
         log_link = app['amContainerLogs']
+    elif app['applicationType'] == 'Oozie Launcher':
+      log_link = app['amContainerLogs']
   except (KeyError, RestException), e:
     raise KeyError(_("Cannot find job attempt '%(id)s'.") % {'id': job.jobId}, e)
   except Exception, e:
@@ -521,10 +523,6 @@ def single_task_attempt_logs(request, job, taskid, attemptid, offset=LOG_OFFSET_
     log_tab = [i for i, log in enumerate(logs) if log]
     if log_tab:
       first_log_tab = log_tab[0]
-  except TaskTrackerNotFoundException:
-    # Four entries,
-    # for diagnostic, stdout, stderr and syslog
-    logs = [_("Failed to retrieve log. TaskTracker not found.")] * 4
   except urllib2.URLError:
     logs = [_("Failed to retrieve log. TaskTracker not ready.")] * 4
 

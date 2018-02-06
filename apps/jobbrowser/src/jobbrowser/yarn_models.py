@@ -317,6 +317,86 @@ class Job(object):
       self._job_attempts = self.api.job_attempts(self.id)['jobAttempts']
     return self._job_attempts
 
+class OozieYarnJob(Job):
+  def __init__(self, api, attrs):
+    self.api = api
+    for attr in attrs.keys():
+      if attr == 'acls':
+        # 'acls' are actually not available in the API
+        LOG.warn('Not using attribute: %s' % attrs[attr])
+      else:
+        setattr(self, attr, attrs[attr])
+
+    self._fixup()
+
+  def _fixup(self):
+    jobid = self.id
+
+    setattr(self, 'status', self.state)
+    setattr(self, 'jobName', self.name)
+    setattr(self, 'jobId', jobid)
+    setattr(self, 'jobId_short', self.jobId.replace('job_', ''))
+    setattr(self, 'is_retired', False)
+    setattr(self, 'is_mr2', True)
+    setattr(self, 'maps_percent_complete', None)
+    setattr(self, 'reduces_percent_complete', None)
+    setattr(self, 'finishedMaps', 0)
+    setattr(self, 'desiredMaps', 0)
+    setattr(self, 'finishedReduces', 0)
+    setattr(self, 'desiredReduces', 0)
+
+    if self.finishedTime == 0:
+      finishTime = int(time.time() * 1000)
+    else:
+      finishTime = self.finishedTime
+    if self.startedTime == 0:
+      durationInMillis = None
+    else:
+      durationInMillis = finishTime - self.startedTime
+
+    setattr(self, 'duration', durationInMillis)
+    setattr(self, 'durationInMillis', durationInMillis)
+    setattr(self, 'durationFormatted', self.duration and format_duration_in_millis(self.duration))
+    setattr(self, 'finishTimeFormatted', format_unixtime_ms(finishTime))
+    setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startedTime))
+    setattr(self, 'startTimeMs', self.startTimeFormatted)
+    setattr(self, 'startTime', self.startedTime)
+    setattr(self, 'finishTime', finishTime)
+
+    try:
+      setattr(self, 'assignedContainerId', urlparse.urlsplit(self.amContainerLogs).path.split('/node/containerlogs/')[1].split('/')[0])
+    except Exception:
+      setattr(self, 'assignedContainerId', '')
+
+  def get_task(self, task_id):
+    task = YarnTask(self)
+    task.taskId = None
+    task.taskAttemptIds = [appAttempt['appAttemptId'] for appAttempt in self.job_attempts['jobAttempt']]
+    return task
+
+  def filter_tasks(self, task_types=None, task_states=None, task_text=None):
+    return [self.get_task(0)]
+
+  @property
+  def job_attempts(self):
+    if not hasattr(self, '_job_attempts'):
+      attempts = self.api.appattempts(self.id)['appAttempts']['appAttempt']
+      for attempt in attempts:
+        attempt['id'] = attempt['appAttemptId']
+      self._job_attempts = {
+        'jobAttempt': attempts
+      }
+
+    return self._job_attempts
+
+# There's are tasks for Oozie workflow so we create a dummy one.
+class YarnTask:
+  def __init__(self, job):
+    self.job = job
+
+  def get_attempt(self, attempt_id):
+    json = self.job.api.appattempts_attempt(self.job.id, attempt_id)
+    return YarnOozieAttempt(self, json)
 
 class KilledJob(Job):
 
@@ -445,7 +525,7 @@ class Attempt:
     log_link = attempt['logsLink']
 
     # Generate actual task log link from logsLink url
-    if self.task.job.status in ('NEW', 'SUBMITTED', 'RUNNING'):
+    if self.task.job.status in ('NEW', 'SUBMITTED', 'RUNNING') or self.type == 'Oozie Launcher':
       logs_path = '/node/containerlogs/'
       node_url, tracking_path = log_link.split(logs_path)
       container_id, user = tracking_path.strip('/').split('/')
@@ -483,9 +563,13 @@ class Attempt:
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
-      params = {
-        'doAs': user
-      }
+      if self.type == 'Oozie Launcher' and not self.task.job.status == 'FINISHED': # Yarn currently dumps with 500 error with doas in running state
+        params = {}
+      else:
+        params = {
+          'doAs': user
+        }
+
       if int(offset) != 0:
         params['start'] = offset
       else:
@@ -511,6 +595,19 @@ class Attempt:
 
     return logs + [''] * (3 - len(logs))
 
+class YarnOozieAttempt(Attempt):
+  def __init__(self, task, attrs):
+    self.task = task
+    if attrs:
+      for key, value in attrs.iteritems():
+        setattr(self, key, value)
+    self.is_mr2 = True
+    self._fixup()
+
+  def _fixup(self):
+    setattr(self, 'diagnostics', self.diagnosticsInfo)
+    setattr(self, 'type', 'Oozie Launcher')
+    setattr(self, 'id', self.appAttemptId)
 
 class Container:
 
