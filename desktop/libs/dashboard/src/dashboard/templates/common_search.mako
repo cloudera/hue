@@ -3806,6 +3806,7 @@ $(document).ready(function () {
     var $huePreviewHolder = $('.hue-preview-holder');
     if (coords.row > 0 && coords.col > 0 && coords.col < 13) {
       var overlaps = false;
+      var isEmptyWidget = false;
       $('li.gs-w').each(function () {
         var dimensions = {
           col: parseInt($(this).attr('data-immutable-col')),
@@ -3814,7 +3815,7 @@ $(document).ready(function () {
           sizey: parseInt($(this).attr('data-immutable-sizey'))
         }
         var $widget = $(this);
-        var isEmptyWidget = $widget.children('.empty-gridster-widget').length > 0;
+        isEmptyWidget = $widget.children('.empty-gridster-widget').length > 0;
         if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey) {
           overlaps = true;
           if (!isEmptyWidget) {
@@ -3960,6 +3961,9 @@ $(document).ready(function () {
           $huePreviewHolder.removeAttr('data-widgetrow');
           $huePreviewHolder.removeAttr('data-widgetcol');
         }
+        if (isEmptyWidget) {
+          $huePreviewHolder.hide();
+        }
       }
       else {
         $huePreviewHolder.hide();
@@ -4074,34 +4078,36 @@ $(document).ready(function () {
 
     if (searchViewModel.columns().length > 0) {
 
-      if (dimensions.overlap === 'N') {
-        dimensions.row = dimensions.widgetRow;
-      }
-      else if (dimensions.overlap !== 'S') {
-        var collindingWidgets = [];
-        searchViewModel.gridItems().forEach(function (existingWidget) {
-          var existingWidgetRow = parseInt($(existingWidget.gridsterElement).attr('data-row'));
-          if (existingWidgetRow === dimensions.widgetRow) {
-            collindingWidgets.push(existingWidget);
-          }
-        });
+      if (typeof dimensions.overlap !== 'undefined') {
+        if (dimensions.overlap === 'N') {
+          dimensions.row = dimensions.widgetRow;
+        }
+        else if (dimensions.overlap !== 'S') {
+          var collindingWidgets = [];
+          searchViewModel.gridItems().forEach(function (existingWidget) {
+            var existingWidgetRow = parseInt($(existingWidget.gridsterElement).attr('data-row'));
+            if (existingWidgetRow === dimensions.widgetRow) {
+              collindingWidgets.push(existingWidget);
+            }
+          });
 
-        var newOptimalWidth = Math.floor(12 / (collindingWidgets.length + 1));
-        collindingWidgets.sort(function (a, b) {
-          return a.col() > b.col()
-        });
+          var newOptimalWidth = Math.floor(12 / (collindingWidgets.length + 1));
+          collindingWidgets.sort(function (a, b) {
+            return a.col() > b.col()
+          });
 
-        // yay for Gridster starting arrays at 1
-        var droppedWidgetFauxColumn = Math.floor((dimensions.col - 1) / newOptimalWidth) + 1;
-        var adjustedDropPosition = (Math.floor((dimensions.col - 1) / newOptimalWidth) * newOptimalWidth) + 1;
-        dimensions.col = adjustedDropPosition;
-        dimensions.sizex = newOptimalWidth;
+          // yay for Gridster starting arrays at 1
+          var droppedWidgetFauxColumn = Math.floor((dimensions.col - 1) / newOptimalWidth) + 1;
+          var adjustedDropPosition = (Math.floor((dimensions.col - 1) / newOptimalWidth) * newOptimalWidth) + 1;
+          dimensions.col = adjustedDropPosition;
+          dimensions.sizex = newOptimalWidth;
 
-        var siblingCounter = 0;
-        for (var i = 1; i <= 12 / newOptimalWidth; i++) {
-          if (i !== droppedWidgetFauxColumn) {
-            resizeAndMove(collindingWidgets[siblingCounter], newOptimalWidth, ((i - 1) * newOptimalWidth) + 1)
-            siblingCounter++;
+          var siblingCounter = 0;
+          for (var i = 1; i <= 12 / newOptimalWidth; i++) {
+            if (i !== droppedWidgetFauxColumn) {
+              resizeAndMove(collindingWidgets[siblingCounter], newOptimalWidth, ((i - 1) * newOptimalWidth) + 1)
+              siblingCounter++;
+            }
           }
         }
       }
