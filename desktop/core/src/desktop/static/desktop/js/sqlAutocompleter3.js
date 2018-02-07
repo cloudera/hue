@@ -295,7 +295,7 @@ var AutocompleteResults = (function () {
     var colRefDeferred = $.Deferred();
     if (self.parseResult.colRef) {
       var colRefCallback = function (catalogEntry) {
-        self.cancellablePromises.push(catalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
+        self.cancellablePromises.push(catalogEntry.getSourceMeta({ silenceErrors: true, cancellable: true }).done(function (sourceMeta) {
           if (typeof sourceMeta.type !== 'undefined') {
             colRefDeferred.resolve(sourceMeta);
           } else {
@@ -327,7 +327,7 @@ var AutocompleteResults = (function () {
     var self = this;
     var databasesDeferred = $.Deferred();
     DataCatalog.getEntry({ sourceType: self.snippet.type(), path: [] }).done(function (entry) {
-      self.cancellablePromises.push(entry.getChildren({ silenceErrors: true }).done(function (databases) {
+      self.cancellablePromises.push(entry.getChildren({ silenceErrors: true, cancellable: true }).done(function (databases) {
         databasesDeferred.resolve(databases);
       }).fail(databasesDeferred.reject));
     }).fail(databasesDeferred.reject);
@@ -545,7 +545,7 @@ var AutocompleteResults = (function () {
         var database = suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.activeDatabase;
 
         DataCatalog.getEntry({ sourceType: self.snippet.type(), path: [ database ]}).done(function (dbEntry) {
-          self.cancellablePromises.push(dbEntry.getChildren({ silenceErrors: true }).done(function (tableEntries) {
+          self.cancellablePromises.push(dbEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (tableEntries) {
             var tableSuggestions = [];
 
             tableEntries.forEach(function (tableEntry) {
@@ -732,8 +732,8 @@ var AutocompleteResults = (function () {
       addColumnsDeferred.resolve();
     } else if (typeof table.identifierChain !== 'undefined') {
       var addColumnsFromEntry = function (dataCatalogEntry) {
-        self.cancellablePromises.push(dataCatalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
-          self.cancellablePromises.push(dataCatalogEntry.getChildren({ silenceErrors: true })
+        self.cancellablePromises.push(dataCatalogEntry.getSourceMeta({ silenceErrors: true, cancellable: true }).done(function (sourceMeta) {
+          self.cancellablePromises.push(dataCatalogEntry.getChildren({ silenceErrors: true, cancellable: true })
             .done(function (childEntries) {
               childEntries.forEach(function (childEntry) {
                 var name = SqlUtils.backTickIfNeeded(self.snippet.type(), childEntry.name);
@@ -1207,7 +1207,7 @@ var AutocompleteResults = (function () {
     });
 
     self.cancellablePromises.push(DataCatalog.getCatalog(self.snippet.type())
-      .loadNavOptPopularityForTables({ paths: paths, silenceErrors: true }).done(function (entries) {
+      .loadNavOptPopularityForTables({ paths: paths, silenceErrors: true, cancellable: true }).done(function (entries) {
         var totalColumnCount = 0;
         var matchedEntries = [];
         var prefix = suggestSpec.prefix ? (self.parseResult.lowerCase ? suggestSpec.prefix.toLowerCase() : suggestSpec.prefix) + ' ' : '';
@@ -1344,7 +1344,7 @@ var AutocompleteResults = (function () {
         && self.parseResult.suggestTables.identifierChain[0].name ? self.parseResult.suggestTables.identifierChain[0].name : self.activeDatabase;
 
       DataCatalog.getEntry({sourceType: self.snippet.type(), path: [db]}).done(function (entry) {
-        self.cancellablePromises.push(entry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function (childEntries) {
+        self.cancellablePromises.push(entry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
           var totalPopularity = 0;
           var popularityIndex = {};
           childEntries.forEach(function (childEntry) {
@@ -1381,7 +1381,14 @@ var AutocompleteResults = (function () {
     var self = this;
     var popularColumnsDeferred = $.Deferred();
     var suggestColumns = self.parseResult.suggestColumns;
-    if (HAS_OPTIMIZER && suggestColumns && suggestColumns.source !== 'undefined') {
+
+    // The columnsDeferred gets resolved synchronously when the data is cached, if not, assume there are some suggestions.
+    var hasColumnSuggestions = true;
+    columnsDeferred.done(function (columns) {
+      hasColumnSuggestions = columns.length > 0;
+    });
+
+    if (hasColumnSuggestions && HAS_OPTIMIZER && suggestColumns && suggestColumns.source !== 'undefined') {
       initLoading(self.loadingPopularColumns, popularColumnsDeferred);
 
       var paths = [];
@@ -1395,7 +1402,11 @@ var AutocompleteResults = (function () {
         }
       });
 
-      self.cancellablePromises.push(DataCatalog.getCatalog(self.snippet.type()).loadNavOptPopularityForTables({ paths: paths, silenceErrors: true }).done(function (popularEntries) {
+      self.cancellablePromises.push(DataCatalog.getCatalog(self.snippet.type()).loadNavOptPopularityForTables({
+        paths: paths,
+        silenceErrors: true,
+        cancellable: true
+      }).done(function (popularEntries) {
         var valueAttribute = '';
         switch (suggestColumns.source) {
           case 'select':
@@ -1554,7 +1565,7 @@ var AutocompleteResults = (function () {
       }
 
       DataCatalog.getEntry({ sourceType: self.snippet.type(), path: fetchedPath }).done(function (catalogEntry) {
-        self.cancellablePromises.push(catalogEntry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
+        self.cancellablePromises.push(catalogEntry.getSourceMeta({ silenceErrors: true, cancellable: true }).done(function (sourceMeta) {
           if (self.snippet.type() === 'hive'
               && typeof sourceMeta.extended_columns !== 'undefined'
               && sourceMeta.extended_columns.length === 1
@@ -1584,7 +1595,7 @@ var AutocompleteResults = (function () {
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
     if (path.length > 1 && (self.snippet.type() === 'impala' || self.snippet.type() === 'hive')) {
       DataCatalog.getEntry({sourceType: self.snippet.type(), path: []}).done(function (catalogEntry) {
-        self.cancellablePromises.push(catalogEntry.getChildren({silenceErrors: true}).done(function (databaseEntries) {
+        self.cancellablePromises.push(catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (databaseEntries) {
           var firstIsDb = databaseEntries.some(function (dbEntry) {
             return hueUtils.equalIgnoreCase(dbEntry.name, path[0]);
           });

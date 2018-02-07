@@ -113,11 +113,44 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Helper function that adds sets the silence errors option to true if not specified
+   *
+   * @param {Object} [options]
+   * @return {Object}
+   */
+  var setSilencedErrors = function (options) {
+    if (!options) {
+      options = {};
+    }
+    if (typeof options.silenceErrors === 'undefined') {
+      options.silenceErrors = true;
+    }
+    return options;
+  };
+
+  /**
+   * Helper function to apply the cancellable option to an existing or new promise
+   *
+   * @param {CancellablePromise} [promise]
+   * @param {Object} [options]
+   * @param {boolean} [options.cancellable] - Default false
+   *
+   * @return {CancellablePromise}
+   */
+  var applyCancellable = function (promise, options) {
+    if (promise && promise.preventCancel && (!options || !options.cancellable)) {
+      promise.preventCancel();
+    }
+    return promise;
+  };
+
+  /**
    * Loads Navigator Optimizer popularity for multiple tables in one go.
    *
    * @param {Object} options
    * @param {string[][]} options.paths
    * @param {boolean} [options.silenceErrors] - Default true
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
@@ -128,12 +161,7 @@ var DataCatalog = (function () {
     var popularEntries = [];
     var pathsToLoad = [];
 
-    if (!options) {
-      options = {};
-    }
-    if (typeof options.silenceErrors === 'undefined') {
-      options.silenceErrors = true;
-    }
+    var options = setSilencedErrors(options);
 
     var existingPromises = [];
     options.paths.forEach(function (path) {
@@ -145,14 +173,14 @@ var DataCatalog = (function () {
             existingDeferred.resolve();
           }).fail(existingDeferred.reject);
         } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
-          tableEntry.getChildren({silenceErrors: options.silenceErrors}).done(function (childEntries) {
+          cancellablePromises.push(tableEntry.getChildren(options).done(function (childEntries) {
             childEntries.forEach(function (childEntry) {
               if (childEntry.navOptPopularity) {
                 popularEntries.push(childEntry);
               }
             });
             existingDeferred.resolve();
-          });
+          }).fail(existingDeferred.reject));
         } else {
           pathsToLoad.push(path);
           existingDeferred.resolve();
@@ -199,11 +227,10 @@ var DataCatalog = (function () {
           Object.keys(perTable).forEach(function (path) {
             var tableDeferred = $.Deferred();
             self.getEntry({ path: path }).done(function (entry) {
-              entry.navOptPopularityForChildrenPromise = entry.applyNavOptResponseToChildren(perTable[path], options).done(function (entries) {
+              cancellablePromises.push(entry.trackedPromise('navOptPopularityForChildrenPromise', entry.applyNavOptResponseToChildren(perTable[path], options).done(function (entries) {
                 popularEntries = popularEntries.concat(entries);
                 tableDeferred.resolve();
-              }).fail(tableDeferred.resolve);
-              cancellablePromises.push(entry.navOptPopularityForChildrenPromise);
+              }).fail(tableDeferred.resolve)));
             }).fail(tableDeferred.reject);
             tablePromises.push(tableDeferred.promise());
           });
@@ -222,7 +249,7 @@ var DataCatalog = (function () {
       });
     });
 
-    return new CancellablePromise(deferred.promise(), cancellablePromises);
+    return applyCancellable(new CancellablePromise(deferred, cancellablePromises), options);
   };
 
   /**
@@ -319,24 +346,22 @@ var DataCatalog = (function () {
    * Helper function to reload the source meta for the given entry
    *
    * @param {DataCatalogEntry} dataCatalogEntry
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
    *
    * @return {CancellablePromise}
    */
-  var reloadSourceMeta = function (dataCatalogEntry, apiOptions) {
+  var reloadSourceMeta = function (dataCatalogEntry, options) {
     if (dataCatalogEntry.dataCatalog.invalidatePromise) {
       var deferred = $.Deferred();
-
       var cancellablePromises = [];
       dataCatalogEntry.dataCatalog.invalidatePromise.always(function () {
-        cancellablePromises.push(fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, apiOptions).done(deferred.resolve).fail(deferred.reject))
+        cancellablePromises.push(fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options).done(deferred.resolve).fail(deferred.reject))
       });
-      dataCatalogEntry.sourceMetaPromise = new CancellablePromise(deferred.promise(), undefined, cancellablePromises);
-    } else {
-      dataCatalogEntry.sourceMetaPromise = fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, apiOptions);
+      return dataCatalogEntry.trackedPromise('sourceMetaPromise', new CancellablePromise(deferred, undefined, cancellablePromises));
     }
-    return dataCatalogEntry.sourceMetaPromise;
+
+    return dataCatalogEntry.trackedPromise('sourceMetaPromise', fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options));
   };
 
   /**
@@ -350,10 +375,9 @@ var DataCatalog = (function () {
    */
   var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
     if (dataCatalogEntry.canHaveNavigatorMetadata()) {
-      dataCatalogEntry.navigatorMetaPromise = fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions);
-    } else {
-      dataCatalogEntry.navigatorMetaPromise =  $.Deferred.reject().promise();
+      return dataCatalogEntry.trackedPromise('navigatorMetaPromise', fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions));
     }
+    dataCatalogEntry.navigatorMetaPromise = $.Deferred().reject();
     return dataCatalogEntry.navigatorMetaPromise;
   };
 
@@ -368,8 +392,8 @@ var DataCatalog = (function () {
    * @return {CancellablePromise}
    */
   var reloadAnalysis = function (dataCatalogEntry, apiOptions) {
-    dataCatalogEntry.analysisPromise = fetchAndSave(apiOptions && apiOptions.refreshAnalysis ? 'refreshAnalysis' : 'fetchAnalysis', 'analysis', dataCatalogEntry, apiOptions);
-    return dataCatalogEntry.analysisPromise;
+    return dataCatalogEntry.trackedPromise('analysisPromise',
+      fetchAndSave(apiOptions && apiOptions.refreshAnalysis ? 'refreshAnalysis' : 'fetchAnalysis', 'analysis', dataCatalogEntry, apiOptions));
   };
 
   /**
@@ -382,8 +406,7 @@ var DataCatalog = (function () {
    * @return {CancellablePromise}
    */
   var reloadSample = function (dataCatalogEntry, apiOptions) {
-    dataCatalogEntry.samplePromise = fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions);
-    return dataCatalogEntry.samplePromise;
+    return dataCatalogEntry.trackedPromise('samplePromise', fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions));
   };
 
   /**
@@ -397,10 +420,9 @@ var DataCatalog = (function () {
    */
   var reloadNavOptMeta = function (dataCatalogEntry, apiOptions) {
     if (HAS_OPTIMIZER && (dataCatalogEntry.getSourceType() === 'hive' || dataCatalogEntry.getSourceType() === 'impala')) {
-      dataCatalogEntry.navOptMetaPromise = fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions);
-    } else {
-      dataCatalogEntry.navOptMetaPromise =  $.Deferred.reject().promise();
+      return dataCatalogEntry.trackedPromise('navOptMetaPromise', fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions));
     }
+    dataCatalogEntry.navOptMetaPromise =  $.Deferred.reject().promise();
     return dataCatalogEntry.navOptMetaPromise;
   };
 
@@ -449,6 +471,22 @@ var DataCatalog = (function () {
     self.navOptPopularityForChildrenPromise = undefined;
 
     self.childrenPromise = undefined;
+  };
+
+  /**
+   * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
+   *
+   * @param {string} promiseName - The attribute name to use
+   * @param {CancellablePromise} cancellablePromise
+   */
+  DataCatalogEntry.prototype.trackedPromise = function (promiseName, cancellablePromise) {
+    var self = this;
+    self[promiseName] = cancellablePromise;
+    return cancellablePromise.fail(function () {
+      if (cancellablePromise.cancelled) {
+        delete self[promiseName];
+      }
+    })
   };
 
   /**
@@ -535,17 +573,18 @@ var DataCatalog = (function () {
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly]
    * @param {boolean} [options.refreshCache]
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {Promise}
    */
   DataCatalogEntry.prototype.getChildren = function (options) {
     var self = this;
     if (self.childrenPromise && (!options || !options.refreshCache)) {
-      return self.childrenPromise;
+      return applyCancellable(self.childrenPromise, options);
     }
     var deferred = $.Deferred();
-    self.childrenPromise = deferred.promise();
-    self.getSourceMeta(options).done(function (sourceMeta) {
+
+    var sourceMetaPromise = self.getSourceMeta(options).done(function (sourceMeta) {
       if (sourceMeta.notFound) {
         deferred.reject();
         return;
@@ -609,35 +648,31 @@ var DataCatalog = (function () {
         deferred.resolve(Array.prototype.slice.call(arguments));
       });
     }).fail(deferred.reject);
-    return self.childrenPromise;
+
+    return applyCancellable(self.trackedPromise('childrenPromise', new CancellablePromise(deferred, undefined, [ sourceMetaPromise ])), options);
   };
 
   /**
-   * Loads navigator metdata for children, only applicable to databases and tables
+   * Loads navigator metadata for children, only applicable to databases and tables
    *
    * @param {Object} [options]
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.silenceErrors] - Default true
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
   DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function (options) {
     var self = this;
 
-    if (!options) {
-      options = {};
-    }
-
-    if (typeof options.silenceErrors === 'undefined') {
-      options.silenceErrors = true;
-    }
+    options = setSilencedErrors(options);
 
     if (!self.canHaveNavigatorMetadata() || self.isField()) {
       return $.Deferred().reject().promise();
     }
 
     if (self.navigatorMetaForChildrenPromise && (!options || !options.refreshCache)) {
-      return self.navigatorMetaForChildrenPromise;
+      return applyCancellable(self.navigatorMetaForChildrenPromise, options);
     }
 
     var deferred = $.Deferred();
@@ -685,8 +720,7 @@ var DataCatalog = (function () {
       }).fail(deferred.reject));
     }).fail(deferred.reject));
 
-    self.navigatorMetaForChildrenPromise = new CancellablePromise(deferred.promise(), null, cancellablePromises);
-    return self.navigatorMetaForChildrenPromise;
+    return applyCancellable(self.trackedPromise('navigatorMetaForChildrenPromise', new CancellablePromise(deferred, null, cancellablePromises)), options);
   };
 
   /**
@@ -694,7 +728,9 @@ var DataCatalog = (function () {
    *
    * @param {Object} response
    * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.silenceErrors] - Default false
+   *
+   * @return {CancellablePromise}
    */
   DataCatalogEntry.prototype.applyNavOptResponseToChildren = function (response, options) {
     var self = this;
@@ -705,8 +741,7 @@ var DataCatalog = (function () {
     self.definition.navOptLoaded = true;
     self.saveLater();
 
-
-    var childPromise = self.getChildren({ silenceErrors: options && options.silenceErrors }).done(function (childEntries) {
+    var childPromise = self.getChildren(options).done(function (childEntries) {
       var entriesByName = {};
       childEntries.forEach(function (childEntry) {
         entriesByName[childEntry.name.toLowerCase()] = childEntry;
@@ -752,7 +787,7 @@ var DataCatalog = (function () {
       deferred.resolve(popularEntries);
     }).fail(deferred.reject);
 
-    return new CancellablePromise(deferred.promise(), undefined, [ childPromise ]);
+    return new CancellablePromise(deferred, undefined, [ childPromise ]);
   };
 
   /**
@@ -761,23 +796,20 @@ var DataCatalog = (function () {
    * @param {Object} [options]
    * @param {boolean} [options.refreshCache]
    * @param {boolean} [options.silenceErrors] - Default true
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
   DataCatalogEntry.prototype.loadNavOptPopularityForChildren = function (options) {
     var self = this;
-    if (!options) {
-      options = {};
-    }
-    if (typeof options.silenceErrors === 'undefined') {
-      options.silenceErrors = true;
-    }
+
+    var options = setSilencedErrors(options);
 
     if (!HAS_OPTIMIZER || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
       return $.Deferred().reject().promise();
     }
     if (self.navOptPopularityForChildrenPromise && (!options || !options.refreshCache)) {
-      return self.navOptPopularityForChildrenPromise;
+      return applyCancellable(self.navOptPopularityForChildrenPromise, options);
     }
     var deferred = $.Deferred();
     var cancellablePromises = [];
@@ -796,8 +828,8 @@ var DataCatalog = (function () {
     } else {
       deferred.resolve([]);
     }
-    self.navOptPopularityForChildrenPromise = new CancellablePromise(deferred.promise(), undefined, cancellablePromises);
-    return self.navOptPopularityForChildrenPromise;
+
+    return applyCancellable(self.trackedPromise('navOptPopularityForChildrenPromise', new CancellablePromise(deferred, undefined, cancellablePromises)), options);
   };
 
   /**
@@ -841,14 +873,15 @@ var DataCatalog = (function () {
   /**
    * Gets the comment for this entry, fetching it if necessary from the proper source.
    *
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   * @param {boolean} [apiOptions.cachedOnly]
-   * @param {boolean} [apiOptions.refreshCache]
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.refreshCache]
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
-  DataCatalogEntry.prototype.getComment = function (apiOptions) {
+  DataCatalogEntry.prototype.getComment = function (options) {
     var self = this;
     var deferred = $.Deferred();
     var cancellablePromises = [];
@@ -857,7 +890,7 @@ var DataCatalog = (function () {
       if (self.sourceMeta) {
         deferred.resolve(self.sourceMeta && self.sourceMeta.comment || '');
       } else {
-        cancellablePromises.push(self.getSourceMeta(apiOptions).done(function (sourceMeta) {
+        cancellablePromises.push(self.getSourceMeta(options).done(function (sourceMeta) {
           deferred.resolve(sourceMeta && sourceMeta.comment || '');
         }).fail(deferred.reject));
       }
@@ -867,7 +900,7 @@ var DataCatalog = (function () {
       if (self.navigatorMeta) {
         deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
       } else {
-        cancellablePromises.push(self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
+        cancellablePromises.push(self.getNavigatorMeta(options).done(function (navigatorMeta) {
           if (navigatorMeta) {
             deferred.resolve(navigatorMeta.description || navigatorMeta.originalDescription || '');
           } else {
@@ -879,7 +912,7 @@ var DataCatalog = (function () {
       resolveWithSourceMeta();
     }
 
-    return new CancellablePromise(deferred.promise(), undefined, cancellablePromises);
+    return applyCancellable(new CancellablePromise(deferred, undefined, cancellablePromises), options);
   };
 
   /**
@@ -1264,18 +1297,19 @@ var DataCatalog = (function () {
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.cachedOnly]
    * @param {boolean} [options.refreshCache]
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
   DataCatalogEntry.prototype.getSourceMeta = function (options) {
     var self = this;
     if (options && options.cachedOnly) {
-      return self.sourceMetaPromise || $.Deferred().reject(false).promise();
+      return applyCancellable(self.sourceMetaPromise, options) || $.Deferred().reject(false).promise();
     }
     if (options && options.refreshCache) {
-      return reloadSourceMeta(self, options);
+      return applyCancellable(reloadSourceMeta(self, options));
     }
-    return self.sourceMetaPromise || reloadSourceMeta(self, options);
+    return applyCancellable(self.sourceMetaPromise || reloadSourceMeta(self, options), options);
   };
 
   /**
@@ -1286,18 +1320,19 @@ var DataCatalog = (function () {
    * @param {boolean} [options.cachedOnly]
    * @param {boolean} [options.refreshCache] - Clears the browser cache
    * @param {boolean} [options.refreshAnalysis] - Performs a hard refresh on the source level
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
   DataCatalogEntry.prototype.getAnalysis = function (options) {
     var self = this;
     if (options && options.cachedOnly) {
-      return self.analysisPromise || $.Deferred().reject(false).promise();
+      return applyCancellable(self.analysisPromise, options) || $.Deferred().reject(false).promise();
     }
     if (options && (options.refreshCache || options.refreshAnalysis)) {
-      return reloadAnalysis(self, options);
+      return applyCancellable(reloadAnalysis(self, options), options);
     }
-    return self.analysisPromise || reloadAnalysis(self, options);
+    return applyCancellable(self.analysisPromise || reloadAnalysis(self, options), options);
   };
 
   /**
@@ -1307,28 +1342,25 @@ var DataCatalog = (function () {
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cachedOnly]
    * @param {boolean} [options.refreshCache]
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
   DataCatalogEntry.prototype.getNavigatorMeta = function (options) {
     var self = this;
 
-    if (!options) {
-      options = {};
-    }
-    if (typeof options.silenceErrors === 'undefined') {
-      options.silenceErrors = true;
-    }
-    if (!HAS_NAVIGATOR || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
+    var options = setSilencedErrors(options);
+
+    if (!self.canHaveNavigatorMetadata()) {
       return $.Deferred().reject().promise();
     }
     if (options && options.cachedOnly) {
-      return self.navigatorMetaPromise || $.Deferred().reject(false).promise();
+      return applyCancellable(self.navigatorMetaPromise, options) || $.Deferred().reject(false).promise();
     }
     if (options && options.refreshCache) {
-      return reloadNavigatorMeta(self, options);
+      return applyCancellable(reloadNavigatorMeta(self, options), options);
     }
-    return self.navigatorMetaPromise || reloadNavigatorMeta(self, options);
+    return applyCancellable(self.navigatorMetaPromise || reloadNavigatorMeta(self, options), options)
   };
 
   /**
@@ -1338,28 +1370,25 @@ var DataCatalog = (function () {
    * @param {boolean} [options.silenceErrors] - Default true
    * @param {boolean} [options.cachedOnly]
    * @param {boolean} [options.refreshCache]
+   * @param {boolean} [options.cancellable] - Default false
    *
    * @return {CancellablePromise}
    */
   DataCatalogEntry.prototype.getNavOptMeta = function (options) {
     var self = this;
 
-    if (!options) {
-      options = {};
-    }
-    if (typeof options.silenceErrors === 'undefined') {
-      options.silenceErrors = true;
-    }
+    var options = setSilencedErrors(options);
+
     if (!self.isTableOrView() || !HAS_OPTIMIZER || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
       return $.Deferred().reject().promise();
     }
     if (options && options.cachedOnly) {
-      return self.navOptMetaPromise || $.Deferred().reject(false).promise();
+      return applyCancellable(self.navOptMetaPromise, options) || $.Deferred().reject(false).promise();
     }
     if (options && options.refreshCache) {
-      return reloadNavOptMeta(self, options);
+      return applyCancellable(reloadNavOptMeta(self, options), options);
     }
-    return self.navOptMetaPromise || reloadNavOptMeta(self, options);
+    return applyCancellable(self.navOptMetaPromise || reloadNavOptMeta(self, options), options);
   };
 
   /**
@@ -1375,18 +1404,18 @@ var DataCatalog = (function () {
   DataCatalogEntry.prototype.getSample = function (options) {
     var self = this;
     if (options && options.cachedOnly) {
-      return self.samplePromise || $.Deferred().reject(false).promise();
+      return applyCancellable(self.samplePromise, options) || $.Deferred().reject(false).promise();
     }
     if (options && options.refreshCache) {
-      return reloadSample(self, options);
+      return applyCancellable(reloadSample(self, options), options);
     }
-    return self.samplePromise || reloadSample(self, options);
+    return applyCancellable(self.samplePromise || reloadSample(self, options), options);
   };
 
   var instances = {};
 
   /**
-   * Helepr function to get the DataCatalog instance for a given data source.
+   * Helper function to get the DataCatalog instance for a given data source.
    *
    * @param {string} sourceType
    * @return {DataCatalog}
