@@ -95,7 +95,7 @@ var DataCatalog = (function () {
    */
   DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
     var self = this;
-    if (!cacheEnabled) {
+    if (!cacheEnabled || CACHEABLE_TTL.default <= 0) {
       return $.Deferred().resolve().promise();
     }
     var deferred = $.Deferred();
@@ -520,10 +520,12 @@ var DataCatalog = (function () {
    */
   DataCatalogEntry.prototype.saveLater = function () {
     var self = this;
-    window.clearTimeout(self.saveTimeout);
-    self.saveTimeout = window.setTimeout(function () {
-      self.save();
-    }, 1000);
+    if (CACHEABLE_TTL.default > 0) {
+      window.clearTimeout(self.saveTimeout);
+      self.saveTimeout = window.setTimeout(function () {
+        self.save();
+      }, 1000);
+    }
   };
 
   /**
@@ -1480,12 +1482,14 @@ var DataCatalog = (function () {
           silenceErrors: options && options.silenceErrors,
         }).done(deferred.resolve).fail(deferred.reject);
 
-        deferred.done(function (allTags) {
-          sharedDataCalogStore.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
-        })
+        if (CACHEABLE_TTL.default > 0) {
+          deferred.done(function (allTags) {
+            sharedDataCalogStore.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
+          })
+        }
       };
 
-      if (!options || !options.refreshCache) {
+      if (CACHEABLE_TTL.default > 0 && (!options || !options.refreshCache)) {
         sharedDataCalogStore.getItem('hue.dataCatalog.allNavTags').then(function (storeEntry) {
           if (storeEntry && storeEntry.version === DATA_CATALOG_VERSION && (!storeEntry.hueTimestamp || (Date.now() - storeEntry.hueTimestamp) < CACHEABLE_TTL.default)) {
             deferred.resolve(storeEntry.allTags);
