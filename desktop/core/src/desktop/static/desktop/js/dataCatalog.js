@@ -1121,6 +1121,9 @@ var DataCatalog = (function () {
         title += ' (' + type + ')';
       }
     }
+    if (self.hasResolvedComment() && self.getResolvedComment()) {
+      title += ' - ' + self.getResolvedComment();
+    }
     return title;
   };
 
