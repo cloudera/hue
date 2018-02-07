@@ -3761,8 +3761,6 @@ $(document).ready(function () {
     widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     autogenerate_stylesheet: true,
-    shift_widgets_up: false,
-    shift_larger_widgets_down: false,
     collision: {
       wait_for_mouseup: true
     },
@@ -4087,6 +4085,7 @@ $(document).ready(function () {
             collindingWidgets.push(existingWidget);
           }
         });
+
         var newOptimalWidth = Math.floor(12 / (collindingWidgets.length + 1));
         collindingWidgets.sort(function (a, b) {
           return a.col() > b.col()
@@ -4193,7 +4192,6 @@ $(document).ready(function () {
               $widget.attr('data-immutable-sizey', $widget.attr('data-sizey'));
               $widget.attr('data-immutable-col', $widget.attr('data-col'));
               $widget.attr('data-immutable-row', $widget.attr('data-row'));
-              restoreWidgetSizes();
               huePubSub.publish('gridster.clean.whitespace');
             });
           }
