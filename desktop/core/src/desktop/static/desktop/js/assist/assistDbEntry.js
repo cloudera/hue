@@ -307,7 +307,7 @@ var AssistDbEntry = (function () {
     var successCallback = function(sourceMeta) {
       self.entries([]);
       if (!sourceMeta.notFound) {
-        self.catalogEntry.getChildren().done(function (catalogEntries) {
+        self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done(function (catalogEntries) {
           self.hasErrors(false);
           self.loading(false);
           self.loaded = true;
