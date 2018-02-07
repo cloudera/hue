@@ -3816,7 +3816,8 @@ $(document).ready(function () {
           sizey: parseInt($(this).attr('data-immutable-sizey'))
         }
         var $widget = $(this);
-        if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey) {
+        var isEmptyWidget = $widget.children('.empty-gridster-widget').length;
+        if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey && !isEmptyWidget) {
           overlaps = true;
           var sidesWidth = Math.floor(dimensions.sizex / 3);
           var centerWidth = dimensions.sizex - sidesWidth * 2;
