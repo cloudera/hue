@@ -1424,42 +1424,6 @@ var DataCatalog = (function () {
     return instances[sourceType] || (instances[sourceType] = new DataCatalog(sourceType));
   };
 
-  if (typeof window.hueDebug === 'undefined') {
-    window.hueDebug = {};
-  }
-
-  window.hueDebug.fillDataCatalog = function (sourceType, path) {
-    if (!path) {
-      path = [];
-    }
-
-    var options = { silenceErrors: true };
-
-    var loadRecursive = function (entry) {
-      var deferred = $.Deferred();
-      var promises = [];
-      promises.push(entry.getSourceMeta(options));
-      promises.push(entry.getSample(options));
-      if (entry.hasPossibleChildren()) {
-        promises.push(entry.loadNavigatorMetaForChildren(options));
-        promises.push(entry.getChildren(options).done(function (childEntries) {
-          promises.push(childEntries.forEach(function (childEntry) {
-            loadRecursive(childEntry);
-          }));
-        }));
-      }
-      $.when.apply($, promises).always(deferred.resolve);
-      return deferred.promise();
-    };
-
-    var deferred = $.Deferred();
-    getCatalog(sourceType).getEntry({ path: path }).done(function (startEntry) {
-      startEntry.loadNavigatorMetaForChildren(options);
-      loadRecursive(startEntry).always(deferred.resolve);
-    });
-    return deferred.promise();
-  };
-
   huePubSub.subscribe('data.catalog.refresh.entry', function (options) {
     options.catalogEntry.clear(options.invalidate).always(function () {
       if (options.callback) {
@@ -1496,7 +1460,7 @@ var DataCatalog = (function () {
      * @param {boolean} [options.silenceErrors]
      * @param {boolean} [options.refreshCache]
      *
-     * @return {CancellablePromise}
+     * @return {Promise}
      */
     getAllNavigatorTags: function (options) {
       if (allNavigatorTagsPromise && (!options || !options.refreshCache)) {
@@ -1542,11 +1506,11 @@ var DataCatalog = (function () {
             }
             allTags[newTag]++;
           });
-          tagsToRemove.forEach(function (newTag) {
-            if (!allTags[tagsToRemove]) {
-              allTags[tagsToRemove]--;
-              if (allTags[tagsToRemove] === 0) {
-                delete allTags[tagsToRemove];
+          tagsToRemove.forEach(function (removedTag) {
+            if (!allTags[removedTag]) {
+              allTags[removedTag]--;
+              if (allTags[removedTag] === 0) {
+                delete allTags[removedTag];
               }
             }
           });
