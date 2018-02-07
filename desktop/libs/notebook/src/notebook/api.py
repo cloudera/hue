@@ -719,6 +719,7 @@ def export_result(request):
 
         response['status'] = 0
         response['id'] = notebook_id
+        response['name'] = _get_snippet_name(notebook)
         response['source_type'] = 'query'
         response['target_type'] = 'index'
         response['target_path'] = destination
