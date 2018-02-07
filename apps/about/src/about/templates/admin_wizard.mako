@@ -139,7 +139,7 @@ ${ layout.menubar(section='quick_start') }
                     </a>
                   </li>
               % endif
-              % if IS_HUE_4.get():
+              % if IS_HUE_4.get() and 'oozie' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('oozie:install_examples') }">
