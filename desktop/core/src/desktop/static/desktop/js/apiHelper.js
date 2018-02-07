@@ -56,10 +56,31 @@ var CancellablePromise = (function () {
     self.deferred = deferred;
     self.request = request;
     self.otherCancellables = otherCancellables;
+    self.cancelled = false;
+    self.cancelPrevented = false;
   }
+
+  /**
+   * A promise might be shared across multiple components in the UI, in some cases cancel is not an option and calling
+   * this will prevent that to happen.
+   *
+   * One example is autocompletion of databases while the assist is loading the database tree, closing the autocomplete
+   * results would make the assist loading fail if cancel hasn't been prevented.
+   *
+   * @returns {CancellablePromise}
+   */
+  CancellablePromise.prototype.preventCancel = function () {
+    var self = this;
+    self.cancelPrevented = true;
+    return self;
+  };
 
   CancellablePromise.prototype.cancel = function () {
     var self = this;
+    if (self.cancelPrevented) {
+      return;
+    }
+    self.cancelled = true;
     if (self.request) {
       ApiHelper.getInstance().cancelActiveRequest(self.request);
     }

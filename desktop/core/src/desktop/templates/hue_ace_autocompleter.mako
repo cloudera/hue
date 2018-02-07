@@ -705,7 +705,7 @@ from desktop.views import _ko
         } else {
           self.loading(true);
           self.loadTimeout = window.setTimeout(function () {
-            self.activePromises.push(self.catalogEntry.getComment({ silenceErrors: true }).done(self.comment).always(function () {
+            self.activePromises.push(self.catalogEntry.getComment({ silenceErrors: true, cancellable: true }).done(self.comment).always(function () {
               self.loading(false);
             }));
           }, COMMENT_LOAD_DELAY);
