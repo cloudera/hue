@@ -51,9 +51,9 @@ var ApiQueueManager = (function () {
 
 var CancellablePromise = (function () {
 
-  function CancellablePromise(promise, request, otherCancellables) {
+  function CancellablePromise(deferred, request, otherCancellables) {
     var self = this;
-    self.promise = promise;
+    self.deferred = deferred;
     self.request = request;
     self.otherCancellables = otherCancellables;
   }
@@ -63,6 +63,11 @@ var CancellablePromise = (function () {
     if (self.request) {
       ApiHelper.getInstance().cancelActiveRequest(self.request);
     }
+
+    if (self.state() === 'pending' && self.deferred.reject) {
+      self.deferred.reject();
+    }
+
     if (self.otherCancellables) {
       self.otherCancellables.forEach(function (cancellable) { if (cancellable.cancel) { cancellable.cancel() } });
     }
@@ -71,43 +76,43 @@ var CancellablePromise = (function () {
 
   CancellablePromise.prototype.then = function () {
     var self = this;
-    self.promise.then.apply(self.promise, arguments);
+    self.deferred.then.apply(self.deferred, arguments);
     return self;
   };
 
   CancellablePromise.prototype.done = function (callback) {
     var self = this;
-    self.promise.done.apply(self.promise, arguments);
+    self.deferred.done.apply(self.deferred, arguments);
     return self;
   };
 
   CancellablePromise.prototype.fail = function (callback) {
     var self = this;
-    self.promise.fail.apply(self.promise, arguments);
+    self.deferred.fail.apply(self.deferred, arguments);
     return self;
   };
 
   CancellablePromise.prototype.always = function (callback) {
     var self = this;
-    self.promise.always.apply(self.promise, arguments);
+    self.deferred.always.apply(self.deferred, arguments);
     return self;
   };
 
   CancellablePromise.prototype.pipe = function (callback) {
     var self = this;
-    self.promise.pipe.apply(self.promise, arguments);
+    self.deferred.pipe.apply(self.deferred, arguments);
     return self;
   };
 
   CancellablePromise.prototype.progress = function (callback) {
     var self = this;
-    self.promise.progress.apply(self.promise, arguments);
+    self.deferred.progress.apply(self.deferred, arguments);
     return self;
   };
 
   CancellablePromise.prototype.state = function () {
     var self = this;
-    return self.promise.state();
+    return self.deferred.state && self.deferred.state();
   };
 
   return CancellablePromise;
@@ -1561,7 +1566,7 @@ var ApiHelper = (function () {
 
       var request = self.simplePost(IMPALA_INVALIDATE_API, data, options).done(deferred.resolve).fail(deferred.reject);
 
-      return new CancellablePromise(deferred.promise(), request);
+      return new CancellablePromise(deferred, request);
     }
 
     return deferred.resolve().promise();
@@ -1615,7 +1620,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     }));
 
-    return new CancellablePromise(deferred.promise(), request);
+    return new CancellablePromise(deferred, request);
   };
 
 
@@ -1708,7 +1713,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred.promise(), request);
+    return new CancellablePromise(deferred, request);
   };
 
   /**
@@ -1766,7 +1771,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     }));
 
-    return new CancellablePromise(deferred.promise(), undefined, promises);
+    return new CancellablePromise(deferred, undefined, promises);
   };
 
   /**
@@ -1798,7 +1803,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     }).done().fail(deferred.reject);
 
-    return new CancellablePromise(deferred.promise(), request);
+    return new CancellablePromise(deferred, request);
   };
 
   /**
@@ -1824,7 +1829,7 @@ var ApiHelper = (function () {
     } else if (options.path.length === 3) {
       url +=  '?type=field&database=' + options.path[0] + '&table=' + options.path[1] + '&name=' + options.path[2];
     } else {
-      return new CancellablePromise($.Deferred().reject().promise());
+      return new CancellablePromise($.Deferred().reject());
     }
 
     var request = self.simplePost(url, {
@@ -1842,7 +1847,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred.promise(), request);
+    return new CancellablePromise(deferred, request);
   };
 
   ApiHelper.prototype.updateNavigatorMetadata = function (options) {
@@ -1880,7 +1885,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred.promise(), request);
+    return new CancellablePromise(deferred, request);
   };
 
   ApiHelper.prototype.addNavTags = function (entityId, tags) {
@@ -1935,7 +1940,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred.promise(), request);
+    return new CancellablePromise(deferred, request);
   };
 
   /**
@@ -1966,7 +1971,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred.promise(), request);
+    return new CancellablePromise(deferred, request);
   };
 
   /**
@@ -2416,7 +2421,7 @@ var ApiHelper = (function () {
       errorCallback: deferred.reject
     });
 
-    return new CancellablePromise(deferred.promise(), request);
+    return new CancellablePromise(deferred, request);
   };
 
   ApiHelper.prototype.formatSql = function (statements) {
