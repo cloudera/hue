@@ -433,26 +433,26 @@ var MetastoreTable = (function () {
         self.catalogEntry.getNavOptMeta().done(function (navOptMeta) {
           self.optimizerDetails(navOptMeta);
 
-          var topFiveIndex = {};
           var topColIndex = {};
-          for (var i = 0; i < navOptMeta.topCols.length; i++) {
-            var topCol = navOptMeta.topCols[i];
-            if (i < 5) {
-              topFiveIndex[topCol.name] = topCol;
-            }
+          navOptMeta.topCols.forEach(function (topCol) {
             topColIndex[topCol.name] = topCol;
-          }
+          });
 
           var favorites = [];
+          var nonFavorites = [];
           self.columns().forEach(function (column) {
             if (topColIndex[column.catalogEntry.name]) {
               favorites.push(column);
-            }
-            if (topColIndex[column.catalogEntry.name]) {
               column.popularity(topColIndex[column.catalogEntry.name].score);
+            } else {
+              nonFavorites.push(column);
             }
           });
-          self.favouriteColumns(favorites);
+          favorites.sort(function (colA, colB) {
+            return colB.popularity() - colA.popularity();
+          });
+
+          self.favouriteColumns(favorites.concat(nonFavorites).slice(0, 5));
         }).always(function () {
           self.loadingQueries(false);
         });
