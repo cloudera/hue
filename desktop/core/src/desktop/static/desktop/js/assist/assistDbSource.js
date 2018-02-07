@@ -238,7 +238,7 @@ var AssistDbSource = (function () {
 
       DataCatalog.getEntry({ sourceType: self.sourceType, path : [], definition: { type: 'source' }}).done(function (catalogEntry) {
         self.catalogEntry = catalogEntry;
-        self.catalogEntry.getChildren().done(function (databaseEntries) {
+        self.catalogEntry.getChildren({ silenceErrors: self.navigationSettings.rightAssist }).done(function (databaseEntries) {
           self.dbIndex = {};
           var hasNavMeta = false;
           var dbs = [];
