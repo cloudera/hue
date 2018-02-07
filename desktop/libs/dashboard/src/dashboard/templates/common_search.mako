@@ -3816,85 +3816,92 @@ $(document).ready(function () {
           sizey: parseInt($(this).attr('data-immutable-sizey'))
         }
         var $widget = $(this);
-        var isEmptyWidget = $widget.children('.empty-gridster-widget').length;
-        if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey && !isEmptyWidget) {
+        var isEmptyWidget = $widget.children('.empty-gridster-widget').length > 0;
+        if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey) {
           overlaps = true;
-          var sidesWidth = Math.floor(dimensions.sizex / 3);
-          var centerWidth = dimensions.sizex - sidesWidth * 2;
-          var sidesHeight = Math.floor(dimensions.sizey / 3);
-          var centerHeight = dimensions.sizey - sidesHeight * 2;
-          var overlapZoneSideToSide = '';
-          var overlapZoneTopDown = '';
-          if (coords.col < dimensions.col + sidesWidth) {
-            overlapZoneSideToSide = 'W';
-          }
-          else if (coords.col >= (dimensions.col + sidesWidth) && coords.col < (dimensions.col + sidesWidth + centerWidth)) {
-            overlapZoneSideToSide = '';
+          if (!isEmptyWidget) {
+            var sidesWidth = Math.floor(dimensions.sizex / 3);
+            var centerWidth = dimensions.sizex - sidesWidth * 2;
+            var sidesHeight = Math.floor(dimensions.sizey / 3);
+            var centerHeight = dimensions.sizey - sidesHeight * 2;
+            var overlapZoneSideToSide = '';
+            var overlapZoneTopDown = '';
+            if (coords.col < dimensions.col + sidesWidth) {
+              overlapZoneSideToSide = 'W';
+            }
+            else if (coords.col >= (dimensions.col + sidesWidth) && coords.col < (dimensions.col + sidesWidth + centerWidth)) {
+              overlapZoneSideToSide = '';
+            }
+            else {
+              overlapZoneSideToSide = 'E';
+            }
+
+            if (coords.row < dimensions.row + sidesHeight) {
+              overlapZoneTopDown = 'N';
+            }
+            else if (coords.row >= (dimensions.row + sidesHeight) && coords.row < (dimensions.row + sidesHeight + centerHeight)) {
+              overlapZoneTopDown = '';
+            }
+            else {
+              overlapZoneTopDown = 'S';
+            }
+
+            if (overlapZoneTopDown + overlapZoneSideToSide != overlapZone) {
+              restoreWidgetSizes();
+            }
+
+            overlapZone = overlapZoneTopDown + overlapZoneSideToSide;
+
+            if (['NW', 'W', 'SW'].indexOf(overlapZone) > -1) {
+              if (!$widget.attr('data-original-col')) {
+                $widget.attr('data-original-col', $widget.attr('data-col'));
+                $widget.attr('data-col', dimensions.col + 1);
+              }
+              $huePreviewHolder.attr('data-col', dimensions.col);
+              $huePreviewHolder.attr('data-row', dimensions.row);
+              $huePreviewHolder.attr('data-sizex', 1);
+              $huePreviewHolder.attr('data-sizey', dimensions.sizey);
+            }
+            else if (overlapZone === 'N') {
+              if (!$widget.attr('data-original-row')) {
+                $widget.attr('data-original-row', $widget.attr('data-row'));
+                $widget.attr('data-row', dimensions.row + 1);
+              }
+              $huePreviewHolder.attr('data-col', dimensions.col);
+              $huePreviewHolder.attr('data-row', dimensions.row);
+              $huePreviewHolder.attr('data-sizex', dimensions.sizex);
+              $huePreviewHolder.attr('data-sizey', 1);
+            }
+            else if (overlapZone === 'S') {
+              if (!$widget.attr('data-original-sizey')) {
+                $widget.attr('data-original-sizey', $widget.attr('data-sizey'));
+                $widget.attr('data-sizey', dimensions.sizey - 1);
+              }
+              $huePreviewHolder.attr('data-col', dimensions.col);
+              $huePreviewHolder.attr('data-row', dimensions.row + dimensions.sizey - 1);
+              $huePreviewHolder.attr('data-sizex', dimensions.sizex);
+              $huePreviewHolder.attr('data-sizey', 1);
+            }
+            else {
+              if (!$widget.attr('data-original-sizex')) {
+                $widget.attr('data-original-sizex', $widget.attr('data-sizex'));
+                $widget.attr('data-sizex', dimensions.sizex - 1);
+              }
+              $huePreviewHolder.attr('data-col', dimensions.col + dimensions.sizex - 1);
+              $huePreviewHolder.attr('data-row', dimensions.row);
+              $huePreviewHolder.attr('data-sizex', 1);
+              $huePreviewHolder.attr('data-sizey', dimensions.sizey);
+            }
+            $huePreviewHolder.attr('data-overlapzone', overlapZone);
+            $huePreviewHolder.attr('data-widgetid', $widget.attr('data-widgetid'));
+            $huePreviewHolder.attr('data-widgetrow', $widget.attr('data-immutable-row'));
+            $huePreviewHolder.attr('data-widgetcol', $widget.attr('data-immutable-col'));
+            skipRestoreOnStop = false;
           }
           else {
-            overlapZoneSideToSide = 'E';
-          }
-
-          if (coords.row < dimensions.row + sidesHeight) {
-            overlapZoneTopDown = 'N';
-          }
-          else if (coords.row >= (dimensions.row + sidesHeight) && coords.row < (dimensions.row + sidesHeight + centerHeight)) {
-            overlapZoneTopDown = '';
-          }
-          else {
-            overlapZoneTopDown = 'S';
-          }
-
-          if (overlapZoneTopDown + overlapZoneSideToSide != overlapZone) {
+            skipRestoreOnStop = true;
             restoreWidgetSizes();
           }
-
-          overlapZone = overlapZoneTopDown + overlapZoneSideToSide;
-
-          if (['NW', 'W', 'SW'].indexOf(overlapZone) > -1) {
-            if (!$widget.attr('data-original-col')) {
-              $widget.attr('data-original-col', $widget.attr('data-col'));
-              $widget.attr('data-col', dimensions.col + 1);
-            }
-            $huePreviewHolder.attr('data-col', dimensions.col);
-            $huePreviewHolder.attr('data-row', dimensions.row);
-            $huePreviewHolder.attr('data-sizex', 1);
-            $huePreviewHolder.attr('data-sizey', dimensions.sizey);
-          }
-          else if (overlapZone === 'N') {
-            if (!$widget.attr('data-original-row')) {
-              $widget.attr('data-original-row', $widget.attr('data-row'));
-              $widget.attr('data-row', dimensions.row + 1);
-            }
-            $huePreviewHolder.attr('data-col', dimensions.col);
-            $huePreviewHolder.attr('data-row', dimensions.row);
-            $huePreviewHolder.attr('data-sizex', dimensions.sizex);
-            $huePreviewHolder.attr('data-sizey', 1);
-          }
-          else if (overlapZone === 'S') {
-            if (!$widget.attr('data-original-sizey')) {
-              $widget.attr('data-original-sizey', $widget.attr('data-sizey'));
-              $widget.attr('data-sizey', dimensions.sizey - 1);
-            }
-            $huePreviewHolder.attr('data-col', dimensions.col);
-            $huePreviewHolder.attr('data-row', dimensions.row + dimensions.sizey - 1);
-            $huePreviewHolder.attr('data-sizex', dimensions.sizex);
-            $huePreviewHolder.attr('data-sizey', 1);
-          }
-          else {
-            if (!$widget.attr('data-original-sizex')) {
-              $widget.attr('data-original-sizex', $widget.attr('data-sizex'));
-              $widget.attr('data-sizex', dimensions.sizex - 1);
-            }
-            $huePreviewHolder.attr('data-col', dimensions.col + dimensions.sizex - 1);
-            $huePreviewHolder.attr('data-row', dimensions.row);
-            $huePreviewHolder.attr('data-sizex', 1);
-            $huePreviewHolder.attr('data-sizey', dimensions.sizey);
-          }
-          $huePreviewHolder.attr('data-overlapzone', overlapZone);
-          $huePreviewHolder.attr('data-widgetid', $widget.attr('data-widgetid'));
-          $huePreviewHolder.attr('data-widgetrow', $widget.attr('data-immutable-row'));
-          $huePreviewHolder.attr('data-widgetcol', $widget.attr('data-immutable-col'));
         }
       });
       if (!$('.gridster').hasClass('dragging')) {
@@ -3903,7 +3910,7 @@ $(document).ready(function () {
           restoreWidgetSizes();
 
           // find out avail space
-          var $gridster = $('.gridster ul').data('gridster');
+          var $gridster = $('.gridster>ul').data('gridster');
           var availCoords = {
             col: coords.col,
             row: coords.row,
@@ -4133,29 +4140,6 @@ $(document).ready(function () {
 
   }, 'dashboard');
 
-  function resizeGridsterWidgets() {
-    if (searchViewModel.isGridster()) {
-      var $gridster = $('.gridster>ul').data('gridster');
-      $('.gridster>ul>li.gs-w').each(function () {
-        var $el = $(this);
-        var newYSize = Math.floor($el.find('.card-widget').height() / WIDGET_BASE_HEIGHT);
-        $gridster.resize_widget($el, parseInt($el.data('sizex')), newYSize, function() {
-          var scrollableDifference = $el[0].scrollHeight - $el[0].clientHeight;
-          if (scrollableDifference > 0) {
-            $gridster.resize_widget($el, parseInt($el.data('sizex')), newYSize + Math.ceil(scrollableDifference / WIDGET_BASE_HEIGHT));
-          }
-        });
-      });
-      huePubSub.publish('gridster.clean.whitespace');
-    }
-  }
-
-  huePubSub.subscribe('gridster.autoheight', resizeGridsterWidgets, 'dashboard');
-
-  huePubSub.subscribe('plotly.afterplot', resizeGridsterWidgets, 'dashboard');
-
-  huePubSub.subscribe('leaflet.afterplot', resizeGridsterWidgets, 'dashboard');
-
   huePubSub.subscribe('gridster.remove', function (gridElement) {
     // resize the siblings to the max of the avail space
     var siblings = [];
@@ -4191,10 +4175,11 @@ $(document).ready(function () {
   huePubSub.subscribe('gridster.add.widget', function (options) {
     var widget = searchViewModel.getWidgetById(options.id);
     if (widget) {
-      var targetHeight = widget.gridsterHeight() || 6;
+      var targetHeight = widget.gridsterHeight();
+      var $gridster = $('.gridster>ul').data('gridster');
       if (options.target) {
         searchViewModel.gridItems().forEach(function (item) {
-          if (item.col() === options.target.col() && item.row() === options.target.row()) {
+          if (item.widgetId() === options.target.widgetId()) {
             if (ko.isObservable(item.widget)) {
               item.widget(widget);
             }
@@ -4202,13 +4187,20 @@ $(document).ready(function () {
               item.widget = ko.observable(widget);
             }
             item.size_y(targetHeight);
-            $('.gridster ul').data('gridster').resize_widget($(item.gridsterElement), item.size_x(), item.size_y());
-            huePubSub.publish('gridster.clean.whitespace');
+            $gridster.resize_widget($(item.gridsterElement), parseInt(item.size_x()), parseInt(item.size_y()), function () {
+              var $widget = $(item.gridsterElement);
+              $widget.attr('data-immutable-sizex', $widget.attr('data-sizex'));
+              $widget.attr('data-immutable-sizey', $widget.attr('data-sizey'));
+              $widget.attr('data-immutable-col', $widget.attr('data-col'));
+              $widget.attr('data-immutable-row', $widget.attr('data-row'));
+              restoreWidgetSizes();
+              huePubSub.publish('gridster.clean.whitespace');
+            });
           }
         });
       }
       else {
-        var newPosition = $('.gridster ul').data('gridster').next_position(12, targetHeight);
+        var newPosition = $gridster.next_position(12, targetHeight);
         searchViewModel.gridItems.push(
           ko.mapping.fromJS({
             col: newPosition.col,
@@ -4216,8 +4208,12 @@ $(document).ready(function () {
             size_x: 12,
             size_y: targetHeight,
             widget: widget,
-            callback: function (el) {
-              $('.gridster ul').data('gridster').move_widget(el, 1, 1);
+            callback: function ($el) {
+              $gridster.move_widget($el, 1, 1);
+              $el.attr('data-immutable-sizex', $widget.attr('data-sizex'));
+              $el.attr('data-immutable-sizey', $widget.attr('data-sizey'));
+              $el.attr('data-immutable-col', $widget.attr('data-col'));
+              $el.attr('data-immutable-row', $widget.attr('data-row'));
               huePubSub.publish('gridster.clean.whitespace');
             }
           })
