@@ -766,7 +766,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 viewModel.createWizard.prefill.target_path(data['target_path']);
               });
               hueUtils.waitForVariable(viewModel.createWizard.source.query, function(){
-                viewModel.createWizard.source.query({"id": data.id}); // TODO load in dropdown to be cleaner
+                viewModel.createWizard.source.query({"id": data.id, "name": data.name});
               });
               hueUtils.waitForVariable(viewModel.createWizard.loadSampleData, function(){
                 viewModel.createWizard.loadSampleData(data);

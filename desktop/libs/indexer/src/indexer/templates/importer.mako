@@ -330,7 +330,11 @@ ${ assist.assistPanel() }
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'query'">
             <label for="path" class="control-label"><div>${ _('Query') }</div>
-              <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { dependentValue: createWizard.source.draggedQuery, mappedDocument: createWizard.source.query }"></select>
+              <!-- ko if: createWizard.source.query() && createWizard.source.query().name -->
+              <span data-bind="text: createWizard.source.query().name"></span>
+              <!-- /ko -->
+              ## No dropdown for now
+              ## <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { dependentValue: createWizard.source.draggedQuery, mappedDocument: createWizard.source.query }"></select>
             </label>
           </div>
         </div>
