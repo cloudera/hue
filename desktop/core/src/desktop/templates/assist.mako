@@ -2621,7 +2621,7 @@ from desktop.views import _ko
                   }
 
                   dbDeferred.done(function (dbEntry) {
-                    dbEntry.catalogEntry.getChildren().done(function (tableEntries) {
+                    dbEntry.catalogEntry.getChildren({ silenceErrors: true }).done(function (tableEntries) {
                       var tableName = location.identifierChain[location.identifierChain.length - 1].name;
                       var found = tableEntries.some(function (tableEntry) {
                         if (tableEntry.name === tableName) {
