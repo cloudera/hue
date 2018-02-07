@@ -588,11 +588,11 @@ class TestMultipleBackendLoginNoHadoop(object):
       finish()
 
   def test_login(self):
-    response = self.c.get('/hue/accounts/login/')
+    response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_true(response.context['first_login_ever'])
 
-    response = self.c.post('/hue/accounts/login/', {
+    response = self.c.post('/accounts/login/', {
         'username': self.test_username,
         'password': "ldap1",
         'password1': "ldap1",
@@ -601,13 +601,13 @@ class TestMultipleBackendLoginNoHadoop(object):
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
 
-    response = self.c.get('/hue/accounts/login/')
+    response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
     self.c.get('/accounts/logout')
 
-    response = self.c.post('/hue/accounts/login/', {
+    response = self.c.post('/accounts/login/', {
         'username': self.test_username,
         'password': "ldap1",
         'server': "LDAP"
