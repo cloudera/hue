@@ -559,7 +559,7 @@ var MetastoreTable = (function () {
     huePubSub.publish('context.popover.show', {
       data: {
         type: 'table',
-        identifierChain: [{ name: entry.catalogEntry.name }]
+        identifierChain: [{ name: entry.database.catalogEntry.name }, { name: entry.catalogEntry.name }]
       },
       orientation: orientation || 'right',
       sourceType: entry.catalogEntry.getSourceType(),
@@ -625,7 +625,7 @@ var MetastoreColumn = (function () {
     huePubSub.publish('context.popover.show', {
       data: {
         type: 'column',
-        identifierChain: [{ name: entry.table.catalogEntry.name }, { name: entry.catalogEntry.name }]
+        identifierChain: [{ name: entry.table.database.catalogEntry.name }, { name: entry.table.catalogEntry.name }, { name: entry.catalogEntry.name }]
       },
       orientation: 'right',
       sourceType: entry.catalogEntry.getSourceType(),
