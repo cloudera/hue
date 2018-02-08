@@ -155,7 +155,7 @@ ${ components.menubar(is_embeddable) }
               <!-- ko ifnot: table.isView() -->
               <div class="show-inactive-on-hover">
               <a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil"></i></a>
-              <span data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'wysihtml5', toggle: 'manual', skipNewLines: true, toggleElement: '.toggle-editable', placement: 'left', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('Add a description...') }', inputclass: 'input-xlarge'}">
+              <span data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'textarea', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'left', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('Add a description...') }', inputclass: 'input-xlarge'}">
                 ${ _('Add a description...') }</span>
               </div>
               <!-- /ko -->
@@ -895,7 +895,7 @@ ${ components.menubar(is_embeddable) }
   <div style="position: relative;" class="show-inactive-on-hover">
     <div style="position:absolute; left: 10px; top: 2px;"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a></div>
     <div style="margin-left: 25px;" data-bind="toggleOverflow: { height: 24 }">
-      <div style="height: inherit" data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'wysihtml5', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', forcePlacement: true, placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block">
+      <div style="height: inherit" data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'textarea', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', forcePlacement: true, placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block">
         ${ _('Add a description...') }
       </div>
     </div>
