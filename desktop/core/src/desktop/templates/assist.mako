@@ -2047,9 +2047,9 @@ from desktop.views import _ko
 
           var lastFoundPanel = self.availablePanels().filter(function (panel) { return panel.type === self.lastOpenPanelType() });
 
-          // always forces the db panel to load if not the last open panel
+          // always forces the db panel to load
           var dbPanel = self.availablePanels().filter(function (panel) { return panel.type === 'sql' });
-          if (dbPanel.length > 0 && (lastFoundPanel.length === 0 || (lastFoundPanel[0] !== dbPanel[0]))) {
+          if (dbPanel.length > 0) {
             dbPanel[0].panelData.init();
           }
 
