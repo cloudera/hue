@@ -160,10 +160,10 @@ ${ components.menubar(is_embeddable) }
               </div>
               <!-- /ko -->
               <!-- ko if: table.isView() -->
-                <span data-bind="text: comment"></span>
+                <span style="white-space: pre;" data-bind="text: comment"></span>
               <!-- /ko -->
             % else:
-              <span data-bind="text: comment"></span>
+              <span style="white-space: pre;" data-bind="text: comment"></span>
             % endif
           </td>
         </tr>
@@ -431,28 +431,34 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-tables">
     <div class="row-fluid">
+      % if has_write_access:
+        <div style="position: relative;" class="show-inactive-on-hover margin-bottom-20">
+          <div style="position:absolute; left: 10px; top: 2px;"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a></div>
+          <div style="margin-left: 25px;" data-bind="toggleOverflow: { height: 24 }">
+            <div style="height: inherit" data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'textarea', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', forcePlacement: true, placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block">
+              ${ _('Add a description...') }
+            </div>
+          </div>
+        </div>
+      % else:
+        <div data-bind="text: comment, attr:{ title: comment }" class="table-description"></div>
+      %endif
+
       <!-- ko with: stats  -->
       <div class="span12 tile">
           <div class="span6 tile">
             <h4>${ _('Properties') }</h4>
-            <div title="${ _('Description') }"><i class="fa fa-fw fa-comment muted"></i>
-              <!-- ko if: $parent.comment -->
-              <span data-bind="text: comment"></span>
-              <!-- /ko -->
-              <!-- ko ifnot: $parent.comment -->
-              <i>${_('No description.')}</i>
-              <!-- /ko -->
-              <div title="${ _('Owner') }">
-                <i class="fa fa-fw fa-user muted"></i>
-                <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
-                <br/>
-                <i class="fa fa-fw fa-hdd-o muted"></i>
-                % if IS_EMBEDDED.get():
-                  <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
-                % else:
-                  <a data-bind="attr: { 'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
-                % endif
-              </div>
+            <div title="${ _('Owner') }">
+              <i class="fa fa-fw fa-user muted"></i>
+              <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
+            </div>
+            <div title="${ _('Location') }">
+              <i class="fa fa-fw fa-hdd-o muted"></i>
+              % if IS_EMBEDDED.get():
+                <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
+              % else:
+                <a data-bind="attr: { 'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
+              % endif
             </div>
           </div>
           <div class="span6 tile">
@@ -496,7 +502,7 @@ ${ components.menubar(is_embeddable) }
             <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
             <th>&nbsp;</th>
             <th width="30%">${ _('Table Name') }</th>
-            <th width="48%">${ _('Comment') }</th>
+            <th width="48%">${ _('Description') }</th>
             <!-- ko if: $root.optimizerEnabled  -->
             <th width="10%">${ _('Popularity') }</th>
             <th width="10%">${ _('Columns') }</th>
@@ -513,7 +519,7 @@ ${ components.menubar(is_embeddable) }
               <td>
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: catalogEntry.name, click: function() { $parent.setTable($data, function() { huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
-              <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="html: commentWithoutNewLines, attr: { title: hueUtils.html2text(commentWithoutNewLines()) }"></td>
+              <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="text: commentWithoutNewLines, attr: { title: hueUtils.html2text(commentWithoutNewLines()) }"></td>
               <!-- ko if: $root.optimizerEnabled -->
                 <!-- ko if: optimizerStats() -->
                 <td>
@@ -901,7 +907,7 @@ ${ components.menubar(is_embeddable) }
     </div>
   </div>
   % else:
-    <div data-bind="html: comment, attr:{ title: comment }" class="table-description"></div>
+    <div data-bind="text: comment, attr:{ title: comment }" class="table-description"></div>
   %endif
 
   <ul class="nav nav-tabs nav-tabs-border margin-top-30">
