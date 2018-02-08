@@ -3995,6 +3995,19 @@ $(document).ready(function () {
     });
   }
 
+  window.setInterval(function () {
+    if (searchViewModel.isGridster()) {
+      var $gridster = $('.gridster>ul').data('gridster');
+      searchViewModel.gridItems().forEach(function (existingWidget) {
+        var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
+        if (scrollDifference > 0) {
+          existingWidget.size_y(existingWidget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
+          $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y());
+        }
+      });
+    }
+  }, 1000, 'dashboard');
+
   var tempDraggable = null;
   var skipRestoreOnStop = false;
   huePubSub.subscribe('dashboard.top.widget.drag.start', function (options) {
