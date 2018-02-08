@@ -60,8 +60,8 @@ HAS_REPORT_ENABLED = Config(
 
 USE_GRIDSTER = Config(
   key="use_gridster",
-  help=_t("Activate the new grid layout system (beta)."),
-  default=False,
+  help=_t("Activate the new grid layout system."),
+  default=True,
   type=coerce_bool
 )
 

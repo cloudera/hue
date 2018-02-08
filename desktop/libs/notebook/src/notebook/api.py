@@ -39,6 +39,7 @@ from notebook.connectors.oozie_batch import OozieApi
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties
+from indexer.solr_client import SolrClient
 
 
 LOG = logging.getLogger(__name__)
@@ -716,7 +717,10 @@ def export_result(request):
         response['status'] = 0
       else:
         sample = get_api(request, snippet).fetch_result(notebook, snippet, rows=4, start_over=True)
-
+        for col in sample['meta']:
+          col['type'] = HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')
+          SolrClient._port_field_types(col)
+          
         response['status'] = 0
         response['id'] = notebook_id
         response['name'] = _get_snippet_name(notebook)
@@ -725,8 +729,7 @@ def export_result(request):
         response['target_path'] = destination
         response['sample'] = list(sample['data'])
         response['columns'] = [
-            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
-            for col in sample['meta']
+            Field(col['name'], col['type']).to_dict() for col in sample['meta']
         ]
     else:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))

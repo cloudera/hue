@@ -273,13 +273,13 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="search-index">
-                  &nbsp;${ _('Collection') }
+                  &nbsp;${ _('Index') }
                 </label>
                 <div class="inline-block" data-bind="tooltip: { title: '${ _ko("Index the data to make Dashboard explorations faster") }', placement: 'top' }">
                   <i class="fa fa-fw fa-question-circle muted"></i>
                 </div>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate: 'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Collection name')}">
+                  <input data-bind="value: savePath, valueUpdate: 'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
                 </div>
               </div>
             </div>

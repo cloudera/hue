@@ -329,10 +329,11 @@ ${ assist.assistPanel() }
           </div>
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'query'">
-            <label for="path" class="control-label"><div>${ _('Query') }</div>
+            <label for="path" class="control-label"><div>${ _('Query') }
               <!-- ko if: createWizard.source.query() && createWizard.source.query().name -->
               <span data-bind="text: createWizard.source.query().name"></span>
               <!-- /ko -->
+              </div>
               ## No dropdown for now
               ## <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { dependentValue: createWizard.source.draggedQuery, mappedDocument: createWizard.source.query }"></select>
             </label>
@@ -890,7 +891,7 @@ ${ assist.assistPanel() }
   <!-- /ko -->
   <!-- ko if: $root.createWizard.source.inputFormat() == 'rdbms' -->
   <label class="margin-left-5">${ _('Type') }&nbsp;
-    <input type="text" class="input-small" placeholder="${ _('Field Type') }" data-bind="value: type, enable:false">
+    <input type="text" class="input-small" placeholder="${ _('Field Type') }" data-bind="value: type, enable: false">
   </label>
   <!-- /ko -->
   <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
