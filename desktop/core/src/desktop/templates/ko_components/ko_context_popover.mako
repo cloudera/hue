@@ -91,9 +91,9 @@ from metadata.conf import has_navigator
         </span>
       </div>
       <!-- /ko -->
-      <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
-      <div class="context-popover-header">${ _("Comment") }</div>
-      <div class="context-popover-section" style="font-style: italic;" data-bind="text: comment"></div>
+      <!-- ko if: typeof $parent.comment !== 'undefined' && $parent.comment() -->
+      <div class="context-popover-header">${ _("Description") }</div>
+      <div class="context-popover-section" style="font-style: italic;" data-bind="text: $parent.comment()"></div>
       <!-- /ko -->
       %if has_navigator(user):
         <!-- ko if: ($parent.sourceType === 'hive' || $parent.sourceType === 'impala') && $parent.catalogEntry() -->
@@ -116,9 +116,9 @@ from metadata.conf import has_navigator
     <div class="context-popover-flex-fill" data-bind="with: fetchedData, nicescroll">
       <div>
         <div style="margin: 0 0 5px 10px;"><a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('context.popover.scroll.to.column', name); }"></a> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko --></div>
-        <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
-        <div class="context-popover-header">${ _("Comment") }</div>
-        <div class="context-popover-section" data-bind="text: comment"></div>
+        <!-- ko if: typeof $parent.comment !== 'undefined' && $parent.comment() -->
+        <div class="context-popover-header">${ _("Description") }</div>
+        <div class="context-popover-section" style="font-style: italic;" data-bind="text: $parent.comment()"></div>
         <!-- /ko -->
         %if has_navigator(user):
           <!-- ko if: ($parent.sourceType === 'hive' || $parent.sourceType === 'impala') && $parent.catalogEntry() -->
@@ -524,6 +524,7 @@ from metadata.conf import has_navigator
         self.parent = parent;
 
         self.fetchedData = ko.observable();
+        self.comment = ko.observable();
         self.loading = ko.observable(false);
         self.hasErrors = ko.observable(false);
 
@@ -531,7 +532,12 @@ from metadata.conf import has_navigator
 
         if (self.identifierChain.length > 0) {
           var path = $.map(self.identifierChain, function (identifier) { return identifier.name });
-          DataCatalog.getEntry({ sourceType: sourceType, path: path }).done(self.catalogEntry);
+          DataCatalog.getEntry({ sourceType: sourceType, path: path }).done(function (entry) {
+            self.catalogEntry(entry);
+            if (entry.isDatabase() || entry.isTableOrView() || entry.isColumn()) {
+              entry.getComment({ silenceErrors: true }).done(self.comment);
+            }
+          });
         }
       }
 
