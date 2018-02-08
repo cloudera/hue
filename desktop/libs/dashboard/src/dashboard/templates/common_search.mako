@@ -4240,7 +4240,7 @@ $(document).ready(function () {
   }, 'dashboard');
 
   huePubSub.subscribe('dashboard.hide.dimensions', function (event) {
-    if (!event || (event && !$(event.target).parents('.edit-dimensions').length)) {
+    if (searchViewModel.isGridster() && (!event || (event && !$(event.target).parents('.edit-dimensions').length))) {
       searchViewModel.collection.facets().forEach(function (facet) {
         facet.isAdding(false);
         if (facet.properties && facet.properties.facets()) {
