@@ -94,17 +94,21 @@
       //update observable on save
       if (ko.isObservable(value)) {
         $editable.on('save.ko', function (e, params) {
-          if (editableOptions.type && editableOptions.type == 'wysihtml5') {
+          var newValue = params.newValue || '';
+          if (editableOptions.type === 'wysihtml5') {
             if (editableOptions.skipNewLines) {
-              value(params.newValue.replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''));
+              newValue = newValue.replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+            } else {
+              newValue = newValue.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
             }
-            else {
-              value(params.newValue.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''));
+          } else {
+            newValue = newValue.replace(/<(?:.|\n)*?>/gm, '');
+
+            if (editableOptions.type !== 'textarea') {
+              newValue = newValue.replace(/\r?\n|\r/g, ' ');
             }
           }
-          else {
-            value(params.newValue.replace(/<(?:.|\n)*?>/gm, '').replace(/\r?\n|\r/g, ' '));
-          }
+          value(newValue);
         })
       }
 
