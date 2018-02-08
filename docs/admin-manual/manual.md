@@ -368,6 +368,17 @@ using a proper SSL Certificate.  Self-signed certificates don't
 work.
 </div>
 
+### SASL
+
+When getting a bigger result set from Hive/Impala or bigger files like images from HBase, the response requires to increase
+the buffer size of SASL lib for thrift sasl communication.
+
+<pre>
+[desktop]
+# This property specifies the maximum size of the receive buffer in bytes in thrift sasl communication (default 2 MB).
+sasl_max_buffer=2 * 1024 * 1024
+</pre>
+
 ### User Admin Configuration
 
 In the `[useradmin]` section of the configuration file, you can
