@@ -32,6 +32,16 @@ var MetastoreDatabase = (function () {
 
     self.comment = ko.observable();
 
+    self.comment.subscribe(function (newValue) {
+      self.catalogEntry.getComment().done(function (comment) {
+        if (comment !== newValue) {
+          self.catalogEntry.setComment(newValue).done(self.comment).fail(function () {
+            self.comment(comment);
+          })
+        }
+      });
+    });
+
     self.stats = ko.observable();
     self.navigatorMeta = ko.observable();
 
@@ -390,8 +400,12 @@ var MetastoreTable = (function () {
 
     self.comment = ko.observable();
 
+    if (self.catalogEntry.hasResolvedComment()) {
+      self.comment(self.catalogEntry.getResolvedComment());
+    }
+
     self.commentWithoutNewLines = ko.pureComputed(function(){
-      return self.comment() ? hueUtils.deXSS(self.comment().replace(/<br\s*[\/]?>/gi, ' ')) : '';
+      return self.comment() ? hueUtils.deXSS(self.comment().replace(/[\n\r]+/gi, ' ')) : '';
     });
 
     self.comment.subscribe(function (newValue) {
@@ -617,6 +631,8 @@ var MetastoreColumn = (function () {
         }
       });
     });
+
+    self.catalogEntry.getComment().done(self.comment);
   }
 
   MetastoreColumn.prototype.showContextPopover = function (entry, event) {

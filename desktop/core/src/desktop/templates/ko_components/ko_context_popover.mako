@@ -93,7 +93,7 @@ from metadata.conf import has_navigator
       <!-- /ko -->
       <!-- ko if: typeof $parent.comment !== 'undefined' && $parent.comment() -->
       <div class="context-popover-header">${ _("Description") }</div>
-      <div class="context-popover-section" style="font-style: italic;" data-bind="text: $parent.comment()"></div>
+      <div class="context-popover-section" style="font-style: italic; white-space: pre;" data-bind="text: $parent.comment()"></div>
       <!-- /ko -->
       %if has_navigator(user):
         <!-- ko if: ($parent.sourceType === 'hive' || $parent.sourceType === 'impala') && $parent.catalogEntry() -->
@@ -118,7 +118,7 @@ from metadata.conf import has_navigator
         <div style="margin: 0 0 5px 10px;"><a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('context.popover.scroll.to.column', name); }"></a> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko --></div>
         <!-- ko if: typeof $parent.comment !== 'undefined' && $parent.comment() -->
         <div class="context-popover-header">${ _("Description") }</div>
-        <div class="context-popover-section" style="font-style: italic;" data-bind="text: $parent.comment()"></div>
+        <div class="context-popover-section" style="font-style: italic; white-space: pre;" data-bind="text: $parent.comment()"></div>
         <!-- /ko -->
         %if has_navigator(user):
           <!-- ko if: ($parent.sourceType === 'hive' || $parent.sourceType === 'impala') && $parent.catalogEntry() -->
@@ -203,8 +203,8 @@ from metadata.conf import has_navigator
     <div class="context-popover-flex-fill">
       <div class="context-popover-flex">
         <div data-bind="if: $parent.comment">
-          <div class="context-popover-header">${ _("Comment") }</div>
-          <div class="context-popover-section" style="font-style: italic;" data-bind="text: $parent.comment"></div>
+          <div class="context-popover-header">${ _("Description") }</div>
+          <div class="context-popover-section" style="font-style: italic; white-space: pre;" data-bind="text: $parent.comment"></div>
         </div>
         <!-- ko if: catalogEntry() -->
         <div class="context-popover-header">${_('Tags')}</div>

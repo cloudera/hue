@@ -673,7 +673,7 @@ from desktop.views import _ko
     <!-- /ko -->
     <!-- ko ifnot: loading -->
     <!-- ko if: comment() -->
-    <div class="details-comment" data-bind="html: comment"></div>
+    <div class="details-comment" data-bind="text: comment"></div>
     <!-- /ko -->
     <!-- ko ifnot: comment() -->
     <div class="details-no-comment">
