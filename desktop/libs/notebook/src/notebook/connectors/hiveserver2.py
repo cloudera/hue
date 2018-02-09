@@ -430,11 +430,13 @@ class HS2Api(Api):
       } for job in jobs_with_state]
     elif snippet['type'] == 'impala' and ENABLE_QUERY_BROWSER.get():
       query_id = "%x:%x" % struct.unpack(b"QQ", snippet['result']['handle']['guid'])
+      progress = min(self.progress(snippet, logs), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
       jobs = [{
         'name': query_id,
         'url': '/hue/jobbrowser#!id=%s' % query_id,
         'started': True,
-        'finished': False
+        'finished': False,
+        'percentJob': progress
       }]
 
     return jobs
