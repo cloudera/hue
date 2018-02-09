@@ -3788,6 +3788,10 @@ function togglePresentation(value) {};
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('jobbrowser.data', function (jobs) {
+        var snippet = viewModel.selectedNotebook().snippets()[0];
+        if (snippet.type() === 'impala') {
+          return;
+        }
         if (jobs.length > 0) {
           jobs.forEach(function (job) {
             if ($("#" + job.shortId).length > 0) {

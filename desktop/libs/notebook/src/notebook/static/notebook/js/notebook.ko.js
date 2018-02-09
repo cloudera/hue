@@ -1805,7 +1805,6 @@ var EditorViewModel = (function() {
         if (self.statusForButtons() == 'canceling' || self.status() == 'canceled') {
           // Query was canceled in the meantime, do nothing
         } else {
-          self.getLogs();
           self.result.endTime(new Date());
 
           if (data.status === 0) {
@@ -1862,6 +1861,7 @@ var EditorViewModel = (function() {
             self._ajaxError(data);
             notebook.isExecutingAll(false);
           }
+          self.getLogs(); // Need to execute at the end, because updating the status impacts log progress results
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         if (xhr.status !== 502) {
@@ -1985,8 +1985,14 @@ var EditorViewModel = (function() {
               if (_found.length === 0) {
                 if (typeof job.percentJob === 'undefined') {
                   job.percentJob = ko.observable(-1);
+                } else {
+                  job.percentJob = ko.observable(job.percentJob);
                 }
                 self.jobs.push(job);
+              } else if (typeof job.percentJob !== 'undefined') {
+                for (var i = 0; i < _found.length; i++) {
+                  _found[i].percentJob(job.percentJob)
+                }
               }
             });
             self.jobs().forEach(function (job) {
