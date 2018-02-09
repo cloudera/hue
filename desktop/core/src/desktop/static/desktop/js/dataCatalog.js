@@ -281,7 +281,7 @@ var DataCatalog = (function () {
    * @param {Object} options
    * @param {string|string[]} options.path
    * @param {Object} [options.definition] - The initial definition if not already set on the entry
-   *
+   * @param {boolean} [options.cachedOnly] - Default false
    * @return {Promise}
    */
   DataCatalog.prototype.getEntry = function (options) {
@@ -306,14 +306,16 @@ var DataCatalog = (function () {
         var entry = new DataCatalogEntry(self, options.path, definition);
         if (storeEntry) {
           mergeFromStoreEntry(entry, storeEntry);
-        } else {
+        } else if (!options.cachedOnly) {
           entry.saveLater();
         }
         deferred.resolve(entry);
       }).catch(function (error) {
         console.warn(error);
         var entry = new DataCatalogEntry(self, options.path, options.definition);
-        entry.saveLater();
+        if (!options.cachedOnly) {
+          entry.saveLater();
+        }
         deferred.resolve(entry);
       })
     }
@@ -585,7 +587,7 @@ var DataCatalog = (function () {
     var deferred = $.Deferred();
 
     var sourceMetaPromise = self.getSourceMeta(options).done(function (sourceMeta) {
-      if (sourceMeta.notFound) {
+      if (!sourceMeta || sourceMeta.notFound) {
         deferred.reject();
         return;
       }
@@ -1443,12 +1445,39 @@ var DataCatalog = (function () {
 
   return {
     /**
-     * @param options
+     * @param {Object} options
+     * @param {string} options.sourceType
+     * @param {string|string[]} options.path
+     * @param {Object} [options.definition] - Optional initial definition
      *
      * @return {DataCatalogEntry}
      */
     getEntry: function (options) {
       return getCatalog(options.sourceType).getEntry(options);
+    },
+
+    /**
+     * This can be used as a shorthand function to get the child entries of the given path. Same as first calling
+     * getEntry then getChildren.
+     *
+     * @param {Object} options
+     * @param {string} options.sourceType
+     * @param {string|string[]} options.path
+     * @param {Object} [options.definition] - Optional initial definition of the parent entry
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    getChildren:  function(options) {
+      var deferred = $.Deferred();
+      var cancellablePromises = [];
+      getCatalog(options.sourceType).getEntry(options).done(function (entry) {
+        cancellablePromises.push(entry.getChildren(options).done(deferred.resolve).fail(deferred.reject));
+      }).fail(deferred.reject);
+      return new CancellablePromise(deferred, undefined, cancellablePromises);
     },
 
     /**

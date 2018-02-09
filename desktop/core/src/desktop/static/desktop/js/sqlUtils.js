@@ -134,6 +134,9 @@ var SqlUtils = (function () {
     locationEquals: function (a, b) {
       return a && b && a.first_line === b.first_line && a.first_column === b.first_column && a.last_line === b.last_line && a.last_column === b.last_column;
     },
+    identifierEquals: function (a, b) {
+      return a && b && a.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase() === b.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase();
+    },
     sortSuggestions: sortSuggestions
   }
 })();
