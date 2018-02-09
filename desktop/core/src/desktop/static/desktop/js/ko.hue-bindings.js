@@ -3891,23 +3891,18 @@
       self.clearMarkedErrors();
     };
 
-    AceLocationHandler.prototype.fetchAutocompleteDeferred = function (identifierChain) {
+    AceLocationHandler.prototype.fetchChildren = function (identifierChain) {
       var self = this;
-      var promise = $.Deferred();
-      ApiHelper.getInstance().fetchAutocomplete({
+      var deferred = $.Deferred();
+      DataCatalog.getChildren({
         sourceType: self.snippet.type(),
-        identifierChain: identifierChain,
-        defaultDatabase: self.snippet.database(),
+        path: $.map(identifierChain, function (identifier) { return identifier.name }),
         silenceErrors: true,
-        cachedOnly: true,
-        successCallback: function (data) {
-          promise.resolve(data.extended_columns || data.tables_meta || []);
-        },
-        errorCallback: function () {
-          promise.reject([]);
-        }
+        cachedOnly: true
+      }).done(deferred.resolve).fail(function () {
+        deferred.reject([]);
       });
-      return promise;
+      return deferred;
     };
 
     AceLocationHandler.prototype.fetchPossibleValues = function (token) {
@@ -3917,7 +3912,7 @@
         var tablePromises = [];
         token.parseLocation.tables.forEach(function (table) {
           if (table.identifierChain) {
-            tablePromises.push(self.fetchAutocompleteDeferred(table.identifierChain));
+            tablePromises.push(self.fetchChildren(table.identifierChain));
           }
         });
         $.when.apply($, tablePromises).done(function () {
@@ -3929,7 +3924,7 @@
         }).fail(promise.reject);
       } else if (token.parseLocation.identifierChain && token.parseLocation.identifierChain.length > 0) {
         // fetch the parent
-        return self.fetchAutocompleteDeferred(token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1));
+        return self.fetchChildren(token.parseLocation.identifierChain.slice(0, token.parseLocation.identifierChain.length - 1));
       } else {
         promise.reject([]);
       }
@@ -3973,31 +3968,32 @@
         }
       });
 
-      var adjustColumnLocation = function (location) {
+      var resolvePathFromTables = function (location) {
         var promise = $.Deferred();
         if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
           var findIdentifierChainInTable = function (tablesToGo) {
             var nextTable = tablesToGo.shift();
             if (typeof nextTable.subQuery === 'undefined') {
-              ApiHelper.getInstance().fetchAutocomplete({
+              DataCatalog.getChildren({
                 sourceType: self.snippet.type(),
-                defaultDatabase: self.snippet.database(),
-                identifierChain: nextTable.identifierChain,
+                path: $.map(nextTable.identifierChain, function (identifier) { return identifier.name }),
                 cachedOnly: true,
-                silenceErrors: true,
-                successCallback: function (data) {
-                  if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
-                    location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
-                    delete location.tables;
-                    promise.resolve();
-                  } else if (tablesToGo.length > 0) {
-                    findIdentifierChainInTable(tablesToGo);
-                  } else {
-                    promise.resolve();
-                  }
-                },
-                errorCallback: promise.resolve
-              })
+                silenceErrors: true
+              }).done(function (entries) {
+                var containsColumn = entries.some(function (entry) {
+                  return SqlUtils.identifierEquals(entry.name, location.identifierChain[0].name);
+                });
+
+                if (containsColumn) {
+                  location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
+                  delete location.tables;
+                  promise.resolve();
+                } else if (tablesToGo.length > 0) {
+                  findIdentifierChainInTable(tablesToGo);
+                } else {
+                  promise.resolve();
+                }
+              }).fail(promise.resolve);
             } else if (tablesToGo.length > 0) {
               findIdentifierChainInTable(tablesToGo);
             } else {
@@ -4035,7 +4031,7 @@
           }
         }
 
-        adjustColumnLocation(location).done(function () {
+        resolvePathFromTables(location).done(function () {
           if (location.type === 'column') {
             var possibleAlias;
             if (!location.tables && location.identifierChain && location.identifierChain.length > 1) {
@@ -4115,6 +4111,9 @@
               self.addAnchoredMarker(range,  token, 'hue-ace-syntax-warning');
             }
             verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
+          }).fail(function () {
+            // Can happen when tables aren't cached etc.
+            verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
           });
         }).fail(function () {
           // Can happen when tables aren't cached etc.
@@ -4137,7 +4136,6 @@
     AceLocationHandler.prototype.attachSqlWorker = function () {
       var self = this;
 
-      var apiHelper = ApiHelper.getInstance();
       var activeTokens = [];
 
       var lastKnownLocations = {};
@@ -4182,15 +4180,6 @@
           }
 
           if (location.identifierChain && location.identifierChain.length && location.identifierChain[0].name) {
-            // Add databases if missing in the table identifier chains
-            if (location.tables) {
-              location.tables.forEach(function (table) {
-                if (table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name) {
-                  table.identifierChain.unshift({ name: self.snippet.database() });
-                }
-              });
-            }
-
             // The parser isn't aware of the DDL so sometimes it marks complex columns as tables
             // I.e. "Impala SELECT a FROM b.c" Is 'b' a database or a table? If table then 'c' is complex
             if (self.snippet.type() === 'impala' &&
@@ -4246,7 +4235,8 @@
           huePubSub.publish('ace.sql.location.worker.post', {
             id: self.snippet.id(),
             statementDetails: statementDetails,
-            type: self.snippet.type()
+            type: self.snippet.type(),
+            defaultDatabase: self.snippet.database()
           });
         }
       });

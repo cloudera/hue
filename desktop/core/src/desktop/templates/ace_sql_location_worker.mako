@@ -81,6 +81,23 @@ importScripts(scriptPrefix + '${ static('desktop/js/sqlFunctions.js') }');
           this.handleStatement(statement, locations, msg.data.type, false);
         });
 
+        // Add databases where missing in the table identifier chains
+        if (msg.data.defaultDatabase) {
+          locations.forEach(function (location) {
+            if (location.identifierChain && location.identifierChain.length && location.identifierChain[0].name) {
+              if (location.tables) {
+                location.tables.forEach(function (table) {
+                  if (table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name) {
+                    table.identifierChain.unshift({ name: msg.data.defaultDatabase });
+                  }
+                });
+              } else if (location.type === 'table' && location.identifierChain.length === 1) {
+                location.identifierChain.unshift({ name: msg.data.defaultDatabase });
+              }
+            }
+          });
+        }
+
         postMessage({
           id: msg.data.id,
           editorChangeTime: msg.data.statementDetails.editorChangeTime,
