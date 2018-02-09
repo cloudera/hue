@@ -430,176 +430,181 @@ ${ components.menubar(is_embeddable) }
 </script>
 
 <script type="text/html" id="metastore-tables">
-    <div class="row-fluid">
-      % if has_write_access:
-        <div style="position: relative;" class="show-inactive-on-hover margin-bottom-20">
-          <div style="position:absolute; left: 10px; top: 2px;"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a></div>
-          <div style="margin-left: 25px;" data-bind="toggleOverflow: { height: 24 }">
-            <div style="height: inherit" data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'textarea', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', forcePlacement: true, placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block">
-              ${ _('Add a description...') }
-            </div>
+  <div class="row-fluid">
+    % if has_write_access:
+      <!-- ko if: $root.navigatorEnabled() -->
+      <div style="position: relative;" class="show-inactive-on-hover margin-bottom-20">
+        <div style="position:absolute; left: 10px; top: 2px;"><a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a></div>
+        <div style="margin-left: 25px;" data-bind="toggleOverflow: { height: 24 }">
+          <div style="height: inherit" data-bind="editable: comment, editableOptions: { escape: true, enabled: true, type: 'textarea', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', forcePlacement: true, placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block">
+            ${ _('Add a description...') }
           </div>
         </div>
-      % else:
-        <div data-bind="text: comment, attr:{ title: comment }" class="table-description"></div>
-      %endif
+      </div>
+      <!-- /ko -->
+      <!-- ko ifnot: $root.navigatorEnabled() -->
+      <div data-bind="text: comment, attr:{ title: comment }" class="table-description"></div>
+      <!-- /ko -->
+    % else:
+      <div data-bind="text: comment, attr:{ title: comment }" class="table-description"></div>
+    %endif
 
-      <!-- ko with: stats  -->
-      <div class="span12 tile">
-          <div class="span6 tile">
-            <h4>${ _('Properties') }</h4>
-            <div title="${ _('Owner') }">
-              <i class="fa fa-fw fa-user muted"></i>
-              <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
-            </div>
-            <div title="${ _('Location') }">
-              <i class="fa fa-fw fa-hdd-o muted"></i>
-              % if IS_EMBEDDED.get():
-                <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
-              % else:
-                <a data-bind="attr: { 'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
-              % endif
-            </div>
+    <!-- ko with: stats  -->
+    <div class="span12 tile">
+        <div class="span6 tile">
+          <h4>${ _('Properties') }</h4>
+          <div title="${ _('Owner') }">
+            <i class="fa fa-fw fa-user muted"></i>
+            <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
           </div>
-          <div class="span6 tile">
-            <!-- ko if: $root.navigatorEnabled()  -->
-            <h4>${ _('Tags') }</h4>
-            <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-              catalogEntry: $parent.catalogEntry
-            }}"></div>
-            <!-- /ko -->
-        </div>
-        <!-- ko with: parameters -->
-        <div class="row-fluid">
-          <div class="span12">
-            <div title="${ _('Parameters') }">
-              <!-- ko template: { name: 'metastore-databases-parameters', data: hueUtils.parseHivePseudoJson($data) }--><!-- /ko -->
-            </div>
+          <div title="${ _('Location') }">
+            <i class="fa fa-fw fa-hdd-o muted"></i>
+            % if IS_EMBEDDED.get():
+              <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
+            % else:
+              <a data-bind="attr: { 'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
+            % endif
           </div>
         </div>
-        <!-- /ko -->
+        <div class="span6 tile">
+          <!-- ko if: $root.navigatorEnabled()  -->
+          <h4>${ _('Tags') }</h4>
+          <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
+            catalogEntry: $parent.catalogEntry
+          }}"></div>
+          <!-- /ko -->
+      </div>
+      <!-- ko with: parameters -->
+      <div class="row-fluid">
+        <div class="span12">
+          <div title="${ _('Parameters') }">
+            <!-- ko template: { name: 'metastore-databases-parameters', data: hueUtils.parseHivePseudoJson($data) }--><!-- /ko -->
+          </div>
+        </div>
       </div>
       <!-- /ko -->
     </div>
+    <!-- /ko -->
+  </div>
 
-    <div class="row-fluid">
-      <div class="span12 tile">
-        <h4>${ _('Tables') }</h4>
-        <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5, topSnap: '${ TOP_SNAP }' }">
-          <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
-          <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
-          <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/') + '/', $root.sourceType()) : location.href = '/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/'); }, disable: selectedTables().length !== 1">
-            <i class="fa fa-play fa-fw"></i> ${_('Query')}
-          </button>
-          % if has_write_access:
-            <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
-          % endif
-        </div>
-
-        <table id="tablesTable" class="table table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
-          <thead>
-          <tr>
-            <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
-            <th>&nbsp;</th>
-            <th width="30%">${ _('Table Name') }</th>
-            <th width="48%">${ _('Description') }</th>
-            <!-- ko if: $root.optimizerEnabled  -->
-            <th width="10%">${ _('Popularity') }</th>
-            <th width="10%">${ _('Columns') }</th>
-            <!-- /ko -->
-            <th width="1%">${ _('Type') }</th>
-          </tr>
-          </thead>
-          <tbody data-bind="hueach: { data: filteredTables, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 277, scrollUp: true }">
-            <tr>
-              <td width="1%" style="text-align: center">
-                <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
-              </td>
-              <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
-              <td>
-                <a class="tableLink" href="javascript:void(0);" data-bind="text: catalogEntry.name, click: function() { $parent.setTable($data, function() { huePubSub.publish('metastore.url.change'); }) }"></a>
-              </td>
-              <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="text: commentWithoutNewLines, attr: { title: hueUtils.html2text(commentWithoutNewLines()) }"></td>
-              <!-- ko if: $root.optimizerEnabled -->
-                <!-- ko if: optimizerStats() -->
-                <td>
-                  <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': optimizerStats().popularity}">
-                    <div class="bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : optimizerStats().popularity + '%' }"></div>
-                  </div>
-                </td>
-                <td data-bind="text: optimizerStats().column_count"></td>
-                <!-- /ko -->
-              <!-- ko ifnot: optimizerStats() -->
-                <td></td>
-                <td></td>
-              <!-- /ko -->
-              <!-- /ko -->
-
-              <td class="center">
-                <!-- ko ifnot: $root.optimizerEnabled && optimizerStats() -->
-                  <!-- ko if: catalogEntry.isTable() -->
-                    <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
-                  <!-- /ko -->
-                  <!-- ko if: catalogEntry.isView() -->
-                    <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
-                  <!-- /ko -->
-                <!-- /ko -->
-                <!-- ko if: $root.optimizerEnabled && optimizerStats() -->
-                  <!-- ko if: optimizerStats().is_fact -->
-                    <i class="fa fa-fw muted fa-database" title="${ _('Fact table') }"></i>
-                  <!-- /ko -->
-                  <!-- ko ifnot: optimizerStats().is_fact -->
-                    <i class="fa fa-fw muted fa-calendar" title="${ _('Dimension table') }"></i>
-                  <!-- /ko -->
-                <!-- /ko -->
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div data-bind="visible: filteredTables().length === 0, css: { 'margin-left-10': tables().length > 0 }" style="font-style: italic; display: none;">${_('No tables found.')}</div>
+  <div class="row-fluid">
+    <div class="span12 tile">
+      <h4>${ _('Tables') }</h4>
+      <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5, topSnap: '${ TOP_SNAP }' }">
+        <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
+        <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
+        <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/') + '/', $root.sourceType()) : location.href = '/notebook/browse/' + selectedTables()[0].catalogEntry.path.join('/'); }, disable: selectedTables().length !== 1">
+          <i class="fa fa-play fa-fw"></i> ${_('Query')}
+        </button>
+        % if has_write_access:
+          <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
+        % endif
       </div>
-    </div>
 
-  % if has_write_access:
-    <div id="dropTable" class="modal hide fade">
-      % if is_embeddable:
-        <form data-bind="attr: { 'action': '/metastore/tables/drop/' + catalogEntry.name }, submit: dropAndWatch" method="POST">
-          <input type="hidden" name="is_embeddable" value="true"/>
-          <input type="hidden" name="start_time" value=""/>
-          <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
-      % else:
-        <form data-bind="attr: { 'action': '/metastore/tables/drop/' +catalogEntry. name }" method="POST">
-      % endif
-        ${ csrf_token(request) | n,unicode }
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-          <h2 id="dropTableMessage" class="modal-title">${_('Do you really want to drop the selected table(s)?')}</h2>
-        </div>
-        <div class="modal-body">
-          <ul data-bind="foreach: selectedTables">
-            <!-- ko if: $index() <= 9 -->
-            <li>
-              <span data-bind="text: catalogEntry.name"></span>
-            </li>
-            <!-- /ko -->
-          </ul>
-          <!-- ko if: selectedTables().length > 10 -->
-            ${_('and')} <span data-bind="text: selectedTables().length - 10"></span> ${_('others')}.<br>
+      <table id="tablesTable" class="table table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
+        <thead>
+        <tr>
+          <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
+          <th>&nbsp;</th>
+          <th width="30%">${ _('Table Name') }</th>
+          <th width="48%">${ _('Description') }</th>
+          <!-- ko if: $root.optimizerEnabled  -->
+          <th width="10%">${ _('Popularity') }</th>
+          <th width="10%">${ _('Columns') }</th>
           <!-- /ko -->
-          <label class="checkbox" style="display: inline-block; margin-top: 5px">
-            <input type="checkbox" name="skip_trash" /> ${ _('Skip the trash') }
-          </label>
-        </div>
-        <div class="modal-footer">
-          <input type="button" class="btn" data-dismiss="modal" value="${_('No')}" />
-          <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
-        </div>
-        <!-- ko foreach: selectedTables -->
-        <input type="hidden" name="table_selection" data-bind="value: catalogEntry.name" />
-        <!-- /ko -->
-      </form>
+          <th width="1%">${ _('Type') }</th>
+        </tr>
+        </thead>
+        <tbody data-bind="hueach: { data: filteredTables, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 277, scrollUp: true }">
+          <tr>
+            <td width="1%" style="text-align: center">
+              <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
+            </td>
+            <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
+            <td>
+              <a class="tableLink" href="javascript:void(0);" data-bind="text: catalogEntry.name, click: function() { $parent.setTable($data, function() { huePubSub.publish('metastore.url.change'); }) }"></a>
+            </td>
+            <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="text: commentWithoutNewLines, attr: { title: hueUtils.html2text(commentWithoutNewLines()) }"></td>
+            <!-- ko if: $root.optimizerEnabled -->
+              <!-- ko if: optimizerStats() -->
+              <td>
+                <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': optimizerStats().popularity}">
+                  <div class="bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : optimizerStats().popularity + '%' }"></div>
+                </div>
+              </td>
+              <td data-bind="text: optimizerStats().column_count"></td>
+              <!-- /ko -->
+            <!-- ko ifnot: optimizerStats() -->
+              <td></td>
+              <td></td>
+            <!-- /ko -->
+            <!-- /ko -->
+
+            <td class="center">
+              <!-- ko ifnot: $root.optimizerEnabled && optimizerStats() -->
+                <!-- ko if: catalogEntry.isTable() -->
+                  <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
+                <!-- /ko -->
+                <!-- ko if: catalogEntry.isView() -->
+                  <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
+                <!-- /ko -->
+              <!-- /ko -->
+              <!-- ko if: $root.optimizerEnabled && optimizerStats() -->
+                <!-- ko if: optimizerStats().is_fact -->
+                  <i class="fa fa-fw muted fa-database" title="${ _('Fact table') }"></i>
+                <!-- /ko -->
+                <!-- ko ifnot: optimizerStats().is_fact -->
+                  <i class="fa fa-fw muted fa-calendar" title="${ _('Dimension table') }"></i>
+                <!-- /ko -->
+              <!-- /ko -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div data-bind="visible: filteredTables().length === 0, css: { 'margin-left-10': tables().length > 0 }" style="font-style: italic; display: none;">${_('No tables found.')}</div>
     </div>
-  % endif
+  </div>
+
+% if has_write_access:
+  <div id="dropTable" class="modal hide fade">
+    % if is_embeddable:
+      <form data-bind="attr: { 'action': '/metastore/tables/drop/' + catalogEntry.name }, submit: dropAndWatch" method="POST">
+        <input type="hidden" name="is_embeddable" value="true"/>
+        <input type="hidden" name="start_time" value=""/>
+        <input type="hidden" name="source_type" data-bind="value: $root.sourceType"/>
+    % else:
+      <form data-bind="attr: { 'action': '/metastore/tables/drop/' +catalogEntry. name }" method="POST">
+    % endif
+      ${ csrf_token(request) | n,unicode }
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+        <h2 id="dropTableMessage" class="modal-title">${_('Do you really want to drop the selected table(s)?')}</h2>
+      </div>
+      <div class="modal-body">
+        <ul data-bind="foreach: selectedTables">
+          <!-- ko if: $index() <= 9 -->
+          <li>
+            <span data-bind="text: catalogEntry.name"></span>
+          </li>
+          <!-- /ko -->
+        </ul>
+        <!-- ko if: selectedTables().length > 10 -->
+          ${_('and')} <span data-bind="text: selectedTables().length - 10"></span> ${_('others')}.<br>
+        <!-- /ko -->
+        <label class="checkbox" style="display: inline-block; margin-top: 5px">
+          <input type="checkbox" name="skip_trash" /> ${ _('Skip the trash') }
+        </label>
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn" data-dismiss="modal" value="${_('No')}" />
+        <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+      </div>
+      <!-- ko foreach: selectedTables -->
+      <input type="hidden" name="table_selection" data-bind="value: catalogEntry.name" />
+      <!-- /ko -->
+    </form>
+  </div>
+% endif
 </script>
 
 <script type="text/html" id="metastore-databases-parameters">
