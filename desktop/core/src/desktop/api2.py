@@ -406,10 +406,11 @@ def copy_document(request):
       copy_document.save()
       _import_workspace(request.fs, request.user, bundle_or_coordinator)
   elif document.type == 'search-dashboard':
-    copy_data = copy_document.data_dict
-    copy_data['collection']['name'] = name
-    copy_data['collection']['uuid'] = copy_document.uuid
-    copy_document.update_data(copy_data)
+    from dashboard.models import Collection2
+    collection = Collection2(request.user, document=document)
+    collection.data['collection']['label'] = name
+    collection.data['collection']['uuid'] = copy_document.uuid
+    copy_document.update_data({'collection': collection.data['collection']})
     copy_document.save()
   # Keep the document and data in sync
   else:
