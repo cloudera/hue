@@ -417,10 +417,11 @@ except ImportError, e:
                   $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('open.link', resp.watch_url);
                 } else if (self.saveTarget() == 'search-index') {
+                  $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('open.importer.query', resp);
                 } else if (resp.history_uuid) {
-                    $(self.saveResultsModalId).modal('hide');
-                    huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+                  $(self.saveResultsModalId).modal('hide');
+                  huePubSub.publish('notebook.task.submitted', resp.history_uuid);
                 } else if (resp && resp.message) {
                   $(document).trigger("error", resp.message);
                 }
