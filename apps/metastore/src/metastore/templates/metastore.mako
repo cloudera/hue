@@ -333,7 +333,7 @@ ${ components.menubar(is_embeddable) }
           % if IS_EMBEDDED.get():
           <span data-bind="attr: {'title': path_location}">${_('Location')}</span>
           % else:
-          <a data-bind="hueLink: hdfs_link, attr: {'rel': path_location}" title="${_('Open data location')}">${_('Location')}</a>
+          <a data-bind="hueLink: hdfs_link" title="${_('Open data location')}">${_('Location')}</a>
           % endif
         <!-- /ko -->
       </div>
@@ -462,7 +462,7 @@ ${ components.menubar(is_embeddable) }
             % if IS_EMBEDDED.get():
               <span data-bind="attr: { 'title': location }"> ${_('Location')}</span>
             % else:
-              <a data-bind="attr: { 'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
+              <a data-bind="hueLink: hdfs_link"> ${_('Location')}</a>
             % endif
           </div>
         </div>
