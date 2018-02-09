@@ -331,7 +331,7 @@ ${ components.menubar(is_embeddable) }
           ${_('Stored in')} Kudu
         <!-- /ko -->
         <!-- ko if: details.properties.format != 'kudu' -->
-          <a data-bind="hueLink: hdfs_link, attr: {'rel': path_location}" title="${_('Open data location')}">${_('Location')}</a>
+          <a data-bind="hueLink: hdfs_link" title="${_('Open data location')}">${_('Location')}</a>
         <!-- /ko -->
       </div>
       <!-- ko with: $parent.tableStats -->
@@ -449,7 +449,7 @@ ${ components.menubar(is_embeddable) }
                 <i class="fa fa-fw fa-user muted"></i>
                 <span data-bind="text: owner_name ? owner_name : '${ _ko('None') }'"></span> <span data-bind="visible: owner_type">(<span data-bind="text: owner_type"></span>)</span>
                 <br/>
-                <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
+                <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="hueLink: hdfs_link"> ${_('Location')}</a>
               </div>
             </div>
           </div>
