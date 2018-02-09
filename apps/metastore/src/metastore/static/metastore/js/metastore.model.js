@@ -62,7 +62,7 @@ var MetastoreDatabase = (function () {
           if (typeof a.optimizerStats() !== 'undefined' && a.optimizerStats() !== null) {
             if (typeof b.optimizerStats() !== 'undefined' && b.optimizerStats() !== null) {
               if (a.optimizerStats().popularity === b.optimizerStats().popularity) {
-                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                return a.catalogEntry.name.toLowerCase().localeCompare(b.catalogEntry.name.toLowerCase());
               }
               return  b.optimizerStats().popularity - a.optimizerStats().popularity;
             }
