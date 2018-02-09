@@ -3562,9 +3562,26 @@
 
       self.disposeFunctions = [];
 
+      self.databaseIndex = {};
+
       self.attachStatementLocator();
       self.attachSqlWorker();
       self.attachGutterHandler();
+
+      var updateDatabaseIndex = function (databaseList) {
+        self.databaseIndex = {};
+        databaseList.forEach(function (database) {
+          self.databaseIndex[database.toLowerCase()] = true;
+        })
+      };
+
+      var databaseSub = self.snippet.availableDatabases.subscribe(updateDatabaseIndex);
+
+      self.disposeFunctions.push(function () {
+        databaseSub.dispose();
+      });
+
+      updateDatabaseIndex(self.snippet.availableDatabases());
     }
 
     AceLocationHandler.prototype.attachGutterHandler = function () {
@@ -4109,6 +4126,15 @@
       verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
     };
 
+    AceLocationHandler.prototype.isDatabase = function (databaseIdentifier) {
+      var self = this;
+      if (!databaseIdentifier) {
+        return false;
+      }
+      var cleanIdentifier = databaseIdentifier.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase();
+      return self.databaseIndex[cleanIdentifier];
+    };
+
     AceLocationHandler.prototype.attachSqlWorker = function () {
       var self = this;
 
@@ -4127,85 +4153,86 @@
         getLocationsSub.remove();
       });
 
-      // The parser isn't aware of the DDL so sometimes it marks complex columns as tables
-      // I.e. "Impala SELECT a FROM b.c" Is 'b' a database or a table? If table then 'c' is complex
-      var identifyComplexLocations = function (locations, callback) {
-        if (self.snippet.type() === 'impala') {
-          apiHelper.getDatabases(self.snippet.type()).done(function (databases) {
-            locations.forEach(function (location) {
-              if (location.identifierChain && location.identifierChain.length > 2
-                && (location.type === 'table' || location.type === 'column')
-                && databases.indexOf(location.identifierChain[0].name.toLowerCase()) !== -1) {
-                  location.type = 'complex';
-              }
-            });
-            callback();
-          });
-        } else {
-          callback();
-        }
-      };
-
       var locationWorkerSub = huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
         if (e.data.id !== self.snippet.id() || e.data.editorChangeTime !== self.editor.lastChangeTime || !self.snippet.isSqlDialect()) {
           return;
         }
 
-        identifyComplexLocations(e.data.locations, function () {
-          lastKnownLocations = {
-            id: self.editorId,
-            type: self.snippet.type(),
-            defaultDatabase: self.snippet.database(),
-            locations: e.data.locations,
-            editorChangeTime: e.data.editorChangeTime,
-            activeStatementLocations: e.data.activeStatementLocations,
-            totalStatementCount: e.data.totalStatementCount,
-            activeStatementIndex: e.data.activeStatementIndex
-          };
+        lastKnownLocations = {
+          id: self.editorId,
+          type: self.snippet.type(),
+          defaultDatabase: self.snippet.database(),
+          locations: e.data.locations,
+          editorChangeTime: e.data.editorChangeTime,
+          activeStatementLocations: e.data.activeStatementLocations,
+          totalStatementCount: e.data.totalStatementCount,
+          activeStatementIndex: e.data.activeStatementIndex
+        };
 
-          // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
-          while(activeTokens.length > 0) {
-            delete activeTokens.pop().parseLocation;
+        // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
+        while(activeTokens.length > 0) {
+          delete activeTokens.pop().parseLocation;
+        }
+
+        var tokensToVerify = [];
+
+        e.data.locations.forEach(function (location) {
+          if (['statement', 'selectList', 'whereClause', 'limitClause'].indexOf(location.type) !== -1
+            || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
+            return;
           }
 
-          var tokensToVerify = [];
-
-          e.data.locations.forEach(function (location) {
-            if (['statement', 'selectList', 'whereClause', 'limitClause'].indexOf(location.type) !== -1 ||  ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
-              return;
+          if (location.identifierChain && location.identifierChain.length && location.identifierChain[0].name) {
+            // Add databases if missing in the table identifier chains
+            if (location.tables) {
+              location.tables.forEach(function (table) {
+                if (table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name) {
+                  table.identifierChain.unshift({ name: self.snippet.database() });
+                }
+              });
             }
 
-            var token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column);
-
-            if (token && token.value && /`$/.test(token.value)) {
-              // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
-              token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
+            // The parser isn't aware of the DDL so sometimes it marks complex columns as tables
+            // I.e. "Impala SELECT a FROM b.c" Is 'b' a database or a table? If table then 'c' is complex
+            if (self.snippet.type() === 'impala' &&
+              location.identifierChain.length > 2 &&
+              (location.type === 'table' || location.type === 'column') &&
+              self.isDatabase(location.identifierChain[0].name)) {
+              location.type = 'complex';
             }
-            if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
-              token = null;
-            }
-            if (token && token.value) {
-              var AceRange = ace.require('ace/range').Range;
-              // The Ace tokenizer also splits on '{', '(' etc. hence the actual value;
-              token.actualValue = self.editor.getSession().getTextRange(new AceRange(location.location.first_line - 1, location.location.first_column - 1, location.location.last_line - 1, location.location.last_column - 1));
-            }
-
-            if (token !== null) {
-              token.parseLocation = location;
-              activeTokens.push(token);
-              delete token.notFound;
-              delete token.syntaxError;
-              if (location.active) {
-                tokensToVerify.push(token);
-              }
-            }
-          });
-
-          if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
-            self.verifyExists(tokensToVerify, e.data.activeStatementLocations);
           }
-          huePubSub.publish('editor.active.locations', lastKnownLocations);
+
+          var token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column);
+
+          if (token && token.value && /`$/.test(token.value)) {
+            // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
+            token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
+          }
+          if (token && token.value && /^\s*\$\{\s*$/.test(token.value)) {
+            token = null;
+          }
+          if (token && token.value) {
+            var AceRange = ace.require('ace/range').Range;
+            // The Ace tokenizer also splits on '{', '(' etc. hence the actual value;
+            token.actualValue = self.editor.getSession().getTextRange(new AceRange(location.location.first_line - 1, location.location.first_column - 1, location.location.last_line - 1, location.location.last_column - 1));
+          }
+
+          if (token !== null) {
+            token.parseLocation = location;
+            activeTokens.push(token);
+            delete token.notFound;
+            delete token.syntaxError;
+            if (location.active) {
+              tokensToVerify.push(token);
+            }
+          }
         });
+
+        if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
+          self.verifyExists(tokensToVerify, e.data.activeStatementLocations);
+        }
+        huePubSub.publish('editor.active.locations', lastKnownLocations);
+
       });
 
       self.disposeFunctions.push(function () {
