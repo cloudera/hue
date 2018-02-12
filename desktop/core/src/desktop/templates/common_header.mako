@@ -153,7 +153,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.form.js') }"></script>
   <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
-  <script src="${ static('desktop/js/jquery.nicescroll.js') }"></script>
   <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>

@@ -113,7 +113,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-column-details">
-    <div class="context-popover-flex-fill" data-bind="with: fetchedData, nicescroll">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData">
       <div>
         <div style="margin: 0 0 5px 10px;"><a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('context.popover.scroll.to.column', name); }"></a> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko --></div>
         <!-- ko if: typeof $parent.comment !== 'undefined' && $parent.comment() -->
@@ -131,7 +131,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-complex-details">
-    <div class="context-popover-flex-fill" data-bind="with: fetchedData, nicescroll">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData">
       <div style="margin: 15px;">
         <a class="pointer" data-bind="visible: typeof sample !== 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }, click: function() { huePubSub.publish('context.popover.scroll.to.column', name || $parents[2].title); }"></a>
         <span data-bind="visible: typeof sample === 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }"></span> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko -->
@@ -172,7 +172,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-table-analysis">
-    <div class="context-popover-flex-fill" data-bind="with: fetchedData, niceScroll">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData">
       <!-- ko if: stats.length > 0 -->
         <table class="table table-condensed">
           <tbody data-bind="foreach: stats">
@@ -187,7 +187,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-column-analysis">
-    <div class="context-popover-flex-fill" data-bind="with: fetchedData, niceScroll">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData">
       <table class="table table-condensed">
         <tbody data-bind="foreach: stats">
           <tr>
@@ -217,7 +217,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-hdfs-details">
-    <div class="context-popover-flex-fill" data-bind="with: details, niceScroll">
+    <div class="context-popover-flex-fill" data-bind="with: details">
       <div style="padding: 8px">
         <div style="margin: 10px 10px 18px 10px;">
           <div data-bind="hdfsTree: { isS3: $data.path.indexOf('s3a://') === 0, path: $data.path, selectedPath: $parent.selectedPath }"></div>
@@ -227,7 +227,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-collection-stats-details">
-    <div class="context-popover-flex-fill" data-bind="niceScroll">
+    <div class="context-popover-flex-fill">
       <div style="padding: 8px">
         <div data-bind="with: stats">
         <!-- ko hueSpinner: { spin:  $parent.loadingStats, center: true, size: 'large' } --><!-- /ko -->
@@ -280,7 +280,7 @@ from metadata.conf import has_navigator
 
 
   <script type="text/html" id="context-popover-collection-terms-details">
-    <div class="context-popover-flex-fill" data-bind="niceScroll">
+    <div class="context-popover-flex-fill">
       <input type="text" data-bind="value: terms.prefix, clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Filter...') }" class="pull-right">
       <div data-bind="with: terms">
         <!-- ko hueSpinner: { spin:  $parent.loadingTerms, center: true, size: 'large' } --><!-- /ko -->
@@ -316,7 +316,7 @@ from metadata.conf import has_navigator
     </div>
     <!-- /ko -->
     <!-- ko if: typeof details !== 'undefined' -->
-    <div class="context-popover-flex-fill" data-bind="with: details, niceScroll">
+    <div class="context-popover-flex-fill" data-bind="with: details">
       <div style="padding: 8px">
         <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre;" class="monospace" data-bind="text: signature"></span></p>
         <p><span data-bind="text: description"></span></p>
@@ -326,7 +326,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-table-partitions">
-    <div class="context-popover-flex-fill" data-bind="with: fetchedData, niceScroll">
+    <div class="context-popover-flex-fill" data-bind="with: fetchedData">
       <div class="context-popover-header">${_('Columns')}</div>
       <div>
         <table class="table table-condensed table-nowrap">
@@ -397,7 +397,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-document-details">
-    <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="niceScroll">
+    <div class="context-popover-flex-fill" style="overflow: auto;">
       <div style="padding: 8px">
         <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
 
@@ -769,8 +769,6 @@ from metadata.conf import has_navigator
           if ($t.length === 0) {
             return;
           }
-
-          $t.parents('.dataTables_wrapper').getNiceScroll().resize();
         }, 300);
 
         self.disposals.push(function () {
@@ -885,8 +883,6 @@ from metadata.conf import has_navigator
               }
               huePubSub.removeAll('context.popover.resized');
             });
-
-            hueUtils.initNiceScroll($t.parents('.dataTables_wrapper'));
 
             if (data && data.rows) {
               var _tempData = [];
