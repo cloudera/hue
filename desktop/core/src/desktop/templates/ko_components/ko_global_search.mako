@@ -48,7 +48,7 @@ from desktop.views import _ko
         <div>${ _('No results found.') }</div>
       <!-- /ko -->
       <!-- ko if: searchResultCategories().length > 0 -->
-      <div class="global-search-alternatives" style="position:relative;">
+      <div class="global-search-alternatives" data-bind="niceScroll" style="position:relative;">
         <!-- ko foreach: searchResultCategories -->
         <div class="global-search-category">
           <div class="global-search-category-header" data-bind="text: label"></div>
