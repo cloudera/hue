@@ -22,7 +22,7 @@ from desktop.views import _ko
 <%def name="hueAceAutocompleter()">
   <script type="text/html" id="hue-ace-autocompleter">
     <!-- ko if: active() && (suggestions.filtered().length !== 0 || suggestions.loading()) -->
-    <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }">
+    <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }, event: { mousewheel: function (data, event) { event.stopPropagation(); }}">
       <div class="autocompleter-suggestions">
         <!-- ko if: suggestions.availableCategories().length > 1 || suggestions.loading() -->
         <div class="autocompleter-header">
