@@ -209,7 +209,7 @@
     <div class="empty-gridster-widget card card-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}">
       <h2 class="card-heading simple">
         ${ _('Empty widget') }
-        <div class="inline pull-right" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
+        <div class="inline pull-right margin-right-10" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
           <a href="javascript:void(0)" class="remove-widget" data-bind="publish: { 'gridster.remove': $data }"><i class="fa fa-times"></i></a>
         </div>
       </h2>
@@ -298,7 +298,7 @@
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
         <span data-bind="editable: name, editableOptions: { enabled: true, placement: 'right' }"></span>
       <!-- /ko -->
-      <div class="inline pull-right" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
+      <div class="inline pull-right margin-right-10" data-bind="visible: $root.isEditing() || $root.isToolbarVisible()">
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
       </div>
     </h2>
