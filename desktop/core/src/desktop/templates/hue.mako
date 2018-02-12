@@ -513,6 +513,8 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 
+<script src="${ static('desktop/js/jquery.nicescroll.js') }"></script>
+
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
 <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }"></script>
 <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
@@ -950,6 +952,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
           $('.tooltip').hide();
           huePubSub.publish('hue.datatable.search.hide');
+          huePubSub.publish('nicescroll.resize');
           huePubSub.publish('hue.scrollleft.hide');
           huePubSub.publish('context.panel.visible', false);
           huePubSub.publish('context.panel.visible.editor', false);
@@ -1373,6 +1376,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           hueAnalytics.convert('hue', 'rightAssistVisible/' + val)
           window.setTimeout(function () {
             huePubSub.publish('reposition.scroll.anchor.up');
+            huePubSub.publish('nicescroll.resize');
             huePubSub.publish('split.panel.resized');
             $(window).trigger('resize');
           }, 0);
