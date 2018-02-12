@@ -1255,7 +1255,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: meta.type() == 'select' -->
-          <select data-bind="selectize: meta.options(), optionsText: 'text', optionsValue:'value', selectizeOptions: { create: true }, value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
+          <select data-bind="selectize: meta.options, optionsText: 'text', optionsValue:'value', selectizeOptions: { create: true }, value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
           <!-- /ko -->
         </div>
       </li>
