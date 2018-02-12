@@ -40,7 +40,7 @@ from django.utils.translation import ugettext as _
     <h2 class="modal-title">${_('Sharing settings')}</h2>
   </div>
   <div class="modal-body" style="overflow: visible; height: 240px">
-    <div class="row-fluid" data-bind="niceScroll" style="max-height: 114px">
+    <div class="row-fluid" style="max-height: 114px">
       <div class="span6">
         <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
         <div data-bind="visible: (selectedDoc().perms.read.users.length == 0 && selectedDoc().perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>

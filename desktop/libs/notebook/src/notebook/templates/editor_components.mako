@@ -38,7 +38,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/jquery.mCustomScrollbar.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }">
 
 <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -74,7 +73,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
 
 
 %if ENABLE_QUERY_BUILDER.get():
@@ -649,7 +647,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
       </ul>
       <span data-bind="visible: !$root.isPresentationMode() || !$root.isHidingCode()">
         <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated"></pre>
+        <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs" class="logs logs-bigger logs-populated"></pre>
       </span>
     </div>
     <div class="snippet-log-resizer" data-bind="visible: result.logs().length > 0, logResizer: {parent: '.snippet-log-container', target: '.logs-populated', mainScrollable: MAIN_SCROLLABLE, onStart: hideFixedHeaders, onResize: function(){ hideFixedHeaders(); redrawFixedHeaders(500); }, minHeight: 50}">
@@ -1413,7 +1411,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-grid-settings${ suffix }">
-  <div class="snippet-grid-settings" style="overflow: auto">
+  <div class="snippet-grid-settings" data-bind="delayedOverflow">
     <table class="table table-condensed margin-top-10 no-border">
       <thead>
         <tr>
@@ -3670,10 +3668,7 @@ function togglePresentation(value) {};
       $(document).on("toggleResultSettings", function (e, snippet) {
         window.setTimeout(function () {
           $('#snippet_' + snippet.id()).find('.chart').trigger("forceUpdate");
-          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('update');
-          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
-            scrollInertia: 0
-          });
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').scrollLeft(0);
           if (snippet.isResultSettingsVisible()){
             $("#snippet_" + snippet.id()).find('.table-results .grid-side').width((100 - $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth') - hueUtils.bootstrapRatios.margin()) + '%');
           }
@@ -3773,12 +3768,7 @@ function togglePresentation(value) {};
           huePubSub.publish('editor.snippet.result.normal', options.snippet);
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
-        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 10 }, scrollInertia: 0});
-        window.setTimeout(function(){
-          $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
-            scrollInertia: 0
-          });
-        }, 200)
+        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').scrollLeft(0);
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('editor.redraw.data', function (options) {
@@ -3890,18 +3880,7 @@ function togglePresentation(value) {};
         }, function () {
           resizeToggleResultSettings(snippet, true);
           forceChartDraws();
-          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({
-            axis: 'xy',
-            theme: 'minimal-dark',
-            scrollbarPosition: 'outside',
-            mouseWheel: {preventDefault: true, deltaFactor: 10},
-            scrollInertia: 0
-          });
-          window.setTimeout(function () {
-            $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
-              scrollInertia: 0
-            });
-          }, 200)
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').scrollLeft(0);
         });
       }, HUE_PUB_SUB_EDITOR_ID);
 

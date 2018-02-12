@@ -44,7 +44,7 @@ from desktop.views import _ko
       </div>
       <div class="modal-body" style="overflow: visible; height: 240px">
         <!-- ko with: definition -->
-        <div class="row-fluid" data-bind="niceScroll , visible: !$parent.hasErrors()" style="max-height: 114px;" id="scrolldiv">
+        <div class="row-fluid" data-bind="visible: !$parent.hasErrors()" style="max-height: 114px;" id="scrolldiv">
           <div class="span6">
             <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
             <div data-bind="visible: (perms.read.users.length == 0 && perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>

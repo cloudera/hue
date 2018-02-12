@@ -37,7 +37,7 @@ from desktop.views import _ko
     </div>
     <!-- /ko -->
 
-    <div class="catalog-entries-list-container" data-bind="niceScroll" style="overflow:hidden;">
+    <div class="catalog-entries-list-container">
       <!-- ko hueSpinner: { spin: loading, center: true, size: 'xlarge' } --><!-- /ko -->
 
       <!-- ko if: !loading() && catalogEntry.isDatabase() -->

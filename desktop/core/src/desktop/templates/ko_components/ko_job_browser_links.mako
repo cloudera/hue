@@ -155,6 +155,7 @@ from desktop.views import _ko
           success: function (response) {
             params.onePageViewModel.processHeaders(response).done(function (rawHtml) {
               $('#mini_jobbrowser').html(rawHtml);
+              ko.bindingHandlers.delayedOverflow.init($('#mini_jobbrowser')[0]);
             });
           }
         });

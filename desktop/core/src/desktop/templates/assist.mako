@@ -381,7 +381,7 @@ from desktop.views import _ko
     <div class="assist-flex-search">
       <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
-    <div class="assist-flex-fill assist-s3-scrollable">
+    <div class="assist-flex-fill assist-s3-scrollable" data-bind="delayedOverflow">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
@@ -445,7 +445,7 @@ from desktop.views import _ko
       <!-- /ko -->
       <!-- ko template: 'assist-git-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-fill assist-git-scrollable">
+    <div class="assist-flex-fill assist-git-scrollable" data-bind="delayedOverflow">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-git-scrollable' }">
@@ -546,7 +546,7 @@ from desktop.views import _ko
     <div class="assist-flex-search">
       <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
-    <div class="assist-flex-fill assist-hdfs-scrollable">
+    <div class="assist-flex-fill assist-hdfs-scrollable" data-bind="delayedOverflow">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
@@ -604,7 +604,7 @@ from desktop.views import _ko
     <div class="assist-flex-search">
       <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
-    <div class="assist-flex-fill assist-adls-scrollable">
+    <div class="assist-flex-fill assist-adls-scrollable" data-bind="delayedOverflow">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-adls-scrollable', fetchMore: $data.fetchMore.bind($data) }">
@@ -670,7 +670,7 @@ from desktop.views import _ko
     <div class="assist-flex-search">
       <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
-    <div class="assist-flex-fill assist-file-scrollable">
+    <div class="assist-flex-fill assist-file-scrollable" data-bind="delayedOverflow">
       <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
         <!-- ko if: filteredEntries().length == 0 -->
         <ul class="assist-tables">
@@ -724,7 +724,7 @@ from desktop.views import _ko
 
       <!-- ko template: 'assist-hbase-header-actions' --><!-- /ko -->
     </div>
-    <div class="assist-flex-fill assist-hbase-scrollable">
+    <div class="assist-flex-fill assist-hbase-scrollable" data-bind="delayedOverflow">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-hbase-scrollable' }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hbase-context-items', scrollContainer: '.assist-hbase-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
@@ -863,7 +863,7 @@ from desktop.views import _ko
           } --><!-- /ko -->
       </div>
     </div>
-    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries()">
+    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries(), delayedOverflow">
       <!-- ko if: ! loading() && filteredEntries().length == 0 -->
       <ul class="assist-tables">
         <li class="assist-entry no-entries">${_('No results found')}</li>
@@ -946,7 +946,7 @@ from desktop.views import _ko
         } --><!-- /ko -->
       </div>
     </div>
-    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()">
+    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading(), delayedOverflow">
       <!-- ko template: 'assist-db-entries' --><!-- /ko -->
     </div>
     <div class="assist-flex-fill" data-bind="visible: loading() || $parent.loading()">
@@ -2304,7 +2304,7 @@ from desktop.views import _ko
             } --><!-- /ko -->
           </div>
         </div>
-        <div class="assist-flex-half assist-db-scrollable">
+        <div class="assist-flex-half assist-db-scrollable" data-bind="delayedOverflow">
           <!-- ko if: filteredTables().length === 0 && (!filter.querySpec() || filter.querySpec().query === '') -->
           <div class="assist-no-entries">
             <!-- ko if: isSolr -->

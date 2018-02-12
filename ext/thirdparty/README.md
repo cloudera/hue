@@ -142,12 +142,10 @@ Checked-in frontend third party dependencies
 |Leaflet ZoomBox|?|ISC|https://github.com/consbio/Leaflet.ZoomBox|
 |LESS|1.7.0|Apache|https://github.com/less/less.js/|
 |LocalForage|1.5.4|Apache|https://github.com/localForage/localForage|
-|Malihu custom scrollbar|3.1.5|MIT|https://github.com/malihu/malihu-custom-scrollbar-plugin|
 |Markdown.js|?|MIT|https://github.com/cadorn/markdown-js|
 |Medium Editor|?|MIT|https://github.com/yabwe/medium-editor|
 |Moment.js|2.13.0|MIT|https://momentjs.com|
 |Mustache.js|0.7.2|MIT|http://github.com/janl/mustache.js|
-|Nicescroll|3.7.6|MIT|https://github.com/inuyaksa/jquery.nicescroll|
 |nvd3|1.1.15b|Apache|https://github.com/novus/nvd3|
 |page.js|1.7.1|MIT|https://github.com/visionmedia/page.js|
 |Plotly.js|1.31.0|MIT|https://github.com/plotly/plotly.js/|

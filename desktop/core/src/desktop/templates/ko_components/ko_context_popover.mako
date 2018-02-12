@@ -54,7 +54,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-hdfs-details">
-    <div class="context-popover-flex-fill" data-bind="with: details, niceScroll">
+    <div class="context-popover-flex-fill" data-bind="with: details">
       <div style="padding: 8px">
         <div style="margin: 10px 10px 18px 10px;">
           <div data-bind="hdfsTree: { isS3: $data.path.indexOf('s3a://') === 0, path: $data.path, selectedPath: $parent.selectedPath }"></div>
@@ -64,7 +64,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-collection-stats-details">
-    <div class="context-popover-flex-fill" data-bind="niceScroll">
+    <div class="context-popover-flex-fill">
       <div style="padding: 8px">
         <div data-bind="with: stats">
         <!-- ko hueSpinner: { spin:  $parent.loadingStats, center: true, size: 'large' } --><!-- /ko -->
@@ -116,7 +116,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-popover-collection-terms-details">
-    <div class="context-popover-flex-fill" data-bind="niceScroll">
+    <div class="context-popover-flex-fill">
       <input type="text" data-bind="value: terms.prefix, clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Filter...') }" class="pull-right">
       <div data-bind="with: terms">
         <!-- ko hueSpinner: { spin:  $parent.loadingTerms, center: true, size: 'large' } --><!-- /ko -->
@@ -152,7 +152,7 @@ from metadata.conf import has_navigator
     </div>
     <!-- /ko -->
     <!-- ko if: typeof details !== 'undefined' -->
-    <div class="context-popover-flex-fill" data-bind="with: details, niceScroll">
+    <div class="context-popover-flex-fill" data-bind="with: details">
       <div style="padding: 8px">
         <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre;" class="monospace" data-bind="text: signature"></span></p>
         <p><span data-bind="text: description"></span></p>
@@ -190,7 +190,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="context-document-details">
-    <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="niceScroll">
+    <div class="context-popover-flex-fill" style="overflow: auto;">
       <div class="context-popover-inner-content">
         <div style="position: absolute; right: 6px; top: 8px;">
           <a class="pointer inactive-action" data-bind="visible: !$parent.closeDisabled, click: function () { $parent.close() }"><i class="fa fa-fw fa-times"></i></a>
@@ -204,7 +204,7 @@ from metadata.conf import has_navigator
         <!-- /ko -->
         <!-- ko with: documentContents -->
         <!-- ko foreach: snippets -->
-        <div class="context-popover-doc-contents" data-bind="niceScroll, highlight: { value: statement_raw, formatted: true, dialect: type }"></div>
+        <div class="context-popover-doc-contents" data-bind="highlight: { value: statement_raw, formatted: true, dialect: type }"></div>
         <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
@@ -330,7 +330,7 @@ from metadata.conf import has_navigator
       </div>
       <!-- /ko -->
       <!-- ko if: !loading() && !hasErrors() && typeof catalogEntry() !== 'undefined' -->
-      <div class="context-popover-flex-fill" data-bind="with: catalogEntry, niceScroll">
+      <div class="context-popover-flex-fill" data-bind="with: catalogEntry">
         <div class="context-popover-inner-content">
           <!-- ko if: $parent.comment() -->
           <div class="context-popover-comment" data-bind="attr: { 'title': $parent.comment }, multiLineEllipsis, text: $parent.comment"></div>

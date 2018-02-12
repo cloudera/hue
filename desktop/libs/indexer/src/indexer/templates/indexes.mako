@@ -136,7 +136,7 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
         % endif
-        <div class="content-panel" ${ not is_embeddable and 'data-bind="niceScroll"' or ''}>
+        <div class="content-panel">
 
 
           <div class="indexer-main">
