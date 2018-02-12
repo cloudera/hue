@@ -426,6 +426,11 @@
 
         $('<div>').addClass('clearfix').appendTo($(_parent.element).find('.filechooser-tree'));
 
+        if (typeof $.nicescroll !== 'undefined') {
+          hueUtils.initNiceScroll($scrollingBreadcrumbs, {railhoffset: {top: 2}});
+          $scrollingBreadcrumbs.parents('.modal').find('.nicescroll-rails-vr').remove();
+        }
+
         var resizeBreadcrumbs = window.setInterval(function(){
           if ($homeBreadcrumb.is(':visible') && $homeBreadcrumb.width() > 0){
             window.clearInterval(resizeBreadcrumbs);
