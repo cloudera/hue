@@ -3512,7 +3512,7 @@
 
 
   ko.bindingHandlers.delayedOverflow = {
-    init: function (element) {
+    init: function (element, valueAccessor) {
       var $element = $(element);
       $element.css("overflow", "hidden");
 
@@ -3520,7 +3520,7 @@
       $element.hover(function() {
         scrollTimeout = window.setTimeout(function() {
           $element.css("overflow", "auto");
-        }, 500);
+        }, ko.unwrap(valueAccessor) || 500);
       }, function() {
         clearTimeout(scrollTimeout);
         $element.css("overflow", "hidden");
