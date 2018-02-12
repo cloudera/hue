@@ -72,7 +72,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
 
         <!-- ko if: $root.collection.engine() == 'solr' -->
         <!-- ko if: columns().length == 0 -->
-        <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections"></select>
+        <select data-bind="selectize: $root.initial.collections, options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections"></select>
 
         <label class="checkbox" style="display:inline-block; margin-left: 10px">
           <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
@@ -2587,7 +2587,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <div class="control-group">
               <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
               <div class="controls">
-                <select id="settingssolrindex" data-bind="options: $root.initial.collections, value: $root.collection.name"></select>
+                <select id="settingssolrindex" class="input-xlarge" data-bind="selectize: $root.initial.collections, options: $root.initial.collections, value: $root.collection.name"></select>
               </div>
             </div>
             <!-- /ko -->
