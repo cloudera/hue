@@ -1450,6 +1450,7 @@ var ExtendedWidget = function (params) {
   self.actionURL = ko.observable("");
   self.logsURL = ko.observable("");
   self.externalId = ko.observable("");
+  self.externalJobId = ko.observable("");
   self.externalIdUrl = ko.observable("");
   return self;
 }
