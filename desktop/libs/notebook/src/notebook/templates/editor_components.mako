@@ -624,7 +624,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="snippet-log${ suffix }">
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
-    <div data-bind="delayedOverflow: 500, css: resultsKlass" style="margin-top: 5px; position: relative;">
+    <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <a href="javascript: void(0)" class="inactive-action close-logs-overlay" data-bind="click: function(){ showLogs(false) }">&times;</a>
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}">
@@ -673,7 +673,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="query-tabs${ suffix }">
   <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
-    <div data-bind="delayedOverflow: 500, css: resultsKlass" style="margin-top: 5px; position: relative;">
+    <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul class="nav nav-tabs">
         <li data-bind="click: function(){ currentQueryTab('queryHistory'); }, css: {'active': currentQueryTab() == 'queryHistory'}, onClickOutside: function () { if ($parent.historyFilterVisible() && $parent.historyFilter() === '') { $parent.historyFilterVisible(false) } }">
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
@@ -1140,7 +1140,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <div class="clearfix margin-bottom-20"></div>
       <!-- /ko -->
 
-      <div class="ace-editor" data-bind="visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(), css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow: 500, aceEditor: {
+      <div class="ace-editor" data-bind="visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(), css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Right-click to expand with columns") }',
@@ -1389,7 +1389,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-grid-settings${ suffix }">
-  <div class="snippet-grid-settings" data-bind="delayedOverflow">
+  <div class="snippet-grid-settings" style="overflow: auto">
     <table class="table table-condensed margin-top-10 no-border">
       <thead>
         <tr>
@@ -1472,7 +1472,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <div class="resize-bar" style="top: 0; right: -10px; cursor: col-resize;"></div>
           </div>
           <div class="grid-side" data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
-            <div data-bind="visible: showGrid, delayedOverflow: 500, css: resultsKlass" style="display: none;">
+            <div data-bind="visible: showGrid, delayedOverflow, css: resultsKlass" style="display: none;">
               <table class="table table-condensed resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
