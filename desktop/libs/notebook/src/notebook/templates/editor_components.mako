@@ -38,6 +38,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/medium-editor.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/css/bootstrap-medium-editor.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/jquery.mCustomScrollbar.min.css') }">
 
 % if not is_embeddable:
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
@@ -71,6 +72,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
 
 
 %if ENABLE_QUERY_BUILDER.get():
@@ -3583,7 +3585,10 @@ function togglePresentation(value) {};
       $(document).on("toggleResultSettings", function (e, snippet) {
         window.setTimeout(function () {
           $('#snippet_' + snippet.id()).find('.chart').trigger("forceUpdate");
-          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').scrollLeft(0);
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('update');
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
+            scrollInertia: 0
+          });
           if (snippet.isResultSettingsVisible()){
             $("#snippet_" + snippet.id()).find('.table-results .grid-side').width((100 - $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth') - hueUtils.bootstrapRatios.margin()) + '%');
           }
@@ -3683,7 +3688,12 @@ function togglePresentation(value) {};
           huePubSub.publish('editor.snippet.result.normal', options.snippet);
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
-        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').scrollLeft(0);
+        $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 10 }, scrollInertia: 0});
+        window.setTimeout(function(){
+          $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
+            scrollInertia: 0
+          });
+        }, 200)
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('editor.redraw.data', function (options) {
@@ -3791,7 +3801,18 @@ function togglePresentation(value) {};
         }, function () {
           resizeToggleResultSettings(snippet, true);
           forceChartDraws();
-          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').scrollLeft(0);
+          $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({
+            axis: 'xy',
+            theme: 'minimal-dark',
+            scrollbarPosition: 'outside',
+            mouseWheel: {preventDefault: true, deltaFactor: 10},
+            scrollInertia: 0
+          });
+          window.setTimeout(function () {
+            $('#snippet_' + snippet.id()).find('.snippet-grid-settings').mCustomScrollbar('scrollTo', 'left', {
+              scrollInertia: 0
+            });
+          }, 200)
         });
       }, HUE_PUB_SUB_EDITOR_ID);
 
