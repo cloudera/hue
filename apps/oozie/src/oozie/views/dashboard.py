@@ -999,6 +999,7 @@ def massaged_workflow_actions_for_json(workflow_actions, oozie_coordinator, oozi
       'status': action.status,
       'externalIdUrl': action.get_external_id_url(),
       'externalId': action.externalId,
+      'externalJobId': action.externalId,
       'startTime': format_time(action.startTime),
       'endTime': format_time(action.endTime),
       'retries': action.retries,
