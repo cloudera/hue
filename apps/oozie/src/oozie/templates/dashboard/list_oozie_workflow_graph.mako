@@ -113,6 +113,7 @@ ${ dashboard.import_layout() }
                     _w.logsURL(action.log);
                     _w.externalIdUrl(action.externalIdUrl);
                     _w.externalId(action.id);
+                    _w.externalJobId(action.externalJobId);
                   }
                 });
               %endif
