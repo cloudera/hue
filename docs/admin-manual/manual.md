@@ -852,6 +852,34 @@ section for more details about managing and operating a Hue installation.
 Displays the Hue Server log and allows you to download the log to your
 local system in a zip file.
 
+## Threads
+
+Read more on the [Threads and Metrics pages
+ blog post](http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/)
+
+Threads page can be very helpful in debugging purposes. It includes a daemonic thread and the thread objects serving concurrent requests. The host name, thread name identifier and current stack frame of each are displayed. Those are useful when Hue “hangs”, sometimes in case of a request too CPU intensive. There is also a REST API to get the dump of Threads using 'desktop/debug/threads'
+
+## Metrics
+
+
+Read more on the [Threads and Metrics pages
+ blog post](http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/)
+
+Hue uses the **PyFormance** Python library to collect the metrics. These metrics are represented as gauge, counters, meter, rate of events over time, histogram, statistical distribution of values. A REST API endpoint '/desktop/metrics/' to get all the metrics dump as json is also exposed
+
+The below metrics of most concern to us are displayed on the page:
+
+- requests.active
+- requests.exceptions
+- requests.response-time
+- threads.daemon
+- threads.total
+- users
+- users.active
+
+One of the most useful ones are the percentiles of response time of requests and the count of active users.
+Admins can either filter a particular property in all the metrics or select a particular metric for all properties
+
 
 ## User management
 
