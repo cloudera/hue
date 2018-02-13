@@ -250,23 +250,12 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   <div class="pull-right margin-right-10">
   % if ENABLE_PRESENTATION.get():
     <!-- ko with: selectedNotebook() -->
-      <div class="btn-group">
-        <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
-        css: {'btn-inverse': $root.isPresentationMode()}, attr: {title: isPresentationMode() ? '${ _ko('Exit presentation') }' : '${ _ko('View as a presentation') }'}">
-          <i class="fa fa-line-chart"></i>
-        </a>
-
-        <!-- ko if: $root.canSave() -->
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li>
-            <a class="pointer" title="${ _ko('Wether to open in presentation or editor mode by default') }" data-bind="click: function() { isPresentationModeDefault(!isPresentationModeDefault()); }">
-              <i class="fa" data-bind="css: {'fa-toggle-on': isPresentationModeDefault(), 'fa-toggle-off': !isPresentationModeDefault()}"></i> ${ _('Open as presentation') }
-            </a>
-          </li>
-        </ul>
-        <!-- /ko -->
-      </div>
+      <!-- ko if: isPresentationModeAvailable -->
+      <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
+      css: {'btn-inverse': $root.isPresentationMode()}, attr: {title: isPresentationMode() ? '${ _ko('Exit presentation') }' : '${ _ko('View as a presentation') }'}">
+        <i class="fa fa-line-chart"></i>
+      </a>
+      <!-- /ko -->
     <!-- /ko -->
   % endif
 
@@ -353,12 +342,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <!-- ko if: $root.isResultFullScreenMode() -->
 <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="click: function(){ $root.isResultFullScreenMode(false); }">
-  <i class="fa fa-times fa-fw"></i>
-</a>
-<!-- /ko -->
-
-<!-- ko if: $root.isPresentationMode() -->
-<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
   <i class="fa fa-times fa-fw"></i>
 </a>
 <!-- /ko -->
@@ -3336,15 +3319,16 @@ function togglePresentation(value) {};
       var wasRightPanelVisible = viewModel.isRightPanelVisible();
 
       function exitPlayerMode() {
-        if (! wasResultFullScreenMode) {
+        if (!wasResultFullScreenMode) {
           viewModel.selectedNotebook().isPresentationMode(false);
         } else {
           viewModel.isResultFullScreenMode(false);
         }
       }
 
-       huePubSub.subscribe('editor.presentation.operate.toggle', function (value) {
-        viewModel.isEditing(! viewModel.isEditing());
+      huePubSub.subscribe('editor.presentation.operate.toggle', function (value) {
+        wasResultFullScreenMode = false;
+        viewModel.isEditing(!viewModel.isEditing());
         if (value) {
           $(".jHueNotify").remove();
           isAssistAvailable = viewModel.assistAvailable();
@@ -3361,7 +3345,7 @@ function togglePresentation(value) {};
           viewModel.assistAvailable(false);
           viewModel.isLeftPanelVisible(true);
           viewModel.isRightPanelVisible(false);
-          window.setTimeout(function(){
+          window.setTimeout(function () {
             viewModel.assistWithoutStorage(false);
           }, 0);
           $(".navigator").hide();
@@ -3380,15 +3364,15 @@ function togglePresentation(value) {};
           viewModel.isLeftPanelVisible(wasLeftPanelVisible);
           viewModel.isRightPanelVisible(wasRightPanelVisible);
           viewModel.assistAvailable(isAssistAvailable);
-          window.setTimeout(function(){
+          window.setTimeout(function () {
             viewModel.assistWithoutStorage(false);
           }, 0);
           $(".navigator").show();
           $(".add-snippet").show();
           % if conf.CUSTOM.BANNER_TOP_HTML.get():
-          $(".main-content").css("top", "112px");
+            $(".main-content").css("top", "112px");
           % else:
-          $(".main-content").css("top", "74px");
+            $(".main-content").css("top", "74px");
           % endif
           redrawFixedHeaders(200);
           $(window).unbind("keydown", exitPlayerMode);
