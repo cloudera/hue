@@ -2100,6 +2100,7 @@ var EditorViewModel = (function() {
       if (newValue) {
         hueAnalytics.convert('editor', 'presentation');
       }
+      self.isPresentationModeDefault(newValue);
     });
     self.isPresentationMode(self.isPresentationModeDefault());
     self.presentationSnippets = ko.observable({});

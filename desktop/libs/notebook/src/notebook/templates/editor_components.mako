@@ -251,23 +251,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
   % if ENABLE_PRESENTATION.get():
     <!-- ko with: selectedNotebook() -->
       <!-- ko if: isPresentationModeAvailable -->
-      <div class="btn-group">
-        <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
-        css: {'btn-inverse': $root.isPresentationMode()}, attr: {title: isPresentationMode() ? '${ _ko('Exit presentation') }' : '${ _ko('View as a presentation') }'}">
-          <i class="fa fa-line-chart"></i>
-        </a>
-
-        <!-- ko if: $root.canSave() -->
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li>
-            <a class="pointer" title="${ _ko('Wether to open in presentation or editor mode by default') }" data-bind="click: function() { isPresentationModeDefault(!isPresentationModeDefault()); }">
-              <i class="fa" data-bind="css: {'fa-toggle-on': isPresentationModeDefault(), 'fa-toggle-off': !isPresentationModeDefault()}"></i> ${ _('Open as presentation') }
-            </a>
-          </li>
-        </ul>
-        <!-- /ko -->
-      </div>
+      <a class="btn" data-bind="click: function() { isPresentationMode(!isPresentationMode()); },
+      css: {'btn-inverse': $root.isPresentationMode()}, attr: {title: isPresentationMode() ? '${ _ko('Exit presentation') }' : '${ _ko('View as a presentation') }'}">
+        <i class="fa fa-line-chart"></i>
+      </a>
       <!-- /ko -->
     <!-- /ko -->
   % endif
