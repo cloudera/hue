@@ -29,8 +29,10 @@ from django.core.management.base import BaseCommand
 from django.core.wsgi import get_wsgi_application
 from django.utils.translation import ugettext as _
 
+from gevent import monkey
 from gunicorn import util
 from gunicorn.six import iteritems
+
 
 GUNICORN_SERVER_HELP = r"""
   Run Hue using the Gunicorn WSGI server in asynchronous mode.
@@ -50,8 +52,33 @@ def number_of_workers():
   return (multiprocessing.cpu_count() * 2) + 1
 
 
-def handler_app(environ, start_response):
+def handler_app(options):
   os.environ.setdefault("DJANGO_SETTINGS_MODULE", "desktop.settings")
+  # """
+  worker_class = options.get('worker_class')
+  if worker_class.startswith('gevent'):
+      #from gevent.pywsgi import WSGIHandler as GeventWSGIHandler
+      #return GeventWSGIHandler()
+      #monkey.patch_all()
+      monkey.patch_builtins()
+      monkey.patch_dns()
+      monkey.patch_os()
+      monkey.patch_select()
+      monkey.patch_signal()
+      monkey.patch_socket()
+      monkey.patch_ssl()
+      #monkey.patch_subprocess()  # TODO: https://pypi.python.org/pypi/subprocess32
+      monkey.patch_sys()
+      monkey.patch_thread()
+      monkey.patch_time()
+
+  #import socketio
+  #from socketio import Middleware
+  #sio = socketio.Server(async_mode='gevent')
+  #application = get_wsgi_application()
+  #application = DjangoWhiteNoise(application)
+  #application = Middleware(sio, application)
+  # """
   return get_wsgi_application()
 
 
@@ -150,7 +177,7 @@ def rungunicornserver():
       'worker_tmp_dir': None,
       'workers': conf.GUNICORN_NUMBER_OF_WORKERS.get() if conf.GUNICORN_NUMBER_OF_WORKERS.get() is not None else number_of_workers()
   }
-  StandaloneApplication(handler_app, options).run()
+  StandaloneApplication(handler_app(options=options), options).run()
 
 if __name__ == '__main__':
     rungunicornserver()

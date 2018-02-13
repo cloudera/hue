@@ -7,6 +7,10 @@ import sys
 import weakref
 from gevent.lock import RLock
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # Normally we'd have the "expected" case inside the try
 # (Python 3, because Python 3 is the way forward). But
 # under Python 2, the popular `future` library *also* provides
@@ -85,6 +89,9 @@ def __import__(*args, **kwargs):
     if not __lock_imports:
         return _import(*args, **kwargs)
 
+    logger.info("module name: %s" % args[0])
+    if 'abc' in args[0]:
+        logger.info("let's stop here.")
     module_lock = __module_lock(args[0]) # Get a lock for the module name
     imp.acquire_lock()
     try:
@@ -93,6 +100,9 @@ def __import__(*args, **kwargs):
             result = _import(*args, **kwargs)
         finally:
             module_lock.release()
+    except Exception as e:
+        logger.error("module import e: %s" % e)
+        #### raise ImportError("This loader does not know module " + args[0])
     finally:
         imp.release_lock()
     return result
