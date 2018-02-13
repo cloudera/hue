@@ -97,10 +97,11 @@ ko.bindingHandlers.gridster = {
             if (change.value.callback) {
               ko.unwrap(change.value.callback)(addedWidget);
             }
+            syncPositionsToModel();
             break;
           case 'deleted':
             huePubSub.publish('gridster.deleted.widget', change.value.gridsterElement);
-            gridster.remove_widget(change.value.gridsterElement);
+            gridster.remove_widget(change.value.gridsterElement, syncPositionsToModel);
             break;
           default:
             throw new Error('Unexpected change.status');
