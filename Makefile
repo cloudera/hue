@@ -205,8 +205,8 @@ install-env:
 	$(MAKE) -C $(INSTALL_DIR)/desktop env-install
 	@echo --- Setting up Applications
 	$(MAKE) -C $(INSTALL_DIR)/apps env-install
-	@echo --- Setting up Desktop database
-	$(MAKE) -C $(INSTALL_DIR)/desktop syncdb
+	#@echo --- Setting up Desktop database
+	#$(MAKE) -C $(INSTALL_DIR)/desktop syncdb
 
 ###################################
 # Internationalization
