@@ -554,6 +554,15 @@ var EditorViewModel = (function() {
       }
     }, vm.huePubSubId);
 
+    self.statement_raw.subscribe(function (val) {
+      if (val) {
+        notebook.isPresentationModeAvailable(true);
+      }
+      else {
+        notebook.isPresentationModeAvailable(false);
+      }
+    });
+
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
     // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
     self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
@@ -2079,10 +2088,10 @@ var EditorViewModel = (function() {
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
     self.pubSubUrl = ko.observable(typeof notebook.pubSubUrl != "undefined" && notebook.pubSubUrl != null ? notebook.pubSubUrl : null);
     self.isPresentationModeDefault = ko.observable(typeof notebook.isPresentationModeDefault != "undefined" && notebook.isPresentationModeDefault != null ? notebook.isPresentationModeDefault : false);
+    self.isPresentationModeAvailable = ko.observable(false);
     self.isPresentationMode = ko.observable(false);
     self.isPresentationMode.subscribe(function(newValue) {
-      wasResultFullScreenMode = false;
-      if (! newValue) {
+      if (!newValue) {
         self.cancelExecutingAll();
       }
       huePubSub.publish('editor.presentation.operate.toggle', newValue); // Problem with headers / row numbers redraw on full screen results
