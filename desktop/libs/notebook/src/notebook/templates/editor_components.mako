@@ -359,12 +359,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </a>
 <!-- /ko -->
 
-<!-- ko if: $root.isPresentationMode() -->
-<a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Exit presentation') }" data-bind="click: function(){ $root.selectedNotebook().isPresentationMode(false); }">
-  <i class="fa fa-times fa-fw"></i>
-</a>
-<!-- /ko -->
-
 <div class="player-toolbar margin-top-10" data-bind="visible: $root.isPresentationMode()" style="display: none">
   <!-- ko if: $root.isPresentationMode() -->
     <!-- ko if: $root.selectedNotebook() -->
