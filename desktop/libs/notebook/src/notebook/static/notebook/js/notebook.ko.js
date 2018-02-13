@@ -2079,6 +2079,7 @@ var EditorViewModel = (function() {
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
     self.initialType = self.type().replace('query-', '');
+    self.initialTypeUntouched = self.type();
     self.coordinatorUuid = ko.observable(typeof notebook.coordinatorUuid != "undefined" && notebook.coordinatorUuid != null ? notebook.coordinatorUuid : null);
     self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
     self.isManaged = ko.observable(typeof notebook.isManaged != "undefined" && notebook.isManaged != null ? notebook.isManaged : false);
@@ -2383,7 +2384,12 @@ var EditorViewModel = (function() {
       if (cp.schedulerViewModel) {
         cp.schedulerViewModel.availableTimezones = [];
       }
-      var editorMode = vm.editorMode() || (self.isPresentationMode() && vm.editorType() != 'notebook'); // Editor should not convert to Notebook in presentation mode
+      var editorMode = vm.editorMode() || self.isPresentationMode(); // Editor should not convert to Notebook in presentation mode
+
+      // override the type of editor to the initial type
+      if (self.isPresentationMode()) {
+        cp.type = cp.initialTypeUntouched;
+      }
 
       $.post("/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(cp, NOTEBOOK_MAPPING),
@@ -2801,7 +2807,7 @@ var EditorViewModel = (function() {
     self.isNotificationManager = ko.observable(options.is_notification_manager || false);
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
-      self.editorMode(newVal != 'notebook');
+      self.editorMode(newVal !== 'notebook');
       hueUtils.changeURLParameter('type', newVal);
       if (self.editorMode()) {
         self.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
@@ -2873,9 +2879,6 @@ var EditorViewModel = (function() {
     self.selectedNotebook = ko.observable();
 
     self.combinedContent = ko.observable();
-    self.isPresentationModeEnabled = ko.pureComputed(function () {
-      return self.selectedNotebook() && self.selectedNotebook().snippets().length === 1 && self.selectedNotebook().snippets()[0].isSqlDialect()
-    });
     self.isResultFullScreenMode = ko.observable(false);
     self.isPresentationMode = ko.computed(function() {
       return self.selectedNotebook() && self.selectedNotebook().isPresentationMode();

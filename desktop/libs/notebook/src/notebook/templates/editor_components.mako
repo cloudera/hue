@@ -291,7 +291,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko if: $root.canSave -->
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu pull-right">
           <li>
             <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
               <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
@@ -958,10 +958,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
             <div class="snippet-body" data-bind="clickForAceFocus: ace, visible: ! $root.isResultFullScreenMode()">
               <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode() && !$root.isPresentationMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
+              <h3 style="margin-left:5px;padding: 3px 0;font-weight: 400" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode() && !$root.isPresentationMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
                 <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header${ suffix }' } --><!-- /ko -->
                 <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header${ suffix }' } --><!-- /ko -->
-              </h2>
+              </h3>
               <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body${ suffix }' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'text', name: 'text-snippet-body${ suffix }' } --><!-- /ko -->
               <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body${ suffix }' } --><!-- /ko -->
