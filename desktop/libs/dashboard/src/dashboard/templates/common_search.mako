@@ -4465,7 +4465,7 @@ $(document).ready(function () {
             window.clearInterval(_widgetDropInterval);
             row.autosizeWidgets();
           }
-        }, 100, 'search')
+        }, 100, 'dashboard')
       }
       else {
         row.autosizeWidgets();
