@@ -4097,13 +4097,8 @@
             token.notFound = true;
 
             if (token.parseLocation && token.parseLocation.type === 'table') {
-              ApiHelper.getInstance().identifierChainToPath({
-                identifierChain: token.parseLocation.identifierChain,
-                sourceType: self.snippet.type(),
-                defaultDatabase: self.snippet.database()
-              }).done(function (path) {
-                token.qualifiedIdentifier = path.join('.');
-              })
+              var path = $.map(token.parseLocation.identifierChain, function (identifier) { return identifier.name; });
+              token.qualifiedIdentifier = path.join('.');
             }
 
             if (token.parseLocation && weightedExpected.length > 0) {
@@ -4647,14 +4642,13 @@
                       if (tableChain.length > 0 && lastIdentifier && lastIdentifier.name) {
                         var colName = lastIdentifier.name.toLowerCase();
                         // Note, as cachedOnly is set to true it will call the successCallback right away (or not at all)
-                        ApiHelper.getInstance().fetchAutocomplete({
+                        DataCatalog.getEntry({
                           sourceType: snippet.type(),
-                          defaultDatabase: snippet.database(),
-                          identifierChain: tableChain,
-                          cachedOnly: true,
-                          successCallback: function (details) {
-                            if (details && details.extended_columns) {
-                              details.extended_columns.every(function (col) {
+                          path: $.map(tableChain, function (identifier) { return identifier.name })
+                        }).done(function (entry) {
+                          entry.getSourceMeta({ cachedOnly: true, silenceErrors: true }).done(function (sourceMeta) {
+                            if (sourceMeta && sourceMeta.extended_columns) {
+                              sourceMeta.extended_columns.every(function (col) {
                                 if (col.name.toLowerCase() === colName) {
                                   colType = col.type.match(/^[^<]*/g)[0];
                                   return false;
@@ -4662,9 +4656,8 @@
                                 return true;
                               })
                             }
-                          },
-                          silenceErrors: true
-                        })
+                          });
+                        });
                       }
                     }
                     if (token.parseLocation.identifierChain) {

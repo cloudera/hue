@@ -237,33 +237,24 @@
 
     self.getDatabases = function (callback) {
       var self = this;
-      self.apiHelper.loadDatabases({
-        sourceType: self.options.apiHelperType,
-        successCallback: callback,
-        silenceErrors: false
+      DataCatalog.getChildren({ sourceType: self.options.apiHelperType, path: [] }).done(function (dbEntries) {
+        callback($.map(dbEntries, function (entry) { return entry.name }));
       });
-    }
+    };
 
     self.getTables = function (database, callback) {
       var self = this;
-      self.apiHelper.fetchTables({
-        sourceType: self.options.apiHelperType,
-        databaseName: database,
-        successCallback: callback,
-        silenceErrors: false
+      DataCatalog.getEntry({ sourceType: self.options.apiHelperType, path: [database] }).done(function (entry) {
+        entry.getSourceMeta().done(callback)
       });
-    }
+    };
 
     self.getColumns = function (database, table, callback) {
       var self = this;
-      self.apiHelper.fetchTableDetails({
-        sourceType: self.options.apiHelperType,
-        databaseName: database,
-        tableName: table,
-        successCallback: callback,
-        silenceErrors: false
+      DataCatalog.getEntry({ sourceType: self.options.apiHelperType, path: [database, table] }).done(function (entry) {
+        entry.getSourceMeta().done(callback)
       });
-    }
+    };
 
     function autocompleteLogic(autocompleteUrl, data) {
       if (data.error == null) {

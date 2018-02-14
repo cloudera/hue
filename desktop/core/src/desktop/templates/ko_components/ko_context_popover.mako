@@ -150,10 +150,10 @@ from metadata.conf import has_navigator
   <script type="text/html" id="context-popover-table-and-column-sample">
     <div class="context-popover-flex-fill context-popover-sample-container" data-bind="with: fetchedData">
       <div class="context-popover-sample sample-scroll">
-        <!-- ko if: rows.length == 0 -->
+        <!-- ko if: typeof rows === 'undefined' || rows.length === 0 -->
         <div class="alert">${ _('The selected table has no data.') }</div>
         <!-- /ko -->
-        <!-- ko if: rows.length > 0 -->
+        <!-- ko if: typeof rows !== 'undefined' && rows.length > 0 -->
         <table id="samples-table" class="samples-table table table-condensed">
           <thead>
           <tr>
@@ -514,13 +514,13 @@ from metadata.conf import has_navigator
         }
       };
 
-      function GenericTabContents(identifierChain, sourceType, defaultDatabase, apiFunction, parent) {
+      function GenericTabContents(identifierChain, sourceType, defaultDatabase, catalogEntryFnName, parent) {
         var self = this;
         self.identifierChain = identifierChain;
         self.sourceType = sourceType;
         self.defaultDatabase = defaultDatabase;
         self.apiHelper = ApiHelper.getInstance();
-        self.apiFunction = apiFunction;
+        self.catalogEntryFnName = catalogEntryFnName;
         self.parent = parent;
 
         self.fetchedData = ko.observable();
@@ -559,58 +559,79 @@ from metadata.conf import has_navigator
         self.loading(true);
         self.hasErrors(false);
 
-        self.apiFunction.bind(self.apiHelper)({
-          sourceType: self.sourceType,
-          identifierChain: self.identifierChain,
-          defaultDatabase: self.defaultDatabase,
-          silenceErrors: true,
-          successCallback: function (data) {
-            if (data.code === 500) {
-              self.loading(false);
-              self.hasErrors(true);
-              if (data.notFound) {
-                self.parent.notFound(data);
-              }
-              return;
-            }
-            if (typeof data.extended_columns !== 'undefined') {
-              data.extended_columns.forEach(function (column) {
-                column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
-                if (column.type.indexOf('<') !== -1) {
-                  column.type = column.type.substring(0, column.type.indexOf('<'));
-                }
-              });
-            }
-            if (typeof data.properties !== 'undefined') {
-              data.properties.forEach(function (property) {
-                if (property.col_name.toLowerCase() === 'view original text:') {
-                  data.viewSql = ko.observable();
-                  data.loadingViewSql = ko.observable(true);
-                  ApiHelper.getInstance().formatSql(property.data_type).done(function (formatResponse) {
-                    if (formatResponse.status == 0) {
-                      data.viewSql(formatResponse.formatted_statements);
-                    } else {
-                      data.viewSql(property.data_type);
-                    }
-                  }).fail(function () {
-                    data.viewSql(property.data_type);
-                  }).always(function () {
-                    data.loadingViewSql(false);
-                  })
-                }
-              })
-            }
-            self.fetchedData(data);
-            self.loading(false);
-            if (typeof callback === 'function') {
-              callback(data);
-            }
-          },
-          errorCallback: function () {
-            self.loading(false);
-            self.hasErrors(true);
+        if (self.catalogEntryFnName) {
+          var path = $.map(self.identifierChain, function (identifier) { return identifier.name });
+          if (path.length === 0) {
+            path.push(self.defaultDatabase);
           }
-        });
+          DataCatalog.getChildren({ sourceType: self.sourceType, path: [], silenceErrors: true }).done(function (dbEntries) {
+            var firstIsDatabase = dbEntries.some(function (dbEntry) {
+              return dbEntry.name.toLowerCase() === path[0].toLowerCase();
+            });
+
+            if (!firstIsDatabase) {
+              path.unshift(self.defaultDatabase);
+            }
+
+            DataCatalog.getEntry({ sourceType: self.sourceType, path: path }).done(function (catalogEntry) {
+              if (catalogEntry[self.catalogEntryFnName]) {
+                catalogEntry[self.catalogEntryFnName]({ silenceErrors: true }).done(function (response) {
+                  if (response.notFound) {
+                    self.hasErrors(true);
+                    self.parent.notFound(true);
+                    return;
+                  }
+
+                  var details = $.extend({}, response); // shallow clone
+
+                  // Adapt columns if there
+                  if (typeof details.extended_columns !== 'undefined') {
+                    var newExtendedColumns = [];
+                    details.extended_columns.forEach(function (column) {
+                      var clonedColumn = $.extend({}, column);
+                      clonedColumn.extendedType = clonedColumn.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
+                      if (clonedColumn.type.indexOf('<') !== -1) {
+                        clonedColumn.type = clonedColumn.type.substring(0, clonedColumn.type.indexOf('<'));
+                      }
+                      newExtendedColumns.push(clonedColumn);
+                    });
+                    details.extended_columns = newExtendedColumns;
+                  }
+
+                  // Adapt and format view SQL if there
+                  if (typeof details.properties !== 'undefined') {
+                    details.properties.forEach(function (property) {
+                      if (property.col_name.toLowerCase() === 'view original text:') {
+                        details.viewSql = ko.observable();
+                        details.loadingViewSql = ko.observable(true);
+                        ApiHelper.getInstance().formatSql(property.data_type).done(function (formatResponse) {
+                          if (formatResponse.status == 0) {
+                            details.viewSql(formatResponse.formatted_statements);
+                          } else {
+                            details.viewSql(property.data_type);
+                          }
+                        }).fail(function () {
+                          details.viewSql(property.data_type);
+                        }).always(function () {
+                          details.loadingViewSql(false);
+                        })
+                      }
+                    })
+                  }
+
+                  self.fetchedData(details);
+                  if (typeof callback === 'function') {
+                    callback(details);
+                  }
+                }).fail(function () {
+                  self.hasErrors(true);
+                }).always(function () {
+                  self.loading(false);
+                });
+              }
+            });
+          });
+        }
       };
 
       function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn, isComplex) {
@@ -620,12 +641,12 @@ from metadata.conf import has_navigator
 
         var apiHelper = ApiHelper.getInstance();
 
-        self.columns = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete, self);
-        self.columnDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete, self);
-        self.tableDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, sourceType === 'solr' ? $.noop : apiHelper.fetchAnalysis_OLD, self);
-        self.sample = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples, self);
-        self.analysis = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis_OLD, self);
-        self.partitions = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions, self);
+        self.columns = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, 'getSourceMeta', self);
+        self.columnDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, 'getSourceMeta', self);
+        self.tableDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, sourceType === 'solr' ? '' : 'getAnalysis', self);
+        self.sample = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, 'getSample', self);
+        self.analysis = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, 'getAnalysis', self);
+        self.partitions = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, 'getPartitions', self);
 
         self.hasErrors = false;
         self.isTable = !isColumn && !isComplex;
@@ -642,9 +663,11 @@ from metadata.conf import has_navigator
               } else {
                 var data = self.columnDetails.fetchedData();
                 var rows = [];
-                data.sample.forEach(function (sample) {
-                  rows.push([sample]);
-                });
+                if (data.sample) {
+                  data.sample.forEach(function (sample) {
+                    rows.push([sample]);
+                  });
+                }
                 self.sample.fetchedData({
                   headers: [ data.name || self.title ],
                   rows: rows
@@ -818,20 +841,14 @@ from metadata.conf import has_navigator
           scrollPubSub.remove();
         });
 
-        apiHelper.identifierChainToPath({
-          sourceType: sourceType,
-          defaultDatabase: defaultDatabase,
-          identifierChain: data.identifierChain
-        }).done(function (path) {
-          var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
-            huePubSub.publish('assist.db.highlight', {
-              sourceType: sourceType,
-              path: path
-            });
+        var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
+          huePubSub.publish('assist.db.highlight', {
+            sourceType: sourceType,
+            path: $.map(data.identifierChain, function (identifier) { return identifier.name })
           });
-          self.disposals.push(function () {
-            showInAssistPubSub.remove();
-          })
+        });
+        self.disposals.push(function () {
+          showInAssistPubSub.remove();
         });
 
         self.initializeSamplesTable = function (data) {
@@ -950,7 +967,7 @@ from metadata.conf import has_navigator
         });
 
         self.tabs = [
-          { id: 'details', label: '${ _("Details") }', comment : self.dbComment, template: 'context-popover-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, ApiHelper.getInstance().fetchAutocomplete) }
+          { id: 'details', label: '${ _("Details") }', comment : self.dbComment, template: 'context-popover-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, 'getSourceMeta') }
         ];
         self.activeTab = ko.observable('details');
 
@@ -1033,36 +1050,36 @@ from metadata.conf import has_navigator
           huePubSub.publish('context.popover.hide');
         };
 
-        var apiHelper = ApiHelper.getInstance();
         var deferrals = [];
         data.tables.forEach(function (table) {
           if (table.identifierChain) {
             var fetchDeferred = $.Deferred();
             deferrals.push(fetchDeferred);
-            apiHelper.fetchAutocomplete({
+            DataCatalog.getEntry({
               sourceType: sourceType,
-              defaultDatabase: defaultDatabase,
-              identifierChain: table.identifierChain,
-              successCallback: function (data) {
-                if (typeof data.extended_columns !== 'undefined') {
-                  data.extended_columns.forEach(function (column) {
-                    column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
-                    if (column.type.indexOf('<') !== -1) {
-                      column.type = column.type.substring(0, column.type.indexOf('<'));
+              path: $.map(table.identifierChain, function (identifier) { return identifier.name })
+            }).done(function (entry) {
+              entry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
+                if (typeof sourceMeta.extended_columns !== 'undefined') {
+                  var newColumns = [];
+                  sourceMeta.extended_columns.forEach(function (column) {
+                    var clonedColumn = $.extend({}, column);
+                    clonedColumn.extendedType = clonedColumn.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
+                    if (clonedColumn.type.indexOf('<') !== -1) {
+                      clonedColumn.type = clonedColumn.type.substring(0, clonedColumn.type.indexOf('<'));
                     }
-                    column.selected = ko.observable(false);
-                    column.table = table.identifierChain[table.identifierChain.length - 1].name;
+                    clonedColumn.selected = ko.observable(false);
+                    clonedColumn.table = table.identifierChain[table.identifierChain.length - 1].name;
                     if (table.alias) {
-                      column.tableAlias = table.alias
+                      clonedColumn.tableAlias = table.alias
                     }
+                    newColumns.push(clonedColumn);
                   });
+                  self.columns = self.columns.concat(newColumns);
                 }
-                self.columns = self.columns.concat(data.extended_columns);
                 fetchDeferred.resolve();
-              },
-              silenceErrors: true,
-              errorCallback: fetchDeferred.reject
-            })
+              }).fail(fetchDeferred.reject);
+            }).fail(fetchDeferred.reject);
           }
         });
 
@@ -1257,22 +1274,15 @@ from metadata.conf import has_navigator
         ];
         self.activeTab = ko.observable('terms');
 
-        self.apiHelper.identifierChainToPath({
-          sourceType: 'solr',
-          identifierChain: data.identifierChain,
-          defaultDatabase: 'default'
-        }).done(function (path) {
-          var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
-            huePubSub.publish('assist.db.highlight', {
-              sourceType: 'solr',
-              path: path
-            });
+        var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
+          huePubSub.publish('assist.db.highlight', {
+            sourceType: 'solr',
+            path: $.map(data.identifierChain, function (identifier){ return identifier.name; })
           });
-          self.disposals.push(function () {
-            showInAssistPubSub.remove();
-          })
         });
-
+        self.disposals.push(function () {
+          showInAssistPubSub.remove();
+        })
       }
 
       CollectionContextTabs.prototype.loadTerms = function () {
@@ -1666,24 +1676,19 @@ from metadata.conf import has_navigator
         self.orientationClass = 'hue-popover-' + orientation;
 
         if ((self.isDatabase || self.isTable || self.isView) && self.data.identifierChain) {
-          apiHelper.identifierChainToPath({
-            sourceType: self.sourceType,
-            identifierChain: self.data.identifierChain,
-            defaultDatabase: self.defaultDatabase
-          }).done(function (path) {
-
-            var showInMetastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function (type) {
-              if (IS_HUE_4) {
-                huePubSub.publish('open.link', '/metastore/table' + (type === 'table' || type === 'view' ? '/' : 's/') + path.join('/'));
-                huePubSub.publish('context.popover.hide');
-              } else {
-                window.open('/metastore/table' + (type === 'table' || type === 'view' ? '/' : 's/') + path.join('/'), '_blank');
-              }
-            });
-            self.disposals.push(function () {
-              showInMetastorePubSub.remove();
-            });
-            % if HAS_SQL_ENABLED.get():
+          var path = $.map(self.data.identifierChain, function (identifier) { return identifier.name });
+          var showInMetastorePubSub = huePubSub.subscribe('context.popover.open.in.metastore', function (type) {
+            if (IS_HUE_4) {
+              huePubSub.publish('open.link', '/metastore/table' + (type === 'table' || type === 'view' ? '/' : 's/') + path.join('/'));
+              huePubSub.publish('context.popover.hide');
+            } else {
+              window.open('/metastore/table' + (type === 'table' || type === 'view' ? '/' : 's/') + path.join('/'), '_blank');
+            }
+          });
+          self.disposals.push(function () {
+            showInMetastorePubSub.remove();
+          });
+          % if HAS_SQL_ENABLED.get():
             var openInDashboardPubSub = huePubSub.subscribe('context.popover.open.in.dashboard', function () {
               if (IS_HUE_4) {
                 huePubSub.publish('open.link', '/hue/dashboard/browse/' + path.join('.') + '?engine=' + self.sourceType);
@@ -1695,8 +1700,7 @@ from metadata.conf import has_navigator
             self.disposals.push(function () {
               openInDashboardPubSub.remove();
             });
-            % endif
-          });
+          % endif
         }
 
         if (params.delayedHide) {

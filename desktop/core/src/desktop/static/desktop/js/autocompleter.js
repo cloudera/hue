@@ -38,22 +38,11 @@ var Autocompleter = (function () {
           timeout: self.timeout
         });
       } else {
-        var hdfsAutocompleter = new HdfsAutocompleter({
+        self.autocompleter = new HdfsAutocompleter({
           user: options.user,
           snippet: options.snippet,
           timeout: options.timeout
         });
-        if (self.snippet.isSqlDialect()) {
-          self.autocompleter = new SqlAutocompleter({
-            hdfsAutocompleter: hdfsAutocompleter,
-            snippet: options.snippet,
-            oldEditor: options.oldEditor,
-            optEnabled: options.optEnabled,
-            timeout: self.timeout
-          })
-        } else {
-          self.autocompleter = hdfsAutocompleter;
-        }
       }
     };
     self.snippet.type.subscribe(function () {
