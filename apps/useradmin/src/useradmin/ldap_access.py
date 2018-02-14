@@ -158,18 +158,26 @@ class LdapConnection(object):
     if bind_user:
       try:
         self.ldap_handle.simple_bind_s(bind_user, bind_password)
-      except:
-        msg = "Failed to bind to LDAP server as user %s" % bind_user
-        LOG.exception(msg)
-        raise LdapBindException(msg)
+      except Exception, e:
+        self.handle_bind_exception(e, bind_user)
     else:
       try:
         # Do anonymous bind
         self.ldap_handle.simple_bind_s('','')
-      except:
+      except Exception, e:
+        self.handle_bind_exception(e)
+
+  def handle_bind_exception(self, exception, bind_user=None):
+    LOG.error("LDAP access bind error: %s" % exception)
+    if 'Can\'t contact LDAP server' in str(exception):
+      msg = "Can\'t contact LDAP server"
+    else:
+      if bind_user:
+        msg = "Failed to bind to LDAP server as user %s" % bind_user
+      else:
         msg = "Failed to bind to LDAP server anonymously"
-        LOG.exception(msg)
-        raise LdapBindException(msg)
+
+    raise LdapBindException(msg)
 
   def _get_search_params(self, name, attr, find_by_dn=False):
     """
