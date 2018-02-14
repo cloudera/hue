@@ -1,0 +1,2473 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
+<title>Reading and Writing Config Files</title>
+<meta name="authors" content="Michael Foord  Nicola Larosa" />
+<meta name="date" content="2009/04/13" />
+<meta content="ConfigObj - a Python module for easy reading and writing of config files." name="description" />
+<meta content="python, script, module, config, configuration, data, persistence, developer, configparser" name="keywords" />
+<link rel="stylesheet" href="stylesheets/voidspace_docutils.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="reading-and-writing-config-files">
+<h1 class="title">Reading and Writing Config Files</h1>
+<h2 class="subtitle" id="configobj-4-introduction-and-reference">ConfigObj 4 Introduction and Reference</h2>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Authors:</th>
+<td>Michael Foord
+<br />Nicola Larosa</td></tr>
+<tr><th class="docinfo-name">Version:</th>
+<td>ConfigObj 4.6.0</td></tr>
+<tr><th class="docinfo-name">Date:</th>
+<td>2009/04/13</td></tr>
+<tr class="field"><th class="docinfo-name">Homepage:</th><td class="field-body"><a class="reference external" href="http://www.voidspace.org.uk/python/configobj.html">ConfigObj Homepage</a></td>
+</tr>
+<tr class="field"><th class="docinfo-name">PyPI Entry:</th><td class="field-body"><a class="reference external" href="http://pypi.python.org/pypi/ConfigObj/">ConfigObj on PyPI</a></td>
+</tr>
+<tr class="field"><th class="docinfo-name">Development:</th><td class="field-body"><a class="reference external" href="http://code.google.com/p/configobj/">Google Code Homepage</a></td>
+</tr>
+<tr class="field"><th class="docinfo-name">License:</th><td class="field-body"><a class="reference external" href="http://www.voidspace.org.uk/python/license.shtml">BSD License</a></td>
+</tr>
+<tr class="field"><th class="docinfo-name">Support:</th><td class="field-body"><a class="reference external" href="http://lists.sourceforge.net/lists/listinfo/configobj-develop">Mailing List</a></td>
+</tr>
+</tbody>
+</table>
+<div class="contents topic" id="configobj-manual">
+<p class="topic-title first">ConfigObj Manual</p>
+<ul class="auto-toc simple">
+<li><a class="reference internal" href="#introduction" id="id26">1&nbsp;&nbsp;&nbsp;Introduction</a></li>
+<li><a class="reference internal" href="#downloading" id="id27">2&nbsp;&nbsp;&nbsp;Downloading</a><ul class="auto-toc">
+<li><a class="reference internal" href="#installing" id="id28">2.1&nbsp;&nbsp;&nbsp;Installing</a></li>
+<li><a class="reference internal" href="#documentation" id="id29">2.2&nbsp;&nbsp;&nbsp;Documentation</a></li>
+<li><a class="reference internal" href="#development-version" id="id30">2.3&nbsp;&nbsp;&nbsp;Development Version</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configobj-in-the-real-world" id="id31">3&nbsp;&nbsp;&nbsp;ConfigObj in the Real World</a></li>
+<li><a class="reference internal" href="#getting-started" id="id32">4&nbsp;&nbsp;&nbsp;Getting Started</a><ul class="auto-toc">
+<li><a class="reference internal" href="#reading-a-config-file" id="id33">4.1&nbsp;&nbsp;&nbsp;Reading a Config File</a></li>
+<li><a class="reference internal" href="#writing-a-config-file" id="id34">4.2&nbsp;&nbsp;&nbsp;Writing a Config File</a></li>
+<li><a class="reference internal" href="#config-files" id="id35">4.3&nbsp;&nbsp;&nbsp;Config Files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configobj-specifications" id="id36">5&nbsp;&nbsp;&nbsp;ConfigObj specifications</a><ul class="auto-toc">
+<li><a class="reference internal" href="#infile" id="id37">5.1&nbsp;&nbsp;&nbsp;infile</a></li>
+<li><a class="reference internal" href="#options" id="id38">5.2&nbsp;&nbsp;&nbsp;options</a></li>
+<li><a class="reference internal" href="#methods" id="id39">5.3&nbsp;&nbsp;&nbsp;Methods</a><ul class="auto-toc">
+<li><a class="reference internal" href="#write" id="id40">5.3.1&nbsp;&nbsp;&nbsp;write</a></li>
+<li><a class="reference internal" href="#validate" id="id41">5.3.2&nbsp;&nbsp;&nbsp;validate</a><ul class="auto-toc">
+<li><a class="reference internal" href="#return-value" id="id42">5.3.2.1&nbsp;&nbsp;&nbsp;Return Value</a></li>
+<li><a class="reference internal" href="#mentioning-default-values" id="id43">5.3.2.2&nbsp;&nbsp;&nbsp;Mentioning Default Values</a></li>
+<li><a class="reference internal" href="#mentioning-repeated-sections-and-values" id="id44">5.3.2.3&nbsp;&nbsp;&nbsp;Mentioning Repeated Sections and Values</a></li>
+<li><a class="reference internal" href="#mentioning-simpleval" id="id45">5.3.2.4&nbsp;&nbsp;&nbsp;Mentioning SimpleVal</a></li>
+<li><a class="reference internal" href="#mentioning-copy-mode" id="id46">5.3.2.5&nbsp;&nbsp;&nbsp;Mentioning copy Mode</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#reload" id="id47">5.3.3&nbsp;&nbsp;&nbsp;reload</a></li>
+<li><a class="reference internal" href="#reset" id="id48">5.3.4&nbsp;&nbsp;&nbsp;reset</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#attributes" id="id49">5.4&nbsp;&nbsp;&nbsp;Attributes</a><ul class="auto-toc">
+<li><a class="reference internal" href="#interpolation" id="id50">5.4.1&nbsp;&nbsp;&nbsp;interpolation</a></li>
+<li><a class="reference internal" href="#stringify" id="id51">5.4.2&nbsp;&nbsp;&nbsp;stringify</a></li>
+<li><a class="reference internal" href="#bom" id="id52">5.4.3&nbsp;&nbsp;&nbsp;BOM</a></li>
+<li><a class="reference internal" href="#initial-comment" id="id53">5.4.4&nbsp;&nbsp;&nbsp;initial_comment</a></li>
+<li><a class="reference internal" href="#final-comment" id="id54">5.4.5&nbsp;&nbsp;&nbsp;final_comment</a></li>
+<li><a class="reference internal" href="#list-values" id="id55">5.4.6&nbsp;&nbsp;&nbsp;list_values</a></li>
+<li><a class="reference internal" href="#encoding" id="id56">5.4.7&nbsp;&nbsp;&nbsp;encoding</a></li>
+<li><a class="reference internal" href="#default-encoding" id="id57">5.4.8&nbsp;&nbsp;&nbsp;default_encoding</a></li>
+<li><a class="reference internal" href="#unrepr" id="id58">5.4.9&nbsp;&nbsp;&nbsp;unrepr</a></li>
+<li><a class="reference internal" href="#write-empty-values" id="id59">5.4.10&nbsp;&nbsp;&nbsp;write_empty_values</a></li>
+<li><a class="reference internal" href="#newlines" id="id60">5.4.11&nbsp;&nbsp;&nbsp;newlines</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-config-file-format" id="id61">6&nbsp;&nbsp;&nbsp;The Config File Format</a></li>
+<li><a class="reference internal" href="#sections" id="id62">7&nbsp;&nbsp;&nbsp;Sections</a><ul class="auto-toc">
+<li><a class="reference internal" href="#section-attributes" id="id63">7.1&nbsp;&nbsp;&nbsp;Section Attributes</a></li>
+<li><a class="reference internal" href="#section-methods" id="id64">7.2&nbsp;&nbsp;&nbsp;Section Methods</a></li>
+<li><a class="reference internal" href="#walking-a-section" id="id65">7.3&nbsp;&nbsp;&nbsp;Walking a Section</a></li>
+<li><a class="reference internal" href="#examples" id="id66">7.4&nbsp;&nbsp;&nbsp;Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exceptions" id="id67">8&nbsp;&nbsp;&nbsp;Exceptions</a></li>
+<li><a class="reference internal" href="#validation" id="id68">9&nbsp;&nbsp;&nbsp;Validation</a><ul class="auto-toc">
+<li><a class="reference internal" href="#configspec" id="id69">9.1&nbsp;&nbsp;&nbsp;configspec</a></li>
+<li><a class="reference internal" href="#type-conversion" id="id70">9.2&nbsp;&nbsp;&nbsp;Type Conversion</a></li>
+<li><a class="reference internal" href="#default-values" id="id71">9.3&nbsp;&nbsp;&nbsp;Default Values</a><ul class="auto-toc">
+<li><a class="reference internal" href="#id13" id="id72">9.3.1&nbsp;&nbsp;&nbsp;List Values</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#repeated-sections" id="id73">9.4&nbsp;&nbsp;&nbsp;Repeated Sections</a></li>
+<li><a class="reference internal" href="#repeated-values" id="id74">9.5&nbsp;&nbsp;&nbsp;Repeated Values</a></li>
+<li><a class="reference internal" href="#copy-mode" id="id75">9.6&nbsp;&nbsp;&nbsp;Copy Mode</a></li>
+<li><a class="reference internal" href="#validation-and-interpolation" id="id76">9.7&nbsp;&nbsp;&nbsp;Validation and Interpolation</a></li>
+<li><a class="reference internal" href="#simpleval" id="id77">9.8&nbsp;&nbsp;&nbsp;SimpleVal</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#empty-values" id="id78">10&nbsp;&nbsp;&nbsp;Empty values</a></li>
+<li><a class="reference internal" href="#unrepr-mode" id="id79">11&nbsp;&nbsp;&nbsp;unrepr mode</a></li>
+<li><a class="reference internal" href="#string-interpolation" id="id80">12&nbsp;&nbsp;&nbsp;String Interpolation</a></li>
+<li><a class="reference internal" href="#comments" id="id81">13&nbsp;&nbsp;&nbsp;Comments</a></li>
+<li><a class="reference internal" href="#flatten-errors" id="id82">14&nbsp;&nbsp;&nbsp;flatten_errors</a><ul class="auto-toc">
+<li><a class="reference internal" href="#example-usage" id="id83">14.1&nbsp;&nbsp;&nbsp;Example Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#credits" id="id84">15&nbsp;&nbsp;&nbsp;CREDITS</a></li>
+<li><a class="reference internal" href="#license" id="id85">16&nbsp;&nbsp;&nbsp;LICENSE</a></li>
+<li><a class="reference internal" href="#todo" id="id86">17&nbsp;&nbsp;&nbsp;TODO</a></li>
+<li><a class="reference internal" href="#issues" id="id87">18&nbsp;&nbsp;&nbsp;ISSUES</a></li>
+<li><a class="reference internal" href="#changelog" id="id88">19&nbsp;&nbsp;&nbsp;CHANGELOG</a><ul class="auto-toc">
+<li><a class="reference internal" href="#version-4-6-0" id="id89">19.1&nbsp;&nbsp;&nbsp;2009/04/13 - Version 4.6.0</a></li>
+<li><a class="reference internal" href="#version-4-5-3" id="id90">19.2&nbsp;&nbsp;&nbsp;2008/06/27 - Version 4.5.3</a></li>
+<li><a class="reference internal" href="#version-4-5-2" id="id91">19.3&nbsp;&nbsp;&nbsp;2008/02/05 - Version 4.5.2</a></li>
+<li><a class="reference internal" href="#version-4-5-1" id="id92">19.4&nbsp;&nbsp;&nbsp;2008/02/05 - Version 4.5.1</a></li>
+<li><a class="reference internal" href="#version-4-5-0" id="id93">19.5&nbsp;&nbsp;&nbsp;2008/02/05 - Version 4.5.0</a></li>
+<li><a class="reference internal" href="#version-4-4-0" id="id94">19.6&nbsp;&nbsp;&nbsp;2007/02/04 - Version 4.4.0</a></li>
+<li><a class="reference internal" href="#version-4-3-3-alpha4" id="id95">19.7&nbsp;&nbsp;&nbsp;2006/12/17 - Version 4.3.3-alpha4</a></li>
+<li><a class="reference internal" href="#version-4-3-3-alpha3" id="id96">19.8&nbsp;&nbsp;&nbsp;2006/12/17 - Version 4.3.3-alpha3</a></li>
+<li><a class="reference internal" href="#version-4-3-3-alpha2" id="id97">19.9&nbsp;&nbsp;&nbsp;2006/12/09 - Version 4.3.3-alpha2</a></li>
+<li><a class="reference internal" href="#version-4-3-3-alpha1" id="id98">19.10&nbsp;&nbsp;&nbsp;2006/12/09 - Version 4.3.3-alpha1</a></li>
+<li><a class="reference internal" href="#version-4-3-2" id="id99">19.11&nbsp;&nbsp;&nbsp;2006/06/04 - Version 4.3.2</a></li>
+<li><a class="reference internal" href="#version-4-3-1" id="id100">19.12&nbsp;&nbsp;&nbsp;2006/04/29 - Version 4.3.1</a></li>
+<li><a class="reference internal" href="#version-4-3-0" id="id101">19.13&nbsp;&nbsp;&nbsp;2006/03/24 - Version 4.3.0</a></li>
+<li><a class="reference internal" href="#version-4-2-0" id="id102">19.14&nbsp;&nbsp;&nbsp;2006/02/16 - Version 4.2.0</a></li>
+<li><a class="reference internal" href="#version-4-1-0" id="id103">19.15&nbsp;&nbsp;&nbsp;2005/12/14 - Version 4.1.0</a></li>
+<li><a class="reference internal" href="#version-4-0-2" id="id104">19.16&nbsp;&nbsp;&nbsp;2005/12/02 - Version 4.0.2</a></li>
+<li><a class="reference internal" href="#version-4-0-1" id="id105">19.17&nbsp;&nbsp;&nbsp;2005/11/05 - Version 4.0.1</a></li>
+<li><a class="reference internal" href="#version-4-0-0" id="id106">19.18&nbsp;&nbsp;&nbsp;2005/10/17 - Version 4.0.0</a></li>
+<li><a class="reference internal" href="#version-4-0-0-beta-5" id="id107">19.19&nbsp;&nbsp;&nbsp;2005/09/09 - Version 4.0.0 beta 5</a></li>
+<li><a class="reference internal" href="#version-4-0-0-beta-4" id="id108">19.20&nbsp;&nbsp;&nbsp;2005/09/07 - Version 4.0.0 beta 4</a></li>
+<li><a class="reference internal" href="#version-4-0-0-beta-3" id="id109">19.21&nbsp;&nbsp;&nbsp;2005/08/28 - Version 4.0.0 beta 3</a></li>
+<li><a class="reference internal" href="#version-4-0-0-beta-2" id="id110">19.22&nbsp;&nbsp;&nbsp;2005/08/25 - Version 4.0.0 beta 2</a></li>
+<li><a class="reference internal" href="#version-4-0-0-beta-1" id="id111">19.23&nbsp;&nbsp;&nbsp;2005/08/21 - Version 4.0.0 beta 1</a></li>
+<li><a class="reference internal" href="#version-3-0-0" id="id112">19.24&nbsp;&nbsp;&nbsp;2004/05/24 - Version 3.0.0</a></li>
+<li><a class="reference internal" href="#version-2-0-0-beta" id="id113">19.25&nbsp;&nbsp;&nbsp;2004/03/14 - Version 2.0.0 beta</a></li>
+<li><a class="reference internal" href="#version-1-0-5" id="id114">19.26&nbsp;&nbsp;&nbsp;2004/01/29 - Version 1.0.5</a></li>
+<li><a class="reference internal" href="#origins" id="id115">19.27&nbsp;&nbsp;&nbsp;Origins</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#footnotes" id="id116">20&nbsp;&nbsp;&nbsp;Footnotes</a></li>
+</ul>
+</div>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>The best introduction to working with ConfigObj, including the powerful configuration validation system,
+is the article:</p>
+<ul class="last simple">
+<li><a class="reference external" href="http://www.voidspace.org.uk/python/articles/configobj.shtml">An Introduction to ConfigObj</a></li>
+</ul>
+</div>
+<div class="section" id="introduction">
+<h1><a class="toc-backref" href="#id26">1&nbsp;&nbsp;&nbsp;Introduction</a></h1>
+<p><strong>ConfigObj</strong> is a simple but powerful config file reader and writer: an <em>ini
+file round tripper</em>. Its main feature is that it is very easy to use, with a
+straightforward programmer's interface and a simple syntax for config files.
+It has lots of other features though :</p>
+<ul>
+<li><p class="first">Nested sections (subsections), to any level</p>
+</li>
+<li><p class="first">List values</p>
+</li>
+<li><p class="first">Multiple line values</p>
+</li>
+<li><p class="first">String interpolation (substitution)</p>
+</li>
+<li><p class="first">Integrated with a powerful validation system</p>
+<blockquote>
+<ul class="simple">
+<li>including automatic type checking/conversion</li>
+<li>repeated sections</li>
+<li>and allowing default values</li>
+</ul>
+</blockquote>
+</li>
+<li><p class="first">When writing out config files, ConfigObj preserves all comments and the order of members and sections</p>
+</li>
+<li><p class="first">Many useful methods and options for working with configuration files (like the 'reload' method)</p>
+</li>
+<li><p class="first">Full Unicode support</p>
+</li>
+</ul>
+<p>For support and bug reports please use the ConfigObj <a class="reference external" href="http://lists.sourceforge.net/lists/listinfo/configobj-develop">Mailing List</a> or the issue tracker on the
+<a class="reference external" href="http://code.google.com/p/configobj/">Google Code Homepage</a>.</p>
+</div>
+<div class="section" id="downloading">
+<h1><a class="toc-backref" href="#id27">2&nbsp;&nbsp;&nbsp;Downloading</a></h1>
+<p>The current version is <strong>4.6.0</strong>, dated 13th April 2008. ConfigObj 4 is
+stable and mature. We still expect to pick up a few bugs along the way though <a class="footnote-reference" href="#id14" id="id1">[1]</a>.
+ <img src="/smilies/smile.gif" alt="Smile" height="15" width="15" /> </p>
+<p>You can get ConfigObj in the following ways :</p>
+<ul>
+<li><p class="first"><a class="reference external" href="http://www.voidspace.org.uk/downloads/configobj.py">configobj.py</a> from Voidspace</p>
+<blockquote>
+<p>ConfigObj has no external dependencies. This file is sufficient to access
+all the functionality except <a class="reference internal" href="#validation">Validation</a>.</p>
+</blockquote>
+</li>
+<li><p class="first"><a class="reference external" href="http://www.voidspace.org.uk/downloads/configobj-4.6.0.zip">configobj.zip</a> from Voidspace</p>
+<blockquote>
+<p>This also contains <a class="reference external" href="http://www.voidspace.org.uk/downloads/validate.py">validate.py</a>  and <a class="reference external" href="http://www.voidspace.org.uk/python/configobj.html">this document</a>.</p>
+</blockquote>
+</li>
+<li><p class="first"><a class="reference external" href="http://www.voidspace.org.uk/downloads/validate.py">validate.py</a> from Voidspace</p>
+</li>
+</ul>
+<div class="section" id="installing">
+<h2><a class="toc-backref" href="#id28">2.1&nbsp;&nbsp;&nbsp;Installing</a></h2>
+<p>ConfigObj has a source distribution <a class="reference external" href="http://pypi.python.org/pypi/ConfigObj/">on PyPI</a>. If you unzip
+the archive you can install it with:</p>
+<pre class="literal-block">
+setup.py install
+</pre>
+<p>Alternatively, you can install with easy install or pip:</p>
+<pre class="literal-block">
+easy_install configobj
+</pre>
+</div>
+<div class="section" id="documentation">
+<h2><a class="toc-backref" href="#id29">2.2&nbsp;&nbsp;&nbsp;Documentation</a></h2>
+<p><em>configobj.zip</em> also contains <a class="reference external" href="http://www.voidspace.org.uk/python/configobj.html">this document</a>.</p>
+<ul class="simple">
+<li>You can view <a class="reference external" href="http://www.voidspace.org.uk/python/configobj.html">this document</a> online at the <a class="reference external" href="http://www.voidspace.org.uk/python/configobj.html">ConfigObj Homepage</a>.</li>
+</ul>
+</div>
+<div class="section" id="development-version">
+<h2><a class="toc-backref" href="#id30">2.3&nbsp;&nbsp;&nbsp;Development Version</a></h2>
+<p>It is sometimes possible to get the latest <em>development version</em> of ConfigObj
+from the Subversion Repository maintained on the <a class="reference external" href="http://code.google.com/p/configobj/">Google Code Homepage</a>.</p>
+</div>
+</div>
+<div class="section" id="configobj-in-the-real-world">
+<h1><a class="toc-backref" href="#id31">3&nbsp;&nbsp;&nbsp;ConfigObj in the Real World</a></h1>
+<p><strong>ConfigObj</strong> is widely used. Projects using it include:</p>
+<ul>
+<li><p class="first"><a class="reference external" href="http://bazaar-ng.org">Bazaar</a>.</p>
+<blockquote>
+<p>Bazaar is a Python distributed <acronym title="Version Control System">VCS</acronym>.
+ConfigObj is used to read <tt class="docutils literal"><span class="pre">bazaar.conf</span></tt> and <tt class="docutils literal"><span class="pre">branches.conf</span></tt>.</p>
+</blockquote>
+</li>
+<li><p class="first"><a class="reference external" href="http://chandler.osafoundation.org/">Chandler</a></p>
+<blockquote>
+<p>A Python and <a class="reference external" href="http://www.wxpython.org">wxPython</a>
+<acronym title="Personal Information Manager">PIM</acronym>, being developed by the
+<a class="reference external" href="http://www.osafoundation.org/">OSAFoundation</a>.</p>
+</blockquote>
+</li>
+<li><p class="first"><a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a></p>
+<blockquote>
+<p>A 2D plotting library.</p>
+</blockquote>
+</li>
+<li><p class="first"><a class="reference external" href="http://ipython.scipy.org/moin/">IPython</a></p>
+<blockquote>
+<p>IPython is an enhanced interactive Python shell. IPython uses ConfigObj in a module called 'TConfig' that combines it with enthought <a class="reference external" href="http://code.enthought.com/traits/">Traits</a>: <a class="reference external" href="http://ipython.scipy.org/ipython/ipython/browser/ipython/branches/saw/sandbox/tconfig">tconfig</a>.</p>
+</blockquote>
+</li>
+<li><p class="first"><a class="reference external" href="http://elisa.fluendo.com/">Elisa - the Fluendo Mediacenter</a></p>
+<blockquote>
+<p>Elisa is an open source cross-platform media center solution designed to be simple for people not particularly familiar with computers.</p>
+</blockquote>
+</li>
+</ul>
+<p>Version 4.5.3 was downloaded over 25 000 times from PyPI alone.</p>
+</div>
+<div class="section" id="getting-started">
+<h1><a class="toc-backref" href="#id32">4&nbsp;&nbsp;&nbsp;Getting Started</a></h1>
+<p>The outstanding feature of using ConfigObj is simplicity. Most functions can be
+performed with single line commands.</p>
+<div class="section" id="reading-a-config-file">
+<h2><a class="toc-backref" href="#id33">4.1&nbsp;&nbsp;&nbsp;Reading a Config File</a></h2>
+<p>The normal way to read a config file, is to give ConfigObj the filename :</p>
+<div class="pysrc"><span class="pykeyword">from</span> <span class="pytext">configobj</span> <span class="pykeyword">import</span> <span class="pytext">ConfigObj</span><br />
+<span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">filename</span><span class="pyoperator">)</span><span class="pytext"></span></div><p>You can also pass the config file in as a list of lines, or a <tt class="docutils literal"><span class="pre">StringIO</span></tt>
+instance, so it doesn't matter where your config data comes from.</p>
+<p>You can then access members of your config file as a dictionary. Subsections
+will also be dictionaries.</p>
+<div class="pysrc"><span class="pykeyword">from</span> <span class="pytext">configobj</span> <span class="pykeyword">import</span> <span class="pytext">ConfigObj</span><br />
+<span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">filename</span><span class="pyoperator">)</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">value1</span> <span class="pyoperator">=</span> <span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'keyword1'</span><span class="pyoperator">]</span><br />
+<span class="pytext">value2</span> <span class="pyoperator">=</span> <span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'keyword2'</span><span class="pyoperator">]</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">section1</span> <span class="pyoperator">=</span> <span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section1'</span><span class="pyoperator">]</span><br />
+<span class="pytext">value3</span> <span class="pyoperator">=</span> <span class="pytext">section1</span><span class="pyoperator">[</span><span class="pystring">'keyword3'</span><span class="pyoperator">]</span><br />
+<span class="pytext">value4</span> <span class="pyoperator">=</span> <span class="pytext">section1</span><span class="pyoperator">[</span><span class="pystring">'keyword4'</span><span class="pyoperator">]</span><br />
+<span class="pycomment">#<br />
+</span><span class="pycomment"># you could also write<br />
+</span><span class="pytext">value3</span> <span class="pyoperator">=</span> <span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section1'</span><span class="pyoperator">]</span><span class="pyoperator">[</span><span class="pystring">'keyword3'</span><span class="pyoperator">]</span><br />
+<span class="pytext">value4</span> <span class="pyoperator">=</span> <span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section1'</span><span class="pyoperator">]</span><span class="pyoperator">[</span><span class="pystring">'keyword4'</span><span class="pyoperator">]</span><span class="pytext"></span></div></div>
+<div class="section" id="writing-a-config-file">
+<h2><a class="toc-backref" href="#id34">4.2&nbsp;&nbsp;&nbsp;Writing a Config File</a></h2>
+<p>Creating a new config file is just as easy as reading one. You can specify a
+filename when you create the ConfigObj, or do it later <a class="footnote-reference" href="#id15" id="id2">[2]</a>.</p>
+<p>If you <em>don't</em> set a filename, then the <tt class="docutils literal"><span class="pre">write</span></tt> method will return a list of
+lines instead of writing to file. See the <a class="reference internal" href="#write">write</a> method for more details.</p>
+<p>Here we show creating an empty ConfigObj, setting a filename and some values,
+and then writing to file :</p>
+<div class="pysrc"><span class="pykeyword">from</span> <span class="pytext">configobj</span> <span class="pykeyword">import</span> <span class="pytext">ConfigObj</span><br />
+<span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">filename</span> <span class="pyoperator">=</span> <span class="pytext">filename</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'keyword1'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">value1</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'keyword2'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">value2</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section1'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pyoperator">{</span><span class="pyoperator">}</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section1'</span><span class="pyoperator">]</span><span class="pyoperator">[</span><span class="pystring">'keyword3'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">value3</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section1'</span><span class="pyoperator">]</span><span class="pyoperator">[</span><span class="pystring">'keyword4'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">value4</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">section2</span> <span class="pyoperator">=</span> <span class="pyoperator">{</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword5'</span><span class="pyoperator">:</span> <span class="pytext">value5</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword6'</span><span class="pyoperator">:</span> <span class="pytext">value6</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'sub-section'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword7'</span><span class="pyoperator">:</span> <span class="pytext">value7</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pyoperator">}</span><br />
+<span class="pyoperator">}</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section2'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">section2</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section3'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pyoperator">{</span><span class="pyoperator">}</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section3'</span><span class="pyoperator">]</span><span class="pyoperator">[</span><span class="pystring">'keyword 8'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pyoperator">[</span><span class="pytext">value8</span><span class="pyoperator">,</span> <span class="pytext">value9</span><span class="pyoperator">,</span> <span class="pytext">value10</span><span class="pyoperator">]</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'section3'</span><span class="pyoperator">]</span><span class="pyoperator">[</span><span class="pystring">'keyword 9'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pyoperator">[</span><span class="pytext">value11</span><span class="pyoperator">,</span> <span class="pytext">value12</span><span class="pyoperator">,</span> <span class="pytext">value13</span><span class="pyoperator">]</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">write</span><span class="pyoperator">(</span><span class="pyoperator">)</span><span class="pytext"></span></div><div class="caution">
+<p class="first admonition-title">Caution!</p>
+<p class="last">Keywords and section names can only be strings <a class="footnote-reference" href="#id16" id="id3">[3]</a>. Attempting to set
+anything else will raise a <tt class="docutils literal"><span class="pre">ValueError</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="config-files">
+<h2><a class="toc-backref" href="#id35">4.3&nbsp;&nbsp;&nbsp;Config Files</a></h2>
+<p>The config files that ConfigObj will read and write are based on the 'INI'
+format. This means it will read and write files created for <tt class="docutils literal"><span class="pre">ConfigParser</span></tt>
+<a class="footnote-reference" href="#id17" id="id4">[4]</a>.</p>
+<p>Keywords and values are separated by an <tt class="docutils literal"><span class="pre">'='</span></tt>, and section markers are
+between square brackets. Keywords, values, and section names can be surrounded
+by single or double quotes. Indentation is not significant, but can be
+preserved.</p>
+<p>Subsections are indicated by repeating the square brackets in the section
+marker. You nest levels by using more brackets.</p>
+<p>You can have list values by separating items with a comma, and values spanning
+multiple lines by using triple quotes (single or double).</p>
+<p>For full details on all these see <a class="reference internal" href="#the-config-file-format">the config file format</a>. Here's an example
+to illustrate :</p>
+<pre class="literal-block">
+# This is the 'initial_comment'
+# Which may be several lines
+keyword1 = value1
+'keyword 2' = 'value 2'
+
+[ &quot;section 1&quot; ]
+# This comment goes with keyword 3
+keyword 3 = value 3
+'keyword 4' = value4, value 5, 'value 6'
+
+    [[ sub-section ]]    # an inline comment
+    # sub-section is inside &quot;section 1&quot;
+    'keyword 5' = 'value 7'
+    'keyword 6' = '''A multiline value,
+that spans more than one line :-)
+The line breaks are included in the value.'''
+
+        [[[ sub-sub-section ]]]
+        # sub-sub-section is *in* 'sub-section'
+        # which is in 'section 1'
+        'keyword 7' = 'value 8'
+
+[section 2]    # an inline comment
+keyword8 = &quot;value 9&quot;
+keyword9 = value10     # an inline comment
+# The 'final_comment'
+# Which also may be several lines
+</pre>
+</div>
+</div>
+<div class="section" id="configobj-specifications">
+<h1><a class="toc-backref" href="#id36">5&nbsp;&nbsp;&nbsp;ConfigObj specifications</a></h1>
+<div class="pysrc"><span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">infile</span><span class="pyoperator">=</span><span class="pytext">None</span><span class="pyoperator">,</span> <span class="pytext">options</span><span class="pyoperator">=</span><span class="pytext">None</span><span class="pyoperator">,</span> <span class="pyoperator">**</span><span class="pytext">keywargs</span><span class="pyoperator">)</span><span class="pytext"></span></div><div class="section" id="infile">
+<h2><a class="toc-backref" href="#id37">5.1&nbsp;&nbsp;&nbsp;infile</a></h2>
+<p>You don't need to specify an infile. If you omit it, an empty ConfigObj will be
+created. <tt class="docutils literal"><span class="pre">infile</span></tt> <em>can</em> be :</p>
+<ul class="simple">
+<li>Nothing. In which case the <tt class="docutils literal"><span class="pre">filename</span></tt> attribute of your ConfigObj will be
+<tt class="docutils literal"><span class="pre">None</span></tt>. You can set a filename at any time.</li>
+<li>A filename. What happens if the file doesn't already exist is determined by
+the <a class="reference internal" href="#options">options</a> <tt class="docutils literal"><span class="pre">file_error</span></tt> and <tt class="docutils literal"><span class="pre">create_empty</span></tt>. The filename will be
+preserved as the <tt class="docutils literal"><span class="pre">filename</span></tt> attribute. This can be changed at any time.</li>
+<li>A list of lines. Any trailing newlines will be removed from the lines. The
+<tt class="docutils literal"><span class="pre">filename</span></tt> attribute of your ConfigObj will be <tt class="docutils literal"><span class="pre">None</span></tt>.</li>
+<li>A <tt class="docutils literal"><span class="pre">StringIO</span></tt> instance or file object, or any object with a <tt class="docutils literal"><span class="pre">read</span></tt> method.
+The <tt class="docutils literal"><span class="pre">filename</span></tt> attribute of your ConfigObj will be <tt class="docutils literal"><span class="pre">None</span></tt> <a class="footnote-reference" href="#id18" id="id5">[5]</a>.</li>
+<li>A dictionary. You can initialise a ConfigObj from a dictionary <a class="footnote-reference" href="#id19" id="id6">[6]</a>. The
+<tt class="docutils literal"><span class="pre">filename</span></tt> attribute of your ConfigObj will be <tt class="docutils literal"><span class="pre">None</span></tt>. All keys must be
+strings. In this case, the order of values and sections is arbitrary.</li>
+</ul>
+</div>
+<div class="section" id="options">
+<h2><a class="toc-backref" href="#id38">5.2&nbsp;&nbsp;&nbsp;options</a></h2>
+<p>There are various options that control the way ConfigObj behaves. They can be
+passed in as a dictionary of options, or as keyword arguments. Explicit keyword
+arguments override the dictionary.</p>
+<p>All of the options are available as attributes after the config file has been
+parsed.</p>
+<p>ConfigObj has the following options (with the default values shown) :</p>
+<ul>
+<li><p class="first">'raise_errors': <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<blockquote>
+<p>When parsing, it is possible that the config file will be badly formed. The
+default is to parse the whole file and raise a single error at the end. You
+can set <tt class="docutils literal"><span class="pre">raise_errors</span> <span class="pre">=</span> <span class="pre">True</span></tt> to have errors raised immediately. See the
+<a class="reference internal" href="#exceptions">exceptions</a> section for more details.</p>
+<p>Altering this value after initial parsing has no effect.</p>
+</blockquote>
+</li>
+<li><p class="first">'list_values': <tt class="docutils literal"><span class="pre">True</span></tt></p>
+<blockquote>
+<p>If <tt class="docutils literal"><span class="pre">True</span></tt> (the default) then list values are possible. If <tt class="docutils literal"><span class="pre">False</span></tt>, the
+values are not parsed for lists.</p>
+<blockquote>
+<p>If <tt class="docutils literal"><span class="pre">list_values</span> <span class="pre">=</span> <span class="pre">False</span></tt> then single line values are not quoted or
+unquoted when reading and writing.</p>
+</blockquote>
+<p>Changing this value affects whether single line values will be quoted or
+not when writing.</p>
+</blockquote>
+</li>
+<li><p class="first">'create_empty': <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<blockquote>
+<p>If this value is <tt class="docutils literal"><span class="pre">True</span></tt> and the file specified by <tt class="docutils literal"><span class="pre">infile</span></tt> doesn't
+exist, ConfigObj will create an empty file. This can be a useful test that
+the filename makes sense: an impossible filename will cause an error.</p>
+<p>Altering this value after initial parsing has no effect.</p>
+</blockquote>
+</li>
+<li><p class="first">'file_error': <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<blockquote>
+<p>If this value is <tt class="docutils literal"><span class="pre">True</span></tt> and the file specified by <tt class="docutils literal"><span class="pre">infile</span></tt> doesn't
+exist, ConfigObj will raise an <tt class="docutils literal"><span class="pre">IOError</span></tt>.</p>
+<p>Altering this value after initial parsing has no effect.</p>
+</blockquote>
+</li>
+<li><p class="first">'interpolation': <tt class="docutils literal"><span class="pre">True</span></tt></p>
+<blockquote>
+<p>Whether string interpolation is switched on or not. It is on (<tt class="docutils literal"><span class="pre">True</span></tt>) by
+default.</p>
+<p>You can set this attribute to change whether string interpolation is done
+when values are fetched. See the <a class="reference internal" href="#string-interpolation">String Interpolation</a> section for more details.</p>
+</blockquote>
+</li>
+<li><p class="first">'configspec': <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<blockquote>
+<p>If you want to use the validation system, you supply a configspec. This is
+effectively a type of config file that specifies a check for each member.
+This check can be used to do type conversion as well as check that the
+value is within your required parameters.</p>
+<p>You provide a configspec in the same way as you do the initial file: a
+filename, or list of lines, etc. See the <a class="reference internal" href="#validation">validation</a> section for full
+details on how to use the system.</p>
+<p>When parsed, every section has a <tt class="docutils literal"><span class="pre">configspec</span></tt> with a dictionary of
+configspec checks for <em>that section</em>.</p>
+</blockquote>
+</li>
+<li><p class="first">'stringify': <tt class="docutils literal"><span class="pre">True</span></tt></p>
+<blockquote>
+<p>If you use the validation scheme, it can do type checking <em>and</em> conversion
+for you. This means you may want to set members to integers, or other
+non-string values.</p>
+<p>If 'stringify' is set to <tt class="docutils literal"><span class="pre">True</span></tt> (default) then non-string values will
+be converted to strings when you write the config file. The <a class="reference internal" href="#validation">validation</a>
+process converts values from strings to the required type.</p>
+<p>If 'stringify' is set to <tt class="docutils literal"><span class="pre">False</span></tt>, attempting to set a member to a
+non-string value <a class="footnote-reference" href="#id20" id="id7">[7]</a> will raise a <tt class="docutils literal"><span class="pre">TypeError</span></tt> (no type conversion is
+done by validation).</p>
+</blockquote>
+</li>
+<li><p class="first">'indent_type': <tt class="docutils literal"><span class="pre">'</span>&nbsp;&nbsp;&nbsp; <span class="pre">'</span></tt></p>
+<blockquote>
+<p>Indentation is not significant; it can however be present in the input and
+output config. Any combination of tabs and spaces may be used: the string
+will be repeated for each level of indentation. Typical values are: <tt class="docutils literal"><span class="pre">''</span></tt>
+(no indentation), <tt class="docutils literal"><span class="pre">'</span>&nbsp;&nbsp;&nbsp; <span class="pre">'</span></tt> (indentation with four spaces, the default),
+<tt class="docutils literal"><span class="pre">'\t'</span></tt> (indentation with one tab).</p>
+<p>If this option is not specified, and the ConfigObj is initialised with a
+dictionary, the indentation used in the output is the default one, that is,
+four spaces.</p>
+<p>If this option is not specified, and the ConfigObj is initialised with a
+list of lines or a file, the indentation used in the first indented line is
+selected and used in all output lines. If no input line is indented, no
+output line will be either.</p>
+<p>If this option <em>is</em> specified, the option value is used in the output
+config, overriding the type of indentation in the input config (if any).</p>
+</blockquote>
+</li>
+<li><p class="first">'encoding': <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<blockquote>
+<p>By default <strong>ConfigObj</strong> does not decode the file/strings you pass it into
+Unicode <a class="footnote-reference" href="#id21" id="id8">[8]</a>. If you want your config file as Unicode (keys and members)
+you need to provide an encoding to decode the file with. This encoding will
+also be used to encode the config file when writing.</p>
+<p>You can change the encoding attribute at any time.</p>
+<p>Any characters in your strings that can't be encoded with the specified
+encoding will raise a <tt class="docutils literal"><span class="pre">UnicodeEncodeError</span></tt>.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p><tt class="docutils literal"><span class="pre">UTF16</span></tt> encoded files will automatically be detected and decoded,
+even if <tt class="docutils literal"><span class="pre">encoding</span></tt> is <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+<p class="last">This is because it is a 16-bit encoding, and ConfigObj will mangle it
+(split characters on byte boundaries) if it parses it without decoding.</p>
+</div>
+</blockquote>
+</li>
+<li><p class="first">'default_encoding': <tt class="docutils literal"><span class="pre">None</span></tt></p>
+<blockquote>
+<p>When using the <tt class="docutils literal"><span class="pre">write</span></tt> method, <strong>ConfigObj</strong> uses the <tt class="docutils literal"><span class="pre">encoding</span></tt>
+attribute to encode the Unicode strings. If any members (or keys) have
+been set as byte strings instead of Unicode, these must first be decoded
+to Unicode before outputting in the specified encoding.</p>
+<p><tt class="docutils literal"><span class="pre">default_encoding</span></tt>, if specified, is the encoding used to decode byte
+strings in the <strong>ConfigObj</strong> before writing. If this is <tt class="docutils literal"><span class="pre">None</span></tt>, then
+the Python default encoding (<tt class="docutils literal"><span class="pre">sys.defaultencoding</span></tt> - usually ASCII) is
+used.</p>
+<p>For most Western European users, a value of <tt class="docutils literal"><span class="pre">latin-1</span></tt> is sensible.</p>
+<p><tt class="docutils literal"><span class="pre">default_encoding</span></tt> is <em>only</em> used if an <tt class="docutils literal"><span class="pre">encoding</span></tt> is specified.</p>
+<p>Any characters in byte-strings that can't be decoded using the
+<tt class="docutils literal"><span class="pre">default_encoding</span></tt> will raise a <tt class="docutils literal"><span class="pre">UnicodeDecodeError</span></tt>.</p>
+</blockquote>
+</li>
+<li><p class="first">'unrepr': <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<blockquote>
+<p>The <tt class="docutils literal"><span class="pre">unrepr</span></tt> option reads and writes files in a different mode. This
+allows you to store and retrieve the basic Python data-types using config
+files.</p>
+<p>This uses Python syntax for lists and quoting. See <a class="reference internal" href="#unrepr-mode">unrepr mode</a> for the
+full details.</p>
+</blockquote>
+</li>
+<li><p class="first">'write_empty_values': <tt class="docutils literal"><span class="pre">False</span></tt></p>
+<blockquote>
+<p>If <tt class="docutils literal"><span class="pre">write_empty_values</span></tt> is <tt class="docutils literal"><span class="pre">True</span></tt>, empty strings are written as
+empty values. See <a class="reference internal" href="#empty-values">Empty Values</a> for more details.</p>
+</blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="methods">
+<h2><a class="toc-backref" href="#id39">5.3&nbsp;&nbsp;&nbsp;Methods</a></h2>
+<p>The ConfigObj is a subclass of an object called <tt class="docutils literal"><span class="pre">Section</span></tt>, which is itself a
+subclass of <tt class="docutils literal"><span class="pre">dict</span></tt>, the builtin dictionary type. This means it also has
+<strong>all</strong> the normal dictionary methods.</p>
+<p>In addition, the following <a class="reference internal" href="#section-methods">Section Methods</a> may be useful :</p>
+<ul class="simple">
+<li>'restore_default'</li>
+<li>'restore_defaults'</li>
+<li>'walk'</li>
+<li>'merge'</li>
+<li>'dict'</li>
+<li>'as_bool'</li>
+<li>'as_float'</li>
+<li>'as_int'</li>
+<li>'as_list'</li>
+</ul>
+<p>Read about <a class="reference internal" href="#sections">Sections</a> for details of all the methods.</p>
+<div class="hint">
+<p class="first admonition-title">Hint</p>
+<p>The <em>merge</em> method of sections is a recursive update.</p>
+<p>You can use this to merge sections, or even whole ConfigObjs, into each
+other.</p>
+<p class="last">You would typically use this to create a default ConfigObj and then merge
+in user settings. This way users only need to specify values that are
+different from the default. You can use configspecs and validation to
+achieve the same thing of course.</p>
+</div>
+<p>The public methods available on ConfigObj are :</p>
+<ul class="simple">
+<li>'write'</li>
+<li>'validate'</li>
+<li>'reset'</li>
+<li>'reload'</li>
+</ul>
+<div class="section" id="write">
+<h3><a class="toc-backref" href="#id40">5.3.1&nbsp;&nbsp;&nbsp;write</a></h3>
+<pre class="literal-block">
+write(file_object=None)
+</pre>
+<p>This method writes the current ConfigObj and takes a single, optional argument
+<a class="footnote-reference" href="#id22" id="id9">[9]</a>.</p>
+<p>If you pass in a file like object to the <tt class="docutils literal"><span class="pre">write</span></tt> method, the config file will
+be written to this. (The only method of this object that is used is its
+<tt class="docutils literal"><span class="pre">write</span></tt> method, so a <tt class="docutils literal"><span class="pre">StringIO</span></tt> instance, or any other file like object
+will work.)</p>
+<p>Otherwise, the behaviour of this method depends on the <tt class="docutils literal"><span class="pre">filename</span></tt> attribute
+of the ConfigObj.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">filename</span></tt></dt>
+<dd>ConfigObj will write the configuration to the file specified.</dd>
+<dt><tt class="docutils literal"><span class="pre">None</span></tt></dt>
+<dd><tt class="docutils literal"><span class="pre">write</span></tt> returns a list of lines. (Not <tt class="docutils literal"><span class="pre">'\n'</span></tt> terminated)</dd>
+</dl>
+<p>First the 'initial_comment' is written, then the config file, followed by the
+'final_comment'. Comment lines and inline comments are written with each
+key/value.</p>
+</div>
+<div class="section" id="validate">
+<h3><a class="toc-backref" href="#id41">5.3.2&nbsp;&nbsp;&nbsp;validate</a></h3>
+<pre class="literal-block">
+validate(validator, preserve_errors=False, copy=False)
+</pre>
+<div class="pysrc"><span class="pycomment"># filename is the config file<br />
+</span><span class="pycomment"># filename2 is the configspec<br />
+</span><span class="pycomment"># (which could also be hardcoded into your program)<br />
+</span><span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">filename</span><span class="pyoperator">,</span> <span class="pytext">configspec</span><span class="pyoperator">=</span><span class="pytext">filename2</span><span class="pyoperator">)</span><br />
+<span class="pycomment">#<br />
+</span><span class="pykeyword">from</span> <span class="pytext">validate</span> <span class="pykeyword">import</span> <span class="pytext">Validator</span><br />
+<span class="pytext">val</span> <span class="pyoperator">=</span> <span class="pytext">Validator</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pytext">test</span> <span class="pyoperator">=</span> <span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">validate</span><span class="pyoperator">(</span><span class="pytext">val</span><span class="pyoperator">)</span><br />
+<span class="pykeyword">if</span> <span class="pytext">test</span> <span class="pyoperator">==</span> <span class="pytext">True</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">print</span> <span class="pystring">'Succeeded.'</span><span class="pytext"></span></div><p>The validate method uses the <a class="reference external" href="http://www.voidspace.org.uk/python/validate.html">validate</a> module to do the
+validation.</p>
+<p>This method validates the ConfigObj against the configspec. By doing type
+conversion as well it can abstract away the config file altogether and present
+the config <em>data</em> to your application (in the types it expects it to be).</p>
+<p>If the <tt class="docutils literal"><span class="pre">configspec</span></tt> attribute of the ConfigObj is <tt class="docutils literal"><span class="pre">None</span></tt>, it raises a
+<tt class="docutils literal"><span class="pre">ValueError</span></tt>.</p>
+<p>If the <a class="reference internal" href="#stringify">stringify</a> attribute is set, this process will convert values to the
+type defined in the configspec.</p>
+<p>The validate method uses checks specified in the configspec and defined in the
+<tt class="docutils literal"><span class="pre">Validator</span></tt> object. It is very easy to extend.</p>
+<p>The configspec looks like the config file, but instead of the value, you
+specify the check (and any default value). See the <a class="reference internal" href="#validation">validation</a> section for
+details.</p>
+<div class="hint">
+<p class="first admonition-title">Hint</p>
+<p>The system of configspecs can seem confusing at first, but is actually
+quite simple and powerful. The best guide to them is this article on
+ConfigObj:</p>
+<ul class="last simple">
+<li><a class="reference external" href="http://www.voidspace.org.uk/python/articles/configobj.shtml">An Introduction to ConfigObj</a></li>
+</ul>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">copy</span></tt> parameter fills in missing values from the configspec (default
+values), <em>without</em> marking the values as defaults. It also causes comments to
+be copied from the configspec into the config file. This allows you to use a
+configspec to create default config files. (Normally default values aren't
+written out by the <tt class="docutils literal"><span class="pre">write</span></tt> method.)</p>
+<p>As of ConfigObj 4.3.0 you can also pass in a ConfigObj instance as your
+configspec. This is especially useful if you need to specify the encoding of
+your configspec file. When you read your configspec file, you <em>must</em> specify
+<tt class="docutils literal"><span class="pre">list_values=False</span></tt>. If you need to support hashes inside the configspec
+values then you must also pass in <tt class="docutils literal"><span class="pre">_inspec=True</span></tt>. This is because configspec
+files actually use a different syntax to config files and inline comment support
+must be switched off to correctly read configspec files with hashes in the values.</p>
+<div class="pysrc"><span class="pykeyword">from</span> <span class="pytext">configobj</span> <span class="pykeyword">import</span> <span class="pytext">ConfigObj</span><br />
+<span class="pytext">configspec</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">configspecfilename</span><span class="pyoperator">,</span> <span class="pytext">encoding</span><span class="pyoperator">=</span><span class="pystring">'UTF8'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="pytext">list_values</span><span class="pyoperator">=</span><span class="pytext">False</span><span class="pyoperator">,</span> <span class="pytext">_inspec</span><span class="pyoperator">=</span><span class="pytext">True</span><span class="pyoperator">)</span><br />
+<span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">filename</span><span class="pyoperator">,</span> <span class="pytext">configspec</span><span class="pyoperator">=</span><span class="pytext">configspec</span><span class="pyoperator">)</span><span class="pytext"></span></div><div class="section" id="return-value">
+<h4><a class="toc-backref" href="#id42">5.3.2.1&nbsp;&nbsp;&nbsp;Return Value</a></h4>
+<p>By default, the validate method either returns <tt class="docutils literal"><span class="pre">True</span></tt> (everything passed)
+or a dictionary of <tt class="docutils literal"><span class="pre">True</span></tt> / <tt class="docutils literal"><span class="pre">False</span></tt> representing pass/fail. The dictionary
+follows the structure of the ConfigObj.</p>
+<p>If a whole section passes then it is replaced with the value <tt class="docutils literal"><span class="pre">True</span></tt>. If a
+whole section fails, then it is replaced with the value <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
+<p>If a value is missing, and there is no default in the check, then the check
+automatically fails.</p>
+<p>The <tt class="docutils literal"><span class="pre">validate</span></tt> method takes an optional keyword argument <tt class="docutils literal"><span class="pre">preserve_errors</span></tt>.
+If you set this to <tt class="docutils literal"><span class="pre">True</span></tt>, instead of getting <tt class="docutils literal"><span class="pre">False</span></tt> for failed checks you
+get the actual error object from the <strong>validate</strong> module. This usually contains
+useful information about why the check failed.</p>
+<p>See the <a class="reference internal" href="#flatten-errors">flatten_errors</a> function for how to turn your results dictionary into
+a useful list of error messages.</p>
+<p>Even if <tt class="docutils literal"><span class="pre">preserve_errors</span></tt> is <tt class="docutils literal"><span class="pre">True</span></tt>, missing keys or sections will still be
+represented by a <tt class="docutils literal"><span class="pre">False</span></tt> in the results dictionary.</p>
+</div>
+<div class="section" id="mentioning-default-values">
+<h4><a class="toc-backref" href="#id43">5.3.2.2&nbsp;&nbsp;&nbsp;Mentioning Default Values</a></h4>
+<p>In the check in your configspec, you can specify a default to be used - by
+using the <tt class="docutils literal"><span class="pre">default</span></tt> keyword. E.g.</p>
+<pre class="literal-block">
+key1 = integer(0, 30, default=15)
+key2 = integer(default=15)
+key3 = boolean(default=True)
+key4 = option('Hello', 'Goodbye', 'Not Today', default='Not Today')
+</pre>
+<p>If the configspec check supplies a default and the value is missing in the
+config, then the default will be set in your ConfigObj. (It is still passed to
+the <tt class="docutils literal"><span class="pre">Validator</span></tt> so that type conversion can be done: this means the default
+value must still pass the check.)</p>
+<p>ConfigObj keeps a record of which values come from defaults, using the
+<tt class="docutils literal"><span class="pre">defaults</span></tt> attribute of <a class="reference internal" href="#sections">sections</a>. Any key in this list isn't written out by
+the <tt class="docutils literal"><span class="pre">write</span></tt> method. If a key is set from outside (even to the same value)
+then it is removed from the <tt class="docutils literal"><span class="pre">defaults</span></tt> list.</p>
+<!-- note:
+
+Even if all the keys in a section are in the defaults list, the section
+marker is still written out. -->
+<p>There is additionally a special case default value of <tt class="docutils literal"><span class="pre">None</span></tt>. If you set the
+default value to <tt class="docutils literal"><span class="pre">None</span></tt> and the value is missing, the value will always be
+set to <tt class="docutils literal"><span class="pre">None</span></tt>. As the other checks don't return <tt class="docutils literal"><span class="pre">None</span></tt> (unless you
+implement your own that do), you can tell that this value came from a default
+value (and was missing from the config file). It allows an easy way of
+implementing optional values. Simply check (and ignore) members that are set
+to <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <a class="reference internal" href="#stringify">stringify</a> is <tt class="docutils literal"><span class="pre">False</span></tt> then <tt class="docutils literal"><span class="pre">default=None</span></tt> returns <tt class="docutils literal"><span class="pre">''</span></tt> instead of
+<tt class="docutils literal"><span class="pre">None</span></tt>. This is because setting a value to a non-string raises an error
+if stringify is unset.</p>
+</div>
+<p>The default value can be a list. See <a class="reference internal" href="#id13">List Values</a> for the way to do this.</p>
+<p>Writing invalid default values is a <em>guaranteed</em> way of confusing your users.
+Default values <strong>must</strong> pass the check.</p>
+</div>
+<div class="section" id="mentioning-repeated-sections-and-values">
+<h4><a class="toc-backref" href="#id44">5.3.2.3&nbsp;&nbsp;&nbsp;Mentioning Repeated Sections and Values</a></h4>
+<p>In the configspec it is possible to cause <em>every</em> sub-section in a section to
+be validated using the same configspec. You do this with a section in the
+configspec  called <tt class="docutils literal"><span class="pre">__many__</span></tt>. Every sub-section in that section has the
+<tt class="docutils literal"><span class="pre">__many__</span></tt> configspec applied to it (without you having to explicitly name
+them in advance).</p>
+<p>Your <tt class="docutils literal"><span class="pre">__many__</span></tt> section can have nested subsections, which can also include
+<tt class="docutils literal"><span class="pre">__many__</span></tt> type sections.</p>
+<p>You can also specify that all values should be validated using the same configspec,
+by having a member with the name <tt class="docutils literal"><span class="pre">__many__</span></tt>. If you want to use repeated values
+along with repeated sections then you can call one of them <tt class="docutils literal"><span class="pre">___many___</span></tt> (triple
+underscores).</p>
+<p>Sections with repeated sections or values can also have specifically named sub-sections
+or values. The <tt class="docutils literal"><span class="pre">__many__</span></tt> configspec will only be used to validate entries that don't
+have an explicit configspec.</p>
+<p>See <a class="reference internal" href="#repeated-sections">Repeated Sections</a> for examples.</p>
+</div>
+<div class="section" id="mentioning-simpleval">
+<h4><a class="toc-backref" href="#id45">5.3.2.4&nbsp;&nbsp;&nbsp;Mentioning SimpleVal</a></h4>
+<p>If you just want to check if all members are present, then you can use the
+<tt class="docutils literal"><span class="pre">SimpleVal</span></tt> object that comes with ConfigObj. It only fails members if they
+are missing.</p>
+<p>Write a configspec that has all the members you want to check for, but set
+every section to <tt class="docutils literal"><span class="pre">''</span></tt>.</p>
+<div class="pysrc"><span class="pytext">val</span> <span class="pyoperator">=</span> <span class="pytext">SimpleVal</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pytext">test</span> <span class="pyoperator">=</span> <span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">validate</span><span class="pyoperator">(</span><span class="pytext">val</span><span class="pyoperator">)</span><br />
+<span class="pykeyword">if</span> <span class="pytext">test</span> <span class="pykeyword">is</span> <span class="pytext">True</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">print</span> <span class="pystring">'Succeeded.'</span><span class="pytext"></span></div></div>
+<div class="section" id="mentioning-copy-mode">
+<h4><a class="toc-backref" href="#id46">5.3.2.5&nbsp;&nbsp;&nbsp;Mentioning copy Mode</a></h4>
+<p>As discussed in <a class="reference internal" href="#mentioning-default-values">Mentioning Default Values</a>, you can use a configspec to
+supply default values. These are marked in the ConfigObj instance as defaults,
+and <em>not</em> written out by the <tt class="docutils literal"><span class="pre">write</span></tt> mode. This means that your users only
+need to supply values that are different from the defaults.</p>
+<p>This can be inconvenient if you <em>do</em> want to write out the default values,
+for example to write out a default config file.</p>
+<p>If you set <tt class="docutils literal"><span class="pre">copy=True</span></tt> when you call validate, then no values are marked as
+defaults. In addition, all comments from the configspec are copied into
+your ConfigObj instance. You can then call <tt class="docutils literal"><span class="pre">write</span></tt> to create your config
+file.</p>
+<p>There is a limitation with this. In order to allow <a class="reference internal" href="#string-interpolation">String Interpolation</a> to work
+within configspecs, <tt class="docutils literal"><span class="pre">DEFAULT</span></tt> sections are not processed by
+validation; even in copy mode.</p>
+</div>
+</div>
+<div class="section" id="reload">
+<h3><a class="toc-backref" href="#id47">5.3.3&nbsp;&nbsp;&nbsp;reload</a></h3>
+<p>If a ConfigObj instance was loaded from the filesystem, then this method will reload it. It
+will also reuse any configspec you supplied at instantiation (including reloading it from
+the filesystem if you passed it in as a filename).</p>
+<p>If the ConfigObj does not have a filename attribute pointing to a file, then a <tt class="docutils literal"><span class="pre">ReloadError</span></tt>
+will be raised.</p>
+</div>
+<div class="section" id="reset">
+<h3><a class="toc-backref" href="#id48">5.3.4&nbsp;&nbsp;&nbsp;reset</a></h3>
+<p>This method takes no arguments and doesn't return anything. It restores a ConfigObj
+instance to a freshly created state.</p>
+</div>
+</div>
+<div class="section" id="attributes">
+<h2><a class="toc-backref" href="#id49">5.4&nbsp;&nbsp;&nbsp;Attributes</a></h2>
+<p>A ConfigObj has the following attributes :</p>
+<ul class="simple">
+<li>indent_type</li>
+<li>interpolate</li>
+<li>stringify</li>
+<li>BOM</li>
+<li>initial_comment</li>
+<li>final_comment</li>
+<li>list_values</li>
+<li>encoding</li>
+<li>default_encoding</li>
+<li>unrepr</li>
+<li>write_empty_values</li>
+<li>newlines</li>
+</ul>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">This doesn't include <em>comments</em>, <em>inline_comments</em>, <em>defaults</em>, or
+<em>configspec</em>. These are actually attributes of <a class="reference internal" href="#sections">Sections</a>.</p>
+</div>
+<p>It also has the following attributes as a result of parsing. They correspond to
+<a class="reference internal" href="#options">options</a> when the ConfigObj was created, but changing them has no effect.</p>
+<ul class="simple">
+<li>raise_errors</li>
+<li>create_empty</li>
+<li>file_error</li>
+</ul>
+<div class="section" id="interpolation">
+<h3><a class="toc-backref" href="#id50">5.4.1&nbsp;&nbsp;&nbsp;interpolation</a></h3>
+<p>ConfigObj can perform string interpolation in a <em>similar</em> way to
+<tt class="docutils literal"><span class="pre">ConfigParser</span></tt>. See the <a class="reference internal" href="#string-interpolation">String Interpolation</a> section for full details.</p>
+<p>If <tt class="docutils literal"><span class="pre">interpolation</span></tt> is set to <tt class="docutils literal"><span class="pre">False</span></tt>, then interpolation is <em>not</em> done when
+you fetch values.</p>
+</div>
+<div class="section" id="stringify">
+<h3><a class="toc-backref" href="#id51">5.4.2&nbsp;&nbsp;&nbsp;stringify</a></h3>
+<p>If this attribute is set (<tt class="docutils literal"><span class="pre">True</span></tt>) then the <a class="reference internal" href="#validate">validate</a> method changes the
+values in the ConfigObj. These are turned back into strings when <a class="reference internal" href="#write">write</a> is
+called.</p>
+<p>If stringify is unset (<tt class="docutils literal"><span class="pre">False</span></tt>) then attempting to set a value to a non
+string (or a list of strings) will raise a <tt class="docutils literal"><span class="pre">TypeError</span></tt>.</p>
+</div>
+<div class="section" id="bom">
+<h3><a class="toc-backref" href="#id52">5.4.3&nbsp;&nbsp;&nbsp;BOM</a></h3>
+<p>If the initial config file <em>started</em> with the UTF8 Unicode signature (known
+slightly incorrectly as the <acronym title="Byte Order Mark">BOM</acronym>), or the UTF16 BOM, then
+this attribute is set to <tt class="docutils literal"><span class="pre">True</span></tt>. Otherwise it is <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
+<p>If it is set to <tt class="docutils literal"><span class="pre">True</span></tt> when <tt class="docutils literal"><span class="pre">write</span></tt> is called then, if <tt class="docutils literal"><span class="pre">encoding</span></tt> is set
+to <tt class="docutils literal"><span class="pre">None</span></tt> <em>or</em> to <tt class="docutils literal"><span class="pre">utf_8</span></tt> (and variants) a UTF BOM will be written.</p>
+<p>For UTF16 encodings, a BOM is <em>always</em> written.</p>
+</div>
+<div class="section" id="initial-comment">
+<h3><a class="toc-backref" href="#id53">5.4.4&nbsp;&nbsp;&nbsp;initial_comment</a></h3>
+<p>This is a list of lines. If the ConfigObj is created from an existing file, it
+will contain any lines of comments before the start of the members.</p>
+<p>If you create a new ConfigObj, this will be an empty list.</p>
+<p>The write method puts these lines before it starts writing out the members.</p>
+</div>
+<div class="section" id="final-comment">
+<h3><a class="toc-backref" href="#id54">5.4.5&nbsp;&nbsp;&nbsp;final_comment</a></h3>
+<p>This is a list of lines. If the ConfigObj is created from an existing file, it
+will contain any lines of comments after the last member.</p>
+<p>If you create a new ConfigObj, this will be an empty list.</p>
+<p>The <tt class="docutils literal"><span class="pre">write</span></tt> method puts these lines after it finishes writing out the
+members.</p>
+</div>
+<div class="section" id="list-values">
+<h3><a class="toc-backref" href="#id55">5.4.6&nbsp;&nbsp;&nbsp;list_values</a></h3>
+<p>This attribute is <tt class="docutils literal"><span class="pre">True</span></tt> or <tt class="docutils literal"><span class="pre">False</span></tt>. If set to <tt class="docutils literal"><span class="pre">False</span></tt> then values are
+not parsed for list values. In addition single line values are not unquoted.</p>
+<p>This allows you to do your own parsing of values. It exists primarily to
+support the reading of the <a class="reference internal" href="#configspec">configspec</a> - but has other use cases.</p>
+<p>For example you could use the <tt class="docutils literal"><span class="pre">LineParser</span></tt> from the
+<a class="reference external" href="http://www.voidspace.org.uk/python/listquote.html#lineparser">listquote module</a>
+to read values for nested lists.</p>
+<p>Single line values aren't quoted when writing - but multiline values are
+handled as normal.</p>
+<div class="caution">
+<p class="first admonition-title">Caution!</p>
+<dl class="docutils">
+<dt>Because values aren't quoted, leading or trailing whitespace can be</dt>
+<dd>lost.</dd>
+</dl>
+<p>This behaviour was changed in version 4.0.1.</p>
+<blockquote class="last">
+Prior to this, single line values might have been quoted; even with
+<tt class="docutils literal"><span class="pre">list_values=False</span></tt>. This means that files written by <strong>ConfigObj</strong>
+<em>could</em> now be incompatible - and need the quotes removing by hand.</blockquote>
+</div>
+</div>
+<div class="section" id="encoding">
+<h3><a class="toc-backref" href="#id56">5.4.7&nbsp;&nbsp;&nbsp;encoding</a></h3>
+<p>This is the encoding used to encode the output, when you call <tt class="docutils literal"><span class="pre">write</span></tt>. It
+must be a valid encoding <a class="reference external" href="http://docs.python.org/lib/standard-encodings.html">recognised by Python</a>.</p>
+<p>If this value is <tt class="docutils literal"><span class="pre">None</span></tt> then no encoding is done when <tt class="docutils literal"><span class="pre">write</span></tt> is called.</p>
+</div>
+<div class="section" id="default-encoding">
+<h3><a class="toc-backref" href="#id57">5.4.8&nbsp;&nbsp;&nbsp;default_encoding</a></h3>
+<p>If encoding is set, any byte-strings in your ConfigObj instance (keys or
+members) will first be decoded to Unicode using the encoding specified by the
+<tt class="docutils literal"><span class="pre">default_encoding</span></tt> attribute. This ensures that the output is in the encoding
+specified.</p>
+<p>If this value is <tt class="docutils literal"><span class="pre">None</span></tt> then <tt class="docutils literal"><span class="pre">sys.defaultencoding</span></tt> is used instead.</p>
+</div>
+<div class="section" id="unrepr">
+<h3><a class="toc-backref" href="#id58">5.4.9&nbsp;&nbsp;&nbsp;unrepr</a></h3>
+<p>Another boolean value. If this is set, then <tt class="docutils literal"><span class="pre">repr(value)</span></tt> is used to write
+values. This writes values in a slightly different way to the normal ConfigObj
+file syntax.</p>
+<p>This preserves basic Python data-types when read back in. See <a class="reference internal" href="#unrepr-mode">unrepr mode</a>
+for more details.</p>
+</div>
+<div class="section" id="write-empty-values">
+<h3><a class="toc-backref" href="#id59">5.4.10&nbsp;&nbsp;&nbsp;write_empty_values</a></h3>
+<p>Also boolean. If set, values that are an empty string (<tt class="docutils literal"><span class="pre">''</span></tt>) are written as
+empty values. See <a class="reference internal" href="#empty-values">Empty Values</a> for more details.</p>
+</div>
+<div class="section" id="newlines">
+<h3><a class="toc-backref" href="#id60">5.4.11&nbsp;&nbsp;&nbsp;newlines</a></h3>
+<p>When a config file is read, ConfigObj records the type of newline separators in the
+file and uses this separator when writing. It defaults to <tt class="docutils literal"><span class="pre">None</span></tt>, and ConfigObj
+uses the system default (<tt class="docutils literal"><span class="pre">os.sep</span></tt>) if write is called without newlines having
+been set.</p>
+</div>
+</div>
+</div>
+<div class="section" id="the-config-file-format">
+<h1><a class="toc-backref" href="#id61">6&nbsp;&nbsp;&nbsp;The Config File Format</a></h1>
+<p>You saw an example config file in the <a class="reference internal" href="#config-files">Config Files</a> section. Here is a fuller
+specification of the config files used and created by ConfigObj.</p>
+<p>The basic pattern for keywords is :</p>
+<pre class="literal-block">
+# comment line
+# comment line
+keyword = value # inline comment
+</pre>
+<p>Both keyword and value can optionally be surrounded in quotes. The equals sign
+is the only valid divider.</p>
+<p>Values can have comments on the lines above them, and an inline comment after
+them. This, of course, is optional. See the <a class="reference internal" href="#comments">comments</a> section for details.</p>
+<p>If a keyword or value starts or ends with whitespace, or contains a quote mark
+or comma, then it should be surrounded by quotes. Quotes are not necessary if
+whitespace is surrounded by non-whitespace.</p>
+<p>Values can also be lists. Lists are comma separated. You indicate a single
+member list by a trailing comma. An empty list is shown by a single comma :</p>
+<pre class="literal-block">
+keyword1 = value1, value2, value3
+keyword2 = value1, # a single member list
+keyword3 = , # an empty list
+</pre>
+<p>Values that contain line breaks (multi-line values) can be surrounded by triple
+quotes. These can also be used if a value contains both types of quotes. List
+members cannot be surrounded by triple quotes :</p>
+<pre class="literal-block">
+keyword1 = ''' A multi line value
+on several
+lines'''     # with a comment
+keyword2 = '''I won't be &quot;afraid&quot;.'''
+#
+keyword3 = &quot;&quot;&quot; A multi line value
+on several
+lines&quot;&quot;&quot;     # with a comment
+keyword4 = &quot;&quot;&quot;I won't be &quot;afraid&quot;.&quot;&quot;&quot;
+</pre>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">There is no way of safely quoting values that contain both types of triple
+quotes.</p>
+</div>
+<p>A line that starts with a '#', possibly preceded by whitespace, is a comment.</p>
+<p>New sections are indicated by a section marker line. That is the section name
+in square brackets. Whitespace around the section name is ignored. The name can
+be quoted with single or double quotes. The marker can have comments before it
+and an inline comment after it :</p>
+<pre class="literal-block">
+# The First Section
+[ section name 1 ] # first section
+keyword1 = value1
+
+# The Second Section
+[ &quot;section name 2&quot; ] # second section
+keyword2 = value2
+</pre>
+<p>Any subsections (sections that are <em>inside</em> the current section) are
+designated by repeating the square brackets before and after the section name.
+The number of square brackets represents the nesting level of the sub-section.
+Square brackets may be separated by whitespace; such whitespace, however, will
+not be present in the output config written by the <tt class="docutils literal"><span class="pre">write</span></tt> method.</p>
+<p>Indentation is not significant, but can be preserved. See the description of
+the <tt class="docutils literal"><span class="pre">indent_type</span></tt> option, in the <a class="reference internal" href="#configobj-specifications">ConfigObj specifications</a> chapter, for the
+details.</p>
+<p>A <em>NestingError</em> will be raised if the number of the opening and the closing
+brackets in a section marker is not the same, or if a sub-section's nesting
+level is greater than the nesting level of it parent plus one.</p>
+<p>In the outer section, single values can only appear before any sub-section.
+Otherwise they will belong to the sub-section immediately before them.</p>
+<pre class="literal-block">
+# initial comment
+keyword1 = value1
+keyword2 = value2
+
+[section 1]
+keyword1 = value1
+keyword2 = value2
+
+    [[sub-section]]
+    # this is in section 1
+    keyword1 = value1
+    keyword2 = value2
+
+        [[[nested section]]]
+        # this is in sub section
+        keyword1 = value1
+        keyword2 = value2
+
+    [[sub-section2]]
+    # this is in section 1 again
+    keyword1 = value1
+    keyword2 = value2
+
+[[sub-section3]]
+# this is also in section 1, indentation is misleading here
+keyword1 = value1
+keyword2 = value2
+
+# final comment
+</pre>
+<p>When parsed, the above config file produces the following data structure :</p>
+<div class="pysrc"><span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pyoperator">{</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword1'</span><span class="pyoperator">:</span> <span class="pystring">'value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword2'</span><span class="pyoperator">:</span> <span class="pystring">'value2'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'section 1'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword1'</span><span class="pyoperator">:</span> <span class="pystring">'value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword2'</span><span class="pyoperator">:</span> <span class="pystring">'value2'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'sub-section'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword1'</span><span class="pyoperator">:</span> <span class="pystring">'value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword2'</span><span class="pyoperator">:</span> <span class="pystring">'value2'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'nested section'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword1'</span><span class="pyoperator">:</span> <span class="pystring">'value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword2'</span><span class="pyoperator">:</span> <span class="pystring">'value2'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pyoperator">}</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pyoperator">}</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'sub-section2'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword1'</span><span class="pyoperator">:</span> <span class="pystring">'value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword2'</span><span class="pyoperator">:</span> <span class="pystring">'value2'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pyoperator">}</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'sub-section3'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword1'</span><span class="pyoperator">:</span> <span class="pystring">'value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'keyword2'</span><span class="pyoperator">:</span> <span class="pystring">'value2'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pyoperator">}</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pyoperator">}</span><span class="pyoperator">,</span><br />
+<span class="pyoperator">}</span><span class="pyoperator">)</span><span class="pytext"></span></div><p>Sections are ordered: note how the structure of the resulting ConfigObj is in
+the same order as the original file.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>In ConfigObj 4.3.0 <em>empty values</em> became valid syntax. They are read as the
+empty string. There is also an option/attribute (<tt class="docutils literal"><span class="pre">write_empty_values</span></tt>) to
+allow the writing of these.</p>
+<p>This is mainly to support 'legacy' config files, written from other
+applications. This is documented under <a class="reference internal" href="#empty-values">Empty Values</a>.</p>
+<p class="last"><a class="reference internal" href="#unrepr-mode">unrepr mode</a> introduces <em>another</em> syntax variation, used for storing
+basic Python datatypes in config files.  <img src="/smilies/smile.gif" alt="Smile" height="15" width="15" /> </p>
+</div>
+</div>
+<div class="section" id="sections">
+<h1><a class="toc-backref" href="#id62">7&nbsp;&nbsp;&nbsp;Sections</a></h1>
+<p>Every section in a ConfigObj has certain properties. The ConfigObj itself also
+has these properties, because it too is a section (sometimes called the <em>root
+section</em>).</p>
+<p><tt class="docutils literal"><span class="pre">Section</span></tt> is a subclass of the standard new-class dictionary, therefore it
+has <strong>all</strong> the methods of a normal dictionary. This means you can <tt class="docutils literal"><span class="pre">update</span></tt>
+and <tt class="docutils literal"><span class="pre">clear</span></tt> sections.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>You create a new section by assigning a member to be a dictionary.</p>
+<p>The new <tt class="docutils literal"><span class="pre">Section</span></tt> is created <em>from</em> the dictionary, but isn't the same
+thing as the dictionary. (So references to the dictionary you use to create
+the section <em>aren't</em> references to the new section).</p>
+<p>Note the following.</p>
+<div class="pysrc"><span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pytext">vals</span> <span class="pyoperator">=</span> <span class="pyoperator">{</span><span class="pystring">'key1'</span><span class="pyoperator">:</span> <span class="pystring">'value 1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'key2'</span><span class="pyoperator">:</span> <span class="pystring">'value 2'</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="pyoperator">}</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'vals'</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">vals</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'vals'</span><span class="pyoperator">]</span> <span class="pyoperator">==</span> <span class="pytext">vals</span><br />
+<span class="pytext">True</span><br />
+<span class="pytext">config</span><span class="pyoperator">[</span><span class="pystring">'vals'</span><span class="pyoperator">]</span> <span class="pykeyword">is</span> <span class="pytext">vals</span><br />
+<span class="pytext">False</span><span class="pytext"></span></div><p class="last">If you now change <tt class="docutils literal"><span class="pre">vals</span></tt>, the changes won't be reflected in <tt class="docutils literal"><span class="pre">config['vals']</span></tt>.</p>
+</div>
+<p>A section is ordered, following its <tt class="docutils literal"><span class="pre">scalars</span></tt> and <tt class="docutils literal"><span class="pre">sections</span></tt>
+attributes documented below. This means that the following dictionary
+attributes return their results in order.</p>
+<ul>
+<li><p class="first">'__iter__'</p>
+<blockquote>
+<p>More commonly known as <tt class="docutils literal"><span class="pre">for</span> <span class="pre">member</span> <span class="pre">in</span> <span class="pre">section:</span></tt>.</p>
+</blockquote>
+</li>
+<li><p class="first">'__repr__' and '__str__'</p>
+<blockquote>
+<p>Any time you print or display the ConfigObj.</p>
+</blockquote>
+</li>
+<li><p class="first">'items'</p>
+</li>
+<li><p class="first">'iteritems'</p>
+</li>
+<li><p class="first">'iterkeys'</p>
+</li>
+<li><p class="first">'itervalues'</p>
+</li>
+<li><p class="first">'keys'</p>
+</li>
+<li><p class="first">'popitem'</p>
+</li>
+<li><p class="first">'values'</p>
+</li>
+</ul>
+<div class="section" id="section-attributes">
+<h2><a class="toc-backref" href="#id63">7.1&nbsp;&nbsp;&nbsp;Section Attributes</a></h2>
+<ul>
+<li><p class="first">main</p>
+<blockquote>
+<p>A reference to the main ConfigObj.</p>
+</blockquote>
+</li>
+<li><p class="first">parent</p>
+<blockquote>
+<p>A reference to the 'parent' section, the section that this section is a
+member of.</p>
+<p>On the ConfigObj this attribute is a reference to itself. You can use this
+to walk up the sections, stopping when <tt class="docutils literal"><span class="pre">section.parent</span> <span class="pre">is</span> <span class="pre">section</span></tt>.</p>
+</blockquote>
+</li>
+<li><p class="first">depth</p>
+<blockquote>
+<p>The nesting level of the current section.</p>
+<p>If you create a new ConfigObj and add sections, 1 will be added to the
+depth level between sections.</p>
+</blockquote>
+</li>
+<li><p class="first">defaults</p>
+<blockquote>
+<p>This attribute is a list of scalars that came from default values. Values
+that came from defaults aren't written out by the <tt class="docutils literal"><span class="pre">write</span></tt> method.
+Setting any of these values in the section removes them from the defaults
+list.</p>
+</blockquote>
+</li>
+<li><p class="first">default_values</p>
+<blockquote>
+<p>This attribute is a dictionary mapping keys to the default values for the
+keys. By default it is an empty dictionary and is populated when you
+validate the ConfigObj.</p>
+</blockquote>
+</li>
+<li><p class="first">scalars, sections</p>
+<blockquote>
+<p>These attributes are normal lists, representing the order that members,
+single values and subsections appear in the section. The order will either
+be the order of the original config file, <em>or</em> the order that you added
+members.</p>
+<p>The order of members in this lists is the order that <tt class="docutils literal"><span class="pre">write</span></tt> creates in
+the config file. The <tt class="docutils literal"><span class="pre">scalars</span></tt> list is output before the <tt class="docutils literal"><span class="pre">sections</span></tt>
+list.</p>
+<p>Adding or removing members also alters these lists. You can manipulate the
+lists directly to alter the order of members.</p>
+<div class="warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you alter the <tt class="docutils literal"><span class="pre">scalars</span></tt>, <tt class="docutils literal"><span class="pre">sections</span></tt>, or <tt class="docutils literal"><span class="pre">defaults</span></tt> attributes
+so that they no longer reflect the contents of the section, you will
+break your ConfigObj.</p>
+</div>
+<p>See also the <tt class="docutils literal"><span class="pre">rename</span></tt> method.</p>
+</blockquote>
+</li>
+<li><p class="first">comments</p>
+<blockquote>
+<p>This is a dictionary of comments associated with each member. Each entry is
+a list of lines. These lines are written out before the member.</p>
+</blockquote>
+</li>
+<li><p class="first">inline_comments</p>
+<blockquote>
+<p>This is <em>another</em> dictionary of comments associated with each member. Each
+entry is a string that is put inline with the member.</p>
+</blockquote>
+</li>
+<li><p class="first">configspec</p>
+<blockquote>
+<p>The configspec attribute is a dictionary mapping scalars to <em>checks</em>. A
+check defines the expected type and possibly the allowed values for a
+member.</p>
+<p>The configspec has the same format as a config file, but instead of values
+it has a specification for the value (which may include a default value).
+The <a class="reference internal" href="#validate">validate</a> method uses it to check the config file makes sense. If a
+configspec is passed in when the ConfigObj is created, then it is parsed
+and broken up to become the <tt class="docutils literal"><span class="pre">configspec</span></tt> attribute of each section.</p>
+<p>If you didn't pass in a configspec, this attribute will be <tt class="docutils literal"><span class="pre">None</span></tt> on the
+root section (the main ConfigObj).</p>
+<p>You can set the configspec attribute directly on a section.</p>
+<p>See the <a class="reference internal" href="#validation">validation</a> section for full details of how to write configspecs.</p>
+</blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="section-methods">
+<h2><a class="toc-backref" href="#id64">7.2&nbsp;&nbsp;&nbsp;Section Methods</a></h2>
+<ul>
+<li><p class="first"><strong>dict</strong></p>
+<blockquote>
+<p>This method takes no arguments. It returns a deep copy of the section as a
+dictionary. All subsections will also be dictionaries, and list values will
+be copies, rather than references to the original <a class="footnote-reference" href="#id23" id="id10">[10]</a>.</p>
+</blockquote>
+</li>
+<li><p class="first"><strong>rename</strong></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">rename(oldkey,</span> <span class="pre">newkey)</span></tt></p>
+<p>This method renames a key, without affecting its position in the sequence.</p>
+</blockquote>
+</li>
+<li><p class="first"><strong>merge</strong></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">merge(indict)</span></tt></p>
+<p>This method is a <em>recursive update</em> method. It allows you to merge two
+config files together.</p>
+<p>You would typically use this to create a default ConfigObj and then merge
+in user settings. This way users only need to specify values that are
+different from the default.</p>
+<p>For example :</p>
+<div class="pysrc"><span class="pycomment"># def_cfg contains your default config settings<br />
+</span><span class="pycomment"># user_cfg contains the user settings<br />
+</span><span class="pytext">cfg</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">def_cfg</span><span class="pyoperator">)</span><br />
+<span class="pytext">usr</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">user_cfg</span><span class="pyoperator">)</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">cfg</span><span class="pyoperator">.</span><span class="pytext">merge</span><span class="pyoperator">(</span><span class="pytext">usr</span><span class="pyoperator">)</span><br />
+<br />
+<span class="pystring">"""<br />
+cfg now contains a combination of the default settings and the user<br />
+settings.<br />
+<br />
+The user settings will have overwritten any of the default ones.<br />
+"""</span><span class="pytext"></span></div></blockquote>
+</li>
+<li><p class="first"><strong>walk</strong></p>
+<blockquote>
+<p>This method can be used to transform values and names. See <a class="reference internal" href="#walking-a-section">walking a
+section</a> for examples and explanation.</p>
+</blockquote>
+</li>
+<li><p class="first"><strong>as_bool</strong></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">as_bool(key)</span></tt></p>
+<p>Returns <tt class="docutils literal"><span class="pre">True</span></tt> if the key contains a string that represents <tt class="docutils literal"><span class="pre">True</span></tt>, or
+is the <tt class="docutils literal"><span class="pre">True</span></tt> object.</p>
+<p>Returns <tt class="docutils literal"><span class="pre">False</span></tt> if the key contains a string that represents <tt class="docutils literal"><span class="pre">False</span></tt>,
+or is the <tt class="docutils literal"><span class="pre">False</span></tt> object.</p>
+<p>Raises a <tt class="docutils literal"><span class="pre">ValueError</span></tt> if the key contains anything else.</p>
+<p>Strings that represent <tt class="docutils literal"><span class="pre">True</span></tt> are (not case sensitive) :</p>
+<pre class="literal-block">
+true, yes, on, 1
+</pre>
+<p>Strings that represent <tt class="docutils literal"><span class="pre">False</span></tt> are :</p>
+<pre class="literal-block">
+false, no, off, 0
+</pre>
+</blockquote>
+</li>
+<li><p class="first"><strong>as_int</strong></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">as_int(key)</span></tt></p>
+<p>This returns the value contained in the specified key as an integer.</p>
+<p>It raises a <tt class="docutils literal"><span class="pre">ValueError</span></tt> if the conversion can't be done.</p>
+</blockquote>
+</li>
+<li><p class="first"><strong>as_float</strong></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">as_float(key)</span></tt></p>
+<p>This returns the value contained in the specified key as a float.</p>
+<p>It raises a <tt class="docutils literal"><span class="pre">ValueError</span></tt> if the conversion can't be done.</p>
+</blockquote>
+</li>
+<li><p class="first"><strong>as_list</strong></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">as_list(key)</span></tt></p>
+<p>This returns the value contained in the specified key as a list.</p>
+<p>If it isn't a list it will be wrapped as a list so that you can
+guarantee the returned value will be a list.</p>
+</blockquote>
+</li>
+<li><p class="first"><strong>restore_default</strong></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">restore_default(key)</span></tt></p>
+<p>Restore (and return) the default value for the specified key.</p>
+<p>This method will only work for a ConfigObj that was created
+with a configspec and has been validated.</p>
+<p>If there is no default value for this key, <tt class="docutils literal"><span class="pre">KeyError</span></tt> is raised.</p>
+</blockquote>
+</li>
+<li><p class="first"><strong>restore_defaults</strong></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">restore_defaults()</span></tt></p>
+<p>Recursively restore default values to all members
+that have them.</p>
+<p>This method will only work for a ConfigObj that was created
+with a configspec and has been validated.</p>
+<p>It doesn't delete or modify entries without default values.</p>
+</blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="walking-a-section">
+<h2><a class="toc-backref" href="#id65">7.3&nbsp;&nbsp;&nbsp;Walking a Section</a></h2>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">The walk method allows you to call a function on every member/name.</p>
+</div>
+<div class="pysrc"><span class="pytext">walk</span><span class="pyoperator">(</span><span class="pytext">function</span><span class="pyoperator">,</span> <span class="pytext">raise_errors</span><span class="pyoperator">=</span><span class="pytext">True</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="pytext">call_on_sections</span><span class="pyoperator">=</span><span class="pytext">False</span><span class="pyoperator">,</span> <span class="pyoperator">**</span><span class="pytext">keywargs</span><span class="pyoperator">)</span><span class="pyoperator">:</span><span class="pytext"></span></div><p><tt class="docutils literal"><span class="pre">walk</span></tt> is a method of the <tt class="docutils literal"><span class="pre">Section</span></tt> object. This means it is also a method
+of ConfigObj.</p>
+<p>It walks through every member and calls a function on the keyword and value. It
+walks recursively through subsections.</p>
+<p>It returns a dictionary of all the computed values.</p>
+<p>If the function raises an exception, the default is to propagate the error, and
+stop. If <tt class="docutils literal"><span class="pre">raise_errors=False</span></tt> then it sets the return value for that keyword
+to <tt class="docutils literal"><span class="pre">False</span></tt> instead, and continues. This is similar to the way <a class="reference internal" href="#validation">validation</a>
+works.</p>
+<p>Your function receives the arguments <tt class="docutils literal"><span class="pre">(section,</span> <span class="pre">key)</span></tt>. The current value is
+then <tt class="docutils literal"><span class="pre">section[key]</span></tt> <a class="footnote-reference" href="#id24" id="id11">[11]</a>. Any unrecognised keyword arguments you pass to
+walk, are passed on to the function.</p>
+<p>Normally <tt class="docutils literal"><span class="pre">walk</span></tt> just recurses into subsections. If you are transforming (or
+checking) names as well as values, then you want to be able to change the names
+of sections. In this case set <tt class="docutils literal"><span class="pre">call_on_sections</span></tt> to <tt class="docutils literal"><span class="pre">True</span></tt>. Now, on
+encountering a sub-section, <em>first</em> the function is called for the <em>whole</em>
+sub-section, and <em>then</em> it recurses into it's members. This means your function
+must be able to handle receiving dictionaries as well as strings and lists.</p>
+<p>If you are using the return value from <tt class="docutils literal"><span class="pre">walk</span></tt> <em>and</em> <tt class="docutils literal"><span class="pre">call_on_sections</span></tt>,
+note that walk discards the return value when it calls your function.</p>
+<div class="caution">
+<p class="first admonition-title">Caution!</p>
+<p class="last">You can use <tt class="docutils literal"><span class="pre">walk</span></tt> to transform the names of members of a section
+but you mustn't add or delete members.</p>
+</div>
+</div>
+<div class="section" id="examples">
+<h2><a class="toc-backref" href="#id66">7.4&nbsp;&nbsp;&nbsp;Examples</a></h2>
+<p>You can use this for transforming all values in your ConfigObj. For example
+you might like the nested lists from ConfigObj 3. This was provided by the
+<a class="reference external" href="http://www.voidspace.org.uk/python/modules.shtml#listquote">listquote</a> module. You could switch off the parsing for list values
+(<tt class="docutils literal"><span class="pre">list_values=False</span></tt>) and use listquote to parse every value.</p>
+<p>Another thing you might want to do is use the Python escape codes in your
+values. You might be <em>used</em> to using <tt class="docutils literal"><span class="pre">\n</span></tt> for line feed and <tt class="docutils literal"><span class="pre">\t</span></tt> for tab.
+Obviously we'd need to decode strings that come from the config file (using the
+escape codes). Before writing out we'll need to put the escape codes back in
+encode.</p>
+<p>As an example we'll write a function to use with walk, that encodes or decodes
+values using the <tt class="docutils literal"><span class="pre">string-escape</span></tt> codec.</p>
+<p>The function has to take each value and set the new value. As a bonus we'll
+create one function that will do decode <em>or</em> encode depending on a keyword
+argument.</p>
+<p>We don't want to work with section names, we're only transforming values, so
+we can leave <tt class="docutils literal"><span class="pre">call_on_sections</span></tt> as <tt class="docutils literal"><span class="pre">False</span></tt>. This means the two datatypes we
+have to handle are strings and lists, we can ignore everything else. (We'll
+treat tuples as lists as well).</p>
+<p>We're not using the return values, so it doesn't need to return anything, just
+change the values if appropriate.</p>
+<div class="pysrc"><span class="pykeyword">def</span> <span class="pytext">string_escape</span><span class="pyoperator">(</span><span class="pytext">section</span><span class="pyoperator">,</span> <span class="pytext">key</span><span class="pyoperator">,</span> <span class="pytext">encode</span><span class="pyoperator">=</span><span class="pytext">False</span><span class="pyoperator">)</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">"""<br />
+&nbsp;&nbsp;&nbsp;&nbsp;A function to encode or decode using the 'string-escape' codec.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;To be passed to the walk method of a ConfigObj.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;By default it decodes.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;To encode, pass in the keyword argument ``encode=True``.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;"""</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">val</span> <span class="pyoperator">=</span> <span class="pytext">section</span><span class="pyoperator">[</span><span class="pytext">key</span><span class="pyoperator">]</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># is it a type we can work with<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># NOTE: for platforms where Python &gt; 2.2<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># you can use basestring instead of (str, unicode)<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">if</span> <span class="pykeyword">not</span> <span class="pytext">isinstance</span><span class="pyoperator">(</span><span class="pytext">val</span><span class="pyoperator">,</span> <span class="pyoperator">(</span><span class="pytext">str</span><span class="pyoperator">,</span> <span class="pytext">unicode</span><span class="pyoperator">,</span> <span class="pytext">list</span><span class="pyoperator">,</span> <span class="pytext">tuple</span><span class="pyoperator">)</span><span class="pyoperator">)</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># no !<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">return</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">elif</span> <span class="pytext">isinstance</span><span class="pyoperator">(</span><span class="pytext">val</span><span class="pyoperator">,</span> <span class="pyoperator">(</span><span class="pytext">str</span><span class="pyoperator">,</span> <span class="pytext">unicode</span><span class="pyoperator">)</span><span class="pyoperator">)</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># it's a string !<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">if</span> <span class="pykeyword">not</span> <span class="pytext">encode</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">section</span><span class="pyoperator">[</span><span class="pytext">key</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">val</span><span class="pyoperator">.</span><span class="pytext">decode</span><span class="pyoperator">(</span><span class="pystring">'string-escape'</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">else</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">section</span><span class="pyoperator">[</span><span class="pytext">key</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">val</span><span class="pyoperator">.</span><span class="pytext">encode</span><span class="pyoperator">(</span><span class="pystring">'string-escape'</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">else</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># it must be a list or tuple!<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># we'll be lazy and create a new list<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">newval</span> <span class="pyoperator">=</span> <span class="pyoperator">[</span><span class="pyoperator">]</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># we'll check every member of the list<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">for</span> <span class="pytext">entry</span> <span class="pykeyword">in</span> <span class="pytext">val</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">if</span> <span class="pytext">isinstance</span><span class="pyoperator">(</span><span class="pytext">entry</span><span class="pyoperator">,</span> <span class="pyoperator">(</span><span class="pytext">str</span><span class="pyoperator">,</span> <span class="pytext">unicode</span><span class="pyoperator">)</span><span class="pyoperator">)</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">if</span> <span class="pykeyword">not</span> <span class="pytext">encode</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">newval</span><span class="pyoperator">.</span><span class="pytext">append</span><span class="pyoperator">(</span><span class="pytext">entry</span><span class="pyoperator">.</span><span class="pytext">decode</span><span class="pyoperator">(</span><span class="pystring">'string-escape'</span><span class="pyoperator">)</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">else</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="pytext">newval</span><span class="pyoperator">.</span><span class="pytext">append</span><span class="pyoperator">(</span><span class="pytext">entry</span><span class="pyoperator">.</span><span class="pytext">encode</span><span class="pyoperator">(</span><span class="pystring">'string-escape'</span><span class="pyoperator">)</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">else</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">newval</span><span class="pyoperator">.</span><span class="pytext">append</span><span class="pyoperator">(</span><span class="pytext">entry</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># done !<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">section</span><span class="pyoperator">[</span><span class="pytext">key</span><span class="pyoperator">]</span> <span class="pyoperator">=</span>&nbsp;&nbsp;<span class="pytext">newval</span><br />
+<br />
+<span class="pycomment"># assume we have a ConfigObj called ``config``<br />
+</span><span class="pycomment">#<br />
+</span><span class="pycomment"># To decode<br />
+</span><span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">walk</span><span class="pyoperator">(</span><span class="pytext">string_escape</span><span class="pyoperator">)</span><br />
+<span class="pycomment">#<br />
+</span><span class="pycomment"># To encode.<br />
+</span><span class="pycomment"># Because ``walk`` doesn't recognise the ``encode`` argument<br />
+</span><span class="pycomment"># it passes it to our function.<br />
+</span><span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">walk</span><span class="pyoperator">(</span><span class="pytext">string_escape</span><span class="pyoperator">,</span> <span class="pytext">encode</span><span class="pyoperator">=</span><span class="pytext">True</span><span class="pyoperator">)</span><span class="pytext"></span></div><p>Here's a simple example of using <tt class="docutils literal"><span class="pre">walk</span></tt> to transform names and values. One
+usecase of this would be to create a <em>standard</em> config file with placeholders
+for section and keynames. You can then use walk to create new config files
+and change values and member names :</p>
+<div class="pysrc"><span class="pycomment"># We use 'XXXX' as a placeholder<br />
+</span><span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pystring">'''<br />
+XXXXkey1 = XXXXvalue1<br />
+XXXXkey2 = XXXXvalue2<br />
+XXXXkey3 = XXXXvalue3<br />
+[XXXXsection1]<br />
+XXXXkey1 = XXXXvalue1<br />
+XXXXkey2 = XXXXvalue2<br />
+XXXXkey3 = XXXXvalue3<br />
+[XXXXsection2]<br />
+XXXXkey1 = XXXXvalue1<br />
+XXXXkey2 = XXXXvalue2<br />
+XXXXkey3 = XXXXvalue3<br />
+&nbsp;&nbsp;&nbsp;&nbsp;[[XXXXsection1]]<br />
+&nbsp;&nbsp;&nbsp;&nbsp;XXXXkey1 = XXXXvalue1<br />
+&nbsp;&nbsp;&nbsp;&nbsp;XXXXkey2 = XXXXvalue2<br />
+&nbsp;&nbsp;&nbsp;&nbsp;XXXXkey3 = XXXXvalue3<br />
+'''</span><span class="pyoperator">.</span><span class="pytext">splitlines</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pytext">cfg</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">config</span><span class="pyoperator">)</span><br />
+<span class="pycomment">#<br />
+</span><span class="pykeyword">def</span> <span class="pytext">transform</span><span class="pyoperator">(</span><span class="pytext">section</span><span class="pyoperator">,</span> <span class="pytext">key</span><span class="pyoperator">)</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">val</span> <span class="pyoperator">=</span> <span class="pytext">section</span><span class="pyoperator">[</span><span class="pytext">key</span><span class="pyoperator">]</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">newkey</span> <span class="pyoperator">=</span> <span class="pytext">key</span><span class="pyoperator">.</span><span class="pytext">replace</span><span class="pyoperator">(</span><span class="pystring">'XXXX'</span><span class="pyoperator">,</span> <span class="pystring">'CLIENT1'</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">section</span><span class="pyoperator">.</span><span class="pytext">rename</span><span class="pyoperator">(</span><span class="pytext">key</span><span class="pyoperator">,</span> <span class="pytext">newkey</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">if</span> <span class="pytext">isinstance</span><span class="pyoperator">(</span><span class="pytext">val</span><span class="pyoperator">,</span> <span class="pyoperator">(</span><span class="pytext">tuple</span><span class="pyoperator">,</span> <span class="pytext">list</span><span class="pyoperator">,</span> <span class="pytext">dict</span><span class="pyoperator">)</span><span class="pyoperator">)</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">pass</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">else</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">val</span> <span class="pyoperator">=</span> <span class="pytext">val</span><span class="pyoperator">.</span><span class="pytext">replace</span><span class="pyoperator">(</span><span class="pystring">'XXXX'</span><span class="pyoperator">,</span> <span class="pystring">'CLIENT1'</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">section</span><span class="pyoperator">[</span><span class="pytext">newkey</span><span class="pyoperator">]</span> <span class="pyoperator">=</span> <span class="pytext">val</span><br />
+<span class="pycomment">#<br />
+</span><span class="pytext">cfg</span><span class="pyoperator">.</span><span class="pytext">walk</span><span class="pyoperator">(</span><span class="pytext">transform</span><span class="pyoperator">,</span> <span class="pytext">call_on_sections</span><span class="pyoperator">=</span><span class="pytext">True</span><span class="pyoperator">)</span><br />
+<span class="pykeyword">print</span> <span class="pytext">cfg</span><br />
+<span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pyoperator">{</span><span class="pystring">'CLIENT1key1'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value1'</span><span class="pyoperator">,</span> <span class="pystring">'CLIENT1key2'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value2'</span><span class="pyoperator">,</span><br />
+<span class="pystring">'CLIENT1key3'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value3'</span><span class="pyoperator">,</span><br />
+<span class="pystring">'CLIENT1section1'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><span class="pystring">'CLIENT1key1'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'CLIENT1key2'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value2'</span><span class="pyoperator">,</span> <span class="pystring">'CLIENT1key3'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value3'</span><span class="pyoperator">}</span><span class="pyoperator">,</span><br />
+<span class="pystring">'CLIENT1section2'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><span class="pystring">'CLIENT1key1'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'CLIENT1key2'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value2'</span><span class="pyoperator">,</span> <span class="pystring">'CLIENT1key3'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value3'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'CLIENT1section1'</span><span class="pyoperator">:</span> <span class="pyoperator">{</span><span class="pystring">'CLIENT1key1'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value1'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pystring">'CLIENT1key2'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value2'</span><span class="pyoperator">,</span> <span class="pystring">'CLIENT1key3'</span><span class="pyoperator">:</span> <span class="pystring">'CLIENT1value3'</span><span class="pyoperator">}</span><span class="pyoperator">}</span><span class="pyoperator">}</span><span class="pyoperator">)</span><span class="pytext"></span></div></div>
+</div>
+<div class="section" id="exceptions">
+<h1><a class="toc-backref" href="#id67">8&nbsp;&nbsp;&nbsp;Exceptions</a></h1>
+<p>There are several places where ConfigObj may raise exceptions (other than
+because of bugs).</p>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>If a configspec filename you pass in doesn't exist, or a config file</dt>
+<dd><p class="first last">filename doesn't exist <em>and</em> <tt class="docutils literal"><span class="pre">file_error=True</span></tt>, an <tt class="docutils literal"><span class="pre">IOError</span></tt> will be
+raised.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>If you try to set a non-string key, or a non string value when</dt>
+<dd><p class="first last"><tt class="docutils literal"><span class="pre">stringify=False</span></tt>, a <tt class="docutils literal"><span class="pre">TypeError</span></tt> will be raised.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">A badly built config file will cause parsing errors.</p>
+</li>
+<li><p class="first">A parsing error can also occur when reading a configspec.</p>
+</li>
+<li><dl class="first docutils">
+<dt>In string interpolation you can specify a value that doesn't exist, or</dt>
+<dd><p class="first last">create circular references (recursion).</p>
+</dd>
+</dl>
+</li>
+</ol>
+<p>Number 5 (which is actually two different types of exceptions) is documented
+in <a class="reference internal" href="#string-interpolation">String Interpolation</a>.</p>
+<p><em>This</em> section is about errors raised during parsing.</p>
+<p>The base error class is <tt class="docutils literal"><span class="pre">ConfigObjError</span></tt>. This is a subclass of
+<tt class="docutils literal"><span class="pre">SyntaxError</span></tt>, so you can trap for <tt class="docutils literal"><span class="pre">SyntaxError</span></tt> without needing to
+directly import any of the ConfigObj exceptions.</p>
+<p>The following other exceptions are defined (all deriving from
+<tt class="docutils literal"><span class="pre">ConfigObjError</span></tt>) :</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">NestingError</span></tt></p>
+<blockquote>
+<p>This error indicates either a mismatch in the brackets in a section marker,
+or an excessive level of nesting.</p>
+</blockquote>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">ParseError</span></tt></p>
+<blockquote>
+<p>This error indicates that a line is badly written. It is neither a valid
+<tt class="docutils literal"><span class="pre">key</span> <span class="pre">=</span> <span class="pre">value</span></tt> line, nor a valid section marker line, nor a comment line.</p>
+</blockquote>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">DuplicateError</span></tt></p>
+<blockquote>
+<p>The keyword or section specified already exists.</p>
+</blockquote>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">ConfigspecError</span></tt></p>
+<blockquote>
+<p>An error occurred whilst parsing a configspec.</p>
+</blockquote>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">UnreprError</span></tt></p>
+<blockquote>
+<p>An error occurred when parsing a value in <a class="reference internal" href="#unrepr-mode">unrepr mode</a>.</p>
+</blockquote>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">ReloadError</span></tt></p>
+<blockquote>
+<p><tt class="docutils literal"><span class="pre">reload</span></tt> was called on a ConfigObj instance that doesn't have a valid
+filename attribute.</p>
+</blockquote>
+</li>
+</ul>
+<p>When parsing a configspec, ConfigObj will stop on the first error it
+encounters.  It will raise a <tt class="docutils literal"><span class="pre">ConfigspecError</span></tt>. This will have an <tt class="docutils literal"><span class="pre">error</span></tt>
+attribute, which is the actual error that was raised.</p>
+<p>Behaviour when parsing a config file depends on the option <tt class="docutils literal"><span class="pre">raise_errors</span></tt>.
+If ConfigObj encounters an error while parsing a config file:</p>
+<blockquote>
+<p>If <tt class="docutils literal"><span class="pre">raise_errors=True</span></tt> then ConfigObj will raise the appropriate error
+and parsing will stop.</p>
+<p>If <tt class="docutils literal"><span class="pre">raise_errors=False</span></tt> (the default) then parsing will continue to the
+end and <em>all</em> errors will be collected.</p>
+</blockquote>
+<p>If <tt class="docutils literal"><span class="pre">raise_errors</span></tt> is False and multiple errors are found a <tt class="docutils literal"><span class="pre">ConfigObjError</span></tt>
+is raised. The error raised has a <tt class="docutils literal"><span class="pre">config</span></tt> attribute, which is the parts of
+the ConfigObj that parsed successfully. It also has an attribute <tt class="docutils literal"><span class="pre">errors</span></tt>,
+which is a list of <em>all</em> the errors raised. Each entry in the list is an
+instance of the appropriate error type. Each one has the following attributes
+(useful for delivering a sensible error message to your user) :</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">line</span></tt>: the original line that caused the error.</li>
+<li><tt class="docutils literal"><span class="pre">line_number</span></tt>: its number in the config file.</li>
+<li><tt class="docutils literal"><span class="pre">message</span></tt>: the error message that accompanied the error.</li>
+</ul>
+<p>If only one error is found, then that error is re-raised. The error still has
+the <tt class="docutils literal"><span class="pre">config</span></tt> and <tt class="docutils literal"><span class="pre">errors</span></tt> attributes. This means that your error handling
+code can be the same whether one error is raised in parsing , or several.</p>
+<p>It also means that in the most common case (a single error) a useful error
+message will be raised.</p>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">One wrongly written line could break the basic structure of your config
+file. This could cause every line after it to flag an error, so having a
+list of all the lines that caused errors may not be as useful as it sounds.
+ <img src="/smilies/sad.gif" alt="Sad" height="15" width="15" /> .</p>
+</div>
+</div>
+<div class="section" id="validation">
+<h1><a class="toc-backref" href="#id68">9&nbsp;&nbsp;&nbsp;Validation</a></h1>
+<div class="hint">
+<p class="first admonition-title">Hint</p>
+<p>The system of configspecs can seem confusing at first, but is actually
+quite simple and powerful. The best reference is my article on ConfigObj:</p>
+<ul class="last simple">
+<li><a class="reference external" href="http://www.voidspace.org.uk/python/articles/configobj.shtml">An Introduction to ConfigObj</a></li>
+</ul>
+</div>
+<p>Validation is done through a combination of the <a class="reference internal" href="#configspec">configspec</a> and a <tt class="docutils literal"><span class="pre">Validator</span></tt>
+object. For this you need <em>validate.py</em> <a class="footnote-reference" href="#id25" id="id12">[12]</a>. See <a class="reference internal" href="#downloading">downloading</a> if you don't
+have a copy.</p>
+<p>Validation can perform two different operations :</p>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>Check that a value meets a specification. For example, check that a value</dt>
+<dd><p class="first last">is an integer between one and six, or is a choice from a specific set of
+options.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>It can convert the value into the type required. For example, if one of</dt>
+<dd><p class="first last">your values is a port number, validation will turn it into an integer for
+you.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<p>So validation can act as a transparent layer between the datatypes of your
+application configuration (boolean, integers, floats, etc) and the text format
+of your config file.</p>
+<div class="section" id="configspec">
+<h2><a class="toc-backref" href="#id69">9.1&nbsp;&nbsp;&nbsp;configspec</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">validate</span></tt> method checks members against an entry in the configspec. Your
+configspec therefore resembles your config file, with a check for every member.</p>
+<p>In order to perform validation you need a <tt class="docutils literal"><span class="pre">Validator</span></tt> object. This has
+several useful built-in check functions. You can also create your own custom
+functions and register them with your Validator object.</p>
+<p>Each check is the name of one of these functions, including any parameters and
+keyword arguments. The configspecs look like function calls, and they map to
+function calls.</p>
+<p>The basic datatypes that an un-extended Validator can test for are :</p>
+<ul class="simple">
+<li>boolean values (True and False)</li>
+<li>integers (including minimum and maximum values)</li>
+<li>floats (including min and max)</li>
+<li>strings (including min and max length)</li>
+<li>IP addresses (v4 only)</li>
+</ul>
+<p>It can also handle lists of these types and restrict a value to being one from
+a set of options.</p>
+<p>An example configspec is going to look something like:</p>
+<pre class="literal-block">
+port = integer(0, 100)
+user = string(max=25)
+mode = option('quiet', 'loud', 'silent')
+</pre>
+<p>You can specify default values, and also have the same configspec applied to
+several sections. This is called <a class="reference internal" href="#repeated-sections">repeated sections</a>.</p>
+<p>For full details on writing configspecs, please refer to the <a class="reference external" href="http://www.voidspace.org.uk/python/validate.html">validate.py
+documentation</a>.</p>
+<div class="important">
+<p class="first admonition-title">Important</p>
+<p>Your configspec is read by ConfigObj in the same way as a config file.</p>
+<p>That means you can do interpolation <em>within</em> your configspec.</p>
+<p class="last">In order to allow this, checks in the 'DEFAULT' section (of the root level
+of your configspec) are <em>not</em> used.</p>
+</div>
+<p>If you need to specify the encoding of your configspec, then you can pass in a
+ConfigObj instance as your configspec. When you read your configspec file, you
+<em>must</em> specify <tt class="docutils literal"><span class="pre">list_values=False</span></tt>. If you need to support hashes in
+configspec values then you must also pass in <tt class="docutils literal"><span class="pre">_inspec=True</span></tt>.</p>
+<div class="pysrc"><span class="pykeyword">from</span> <span class="pytext">configobj</span> <span class="pykeyword">import</span> <span class="pytext">ConfigObj</span><br />
+<span class="pytext">configspec</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">configspecfilename</span><span class="pyoperator">,</span> <span class="pytext">encoding</span><span class="pyoperator">=</span><span class="pystring">'UTF8'</span><span class="pyoperator">,</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="pytext">list_values</span><span class="pyoperator">=</span><span class="pytext">False</span><span class="pyoperator">,</span> <span class="pytext">_inspec</span><span class="pyoperator">=</span><span class="pytext">True</span><span class="pyoperator">)</span><br />
+<span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">filename</span><span class="pyoperator">,</span> <span class="pytext">configspec</span><span class="pyoperator">=</span><span class="pytext">configspec</span><span class="pyoperator">)</span><span class="pytext"></span></div></div>
+<div class="section" id="type-conversion">
+<h2><a class="toc-backref" href="#id70">9.2&nbsp;&nbsp;&nbsp;Type Conversion</a></h2>
+<p>By default, validation does type conversion. This means that if you specify
+<tt class="docutils literal"><span class="pre">integer</span></tt> as the check, then calling <a class="reference internal" href="#validate">validate</a> will actually change the value
+to an integer (so long as the check succeeds).</p>
+<p>It also means that when you call the <a class="reference internal" href="#write">write</a> method, the value will be converted
+back into a string using the <tt class="docutils literal"><span class="pre">str</span></tt> function.</p>
+<p>To switch this off, and leave values as strings after validation, you need to
+set the <a class="reference internal" href="#stringify">stringify</a> attribute to <tt class="docutils literal"><span class="pre">False</span></tt>. If this is the case, attempting to
+set a value to a non-string will raise an error.</p>
+</div>
+<div class="section" id="default-values">
+<h2><a class="toc-backref" href="#id71">9.3&nbsp;&nbsp;&nbsp;Default Values</a></h2>
+<p>You can set a default value in your check. If the value is missing from the
+config file then this value will be used instead. This means that your user
+only has to supply values that differ from the defaults.</p>
+<p>If you <em>don't</em> supply a default then for a value to be missing is an error,
+and this will show in the <a class="reference internal" href="#return-value">return value</a> from validate.</p>
+<p>Additionally you can set the default to be <tt class="docutils literal"><span class="pre">None</span></tt>. This means the value will
+be set to <tt class="docutils literal"><span class="pre">None</span></tt> (the object) <em>whichever check is used</em>. (It will be set to
+<tt class="docutils literal"><span class="pre">''</span></tt> rather than <tt class="docutils literal"><span class="pre">None</span></tt> if <a class="reference internal" href="#stringify">stringify</a> is <tt class="docutils literal"><span class="pre">False</span></tt>). You can use this
+to easily implement optional values in your config files.</p>
+<pre class="literal-block">
+port = integer(0, 100, default=80)
+user = string(max=25, default=0)
+mode = option('quiet', 'loud', 'silent', default='loud')
+nick = string(default=None)
+</pre>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>Because the default goes through type conversion, it also has to pass the
+check.</p>
+<p class="last">Note that <tt class="docutils literal"><span class="pre">default=None</span></tt> is case sensitive.</p>
+</div>
+<div class="section" id="id13">
+<h3><a class="toc-backref" href="#id72">9.3.1&nbsp;&nbsp;&nbsp;List Values</a></h3>
+<p>It's possible that you will want to specify a list as a default value. To avoid
+confusing syntax with commas and quotes you use a list constructor to specify
+that keyword arguments are lists. This includes the <tt class="docutils literal"><span class="pre">default</span></tt> value. This
+makes checks look something like :</p>
+<pre class="literal-block">
+checkname(default=list('val1', 'val2', 'val3'))
+</pre>
+<p>This works with all keyword arguments, but is most useful for default values.</p>
+</div>
+</div>
+<div class="section" id="repeated-sections">
+<h2><a class="toc-backref" href="#id73">9.4&nbsp;&nbsp;&nbsp;Repeated Sections</a></h2>
+<p>Repeated sections are a way of specifying a configspec for a section that
+should be applied to all unspecified subsections in the same section.</p>
+<p>The easiest way of explaining this is to give an example. Suppose you have a
+config file that describes a dog. That dog has various attributes, but it can
+also have many fleas. You don't know in advance how many fleas there will be,
+or what they will be called, but you want each flea validated against the same
+configspec.</p>
+<p>We can define a section called <em>fleas</em>. We want every flea in that section
+(every sub-section) to have the same configspec applied to it. We do this by
+defining a single section called <tt class="docutils literal"><span class="pre">__many__</span></tt>.</p>
+<pre class="literal-block">
+[dog]
+name = string(default=Rover)
+age = float(0, 99, default=0)
+
+    [[fleas]]
+
+        [[[__many__]]]
+        bloodsucker = boolean(default=True)
+        children = integer(default=10000)
+        size = option(small, tiny, micro, default=tiny)
+</pre>
+<p>Every flea on our dog will now be validated using the <tt class="docutils literal"><span class="pre">__many__</span></tt> configspec.</p>
+<p><tt class="docutils literal"><span class="pre">__many__</span></tt> sections can have sub-sections, including their own <tt class="docutils literal"><span class="pre">__many__</span></tt>
+sub-sections. Defaults work in the normal way in repeated sections.</p>
+</div>
+<div class="section" id="repeated-values">
+<h2><a class="toc-backref" href="#id74">9.5&nbsp;&nbsp;&nbsp;Repeated Values</a></h2>
+<p>As well as using <tt class="docutils literal"><span class="pre">__many__</span></tt> to validate unspecified sections you can use it to validate values. For
+example, to specify that all values in a section should be integers:</p>
+<pre class="literal-block">
+[section]
+    __many__ = integer
+</pre>
+<p>If you want to use repeated values alongside repeated sections you can call one <tt class="docutils literal"><span class="pre">__many__</span></tt> and the
+other <tt class="docutils literal"><span class="pre">___many___</span></tt> (with three underscores).</p>
+</div>
+<div class="section" id="copy-mode">
+<h2><a class="toc-backref" href="#id75">9.6&nbsp;&nbsp;&nbsp;Copy Mode</a></h2>
+<p>Because you can specify default values in your configspec, you can use
+ConfigObj to write out default config files for your application.</p>
+<p>However, normally values supplied from a default in a configspec are <em>not</em>
+written out by the <tt class="docutils literal"><span class="pre">write</span></tt> method.</p>
+<p>To do this, you need to specify <tt class="docutils literal"><span class="pre">copy=True</span></tt> when you call validate. As well
+as not marking values as default, all the comments in the configspec file
+will be copied into your ConfigObj instance.</p>
+<div class="pysrc"><span class="pykeyword">from</span> <span class="pytext">configobj</span> <span class="pykeyword">import</span> <span class="pytext">ConfigObj</span><br />
+<span class="pykeyword">from</span> <span class="pytext">validate</span> <span class="pykeyword">import</span> <span class="pytext">Validator</span><br />
+<span class="pytext">vdt</span> <span class="pyoperator">=</span> <span class="pytext">Validator</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">configspec</span><span class="pyoperator">=</span><span class="pystring">'default.ini'</span><span class="pyoperator">)</span><br />
+<span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">filename</span> <span class="pyoperator">=</span> <span class="pystring">'new_default.ini'</span><br />
+<span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">validate</span><span class="pyoperator">(</span><span class="pytext">vdt</span><span class="pyoperator">,</span> <span class="pytext">copy</span><span class="pyoperator">=</span><span class="pytext">True</span><span class="pyoperator">)</span><br />
+<span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">write</span><span class="pyoperator">(</span><span class="pyoperator">)</span><span class="pytext"></span></div><p>If you need to support hashes in the configspec values then you must create
+it with <tt class="docutils literal"><span class="pre">_inspec=True</span></tt>. This has the side effect of switching off the parsing
+of inline comments, meaning that they won't be copied into the new config file.
+(ConfigObj syntax is slightly different from configspec syntax and the parser
+can't support both inline comments and hashes in configspec values.)</p>
+</div>
+<div class="section" id="validation-and-interpolation">
+<h2><a class="toc-backref" href="#id76">9.7&nbsp;&nbsp;&nbsp;Validation and Interpolation</a></h2>
+<p>String interpolation and validation don't play well together. When validation
+changes type it sets the value. If the value uses interpolation, then the
+interpolation reference would normally be overwritten. Calling <tt class="docutils literal"><span class="pre">write</span></tt> would
+then use the absolute value and the interpolation reference would be lost.</p>
+<p>As a compromise - if the value is unchanged by validation then it is not reset.
+This means strings that pass through validation unmodified will not be
+overwritten. If validation changes type - the value has to be overwritten, and
+any interpolation references are lost  <img src="/smilies/sad.gif" alt="Sad" height="15" width="15" /> .</p>
+</div>
+<div class="section" id="simpleval">
+<h2><a class="toc-backref" href="#id77">9.8&nbsp;&nbsp;&nbsp;SimpleVal</a></h2>
+<p>You may not need a full validation process, but still want to check if all the
+expected values are present.</p>
+<p>Provided as part of the ConfigObj module is the <tt class="docutils literal"><span class="pre">SimpleVal</span></tt> object. This has
+a dummy <tt class="docutils literal"><span class="pre">test</span></tt> method that always passes.</p>
+<p>The only reason a test will fail is if the value is missing. The return value
+from <tt class="docutils literal"><span class="pre">validate</span></tt> will either be <tt class="docutils literal"><span class="pre">True</span></tt>, meaning all present, or a dictionary
+with <tt class="docutils literal"><span class="pre">False</span></tt> for all missing values/sections.</p>
+<p>To use it, you still need to pass in a valid configspec when you create the
+ConfigObj, but just set all the values to <tt class="docutils literal"><span class="pre">''</span></tt>. Then create an instance of
+<tt class="docutils literal"><span class="pre">SimpleVal</span></tt> and pass it to the <tt class="docutils literal"><span class="pre">validate</span></tt> method.</p>
+<p>As a trivial example if you had the following config file :</p>
+<pre class="literal-block">
+# config file for an application
+port = 80
+protocol = http
+domain = voidspace
+top_level_domain = org.uk
+</pre>
+<p>You would write the following configspec :</p>
+<pre class="literal-block">
+port = ''
+protocol = ''
+domain = ''
+top_level_domain = ''
+</pre>
+<div class="pysrc"><span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">Configobj</span><span class="pyoperator">(</span><span class="pytext">filename</span><span class="pyoperator">,</span> <span class="pytext">configspec</span><span class="pyoperator">=</span><span class="pytext">configspec</span><span class="pyoperator">)</span><br />
+<span class="pytext">val</span> <span class="pyoperator">=</span> <span class="pytext">SimpleVal</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pytext">test</span> <span class="pyoperator">=</span> <span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">validate</span><span class="pyoperator">(</span><span class="pytext">val</span><span class="pyoperator">)</span><br />
+<span class="pykeyword">if</span> <span class="pytext">test</span> <span class="pyoperator">==</span> <span class="pytext">True</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">print</span> <span class="pystring">'All values present.'</span><br />
+<span class="pykeyword">elif</span> <span class="pytext">test</span> <span class="pyoperator">==</span> <span class="pytext">False</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">print</span> <span class="pystring">'No values present!'</span><br />
+<span class="pykeyword">else</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">for</span> <span class="pytext">entry</span> <span class="pykeyword">in</span> <span class="pytext">test</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">if</span> <span class="pytext">test</span><span class="pyoperator">[</span><span class="pytext">entry</span><span class="pyoperator">]</span> <span class="pyoperator">==</span> <span class="pytext">False</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">print</span> <span class="pystring">'"%s" missing.'</span> <span class="pyoperator">%</span> <span class="pytext">entry</span><span class="pytext"></span></div></div>
+</div>
+<div class="section" id="empty-values">
+<h1><a class="toc-backref" href="#id78">10&nbsp;&nbsp;&nbsp;Empty values</a></h1>
+<p>Many config files from other applications allow empty values. As of version
+4.3.0, ConfigObj will read these as an empty string.</p>
+<p>A new option/attribute has been added (<tt class="docutils literal"><span class="pre">write_empty_values</span></tt>) to allow
+ConfigObj to write empty strings as empty values.</p>
+<div class="pysrc"><span class="pykeyword">from</span> <span class="pytext">configobj</span> <span class="pykeyword">import</span> <span class="pytext">ConfigObj</span><br />
+<span class="pytext">cfg</span> <span class="pyoperator">=</span> <span class="pystring">'''<br />
+&nbsp;&nbsp;&nbsp;&nbsp;key =<br />
+&nbsp;&nbsp;&nbsp;&nbsp;key2 = # a comment<br />
+'''</span><span class="pyoperator">.</span><span class="pytext">splitlines</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pytext">config</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">cfg</span><span class="pyoperator">)</span><br />
+<span class="pykeyword">print</span> <span class="pytext">config</span><br />
+<span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pyoperator">{</span><span class="pystring">'key'</span><span class="pyoperator">:</span> <span class="pystring">''</span><span class="pyoperator">,</span> <span class="pystring">'key2'</span><span class="pyoperator">:</span> <span class="pystring">''</span><span class="pyoperator">}</span><span class="pyoperator">)</span><br />
+<br />
+<span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">write_empty_values</span> <span class="pyoperator">=</span> <span class="pytext">True</span><br />
+<span class="pykeyword">for</span> <span class="pytext">line</span> <span class="pykeyword">in</span> <span class="pytext">config</span><span class="pyoperator">.</span><span class="pytext">write</span><span class="pyoperator">(</span><span class="pyoperator">)</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">print</span> <span class="pytext">line</span><br />
+<br />
+<span class="pytext">key</span> <span class="pyoperator">=</span><br />
+<span class="pytext">key2</span> <span class="pyoperator">=</span>&nbsp;&nbsp;&nbsp;&nbsp; <span class="pycomment"># a comment</span><span class="pytext"></span></div></div>
+<div class="section" id="unrepr-mode">
+<h1><a class="toc-backref" href="#id79">11&nbsp;&nbsp;&nbsp;unrepr mode</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">unrepr</span></tt> option allows you to store and retrieve the basic Python
+data-types using config files. It has to use a slightly different syntax to
+normal ConfigObj files. Unsurprisingly it uses Python syntax.</p>
+<p>This means that lists are different (they are surrounded by square brackets),
+and strings <em>must</em> be quoted.</p>
+<p>The types that <tt class="docutils literal"><span class="pre">unrepr</span></tt> can work with are :</p>
+<blockquote>
+<div class="line-block">
+<div class="line">strings, lists tuples</div>
+<div class="line">None, True, False</div>
+<div class="line">dictionaries, integers, floats</div>
+<div class="line">longs and complex numbers</div>
+</div>
+</blockquote>
+<p>You can't store classes, types or instances.</p>
+<p><tt class="docutils literal"><span class="pre">unrepr</span></tt> uses <tt class="docutils literal"><span class="pre">repr(object)</span></tt> to write out values, so it currently <em>doesn't</em>
+check that you are writing valid objects. If you attempt to read an unsupported
+value, ConfigObj will raise a <tt class="docutils literal"><span class="pre">configobj.UnknownType</span></tt> exception.</p>
+<p>Values that are triple quoted cased. The triple quotes are removed <em>before</em>
+converting. This means that you can use triple quotes to write dictionaries
+over several lines in your config files. They won't be written like this
+though.</p>
+<p>If you are writing config files by hand, for use with <tt class="docutils literal"><span class="pre">unrepr</span></tt>, you should
+be aware of the following differences from normal ConfigObj syntax :</p>
+<blockquote>
+<div class="line-block">
+<div class="line">List : <tt class="docutils literal"><span class="pre">['A</span> <span class="pre">List',</span> <span class="pre">'With',</span> <span class="pre">'Strings']</span></tt></div>
+<div class="line">Strings : <tt class="docutils literal"><span class="pre">&quot;Must</span> <span class="pre">be</span> <span class="pre">quoted.&quot;</span></tt></div>
+<div class="line">Backslash : <tt class="docutils literal"><span class="pre">&quot;The</span> <span class="pre">backslash</span> <span class="pre">must</span> <span class="pre">be</span> <span class="pre">escaped</span> <span class="pre">\\&quot;</span></tt></div>
+</div>
+</blockquote>
+<p>These all follow normal Python syntax.</p>
+<p>In unrepr mode <em>inline comments</em> are not saved. This is because lines are
+parsed using the <a class="reference external" href="http://docs.python.org/lib/compiler.html">compiler package</a>
+which discards comments.</p>
+</div>
+<div class="section" id="string-interpolation">
+<h1><a class="toc-backref" href="#id80">12&nbsp;&nbsp;&nbsp;String Interpolation</a></h1>
+<p>ConfigObj allows string interpolation <em>similar</em> to the way <tt class="docutils literal"><span class="pre">ConfigParser</span></tt>
+or <tt class="docutils literal"><span class="pre">string.Template</span></tt> work. The value of the <tt class="docutils literal"><span class="pre">interpolation</span></tt> attribute
+determines which style of interpolation you want to use. Valid values are
+&quot;ConfigParser&quot; or &quot;Template&quot; (case-insensitive, so &quot;configparser&quot; and
+&quot;template&quot; will also work). For backwards compatibility reasons, the value
+<tt class="docutils literal"><span class="pre">True</span></tt> is also a valid value for the <tt class="docutils literal"><span class="pre">interpolation</span></tt> attribute, and
+will select <tt class="docutils literal"><span class="pre">ConfigParser</span></tt>-style interpolation. At some undetermined point
+in the future, that default <em>may</em> change to <tt class="docutils literal"><span class="pre">Template</span></tt>-style interpolation.</p>
+<p>For <tt class="docutils literal"><span class="pre">ConfigParser</span></tt>-style interpolation, you specify a value to be
+substituted by including <tt class="docutils literal"><span class="pre">%(name)s</span></tt> in the value.</p>
+<p>For <tt class="docutils literal"><span class="pre">Template</span></tt>-style interpolation, you specify a value to be substituted
+by including <tt class="docutils literal"><span class="pre">${name}</span></tt> in the value. Alternately, if 'name' is a valid
+Python identifier (i.e., is composed of nothing but alphanumeric characters,
+plus the underscore character), then the braces are optional and the value
+can be written as <tt class="docutils literal"><span class="pre">$name</span></tt>.</p>
+<p>Note that <tt class="docutils literal"><span class="pre">ConfigParser</span></tt>-style interpolation and <tt class="docutils literal"><span class="pre">Template</span></tt>-style
+interpolation are mutually exclusive; you cannot have a configuration file
+that's a mix of one or the other. Pick one and stick to it. <tt class="docutils literal"><span class="pre">Template</span></tt>-style
+interpolation is simpler to read and write by hand, and is recommended if
+you don't have a particular reason to use <tt class="docutils literal"><span class="pre">ConfigParser</span></tt>-style.</p>
+<p>Interpolation checks first the current section to see if <tt class="docutils literal"><span class="pre">name</span></tt> is the key
+to a value. ('name' is case sensitive).</p>
+<p>If it doesn't find it, next it checks the 'DEFAULT' sub-section of the current
+section.</p>
+<p>If it still doesn't find it, it moves on to check the parent section and the
+parent section's 'DEFAULT' subsection, and so on all the way up to the main
+section.</p>
+<p>If the value specified isn't found in any of these locations, then a
+<tt class="docutils literal"><span class="pre">MissingInterpolationOption</span></tt> error is raised (a subclass of
+<tt class="docutils literal"><span class="pre">ConfigObjError</span></tt>).</p>
+<p>If it is found then the returned value is also checked for substitutions. This
+allows you to make up compound values (for example directory paths) that use
+more than one default value. It also means it's possible to create circular
+references. If there are any circular references which would cause an infinite
+interpolation loop, an <tt class="docutils literal"><span class="pre">InterpolationLoopError</span></tt> is raised.</p>
+<p>Both of these errors are subclasses of <tt class="docutils literal"><span class="pre">InterpolationError</span></tt>, which is a
+subclass of <tt class="docutils literal"><span class="pre">ConfigObjError</span></tt>.</p>
+<p>String interpolation and validation don't play well together. This is because
+validation overwrites values - and so may erase the interpolation references.
+See <a class="reference internal" href="#validation-and-interpolation">Validation and Interpolation</a>. (This can only happen if validation
+has to <em>change</em> the value).</p>
+</div>
+<div class="section" id="comments">
+<h1><a class="toc-backref" href="#id81">13&nbsp;&nbsp;&nbsp;Comments</a></h1>
+<p>Any line that starts with a '#', possibly preceded by whitespace, is a comment.</p>
+<p>If a config file starts with comments then these are preserved as the
+<a class="reference internal" href="#initial-comment">initial_comment</a>.</p>
+<p>If a config file ends with comments then these are preserved as the
+<a class="reference internal" href="#final-comment">final_comment</a>.</p>
+<p>Every key or section marker may have lines of comments immediately above it.
+These are saved as the <tt class="docutils literal"><span class="pre">comments</span></tt> attribute of the section. Each member is a
+list of lines.</p>
+<p>You can also have a comment inline with a value. These are saved as the
+<tt class="docutils literal"><span class="pre">inline_comments</span></tt> attribute of the section, with one entry per member of the
+section.</p>
+<p>Subsections (section markers in the config file) can also have comments.</p>
+<p>See <a class="reference internal" href="#section-attributes">Section Attributes</a> for more on these attributes.</p>
+<p>These comments are all written back out by the <tt class="docutils literal"><span class="pre">write</span></tt> method.</p>
+</div>
+<div class="section" id="flatten-errors">
+<h1><a class="toc-backref" href="#id82">14&nbsp;&nbsp;&nbsp;flatten_errors</a></h1>
+<pre class="literal-block">
+flatten_errors(cfg, res)
+</pre>
+<p><a class="reference internal" href="#validation">Validation</a> is a powerful way of checking that the values supplied by the user
+make sense.</p>
+<p>The <a class="reference internal" href="#validate">validate</a> method returns a results dictionary that represents pass or fail
+for each value. This doesn't give you any information about <em>why</em> the check
+failed.</p>
+<p><tt class="docutils literal"><span class="pre">flatten_errors</span></tt> is an example function that turns a results dictionary into
+a flat list, that only contains values that <em>failed</em>.</p>
+<p><tt class="docutils literal"><span class="pre">cfg</span></tt> is the ConfigObj instance being checked, <tt class="docutils literal"><span class="pre">res</span></tt> is the results
+dictionary returned by <tt class="docutils literal"><span class="pre">validate</span></tt>.</p>
+<p>It returns a list of keys that failed. Each member of the list is a tuple :</p>
+<pre class="literal-block">
+([list of sections...], key, result)
+</pre>
+<p>If <tt class="docutils literal"><span class="pre">validate</span></tt> was called with <tt class="docutils literal"><span class="pre">preserve_errors=False</span></tt> (the default)
+then <tt class="docutils literal"><span class="pre">result</span></tt> will always be <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
+<p><em>list of sections</em> is a flattened list of sections that the key was found
+in.</p>
+<p>If the section was missing then key will be <tt class="docutils literal"><span class="pre">None</span></tt>.</p>
+<p>If the value (or section) was missing then <tt class="docutils literal"><span class="pre">result</span></tt> will be <tt class="docutils literal"><span class="pre">False</span></tt>.</p>
+<p>If <tt class="docutils literal"><span class="pre">validate</span></tt> was called with <tt class="docutils literal"><span class="pre">preserve_errors=True</span></tt> and a value
+was present, but failed the check, then <tt class="docutils literal"><span class="pre">result</span></tt> will be the exception
+object returned. You can use this as a string that describes the failure.</p>
+<p>For example :</p>
+<blockquote>
+<em>The value &quot;3&quot; is of the wrong type</em>.</blockquote>
+<div class="section" id="example-usage">
+<h2><a class="toc-backref" href="#id83">14.1&nbsp;&nbsp;&nbsp;Example Usage</a></h2>
+<p>The output from <tt class="docutils literal"><span class="pre">flatten_errors</span></tt> is a list of tuples.</p>
+<p>Here is an example of how you could present this information to the user.</p>
+<div class="pysrc"><span class="pytext">vtor</span> <span class="pyoperator">=</span> <span class="pytext">validate</span><span class="pyoperator">.</span><span class="pytext">Validator</span><span class="pyoperator">(</span><span class="pyoperator">)</span><br />
+<span class="pycomment"># ini is your config file - cs is the configspec<br />
+</span><span class="pytext">cfg</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">ini</span><span class="pyoperator">,</span> <span class="pytext">configspec</span><span class="pyoperator">=</span><span class="pytext">cs</span><span class="pyoperator">)</span><br />
+<span class="pytext">res</span> <span class="pyoperator">=</span> <span class="pytext">cfg</span><span class="pyoperator">.</span><span class="pytext">validate</span><span class="pyoperator">(</span><span class="pytext">vtor</span><span class="pyoperator">,</span> <span class="pytext">preserve_errors</span><span class="pyoperator">=</span><span class="pytext">True</span><span class="pyoperator">)</span><br />
+<span class="pykeyword">for</span> <span class="pytext">entry</span> <span class="pykeyword">in</span> <span class="pytext">flatten_errors</span><span class="pyoperator">(</span><span class="pytext">cfg</span><span class="pyoperator">,</span> <span class="pytext">res</span><span class="pyoperator">)</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pycomment"># each entry is a tuple<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">section_list</span><span class="pyoperator">,</span> <span class="pytext">key</span><span class="pyoperator">,</span> <span class="pytext">error</span> <span class="pyoperator">=</span> <span class="pytext">entry</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">if</span> <span class="pytext">key</span> <span class="pykeyword">is</span> <span class="pykeyword">not</span> <span class="pytext">None</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="pytext">section_list</span><span class="pyoperator">.</span><span class="pytext">append</span><span class="pyoperator">(</span><span class="pytext">key</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">else</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">section_list</span><span class="pyoperator">.</span><span class="pytext">append</span><span class="pyoperator">(</span><span class="pystring">'[missing section]'</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">section_string</span> <span class="pyoperator">=</span> <span class="pystring">', '</span><span class="pyoperator">.</span><span class="pytext">join</span><span class="pyoperator">(</span><span class="pytext">section_list</span><span class="pyoperator">)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">if</span> <span class="pytext">error</span> <span class="pyoperator">==</span> <span class="pytext">False</span><span class="pyoperator">:</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="pytext">error</span> <span class="pyoperator">=</span> <span class="pystring">'Missing value or section.'</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="pykeyword">print</span> <span class="pytext">section_string</span><span class="pyoperator">,</span> <span class="pystring">' = '</span><span class="pyoperator">,</span> <span class="pytext">error</span><span class="pytext"></span></div></div>
+</div>
+<div class="section" id="credits">
+<h1><a class="toc-backref" href="#id84">15&nbsp;&nbsp;&nbsp;CREDITS</a></h1>
+<p>ConfigObj 4 is written by (and copyright) <a class="reference external" href="http://www.voidspace.org.uk/python/weblog/index.shtml">Michael Foord</a> and
+<a class="reference external" href="http://www.teknico.net">Nicola Larosa</a>.</p>
+<p>Particularly thanks to Nicola Larosa for help on the config file spec, the
+validation system and the doctests.</p>
+<p><em>validate.py</em> was originally written by Michael Foord and Mark Andrews.</p>
+<p>Thanks to many others for input, patches and bugfixes.</p>
+</div>
+<div class="section" id="license">
+<h1><a class="toc-backref" href="#id85">16&nbsp;&nbsp;&nbsp;LICENSE</a></h1>
+<p>ConfigObj, and related files, are licensed under the BSD license. This is a
+very unrestrictive license, but it comes with the usual disclaimer. This is
+free software: test it, break it, just don't blame us if it eats your data !
+Of course if it does, let us know and we'll fix the problem so it doesn't
+happen to anyone else  <img src="/smilies/smile.gif" alt="Smile" height="15" width="15" /> .</p>
+<pre class="literal-block">
+Copyright (c) 2004 - 2009, Michael Foord &amp; Nicola Larosa
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+
+    * Neither the name of Michael Foord nor Nicola Larosa
+      may be used to endorse or promote products derived from this
+      software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+&quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</pre>
+<p>You should also be able to find a copy of this license at : <a class="reference external" href="http://www.voidspace.org.uk/python/license.shtml">BSD License</a></p>
+</div>
+<div class="section" id="todo">
+<h1><a class="toc-backref" href="#id86">17&nbsp;&nbsp;&nbsp;TODO</a></h1>
+<p>Better support for configuration from multiple files, including tracking
+<em>where</em> the original file came from and writing changes to the correct
+file.</p>
+<p>Make <tt class="docutils literal"><span class="pre">newline</span></tt> a keyword argument (as well as an attribute) ?</p>
+<p><tt class="docutils literal"><span class="pre">UTF16</span></tt> encoded files, when returned as a list of lines, will have the
+BOM at the start of every line. Should this be removed from all but the
+first line ?</p>
+<p>Option to set warning type for unicode decode ? (Defaults to strict).</p>
+<p>A method to optionally remove uniform indentation from multiline values.
+(do as an example of using <tt class="docutils literal"><span class="pre">walk</span></tt> - along with string-escape)</p>
+<p>Should the results dictionary from validate be an ordered dictionary if
+<a class="reference external" href="http://www.voidspace.org.uk/python/odict.html">odict</a> is available ?</p>
+<p>Implement some of the sequence methods (which include slicing) from the
+newer <tt class="docutils literal"><span class="pre">odict</span></tt> ?</p>
+<p>Preserve line numbers of values (and possibly the original text of each value).</p>
+</div>
+<div class="section" id="issues">
+<h1><a class="toc-backref" href="#id87">18&nbsp;&nbsp;&nbsp;ISSUES</a></h1>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p class="last">Please file any bug reports to <a class="reference external" href="http://www.voidspace.org.uk/python/weblog/index.shtml">Michael Foord</a> or the <strong>ConfigObj</strong>
+<a class="reference external" href="http://lists.sourceforge.net/lists/listinfo/configobj-develop">Mailing List</a>.</p>
+</div>
+<p>There is currently no way to specify the encoding of a configspec file.</p>
+<p>As a consequence of the changes to configspec handling in version 4.6.0, when you create a ConfigObj instance and provide a configspec, the configspec attribute is only set on the ConfigObj instance - it isn't set on the sections until you validate. You also can't set the configspec attribute to be a dictionary. This wasn't documented but did work previously.</p>
+<p>In order to fix the problem with hashes in configspecs I had to turn off the parsing of inline comments in configspecs. This will only affect you if you are using <tt class="docutils literal"><span class="pre">copy=True</span></tt> when validating and expecting inline comments to be copied from the configspec into the ConfigObj instance (all other comments will be copied as usual).</p>
+<p>If you <em>create</em> the configspec by passing in a ConfigObj instance (usual way is to pass in a filename or list of lines) then you should pass in <tt class="docutils literal"><span class="pre">_inspec=True</span></tt> to the constructor to allow hashes in values. This is the magic that switches off inline comment parsing.</p>
+<p>When using <tt class="docutils literal"><span class="pre">copy</span></tt> mode for validation, it won't copy <tt class="docutils literal"><span class="pre">DEFAULT</span></tt>
+sections. This is so that you <em>can</em> use interpolation in configspec
+files.</p>
+<p><tt class="docutils literal"><span class="pre">validate</span></tt> doesn't report <em>extra</em> values or sections.</p>
+<p>You can't have a keyword with the same name as a section (in the same
+section). They are both dictionary keys - so they would overlap.</p>
+<p>ConfigObj doesn't quote and unquote values if <tt class="docutils literal"><span class="pre">list_values=False</span></tt>.
+This means that leading or trailing whitespace in values will be lost when
+writing. (Unless you manually quote).</p>
+<p>Interpolation checks first the current section, then the 'DEFAULT' subsection
+of the current section, before moving on to the current section's parent and
+so on up the tree.</p>
+<p>Does it matter that we don't support the ':' divider, which is supported
+by <tt class="docutils literal"><span class="pre">ConfigParser</span></tt> ?</p>
+<p>String interpolation and validation don't play well together. When
+validation changes type it sets the value. This will correctly fetch the
+value using interpolation - but then overwrite the interpolation reference.
+If the value is unchanged by validation (it's a string) - but other types
+will be.</p>
+</div>
+<div class="section" id="changelog">
+<h1><a class="toc-backref" href="#id88">19&nbsp;&nbsp;&nbsp;CHANGELOG</a></h1>
+<p>This is an abbreviated changelog showing the major releases up to version 4.
+From version 4 it lists all releases and changes.</p>
+<div class="section" id="version-4-6-0">
+<h2><a class="toc-backref" href="#id89">19.1&nbsp;&nbsp;&nbsp;2009/04/13 - Version 4.6.0</a></h2>
+<ul class="simple">
+<li>Pickling of ConfigObj instances now supported (thanks to Christian Heimes)</li>
+<li>Hashes in confgspecs are now allowed (see note below)</li>
+<li>Replaced use of hasattr (which can swallow exceptions) with getattr</li>
+<li>__many__ in configspecs can refer to scalars (ordinary values) as well as sections</li>
+<li>You can use ___many___ (three underscores!) where you want to use __many__ as well</li>
+<li>You can now have normal sections inside configspec sections that use __many__</li>
+<li>You can now create an empty ConfigObj with a configspec, programmatically set values and then validate</li>
+<li>A section that was supplied as a value (or vice-versa) in the actual config file would cause an exception during validation (the config file is still broken of course, but it is now handled gracefully)</li>
+<li>Added <tt class="docutils literal"><span class="pre">as_list</span></tt> method</li>
+<li>Removed the deprecated <tt class="docutils literal"><span class="pre">istrue</span></tt>, <tt class="docutils literal"><span class="pre">encode</span></tt> and <tt class="docutils literal"><span class="pre">decode</span></tt> methods</li>
+<li>Running test_configobj.py now also runs the doctests in the configobj module</li>
+</ul>
+<p>As a consequence of the changes to configspec handling, when you create a ConfigObj instance and provide
+a configspec, the configspec attribute is only set on the ConfigObj instance - it isn't set on the
+sections until you validate. You also can't set the configspec attribute to be a dictionary. This wasn't
+documented but did work previously.</p>
+<p>In order to fix the problem with hashes in configspecs I had to turn off the parsing of inline comments
+in configspecs. This will only affect you if you are using <tt class="docutils literal"><span class="pre">copy=True</span></tt> when validating and expecting
+inline comments to be copied from the configspec into the ConfigObj instance (all other comments will be
+copied as usual).</p>
+<p>If you <em>create</em> the configspec by passing in a ConfigObj instance (usual way is to pass in a filename or
+list of lines) then you should pass in <tt class="docutils literal"><span class="pre">_inspec=True</span></tt> to the constructor to allow hashes in values.
+This is the magic that switches off inline comment parsing.</p>
+</div>
+<div class="section" id="version-4-5-3">
+<h2><a class="toc-backref" href="#id90">19.2&nbsp;&nbsp;&nbsp;2008/06/27 - Version 4.5.3</a></h2>
+<p>BUGFIX: fixed a problem with <tt class="docutils literal"><span class="pre">copy=True</span></tt> when validating with configspecs that use
+<tt class="docutils literal"><span class="pre">__many__</span></tt> sections.</p>
+</div>
+<div class="section" id="version-4-5-2">
+<h2><a class="toc-backref" href="#id91">19.3&nbsp;&nbsp;&nbsp;2008/02/05 - Version 4.5.2</a></h2>
+<p>Distribution updated to include version 0.3.2 of <a class="reference internal" href="#validate">validate</a>. This means that
+<tt class="docutils literal"><span class="pre">None</span></tt> as a default value win configspecs works.</p>
+</div>
+<div class="section" id="version-4-5-1">
+<h2><a class="toc-backref" href="#id92">19.4&nbsp;&nbsp;&nbsp;2008/02/05 - Version 4.5.1</a></h2>
+<p>Distribution updated to include version 0.3.1 of <a class="reference internal" href="#validate">validate</a>. This means that
+Unicode configspecs now work.</p>
+</div>
+<div class="section" id="version-4-5-0">
+<h2><a class="toc-backref" href="#id93">19.5&nbsp;&nbsp;&nbsp;2008/02/05 - Version 4.5.0</a></h2>
+<p>ConfigObj will now guarantee that files will be written terminated with a
+newline.</p>
+<p>ConfigObj will no longer attempt to import the <tt class="docutils literal"><span class="pre">validate</span></tt> module, until/unless
+you call <tt class="docutils literal"><span class="pre">ConfigObj.validate</span></tt> with <tt class="docutils literal"><span class="pre">preserve_errors=True</span></tt>. This makes it
+faster to import.</p>
+<p>New methods <tt class="docutils literal"><span class="pre">restore_default</span></tt> and <tt class="docutils literal"><span class="pre">restore_defaults</span></tt>. <tt class="docutils literal"><span class="pre">restore_default</span></tt>
+resets an entry to its default value (and returns that value). <tt class="docutils literal"><span class="pre">restore_defaults</span></tt>
+resets all entries to their default value. It doesn't modify entries without a
+default value. You must have validated a ConfigObj (which populates the
+<tt class="docutils literal"><span class="pre">default_values</span></tt> dictionary) before calling these methods.</p>
+<p>BUGFIX: Proper quoting of keys, values and list values that contain hashes
+(when writing).  When <tt class="docutils literal"><span class="pre">list_values=False</span></tt>, values containing hashes are
+triple quoted.</p>
+<p>Added the <tt class="docutils literal"><span class="pre">reload</span></tt> method. This reloads a ConfigObj from file. If the filename
+attribute is not set then a <tt class="docutils literal"><span class="pre">ReloadError</span></tt> (a new exception inheriting from
+<tt class="docutils literal"><span class="pre">IOError</span></tt>) is raised.</p>
+<p>BUGFIX: Files are read in with 'rb' mode, so that native/non-native line endings work!</p>
+<p>Minor efficiency improvement in <tt class="docutils literal"><span class="pre">unrepr</span></tt> mode.</p>
+<p>Added missing docstrings for some overidden dictionary methods.</p>
+<p>Added the <tt class="docutils literal"><span class="pre">reset</span></tt> method. This restores a ConfigObj to a freshly created state.</p>
+<p>Removed old CHANGELOG file.</p>
+</div>
+<div class="section" id="version-4-4-0">
+<h2><a class="toc-backref" href="#id94">19.6&nbsp;&nbsp;&nbsp;2007/02/04 - Version 4.4.0</a></h2>
+<p>Official release of 4.4.0</p>
+</div>
+<div class="section" id="version-4-3-3-alpha4">
+<h2><a class="toc-backref" href="#id95">19.7&nbsp;&nbsp;&nbsp;2006/12/17 - Version 4.3.3-alpha4</a></h2>
+<p>By Nicola Larosa</p>
+<p>Allowed arbitrary indentation in the <tt class="docutils literal"><span class="pre">indent_type</span></tt> parameter, removed the
+<tt class="docutils literal"><span class="pre">NUM_INDENT_SPACES</span></tt> and <tt class="docutils literal"><span class="pre">MAX_INTERPOL_DEPTH</span></tt> (a leftover) constants,
+added indentation tests (including another docutils workaround, sigh), updated
+the documentation.</p>
+<p>By Michael Foord</p>
+<p>Made the import of <tt class="docutils literal"><span class="pre">compiler</span></tt> conditional so that <tt class="docutils literal"><span class="pre">ConfigObj</span></tt> can be used
+with <a class="reference external" href="http://www.codeplex.com/IronPython">IronPython</a>.</p>
+</div>
+<div class="section" id="version-4-3-3-alpha3">
+<h2><a class="toc-backref" href="#id96">19.8&nbsp;&nbsp;&nbsp;2006/12/17 - Version 4.3.3-alpha3</a></h2>
+<p>By Nicola Larosa</p>
+<p>Added a missing <tt class="docutils literal"><span class="pre">self.</span></tt> in the _handle_comment method and a related test,
+per Sourceforge bug #1523975.</p>
+</div>
+<div class="section" id="version-4-3-3-alpha2">
+<h2><a class="toc-backref" href="#id97">19.9&nbsp;&nbsp;&nbsp;2006/12/09 - Version 4.3.3-alpha2</a></h2>
+<p>By Nicola Larosa</p>
+<p>Changed interpolation search strategy, based on this patch by Robin Munn:
+<a class="reference external" href="http://sourceforge.net/mailarchive/message.php?msg_id=17125993">http://sourceforge.net/mailarchive/message.php?msg_id=17125993</a></p>
+</div>
+<div class="section" id="version-4-3-3-alpha1">
+<h2><a class="toc-backref" href="#id98">19.10&nbsp;&nbsp;&nbsp;2006/12/09 - Version 4.3.3-alpha1</a></h2>
+<p>By Nicola Larosa</p>
+<p>Added Template-style interpolation, with tests, based on this patch by
+Robin Munn: <a class="reference external" href="http://sourceforge.net/mailarchive/message.php?msg_id=17125991">http://sourceforge.net/mailarchive/message.php?msg_id=17125991</a>
+(awful archives, bad Sourceforge, bad).</p>
+</div>
+<div class="section" id="version-4-3-2">
+<h2><a class="toc-backref" href="#id99">19.11&nbsp;&nbsp;&nbsp;2006/06/04 - Version 4.3.2</a></h2>
+<p>Changed error handling, if parsing finds a single error then that error will
+be re-raised. That error will still have an <tt class="docutils literal"><span class="pre">errors</span></tt> and a <tt class="docutils literal"><span class="pre">config</span></tt>
+attribute.</p>
+<p>Fixed bug where '\n' terminated files could be truncated.</p>
+<p>Bugfix in <tt class="docutils literal"><span class="pre">unrepr</span></tt> mode, it couldn't handle '#' in values. (Thanks to
+Philippe Normand for the report.)</p>
+<p>As a consequence of this fix, ConfigObj doesn't now keep inline comments in
+<tt class="docutils literal"><span class="pre">unrepr</span></tt> mode. This is because the parser in the <a class="reference external" href="http://docs.python.org/lib/compiler.html">compiler package</a>
+doesn't keep comments.  <img src="/smilies/smile.gif" alt="Smile" height="15" width="15" /> </p>
+<p>Error messages are now more useful. They tell you the number of parsing errors
+and the line number of the first error. (In the case of multiple errors.)</p>
+<p>Line numbers in exceptions now start at 1, not 0.</p>
+<p>Errors in <tt class="docutils literal"><span class="pre">unrepr</span></tt> mode are now handled the same way as in the normal mode.
+The errors stored will be an <tt class="docutils literal"><span class="pre">UnreprError</span></tt>.</p>
+</div>
+<div class="section" id="version-4-3-1">
+<h2><a class="toc-backref" href="#id100">19.12&nbsp;&nbsp;&nbsp;2006/04/29 - Version 4.3.1</a></h2>
+<p>Added <tt class="docutils literal"><span class="pre">validate.py</span></tt> back into <tt class="docutils literal"><span class="pre">configobj.zip</span></tt>. (Thanks to Stewart
+Midwinter)</p>
+<p>Updated to <a class="reference external" href="http://www.voidspace.org.uk/downloads/validate.py">validate.py</a> 0.2.2.</p>
+<p>Preserve tuples when calling the <tt class="docutils literal"><span class="pre">dict</span></tt> method. (Thanks to Gustavo Niemeyer.)</p>
+<p>Changed <tt class="docutils literal"><span class="pre">__repr__</span></tt> to return a string that contains <tt class="docutils literal"><span class="pre">ConfigObj({</span> <span class="pre">...</span> <span class="pre">})</span></tt>.</p>
+<p>Change so that an options dictionary isn't modified by passing it to ConfigObj.
+(Thanks to Artarious.)</p>
+<p>Added ability to handle negative integers in <tt class="docutils literal"><span class="pre">unrepr</span></tt>. (Thanks to Kevin
+Dangoor.)</p>
+</div>
+<div class="section" id="version-4-3-0">
+<h2><a class="toc-backref" href="#id101">19.13&nbsp;&nbsp;&nbsp;2006/03/24 - Version 4.3.0</a></h2>
+<p>Moved the tests and the CHANGELOG (etc) into a separate file. This has reduced
+the size of <tt class="docutils literal"><span class="pre">configobj.py</span></tt> by about 40%.</p>
+<p>Added the <tt class="docutils literal"><span class="pre">unrepr</span></tt> mode to reading and writing config files. Thanks to Kevin
+Dangoor for this suggestion.</p>
+<p>Empty values are now valid syntax. They are read as an empty string <tt class="docutils literal"><span class="pre">''</span></tt>.
+(<tt class="docutils literal"><span class="pre">key</span> <span class="pre">=</span></tt>, or <tt class="docutils literal"><span class="pre">key</span> <span class="pre">=</span> <span class="pre">#</span> <span class="pre">comment</span></tt>.)</p>
+<p><tt class="docutils literal"><span class="pre">validate</span></tt> now honours the order of the configspec.</p>
+<p>Added the <tt class="docutils literal"><span class="pre">copy</span></tt> mode to validate. Thanks to Louis Cordier for this
+suggestion.</p>
+<p>Fixed bug where files written on windows could be given <tt class="docutils literal"><span class="pre">'\r\r\n'</span></tt> line
+terminators.</p>
+<p>Fixed bug where last occurring comment line could be interpreted as the
+final comment if the last line isn't terminated.</p>
+<p>Fixed bug where nested list values would be flattened when <tt class="docutils literal"><span class="pre">write</span></tt> is
+called. Now sub-lists have a string representation written instead.</p>
+<p>Deprecated <tt class="docutils literal"><span class="pre">encode</span></tt> and <tt class="docutils literal"><span class="pre">decode</span></tt> methods instead.</p>
+<p>You can now pass in a ConfigObj instance as a configspec (remember to read
+the configspec file using <tt class="docutils literal"><span class="pre">list_values=False</span></tt>).</p>
+<p>Sorted footnotes in the docs.</p>
+</div>
+<div class="section" id="version-4-2-0">
+<h2><a class="toc-backref" href="#id102">19.14&nbsp;&nbsp;&nbsp;2006/02/16 - Version 4.2.0</a></h2>
+<p>Removed <tt class="docutils literal"><span class="pre">BOM_UTF8</span></tt> from <tt class="docutils literal"><span class="pre">__all__</span></tt>.</p>
+<p>The <tt class="docutils literal"><span class="pre">BOM</span></tt> attribute has become a boolean. (Defaults to <tt class="docutils literal"><span class="pre">False</span></tt>.) It is
+<em>only</em> <tt class="docutils literal"><span class="pre">True</span></tt> for the <tt class="docutils literal"><span class="pre">UTF16/UTF8</span></tt> encodings.</p>
+<p>File like objects no longer need a <tt class="docutils literal"><span class="pre">seek</span></tt> attribute.</p>
+<p>Full unicode support added. New options/attributes <tt class="docutils literal"><span class="pre">encoding</span></tt>,
+<tt class="docutils literal"><span class="pre">default_encoding</span></tt>.</p>
+<p>ConfigObj no longer keeps a reference to file like objects. Instead the
+<tt class="docutils literal"><span class="pre">write</span></tt> method takes a file like object as an optional argument. (Which
+will be used in preference of the <tt class="docutils literal"><span class="pre">filename</span></tt> attribute if that exists as
+well.)</p>
+<p>utf16 files decoded to unicode.</p>
+<p>If <tt class="docutils literal"><span class="pre">BOM</span></tt> is <tt class="docutils literal"><span class="pre">True</span></tt>, but no encoding specified, then the utf8 BOM is
+written out at the start of the file. (It will normally only be <tt class="docutils literal"><span class="pre">True</span></tt> if
+the utf8 BOM was found when the file was read.)</p>
+<p>Thanks to Aaron Bentley for help and testing on the unicode issues.</p>
+<p>File paths are <em>not</em> converted to absolute paths, relative paths will
+remain relative as the <tt class="docutils literal"><span class="pre">filename</span></tt> attribute.</p>
+<p>Fixed bug where <tt class="docutils literal"><span class="pre">final_comment</span></tt> wasn't returned if <tt class="docutils literal"><span class="pre">write</span></tt> is returning
+a list of lines.</p>
+<p>Deprecated <tt class="docutils literal"><span class="pre">istrue</span></tt>, replaced it with <tt class="docutils literal"><span class="pre">as_bool</span></tt>.</p>
+<p>Added <tt class="docutils literal"><span class="pre">as_int</span></tt> and <tt class="docutils literal"><span class="pre">as_float</span></tt>.</p>
+</div>
+<div class="section" id="version-4-1-0">
+<h2><a class="toc-backref" href="#id103">19.15&nbsp;&nbsp;&nbsp;2005/12/14 - Version 4.1.0</a></h2>
+<p>Added <tt class="docutils literal"><span class="pre">merge</span></tt>, a recursive update.</p>
+<p>Added <tt class="docutils literal"><span class="pre">preserve_errors</span></tt> to <tt class="docutils literal"><span class="pre">validate</span></tt> and the <tt class="docutils literal"><span class="pre">flatten_errors</span></tt>
+example function.</p>
+<p>Thanks to Matthew Brett for suggestions and helping me iron out bugs.</p>
+<p>Fixed bug where a config file is <em>all</em> comment, the comment will now be
+<tt class="docutils literal"><span class="pre">initial_comment</span></tt> rather than <tt class="docutils literal"><span class="pre">final_comment</span></tt>.</p>
+<p>Validation no longer done on the 'DEFAULT' section (only in the root level).
+This allows interpolation in configspecs.</p>
+<p>Also use the new list syntax in <a class="reference internal" href="#validate">validate</a> 0.2.1. (For configspecs).</p>
+</div>
+<div class="section" id="version-4-0-2">
+<h2><a class="toc-backref" href="#id104">19.16&nbsp;&nbsp;&nbsp;2005/12/02 - Version 4.0.2</a></h2>
+<p>Fixed bug in <tt class="docutils literal"><span class="pre">create_empty</span></tt>. Thanks to Paul Jimenez for the report.</p>
+</div>
+<div class="section" id="version-4-0-1">
+<h2><a class="toc-backref" href="#id105">19.17&nbsp;&nbsp;&nbsp;2005/11/05 - Version 4.0.1</a></h2>
+<p>Fixed bug in <tt class="docutils literal"><span class="pre">Section.walk</span></tt> when transforming names as well as values.</p>
+<p>Added the <tt class="docutils literal"><span class="pre">istrue</span></tt> method. (Fetches the boolean equivalent of a string
+value).</p>
+<p>Fixed <tt class="docutils literal"><span class="pre">list_values=False</span></tt> - they are now only quoted/unquoted if they
+are multiline values.</p>
+<p>List values are written as <tt class="docutils literal"><span class="pre">item,</span> <span class="pre">item</span></tt> rather than <tt class="docutils literal"><span class="pre">item,item</span></tt>.</p>
+</div>
+<div class="section" id="version-4-0-0">
+<h2><a class="toc-backref" href="#id106">19.18&nbsp;&nbsp;&nbsp;2005/10/17 - Version 4.0.0</a></h2>
+<p><strong>ConfigObj 4.0.0 Final</strong></p>
+<p>Fixed bug in <tt class="docutils literal"><span class="pre">setdefault</span></tt>. When creating a new section with setdefault the
+reference returned would be to the dictionary passed in <em>not</em> to the new
+section. Bug fixed and behaviour documented.</p>
+<p>Obscure typo/bug fixed in <tt class="docutils literal"><span class="pre">write</span></tt>. Wouldn't have affected anyone though.</p>
+</div>
+<div class="section" id="version-4-0-0-beta-5">
+<h2><a class="toc-backref" href="#id107">19.19&nbsp;&nbsp;&nbsp;2005/09/09 - Version 4.0.0 beta 5</a></h2>
+<p>Removed <tt class="docutils literal"><span class="pre">PositionError</span></tt>.</p>
+<p>Allowed quotes around keys as documented.</p>
+<p>Fixed bug with commas in comments. (matched as a list value)</p>
+</div>
+<div class="section" id="version-4-0-0-beta-4">
+<h2><a class="toc-backref" href="#id108">19.20&nbsp;&nbsp;&nbsp;2005/09/07 - Version 4.0.0 beta 4</a></h2>
+<p>Fixed bug in <tt class="docutils literal"><span class="pre">__delitem__</span></tt>. Deleting an item no longer deletes the
+<tt class="docutils literal"><span class="pre">inline_comments</span></tt> attribute.</p>
+<p>Fixed bug in initialising ConfigObj from a ConfigObj.</p>
+<p>Changed the mailing list address.</p>
+</div>
+<div class="section" id="version-4-0-0-beta-3">
+<h2><a class="toc-backref" href="#id109">19.21&nbsp;&nbsp;&nbsp;2005/08/28 - Version 4.0.0 beta 3</a></h2>
+<p>Interpolation is switched off before writing out files.</p>
+<p>Fixed bug in handling <tt class="docutils literal"><span class="pre">StringIO</span></tt> instances. (Thanks to report from
+Gustavo Niemeyer.)</p>
+<p>Moved the doctests from the <tt class="docutils literal"><span class="pre">__init__</span></tt> method to a separate function.
+(For the sake of IDE calltips).</p>
+</div>
+<div class="section" id="version-4-0-0-beta-2">
+<h2><a class="toc-backref" href="#id110">19.22&nbsp;&nbsp;&nbsp;2005/08/25 - Version 4.0.0 beta 2</a></h2>
+<p>Amendments to <em>validate.py</em>.</p>
+<p>First public release.</p>
+</div>
+<div class="section" id="version-4-0-0-beta-1">
+<h2><a class="toc-backref" href="#id111">19.23&nbsp;&nbsp;&nbsp;2005/08/21 - Version 4.0.0 beta 1</a></h2>
+<p>Reads nested subsections to any depth.</p>
+<p>Multiline values.</p>
+<p>Simplified options and methods.</p>
+<p>New list syntax.</p>
+<p>Faster, smaller, and better parser.</p>
+<p>Validation greatly improved. Includes:</p>
+<blockquote>
+<ul class="simple">
+<li>type conversion</li>
+<li>default values</li>
+<li>repeated sections</li>
+</ul>
+</blockquote>
+<p>Improved error handling.</p>
+<p>Plus lots of other improvements.  <img src="/smilies/biggrin.gif" alt="Very Happy" height="15" width="15" /> </p>
+</div>
+<div class="section" id="version-3-0-0">
+<h2><a class="toc-backref" href="#id112">19.24&nbsp;&nbsp;&nbsp;2004/05/24 - Version 3.0.0</a></h2>
+<p>Several incompatible changes: another major overhaul and change. (Lots of
+improvements though).</p>
+<p>Added support for standard config files with sections. This has an entirely
+new interface: each section is a dictionary of values.</p>
+<p>Changed the update method to be called writein: update clashes with a dict
+method.</p>
+<p>Made various attributes keyword arguments, added several.</p>
+<p>Configspecs and orderlists have changed a great deal.</p>
+<p>Removed support for adding dictionaries: use update instead.</p>
+<p>Now subclasses a new class called caselessDict. This should add various
+dictionary methods that could have caused errors before.</p>
+<p>It also preserves the original casing of keywords when writing them back out.</p>
+<p>Comments are also saved using a <tt class="docutils literal"><span class="pre">caselessDict</span></tt>.</p>
+<p>Using a non-string key will now raise a <tt class="docutils literal"><span class="pre">TypeError</span></tt> rather than converting
+the key.</p>
+<p>Added an exceptions keyword for <em>much</em> better handling of errors.</p>
+<p>Made <tt class="docutils literal"><span class="pre">creatempty=False</span></tt> the default.</p>
+<p>Now checks indict <em>and</em> any keyword args. Keyword args take precedence over
+indict.</p>
+<p><tt class="docutils literal"><span class="pre">'</span> <span class="pre">',</span> <span class="pre">':',</span> <span class="pre">'=',</span> <span class="pre">','</span></tt> and <tt class="docutils literal"><span class="pre">'\t'</span></tt> are now all valid dividers where the
+keyword is unquoted.</p>
+<p>ConfigObj now does no type checking against configspec when you set items.</p>
+<p>delete and add methods removed (they were unnecessary).</p>
+<p>Docs rewritten to include all this gumph and more; actually ConfigObj is
+<em>really</em> easy to use.</p>
+<p>Support for stdout was removed.</p>
+<p>A few new methods added.</p>
+<p>Charmap is now incorporated into ConfigObj.</p>
+</div>
+<div class="section" id="version-2-0-0-beta">
+<h2><a class="toc-backref" href="#id113">19.25&nbsp;&nbsp;&nbsp;2004/03/14 - Version 2.0.0 beta</a></h2>
+<p>Re-written it to subclass dict. My first forays into inheritance and operator
+overloading.</p>
+<p>The config object now behaves like a dictionary.</p>
+<p>I've completely broken the interface, but I don't think anyone was really
+using it anyway.</p>
+<p>This new version is much more 'classy'.  <img src="/smilies/wink.gif" alt="Wink" height="15" width="15" /> </p>
+<p>It will also read straight from/to a filename and completely parse a config
+file without you <em>having</em> to supply a config spec.</p>
+<p>Uses listparse, so can handle nested list items as values.</p>
+<p>No longer has getval and setval methods: use normal dictionary methods, or add
+and delete.</p>
+</div>
+<div class="section" id="version-1-0-5">
+<h2><a class="toc-backref" href="#id114">19.26&nbsp;&nbsp;&nbsp;2004/01/29 - Version 1.0.5</a></h2>
+<p>Version 1.0.5 has a couple of bugfixes as well as a couple of useful additions
+over previous versions.</p>
+<p>Since 1.0.0 the buildconfig function has been moved into this distribution,
+and the methods reset, verify, getval and setval have been added.</p>
+<p>A couple of bugs have been fixed.</p>
+</div>
+<div class="section" id="origins">
+<h2><a class="toc-backref" href="#id115">19.27&nbsp;&nbsp;&nbsp;Origins</a></h2>
+<p>ConfigObj originated in a set of functions for reading config files in the
+<a class="reference external" href="http://www.voidspace.org.uk/atlantibots/">atlantibots</a> project. The original
+functions were written by Rob McNeur.</p>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="footnotes">
+<h1><a class="toc-backref" href="#id116">20&nbsp;&nbsp;&nbsp;Footnotes</a></h1>
+<table class="docutils footnote" frame="void" id="id14" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>And if you discover any bugs, let us know. We'll fix them quickly.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id15" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>If you specify a filename that doesn't exist, ConfigObj will assume you
+are creating a new one. See the <em>create_empty</em> and <em>file_error</em> <a class="reference internal" href="#options">options</a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id16" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>They can be byte strings (<em>ordinary</em> strings) or Unicode.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id17" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Except we don't support the RFC822 style line continuations, nor ':' as
+a divider.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id18" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td>This is a change in ConfigObj 4.2.0. Note that ConfigObj doesn't call
+the seek method of any file like object you pass in. You may want to call
+<tt class="docutils literal"><span class="pre">file_object.seek(0)</span></tt> yourself, first.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id19" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[6]</a></td><td><p class="first">A side effect of this is that it enables you to copy a ConfigObj :</p>
+<div class="pysrc"><span class="pycomment"># only copies members<br />
+</span><span class="pycomment"># not attributes/comments<br />
+</span><span class="pytext">config2</span> <span class="pyoperator">=</span> <span class="pytext">ConfigObj</span><span class="pyoperator">(</span><span class="pytext">config1</span><span class="pyoperator">)</span><span class="pytext"></span></div><p class="last">The order of values and sections will not be preserved, though.</p>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id20" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[7]</a></td><td>Other than lists of strings.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id21" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[8]</a></td><td>The exception is if it detects a <tt class="docutils literal"><span class="pre">UTF16</span></tt> encoded file which it
+must decode before parsing.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id22" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id9">[9]</a></td><td>The method signature shows that this method takes
+two arguments. The second is the section to be written. This is because the
+<tt class="docutils literal"><span class="pre">write</span></tt> method is called recursively.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id23" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id10">[10]</a></td><td>The dict method doesn't actually use the deepcopy mechanism. This means
+if you add nested lists (etc) to your ConfigObj, then the dictionary
+returned by dict may contain some references. For all <em>normal</em> ConfigObjs
+it will return a deepcopy.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id24" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id11">[11]</a></td><td>Passing <tt class="docutils literal"><span class="pre">(section,</span> <span class="pre">key)</span></tt> rather than <tt class="docutils literal"><span class="pre">(value,</span> <span class="pre">key)</span></tt> allows you to
+change the value by setting <tt class="docutils literal"><span class="pre">section[key]</span> <span class="pre">=</span> <span class="pre">newval</span></tt>. It also gives you
+access to the <em>rename</em> method of the section.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id25" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id12">[12]</a></td><td>Minimum required version of <em>validate.py</em> 0.2.0 .</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+<a class="reference external" href="configobj.txt">View document source</a>.
+Generated on: 2009-04-16 21:03 UTC.
+Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
+
+</div>
+</body>
+</html>
