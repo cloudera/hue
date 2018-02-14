@@ -37,7 +37,6 @@ from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.rdbms import RdbmsIndexer, run_sqoop
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, MAX_UPLOAD_SIZE
-from beeswax.api import _autocomplete
 
 
 LOG = logging.getLogger(__name__)

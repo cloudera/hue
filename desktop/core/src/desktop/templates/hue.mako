@@ -764,6 +764,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 viewModel.createWizard.prefill.source_type(data['source_type']);
                 viewModel.createWizard.prefill.target_type(data['target_type']);
                 viewModel.createWizard.prefill.target_path(data['target_path']);
+                viewModel.createWizard.destination.outputFormat(data['target_type']);
               });
               hueUtils.waitForVariable(viewModel.createWizard.source.query, function(){
                 viewModel.createWizard.source.query({"id": data.id, "name": data.name});
