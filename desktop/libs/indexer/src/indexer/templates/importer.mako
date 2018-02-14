@@ -380,7 +380,7 @@ ${ assist.assistPanel() }
             <thead>
             <tr data-bind="foreach: createWizard.source.sampleCols">
               ##<!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-              <th data-bind="truncatedText: name" style="padding-right:60px"></th>
+              <th data-bind="truncatedText: name" style="padding-right: 60px"></th>
               ## TODO nested
             </tr>
             </thead>
