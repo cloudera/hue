@@ -554,14 +554,7 @@ var EditorViewModel = (function() {
       }
     }, vm.huePubSubId);
 
-    self.statement_raw.subscribe(function (val) {
-      if (val) {
-        notebook.isPresentationModeAvailable(true);
-      }
-      else {
-        notebook.isPresentationModeAvailable(false);
-      }
-    });
+    self.statement_raw.subscribe(notebook.isPresentationModeAvailable);
 
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
     // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
@@ -2089,7 +2082,7 @@ var EditorViewModel = (function() {
     self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
     self.pubSubUrl = ko.observable(typeof notebook.pubSubUrl != "undefined" && notebook.pubSubUrl != null ? notebook.pubSubUrl : null);
     self.isPresentationModeDefault = ko.observable(typeof notebook.isPresentationModeDefault != "undefined" && notebook.isPresentationModeDefault != null ? notebook.isPresentationModeDefault : false);
-    self.isPresentationModeAvailable = ko.observable(false);
+    self.isPresentationModeAvailable = ko.observable();
     self.isPresentationMode = ko.observable(false);
     self.isPresentationMode.subscribe(function(newValue) {
       if (!newValue) {
@@ -2385,7 +2378,7 @@ var EditorViewModel = (function() {
       if (cp.schedulerViewModel) {
         cp.schedulerViewModel.availableTimezones = [];
       }
-      var editorMode = vm.editorMode() || self.isPresentationMode(); // Editor should not convert to Notebook in presentation mode
+      var editorMode = vm.editorMode() || (self.isPresentationMode() && vm.editorType() != 'notebook'); // Editor should not convert to Notebook in presentation mode
 
       // override the type of editor to the initial type
       if (self.isPresentationMode()) {
@@ -2427,11 +2420,16 @@ var EditorViewModel = (function() {
             if (vm.isHue4()){
               vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
             } else {
-              vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+              vm.changeURL('/notebook/editor?editor=' + data.id);
             }
           } else {
             if (vm.isHue4()){
-              vm.changeURL(vm.URLS.hue4_notebook + '?notebook=' + data.id);
+              if (vm.isPresentationMode()) {
+                vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
+              }
+              else {
+                vm.changeURL(vm.URLS.hue4_notebook + '?notebook=' + data.id);
+              }
             } else {
               vm.changeURL('/notebook/notebook?notebook=' + data.id);
             }
