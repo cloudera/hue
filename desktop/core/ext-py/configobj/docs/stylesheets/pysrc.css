@@ -1,0 +1,29 @@
+.pysrc {
+    border: #c0c0ff 2px dotted;  padding:10px;
+    font-weight: normal; background: #e0e0ff; margin: 20px;  
+    padding:10px; 
+}
+
+.pykeyword {
+    font-weight: bold;
+    color: orange;
+}
+.pystring {
+	color: green
+}
+.pycomment {
+	color: red
+}
+.pynumber {
+    color:purple;
+}
+.pyoperator {
+    color:purple;
+}
+.pytext {
+    color:black;
+}
+.pyerror {
+    font-wieght: bold;
+    color: red;
+}
