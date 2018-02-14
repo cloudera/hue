@@ -269,24 +269,17 @@ var MetastoreTable = (function () {
     if (self.loaded()) {
       return;
     }
-    // TODO: Add to DataCatalogEntry
-    self.apiHelper.fetchPartitions({
-      databaseName: self.metastoreTable.catalogEntry.path[0],
-      tableName: self.metastoreTable.catalogEntry.name,
-      successCallback: function (data) {
-        self.keys(data.partition_keys_json);
-        self.values(data.partition_values_json);
-        self.preview.values(self.values().slice(0, 5));
-        self.preview.keys(self.keys());
-        self.loading(false);
-        self.loaded(true);
-        huePubSub.publish('metastore.loaded.partitions');
-      },
-      errorCallback: function () {
-        self.loading(false);
-        self.loaded(true);
-      }
-    })
+
+    self.metastoreTable.catalogEntry.getPartitions().done(function (partitions) {
+      self.keys(partitions.partition_keys_json);
+      self.values(partitions.partition_values_json);
+      self.preview.values(self.values().slice(0, 5));
+      self.preview.keys(self.keys());
+      huePubSub.publish('metastore.loaded.partitions');
+    }).always(function () {
+      self.loading(false);
+      self.loaded(true);
+    });
   };
 
   /**

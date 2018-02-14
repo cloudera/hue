@@ -62,7 +62,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/js/autocomplete/sqlStatementsParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/globalSearchParser.js') }"></script>
-<script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter3.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>

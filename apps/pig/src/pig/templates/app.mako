@@ -1020,16 +1020,9 @@ ${ commonshare() | n,unicode }
       var apiHelper = ApiHelper.getInstance({
         user: '${ user }'
       });
-      apiHelper.fetchTables({
-        successCallback: function (data) {
-          if (data && data.status == 0 && data.tables_meta) {
-            availableTables = data.tables_meta.map(function (t) {
-              return t.name;
-            }).join(' ');
-          }
-        },
-        sourceType: 'hive',
-        databaseName: 'default'
+
+      DataCatalog.getChildren({ sourceType: 'hive', path: ['default'], silenceErrors: true }).done(function (childEntries) {
+        availableTables = $.map(childEntries, function (entry) { return entry.name }).join(' ');
       });
     % endif
 
