@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import datetime
+import logging
 
 from django.conf import settings
 from django.contrib.auth import authenticate, get_backends
@@ -27,6 +28,9 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop import conf
 from useradmin.password_policy import get_password_validators
+
+
+LOG = logging.getLogger(__name__)
 
 
 def get_backend_names():
@@ -115,10 +119,29 @@ class LdapAuthenticationForm(AuthenticationForm):
       raise ValidationError(self.error_messages['invalid_login'])
 
     if username and password:
-      self.user_cache = authenticate(username=username,
-                                     password=password,
-                                     server=server)
+      try:
+        self.user_cache = authenticate(username=username,
+                                       password=password,
+                                       server=server)
+      except Exception as e:
+        # If bind password incorrect will cause exception when sync group in login, suggest admin to test LDAP connection
+        LOG.error("LDAP auth error: %s" % e)
+        raise ValidationError(_("Please contact your administrator for LDAP connection setup."))
+
       if self.user_cache is None:
+        from useradmin.ldap_access import get_connection as get_ldap_connection
+        try:
+          server_key = ''
+          if conf.LDAP.LDAP_SERVERS.get():
+            if server in conf.LDAP.LDAP_SERVERS.get():
+              server_key = server
+              ldap_config = conf.LDAP.LDAP_SERVERS.get()[server]
+              get_ldap_connection(ldap_config)
+          else:
+            get_ldap_connection(conf.LDAP)
+        except Exception as e:
+          raise ValidationError(_("LDAP server %s Error: %s" % (server_key, str(e))))
+
         raise ValidationError(
           self.error_messages['invalid_login'])
       elif not self.user_cache.is_active:
