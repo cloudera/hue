@@ -262,24 +262,27 @@ class Workflow(Job):
     adj_list = _create_graph_adjaceny_list(node_list)
 
     node_hierarchy = ['start']
-    data = {'layout': [{}], 'workflow': {}}
-    data['workflow']['nodes'] = []
 
     try:
       _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
-      _update_adj_list(adj_list)
-
-      nodes_uuid_set = set()
-      wf_rows = _create_workflow_layout(node_hierarchy, adj_list, nodes_uuid_set)
-      if wf_rows:
-        data['layout'][0]['rows'] = wf_rows
-
-      wf_nodes = []
-      nodes_uuid_set = set()
-      _dig_nodes(node_hierarchy, adj_list, user, wf_nodes, nodes_uuid_set)
-      data['workflow']['nodes'] = wf_nodes
     except WorkflowDepthReached:
       LOG.warn("The Workflow: %s with id: %s, has reached the maximum allowed depth for Graph display " % (oozie_workflow.appName, oozie_workflow.id))
+      # Hide graph same as when total nodes > 30
+      return {}
+
+    data = {'layout': [{}], 'workflow': {}}
+    data['workflow']['nodes'] = []
+    _update_adj_list(adj_list)
+
+    nodes_uuid_set = set()
+    wf_rows = _create_workflow_layout(node_hierarchy, adj_list, nodes_uuid_set)
+    if wf_rows:
+      data['layout'][0]['rows'] = wf_rows
+
+    wf_nodes = []
+    nodes_uuid_set = set()
+    _dig_nodes(node_hierarchy, adj_list, user, wf_nodes, nodes_uuid_set)
+    data['workflow']['nodes'] = wf_nodes
 
     data['workflow']['id'] = '123'
     data['workflow']['properties'] = cls.get_workflow_properties_for_user(user, workflow=None)
