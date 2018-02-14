@@ -182,7 +182,7 @@ class WorkflowAction(Action):
 
   def get_absolute_log_url(self):
     url = None
-    if self.externalId and re.match('job_.*', self.externalId):
+    if self.externalId and (re.match('job_.*', self.externalId) or re.match('application_.*', self.externalId)):
       url = self.externalId and reverse('jobbrowser.views.job_single_logs', kwargs={'job': self.externalId}) or ''
     return url
 

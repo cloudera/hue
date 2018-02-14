@@ -2854,7 +2854,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               format: 'link'
             },
             function(data) {
-              var id = data.attemptid || data.job;
+              var id = data.job || data.attemptid;
               if (id) {
                 openJob(id);
               } else {
