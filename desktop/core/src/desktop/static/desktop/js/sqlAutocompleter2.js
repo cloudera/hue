@@ -463,7 +463,8 @@ var SqlAutocompleter2 = (function () {
 
       $.when(topColumnsDeferral, suggestColumnsDeferral).then(function (topColumns, suggestions) {
         if (topColumns.length > 0) {
-          self.snippet.getApiHelper().getDatabases(self.snippet.type()).done(function (databases) {
+          DataCatalog.getChildren({ sourceType: self.snippet.type(), path: [], silenceErrors: true }).done(function (dbEntries) {
+            var databases = $.map(dbEntries, function (dbEntry) { return dbEntry.name });
             suggestions.forEach(function (suggestion) {
               var path = '';
               if (!suggestion.table.identifierChain[0].name || databases.indexOf(suggestion.table.identifierChain[0].name.toLowerCase() === -1)) {
@@ -481,7 +482,7 @@ var SqlAutocompleter2 = (function () {
               }
             });
             mergeNavOptColDeferral.resolve();
-          });
+          }).fail(mergeNavOptColDeferral.resolve);
         } else {
           mergeNavOptColDeferral.resolve();
         }
@@ -587,28 +588,27 @@ var SqlAutocompleter2 = (function () {
     };
 
     if (parseResult.suggestTables) {
-      if (self.snippet.type() == 'impala' && parseResult.suggestTables.identifierChain && parseResult.suggestTables.identifierChain.length === 1) {
+      if (self.snippet.type() === 'impala' && parseResult.suggestTables.identifierChain && parseResult.suggestTables.identifierChain.length === 1) {
         var checkDbDeferral = $.Deferred();
-        self.snippet.getApiHelper().loadDatabases({
+        DataCatalog.getChildren({
           sourceType: self.snippet.type(),
-          successCallback: function (data) {
-            var foundDb = data.filter(function (db) {
-              return db.toLowerCase() === parseResult.suggestTables.identifierChain[0].name.toLowerCase();
-            });
-            if (foundDb.length > 0) {
-              var tableDeferral = self.addTables(parseResult, database, completions);
-              deferrals.push(tableDeferral);
-              adjustWeightsForTopTables(database, tableDeferral);
-            } else {
-              parseResult.suggestColumns = { tables: [{ identifierChain: parseResult.suggestTables.identifierChain }] };
-              delete parseResult.suggestTables;
-              deferrals.push(self.addColumns(parseResult, parseResult.suggestColumns.tables[0], database, parseResult.suggestColumns.types || ['T'], columnSuggestions));
-            }
-            checkDbDeferral.resolve();
-          },
-          silenceErrors: true,
-          errorCallback: checkDbDeferral.resolve
-        });
+          path: [],
+          silenceErrors: true
+        }).done(function (dbEntries) {
+          var firstIsDb = dbEntries.some(function (db) {
+            return db.name.toLowerCase() === parseResult.suggestTables.identifierChain[0].name.toLowerCase();
+          });
+          if (firstIsDb) {
+            var tableDeferral = self.addTables(parseResult, database, completions);
+            deferrals.push(tableDeferral);
+            adjustWeightsForTopTables(database, tableDeferral);
+          } else {
+            parseResult.suggestColumns = { tables: [{ identifierChain: parseResult.suggestTables.identifierChain }] };
+            delete parseResult.suggestTables;
+            deferrals.push(self.addColumns(parseResult, parseResult.suggestColumns.tables[0], database, parseResult.suggestColumns.types || ['T'], columnSuggestions));
+          }
+          checkDbDeferral.resolve();
+        }).fail(checkDbDeferral.resolve);
         deferrals.push(checkDbDeferral);
       } else if (self.snippet.type() == 'impala' && parseResult.suggestTables.identifierChain && parseResult.suggestTables.identifierChain.length > 1) {
         parseResult.suggestColumns = { tables: [{ identifierChain: parseResult.suggestTables.identifierChain }] };
@@ -781,40 +781,33 @@ var SqlAutocompleter2 = (function () {
         identifierChain = identifierChain.slice(1);
       }
 
-      self.snippet.getApiHelper().fetchFields({
-        sourceType: self.snippet.type(),
-        databaseName: database,
-        tableName: table,
-        fields: fetchedFields,
-        timeout: self.timeout,
-        successCallback: function (data) {
+      DataCatalog.getEntry({ sourceType: self.snippet.type(), path: [database, table].concat(fetchedFields) }).done(function (entry) {
+        entry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
           if (self.snippet.type() === 'hive'
-              && typeof data.extended_columns !== 'undefined'
-              && data.extended_columns.length === 1
-              && data.extended_columns.length
-              && /^map|array|struct/i.test(data.extended_columns[0].type)) {
-            identifierChain.unshift({ name: data.extended_columns[0].name })
+            && typeof sourceMeta.extended_columns !== 'undefined'
+            && sourceMeta.extended_columns.length === 1
+            && sourceMeta.extended_columns.length
+            && /^map|array|struct/i.test(sourceMeta.extended_columns[0].type)) {
+            identifierChain.unshift({ name: sourceMeta.extended_columns[0].name })
           }
           if (identifierChain.length > 0) {
             if (typeof identifierChain[0].name !== 'undefined' && /value|item|key/i.test(identifierChain[0].name)) {
               fetchedFields.push(identifierChain[0].name);
               identifierChain.shift();
             } else {
-              if (data.type === 'array') {
+              if (sourceMeta.type === 'array') {
                 fetchedFields.push('item')
               }
-              if (data.type === 'map') {
+              if (sourceMeta.type === 'map') {
                 fetchedFields.push('value')
               }
             }
             fetchFieldsInternal(table, database, identifierChain, callback, errorCallback, fetchedFields)
           } else {
-            callback(data);
+            callback(sourceMeta);
           }
-        },
-        silenceErrors: true,
-        errorCallback: errorCallback
-      });
+        }).fail(errorCallback)
+      }).fail(errorCallback);
     };
 
     // For Impala the first parts of the identifier chain could be either database or table, either:
@@ -824,23 +817,22 @@ var SqlAutocompleter2 = (function () {
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
     if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
       if (identifierChain.length > 1) {
-        self.snippet.getApiHelper().loadDatabases({
+        DataCatalog.getChildren({
           sourceType: self.snippet.type(),
-          successCallback: function (data) {
-            try {
-              var foundDb = data.filter(function (db) {
-                return db.toLowerCase() === identifierChain[0].name.toLowerCase();
-              });
-              var databaseName = foundDb.length > 0 ? identifierChain.shift().name : defaultDatabase;
-              var tableName = identifierChain.shift().name;
-              fetchFieldsInternal(tableName, databaseName, identifierChain, callback, errorCallback, []);
-            } catch(e) {
-              callback([]);
-            } // TODO: Ignore for subqueries
-          },
-          silenceErrors: true,
-          errorCallback: errorCallback
-        });
+          path: [],
+          silenceErrors: true
+        }).done(function (dbEntries) {
+          try {
+            var firstIsDb = dbEntries.some(function (db) {
+              return db.name.toLowerCase() === identifierChain[0].name.toLowerCase();
+            });
+            var databaseName = firstIsDb ? identifierChain.shift().name : defaultDatabase;
+            var tableName = identifierChain.shift().name;
+            fetchFieldsInternal(tableName, databaseName, identifierChain, callback, errorCallback, []);
+          } catch(e) {
+            callback([]);
+          } // TODO: Ignore for subqueries
+        }).fail(errorCallback);
       } else {
         var databaseName = defaultDatabase;
         var tableName = identifierChain.shift().name;
@@ -863,32 +855,23 @@ var SqlAutocompleter2 = (function () {
         prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
       }
 
-      self.snippet.getApiHelper().fetchTables({
-        sourceType: self.snippet.type(),
-        databaseName: databaseName,
-        successCallback: function (data) {
-          var tables = [];
-          data.tables_meta.forEach(function (tablesMeta) {
-            if (parseResult.suggestTables.onlyTables && tablesMeta.type.toLowerCase() !== 'table' ||
-                parseResult.suggestTables.onlyViews && tablesMeta.type.toLowerCase() !== 'view') {
-              return;
-            }
-            var table = {
-              value: prefix + self.backTickIfNeeded(tablesMeta.name),
-              meta: tablesMeta.type.toLowerCase(),
-              weight: DEFAULT_WEIGHTS.TABLE,
-              name: tablesMeta.name
-            };
-            completions.push(table);
-            tables.push(table);
-          });
-          tableDeferred.resolve(tables);
-        },
-        silenceErrors: true,
-        errorCallback: function () {
-          tableDeferred.resolve([]);
-        },
-        timeout: self.timeout
+      DataCatalog.getChildren({ sourceType: self.snippet.type(), path: [databaseName], silenceErrors: true }).done(function (tableEntries) {
+        var tables = [];
+        tableEntries.forEach(function (tableEntry) {
+          if (parseResult.suggestTables.onlyTables && tableEntry.isTable() ||
+            parseResult.suggestTables.onlyViews && tableEntry.isView()) {
+            return;
+          }
+          var table = {
+            value: prefix + self.backTickIfNeeded(tableEntry.name),
+            meta: tableEntry.getType(),
+            weight: DEFAULT_WEIGHTS.TABLE,
+            name: tableEntry.name
+          };
+          completions.push(table);
+          tables.push(table);
+        });
+        tableDeferred.resolve(tables);
       });
     };
 
@@ -1041,21 +1024,20 @@ var SqlAutocompleter2 = (function () {
     if (parseResult.suggestDatabases.prependFrom) {
       prefix += parseResult.lowerCase ? 'from ' : 'FROM ';
     }
-    self.snippet.getApiHelper().loadDatabases({
+    DataCatalog.getChildren({
       sourceType: self.snippet.type(),
-      successCallback: function (data) {
-        data.forEach(function (db) {
-          completions.push({
-            value: prefix + self.backTickIfNeeded(db) + (parseResult.suggestDatabases.appendDot ? '.' : ''),
-            meta: 'database',
-            weight: DEFAULT_WEIGHTS.DATABASE
-          });
+      path: [],
+      silenceErrors: true
+    }).done(function (dbEntries) {
+      dbEntries.forEach(function (db) {
+        completions.push({
+          value: prefix + self.backTickIfNeeded(db.name) + (parseResult.suggestDatabases.appendDot ? '.' : ''),
+          meta: 'database',
+          weight: DEFAULT_WEIGHTS.DATABASE
         });
-        databasesDeferred.resolve();
-      },
-      silenceErrors: true,
-      errorCallback: databasesDeferred.resolve
-    });
+      });
+      databasesDeferred.resolve();
+    }).fail(databasesDeferred.resolve);
     return databasesDeferred;
   };
 

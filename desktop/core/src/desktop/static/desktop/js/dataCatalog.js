@@ -104,6 +104,7 @@ var DataCatalog = (function () {
       definition: dataCatalogEntry.definition,
       sourceMeta: dataCatalogEntry.sourceMeta,
       analysis: dataCatalogEntry.analysis,
+      partitions: dataCatalogEntry.partitions,
       sample: dataCatalogEntry.sample,
       navigatorMeta: dataCatalogEntry.navigatorMeta,
       navOptMeta:  dataCatalogEntry.navOptMeta,
@@ -271,6 +272,7 @@ var DataCatalog = (function () {
     mergeAttribute('definition', CACHEABLE_TTL.default);
     mergeAttribute('sourceMeta', CACHEABLE_TTL.default, 'sourceMetaPromise');
     mergeAttribute('analysis', CACHEABLE_TTL.default, 'analysisPromise');
+    mergeAttribute('partitions', CACHEABLE_TTL.default, 'partitionsPromise');
     mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
     mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
     mergeAttribute('navOptMeta', CACHEABLE_TTL.optimizer, 'navOptMetaPromise');
@@ -399,6 +401,19 @@ var DataCatalog = (function () {
   };
 
   /**
+   * Helper function to reload the partitions for the given entry
+   *
+   * @param {DataCatalogEntry} dataCatalogEntry
+   * @param {Object} [apiOptions]
+   * @param {boolean} [apiOptions.silenceErrors]
+   *
+   * @return {CancellablePromise}
+   */
+  var reloadPartitions = function (dataCatalogEntry, apiOptions) {
+    return dataCatalogEntry.trackedPromise('partitionsPromise', fetchAndSave('fetchPartitions', 'partitions', dataCatalogEntry, apiOptions));
+  };
+
+  /**
    * Helper function to reload the sample for the given entry
    *
    * @param {DataCatalogEntry} dataCatalogEntry
@@ -461,6 +476,9 @@ var DataCatalog = (function () {
 
     self.analysis = undefined;
     self.analysisPromise = undefined;
+
+    self.partitions = undefined;
+    self.partitionsPromise = undefined;
 
     self.samplePromise = undefined;
     self.sample = undefined;
@@ -1338,6 +1356,31 @@ var DataCatalog = (function () {
       return applyCancellable(reloadAnalysis(self, options), options);
     }
     return applyCancellable(self.analysisPromise || reloadAnalysis(self, options), options);
+  };
+
+  /**
+   * Gets the partitions for the entry. It will fetch it if not cached or if the refresh option is set.
+   *
+   * @param {Object} [options]
+   * @param {boolean} [options.silenceErrors]
+   * @param {boolean} [options.cachedOnly]
+   * @param {boolean} [options.refreshCache] - Clears the browser cache
+   * @param {boolean} [options.cancellable] - Default false
+   *
+   * @return {CancellablePromise}
+   */
+  DataCatalogEntry.prototype.getPartitions = function (options) {
+    var self = this;
+    if (!self.isTableOrView()) {
+      return $.Deferred().reject(false).promise();
+    }
+    if (options && options.cachedOnly) {
+      return applyCancellable(self.partitionsPromise, options) || $.Deferred().reject(false).promise();
+    }
+    if (options && options.refreshCache) {
+      return applyCancellable(reloadPartitions(self, options), options);
+    }
+    return applyCancellable(self.partitionsPromise || reloadPartitions(self, options), options);
   };
 
   /**
