@@ -2947,6 +2947,10 @@ from desktop.views import _ko
         var activeDashboardCollection = huePubSub.subscribe('set.active.dashboard.collection', function(collection) {
           var collectionName = collection.name();
 
+          if (!collectionName) {
+            return;
+          }
+
           var assistDbSource = new AssistDbSource({
             i18n : i18n,
             type: collection.engine(),
