@@ -681,7 +681,7 @@ var EditorViewModel = (function() {
 
           //If 1 match, text value
           //If multiple matches, list value
-          var value = { type: "text" };
+          var value = { type: 'text', placeholder: '' };
           while (matchList = reList.exec(match[2])) {
             var option = {text:matchList[2] || matchList[3], value:matchList[3] || matchList[1]};
             option.text = option.text && option.text.trim();
@@ -690,7 +690,7 @@ var EditorViewModel = (function() {
             if (value.placeholder || matchList[2]) {
               if (!value.options) {
                 value.options = [];
-                value.type = "select";
+                value.type = 'select';
               }
               value.options.push(option);
             }
@@ -706,8 +706,8 @@ var EditorViewModel = (function() {
         }
       }
       return $.map(matches, function (match, key) {
-        var isMatchObject = typeof matches[key] === "object";
-        var meta = isMatchObject ? matches[key] : { type: "text", placeholder: matches[key] };
+        var isMatchObject = typeof matches[key] === 'object';
+        var meta = isMatchObject ? matches[key] : { type: 'text', placeholder: matches[key] };
         return { name: key, meta: meta };
       });
     });
@@ -726,7 +726,7 @@ var EditorViewModel = (function() {
       }, self.variableValues);
       if (needsMore) {
         for (var i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
-          self.variables.push(ko.mapping.fromJS({ name: "", value: "", meta: { type: "text", placeholder: "" }, sample: [], type: "text", step: ""}));
+          self.variables.push(ko.mapping.fromJS({ name: '', value: '', meta: { type: 'text', placeholder: '' }, sample: [], type: 'text', step: ''}));
         }
       } else if (needsLess) {
         self.variables.splice(self.variables().length - diffLengthVariables, diffLengthVariables);
@@ -737,7 +737,7 @@ var EditorViewModel = (function() {
         variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || '');
         variable.meta = ko.mapping.fromJS(item.meta, {}, variable.meta);
         variable.sample(self.variableValues[item.name] ? self.variableValues[item.name].sample : []);
-        variable.type(self.variableValues[item.name] ? self.variableValues[item.name].type : 'text');
+        variable.type(self.variableValues[item.name] ? self.variableValues[item.name].type || 'text' : 'text');
       });
     });
     huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
@@ -747,20 +747,8 @@ var EditorViewModel = (function() {
           variables.table = location.identifierChain;
           variables.column = null;
           variables.complex = null;
-        } else if (location.type === 'column') {
-          variables.column = location.identifierChain;
-        } else if (location.type === 'complex') {
-          variables.complex = location.identifierChain;
-        } else if (location.type === 'variable') {
-          var column;
-          if (!location.colRef) {
-            column = variables.complex || variables.column;
-            if (!column) {
-              return variables;
-            }
-          } else {
-            column = location.colRef.identifierChain;
-          }
+        } else if (location.type === 'variable' && location.colRef) {
+          var column = location.colRef.identifierChain;
           var identifierChain = variables.table.slice().concat(column);
           var value = re.exec(location.value);
           variables.push({
@@ -799,7 +787,7 @@ var EditorViewModel = (function() {
               case 'DECIMAL_TYPE':
               case 'DOUBLE_TYPE':
               case 'FLOAT_TYPE':
-                variablesValues.step = '0.01';
+                variablesValues.step = 'any';
                 variablesValues.type = 'number';
                 variablesValues.sample = sample.rows.map(function (row) { return row[0]; });
                 break;
@@ -857,7 +845,8 @@ var EditorViewModel = (function() {
         statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{(" : "(") + variablesString + ")(=[^}]*)?" + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), function(match, p1, p2){
           var variable = variables[p2];
           var pad = variable.type() == 'datetime-local' && variable.value().length == 16 ? ':00' : ''; // Chrome drops the seconds from the timestamp when it's at 0 second.
-          return p1 + (variable.value() != null ? variable.value() + pad : variable.meta.placeholder && variable.meta.placeholder());
+          var value = variable.value();
+          return p1 + (value || value === 0 ? value + pad : variable.meta.placeholder && variable.meta.placeholder());
         });
       }
       return statement;
