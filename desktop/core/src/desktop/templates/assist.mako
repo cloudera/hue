@@ -890,7 +890,7 @@ from desktop.views import _ko
         ${_('Tables')}
         <!-- /ko -->
         <!-- ko if: sourceType === 'solr' -->
-        <div data-bind="appAwareTemplateContextMenu: { template: 'collection-title-context-items', scrollContainer: '.assist-db-scrollable' }">${_('Collections')}</div>
+        <div data-bind="appAwareTemplateContextMenu: { template: 'collection-title-context-items', scrollContainer: '.assist-db-scrollable' }">${_('Indexes')}</div>
         <!-- /ko -->
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
@@ -1864,8 +1864,8 @@ from desktop.views import _ko
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview') }"
         };
         var i18nCollections = {
-          errorLoadingDatabases: "${ _('There was a problem loading the collections') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the collection preview') }"
+          errorLoadingDatabases: "${ _('There was a problem loading the indexes') }",
+          errorLoadingTablePreview: "${ _('There was a problem loading the index preview') }"
         };
 
         self.apiHelper = ApiHelper.getInstance();
@@ -1954,7 +1954,7 @@ from desktop.views import _ko
                     isSolr: true
                   }, params.sql)),
                   apiHelper: self.apiHelper,
-                  name: '${ _("Collections") }',
+                  name: '${ _("Indexes") }',
                   type: 'solr',
                   icon: 'fa-search-plus',
                   minHeight: 75
@@ -2280,7 +2280,7 @@ from desktop.views import _ko
         <div class="assist-flex-header">
           <div class="assist-inner-header">
             <!-- ko if: isSolr -->
-            ${ _('Collections') }
+            ${ _('Indexes') }
             <!-- /ko -->
             <!-- ko ifnot: isSolr  -->
             ${ _('Tables') }
@@ -2307,7 +2307,7 @@ from desktop.views import _ko
           <!-- ko if: filteredTables().length === 0 && (!filter.querySpec() || filter.querySpec().query === '') -->
           <div class="assist-no-entries">
             <!-- ko if: isSolr -->
-            ${ _('No collections selected.') }
+            ${ _('No indexes selected.') }
             <!-- /ko -->
             <!-- ko ifnot: isSolr  -->
             ${ _('No tables identified.') }
@@ -2320,7 +2320,7 @@ from desktop.views import _ko
           <!-- ko if: filteredTables().length > 0 -->
           <ul class="database-tree assist-tables" data-bind="foreachVisible: { data: filteredTables, minHeight: 22, container: '.assist-db-scrollable', skipScrollEvent: true }">
             <!-- ko if: hasErrors -->
-            <li class="assist-table hue-warning" data-bind="attr: { 'title': $parent.isSolr() ? '${ _ko('Error loading collection details.') }' : '${ _ko('Error loading table details.') }'}">
+            <li class="assist-table hue-warning" data-bind="attr: { 'title': $parent.isSolr() ? '${ _ko('Error loading index details.') }' : '${ _ko('Error loading table details.') }'}">
               <span class="assist-entry">
                 <i class="hue-warning fa fa-fw muted valign-middle fa-warning"></i>
                 <span data-bind="text: catalogEntry.getDisplayName()"></span>
