@@ -632,8 +632,8 @@ except ImportError, e:
                 <li>
                   <b>${ _('Right Click')}</b>
                   <div>${ _('Right clicking on an element of a query will bring up the appropriate browser for that element.')}</div>
-                  <div>${ _('Items that are right clickable highlight when mousing over them.')}</div>
-                  <div>${ _('e.g.: column names, table names, *')}</div>
+                  <div>${ _('Clickable items are highlighted on mouse hover.')}</div>
+                  <div><span class="muted">${ _('e.g.: function, column, table names, SELECT *') }</span></div>
                 </li>
                 <li>
                   <b>${ _('Single Click')}</b>
