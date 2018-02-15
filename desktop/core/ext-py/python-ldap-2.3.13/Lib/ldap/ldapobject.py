@@ -84,11 +84,15 @@ class SimpleLDAPObject:
     self._ldap_object_lock.acquire()
     if __debug__:
       if self._trace_level>=1:# and func.__name__!='result':
+        redact = [i for i in args]
+        if 'simple_bind' in func.__name__:
+          redact[1] = "*******"
         self._trace_file.write('*** %s - %s (%s,%s)\n' % (
           self._uri,
           self.__class__.__name__+'.'+func.__name__,
-          repr(args),repr(kwargs)
+          repr(redact),repr(kwargs)
         ))
+
         if self._trace_level>=3:
           traceback.print_stack(limit=self._trace_stack_limit,file=self._trace_file)
     try:
