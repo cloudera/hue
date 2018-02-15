@@ -1586,7 +1586,7 @@ var ApiHelper = (function () {
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
-   * @param {string[string[]]} options.paths
+   * @param {string[][]} options.paths
    * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchNavOptPopularity = function (options) {
@@ -1623,6 +1623,87 @@ var ApiHelper = (function () {
   };
 
   /**
+   * Fetches the popularity for various aspects of the given tables
+   *
+   * @param {ApiHelper} apiHelper
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[][]} options.paths
+   * @param {string} url
+   * @return {CancellablePromise}
+   */
+  var genericNavOptMultiTableFetch = function (apiHelper, options, url) {
+    var deferred = $.Deferred();
+
+    var dbTables = {};
+    options.paths.forEach(function (path) {
+      dbTables[path.join('.')] = true;
+    });
+    var data = {
+      dbTables: ko.mapping.toJSON(Object.keys(dbTables))
+    };
+
+    var request = apiHelper.simplePost(url, data, {
+      silenceErrors: options.silenceErrors,
+      successCallback: function (data) {
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
+      },
+      errorCallback: deferred.reject
+    });
+
+    return new CancellablePromise(deferred, request);
+  };
+
+  /**
+   * Fetches the popular aggregate functions for the given tables
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptTopAggs = function (options) {
+    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_AGGS);
+  };
+
+  /**
+   * Fetches the popular columns for the given tables
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
+    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_COLUMNS);
+  };
+
+  /**
+   * Fetches the popular filters for the given tables
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
+    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_FILTERS);
+  };
+
+  /**
+   * Fetches the popular joins for the given tables
+   *
+   * @param {Object} options
+   * @param {boolean} [options.silenceErrors]
+   * @param {string[][]} options.paths
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.fetchNavOptTopJoins = function (options) {
+    return genericNavOptMultiTableFetch(this, options, NAV_OPT_URLS.TOP_JOINS);
+  };
+
+  /**
    * Fetches navOpt meta for the given path, only possible for tables atm.
    *
    * @param {Object} options
@@ -1656,222 +1737,6 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.getClusterConfig = function (data) {
     return $.post(FETCH_CONFIG, data);
-  };
-
-  ApiHelper.prototype.createNavOptDbTablesJson = function (options) {
-    var self = this;
-    var tables = [];
-    var tableIndex = {};
-
-    var promise = $.Deferred();
-
-    DataCatalog.getChildren({
-      sourceType: options.sourceType,
-      path: [],
-      silenceErrors: options.silenceErrors
-    }).done(function (dbEntries) {
-      var databases = $.map(dbEntries, function (entry) { return entry.name; });
-      options.tables.forEach(function (table) {
-        if (table.subQuery || !table.identifierChain) {
-          return;
-        }
-        var clonedIdentifierChain = table.identifierChain.concat();
-
-        var databasePrefix;
-        if (clonedIdentifierChain.length > 1 && clonedIdentifierChain[0].name && databases.indexOf(clonedIdentifierChain[0].name.toLowerCase()) > -1) {
-          databasePrefix = clonedIdentifierChain.shift().name + '.';
-        } else if (options.defaultDatabase) {
-          databasePrefix = options.defaultDatabase + '.';
-        } else {
-          databasePrefix = '';
-        }
-        var identifier = databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.');
-        if (!tableIndex[databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.')]) {
-          tables.push(identifier);
-          tableIndex[identifier] = true;
-        }
-      });
-      promise.resolve(ko.mapping.toJSON(tables));
-    }).fail(function () {
-      promise.resolve(ko.mapping.toJSON(tables));
-    });
-
-    return promise;
-  };
-
-  /**
-   * Fetches the top tables for the given database
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {Object[]} options.database
-   */
-  // TODO: Add to DataCatalog
-  ApiHelper.prototype.fetchNavOptTopTables = function (options) {
-    var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_TABLES, options, function (data) {
-      return data.status === 0;
-    });
-  };
-
-  /**
-   * Fetches the top columns for the given tables
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {Object[]} options.tables
-   * @param {Object[]} options.tables.identifierChain
-   * @param {string} options.tables.identifierChain.name
-   * @param {string} [options.defaultDatabase]
-   */
-  // TODO: Add to DataCatalog
-  ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
-    var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_COLUMNS, options, function (data) {
-      return data.status === 0;
-    });
-  };
-
-  /**
-   * Fetches the popular joins for the given tables
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {Object[]} options.tables
-   * @param {Object[]} options.tables.identifierChain
-   * @param {string} options.tables.identifierChain.name
-   * @param {string} [options.defaultDatabase]
-   */
-  ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
-    var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_JOINS, options, function (data) {
-      return data.status === 0;
-    });
-  };
-
-  /**
-   * Fetches the popular filters for the given tables
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {Object[]} options.tables
-   * @param {Object[]} options.tables.identifierChain
-   * @param {string} options.tables.identifierChain.name
-   * @param {string} [options.defaultDatabase]
-   */
-  ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
-    var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_FILTERS, options, function (data) {
-      return data.status === 0;
-    });
-  };
-
-  /**
-   * Fetches the popular aggregate functions for the given tables
-   *
-   * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @param {number} options.timeout
-   * @param {Object[]} options.tables
-   * @param {Object[]} options.tables.identifierChain
-   * @param {string} options.tables.identifierChain.name
-   * @param {string} [options.defaultDatabase]
-   */
-  ApiHelper.prototype.fetchNavOptTopAggs = function (options) {
-    var self = this;
-    return self.fetchNavOptCached(NAV_OPT_URLS.TOP_AGGS, options, function (data) {
-      return data.status === 0;
-    });
-  };
-
-  ApiHelper.prototype.fetchNavOptCached = function (url, options, cacheCondition) {
-    var self = this;
-
-    var performFetch = function (data, hash) {
-      var promise = self.queueManager.getQueued(url, hash);
-      var firstInQueue = typeof promise === 'undefined';
-      if (firstInQueue) {
-        promise = $.Deferred();
-        self.queueManager.addToQueue(promise, url, hash);
-      }
-
-      promise.done(options.successCallback).fail(self.assistErrorCallback(options)).always(function () {
-        if (typeof options.editor !== 'undefined' && options.editor !== null) {
-          options.editor.hideSpinner();
-        }
-      });
-
-      if (!firstInQueue) {
-        return;
-      }
-
-      var fetchFunction = function (storeInCache) {
-        if (options.timeout === 0) {
-          self.assistErrorCallback(options)({ status: -1 });
-          return;
-        }
-
-        return $.ajax({
-          type: 'post',
-          url: url,
-          data: data,
-          timeout: options.timeout
-        })
-          .done(function (data) {
-            if (data.status === 0) {
-              if (cacheCondition(data)) {
-                storeInCache(data);
-              }
-              promise.resolve(data);
-            } else {
-              promise.reject(data);
-            }
-          })
-          .fail(promise.reject);
-      };
-
-      return fetchCached.bind(self)($.extend({}, options, {
-        url: url,
-        hash: hash,
-        cacheType: 'optimizer',
-        fetchFunction: fetchFunction,
-        promise: promise
-      }));
-    }
-
-    var promise = $.Deferred();
-    if (options.tables) {
-      self.createNavOptDbTablesJson(options).done(function (json) {
-        promise.resolve(performFetch({
-          dbTables: json
-        }, json.hashCode()))
-      });
-    } else if (options.database) {
-      promise.resolve(performFetch({
-        database: options.database
-      }, options.database));
-    }
-    return promise;
   };
 
   ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
