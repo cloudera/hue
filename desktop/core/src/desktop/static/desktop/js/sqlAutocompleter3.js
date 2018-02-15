@@ -955,6 +955,25 @@ var AutocompleteResults = (function () {
     return pathsDeferred;
   };
 
+  AutocompleteResults.prototype.tableIdentifierChainsToPaths = function (tables) {
+    var self = this;
+    var paths = [];
+    tables.forEach(function (table) {
+      // Could be subquery
+      var isTable = table.identifierChain.every(function (identifier) { return typeof identifier.name !== 'undefined' });
+      if (isTable) {
+        var path = $.map(table.identifierChain, function (identifier) {
+          return identifier.name;
+        });
+        if (path.length === 1) {
+          path.unshift(self.activeDatabase);
+        }
+        paths.push(path);
+      }
+    });
+    return paths;
+  };
+
   AutocompleteResults.prototype.handleJoins = function () {
     var self = this;
     var joinsDeferred = $.Deferred();
@@ -963,72 +982,73 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingJoins, joinsDeferred);
       joinsDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.push(self.apiHelper.fetchNavOptPopularJoins({
-        sourceType: self.snippet.type(),
-        timeout: AUTOCOMPLETE_TIMEOUT,
-        defaultDatabase: self.activeDatabase,
-        silenceErrors: true,
-        tables: suggestJoins.tables,
-        successCallback: function (data) {
+      var paths = self.tableIdentifierChainsToPaths(suggestJoins.tables);
+      if (paths.length) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+        self.cancellablePromises.push(multiTableEntry.getTopJoins({ silenceErrors: true, cancellable: true  }).done(function (topJoins) {
           var joinSuggestions = [];
           var totalCount = 0;
-          data.values.forEach(function (value) {
+          if (topJoins.values) {
+            topJoins.values.forEach(function (value) {
 
-            var joinType = value.joinType || 'join';
-            joinType += ' ';
-            var suggestionString = suggestJoins.prependJoin ? (self.parseResult.lowerCase ? joinType.toLowerCase() : joinType.toUpperCase()) : '';
-            var first = true;
+              var joinType = value.joinType || 'join';
+              joinType += ' ';
+              var suggestionString = suggestJoins.prependJoin ? (self.parseResult.lowerCase ? joinType.toLowerCase() : joinType.toUpperCase()) : '';
+              var first = true;
 
-            var existingTables = {};
-            suggestJoins.tables.forEach(function (table) {
-              existingTables[table.identifierChain[table.identifierChain.length - 1].name] = true;
-            });
+              var existingTables = {};
+              suggestJoins.tables.forEach(function (table) {
+                existingTables[table.identifierChain[table.identifierChain.length - 1].name] = true;
+              });
 
-            var joinRequired = false;
-            var tablesAdded = false;
-            value.tables.forEach(function (table) {
-              var tableParts = table.split('.');
-              if (!existingTables[tableParts[tableParts.length - 1]]) {
-                tablesAdded = true;
-                var identifier = self.convertNavOptQualifiedIdentifier(table, suggestJoins.tables);
-                suggestionString += joinRequired ? (self.parseResult.lowerCase ? ' join ' : ' JOIN ') + identifier : identifier;
-                joinRequired = true;
-              }
-            });
-
-            if (value.joinCols.length > 0) {
-              if (!tablesAdded && suggestJoins.prependJoin) {
-                suggestionString = '';
-                tablesAdded = true;
-              }
-              suggestionString += self.parseResult.lowerCase ? ' on ' : ' ON ';
-            }
-            if (tablesAdded) {
-              value.joinCols.forEach(function (joinColPair) {
-                if (!first) {
-                  suggestionString += self.parseResult.lowerCase ? ' and ' : ' AND ';
+              var joinRequired = false;
+              var tablesAdded = false;
+              value.tables.forEach(function (table) {
+                var tableParts = table.split('.');
+                if (!existingTables[tableParts[tableParts.length - 1]]) {
+                  tablesAdded = true;
+                  var identifier = self.convertNavOptQualifiedIdentifier(table, suggestJoins.tables);
+                  suggestionString += joinRequired ? (self.parseResult.lowerCase ? ' join ' : ' JOIN ') + identifier : identifier;
+                  joinRequired = true;
                 }
-                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoins.tables, self.snippet.type()) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoins.tables, self.snippet.type());
-                first = false;
               });
-              totalCount += value.totalQueryCount;
-              joinSuggestions.push({
-                value: suggestionString,
-                meta: HUE_I18n.autocomplete.meta.join,
-                category: suggestJoins.prependJoin ? CATEGORIES.POPULAR_JOIN : CATEGORIES.POPULAR_ACTIVE_JOIN,
-                popular: ko.observable(true),
-                details: value
-              });
-            }
-          });
-          joinSuggestions.forEach(function (suggestion) {
-            suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
-            suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
-          });
+
+              if (value.joinCols.length > 0) {
+                if (!tablesAdded && suggestJoins.prependJoin) {
+                  suggestionString = '';
+                  tablesAdded = true;
+                }
+                suggestionString += self.parseResult.lowerCase ? ' on ' : ' ON ';
+              }
+              if (tablesAdded) {
+                value.joinCols.forEach(function (joinColPair) {
+                  if (!first) {
+                    suggestionString += self.parseResult.lowerCase ? ' and ' : ' AND ';
+                  }
+                  suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoins.tables, self.snippet.type()) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoins.tables, self.snippet.type());
+                  first = false;
+                });
+                totalCount += value.totalQueryCount;
+                joinSuggestions.push({
+                  value: suggestionString,
+                  meta: HUE_I18n.autocomplete.meta.join,
+                  category: suggestJoins.prependJoin ? CATEGORIES.POPULAR_JOIN : CATEGORIES.POPULAR_ACTIVE_JOIN,
+                  popular: ko.observable(true),
+                  details: value
+                });
+              }
+            });
+            joinSuggestions.forEach(function (suggestion) {
+              suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
+              suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
+            });
+          }
           joinsDeferred.resolve(joinSuggestions);
-        },
-        errorCallback: joinsDeferred.reject
-      }));
+        }).fail(joinsDeferred.reject));
+      }).fail(joinsDeferred.reject);
+      } else {
+        joinsDeferred.reject();
+      }
     } else {
       joinsDeferred.reject();
     }
@@ -1043,45 +1063,46 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingJoinConditions, joinConditionsDeferred);
       joinConditionsDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.push(self.apiHelper.fetchNavOptPopularJoins({
-        sourceType: self.snippet.type(),
-        timeout: AUTOCOMPLETE_TIMEOUT,
-        defaultDatabase: self.activeDatabase,
-        silenceErrors: true,
-        tables: suggestJoinConditions.tables,
-        successCallback: function (data) {
+      var paths = self.tableIdentifierChainsToPaths(suggestJoinConditions.tables);
+      if (paths.length) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+          self.cancellablePromises.push(multiTableEntry.getTopJoins({ silenceErrors: true, cancellable: true }).done(function (topJoins) {
           var joinConditionSuggestions = [];
           var totalCount = 0;
-          data.values.forEach(function (value) {
-            if (value.joinCols.length > 0) {
-              var suggestionString = suggestJoinConditions.prependOn ? (self.parseResult.lowerCase ? 'on ' : 'ON ') : '';
-              var first = true;
-              value.joinCols.forEach(function (joinColPair) {
-                if (!first) {
-                  suggestionString += self.parseResult.lowerCase ? ' and ' : ' AND ';
-                }
-                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoinConditions.tables) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoinConditions.tables);
-                first = false;
-              });
-              totalCount += value.totalQueryCount;
-              joinConditionSuggestions.push({
-                value: suggestionString,
-                meta: HUE_I18n.autocomplete.meta.joinCondition,
-                category: CATEGORIES.POPULAR_JOIN_CONDITION,
-                popular: ko.observable(true),
-                details: value
-              });
-            }
-          });
-          joinConditionSuggestions.forEach(function (suggestion) {
-            suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
-            suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
-          });
+          if (topJoins.values) {
+            topJoins.values.forEach(function (value) {
+              if (value.joinCols.length > 0) {
+                var suggestionString = suggestJoinConditions.prependOn ? (self.parseResult.lowerCase ? 'on ' : 'ON ') : '';
+                var first = true;
+                value.joinCols.forEach(function (joinColPair) {
+                  if (!first) {
+                    suggestionString += self.parseResult.lowerCase ? ' and ' : ' AND ';
+                  }
+                  suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoinConditions.tables) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoinConditions.tables);
+                  first = false;
+                });
+                totalCount += value.totalQueryCount;
+                joinConditionSuggestions.push({
+                  value: suggestionString,
+                  meta: HUE_I18n.autocomplete.meta.joinCondition,
+                  category: CATEGORIES.POPULAR_JOIN_CONDITION,
+                  popular: ko.observable(true),
+                  details: value
+                });
+              }
+            });
+            joinConditionSuggestions.forEach(function (suggestion) {
+              suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
+              suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
+            });
+          }
 
           joinConditionsDeferred.resolve(joinConditionSuggestions);
-        },
-        errorCallback: joinConditionsDeferred.reject
-      }));
+        }).fail(joinConditionsDeferred.reject));
+        }).fail(joinConditionsDeferred.reject);
+      } else {
+        joinConditionsDeferred.reject();
+      }
     } else {
       joinConditionsDeferred.reject();
     }
@@ -1098,73 +1119,72 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingAggregateFunctions, aggregateFunctionsDeferred);
       aggregateFunctionsDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.push(self.apiHelper.fetchNavOptTopAggs({
-        sourceType: self.snippet.type(),
-        timeout: AUTOCOMPLETE_TIMEOUT,
-        defaultDatabase: self.activeDatabase,
-        silenceErrors: true,
-        tables: suggestAggregateFunctions.tables,
-        successCallback: function (data) {
-          var aggregateFunctionsSuggestions = [];
-          if (data.values.length > 0) {
+      var paths = self.tableIdentifierChainsToPaths(suggestAggregateFunctions.tables);
+      if (paths.length) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+          self.cancellablePromises.push(multiTableEntry.getTopAggs({ silenceErrors: true, cancellable: true }).done(function (topAggs) {
+            var aggregateFunctionsSuggestions = [];
+            if (topAggs.values && topAggs.values.length > 0) {
 
-            // Expand all column names to the fully qualified name including db and table.
-            data.values.forEach(function (value) {
-              value.aggregateInfo.forEach(function (info) {
-                value.aggregateClause = value.aggregateClause.replace(new RegExp('([^.])' + info.columnName, 'gi'), '$1' + info.databaseName + '.' + info.tableName + '.' + info.columnName);
-              });
-            });
-
-            // Substitute qualified table identifiers with either alias or table when multiple tables are present or just empty string
-            var substitutions = [];
-            suggestAggregateFunctions.tables.forEach(function (table) {
-              var replaceWith = table.alias ? table.alias + '.' : (suggestAggregateFunctions.tables.length > 1 ? table.identifierChain[table.identifierChain.length - 1].name + '.' : '');
-              if (table.identifierChain.length > 1) {
-                substitutions.push({
-                  replace: new RegExp($.map(table.identifierChain, function (identifier) {
-                        return identifier.name
-                      }).join('\.') + '\.', 'gi'),
-                  with: replaceWith
-                })
-              } else if (table.identifierChain.length === 1) {
-                substitutions.push({
-                  replace: new RegExp(self.activeDatabase + '\.' + table.identifierChain[0].name + '\.', 'gi'),
-                  with: replaceWith
+              // Expand all column names to the fully qualified name including db and table.
+              topAggs.values.forEach(function (value) {
+                value.aggregateInfo.forEach(function (info) {
+                  value.aggregateClause = value.aggregateClause.replace(new RegExp('([^.])' + info.columnName, 'gi'), '$1' + info.databaseName + '.' + info.tableName + '.' + info.columnName);
                 });
-                substitutions.push({
-                  replace: new RegExp(table.identifierChain[0].name + '\.', 'gi'),
-                  with: replaceWith
-                })
-              }
-            });
-
-            var totalCount = 0;
-            data.values.forEach(function (value) {
-              var clean = value.aggregateClause;
-              substitutions.forEach(function (substitution) {
-                clean = clean.replace(substitution.replace, substitution.with);
               });
-              totalCount += value.totalQueryCount;
-              value.function = SqlFunctions.findFunction(self.snippet.type(), value.aggregateFunction);
-              aggregateFunctionsSuggestions.push({
-                value: clean,
-                meta: value.function.returnTypes.join('|'),
-                category: CATEGORIES.POPULAR_AGGREGATE,
-                weightAdjust: Math.min(value.totalQueryCount, 99),
-                popular: ko.observable(true),
-                details: value
-              });
-            });
 
-            aggregateFunctionsSuggestions.forEach(function (suggestion) {
-              suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
-              suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
-            });
-          }
-          aggregateFunctionsDeferred.resolve(aggregateFunctionsSuggestions);
-        },
-        errorCallback: aggregateFunctionsDeferred.reject
-      }));
+              // Substitute qualified table identifiers with either alias or table when multiple tables are present or just empty string
+              var substitutions = [];
+              suggestAggregateFunctions.tables.forEach(function (table) {
+                var replaceWith = table.alias ? table.alias + '.' : (suggestAggregateFunctions.tables.length > 1 ? table.identifierChain[table.identifierChain.length - 1].name + '.' : '');
+                if (table.identifierChain.length > 1) {
+                  substitutions.push({
+                    replace: new RegExp($.map(table.identifierChain, function (identifier) {
+                      return identifier.name
+                    }).join('\.') + '\.', 'gi'),
+                    with: replaceWith
+                  })
+                } else if (table.identifierChain.length === 1) {
+                  substitutions.push({
+                    replace: new RegExp(self.activeDatabase + '\.' + table.identifierChain[0].name + '\.', 'gi'),
+                    with: replaceWith
+                  });
+                  substitutions.push({
+                    replace: new RegExp(table.identifierChain[0].name + '\.', 'gi'),
+                    with: replaceWith
+                  })
+                }
+              });
+
+              var totalCount = 0;
+              topAggs.values.forEach(function (value) {
+                var clean = value.aggregateClause;
+                substitutions.forEach(function (substitution) {
+                  clean = clean.replace(substitution.replace, substitution.with);
+                });
+                totalCount += value.totalQueryCount;
+                value.function = SqlFunctions.findFunction(self.snippet.type(), value.aggregateFunction);
+                aggregateFunctionsSuggestions.push({
+                  value: clean,
+                  meta: value.function.returnTypes.join('|'),
+                  category: CATEGORIES.POPULAR_AGGREGATE,
+                  weightAdjust: Math.min(value.totalQueryCount, 99),
+                  popular: ko.observable(true),
+                  details: value
+                });
+              });
+
+              aggregateFunctionsSuggestions.forEach(function (suggestion) {
+                suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
+                suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
+              });
+            }
+            aggregateFunctionsDeferred.resolve(aggregateFunctionsSuggestions);
+          }).fail(aggregateFunctionsDeferred.reject));
+        }).fail(aggregateFunctionsDeferred.reject);
+      } else {
+        aggregateFunctionsDeferred.reject();
+      }
     } else {
       aggregateFunctionsDeferred.reject();
     }
@@ -1281,52 +1301,53 @@ var AutocompleteResults = (function () {
       initLoading(self.loadingFilters, filtersDeferred);
       filtersDeferred.done(self.appendEntries);
 
-      self.lastKnownRequests.push(self.apiHelper.fetchNavOptTopFilters({
-        sourceType: self.snippet.type(),
-        timeout: AUTOCOMPLETE_TIMEOUT,
-        defaultDatabase: self.activeDatabase,
-        silenceErrors: true,
-        tables: suggestFilters.tables,
-        successCallback: function (data) {
-          var filterSuggestions = [];
-          var totalCount = 0;
-          data.values.forEach(function (value) {
-            if (typeof value.popularValues !== 'undefined' && value.popularValues.length > 0) {
-              value.popularValues.forEach(function (popularValue) {
-                if (typeof popularValue.group !== 'undefined') {
-                  popularValue.group.forEach(function (grp) {
-                    var compVal = suggestFilters.prefix ? (self.parseResult.lowerCase ? suggestFilters.prefix.toLowerCase() : suggestFilters.prefix) + ' ' : '';
-                    compVal += self.createNavOptIdentifier(value.tableName, grp.columnName, suggestFilters.tables);
-                    if (!/^ /.test(grp.op)) {
-                      compVal += ' ';
+      var paths = self.tableIdentifierChainsToPaths(suggestFilters.tables);
+      if (paths.length) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+          self.cancellablePromises.push(multiTableEntry.getTopFilters({ silenceErrors: true, cancellable: true }).done(function (topFilters) {
+            var filterSuggestions = [];
+            var totalCount = 0;
+            if (topFilters.values) {
+              topFilters.values.forEach(function (value) {
+                if (typeof value.popularValues !== 'undefined' && value.popularValues.length > 0) {
+                  value.popularValues.forEach(function (popularValue) {
+                    if (typeof popularValue.group !== 'undefined') {
+                      popularValue.group.forEach(function (grp) {
+                        var compVal = suggestFilters.prefix ? (self.parseResult.lowerCase ? suggestFilters.prefix.toLowerCase() : suggestFilters.prefix) + ' ' : '';
+                        compVal += self.createNavOptIdentifier(value.tableName, grp.columnName, suggestFilters.tables);
+                        if (!/^ /.test(grp.op)) {
+                          compVal += ' ';
+                        }
+                        compVal += self.parseResult.lowerCase ? grp.op.toLowerCase() : grp.op;
+                        if (!/ $/.test(grp.op)) {
+                          compVal += ' ';
+                        }
+                        compVal += grp.literal;
+                        totalCount += popularValue.count;
+                        filterSuggestions.push({
+                          value: compVal,
+                          meta: HUE_I18n.autocomplete.meta.filter,
+                          category: CATEGORIES.POPULAR_FILTER,
+                          popular: ko.observable(true),
+                          details: popularValue
+                        });
+                      });
                     }
-                    compVal += self.parseResult.lowerCase ? grp.op.toLowerCase() : grp.op;
-                    if (!/ $/.test(grp.op)) {
-                      compVal += ' ';
-                    }
-                    compVal += grp.literal;
-                    totalCount += popularValue.count;
-                    filterSuggestions.push({
-                      value: compVal,
-                      meta: HUE_I18n.autocomplete.meta.filter,
-                      category: CATEGORIES.POPULAR_FILTER,
-                      popular: ko.observable(true),
-                      details: popularValue
-                    });
                   });
                 }
               });
             }
-          });
-          filterSuggestions.forEach(function (suggestion) {
-            suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.count : Math.round(100 * suggestion.details.count / totalCount);
-            suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
-          });
+            filterSuggestions.forEach(function (suggestion) {
+              suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.count : Math.round(100 * suggestion.details.count / totalCount);
+              suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
+            });
 
-          filtersDeferred.resolve(filterSuggestions);
-        },
-        errorCallback: filtersDeferred.reject
-      }));
+            filtersDeferred.resolve(filterSuggestions);
+          }).fail(filtersDeferred.reject));
+        }).fail(filtersDeferred.reject);
+      } else {
+        filtersDeferred.reject();
+      }
     } else {
       filtersDeferred.reject();
     }

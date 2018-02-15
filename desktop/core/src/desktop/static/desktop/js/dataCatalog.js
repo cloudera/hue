@@ -16,102 +16,11 @@
 
 var DataCatalog = (function () {
 
-  var STORAGE_POSTFIX = LOGGED_USERNAME // TODO: Add flag for embedded mode
+  var STORAGE_POSTFIX = LOGGED_USERNAME; // TODO: Add flag for embedded mode
 
   var DATA_CATALOG_VERSION = 1;
 
   var cacheEnabled = true;
-
-  /**
-   * @param {string} sourceType
-   *
-   * @constructor
-   */
-  function DataCatalog(sourceType) {
-    var self = this;
-    self.sourceType = sourceType;
-    self.entries = {};
-    self.store = localforage.createInstance({
-      name: 'HueDataCatalog_' + self.sourceType + '_' + STORAGE_POSTFIX
-    });
-  }
-
-  /**
-   * Disables the caching for subsequent operations, mainly used for test purposes
-   */
-  DataCatalog.prototype.disableCache = function () {
-    cacheEnabled = false;
-  };
-
-  /**
-   * Enables the cache for subsequent operations, mainly used for test purposes
-   */
-  DataCatalog.prototype.enableCache = function () {
-    cacheEnabled = true;
-  };
-
-  /**
-   * Clears the data catalog and cache for the given path and any children thereof.
-   *
-   * @param {string[]} rootPath - The path to clear
-   */
-  DataCatalog.prototype.clearStorageCascade = function (rootPath) {
-    var self = this;
-    var deferred = $.Deferred();
-    if (rootPath.length === 0) {
-      self.entries = {};
-      self.store.clear().then(deferred.resolve).catch(deferred.reject);
-      return deferred.promise();
-    }
-
-    var keyPrefix = rootPath.join('.');
-    Object.keys(self.entries).forEach(function (key) {
-      if (key.indexOf(keyPrefix) === 0) {
-        delete self.entries[key];
-      }
-    });
-
-    var deletePromises = [];
-    var keysDeferred = $.Deferred();
-    deletePromises.push(keysDeferred.promise());
-    self.store.keys().then(function (keys) {
-      keys.forEach(function (key) {
-        if (key.indexOf(keyPrefix) === 0) {
-          var deleteDeferred = $.Deferred();
-          deletePromises.push(deleteDeferred.promise());
-          self.store.removeItem(key).then(deleteDeferred.resolve).catch(deleteDeferred.reject);
-        }
-      });
-      keysDeferred.resolve();
-    }).catch(keysDeferred.reject);
-
-    return $.when.apply($, deletePromises);
-  };
-
-  /**
-   * Updates the cache for the given entry
-   *
-   * @param {DataCatalogEntry} dataCatalogEntry
-   */
-  DataCatalog.prototype.updateStore = function (dataCatalogEntry) {
-    var self = this;
-    if (!cacheEnabled || CACHEABLE_TTL.default <= 0) {
-      return $.Deferred().resolve().promise();
-    }
-    var deferred = $.Deferred();
-    self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
-      version: DATA_CATALOG_VERSION,
-      definition: dataCatalogEntry.definition,
-      sourceMeta: dataCatalogEntry.sourceMeta,
-      analysis: dataCatalogEntry.analysis,
-      partitions: dataCatalogEntry.partitions,
-      sample: dataCatalogEntry.sample,
-      navigatorMeta: dataCatalogEntry.navigatorMeta,
-      navOptMeta:  dataCatalogEntry.navOptMeta,
-      navOptPopularity: dataCatalogEntry.navOptPopularity,
-    }).then(deferred.resolve).catch(deferred.reject);
-    return deferred.promise();
-  };
 
   /**
    * Helper function that adds sets the silence errors option to true if not specified
@@ -146,1367 +55,955 @@ var DataCatalog = (function () {
   };
 
   /**
-   * Loads Navigator Optimizer popularity for multiple tables in one go.
-   *
-   * @param {Object} options
-   * @param {string[][]} options.paths
-   * @param {boolean} [options.silenceErrors] - Default true
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalog.prototype.loadNavOptPopularityForTables = function (options) {
-    var self = this;
-    var deferred = $.Deferred();
-    var cancellablePromises = [];
-    var popularEntries = [];
-    var pathsToLoad = [];
-
-    var options = setSilencedErrors(options);
-
-    var existingPromises = [];
-    options.paths.forEach(function (path) {
-      var existingDeferred = $.Deferred();
-      self.getEntry({ path: path }).done(function (tableEntry) {
-        if (tableEntry.navOptPopularityForChildrenPromise) {
-          tableEntry.navOptPopularityForChildrenPromise.done(function (existingPopularEntries) {
-            popularEntries = popularEntries.concat(existingPopularEntries);
-            existingDeferred.resolve();
-          }).fail(existingDeferred.reject);
-        } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
-          cancellablePromises.push(tableEntry.getChildren(options).done(function (childEntries) {
-            childEntries.forEach(function (childEntry) {
-              if (childEntry.navOptPopularity) {
-                popularEntries.push(childEntry);
-              }
-            });
-            existingDeferred.resolve();
-          }).fail(existingDeferred.reject));
-        } else {
-          pathsToLoad.push(path);
-          existingDeferred.resolve();
-        }
-      }).fail(existingDeferred.reject);
-      existingPromises.push(existingDeferred.promise());
-    });
-
-    $.when.apply($, existingPromises).always(function () {
-      var loadDeferred = $.Deferred();
-      if (pathsToLoad.length) {
-        cancellablePromises.push(ApiHelper.getInstance().fetchNavOptPopularity({
-          silenceErrors: options.silenceErrors,
-          paths: pathsToLoad
-        }).done(function (data) {
-          var perTable = {};
-
-          var splitNavOptValuesPerTable = function (listName) {
-            if (data.values[listName]) {
-              data.values[listName].forEach(function (column) {
-                var tableMeta = perTable[column.dbName + '.' + column.tableName];
-                if (!tableMeta) {
-                  tableMeta = { values: [] };
-                  perTable[column.dbName + '.' + column.tableName] = tableMeta;
-                }
-                if (!tableMeta.values[listName]) {
-                  tableMeta.values[listName] = [];
-                }
-                tableMeta.values[listName].push(column);
-              });
-            }
-          };
-
-          if (data.values) {
-            splitNavOptValuesPerTable('filterColumns');
-            splitNavOptValuesPerTable('groupbyColumns');
-            splitNavOptValuesPerTable('joinColumns');
-            splitNavOptValuesPerTable('orderbyColumns');
-            splitNavOptValuesPerTable('selectColumns');
-          }
-
-          var tablePromises = [];
-
-          Object.keys(perTable).forEach(function (path) {
-            var tableDeferred = $.Deferred();
-            self.getEntry({ path: path }).done(function (entry) {
-              cancellablePromises.push(entry.trackedPromise('navOptPopularityForChildrenPromise', entry.applyNavOptResponseToChildren(perTable[path], options).done(function (entries) {
-                popularEntries = popularEntries.concat(entries);
-                tableDeferred.resolve();
-              }).fail(tableDeferred.resolve)));
-            }).fail(tableDeferred.reject);
-            tablePromises.push(tableDeferred.promise());
-          });
-
-          $.when.apply($, tablePromises).always(function () {
-            loadDeferred.resolve();
-          });
-        }).fail(loadDeferred.reject));
-      } else {
-        loadDeferred.resolve();
-      }
-      loadDeferred.always(function () {
-        $.when.apply($, cancellablePromises).done(function () {
-          deferred.resolve(popularEntries);
-        }).fail(deferred.reject);
-      });
-    });
-
-    return applyCancellable(new CancellablePromise(deferred, cancellablePromises), options);
-  };
-
-  /**
-   * Helper function to fill a catalog entry with cached metadata.
-   *
-   * @param {DataCatalogEntry} dataCatalogEntry - The entry to fill
-   * @param {Object} storeEntry - The cached version
-   */
-  var mergeFromStoreEntry = function (dataCatalogEntry, storeEntry) {
-    var mergeAttribute = function (attributeName, ttl, promiseName) {
-      if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
-        dataCatalogEntry[attributeName] = storeEntry[attributeName];
-        if (promiseName) {
-          dataCatalogEntry[promiseName] = $.Deferred().resolve(dataCatalogEntry[attributeName]).promise();
-        }
-      }
-    };
-
-    mergeAttribute('definition', CACHEABLE_TTL.default);
-    mergeAttribute('sourceMeta', CACHEABLE_TTL.default, 'sourceMetaPromise');
-    mergeAttribute('analysis', CACHEABLE_TTL.default, 'analysisPromise');
-    mergeAttribute('partitions', CACHEABLE_TTL.default, 'partitionsPromise');
-    mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
-    mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
-    mergeAttribute('navOptMeta', CACHEABLE_TTL.optimizer, 'navOptMetaPromise');
-    mergeAttribute('navOptPopularity', CACHEABLE_TTL.optimizer);
-  };
-
-  /**
-   * @param {Object} options
-   * @param {string|string[]} options.path
-   * @param {Object} [options.definition] - The initial definition if not already set on the entry
-   * @param {boolean} [options.cachedOnly] - Default false
-   * @return {Promise}
-   */
-  DataCatalog.prototype.getEntry = function (options) {
-    var self = this;
-    var deferred = $.Deferred();
-    var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
-    if (self.entries[identifier]) {
-      deferred.resolve(self.entries[identifier]);
-    } else {
-      deferred.done(function (entry) {
-        self.entries[identifier] = entry;
-      });
-      if (!cacheEnabled) {
-        return deferred.resolve(new DataCatalogEntry(self, options.path, options.definition)).promise();
-      }
-      self.store.getItem(identifier).then(function (storeEntry) {
-        var definition = storeEntry ? storeEntry.definition : options.definition;
-        if (self.entries[identifier]) {
-          deferred.resolve(self.entries[identifier]);
-          return;
-        }
-        var entry = new DataCatalogEntry(self, options.path, definition);
-        if (storeEntry) {
-          mergeFromStoreEntry(entry, storeEntry);
-        } else if (!options.cachedOnly) {
-          entry.saveLater();
-        }
-        deferred.resolve(entry);
-      }).catch(function (error) {
-        console.warn(error);
-        var entry = new DataCatalogEntry(self, options.path, options.definition);
-        if (!options.cachedOnly) {
-          entry.saveLater();
-        }
-        deferred.resolve(entry);
-      })
-    }
-    return deferred.promise();
-  };
-
-  /**
    * Wrapper function around ApiHelper calls, it will also save the entry on success.
    *
    * @param {string} apiHelperFunction - The name of the ApiHelper function to call
    * @param {string} attributeName - The attribute to set
-   * @param {DataCatalogEntry} dataCatalogEntry - The catalog entry
+   * @param {DataCatalogEntry|MultiTableEntry} entry - The catalog entry
    * @param {Object} [apiOptions]
    * @param {boolean} [apiOptions.silenceErrors]
    */
-  var fetchAndSave = function (apiHelperFunction, attributeName, dataCatalogEntry, apiOptions) {
+  var fetchAndSave = function (apiHelperFunction, attributeName, entry, apiOptions) {
     return ApiHelper.getInstance()[apiHelperFunction]({
-      sourceType: dataCatalogEntry.getSourceType(),
-      path: dataCatalogEntry.path,
+      sourceType: entry.dataCatalog.sourceType,
+      path: entry.path, // Set for DataCatalogEntry
+      paths: entry.paths, // Set for MultiTableEntry
       silenceErrors: apiOptions && apiOptions.silenceErrors
     }).done(function (data) {
-      dataCatalogEntry[attributeName] = data;
-      dataCatalogEntry.saveLater();
-    }).fail(function () {
-      dataCatalogEntry[attributeName] = {};
+      entry[attributeName] = data;
+      entry.saveLater();
     })
   };
 
-  /**
-   * Helper function to reload the source meta for the given entry
-   *
-   * @param {DataCatalogEntry} dataCatalogEntry
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
-   *
-   * @return {CancellablePromise}
-   */
-  var reloadSourceMeta = function (dataCatalogEntry, options) {
-    if (dataCatalogEntry.dataCatalog.invalidatePromise) {
+  var DataCatalog = (function () {
+    /**
+     * @param {string} sourceType
+     *
+     * @constructor
+     */
+    function DataCatalog(sourceType) {
+      var self = this;
+      self.sourceType = sourceType;
+      self.entries = {};
+      self.multiTableEntries = {};
+      self.store = localforage.createInstance({
+        name: 'HueDataCatalog_' + self.sourceType + '_' + STORAGE_POSTFIX
+      });
+      self.multiTableStore = localforage.createInstance({
+        name: 'HueDataCatalog_' + self.sourceType + '_multiTable_' + STORAGE_POSTFIX
+      });
+    }
+
+    /**
+     * Disables the caching for subsequent operations, mainly used for test purposes
+     */
+    DataCatalog.prototype.disableCache = function () {
+      cacheEnabled = false;
+    };
+
+    /**
+     * Enables the cache for subsequent operations, mainly used for test purposes
+     */
+    DataCatalog.prototype.enableCache = function () {
+      cacheEnabled = true;
+    };
+
+    /**
+     * Returns true if the catalog can have NavOpt metadata
+     *
+     * @return {boolean}
+     */
+    DataCatalog.prototype.canHaveNavOptMetadata = function () {
+      var self = this;
+      return HAS_OPTIMIZER && (self.sourceType === 'hive' || self.sourceType === 'impala');
+    };
+
+    /**
+     * Clears the data catalog and cache for the given path and any children thereof.
+     *
+     * @param {string[]} rootPath - The path to clear
+     */
+    DataCatalog.prototype.clearStorageCascade = function (rootPath) {
+      var self = this;
+      var deferred = $.Deferred();
+      if (rootPath.length === 0) {
+        self.entries = {};
+        self.store.clear().then(deferred.resolve).catch(deferred.reject);
+        return deferred.promise();
+      }
+
+      var keyPrefix = rootPath.join('.');
+      Object.keys(self.entries).forEach(function (key) {
+        if (key.indexOf(keyPrefix) === 0) {
+          delete self.entries[key];
+        }
+      });
+
+      var deletePromises = [];
+      var keysDeferred = $.Deferred();
+      deletePromises.push(keysDeferred.promise());
+      self.store.keys().then(function (keys) {
+        keys.forEach(function (key) {
+          if (key.indexOf(keyPrefix) === 0) {
+            var deleteDeferred = $.Deferred();
+            deletePromises.push(deleteDeferred.promise());
+            self.store.removeItem(key).then(deleteDeferred.resolve).catch(deleteDeferred.reject);
+          }
+        });
+        keysDeferred.resolve();
+      }).catch(keysDeferred.reject);
+
+      return $.when.apply($, deletePromises);
+    };
+
+    /**
+     * Updates the cache for the given entry
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry
+     * @return {Promise}
+     */
+    DataCatalog.prototype.persistCatalogEntry = function (dataCatalogEntry) {
+      var self = this;
+      if (!cacheEnabled || CACHEABLE_TTL.default <= 0) {
+        return $.Deferred().resolve().promise();
+      }
+      var deferred = $.Deferred();
+      self.store.setItem(dataCatalogEntry.getQualifiedPath(), {
+        version: DATA_CATALOG_VERSION,
+        definition: dataCatalogEntry.definition,
+        sourceMeta: dataCatalogEntry.sourceMeta,
+        analysis: dataCatalogEntry.analysis,
+        partitions: dataCatalogEntry.partitions,
+        sample: dataCatalogEntry.sample,
+        navigatorMeta: dataCatalogEntry.navigatorMeta,
+        navOptMeta:  dataCatalogEntry.navOptMeta,
+        navOptPopularity: dataCatalogEntry.navOptPopularity,
+      }).then(deferred.resolve).catch(deferred.reject);
+      return deferred.promise();
+    };
+
+    /**
+     * Loads Navigator Optimizer popularity for multiple tables in one go.
+     *
+     * @param {Object} options
+     * @param {string[][]} options.paths
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalog.prototype.loadNavOptPopularityForTables = function (options) {
+      var self = this;
       var deferred = $.Deferred();
       var cancellablePromises = [];
-      dataCatalogEntry.dataCatalog.invalidatePromise.always(function () {
-        cancellablePromises.push(fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options).done(deferred.resolve).fail(deferred.reject))
-      });
-      return dataCatalogEntry.trackedPromise('sourceMetaPromise', new CancellablePromise(deferred, undefined, cancellablePromises));
-    }
-
-    return dataCatalogEntry.trackedPromise('sourceMetaPromise', fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options));
-  };
-
-  /**
-   * Helper function to reload the navigator meta for the given entry
-   *
-   * @param {DataCatalogEntry} dataCatalogEntry
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors] - Default true
-   *
-   * @return {CancellablePromise}
-   */
-  var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
-    if (dataCatalogEntry.canHaveNavigatorMetadata()) {
-      return dataCatalogEntry.trackedPromise('navigatorMetaPromise', fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions));
-    }
-    dataCatalogEntry.navigatorMetaPromise = $.Deferred().reject();
-    return dataCatalogEntry.navigatorMetaPromise;
-  };
-
-  /**
-   * Helper function to reload the analysis for the given entry
-   *
-   * @param {DataCatalogEntry} dataCatalogEntry
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   * @param {boolean} [apiOptions.refreshAnalysis]
-   *
-   * @return {CancellablePromise}
-   */
-  var reloadAnalysis = function (dataCatalogEntry, apiOptions) {
-    return dataCatalogEntry.trackedPromise('analysisPromise',
-      fetchAndSave(apiOptions && apiOptions.refreshAnalysis ? 'refreshAnalysis' : 'fetchAnalysis', 'analysis', dataCatalogEntry, apiOptions));
-  };
-
-  /**
-   * Helper function to reload the partitions for the given entry
-   *
-   * @param {DataCatalogEntry} dataCatalogEntry
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   *
-   * @return {CancellablePromise}
-   */
-  var reloadPartitions = function (dataCatalogEntry, apiOptions) {
-    return dataCatalogEntry.trackedPromise('partitionsPromise', fetchAndSave('fetchPartitions', 'partitions', dataCatalogEntry, apiOptions));
-  };
-
-  /**
-   * Helper function to reload the sample for the given entry
-   *
-   * @param {DataCatalogEntry} dataCatalogEntry
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   *
-   * @return {CancellablePromise}
-   */
-  var reloadSample = function (dataCatalogEntry, apiOptions) {
-    return dataCatalogEntry.trackedPromise('samplePromise', fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions));
-  };
-
-  /**
-   * Helper function to reload the nav opt metadata for the given entry
-   *
-   * @param {DataCatalogEntry} dataCatalogEntry
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors] - Default true
-   *
-   * @return {CancellablePromise}
-   */
-  var reloadNavOptMeta = function (dataCatalogEntry, apiOptions) {
-    if (HAS_OPTIMIZER && (dataCatalogEntry.getSourceType() === 'hive' || dataCatalogEntry.getSourceType() === 'impala')) {
-      return dataCatalogEntry.trackedPromise('navOptMetaPromise', fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions));
-    }
-    dataCatalogEntry.navOptMetaPromise =  $.Deferred.reject().promise();
-    return dataCatalogEntry.navOptMetaPromise;
-  };
-
-  /**
-   * @param {DataCatalog} dataCatalog
-   * @param {string|string[]} path
-   * @param {Object} definition - Initial known metadata on creation (normally comes from the parent entry)
-   *
-   * @constructor
-   */
-  function DataCatalogEntry(dataCatalog, path, definition) {
-    var self = this;
-
-    self.dataCatalog = dataCatalog;
-    self.path = typeof path === 'string' && path ? path.split('.') : path || [];
-    self.name = self.path.length ? self.path[self.path.length - 1] : dataCatalog.sourceType;
-
-    self.definition = definition;
-
-    self.reset();
-  }
-
-  /**
-   * Resets the entry to an empty state, it might still have some details cached
-   */
-  DataCatalogEntry.prototype.reset = function () {
-    var self = this;
-    self.saveTimeout = -1;
-    self.sourceMetaPromise = undefined;
-    self.sourceMeta = undefined;
-
-    self.navigatorMeta = undefined;
-    self.navigatorMetaPromise = undefined;
-
-    self.analysis = undefined;
-    self.analysisPromise = undefined;
-
-    self.partitions = undefined;
-    self.partitionsPromise = undefined;
-
-    self.samplePromise = undefined;
-    self.sample = undefined;
-
-    self.navOptPopularity = undefined;
-    self.navOptMeta = undefined;
-    self.navOptMetaPromise = undefined;
-
-    self.navigatorMetaForChildrenPromise = undefined;
-    self.navOptPopularityForChildrenPromise = undefined;
-
-    self.childrenPromise = undefined;
-  };
-
-  /**
-   * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
-   *
-   * @param {string} promiseName - The attribute name to use
-   * @param {CancellablePromise} cancellablePromise
-   */
-  DataCatalogEntry.prototype.trackedPromise = function (promiseName, cancellablePromise) {
-    var self = this;
-    self[promiseName] = cancellablePromise;
-    return cancellablePromise.fail(function () {
-      if (cancellablePromise.cancelled) {
-        delete self[promiseName];
-      }
-    })
-  };
-
-  /**
-   * Resets the entry and clears the cache
-   *
-   * @param {string} [invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
-   * @param {boolean} [cascade] - Default false, only used when the entry is for the source
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.clear = function (invalidate, cascade) {
-    var self = this;
-
-    var invalidatePromise;
-
-    if (!invalidate) {
-      invalidate = 'cache';
-    }
-
-    if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
-      if (self.dataCatalog.invalidatePromise) {
-        invalidatePromise = self.dataCatalog.invalidatePromise;
-      } else {
-        if (self.path.length) {
-          invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
-            sourceType: self.getSourceType(),
-            invalidate: invalidate,
-            database: self.path[0]
-          });
-        } else {
-          invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
-            sourceType: self.getSourceType(),
-            invalidate: invalidate
-          });
-        }
-        self.dataCatalog.invalidatePromise = invalidatePromise;
-        invalidatePromise.always(function () {
-          delete self.dataCatalog.invalidatePromise;
-        });
-      }
-    } else {
-      invalidatePromise = $.Deferred().resolve().promise();
-    }
-
-    self.reset();
-    var saveDeferred = cascade ? self.dataCatalog.clearStorageCascade(self.path) : self.save();
-
-    var clearPromise = $.when(invalidatePromise, saveDeferred);
-
-    clearPromise.always(function () {
-      huePubSub.publish('data.catalog.entry.refreshed', { entry: self, cascade: cascade });
-    });
-
-    return new CancellablePromise(clearPromise, undefined, [invalidatePromise]);
-  };
-
-  /**
-   * Save the entry to cache
-   *
-   * @return {Promise}
-   */
-  DataCatalogEntry.prototype.save = function () {
-    var self = this;
-    window.clearTimeout(self.saveTimeout);
-    return self.dataCatalog.updateStore(self);
-  };
-
-  /**
-   * Save the entry at a later point of time
-   */
-  DataCatalogEntry.prototype.saveLater = function () {
-    var self = this;
-    if (CACHEABLE_TTL.default > 0) {
-      window.clearTimeout(self.saveTimeout);
-      self.saveTimeout = window.setTimeout(function () {
-        self.save();
-      }, 1000);
-    }
-  };
-
-  /**
-   * Get the children of the catalog entry, columns for a table entry etc.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.cachedOnly]
-   * @param {boolean} [options.refreshCache]
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {Promise}
-   */
-  DataCatalogEntry.prototype.getChildren = function (options) {
-    var self = this;
-    if (self.childrenPromise && (!options || !options.refreshCache)) {
-      return applyCancellable(self.childrenPromise, options);
-    }
-    var deferred = $.Deferred();
-
-    var sourceMetaPromise = self.getSourceMeta(options).done(function (sourceMeta) {
-      if (!sourceMeta || sourceMeta.notFound) {
-        deferred.reject();
-        return;
-      }
-      var promises = [];
-      var index = 0;
-      var partitionKeys = {};
-      if (sourceMeta.partition_keys) {
-        sourceMeta.partition_keys.forEach(function (partitionKey) {
-          partitionKeys[partitionKey.name] = true;
-        })
-      }
-
-      var entities = sourceMeta.databases
-        || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields || sourceMeta.columns;
-
-      if (entities) {
-        entities.forEach(function (entity) {
-          if (!sourceMeta.databases || ((entity.name || entity) !== '_impala_builtins')) {
-            promises.push(self.dataCatalog.getEntry({
-              path: self.path.concat(entity.name || entity)
-            }).done(function (catalogEntry) {
-              if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
-                var definition = typeof entity === 'object' ? entity : {};
-                if (typeof entity !== 'object') {
-                  if (self.path.length === 0) {
-                    definition.type = 'database';
-                  } else if (self.path.length === 1) {
-                    definition.type = 'table';
-                  } else if (self.path.length === 2) {
-                    definition.type = 'column';
-                  }
-                }
-                if (sourceMeta.partition_keys) {
-                  definition.partitionKey = !!partitionKeys[entity.name];
-                }
-                definition.index = index++;
-                catalogEntry.definition = definition;
-                catalogEntry.saveLater();
-              }
-            }));
-          }
-        });
-      }
-      if ((self.getSourceType() === 'impala' || self.getSourceType() === 'hive') && self.isComplex()) {
-        (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
-          if (sourceMeta[path]) {
-            promises.push(self.dataCatalog.getEntry({ path: self.path.concat(path) }).done(function (catalogEntry) {
-              if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
-                var definition = sourceMeta[path];
-                definition.index = index++;
-                definition.isMapValue = path === 'value';
-                catalogEntry.definition = definition;
-                catalogEntry.saveLater();
-              }
-            }));
-          }
-        })
-      }
-      $.when.apply($, promises).done(function () {
-        deferred.resolve(Array.prototype.slice.call(arguments));
-      });
-    }).fail(deferred.reject);
-
-    return applyCancellable(self.trackedPromise('childrenPromise', new CancellablePromise(deferred, undefined, [ sourceMetaPromise ])), options);
-  };
-
-  /**
-   * Loads navigator metadata for children, only applicable to databases and tables
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.refreshCache]
-   * @param {boolean} [options.silenceErrors] - Default true
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function (options) {
-    var self = this;
-
-    options = setSilencedErrors(options);
-
-    if (!self.canHaveNavigatorMetadata() || self.isField()) {
-      return $.Deferred().reject().promise();
-    }
-
-    if (self.navigatorMetaForChildrenPromise && (!options || !options.refreshCache)) {
-      return applyCancellable(self.navigatorMetaForChildrenPromise, options);
-    }
-
-    var deferred = $.Deferred();
-
-    var cancellablePromises = [];
-
-    cancellablePromises.push(self.getChildren(options).done(function (children) {
-      var someHaveNavMeta = children.some(function (childEntry) { return childEntry.navigatorMeta });
-      if (someHaveNavMeta && (!options || !options.refreshCache)) {
-        deferred.resolve(children);
-        return;
-      }
-
-      var query;
-      // TODO: Add sourceType to nav search query
-      if (self.path.length) {
-        query = 'parentPath:"/' + self.path.join('/') + '" AND type:(table view field)';
-      } else {
-        query = 'type:database'
-      }
-
-      cancellablePromises.push(ApiHelper.getInstance().searchEntities({
-        query: query,
-        rawQuery: true,
-        limit: children.length,
-        silenceErrors: options && options.silenceErrors
-      }).done(function (result) {
-        if (result && result.entities && result.entities.length > 0) {
-          var entryPromises = [];
-          result.entities.forEach(function (entity) {
-            var entryPromise = self.dataCatalog.getEntry({ path: self.path.concat((entity.name || entity.originalName).toLowerCase())}).done(function(catalogEntry) {
-              catalogEntry.navigatorMeta = entity;
-              catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta).promise();
-              catalogEntry.saveLater();
-            });
-            entryPromises.push(entryPromise);
-            cancellablePromises.push(entryPromise);
-          });
-          $.when.apply($, entryPromises).done(function () {
-            deferred.resolve(Array.prototype.slice.call(arguments));
-          });
-        } else {
-          deferred.resolve([]);
-        }
-      }).fail(deferred.reject));
-    }).fail(deferred.reject));
-
-    return applyCancellable(self.trackedPromise('navigatorMetaForChildrenPromise', new CancellablePromise(deferred, null, cancellablePromises)), options);
-  };
-
-  /**
-   * Helper function used when loading navopt metdata for children
-   *
-   * @param {Object} response
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.applyNavOptResponseToChildren = function (response, options) {
-    var self = this;
-    var deferred = $.Deferred();
-    if (!self.definition) {
-      self.definition = {};
-    }
-    self.definition.navOptLoaded = true;
-    self.saveLater();
-
-    var childPromise = self.getChildren(options).done(function (childEntries) {
-      var entriesByName = {};
-      childEntries.forEach(function (childEntry) {
-        entriesByName[childEntry.name.toLowerCase()] = childEntry;
-      });
-      var updatedIndex = {};
-
-      if (self.isDatabase() && response.top_tables) {
-        response.top_tables.forEach(function (topTable) {
-          var matchingChild = entriesByName[topTable.name.toLowerCase()];
-          if (matchingChild) {
-            matchingChild.navOptPopularity = topTable;
-            matchingChild.saveLater();
-            updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
-          }
-        });
-      } else if (self.isTableOrView() && response.values) {
-        var addNavOptPopularity = function (columns, type) {
-          if (columns) {
-            columns.forEach(function (column) {
-              var matchingChild = entriesByName[column.columnName.toLowerCase()];
-              if (matchingChild) {
-                if (!matchingChild.navOptPopularity) {
-                  matchingChild.navOptPopularity = {};
-                }
-                matchingChild.navOptPopularity[type] = column;
-                matchingChild.saveLater();
-                updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
-              }
-            });
-          }
-        };
-
-        addNavOptPopularity(response.values.filterColumns, 'filterColumn');
-        addNavOptPopularity(response.values.groupbyColumns, 'groupByColumn');
-        addNavOptPopularity(response.values.joinColumns, 'joinColumn');
-        addNavOptPopularity(response.values.orderbyColumns, 'orderByColumn');
-        addNavOptPopularity(response.values.selectColumns, 'selectColumn');
-      }
       var popularEntries = [];
-      Object.keys(updatedIndex).forEach(function(path) {
-        popularEntries.push(updatedIndex[path]);
+      var pathsToLoad = [];
+
+      var options = setSilencedErrors(options);
+
+      var existingPromises = [];
+      options.paths.forEach(function (path) {
+        var existingDeferred = $.Deferred();
+        self.getEntry({ path: path }).done(function (tableEntry) {
+          if (tableEntry.navOptPopularityForChildrenPromise) {
+            tableEntry.navOptPopularityForChildrenPromise.done(function (existingPopularEntries) {
+              popularEntries = popularEntries.concat(existingPopularEntries);
+              existingDeferred.resolve();
+            }).fail(existingDeferred.reject);
+          } else if (tableEntry.definition && tableEntry.definition.navOptLoaded) {
+            cancellablePromises.push(tableEntry.getChildren(options).done(function (childEntries) {
+              childEntries.forEach(function (childEntry) {
+                if (childEntry.navOptPopularity) {
+                  popularEntries.push(childEntry);
+                }
+              });
+              existingDeferred.resolve();
+            }).fail(existingDeferred.reject));
+          } else {
+            pathsToLoad.push(path);
+            existingDeferred.resolve();
+          }
+        }).fail(existingDeferred.reject);
+        existingPromises.push(existingDeferred.promise());
       });
-      deferred.resolve(popularEntries);
-    }).fail(deferred.reject);
 
-    return new CancellablePromise(deferred, undefined, [ childPromise ]);
-  };
+      $.when.apply($, existingPromises).always(function () {
+        var loadDeferred = $.Deferred();
+        if (pathsToLoad.length) {
+          cancellablePromises.push(ApiHelper.getInstance().fetchNavOptPopularity({
+            silenceErrors: options.silenceErrors,
+            paths: pathsToLoad
+          }).done(function (data) {
+            var perTable = {};
 
-  /**
-   * Loads nav opt popularity for the children of this entry.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.refreshCache]
-   * @param {boolean} [options.silenceErrors] - Default true
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.loadNavOptPopularityForChildren = function (options) {
-    var self = this;
+            var splitNavOptValuesPerTable = function (listName) {
+              if (data.values[listName]) {
+                data.values[listName].forEach(function (column) {
+                  var tableMeta = perTable[column.dbName + '.' + column.tableName];
+                  if (!tableMeta) {
+                    tableMeta = { values: [] };
+                    perTable[column.dbName + '.' + column.tableName] = tableMeta;
+                  }
+                  if (!tableMeta.values[listName]) {
+                    tableMeta.values[listName] = [];
+                  }
+                  tableMeta.values[listName].push(column);
+                });
+              }
+            };
 
-    var options = setSilencedErrors(options);
+            if (data.values) {
+              splitNavOptValuesPerTable('filterColumns');
+              splitNavOptValuesPerTable('groupbyColumns');
+              splitNavOptValuesPerTable('joinColumns');
+              splitNavOptValuesPerTable('orderbyColumns');
+              splitNavOptValuesPerTable('selectColumns');
+            }
 
-    if (!HAS_OPTIMIZER || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
-      return $.Deferred().reject().promise();
-    }
-    if (self.navOptPopularityForChildrenPromise && (!options || !options.refreshCache)) {
-      return applyCancellable(self.navOptPopularityForChildrenPromise, options);
-    }
-    var deferred = $.Deferred();
-    var cancellablePromises = [];
-    if (self.definition && self.definition.navOptLoaded && (!options || !options.refreshCache)) {
-      cancellablePromises.push(self.getChildren(options).done(function (childEntries) {
-        deferred.resolve(childEntries.filter(function (entry) { return entry.navOptPopularity }));
-      }).fail(deferred.reject));
-    } else if (self.isDatabase() || self.isTableOrView()) {
-      cancellablePromises.push(ApiHelper.getInstance().fetchNavOptPopularity({
-        silenceErrors: options && options.silenceErrors,
-        refreshCache: options && options.refreshCache,
-        paths: [ self.path ]
-      }).done(function (data) {
-        cancellablePromises.push(self.applyNavOptResponseToChildren(data, options).done(deferred.resolve).fail(deferred.reject));
-      }).fail(deferred.reject));
-    } else {
-      deferred.resolve([]);
-    }
+            var tablePromises = [];
 
-    return applyCancellable(self.trackedPromise('navOptPopularityForChildrenPromise', new CancellablePromise(deferred, undefined, cancellablePromises)), options);
-  };
+            Object.keys(perTable).forEach(function (path) {
+              var tableDeferred = $.Deferred();
+              self.getEntry({ path: path }).done(function (entry) {
+                cancellablePromises.push(entry.trackedPromise('navOptPopularityForChildrenPromise', entry.applyNavOptResponseToChildren(perTable[path], options).done(function (entries) {
+                  popularEntries = popularEntries.concat(entries);
+                  tableDeferred.resolve();
+                }).fail(tableDeferred.resolve)));
+              }).fail(tableDeferred.reject);
+              tablePromises.push(tableDeferred.promise());
+            });
 
-  /**
-   * Returns true if the catalog entry can have navigator metadata
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.canHaveNavigatorMetadata = function () {
-    var self = this;
-    return HAS_NAVIGATOR
-      && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')
-      && self.isDatabase() || self.isTableOrView() || self.isColumn();
-  };
+            $.when.apply($, tablePromises).always(function () {
+              loadDeferred.resolve();
+            });
+          }).fail(loadDeferred.reject));
+        } else {
+          loadDeferred.resolve();
+        }
+        loadDeferred.always(function () {
+          $.when.apply($, cancellablePromises).done(function () {
+            deferred.resolve(popularEntries);
+          }).fail(deferred.reject);
+        });
+      });
 
-  /**
-   * Returns the currently known comment without loading any additional metadata
-   *
-   * @return {string}
-   */
-  DataCatalogEntry.prototype.getResolvedComment = function () {
-    var self = this;
-    if (self.navigatorMeta && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
-      return self.navigatorMeta.description || self.navigatorMeta.originalDescription || ''
-    }
-    return self.sourceMeta && self.sourceMeta.comment || '';
-  };
+      return applyCancellable(new CancellablePromise(deferred, cancellablePromises), options);
+    };
 
-  /**
-   * Checks whether the comment is known and has been loaded from the proper source
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.hasResolvedComment = function () {
-    var self = this;
-    if (self.canHaveNavigatorMetadata()) {
-      return typeof self.navigatorMeta !== 'undefined';
-    }
-    return typeof self.sourceMeta !== 'undefined';
-  };
+    /**
+     * Helper function to fill a catalog entry with cached metadata.
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry - The entry to fill
+     * @param {Object} storeEntry - The cached version
+     */
+    var mergeEntry = function (dataCatalogEntry, storeEntry) {
+      var mergeAttribute = function (attributeName, ttl, promiseName) {
+        if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
+          dataCatalogEntry[attributeName] = storeEntry[attributeName];
+          if (promiseName) {
+            dataCatalogEntry[promiseName] = $.Deferred().resolve(dataCatalogEntry[attributeName]).promise();
+          }
+        }
+      };
 
-  /**
-   * Gets the comment for this entry, fetching it if necessary from the proper source.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.cachedOnly]
-   * @param {boolean} [options.refreshCache]
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.getComment = function (options) {
-    var self = this;
-    var deferred = $.Deferred();
-    var cancellablePromises = [];
+      mergeAttribute('definition', CACHEABLE_TTL.default);
+      mergeAttribute('sourceMeta', CACHEABLE_TTL.default, 'sourceMetaPromise');
+      mergeAttribute('analysis', CACHEABLE_TTL.default, 'analysisPromise');
+      mergeAttribute('partitions', CACHEABLE_TTL.default, 'partitionsPromise');
+      mergeAttribute('sample', CACHEABLE_TTL.default, 'samplePromise');
+      mergeAttribute('navigatorMeta', CACHEABLE_TTL.default, 'navigatorMetaPromise');
+      mergeAttribute('navOptMeta', CACHEABLE_TTL.optimizer, 'navOptMetaPromise');
+      mergeAttribute('navOptPopularity', CACHEABLE_TTL.optimizer);
+    };
 
-    var resolveWithSourceMeta = function () {
-      if (self.sourceMeta) {
-        deferred.resolve(self.sourceMeta && self.sourceMeta.comment || '');
+    /**
+     * @param {Object} options
+     * @param {string|string[]} options.path
+     * @param {Object} [options.definition] - The initial definition if not already set on the entry
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @return {Promise}
+     */
+    DataCatalog.prototype.getEntry = function (options) {
+      var self = this;
+      var identifier = typeof options.path === 'string' ? options.path : options.path.join('.');
+      if (self.entries[identifier]) {
+        return self.entries[identifier];
+      }
+
+      var deferred = $.Deferred();
+      self.entries[identifier] = deferred.promise();
+
+      if (!cacheEnabled) {
+        deferred.resolve(new DataCatalogEntry(self, options.path, options.definition)).promise();
       } else {
-        cancellablePromises.push(self.getSourceMeta(options).done(function (sourceMeta) {
-          deferred.resolve(sourceMeta && sourceMeta.comment || '');
-        }).fail(deferred.reject));
+        self.store.getItem(identifier).then(function (storeEntry) {
+          var definition = storeEntry ? storeEntry.definition : options.definition;
+          var entry = new DataCatalogEntry(self, options.path, definition);
+          if (storeEntry) {
+            mergeEntry(entry, storeEntry);
+          } else if (!options.cachedOnly && options.definition) {
+            entry.saveLater();
+          }
+          deferred.resolve(entry);
+        }).catch(function (error) {
+          console.warn(error);
+          var entry = new DataCatalogEntry(self, options.path, options.definition);
+          if (!options.cachedOnly && options.definition) {
+            entry.saveLater();
+          }
+          deferred.resolve(entry);
+        })
+      }
+
+      return self.entries[identifier];
+    };
+
+    /**
+     * Helper function to fill a multi table catalog entry with cached metadata.
+     *
+     * @param {MultiTableEntry} multiTableCatalogEntry - The entry to fill
+     * @param {Object} storeEntry - The cached version
+     */
+    var mergeMultiTableEntry = function (multiTableCatalogEntry, storeEntry) {
+      var mergeAttribute = function (attributeName, ttl, promiseName) {
+        if (storeEntry.version === DATA_CATALOG_VERSION && storeEntry[attributeName] && (!storeEntry[attributeName].hueTimestamp || (Date.now() - storeEntry[attributeName].hueTimestamp) < ttl)) {
+          multiTableCatalogEntry[attributeName] = storeEntry[attributeName];
+          if (promiseName) {
+            multiTableCatalogEntry[promiseName] = $.Deferred().resolve(multiTableCatalogEntry[attributeName]).promise();
+          }
+        }
+      };
+
+      mergeAttribute('topAggs', CACHEABLE_TTL.optimizer, 'topAggsPromise');
+      mergeAttribute('topColumns', CACHEABLE_TTL.optimizer, 'topColumnsPromise');
+      mergeAttribute('topFilters', CACHEABLE_TTL.optimizer, 'topFiltersPromise');
+      mergeAttribute('topJoins', CACHEABLE_TTL.optimizer, 'topJoinsPromise');
+    };
+
+    /**
+     * Creates an identifier for the given paths with duplicates removed
+     *
+     * @param {string[][]} paths
+     * @return {string}
+     */
+    var createMultiTableIdentifier = function (paths) {
+      var pathSet = {};
+      paths.forEach(function (path) {
+        pathSet[path.join('.')] = true;
+      });
+      var uniquePaths = Object.keys(pathSet);
+      uniquePaths.sort();
+      return uniquePaths.join(',');
+    };
+
+    /**
+     * @param {string[][]} paths
+     *
+     * @return {Promise}
+     */
+    DataCatalog.prototype.getMultiTableEntry = function (paths) {
+      var self = this;
+      var identifier = createMultiTableIdentifier(paths);
+      if (self.multiTableEntries[identifier]) {
+        return self.multiTableEntries[identifier];
+      }
+
+      var deferred = $.Deferred();
+      self.multiTableEntries[identifier] = deferred.promise();
+
+      if (!cacheEnabled) {
+        deferred.resolve(new MultiTableEntry(identifier, self, paths)).promise();
+      } else {
+        self.multiTableStore.getItem(identifier).then(function (storeEntry) {
+          var entry = new MultiTableEntry(identifier, self, paths);
+          if (storeEntry) {
+            mergeMultiTableEntry(entry, storeEntry);
+          }
+          deferred.resolve(entry);
+        }).catch(function (error) {
+          console.warn(error);
+          deferred.resolve(new MultiTableEntry(identifier, self, paths));
+        })
+      }
+
+      return self.multiTableEntries[identifier];
+    };
+
+    /**
+     * Updates the cache for the given multi tableentry
+     *
+     * @param {MultiTableEntry} multiTableEntry
+     * @return {Promise}
+     */
+    DataCatalog.prototype.persistMultiTableEntry = function (multiTableEntry) {
+      var self = this;
+      if (!cacheEnabled || CACHEABLE_TTL.default <= 0 || CACHEABLE_TTL.optimizer <= 0) {
+        return $.Deferred().resolve().promise();
+      }
+      var deferred = $.Deferred();
+      self.multiTableStore.setItem(multiTableEntry.identifier, {
+        version: DATA_CATALOG_VERSION,
+        topAggs: multiTableEntry.topAggs,
+        topColumns: multiTableEntry.topColumns,
+        topFilters: multiTableEntry.topFilters,
+        topJoins: multiTableEntry.topJoins,
+      }).then(deferred.resolve).catch(deferred.reject);
+      return deferred.promise();
+    };
+
+    return DataCatalog;
+  })();
+
+  var DataCatalogEntry = (function () {
+
+    /**
+     * Helper function to reload the source meta for the given entry
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     *
+     * @return {CancellablePromise}
+     */
+    var reloadSourceMeta = function (dataCatalogEntry, options) {
+      if (dataCatalogEntry.dataCatalog.invalidatePromise) {
+        var deferred = $.Deferred();
+        var cancellablePromises = [];
+        dataCatalogEntry.dataCatalog.invalidatePromise.always(function () {
+          cancellablePromises.push(fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options).done(deferred.resolve).fail(deferred.reject))
+        });
+        return dataCatalogEntry.trackedPromise('sourceMetaPromise', new CancellablePromise(deferred, undefined, cancellablePromises));
+      }
+
+      return dataCatalogEntry.trackedPromise('sourceMetaPromise', fetchAndSave('fetchSourceMetadata', 'sourceMeta', dataCatalogEntry, options));
+    };
+
+    /**
+     * Helper function to reload the navigator meta for the given entry
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors] - Default true
+     *
+     * @return {CancellablePromise}
+     */
+    var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
+      if (dataCatalogEntry.canHaveNavigatorMetadata()) {
+        return dataCatalogEntry.trackedPromise('navigatorMetaPromise', fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions));
+      }
+      dataCatalogEntry.navigatorMetaPromise = $.Deferred().reject();
+      return dataCatalogEntry.navigatorMetaPromise;
+    };
+
+    /**
+     * Helper function to reload the analysis for the given entry
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors]
+     * @param {boolean} [apiOptions.refreshAnalysis]
+     *
+     * @return {CancellablePromise}
+     */
+    var reloadAnalysis = function (dataCatalogEntry, apiOptions) {
+      return dataCatalogEntry.trackedPromise('analysisPromise',
+        fetchAndSave(apiOptions && apiOptions.refreshAnalysis ? 'refreshAnalysis' : 'fetchAnalysis', 'analysis', dataCatalogEntry, apiOptions));
+    };
+
+    /**
+     * Helper function to reload the partitions for the given entry
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors]
+     *
+     * @return {CancellablePromise}
+     */
+    var reloadPartitions = function (dataCatalogEntry, apiOptions) {
+      return dataCatalogEntry.trackedPromise('partitionsPromise', fetchAndSave('fetchPartitions', 'partitions', dataCatalogEntry, apiOptions));
+    };
+
+    /**
+     * Helper function to reload the sample for the given entry
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors]
+     *
+     * @return {CancellablePromise}
+     */
+    var reloadSample = function (dataCatalogEntry, apiOptions) {
+      return dataCatalogEntry.trackedPromise('samplePromise', fetchAndSave('fetchSample', 'sample', dataCatalogEntry, apiOptions));
+    };
+
+    /**
+     * Helper function to reload the nav opt metadata for the given entry
+     *
+     * @param {DataCatalogEntry} dataCatalogEntry
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors] - Default true
+     *
+     * @return {CancellablePromise}
+     */
+    var reloadNavOptMeta = function (dataCatalogEntry, apiOptions) {
+      if (dataCatalogEntry.dataCatalog.canHaveNavOptMetadata()) {
+        return dataCatalogEntry.trackedPromise('navOptMetaPromise', fetchAndSave('fetchNavOptMeta', 'navOptMeta', dataCatalogEntry, apiOptions));
+      }
+      dataCatalogEntry.navOptMetaPromise =  $.Deferred.reject().promise();
+      return dataCatalogEntry.navOptMetaPromise;
+    };
+
+    /**
+     * @param {DataCatalog} dataCatalog
+     * @param {string|string[]} path
+     * @param {Object} definition - Initial known metadata on creation (normally comes from the parent entry)
+     *
+     * @constructor
+     */
+    function DataCatalogEntry(dataCatalog, path, definition) {
+      var self = this;
+
+      self.dataCatalog = dataCatalog;
+      self.path = typeof path === 'string' && path ? path.split('.') : path || [];
+      self.name = self.path.length ? self.path[self.path.length - 1] : dataCatalog.sourceType;
+
+      self.definition = definition;
+
+      self.reset();
+    }
+
+    /**
+     * Resets the entry to an empty state, it might still have some details cached
+     */
+    DataCatalogEntry.prototype.reset = function () {
+      var self = this;
+      self.saveTimeout = -1;
+      self.sourceMetaPromise = undefined;
+      self.sourceMeta = undefined;
+
+      self.navigatorMeta = undefined;
+      self.navigatorMetaPromise = undefined;
+
+      self.analysis = undefined;
+      self.analysisPromise = undefined;
+
+      self.partitions = undefined;
+      self.partitionsPromise = undefined;
+
+      self.sample = undefined;
+      self.samplePromise = undefined;
+
+      self.navOptPopularity = undefined;
+      self.navOptMeta = undefined;
+      self.navOptMetaPromise = undefined;
+
+      self.navigatorMetaForChildrenPromise = undefined;
+      self.navOptPopularityForChildrenPromise = undefined;
+
+      self.childrenPromise = undefined;
+    };
+
+    /**
+     * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
+     *
+     * @param {string} promiseName - The attribute name to use
+     * @param {CancellablePromise} cancellablePromise
+     */
+    DataCatalogEntry.prototype.trackedPromise = function (promiseName, cancellablePromise) {
+      var self = this;
+      self[promiseName] = cancellablePromise;
+      return cancellablePromise.fail(function () {
+        if (cancellablePromise.cancelled) {
+          delete self[promiseName];
+        }
+      })
+    };
+
+    /**
+     * Resets the entry and clears the cache
+     *
+     * @param {string} [invalidate] - 'cache', 'invalidate' or 'invalidateAndFlush', default 'cache', only used for Impala
+     * @param {boolean} [cascade] - Default false, only used when the entry is for the source
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.clear = function (invalidate, cascade) {
+      var self = this;
+
+      var invalidatePromise;
+
+      if (!invalidate) {
+        invalidate = 'cache';
+      }
+
+      if (invalidate !== 'cache' && self.getSourceType() === 'impala') {
+        if (self.dataCatalog.invalidatePromise) {
+          invalidatePromise = self.dataCatalog.invalidatePromise;
+        } else {
+          if (self.path.length) {
+            invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
+              sourceType: self.getSourceType(),
+              invalidate: invalidate,
+              database: self.path[0]
+            });
+          } else {
+            invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
+              sourceType: self.getSourceType(),
+              invalidate: invalidate
+            });
+          }
+          self.dataCatalog.invalidatePromise = invalidatePromise;
+          invalidatePromise.always(function () {
+            delete self.dataCatalog.invalidatePromise;
+          });
+        }
+      } else {
+        invalidatePromise = $.Deferred().resolve().promise();
+      }
+
+      self.reset();
+      var saveDeferred = cascade ? self.dataCatalog.clearStorageCascade(self.path) : self.save();
+
+      var clearPromise = $.when(invalidatePromise, saveDeferred);
+
+      clearPromise.always(function () {
+        huePubSub.publish('data.catalog.entry.refreshed', { entry: self, cascade: cascade });
+      });
+
+      return new CancellablePromise(clearPromise, undefined, [invalidatePromise]);
+    };
+
+    /**
+     * Save the entry to cache
+     *
+     * @return {Promise}
+     */
+    DataCatalogEntry.prototype.save = function () {
+      var self = this;
+      window.clearTimeout(self.saveTimeout);
+      return self.dataCatalog.persistCatalogEntry(self);
+    };
+
+    /**
+     * Save the entry at a later point of time
+     */
+    DataCatalogEntry.prototype.saveLater = function () {
+      var self = this;
+      if (CACHEABLE_TTL.default > 0) {
+        window.clearTimeout(self.saveTimeout);
+        self.saveTimeout = window.setTimeout(function () {
+          self.save();
+        }, 1000);
       }
     };
 
-    if (self.canHaveNavigatorMetadata()) {
-      if (self.navigatorMeta) {
-        deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
-      } else {
-        cancellablePromises.push(self.getNavigatorMeta(options).done(function (navigatorMeta) {
-          if (navigatorMeta) {
-            deferred.resolve(navigatorMeta.description || navigatorMeta.originalDescription || '');
-          } else {
-            resolveWithSourceMeta();
-          }
-        }).fail(resolveWithSourceMeta))
-      }
-    } else {
-      resolveWithSourceMeta();
-    }
-
-    return applyCancellable(new CancellablePromise(deferred, undefined, cancellablePromises), options);
-  };
-
-  /**
-   * Sets the comment in the proper source
-   *
-   * @param {string} comment
-   * @param {Object} [apiOptions]
-   * @param {boolean} [apiOptions.silenceErrors]
-   * @param {boolean} [apiOptions.cachedOnly]
-   * @param {boolean} [apiOptions.refreshCache]
-   *
-   * @return {Promise}
-   */
-  DataCatalogEntry.prototype.setComment = function (comment, apiOptions) {
-    var self = this;
-    var deferred = $.Deferred();
-
-    if (self.canHaveNavigatorMetadata()) {
-      self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
-        if (navigatorMeta) {
-          ApiHelper.getInstance().updateNavigatorMetadata({
-            identity: navigatorMeta.identity,
-            properties: {
-              description: comment
-            }
-          }).done(function () {
-            reloadNavigatorMeta(self, {
-              silenceErrors: apiOptions && apiOptions.silenceErrors,
-              refreshCache: true
-            }).done(function() {
-              self.getComment(apiOptions).done(deferred.resolve);
-            });
-          }).fail(deferred.reject);
-        }
-      }).fail(deferred.reject);
-    } else {
-      ApiHelper.getInstance().updateSourceMetadata({
-        sourceType: self.getSourceType(),
-        path: self.path,
-        properties: {
-          comment: comment
-        }
-      }).done(function () {
-        reloadSourceMeta(self, {
-          silenceErrors: apiOptions && apiOptions.silenceErrors,
-          refreshCache: true
-        }).done(function () {
-          self.getComment(apiOptions).done(deferred.resolve);
-        });
-      }).fail(deferred.reject);
-    }
-
-    return deferred.promise();
-  };
-
-  /**
-   * Adds a list of tags and updates the navigator metadata of the entry
-   *
-   * @param {string[]} tags
-   *
-   * @return {Promise}
-   */
-  DataCatalogEntry.prototype.addNavigatorTags = function (tags) {
-    var self = this;
-    var deferred = $.Deferred();
-    if (self.canHaveNavigatorMetadata()) {
-      self.getNavigatorMeta().done(function (navMeta) {
-        if (navMeta && typeof navMeta.identity !== 'undefined') {
-        ApiHelper.getInstance().addNavTags(navMeta.identity, tags).done(function (response) {
-          if (response && response.entity) {
-            self.navigatorMeta = response.entity;
-            self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
-            self.saveLater();
-          } else {
-            deferred.reject();
-          }
-          deferred.resolve(self.navigatorMeta);
-        });
-        } else {
-          deferred.reject();
-        }
-      }).fail(deferred.reject);
-    } else {
-      deferred.reject();
-    }
-    return deferred.promise();
-  };
-
-  /**
-   * Removes a list of tags and updates the navigator metadata of the entry
-   *
-   * @param {string[]} tags
-   *
-   * @return {Promise}
-   */
-  DataCatalogEntry.prototype.deleteNavigatorTags = function (tags) {
-    var self = this;
-    var deferred = $.Deferred();
-    if (self.canHaveNavigatorMetadata()) {
-      self.getNavigatorMeta().done(function (navMeta) {
-        if (navMeta && typeof navMeta.identity !== 'undefined') {
-          ApiHelper.getInstance().deleteNavTags(navMeta.identity, tags).done(function (response) {
-            if (response && response.entity) {
-              self.navigatorMeta = response.entity;
-              self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
-              self.saveLater();
-            } else {
-              deferred.reject();
-            }
-            deferred.resolve(self.navigatorMeta);
-          });
-        } else {
-          deferred.reject();
-        }
-      }).fail(deferred.reject);
-    } else {
-      deferred.reject();
-    }
-    return deferred.promise();
-  };
-
-  /**
-   * Checks if the entry can have children or not without fetching additional metadata.
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.hasPossibleChildren = function () {
-    var self = this;
-    return (self.path.length < 3) ||
-      (!self.definition && !self.sourceMeta) ||
-      (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type)) ||
-      (self.definition && /^(?:struct|array|map)/i.test(self.definition.type));
-  };
-
-  /**
-   * Returns the index representing the order in which the backend returned this entry.
-   *
-   * @return {number}
-   */
-  DataCatalogEntry.prototype.getIndex = function () {
-    var self = this;
-    return self.definition && self.definition.index ? self.definition.index : 0;
-  };
-
-  /**
-   * Returns the source type of this entry.
-   *
-   * @return {string} - 'impala', 'hive', 'solr', etc.
-   */
-  DataCatalogEntry.prototype.getSourceType = function () {
-    var self = this;
-    return self.dataCatalog.sourceType;
-  };
-
-  /**
-   * Returns true if the entry represents a data source.
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isSource = function () {
-    var self = this;
-    return self.path.length === 0;
-  };
-
-  /**
-   * Returns true if the entry is a database.
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isDatabase = function () {
-    var self = this;
-    return self.path.length === 1;
-  };
-
-  /**
-   * Returns true if the entry is a table or a view.
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isTableOrView = function () {
-    var self = this;
-    return self.path.length === 2;
-  };
-
-  /**
-   * Returns the default tooltip to use for the entry, either the comment if known or the qualified path.
-   *
-   * @return {string}
-   */
-  DataCatalogEntry.prototype.getTooltip = function () {
-    var self = this;
-    return self.getResolvedComment() || self.getTitle();
-  };
-
-  /**
-   * Returns the default title used for the entry, the qualified path with type for fields.
-   *
-   * @return {string}
-   */
-  DataCatalogEntry.prototype.getTitle = function () {
-    var self = this;
-    var title = self.getQualifiedPath();
-    if (self.isField()) {
-      var type = self.getType();
-      if (type) {
-        title += ' (' + type + ')';
-      }
-    }
-    if (self.hasResolvedComment() && self.getResolvedComment()) {
-      title += ' - ' + self.getResolvedComment();
-    }
-    return title;
-  };
-
-  /**
-   * Returns the fully qualified path for this entry.
-   *
-   * @return {string}
-   */
-  DataCatalogEntry.prototype.getQualifiedPath = function () {
-    var self = this;
-    return self.path.join('.');
-  };
-
-  /**
-   * Returns the display name for the entry, name or qualified path plus type for fields
-   *
-   * @param {boolean} qualified - Whether to use the qualified path or not, default false
-   * @return {string}
-   */
-  DataCatalogEntry.prototype.getDisplayName = function (qualified) {
-    var self = this;
-    var displayName = qualified ? self.getQualifiedPath() : self.name;
-    if (self.isField()) {
-      var type = self.getType();
-      if (type) {
-        displayName += ' (' + type + ')';
-      }
-    }
-    return displayName;
-  };
-
-  /**
-   * Returns true for columns that are a primary key. Note that the definition has to come from a parent entry, i.e.
-   * getChildren().
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isPrimaryKey = function () {
-    var self = this;
-    return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
-  };
-
-  /**
-   * Returns true if the entry is a partition key. Note that the definition has to come from a parent entry, i.e.
-   * getChildren().
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isPartitionKey = function () {
-    var self = this;
-    return self.definition && !!self.definition.partitionKey;
-  };
-
-  /**
-   * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isTable = function () {
-    var self = this;
-    if (self.path.length === 2) {
-      if (self.sourceMeta) {
-        return !self.sourceMeta.is_view;
-      }
-      if (self.definition && self.definition.type) {
-        return self.definition.type.toLowerCase() === 'table';
-      }
-      return true;
-    }
-    return false;
-  };
-
-  /**
-   * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isView = function () {
-    var self = this;
-    return self.path.length === 2 &&
-      ((self.sourceMeta && self.sourceMeta.is_view) ||
-      (self.definition && self.definition.type && self.definition.type.toLowerCase() === 'view'));
-  };
-
-  /**
-   * Returns true if the entry is a column.
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isColumn = function () {
-    var self = this;
-    return self.path.length === 3;
-  };
-
-  /**
-   * Returns true if the entry is a column. It will be accurate once the source meta has been loaded or if loaded from
-   * a parent entry via getChildren().
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isComplex = function () {
-    var self = this;
-    return self.path.length > 2 && (
-      (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type)) ||
-      (self.definition && /^(?:struct|array|map)/i.test(self.definition.type)));
-  };
-
-  /**
-   * Returns true if the entry is a field, i.e. column or child of a complex type.
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isField = function () {
-    var self = this;
-    return self.path.length > 2;
-  };
-
-  /**
-   * Returns true if the entry is an array. It will be accurate once the source meta has been loaded or if loaded from
-   * a parent entry via getChildren().
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isArray = function () {
-    var self = this;
-    return (self.sourceMeta && /^array/i.test(self.sourceMeta.type)) ||
-      (self.definition && /^array/i.test(self.definition.type));
-  };
-
-  /**
-   * Returns true if the entry is a map. It will be accurate once the source meta has been loaded or if loaded from
-   * a parent entry via getChildren().
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isMap = function () {
-    var self = this;
-    return (self.sourceMeta && /^map/i.test(self.sourceMeta.type)) ||
-      (self.definition && /^map/i.test(self.definition.type));
-  };
-
-  /**
-   * Returns true if the entry is a map value. It will be accurate once the source meta has been loaded or if loaded
-   * from a parent entry via getChildren().
-   *
-   * @return {boolean}
-   */
-  DataCatalogEntry.prototype.isMapValue = function () {
-    var self = this;
-    return self.definition && self.definition.isMapValue;
-  };
-
-  /**
-   * Returns the type of the entry. It will be accurate once the source meta has been loaded or if loaded from
-   * a parent entry via getChildren().
-   *
-   * For complex entries the type definition is stripped to either 'array', 'map' or 'struct'
-   *
-   * @return {string}
-   */
-  DataCatalogEntry.prototype.getType = function () {
-    var self = this;
-    var type = self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
-    if (type.indexOf('<') !== -1) {
-      type = type.substring(0, type.indexOf('<'));
-    }
-    return type;
-  };
-
-  /**
-   * Gets the source metadata for the entry. It will fetch it if not cached or if the refresh option is set.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.cachedOnly]
-   * @param {boolean} [options.refreshCache]
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.getSourceMeta = function (options) {
-    var self = this;
-    if (options && options.cachedOnly) {
-      return applyCancellable(self.sourceMetaPromise, options) || $.Deferred().reject(false).promise();
-    }
-    if (options && options.refreshCache) {
-      return applyCancellable(reloadSourceMeta(self, options));
-    }
-    return applyCancellable(self.sourceMetaPromise || reloadSourceMeta(self, options), options);
-  };
-
-  /**
-   * Gets the analysis for the entry. It will fetch it if not cached or if the refresh option is set.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.cachedOnly]
-   * @param {boolean} [options.refreshCache] - Clears the browser cache
-   * @param {boolean} [options.refreshAnalysis] - Performs a hard refresh on the source level
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.getAnalysis = function (options) {
-    var self = this;
-    if (options && options.cachedOnly) {
-      return applyCancellable(self.analysisPromise, options) || $.Deferred().reject(false).promise();
-    }
-    if (options && (options.refreshCache || options.refreshAnalysis)) {
-      return applyCancellable(reloadAnalysis(self, options), options);
-    }
-    return applyCancellable(self.analysisPromise || reloadAnalysis(self, options), options);
-  };
-
-  /**
-   * Gets the partitions for the entry. It will fetch it if not cached or if the refresh option is set.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.cachedOnly]
-   * @param {boolean} [options.refreshCache] - Clears the browser cache
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.getPartitions = function (options) {
-    var self = this;
-    if (!self.isTableOrView()) {
-      return $.Deferred().reject(false).promise();
-    }
-    if (options && options.cachedOnly) {
-      return applyCancellable(self.partitionsPromise, options) || $.Deferred().reject(false).promise();
-    }
-    if (options && options.refreshCache) {
-      return applyCancellable(reloadPartitions(self, options), options);
-    }
-    return applyCancellable(self.partitionsPromise || reloadPartitions(self, options), options);
-  };
-
-  /**
-   * Gets the Navigator metadata for the entry. It will fetch it if not cached or if the refresh option is set.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors] - Default true
-   * @param {boolean} [options.cachedOnly]
-   * @param {boolean} [options.refreshCache]
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.getNavigatorMeta = function (options) {
-    var self = this;
-
-    var options = setSilencedErrors(options);
-
-    if (!self.canHaveNavigatorMetadata()) {
-      return $.Deferred().reject().promise();
-    }
-    if (options && options.cachedOnly) {
-      return applyCancellable(self.navigatorMetaPromise, options) || $.Deferred().reject(false).promise();
-    }
-    if (options && options.refreshCache) {
-      return applyCancellable(reloadNavigatorMeta(self, options), options);
-    }
-    return applyCancellable(self.navigatorMetaPromise || reloadNavigatorMeta(self, options), options)
-  };
-
-  /**
-   * Gets the Nav Opt metadata for the entry. It will fetch it if not cached or if the refresh option is set.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors] - Default true
-   * @param {boolean} [options.cachedOnly]
-   * @param {boolean} [options.refreshCache]
-   * @param {boolean} [options.cancellable] - Default false
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.getNavOptMeta = function (options) {
-    var self = this;
-
-    var options = setSilencedErrors(options);
-
-    if (!self.isTableOrView() || !HAS_OPTIMIZER || (self.getSourceType() !== 'hive' && self.getSourceType() !== 'impala')) {
-      return $.Deferred().reject().promise();
-    }
-    if (options && options.cachedOnly) {
-      return applyCancellable(self.navOptMetaPromise, options) || $.Deferred().reject(false).promise();
-    }
-    if (options && options.refreshCache) {
-      return applyCancellable(reloadNavOptMeta(self, options), options);
-    }
-    return applyCancellable(self.navOptMetaPromise || reloadNavOptMeta(self, options), options);
-  };
-
-  /**
-   * Gets the sample for the entry. It will fetch it if not cached or if the refresh option is set.
-   *
-   * @param {Object} [options]
-   * @param {boolean} [options.silenceErrors]
-   * @param {boolean} [options.cachedOnly]
-   * @param {boolean} [options.refreshCache]
-   *
-   * @return {CancellablePromise}
-   */
-  DataCatalogEntry.prototype.getSample = function (options) {
-    var self = this;
-    if (options && options.cachedOnly) {
-      return applyCancellable(self.samplePromise, options) || $.Deferred().reject(false).promise();
-    }
-    if (options && options.refreshCache) {
-      return applyCancellable(reloadSample(self, options), options);
-    }
-    return applyCancellable(self.samplePromise || reloadSample(self, options), options);
-  };
-
-  var instances = {};
-
-  /**
-   * Helper function to get the DataCatalog instance for a given data source.
-   *
-   * @param {string} sourceType
-   * @return {DataCatalog}
-   */
-  var getCatalog = function (sourceType) {
-    return instances[sourceType] || (instances[sourceType] = new DataCatalog(sourceType));
-  };
-
-  huePubSub.subscribe('data.catalog.refresh.entry', function (options) {
-    options.catalogEntry.clear(options.invalidate).always(function () {
-      if (options.callback) {
-        options.callback();
-      }
-    });
-  });
-
-  var allNavigatorTagsPromise = undefined;
-
-  var sharedDataCalogStore = localforage.createInstance({
-    name: 'HueDataCatalog_' + STORAGE_POSTFIX
-  });
-
-  return {
     /**
-     * @param {Object} options
-     * @param {string} options.sourceType
-     * @param {string|string[]} options.path
-     * @param {Object} [options.definition] - Optional initial definition
+     * Get the children of the catalog entry, columns for a table entry etc.
      *
-     * @return {DataCatalogEntry}
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {Promise}
      */
-    getEntry: function (options) {
-      return getCatalog(options.sourceType).getEntry(options);
-    },
+    DataCatalogEntry.prototype.getChildren = function (options) {
+      var self = this;
+      if (self.childrenPromise && (!options || !options.refreshCache)) {
+        return applyCancellable(self.childrenPromise, options);
+      }
+      var deferred = $.Deferred();
+
+      var sourceMetaPromise = self.getSourceMeta(options).done(function (sourceMeta) {
+        if (!sourceMeta || sourceMeta.notFound) {
+          deferred.reject();
+          return;
+        }
+        var promises = [];
+        var index = 0;
+        var partitionKeys = {};
+        if (sourceMeta.partition_keys) {
+          sourceMeta.partition_keys.forEach(function (partitionKey) {
+            partitionKeys[partitionKey.name] = true;
+          })
+        }
+
+        var entities = sourceMeta.databases
+          || sourceMeta.tables_meta || sourceMeta.extended_columns || sourceMeta.fields || sourceMeta.columns;
+
+        if (entities) {
+          entities.forEach(function (entity) {
+            if (!sourceMeta.databases || ((entity.name || entity) !== '_impala_builtins')) {
+              promises.push(self.dataCatalog.getEntry({
+                path: self.path.concat(entity.name || entity)
+              }).done(function (catalogEntry) {
+                if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
+                  var definition = typeof entity === 'object' ? entity : {};
+                  if (typeof entity !== 'object') {
+                    if (self.path.length === 0) {
+                      definition.type = 'database';
+                    } else if (self.path.length === 1) {
+                      definition.type = 'table';
+                    } else if (self.path.length === 2) {
+                      definition.type = 'column';
+                    }
+                  }
+                  if (sourceMeta.partition_keys) {
+                    definition.partitionKey = !!partitionKeys[entity.name];
+                  }
+                  definition.index = index++;
+                  catalogEntry.definition = definition;
+                  catalogEntry.saveLater();
+                }
+              }));
+            }
+          });
+        }
+        if ((self.getSourceType() === 'impala' || self.getSourceType() === 'hive') && self.isComplex()) {
+          (sourceMeta.type === 'map' ? ['key', 'value'] : ['item']).forEach(function (path) {
+            if (sourceMeta[path]) {
+              promises.push(self.dataCatalog.getEntry({ path: self.path.concat(path) }).done(function (catalogEntry) {
+                if (!catalogEntry.definition || typeof catalogEntry.definition.index === 'undefined') {
+                  var definition = sourceMeta[path];
+                  definition.index = index++;
+                  definition.isMapValue = path === 'value';
+                  catalogEntry.definition = definition;
+                  catalogEntry.saveLater();
+                }
+              }));
+            }
+          })
+        }
+        $.when.apply($, promises).done(function () {
+          deferred.resolve(Array.prototype.slice.call(arguments));
+        });
+      }).fail(deferred.reject);
+
+      return applyCancellable(self.trackedPromise('childrenPromise', new CancellablePromise(deferred, undefined, [ sourceMetaPromise ])), options);
+    };
 
     /**
-     * This can be used as a shorthand function to get the child entries of the given path. Same as first calling
-     * getEntry then getChildren.
+     * Loads navigator metadata for children, only applicable to databases and tables
      *
-     * @param {Object} options
-     * @param {string} options.sourceType
-     * @param {string|string[]} options.path
-     * @param {Object} [options.definition] - Optional initial definition of the parent entry
+     * @param {Object} [options]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.loadNavigatorMetaForChildren = function (options) {
+      var self = this;
+
+      options = setSilencedErrors(options);
+
+      if (!self.canHaveNavigatorMetadata() || self.isField()) {
+        return $.Deferred().reject().promise();
+      }
+
+      if (self.navigatorMetaForChildrenPromise && (!options || !options.refreshCache)) {
+        return applyCancellable(self.navigatorMetaForChildrenPromise, options);
+      }
+
+      var deferred = $.Deferred();
+
+      var cancellablePromises = [];
+
+      cancellablePromises.push(self.getChildren(options).done(function (children) {
+        var someHaveNavMeta = children.some(function (childEntry) { return childEntry.navigatorMeta });
+        if (someHaveNavMeta && (!options || !options.refreshCache)) {
+          deferred.resolve(children);
+          return;
+        }
+
+        var query;
+        // TODO: Add sourceType to nav search query
+        if (self.path.length) {
+          query = 'parentPath:"/' + self.path.join('/') + '" AND type:(table view field)';
+        } else {
+          query = 'type:database'
+        }
+
+        cancellablePromises.push(ApiHelper.getInstance().searchEntities({
+          query: query,
+          rawQuery: true,
+          limit: children.length,
+          silenceErrors: options && options.silenceErrors
+        }).done(function (result) {
+          if (result && result.entities && result.entities.length > 0) {
+            var entryPromises = [];
+            result.entities.forEach(function (entity) {
+              var entryPromise = self.dataCatalog.getEntry({ path: self.path.concat((entity.name || entity.originalName).toLowerCase())}).done(function(catalogEntry) {
+                catalogEntry.navigatorMeta = entity;
+                catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta).promise();
+                catalogEntry.saveLater();
+              });
+              entryPromises.push(entryPromise);
+              cancellablePromises.push(entryPromise);
+            });
+            $.when.apply($, entryPromises).done(function () {
+              deferred.resolve(Array.prototype.slice.call(arguments));
+            });
+          } else {
+            deferred.resolve([]);
+          }
+        }).fail(deferred.reject));
+      }).fail(deferred.reject));
+
+      return applyCancellable(self.trackedPromise('navigatorMetaForChildrenPromise', new CancellablePromise(deferred, null, cancellablePromises)), options);
+    };
+
+    /**
+     * Helper function used when loading navopt metdata for children
+     *
+     * @param {Object} response
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.applyNavOptResponseToChildren = function (response, options) {
+      var self = this;
+      var deferred = $.Deferred();
+      if (!self.definition) {
+        self.definition = {};
+      }
+      self.definition.navOptLoaded = true;
+      self.saveLater();
+
+      var childPromise = self.getChildren(options).done(function (childEntries) {
+        var entriesByName = {};
+        childEntries.forEach(function (childEntry) {
+          entriesByName[childEntry.name.toLowerCase()] = childEntry;
+        });
+        var updatedIndex = {};
+
+        if (self.isDatabase() && response.top_tables) {
+          response.top_tables.forEach(function (topTable) {
+            var matchingChild = entriesByName[topTable.name.toLowerCase()];
+            if (matchingChild) {
+              matchingChild.navOptPopularity = topTable;
+              matchingChild.saveLater();
+              updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
+            }
+          });
+        } else if (self.isTableOrView() && response.values) {
+          var addNavOptPopularity = function (columns, type) {
+            if (columns) {
+              columns.forEach(function (column) {
+                var matchingChild = entriesByName[column.columnName.toLowerCase()];
+                if (matchingChild) {
+                  if (!matchingChild.navOptPopularity) {
+                    matchingChild.navOptPopularity = {};
+                  }
+                  matchingChild.navOptPopularity[type] = column;
+                  matchingChild.saveLater();
+                  updatedIndex[matchingChild.getQualifiedPath()] = matchingChild;
+                }
+              });
+            }
+          };
+
+          addNavOptPopularity(response.values.filterColumns, 'filterColumn');
+          addNavOptPopularity(response.values.groupbyColumns, 'groupByColumn');
+          addNavOptPopularity(response.values.joinColumns, 'joinColumn');
+          addNavOptPopularity(response.values.orderbyColumns, 'orderByColumn');
+          addNavOptPopularity(response.values.selectColumns, 'selectColumn');
+        }
+        var popularEntries = [];
+        Object.keys(updatedIndex).forEach(function(path) {
+          popularEntries.push(updatedIndex[path]);
+        });
+        deferred.resolve(popularEntries);
+      }).fail(deferred.reject);
+
+      return new CancellablePromise(deferred, undefined, [ childPromise ]);
+    };
+
+    /**
+     * Loads nav opt popularity for the children of this entry.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.loadNavOptPopularityForChildren = function (options) {
+      var self = this;
+
+      var options = setSilencedErrors(options);
+
+      if (!self.dataCatalog.canHaveNavOptMetadata()) {
+        return $.Deferred().reject().promise();
+      }
+      if (self.navOptPopularityForChildrenPromise && (!options || !options.refreshCache)) {
+        return applyCancellable(self.navOptPopularityForChildrenPromise, options);
+      }
+      var deferred = $.Deferred();
+      var cancellablePromises = [];
+      if (self.definition && self.definition.navOptLoaded && (!options || !options.refreshCache)) {
+        cancellablePromises.push(self.getChildren(options).done(function (childEntries) {
+          deferred.resolve(childEntries.filter(function (entry) { return entry.navOptPopularity }));
+        }).fail(deferred.reject));
+      } else if (self.isDatabase() || self.isTableOrView()) {
+        cancellablePromises.push(ApiHelper.getInstance().fetchNavOptPopularity({
+          silenceErrors: options && options.silenceErrors,
+          refreshCache: options && options.refreshCache,
+          paths: [ self.path ]
+        }).done(function (data) {
+          cancellablePromises.push(self.applyNavOptResponseToChildren(data, options).done(deferred.resolve).fail(deferred.reject));
+        }).fail(deferred.reject));
+      } else {
+        deferred.resolve([]);
+      }
+
+      return applyCancellable(self.trackedPromise('navOptPopularityForChildrenPromise', new CancellablePromise(deferred, undefined, cancellablePromises)), options);
+    };
+
+    /**
+     * Returns true if the catalog entry can have navigator metadata
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.canHaveNavigatorMetadata = function () {
+      var self = this;
+      return HAS_NAVIGATOR
+        && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')
+        && self.isDatabase() || self.isTableOrView() || self.isColumn();
+    };
+
+    /**
+     * Returns the currently known comment without loading any additional metadata
+     *
+     * @return {string}
+     */
+    DataCatalogEntry.prototype.getResolvedComment = function () {
+      var self = this;
+      if (self.navigatorMeta && (self.getSourceType() === 'hive' || self.getSourceType() === 'impala')) {
+        return self.navigatorMeta.description || self.navigatorMeta.originalDescription || ''
+      }
+      return self.sourceMeta && self.sourceMeta.comment || '';
+    };
+
+    /**
+     * Checks whether the comment is known and has been loaded from the proper source
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.hasResolvedComment = function () {
+      var self = this;
+      if (self.canHaveNavigatorMetadata()) {
+        return typeof self.navigatorMeta !== 'undefined';
+      }
+      return typeof self.sourceMeta !== 'undefined';
+    };
+
+    /**
+     * Gets the comment for this entry, fetching it if necessary from the proper source.
+     *
+     * @param {Object} [options]
      * @param {boolean} [options.silenceErrors]
      * @param {boolean} [options.cachedOnly]
      * @param {boolean} [options.refreshCache]
@@ -1514,21 +1011,821 @@ var DataCatalog = (function () {
      *
      * @return {CancellablePromise}
      */
-    getChildren:  function(options) {
+    DataCatalogEntry.prototype.getComment = function (options) {
+      var self = this;
       var deferred = $.Deferred();
       var cancellablePromises = [];
-      getCatalog(options.sourceType).getEntry(options).done(function (entry) {
-        cancellablePromises.push(entry.getChildren(options).done(deferred.resolve).fail(deferred.reject));
-      }).fail(deferred.reject);
-      return new CancellablePromise(deferred, undefined, cancellablePromises);
-    },
+
+      var resolveWithSourceMeta = function () {
+        if (self.sourceMeta) {
+          deferred.resolve(self.sourceMeta && self.sourceMeta.comment || '');
+        } else {
+          cancellablePromises.push(self.getSourceMeta(options).done(function (sourceMeta) {
+            deferred.resolve(sourceMeta && sourceMeta.comment || '');
+          }).fail(deferred.reject));
+        }
+      };
+
+      if (self.canHaveNavigatorMetadata()) {
+        if (self.navigatorMeta) {
+          deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
+        } else {
+          cancellablePromises.push(self.getNavigatorMeta(options).done(function (navigatorMeta) {
+            if (navigatorMeta) {
+              deferred.resolve(navigatorMeta.description || navigatorMeta.originalDescription || '');
+            } else {
+              resolveWithSourceMeta();
+            }
+          }).fail(resolveWithSourceMeta))
+        }
+      } else {
+        resolveWithSourceMeta();
+      }
+
+      return applyCancellable(new CancellablePromise(deferred, undefined, cancellablePromises), options);
+    };
 
     /**
-     * @param {string} sourceType
+     * Sets the comment in the proper source
      *
-     * @return {DataCatalog}
+     * @param {string} comment
+     * @param {Object} [apiOptions]
+     * @param {boolean} [apiOptions.silenceErrors]
+     * @param {boolean} [apiOptions.cachedOnly]
+     * @param {boolean} [apiOptions.refreshCache]
+     *
+     * @return {Promise}
      */
-    getCatalog : getCatalog,
+    DataCatalogEntry.prototype.setComment = function (comment, apiOptions) {
+      var self = this;
+      var deferred = $.Deferred();
+
+      if (self.canHaveNavigatorMetadata()) {
+        self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
+          if (navigatorMeta) {
+            ApiHelper.getInstance().updateNavigatorMetadata({
+              identity: navigatorMeta.identity,
+              properties: {
+                description: comment
+              }
+            }).done(function () {
+              reloadNavigatorMeta(self, {
+                silenceErrors: apiOptions && apiOptions.silenceErrors,
+                refreshCache: true
+              }).done(function() {
+                self.getComment(apiOptions).done(deferred.resolve);
+              });
+            }).fail(deferred.reject);
+          }
+        }).fail(deferred.reject);
+      } else {
+        ApiHelper.getInstance().updateSourceMetadata({
+          sourceType: self.getSourceType(),
+          path: self.path,
+          properties: {
+            comment: comment
+          }
+        }).done(function () {
+          reloadSourceMeta(self, {
+            silenceErrors: apiOptions && apiOptions.silenceErrors,
+            refreshCache: true
+          }).done(function () {
+            self.getComment(apiOptions).done(deferred.resolve);
+          });
+        }).fail(deferred.reject);
+      }
+
+      return deferred.promise();
+    };
+
+    /**
+     * Adds a list of tags and updates the navigator metadata of the entry
+     *
+     * @param {string[]} tags
+     *
+     * @return {Promise}
+     */
+    DataCatalogEntry.prototype.addNavigatorTags = function (tags) {
+      var self = this;
+      var deferred = $.Deferred();
+      if (self.canHaveNavigatorMetadata()) {
+        self.getNavigatorMeta().done(function (navMeta) {
+          if (navMeta && typeof navMeta.identity !== 'undefined') {
+            ApiHelper.getInstance().addNavTags(navMeta.identity, tags).done(function (response) {
+              if (response && response.entity) {
+                self.navigatorMeta = response.entity;
+                self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+                self.saveLater();
+              } else {
+                deferred.reject();
+              }
+              deferred.resolve(self.navigatorMeta);
+            });
+          } else {
+            deferred.reject();
+          }
+        }).fail(deferred.reject);
+      } else {
+        deferred.reject();
+      }
+      return deferred.promise();
+    };
+
+    /**
+     * Removes a list of tags and updates the navigator metadata of the entry
+     *
+     * @param {string[]} tags
+     *
+     * @return {Promise}
+     */
+    DataCatalogEntry.prototype.deleteNavigatorTags = function (tags) {
+      var self = this;
+      var deferred = $.Deferred();
+      if (self.canHaveNavigatorMetadata()) {
+        self.getNavigatorMeta().done(function (navMeta) {
+          if (navMeta && typeof navMeta.identity !== 'undefined') {
+            ApiHelper.getInstance().deleteNavTags(navMeta.identity, tags).done(function (response) {
+              if (response && response.entity) {
+                self.navigatorMeta = response.entity;
+                self.navigatorMetaPromise = $.Deferred().resolve(self.navigatorMeta).promise();
+                self.saveLater();
+              } else {
+                deferred.reject();
+              }
+              deferred.resolve(self.navigatorMeta);
+            });
+          } else {
+            deferred.reject();
+          }
+        }).fail(deferred.reject);
+      } else {
+        deferred.reject();
+      }
+      return deferred.promise();
+    };
+
+    /**
+     * Checks if the entry can have children or not without fetching additional metadata.
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.hasPossibleChildren = function () {
+      var self = this;
+      return (self.path.length < 3) ||
+        (!self.definition && !self.sourceMeta) ||
+        (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type)) ||
+        (self.definition && /^(?:struct|array|map)/i.test(self.definition.type));
+    };
+
+    /**
+     * Returns the index representing the order in which the backend returned this entry.
+     *
+     * @return {number}
+     */
+    DataCatalogEntry.prototype.getIndex = function () {
+      var self = this;
+      return self.definition && self.definition.index ? self.definition.index : 0;
+    };
+
+    /**
+     * Returns the source type of this entry.
+     *
+     * @return {string} - 'impala', 'hive', 'solr', etc.
+     */
+    DataCatalogEntry.prototype.getSourceType = function () {
+      var self = this;
+      return self.dataCatalog.sourceType;
+    };
+
+    /**
+     * Returns true if the entry represents a data source.
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isSource = function () {
+      var self = this;
+      return self.path.length === 0;
+    };
+
+    /**
+     * Returns true if the entry is a database.
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isDatabase = function () {
+      var self = this;
+      return self.path.length === 1;
+    };
+
+    /**
+     * Returns true if the entry is a table or a view.
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isTableOrView = function () {
+      var self = this;
+      return self.path.length === 2;
+    };
+
+    /**
+     * Returns the default tooltip to use for the entry, either the comment if known or the qualified path.
+     *
+     * @return {string}
+     */
+    DataCatalogEntry.prototype.getTooltip = function () {
+      var self = this;
+      return self.getResolvedComment() || self.getTitle();
+    };
+
+    /**
+     * Returns the default title used for the entry, the qualified path with type for fields.
+     *
+     * @return {string}
+     */
+    DataCatalogEntry.prototype.getTitle = function () {
+      var self = this;
+      var title = self.getQualifiedPath();
+      if (self.isField()) {
+        var type = self.getType();
+        if (type) {
+          title += ' (' + type + ')';
+        }
+      }
+      if (self.hasResolvedComment() && self.getResolvedComment()) {
+        title += ' - ' + self.getResolvedComment();
+      }
+      return title;
+    };
+
+    /**
+     * Returns the fully qualified path for this entry.
+     *
+     * @return {string}
+     */
+    DataCatalogEntry.prototype.getQualifiedPath = function () {
+      var self = this;
+      return self.path.join('.');
+    };
+
+    /**
+     * Returns the display name for the entry, name or qualified path plus type for fields
+     *
+     * @param {boolean} qualified - Whether to use the qualified path or not, default false
+     * @return {string}
+     */
+    DataCatalogEntry.prototype.getDisplayName = function (qualified) {
+      var self = this;
+      var displayName = qualified ? self.getQualifiedPath() : self.name;
+      if (self.isField()) {
+        var type = self.getType();
+        if (type) {
+          displayName += ' (' + type + ')';
+        }
+      }
+      return displayName;
+    };
+
+    /**
+     * Returns true for columns that are a primary key. Note that the definition has to come from a parent entry, i.e.
+     * getChildren().
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isPrimaryKey = function () {
+      var self = this;
+      return self.isColumn() && self.definition && /true/i.test(self.definition.primary_key);
+    };
+
+    /**
+     * Returns true if the entry is a partition key. Note that the definition has to come from a parent entry, i.e.
+     * getChildren().
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isPartitionKey = function () {
+      var self = this;
+      return self.definition && !!self.definition.partitionKey;
+    };
+
+    /**
+     * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isTable = function () {
+      var self = this;
+      if (self.path.length === 2) {
+        if (self.sourceMeta) {
+          return !self.sourceMeta.is_view;
+        }
+        if (self.definition && self.definition.type) {
+          return self.definition.type.toLowerCase() === 'table';
+        }
+        return true;
+      }
+      return false;
+    };
+
+    /**
+     * Returns true if the entry is a table. It will be accurate once the source meta has been loaded.
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isView = function () {
+      var self = this;
+      return self.path.length === 2 &&
+        ((self.sourceMeta && self.sourceMeta.is_view) ||
+          (self.definition && self.definition.type && self.definition.type.toLowerCase() === 'view'));
+    };
+
+    /**
+     * Returns true if the entry is a column.
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isColumn = function () {
+      var self = this;
+      return self.path.length === 3;
+    };
+
+    /**
+     * Returns true if the entry is a column. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isComplex = function () {
+      var self = this;
+      return self.path.length > 2 && (
+        (self.sourceMeta && /^(?:struct|array|map)/i.test(self.sourceMeta.type)) ||
+        (self.definition && /^(?:struct|array|map)/i.test(self.definition.type)));
+    };
+
+    /**
+     * Returns true if the entry is a field, i.e. column or child of a complex type.
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isField = function () {
+      var self = this;
+      return self.path.length > 2;
+    };
+
+    /**
+     * Returns true if the entry is an array. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isArray = function () {
+      var self = this;
+      return (self.sourceMeta && /^array/i.test(self.sourceMeta.type)) ||
+        (self.definition && /^array/i.test(self.definition.type));
+    };
+
+    /**
+     * Returns true if the entry is a map. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isMap = function () {
+      var self = this;
+      return (self.sourceMeta && /^map/i.test(self.sourceMeta.type)) ||
+        (self.definition && /^map/i.test(self.definition.type));
+    };
+
+    /**
+     * Returns true if the entry is a map value. It will be accurate once the source meta has been loaded or if loaded
+     * from a parent entry via getChildren().
+     *
+     * @return {boolean}
+     */
+    DataCatalogEntry.prototype.isMapValue = function () {
+      var self = this;
+      return self.definition && self.definition.isMapValue;
+    };
+
+    /**
+     * Returns the type of the entry. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * For complex entries the type definition is stripped to either 'array', 'map' or 'struct'
+     *
+     * @return {string}
+     */
+    DataCatalogEntry.prototype.getType = function () {
+      var self = this;
+      var type = self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
+      if (type.indexOf('<') !== -1) {
+        type = type.substring(0, type.indexOf('<'));
+      }
+      return type;
+    };
+
+    /**
+     * Gets the source metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getSourceMeta = function (options) {
+      var self = this;
+      if (options && options.cachedOnly) {
+        return applyCancellable(self.sourceMetaPromise, options) || $.Deferred().reject(false).promise();
+      }
+      if (options && options.refreshCache) {
+        return applyCancellable(reloadSourceMeta(self, options));
+      }
+      return applyCancellable(self.sourceMetaPromise || reloadSourceMeta(self, options), options);
+    };
+
+    /**
+     * Gets the analysis for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache] - Clears the browser cache
+     * @param {boolean} [options.refreshAnalysis] - Performs a hard refresh on the source level
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getAnalysis = function (options) {
+      var self = this;
+      if (options && options.cachedOnly) {
+        return applyCancellable(self.analysisPromise, options) || $.Deferred().reject(false).promise();
+      }
+      if (options && (options.refreshCache || options.refreshAnalysis)) {
+        return applyCancellable(reloadAnalysis(self, options), options);
+      }
+      return applyCancellable(self.analysisPromise || reloadAnalysis(self, options), options);
+    };
+
+    /**
+     * Gets the partitions for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors]
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache] - Clears the browser cache
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getPartitions = function (options) {
+      var self = this;
+      if (!self.isTableOrView()) {
+        return $.Deferred().reject(false).promise();
+      }
+      if (options && options.cachedOnly) {
+        return applyCancellable(self.partitionsPromise, options) || $.Deferred().reject(false).promise();
+      }
+      if (options && options.refreshCache) {
+        return applyCancellable(reloadPartitions(self, options), options);
+      }
+      return applyCancellable(self.partitionsPromise || reloadPartitions(self, options), options);
+    };
+
+    /**
+     * Gets the Navigator metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cachedOnly]
+     * @param {boolean} [options.refreshCache]
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getNavigatorMeta = function (options) {
+      var self = this;
+
+      var options = setSilencedErrors(options);
+
+      if (!self.canHaveNavigatorMetadata()) {
+        return $.Deferred().reject().promise();
+      }
+      if (options && options.cachedOnly) {
+        return applyCancellable(self.navigatorMetaPromise, options) || $.Deferred().reject(false).promise();
+      }
+      if (options && options.refreshCache) {
+        return applyCancellable(reloadNavigatorMeta(self, options), options);
+      }
+      return applyCancellable(self.navigatorMetaPromise || reloadNavigatorMeta(self, options), options)
+    };
+
+    /**
+     * Gets the Nav Opt metadata for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getNavOptMeta = function (options) {
+      var self = this;
+
+      var options = setSilencedErrors(options);
+
+      if (!self.catalogEntry.canHaveNavOptMetadata() || !self.isTableOrView()) {
+        return $.Deferred().reject().promise();
+      }
+      if (options && options.cachedOnly) {
+        return applyCancellable(self.navOptMetaPromise, options) || $.Deferred().reject(false).promise();
+      }
+      if (options && options.refreshCache) {
+        return applyCancellable(reloadNavOptMeta(self, options), options);
+      }
+      return applyCancellable(self.navOptMetaPromise || reloadNavOptMeta(self, options), options);
+    };
+
+    /**
+     * Gets the sample for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getSample = function (options) {
+      var self = this;
+      if (options && options.cachedOnly) {
+        return applyCancellable(self.samplePromise, options) || $.Deferred().reject(false).promise();
+      }
+      if (options && options.refreshCache) {
+        return applyCancellable(reloadSample(self, options), options);
+      }
+      return applyCancellable(self.samplePromise || reloadSample(self, options), options);
+    };
+
+    /**
+     * Helper function to get details from the multi-table catalog for just this specific table
+     *
+     * @param {DataCatalogEntry} catalogEntry
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     * @param {string} functionName - The function to call, i.e. 'getTopAggs' etc.
+     * @return {CancellablePromise}
+     */
+    var getFromMultiTableCatalog = function (catalogEntry, options, functionName) {
+      var deferred = $.Deferred();
+      if (!catalogEntry.isTableOrView()) {
+        return deferred.reject();
+      }
+      var cancellablePromises = [];
+      catalogEntry.dataCatalog.getMultiTableEntry([ catalogEntry.path ]).done(function (multiTableEntry) {
+        cancellablePromises.push(multiTableEntry[functionName](options).done(deferred.resolve).fail(deferred.reject));
+      }).fail(deferred.reject);
+      return new CancellablePromise(deferred, undefined, cancellablePromises);
+    };
+
+    /**
+     * Gets the top aggregate UDFs for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getTopAggs = function (options) {
+      var self = this;
+      return getFromMultiTableCatalog(self, options, 'getTopAggs');
+    };
+
+    /**
+     * Gets the top filters for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getTopFilters = function (options) {
+      var self = this;
+      return getFromMultiTableCatalog(self, options, 'getTopFilters');
+    };
+
+    /**
+     * Gets the top joins for the entry if it's a table or view. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    DataCatalogEntry.prototype.getTopJoins = function (options) {
+      var self = this;
+      return getFromMultiTableCatalog(self, options, 'getTopJoins');
+    };
+
+    return DataCatalogEntry;
+  })();
+
+  var MultiTableEntry = (function () {
+
+    var MultiTableEntry = function (identifier, dataCatalog, paths) {
+      var self = this;
+      self.identifier = identifier;
+      self.dataCatalog = dataCatalog;
+      self.paths = paths;
+
+      self.topAggs = undefined;
+      self.topAggsPromise = undefined;
+
+      self.topColumns = undefined;
+      self.topColumnsPromise = undefined;
+
+      self.topFilters = undefined;
+      self.topFiltersPromise = undefined;
+
+      self.topJoins = undefined;
+      self.topJoinsPromise = undefined;
+    };
+
+    /**
+     * Save the multi table entry to cache
+     *
+     * @return {Promise}
+     */
+    MultiTableEntry.prototype.save = function () {
+      var self = this;
+      window.clearTimeout(self.saveTimeout);
+      return self.dataCatalog.persistMultiTableEntry(self);
+    };
+
+    /**
+     * Save the multi table entry at a later point of time
+     */
+    MultiTableEntry.prototype.saveLater = function () {
+      var self = this;
+      if (CACHEABLE_TTL.default > 0) {
+        window.clearTimeout(self.saveTimeout);
+        self.saveTimeout = window.setTimeout(function () {
+          self.save();
+        }, 1000);
+      }
+    };
+    /**
+     * Helper function that ensure that cancellable promises are not tracked anymore when cancelled
+     *
+     * @param {string} promiseName - The attribute name to use
+     * @param {CancellablePromise} cancellablePromise
+     */
+    MultiTableEntry.prototype.trackedPromise = function (promiseName, cancellablePromise) {
+      var self = this;
+      self[promiseName] = cancellablePromise;
+      return cancellablePromise.fail(function () {
+        if (cancellablePromise.cancelled) {
+          delete self[promiseName];
+        }
+      })
+    };
+
+    /**
+     * Helper function to reload a NavOpt multi table attribute, like topAggs or topFilters
+     *
+     * @param {MultiTableEntry} multiTableEntry
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default true
+     * @param {string} promiseAttribute
+     * @param {string} dataAttribute
+     * @param {string} apiHelperFunction
+     * @return {CancellablePromise}
+     */
+    var genericNavOptReload = function (multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction) {
+      if (multiTableEntry.dataCatalog.canHaveNavOptMetadata()) {
+        return multiTableEntry.trackedPromise(promiseAttribute, fetchAndSave(apiHelperFunction, dataAttribute, multiTableEntry, options));
+      }
+      multiTableEntry[promiseAttribute] = $.Deferred().reject();
+      return multiTableEntry[promiseAttribute];
+    };
+
+    /**
+     * Helper function to get a NavOpt multi table attribute, like topAggs or topFilters
+     *
+     * @param {MultiTableEntry} multiTableEntry
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     * @param {string} promiseAttribute
+     * @param {string} dataAttribute
+     * @param {string} apiHelperFunction
+     * @return {CancellablePromise}
+     */
+    var genericNavOptGet = function (multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction) {
+      if (options && options.cachedOnly) {
+        return applyCancellable(multiTableEntry[promiseAttribute], options) || $.Deferred().reject(false).promise();
+      }
+      if (options && options.refreshCache) {
+        return applyCancellable(genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
+      }
+      return applyCancellable(multiTableEntry[promiseAttribute] || genericNavOptReload(multiTableEntry, options, promiseAttribute, dataAttribute, apiHelperFunction), options);
+    };
+
+    /**
+     * Gets the top aggregate UDFs for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    MultiTableEntry.prototype.getTopAggs = function (options) {
+      var self = this;
+      return genericNavOptGet(self, options, 'topAggsPromise', 'topAggs', 'fetchNavOptTopAggs');
+    };
+
+    /**
+     * Gets the top columns for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    MultiTableEntry.prototype.getTopColumns = function (options) {
+      var self = this;
+      return genericNavOptGet(self, options, 'topColumnsPromise', 'topColumns', 'fetchNavOptTopColumns');
+    };
+
+    /**
+     * Gets the top filters for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    MultiTableEntry.prototype.getTopFilters = function (options) {
+      var self = this;
+      return genericNavOptGet(self, options, 'topFiltersPromise', 'topFilters', 'fetchNavOptTopFilters');
+    };
+
+    /**
+     * Gets the top joins for the entry. It will fetch it if not cached or if the refresh option is set.
+     *
+     * @param {Object} [options]
+     * @param {boolean} [options.silenceErrors] - Default false
+     * @param {boolean} [options.cachedOnly] - Default false
+     * @param {boolean} [options.refreshCache] - Default false
+     * @param {boolean} [options.cancellable] - Default false
+     *
+     * @return {CancellablePromise}
+     */
+    MultiTableEntry.prototype.getTopJoins = function (options) {
+      var self = this;
+      return genericNavOptGet(self, options, 'topJoinsPromise', 'topJoins', 'fetchNavOptTopJoins');
+    };
+
+    return MultiTableEntry;
+  })();
+
+  var GeneralDataCatalog = (function () {
+
+    function GeneralDataCatalog() {
+      var self = this;
+      self.store = localforage.createInstance({
+        name: 'HueDataCatalog_' + STORAGE_POSTFIX
+      });
+
+      self.allNavigatorTagsPromise = undefined;
+    }
 
     /**
      * @param {Object} [options]
@@ -1537,13 +1834,14 @@ var DataCatalog = (function () {
      *
      * @return {Promise}
      */
-    getAllNavigatorTags: function (options) {
-      if (allNavigatorTagsPromise && (!options || !options.refreshCache)) {
-        return allNavigatorTagsPromise;
+    GeneralDataCatalog.prototype.getAllNavigatorTags = function (options) {
+      var self = this;
+      if (self.allNavigatorTagsPromise && (!options || !options.refreshCache)) {
+        return self.allNavigatorTagsPromise;
       }
 
       var deferred = $.Deferred();
-      allNavigatorTagsPromise = deferred.promise();
+      self.allNavigatorTagsPromise = deferred.promise();
 
       var reloadAllTags = function () {
         ApiHelper.getInstance().fetchAllNavigatorTags({
@@ -1552,13 +1850,13 @@ var DataCatalog = (function () {
 
         if (CACHEABLE_TTL.default > 0) {
           deferred.done(function (allTags) {
-            sharedDataCalogStore.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
+            self.store.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
           })
         }
       };
 
       if (CACHEABLE_TTL.default > 0 && (!options || !options.refreshCache)) {
-        sharedDataCalogStore.getItem('hue.dataCatalog.allNavTags').then(function (storeEntry) {
+        self.store.getItem('hue.dataCatalog.allNavTags').then(function (storeEntry) {
           if (storeEntry && storeEntry.version === DATA_CATALOG_VERSION && (!storeEntry.hueTimestamp || (Date.now() - storeEntry.hueTimestamp) < CACHEABLE_TTL.default)) {
             deferred.resolve(storeEntry.allTags);
           } else {
@@ -1569,12 +1867,17 @@ var DataCatalog = (function () {
         reloadAllTags();
       }
 
-      return allNavigatorTagsPromise;
-    },
+      return self.allNavigatorTagsPromise;
+    };
 
-    updateAllNavigatorTags: function (tagsToAdd, tagsToRemove) {
-      if (allNavigatorTagsPromise) {
-        allNavigatorTagsPromise.done(function (allTags) {
+    /**
+     * @param {string[]} tagsToAdd
+     * @param {string[]} tagsToRemove
+     */
+    GeneralDataCatalog.prototype.updateAllNavigatorTags = function (tagsToAdd, tagsToRemove) {
+      var self = this;
+      if (self.allNavigatorTagsPromise) {
+        self.allNavigatorTagsPromise.done(function (allTags) {
           tagsToAdd.forEach(function (newTag) {
             if (!allTags[newTag]) {
               allTags[newTag] = 0;
@@ -1589,17 +1892,114 @@ var DataCatalog = (function () {
               }
             }
           });
-          sharedDataCalogStore.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
+          self.store.setItem('hue.dataCatalog.allNavTags', { allTags: allTags, hueTimestamp: Date.now(), version: DATA_CATALOG_VERSION });
         });
       }
-    },
-
-    enableCache: function () {
-      cacheEnabled = true
-    },
-
-    disableCache: function () {
-      cacheEnabled = false;
     }
-  };
+
+    return GeneralDataCatalog;
+  })();
+
+  return (function () {
+    var generalDataCatalog = new GeneralDataCatalog();
+    var sourceBoundCatalogs = {};
+
+    /**
+     * Helper function to get the DataCatalog instance for a given data source.
+     *
+     * @param {string} sourceType
+     * @return {DataCatalog}
+     */
+    var getCatalog = function (sourceType) {
+      return sourceBoundCatalogs[sourceType] || (sourceBoundCatalogs[sourceType] = new DataCatalog(sourceType));
+    };
+
+    huePubSub.subscribe('data.catalog.refresh.entry', function (options) {
+      options.catalogEntry.clear(options.invalidate).always(function () {
+        if (options.callback) {
+          options.callback();
+        }
+      });
+    });
+
+    return {
+
+      /**
+       * @param {Object} options
+       * @param {string} options.sourceType
+       * @param {string|string[]} options.path
+       * @param {Object} [options.definition] - Optional initial definition
+       *
+       * @return {Promise}
+       */
+      getEntry: function (options) {
+        return getCatalog(options.sourceType).getEntry(options);
+      },
+
+      /**
+       * @param {Object} options
+       * @param {string} options.sourceType
+       * @param {string[][]} options.paths
+       *
+       * @return {Promise}
+       */
+      getMultiTableEntry: function (options) {
+        return getCatalog(options.sourceType).getMultiTableEntry(options.paths);
+      },
+
+      /**
+       * This can be used as a shorthand function to get the child entries of the given path. Same as first calling
+       * getEntry then getChildren.
+       *
+       * @param {Object} options
+       * @param {string} options.sourceType
+       * @param {string|string[]} options.path
+       * @param {Object} [options.definition] - Optional initial definition of the parent entry
+       * @param {boolean} [options.silenceErrors]
+       * @param {boolean} [options.cachedOnly]
+       * @param {boolean} [options.refreshCache]
+       * @param {boolean} [options.cancellable] - Default false
+       *
+       * @return {CancellablePromise}
+       */
+      getChildren:  function(options) {
+        var deferred = $.Deferred();
+        var cancellablePromises = [];
+        getCatalog(options.sourceType).getEntry(options).done(function (entry) {
+          cancellablePromises.push(entry.getChildren(options).done(deferred.resolve).fail(deferred.reject));
+        }).fail(deferred.reject);
+        return new CancellablePromise(deferred, undefined, cancellablePromises);
+      },
+
+      /**
+       * @param {string} sourceType
+       *
+       * @return {DataCatalog}
+       */
+      getCatalog : getCatalog,
+
+      /**
+       * @param {Object} [options]
+       * @param {boolean} [options.silenceErrors]
+       * @param {boolean} [options.refreshCache]
+       *
+       * @return {Promise}
+       */
+      getAllNavigatorTags: generalDataCatalog.getAllNavigatorTags.bind(generalDataCatalog),
+
+      /**
+       * @param {string[]} tagsToAdd
+       * @param {string[]} tagsToRemove
+       */
+      updateAllNavigatorTags: generalDataCatalog.updateAllNavigatorTags.bind(generalDataCatalog),
+
+      enableCache: function () {
+        cacheEnabled = true
+      },
+
+      disableCache: function () {
+        cacheEnabled = false;
+      }
+    };
+  })();
 })();
