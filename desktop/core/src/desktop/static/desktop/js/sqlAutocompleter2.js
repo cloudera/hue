@@ -52,6 +52,22 @@ var SqlAutocompleter2 = (function () {
     JOIN: -1
   };
 
+  SqlAutocompleter2.prototype.tableIdentifierChainsToPaths = function (tables, activeDatabase) {
+    var paths = [];
+    tables.forEach(function (table) {
+      // Could be subquery
+      var isTable = table.identifierChain.every(function (identifier) { return typeof identifier.name !== 'undefined' });
+      if (isTable) {
+        var path = $.map(table.identifierChain, function (identifier) { return identifier.name; });
+        if (path.length === 1) {
+          path.unshift(activeDatabase);
+        }
+        paths.push(path)
+      }
+    });
+    return paths;
+  };
+
   SqlAutocompleter2.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
     var self = this;
     var parseResult = sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), false);
@@ -129,96 +145,100 @@ var SqlAutocompleter2 = (function () {
     if (parseResult.suggestJoins && HAS_OPTIMIZER) {
       var joinsDeferral = $.Deferred();
       deferrals.push(joinsDeferral);
-      self.snippet.getApiHelper().fetchNavOptPopularJoins({
-        sourceType: self.snippet.type(),
-        timeout: self.timeout,
-        defaultDatabase: database,
-        silenceErrors: true,
-        tables: parseResult.suggestJoins.tables,
-        successCallback: function (data) {
-          data.values.forEach(function (value) {
-            var suggestionString = parseResult.suggestJoins.prependJoin ? (parseResult.lowerCase ? 'join ' : 'JOIN ') : '';
-            var first = true;
 
-            var existingTables = {};
-            parseResult.suggestJoins.tables.forEach(function (table) {
-              existingTables[table.identifierChain[table.identifierChain.length - 1].name] = true;
-            });
+      var paths = self.tableIdentifierChainsToPaths(parseResult.suggestJoins.tables, database);
+      if (paths.length) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+          multiTableEntry.getTopJoins({ silenceErrors: true }).done(function (topJoins) {
+            if (topJoins.values) {
+              topJoins.values.forEach(function (value) {
+                var suggestionString = parseResult.suggestJoins.prependJoin ? (parseResult.lowerCase ? 'join ' : 'JOIN ') : '';
+                var first = true;
 
-            var joinRequired = false;
-            var tablesAdded = false;
-            value.tables.forEach(function (table) {
-              var tableParts = table.split('.');
-              if (!existingTables[tableParts[tableParts.length - 1]]) {
-                tablesAdded = true;
-                var identifier = self.convertNavOptQualifiedIdentifier(table, database, parseResult.suggestJoins.tables, false);
-                suggestionString += joinRequired ? (parseResult.lowerCase ? ' join ' : ' JOIN ') + identifier : identifier;
-                joinRequired = true;
-              }
-            });
+                var existingTables = {};
+                parseResult.suggestJoins.tables.forEach(function (table) {
+                  existingTables[table.identifierChain[table.identifierChain.length - 1].name] = true;
+                });
 
-            if (value.joinCols.length > 0) {
-              if (!tablesAdded && parseResult.suggestJoins.prependJoin) {
-                suggestionString = '';
-                tablesAdded = true;
-              }
-              suggestionString += parseResult.lowerCase ? ' on ' : ' ON ';
-            }
-            if (tablesAdded) {
-              value.joinCols.forEach(function (joinColPair) {
-                if (!first) {
-                  suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
+                var joinRequired = false;
+                var tablesAdded = false;
+                value.tables.forEach(function (table) {
+                  var tableParts = table.split('.');
+                  if (!existingTables[tableParts[tableParts.length - 1]]) {
+                    tablesAdded = true;
+                    var identifier = self.convertNavOptQualifiedIdentifier(table, database, parseResult.suggestJoins.tables, false);
+                    suggestionString += joinRequired ? (parseResult.lowerCase ? ' join ' : ' JOIN ') + identifier : identifier;
+                    joinRequired = true;
+                  }
+                });
+
+                if (value.joinCols.length > 0) {
+                  if (!tablesAdded && parseResult.suggestJoins.prependJoin) {
+                    suggestionString = '';
+                    tablesAdded = true;
+                  }
+                  suggestionString += parseResult.lowerCase ? ' on ' : ' ON ';
                 }
-                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database, parseResult.suggestJoins.tables, true) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database, parseResult.suggestJoins.tables, true);
-                first = false;
-              });
-              completions.push({
-                value: suggestionString,
-                meta: 'join',
-                weight: parseResult.suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.POPULAR_ACTIVE_JOIN,
-                docHTML: self.createJoinHtml(suggestionString)
+                if (tablesAdded) {
+                  value.joinCols.forEach(function (joinColPair) {
+                    if (!first) {
+                      suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
+                    }
+                    suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database, parseResult.suggestJoins.tables, true) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database, parseResult.suggestJoins.tables, true);
+                    first = false;
+                  });
+                  completions.push({
+                    value: suggestionString,
+                    meta: 'join',
+                    weight: parseResult.suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.POPULAR_ACTIVE_JOIN,
+                    docHTML: self.createJoinHtml(suggestionString)
+                  });
+                }
               });
             }
-          });
-          joinsDeferral.resolve();
-        },
-        errorCallback: joinsDeferral.resolve
-      });
+            joinsDeferral.resolve();
+          }).fail(joinsDeferral.resolve);
+        }).fail(joinsDeferral.resolve);
+      } else {
+        joinsDeferral.resolve();
+      }
     }
 
     if (parseResult.suggestJoinConditions && HAS_OPTIMIZER) {
       var joinConditionsDeferral = $.Deferred();
       deferrals.push(joinConditionsDeferral);
-      self.snippet.getApiHelper().fetchNavOptPopularJoins({
-        sourceType: self.snippet.type(),
-        timeout: self.timeout,
-        defaultDatabase: database,
-        silenceErrors: true,
-        tables: parseResult.suggestJoinConditions.tables,
-        successCallback: function (data) {
-          data.values.forEach(function (value) {
-            if (value.joinCols.length > 0) {
-              var suggestionString = parseResult.suggestJoinConditions.prependOn ? (parseResult.lowerCase ? 'on ' : 'ON ') : '';
-              var first = true;
-              value.joinCols.forEach(function (joinColPair) {
-                if (!first) {
-                  suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
+
+      var paths = self.tableIdentifierChainsToPaths(parseResult.suggestJoinConditions.tables, database);
+      if (paths.length) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+          multiTableEntry.getTopJoins({ silenceErrors: true }).done(function (topJoins) {
+            if (topJoins.values) {
+              topJoins.values.forEach(function (value) {
+                if (value.joinCols.length > 0) {
+                  var suggestionString = parseResult.suggestJoinConditions.prependOn ? (parseResult.lowerCase ? 'on ' : 'ON ') : '';
+                  var first = true;
+                  value.joinCols.forEach(function (joinColPair) {
+                    if (!first) {
+                      suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
+                    }
+                    suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database, parseResult.suggestJoinConditions.tables, true) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database, parseResult.suggestJoinConditions.tables, true);
+                    first = false;
+                  });
+                  completions.push({
+                    value: suggestionString,
+                    meta: 'condition',
+                    weight: DEFAULT_WEIGHTS.POPULAR_JOIN_CONDITION,
+                    docHTML: self.createJoinHtml(suggestionString)
+                  });
                 }
-                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database, parseResult.suggestJoinConditions.tables, true) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database,parseResult.suggestJoinConditions.tables, true);
-                first = false;
-              });
-              completions.push({
-                value: suggestionString,
-                meta: 'condition',
-                weight: DEFAULT_WEIGHTS.POPULAR_JOIN_CONDITION,
-                docHTML: self.createJoinHtml(suggestionString)
               });
             }
-          });
-          joinConditionsDeferral.resolve();
-        },
-        errorCallback: joinConditionsDeferral.resolve
-      });
+            joinConditionsDeferral.resolve();
+          }).fail(joinConditionsDeferral.resolve);
+        }).fail(joinConditionsDeferral.resolve);
+      } else {
+        joinConditionsDeferral.resolve();
+      }
     }
 
     if (parseResult.suggestFunctions) {
@@ -240,58 +260,58 @@ var SqlAutocompleter2 = (function () {
       if (HAS_OPTIMIZER && typeof parseResult.suggestAggregateFunctions !== 'undefined' && parseResult.suggestAggregateFunctions.tables.length > 0) {
         var suggestAggregatesDeferral = $.Deferred();
         deferrals.push(suggestAggregatesDeferral);
-        self.snippet.getApiHelper().fetchNavOptTopAggs({
-          sourceType: self.snippet.type(),
-          timeout: self.timeout,
-          defaultDatabase: database,
-          silenceErrors: true,
-          tables: parseResult.suggestAggregateFunctions.tables,
-          successCallback: function (data) {
-            if (data.values.length > 0) {
 
-              // TODO: Handle column conflicts with multiple tables
+        var paths = self.tableIdentifierChainsToPaths(parseResult.suggestAggregateFunctions.tables, database);
+        if (paths.length) {
+          DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+            multiTableEntry.getTopAggs({ silenceErrors: true }).done(function (topAggs) {
+              if (topAggs.values.length > 0) {
 
-              // Substitute qualified table identifiers with either alias or empty string
-              var substitutions = [];
-              parseResult.suggestAggregateFunctions.tables.forEach(function (table) {
-                var replaceWith = table.alias ? table.alias + '.' : '';
-                if (table.identifierChain.length > 1) {
-                  substitutions.push({
-                    replace: new RegExp($.map(table.identifierChain, function (identifier) {
-                          return identifier.name
-                        }).join('\.') + '\.', 'gi'),
-                    with: replaceWith
-                  })
-                } else if (table.identifierChain.length === 1) {
-                  substitutions.push({
-                    replace: new RegExp(database + '\.' + table.identifierChain[0].name + '\.', 'gi'),
-                    with: replaceWith
+                // TODO: Handle column conflicts with multiple tables
+
+                // Substitute qualified table identifiers with either alias or empty string
+                var substitutions = [];
+                parseResult.suggestAggregateFunctions.tables.forEach(function (table) {
+                  var replaceWith = table.alias ? table.alias + '.' : '';
+                  if (table.identifierChain.length > 1) {
+                    substitutions.push({
+                      replace: new RegExp($.map(table.identifierChain, function (identifier) {
+                        return identifier.name
+                      }).join('\.') + '\.', 'gi'),
+                      with: replaceWith
+                    })
+                  } else if (table.identifierChain.length === 1) {
+                    substitutions.push({
+                      replace: new RegExp(database + '\.' + table.identifierChain[0].name + '\.', 'gi'),
+                      with: replaceWith
+                    });
+                    substitutions.push({
+                      replace: new RegExp(table.identifierChain[0].name + '\.', 'gi'),
+                      with: replaceWith
+                    })
+                  }
+                });
+
+                topAggs.values.forEach(function (value) {
+                  var clean = value.aggregateClause;
+                  substitutions.forEach(function (substitution) {
+                    clean = clean.replace(substitution.replace, substitution.with);
                   });
-                  substitutions.push({
-                    replace: new RegExp(table.identifierChain[0].name + '\.', 'gi'),
-                    with: replaceWith
-                  })
-                }
-              });
 
-              data.values.forEach(function (value) {
-                var clean = value.aggregateClause;
-                substitutions.forEach(function (substitution) {
-                  clean = clean.replace(substitution.replace, substitution.with);
-                });
-
-                completions.push({
-                  value: clean,
-                  meta: 'aggregate *',
-                  weight: DEFAULT_WEIGHTS.POPULAR_AGGREGATE + value.totalQueryCount,
-                  docHTML: self.createAggregateHtml(value)
-                });
-              })
-            }
-            suggestAggregatesDeferral.resolve();
-          },
-          errorCallback: suggestAggregatesDeferral.resolve
-        });
+                  completions.push({
+                    value: clean,
+                    meta: 'aggregate *',
+                    weight: DEFAULT_WEIGHTS.POPULAR_AGGREGATE + value.totalQueryCount,
+                    docHTML: self.createAggregateHtml(value)
+                  });
+                })
+              }
+              suggestAggregatesDeferral.resolve();
+            }).fail(suggestAggregatesDeferral.resolve)
+          }).fail(suggestAggregatesDeferral.resolve);
+        } else {
+          suggestAggregatesDeferral.resolve();
+        }
       }
       deferrals.push(suggestFunctionsDeferral);
     }
@@ -374,83 +394,85 @@ var SqlAutocompleter2 = (function () {
     if (HAS_OPTIMIZER && typeof parseResult.suggestFilters !== 'undefined') {
       var topFiltersDeferral = $.Deferred();
       deferrals.push(topFiltersDeferral);
-      self.snippet.getApiHelper().fetchNavOptTopFilters({
-        sourceType: self.snippet.type(),
-        timeout: self.timeout,
-        defaultDatabase: database,
-        silenceErrors: true,
-        tables: parseResult.suggestFilters.tables,
-        successCallback: function (data) {
-          data.values.forEach(function (value) {
-            if (typeof value.popularValues !== 'undefined' && value.popularValues.length > 0) {
-              value.popularValues.forEach(function (popularValue) {
-                if (typeof popularValue.group !== 'undefined') {
-                  popularValue.group.forEach(function (grp) {
-                    var compVal = parseResult.suggestFilters.prefix ? (parseResult.lowerCase ? parseResult.suggestFilters.prefix.toLowerCase() : parseResult.suggestFilters.prefix) + ' ' : '';
-                    compVal += createNavOptIdentifier(value.tableName, grp.columnName, parseResult.suggestFilters.tables);
-                    if (!/^ /.test(grp.op)) {
-                      compVal += ' ';
+
+      var paths = self.tableIdentifierChainsToPaths(parseResult.suggestFilters.tables, database);
+      if (paths.length) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+          multiTableEntry.getTopFilters({ silenceErrors: true }).done(function (topFilters) {
+            if (topFilters.values) {
+              topFilters.values.forEach(function (value) {
+                if (typeof value.popularValues !== 'undefined' && value.popularValues.length > 0) {
+                  value.popularValues.forEach(function (popularValue) {
+                    if (typeof popularValue.group !== 'undefined') {
+                      popularValue.group.forEach(function (grp) {
+                        var compVal = parseResult.suggestFilters.prefix ? (parseResult.lowerCase ? parseResult.suggestFilters.prefix.toLowerCase() : parseResult.suggestFilters.prefix) + ' ' : '';
+                        compVal += createNavOptIdentifier(value.tableName, grp.columnName, parseResult.suggestFilters.tables);
+                        if (!/^ /.test(grp.op)) {
+                          compVal += ' ';
+                        }
+                        compVal += parseResult.lowerCase ? grp.op.toLowerCase() : grp.op;
+                        if (!/ $/.test(grp.op)) {
+                          compVal += ' ';
+                        }
+                        compVal += grp.literal;
+                        completions.push({
+                          value: compVal,
+                          meta: 'filter *',
+                          weight: DEFAULT_WEIGHTS.POPULAR_FILTER,
+                          docHTML: self.createFilterHtml()
+                        });
+                      });
                     }
-                    compVal += parseResult.lowerCase ? grp.op.toLowerCase() : grp.op;
-                    if (!/ $/.test(grp.op)) {
-                      compVal += ' ';
-                    }
-                    compVal += grp.literal;
-                    completions.push({
-                      value: compVal,
-                      meta: 'filter *',
-                      weight: DEFAULT_WEIGHTS.POPULAR_FILTER,
-                      docHTML: self.createFilterHtml()
-                    });
                   });
                 }
               });
             }
-          });
-
-          topFiltersDeferral.resolve();
-        },
-        errorCallback: topFiltersDeferral.resolve
-      });
+            topFiltersDeferral.resolve();
+          }).fail(topFiltersDeferral.resolve);
+        }).fail(topFiltersDeferral.resolve);
+      } else {
+        topFiltersDeferral.resolve();
+      }
     }
 
     if (HAS_OPTIMIZER && (typeof parseResult.suggestGroupBys !== 'undefined' || typeof parseResult.suggestOrderBys !== 'undefined')) {
       var tables = typeof parseResult.suggestGroupBys !== 'undefined' ? parseResult.suggestGroupBys.tables : parseResult.suggestOrderBys.tables;
       var groupAndOrderByDeferral = $.Deferred();
       deferrals.push(groupAndOrderByDeferral);
-      self.snippet.getApiHelper().fetchNavOptTopColumns({
-        sourceType: self.snippet.type(),
-        timeout: self.timeout,
-        defaultDatabase: database,
-        silenceErrors: true,
-        tables: tables,
-        successCallback: function (data) {
-          if (parseResult.suggestGroupBys && typeof data.values.groupbyColumns !== 'undefined') {
-            var prefix = parseResult.suggestGroupBys.prefix ? (parseResult.lowerCase ? parseResult.suggestGroupBys.prefix.toLowerCase() : parseResult.suggestGroupBys.prefix) + ' ' : '';
-            data.values.groupbyColumns.forEach(function (col) {
-              completions.push({
-                value: prefix + createNavOptIdentifierForColumn(col, parseResult.suggestGroupBys.tables),
-                meta: 'group *',
-                weight: DEFAULT_WEIGHTS.POPULAR_GROUP_BY + Math.min(col.columnCount, 99),
-                docHTML: self.createGroupByHtml()
+
+      var paths = self.tableIdentifierChainsToPaths(tables, database);
+      if (paths.length) {
+        DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+          multiTableEntry.getTopColumns({ silenceErrors: true }).done(function (topColumns) {
+            if (topColumns.values && parseResult.suggestGroupBys && typeof topColumns.values.groupbyColumns !== 'undefined') {
+              var prefix = parseResult.suggestGroupBys.prefix ? (parseResult.lowerCase ? parseResult.suggestGroupBys.prefix.toLowerCase() : parseResult.suggestGroupBys.prefix) + ' ' : '';
+              topColumns.values.groupbyColumns.forEach(function (col) {
+                completions.push({
+                  value: prefix + createNavOptIdentifierForColumn(col, parseResult.suggestGroupBys.tables),
+                  meta: 'group *',
+                  weight: DEFAULT_WEIGHTS.POPULAR_GROUP_BY + Math.min(col.columnCount, 99),
+                  docHTML: self.createGroupByHtml()
+                });
               });
-            });
-          }
-          if (parseResult.suggestOrderBys && typeof data.values.orderbyColumns !== 'undefined') {
-            var prefix = parseResult.suggestOrderBys.prefix ? (parseResult.lowerCase ? parseResult.suggestOrderBys.prefix.toLowerCase() : parseResult.suggestOrderBys.prefix) + ' ' : '';
-            data.values.orderbyColumns.forEach(function (col) {
-              completions.push({
-                value: prefix + createNavOptIdentifierForColumn(col, parseResult.suggestOrderBys.tables),
-                meta: 'order *',
-                weight: DEFAULT_WEIGHTS.POPULAR_ORDER_BY + Math.min(col.columnCount, 99),
-                docHTML: self.createOrderByHtml()
+            }
+            if (topColumns.values && parseResult.suggestOrderBys && typeof topColumns.values.orderbyColumns !== 'undefined') {
+              var prefix = parseResult.suggestOrderBys.prefix ? (parseResult.lowerCase ? parseResult.suggestOrderBys.prefix.toLowerCase() : parseResult.suggestOrderBys.prefix) + ' ' : '';
+              topColumns.values.orderbyColumns.forEach(function (col) {
+                completions.push({
+                  value: prefix + createNavOptIdentifierForColumn(col, parseResult.suggestOrderBys.tables),
+                  meta: 'order *',
+                  weight: DEFAULT_WEIGHTS.POPULAR_ORDER_BY + Math.min(col.columnCount, 99),
+                  docHTML: self.createOrderByHtml()
+                });
               });
-            });
-          }
-          groupAndOrderByDeferral.resolve();
-        },
-        errorCallback: groupAndOrderByDeferral.resolve
-      });
+            }
+            groupAndOrderByDeferral.resolve();
+          }).fail(groupAndOrderByDeferral.resolve);
+        }).fail(groupAndOrderByDeferral.resolve);
+      } else {
+        groupAndOrderByDeferral.resolve();
+      }
+
     }
 
     if (parseResult.suggestColumns) {
@@ -511,38 +533,39 @@ var SqlAutocompleter2 = (function () {
       }
 
       if (HAS_OPTIMIZER && typeof parseResult.suggestColumns.source !== 'undefined') {
-        self.snippet.getApiHelper().fetchNavOptTopColumns({
-          sourceType: self.snippet.type(),
-          timeout: self.timeout,
-          defaultDatabase: database,
-          silenceErrors: true,
-          tables: parseResult.suggestColumns.tables,
-          successCallback: function (data) {
-            var topColumns = [];
-            var values = [];
-            switch (parseResult.suggestColumns.source) {
-              case 'select':
-                values = data.values.selectColumns;
-                break;
-              case 'group by':
-                values = data.values.groupbyColumns;
-                break;
-              case 'order by':
-                values = data.values.orderbyColumns;
-                break;
-              default:
-                values = [];
-            }
-            values.forEach(function (col) {
-              col.path = col.tableName.split('.').concat(col.columnName.split('.').slice(1)).join('.');
+        var paths = self.tableIdentifierChainsToPaths(parseResult.suggestColumns.tables, database);
+        if (paths.length) {
+          DataCatalog.getMultiTableEntry({ sourceType: self.snippet.type(), paths: paths }).done(function (multiTableEntry) {
+            multiTableEntry.getTopColumns({ silenceErrors: true }).done(function (topColumns) {
+              var values = [];
+              if (topColumns.values) {
+                switch (parseResult.suggestColumns.source) {
+                  case 'select':
+                    values = topColumns.values.selectColumns;
+                    break;
+                  case 'group by':
+                    values = topColumns.values.groupbyColumns;
+                    break;
+                  case 'order by':
+                    values = topColumns.values.orderbyColumns;
+                    break;
+                  default:
+                    values = [];
+                }
+                values.forEach(function (col) {
+                  col.path = col.tableName.split('.').concat(col.columnName.split('.').slice(1)).join('.');
+                });
+              }
+              topColumnsDeferral.resolve(values);
+            }).fail(function () {
+              topColumnsDeferral.resolve([])
             });
-
-            topColumnsDeferral.resolve(values);
-          },
-          errorCallback: function () {
-            topColumnsDeferral.resolve([]);
-          }
-        });
+          }).fail(function () {
+            topColumnsDeferral.resolve([])
+          });
+        } else {
+          topColumnsDeferral.resolve([])
+        }
       } else {
         topColumnsDeferral.resolve([]);
       }
@@ -560,21 +583,19 @@ var SqlAutocompleter2 = (function () {
       if (HAS_OPTIMIZER) {
         var topTablesDeferral = $.Deferred();
         deferrals.push(topTablesDeferral);
-        self.snippet.getApiHelper().fetchNavOptTopTables({
-          database: database,
-          sourceType: self.snippet.type(),
-          successCallback: function (data) {
-            var popularityIndex = {};
-            data.top_tables.forEach(function (topTable) {
-              popularityIndex[topTable.name] = topTable.popularity;
-            });
 
-            topTablesDeferral.resolve(popularityIndex);
-          },
-          errorCallback: function () {
-            topTablesDeferral.resolve({});
-          }
+        DataCatalog.getCatalog(self.snippet.type()).loadNavOptPopularityForTables({ paths: [[database]], silenceErrors: true }).done(function (popularTables) {
+          var popularityIndex = {};
+          popularTables.forEach(function (popularTable) {
+            if (popularTable.navOptPopularity) {
+              popularityIndex[popularTable.name] = popularTable.navOptPopularity.popularity;
+            }
+          });
+          topTablesDeferral.resolve(popularityIndex);
+        }).fail(function () {
+          topTablesDeferral.resolve({});
         });
+
         $.when(topTablesDeferral, tableDeferral).done(function (popularityIndex, tableCompletions) {
           tableCompletions.forEach(function (tableCompletion) {
             if (typeof popularityIndex[tableCompletion.name] !== 'undefined') {
