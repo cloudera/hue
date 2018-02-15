@@ -159,7 +159,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if (canSave()) { save() } else { $('#saveAsModalDashboard').modal('show'); } }, attr: { title: canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
           <!-- ko if: canSave() -->
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu pull-right">
             <li>
               <a class="pointer" data-bind="click: function() { $('#saveAsModalDashboard').modal('show'); }">
                 <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
