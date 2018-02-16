@@ -37,7 +37,7 @@ def test_export_csv():
   assert_equal("application/csv", response["content-type"])
   content = ''.join(response.streaming_content)
   assert_equal('x,y\r\n1,2\r\n3,4\r\n"5,6",7\r\nNULL,NULL\r\n', content)
-  assert_equal("attachment; filename=foo.csv", response["content-disposition"])
+  assert_equal('attachment; filename="foo.csv"', response["content-disposition"])
 
 
 def test_export_xls():
@@ -54,7 +54,7 @@ def test_export_xls():
   sheet_data = _read_xls_sheet_data(response)
 
   assert_equal(expected_data, sheet_data)
-  assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
+  assert_equal('attachment; filename="foo.xlsx"', response["content-disposition"])
 
 
 def _read_xls_sheet_data(response):

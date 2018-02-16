@@ -135,6 +135,6 @@ def make_response(generator, format, name, encoding=None):
   else:
     raise Exception("Unknown format: %s" % format)
 
-  resp['Content-Disposition'] = 'attachment; filename=%s.%s' % (name, format)
+  resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % (name, format)
 
   return resp
