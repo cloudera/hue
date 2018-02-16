@@ -409,7 +409,7 @@ from desktop.views import _ko
                   </a>
                   <ul class="dropdown-menu">
                     <li data-bind="css: { 'disabled': directorySelected() || selectedEntries().length < 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }">
-                      <a href="javascript:void(0);" data-bind="click: function () {  copy() }"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
+                      <a href="javascript:void(0);" data-bind="click: function () {  copy() }"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a>
                     </li>
                     <!-- ko if: isTrash() -->
                     <li data-bind="css: { 'disabled': selectedEntries().length === 0 }">
