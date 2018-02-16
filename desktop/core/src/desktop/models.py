@@ -929,8 +929,7 @@ class Document2QueryMixin(object):
       documents = documents.filter(type__in=types)
 
     if search_text:
-      documents = documents.filter(Q(uuid__icontains=search_text) | Q(name__icontains=search_text) | Q(description__icontains=search_text) |
-                                   Q(search__icontains=search_text))
+      documents = documents.filter(Q(name__icontains=search_text) | Q(description__icontains=search_text) | Q(search__icontains=search_text))
 
     if order_by:  # TODO: Validate that order_by is a valid sort parameter
       documents = documents.order_by(order_by)
