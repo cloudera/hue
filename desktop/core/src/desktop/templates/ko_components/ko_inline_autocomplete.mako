@@ -27,8 +27,23 @@ from desktop.views import _ko
   <script type="text/html" id="inline-autocomplete-template">
     <div class="inline-autocomplete-container">
       <div>
-        <input class="inline-autocomplete-input" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" data-bind="attr: { 'placeHolder' : hasFocus() ? '' : placeHolder }, textInput: searchInput, hasFocus: hasFocus, clearable: { value: searchInput, onClear: onClear }">
-        <input class="inline-autocomplete-autocomplete" disabled type="text" data-bind="value: inlineAutocomplete">
+        <!-- ko if: showMagnify -->
+          <!-- ko ifnot: spin -->
+          <i style="top: 6px;" class="inline-autocomplete-magnify-icon fa fa-fw fa-search"></i>
+          <!-- /ko -->
+          <!-- ko if: spin -->
+          <i class="inline-autocomplete-magnify-icon fa fa-fw fa-spinner fa-spin"></i>
+          <!-- /ko -->
+        <!-- /ko-->
+        <input class="inline-autocomplete-input" autocorrect="off" autocapitalize="off" spellcheck="false" type="text" data-bind="
+          attr: { 'placeHolder' : hasFocus() ? '' : placeHolder },
+          textInput: searchInput,
+          hasFocus: hasFocus,
+          clearable: { value: searchInput, onClear: onClear },
+          css: { 'inline-autocomplete-magnify-input': showMagnify }">
+        <input class="inline-autocomplete-autocomplete" disabled type="text" data-bind="
+          value: inlineAutocomplete,
+          css: { 'inline-autocomplete-magnify-input': showMagnify }">
       </div>
     </div>
   </script>
@@ -54,6 +69,8 @@ from desktop.views import _ko
         var self = this;
         self.disposals = [];
 
+        self.showMagnify = !!params.showMagnify;
+        self.spin = params.spin;
         self.placeHolder = params.placeHolder || '${ _('Filter...') }';
         self.hasFocus = params.hasFocus || ko.observable();
         self.querySpec = params.querySpec;
@@ -77,7 +94,7 @@ from desktop.views import _ko
         });
 
         self.inlineAutocomplete = ko.pureComputed(function () {
-          if (self.suggestions().length === 0) {
+          if (!self.hasFocus() || self.suggestions().length === 0) {
             return '';
           }
           return self.suggestions()[self.selectedSuggestionIndex()];
@@ -87,6 +104,7 @@ from desktop.views import _ko
 
         var querySpecSub = self.querySpec.subscribe(function (newVal) {
           if (!newVal || !newVal.query) {
+            self.lastParseResult = {};
             self.searchInput('');
             self.clearSuggestions();
           }
