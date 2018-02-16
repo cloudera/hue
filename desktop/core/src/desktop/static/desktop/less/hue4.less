@@ -259,7 +259,7 @@
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  max-width: 600px;
+  max-width: 700px;
 }
 
 .search-container-top-old,
@@ -280,7 +280,7 @@
 
 .search-container > input {
   .flex(1 1 100%);
-  border-radius: 4px 0 0 4px;
+  border-radius: 2px 0 0 2px;
   border: 1px solid @cui-gray-300;
   border-right: none;
   box-shadow: none;
@@ -295,11 +295,11 @@
 .search-container-top .inline-autocomplete-container {
   position: relative;
   margin-top: 8px;
-  height: 31px;
+  height: 30px;
   width: 100%;
 
   > div {
-    right: 10px !important;
+    right: 40px !important;
   }
 }
 
@@ -944,15 +944,26 @@ a:visited {
   .hue-box-shadow-bottom();
 
   .global-search-alternatives {
-    .flex(0 0 175px);
+    .flex(0 0 35%);
+    position: relative;
+    min-width: 175px;
     border-right: 1px solid @cui-default-border-color;
-    font-size: 13px;
+    font-size: 14px;
     overflow-y: auto;
+
+    > .hue-spinner-inline {
+      margin: 4px;
+    }
+
+    &.global-search-full-width {
+      .flex(0 0 100%);
+      border-right: none;
+    }
 
     .global-search-category {
       .global-search-category-header {
         color: @hue-primary-color-dark;
-        padding-left: 5px;
+        padding: 5px;
         border-bottom: 1px solid @cui-gray-100;
       }
 
@@ -964,7 +975,8 @@ a:visited {
           .no-select();
           .pointer();
           .nowrap-ellipsis();
-          padding: 2px 0 2px 7px;
+
+          padding: 3px 0 3px 8px;
           > em {
             font-style: normal;
             font-weight: 600;
@@ -981,6 +993,14 @@ a:visited {
     padding-top: 10px;
     .display-flex();
     .flex(1);
+
+    .global-search-close-preview {
+      position: absolute;
+      top: 3px;
+      right: 10px;
+      width: 18px;
+      height: 18px;
+    }
 
     .context-popover-tab {
       background-color: transparent !important;

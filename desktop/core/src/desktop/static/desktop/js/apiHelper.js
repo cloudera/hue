@@ -1740,35 +1740,35 @@ var ApiHelper = (function () {
   };
 
   ApiHelper.prototype.fetchHueDocsInteractive = function (query) {
-    var promise = $.Deferred();
-    $.post(INTERACTIVE_SEARCH_API, {
+    var deferred = $.Deferred();
+    var request = $.post(INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(query),
-      limit: 5,
+      limit: 50,
       sources: '["documents"]'
     }).done(function (data) {
       if (data.status === 0) {
-        promise.resolve(data);
+        deferred.resolve(data);
       } else {
-        promise.reject(data);
+        deferred.reject(data);
       }
-    }).fail(promise.reject);
-    return promise;
+    }).fail(deferred.reject);
+    return new CancellablePromise(deferred, request);
   };
 
   ApiHelper.prototype.fetchNavEntitiesInteractive = function (query) {
-    var promise = $.Deferred();
-    $.post(INTERACTIVE_SEARCH_API, {
+    var deferred = $.Deferred();
+    var request = $.post(INTERACTIVE_SEARCH_API, {
       query_s: ko.mapping.toJSON(query),
-      limit: 5,
+      limit: 50,
       sources: '["sql", "hdfs", "s3"]'
     }).done(function (data) {
       if (data.status === 0) {
-        promise.resolve(data);
+        deferred.resolve(data);
       } else {
-        promise.reject(data);
+        deferred.reject(data);
       }
-    }).fail(promise.reject);
-    return promise;
+    }).fail(deferred.reject);
+    return new CancellablePromise(deferred, request);
   };
 
   ApiHelper.prototype.searchEntities = function (options) {
