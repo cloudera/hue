@@ -750,7 +750,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
             <!-- ko if: $parent.history().length > 0 -->
             <table class="table table-condensed margin-top-10 history-table">
-              <tbody data-bind="foreach: $parent.history">
+              <tbody data-bind="foreach: { data: $parent.history, afterRender: function(){ huePubSub.publish('editor.calculate.history.height'); } }">
                 <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid()); } }, css: { 'highlight': uuid() == $root.selectedNotebook().uuid(), 'pointer': uuid() != $root.selectedNotebook().uuid() }">
                   <td style="width: 100px" class="muted" data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}">
                     <span data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></span>
@@ -3015,6 +3015,13 @@ function togglePresentation(value) {};
       }
       if (scrollElement.data('scrollFnDt')) {
         scrollElement.off('scroll', scrollElement.data('scrollFnDt'));
+      }
+    }, HUE_PUB_SUB_EDITOR_ID);
+
+    huePubSub.subscribe('editor.calculate.history.height', function () {
+      if (viewModel.editorMode() && (viewModel.selectedNotebook().historyInitialHeight() === 0 || viewModel.selectedNotebook().forceHistoryInitialHeight())) {
+        viewModel.selectedNotebook().historyInitialHeight($('.history-table').height() + 80); // add pagination too
+        viewModel.selectedNotebook().forceHistoryInitialHeight(false);
       }
     }, HUE_PUB_SUB_EDITOR_ID);
 

@@ -1385,6 +1385,7 @@ var EditorViewModel = (function() {
       if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
       }
+
       if (self.isSqlDialect()) {
         huePubSub.publish('editor.refresh.statement.locations', self);
       }
@@ -1400,6 +1401,8 @@ var EditorViewModel = (function() {
       self.lastExecuted(now);
       $(".jHueNotify").remove();
       hueAnalytics.log('notebook', 'execute/' + self.type());
+
+      notebook.forceHistoryInitialHeight(true);
 
       if (self.result.handle()) {
         self.close();
@@ -2242,7 +2245,8 @@ var EditorViewModel = (function() {
       }
     });
     self.loadingHistory = ko.observable(self.history().length == 0);
-    self.historyInitialHeight = ko.observable(0);
+    self.historyInitialHeight = ko.observable(0).extend({ throttle: 1000 });
+    self.forceHistoryInitialHeight = ko.observable(false);
     self.historyCurrentPage = ko.observable(vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1);
     self.historyCurrentPage.subscribe(function(val) {
       self.fetchHistory();
@@ -2855,7 +2859,6 @@ var EditorViewModel = (function() {
       }
       if (vm.editorMode() && self.history().length == 0) {
         self.fetchHistory(function() {
-          self.historyInitialHeight((self.history().length * 32) + 80); // add pagination too
           self.updateHistory(['starting', 'running'], 30000);
           self.updateHistory(['available'], 60000 * 5);
         });
