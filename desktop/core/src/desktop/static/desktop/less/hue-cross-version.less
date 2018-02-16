@@ -564,7 +564,7 @@ ul.errorlist {
 
 .inline-autocomplete-container {
   position: relative;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid @cui-gray-300;
   background-color: @cui-white;
 
@@ -573,6 +573,14 @@ ul.errorlist {
     left: 0;
     right: 0;
     height: 30px;
+
+    .inline-autocomplete-magnify-icon {
+      position: absolute;
+      left: 10px;
+      top: 7px;
+      font-size: 16px;
+      color: @cui-gray-700;
+    }
 
     input {
       display: block;
@@ -585,6 +593,10 @@ ul.errorlist {
       font-size: 15px;
       line-height: 15px;
       background-color: transparent;
+
+      &.inline-autocomplete-magnify-input {
+        padding-left: 35px;
+      }
 
       &.inline-autocomplete-input {
         z-index: 2;

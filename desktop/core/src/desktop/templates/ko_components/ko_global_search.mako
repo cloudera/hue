@@ -32,27 +32,31 @@ from desktop.views import _ko
       params: {
         hasFocus: searchHasFocus,
         disableNavigation: true,
+        showMagnify: true,
+        spin: loading,
         placeHolder: '${ _ko('Search data and saved documents...') if has_navigator(user) else _ko('Search saved documents...') }',
         querySpec: querySpec,
         onClear: function () { selectedIndex(null); searchResultVisible(false); },
-        facets: ['type', 'tags'],
+        facets: ['type', 'tags', 'parentPath', 'originalName'],
         knownFacetValues: knownFacetValues,
         autocompleteFromEntries: autocompleteFromEntries,
         triggerObservable: searchResultCategories
       }
     } --><!-- /ko -->
-    <!-- ko if: searchResultVisible-->
-    <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, css: { 'global-search-empty' : searchResultCategories().length === 0 }, style: { 'height' : heightWhenDragging }">
-      <!-- ko hueSpinner: { spin: loading() && searchResultCategories().length === 0 , center: true, size: 'large' } --><!-- /ko -->
-      <!-- ko if: !loading() && searchResultCategories().length === 0 -->
-        <div>${ _('No results found.') }</div>
-      <!-- /ko -->
-      <!-- ko if: searchResultCategories().length > 0 -->
-      <div class="global-search-alternatives" data-bind="niceScroll" style="position:relative;">
+    <!-- ko if: searchResultVisible()  -->
+    <!-- ko if: !loading() && searchResultCategories().length === 0 -->
+    <div class="global-search-results global-search-empty" data-bind="onClickOutside: onResultClickOutside">
+      <div>${ _('No results found.') }</div>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: searchResultCategories().length > 0 -->
+    <div class="global-search-results" data-bind="onClickOutside: onResultClickOutside, style: { 'height' : heightWhenDragging }">
+      <div class="global-search-alternatives" data-bind="niceScroll, css: { 'global-search-full-width': !selectedResult() }">
         <!-- ko foreach: searchResultCategories -->
         <div class="global-search-category">
           <div class="global-search-category-header" data-bind="text: label"></div>
-          <ul data-bind="foreach: result">
+          <ul>
+            <!-- ko foreach: expanded() ? result : topMatches -->
             <!-- ko if: typeof draggable !== 'undefined' -->
             <li data-bind="multiClick: {
                 click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
@@ -65,25 +69,30 @@ from desktop.views import _ko
                 dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
               }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }"></li>
             <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: topMatches.length < result.length && !expanded() -->
+            <li class="blue" data-bind="toggle: expanded">${ _('Show more...') }</li>
+            <!-- /ko -->
           </ul>
         </div>
         <!-- /ko -->
-        <!-- ko hueSpinner: { spin: loading() && searchResultCategories().length > 0, center: true, inline: true } --><!-- /ko -->
+        <!-- ko hueSpinner: { spin: loading() && searchResultCategories().length > 0, inline: true } --><!-- /ko -->
       </div>
+      <!-- ko with: selectedResult -->
       <div class="global-search-preview" style="overflow: auto;">
-        <!-- ko with: selectedResult -->
+          <div class="global-search-close-preview"><a href="javscript: void(0);" data-bind="click: function () { $parent.selectedIndex(undefined); }"><i class="fa fa-fw fa-times"></i></a></div>
           <!-- ko switch: type -->
-            <!-- ko case: ['database', 'document', 'field', 'table', 'view', 'hueApp']  -->
+            <!-- ko case: ['database', 'document', 'field', 'table', 'view']  -->
               <!-- ko component: { name: 'context-popover-contents-global-search', params: { data: data, globalSearch: $parent } } --><!-- /ko -->
             <!-- /ko -->
             <!-- ko case: $default -->
               <pre data-bind="text: ko.mapping.toJSON($data)"></pre>
             <!-- /ko -->
           <!-- /ko -->
-        <!--/ko -->
       </div>
-      <!-- /ko -->
+      <!--/ko -->
     </div>
+    <!-- /ko -->
     <!-- /ko -->
   </script>
 
@@ -110,10 +119,13 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
-      var GlobalSearch = function (params) {
+      var GlobalSearch = function () {
         var self = this;
         self.apiHelper = ApiHelper.getInstance();
-        self.knownFacetValues = ko.observable({});
+        self.knownFacetValues = ko.observable({
+          'type': { 'field': 1, 'table': 1, 'view': 1, 'database': 1, 'partition': 1, 'document' : 1 }
+        });
+        self.cancellablePromises = [];
 
         self.autocompleteThrottle = -1;
         self.fetchThrottle = -1;
@@ -125,15 +137,21 @@ from desktop.views import _ko
         self.heightWhenDragging = ko.observable(null);
         self.searchResultCategories = ko.observableArray([]);
         self.selectedIndex = ko.observable();
-        self.loading = ko.observable(false);
+
+        self.loadingNav = ko.observable(false);
+        self.loadingDocs = ko.observable(false);
+
+        self.loading = ko.pureComputed(function () {
+          return self.loadingNav() || self.loadingDocs();
+        });
+
+        self.initializeFacetValues();
 
         self.selectedResult = ko.pureComputed(function () {
           if (self.selectedIndex()) {
             return self.searchResultCategories()[self.selectedIndex().categoryIndex].result[self.selectedIndex().resultIndex]
-          } else if (self.searchResultCategories().length > 0 && self.searchResultCategories()[0].result.length > 0) {
-            return self.searchResultCategories()[0].result[0];
           }
-        }).extend({ deferred: true });;
+        }).extend({ deferred: true });
 
         var deferredCloseIfVisible = function () {
           window.setTimeout(function () {
@@ -160,19 +178,21 @@ from desktop.views import _ko
         });
 
         self.querySpec.subscribe(function (newValue) {
+          window.clearTimeout(self.fetchThrottle);
           if (newValue && newValue.query !== '') {
-            window.clearTimeout(self.fetchThrottle);
             self.fetchThrottle = window.setTimeout(function () {
-              self.fetchResults(newValue.query);
-            }, 500);
+              self.fetchResults(newValue);
+            }, 600);
           } else {
+            self.searchResultVisible(false);
             self.selectedIndex(undefined);
             self.searchResultCategories([]);
+            self.cancelRunningRequests();
           }
         });
 
         self.autocompleteFromEntries = function (lastNonPartial, partial) {
-          var result;
+          var result = undefined;
           var partialLower = partial.toLowerCase();
           self.searchResultCategories().every(function (category) {
             return category.result.every(function (entry) {
@@ -213,7 +233,7 @@ from desktop.views import _ko
 
           if (event.keyCode === 13 && self.searchHasFocus() && self.querySpec() && self.querySpec().query !== '') {
             window.clearTimeout(self.fetchThrottle);
-            self.fetchResults(self.querySpec().query);
+            self.fetchResults(self.querySpec());
             return;
           }
 
@@ -250,8 +270,28 @@ from desktop.views import _ko
         });
       };
 
+      GlobalSearch.prototype.initializeFacetValues = function () {
+        var self = this;
+        DataCatalog.getAllNavigatorTags({ silenceErrors: true }).done(function (facets) {
+          var facetValues = self.knownFacetValues();
+          facetValues['tags'] = facets;
+        });
+      };
+
+      GlobalSearch.prototype.cancelRunningRequests = function () {
+        var self = this;
+        while (self.cancellablePromises.length) {
+          var promise = self.cancellablePromises.pop();
+          if (promise.cancel) {
+            promise.cancel();
+          }
+        }
+      };
+
       GlobalSearch.prototype.close = function () {
         var self = this;
+        window.clearTimeout(self.fetchThrottle);
+        self.cancelRunningRequests();
         self.searchResultVisible(false);
         self.querySpec({
           query: '',
@@ -271,10 +311,6 @@ from desktop.views import _ko
           } else {
             huePubSub.publish('open.link', '/hue' + selectedResult.data.link);
           }
-        } else if (selectedResult.type === 'hueApp' && selectedResult.data.interpreter && selectedResult.data.interpreter.page) {
-          huePubSub.publish('open.link', selectedResult.data.interpreter.page);
-        } else if (selectedResult.type === 'hueApp' && selectedResult.data.app && selectedResult.data.app.page) {
-          huePubSub.publish('open.link', selectedResult.data.app.page);
         }
         self.close();
       };
@@ -305,7 +341,6 @@ from desktop.views import _ko
         }
       };
 
-      var HUE_APP_CATEGORY = 'hueApp';
       var HUE_DOC_CATEGORY = 'documents';
       var NAV_CATEGORY = 'nav';
 
@@ -315,15 +350,7 @@ from desktop.views import _ko
         'field': '${ _('Columns') }',
         'partition': '${ _('Partitions') }',
         'view': '${ _('Views') }',
-        'hueDoc': '${ _('Documents') }',
-        'hueApp': '${ _('Applications') }'
-      };
-
-
-      GlobalSearch.prototype.fetchHueConfig = function () {
-        var promise = $.Deferred();
-        huePubSub.publish('cluster.config.get.config', promise.resolve);
-        return promise;
+        'hueDoc': '${ _('Documents') }'
       };
 
       GlobalSearch.prototype.updateCategories = function (type, categoriesToAdd) {
@@ -366,163 +393,163 @@ from desktop.views import _ko
         }
       };
 
-      GlobalSearch.prototype.fetchResults = function (query) {
+      var labelPrioritySort = function (a, b) {
+        var aLabelMatchIndex = a.label.indexOf('<em>');
+        var bLabelMatchIndex = b.label.indexOf('<em>');
+        if (aLabelMatchIndex === 0 && bLabelMatchIndex !== 0) {
+          return -1;
+        } else if (aLabelMatchIndex !== 0 && bLabelMatchIndex === 0) {
+          return 1;
+        } else if (aLabelMatchIndex !== -1 && bLabelMatchIndex === -1) {
+          return -1;
+        } else if (aLabelMatchIndex === -1 && bLabelMatchIndex !== -1) {
+          return 1;
+        } else if (aLabelMatchIndex !== -1 && bLabelMatchIndex !== -1) {
+          return aLabelMatchIndex - bLabelMatchIndex;
+        }
+        return a.originalIndex - b.originalIndex;
+      };
+
+      GlobalSearch.prototype.fetchResults = function (querySpec) {
         var self = this;
-        self.loading(true);
+        self.cancelRunningRequests();
+        if (/:$/.test(querySpec.query)) {
+          self.searchResultVisible(false);
+          return;
+        }
+        self.loadingDocs(true);
         self.searchResultVisible(true);
-        var hueDocsPromise = self.apiHelper.fetchHueDocsInteractive(query);
-        var navPromise = self.apiHelper.fetchNavEntitiesInteractive(query);
-        var hueAppsPromise = self.fetchHueConfig();
 
-        hueAppsPromise.done(function (apps) {
-          var categories = [];
 
-          if (apps && apps.app_config) {
-            var hueApps = {
-              type: HUE_APP_CATEGORY,
-              label: CATEGORIES[HUE_APP_CATEGORY],
-              result: [],
-              weight: 1
-            };
-            Object.keys(apps.app_config).forEach(function (appConfigKey) {
-              var appCatecory = apps.app_config[appConfigKey];
-              var addAll = appCatecory.name.toLowerCase().indexOf(query) === 0 || appCatecory.displayName.toLowerCase().indexOf(query) === 0;
-              if (appCatecory.interpreters) {
-                appCatecory.interpreters.forEach(function (interpreter) {
-                  // Special case for metastore that is now called table browser and hdfs
-                  var specialMatch = appCatecory.name === 'browser' && (
-                    (interpreter.type === 'tables' && 'metastore'.indexOf(query.toLowerCase()) === 0) ||
-                    (interpreter.type === 'hdfs' && 'hdfs'.indexOf(query.toLowerCase()) === 0));
-                  if (addAll || specialMatch || interpreter.displayName.toLowerCase().indexOf(query.toLowerCase()) === 0) {
-                    var label;
-                    if (appCatecory.name === 'browser') {
-                      label = '${ _('Browse') } ' + interpreter.displayName;
-                    } else {
-                      label = interpreter.displayName + ' ' + appCatecory.displayName;
-                    }
-                    hueApps.result.push({
-                      label: label,
-                      type: HUE_APP_CATEGORY,
-                      data: {
-                        interpreter: interpreter,
-                        app: appCatecory,
-                        type: HUE_APP_CATEGORY,
-                        originalName: interpreter.displayName
-                      }
-                    })
-                  }
-                })
-              }
-            })
-          }
-          if (hueApps.result.length > 0) {
-            hueApps.result.sort(function (a, b) {
-              return a.label.localeCompare(b.label);
-            });
-            categories.push(hueApps);
-          }
+        var clearDocsTimeout = window.setTimeout(function () {
+          self.updateCategories(HUE_DOC_CATEGORY, []);
+        }, 300);
 
-          self.updateCategories(HUE_APP_CATEGORY, categories);
-        });
+        var docQuery = querySpec.query;
+        var docOnly = querySpec.facets && querySpec.facets['type'] && querySpec.facets['type']['document'];
+        if (docOnly) {
+          docQuery = querySpec.text.join(' ');
+        }
 
-        hueDocsPromise.done(function (data) {
+        self.cancellablePromises.push(self.apiHelper.fetchHueDocsInteractive(docQuery).always(function () {
+          self.loadingDocs(false);
+          window.clearTimeout(clearDocsTimeout);
+        }).done(function (data) {
           var categories = [];
 
           var docCategory = {
             label: CATEGORIES.hueDoc,
             result: [],
+            expanded: ko.observable(false),
             type: HUE_DOC_CATEGORY,
             weight: 3
           };
 
+          var i = 0;
           data.results.forEach(function (doc) {
-            docCategory.result.push({
-              label: doc.hue_name,
-              draggable: doc.originalName,
-              draggableMeta: {
-                source: 'globalSearch'
-              },
-              type: 'document',
-              data: doc
-            })
-          });
-
-          if (docCategory.result.length) {
-            categories.push(docCategory);
-          }
-
-          self.updateCategories(HUE_DOC_CATEGORY, categories);
-        });
-
-        navPromise.done(function (data) {
-          if (data.facets) {
-            var facetValues = ko.unwrap(self.knownFacetValues);
-            Object.keys(data.facets).forEach(function (facet) {
-              if (!facetValues[facet] && Object.keys(data.facets[facet]).length > 0) {
-                facetValues[facet] = {};
-              }
-              Object.keys(data.facets[facet]).forEach(function (facetKey) {
-                facetValues[facet][facetKey] = data.facets[facet][facetKey];
-              });
-            })
-          }
-          var categories = [];
-          var newCategories = {};
-          data.results.forEach(function (result) {
-            var typeLower = result.type.toLowerCase();
-            if (CATEGORIES[typeLower]) {
-              var category = newCategories[typeLower];
-              if (!category) {
-                category = {
-                  label: CATEGORIES[typeLower],
-                  result: [],
-                  type: NAV_CATEGORY,
-                  weight: 2
-                };
-                newCategories[typeLower] = category;
-              }
-              var meta = {
-                source: 'globalSearch'
-              };
-              if (result.type.toLowerCase() === 'database') {
-                meta.type = 'sql';
-                meta.database = result.originalName
-              } else if (result.type.toLowerCase() === 'table') {
-                meta.type = 'sql';
-                var split = result.originalName.split('.');
-                if (split.length == 2) {
-                  meta.database = split[0];
-                  meta.table = split[1];
-                }
-              } else if (result.type.toLowerCase() === 'field') {
-                meta.type = 'sql';
-                var split = result.originalName.split('.');
-                if (split.length >= 3) {
-                  meta.database = split[0];
-                  meta.table = split[1];
-                  meta.column = split[2];
-                }
-              }
-              category.result.push({
-                label: result.hue_name || result.originalName,
-                draggable: result.originalName,
-                draggableMeta: meta,
-                type: typeLower,
-                data: result
+            if (doc.hue_name.indexOf('.') !== 0) {
+              docCategory.result.push({
+                label: doc.hue_name,
+                draggable: doc.originalName,
+                draggableMeta: {
+                  source: 'globalSearch'
+                },
+                type: 'document',
+                data: doc,
+                originalIndex: i++
               })
             }
           });
 
-          Object.keys(newCategories).forEach(function (key) {
-            categories.push(newCategories[key]);
+          if (docCategory.result.length) {
+            docCategory.result.sort(labelPrioritySort);
+            docCategory.topMatches = docCategory.result.slice(0, 6);
+            categories.push(docCategory);
+          }
+
+          self.updateCategories(HUE_DOC_CATEGORY, categories);
+        }));
+
+        if (!docOnly) {
+          var clearNavTimeout = window.setTimeout(function () {
+            self.updateCategories(NAV_CATEGORY, []);
+          }, 300);
+
+          var navQuery = querySpec.query;
+          // Add * in front of each term unless already there
+          querySpec.text.forEach(function (textPart) {
+            if (textPart.indexOf('*') === -1 && navQuery.indexOf('*' + textPart) === -1) {
+              navQuery = navQuery.replace(textPart, '*' + textPart);
+            }
           });
 
-          self.updateCategories(NAV_CATEGORY, categories);
-        });
+          self.loadingNav(true);
+          self.cancellablePromises.push(self.apiHelper.fetchNavEntitiesInteractive(navQuery).always(function () {
+            self.loadingNav(false);
+            window.clearTimeout(clearNavTimeout);
+          }).done(function (data) {
+            var categories = [];
+            var newCategories = {};
+            data.results.forEach(function (result) {
+              var typeLower = result.type.toLowerCase();
+              if (CATEGORIES[typeLower]) {
+                var category = newCategories[typeLower];
+                if (!category) {
+                  category = {
+                    label: CATEGORIES[typeLower],
+                    result: [],
+                    expanded: ko.observable(false),
+                    type: NAV_CATEGORY,
+                    weight: 2
+                  };
+                  newCategories[typeLower] = category;
+                }
+                var meta = {
+                  source: 'globalSearch'
+                };
+                if (result.type.toLowerCase() === 'database') {
+                  meta.type = 'sql';
+                  meta.database = result.originalName
+                } else if (result.type.toLowerCase() === 'table') {
+                  meta.type = 'sql';
+                  var split = result.originalName.split('.');
+                  if (split.length == 2) {
+                    meta.database = split[0];
+                    meta.table = split[1];
+                  }
+                } else if (result.type.toLowerCase() === 'field') {
+                  meta.type = 'sql';
+                  var split = result.originalName.split('.');
+                  if (split.length >= 3) {
+                    meta.database = split[0];
+                    meta.table = split[1];
+                    meta.column = split[2];
+                  }
+                }
+                category.result.push({
+                  label: result.hue_name || result.originalName,
+                  draggable: result.originalName,
+                  draggableMeta: meta,
+                  type: typeLower,
+                  data: result
+                });
+              }
+            });
 
-        $.when.apply($, [hueAppsPromise, navPromise, hueDocsPromise]).always(function () {
-          self.loading(false);
-        })
+            Object.keys(newCategories).forEach(function (key) {
+              var category = newCategories[key];
+              if (category.result.length) {
+                category.result.sort(labelPrioritySort);
+                category.topMatches = category.result.slice(0, 6);
+                categories.push(category);
+              }
+            });
+
+            self.updateCategories(NAV_CATEGORY, categories);
+          }));
+        } else {
+          self.updateCategories(NAV_CATEGORY, []);
+        }
       };
 
       ko.components.register('hue-global-search', {
