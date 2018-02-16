@@ -25,7 +25,7 @@
   from desktop import conf
   from django.utils.translation import ugettext as _
 
-  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED
+  from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED, USE_GRIDSTER
 %>
 
 <%def name="import_layout(with_deferred=False)">
@@ -51,19 +51,21 @@
   %if not hasattr(caller, "skipLayout"):
   <div style="float: left" data-bind="visible: columns().length == 0 && isEditing">
     <div class="toolbar-label">${_('LAYOUT')}</div>
-    % if not HAS_QUERY_BUILDER_ENABLED.get():
+    % if not USE_GRIDSTER.get():
     <a href="javascript: magicSearchLayout(searchViewModel)" title="${ _('Dynamic dashboard: multiple interconnected widgets') }" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
         <div class="layout-box" style="width: 72px; margin-left: 4px"><i class="fa fa-line-chart"></i></div>
       </div>
-    </a>    
+    </a>
     % else:
     <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Explore with multiple interconnected widgets') }" onmouseover="searchViewModel.previewColumns('dashboard')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px; margin-left: 4px"><i class="fa fa-line-chart"></i></div>
       </div>
     </a>
+    % endif
+    % if HAS_QUERY_BUILDER_ENABLED.get():
     <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Query Builder to slice and dice dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"><i class="fa fa-superscript"></i></div>
