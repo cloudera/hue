@@ -188,6 +188,13 @@
 
   window.LOGGED_USERNAME = '${ user.username }';
 
+  var userGroups = [];
+  % for group in user.groups.all():
+    userGroups.push('${ group }');
+  % endfor
+
+  window.LOGGED_USERGROUPS = userGroups;
+
   window.METASTORE_PARTITION_LIMIT = ${ hasattr(LIST_PARTITIONS_LIMIT, 'get') and LIST_PARTITIONS_LIMIT.get() or 1000 };
 
   window.SQL_COLUMNS_KNOWN_FACET_VALUES = {

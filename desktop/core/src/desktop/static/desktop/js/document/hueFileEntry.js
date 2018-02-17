@@ -85,7 +85,6 @@ var HueFileEntry = (function () {
     self.apiHelper = options.apiHelper;
     self.app = options.app;
     self.user = options.user;
-    self.userGroups = options.userGroups;
     self.superuser = options.superuser;
     self.serverTypeFilter = options.serverTypeFilter || ko.observable({ type: 'all' });
     self.statsVisible = ko.observable(false);
@@ -182,7 +181,7 @@ var HueFileEntry = (function () {
             return user.username == self.user;
           }).length > 0
           || perms.write.groups.filter(function (writeGroup) {
-            return self.userGroups.indexOf(writeGroup) !== -1
+            return LOGGED_USERGROUPS.indexOf(writeGroup.name) !== -1
           }).length > 0));
     });
 
