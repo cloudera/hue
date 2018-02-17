@@ -443,7 +443,9 @@ window.hueUtils = window.hueUtils || (function () {
   };
 
   hueUtils.highlight = function (text, searchTerm) {
-    if(searchTerm === '' || text === '') return text;
+    if (searchTerm === '' || text === '') {
+      return text;
+    }
 
     var remText = text;
     var highLightedText = '';
@@ -458,7 +460,6 @@ window.hueUtils = window.hueUtils || (function () {
       } else {
          highLightedText += remText;
       }
-
     } while (startIndex >= 0);
 
     return highLightedText;
