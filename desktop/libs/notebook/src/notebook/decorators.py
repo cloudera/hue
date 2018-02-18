@@ -113,7 +113,7 @@ def api_error_handler(func):
       response['status'] = 2
       response['message'] = e.message
     except QueryError, e:
-      LOG.exception('Error running %s' % func)
+      LOG.exception('Error running %s' % func.__name__)
       response['status'] = 1
       response['message'] = smart_unicode(e)
       if response['message'].index("max_row_size"):
@@ -137,7 +137,7 @@ def api_error_handler(func):
       response['status'] = 1
       response['message'] = message.get('error')
     except Exception, e:
-      LOG.exception('Error running %s' % func)
+      LOG.exception('Error running %s' % func.__name__)
       response['status'] = -1
       response['message'] = smart_unicode(e)
     finally:
