@@ -3758,6 +3758,7 @@ $(document).ready(function () {
     huePubSub.publish('dashboard.window.resize');
   });
 
+  var isDraggingOrResizingWidgets = false;
 
   var WIDGET_BASE_HEIGHT = 50;
   $('.gridster>ul').gridster({
@@ -3774,11 +3775,13 @@ $(document).ready(function () {
       enabled: true,
       start: function (event, ui, $widget) {
         $widget.find('.card-widget').css('opacity', '.6');
+        isDraggingOrResizingWidgets = true;
       },
       stop: function (event, ui, $widget) {
         huePubSub.publish('resize.plotly.chart');
         huePubSub.publish('gridster.clean.whitespace');
         $widget.find('.card-widget').height($widget.height()).css('opacity', '1');
+        isDraggingOrResizingWidgets = false;
       },
     },
     draggable: {
@@ -4000,7 +4003,7 @@ $(document).ready(function () {
   }
 
   window.setInterval(function () {
-    if (searchViewModel.isGridster()) {
+    if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
       var $gridster = $('.gridster>ul').data('gridster');
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
@@ -4015,6 +4018,7 @@ $(document).ready(function () {
   var tempDraggable = null;
   var skipRestoreOnStop = false;
   huePubSub.subscribe('dashboard.top.widget.drag.start', function (options) {
+    isDraggingOrResizingWidgets = true;
     $('li.gs-w').each(function () {
       var $widget = $(this);
       $widget.attr('data-immutable-sizex', $widget.attr('data-sizex'));
@@ -4031,6 +4035,7 @@ $(document).ready(function () {
   }, 'dashboard');
 
   huePubSub.subscribe('dashboard.top.widget.drag.stop', function () {
+    isDraggingOrResizingWidgets = false;
     if (!skipRestoreOnStop) {
       restoreWidgetSizes();
     }
