@@ -140,6 +140,7 @@ AlterTable
  | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' RegularOrBacktickedIdentifier HiveForeignKeySpecification
  | AlterTableLeftSide AnyRename 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide HiveSpecificOperations
+ | AlterTableLeftSide ImpalaSpecificOperations
  | AlterTableLeftSide DropOperations
  | AlterTableLeftSide OptionalPartitionOperations
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations
@@ -151,6 +152,7 @@ AlterTable_EDIT
  | AlterTableLeftSide_EDIT AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs OptionalCachedInOrUncached
  | AlterTableLeftSide_EDIT AnyRename 'TO' RegularOrBackTickedSchemaQualifiedName
  | AlterTableLeftSide_EDIT HiveSpecificOperations
+ | AlterTableLeftSide_EDIT ImpalaSpecificOperations
  | AlterTableLeftSide_EDIT DropOperations
  | AlterTableLeftSide_EDIT OptionalPartitionOperations
  | AlterTableLeftSide_EDIT PartitionSpec OptionalPartitionOperations
@@ -218,6 +220,7 @@ AlterTable_EDIT
  | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' RegularOrBacktickedIdentifier HivePrimaryKeySpecification_EDIT
  | AlterTableLeftSide AnyAdd '<hive>CONSTRAINT' RegularOrBacktickedIdentifier HiveForeignKeySpecification_EDIT
  | AlterTableLeftSide HiveSpecificOperations_EDIT
+ | AlterTableLeftSide ImpalaSpecificOperations_EDIT
  | AlterTableLeftSide OptionalPartitionOperations_EDIT
  | AlterTableLeftSide DropOperations_EDIT
  | AlterTableLeftSide 'CURSOR'
@@ -229,9 +232,10 @@ AlterTable_EDIT
          'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDE',
          'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'CHANGE', 'DROP COLUMN',
-         'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS',
-         'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION','SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED']);
+       parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'ALTER', 'ALTER COLUMN', 'CHANGE',
+         'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS', 'RENAME TO',
+         'REPLACE COLUMNS', 'SET CACHED IN', 'SET COLUMN STATS', 'SET FILEFORMAT', 'SET LOCATION','SET SERDEPROPERTIES',
+         'SET TBLPROPERTIES', 'SET UNCACHED']);
      }
    }
  | AlterTableLeftSide PartitionSpec 'CURSOR'
@@ -262,7 +266,7 @@ AlterTable_EDIT
      if (parser.isHive()) {
        parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
      } else if (parser.isImpala()) {
-       parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
+       parser.suggestKeywords(['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
      }
    }
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations_EDIT
@@ -355,6 +359,119 @@ HiveSpecificOperations_EDIT
      parser.suggestKeywords(['PARTITION']);
    }
  | '<hive>TOUCH' OptionalPartitionSpec_EDIT
+ ;
+
+ImpalaSpecificOperations
+ : 'ALTER' OptionalImpalaColumn ColumnIdentifier 'SET' KuduStorageAttribute SetValue
+   {
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
+   }
+ | 'ALTER' OptionalImpalaColumn ColumnIdentifier 'DROP' '<impala>DEFAULT'
+   {
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
+   }
+ | 'SET' '<impala>COLUMN' '<impala>STATS' ColumnIdentifier ParenthesizedStatsList
+   {
+     parser.addColumnLocation($4.location, [ $4.identifier ]);
+   }
+ ;
+
+ImpalaSpecificOperations_EDIT
+ : 'ALTER' OptionalImpalaColumn 'CURSOR'
+   {
+     if (parser.isImpala()) {
+       if (!$2) {
+         parser.suggestKeywords(['COLUMN']);
+       }
+       parser.suggestColumns();
+     }
+   }
+ | 'ALTER' OptionalImpalaColumn ColumnIdentifier 'CURSOR'
+   {
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['DROP DEFAULT', 'SET BLOCK_SIZE', 'SET COMMENT', 'SET COMPRESSION', 'SET DEFAULT',
+         'SET ENCODING']);
+        parser.addColumnLocation($3.location, [ $3.identifier ]);
+     }
+   }
+ | 'ALTER' OptionalImpalaColumn ColumnIdentifier 'DROP' 'CURSOR'
+   {
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['DEFAULT']);
+       parser.addColumnLocation($3.location, [ $3.identifier ]);
+     }
+   }
+ | 'ALTER' OptionalImpalaColumn ColumnIdentifier 'SET' 'CURSOR'
+   {
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['BLOCK_SIZE', 'COMMENT', 'COMPRESSION', 'DEFAULT', 'ENCODING']);
+       parser.addColumnLocation($3.location, [ $3.identifier ]);
+     }
+   }
+ | 'ALTER' OptionalImpalaColumn ColumnIdentifier 'SET' KuduStorageAttribute 'CURSOR'
+   {
+     parser.addColumnLocation($3.location, [ $3.identifier ]);
+   }
+ | 'SET' '<impala>COLUMN' 'CURSOR'
+   {
+     parser.suggestKeywords(['STATS']);
+   }
+ | 'SET' '<impala>COLUMN' '<impala>STATS' 'CURSOR'
+   {
+     parser.suggestColumns();
+   }
+ | 'SET' '<impala>COLUMN' '<impala>STATS' ColumnIdentifier 'CURSOR'
+   {
+     parser.addColumnLocation($4.location, [ $4.identifier ]);
+   }
+ | 'SET' '<impala>COLUMN' '<impala>STATS' ColumnIdentifier ParenthesizedStatsList_EDIT
+   {
+     parser.addColumnLocation($4.location, [ $4.identifier ]);
+   }
+ ;
+
+KuduStorageAttribute
+ : '<impala>BLOCK_SIZE'
+ | '<impala>COMMENT'
+ | '<impala>COMPRESSION'
+ | '<impala>DEFAULT'
+ | '<impala>ENCODING'
+ ;
+
+OptionalImpalaColumn
+ :
+ | '<impala>COLUMN'
+ ;
+
+ParenthesizedStatsList
+ : '(' StatsList ')'
+ ;
+
+ParenthesizedStatsList_EDIT
+ : '(' StatsList_EDIT RightParenthesisOrError
+ ;
+
+StatsList
+ : StatsAssignment
+ | StatsList ',' StatsAssignment
+ ;
+
+StatsList_EDIT
+ : StatsAssignment_EDIT
+ | StatsList ',' StatsAssignment_EDIT
+ | StatsList ',' StatsAssignment_EDIT ',' StatsList
+ | StatsAssignment_EDIT ',' StatsList
+ ;
+
+StatsAssignment
+ : QuotedValue '=' QuotedValue
+ ;
+
+StatsAssignment_EDIT
+ : 'CURSOR'
+   {
+     parser.suggestIdentifiers(['\'avgSize\'', '\'maxSize\'', '\'numDVs\'', '\'numNulls\'']);
+   }
  ;
 
 OptionalPartitionOperations

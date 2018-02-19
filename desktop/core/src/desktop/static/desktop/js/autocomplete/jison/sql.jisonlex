@@ -316,6 +316,7 @@
 <impala>'ROLE'                             { return '<impala>ROLE'; }
 <impala>'ROLES'                            { return '<impala>ROLES'; }
 <impala>'STRUCT'                           { return 'STRUCT'; }
+<impala>'UNKNOWN'                          { return '<impala>UNKNOWN'; }
 <impala>\[BROADCAST\]                      { return '<impala>BROADCAST'; }
 <impala>\[NOSHUFFLE\]                      { return '<impala>NOSHUFFLE'; }
 <impala>\[SHUFFLE\]                        { return '<impala>SHUFFLE'; }

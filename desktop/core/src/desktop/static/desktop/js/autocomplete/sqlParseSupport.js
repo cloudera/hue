@@ -215,10 +215,9 @@ var SqlParseSupport = (function () {
     parser.getValueExpressionKeywords = function (valueExpression, extras) {
       var types = valueExpression.lastType ? valueExpression.lastType.types : valueExpression.types;
       // We could have valueExpression.columnReference to suggest based on column type
-      var keywords = ['<', '<=', '<=>', '<>', '=', '>', '>=', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN'];
+      var keywords = ['<', '<=', '<=>', '<>', '=', '>', '>=', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'IS NOT TRUE', 'IS TRUE', 'IS NOT FALSE', 'IS FALSE', 'NOT BETWEEN', 'NOT IN'];
       if (parser.isImpala()) {
-        keywords.push('IS DISTINCT FROM');
-        keywords.push('IS NOT DISTINCT FROM');
+        keywords = keywords.concat(['IS DISTINCT FROM', 'IS NOT DISTINCT FROM', 'IS NOT UNKNOWN', 'IS UNKNOWN']);
       }
       if (extras) {
         keywords = keywords.concat(extras);
@@ -1322,6 +1321,10 @@ var SqlParseSupport = (function () {
       parser.yy.result.suggestSetOptions = true;
     };
 
+    parser.suggestIdentifiers = function (identifiers) {
+      parser.yy.result.suggestIdentifiers = identifiers;
+    };
+
     parser.suggestColumns = function (details) {
       if (typeof details === 'undefined') {
         details = {identifierChain: []};
@@ -1843,7 +1846,7 @@ var SqlParseSupport = (function () {
     'suggestJoins', 'valueExpressionSuggest', 'applyTypeToSuggestions', 'applyArgumentTypesToSuggestions', 'commitLocations', 'identifyPartials',
     'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords',
     'suggestKeywords', 'suggestColRefKeywords', 'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions',
-    'suggestColumns', 'suggestGroupBys', 'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation',
+    'suggestColumns', 'suggestGroupBys', 'suggestIdentifiers', 'suggestOrderBys', 'suggestFilters', 'suggestKeyValues', 'suggestTables', 'addFunctionLocation',
     'addStatementLocation', 'firstDefined', 'addClauseLocation', 'addHdfsLocation', 'addDatabaseLocation', 'addColumnAliasLocation', 'addTableAliasLocation',
     'addSubqueryAliasLocation', 'addTableLocation', 'addAsteriskLocation', 'addVariableLocation', 'addColumnLocation', 'addCteAliasLocation', 'addUnknownLocation',
     'addColRefToVariableIfExists', 'suggestDatabases', 'suggestHdfs', 'suggestValues'];

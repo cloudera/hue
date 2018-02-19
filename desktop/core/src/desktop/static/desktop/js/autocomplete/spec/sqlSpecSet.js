@@ -37,6 +37,34 @@
       });
     });
 
+    describe('Impala specific', function () {
+      it('should handle "SET ALL; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SET ALL; ',
+          afterCursor: '',
+          noErrors: true,
+          dialect: 'impala',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "SET |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SET ',
+          afterCursor: '',
+          dialect: 'impala',
+          expectedResult: {
+            lowerCase: false,
+            suggestSetOptions: true,
+            suggestKeywords: ['ALL']
+          }
+        });
+      });
+    });
+
     describe('SET ROLE', function () {
 
       it('should handle "SET ROLE baaa;', function () {
