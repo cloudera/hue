@@ -731,7 +731,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <!-- /ko -->
       </ul>
       <div class="tab-content" style="border: none; overflow-x: hidden">
-        <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : $parent.historyInitialHeight() + 'px' }">
+        <div class="tab-pane" id="queryHistory" data-bind="css: {'active': currentQueryTab() == 'queryHistory'}, style: { 'height' : Math.max($parent.historyInitialHeight(), 40) + 'px' }">
           <!-- ko if: $parent.loadingHistory -->
           <div style="padding: 20px">
             <i class="fa fa-spinner fa-spin muted"></i>
