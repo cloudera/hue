@@ -3783,6 +3783,7 @@ $(document).ready(function () {
     },
     draggable: {
       handle: 'h2',
+      start: removePreviewHolder,
       stop: function (e, ui, $widget) {
         huePubSub.publish('gridster.clean.whitespace');
       }
