@@ -317,7 +317,7 @@ from desktop.views import _ko
                             data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')"
                           % endif
                           >
-                            <img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'hive' } } --><!-- /ko --> ${_('Hive Query')}
                           </a>
                         </li>
                       % endif
@@ -330,7 +330,7 @@ from desktop.views import _ko
                             data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala')"
                           % endif
                           >
-                            <img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'impala' } } --><!-- /ko --> ${_('Impala Query')}
                           </a>
                       </li>
                       % endif
@@ -340,44 +340,44 @@ from desktop.views import _ko
                       % if SHOW_NOTEBOOKS.get():
                         <li>
                           <a title="${_('Notebook')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('notebook:index') }')">
-                            <i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #0B7FAD;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'notebook' } } --><!-- /ko --> ${_('Notebook')}
                           </a>
                         </li>
                       % endif
                       % if 'pig' in apps:
                         <li>
                           <a title="${_('Pig Script')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('pig:index') }')">
-                            <img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig Script')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'pig' } } --><!-- /ko --> ${_('Pig Script')}
                           </a>
                         </li>
                       % endif
                       % if 'oozie' in apps:
                         <li>
                           <a title="${_('Oozie Workflow')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_workflow') }')">
-                            <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-workflow' } } --><!-- /ko --> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
                           </a>
                         </li>
                         <li>
                           <a title="${_('Oozie Schedule')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }')">
-                            <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-coordinator' } } --><!-- /ko --> ${_('Schedule') if is_embeddable else _('Oozie Coordinator')}
                           </a>
                         </li>
                         <li>
                           <a title="${_('Oozie Bundle')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('oozie:new_bundle') }')">
-                            <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'oozie-bundle' } } --><!-- /ko --> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
                           </a>
                         </li>
                       % endif
                       % if 'search' in apps:
                         <li>
                           <a title="${_('Solr Search')}" data-bind="hueLink: addDirectoryParamToUrl('${ url('search:new_search') }')">
-                            <img src="${ static('search/art/icon_search_48.png') }" class="app-icon" alt="${ _('Search icon') }"/> ${_('Dashboard')}
+                            <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${_('Dashboard')}
                           </a>
                         </li>
                       % endif
                       <li class="divider"></li>
                       <li data-bind="css: { 'disabled': isTrash() || isTrashed() || !canModify() }">
-                        <a href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }"><svg class="hi hi-fw"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
+                        <a href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }"><svg class="hi"><use xlink:href="#hi-folder"></use><use xlink:href="#hi-plus-addon"></use></svg> ${_('New folder')}</a>
                       </li>
                     </ul>
                   </span>
