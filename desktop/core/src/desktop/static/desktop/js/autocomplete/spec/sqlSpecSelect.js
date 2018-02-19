@@ -4565,7 +4565,7 @@
             lowerCase: false,
             suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
+            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS FALSE', 'IS NOT FALSE', 'IS NOT NULL', 'IS NOT TRUE', 'IS NULL', 'IS TRUE', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
       });
@@ -4579,7 +4579,7 @@
             lowerCase: false,
             suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
+            suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS FALSE', 'IS NOT FALSE', 'IS NOT NULL', 'IS NOT TRUE', 'IS NULL', 'IS TRUE', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
       });
@@ -4588,7 +4588,7 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id IS ',
           afterCursor: '',
-          containsKeywords: ['NOT NULL', 'NULL'],
+          containsKeywords: ['NOT NULL', 'NULL', 'NOT TRUE', 'TRUE', 'NOT FALSE', 'FALSE'],
           expectedResult: {
             lowerCase: false
           }
@@ -4599,7 +4599,7 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id IS NOT ',
           afterCursor: '',
-          containsKeywords: ['NULL'],
+          containsKeywords: ['NULL', 'FALSE', 'TRUE'],
           expectedResult: {
             lowerCase: false
           }
@@ -4610,6 +4610,28 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE id IS ',
           afterCursor: ' NULL',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['NOT']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM foo WHERE id IS | FALSE"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE id IS ',
+          afterCursor: ' FALSE',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['NOT']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT * FROM foo WHERE id IS | TRUE"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo WHERE id IS ',
+          afterCursor: ' TRUE',
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NOT']
@@ -4803,7 +4825,7 @@
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
-            containsKeywords: ['DISTINCT FROM', 'NOT DISTINCT FROM'],
+            containsKeywords: ['DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT UNKNOWN', 'UNKNOWN'],
             expectedResult: {
               lowerCase: false
             }
@@ -4816,7 +4838,7 @@
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
-            containsKeywords: ['DISTINCT FROM'],
+            containsKeywords: ['DISTINCT FROM', 'UNKNOWN'],
             expectedResult: {
               lowerCase: false
             }
@@ -4889,7 +4911,7 @@
               lowerCase: false,
               suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
               suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
-              suggestKeywords: ['GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN',  'IN', 'IS NOT NULL', 'IS NULL',  'NOT BETWEEN', 'NOT IN', 'OR']
+              suggestKeywords: ['GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS FALSE', 'IS NOT FALSE', 'IS NOT NULL', 'IS NOT TRUE', 'IS NULL', 'IS TRUE', 'NOT BETWEEN', 'NOT IN', 'OR']
             }
           });
         });
