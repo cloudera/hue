@@ -33,6 +33,9 @@ ValueExpression
      $2.types = ['NUMBER'];
    }
  | ValueExpression 'IS' OptionalNot 'NULL'                             -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IS' OptionalNot 'TRUE'                             -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IS' OptionalNot 'FALSE'                            -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression 'IS' OptionalNot '<impala>UNKNOWN'                  -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'IS' OptionalNot 'DISTINCT' 'FROM' ValueExpression  -> { types: [ 'BOOLEAN' ] }
  ;
 
@@ -74,21 +77,21 @@ ValueExpression_EDIT
    }
  | ValueExpression 'IS' 'CURSOR'
    {
+     var keywords = ['FALSE', 'NOT NULL', 'NOT TRUE', 'NOT FALSE', 'NULL', 'TRUE'];
      if (parser.isImpala()) {
-       parser.suggestKeywords(['DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT NULL', 'NULL']);
-     } else {
-       parser.suggestKeywords(['NOT NULL', 'NULL']);
+       keywords = keywords.concat(['DISTINCT FROM', 'NOT DISTINCT FROM', 'NOT UNKNOWN', 'UNKNOWN']);
      }
+     parser.suggestKeywords(keywords);
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' 'NOT' 'CURSOR'
    {
+     var keywords = ['FALSE', 'NULL', 'TRUE'];
      if (parser.isImpala()) {
-       parser.suggestKeywords(['DISTINCT FROM', 'NULL']);
-     } else {
-       parser.suggestKeywords(['NULL']);
+       keywords = keywords.concat(['DISTINCT FROM', 'UNKNOWN']);
      }
-      $$ = { types: [ 'BOOLEAN' ] };
+     parser.suggestKeywords(keywords);
+     $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' OptionalNot 'DISTINCT' 'CURSOR'
    {
@@ -98,6 +101,16 @@ ValueExpression_EDIT
      $$ = { types: [ 'BOOLEAN' ] };
    }
  | ValueExpression 'IS' 'CURSOR' 'NULL'
+   {
+     parser.suggestKeywords(['NOT']);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'IS' 'CURSOR' 'FALSE'
+   {
+     parser.suggestKeywords(['NOT']);
+     $$ = { types: [ 'BOOLEAN' ] };
+   }
+ | ValueExpression 'IS' 'CURSOR' 'TRUE'
    {
      parser.suggestKeywords(['NOT']);
      $$ = { types: [ 'BOOLEAN' ] };

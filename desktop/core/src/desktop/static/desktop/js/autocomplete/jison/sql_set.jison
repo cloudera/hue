@@ -27,11 +27,15 @@ DataDefinition_EDIT
      if (parser.isHive()) {
        parser.suggestKeywords(['ROLE']);
      }
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['ALL']);
+     }
    }
  ;
 
 SetSpecification
  : 'SET' SetOption '=' SetValue
+ | 'SET' 'ALL'
  ;
 
 SetOption

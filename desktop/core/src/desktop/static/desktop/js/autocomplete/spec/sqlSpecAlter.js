@@ -228,6 +228,32 @@
     });
 
     describe('ALTER TABLE', function () {
+      it('should handle "ALTER TABLE foo ALTER COLUMN bar SET COMMENT \'boo\'; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER TABLE foo ALTER COLUMN bar SET COMMENT \'boo\';  ',
+          afterCursor: '',
+          noErrors: true,
+          dialect: 'impala',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "ALTER TABLE foo ALTER bar DROP DEFAULT; |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'ALTER TABLE foo ALTER bar DROP DEFAULT;  ',
+          afterCursor: '',
+          noErrors: true,
+          dialect: 'impala',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should suggest keywords for "ALTER |"', function() {
         assertAutoComplete({
           beforeCursor: 'ALTER ',
@@ -1559,7 +1585,20 @@
 
       });
 
-      describe('Impala specific', function () {
+     describe('Impala specific', function () {
+        it('should handle "ALTER TABLE db.tbl SET COLUMN STATS foo (\'numDVs\'=\'2\',\'numNulls\'=\'0\'); |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE db.tbl SET COLUMN STATS foo (\'numDVs\'=\'2\',\'numNulls\'=\'0\'); ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['SELECT'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
         it('should suggest databases for "ALTER TABLE db.tbl RENAME TO |"', function() {
           assertAutoComplete({
             beforeCursor: 'ALTER TABLE db.tbl RENAME TO  ',
@@ -1627,10 +1666,107 @@
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'CHANGE',
-                'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS',
-                'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION',
+              suggestKeywords: ['ADD COLUMNS', 'ADD PARTITION', 'ADD RANGE PARTITION', 'ALTER', 'ALTER COLUMN',
+                'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'DROP RANGE PARTITION', 'PARTITION', 'RECOVER PARTITIONS',
+                'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET COLUMN STATS', 'SET FILEFORMAT', 'SET LOCATION',
                 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES', 'SET UNCACHED' ]
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['CACHED IN', 'COLUMN STATS', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar SET COLUMN |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET COLUMN ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['STATS']
+            }
+          });
+        });
+
+        it('should suggest columns for "ALTER TABLE bar SET COLUMN STATS |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar SET COLUMN STATS ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] }
+            }
+          });
+        });
+
+       it('should handle "ALTER TABLE db.tbl SET COLUMN STATS foo (|"', function() {
+         assertAutoComplete({
+           beforeCursor: 'ALTER TABLE db.tbl SET COLUMN STATS foo (',
+           afterCursor: '',
+           dialect: 'impala',
+           expectedResult: {
+             lowerCase: false,
+             suggestIdentifiers: ['\'avgSize\'', '\'maxSize\'', '\'numDVs\'', '\'numNulls\''],
+           }
+         });
+       });
+
+        it('should suggest keywords for "ALTER TABLE bar ALTER |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ALTER ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestColumns: { tables: [{ identifierChain: [{ name: 'bar' }] }] },
+              suggestKeywords: ['COLUMN']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ALTER foo |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ALTER foo ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DROP DEFAULT', 'SET BLOCK_SIZE', 'SET COMMENT', 'SET COMPRESSION', 'SET DEFAULT', 'SET ENCODING']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ALTER foo SET |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ALTER foo SET ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BLOCK_SIZE', 'COMMENT', 'COMPRESSION', 'DEFAULT', 'ENCODING']
+            }
+          });
+        });
+
+        it('should suggest keywords for "ALTER TABLE bar ALTER foo DROP |"', function() {
+          assertAutoComplete({
+            beforeCursor: 'ALTER TABLE bar ALTER foo DROP ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['DEFAULT']
             }
           });
         });

@@ -1835,6 +1835,13 @@ var SqlFunctions = (function () {
         draggable: 'date_sub()',
         description: 'Subtracts a specified number of days from a TIMESTAMP value. The first argument can be a string, which is automatically cast to TIMESTAMP if it uses the recognized format. With an INTERVAL expression as the second argument, you can calculate a delta value using other units such as weeks, years, hours, seconds, and so on.'
       },
+      date_trunc: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [[{type: 'STRING'}], [{type: 'TIMESTAMP'}]],
+        signature: 'date_trunc(STRING unit, TIMESTAMP timestamp)',
+        draggable: 'date_trunc()',
+        description: 'Truncates a TIMESTAMP value to the specified precision. The unit argument value for truncating TIMESTAMP values is not case-sensitive. This argument string can be one of: \'microseconds\', \'milliseconds\', \'second\', \'minute\', \'hour\', \'day\', \'week\', \'month\', \'year\', \'decade\', \'century\' or \'millennium\'.'
+      },
       datediff: {
         returnTypes: ['INT'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'TIMESTAMP'}]],
@@ -1968,11 +1975,11 @@ var SqlFunctions = (function () {
 				draggable: 'microseconds_sub()',
         description: 'Returns the specified date and time minus some number of microseconds.'
       },
-      milliseconds: {
+      millisecond: {
         returnTypes: ['INT'],
         arguments: [[{type: 'TIMESTAMP'}]],
-        signature: 'milliseconds(TIMESTAMP date)',
-        draggable: 'milliseconds()',
+        signature: 'millisecond(TIMESTAMP date)',
+        draggable: 'millisecond()',
         description: 'Returns the millisecond portion of a TIMESTAMP value.'
       },
       milliseconds_add: {

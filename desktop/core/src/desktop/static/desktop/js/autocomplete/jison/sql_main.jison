@@ -247,6 +247,7 @@ NonReservedKeyword
  | '<impala>ROLES'
  | '<impala>URI'
  | '<impala>SERVER'
+ | '<impala>UNKNOWN'
 // | '<impala>BROADCAST'
 // | '<impala>NOSHUFFLE'
 // | '<impala>SHUFFLE'
