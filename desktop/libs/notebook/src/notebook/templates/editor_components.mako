@@ -3006,6 +3006,12 @@ function togglePresentation(value) {};
       if (tab !== 'queryResults') {
         $('.hue-datatable-search').hide();
       }
+      if (tab === 'queryHistory') {
+        hueUtils.waitForRendered($('#queryHistory .history-table'), function(el) { return el.is(':visible') }, function() {
+          viewModel.selectedNotebook().forceHistoryInitialHeight(true);
+          huePubSub.publish('editor.calculate.history.height');
+        });
+      }
     }, HUE_PUB_SUB_EDITOR_ID);
 
     huePubSub.subscribe('detach.scrolls', function (snippet) {
@@ -3020,7 +3026,11 @@ function togglePresentation(value) {};
 
     huePubSub.subscribe('editor.calculate.history.height', function () {
       if (viewModel.editorMode() && (viewModel.selectedNotebook().historyInitialHeight() === 0 || viewModel.selectedNotebook().forceHistoryInitialHeight())) {
-        viewModel.selectedNotebook().historyInitialHeight($('.history-table').height() + 80); // add pagination too
+        var h = $('#queryHistory .history-table').height();
+        if (h === 0) {
+          h = viewModel.selectedNotebook().history().length * 32;
+        }
+        viewModel.selectedNotebook().historyInitialHeight(h + 80); // add pagination too
         viewModel.selectedNotebook().forceHistoryInitialHeight(false);
       }
     }, HUE_PUB_SUB_EDITOR_ID);
