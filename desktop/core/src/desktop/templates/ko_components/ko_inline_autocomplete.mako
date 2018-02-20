@@ -46,6 +46,15 @@ from desktop.views import _ko
           css: { 'inline-autocomplete-magnify-input': showMagnify }">
       </div>
     </div>
+
+    <div class="hue-drop-down-container hue-drop-down-fixed" data-bind="event: { 'mousedown': facetDropDownMouseDown }, css: { 'open' : facetDropDownVisible() }, dropDownKeyUp: { onEsc: facetDropDownOnEsc, onEnter: facetDropDownOnEnter, onSelected: facetDropDownOnSelected, dropDownVisible: facetDropDownVisible }">
+      <div class="dropdown-menu" style="overflow-y: auto;" data-bind="visible: facetSuggestions().length > 0">
+        <ul class="hue-inner-drop-down" data-bind="foreach: facetSuggestions">
+          <li><a href="javascript:void(0)" data-bind="html: label, click: function () { $parent.facetClicked($data); }, clickBubble: false"></a></li>
+        </ul>
+      </div>
+    </div>
+
   </script>
 
   <script type="text/javascript">
@@ -84,6 +93,7 @@ from desktop.views import _ko
         self.knownFacetValues = params.knownFacetValues || {};
         self.uniqueFacets = !!params.uniqueFacets;
         self.disableNavigation = !!params.disableNavigation;
+        self.changedAfterFocus = false;
 
         self.searchInput = ko.observable('');
         self.suggestions = ko.observableArray();
@@ -92,6 +102,42 @@ from desktop.views import _ko
         self.suggestions.subscribe(function () {
           self.selectedSuggestionIndex(0);
         });
+
+        self.facetSuggestions = ko.observableArray();
+        self.facetDropDownVisible = params.facetDropDownVisible || ko.observable(false);
+
+        self.facetClicked = function (facet) {
+          self.searchInput(facet.value);
+          self.facetDropDownVisible(false);
+        };
+
+        self.facetDropDownOnEnter = function (facet) {
+          if (facet) {
+            self.searchInput(facet.value);
+          }
+          self.facetDropDownVisible(false);
+        };
+
+        self.facetDropDownOnEsc = function () {
+          self.facetDropDownVisible(false);
+        };
+
+        self.facetDropDownOnSelected = function (facet) {
+          if (facet) {
+            var suggestions = self.suggestions();
+            for (var i = 0; i < suggestions.length; i++) {
+              if (facet.value === suggestions[i]) {
+                self.selectedSuggestionIndex(i);
+                break;
+              }
+            }
+          }
+        };
+
+        self.facetDropDownMouseDown = function (data, evt) {
+          evt.preventDefault(); // Prevent focus loss on the input when an entry is clicked
+          return false;
+        };
 
         self.inlineAutocomplete = ko.pureComputed(function () {
           if (!self.hasFocus() || self.suggestions().length === 0) {
@@ -136,6 +182,7 @@ from desktop.views import _ko
           }
 
           if (newValue === '') {
+            self.changedAfterFocus = false;
             self.clearSuggestions();
             if (self.querySpec() && self.querySpec().query !== '') {
               self.querySpec({
@@ -146,6 +193,8 @@ from desktop.views import _ko
             }
             return;
           }
+
+          self.changedAfterFocus = true;
 
           self.updateQuerySpec();
           self.autocomplete();
@@ -159,7 +208,7 @@ from desktop.views import _ko
           if (!self.hasFocus()) {
             return;
           }
-          if (!self.disableNavigation && event.keyCode === 38 && self.suggestions().length) { // Up
+          if (!self.disableNavigation && event.keyCode === 38 && self.suggestions().length && !self.facetDropDownVisible()) { // Up
             if (self.selectedSuggestionIndex() === 0) {
               self.selectedSuggestionIndex(self.suggestions().length - 1);
             } else {
@@ -169,7 +218,7 @@ from desktop.views import _ko
             return;
           }
 
-          if (!self.disableNavigation && event.keyCode === 40 && self.suggestions().length) { // Down
+          if (!self.disableNavigation && event.keyCode === 40 && self.suggestions().length && !self.facetDropDownVisible()) { // Down
             if (self.selectedSuggestionIndex() === self.suggestions().length - 1) {
               self.selectedSuggestionIndex(0);
             } else {
@@ -179,6 +228,10 @@ from desktop.views import _ko
             return;
           }
           if (event.keyCode === 32 && event.ctrlKey) { // Ctrl-Space
+            if (!self.lastParseResult) {
+              self.updateQuerySpec();
+            }
+            self.changedAfterFocus = true;
             self.autocomplete();
             return;
           }
@@ -194,18 +247,22 @@ from desktop.views import _ko
         };
 
         self.disposals.push(function () {
-          $(document).off('keydown', onKeyDown);
+          $(document).off('keydown.inlineAutocomplete', onKeyDown);
         });
 
         var focusSub = self.hasFocus.subscribe(function (newVal) {
           if (!newVal) {
             self.clearSuggestions();
-            $(document).off('keydown', onKeyDown);
+            self.changedAfterFocus = false;
+            $(document).off('keydown.inlineAutocomplete', onKeyDown);
           } else if (self.searchInput() !== '') {
             self.autocomplete();
-            $(document).on('keydown', onKeyDown);
+            $(document).on('keydown.inlineAutocomplete', onKeyDown);
           } else {
-            $(document).on('keydown', onKeyDown);
+            $(document).on('keydown.inlineAutocomplete', onKeyDown);
+          }
+          if (!newVal && self.facetDropDownVisible()) {
+            self.facetDropDownVisible(false);
           }
         });
 
@@ -264,8 +321,11 @@ from desktop.views import _ko
 
       InlineAutocomplete.prototype.clearSuggestions = function () {
         var self = this;
-        if (self.suggestions().length > 0) {
+        if (self.suggestions().length) {
           self.suggestions([]);
+        }
+        if (self.facetSuggestions().length) {
+          self.facetSuggestions([]);
         }
       };
 
@@ -295,6 +355,7 @@ from desktop.views import _ko
         }
 
         var newSuggestions = [];
+        var facetSuggestions = [];
         var partialLower = partial.toLowerCase();
         if (self.lastParseResult.suggestFacets) {
           var existingFacetIndex = {};
@@ -324,7 +385,13 @@ from desktop.views import _ko
           if (facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()]) {
             getSortedFacets(facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()]).forEach(function (value) {
               if (value.toLowerCase().indexOf(partialLower) === 0) {
-                newSuggestions.push(nonPartial + partial + value.substring(partial.length, value.length));
+                var fullValue = nonPartial + partial + value.substring(partial.length, value.length);
+                if (partial.length) {
+                  facetSuggestions.push({ label: '<b>' + partial + '</b>' + value.substring(partial.length), value: fullValue});
+                } else {
+                  facetSuggestions.push({ label: value, value: fullValue});
+                }
+                newSuggestions.push(fullValue);
               }
             });
           }
@@ -333,7 +400,12 @@ from desktop.views import _ko
         if (partial !== '' && self.lastParseResult.suggestResults) {
           newSuggestions = newSuggestions.concat(self.autocompleteFromEntries(nonPartial, partial));
         }
-
+        self.facetSuggestions(facetSuggestions);
+        if (self.changedAfterFocus && (facetSuggestions.length > 1 || (facetSuggestions.length === 1 && facetSuggestions[0].value !== self.searchInput()))) {
+          self.facetDropDownVisible(true);
+        } else if (self.facetDropDownVisible()) {
+          self.facetDropDownVisible(false);
+        }
         self.suggestions(newSuggestions);
       };
 
