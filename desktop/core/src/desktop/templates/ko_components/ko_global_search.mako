@@ -33,6 +33,7 @@ from desktop.views import _ko
         hasFocus: searchHasFocus,
         disableNavigation: true,
         showMagnify: true,
+        facetDropDownVisible: facetDropDownVisible,
         spin: loading,
         placeHolder: '${ _ko('Search data and saved documents...') if has_navigator(user) else _ko('Search saved documents...') }',
         querySpec: querySpec,
@@ -44,7 +45,7 @@ from desktop.views import _ko
       }
     } --><!-- /ko -->
     <!-- ko if: searchResultVisible()  -->
-    <!-- ko if: !loading() && searchResultCategories().length === 0 -->
+    <!-- ko if: !loading() && searchResultCategories().length === 0 && hasLoadedOnce() -->
     <div class="global-search-results global-search-empty" data-bind="onClickOutside: onResultClickOutside">
       <div>${ _('No results found.') }</div>
     </div>
@@ -131,6 +132,7 @@ from desktop.views import _ko
         self.fetchThrottle = -1;
 
         self.searchHasFocus = ko.observable(false);
+        self.facetDropDownVisible = ko.observable(false);
         self.querySpec = ko.observable();
         self.searchActive = ko.observable(false);
         self.searchResultVisible = ko.observable(false);
@@ -144,6 +146,8 @@ from desktop.views import _ko
         self.loading = ko.pureComputed(function () {
           return self.loadingNav() || self.loadingDocs();
         });
+
+        self.hasLoadedOnce = ko.observable(false);
 
         self.initializeFacetValues();
 
@@ -227,7 +231,7 @@ from desktop.views import _ko
 
         // TODO: Consider attach/detach on focus
         $(document).keydown(function (event) {
-          if (!self.searchHasFocus() && !self.searchResultVisible()) {
+          if (self.facetDropDownVisible() || (!self.searchHasFocus() && !self.searchResultVisible())) {
             return;
           }
 
@@ -293,6 +297,7 @@ from desktop.views import _ko
         window.clearTimeout(self.fetchThrottle);
         self.cancelRunningRequests();
         self.searchResultVisible(false);
+        self.hasLoadedOnce(false);
         self.querySpec({
           query: '',
           facets: {},
@@ -435,6 +440,7 @@ from desktop.views import _ko
           self.loadingDocs(false);
           window.clearTimeout(clearDocsTimeout);
         }).done(function (data) {
+          self.hasLoadedOnce(true);
           var categories = [];
 
           var docCategory = {
@@ -488,6 +494,7 @@ from desktop.views import _ko
             self.loadingNav(false);
             window.clearTimeout(clearNavTimeout);
           }).done(function (data) {
+            self.hasLoadedOnce(true);
             var categories = [];
             var newCategories = {};
             data.results.forEach(function (result) {
