@@ -38,10 +38,10 @@ from desktop.views import _ko
     <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': inputPlaceHolder }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
-    <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition }">
-      <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0" style="min-width: 190px; max-width: 250px; min-height: 34px; max-height: 200px;">
+    <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition }, dropDownKeyUp: { onEsc: onEsc, onEnter: onEnter, dropDownVisible: dropDownVisible }">
+      <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0, style: { 'overflow-y': !foreachVisible ? 'auto' : 'hidden' }">
         <!-- ko if: foreachVisible -->
-        <ul class="hue-inner-drop-down" style="overflow-x: hidden;" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
+        <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
           <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->
           <li class="divider"></li>
           <!-- /ko -->
@@ -51,7 +51,7 @@ from desktop.views import _ko
         </ul>
         <!-- /ko -->
         <!-- ko ifnot: foreachVisible -->
-        <ul class="hue-inner-drop-down" style="overflow-x: hidden;" data-bind="foreach: filteredEntries">
+        <ul class="hue-inner-drop-down" data-bind="foreach: filteredEntries">
           <!-- ko if: typeof $data.divider !== 'undefined' && $data.divider -->
           <li class="divider"></li>
           <!-- /ko -->
@@ -66,6 +66,86 @@ from desktop.views import _ko
 
   <script type="text/javascript">
     (function () {
+
+      ko.bindingHandlers.dropDownKeyUp = {
+        init: function (element, valueAccessor) {
+          var options = valueAccessor();
+          var onEsc = options.onEsc;
+          var onEnter = options.onEnter;
+          var onSelected = options.onSelected;
+          var dropDownVisible = options.dropDownVisible;
+
+          var keyUpTarget = options.keyUpTarget || window;
+
+          var keyUp = function (e) {
+            var $element = $(element);
+            var $dropDownMenu = $element.find('.dropdown-menu');
+            var $currentActive = $element.find('.hue-inner-drop-down > .active');
+            var activeTop = $currentActive.length !== 0 ? $currentActive.position().top : 0;
+            var activeHeight = $currentActive.length !== 0 ? $currentActive.outerHeight(true) : $element.find('.hue-inner-drop-down li:first-child').outerHeight(true);
+            var containerHeight = $dropDownMenu.innerHeight();
+            var containerScrollTop = $dropDownMenu.scrollTop();
+
+            $currentActive.removeClass('active');
+            if (e.keyCode === 27 && onEsc) {
+              onEsc();
+            } else if (e.keyCode === 38) {
+              // up
+              var $nextActive;
+              if ($currentActive.length !== 0 && $currentActive.prev().length !== 0) {
+                if (activeTop < containerScrollTop + activeHeight) {
+                  $dropDownMenu.scrollTop(activeTop - containerHeight / 2);
+                }
+                $nextActive = $currentActive.prev().addClass('active');
+              }
+              if (onSelected) {
+                onSelected($nextActive && $nextActive.length ? ko.dataFor($nextActive.prev()[0]) : undefined);
+              }
+            } else if (e.keyCode === 40) {
+              // down
+              var $nextActive;
+              if ($currentActive.length === 0) {
+                $nextActive = $element.find('.hue-inner-drop-down li:first-child').addClass('active');
+              } else if ($currentActive.next().length !== 0) {
+                if ((activeTop + activeHeight * 3) > containerHeight - containerScrollTop) {
+                  $dropDownMenu.scrollTop(activeTop - containerHeight / 2);
+                }
+                $nextActive = $currentActive.next().addClass('active');
+              } else {
+                $nextActive = $currentActive.addClass('active');
+              }
+
+              if (onSelected) {
+                onSelected($nextActive && $nextActive.length ? ko.dataFor($nextActive[0]) : undefined);
+              }
+            } else if (e.keyCode === 13) {
+              // enter
+              if ($currentActive.length > 0) {
+                $dropDownMenu.scrollTop(0)
+              }
+              if (onEnter) {
+                onEnter($currentActive.length ? ko.dataFor($currentActive[0]) : undefined);
+              }
+            } else {
+              $dropDownMenu.scrollTop(0)
+            }
+          };
+
+          var visibleSub = dropDownVisible.subscribe(function (newValue) {
+            if (newValue) {
+              $(keyUpTarget).on('keyup.hueDropDown', keyUp);
+            } else {
+              $(keyUpTarget).off('keyup.hueDropDown');
+            }
+          });
+
+          ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+            visibleSub.dispose();
+            $(keyUpTarget).off('keyup.hueDropDown');
+          });
+        }
+      };
+
       var HueDropDown = function (params, element) {
         var self = this;
         self.dropDownVisible = ko.observable(!!params.showOnInit);
@@ -90,48 +170,15 @@ from desktop.views import _ko
           }
         };
 
-        var inputKeyup = function (e) {
-          var $currentActive = $(element).find('.hue-inner-drop-down > .active');
-          var activeTop = $currentActive.length !== 0 ? $currentActive.position().top : 0;
-          var activeHeight = $currentActive.length !== 0 ? $currentActive.outerHeight(true) : $(element).find('.hue-inner-drop-down li:first-child').outerHeight(true);
-          var containerHeight = $(element).find('.dropdown-menu').innerHeight();
-          var containerScrollTop = $(element).find('.dropdown-menu').scrollTop();
-
-          $currentActive.removeClass('active');
-          if (e.keyCode === 27) {
-            // esc
-            self.dropDownVisible(false);
-          } else if (e.keyCode === 38) {
-            // up
-            if ($currentActive.length !== 0 && $currentActive.prev().length !== 0) {
-              if (activeTop < containerScrollTop + activeHeight) {
-                $(element).find('.dropdown-menu').scrollTop(activeTop - containerHeight/2);
-              }
-              $currentActive.prev().addClass('active');
-            }
-          } else if (e.keyCode === 40) {
-            // down
-            if ($currentActive.length === 0) {
-              $(element).find('.hue-inner-drop-down li:first-child').addClass('active');
-            } else if ($currentActive.next().length !== 0) {
-              if ((activeTop + activeHeight *3) > containerHeight - containerScrollTop) {
-                $(element).find('.dropdown-menu').scrollTop(activeTop - containerHeight/2);
-              }
-              $currentActive.next().addClass('active');
-            } else {
-              $currentActive.addClass('active');
-            }
-          } else if (e.keyCode === 13) {
-            // enter
-            if ($currentActive.length > 0) {
-              self.value(ko.dataFor($currentActive[0]));
-              self.dropDownVisible(false);
-              $(element).find('.dropdown-menu').scrollTop(0)
-            }
-          } else {
-            $(element).find('.dropdown-menu').scrollTop(0)
-          }
+        self.onEsc = function () {
+          self.dropDownVisible(false);
         };
+
+        self.onEnter = function (value) {
+          self.value(value);
+          self.dropDownVisible(false);
+        };
+
         self.filter = ko.observable('');
 
         self.value.subscribe(function () {
@@ -144,21 +191,21 @@ from desktop.views import _ko
           self.filterEdited(true);
           $(element).find('.hue-inner-drop-down > .active').removeClass('.active');
         });
+
         self.dropDownVisible.subscribe(function (newValue) {
           self.filterEdited(false);
           if (newValue) {
             window.setTimeout(function () {
               self.filter('');
               $(window).on('click', closeOnOutsideClick);
-              $(element).find('.hue-drop-down-input').on('keyup', inputKeyup);
               $(element).find('.hue-drop-down-input').focus();
             }, 0);
           } else {
             $(element).find('.hue-inner-drop-down > .active').removeClass('.active');
             $(window).off('click', closeOnOutsideClick);
-            $(element).find('.hue-drop-down-input').off('keyup', inputKeyup);
           }
         });
+
         self.filteredEntries = ko.pureComputed(function () {
           if (self.filter() === '' || ! self.filterEdited()) {
             return ko.unwrap(self.entries);

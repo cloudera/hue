@@ -426,7 +426,7 @@ ul.errorlist {
 
 .hue-drop-down-container {
   position: fixed;
-  z-index: 900;
+  z-index: 1061;
 
   &.open {
     position: absolute;
@@ -434,6 +434,19 @@ ul.errorlist {
 
   &.hue-drop-down-fixed {
     position: fixed !important;
+  }
+
+  .dropdown-menu {
+    min-width: 190px;
+    max-width: 250px;
+    min-height: 34px;
+    max-height: 200px;
+    border-radius: 3px;
+    padding: 0;
+
+    .hue-inner-drop-down {
+      overflow-x: hidden;
+    }
   }
 }
 
