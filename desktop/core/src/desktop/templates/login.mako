@@ -115,7 +115,9 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
     %if active_directory:
     <div>
-      ${ form['server'] | n,unicode }
+      %if 'server' in form.fields:
+        ${ form['server'] | n,unicode }
+      %endif
     </div>
     %endif
 
