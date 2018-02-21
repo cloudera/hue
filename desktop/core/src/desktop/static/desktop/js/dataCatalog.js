@@ -1246,21 +1246,13 @@ var DataCatalog = (function () {
     };
 
     /**
-     * Returns the default tooltip to use for the entry, either the comment if known or the qualified path.
+     * Returns the default title used for the entry, the qualified path with type for fields. Optionally include
+     * the comment after, if already resolved.
      *
+     * @param {boolean} [includeComment] - Default false
      * @return {string}
      */
-    DataCatalogEntry.prototype.getTooltip = function () {
-      var self = this;
-      return self.getResolvedComment() || self.getTitle();
-    };
-
-    /**
-     * Returns the default title used for the entry, the qualified path with type for fields.
-     *
-     * @return {string}
-     */
-    DataCatalogEntry.prototype.getTitle = function () {
+    DataCatalogEntry.prototype.getTitle = function (includeComment) {
       var self = this;
       var title = self.getQualifiedPath();
       if (self.isField()) {
@@ -1269,7 +1261,7 @@ var DataCatalog = (function () {
           title += ' (' + type + ')';
         }
       }
-      if (self.hasResolvedComment() && self.getResolvedComment()) {
+      if (includeComment && self.hasResolvedComment() && self.getResolvedComment()) {
         title += ' - ' + self.getResolvedComment();
       }
       return title;
