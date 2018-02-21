@@ -1245,6 +1245,17 @@ var Collection = function (vm, collection) {
   });
 
   self.template.fieldsModalFilter = ko.observable(""); // For UI
+  self.template.autocompleteFromFieldsModalFilter = function (nonPartial, partial) {
+    var result = [];
+    var partialLower = partial.toLowerCase();
+    self.template.availableWidgetFields().forEach(function (entry) {
+      var value = typeof entry.name() == "string" ? entry.name() : entry.name().toString();
+      if (value.toLowerCase().indexOf(partialLower) === 0) {
+        result.push(nonPartial + partial + value.substring(partial.length));
+      }
+    });
+    return result;
+  };
   self.template.fieldsModalType = ko.observable(""); // For UI
   self.template.fieldsAttributesFilter = ko.observable(""); // For UI
 
@@ -1290,11 +1301,19 @@ var Collection = function (vm, collection) {
 
   self.template.filteredModalFields = ko.pureComputed(function () {
     var filter = self.template.fieldsModalFilter();
-    if (! filter) {
+    var bHasText = filter && filter.text && filter.text.length;
+    var bHasFacet = filter && filter.facets && filter.facets['type'];
+    if (!bHasText && !bHasFacet) {
       return self.template.availableWidgetFields();
     } else {
+      var aType = bHasFacet ? Object.keys(filter.facets['type']).map(function (s) { return s && s.toLowerCase(); }) : [];
+      var aText = filter.text.map(function (s) { return s && s.toLowerCase(); })
       return ko.utils.arrayFilter(self.template.availableWidgetFields(), function (field) {
-        return field.name().toLowerCase().indexOf(filter.toLowerCase()) > -1;
+        var bTextMatch = !bHasText || aText.some(function (text) {
+          return field.name().toLowerCase().indexOf(text) > -1;
+        });
+        var bFacetMatch = !bHasFacet || aType.indexOf(field.type().toLowerCase()) > -1;
+        return bTextMatch && bFacetMatch;
       });
     }
   });
@@ -1644,6 +1663,34 @@ var Collection = function (vm, collection) {
       vm.search();
     }
   });
+
+  self.showContextPopover = function (field, event) {
+    var $source = $(event.target);
+    var offset = $source.offset();
+    var split = self.name().split('.');
+    huePubSub.publish('context.popover.show', {
+      data: {
+        type: self.engine() === 'solr' ? 'collection' : 'column',
+        identifierChain: [
+          { name: split.length > 1 ? split[0] : 'default' },
+          { name: split.length > 1 ? split[1] : split[0] },
+          { name: field.name() }
+        ]
+      },
+      showInAssistEnabled: true,
+      sourceType: self.engine(),
+      orientation: 'right',
+      defaultDatabase: 'default',
+      pinEnabled: false,
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 3,
+        right: offset.left + $source.width() + 1,
+        bottom: offset.top + $source.height() - 3
+      }
+    });
+  };
 
   huePubSub.publish('set.active.dashboard.collection', self);
 };
