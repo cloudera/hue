@@ -2555,13 +2555,25 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
     <div style="float: left; margin-right: 10px;">
-      <input id="addFacetInput" type="text" data-bind="clearable: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input" style="float: left" /><br/>
+      <!-- ko component: {
+        name: 'inline-autocomplete',
+        params: {
+          querySpec: $root.collection.template.fieldsModalFilter,
+          facets: ['type'],
+          knownFacetValues: $root.collection.engine() === 'solr' ? SOLR_ASSIST_KNOWN_FACET_VALUES : SQL_ASSIST_KNOWN_FACET_VALUES,
+          autocompleteFromEntries: $root.collection.template.autocompleteFromFieldsModalFilter
+        }
+      } --><!-- /ko -->
+      <!--<input id="addFacetInput" type="text" data-bind="clearable: $root.collection.template.fieldsModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" class="input" style="float: left" /><br/>-->
     </div>
     <div>
       <ul data-bind="foreach: $root.collection.template.filteredModalFields().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.collection.template.filteredModalFields().length > 0"
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
-        <li data-bind="click: addFacetDemiModalFieldPreview">
-          <span class="badge badge-info"><span data-bind="text: name(), attr: {'title': type()}"></span>
+        <li data-bind="visibleOnHover: { 'selector': '.entity-field-picker' }">
+          <a class="entity-field-picker inactive-action" href="javascript:void(0);" data-bind="click: $root.collection.showContextPopover" style="opacity: 0">
+            <i class="fa fa-fw fa-info" title="${_('Show Details')}"/>
+          </a>
+          <span class="badge badge-info"><span data-bind="text: name(), attr: {'title': type()}, click: addFacetDemiModalFieldPreview"></span>
           </span>
         </li>
       </ul>
@@ -4507,17 +4519,6 @@ $(document).ready(function () {
             addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
           }
           else {
-            $('#addFacetInput').typeahead({
-              'source': searchViewModel.collection.template.availableWidgetFieldsNames(),
-              'updater': function (item) {
-                addFacetDemiModalFieldPreview({
-                  'name': function () {
-                    return item
-                  }
-                });
-                return item;
-              }
-            });
             $("#addFacetDemiModal").modal("show");
             $("#addFacetDemiModal input[type='text']").focus();
           }
@@ -4554,17 +4555,6 @@ $(document).ready(function () {
           addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
         }
         else {
-          $('#addFacetInput').typeahead({
-            'source': searchViewModel.collection.template.availableWidgetFieldsNames(),
-            'updater': function (item) {
-              addFacetDemiModalFieldPreview({
-                'name': function () {
-                  return item
-                }
-              });
-              return item;
-            }
-          });
           $("#addFacetDemiModal").modal("show");
           $("#addFacetDemiModal input[type='text']").focus();
         }

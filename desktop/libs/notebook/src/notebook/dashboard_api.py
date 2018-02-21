@@ -202,7 +202,7 @@ class SQLDashboardApi(DashboardApi):
     # Ideally from left assist at some point instead
     databases = get_api(MockRequest(self.user), snippet).autocomplete(snippet)['databases']
     database = databases and 'default' not in databases and databases[0] or 'default'
-    return [table['name'] for table in get_api(MockRequest(self.user), snippet).autocomplete(snippet, database=database)['tables_meta']]
+    return [database + '.' + table['name'] for table in get_api(MockRequest(self.user), snippet).autocomplete(snippet, database=database)['tables_meta']]
 
 
   # This method currently behaves more like a static method
