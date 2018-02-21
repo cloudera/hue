@@ -1028,23 +1028,16 @@ from metadata.conf import has_navigator
               delete colIndex[name];
             }
           });
-          var sqlAutocompleter = new SqlAutocompleter2({
-            snippet: {
-              type: function () {
-                return sourceType;
-              }
-            }
-          });
           huePubSub.publish('ace.replace', {
             location: data.location,
             text: $.map(colsToExpand, function (column) {
               if (column.tableAlias) {
-                return sqlAutocompleter.backTickIfNeeded(column.tableAlias) + '.' + sqlAutocompleter.backTickIfNeeded(column.name);
+                return SqlUtils.backTickIfNeeded(sourceType, column.tableAlias) + '.' + SqlUtils.backTickIfNeeded(sourceType, column.name);
               }
               if (colIndex[column.name]) {
-                return sqlAutocompleter.backTickIfNeeded(column.table) + '.' + sqlAutocompleter.backTickIfNeeded(column.name);
+                return SqlUtils.backTickIfNeeded(sourceType, column.table) + '.' + SqlUtils.backTickIfNeeded(sourceType, column.name);
               }
-              return sqlAutocompleter.backTickIfNeeded(column.name)
+              return SqlUtils.backTickIfNeeded(sourceType, column.name)
             }).join(', ')
           });
           huePubSub.publish('context.popover.hide');
@@ -1055,9 +1048,13 @@ from metadata.conf import has_navigator
           if (table.identifierChain) {
             var fetchDeferred = $.Deferred();
             deferrals.push(fetchDeferred);
+            var path = $.map(table.identifierChain, function (identifier) { return identifier.name });
+            if (path.length === 1) {
+              path.unshift(defaultDatabase);
+            }
             DataCatalog.getEntry({
               sourceType: sourceType,
-              path: $.map(table.identifierChain, function (identifier) { return identifier.name })
+              path: path
             }).done(function (entry) {
               entry.getSourceMeta({ silenceErrors: true }).done(function (sourceMeta) {
                 if (typeof sourceMeta.extended_columns !== 'undefined') {
