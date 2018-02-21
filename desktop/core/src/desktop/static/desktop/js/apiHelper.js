@@ -1723,7 +1723,7 @@ var ApiHelper = (function () {
       silenceErrors: options.silenceErrors,
       successCallback: function (response) {
         if (response.status === 0 && response.details) {
-          resonse.details.hueTimestamp = Date.now();
+          response.details.hueTimestamp = Date.now();
           deferred.resolve(response.details);
         } else {
           deferred.reject();
