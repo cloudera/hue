@@ -824,30 +824,42 @@ var DataCatalog = (function () {
           query = 'type:database'
         }
 
+        var rejectUnknown = function () {
+          children.forEach(function (childEntry) {
+            if (!childEntry.navigatorMeta) {
+              childEntry.navigatorMeta = {};
+              childEntry.navigatorMetaPromise = $.Deferred().reject().promise();
+            }
+          });
+        };
+
         cancellablePromises.push(ApiHelper.getInstance().searchEntities({
           query: query,
           rawQuery: true,
           limit: children.length,
           silenceErrors: options && options.silenceErrors
         }).done(function (result) {
-          if (result && result.entities && result.entities.length > 0) {
-            var entryPromises = [];
+          if (result && result.entities) {
+            var childEntryIndex = {};
+            children.forEach(function (childEntry) {
+              childEntryIndex[childEntry.name.toLowerCase()] = childEntry;
+            });
+
             result.entities.forEach(function (entity) {
-              var entryPromise = self.dataCatalog.getEntry({ path: self.path.concat((entity.name || entity.originalName).toLowerCase())}).done(function(catalogEntry) {
-                catalogEntry.navigatorMeta = entity;
-                catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta).promise();
-                catalogEntry.saveLater();
-              });
-              entryPromises.push(entryPromise);
-              cancellablePromises.push(entryPromise);
+              var matchingChildEntry = childEntryIndex[(entity.name || entity.originalName).toLowerCase()];
+              if (matchingChildEntry) {
+                matchingChildEntry.navigatorMeta = entity;
+                matchingChildEntry.navigatorMetaPromise = $.Deferred().resolve(matchingChildEntry.navigatorMeta).promise();
+                matchingChildEntry.saveLater();
+              }
             });
-            $.when.apply($, entryPromises).done(function () {
-              deferred.resolve(Array.prototype.slice.call(arguments));
-            });
-          } else {
-            deferred.resolve([]);
           }
-        }).fail(deferred.reject));
+          rejectUnknown();
+          deferred.resolve(children);
+        }).fail(function () {
+          rejectUnknown();
+          deferred.reject();
+        }));
       }).fail(deferred.reject));
 
       return applyCancellable(self.trackedPromise('navigatorMetaForChildrenPromise', new CancellablePromise(deferred, null, cancellablePromises)), options);
@@ -1018,7 +1030,9 @@ var DataCatalog = (function () {
 
       var resolveWithSourceMeta = function () {
         if (self.sourceMeta) {
-          deferred.resolve(self.sourceMeta && self.sourceMeta.comment || '');
+          deferred.resolve(self.sourceMeta.comment || '');
+        } else if (self.definition && typeof self.definition.comment !== 'undefined') {
+          deferred.resolve(self.definition.comment)
         } else {
           cancellablePromises.push(self.getSourceMeta(options).done(function (sourceMeta) {
             deferred.resolve(sourceMeta && sourceMeta.comment || '');
@@ -1027,7 +1041,11 @@ var DataCatalog = (function () {
       };
 
       if (self.canHaveNavigatorMetadata()) {
-        if (self.navigatorMeta) {
+        if (self.navigatorMetaPromise) {
+          self.navigatorMetaPromise.done(function () {
+            deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
+          }).fail(resolveWithSourceMeta);
+        } else if (self.navigatorMeta) {
           deferred.resolve(self.navigatorMeta.description || self.navigatorMeta.originalDescription || '');
         } else {
           cancellablePromises.push(self.getNavigatorMeta(options).done(function (navigatorMeta) {
@@ -1537,7 +1555,7 @@ var DataCatalog = (function () {
 
       var options = setSilencedErrors(options);
 
-      if (!self.catalogEntry.canHaveNavOptMetadata() || !self.isTableOrView()) {
+      if (!self.dataCatalog.canHaveNavOptMetadata() || !self.isTableOrView()) {
         return $.Deferred().reject().promise();
       }
       if (options && options.cachedOnly) {

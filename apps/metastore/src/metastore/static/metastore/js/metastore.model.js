@@ -474,7 +474,9 @@ var MetastoreTable = (function () {
     self.fetchDetails = function () {
       self.loadingDetails(true);
 
-      self.catalogEntry.getComment().done(self.comment);
+      self.database.catalogEntry.loadNavigatorMetaForChildren().done(function () {
+        self.catalogEntry.getComment().done(self.comment);
+      });
 
       self.catalogEntry.getAnalysis().done(function (analysis) {
         self.loadingDetails(false);
@@ -625,7 +627,9 @@ var MetastoreColumn = (function () {
       });
     });
 
-    self.catalogEntry.getComment().done(self.comment);
+    self.table.catalogEntry.loadNavigatorMetaForChildren().done(function () {
+      self.catalogEntry.getComment().done(self.comment);
+    });
   }
 
   MetastoreColumn.prototype.showContextPopover = function (entry, event) {
