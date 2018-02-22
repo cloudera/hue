@@ -140,7 +140,7 @@ var AssistDbSource = (function () {
               subscription.dispose();
               applyPopularity();
             });
-          } else if (db.entries().length == 0) {
+          } else if (db.entries().length === 0) {
             var subscription = db.entries.subscribe(function (newEntries) {
               if (newEntries.length > 0) {
                 subscription.dispose();
@@ -154,14 +154,16 @@ var AssistDbSource = (function () {
       }
     });
 
-    huePubSub.subscribe('assist.database.get', function (callback) {
-      callback(self.selectedDatabase());
-    });
+    if (!self.navigationSettings.rightAssist) {
+      huePubSub.subscribe('assist.database.get', function (callback) {
+        callback(self.selectedDatabase());
+      });
+    }
 
     self.reloading = ko.observable(false);
 
     self.loadingTables = ko.pureComputed(function() {
-      return typeof self.selectedDatabase() != "undefined" && self.selectedDatabase() !== null && self.selectedDatabase().loading();
+      return typeof self.selectedDatabase() !== 'undefined' && self.selectedDatabase() !== null && self.selectedDatabase().loading();
     });
 
     self.loadingSamples = ko.observable(true);
@@ -172,11 +174,13 @@ var AssistDbSource = (function () {
         if (!self.selectedDatabase().hasEntries() && !self.selectedDatabase().loading()) {
           self.selectedDatabase().loadEntries()
         }
-        self.apiHelper.setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name)
-        huePubSub.publish("assist.database.set", {
-          source: self.sourceType,
-          name: self.selectedDatabase().catalogEntry.name
-        })
+        if (!self.navigationSettings.rightAssist) {
+          self.apiHelper.setInTotalStorage('assist_' + self.sourceType, 'lastSelectedDb', self.selectedDatabase().catalogEntry.name);
+          huePubSub.publish("assist.database.set", {
+            source: self.sourceType,
+            name: self.selectedDatabase().catalogEntry.name
+          })
+        }
       }
     };
 
@@ -187,23 +191,8 @@ var AssistDbSource = (function () {
     var nestedFilter = {
       querySpec: ko.observable({}),
       showTables: ko.observable(true),
-      showViews: ko.observable(true),
-      activeEditorTables: ko.observableArray([])
+      showViews: ko.observable(true)
     };
-
-    huePubSub.subscribe('editor.active.locations', function (activeLocations) {
-      var activeTables = [];
-      // TODO: Test multiple snippets
-      if (self.sourceType !== activeLocations.type) {
-        return;
-      }
-      activeLocations.locations.forEach(function (location) {
-        if (location.type === 'table') {
-          activeTables.push(location.identifierChain.length == 2 ? { table: location.identifierChain[1].name, db: location.identifierChain[0].name} : { table: location.identifierChain[0].name });
-        }
-      });
-      nestedFilter.activeEditorTables(activeTables);
-    });
 
     self.setDatabase = function (databaseName) {
       if (databaseName && self.selectedDatabase() && databaseName === self.selectedDatabase().catalogEntry.name) {
@@ -281,26 +270,32 @@ var AssistDbSource = (function () {
       $container.find(".assist-actions, .assist-db-header-actions").css('right', -$container.scrollLeft() + 'px');
     };
 
-    huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
-      if (self.catalogEntry === details.entry) {
-        self.initDatabases();
-      } else if (details.entry.getSourceType() === self.sourceType) {
-        var findAndReloadInside = function (entries) {
-          return entries.some(function (entry) {
-            if (entry.catalogEntry === details.entry) {
-              entry.loadEntries();
-              return true;
-            }
-            return findAndReloadInside(entry.entries());
-          })
-        };
-        findAndReloadInside(self.databases());
-      }
-    })
+    if (!self.navigationSettings.rightAssist) {
+      huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+        if (self.catalogEntry === details.entry) {
+          self.initDatabases();
+        } else if (details.entry.getSourceType() === self.sourceType) {
+          var findAndReloadInside = function (entries) {
+            return entries.some(function (entry) {
+              if (entry.catalogEntry === details.entry) {
+                entry.loadEntries();
+                return true;
+              }
+              return findAndReloadInside(entry.entries());
+            })
+          };
+          findAndReloadInside(self.databases());
+        }
+      });
+    }
   }
 
   AssistDbSource.prototype.highlightInside = function (path) {
     var self = this;
+
+    if (self.navigationSettings.rightAssist) {
+      return;
+    }
 
     var foundDb;
     var index;
