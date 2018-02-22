@@ -278,6 +278,7 @@ def _small_indexing(user, fs, client, source, destination, index_name):
 
   if client.is_solr_six_or_more():
     kwargs['processor'] = 'tolerant'
+    kwargs['map'] = 'NULL:'
 
   try:
     if source['inputFormat'] == 'query':
