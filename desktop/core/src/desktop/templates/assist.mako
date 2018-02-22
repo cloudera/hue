@@ -2477,10 +2477,6 @@ from desktop.views import _ko
           }).join('.').toLowerCase();
         };
 
-        var databaseIndex = {};
-
-        var activeTableIndex = {};
-
         self.filter = {
           querySpec: ko.observable({
             query: '',
@@ -2499,12 +2495,7 @@ from desktop.views import _ko
         };
         var i18n = {};
 
-        var assistDbSource = new AssistDbSource({
-          i18n : i18n,
-          type: 'hive',
-          name: 'hive',
-          navigationSettings: navigationSettings
-        });
+        var sources = {};
 
         var loadEntriesTimeout = -1;
         // This fetches the columns for each table synchronously with 2 second in between.
@@ -2569,7 +2560,24 @@ from desktop.views import _ko
             }
           }
           updateOnVisible = false;
-          assistDbSource.sourceType = activeLocations.type;
+
+          if (!sources[activeLocations.type]) {
+            sources[activeLocations.type] = {
+              assistDbSource: new AssistDbSource({
+                i18n: i18n,
+                type: activeLocations.type,
+                name: activeLocations.type,
+                navigationSettings: navigationSettings
+              }),
+              databaseIndex: {},
+              activeTableIndex: {}
+            }
+          }
+
+          var assistDbSource = sources[activeLocations.type].assistDbSource;
+          var databaseIndex = sources[activeLocations.type].databaseIndex;
+          var activeTableIndex = sources[activeLocations.type].activeTableIndex;
+
           if (!activeLocations) {
             self.activeLocations(undefined);
             return;
@@ -2693,6 +2701,38 @@ from desktop.views import _ko
             });
           }
         };
+
+
+        huePubSub.subscribe('data.catalog.entry.refreshed', function (details) {
+          var sourceType = details.entry.getSourceType();
+          if (sources[sourceType]) {
+            var completeRefresh = false;
+            if (details.entry.isSource()) {
+              sources[sourceType].databaseIndex = {};
+              sources[sourceType].activeTableIndex = {};
+              completeRefresh = true;
+            } else if (details.entry.isDatabase() && sources[sourceType].databaseIndex[details.entry.name]) {
+              var dbEntry = sources[sourceType].databaseIndex[details.entry.name];
+              var activeTableIndex = sources[sourceType].activeTableIndex;
+              Object.keys(activeTableIndex).forEach(function (tableKey) {
+                var tableEntry = activeTableIndex[tableKey];
+                if (tableEntry.parent === dbEntry) {
+                  delete activeTableIndex[tableKey];
+                  completeRefresh = true;
+                }
+              });
+            } else if (details.entry.isTableOrView()) {
+              var activeTableIndex = sources[sourceType].activeTableIndex;
+              if (activeTableIndex[details.entry.getQualifiedPath()]) {
+                delete activeTableIndex[details.entry.getQualifiedPath()];
+                completeRefresh = true;
+              }
+            }
+            if (completeRefresh) {
+              handleLocationUpdate(self.activeLocations());
+            }
+          }
+        });
 
         if (self.activeTab() === 'editorAssistant') {
           huePubSub.publish('get.active.editor.locations', handleLocationUpdate);
