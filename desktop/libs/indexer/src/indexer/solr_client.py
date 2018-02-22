@@ -63,7 +63,7 @@ class SolrClient(object):
 
     try:
       if self.is_solr_cloud_mode():
-        collections = self.api.collections2()
+        collections = self.api.collections().keys()
         for name in collections:
           indexes.append({'name': name, 'type': 'collection', 'collections': []})
 
