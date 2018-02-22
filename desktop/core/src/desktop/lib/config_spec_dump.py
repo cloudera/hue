@@ -16,7 +16,7 @@
 # limitations under the License.
 import desktop.appmanager
 
-from desktop.lib.conf import BoundContainer, is_anonymous
+from desktop.lib.conf import BoundContainer, UnspecifiedConfigSection, is_anonymous
 
 class ConfigSpec():
   def __init__(self, configspec):
@@ -35,8 +35,6 @@ class ConfigSpec():
     if isinstance(config_obj, BoundContainer):
       if is_anonymous(config_obj.config.key):
         key = "__many__"
-        if 'notebook.interpreters.' in config_obj.prefix:
-          key = config_obj.prefix.split('notebook.interpreters.')[1]
       else:
         key = config_obj.config.key
       if self.level != 0:
@@ -48,10 +46,13 @@ class ConfigSpec():
         if isinstance(v, BoundContainer):
           sections.append(v)
         else:
-          self.p("%s=%s" % (v.config.key, v.get()))
+          self.p("%s=" % (v.config.key))
 
-      for sec in sections:
-        self.recurse(sec)
+      if isinstance(config_obj.config, UnspecifiedConfigSection) and sections:
+        self.recurse(sections[0])
+      else:
+        for sec in sections:
+          self.recurse(sec)
 
       self.indent -= 2
       self.level -= 1
