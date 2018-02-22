@@ -621,16 +621,25 @@ def validate_by_spec(error_list):
   try:
     # Generate the spec file
     configspec = generate_configspec()
+    config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
     # Load the .ini files
-    conf = load_confs(configspec.name)
+    conf = load_confs(configspec.name, _configs_from_dir(config_dir))
     # Validate after merging all the confs
     collect_validation_messages(conf, error_list)
   finally:
     os.remove(configspec.name)
 
+def load_confs(configspecpath, conf_source=None):
+  """Loads and merges all of the configurations passed in,
+  returning a ConfigObj for the result.
 
-def load_confs(configspecpath):
-  conf_source = _configs_from_dir(get_desktop_root("conf"))
+  @param conf_source if not specified, reads conf/ from
+                     desktop/conf/. Otherwise should be a generator
+                     of ConfigObjs
+  """
+  if conf_source is None:
+    conf_source = _configs_from_dir(get_desktop_root("conf"))
+
   conf = ConfigObj(configspec=configspecpath)
   for in_conf in conf_source:
     conf.merge(in_conf)
@@ -648,7 +657,18 @@ def collect_validation_messages(conf, error_list):
   validator = validate.Validator()
   conf.validate(validator, preserve_errors=True)
   message = []
-  for sections, name in get_extra_values(conf):
+  cm_extras = {
+    'hadoop_hdfs_home': [('hadoop', 'hdfs_clusters', 'default')],
+    'hadoop_bin': [('hadoop', 'hdfs_clusters', 'default'), ('hadoop', 'yarn_clusters', 'default')],
+    'hadoop_mapred_home': [('hadoop', 'yarn_clusters', 'default')],
+    'hadoop_conf_dir': [('hadoop', 'yarn_clusters', 'default')],
+    'ssl_cacerts': [('beeswax', 'ssl'), ('impala', 'ssl')],
+    'remote_data_dir': [('liboozie', )],
+    'shell': [()]
+  }
+  whitelist_extras = ((sections, name) for sections, name in get_extra_values(conf) if not (name in desktop.conf.APP_BLACKLIST.get() or (name in cm_extras.keys() and sections in cm_extras[name])))
+
+  for sections, name in whitelist_extras:
     the_section = conf
     hierarchy_sections_string = ''
     try:
@@ -676,7 +696,7 @@ def collect_validation_messages(conf, error_list):
     message.append('Extra %s, %s in the section: %s' % (section_or_value, name, section_string))
   if message:
     error = {
-      'name': 'Desktop',
+      'name': 'ini configuration',
       'message': ', '.join(message),
     }
     error_list.append(error)

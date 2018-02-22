@@ -57,6 +57,8 @@ from desktop.lib.paginator import Paginator
 from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.conf import _configs_from_dir
+from desktop.lib.paths import get_desktop_root
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document, Document2, get_data_link, _version_from_properties, HUE_VERSION,\
   ClusterConfig
@@ -65,6 +67,7 @@ from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home, generate_configspec, load_confs, collect_validation_messages
 from desktop.auth.backend import rewrite_user
 from dashboard.conf import HAS_SQL_ENABLED
+
 
 
 def setup_test_environment():
@@ -1391,12 +1394,14 @@ def test_get_dn():
   assert_equal(['.hue.com'], desktop.conf.get_dn('finance.sql.hue.com'))
   assert_equal(['.hue.com'], desktop.conf.get_dn('bank.finance.sql.hue.com'))
 
+
 def test_collect_validation_messages_default():
   try:
     # Generate the spec file
     configspec = generate_configspec()
     # Load the .ini files
-    conf = load_confs(configspec.name)
+    config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
+    conf = load_confs(configspec.name, _configs_from_dir(config_dir))
     # This is for the hue.ini file only
     error_list = []
     collect_validation_messages(conf, error_list)
@@ -1409,7 +1414,8 @@ def test_collect_validation_messages_extras():
     # Generate the spec file
     configspec = generate_configspec()
     # Load the .ini files
-    conf = load_confs(configspec.name)
+    config_dir = os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))
+    conf = load_confs(configspec.name, _configs_from_dir(config_dir))
 
     test_conf = ConfigObj()
     test_conf['extrasection'] = {
