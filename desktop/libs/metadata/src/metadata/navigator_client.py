@@ -264,6 +264,8 @@ class NavigatorApi(object):
               fq_type = entity_types
             filterQueries.append(term)
 
+      filterQueries.append('deleted:false')
+
       body = {'query': ' '.join(query) or '*'}
       if fq_type:
         filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
