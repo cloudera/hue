@@ -480,7 +480,7 @@ class TestWithMockedSolr(TestSearchBase):
 
     json_response_content = json.loads(json_response.content)
     assert_equal('application/json', json_response['Content-Type'])
-    assert_equal('attachment; filename=query_result.json', json_response['Content-Disposition'])
+    assert_equal('attachment; filename="query_result.json"', json_response['Content-Disposition'])
     assert_equal(4, len(json_response_content), len(json_response_content))
     assert_equal('Investigations for neonatal seizures.', json_response_content[0]['article_title'])
 
@@ -491,7 +491,7 @@ class TestWithMockedSolr(TestSearchBase):
     })
     csv_response_content = ''.join(csv_response.streaming_content)
     assert_equal('application/csv', csv_response['Content-Type'])
-    assert_equal('attachment; filename=query_result.csv', csv_response['Content-Disposition'])
+    assert_equal('attachment; filename="query_result.csv"', csv_response['Content-Disposition'])
     assert_equal(4 + 1 + 1, len(csv_response_content.split('\n')), csv_response_content.split('\n'))
     assert_true('&lt;script&gt;alert(1234)&lt;/script&gt;,_version_,author,category,comments,content,content_type,description,features,inStock,includes,keywords,last_modified,links,manu,manu_exact,name,payloads,popularity,price,resourcename,sku,store,subject,text,text_rev,title,url,weight,id' in csv_response_content, csv_response_content)
     # Fields does not exactly match the response but this is because the collection schema does not match the query response.
@@ -505,7 +505,7 @@ class TestWithMockedSolr(TestSearchBase):
     xls_response_content = ''.join(xls_response.content)
     assert_not_equal(0, len(xls_response_content))
     assert_equal('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', xls_response['Content-Type'])
-    assert_equal('attachment; filename=query_result.xlsx', xls_response['Content-Disposition'])
+    assert_equal('attachment; filename="query_result.xlsx"', xls_response['Content-Disposition'])
 
   def test_index_xss(self):
     doc = Document2.objects.create(name='test_dashboard', type='search-dashboard', owner=self.user,
