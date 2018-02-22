@@ -714,6 +714,10 @@ var DataCatalog = (function () {
       }
       var deferred = $.Deferred();
 
+      if (options.cachedOnly && !self.sourceMeta && !self.sourceMetaPromise) {
+        return deferred.reject(false).promise();
+      }
+
       var sourceMetaPromise = self.getSourceMeta(options).done(function (sourceMeta) {
         if (!sourceMeta || sourceMeta.notFound) {
           deferred.reject();
@@ -1069,7 +1073,6 @@ var DataCatalog = (function () {
      * @param {string} comment
      * @param {Object} [apiOptions]
      * @param {boolean} [apiOptions.silenceErrors]
-     * @param {boolean} [apiOptions.cachedOnly]
      * @param {boolean} [apiOptions.refreshCache]
      *
      * @return {Promise}
