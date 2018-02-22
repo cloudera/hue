@@ -646,7 +646,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
                                 {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'format': 'csv'})
 
     assert_equal(200, response.status_code)
-    assert_equal(('Content-Disposition', 'attachment; filename=Test Query.csv'), response._headers['content-disposition'])
+    assert_equal(('Content-Disposition', 'attachment; filename="Test Query.csv"'), response._headers['content-disposition'])
 
 
   def test_get_sample(self):

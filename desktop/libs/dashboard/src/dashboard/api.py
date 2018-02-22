@@ -296,7 +296,7 @@ def download(request):
     if file_format == 'json':
       docs = response['response']['docs']
       resp = JsonResponse(docs, safe=False)
-      resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
+      resp['Content-Disposition'] = 'attachment; filename="%s.%s"' % ('query_result', file_format)
       return resp
     else:
       return export_download(response, file_format, collection)

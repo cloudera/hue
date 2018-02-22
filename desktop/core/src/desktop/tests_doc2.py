@@ -1050,11 +1050,11 @@ class TestDocument2ImportExport(object):
 
     # Test that exporting to a file includes the date and number of documents in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id, workflow2.id])})
-    assert_equal(response['Content-Disposition'], 'attachment; filename=hue-documents-%s-(4).json' % datetime.today().strftime('%Y-%m-%d'))
+    assert_equal(response['Content-Disposition'], 'attachment; filename="hue-documents-%s-(4).json"' % datetime.today().strftime('%Y-%m-%d'))
 
     # Test that exporting single file gets the name of the document in the filename
     response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id])})
-    assert_equal(response['Content-Disposition'], 'attachment; filename=' + workflow.name + '.json')
+    assert_equal(response['Content-Disposition'], 'attachment; filename="' + workflow.name + '.json"')
 
 
   def test_export_directories_with_children(self):
