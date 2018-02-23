@@ -714,7 +714,7 @@ var DataCatalog = (function () {
       }
       var deferred = $.Deferred();
 
-      if (options.cachedOnly && !self.sourceMeta && !self.sourceMetaPromise) {
+      if (options && options.cachedOnly && !self.sourceMeta && !self.sourceMetaPromise) {
         return deferred.reject(false).promise();
       }
 
