@@ -2936,13 +2936,13 @@
           beforeCursor: 'CREATE VIEW foo AS SELECT a, ',
           afterCursor: ' FROM tableOne',
           hasLocations:true,
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
-            suggestColumns:  { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
-            suggestKeywords: ['*']
+            suggestColumns:  { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] }
           }
         });
       });
@@ -3021,13 +3021,13 @@
             afterCursor: ' FROM tableOne',
             dialect: 'hive',
             hasLocations:true,
+            containsKeywords: ['*', 'CASE'],
             expectedResult: {
               lowerCase: false,
               suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
-              suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
-              suggestKeywords: ['*']
+              suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] }
             }
           });
         });

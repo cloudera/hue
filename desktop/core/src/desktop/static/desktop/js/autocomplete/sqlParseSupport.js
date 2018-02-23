@@ -212,6 +212,17 @@ var SqlParseSupport = (function () {
       }
     };
 
+    parser.getSelectListKeywords = function (excludeAsterisk) {
+      var keywords = [{ value: 'CASE', weight: 450 }, 'FALSE', 'TRUE', 'NULL'];
+      if (!excludeAsterisk) {
+        keywords.push({ value: '*', weight: 10000 });
+      }
+      if (parser.isHive()) {
+        keywords = keywords.concat(['EXISTS', 'NOT']);
+      }
+      return keywords;
+    };
+
     parser.getValueExpressionKeywords = function (valueExpression, extras) {
       var types = valueExpression.lastType ? valueExpression.lastType.types : valueExpression.types;
       // We could have valueExpression.columnReference to suggest based on column type
@@ -275,11 +286,9 @@ var SqlParseSupport = (function () {
 
     parser.selectListNoTableSuggest = function (selectListEdit, hasDistinctOrAll) {
       if (selectListEdit.cursorAtStart) {
-        var keywords = [];
-        if (hasDistinctOrAll) {
-          keywords = [{value: '*', weight: 1000}];
-        } else {
-          keywords = [{value: '*', weight: 1000}, 'ALL', 'DISTINCT'];
+        var keywords = parser.getSelectListKeywords();
+        if (!hasDistinctOrAll) {
+          keywords = keywords.concat([{ value: 'ALL', weight: 2 }, { value: 'DISTINCT', weight: 2 }]);
         }
         if (parser.isImpala()) {
           keywords.push('STRAIGHT_JOIN');
@@ -318,7 +327,7 @@ var SqlParseSupport = (function () {
       }
       parser.suggestColumns();
       parser.suggestFunctions();
-      var keywords = ['CASE', 'NULL'];
+      var keywords = [{ value: 'CASE', weight: 450 }, { value: 'FALSE', weight: 450 }, { value: 'NULL', weight: 450 }, { value: 'TRUE', weight: 450 }];
       if (parser.isHive() || typeof oppositeValueExpression === 'undefined' || typeof operator === 'undefined') {
         keywords = keywords.concat(['EXISTS', 'NOT']);
       }
@@ -1842,7 +1851,7 @@ var SqlParseSupport = (function () {
   };
 
   var SYNTAX_PARSER_NOOP_FUNCTIONS = ['prepareNewStatement', 'addCommonTableExpressions', 'pushQueryState', 'popQueryState', 'suggestSelectListAliases',
-    'suggestValueExpressionKeywords', 'getValueExpressionKeywords', 'addColRefIfExists', 'selectListNoTableSuggest', 'suggestJoinConditions',
+    'suggestValueExpressionKeywords', 'getSelectListKeywords', 'getValueExpressionKeywords', 'addColRefIfExists', 'selectListNoTableSuggest', 'suggestJoinConditions',
     'suggestJoins', 'valueExpressionSuggest', 'applyTypeToSuggestions', 'applyArgumentTypesToSuggestions', 'commitLocations', 'identifyPartials',
     'getSubQuery', 'addTablePrimary', 'suggestFileFormats', 'suggestDdlAndDmlKeywords', 'checkForSelectListKeywords', 'checkForKeywords',
     'suggestKeywords', 'suggestColRefKeywords', 'suggestTablesOrColumns', 'suggestFunctions', 'suggestAggregateFunctions', 'suggestAnalyticFunctions',

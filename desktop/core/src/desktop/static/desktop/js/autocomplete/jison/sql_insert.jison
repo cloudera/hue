@@ -344,7 +344,7 @@ SelectWithoutTableExpression_EDIT
    }
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR'
    {
-     var keywords = [{ value: '*', weight: 10000 }];
+     var keywords = parser.getSelectListKeywords();
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
