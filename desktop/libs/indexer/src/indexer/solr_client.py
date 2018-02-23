@@ -89,7 +89,8 @@ class SolrClient(object):
       LOG.warn(msg)
       raise PopupException(msg, detail=smart_str(e))
 
-    return indexes
+    return sorted(indexes, key=lambda index: index['name'])
+
 
   def create_index(self, name, fields, config_name=None, unique_key_field=None, df=None, shards=1, replication=1):
     if self.is_solr_cloud_mode():
