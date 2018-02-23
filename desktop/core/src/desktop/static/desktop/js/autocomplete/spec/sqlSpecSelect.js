@@ -342,13 +342,13 @@
         assertAutoComplete({
           beforeCursor: 'SELECT IF(baa, boo, bee) AS b, ',
           afterCursor: ' FROM testTable',
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
             suggestAnalyticFunctions: true,
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestKeywords: ['*']
+            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -357,13 +357,13 @@
         assertAutoComplete({
           beforeCursor: 'SELECT IF(baa > 2, boo, bee) AS b, ',
           afterCursor: ' FROM testTable',
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
             suggestAnalyticFunctions: true,
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestKeywords: ['*']
+            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -559,7 +559,7 @@
         assertAutoComplete({
           beforeCursor: 'SELECT ALL ',
           afterCursor: '',
-          containsKeywords: ['*'],
+          containsKeywords: ['*', 'CASE'],
           doesNotContainKeywords: ['ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
@@ -584,7 +584,7 @@
           beforeCursor: 'SELECT STRAIGHT_JOIN ',
           afterCursor: '',
           dialect: 'impala',
-          containsKeywords: ['*'],
+          containsKeywords: ['*', 'CASE'],
           doesNotContainKeywords: ['ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
@@ -915,10 +915,10 @@
           afterCursor: ' FROM testTableA tta, (SELECT SUM(A*B) total FROM tta.arr) ttaSum, testTableB ttb',
           ignoreErrors: true,
           dialect: 'hive',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }], alias: 'ttb' }] },
             suggestAnalyticFunctions: true,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ subQuery: 'ttaSum'}] }, { identifierChain: [{ name: 'testTableB' }], alias: 'ttb' }] },
             subQueries: [{
@@ -935,9 +935,9 @@
         assertAutoComplete({
           beforeCursor: 'SELECT a, ',
           afterCursor: ' FROM tableA;',
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*'],
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableA' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -950,9 +950,9 @@
         assertAutoComplete({
           beforeCursor: 'SELECT a,',
           afterCursor: ' FROM testTable',
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*'],
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -965,9 +965,9 @@
         assertAutoComplete({
           beforeCursor: 'SELECT *, ',
           afterCursor: ' FROM tableA;',
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*'],
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableA' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -1047,9 +1047,9 @@
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, ',
           afterCursor: ',c, d FROM testTable WHERE a = \'US\' AND b >= 998 ORDER BY c DESC LIMIT 15',
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*'],
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -3020,6 +3020,7 @@
             beforeCursor: 'SELECT ',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem',
             dialect: 'hive',
+            containsKeywords: ['*', 'ALL', 'DISTINCT'],
             expectedResult: {
               locations: [
                 { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 81 } },
@@ -3032,7 +3033,6 @@
               ],
               suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
-              suggestKeywords: ['*', 'ALL', 'DISTINCT'],
               suggestFunctions: {},
               suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testItem', type: 'alias' }],
@@ -3082,13 +3082,13 @@
             beforeCursor: 'SELECT ',
             afterCursor: ' FROM testTable LATERAL VIEW explode(',
             dialect: 'hive',
+            containsKeywords: ['*','ALL','DISTINCT'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
               suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-              suggestKeywords: ['*','ALL','DISTINCT']
+              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         });
@@ -3138,9 +3138,9 @@
             beforeCursor: 'SELECT ',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedTable AS testKey, testValue',
             dialect: 'hive',
+            containsKeywords: ['*', 'ALL', 'DISTINCT'],
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['*', 'ALL', 'DISTINCT'],
               suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
@@ -3310,9 +3310,9 @@
             beforeCursor: 'SELECT ',
             afterCursor: ' FROM testTable LATERAL VIEW explode(testMap) explodedMap AS testMapKey, testMapValue',
             dialect: 'hive',
+            containsKeywords: ['*', 'ALL', 'DISTINCT'],
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['*', 'ALL', 'DISTINCT'],
               suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
@@ -3467,9 +3467,9 @@
           beforeCursor: 'SELECT ',
           afterCursor: ' FROM testTable t, t.testMap tm;',
           dialect: 'impala',
+          containsKeywords: ['*', 'ALL', 'DISTINCT', 'STRAIGHT_JOIN'],
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['*', 'ALL', 'DISTINCT', 'STRAIGHT_JOIN'],
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
@@ -4868,12 +4868,11 @@
             afterCursor: ' FROM tbl',
             dialect: 'impala',
             noErrors: true,
+            containsKeywords: ['CASE', 'NULL'],
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['FROM'],
               suggestColumns: { types: ['NUMBER'], source: 'select', tables: [{ identifierChain: [{ name: 'tbl' }] }] },
-              suggestFunctions: { types: ['NUMBER'] },
-              suggestKeywords: ['CASE', 'NULL']
+              suggestFunctions: { types: ['NUMBER'] }
             }
           });
         });
@@ -4955,11 +4954,11 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE baa = 1 AND ',
           afterCursor: '',
+          containsKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
           expectedResult: {
             lowerCase: false,
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
@@ -4969,11 +4968,11 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ',
           afterCursor: ' AND baa = 1',
+          containsKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
           expectedResult: {
             lowerCase: false,
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
@@ -4983,11 +4982,11 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE baa = 1 OR ',
           afterCursor: '',
+          containsKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
           expectedResult: {
             lowerCase: false,
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
@@ -4997,11 +4996,11 @@
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE ',
           afterCursor: ' OR baa = 1',
+          containsKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
           expectedResult: {
             lowerCase: false,
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
@@ -5064,28 +5063,28 @@
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, \nc,\nd, ',
           afterCursor: '\ng,\nf\nFROM testTable WHERE a > 1 AND b = \'b\' ORDER BY c;',
+          containsKeywords: ['*', 'CASE'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestKeywords: ['*']
+            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
 
-      it('should suggest columns for "SELECT a, b, | c FROM testTable"', function() {
+      it('should suggest columns for "SELECT a,b, | c FROM testTable"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT a,b, ',
           afterCursor: ' c FROM testTable',
+          containsKeywords: ['*'],
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
             suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestKeywords: ['*']
+            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });

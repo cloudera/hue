@@ -1399,7 +1399,7 @@ SelectStatement_EDIT
    {
      parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4);
      if ($4.cursorAtStart) {
-       var keywords = [{ value: '*', weight: 10000 }];
+       var keywords = parser.getSelectListKeywords();
        if (!$3 && !$2) {
          keywords.push({ value: 'ALL', weight: 2 });
          keywords.push({ value: 'DISTINCT', weight: 2 });
@@ -1431,7 +1431,7 @@ SelectStatement_EDIT
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR'
    {
      parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4, true);
-     var keywords = [{ value: '*', weight: 10000 }];
+     var keywords = parser.getSelectListKeywords();
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
@@ -1464,7 +1464,7 @@ SelectStatement_EDIT
  | 'SELECT' OptionalAllOrDistinct OptionalStraightJoin 'CURSOR' TableExpression
    {
      parser.addClauseLocation('selectList', parser.firstDefined($3, @3, $2, @2, $1, @1), @4, true);
-     var keywords = [{ value: '*', weight: 10000 }];
+     var keywords = parser.getSelectListKeywords();
      if (!$2 || $2 === 'ALL') {
        parser.suggestAggregateFunctions();
        parser.suggestAnalyticFunctions();
@@ -2676,21 +2676,21 @@ SelectList_EDIT
    }
  | SelectList ',' AnyCursor
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
+     $$ = { suggestKeywords: parser.getSelectListKeywords(), suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
    }
  | SelectList ',' SelectSpecification_EDIT                 -> $3
  | SelectList ',' AnyCursor SelectList
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: parser.getSelectListKeywords(), suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' AnyCursor ','
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: parser.getSelectListKeywords(), suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' SelectSpecification_EDIT ','             -> $3
  | SelectList ',' AnyCursor ',' SelectList
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: parser.getSelectListKeywords(), suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' SelectSpecification_EDIT ',' SelectList  -> $3
  ;
@@ -3684,13 +3684,17 @@ CountFunction_EDIT
  : 'COUNT' '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
+     var keywords = parser.getSelectListKeywords();
      if (!$3) {
-       var keywords = parser.isImpala() ? [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 10000 }, 'DISTINCT'];
+       keywords.push('DISTINCT');
+       if (parser.isImpala()) {
+         keywords.push('ALL');
+       }
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       parser.suggestKeywords(keywords);
      }
+     parser.suggestKeywords(keywords);
      $$ = { types: parser.findReturnTypes($1) };
    }
  | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList 'CURSOR' RightParenthesisOrError
@@ -3700,12 +3704,15 @@ CountFunction_EDIT
    }
  | 'COUNT' '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
-     if ($4.cursorAtStart && !$3) {
-       if (parser.isImpala()) {
-         parser.suggestKeywords(['ALL', 'DISTINCT']);
-       } else {
-         parser.suggestKeywords(['DISTINCT']);
+     if ($4.cursorAtStart) {
+       var keywords = parser.getSelectListKeywords();
+       if (!$3) {
+         keywords.push('DISTINCT');
+         if (parser.isImpala()) {
+           keywords.push('ALL');
+         }
        }
+       parser.suggestKeywords(keywords);
      }
      $$ = { types: parser.findReturnTypes($1) };
    }
@@ -3765,20 +3772,21 @@ OtherAggregateFunction_EDIT
  : OtherAggregateFunction_Type '(' OptionalAllOrDistinct AnyCursor RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
+     var keywords = parser.getSelectListKeywords(true);
      if (!$3) {
-       var keywords = [];
        if ($1.toLowerCase() === 'group_concat') {
-         keywords = ['ALL'];
+         keywords.push('ALL');
        } else if (parser.isImpala()) {
-         keywords = ['ALL', 'DISTINCT'];
+         keywords.push('ALL');
+         keywords.push('DISTINCT');
        } else {
-         keywords = ['DISTINCT'];
+         keywords.push('DISTINCT');
        }
-       if (parser.yy.result.suggestKeywords) {
-         keywords = parser.yy.result.suggestKeywords.concat(keywords);
-       }
-       parser.suggestKeywords(keywords);
      }
+     if (parser.yy.result.suggestKeywords) {
+       keywords = parser.yy.result.suggestKeywords.concat(keywords);
+     }
+     parser.suggestKeywords(keywords);
      parser.applyArgumentTypesToSuggestions($1, 1);
      $$ = { types: parser.findReturnTypes($1) };
    }
@@ -3789,14 +3797,17 @@ OtherAggregateFunction_EDIT
    }
  | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList_EDIT RightParenthesisOrError
    {
-     if ($4.cursorAtStart && !$3) {
-       var keywords = [];
-       if ($1.toLowerCase() === 'group_concat') {
-         keywords = ['ALL'];
-       } else if (parser.isImpala()) {
-         keywords = ['ALL', 'DISTINCT'];
-       } else {
-         keywords = ['DISTINCT'];
+     if ($4.cursorAtStart) {
+       var keywords = parser.getSelectListKeywords(true);
+       if (!$3) {
+         if ($1.toLowerCase() === 'group_concat') {
+           keywords.push('ALL');
+         } else if (parser.isImpala()) {
+           keywords.push('ALL');
+           keywords.push('DISTINCT');
+         } else {
+           keywords.push('DISTINCT');
+         }
        }
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
@@ -3931,13 +3942,17 @@ SumFunction_EDIT
    {
      parser.valueExpressionSuggest();
      parser.applyArgumentTypesToSuggestions($1, 1);
+     var keywords = parser.getSelectListKeywords(true);
      if (!$3) {
-       var keywords = parser.isImpala() ? ['ALL', 'DISTINCT'] : ['DISTINCT'];
-       if (parser.yy.result.suggestKeywords) {
-         keywords = parser.yy.result.suggestKeywords.concat(keywords);
+       keywords.push('DISTINCT');
+       if (parser.isImpala()) {
+         keywords.push('ALL');
        }
-       parser.suggestKeywords(keywords);
      }
+     if (parser.yy.result.suggestKeywords) {
+       keywords = parser.yy.result.suggestKeywords.concat(keywords);
+     }
+     parser.suggestKeywords(keywords);
      $$ = { types: parser.findReturnTypes($1) };
    }
  | 'SUM' '(' OptionalAllOrDistinct ValueExpression 'CURSOR' RightParenthesisOrError
