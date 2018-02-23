@@ -147,8 +147,6 @@ class Collection2(object):
         for facet_facet in properties['facets']:
           if 'fieldLabel' not in facet_facet:
             facet_facet['fieldLabel'] = facet_facet['field']
-          if 'multiselect' not in facet_facet:
-            facet_facet['multiselect'] = True
 
       if facet['widgetType'] == 'histogram-widget':
         if 'timelineChartType' not in properties:
