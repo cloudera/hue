@@ -184,11 +184,6 @@ var ApiHelper = (function () {
   function ApiHelper () {
     var self = this;
     self.queueManager = ApiQueueManager.getInstance();
-    self.invalidateImpala = null;
-
-    huePubSub.subscribe('assist.invalidate.impala', function (details) {
-      self.invalidateImpala = details;
-    });
 
     huePubSub.subscribe('assist.clear.hdfs.cache', function () {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
@@ -1174,8 +1169,8 @@ var ApiHelper = (function () {
   /**
    * @param {Object} options
    * @param {string} options.sourceType
-   * @param {string} options.invalidate - [invalidate|invalidateAndFlush]
-   * @param {string} [options.database]
+   * @param {string} options.invalidate - 'invalidate' or 'invalidateAndFlush'
+   * @param {string[]} [options.path]
    * @param {boolean} [options.silenceErrors]
    */
   ApiHelper.prototype.invalidateSourceMetadata = function (options) {
@@ -1187,8 +1182,11 @@ var ApiHelper = (function () {
         flush_all: options.invalidate === 'invalidateAndFlush'
       };
 
-      if (options.database) {
-        data.database = options.database;
+      if (options.path && options.path.length > 0) {
+        data.database = options.path[0];
+      }
+      if (options.path && options.path.length > 1) {
+        data.table = options.path[1];
       }
 
       var request = self.simplePost(IMPALA_INVALIDATE_API, data, options).done(deferred.resolve).fail(deferred.reject);
