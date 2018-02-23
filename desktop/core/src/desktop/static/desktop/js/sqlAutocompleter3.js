@@ -616,14 +616,14 @@ var AutocompleteResults = (function () {
                 meta: HUE_I18n.autocomplete.meta.virtual,
                 category: CATEGORIES.VIRTUAL_COLUMN,
                 popular: ko.observable(false),
-                details: null
+                details: { name: 'BLOCK__OFFSET__INSIDE__FILE' }
               });
               columnSuggestions.push({
                 value: 'INPUT__FILE__NAME',
                 meta: HUE_I18n.autocomplete.meta.virtual,
                 category: CATEGORIES.VIRTUAL_COLUMN,
                 popular: ko.observable(false),
-                details: null
+                details: { name: 'INPUT__FILE__NAME' }
               });
             }
             columnsDeferred.resolve(columnSuggestions);

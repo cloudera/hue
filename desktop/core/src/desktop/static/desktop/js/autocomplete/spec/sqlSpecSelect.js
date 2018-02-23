@@ -1293,6 +1293,7 @@
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestAggregateFunctions: { tables: [] },
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
@@ -1306,6 +1307,7 @@
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestAggregateFunctions: { tables: [] },
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] } // TODO: source: 'order by'
           }
@@ -1330,6 +1332,7 @@
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestAggregateFunctions: { tables: [] },
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
@@ -1343,6 +1346,7 @@
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
+            suggestAggregateFunctions: { tables: [] },
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
