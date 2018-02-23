@@ -3379,7 +3379,17 @@ WindowExpression
 
 WindowExpression_EDIT
  : '(' PartitionBy_EDIT OptionalOrderByAndWindow RightParenthesisOrError
+   {
+     if (parser.yy.result.suggestFunctions) {
+       parser.suggestAggregateFunctions();
+     }
+   }
  | '(' OptionalPartitionBy OptionalOrderByAndWindow_EDIT RightParenthesisOrError
+   {
+     if (parser.yy.result.suggestFunctions) {
+       parser.suggestAggregateFunctions();
+     }
+   }
  | '(' AnyCursor OptionalPartitionBy OptionalOrderByAndWindow RightParenthesisOrError
    {
      if (!$3 && !$4) {
