@@ -639,18 +639,11 @@ var DataCatalog = (function () {
         if (self.dataCatalog.invalidatePromise) {
           invalidatePromise = self.dataCatalog.invalidatePromise;
         } else {
-          if (self.path.length) {
-            invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
-              sourceType: self.getSourceType(),
-              invalidate: invalidate,
-              database: self.path[0]
-            });
-          } else {
-            invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
-              sourceType: self.getSourceType(),
-              invalidate: invalidate
-            });
-          }
+          invalidatePromise = ApiHelper.getInstance().invalidateSourceMetadata({
+            sourceType: self.getSourceType(),
+            invalidate: invalidate,
+            path: self.path
+          });
           self.dataCatalog.invalidatePromise = invalidatePromise;
           invalidatePromise.always(function () {
             delete self.dataCatalog.invalidatePromise;

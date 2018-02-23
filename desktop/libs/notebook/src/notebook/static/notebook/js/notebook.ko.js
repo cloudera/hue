@@ -870,14 +870,21 @@ var EditorViewModel = (function() {
     self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
     window.setTimeout(function () {
       self.delayedDDLNotification.subscribe(function (val) {
-        var match = self.statement().match(/(?:CREATE|DROP) (?:TABLE|DATABASE) `([^`]+)`/i); // For importer/metastore generated DDL only currently
+        var match = self.statement().match(/(?:CREATE|DROP)\s+TABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))\..*/i);
+        var path = [];
         if (match) {
-          var db = match[1];
-          huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
+          path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
+        } else {
+          match = self.statement().match(/(?:CREATE|DROP)\s+(?:DATABASE|SCHEMA)\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:`([^`]+)`|([^;\s]+))/i);
+          if (match) {
+            path.push(match[1] || match[2]); // group 1 backticked db name, group 2 regular db name
+          } else if (self.database()) {
+            path.push(self.database());
+          }
         }
         ignoreNextAssistDatabaseUpdate = true;
-        DataCatalog.getEntry({ sourceType: self.type(), path: [] }).done(function (entry) {
-          entry.clear('cache', true);
+        DataCatalog.getEntry({ sourceType: self.type(), path: path }).done(function (entry) {
+          entry.clear('invalidate', true);
         });
       });
     }, 0);
