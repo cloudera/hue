@@ -466,9 +466,9 @@ var AutocompleteResults = (function () {
               category: CATEGORIES.UDF,
               value: name + '()',
               meta: functionsToSuggest[name].returnTypes.join('|'),
-              weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
+              weightAdjust: colRef.type.toUpperCase() !== 'T' && functionsToSuggest[name].returnTypes.some(function (otherType) {
                   return otherType === colRef.type.toUpperCase();
-              }).length > 0 ? 1 : 0,
+              }) ? 1 : 0,
               popular: ko.observable(false),
               details: functionsToSuggest[name]
             })
@@ -485,9 +485,9 @@ var AutocompleteResults = (function () {
             category: CATEGORIES.UDF,
             value: name + '()',
             meta: functionsToSuggest[name].returnTypes.join('|'),
-            weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
+            weightAdjust: types[0].toUpperCase() !== 'T' && functionsToSuggest[name].returnTypes.some(function (otherType) {
               return otherType === types[0].toUpperCase();
-            }).length > 0 ? 1 : 0,
+            }) ? 1 : 0,
             popular: ko.observable(false),
             details: functionsToSuggest[name]
           })

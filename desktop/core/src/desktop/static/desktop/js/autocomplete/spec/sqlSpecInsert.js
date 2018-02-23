@@ -373,7 +373,7 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            containsKeywords: ['*'],
+            containsKeywords: ['*', 'CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -496,7 +496,7 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            containsKeywords: ['*'],
+            containsKeywords: ['*', 'CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -545,7 +545,7 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            containsKeywords: ['*'],
+            containsKeywords: ['*', 'CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -669,7 +669,7 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            containsKeywords: ['*'],
+            containsKeywords: ['*', 'CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -863,7 +863,7 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            containsKeywords: ['*'],
+            containsKeywords: ['*', 'CASE'],
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
@@ -1438,11 +1438,11 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
+          containsKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl2' }], alias: 'S' }, { identifierChain: [{ name: 'tbl' }], alias: 'T' }] },
             suggestFunctions: {},
-            suggestKeywords: ['CASE', 'EXISTS', 'NOT', 'NULL'],
             suggestIdentifiers: [{ name: 'S.', type: 'alias' }, { name: 'T.', type: 'alias' }]
           }
         });
