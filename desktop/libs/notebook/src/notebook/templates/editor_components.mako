@@ -1229,32 +1229,22 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <ul data-bind="foreach: variables" class="unstyled inline">
       <li>
         <div class="input-prepend margin-top-10">
+          <!-- ko ifnot: path() -->
           <span class="muted add-on" data-bind="text: name"></span>
+          <!-- /ko -->
+          <!-- ko if: path() -->
+          <a href="javascript:void(0);" data-bind="click: $root.showContextPopover"> <span class="muted add-on" data-bind="text: name"></span></a>
+          <!-- /ko -->
           <!-- ko if: meta.type() == 'text' -->
             <!-- ko if: meta.placeholder() -->
               <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }">
             <!-- /ko -->
             <!-- ko ifnot: meta.placeholder() -->
-              <!-- ko if: type() == 'checkbox' -->
-              <input list="input-medium" type="text" data-bind="checked: value, attr: { type: type }, event: { 'keydown': $parent.onKeydownInVariable }" />
-              <!-- /ko -->
-              <!-- ko ifnot: type() == 'checkbox' -->
-                <!-- ko if: sample().length -->
-                  <!-- ko if: type() == 'text' -->
-                  <select data-bind="selectize: sample, selectizeOptions: { create: true }, value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
-                  <!-- /ko -->
-                  <!-- ko ifnot: type() == 'text' -->
-                  <input list="input-medium" type="text" data-bind="datalist: { options: sample, value: value }, valueUpdate: 'afterkeydown', attr: { type: type, step: step }, event: { 'keydown': $parent.onKeydownInVariable }" />
-                  <!-- /ko -->
-                <!-- /ko -->
-                <!-- ko ifnot: sample().length -->
-                  <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }">
-                <!-- /ko -->
-              <!-- /ko -->
+              <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }">
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: meta.type() == 'select' -->
-          <select data-bind="selectize: meta.options, optionsText: 'text', optionsValue:'value', selectizeOptions: { create: true }, value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
+          <select data-bind="selectize: sample, optionsText: 'text', optionsValue: 'value', selectizeOptions: { create: function (input) { sampleUser().push({ text: ko.observable(input), value: ko.observable(input) }); return { text: input, value: input }; } }, value: value, event: { 'keydown': $parent.onKeydownInVariable }"/>
           <!-- /ko -->
         </div>
       </li>

@@ -589,9 +589,11 @@ var EditorViewModel = (function() {
     if (snippet.variables) {
       snippet.variables.forEach(function (variable) {
         variable.meta = (typeof variable.defaultValue === "object" && variable.defaultValue) || {type: "text", placeholder: ""};
-        variable.value = variable.value || "";
-        variable.sample = variable.entry || [];
-        variable.type = variable.type || "";
+        variable.value = variable.value || '';
+        variable.type = variable.type || 'text';
+        variable.sample = [];
+        variable.sampleUser = variable.sampleUser || [];
+        variable.path = variable.path || '';
         delete variable.defaultValue;
       });
     }
@@ -670,17 +672,17 @@ var EditorViewModel = (function() {
         var reList = /(?!\s*$)\s*(?:(?:([^,|()\\]*)\(\s*([^,|()\\]*)\)(?:\\[\S\s][^,|()\\]*)?)|([^,|\\]*(?:\\[\S\s][^,|\\]*)*))\s*(?:,|\||$)/g
         var statement = self.statement_raw();
         var matchComment = reComment.exec(statement);
-        //if re is n & reComment is m
-        //finding variables is O(n+m)
+        // if re is n & reComment is m
+        // finding variables is O(n+m)
         while (match = re.exec(statement)) {
-          while (matchComment && match.index > matchComment.index + matchComment[0].length) { //comments before our match
+          while (matchComment && match.index > matchComment.index + matchComment[0].length) { // Comments before our match
             matchComment = reComment.exec(statement);
           }
           var isWithinComment = matchComment && match.index >= matchComment.index;
           if (isWithinComment) continue;
 
-          //If 1 match, text value
-          //If multiple matches, list value
+          // If 1 match, text value
+          // If multiple matches, list value
           var value = { type: 'text', placeholder: '' };
           while (matchList = reList.exec(match[2])) {
             var option = {text:matchList[2] || matchList[3], value:matchList[3] || matchList[1]};
@@ -714,19 +716,21 @@ var EditorViewModel = (function() {
     self.variableValues = {};
     self.variableNames.extend({ rateLimit: 150 });
     self.variableNames.subscribe(function (newVal) {
-      var diffLengthVariables = self.variables().length - newVal.length;
+      var variablesLength = self.variables().length;
+      var diffLengthVariables = variablesLength - newVal.length;
       var needsMore = diffLengthVariables < 0;
       var needsLess = diffLengthVariables > 0;
       self.variableValues = self.variables().reduce(function (variableValues, variable) {
         if (!variableValues[variable.name()]) {
-          variableValues[variable.name()] = { sample: [] };
+          variableValues[variable.name()] = { sampleUser: [] };
         }
         variableValues[variable.name()].value = variable.value();
+        variableValues[variable.name()].sampleUser = variable.sampleUser();
         return variableValues;
       }, self.variableValues);
       if (needsMore) {
         for (var i = 0, length = Math.abs(diffLengthVariables); i < length; i++) {
-          self.variables.push(ko.mapping.fromJS({ name: '', value: '', meta: { type: 'text', placeholder: '' }, sample: [], type: 'text', step: ''}));
+          self.variables.push(ko.mapping.fromJS({ name: '', value: '', meta: { type: 'text', placeholder: '', options: [] }, sample: [], sampleUser: [], type: 'text', step: '', path: ''}));
         }
       } else if (needsLess) {
         self.variables.splice(self.variables().length - diffLengthVariables, diffLengthVariables);
@@ -736,20 +740,18 @@ var EditorViewModel = (function() {
         variable.name(item.name);
         variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || '');
         variable.meta = ko.mapping.fromJS(item.meta, {}, variable.meta);
-        variable.sample(self.variableValues[item.name] ? self.variableValues[item.name].sample : []);
+        variable.sample(variable.meta.options ? variable.meta.options().concat(variable.sampleUser()) : variable.sampleUser())
+        variable.sampleUser(self.variableValues[item.name] ? self.variableValues[item.name].sampleUser : []);
         variable.type(self.variableValues[item.name] ? self.variableValues[item.name].type || 'text' : 'text');
+        variable.path(self.variableValues[item.name] ? self.variableValues[item.name].path || '' : '');
       });
     });
     huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
       var variables = e.data.locations.reduce(function (variables, location) {
         var re = /\${(\w*)\=?([^{}]*)}/g;
-        if (location.type === 'table') {
-          variables.table = location.identifierChain;
-          variables.column = null;
-          variables.complex = null;
-        } else if (location.type === 'variable' && location.colRef) {
+        if (location.type === 'variable' && location.colRef) {
           var column = location.colRef.identifierChain;
-          var identifierChain = variables.table.slice().concat(column);
+          var identifierChain = location.colRef.tables[0].identifierChain.slice().concat(column);
           var value = re.exec(location.value);
           variables.push({
             path: identifierChain.map(function (identifier) {
@@ -761,78 +763,65 @@ var EditorViewModel = (function() {
         return variables;
       }, []);
       var sourceType = self.type();
-      for (var i = 0; i < variables.length; i++) {
-        DataCatalog.getEntry({ sourceType: sourceType, path: variables[i].path })
-        .done(function (variable, entry) {
-          entry.getSample({ silenceErrors: true })
-          .then(function (variable, sample) {
-            if (!self.variableValues[variable.name]) {
-              self.variableValues[variable.name] = {};
-            }
-            var variablesValues = self.variableValues[variable.name];
-            var type = sample.full_headers[0].type;
-            switch (type) {
-              case 'TIMESTAMP_TYPE':
-                variablesValues.type = 'datetime-local';
-                variablesValues.step = '1';
-                variablesValues.sample = sample.rows.map(function (row) {
-                  var date = Date.parse(row[0]);
-                  if (Number.isNaN(date)) {
-                    return row[0];
-                  } else {
-                    return moment(date).format().substring(0,19); // Input options only accept date in ISO format with 20 characters (no timezone)
-                  }
-                });
-                break;
-              case 'DECIMAL_TYPE':
-              case 'DOUBLE_TYPE':
-              case 'FLOAT_TYPE':
-                variablesValues.step = 'any';
-                variablesValues.type = 'number';
-                variablesValues.sample = sample.rows.map(function (row) { return row[0]; });
-                break;
-              case 'INT_TYPE':
-              case 'SMALLINT_TYPE':
-              case 'TINYINT_TYPE':
-              case 'BIGINT_TYPE':
-                variablesValues.type = 'number';
-                variablesValues.step = '1';
-                variablesValues.sample = sample.rows.map(function (row) { return row[0]; });
-                break;
-              case 'DATE_TYPE':
-                variablesValues.type = 'date';
-                variablesValues.step = '';
-                variablesValues.sample = sample.rows.map(function (row) {
-                  var date = Date.parse(row[0]);
-                  if (Number.isNaN(date)) {
-                    return row[0];
-                  } else {
-                    return moment(date).format().substring(0,10); // Input options only accept date in ISO format with 11 characters
-                  }
-                });
-                break;
-              case 'BOOLEAN_TYPE':
-                variablesValues.type = 'checkbox';
-                variablesValues.sample = [];
-                variablesValues.step = '';
-                break;
-              default:
-                variablesValues.sample = sample.rows.map(function (row) { return row[0]; });
-                variablesValues.type = 'text';
-                variablesValues.step = '';
-            }
-
-            var currentVariables = self.variables();
-            for (var i = 0; i < currentVariables.length; i++) {
-              if (currentVariables[i].name() === variable.name) {
-                currentVariables[i].sample(variablesValues.sample);
-                currentVariables[i].type(variablesValues.type);
-                currentVariables[i].step(variablesValues.step);
-              }
-            }
-          }.bind(null, variable));
-        }.bind(null, variables[i]));
-      }
+      var oVariables = variables.reduce(function (variables, variable) {
+        variables[variable.name] = variable;
+        return variables;
+      }, {});
+      var fUpdateVariableSample = function (path, variable, sample) {
+        if (!self.variableValues[variable.name()]) {
+          self.variableValues[variable.name()] = { sampleUser: [] };
+        }
+        var variablesValues = self.variableValues[variable.name()];
+        var type = sample.full_headers[0].type;
+        switch (type) {
+          case 'TIMESTAMP_TYPE':
+            variablesValues.type = 'datetime-local';
+            variablesValues.step = '1';
+            break;
+          case 'DECIMAL_TYPE':
+          case 'DOUBLE_TYPE':
+          case 'FLOAT_TYPE':
+            variablesValues.type = 'number';
+            variablesValues.step = 'any';
+            break;
+          case 'INT_TYPE':
+          case 'SMALLINT_TYPE':
+          case 'TINYINT_TYPE':
+          case 'BIGINT_TYPE':
+            variablesValues.type = 'number';
+            variablesValues.step = '1';
+            break;
+          case 'DATE_TYPE':
+            variablesValues.type = 'date';
+            variablesValues.step = '';
+            break;
+          case 'BOOLEAN_TYPE':
+            variablesValues.type = 'checkbox';
+            variablesValues.step = '';
+            break;
+          default:
+            variablesValues.type = 'text';
+            variablesValues.step = '';
+        }
+        variable.path(variablesValues.path = path);
+        variable.type(variablesValues.type);
+        variable.step(variablesValues.step);
+      };
+      self.variables().forEach(function (variable) {
+        if (oVariables[variable.name()]) {
+          DataCatalog.getEntry({ sourceType: sourceType, path: oVariables[variable.name()].path })
+          .done(function (entry) {
+            entry.getSample({ silenceErrors: true }).then(fUpdateVariableSample.bind(self, oVariables[variable.name()].path, variable));
+          });
+        } else {
+          fUpdateVariableSample(oVariables[variable.name()].path, variable, {
+            full_headers: [
+              { type: 'text' }
+            ],
+            rows: []
+          });
+        }
+      });
     });
     self.statement = ko.computed(function () {
       var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
@@ -3400,6 +3389,29 @@ var EditorViewModel = (function() {
       self.selectedNotebook().parentSavedQueryUuid(null);
       self.selectedNotebook().save(function () {
         huePubSub.publish('assist.document.refresh');
+      });
+    };
+
+    self.showContextPopover = function (field, event) {
+      var $source = $(event.target);
+      var offset = $source.offset();
+      huePubSub.publish('context.popover.show', {
+        data: {
+          type: 'column',
+          identifierChain: field.path().map(function (path) { return { name: path }; })
+        },
+        showInAssistEnabled: true,
+        sourceType: self.editorType(),
+        orientation: 'right',
+        defaultDatabase: 'default',
+        pinEnabled: false,
+        source: {
+          element: event.target,
+          left: offset.left,
+          top: offset.top - 3,
+          right: offset.left + $source.width() + 1,
+          bottom: offset.top + $source.height() - 3
+        }
       });
     };
   }
