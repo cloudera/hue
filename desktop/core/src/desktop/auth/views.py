@@ -80,9 +80,6 @@ def first_login_ever():
       return True
   return False
 
-# We want unique method name to represent HUE-3 vs HUE-4 method call. This is required because of urlresolvers.reverse('desktop.auth.views.dt_login') below which needs uniqueness to work correctly
-def dt_login_old(request, from_modal=False):
-  return dt_login(request, from_modal)
 
 @login_notrequired
 @watch_login
