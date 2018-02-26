@@ -57,7 +57,7 @@ from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
-from desktop.log.access import access_log_level, access_warn
+from desktop.log.access import access_log_level, access_warn, AccessInfo
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
 from desktop.models import Settings, hue_version, _get_apps, UserPreferences, Cluster
 
@@ -156,13 +156,18 @@ def path_forbidden(request):
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
+
 def log_js_error(request):
-  LOG.error('JS ERROR: ' + request.POST.get('jserror', 'Unspecified JS error'))
+  ai = AccessInfo(request)
+  ai.log(level=logging.ERROR, msg='JS ERROR: ' + request.POST.get('jserror', 'Unspecified JS error'))
+
   return JsonResponse({'status': 0})
 
 
 def log_analytics(request):
-  LOG.info('PAGE: ' + request.POST.get('page'))
+  ai = AccessInfo(request)
+  ai.log(level=logging.INFO, msg='PAGE: ' + request.POST.get('page'))
+
   return JsonResponse({'status': 0})
 
 
@@ -183,6 +188,7 @@ def log_view(request):
       return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", ""), hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)))
 
   return render('logs.mako', request, dict(log=[_("No logs found!")], query='', hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)))
+
 
 @access_log_level(logging.WARN)
 def download_log_view(request):
