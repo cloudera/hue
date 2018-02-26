@@ -15,10 +15,12 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
+from notebook.conf import ENABLE_QUERY_SCHEDULING
+
 from desktop.conf import IS_EMBEDDED
 from desktop.lib.i18n import smart_unicode
-
-from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 
@@ -124,9 +126,16 @@ from desktop.views import _ko
 
         var checkJobBrowserStatus = function() {
           lastYarnBrowserRequest = checkYarnBrowserStatus();
-          lastScheduleBrowserRequest = checkScheduleBrowserStatus();
+          % if ENABLE_QUERY_SCHEDULING.get():
+            lastScheduleBrowserRequest = checkScheduleBrowserStatus();
+          % endif
 
-          $.when.apply($, [lastYarnBrowserRequest, lastScheduleBrowserRequest])
+          $.when.apply($, [
+            lastYarnBrowserRequest,
+            % if ENABLE_QUERY_SCHEDULING.get():
+              lastScheduleBrowserRequest
+            % endif
+          ])
           .done(function () {
             checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
            })

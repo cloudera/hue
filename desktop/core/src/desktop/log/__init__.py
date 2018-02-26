@@ -96,7 +96,7 @@ def get_audit_logger():
 def chown_log_dir(uid, gid):
   """
   chown all files in the log dir to this user and group.
-  Should only be called after loggic has been setup.
+  Should only be called after logic has been setup.
   Return success
   """
   if _log_dir is None:
