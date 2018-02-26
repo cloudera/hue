@@ -465,6 +465,11 @@
       box-sizing: border-box;
       height: 25px;
       border-radius: 4px;
+      opacity: .5;
+      .hue-ease-transition(opacity);
+      &:hover, &:focus {
+        opacity: 1;
+      }
     }
   }
 
