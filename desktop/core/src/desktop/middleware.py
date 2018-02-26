@@ -315,7 +315,8 @@ class LoginAndPermissionMiddleware(object):
         return PopupException(
             _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()}, error_code=401).response(request)
       else:
-        log_page_hit(request, view_func, level=access_log_level)
+        if not hasattr(request, 'view_func'):
+          log_page_hit(request, view_func, level=access_log_level)
         return None
 
     logging.info("Redirecting to login page: %s", request.get_full_path())
@@ -335,7 +336,7 @@ class LoginAndPermissionMiddleware(object):
 
   def process_response(self, request, response):
     if hasattr(request, 'ts') and hasattr(request, 'view_func'):
-      log_page_hit(request, request.view_func, level=logging.DEBUG, start_time=request.ts)
+      log_page_hit(request, request.view_func, level=logging.INFO, start_time=request.ts)
     return response
 
 
