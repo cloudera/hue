@@ -755,6 +755,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
               }
             } --><!-- /ko -->
           </div>
+          <!-- ko if: $parent.countsFiltered().length -->
           <div data-bind="foreach: $parent.countsFiltered" class="facet-count">
             <div class="trigger-exclude">
                 <!-- ko if: $index() < $parent.properties.limit() -->
@@ -793,6 +794,12 @@ ${ dashboard.layout_skeleton(suffix='search') }
                 <!-- /ko -->
             </div>
           </div>
+          <!-- /ko -->
+          <!-- ko ifnot: $parent.countsFiltered().length -->
+            <div class="facet-count">
+              <span class="no-results">${ _('No results found.') }</span>
+            </div>
+          <!-- /ko -->
        <!-- /ko -->
        <!-- ko ifnot: properties.facets()[0].multiselect -->
         <select data-bind="selectize: $parent.counts, optionsText: 'text', optionsValue:'value', value: $parent.countsSelected"/>
