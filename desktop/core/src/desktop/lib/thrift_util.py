@@ -447,9 +447,9 @@ class SuperClient(object):
 
           # Log the duration at different levels, depending on how long it took.
           logmsg = "Thrift call: %s.%s(args=%s, kwargs=%s) returned in %dms: %s" % (str(self.wrapped.__class__), attr, str_args, repr(kwargs), duration * 1000, log_msg)
-          if duration >= WARN_LEVEL_CALL_DURATION_MS:
+          if duration >= WARN_LEVEL_CALL_DURATION_MS / 1000:
             logging.warn(logmsg)
-          elif duration >= INFO_LEVEL_CALL_DURATION_MS:
+          elif duration >= INFO_LEVEL_CALL_DURATION_MS / 1000:
             logging.info(logmsg)
           else:
             logging.debug(logmsg)
