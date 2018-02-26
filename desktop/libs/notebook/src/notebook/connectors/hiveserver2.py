@@ -836,7 +836,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     session = Session.objects.get_session(self.user, application='impala')
     server_url = _get_impala_server_url(session)
     if query_id:
-      LOG.info("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
+      LOG.debug("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
 
       fragment = self._get_impala_query_profile(server_url, query_id=query_id)
       total_records_re = "Coordinator Fragment F\d\d.+?RowsReturned: \d+(?:.\d+[KMB])? \((?P<total_records>\d+)\).*?(Averaged Fragment F\d\d)"

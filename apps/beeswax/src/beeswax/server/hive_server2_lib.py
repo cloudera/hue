@@ -522,23 +522,25 @@ class HiveServerClient:
       from ImpalaService import ImpalaHiveServer2Service
       thrift_class = ImpalaHiveServer2Service
 
-    self._client = thrift_util.get_client(thrift_class.Client,
-                                          query_server['server_host'],
-                                          query_server['server_port'],
-                                          service_name=query_server['server_name'],
-                                          kerberos_principal=kerberos_principal_short_name,
-                                          use_sasl=use_sasl,
-                                          mechanism=mechanism,
-                                          username=username,
-                                          password=password,
-                                          timeout_seconds=timeout,
-                                          use_ssl=ssl_enabled,
-                                          ca_certs=ca_certs,
-                                          keyfile=keyfile,
-                                          certfile=certfile,
-                                          validate=validate,
-                                          transport_mode=query_server.get('transport_mode', 'socket'),
-                                          http_url=query_server.get('http_url', ''))
+    self._client = thrift_util.get_client(
+        thrift_class.Client,
+        query_server['server_host'],
+        query_server['server_port'],
+        service_name=query_server['server_name'],
+        kerberos_principal=kerberos_principal_short_name,
+        use_sasl=use_sasl,
+        mechanism=mechanism,
+        username=username,
+        password=password,
+        timeout_seconds=timeout,
+        use_ssl=ssl_enabled,
+        ca_certs=ca_certs,
+        keyfile=keyfile,
+        certfile=certfile,
+        validate=validate,
+        transport_mode=query_server.get('transport_mode', 'socket'),
+        http_url=query_server.get('http_url', '')
+    )
 
 
   def get_security(self):

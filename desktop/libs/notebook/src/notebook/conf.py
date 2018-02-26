@@ -24,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 
 from desktop import appmanager
-from desktop.conf import is_hue4, is_oozie_enabled
+from desktop.conf import is_oozie_enabled
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
   coerce_json_dict, coerce_bool, coerce_csv
 
