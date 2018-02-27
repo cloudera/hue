@@ -35,7 +35,7 @@ class Command(BaseCommand):
     self.indent = 0
 
   """Prints documentation for configuration."""
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     print _("Dumping configuration...")
     print
     self.recurse(desktop.lib.conf.GLOBAL_CONFIG)

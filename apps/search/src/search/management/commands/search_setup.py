@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
 
     sample_user = install_sample_user()
 

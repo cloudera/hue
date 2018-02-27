@@ -246,7 +246,7 @@ def install_examples(request):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      pig_setup.Command().handle_noargs()
+      pig_setup.Command().handle()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)

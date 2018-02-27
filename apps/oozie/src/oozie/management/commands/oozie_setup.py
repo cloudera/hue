@@ -328,7 +328,7 @@ class Command(BaseCommand):
     self._import_workflows(unmanaged_dir, managed=False)
 
 
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     self.user = install_sample_user()
     self.fs = cluster.get_hdfs()
 

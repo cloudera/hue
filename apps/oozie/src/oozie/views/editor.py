@@ -934,7 +934,7 @@ def install_examples(request):
     result['message'] = _('A POST request is required.')
   else:
     try:
-      oozie_setup.Command().handle_noargs()
+      oozie_setup.Command().handle()
       activate_translation(request.LANGUAGE_CODE)
       result['status'] = 0
     except Exception, e:

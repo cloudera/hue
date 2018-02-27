@@ -438,7 +438,7 @@ class Command(BaseCommand):
       LOG.warn('LDAP Test Command failed')
     sys.exit(exit_code)
 
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     """
       ldap_test management command enters here. Main logic as follows:
       * check ldap parameters from hue.ini file

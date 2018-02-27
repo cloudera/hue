@@ -41,7 +41,7 @@ def install_examples(request):
       data = request.POST.get('data')
       indexer_setup.Command().handle(data=data)
       if 'log_analytics_demo' == data: # Hue documents installed only one time
-        search_setup.Command().handle_noargs()
+        search_setup.Command().handle()
       result['status'] = 0
     except Exception, e:
       LOG.exception(e)

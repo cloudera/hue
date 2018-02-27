@@ -14,42 +14,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Dumps a Cloudera Manager Monitor Descriptor file.
-"""
 
-import json
+import logging
 
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
-# Force loading the metrics
-import desktop.urls
-from desktop.lib.metrics import global_registry
-
-
 class Command(BaseCommand):
-  def handle(self, *args, **options):
-    """Generates a Monitor Descriptor file."""
-    registry = global_registry()
-    definitions = []
+    help = 'Runs a makemigrations command'
 
-    for schema in registry.schemas:
-      definitions.extend(schema.to_json())
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--noinput', '--no-input', action='store_false', dest='interactive',
+            help='Tells Django to NOT prompt the user for input of any kind.',
+        )
 
-    definitions.sort(lambda a, b: cmp(a['context'], b['context']))
-
-    d = {
-        'name': 'HUE',
-        'nameForCrossEntityAggregateMetrics': 'hues',
-        'version': 1,
-        'metricDefinitions': [],
-        'roles': [
-          {
-            'name': 'HUE_SERVER',
-            'nameForCrossEntityAggregateMetrics': 'hue_servers',
-            'metricDefinitions': definitions,
-          },
-        ],
-    }
-
-    print json.dumps(d)
+    def handle(self, *args, **options):
+        call_command('makemigrations', '--noinput')

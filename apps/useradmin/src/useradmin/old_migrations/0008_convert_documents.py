@@ -16,7 +16,7 @@ class Migration(DataMigration):
         # the same time preventing such flaws. This migration is being done at
         # the useradmin level to avoid any dependency issues.
 
-        desktop.management.commands.convert_documents.Command().handle_noargs()
+        desktop.management.commands.convert_documents.Command().handle()
 
     def backwards(self, orm):
         "Write your backwards methods here."

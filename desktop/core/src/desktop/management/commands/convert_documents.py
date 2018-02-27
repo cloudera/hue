@@ -27,7 +27,7 @@ from desktop.converters import DocumentConverter
 
 class Command(BaseCommand):
 
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     print 'Starting document conversions...\n'
     try:
       with transaction.atomic():

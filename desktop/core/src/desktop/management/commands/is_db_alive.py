@@ -65,7 +65,7 @@ class Command(BaseCommand):
   The command directly replace the database parameters in the settings.py, to never use the defaut Hue settings.
   """
 
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     self.stdout.write('Going to test accessing the database')
 
     try:

@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 
 class Command(BaseCommand):
   """Creates file system for testing."""
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     fs_dir = os.path.join(get_build_dir(), "fs")
     if not os.path.isdir(fs_dir):
       os.makedirs(fs_dir)

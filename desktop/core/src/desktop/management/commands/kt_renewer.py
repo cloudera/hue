@@ -21,5 +21,5 @@ import desktop.kt_renewer
 class Command(BaseCommand):
   """ Starts a daemon which renews Kerberos credentials from a keytab
   periodically. """
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     desktop.kt_renewer.run()

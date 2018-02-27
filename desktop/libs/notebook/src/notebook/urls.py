@@ -26,7 +26,6 @@ from django.conf.urls import url
 # this file has been loaded after `desktop.settings` has been loaded.
 
 # Start DBProxy server
-import notebook.monkey_patches
 from notebook import views as notebook_views
 from notebook import api as notebook_api
 

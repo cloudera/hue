@@ -19,5 +19,5 @@ import desktop.appmanager
 
 class Command(BaseCommand):
   """Prints documentation for configuration."""
-  def handle_noargs(self, **options):
+  def handle(self, *args, **options):
     desktop.lib.conf.GLOBAL_CONFIG.print_help(skip_header=True)
