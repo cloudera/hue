@@ -37,6 +37,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from desktop.conf import SASL_MAX_BUFFER, CHERRYPY_SERVER_THREADS
 
+from desktop.lib.apputil import WARN_LEVEL_CALL_DURATION_MS, INFO_LEVEL_CALL_DURATION_MS
 from desktop.lib.python_util import create_synchronous_io_multiplexer
 from desktop.lib.thrift_.http_client import THttpClient
 from desktop.lib.thrift_.TSSLSocketWithWildcardSAN import TSSLSocketWithWildcardSAN
@@ -44,15 +45,13 @@ from desktop.lib.thrift_sasl import TSaslClientTransport
 from desktop.lib.exceptions import StructuredException, StructuredThriftTransportException
 
 
+LOG = logging.getLogger(__name__)
+
+
 # The maximum depth that we will recurse through a "jsonable" structure
 # while converting to thrift. This prevents us from infinite recursion
 # in the case of circular references.
 MAX_RECURSION_DEPTH = 50
-
-# When a thrift call finishes, the level at which we log its duration
-# depends on the number of millis the call took.
-WARN_LEVEL_CALL_DURATION_MS = 5000
-INFO_LEVEL_CALL_DURATION_MS = 1000
 
 
 class LifoQueue(Queue.Queue):
@@ -220,13 +219,17 @@ class ConnectionPooler(object):
 
       try:
         connection = self.pooldict[_get_pool_key(conf)].get(block=True, timeout=this_round_timeout)
-        logging.debug("Thrift client %s got connection %s after %.2f seconds" % (self, connection, time.time() - start_pool_get_time))
+        duration = time.time() - start_pool_get_time
+        message = "Thrift client %s got connection %s after %.2f seconds" % (self, connection, duration)
+        log_if_slow_call(duration=duration, message=message)
       except Queue.Empty:
         has_waited_for = time.time() - start_pool_get_time
         if get_client_timeout is not None and has_waited_for > get_client_timeout:
           raise socket.timeout(
             ("Timed out after %.2f seconds waiting to retrieve a %s client from the pool.") % (has_waited_for, conf.service_name))
-        logging.warn("Waited %d seconds for a thrift client to %s:%d" % (has_waited_for, conf.host, conf.port))
+        else:
+          message = "Waited %d seconds for a Thrift client to %s:%d" % (has_waited_for, conf.host, conf.port)
+          log_if_slow_call(duration=has_waited_for, message=message)
 
     return connection
 
@@ -372,8 +375,6 @@ class PooledClient(object):
             superclient.transport.open()
 
           superclient.set_timeout(self.conf.timeout_seconds)
-
-          logging.debug("Thrift client %s call" % superclient)
           return attr(*args, **kwargs)
         except TApplicationException, e:
           # Unknown thrift exception... typically IO errors
@@ -447,12 +448,7 @@ class SuperClient(object):
 
           # Log the duration at different levels, depending on how long it took.
           logmsg = "Thrift call: %s.%s(args=%s, kwargs=%s) returned in %dms: %s" % (str(self.wrapped.__class__), attr, str_args, repr(kwargs), duration * 1000, log_msg)
-          if duration >= WARN_LEVEL_CALL_DURATION_MS / 1000:
-            logging.warn(logmsg)
-          elif duration >= INFO_LEVEL_CALL_DURATION_MS / 1000:
-            logging.info(logmsg)
-          else:
-            logging.debug(logmsg)
+          log_if_slow_call(duration=duration, message=logmsg)
 
           return ret
         except socket.error, e:
@@ -750,3 +746,13 @@ def fixup_enums(obj, name_class_map, suffix="AsString"):
 
 def is_thrift_struct(o):
   return hasattr(o.__class__, "thrift_spec")
+
+
+# Same in resource.py for not losing the trace class
+def log_if_slow_call(duration, message):
+  if duration >= WARN_LEVEL_CALL_DURATION_MS / 1000:
+    LOG.warn('SLOW: %.2f - %s' % (duration, message))
+  elif duration >= INFO_LEVEL_CALL_DURATION_MS / 1000:
+    LOG.info('SLOW: %.2f - %s' % (duration, message))
+  else:
+    LOG.debug(message)
