@@ -4057,6 +4057,9 @@ $(document).ready(function () {
 
   window.setInterval(function () {
     if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
+      if ($('.gridster li:first').width() !== $('.gridster').width()) {
+        $(window).trigger('resize');
+      }
       var $gridster = $('.gridster>ul').data('gridster');
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
