@@ -29,7 +29,7 @@ from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
 
-from dashboard.conf import get_engines
+from dashboard.conf import get_engines, USE_GRIDSTER
 from dashboard.controller import can_edit_index
 from dashboard.dashboard_api import get_engine
 from dashboard.data_export import download as export_download
@@ -409,9 +409,6 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget', 'gradient-map-widget'):
       # properties = {'canRange': False, 'stacked': False, 'limit': 10} # TODO: Lighter weight top nested facet
 
-      if widget_type == 'text-facet-widget':
-        properties['type'] = facet_type
-
       properties['facets_form'] = NESTED_FACET_FORM
       # Not supported on dim 2 currently
       properties['facets_form']['type'] = 'field'
@@ -423,6 +420,11 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       facet['limit'] = 10
       facet['fieldLabel'] = facet_field
       facet['multiselect'] = True
+
+      if widget_type == 'text-facet-widget':
+        properties['type'] = facet_type
+        if USE_GRIDSTER.get():
+          properties['limit'] = facet['limit'] = 100
 
       if range_properties:
         # TODO: timeline still uses properties from top properties
