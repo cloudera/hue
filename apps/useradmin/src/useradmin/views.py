@@ -43,6 +43,7 @@ import desktop.conf
 from desktop.conf import LDAP
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.views import antixss
 
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
@@ -388,7 +389,7 @@ def edit_user(request, username=None):
     })
   else:
     if request.method == 'POST' and is_embeddable:
-      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': map(antixss, f.errors)} for f in form if f.errors]})
     else:
       return render('edit_user.mako', request, {
         'form': form,
