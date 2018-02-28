@@ -3810,9 +3810,7 @@ $(document).ready(function () {
     widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     autogenerate_stylesheet: true,
-    collision: {
-      wait_for_mouseup: true
-    },
+    scroll_container: '.page-content',
     max_cols: 12,
     max_rows: 6000,
     resize: {
