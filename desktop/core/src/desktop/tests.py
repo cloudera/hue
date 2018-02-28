@@ -265,11 +265,12 @@ def test_dump_config():
   response = client_not_me.get(reverse('desktop.views.dump_config'))
   assert_true("You must be a superuser" in response.content, response.content)
 
-  os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
-  resp = c.get(reverse('desktop.views.dump_config'))
-  del os.environ["HUE_CONF_DIR"]
-  assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
-
+  try:
+    os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
+    resp = c.get(reverse('desktop.views.dump_config'))
+    assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
+  finally:
+    del os.environ["HUE_CONF_DIR"]
 
 def hue_version():
   global HUE_VERSION
@@ -782,22 +783,32 @@ def test_config_check():
         desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
       )
 
+      cli = make_logged_in_client()
       try:
-        cli = make_logged_in_client()
         resp = cli.get('/desktop/debug/check_config')
         assert_true('Secret key should be configured' in resp.content, resp)
         assert_true('klingon' in resp.content, resp)
         assert_true('Encoding not supported' in resp.content, resp)
-
-        # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
-        os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
-        resp = cli.get('/desktop/debug/check_config')
-        del os.environ["HUE_CONF_DIR"]
-        assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
       finally:
         for old_conf in reset:
           old_conf()
 
+      try:
+        # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
+        os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
+        def validate_by_spec(error_list):
+          pass
+
+        # Monkey patch as this will fail as the conf dir doesn't exist
+        if not hasattr(desktop.views, 'real_validate_by_spec'):
+          desktop.views.real_validate_by_spec = desktop.views.validate_by_spec
+
+        desktop.views.validate_by_spec = validate_by_spec
+        resp = cli.get('/desktop/debug/check_config')
+        assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
+      finally:
+        del os.environ["HUE_CONF_DIR"]
+        desktop.views.validate_by_spec = desktop.views.real_validate_by_spec
 
 def test_last_access_time():
   raise SkipTest
