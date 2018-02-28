@@ -4063,11 +4063,17 @@ $(document).ready(function () {
       var $gridster = $('.gridster>ul').data('gridster');
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
+        var realGridsterHeight = Math.ceil($(existingWidget.gridsterElement).find('.card-widget').outerHeight() / WIDGET_BASE_HEIGHT);
         if (scrollDifference > 0) {
           existingWidget.size_y(existingWidget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
           $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y());
         }
+        else if (existingWidget.size_y() > realGridsterHeight) {
+          existingWidget.size_y(realGridsterHeight);
+          $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y());
+        }
       });
+      huePubSub.publish('gridster.clean.whitespace');
     }
   }, 1000, 'dashboard');
 
