@@ -219,9 +219,10 @@ class ConnectionPooler(object):
 
       try:
         connection = self.pooldict[_get_pool_key(conf)].get(block=True, timeout=this_round_timeout)
-        duration = time.time() - start_pool_get_time
-        message = "Thrift client %s got connection %s after %.2f seconds" % (self, connection, duration)
-        log_if_slow_call(duration=duration, message=message)
+        if connection is not None:
+          duration = time.time() - start_pool_get_time
+          message = "Thrift client %s got connection %s after %.2f seconds" % (self, connection.CID, duration)
+          log_if_slow_call(duration=duration, message=message)
       except Queue.Empty:
         has_waited_for = time.time() - start_pool_get_time
         if get_client_timeout is not None and has_waited_for > get_client_timeout:
