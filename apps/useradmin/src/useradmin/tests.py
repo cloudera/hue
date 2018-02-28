@@ -775,6 +775,43 @@ class TestUserAdmin(BaseUserAdminTests):
     response = client.post('/useradmin/users/edit/test', dict(language='ko'))
     assert_true('<option value="ko" selected="selected">Korean</option>' in response.content)
 
+  def test_edit_user_xss(self):
+    # Hue 3 Admin
+    edit_user = make_logged_in_client('admin', is_superuser=True)
+    response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
+                                                                      is_superuser=True,
+                                                                      password1="foo",
+                                                                      password2="foo",
+                                                                      language="en-us><script>alert('Hacked')</script>"
+                                                                      ))
+    assert_true('Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    # Hue 4 Admin
+    response = edit_user.post('/useradmin/users/edit/admin', dict(username="admin",
+                                                                      is_superuser=True,
+                                                                      language="en-us><script>alert('Hacked')</script>",
+                                                                      is_embeddable=True))
+    content = json.loads(response.content)
+    assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.', content['errors'][0]['message'][0])
+
+    # Hue 3, User with access to useradmin app
+    edit_user = make_logged_in_client('edit_user', is_superuser=False)
+    grant_access('edit_user', 'edit_user', 'useradmin')
+    response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
+                                                                      is_superuser=False,
+                                                                      password1="foo",
+                                                                      password2="foo",
+                                                                      language="en-us><script>alert('Hacked')</script>"
+                                                                      ))
+    assert_true('Select a valid choice. en-us&gt;&lt;script&gt;alert(&#39;Hacked&#39;)&lt;/script&gt; is not one of the available choices.' in response.content)
+    # Hue 4, User with access to useradmin app
+    response = edit_user.post('/useradmin/users/edit/edit_user', dict(username="edit_user",
+                                                                      is_superuser=False,
+                                                                      language="en-us><script>alert('Hacked')</script>",
+                                                                      is_embeddable=True))
+    content = json.loads(response.content)
+    assert_true('Select a valid choice. en-us>alert(\'Hacked\') is not one of the available choices.',
+                content['errors'][0]['message'][0])
+
 
 class TestUserAdminWithHadoop(BaseUserAdminTests):
 
