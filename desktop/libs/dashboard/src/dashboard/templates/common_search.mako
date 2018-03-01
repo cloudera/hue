@@ -3812,7 +3812,7 @@ $(document).ready(function () {
     autogenerate_stylesheet: true,
     scroll_container: '.page-content',
     max_cols: 12,
-    max_rows: 6000,
+    max_rows: 400,
     resize: {
       axes: ['x'],
       enabled: true,
