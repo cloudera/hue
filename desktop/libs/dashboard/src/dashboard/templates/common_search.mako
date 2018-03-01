@@ -4063,17 +4063,11 @@ $(document).ready(function () {
       var $gridster = $('.gridster>ul').data('gridster');
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
-        var realGridsterHeight = Math.ceil($(existingWidget.gridsterElement).find('.card-widget').outerHeight() / WIDGET_BASE_HEIGHT);
         if (scrollDifference > 0) {
           existingWidget.size_y(existingWidget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
-          $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y());
-        }
-        else if (existingWidget.size_y() > realGridsterHeight) {
-          existingWidget.size_y(realGridsterHeight);
-          $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y());
+          $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y(), function() { huePubSub.publish('gridster.clean.whitespace'); });
         }
       });
-      huePubSub.publish('gridster.clean.whitespace');
     }
   }, 1000, 'dashboard');
 
@@ -4117,14 +4111,22 @@ $(document).ready(function () {
     if (searchViewModel.isGridster()) {
       var maxRow = 0;
       var $gridster = $('.gridster>ul').data('gridster');
+      var occupiedRows = [];
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var tempRow = existingWidget.row() + existingWidget.size_y();
+        for (var i = existingWidget.row(); i < existingWidget.size_y(); i++){
+          if (occupiedRows.indexOf(i) === -1) {
+            occupiedRows.push(i);
+          }
+        }
         if (tempRow > maxRow) {
           maxRow = tempRow;
         }
       });
       for (var i = 0; i < maxRow; i++) {
-        $gridster.remove_empty_cells(1, i, 12, 1);
+        if (occupiedRows.indexOf(i) === -1) {
+          $gridster.remove_empty_cells(1, i, 12, 1);
+        }
       }
     }
   }, 'dashboard');
