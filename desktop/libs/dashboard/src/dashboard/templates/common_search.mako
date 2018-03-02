@@ -3811,6 +3811,7 @@ $(document).ready(function () {
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     autogenerate_stylesheet: true,
     scroll_container: '.page-content',
+    avoid_overlapped_widgets: true,
     max_cols: 12,
     max_rows: 400,
     resize: {
