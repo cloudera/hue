@@ -27,7 +27,7 @@ from desktop.lib import i18n
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
-from filebrowser.views import location_to_url
+from desktop.lib.view_util import location_to_url
 
 from jobbrowser.conf import DISABLE_KILLING_JOBS
 

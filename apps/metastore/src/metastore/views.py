@@ -35,7 +35,7 @@ from beeswax.design import hql_query
 from beeswax.models import SavedQuery
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
-from filebrowser.views import location_to_url
+from desktop.lib.view_util import location_to_url
 from urlparse import urlparse
 from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
 from notebook.connectors.base import Notebook, QueryError

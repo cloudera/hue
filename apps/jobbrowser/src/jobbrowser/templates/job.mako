@@ -20,7 +20,7 @@
   import os
   from hadoop.fs.exceptions import WebHdfsException
   from jobbrowser.views import format_counter_name
-  from filebrowser.views import location_to_url
+  from desktop.lib.view_util import location_to_url
   from desktop.views import commonheader, commonfooter
   from django.template.defaultfilters import urlencode
   from django.utils.translation import ugettext as _

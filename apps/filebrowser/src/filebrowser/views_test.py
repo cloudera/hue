@@ -38,7 +38,7 @@ from desktop.lib.test_utils import grant_access, add_to_group, add_permission, r
 from hadoop import pseudo_hdfs4
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
-from filebrowser.views import location_to_url
+from desktop.lib.view_util import location_to_url
 
 from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from lib.rwx import expand_mode

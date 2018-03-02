@@ -28,7 +28,7 @@ from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.parameterization import substitute_variables
 from desktop.models import Cluster, ANALYTIC_DB
-from filebrowser.views import location_to_url
+from desktop.lib.view_util import location_to_url
 from indexer.file_format import HiveFormat
 
 from beeswax import hive_site
