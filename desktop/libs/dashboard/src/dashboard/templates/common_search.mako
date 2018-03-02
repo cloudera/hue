@@ -601,13 +601,15 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <!-- ko if: !$parents[1].isLoading() || widgetType() == 'hit-widget' -->
   <div class="edit-dimensions">
     <div data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', containment: 'parent', handle: '.move-dimension'}}" class="inline-block">
-      <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }, click: function(){ $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }">
+      <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }, click: function(){ $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }" title="${ _('Edit') }">
         <span data-bind="text: getPrettyMetric($data)"></span>
-        <span class="badge badge-info dimensions-badge" data-bind="text: field, attr: {'title': field}"></span>
+        <span class="badge badge-info dimensions-badge" data-bind="text: field, attr: { 'title': field }"></span>
         <!-- ko if: aggregate.function() != 'field' && aggregate.metrics && $parent.widgetType() != 'hit-widget' -->
           <i class="fa" data-bind="css: { 'fa-long-arrow-down': sort() == 'desc', 'fa-long-arrow-up': sort() == 'asc' }"></i>
         <!-- /ko -->
-        <div class="action-icon margin-left-5 move-dimension"><i class="fa fa-bars"></i></div>
+        <div class="action-icon margin-left-5 move-dimension" data-bind="visible: $parent.properties.facets().length > 1" title="${ _('Move') }">
+          <i class="fa fa-bars"></i>
+        </div>
         <!-- ko if: isEditing -->
         <div class="metric-form" data-bind="template: { name: 'metric-form' }"></div>
         <!-- /ko -->
