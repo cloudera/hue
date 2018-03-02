@@ -974,10 +974,15 @@ class HiveServerClient:
       req = TGetLogReq(operationHandle=operation_handle)
       res = self.call(self._client.GetLog, req)
       return res.log
-    except:
-      LOG.exception('server does not support GetLog')
+    except Exception, e:
+      if 'Invalid query handle' in str(e):
+        message = 'Invalid query handle'
+        LOG.error('%s: %s' % (message, e))
+      else:
+        message = 'Error when fetching the logs of the operation.'
+        LOG.exception(message)
 
-      return 'Server does not support GetLog()'
+      return message
 
 
   def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True):
