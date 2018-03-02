@@ -4241,7 +4241,10 @@ $(document).ready(function () {
     for (var i = 1; i <= siblings.length; i++) {
       var widget = siblings[i - 1];
       $gridster.resize_widget($(widget.gridsterElement), optimalWidgetWidth, widget.size_y());
-      $gridster.move_widget($(widget.gridsterElement), ((i - 1) * optimalWidgetWidth) + 1, widget.row());
+      widget.size_x(optimalWidgetWidth);
+      var newCol = ((i - 1) * optimalWidgetWidth) + 1;
+      $gridster.move_widget($(widget.gridsterElement), newCol, widget.row());
+      widget.col(newCol);
     }
     searchViewModel.gridItems.remove(gridElement);
     huePubSub.publish('gridster.clean.whitespace');
