@@ -530,12 +530,15 @@
         color: @cui-gray-700;
       }
     }
+    .move-dimension {
+      cursor: move;
+    }
     &:hover {
       .action-icon {
         opacity: 1;
       }
       .dimensions-badge-container {
-        cursor: move;
+        cursor: pointer;
         border-color: @cui-gray-200;
         &.is-editing {
           border-color: @cui-blue-700;
