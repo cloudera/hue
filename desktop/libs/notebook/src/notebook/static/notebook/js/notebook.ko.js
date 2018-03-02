@@ -2132,7 +2132,7 @@ var EditorViewModel = (function() {
     });
 
     self.init = function () {
-      if (self.status() == 'running' || self.status() == 'available') {
+      if ((self.status() == 'running' || self.status() == 'available') && notebook.isHistory()) {
         self.checkStatus();
       }
       else if (self.status() == 'loading') {
