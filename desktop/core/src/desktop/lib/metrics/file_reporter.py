@@ -39,6 +39,7 @@ class FileReporter(Reporter):
         os.makedirs(dirname)
       except OSError, e:
         LOG.error('failed to make the directory %s: %s' % (dirname, e))
+      return
 
     # Write the metrics to a temporary file, then atomically
     # rename the file to the real location.
