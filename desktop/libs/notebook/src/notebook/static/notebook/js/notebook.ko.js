@@ -2853,6 +2853,7 @@ var EditorViewModel = (function() {
       });
       if (typeof notebook.presentationSnippets != "undefined" && notebook.presentationSnippets != null) { // Load
         $.each(notebook.presentationSnippets, function(key, snippet) {
+          snippet.status = 'ready' // Protect from storm of check_statuses
           var _snippet = new Snippet(vm, self, snippet);
           _snippet.init();
           _snippet.previousChartOptions = vm._getPreviousChartOptions(_snippet);
