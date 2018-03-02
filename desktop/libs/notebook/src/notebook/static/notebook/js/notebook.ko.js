@@ -298,7 +298,7 @@ var EditorViewModel = (function() {
     });
 
     // Ace stuff
-    self.aceCursorPosition = ko.observable(snippet.aceCursorPosition);
+    self.aceCursorPosition = ko.observable(notebook.isHistory() ? snippet.aceCursorPosition : null);
 
     var aceEditor = null;
 
