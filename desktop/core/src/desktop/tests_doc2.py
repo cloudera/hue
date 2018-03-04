@@ -955,6 +955,61 @@ class TestDocument2Permissions(object):
     doc_names = [doc['name'] for doc in data['documents']]
     assert_true('history.sql' in doc_names)
 
+  def test_x_share_directory_y_add_file_x_share(self):
+    # Test that when another User, Y, adds a doc to dir shared by User X, User X doesn't fail to share the dir next time:
+    # /
+    #   test_dir/
+    #     query1.sql
+
+
+    # Dir owned by self.user
+    parent_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
+    child_doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=parent_dir)
+
+    user_y = User.objects.create(username='user_y', password="user_y")
+
+    # Share the dir with user_not_me
+    response = self.client.post("/desktop/api2/doc/share", {
+      'uuid': json.dumps(parent_dir.uuid),
+      'data': json.dumps({
+        'read': {
+          'user_ids': [],
+          'group_ids': []
+        },
+        'write': {
+          'user_ids': [user_y.id],
+          'group_ids': []
+        }
+      })
+    })
+
+    user_y_child_doc = Document2.objects.create(name='other_query1.sql', type='query-hive', owner=user_y, data={},
+                                          parent_directory=parent_dir)
+
+    share_test_user = User.objects.create(username='share_test_user', password="share_test_user")
+
+    # Share the dir with another user - share_test_user
+    response = self.client.post("/desktop/api2/doc/share", {
+      'uuid': json.dumps(parent_dir.uuid),
+      'data': json.dumps({
+        'read': {
+          'user_ids': [],
+          'group_ids': []
+        },
+        'write': {
+          'user_ids': [share_test_user.id],
+          'group_ids': []
+        }
+      })
+    })
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+    for doc in [parent_dir, child_doc, user_y_child_doc]:
+      assert_true(doc.can_read(self.user))
+      assert_true(doc.can_write(self.user))
+      assert_true(doc.can_read(share_test_user))
+      assert_true(doc.can_write(share_test_user))
+
 
   def test_unicode_name(self):
     doc = Document2.objects.create(name='My Bundle a voté « non » à l’accord', type='oozie-workflow2', owner=self.user,

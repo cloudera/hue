@@ -1310,7 +1310,7 @@ class Document2(models.Model):
   def can_write(self, user):
     perm = self.get_permission('write')
     has_write_permissions = perm.user_has_access(user) if perm else False
-    return user.is_superuser or self.owner == user or has_write_permissions
+    return user.is_superuser or self.owner == user or has_write_permissions or (self.parent_directory and self.parent_directory.can_write(user))
 
   def can_write_or_exception(self, user):
     if self.can_write(user):
