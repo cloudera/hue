@@ -3270,6 +3270,7 @@ var EditorViewModel = (function() {
           notebook.snippets()[0].queries(currentQueries);
         }
         notebook.snippets().forEach(function (snippet) {
+          snippet.aceAutoExpand = false;
           snippet.statement_raw.valueHasMutated();
           if (snippet.result.handle().statements_count > 1 && snippet.result.handle().start != null && snippet.result.handle().end != null) {
             var aceLineOffset = snippet.result.handle().aceLineOffset || 0;

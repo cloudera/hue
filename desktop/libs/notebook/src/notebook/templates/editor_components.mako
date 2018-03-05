@@ -1728,7 +1728,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 </script>
 
 <script type="text/html" id="snippet-code-resizer${ suffix }">
-  <div class="snippet-code-resizer" data-bind="aceResizer : { ace: ace, target: '.ace-container-resizable', onStart: hideFixedHeaders, onStop: redrawFixedHeaders }">
+  <div class="snippet-code-resizer" data-bind="aceResizer : { snippet: $data, target: '.ace-container-resizable', onStart: hideFixedHeaders, onStop: redrawFixedHeaders }">
     <i class="fa fa-ellipsis-h"></i>
   </div>
 </script>
