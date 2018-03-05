@@ -1371,6 +1371,9 @@ var EditorViewModel = (function() {
         return;
       }
 
+      self.status('running');
+      self.statusForButtons('executing');
+
       if (self.isSqlDialect()) {
         huePubSub.publish('editor.refresh.statement.locations', self);
       }
@@ -1391,7 +1394,6 @@ var EditorViewModel = (function() {
 
       if (self.result.handle()) {
         self.close();
-        self.statusForButtons('executed');
       }
 
       if (self.isSqlDialect() && self.positionStatement()) {
@@ -1400,8 +1402,6 @@ var EditorViewModel = (function() {
         self.lastExecutedStatement(null);
       }
 
-      self.status('running');
-      self.statusForButtons('executing');
       self.errors([]);
       huePubSub.publish('editor.clear.highlighted.errors', self.ace());
       self.result.clear();
@@ -1938,7 +1938,7 @@ var EditorViewModel = (function() {
         if (xhr.status !== 502) {
           // $(document).trigger("error", xhr.responseText);
         }
-        self.status('failed');
+        // self.status('failed'); // Can conflict with slow close and new query execution
       });
     };
 
