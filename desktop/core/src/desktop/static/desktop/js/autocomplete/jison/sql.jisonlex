@@ -441,6 +441,7 @@ VAR_SAMP\s*\(                              { yy.lexer.unput('('); yytext = 'var_
 <impala>APPX_MEDIAN\s*\(                   { yy.lexer.unput('('); yytext = 'appx_median'; parser.addFunctionLocation(yylloc, yytext); return '<impala>APPX_MEDIAN'; }
 <impala>EXTRACT\s*\(                       { yy.lexer.unput('('); yytext = 'extract'; parser.addFunctionLocation(yylloc, yytext); return '<impala>EXTRACT'; }
 <impala>GROUP_CONCAT\s*\(                  { yy.lexer.unput('('); yytext = 'group_concat'; parser.addFunctionLocation(yylloc, yytext); return '<impala>GROUP_CONCAT'; }
+<impala>NDV\s*\(                           { yy.lexer.unput('('); yytext = 'ndv'; parser.addFunctionLocation(yylloc, yytext); return '<impala>NDV'; }
 <impala>STDDEV\s*\(                        { yy.lexer.unput('('); yytext = 'stddev'; parser.addFunctionLocation(yylloc, yytext); return '<impala>STDDEV'; }
 <impala>VARIANCE_POP\s*\(                  { yy.lexer.unput('('); yytext = 'variance_pop'; parser.addFunctionLocation(yylloc, yytext); return '<impala>VARIANCE_POP'; }
 <impala>VARIANCE_SAMP\s*\(                 { yy.lexer.unput('('); yytext = 'variance_samp'; parser.addFunctionLocation(yylloc, yytext); return '<impala>VARIANCE_SAMP'; }

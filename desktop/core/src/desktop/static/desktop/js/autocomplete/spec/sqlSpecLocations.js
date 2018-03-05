@@ -121,8 +121,6 @@
       });
     });
 
-
-
     it('should report locations for "select cos(1) as foo from customers order by foo;"', function () {
       assertLocations({
         beforeCursor: 'select cos(1) as foo from customers order by foo; ',

@@ -1114,8 +1114,8 @@
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
             'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'SORT BY (baa, boo, ble) WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
-            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'SORT BY (baa, boo, ble) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' ' +
+            'LINES TERMINATED BY \'q\' STORED AS PARQUET WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED IN \'boo\';',
             afterCursor: '',
@@ -1535,8 +1535,8 @@
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName (id INT, col2 STRING COMMENT \'booo\', col3 BIGINT) ' +
             'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED ',
             afterCursor: '',
@@ -1552,9 +1552,8 @@
           assertAutoComplete({
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE PARQUET \'/boo/baa\' ' +
             'COMMENT \'Table comment...\' PARTITIONED BY (boo DOUBLE COMMENT \'booo boo\', baa INT) ' +
-            'SORT BY (baa, boo, ble) WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
-            'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
-            'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
+            'SORT BY (baa, boo, ble) ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED ',
             afterCursor: '',
             dialect: 'impala',
@@ -1597,8 +1596,8 @@
           assertAutoComplete({
             beforeCursor: 'CREATE TABLE dbOne.tableName ' +
             'COMMENT \'Table comment...\' ' +
-            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'ROW FORMAT DELIMITED FIELDS TERMINATED BY \'a\' ESCAPED BY \'c\' LINES TERMINATED BY \'q\' STORED AS PARQUET ' +
+            'WITH SERDEPROPERTIES ( \'key\' = \'value\', \'key2\' = \'value 2\' ) ' +
             'LOCATION \'/baa/baa\' TBLPROPERTIES (\'key\' = \'value\', \'key2\' = \'value 2\') ' +
             'CACHED IN \'boo\' AS ',
             afterCursor: '',

@@ -301,6 +301,19 @@
         });
       });
 
+      it('should handle "SELECT replace(foo, \'d\', \'c\') as rep, truncate(foo, 1) as tru FROM tbl; |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT replace(foo, \'d\', \'c\') as rep, truncate(foo, 1) as tru FROM tbl; ',
+          afterCursor: '',
+          noErrors: true,
+          dialect: 'impala',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should handle "SELECT * FROM foo WHERE bar IREGEXP \'bla\'; |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM foo WHERE bar IREGEXP \'bla\'; ',
