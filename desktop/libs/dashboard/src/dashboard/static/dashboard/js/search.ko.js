@@ -20,7 +20,8 @@ function magicSearchLayout(vm) {
   huePubSub.publish('dashboard.set.layout');
 }
 
-function queryBuilderSearchLayout(vm) {
+function queryBuilderSearchLayout(vm, isQueryBuilder) {
+  vm.isQueryBuilder(!!isQueryBuilder);
   loadSearchLayout(vm, vm.initial.qbLayout);
   $(document).trigger("magicSearchLayout");
   huePubSub.publish('dashboard.set.layout');
@@ -1827,6 +1828,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
   self.initialJson = initial_json;
 
   self.isGridster = ko.observable(!!has_gridster_enabled && (collection_json.layout.length === 0 || (collection_json.layout.length && collection_json.gridItems.length)));
+  self.isQueryBuilder = ko.observable(false);
 
   if ($.totalStorage('hue.enable.gridster') === false) {
     self.isGridster(false);
