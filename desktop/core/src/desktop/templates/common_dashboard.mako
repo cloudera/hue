@@ -66,7 +66,7 @@
     </a>
     % endif
     % if HAS_QUERY_BUILDER_ENABLED.get():
-    <a href="javascript: queryBuilderSearchLayout(searchViewModel)" title="${ _('Query Builder to slice and dice dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: queryBuilderSearchLayout(searchViewModel, true)" title="${ _('Query Builder to slice and dice dimensions') }" onmouseover="searchViewModel.previewColumns('qbuilder')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"><i class="fa fa-superscript"></i></div>
       </div>
