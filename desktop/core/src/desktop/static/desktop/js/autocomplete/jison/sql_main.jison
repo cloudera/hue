@@ -305,7 +305,7 @@ NonStartingToken
  | 'ALL' | 'ARRAY' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CROSS' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'HAVING' | 'IF' | 'IN' | 'INNER' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'MAP' | 'NOT' | 'NULL' | 'ON' | 'OPTION' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'PURGE' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'STRUCT' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'UNION' | 'VALUES' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
  | 'AVG' | 'CAST' | 'COUNT' | 'MAX' | 'MIN' | 'STDDEV_POP' | 'STDDEV_SAMP' | 'SUM' | 'VARIANCE' | 'VAR_POP' | 'VAR_SAMP'
  | '<hive>COLLECT_SET' | '<hive>COLLECT_LIST' | '<hive>CORR' | '<hive>COVAR_POP' | '<hive>COVAR_SAMP' | '<hive>DAY' | '<hive>DAYOFWEEK' | '<hive>HISTOGRAM_NUMERIC' | '<hive>HOUR' | '<hive>MINUTE' | '<hive>MONTH' | '<hive>NTILE' | '<hive>PERCENTILE' | '<hive>PERCENTILE_APPROX' | '<hive>QUARTER' | '<hive>SECOND' | '<hive>WEEK' | '<hive>YEAR'
- | '<impala>APPX_MEDIAN' | '<impala>EXTRACT' | '<impala>GROUP_CONCAT' | '<impala>STDDEV' | '<impala>VARIANCE_POP' | '<impala>VARIANCE_SAMP'
+ | '<impala>APPX_MEDIAN' | '<impala>EXTRACT' | '<impala>GROUP_CONCAT' | '<impala>NDV' | '<impala>STDDEV' | '<impala>VARIANCE_POP' | '<impala>VARIANCE_SAMP'
  | 'ANALYTIC'
  | 'UNSIGNED_INTEGER' | 'UNSIGNED_INTEGER_E' | 'REGULAR_IDENTIFIER' | 'HDFS_START_QUOTE' | 'AND' | 'OR' | '=' | '<' | '>' | 'COMPARISON_OPERATOR' | '-' | '*' | 'ARITHMETIC_OPERATOR' | ',' | '.' | '~' | '!' | '(' | ')' | '[' | ']' | 'VARIABLE_REFERENCE' | 'BACKTICK' | 'SINGLE_QUOTE' | 'DOUBLE_QUOTE'
  ;
@@ -3299,6 +3299,8 @@ ArbitraryFunctionName
  | 'ARRAY'
  | '<hive>BINARY'
  | 'MAP'
+ | '<impala>REPLACE'
+ | 'TRUNCATE'
  ;
 
 ArbitraryFunctionRightPart
@@ -3830,12 +3832,13 @@ OtherAggregateFunction_Type
  | '<hive>COVAR_POP'
  | '<hive>COVAR_SAMP'
  | '<impala>GROUP_CONCAT'
- | '<hive>HISTOGRAM_NUMERI'
+ | '<hive>HISTOGRAM_NUMERIC'
  | '<impala>STDDEV'
  | 'STDDEV_POP'
  | 'STDDEV_SAMP'
  | 'MAX'
  | 'MIN'
+ | '<impala>NDV'
  | '<hive>NTILE'
  | '<hive>PERCENTILE'
  | '<hive>PERCENTILE_APPROX'

@@ -1270,9 +1270,9 @@ var SqlFunctions = (function () {
       histogram_numeric: {
         returnTypes: ['ARRAY'],
         arguments: [[{type: 'T'}], [{type: 'INT'}]],
-        signature: 'array<struct {\'x\', \'y\'}> histogram_numeric(col, b)',
-        draggable: 'array<struct {\'x\', \'y\'}> histogram_numeric()',
-        description: 'Computes a histogram of a numeric column in the group using b non-uniformly spaced bins. The output is an array of size b of double-valued (x,y) coordinates that represent the bin centers and heights'
+        signature: 'histogram_numeric(col, b)',
+        draggable: 'histogram_numeric()',
+        description: 'Computes a histogram of a numeric column in the group using b non-uniformly spaced bins. The output is an array of size b of double-valued (x,y) coordinates that represent the bin centers and heights.'
       },
       max: {
         returnTypes: ['DOUBLE'],

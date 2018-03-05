@@ -2141,7 +2141,7 @@ from desktop.views import _ko
 
         self.activeType = ko.observable();
         self.availableTypes = ko.observableArray(['Hive', 'Impala', 'Pig']);
-        self.query = ko.observable();
+        self.query = ko.observable().extend({ rateLimit: 400 });
         self.selectedFunction = ko.observable();
 
         self.availableTypes().forEach(function (type) {

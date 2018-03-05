@@ -4201,6 +4201,31 @@
 
           var token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column);
 
+          // Find open UDFs and prevent them from being marked as missing columns, i.e. cos in "SELECT * FROM foo where cos(a|"
+          var rowTokens = self.editor.getSession().getTokens(location.location.first_line - 1);
+          if (location.type === 'column' && token && rowTokens) {
+            var tokenFound = false;
+            var isFunction = false;
+            rowTokens.some(function (rowToken) {
+              if (tokenFound && /\s+/.test(rowToken.value)) {
+                return false;
+              }
+              if (tokenFound) {
+                isFunction = rowToken.value === '(';
+                return true;
+              }
+              if (rowToken === token) {
+                tokenFound = true;
+              }
+            });
+            if (isFunction) {
+              location.type = 'function';
+              delete location.identifierChain;
+              location.function = token.value;
+              token = null;
+            }
+          }
+
           if (token && token.value && /`$/.test(token.value)) {
             // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
             token = self.editor.getSession().getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
