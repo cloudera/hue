@@ -1346,22 +1346,35 @@ from metadata.conf import has_navigator
         var rightX, leftX, leftDiff, rightDiff, topY, bottomY, topDiff, bottomDiff;
         var redrawHeaders = false;
 
-        window.setTimeout(function () {
-          var offset = $('.hue-popover').offset();
-          if (orientation === 'right') {
-            offset.left -= 5;
-          } else if (orientation === 'bottom') {
-            offset.top -= 5;
+        var initOriginalValues = function (attempt) {
+          if (attempt > 20) {
+            return;
           }
-          originalHeight = $('.hue-popover').height();
-          originalWidth = $('.hue-popover').width();
-          originalMidX = offset.left + originalWidth / 2;
-          originalMidY = offset.top + originalHeight / 2;
-          originalLeftX = offset.left;
-          originalRightX = offset.left + originalWidth;
-          originalTopY = offset.top;
-          originalBottomY = offset.top + originalHeight;
-        }, 0);
+          window.setTimeout(function () {
+            var offset = $('.hue-popover').offset();
+            if (!offset) {
+              // Popover isn't visible yet, wait a bit and try again
+              attempt++;
+              initOriginalValues(attempt);
+              return;
+            }
+            if (orientation === 'right') {
+              offset.left -= 5;
+            } else if (orientation === 'bottom') {
+              offset.top -= 5;
+            }
+            originalHeight = $('.hue-popover').height();
+            originalWidth = $('.hue-popover').width();
+            originalMidX = offset.left + originalWidth / 2;
+            originalMidY = offset.top + originalHeight / 2;
+            originalLeftX = offset.left;
+            originalRightX = offset.left + originalWidth;
+            originalTopY = offset.top;
+            originalBottomY = offset.top + originalHeight;
+          }, attempt * 20);
+        };
+
+        initOriginalValues(0);
 
         self.saveSize = function () {
           apiHelper.setInTotalStorage('assist', 'popover.size', {
