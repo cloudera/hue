@@ -32,10 +32,9 @@ import time
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload, UploadFileException, SkipFile
 from django.utils.translation import ugettext as _
 
+from desktop.lib import fsmanager
 
 import hadoop.cluster
-from desktop.lib import fsmanager
-from urlparse import urlparse
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
