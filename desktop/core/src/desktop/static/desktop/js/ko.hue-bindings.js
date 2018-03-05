@@ -2150,7 +2150,7 @@
   ko.bindingHandlers.aceResizer = {
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
-      var ace = options.ace;
+      var ace = options.snippet.ace;
       var $target = $(options.target);
       var $resizer = $(element);
       var $contentPanel = $(".content-panel");
@@ -2160,7 +2160,7 @@
       var lastEditorSize = $.totalStorage('hue.editor.editor.size') || 131;
       var editorHeight = Math.floor(lastEditorSize / 16);
       $target.height(lastEditorSize);
-      var autoExpand = true;
+      var autoExpand = typeof options.snippet.aceAutoExpand !== 'undefined' ? options.snippet.aceAutoExpand : true;
       var draggedOnce = false;
 
       function throttleChange() {
