@@ -599,7 +599,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
   <!-- /ko -->
 
   <!-- ko if: !$parents[1].isLoading() || widgetType() == 'hit-widget' -->
-  <div class="edit-dimensions">
+  <div class="edit-dimensions" data-bind="css: { 'query-builder': $root.isQueryBuilder }">
     <div data-bind="sortable: { data: properties.facets, allowDrop: false, options: { axis: 'x', containment: 'parent', handle: '.move-dimension'}}" class="inline-block">
       <div class="badge dimensions-badge-container" data-bind="css: { 'is-editing': isEditing }, click: function(){ $parent.isAdding(false); $parent.properties.facets().forEach(function(f){ f.isEditing(false); }); isEditing(true); }" title="${ _('Edit') }">
         <span data-bind="text: getPrettyMetric($data)"></span>
