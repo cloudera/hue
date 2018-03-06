@@ -1367,7 +1367,9 @@ var EditorViewModel = (function() {
 
     self.execute = function () {
       var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || ! self.isReady()) {
+      if (self.status() == 'running' || self.status() == 'loading') {
+        self.cancel();
+      } else if (now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
       }
 
