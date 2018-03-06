@@ -59,13 +59,13 @@ from desktop.views import _ko
           <ul>
             <!-- ko foreach: expanded() ? result : topMatches -->
             <!-- ko if: typeof draggable !== 'undefined' -->
-            <li data-bind="multiClick: {
+            <li class="result" data-bind="multiClick: {
                 click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
                 dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
               }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }, draggableText: { text: draggable, meta: draggableMeta }"></li>
             <!-- /ko -->
             <!-- ko if: typeof draggable === 'undefined' -->
-            <li data-bind="multiClick: {
+            <li class="result" data-bind="multiClick: {
                 click: function () { $parents[1].resultSelected($parentContext.$index(), $index()) },
                 dblClick: function () { $parents[1].resultSelected($parentContext.$index(), $index()); $parents[1].openResult(); }
               }, html: label, css: { 'selected': $parents[1].selectedResult() === $data }"></li>
