@@ -4058,20 +4058,18 @@ $(document).ready(function () {
     });
   }
 
+
   window.setInterval(function () {
-    if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
-      if ($('.gridster li:first').width() !== $('.gridster').width()) {
-        $(window).trigger('resize');
-      }
-      var $gridster = $('.gridster>ul').data('gridster');
-      searchViewModel.gridItems().forEach(function (existingWidget) {
-        var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
-        if (scrollDifference > 0) {
-          existingWidget.size_y(existingWidget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
-          $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y(), function() { huePubSub.publish('gridster.clean.whitespace'); });
-        }
-      });
-    }
+     if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
+       var $gridster = $('.gridster>ul').data('gridster');
+       searchViewModel.gridItems().forEach(function (existingWidget) {
+         var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
+         if (scrollDifference > 0) {
+           existingWidget.size_y(existingWidget.size_y() + Math.ceil(scrollDifference / WIDGET_BASE_HEIGHT));
+           $gridster.resize_widget($(existingWidget.gridsterElement), existingWidget.size_x(), existingWidget.size_y(), function() { huePubSub.publish('gridster.clean.whitespace'); });
+         }
+       });
+     }
   }, 1000, 'dashboard');
 
   var tempDraggable = null;
@@ -4111,6 +4109,10 @@ $(document).ready(function () {
       addPreviewHolder(options);
     }
   }, 'dashboard');
+
+  huePubSub.subscribeOnce('gridster.added.widget', function () {
+    $(window).trigger('resize');
+  });
 
   huePubSub.subscribe('gridster.added.widget', removePreviewHolder, 'dashboard');
 
