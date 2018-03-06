@@ -4093,10 +4093,14 @@ $(document).ready(function () {
     }
   }, 'dashboard');
 
-  huePubSub.subscribe('dashboard.top.widget.drag', movePreviewHolder, 'dashboard');
+  huePubSub.subscribe('dashboard.top.widget.drag', function(options) {
+    if (!searchViewModel.isQueryBuilder()) {
+      movePreviewHolder(options);
+    }
+  }, 'dashboard');
 
   huePubSub.subscribe('draggable.text.drag', function(options) {
-    if (searchViewModel.isGridster()) {
+    if (searchViewModel.isGridster() && !searchViewModel.isQueryBuilder()) {
       movePreviewHolder(options);
     }
   }, 'dashboard');
@@ -4406,7 +4410,7 @@ $(document).ready(function () {
   $('#searchComponents').parents('.embeddable').droppable({
     accept: '.draggable-widget, .draggableText',
     drop: function( event, ui ) {
-      if (searchViewModel.isGridster()) {
+      if (searchViewModel.isGridster() && !searchViewModel.isQueryBuilder()) {
         huePubSub.publish('dashboard.drop.on.page', {event: event, ui: ui});
       }
     }
