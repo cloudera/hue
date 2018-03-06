@@ -4067,6 +4067,12 @@
           }
 
           self.fetchPossibleValues(token).done(function (possibleValues) {
+            // Tokens might change while making api calls
+            if (!token.parseLocation) {
+              verifyThrottle = window.setTimeout(verify, VERIFY_DELAY);
+              return;
+            }
+
             // Append aliases unless qualified i.e.for 'b' in SELECT a.b we shouldn't suggest aliases
             if ((token.parseLocation.type !== 'column' && token.parseLocation.type !== 'complex') || !token.parseLocation.qualified) {
               possibleValues = possibleValues.concat(aliases);
