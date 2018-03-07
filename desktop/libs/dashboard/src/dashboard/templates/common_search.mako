@@ -4330,11 +4330,15 @@ $(document).ready(function () {
     }
   }, 'dashboard');
 
-  huePubSub.subscribe('app.dom.unload', function(app) {
+  huePubSub.subscribe('app.dom.unload', function (app) {
     if (app === 'dashboard') {
       $gridster.destroy();
     }
-  }, 'dashboard')
+  }, 'dashboard');
+
+  huePubSub.subscribe('split.panel.resized', function () {
+    $(window).trigger('resize');
+  }, 'dashboard');
 
 
   $(document).on("click", ".widget-settings-pill", function(){
