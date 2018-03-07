@@ -20,7 +20,11 @@ from desktop.lib.metrics import global_registry
 
 def active_users():
   from useradmin.models import UserProfile
-  return UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1)).count()
+  try:
+    count = UserProfile.objects.filter(last_activity__gt=datetime.now() - timedelta(hours=1)).count()
+  except:
+    count = 0
+  return count
 
 global_registry().gauge_callback(
     name='users.active',
