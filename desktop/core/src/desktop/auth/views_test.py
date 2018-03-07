@@ -88,6 +88,19 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
 
+  def test_login_old(self):
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true(response.context['first_login_ever'])
+
+    response = self.c.post('/accounts/login/', dict(username=self.test_username, password="foo"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_true(self.fs.exists("/user/%s" % self.test_username))
+
+    response = self.c.get('/accounts/login/')
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_false(response.context['first_login_ever'])
+
   def test_login_home_creation_failure(self):
     response = self.c.get('/hue/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
