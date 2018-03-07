@@ -1550,6 +1550,7 @@ var ApiHelper = (function () {
               }).done(function (sampleResponse) {
                 var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
                 data.hueTimestamp = Date.now();
+                deferred.resolve(data);
               }).fail(deferred.reject);
               cancellablePromises.push(resultRequest, resultRequest);
             }).fail(deferred.reject));

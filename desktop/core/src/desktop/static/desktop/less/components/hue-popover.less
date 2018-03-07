@@ -118,6 +118,7 @@
 .hue-popover-title {
   .flex(0 1 auto);
   .nowrap-ellipsis;
+  overflow: hidden;
   padding: 6px 10px;
   margin: 0 30px 0 0;
   font-size: 14px;
@@ -223,7 +224,8 @@
 }
 
 .context-popover-flex-fill {
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
   margin: 0 10px;
   .flex(1 1 100%);
@@ -300,7 +302,6 @@
       line-height: 14px !important;
     }
   }
-
 }
 
 .context-popover-empty-columns {
@@ -353,6 +354,43 @@
 
 #contextPopover .hue-popover {
   position: fixed;
+}
+
+.context-popover-comment {
+  margin-top: 8px;
+  padding-left: 4px;
+}
+
+.context-popover-attributes {
+  margin-top: 8px;
+  padding-left: 4px;
+
+  .context-popover-attribute {
+    //background-color: @cui-gray-050;
+    //border-radius: 4px;
+    //padding: 4px 7px;
+
+    white-space: pre;
+
+    &:not(:last-child) {
+      margin-right: 10px;
+    }
+
+    span:first-child {
+      font-weight:500;
+      color: @cui-gray-700;
+      margin-right: 5px;
+      //font-weight:500;
+    }
+
+    span:last-child {
+      //color: @hue-primary-color-dark;
+    }
+  }
+}
+
+.context-popover-entries-list {
+  margin-top: 10px;
 }
 
 .context-popover-title {

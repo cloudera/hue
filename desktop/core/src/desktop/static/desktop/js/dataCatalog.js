@@ -1432,11 +1432,24 @@ var DataCatalog = (function () {
      */
     DataCatalogEntry.prototype.getType = function () {
       var self = this;
-      var type = self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
+      var type = self.getRawType();
       if (type.indexOf('<') !== -1) {
         type = type.substring(0, type.indexOf('<'));
       }
       return type;
+    };
+
+    /**
+     * Returns the raw type of the entry. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * For complex entries the type definition is the full version.
+     *
+     * @return {string}
+     */
+    DataCatalogEntry.prototype.getRawType = function () {
+      var self = this;
+      return self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
     };
 
     /**
