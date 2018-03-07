@@ -936,7 +936,12 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         new_groups = set()
         current_ldap_groups = set()
 
-        ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
+        if desktop.conf.LDAP.LDAP_SERVERS.get():
+          # Choose from multiple server configs
+          ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server]
+        else:
+          ldap_config = desktop.conf.LDAP
+
         group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
         group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
         # Search for groups based on group_member_attr=username and group_member_attr=dn
