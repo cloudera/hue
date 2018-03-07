@@ -943,6 +943,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.lastContext = null;
           }
           SKIP_CACHE.forEach(function (skipped) {
+            huePubSub.publish('app.dom.unload', skipped);
             $('#embeddable_' + skipped).html('');
           });
           self.isLoadingEmbeddable(true);

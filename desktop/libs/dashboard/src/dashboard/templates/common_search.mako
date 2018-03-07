@@ -3808,7 +3808,7 @@ $(document).ready(function () {
   var isDraggingOrResizingWidgets = false;
 
   var WIDGET_BASE_HEIGHT = 50;
-  $('.gridster>ul').gridster({
+  var $gridster = $('.gridster>ul').gridster({
     widget_margins: [10, 10],
     widget_base_dimensions: ['auto', WIDGET_BASE_HEIGHT],
     autogenerate_stylesheet: true,
@@ -3837,7 +3837,7 @@ $(document).ready(function () {
         huePubSub.publish('gridster.clean.whitespace');
       }
     }
-  });
+  }).data('gridster');
 
   function addPreviewHolder() {
     if (!$('.hue-preview-holder').length && searchViewModel.columns().length > 0) {
@@ -3854,7 +3854,7 @@ $(document).ready(function () {
   function movePreviewHolder(options) {
     var coords = {
       col: Math.ceil((options.event.clientX - $('.gridster').offset().left) / (widgetGridWidth + 10)),
-      row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (widgetGridHeight + 10))
+      row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (WIDGET_BASE_HEIGHT + 10))
     }
     var $huePreviewHolder = $('.hue-preview-holder');
     if (coords.row > 0 && coords.col > 0 && coords.col < 13) {
@@ -3962,7 +3962,6 @@ $(document).ready(function () {
           restoreWidgetSizes();
 
           // find out avail space
-          var $gridster = $('.gridster>ul').data('gridster');
           var availCoords = {
             col: coords.col,
             row: coords.row,
@@ -4027,7 +4026,6 @@ $(document).ready(function () {
     }
   }
 
-  var widgetGridHeight = parseInt(hueUtils.getStyleFromCSSClass('[data-sizey="1"]').height);
   var widgetGridWidth = parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width);
 
   huePubSub.subscribe('dashboard.window.resize', function () {
@@ -4061,7 +4059,6 @@ $(document).ready(function () {
 
   window.setInterval(function () {
      if (searchViewModel.isGridster() && !isDraggingOrResizingWidgets) {
-       var $gridster = $('.gridster>ul').data('gridster');
        searchViewModel.gridItems().forEach(function (existingWidget) {
          var scrollDifference = existingWidget.gridsterElement.scrollHeight - existingWidget.gridsterElement.clientHeight;
          if (scrollDifference > 0) {
@@ -4113,7 +4110,6 @@ $(document).ready(function () {
   huePubSub.subscribeOnce('gridster.added.widget', function () {
     $(window).trigger('resize');
     if (searchViewModel.isQueryBuilder()) {
-      var $gridster = $('.gridster>ul').data('gridster');
       $gridster.disable_resize();
       $gridster.disable();
     }
@@ -4124,7 +4120,6 @@ $(document).ready(function () {
   huePubSub.subscribe('gridster.clean.whitespace', function () {
     if (searchViewModel.isGridster()) {
       var maxRow = 0;
-      var $gridster = $('.gridster>ul').data('gridster');
       var occupiedRows = [];
       searchViewModel.gridItems().forEach(function (existingWidget) {
         var tempRow = existingWidget.row() + existingWidget.size_y();
@@ -4163,7 +4158,6 @@ $(document).ready(function () {
     removePreviewHolder();
 
     function resizeAndMove(widget, width, col) {
-      var $gridster = $('.gridster>ul').data('gridster');
       $gridster.resize_widget($(widget.gridsterElement), width, widget.size_y());
       widget.size_x(width);
       $gridster.move_widget($(widget.gridsterElement), col, widget.row());
@@ -4251,7 +4245,6 @@ $(document).ready(function () {
       return a.col() > b.col()
     });
     var optimalWidgetWidth = Math.floor(12 / siblings.length);
-    var $gridster = $('.gridster>ul').data('gridster');
     for (var i = 1; i <= siblings.length; i++) {
       var widget = siblings[i - 1];
       $gridster.resize_widget($(widget.gridsterElement), optimalWidgetWidth, widget.size_y());
@@ -4278,7 +4271,6 @@ $(document).ready(function () {
     var widget = searchViewModel.getWidgetById(options.id);
     if (widget) {
       var targetHeight = widget.gridsterHeight();
-      var $gridster = $('.gridster>ul').data('gridster');
       if (options.target) {
         searchViewModel.gridItems().forEach(function (item) {
           if (item.widgetId() === options.target.widgetId()) {
@@ -4335,6 +4327,12 @@ $(document).ready(function () {
       });
     }
   }, 'dashboard');
+
+  huePubSub.subscribe('app.dom.unload', function(app) {
+    if (app === 'dashboard') {
+      $gridster.destroy();
+    }
+  }, 'dashboard')
 
 
   $(document).on("click", ".widget-settings-pill", function(){
