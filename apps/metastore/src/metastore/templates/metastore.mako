@@ -466,7 +466,7 @@ ${ components.menubar(is_embeddable) }
             % endif
           </div>
         </div>
-        <div class="span6 tile">
+        <div class="span5 tile">
           <!-- ko if: $root.navigatorEnabled()  -->
           <h4>${ _('Tags') }</h4>
           <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {

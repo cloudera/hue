@@ -529,7 +529,7 @@ from metadata.conf import has_navigator
 
           <!-- ko if: isField() -->
           <div class="context-popover-attributes">
-            <span class="blue" data-bind="text: getType(), attr: { 'title': getRawType() }" ></span>
+            <div class="blue" data-bind="text: getType(), attr: { 'title': getRawType() }" ></div>
 ##             Min:
 ##             Max:
 ##             Distinct:
@@ -538,10 +538,10 @@ from metadata.conf import has_navigator
           <!-- ko if: isTable() -->
           <div class="context-popover-attributes">
             <!-- ko with: analysis -->
-            <span class="context-popover-attribute"><span>${ _('Owner') }</span> <span data-bind="text: details.properties.owner"></span></span>
-            <span class="context-popover-attribute"><span>${ _('Rows') }</span> <span data-bind="text: details.stats.numRows"></span></span>
-            <span class="context-popover-attribute"><span>${ _('Format') }</span> <span data-bind="text: details.properties.format"></span></span>
-            <span class="context-popover-attribute"><span>${ _('Modified') }</span> <span data-bind="text: localeFormat(details.stats.last_modified_time*1000)"></span></span>
+            <div class="context-popover-attribute"><div>${ _('Owner') }</div> <div data-bind="text: details.properties.owner"></div></div>
+            <div class="context-popover-attribute"><div>${ _('Rows') }</div> <div data-bind="text: details.stats.numRows"></div></div>
+            <div class="context-popover-attribute"><div>${ _('Format') }</div> <div data-bind="text: details.properties.format"></div></div>
+            <div class="context-popover-attribute"><div>${ _('Modified') }</div> <div data-bind="text: localeFormat(details.stats.last_modified_time*1000)"></div></div>
             <!-- /ko -->
           </div>
           <!-- /ko -->
