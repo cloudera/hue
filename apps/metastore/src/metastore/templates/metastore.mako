@@ -265,7 +265,7 @@ ${ components.menubar(is_embeddable) }
         <tr>
           <td data-bind="text: $index() + 1"></td>
           <!-- ko foreach: $data -->
-            <td data-bind="text: $data"></td>
+            <td data-bind="html: $data"></td>
           <!-- /ko -->
         </tr>
       <!-- /ko -->

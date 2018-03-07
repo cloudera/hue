@@ -311,8 +311,8 @@ var MetastoreTable = (function () {
     self.hasErrors(false);
     self.loading(true);
     self.metastoreTable.catalogEntry.getSample().done(function (sample) {
-      self.rows(sample.rows);
-      self.headers(sample.headers);
+      self.rows(sample.data);
+      self.headers($.map(sample.meta, function (meta) { return meta.name }));
       self.preview.rows(self.rows().slice(0, 3));
       self.preview.headers(self.headers());
     }).fail(function (message) {
