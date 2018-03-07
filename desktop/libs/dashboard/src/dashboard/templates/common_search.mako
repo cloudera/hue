@@ -4193,7 +4193,9 @@ $(document).ready(function () {
           var siblingCounter = 0;
           for (var i = 1; i <= 12 / newOptimalWidth; i++) {
             if (i !== droppedWidgetFauxColumn) {
-              resizeAndMove(collindingWidgets[siblingCounter], newOptimalWidth, ((i - 1) * newOptimalWidth) + 1)
+              if (collindingWidgets[siblingCounter]) {
+                resizeAndMove(collindingWidgets[siblingCounter], newOptimalWidth, ((i - 1) * newOptimalWidth) + 1)
+              }
               siblingCounter++;
             }
           }
