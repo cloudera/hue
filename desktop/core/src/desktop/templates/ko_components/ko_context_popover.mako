@@ -529,19 +529,29 @@ from metadata.conf import has_navigator
 
           <!-- ko if: isField() -->
           <div class="context-popover-attributes">
-            <div class="blue" data-bind="text: getType(), attr: { 'title': getRawType() }" ></div>
+            <div class="context-popover-attribute"><div>${ _('Type') }</div> <div data-bind="text: getType(), attr: { 'title': getRawType() }"></div></div>
+            <!-- ko with: analysis -->
+            <!-- ko with: stats -->
+            <!-- ko if: typeof distinct_count !== 'undefined' -->
+            <div class="context-popover-attribute"><div>${ _('Distinct') }</div> <div data-bind="text: distinct_count"></div></div>
 ##             Min:
 ##             Max:
-##             Distinct:
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
           </div>
           <!-- /ko -->
           <!-- ko if: isTable() -->
           <div class="context-popover-attributes">
             <!-- ko with: analysis -->
             <div class="context-popover-attribute"><div>${ _('Owner') }</div> <div data-bind="text: details.properties.owner"></div></div>
+            <!-- ko if: typeof details.stats.numRows !== 'undefined' -->
             <div class="context-popover-attribute"><div>${ _('Rows') }</div> <div data-bind="text: details.stats.numRows"></div></div>
+            <!-- /ko -->
             <div class="context-popover-attribute"><div>${ _('Format') }</div> <div data-bind="text: details.properties.format"></div></div>
-            <div class="context-popover-attribute"><div>${ _('Modified') }</div> <div data-bind="text: localeFormat(details.stats.last_modified_time*1000)"></div></div>
+            <!-- ko if: typeof details.stats.last_modified_time !== 'undefined' -->
+            <div class="context-popover-attribute"><div>${ _('Modified') }</div> <div data-bind="text: localeFormat(details.stats.last_modified_time * 1000)"></div></div>
+            <!-- /ko -->
             <!-- /ko -->
           </div>
           <!-- /ko -->
@@ -566,7 +576,7 @@ from metadata.conf import has_navigator
               </a>
             % endif
             % if not IS_EMBEDDED.get():
-              <!-- ko if: catalogEntry().getSourceType() !== 'solr' -->
+              <!-- ko if: catalogEntry().getSourceType() !== 'solr' && catalogEntry().path.length < 3 -->
               <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
                 <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
               </a>
@@ -689,7 +699,10 @@ from metadata.conf import has_navigator
 
       DataCatalogContext.prototype.showInAssist = function () {
         var self = this;
-        //huePubSub.publish('context.popover.show.in.assist')
+        huePubSub.publish('assist.db.highlight', {
+          sourceType: self.catalogEntry().getSourceType(),
+          path: self.catalogEntry().path
+        });
       };
 
       DataCatalogContext.prototype.openInDashboard = function() {
@@ -699,7 +712,8 @@ from metadata.conf import has_navigator
 
       DataCatalogContext.prototype.openInTableBrowser = function () {
         var self = this;
-        //huePubSub.publish('context.popover.open.in.metastore', isTable || isView ? 'table' : 'db')
+        huePubSub.publish('open.link', '/metastore/table' + (self.catalogEntry().isTableOrView() ? '/' : 's/') + self.catalogEntry().path.join('/'));
+        huePubSub.publish('context.popover.hide');
       };
 
       DataCatalogContext.prototype.insertInEditor = function () {
