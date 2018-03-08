@@ -3457,16 +3457,13 @@
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var _el = $(element);
       var _options = ko.unwrap(valueAccessor());
-      var disableUTC = _options.disableUTC || false;
       _el.datepicker({
         format: "yyyy-mm-dd"
       }).on("show", function (e) {
         if (_options.momentFormat) {
-          var m = moment(_el.val());
-          if (!disableUTC) {
-            m = m.utc();
-          }
+          var m = moment(_el.val()).utc();
           _el.datepicker("setValue", m.format("YYYY-MM-DD"));
+          _el.val(m.format(_options.momentFormat)); // Set value again as datepicker clears the time component
         }
       }).on("changeDate", function (e) {
         setDate(e.date);
@@ -3477,10 +3474,13 @@
       function setDate(d) {
         if (_options.momentFormat) {
           var m = moment(d);
-          if (!disableUTC) {
-            m = m.utc();
-          }
-          _el.val(m.format(_options.momentFormat));
+          // Keep time intact
+          var previous = moment(allBindings().value()).utc();
+          previous.date(m.date());
+          previous.month(m.month());
+          previous.year(m.year());
+
+          _el.val(previous.format(_options.momentFormat));
         }
         allBindings().value(_el.val());
       }
