@@ -658,7 +658,6 @@ var HueFileEntry = (function () {
     if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
       self.entriesToDelete(self.selectedEntries());
       self.removeDocuments(false);
-      huePubSub.publish('assist.document.refresh');
     }
   };
 
