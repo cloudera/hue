@@ -596,7 +596,6 @@ from desktop.views import _ko
             drop: function (ev, ui) {
               if (!dragToSelect && dragData && !dragData.dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
                 boundEntry.moveHere(dragData.selectedEntries);
-                dragData.originEntry.load();
               }
               $element.removeClass('doc-browser-drop-hover');
             },
