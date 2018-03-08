@@ -26,6 +26,7 @@
   from django.utils.translation import ugettext as _
 
   from dashboard.conf import HAS_QUERY_BUILDER_ENABLED, HAS_REPORT_ENABLED, USE_GRIDSTER
+  from desktop.views import _ko
 %>
 
 <%def name="import_layout(with_deferred=False)">
@@ -209,7 +210,7 @@
   <li>
     <!-- ko ifnot: widget -->
     <div class="empty-gridster-widget card card-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}, css: { 'query-builder': $root.isQueryBuilder }">
-      <h2 class="card-heading simple">
+      <h2 class="card-heading simple" title="${ _('Drag to move') }">
         ${ _('Empty widget') }
         <div class="inline pull-right margin-right-10" data-bind="visible: ($root.isEditing() || $root.isToolbarVisible()) && !$root.isQueryBuilder()">
           <a href="javascript:void(0)" class="remove-widget" data-bind="publish: { 'gridster.remove': $data }"><i class="fa fa-times"></i></a>
@@ -283,7 +284,7 @@
 
 <script type="text/html" id="widget-template${ suffix }">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass, droppable: { data: function() { $root.collection.dropOnWidget(id()) }, options:{ greedy:true, drop: function(event, ui) { huePubSub.publish('dashboard.drop.on.page', { event: event, ui: ui } } }}">
-    <h2 class="card-heading simple">
+    <h2 class="card-heading simple" data-bind="attr: { title: $root.isGridster() ? '${ _ko('Drag to move') }' : '' }">
       <!-- ko ifnot: $root.isGridster -->
       <span data-bind="visible: $root.isEditing">
         <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
@@ -294,11 +295,11 @@
       <!-- /ko -->
       <!-- ko if: $root.collection && $root.collection.getFacetById(id()) -->
       <span data-bind="with: $root.collection.getFacetById(id())">
-        <span data-bind="editable: label, editableOptions: { enabled: true, placement: 'right' }"></span>
+        <span data-bind="editable: label, editableOptions: { enabled: true, placement: 'right' }" title="${ _('Click to change the widget title') }"></span>
       </span>
       <!-- /ko -->
       <!-- ko if: typeof $root.collection == 'undefined' || $root.collection.getFacetById(id()) == null -->
-        <span data-bind="editable: name, editableOptions: { enabled: true, placement: 'right' }"></span>
+        <span data-bind="editable: name, editableOptions: { enabled: true, placement: 'right' }" title="${ _('Click to change the widget title') }"></span>
       <!-- /ko -->
       <div class="inline pull-right margin-right-10" data-bind="visible: ($root.isEditing() || $root.isToolbarVisible()) && !$root.isQueryBuilder()">
         <a href="javascript:void(0)" class="remove-widget" data-bind="click: $root.removeWidget"><i class="fa fa-times"></i></a>
