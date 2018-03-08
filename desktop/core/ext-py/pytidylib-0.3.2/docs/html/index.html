@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PyTidyLib: A Python Interface to HTML Tidy &mdash; pytidylib module</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pytidylib module" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="#">pytidylib module</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pytidylib-a-python-interface-to-html-tidy">
+<h1>PyTidyLib: A Python Interface to HTML Tidy<a class="headerlink" href="#pytidylib-a-python-interface-to-html-tidy" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://countergram.com/open-source/pytidylib/">PyTidyLib</a> is a Python package that wraps the <a class="reference external" href="http://tidy.sourceforge.net/">HTML Tidy</a> library. This allows you, from Python code, to &#8220;fix&#8221; invalid (X)HTML markup. Some of the library&#8217;s many capabilities include:</p>
+<ul class="simple">
+<li>Clean up unclosed tags and unescaped characters such as ampersands</li>
+<li>Output HTML 4 or XHTML, strict or transitional, and add missing doctypes</li>
+<li>Convert named entities to numeric entities, which can then be used in XML documents without an HTML doctype.</li>
+<li>Clean up HTML from programs such as Word (to an extent)</li>
+<li>Indent the output, including proper (i.e. no) indenting for <tt class="docutils literal"><span class="pre">pre</span></tt> elements, which some (X)HTML indenting code overlooks.</li>
+</ul>
+<p>As of the latest PyTidyLib maintenance updates, HTML Tidy itself has currently not been updated since 2008, and it may have trouble with newer HTML. This is just a thin Python wrapper around HTML Tidy, which is a separate project.</p>
+<p>As of 0.2.3, both Python 2 and Python 3 are supported with passing tests.</p>
+<div class="section" id="naming-conventions">
+<h2>Naming conventions<a class="headerlink" href="#naming-conventions" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://tidy.sourceforge.net/">HTML Tidy</a> is a longstanding open-source library written in C that implements the actual functionality of cleaning up (X)HTML markup. It provides a shared library (<tt class="docutils literal"><span class="pre">so</span></tt>, <tt class="docutils literal"><span class="pre">dll</span></tt>, or <tt class="docutils literal"><span class="pre">dylib</span></tt>) that can variously be called <tt class="docutils literal"><span class="pre">tidy</span></tt>, <tt class="docutils literal"><span class="pre">libtidy</span></tt>, or <tt class="docutils literal"><span class="pre">tidylib</span></tt>, as well as a command-line executable named <tt class="docutils literal"><span class="pre">tidy</span></tt>. For clarity, this document will consistently refer to it by the project name, HTML Tidy.</p>
+<p><a class="reference external" href="http://countergram.com/open-source/pytidylib/">PyTidyLib</a> is the name of the Python package discussed here. As this is the package name, <tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pytidylib</span></tt> is correct (they are case-insenstive). The <em>module</em> name is <tt class="docutils literal"><span class="pre">tidylib</span></tt>, so <tt class="docutils literal"><span class="pre">import</span> <span class="pre">tidylib</span></tt> is correct in Python code. This document will consistently use the package name, PyTidyLib, outside of code examples.</p>
+</div>
+<div class="section" id="installing-html-tidy">
+<h2>Installing HTML Tidy<a class="headerlink" href="#installing-html-tidy" title="Permalink to this headline">¶</a></h2>
+<p>You must have both <a class="reference external" href="http://tidy.sourceforge.net/">HTML Tidy</a> and <a class="reference external" href="http://countergram.com/open-source/pytidylib/">PyTidyLib</a> installed in order to use the functionality described here. There is no affiliation between the two projects. The following briefly outlines what you must do to install HTML Tidy. See the <a class="reference external" href="http://tidy.sourceforge.net/">HTML Tidy</a> web site for more information.</p>
+<p><strong>Linux/BSD or similar:</strong> First, try to use your distribution&#8217;s package management system (<tt class="docutils literal"><span class="pre">apt-get</span></tt>, <tt class="docutils literal"><span class="pre">yum</span></tt>, etc.) to install HTML Tidy. It might go under the name <tt class="docutils literal"><span class="pre">libtidy</span></tt>, <tt class="docutils literal"><span class="pre">tidylib</span></tt>, <tt class="docutils literal"><span class="pre">tidy</span></tt>, or something similar. Otherwise see <em>Building from Source</em>, below.</p>
+<p><strong>OS X:</strong> You may already have HTML Tidy installed. In the Terminal, run <tt class="docutils literal"><span class="pre">locate</span> <span class="pre">libtidy</span></tt> and see if you get any results, which should end in <tt class="docutils literal"><span class="pre">dylib</span></tt>. Otherwise see <em>Building from Source</em>, below.</p>
+<p><strong>Windows:</strong> (Do not use pre-0.2.0 PyTidyLib.) You may be able to find prebuild DLLs. The DLL sources that were linked to in previous versions of this documentation have since gone 404 without obvious  replacements.</p>
+<p>Once you have a DLL (which may be named <tt class="docutils literal"><span class="pre">tidy.dll</span></tt>, <tt class="docutils literal"><span class="pre">libtidy.dll</span></tt>, or <tt class="docutils literal"><span class="pre">tidylib.dll</span></tt>), you must place it in a directory on your system path. If you are running Python from the command-line, placing the DLL in the present working directory will work, but this is unreliable otherwise (e.g. for server software).</p>
+<p>See the articles <a class="reference external" href="http://www.computerhope.com/issues/ch000549.htm">How to set the path in Windows 2000/Windows XP</a> (ComputerHope.com) and <a class="reference external" href="http://www.question-defense.com/2009/06/22/modify-a-users-path-in-windows-vista-vista-path-environment-variable/">Modify a Users Path in Windows Vista</a> (Question Defense) for more information on your system path.</p>
+<p><strong>Building from Source:</strong> The HTML Tidy developers have chosen to make the source code downloadable <em>only</em> through CVS, and not from the web site. Use the following CVS checkout at the command line:</p>
+<div class="highlight-python"><div class="highlight"><pre>cvs -z3 -d:pserver:anonymous@tidy.cvs.sourceforge.net:/cvsroot/tidy co -P tidy
+</pre></div>
+</div>
+<p>Then see the instructions packaged with the source code or on the <a class="reference external" href="http://tidy.sourceforge.net/">HTML Tidy</a> web site.</p>
+</div>
+<div class="section" id="installing-pytidylib">
+<h2>Installing PyTidyLib<a class="headerlink" href="#installing-pytidylib" title="Permalink to this headline">¶</a></h2>
+<p>PyTidyLib is available on the Python Package Index:</p>
+<div class="highlight-python"><div class="highlight"><pre>pip install pytidylib
+</pre></div>
+</div>
+<p>You can also download the latest source distribution from PyPI manually.</p>
+</div>
+<div class="section" id="small-example-of-use">
+<h2>Small example of use<a class="headerlink" href="#small-example-of-use" title="Permalink to this headline">¶</a></h2>
+<p>The following code cleans up an invalid HTML document and sets an option:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">tidylib</span> <span class="kn">import</span> <span class="n">tidy_document</span>
+<span class="n">document</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">tidy_document</span><span class="p">(</span><span class="s">&#39;&#39;&#39;&lt;p&gt;f&amp;otilde;o &lt;img src=&quot;bar.jpg&quot;&gt;&#39;&#39;&#39;</span><span class="p">,</span>
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;numeric-entities&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">})</span>
+<span class="k">print</span> <span class="n">document</span>
+<span class="k">print</span> <span class="n">errors</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="configuration-options">
+<h2>Configuration options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>The Python interface allows you to pass options directly to HTML Tidy. For a complete list of options, see the <a class="reference external" href="http://tidy.sourceforge.net/docs/quickref.html">HTML Tidy Configuration Options Quick Reference</a> or, from the command line, run <tt class="docutils literal"><span class="pre">tidy</span> <span class="pre">-help-config</span></tt>.</p>
+<p>This module sets certain default options, as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">BASE_OPTIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;indent&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>           <span class="c"># Pretty; not too much of a performance hit</span>
+    <span class="s">&quot;tidy-mark&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>        <span class="c"># No tidy meta tag in output</span>
+    <span class="s">&quot;wrap&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>             <span class="c"># No wrapping</span>
+    <span class="s">&quot;alt-text&quot;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span>        <span class="c"># Help ensure validation</span>
+    <span class="s">&quot;doctype&quot;</span><span class="p">:</span> <span class="s">&#39;strict&#39;</span><span class="p">,</span>   <span class="c"># Little sense in transitional for tool-generated markup...</span>
+    <span class="s">&quot;force-output&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>     <span class="c"># May not get what you expect but you will get something</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>If you do not like these options to be set for you, do the following after importing <tt class="docutils literal"><span class="pre">tidylib</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">tidylib</span><span class="o">.</span><span class="n">BASE_OPTIONS</span> <span class="o">=</span> <span class="p">{}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="function-reference">
+<h2>Function reference<a class="headerlink" href="#function-reference" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tidylib.tidy_document">
+<tt class="descclassname">tidylib.</tt><tt class="descname">tidy_document</tt><big>(</big><em>text</em>, <em>options=None</em>, <em>keep_doc=False</em><big>)</big><a class="headerlink" href="#tidylib.tidy_document" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a string with markup through HTML Tidy; return the corrected one.</p>
+<p>text (str): The markup, which may be anything from an empty string to a
+complete (X)HTML document. Unicode values are supported; they will be
+encoded as UTF-8, and HTML Tidy&#8217;s output will be decoded back to a unicode
+object.</p>
+<p>options (dict): Options passed directly to HTML Tidy; see the HTML Tidy docs
+(<a class="reference external" href="http://tidy.sourceforge.net/docs/quickref.html">http://tidy.sourceforge.net/docs/quickref.html</a>) or run tidy -help-config
+from the command line.</p>
+<p>keep_doc (boolean): If True, store 1 document object per thread and re-use
+it, for a slight performance boost especially when tidying very large numbers
+of very short documents.</p>
+<p>returns (str, str): The tidied markup [0] and warning/error messages[1].
+Warnings and errors are returned just as tidylib returns them.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tidylib.tidy_fragment">
+<tt class="descclassname">tidylib.</tt><tt class="descname">tidy_fragment</tt><big>(</big><em>text</em>, <em>options=None</em>, <em>keep_doc=False</em><big>)</big><a class="headerlink" href="#tidylib.tidy_fragment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tidy a string with markup and return only the &lt;body&gt; contents.</p>
+<p>HTML Tidy normally returns a full (X)HTML document; this function returns only
+the contents of the &lt;body&gt; element and is meant to be used for snippets.
+Calling tidy_fragment on elements that don&#8217;t go in the &lt;body&gt;, like &lt;title&gt;,
+will produce incorrect behavior.</p>
+<p>Arguments and return value are the same as tidy_document. Note that HTML
+Tidy will always complain about the lack of a doctype and &lt;title&gt; element
+in fragments, and these errors are not stripped out for you.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tidylib.release_tidy_doc">
+<tt class="descclassname">tidylib.</tt><tt class="descname">release_tidy_doc</tt><big>(</big><big>)</big><a class="headerlink" href="#tidylib.release_tidy_doc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Release the stored document object in the current thread. Only useful
+if you have called tidy_document or tidy_fragament with keep_doc=True.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PyTidyLib: A Python Interface to HTML Tidy</a><ul>
+<li><a class="reference internal" href="#naming-conventions">Naming conventions</a></li>
+<li><a class="reference internal" href="#installing-html-tidy">Installing HTML Tidy</a></li>
+<li><a class="reference internal" href="#installing-pytidylib">Installing PyTidyLib</a></li>
+<li><a class="reference internal" href="#small-example-of-use">Small example of use</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration options</a></li>
+<li><a class="reference internal" href="#function-reference">Function reference</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="#">pytidylib module</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009-2014 Jason Stitt.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>
