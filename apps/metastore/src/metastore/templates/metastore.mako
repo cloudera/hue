@@ -412,6 +412,7 @@ ${ components.menubar(is_embeddable) }
     <thead>
     <tr>
       <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
+      <th>&nbsp;</th>
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
@@ -420,6 +421,7 @@ ${ components.menubar(is_embeddable) }
       <td width="1%" style="text-align: center">
         <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
       </td>
+      <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
       <td>
         <a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: function () { $parent.setDatabase($data, function() { huePubSub.publish('metastore.url.change'); }) }"></a>
       </td>

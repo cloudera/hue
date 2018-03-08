@@ -567,7 +567,7 @@ from metadata.conf import has_navigator
         <div class="context-popover-flex-bottom-links">
           <div class="context-popover-link-row">
             <!-- ko if: catalogEntry -->
-            <a class="inactive-action pointer" data-bind="click: showInAssist">
+            <a class="inactive-action pointer" data-bind="visible: popover.showInAssistEnabled, click: showInAssist">
               <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
             </a>
             % if HAS_SQL_ENABLED.get():
@@ -576,15 +576,12 @@ from metadata.conf import has_navigator
               </a>
             % endif
             % if not IS_EMBEDDED.get():
-              <!-- ko if: catalogEntry().getSourceType() !== 'solr' && catalogEntry().path.length < 3 -->
+              <!-- ko if: catalogEntry().getSourceType() !== 'solr' && popover.openInTableBrowserEnabled -->
               <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
                 <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
               </a>
               <!-- /ko -->
             % endif
-            <a class="inactive-action pointer" data-bind="visible: popover.insertInEditorEnabled, click: insertInEditor" style="display: none;">
-              <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
-            </a>
             <!-- /ko -->
           </div>
         </div>
@@ -690,7 +687,7 @@ from metadata.conf import has_navigator
             promise.cancel();
           }
         }
-      }
+      };
 
       DataCatalogContext.prototype.dispose = function () {
         var self = this;
@@ -707,7 +704,8 @@ from metadata.conf import has_navigator
 
       DataCatalogContext.prototype.openInDashboard = function() {
         var self = this;
-        //huePubSub.publish('context.popover.open.in.dashboard')
+        huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry().path.join('.') + '?engine=' + self.sourceType);
+        huePubSub.publish('context.popover.hide');
       };
 
       DataCatalogContext.prototype.openInTableBrowser = function () {
@@ -715,12 +713,6 @@ from metadata.conf import has_navigator
         huePubSub.publish('open.link', '/metastore/table' + (self.catalogEntry().isTableOrView() ? '/' : 's/') + self.catalogEntry().path.join('/'));
         huePubSub.publish('context.popover.hide');
       };
-
-      DataCatalogContext.prototype.insertInEditor = function () {
-        var self = this;
-        //huePubSub.publish('context.popover.replace.in.editor')
-      };
-
 
       var HALF_SIZE_LIMIT_X = 130;
       var HALF_SIZE_LIMIT_Y = 100;
@@ -1831,9 +1823,10 @@ from metadata.conf import has_navigator
         self.isCollection = params.data.type === 'collection';
         self.isCatalogEntry = !!params.data.catalogEntry;
 
-        self.showInAssistEnabled = (typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true) && (self.isDocument || self.isDatabase || self.isTable || self.isColumn || self.isCollection);
-        self.openInDashboardEnabled = self.isTable || self.isView || self.isDatabase;
-        self.openInTableBrowserEnabled = self.isTable || self.isView || self.isDatabase;
+        self.showInAssistEnabled = (typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true)
+                && (self.isDocument || self.isDatabase || self.isTable || self.isColumn || self.isCollection || self.isCatalogEntry);
+        self.openInDashboardEnabled = self.isTable || self.isView || self.isDatabase || (self.isCatalogEntry && params.data.catalogEntry.path.length <= 2);
+        self.openInTableBrowserEnabled = self.isTable || self.isView || self.isDatabase || (self.isCatalogEntry && params.data.catalogEntry.path.length <= 2);
         self.replaceEditorContentEnabled = self.isHdfs;
         self.openInFileBrowserEnabled = self.isHdfs;
         self.expandColumnsEnabled = self.isAsterisk;
@@ -1855,7 +1848,7 @@ from metadata.conf import has_navigator
           self.data.identifierChain = identifierChain
         }
 
-        self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isHdfs;
+        self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isHdfs && !self.isCatalogEntry;
 
         if (self.isTable || self.isView) {
           if (self.isSolr) {

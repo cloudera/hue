@@ -197,28 +197,13 @@ var AssistDbEntry = (function () {
       offset.top += positionAdjustment.top;
     }
 
-    var type;
-    if (self.catalogEntry.isColumn() && self.sourceType === 'solr') {
-      type = 'collection';
-    } else if (self.catalogEntry.isColumn()) {
-      type = 'column';
-    } else if (self.catalogEntry.isDatabase()) {
-      type = 'database';
-    } else if (self.catalogEntry.isTable()) {
-      type = 'table';
-    } else if (self.catalogEntry.isView()) {
-      type = 'view';
-    } else {
-      type = 'complex';
-    }
-
     self.statsVisible(true);
     huePubSub.publish('context.popover.show', {
       data: {
         type: 'catalogEntry',
         catalogEntry: self.catalogEntry
       },
-      showInAssistEnabled: self.navigationSettings.rightAssist,
+      showInAssistEnabled: !!self.navigationSettings.rightAssist,
       orientation: self.navigationSettings.rightAssist ? 'left' : 'right',
       pinEnabled: self.navigationSettings.pinEnabled,
       source: {
