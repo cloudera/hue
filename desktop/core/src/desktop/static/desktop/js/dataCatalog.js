@@ -663,6 +663,10 @@ var DataCatalog = (function () {
         invalidatePromise = $.Deferred().resolve().promise();
       }
 
+      if (self.definition && self.definition.navOptLoaded) {
+        delete self.definition.navOptLoaded;
+      }
+
       self.reset();
       var saveDeferred = cascade ? self.dataCatalog.clearStorageCascade(self.path) : self.save();
 

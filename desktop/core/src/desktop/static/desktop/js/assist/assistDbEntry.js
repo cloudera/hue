@@ -355,13 +355,20 @@ var AssistDbEntry = (function () {
       loadEntriesDeferred.resolve([]);
     };
 
-    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && self.catalogEntry.isTable() && self.assistDbSource.sourceType !== 'solr') {
+    if (!self.navigationSettings.rightAssist && HAS_OPTIMIZER && (self.catalogEntry.isTable() || self.catalogEntry.isDatabase()) && self.assistDbSource.sourceType !== 'solr') {
       self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true }).done(function () {
         loadEntriesDeferred.done(function () {
           if (!self.hasErrors()) {
             self.entries().forEach(function (entry) {
               if (entry.catalogEntry.navOptPopularity) {
-                entry.popularity(entry.catalogEntry.navOptPopularity.columnCount)
+                if (entry.catalogEntry.navOptPopularity.popularity) {
+                  entry.popularity(entry.catalogEntry.navOptPopularity.popularity)
+                } else if (entry.catalogEntry.navOptPopularity.column_count) {
+                  entry.popularity(entry.catalogEntry.navOptPopularity.column_count)
+                } else if (entry.catalogEntry.navOptPopularity.selectColumn) {
+                  entry.popularity(entry.catalogEntry.navOptPopularity.selectColumn.columnCount);
+                }
+
               }
             });
 
