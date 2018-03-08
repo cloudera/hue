@@ -702,7 +702,7 @@ var EditorViewModel = (function() {
             return current.value == value.placeholder;
           });
           if (!isPlaceholderInOptions) {
-            value.options.push({ text: value.placeholder, value: value.placeholder });
+            value.options.unshift({ text: value.placeholder, value: value.placeholder });
           }
           matches[match[1]] = matches[match[1]] || value;
         }
@@ -738,7 +738,9 @@ var EditorViewModel = (function() {
       newVal.forEach(function (item, index) {
         var variable = self.variables()[index];
         variable.name(item.name);
-        variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || '');
+        setTimeout(function(){
+          variable.value(self.variableValues[item.name] ? self.variableValues[item.name].value : (!needsMore && variable.value()) || '');
+        },0);
         variable.meta = ko.mapping.fromJS(item.meta, {}, variable.meta);
         variable.sample(variable.meta.options ? variable.meta.options().concat(variable.sampleUser()) : variable.sampleUser())
         variable.sampleUser(self.variableValues[item.name] ? self.variableValues[item.name].sampleUser : []);
@@ -814,7 +816,7 @@ var EditorViewModel = (function() {
             entry.getSample({ silenceErrors: true }).then(fUpdateVariableSample.bind(self, oVariables[variable.name()].path, variable));
           });
         } else {
-          fUpdateVariableSample(oVariables[variable.name()].path, variable, {
+          fUpdateVariableSample([variable.name()], variable, {
             full_headers: [
               { type: 'text' }
             ],
@@ -3393,7 +3395,7 @@ var EditorViewModel = (function() {
     };
 
     self.showContextPopover = function (field, event) {
-      var $source = $(event.target);
+      var $source = $(event.target && event.target.nodeName !== 'A' ? event.target.parentElement : event.target);
       var offset = $source.offset();
       huePubSub.publish('context.popover.show', {
         data: {
@@ -3402,7 +3404,7 @@ var EditorViewModel = (function() {
         },
         showInAssistEnabled: true,
         sourceType: self.editorType(),
-        orientation: 'right',
+        orientation: 'bottom',
         defaultDatabase: 'default',
         pinEnabled: false,
         source: {
