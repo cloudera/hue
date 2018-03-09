@@ -911,7 +911,7 @@ ${ assist.assistPanel() }
   </span>
 
   <!-- ko if: operations().length == 0 -->
-  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation, visible: $root.createWizard.destination.indexerRunJob" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
+  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
   <!-- /ko -->
 
   <div class="inline-block" data-bind="template: { name: 'field-column-example' }"></div>
@@ -944,7 +944,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="operation-template">
   <div class="operation">
-    <select data-bind="browserAwareSelectize: $root.createWizard.operationTypes.map(function(o){return o.name}), value: operation.type"></select>
+    <select data-bind="browserAwareSelectize: $root.createWizard.operationTypesFiltered, value: operation.type"></select>
     <!-- ko template: "args-template" --><!-- /ko -->
     <!-- ko if: operation.settings().outputType() == "custom_fields" -->
       <label class="margin-left-5">${ _('Number of expected fields') }
@@ -1935,6 +1935,19 @@ ${ assist.assistPanel() }
       self.isIndexing = ko.observable(false);
       self.indexingError = ko.observable(false);
       self.indexingSuccess = ko.observable(false);
+      self.destination.indexerRunJob.subscribe(function () {
+        self.destination.columns().forEach(function (column) {
+          column.operations.removeAll();
+        });
+      });
+      self.operationTypesFiltered = ko.pureComputed(function () {
+        var indexerRunJob = self.destination.indexerRunJob();
+        return self.operationTypes.filter(function (operation) {
+          return indexerRunJob || operation.name === 'split'; // We only support split for now with CSV API
+        }).map(function (o) {
+          return o.name;
+        });
+      });
       self.indexFile = function () {
         if (!self.readyToIndex()) {
           return;

@@ -248,6 +248,13 @@ def _small_indexing(user, fs, client, source, destination, index_name):
   skip_fields = [field['name'] for field in fields if not field['keep']]
 
   kwargs['fieldnames'] = ','.join([field['name'] for field in fields])
+  for field in fields:
+    for operation in field['operations']:
+      if operation['type'] == 'split':
+        field['multiValued'] = True # Solr requires multiValued to be set when splitting
+        kwargs['f.%(name)s.split' % field] = 'true'
+        kwargs['f.%(name)s.separator' % field] = operation['settings']['splitChar'] or ','
+
   if skip_fields:
     kwargs['skip'] = ','.join(skip_fields)
     fields = [field for field in fields if field['name'] not in skip_fields]

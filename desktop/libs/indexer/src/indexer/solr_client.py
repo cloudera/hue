@@ -121,7 +121,8 @@ class SolrClient(object):
         fields = [{
             'name': field['name'],
             'type': SolrClient._port_field_types(field)['type'],
-            'stored': field.get('stored', True)
+            'stored': field.get('stored', True),
+            'multiValued': field.get('multiValued', False)
           } for field in fields if field['name'] != 'id'
         ]
         self.api.add_fields(name, fields)
