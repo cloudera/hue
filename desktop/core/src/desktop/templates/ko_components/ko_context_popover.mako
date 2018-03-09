@@ -621,6 +621,8 @@ from metadata.conf import has_navigator
         self.viewSql = ko.observable();
         self.viewSqlVisible = ko.observable(false);
 
+        self.catalogEntry.subscribe(self.load.bind(self));
+
         self.breadCrumbs = ko.pureComputed(function () {
           var result = [];
           var catalogEntry = self.catalogEntry();
@@ -631,9 +633,7 @@ from metadata.conf import has_navigator
                 isActive: i === catalogEntry.path.length - 1,
                 path: catalogEntry.path.slice(0, i + 1),
                 makeActive: function () {
-                  self.catalogEntry().dataCatalog.getEntry({ path: this.path }).done(function (entry) {
-                    self.load(entry);
-                  });
+                  self.catalogEntry().dataCatalog.getEntry({ path: this.path }).done(self.catalogEntry);
                 }
               })
             }
@@ -641,24 +641,22 @@ from metadata.conf import has_navigator
           return result;
         });
 
-        self.load(options.catalogEntry);
+        self.catalogEntry(options.catalogEntry);
       };
 
-      DataCatalogContext.prototype.load = function (catalogEntry) {
+      DataCatalogContext.prototype.load = function () {
         var self = this;
         self.loading(true);
         self.cancelActivePromises();
 
-        self.catalogEntry(catalogEntry);
-
         var viewSqlDeferred = $.Deferred().done(self.viewSql);
         self.activePromises.push(viewSqlDeferred.promise());
 
-        self.activePromises.push(catalogEntry.getSourceMeta().done().fail(function () {
+        self.activePromises.push(self.catalogEntry().getSourceMeta().done().fail(function () {
           self.hasErrors(true);
         }));
 
-        self.activePromises.push(catalogEntry.getAnalysis({ silenceErrors: true }).done(function (analysis) {
+        self.activePromises.push(self.catalogEntry().getAnalysis({ silenceErrors: true }).done(function (analysis) {
           var found = analysis.properties && analysis.properties.some(function (property) {
             if (property.col_name.toLowerCase() === 'view original text:') {
               ApiHelper.getInstance().formatSql(property.data_type).done(function (formatResponse) {
@@ -679,9 +677,9 @@ from metadata.conf import has_navigator
           self.analysis(analysis);
         }).fail(viewSqlDeferred.reject));
 
-        self.activePromises.push(catalogEntry.getChildren({ silenceErrors: true }).done(self.children));
+        self.activePromises.push(self.catalogEntry().getChildren({ silenceErrors: true }).done(self.children));
 
-        self.activePromises.push(catalogEntry.getComment().done(self.comment));
+        self.activePromises.push(self.catalogEntry().getComment().done(self.comment));
 
         $.when.apply($, self.activePromises).always(function () {
           self.activePromises.length = 0;
