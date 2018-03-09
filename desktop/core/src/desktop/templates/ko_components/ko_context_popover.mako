@@ -504,7 +504,7 @@ from metadata.conf import has_navigator
       <div class="hue-popover-title-actions">
         <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
         <a class="pointer inactive-action" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
-        <a class="pointer inactive-action" data-bind="click: popover.close"><i class="fa fa-fw fa-times"></i></a>
+        <a class="pointer inactive-action" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
       </div>
     </div>
   </script>
@@ -589,8 +589,18 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
-  <script type="text/html" id="data-catalog-tables-list">
-
+  <script type="text/html" id="global-search-context">
+  <!-- ko if: isCatalogEntry -->
+  <!-- ko with: contents -->
+  <div style="display: flex; flex-direction: column;">
+  <!-- ko template: 'context-catalog-entry-title' --><!-- /ko -->
+  <!-- ko template: 'context-catalog-entry-contents' --><!-- /ko -->
+  </div>
+  <!-- /ko -->
+  <!-- /ko -->
+  <!-- ko ifnot: isCatalogEntry -->
+  <!-- ko template: 'context-popover-contents' --><!-- /ko -->
+  <!-- /ko -->
   </script>
 
   <script type="text/javascript">
@@ -2033,17 +2043,17 @@ from metadata.conf import has_navigator
 
       var SqlContextContentsGlobalSearch = function (params) {
         var self = this;
-        self.contents = undefined;
+        self.contents = ko.observable();
 
         self.disposals = [];
 
-        self.isCatalogEntry = params.data.type === 'catalogEntry';
-        self.isDatabase = params.data.type.toLowerCase() === 'database';
-        self.isTable = params.data.type.toLowerCase() === 'table';
-        self.isColumn = params.data.type.toLowerCase() === 'field';
-        self.isView = params.data.type.toLowerCase() === 'view';
+        self.isCatalogEntry = params.data.type === 'catalogEntry'
+                || params.data.type.toLowerCase() === 'database'
+                || params.data.type.toLowerCase() === 'table'
+                || params.data.type.toLowerCase() === 'field'
+                || params.data.type.toLowerCase() === 'view';
+
         self.isDocument = params.data.type.toLowerCase() === 'hue';
-        self.isHueApp = params.data.type.toLowerCase() === 'hueapp';
 
         self.close = params.globalSearch.close.bind(params.globalSearch);
 
@@ -2059,6 +2069,7 @@ from metadata.conf import has_navigator
         self.replaceEditorContentEnabled = self.isHdfs;
         self.openInFileBrowserEnabled = self.isHdfs;
         self.expandColumnsEnabled = self.isAsterisk;
+        self.closeDisabled = true; // Global search has it's own close
 
         var adaptedData = { identifierChain: [] };
 
@@ -2076,32 +2087,22 @@ from metadata.conf import has_navigator
           metastorePubSub.remove();
         });
 
-        var sqlSourceType;
-        if (self.isDatabase || self.isTable || self.isView || self.isColumn || self.isComplex) {
+        var sourceType = params.data.sourceType && params.data.sourceType.toLowerCase();
+
+        if (!sourceType && self.isCatalogEntry) {
           huePubSub.publish('cluster.config.get.config', function (clusterConfig) {
             if (clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['editor']) {
-              sqlSourceType = clusterConfig['app_config']['editor']['default_sql_interpreter'];
+              sourceType = clusterConfig['app_config']['editor']['default_sql_interpreter'];
             }
           });
-          if (!sqlSourceType) {
-            sqlSourceType = params.data.sourceType.toLowerCase();
-          }
         }
 
         if (self.isCatalogEntry) {
-          self.contents = new DataCatalogContext({ popover: self, catalogEntry: params.data.catalogEntry });
-        } else if (self.isDatabase) {
-          self.contents = new DatabaseContextTabs(adaptedData, sqlSourceType, 'default');
-        } else if (self.isTable) {
-          self.contents = new TableAndColumnContextTabs(adaptedData, sqlSourceType, 'default', false, false);
-        } else if (self.isView) {
-          self.contents = new TableAndColumnContextTabs(adaptedData, sqlSourceType, 'default', false, false);
-        } else if (self.isColumn) {
-          self.contents = new TableAndColumnContextTabs(adaptedData, sqlSourceType, 'default', true, false);
+          DataCatalog.getEntry({ sourceType: sourceType, path: path, definition: { type: params.data.type.toLowerCase() }}).done(function (catalogEntry) {
+            self.contents(new DataCatalogContext({ popover: self, catalogEntry: catalogEntry }));
+          });
         } else if (self.isDocument) {
-          self.contents = new DocumentContext(params.data);
-        } else if (self.isHueApp) {
-          self.contents = new HueAppContext(params.data);
+          self.contents(new DocumentContext(params.data));
         }
       };
 
@@ -2119,7 +2120,7 @@ from metadata.conf import has_navigator
 
       ko.components.register('context-popover-contents-global-search', {
         viewModel: SqlContextContentsGlobalSearch,
-        template: { element: 'context-popover-contents' }
+        template: { element: 'global-search-context' }
       })
     })();
   </script>
