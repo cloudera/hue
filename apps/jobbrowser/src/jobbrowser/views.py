@@ -355,9 +355,12 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
 
   if log_link:
     link = '/%s/' % name
-    params = {
-      'doAs': request.user.username
-    }
+    if app['applicationType'] == 'Oozie Launcher' and app['state'] != 'FINISHED': # Yarn currently dumps with 500 error with doas in running state
+      params = {}
+    else:
+      params = {
+        'doAs': request.user.username
+      }
     if offset != 0:
       params['start'] = offset
 
