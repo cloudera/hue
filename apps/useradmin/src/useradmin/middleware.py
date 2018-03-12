@@ -43,6 +43,11 @@ class LdapSynchronizationMiddleware(object):
 
   def process_request(self, request):
     user = request.user
+    server = None
+
+    # Used by tests only
+    if request.method == "GET":
+      server = request.GET.get('server')
 
     if not user or not user.is_authenticated():
       return
@@ -58,7 +63,7 @@ class LdapSynchronizationMiddleware(object):
       else:
         connection = ldap_access.get_connection_from_server()
 
-      import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False)
+      import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False, server=server)
 
       request.session[self.USER_CACHE_NAME] = True
       request.session.modified = True
