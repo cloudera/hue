@@ -175,6 +175,7 @@
 }
 
 .context-popover-content {
+  padding: 5px;
   .display-flex();
   .flex(1 1 100%);
   .flex-direction(column);
@@ -357,11 +358,17 @@
 }
 
 .context-popover-comment {
+  .flex(1);
   margin-top: 2px;
   padding-left: 4px;
 }
 
+.context-popover-sql {
+  .flex(1);
+}
+
 .context-popover-attributes {
+  .flex(1);
   margin-top: 8px;
   margin-left: 4px;
   font-size: 13px;
@@ -392,6 +399,22 @@
   }
 }
 
+.catalog-entries-list-container {
+  .flex(1 1 100%);
+  overflow: auto;
+}
+
+.context-popover-inner-content {
+  position: absolute;
+  .display-flex();
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  .flex-direction(column);
+}
+
 .context-popover-entries-list {
   margin: 10px 4px 4px 4px;
 }
@@ -412,9 +435,5 @@
 
 .context-popover-close {
   .flex(1 0 15px);
-  padding: 5px;
-}
-
-.context-popover-content {
   padding: 5px;
 }

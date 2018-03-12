@@ -25,22 +25,24 @@ from desktop.views import _ko
   <script type="text/html" id="catalog-entries-list-template">
     <!-- ko hueSpinner: { spin: loading, inline: true, size: 'small' } --><!-- /ko -->
     <!-- ko if: !loading() && columnSamples().length -->
-    <table class="table table-condensed table-nowrap">
-      <thead>
-        <tr>
-          <th>${ _("Sample") }</th>
-        </tr>
-      </thead>
-      <tbody data-bind="foreach: columnSamples">
-        <tr>
-          <td data-bind="html: $data"></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="catalog-entries-list-container">
+      <table class="table table-condensed table-nowrap">
+        <thead>
+          <tr>
+            <th>${ _("Sample") }</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: columnSamples">
+          <tr>
+            <td data-bind="html: $data"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <!-- /ko -->
 
     <!-- ko if: !loading() && entries().length -->
-    <div class="context-popover-inline-autocomplete" style="width: 250px">
+    <div class="catalog-entries-list-filter context-popover-inline-autocomplete">
       <!-- ko component: {
         name: 'inline-autocomplete',
         params: {
@@ -51,56 +53,60 @@ from desktop.views import _ko
         }
       } --><!-- /ko -->
     </div>
-    <!-- ko if: catalogEntry.isDatabase() -->
-    <table class="table table-condensed table-nowrap">
-      <thead>
-      <tr>
-        <th>${ _("Table") }</th><th>${ _("Description") }</th>
-      </tr>
-      </thead>
-      <!-- ko if: filteredEntries().length -->
-      <tbody data-bind="foreach: filteredEntries">
+    <div class="catalog-entries-list-container">
+      <!-- ko if: catalogEntry.isDatabase() -->
+      <table class="table table-condensed table-nowrap">
+        <thead>
         <tr>
-          <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
-          <td data-bind="text: catalogEntry.getResolvedComment()"></td>
+          <th>${ _("Table") }</th><th>${ _("Description") }</th>
         </tr>
-      </tbody>
+        </thead>
+        <!-- ko if: filteredEntries().length -->
+        <tbody data-bind="foreach: filteredEntries">
+          <tr>
+            <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
+            <td data-bind="text: catalogEntry.getResolvedComment()"></td>
+          </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko if: filteredEntries().length === 0 -->
+        <tbody>
+          <tr>
+            <td colspan="2" style="font-style: italic;">${ _("No result found") }</td>
+          </tr>
+        </tbody>
+        <!-- /ko -->
+      </table>
       <!-- /ko -->
-      <!-- ko if: filteredEntries().length === 0 -->
-      <tbody>
-        <tr>
-          <td colspan="2" style="font-style: italic;">${ _("No result found") }</td>
-        </tr>
-      </tbody>
+      <!-- ko if: catalogEntry.isTableOrView() || catalogEntry.isComplex() -->
+      <table class="table table-condensed table-nowrap">
+        <thead>
+          <tr>
+            <th>${ _("Column") }</th>
+            <th>${ _("Type") }</th>
+            <th colspan="2">${ _("Sample") } <!-- ko if: loadingSamples --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
+          </tr>
+        </thead>
+        <!-- ko if: filteredEntries().length -->
+        <tbody data-bind="foreach: filteredEntries">
+          <tr>
+            <td width="10%"><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
+            <td width="10%" data-bind="text: catalogEntry.getType()"></td>
+            <td width="40%" data-bind="html: firstSample"></td>
+            <td width="40%" data-bind="html: secondSample"></td>
+          </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko if: filteredEntries().length === 0 -->
+        <tbody>
+          <tr>
+            <td colspan="4" style="font-style: italic;">${ _("No result found") }</td>
+          </tr>
+        </tbody>
+        <!-- /ko -->
+      </table>
       <!-- /ko -->
-    </table>
-    <!-- /ko -->
-    <!-- ko if: catalogEntry.isTableOrView() || catalogEntry.isComplex() -->
-    <table class="table table-condensed table-nowrap">
-      <thead>
-        <tr>
-          <th>${ _("Column") }</th><th>${ _("Type") }</th><th colspan="2">${ _("Sample") } <!-- ko if: loadingSamples --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
-        </tr>
-      </thead>
-      <!-- ko if: filteredEntries().length -->
-      <tbody data-bind="foreach: filteredEntries">
-        <tr>
-          <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
-          <td data-bind="text: catalogEntry.getType()"></td>
-          <td data-bind="html: firstSample"></td>
-          <td data-bind="html: secondSample"></td>
-        </tr>
-      </tbody>
-      <!-- /ko -->
-      <!-- ko if: filteredEntries().length === 0 -->
-      <tbody>
-        <tr>
-          <td colspan="4" style="font-style: italic;">${ _("No result found") }</td>
-        </tr>
-      </tbody>
-      <!-- /ko -->
-    </table>
-    <!-- /ko -->
+    </div>
     <!-- /ko -->
   </script>
 
@@ -151,7 +157,7 @@ from desktop.views import _ko
 
             if (!isFacetMatch) {
               if (entry.catalogEntry.isField()) {
-                match = !!facets['type'][entry.catalogEntry.getType()];
+                match = !!facets['type'][entry.catalogEntry.getType().toLowerCase()];
               } else if (entry.catalogEntry.isTableOrView()) {
                 match = (facets['type']['table'] && entry.catalogEntry.isTable()) || (facets['type']['view'] && entry.catalogEntry.isView()) ;
               }
@@ -212,7 +218,11 @@ from desktop.views import _ko
                     entryIndex[entry.catalogEntry.name] = entry;
                   });
                   for (var i = 0; i < sample.meta.length; i++) {
-                    var sampleEntry = entryIndex[sample.meta[i].name];
+                    var name = sample.meta[i].name;
+                    if (name.toLowerCase().indexOf(self.catalogEntry.name.toLowerCase() + '.') === 0) {
+                      name = name.substring(self.catalogEntry.name.length + 1);
+                    }
+                    var sampleEntry = entryIndex[name];
                     if (sampleEntry) {
                       sampleEntry.firstSample(sample.data[0][i]);
                       if (sample.data.length > 1) {

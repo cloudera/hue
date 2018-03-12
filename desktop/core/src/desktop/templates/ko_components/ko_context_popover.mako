@@ -518,14 +518,17 @@ from metadata.conf import has_navigator
       </div>
       <!-- /ko -->
       <!-- ko if: !loading() && !hasErrors() -->
-        <div class="context-popover-flex-fill" data-bind="with: catalogEntry, niceScroll">
+      <div class="context-popover-flex-fill" data-bind="with: catalogEntry, niceScroll">
+        <div class="context-popover-inner-content">
           %if has_navigator(user):
           <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
           <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true } }"></div>
           <!-- /ko -->
           %endif
 
+          <!-- ko if: $parent.comment() -->
           <div class="context-popover-comment" data-bind="text: $parent.comment"></div>
+          <!-- /ko -->
 
           <!-- ko if: isField() -->
           <div class="context-popover-attributes">
@@ -534,8 +537,8 @@ from metadata.conf import has_navigator
             <!-- ko with: stats -->
             <!-- ko if: typeof distinct_count !== 'undefined' -->
             <div class="context-popover-attribute"><div>${ _('Distinct') }</div> <div data-bind="text: distinct_count"></div></div>
-##             Min:
-##             Max:
+  ##             Min:
+  ##             Max:
             <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
@@ -545,6 +548,9 @@ from metadata.conf import has_navigator
           <div class="context-popover-attributes">
             <!-- ko with: analysis -->
             <div class="context-popover-attribute"><div>${ _('Owner') }</div> <div data-bind="text: details.properties.owner"></div></div>
+            <!-- ko if: typeof cols !== 'undefined' -->
+            <div class="context-popover-attribute"><div>${ _('Columns') }</div> <div data-bind="text: cols.length"></div></div>
+            <!-- /ko -->
             <!-- ko if: typeof details.stats.numRows !== 'undefined' -->
             <div class="context-popover-attribute"><div>${ _('Rows') }</div> <div data-bind="text: details.stats.numRows"></div></div>
             <!-- /ko -->
@@ -562,29 +568,31 @@ from metadata.conf import has_navigator
           </div>
           <!-- /ko -->
 
-          <div class="context-popover-entries-list" data-bind="component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry } }"></div>
+          <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry } } --><!-- /ko -->
         </div>
-        <div class="context-popover-flex-bottom-links">
-          <div class="context-popover-link-row">
-            <!-- ko if: catalogEntry -->
-            <a class="inactive-action pointer" data-bind="visible: popover.showInAssistEnabled, click: showInAssist">
-              <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
+      </div>
+
+      <div class="context-popover-flex-bottom-links">
+        <div class="context-popover-link-row">
+          <!-- ko if: catalogEntry -->
+          <a class="inactive-action pointer" data-bind="visible: popover.showInAssistEnabled, click: showInAssist">
+            <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
+          </a>
+          % if HAS_SQL_ENABLED.get():
+            <a class="inactive-action pointer" data-bind="visible: popover.openInDashboardEnabled, click: openInDashboard">
+              <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
             </a>
-            % if HAS_SQL_ENABLED.get():
-              <a class="inactive-action pointer" data-bind="visible: popover.openInDashboardEnabled, click: openInDashboard">
-                <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
-              </a>
-            % endif
-            % if not IS_EMBEDDED.get():
-              <!-- ko if: catalogEntry().getSourceType() !== 'solr' && popover.openInTableBrowserEnabled -->
-              <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
-                <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
-              </a>
-              <!-- /ko -->
-            % endif
+          % endif
+          % if not IS_EMBEDDED.get():
+            <!-- ko if: catalogEntry().getSourceType() !== 'solr' && popover.openInTableBrowserEnabled -->
+            <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
+              <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
+            </a>
             <!-- /ko -->
-          </div>
+          % endif
+          <!-- /ko -->
         </div>
+      </div>
       <!-- /ko -->
     </div>
   </script>

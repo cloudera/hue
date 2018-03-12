@@ -1430,7 +1430,8 @@ var DataCatalog = (function () {
      * Returns the type of the entry. It will be accurate once the source meta has been loaded or if loaded from
      * a parent entry via getChildren().
      *
-     * For complex entries the type definition is stripped to either 'array', 'map' or 'struct'
+     * The returned string is always lower case and for complex entries the type definition is stripped to
+     * either 'array', 'map' or 'struct'.
      *
      * @return {string}
      */
@@ -1440,7 +1441,7 @@ var DataCatalog = (function () {
       if (type.indexOf('<') !== -1) {
         type = type.substring(0, type.indexOf('<'));
       }
-      return type;
+      return type.toLowerCase();
     };
 
     /**
