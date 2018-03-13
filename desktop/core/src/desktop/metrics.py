@@ -17,6 +17,7 @@
 from __future__ import absolute_import
 
 import gc
+import logging
 import multiprocessing
 import threading
 
@@ -104,10 +105,19 @@ response_time = global_registry().timer(
 )
 
 # ------------------------------------------------------------------------------
+LOG = logging.getLogger(__name__)
+
+def user_count():
+  users = 0
+  try:
+    users = User.objects.count()
+  except Exception, e:
+    LOG.exception('Failed to get user count %s' % str(e))
+  return users
 
 user_count = global_registry().gauge_callback(
     name='users',
-    callback=lambda: User.objects.count(),
+    callback=user_count,
     label='Users',
     description='Total number of user accounts',
     numerator='users',
