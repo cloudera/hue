@@ -196,7 +196,7 @@ except ImportError, e:
         </li>
         % if ENABLE_SQL_INDEXER.get():
         <li>
-          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Visually explore the result') }">
+          <a class="download" href="javascript:void(0)" data-bind="click: function() { saveTarget('dashboard'); trySaveResults(); }" title="${ _('Visually explore the result') }">
             <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
           </a>
         </li>
@@ -355,7 +355,7 @@ except ImportError, e:
         });
 
         self.isValidDestination = ko.pureComputed(function () {
-          return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.savePath()));
+          return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.savePath())) || self.saveTarget() == 'dashboard';
         });
 
         self.clipboardClass = ko.pureComputed(function () {
@@ -419,6 +419,9 @@ except ImportError, e:
                 } else if (self.saveTarget() == 'search-index') {
                   $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('open.importer.query', resp);
+                } else if (self.saveTarget() == 'dashboard') {
+                  $(self.saveResultsModalId).modal('hide');
+                  huePubSub.publish('open.link', resp.watch_url);
                 } else if (resp.history_uuid) {
                   $(self.saveResultsModalId).modal('hide');
                   huePubSub.publish('notebook.task.submitted', resp.history_uuid);
