@@ -705,12 +705,12 @@ def export_result(request):
       'operationText': 'User %s exported to HDFS directory: %s' % (request.user.username, destination),
       'allowed': True
     }
-  elif data_format == 'search-index':
+  elif data_format in ('search-index', 'dashboard'):
     # Open the result in the Dashboard via a SQL sub-query or the Import wizard (quick vs scalable)
     if is_embedded:
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
 
-      if destination == '__hue__':
+      if data_format == 'dashboard':
         engine = notebook['type'].replace('query-', '')
         response['watch_url'] = reverse('dashboard:browse', kwargs={'name': notebook_id}) + '?source=query&engine=%(engine)s' % {'engine': engine}
         response['status'] = 0
