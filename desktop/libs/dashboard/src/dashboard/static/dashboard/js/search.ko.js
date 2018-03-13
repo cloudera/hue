@@ -2039,7 +2039,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json, has_g
       self.isToolbarVisible(self.isEditing());
       self.initial.init();
       self.collection.syncFields();
-      self.search(callback);
+      if (self.collection.engine() == 'solr') {
+        self.search(callback);
+      }
     }
 
     self.searchBtn = function () {
