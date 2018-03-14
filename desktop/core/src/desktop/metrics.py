@@ -25,6 +25,10 @@ from django.contrib.auth.models import User
 
 from desktop.lib.metrics import global_registry
 
+
+LOG = logging.getLogger(__name__)
+
+
 global_registry().gauge_callback(
     name='threads.total',
     callback=lambda: len(threading.enumerate()),
@@ -105,14 +109,13 @@ response_time = global_registry().timer(
 )
 
 # ------------------------------------------------------------------------------
-LOG = logging.getLogger(__name__)
 
 def user_count():
   users = 0
   try:
     users = User.objects.count()
-  except Exception, e:
-    LOG.exception('Failed to get user count %s' % str(e))
+  except:
+    LOG.exception('Metrics: Failed to get number of user accounts')
   return users
 
 user_count = global_registry().gauge_callback(
