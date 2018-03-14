@@ -2140,7 +2140,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <a href="javascript:void(0)" data-bind="toggle: $parents[0].isAdding" class="pull-right"><i class="fa fa-times inactive-action"></i></a>
       <!-- /ko -->
       <!-- ko with: aggregate -->
-      <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: ($parents[1].widgetType() == 'text-facet-widget' && $index() == 0 && !$parent.isFacetForm" class="input-small"></select>
+      <select data-bind="options: metrics, optionsText: 'label', optionsValue: 'value', value: $data.function, disable: $parents[1].widgetType() != 'hit-widget' && (typeof $index != 'undefined' && $index() == 0)" class="input-small"></select>
 
       <!-- ko if: $data.function() == 'percentile' -->
       <input type="number" class="input-mini" data-bind="value: percentile"/>
