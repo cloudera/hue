@@ -503,8 +503,9 @@ from metadata.conf import has_navigator
       <span class="hue-popover-title-text" data-bind="foreach: breadCrumbs"><!-- ko ifnot: isActive --><a href="javascript: void(0);" data-bind="click: makeActive, text: name"></a>.<!-- /ko --><!-- ko if: isActive --><span data-bind="text: name"></span><!-- /ko --></span>
       <div class="hue-popover-title-actions">
         <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
-        <a class="pointer inactive-action" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
-        <a class="pointer inactive-action" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
+        <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading(), click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
+        <a class="pointer inactive-action" title="${ _('Pin') }" data-bind="visible: popover.pinEnabled, click: popover.pin"><i class="fa fa-fw fa-thumb-tack"></i></a>
+        <a class="pointer inactive-action" title="${ _('Close') }" data-bind="visible: !popover.closeDisabled, click: popover.close"><i class="fa fa-fw fa-times"></i></a>
       </div>
     </div>
   </script>
@@ -650,6 +651,11 @@ from metadata.conf import has_navigator
         });
 
         self.catalogEntry(options.catalogEntry);
+      };
+
+      DataCatalogContext.prototype.refresh = function () {
+        var self = this;
+        self.catalogEntry().clear('invalidate', true).always(self.load.bind(self));
       };
 
       DataCatalogContext.prototype.load = function () {

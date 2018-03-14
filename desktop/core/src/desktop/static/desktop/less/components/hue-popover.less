@@ -401,7 +401,11 @@
 
 .catalog-entries-list-container {
   .flex(1 1 100%);
-  overflow: auto;
+
+  table td.sample-column {
+    max-width: 500px;
+    .nowrap-ellipsis();
+  }
 }
 
 .context-popover-inner-content {

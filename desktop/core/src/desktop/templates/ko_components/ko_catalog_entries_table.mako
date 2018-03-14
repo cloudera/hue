@@ -25,7 +25,7 @@ from desktop.views import _ko
   <script type="text/html" id="catalog-entries-list-template">
     <!-- ko hueSpinner: { spin: loading, inline: true, size: 'small' } --><!-- /ko -->
     <!-- ko if: !loading() && columnSamples().length -->
-    <div class="catalog-entries-list-container">
+    <div class="catalog-entries-list-container" data-bind="niceScroll" style="overflow:hidden;">
       <table class="table table-condensed table-nowrap">
         <thead>
           <tr>
@@ -34,7 +34,7 @@ from desktop.views import _ko
         </thead>
         <tbody data-bind="foreach: columnSamples">
           <tr>
-            <td data-bind="html: $data"></td>
+            <td data-bind="html: $data, attr: { 'title': $data }"></td>
           </tr>
         </tbody>
       </table>
@@ -53,7 +53,7 @@ from desktop.views import _ko
         }
       } --><!-- /ko -->
     </div>
-    <div class="catalog-entries-list-container">
+    <div class="catalog-entries-list-container" data-bind="niceScroll" style="overflow:hidden;">
       <!-- ko if: catalogEntry.isDatabase() -->
       <table class="table table-condensed table-nowrap">
         <thead>
@@ -64,8 +64,8 @@ from desktop.views import _ko
         <!-- ko if: filteredEntries().length -->
         <tbody data-bind="foreach: filteredEntries">
           <tr>
-            <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
-            <td data-bind="text: catalogEntry.getResolvedComment()"></td>
+            <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick, attr: { 'title': catalogEntry.getTitle() }"></a></td>
+            <td data-bind="text: catalogEntry.getResolvedComment(), attr: { 'title': catalogEntry.getResolvedComment() }"></td>
           </tr>
         </tbody>
         <!-- /ko -->
@@ -84,23 +84,25 @@ from desktop.views import _ko
           <tr>
             <th>${ _("Column") }</th>
             <th>${ _("Type") }</th>
+            <th>${ _("Description") }</th>
             <th colspan="2">${ _("Sample") } <!-- ko if: loadingSamples --><i class="fa fa-spinner fa-spin"></i><!-- /ko --></th>
           </tr>
         </thead>
         <!-- ko if: filteredEntries().length -->
         <tbody data-bind="foreach: filteredEntries">
           <tr>
-            <td width="10%"><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
-            <td width="10%" data-bind="text: catalogEntry.getType()"></td>
-            <td width="40%" data-bind="html: firstSample"></td>
-            <td width="40%" data-bind="html: secondSample"></td>
+            <td width="10%" data-bind="attr: { 'title': catalogEntry.getTitle() }"><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
+            <td width="10%" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
+            <td width="30%" data-bind="text: catalogEntry.getResolvedComment(), attr: { 'title': catalogEntry.getResolvedComment() }"></td>
+            <td width="25%" class="sample-column" data-bind="html: firstSample, attr: { 'title': firstSampleTitle }"></td>
+            <td width="25%" class="sample-column" data-bind="html: secondSample, attr: { 'title': secondSampleTitle }"></td>
           </tr>
         </tbody>
         <!-- /ko -->
         <!-- ko if: filteredEntries().length === 0 -->
         <tbody>
           <tr>
-            <td colspan="4" style="font-style: italic;">${ _("No result found") }</td>
+            <td colspan="5" style="font-style: italic;">${ _("No result found") }</td>
           </tr>
         </tbody>
         <!-- /ko -->
@@ -113,11 +115,24 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
+      var ESCAPED_HTML_INDEX = {
+        '&nbsp;': ' ',
+        '&quot;': '"',
+        '&apos;': '\'',
+        '&lt;' : '<',
+        '&gt;' : '>',
+        "&amp;": "&",
+        "&#39;": '\'',
+        "&#x2F;": '/'
+      };
+
       function SampleEnrichedEntry(catalogEntry, onClick) {
         var self = this;
         self.catalogEntry = catalogEntry;
         self.firstSample = ko.observable();
         self.secondSample = ko.observable();
+        self.firstSampleTitle = ko.observable();
+        self.secondSampleTitle = ko.observable();
         self.onClick = onClick;
       }
 
@@ -225,6 +240,7 @@ from desktop.views import _ko
                     var sampleEntry = entryIndex[name];
                     if (sampleEntry) {
                       sampleEntry.firstSample(sample.data[0][i]);
+                      sampleEntry.firstSampleTitle(typeof sample.data[0][i] === 'string' ? sample.data[0][i].replace(/(&[a-z#1-9]+;)/g, function (a,b) { return ESCAPED_HTML_INDEX[b] || b; }) : sample.data[0][i]);
                       if (sample.data.length > 1) {
                         sampleEntry.secondSample(sample.data[1][i])
                       }
