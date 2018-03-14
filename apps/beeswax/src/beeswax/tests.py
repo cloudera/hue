@@ -845,6 +845,17 @@ for x in sys.stdin:
     finally:
       finish()
 
+    finish = conf.DOWNLOAD_BYTES_LIMIT.set_for_testing(1024)
+    try:
+      hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
+      query = hql_query(hql)
+      handle = self.db.execute_and_wait(query)
+      resp = download(handle, 'csv', self.db)
+      content = "".join(resp.streaming_content)
+      assert_true(len(content) <= 1024)
+    finally:
+      finish()
+
 
   def test_data_upload(self):
     hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
