@@ -85,7 +85,7 @@
   <div data-bind="dockable: { scrollable: '.page-content', jumpCorrection: 50, topSnap: '${ conf.CUSTOM.BANNER_TOP_HTML.get() and "78px" or "50px" }', triggerAdjust: 0 }">
     %if hasattr(caller, "results"):
     <div style="float: left; margin-left: 20px">
-      <div class="toolbar-label">${_('RESULTS')}</div>
+      <div class="toolbar-label">${_('DISPLAY')}</div>
       ${caller.results()}
     </div>
     %endif
@@ -95,7 +95,7 @@
       %if hasattr(caller, "widgetSectionName"):
         <div class="toolbar-label">${caller.widgetSectionName()}</div>
       %else:
-        <div class="toolbar-label margin-left-20">${_('WIDGETS')}</div>
+        <div class="toolbar-label margin-left-20">${_('ANALYTICS')}</div>
       %endif
       ${caller.widgets()}
     </div>

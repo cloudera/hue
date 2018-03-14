@@ -72,6 +72,14 @@ HAS_WIDGET_FILTER = Config(
   type=coerce_bool
 )
 
+HAS_TREE_WIDGET = Config(
+  key="has_tree_widget",
+  help=_t("Activate the tree widget (to drill down fields as dimensions, alpha)."),
+  default=False,
+  type=coerce_bool
+)
+
+
 def get_properties():
   if ENGINES.get():
     engines = ENGINES.get()
