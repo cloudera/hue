@@ -55,7 +55,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-no-database-entries">
     <ul class="assist-tables">
       <li>
-        <span class="assist-no-entries">${_('The database has no tables')}</span>
+        <span class="assist-no-entries">${_('No entries found')}</span>
       </li>
     </ul>
   </script>
