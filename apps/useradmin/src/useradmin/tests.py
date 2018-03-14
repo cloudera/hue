@@ -483,7 +483,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Test creating a new user
       response = c.get('/useradmin/users/new')
-      assert_true(password_hint in response.content)
+      c = make_logged_in_client('superuser', 'foobarTest1[', is_superuser=True)
 
       # Password is more than 8 characters long but does not have a special character
       response = c.post('/useradmin/users/new',
@@ -526,7 +526,8 @@ class TestUserAdmin(BaseUserAdminTests):
 
 
   def test_user_admin(self):
-    FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
+    #FUNNY_NAME = '~`!@#$%^&*()_-+={}[]|\;"<>?/,.'
+    FUNNY_NAME = 'أحمد@cloudera.com'
     FUNNY_NAME_QUOTED = urllib.quote(FUNNY_NAME)
 
     resets = [
@@ -553,8 +554,8 @@ class TestUserAdmin(BaseUserAdminTests):
                         dict(username="test",
                              first_name=u"Inglés",
                              last_name=u"Español",
-                             is_superuser="True",
-                             is_active="True"),
+                             is_superuser=True,
+                             is_active=True),
                         follow=True)
       assert_true("User information updated" in response.content,
                   "Notification should be displayed in: %s" % response.content)
@@ -563,8 +564,8 @@ class TestUserAdmin(BaseUserAdminTests):
                         dict(username="test2",
                              first_name=u"Inglés",
                              last_name=u"Español",
-                             is_superuser="True",
-                             is_active="True"),
+                             is_superuser=True,
+                             is_active=True),
                         follow=True)
       assert_true("You cannot change a username" in response.content)
       # Now make sure that those were materialized
@@ -593,7 +594,11 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_true(User.objects.get(username="test").is_superuser)
       assert_true(User.objects.get(username="test").check_password("foo"))
       # Change it back!
-      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="test", password2="test", password_old="foo", is_active="True", is_superuser="True"))
+      response = c.post('/hue/accounts/login/', dict(username="test", password="foo"), follow=True)
+
+      response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="test", password2="test", password_old="foo", is_active=True, is_superuser=True))
+      response = c.post('/hue/accounts/login/', dict(username="test", password="test"), follow=True)
+
       assert_true(User.objects.get(username="test").check_password("test"))
       assert_true(make_logged_in_client(username = "test", password = "test"), "Check that we can still login.")
 
@@ -601,7 +606,7 @@ class TestUserAdmin(BaseUserAdminTests):
       group = get_default_user_group()
       response = c.get('/useradmin/users/new')
       assert_true(response)
-      assert_true(('<option value="%s" selected="selected">%s</option>' % (group.id, group.name)) in str(response))
+      assert_true(('<option value="%s" selected>%s</option>' % (group.id, group.name)) in str(response))
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
@@ -611,9 +616,11 @@ class TestUserAdmin(BaseUserAdminTests):
       response = c.post('/useradmin/users/new', dict(username=FUNNY_NAME,
                                                password1="test",
                                                password2="test",
-                                               is_active="True"))
+                                               is_superuser=True,
+                                               is_active=True))
       response = c.get('/useradmin/')
-      assert_true(FUNNY_NAME_QUOTED in response.content)
+
+      assert_true(FUNNY_NAME in response.content)
       assert_true(len(response.context[0]["users"]) > 1)
       assert_true("Hue Users" in response.content)
       # Validate profile is created.
@@ -669,7 +676,7 @@ class TestUserAdmin(BaseUserAdminTests):
       response = c.post('/useradmin/users/new', dict(username='christian_häusler',
                                                      password1="test",
                                                      password2="test",
-                                                     is_active="True"))
+                                                     is_active=True))
       response = c.get('/useradmin/')
       assert_true('christian_häusler' in response.content)
       assert_true(len(response.context[0]["users"]) > 1)
@@ -787,7 +794,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
     # Changing language preference will change language setting
     response = client.post('/useradmin/users/edit/test', dict(language='ko'))
-    assert_true('<option value="ko" selected="selected">Korean</option>' in response.content)
+    assert_true('<option value="ko" selected>Korean</option>' in response.content)
 
   def test_edit_user_xss(self):
     # Hue 3 Admin

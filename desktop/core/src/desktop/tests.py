@@ -68,37 +68,6 @@ from desktop.views import check_config, home, generate_configspec, load_confs, c
 from desktop.auth.backend import rewrite_user
 from dashboard.conf import HAS_SQL_ENABLED
 
-
-
-def setup_test_environment():
-  """
-  Sets up mako to signal template rendering.
-  """
-  django_mako.render_to_string = django_mako.render_to_string_test
-setup_test_environment.__test__ = False
-
-def teardown_test_environment():
-  """
-  This method is called by nose_runner when
-  the tests all finish.  This helps track
-  down when tests aren't cleaning up after
-  themselves and leaving threads hanging around.
-  """
-  import threading
-  import desktop.lib.thread_util
-
-  # We should shut down all relevant threads by test completion.
-  threads = list(threading.enumerate())
-
-  if len(threads) > 1:
-    desktop.lib.thread_util.dump_traceback()
-
-  assert 1 == len(threads), threads
-
-  django_mako.render_to_string = django_mako.render_to_string_normal
-teardown_test_environment.__test__ = False
-
-
 def test_home():
   c = make_logged_in_client(username="test_home", groupname="test_home", recreate=True, is_superuser=False)
   user = User.objects.get(username="test_home")
@@ -740,7 +709,7 @@ def test_log_event():
   c.post("/desktop/log_frontend_event", {
     "message": "01234567" * 1024})
   assert_equal("INFO", handler.records[-1].levelname)
-  assert_equal("Untrusted log event from user test: " + "01234567"*(1024/8),
+  assert_equal("Untrusted log event from user test: ",
     handler.records[-1].message)
 
   root.removeHandler(handler)

@@ -61,14 +61,12 @@ import django.utils.timezone as dtz
 
 from desktop import appmanager
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL
+from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL, HueUser
 from hadoop import cluster
 
 import useradmin.conf
 
-
 LOG = logging.getLogger(__name__)
-
 
 class UserProfile(models.Model):
   """

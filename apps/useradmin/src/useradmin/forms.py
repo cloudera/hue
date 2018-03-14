@@ -27,6 +27,7 @@ from django.utils.translation import get_language, ugettext as _, ugettext_lazy 
 
 from desktop import conf as desktop_conf
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
+from desktop.models import HueUser
 from desktop.settings import LANGUAGES
 
 from useradmin.models import GroupPermission, HuePermission
@@ -115,6 +116,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                                       required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
+    model =  HueUser
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
   def __init__(self, *args, **kwargs):
