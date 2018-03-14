@@ -843,7 +843,7 @@ var Collection = function (vm, collection) {
 
     if (facet.properties.facets) { // Sub facet
       $.each(facet.properties.facets(), function (index, nestedFacet) {
-        self._addObservablesToNestedFacet(self, nestedFacet, vm);
+        self._addObservablesToNestedFacet(facet, nestedFacet, vm);
       });
     }
   }
@@ -865,7 +865,7 @@ var Collection = function (vm, collection) {
       });
 
       nestedFacet.aggregate.metrics = ko.computed(function() {
-        var _field = self.getTemplateField(nestedFacet.field(), facet.template.fieldsAttributes());
+        var _field = self.getTemplateField(nestedFacet.field(), vm.collection.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
       });
     }
