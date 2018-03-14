@@ -588,7 +588,7 @@ def augment_solr_response(response, collection, query):
             counts = range_pair2(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet['properties']['facets'][0], collection_facet=collection_facet)
           else:
             # Dimension 1 with counts and 2 with analytics
-            agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
+            agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')] if counts else []
             agg_keys.sort(key=lambda a: a[4:])
 
             if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
