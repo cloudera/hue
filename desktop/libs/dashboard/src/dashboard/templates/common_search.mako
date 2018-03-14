@@ -3398,8 +3398,8 @@ function timelineChartDataTransformer(rawDatum) {
   $(rawDatum.counts).each(function (cnt, item) {
     _data.push({
       series: 0,
-      x: new Date(moment(item.from).valueOf()),
-      y: item.value,
+      x: new Date(moment(item.from ? item.from : item.value).valueOf()), // When started from a non timeline widget
+      y: item.from ? item.value : item.count,
       obj: item
     });
   });
@@ -3418,8 +3418,8 @@ function timelineChartDataTransformer(rawDatum) {
     $(item.counts).each(function (cnt, item) {
       _data.push({
         series: cnt + 1,
-        x: new Date(moment(item.from).valueOf()),
-        y: item.value,
+        x: new Date(moment(item.from ? item.from : item.value).valueOf()), // When started from a non timeline widget
+        y: item.from ? item.value : item.count,
         obj: item
       });
     });
