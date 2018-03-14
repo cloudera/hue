@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 from desktop import conf
 from desktop.views import commonheader, commonfooter, _ko, commonshare
 
-from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
+from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER, HAS_TREE_WIDGET
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
@@ -264,7 +264,9 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
              <i class="fa fa-map-marker"></i>
          </a>
     </div>
+      </%def>
 
+      <%def name="widgets()">
     <div data-bind="visible: $root.collection.supportAnalytics,
                     css: { 'draggable-widget': true, 'disabled': !hasAvailableFields() },
                     draggable: {data: draggableCounter(), isEnabled: hasAvailableFields,
@@ -274,9 +276,6 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
                        <i class="fa fa-superscript" style="font-size: 110%"></i>
          </a>
     </div>
-      </%def>
-
-      <%def name="widgets()">
     <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
                     options: getDraggableOptions({ data: draggableFacet() }) }"
@@ -288,7 +287,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableTextFacet(), isEnabled: availableDraggableChart,
                     options: getDraggableOptions({ data: draggableTextFacet() }) }"
-         title="${_('Text Facet')}" rel="tooltip" data-placement="top">
+         title="${_('Value List')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-sort-amount-asc"></i>
          </a>
@@ -322,7 +321,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
                     css: { 'draggable-widget': true, 'disabled': ! availableDraggableChart() },
                     draggable: {data: draggableBucket(), isEnabled: availableDraggableChart,
                     options: getDraggableOptions({ data: draggableBucket() }) }"
-         title="${_('Chart')}" rel="tooltip" data-placement="top">
+         title="${_('Bar Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="fa fa-bar-chart"></i>
          </a>
@@ -344,6 +343,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
                        <i class="fa fa-sitemap fa-rotate-270"></i>
          </a>
     </div>
+    % if HAS_TREE_WIDGET.get():
     <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree2(), isEnabled: true,
                     options: getDraggableOptions({ data: draggableTree2() }) }"
@@ -352,6 +352,7 @@ from dashboard.conf import USE_GRIDSTER, HAS_REPORT_ENABLED, HAS_WIDGET_FILTER
                        <i class="fa fa-sitemap fa-rotate-270"></i>
          </a>
     </div>
+    % endif
     <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableHeatmap(), isEnabled: true,
