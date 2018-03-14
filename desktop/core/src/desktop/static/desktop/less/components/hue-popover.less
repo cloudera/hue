@@ -250,15 +250,28 @@
   margin-left: 15px;
 }
 .context-popover-doc-header-link {
+  .flex(1);
+  margin-top: 10px;
   font-size: 18px;
 }
 
 .context-popover-doc-description {
+  .flex(1);
   margin-top: 5px;
 
   > em {
     font-style: normal;
     font-weight: bold;
+  }
+}
+
+.context-popover-doc-contents {
+  .flex(1 1 100%);
+  margin-top: 8px;
+
+  .ace_editor,
+  .ace_layer {
+    overflow: visible !important;
   }
 }
 
@@ -360,6 +373,7 @@
 .context-popover-comment {
   .flex(1);
   margin-top: 2px;
+  margin-bottom: 8px;
   padding-left: 4px;
 }
 
@@ -369,7 +383,7 @@
 
 .context-popover-attributes {
   .flex(1);
-  margin-top: 8px;
+  margin-bottom: 10px;
   margin-left: 4px;
   font-size: 13px;
 
@@ -417,6 +431,10 @@
   left: 0;
   overflow: hidden;
   .flex-direction(column);
+
+  .hue-tags {
+    margin-top: 2px;
+  }
 }
 
 .context-popover-entries-list {

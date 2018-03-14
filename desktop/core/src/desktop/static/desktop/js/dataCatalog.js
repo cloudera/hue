@@ -489,7 +489,11 @@ var DataCatalog = (function () {
      */
     var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
       if (dataCatalogEntry.canHaveNavigatorMetadata()) {
-        return dataCatalogEntry.trackedPromise('navigatorMetaPromise', fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions));
+        return dataCatalogEntry.trackedPromise('navigatorMetaPromise', fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions)).done(function (navigatorMeta) {
+          if (navigatorMeta && dataCatalogEntry.commentObservable) {
+            dataCatalogEntry.commentObservable(dataCatalogEntry.getResolvedComment());
+          }
+        });
       }
       dataCatalogEntry.navigatorMetaPromise = $.Deferred().reject();
       return dataCatalogEntry.navigatorMetaPromise;
@@ -861,6 +865,9 @@ var DataCatalog = (function () {
               if (matchingChildEntry) {
                 matchingChildEntry.navigatorMeta = entity;
                 matchingChildEntry.navigatorMetaPromise = $.Deferred().resolve(matchingChildEntry.navigatorMeta).promise();
+                if (entity && matchingChildEntry.commentObservable) {
+                  matchingChildEntry.commentObservable(matchingChildEntry.getResolvedComment());
+                }
                 matchingChildEntry.saveLater();
               }
             });
@@ -1008,6 +1015,20 @@ var DataCatalog = (function () {
         return self.navigatorMeta.description || self.navigatorMeta.originalDescription || ''
       }
       return self.sourceMeta && self.sourceMeta.comment || '';
+    };
+
+    /**
+     * This can be used to get an observable for the comment which will be updated once a comment has been
+     * resolved.
+     *
+     * @return {ko.observable}
+     */
+    DataCatalogEntry.prototype.getCommentObservable = function () {
+      var self = this;
+      if (!self.commentObservable) {
+        self.commentObservable = ko.observable(self.getResolvedComment());
+      }
+      return self.commentObservable;
     };
 
     /**

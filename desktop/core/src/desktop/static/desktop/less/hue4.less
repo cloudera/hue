@@ -292,7 +292,7 @@
   position: relative;
 }
 
-.search-container-top .inline-autocomplete-container {
+.search-container-top > .inline-autocomplete-container {
   position: relative;
   margin-top: 8px;
   height: 30px;
@@ -828,17 +828,32 @@ a:visited {
       }
     }
   }
+
   .global-search-preview {
-    padding-top: 10px;
     .display-flex();
     .flex(1);
 
     .global-search-close-preview {
       position: absolute;
-      top: 3px;
-      right: 10px;
+      z-index: 100;
+      top: 8px;
+      right: 7px;
       width: 18px;
       height: 18px;
+    }
+
+    .context-popover-content {
+      margin-top: 10px;
+    }
+
+    .global-search-catalog-entry {
+      .display-flex();
+      .flex-direction(column);
+      width: 100%;
+
+      .hue-popover-title-actions {
+        right: 29px !important;
+      }
     }
 
     .context-popover-tab {

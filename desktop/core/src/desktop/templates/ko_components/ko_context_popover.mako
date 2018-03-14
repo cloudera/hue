@@ -368,7 +368,7 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="generic-document-context-template">
-    <div style="width:100%; text-align: center; margin-top: 30px; font-size: 100px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
+    <div style="width:100%; text-align: center; margin-top: 40px; font-size: 100px; color: #787878;" data-bind="template: { name: 'document-icon-template', data: { document: { isDirectory: type === 'directory', definition: function() { return $data } } } }"></div>
     <div style="width: 100%; margin-top: 20px; text-align:center">
       <!-- ko if: type === 'directory' -->
       <a style="font-size: 20px;" href="javscript:void(0)" data-bind="text: name, publish: 'context.popover.show.in.assist'"></a>
@@ -397,20 +397,20 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="context-document-details">
     <div class="context-popover-flex-fill" style="overflow: auto;" data-bind="niceScroll">
-      <div style="padding: 8px">
+      <div class="context-popover-inner-content">
+        <div style="position: absolute; right: 6px; top: 8px;">
+          <a class="pointer inactive-action" data-bind="visible: !$parent.closeDisabled, click: function () { $parent.close() }"><i class="fa fa-fw fa-times"></i></a>
+        </div>
         <!-- ko if: typeof documentContents() !== 'undefined' && typeof documentContents().snippets !== 'undefined' -->
-
         <!-- ko with: details -->
         <div class="context-popover-doc-header-link" ><a href="javscript:void(0)" data-bind="hueLink: link, click: function () { $parents[1].close(); }"><!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko --> <span data-bind="text:name"></span></a></div>
         <!-- ko if: description -->
         <div class="context-popover-doc-description" data-bind="html: description"></div>
         <!-- /ko -->
         <!-- /ko -->
-
-        <div class="context-popover-header" style="margin: 10px 0 5px 0">${_('Contents')}</div>
         <!-- ko with: documentContents -->
         <!-- ko foreach: snippets -->
-        <div data-bind="highlight: { value: statement_raw, formatted: true, dialect: type }"></div>
+        <div class="context-popover-doc-contents" data-bind="niceScroll, highlight: { value: statement_raw, formatted: true, dialect: type }"></div>
         <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
@@ -497,6 +497,9 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="context-catalog-doc-title">
+  </script>
+
   <script type="text/html" id="context-catalog-entry-title">
     <div class="hue-popover-title">
       <i class="hue-popover-title-icon fa muted" data-bind="css: catalogEntry() && catalogEntry().isView() ? 'fa-eye' : 'fa-table'"></i>
@@ -521,15 +524,15 @@ from metadata.conf import has_navigator
       <!-- ko if: !loading() && !hasErrors() -->
       <div class="context-popover-flex-fill" data-bind="with: catalogEntry, niceScroll">
         <div class="context-popover-inner-content">
-          %if has_navigator(user):
-          <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
-          <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true } }"></div>
-          <!-- /ko -->
-          %endif
-
           <!-- ko if: $parent.comment() -->
           <div class="context-popover-comment" data-bind="text: $parent.comment"></div>
           <!-- /ko -->
+
+          %if has_navigator(user):
+            <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
+            <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true } }"></div>
+            <!-- /ko -->
+          %endif
 
           <!-- ko if: isField() -->
           <div class="context-popover-attributes">
@@ -599,17 +602,17 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="global-search-context">
-  <!-- ko if: isCatalogEntry -->
-  <!-- ko with: contents -->
-  <div style="display: flex; flex-direction: column;">
-  <!-- ko template: 'context-catalog-entry-title' --><!-- /ko -->
-  <!-- ko template: 'context-catalog-entry-contents' --><!-- /ko -->
-  </div>
-  <!-- /ko -->
-  <!-- /ko -->
-  <!-- ko ifnot: isCatalogEntry -->
-  <!-- ko template: 'context-popover-contents' --><!-- /ko -->
-  <!-- /ko -->
+    <!-- ko if: isCatalogEntry -->
+    <!-- ko with: contents -->
+    <div class="global-search-catalog-entry">
+      <!-- ko template: 'context-catalog-entry-title' --><!-- /ko -->
+      <!-- ko template: 'context-catalog-entry-contents' --><!-- /ko -->
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko ifnot: isCatalogEntry -->
+    <!-- ko template: 'context-popover-contents' --><!-- /ko -->
+    <!-- /ko -->
   </script>
 
   <script type="text/javascript">
@@ -1924,8 +1927,7 @@ from metadata.conf import has_navigator
           self.iconClass = 'fa-table';
         } else if (self.isDocument) {
           self.contents = new DocumentContext(self.data.definition);
-          self.title = self.data.definition.name;
-          self.iconClass = 'fa-file-o';
+          self.titleTemplate = 'context-catalog-doc-title';
         } else if (self.isCollection) {
           self.contents = new CollectionContextTabs(self.data);
           self.title = self.data.identifierChain[1].name + '.' + self.data.identifierChain[2].name;
@@ -2111,6 +2113,9 @@ from metadata.conf import has_navigator
 
         if (self.isCatalogEntry) {
           DataCatalog.getEntry({ sourceType: sourceType, path: path, definition: { type: params.data.type.toLowerCase() }}).done(function (catalogEntry) {
+            catalogEntry.navigatorMeta = params.data;
+            catalogEntry.navigatorMetaPromise = $.Deferred().resolve(catalogEntry.navigatorMeta);
+            catalogEntry.saveLater();
             self.contents(new DataCatalogContext({ popover: self, catalogEntry: catalogEntry }));
           });
         } else if (self.isDocument) {

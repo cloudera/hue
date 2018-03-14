@@ -65,7 +65,7 @@ from desktop.views import _ko
         <tbody data-bind="foreach: filteredEntries">
           <tr>
             <td><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick, attr: { 'title': catalogEntry.getTitle() }"></a></td>
-            <td data-bind="text: catalogEntry.getResolvedComment(), attr: { 'title': catalogEntry.getResolvedComment() }"></td>
+            <td data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
           </tr>
         </tbody>
         <!-- /ko -->
@@ -93,9 +93,9 @@ from desktop.views import _ko
           <tr>
             <td width="10%" data-bind="attr: { 'title': catalogEntry.getTitle() }"><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
             <td width="10%" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
-            <td width="30%" data-bind="text: catalogEntry.getResolvedComment(), attr: { 'title': catalogEntry.getResolvedComment() }"></td>
-            <td width="25%" class="sample-column" data-bind="html: firstSample, attr: { 'title': firstSampleTitle }"></td>
-            <td width="25%" class="sample-column" data-bind="html: secondSample, attr: { 'title': secondSampleTitle }"></td>
+            <td width="30%" data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
+            <td width="25%" class="sample-column" data-bind="html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }"></td>
+            <td width="25%" class="sample-column" data-bind="html: secondSample, attr: { 'title': hueUtils.html2text(secondSample()) }"></td>
           </tr>
         </tbody>
         <!-- /ko -->
@@ -115,24 +115,11 @@ from desktop.views import _ko
   <script type="text/javascript">
     (function () {
 
-      var ESCAPED_HTML_INDEX = {
-        '&nbsp;': ' ',
-        '&quot;': '"',
-        '&apos;': '\'',
-        '&lt;' : '<',
-        '&gt;' : '>',
-        "&amp;": "&",
-        "&#39;": '\'',
-        "&#x2F;": '/'
-      };
-
       function SampleEnrichedEntry(catalogEntry, onClick) {
         var self = this;
         self.catalogEntry = catalogEntry;
         self.firstSample = ko.observable();
         self.secondSample = ko.observable();
-        self.firstSampleTitle = ko.observable();
-        self.secondSampleTitle = ko.observable();
         self.onClick = onClick;
       }
 
@@ -218,9 +205,14 @@ from desktop.views import _ko
             self.entries($.map(childEntries, function (entry) { return new SampleEnrichedEntry(entry, onClick) }));
           }).fail(function () {
             self.errorloading(true);
-          }).always(function () {
+          })
+
+          var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
+
+          $.when(childPromise, navMetaPromise).always(function () {
             self.loading(false);
           });
+
           self.cancellablePromises.push(childPromise);
 
           if (self.catalogEntry.isTableOrView() || self.catalogEntry.isField()) {
@@ -240,7 +232,6 @@ from desktop.views import _ko
                     var sampleEntry = entryIndex[name];
                     if (sampleEntry) {
                       sampleEntry.firstSample(sample.data[0][i]);
-                      sampleEntry.firstSampleTitle(typeof sample.data[0][i] === 'string' ? sample.data[0][i].replace(/(&[a-z#1-9]+;)/g, function (a,b) { return ESCAPED_HTML_INDEX[b] || b; }) : sample.data[0][i]);
                       if (sample.data.length > 1) {
                         sampleEntry.secondSample(sample.data[1][i])
                       }
