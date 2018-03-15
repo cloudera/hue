@@ -276,6 +276,7 @@ class YarnApi(JobBrowserApi):
       if e.code == 404:  # Job not found in RM so attempt to find job in JHS
         job = self._get_job_from_history_server(job_id)
       else:
+        LOG.error("Job %s has expired: %s" % (app_id, e))
         raise JobExpired(app_id)
     except PopupException, e:
       if 'NotFoundException' in e.message:
