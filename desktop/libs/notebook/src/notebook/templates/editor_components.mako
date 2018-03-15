@@ -49,6 +49,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script src="${ static('desktop/ext/js/clipboard.min.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/ext/js/selectize-plugin-clear.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 % if ENABLE_QUERY_SCHEDULING.get():

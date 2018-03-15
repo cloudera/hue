@@ -49,6 +49,7 @@ ko.bindingHandlers.selectize = {
     ko.bindingHandlers.options.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 
     var options = {};
+
     if (allBindingsAccessor.get('optionsValue')) {
       options.valueField = allBindingsAccessor.get('optionsValue');
     }
@@ -65,6 +66,9 @@ ko.bindingHandlers.selectize = {
           options.createFilter = function (input) {
             return input.length <= passed_options[attr_name]
           }
+        }
+        else if (attr_name === 'clearable' && passed_options[attr_name]) {
+          options.plugins = ['clear_button'];
         }
         else {
           options[attr_name] = passed_options[attr_name];
