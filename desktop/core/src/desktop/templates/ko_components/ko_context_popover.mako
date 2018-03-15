@@ -534,6 +534,17 @@ from metadata.conf import has_navigator
             <!-- /ko -->
           %endif
 
+          <!-- ko if: isDatabase() -->
+          <div class="context-popover-attributes">
+            <!-- ko with: sourceMeta -->
+            <div class="context-popover-attribute"><div>${ _('Tables') }</div> <div data-bind="text: tables_meta.length"></div></div>
+            <!-- /ko -->
+            <!-- ko with: analysis -->
+            <div class="context-popover-attribute"><div>${ _('Owner') }</div> <div data-bind="text: owner_name"></div></div>
+            <!-- /ko -->
+          </div>
+          <!-- /ko -->
+
           <!-- ko if: isField() -->
           <div class="context-popover-attributes">
             <div class="context-popover-attribute"><div>${ _('Type') }</div> <div data-bind="text: getType(), attr: { 'title': getRawType() }"></div></div>
@@ -546,40 +557,55 @@ from metadata.conf import has_navigator
             <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
+            <!-- ko if: definition.primary_key === 'true' -->
+            <div class="context-popover-attribute"><div>${ _('Primary Key') }</div></div>
+            <!-- /ko -->
           </div>
           <!-- /ko -->
-          <!-- ko if: isTable() -->
+          <!-- ko if: isTableOrView() -->
           <div class="context-popover-attributes">
             <!-- ko with: analysis -->
-            <div class="context-popover-attribute"><div>${ _('Owner') }</div> <div data-bind="text: details.properties.owner"></div></div>
-            <!-- ko if: typeof cols !== 'undefined' -->
-            <div class="context-popover-attribute"><div>${ _('Columns') }</div> <div data-bind="text: cols.length"></div></div>
-            <!-- /ko -->
             <!-- ko if: typeof details.stats.numRows !== 'undefined' -->
             <div class="context-popover-attribute"><div>${ _('Rows') }</div> <div data-bind="text: details.stats.numRows"></div></div>
             <!-- /ko -->
+            <!-- ko if: typeof cols !== 'undefined' -->
+            <div class="context-popover-attribute"><div>${ _('Columns') }</div> <div data-bind="text: cols.length"></div></div>
+            <!-- /ko -->
+            <div class="context-popover-attribute"><div>${ _('Owner') }</div> <div data-bind="text: details.properties.owner"></div></div>
+            <!-- ko if: details.properties.format -->
             <div class="context-popover-attribute"><div>${ _('Format') }</div> <div data-bind="text: details.properties.format"></div></div>
+            <!-- /ko -->
+            <!-- ko if: typeof details.stats['kudu.table_name'] !== 'undefined' -->
+            <div class="context-popover-attribute"><div>${ _('Format') }</div> ${ _('Kudu') }</div>
+            <!-- /ko -->
             <!-- ko if: typeof details.stats.last_modified_time !== 'undefined' -->
             <div class="context-popover-attribute"><div>${ _('Modified') }</div> <div data-bind="text: localeFormat(details.stats.last_modified_time * 1000)"></div></div>
+            <!-- /ko -->
+            <!-- ko if: typeof details.stats.transient_lastDdlTime !== 'undefined' -->
+            <div class="context-popover-attribute"><div>${ _('Last DDL') }</div> <div data-bind="text: localeFormat(details.stats.transient_lastDdlTime * 1000)"></div></div>
             <!-- /ko -->
             <!-- /ko -->
           </div>
           <!-- /ko -->
 
           <!-- ko if: isView() && $parent.viewSql() -->
-          <div class="context-popover-sql">
-            <a href="javascript:void(0);" data-bind="toggle: viewSqlVisible, text: viewSqlVisible() ? '${ _ko('Hide SQL...')}' : '${ _ko('Show SQL...')}'"></a>
-          </div>
+          <a href="javascript:void(0);" style="text-align: right; margin-bottom: 5px;" data-bind="toggle: $parent.viewSqlVisible, text: $parent.viewSqlVisible() ? '${ _ko('Show columns')}' : '${ _ko('Show view SQL')}'"></a>
           <!-- /ko -->
 
+          <!-- ko if: $parent.viewSqlVisible -->
+          <div class="context-popover-sql" data-bind="highlight: { value: $parent.viewSql, formatted: true, dialect: getSourceType() }">
+          </div>
+          <!-- /ko -->
+          <!-- ko ifnot: $parent.viewSqlVisible -->
           <!-- ko component: { name: 'catalog-entries-list', params: { catalogEntry: $data, onClick: $parent.catalogEntry } } --><!-- /ko -->
+          <!-- /ko -->
         </div>
       </div>
 
       <div class="context-popover-flex-bottom-links">
         <div class="context-popover-link-row">
           <!-- ko if: catalogEntry -->
-          <a class="inactive-action pointer" data-bind="visible: popover.showInAssistEnabled, click: showInAssist">
+          <a class="inactive-action pointer" data-bind="visible: popover.showInAssistEnabled || catalogEntry() !== originalCatalogEntry, click: showInAssist">
             <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
           </a>
           % if HAS_SQL_ENABLED.get():
@@ -626,6 +652,7 @@ from metadata.conf import has_navigator
         self.loading = ko.observable(false);
         self.hasErrors = ko.observable(false);
         self.activePromises = [];
+        self.errorText = ko.observable();
 
         self.children = ko.observableArray();
         self.analysis = ko.observable();
@@ -652,7 +679,7 @@ from metadata.conf import has_navigator
           }
           return result;
         });
-
+        self.originalCatalogEntry = options.catalogEntry;
         self.catalogEntry(options.catalogEntry);
       };
 
@@ -664,19 +691,21 @@ from metadata.conf import has_navigator
       DataCatalogContext.prototype.load = function () {
         var self = this;
         self.loading(true);
+        self.hasErrors(false);
         self.cancelActivePromises();
 
         var viewSqlDeferred = $.Deferred().done(self.viewSql);
         self.activePromises.push(viewSqlDeferred.promise());
 
-        self.activePromises.push(self.catalogEntry().getSourceMeta().done().fail(function () {
+        self.activePromises.push(self.catalogEntry().getSourceMeta({ cancellable: true }).done().fail(function () {
           self.hasErrors(true);
         }));
 
-        self.activePromises.push(self.catalogEntry().getAnalysis({ silenceErrors: true }).done(function (analysis) {
+        self.activePromises.push(self.catalogEntry().getAnalysis({ silenceErrors: true, cancellable: true }).done(function (analysis) {
           var found = analysis.properties && analysis.properties.some(function (property) {
             if (property.col_name.toLowerCase() === 'view original text:') {
-              ApiHelper.getInstance().formatSql(property.data_type).done(function (formatResponse) {
+              ApiHelper.getInstance().formatSql({ statements: property.data_type }).done(function (formatResponse) {
+                console.log(formatResponse);
                 if (formatResponse.status === 0) {
                   viewSqlDeferred.resolve(formatResponse.formatted_statements);
                 } else {
@@ -694,9 +723,9 @@ from metadata.conf import has_navigator
           self.analysis(analysis);
         }).fail(viewSqlDeferred.reject));
 
-        self.activePromises.push(self.catalogEntry().getChildren({ silenceErrors: true }).done(self.children));
+        self.activePromises.push(self.catalogEntry().getChildren({ silenceErrors: true, cancellable: true  }).done(self.children));
 
-        self.activePromises.push(self.catalogEntry().getComment().done(self.comment));
+        self.activePromises.push(self.catalogEntry().getComment({ silenceErrors: true, cancellable: true }).done(self.comment));
 
         $.when.apply($, self.activePromises).always(function () {
           self.activePromises.length = 0;
@@ -729,7 +758,7 @@ from metadata.conf import has_navigator
 
       DataCatalogContext.prototype.openInDashboard = function() {
         var self = this;
-        huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry().path.join('.') + '?engine=' + self.sourceType);
+        huePubSub.publish('open.link', '/hue/dashboard/browse/' + self.catalogEntry().path.join('.') + '?engine=' + self.catalogEntry().getSourceType());
         huePubSub.publish('context.popover.hide');
       };
 
@@ -852,7 +881,7 @@ from metadata.conf import has_navigator
                       if (property.col_name.toLowerCase() === 'view original text:') {
                         details.viewSql = ko.observable();
                         details.loadingViewSql = ko.observable(true);
-                        ApiHelper.getInstance().formatSql(property.data_type).done(function (formatResponse) {
+                        ApiHelper.getInstance().formatSql({ statements: property.data_type }).done(function (formatResponse) {
                           if (formatResponse.status == 0) {
                             details.viewSql(formatResponse.formatted_statements);
                           } else {

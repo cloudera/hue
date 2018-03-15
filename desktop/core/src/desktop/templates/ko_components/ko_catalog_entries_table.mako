@@ -91,7 +91,14 @@ from desktop.views import _ko
         <!-- ko if: filteredEntries().length -->
         <tbody data-bind="foreach: filteredEntries">
           <tr>
-            <td width="10%" data-bind="attr: { 'title': catalogEntry.getTitle() }"><a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: onClick"></a></td>
+            <td width="10%" data-bind="attr: { 'title': catalogEntry.name + ' - ${ _ko("Click for more details") }' }">
+              <a href="javascript: void(0);" data-bind="click: onClick">
+                <span data-bind="text: catalogEntry.name"></span>
+                <!-- ko if: catalogEntry.isPrimaryKey() -->
+                &nbsp;<i title="${ _("Primary Key") }"class="fa fa-key"></i>
+                <!-- /ko -->
+              </a>
+            </td>
             <td width="10%" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
             <td width="30%" data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
             <td width="25%" class="sample-column" data-bind="html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }"></td>
@@ -189,35 +196,36 @@ from desktop.views import _ko
 
         if (self.catalogEntry.isColumn() && !self.catalogEntry.isComplex()) {
           self.loading(true);
-          self.catalogEntry.getSample({ silenceErrors: true }).done(function (samples) {
+          self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (samples) {
             if (samples.data && samples.data.length) {
               self.columnSamples(samples.data);
             }
           }).always(function () {
             self.loading(false);
-          })
+          }));
         } else if (self.catalogEntry.hasPossibleChildren()) {
           self.loading(true);
           var onClick = function (sampleEnrichedEntry) {
             params.onClick(sampleEnrichedEntry.catalogEntry);
           };
-          var childPromise = self.catalogEntry.getChildren({ silenceErrors: true }).done(function (childEntries) {
+          var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
             self.entries($.map(childEntries, function (entry) { return new SampleEnrichedEntry(entry, onClick) }));
           }).fail(function () {
             self.errorloading(true);
-          })
+          });
 
-          var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true });
+          var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true });
 
           $.when(childPromise, navMetaPromise).always(function () {
             self.loading(false);
           });
 
+          self.cancellablePromises.push(navMetaPromise);
           self.cancellablePromises.push(childPromise);
 
           if (self.catalogEntry.isTableOrView() || self.catalogEntry.isField()) {
             self.loadingSamples(true);
-            self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true }).done(function (sample) {
+            self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (sample) {
               childPromise.done(function () {
                 if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
                   var entryIndex = {};

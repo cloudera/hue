@@ -157,6 +157,7 @@ var ApiHelper = (function () {
   var SOLR_FIELDS_API = '/indexer/api/index/list/';
   var DASHBOARD_TERMS_API = '/dashboard/get_terms';
   var DASHBOARD_STATS_API = '/dashboard/get_stats';
+  var FORMAT_SQL_API = '/notebook/api/format';
 
   var SEARCH_API = '/desktop/api/search/entities';
   var INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
@@ -1870,10 +1871,25 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
-  ApiHelper.prototype.formatSql = function (statements) {
-    return $.post("/notebook/api/format", {
-      statements: statements
+  /**
+   *
+   * @param {Object} options
+   * @param {string} options.statements
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.formatSql = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+
+    var request = self.simplePost(FORMAT_SQL_API, {
+      statements: options.statements
+    }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: deferred.resolve,
+      errorCallback: deferred.reject
     });
+
+    return new CancellablePromise(deferred, request);
   };
 
   /**

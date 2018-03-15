@@ -1541,7 +1541,7 @@ var EditorViewModel = (function() {
 
     self.format = function () {
       if (self.isSqlDialect()) {
-        self.getApiHelper().formatSql(self.ace().getSelectedText() != '' ? self.ace().getSelectedText() : self.statement_raw()).done(function (data) {
+        self.getApiHelper().formatSql({ statements: self.ace().getSelectedText() != '' ? self.ace().getSelectedText() : self.statement_raw() }).done(function (data) {
           if (data.status == 0) {
             if (self.ace().getSelectedText() != '') {
               self.ace().session.replace(self.ace().session.selection.getRange(), data.formatted_statements);
