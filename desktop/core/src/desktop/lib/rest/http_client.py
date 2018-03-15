@@ -67,7 +67,7 @@ class RestException(Exception):
     try:
       self._code = error.response.status_code
       self._headers = error.response.headers
-      self._message = self._error.response.text
+      self._message = self._message + '\n' + self._error.response.text
     except AttributeError:
       pass
 
