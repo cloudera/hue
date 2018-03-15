@@ -367,12 +367,18 @@ class HiveServer2Dbms(object):
     if table.partition_keys:
       hql = self._get_sample_partition_query(database, table, column, limit)
     elif self.server_name == 'impala':
+      # Note: requires CDH5.15+
+      if not table.is_view and not table.is_impala_only and table.path_location and table.path_location.lower().startswith('hdfs://'):
+        hql_sampling = 'TABLESAMPLE SYSTEM(1) REPEATABLE(1) '
+      else:
+        hql_sampling = ''
+
       if column or nested:
         from impala.dbms import ImpalaDbms
         select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
-        hql = 'SELECT %s FROM %s LIMIT %s;' % (select_clause, from_clause, limit)
+        hql = 'SELECT %s FROM %s %sLIMIT %s;' % (select_clause, from_clause, hql_sampling, limit)
       else:
-        hql = "SELECT * FROM `%s`.`%s` LIMIT %s;" % (database, table.name, limit)
+        hql = "SELECT * FROM `%s`.`%s` LIMIT %s;" % (database, table.name, hql_sampling, limit)
     else:
       hql = "SELECT %s FROM `%s`.`%s` LIMIT %s;" % (column, database, table.name, limit)
       # TODO: Add nested select support for HS2
