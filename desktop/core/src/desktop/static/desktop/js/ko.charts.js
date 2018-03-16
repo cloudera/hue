@@ -279,7 +279,9 @@
       var _chart = $(element).data("chart");
       if (_chart) {
         window.setTimeout(function () {
-          _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
+          if (_chart.multibar) {
+            _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
+          }
           var enableSelection = true;
           if (typeof _options.enableSelection !== 'undefined') {
             enableSelection = _options.enableSelection;
@@ -767,7 +769,7 @@
         _chart.yAxis
             .tickFormat(d3v3.format(",0f"));
 
-        var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
+        var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).insert("svg", ":first-child");
         _d3.datum(_datum)
             .transition().duration(150)
             .each("end", function () {
@@ -795,7 +797,15 @@
 
         return _chart;
       }, function () {
-        var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
+        if ($(element).find("svg").length > 0) {
+          _d3 = d3v3.select($(element).find("svg")[0]);
+          if ($(element).find("svg").length < 2) {
+            addLegend(element);
+          }
+        } else {
+          _d3 = d3v3.select($(element)[0]).append("svg");
+          addLegend(element);
+        }
         _d3.selectAll(".nv-line").on("click",
             function (d, i) {
               if (typeof options.onClick != "undefined") {
@@ -805,6 +815,18 @@
             });
       });
     }
+  }
+
+  function addLegend(element) {
+    d3v3.select($(element)[0])
+      .append("div")
+        .style("position", "absolute")
+        .style("overflow", "auto")
+        .style("top", "0px")
+        .style("right", "0px")
+        .style("width", "175px")
+        .style("height", "100%")
+      .append("svg");
   }
 
   function barChartBuilder(element, options, isTimeline) {
@@ -943,7 +965,7 @@
 
       $(element).data("chart", _chart);
 
-      var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
+      var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).insert("svg",":first-child");
       _d3.datum(_datum)
         .transition().duration(150)
         .each("end", function () {
@@ -994,7 +1016,16 @@
 
       return _chart;
     }, function () {
-      var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
+      var _d3;
+      if ($(element).find("svg").length > 0) {
+        _d3 = d3v3.select($(element).find("svg")[0]);
+        if ($(element).find("svg").length < 2) {
+          addLegend(element);
+        }
+      } else {
+        _d3 = d3v3.select($(element)[0]).append("svg");
+        addLegend(element);
+      }
       _d3.selectAll(".nv-bar").on("click",
         function (d, i) {
           if (typeof options.onClick != "undefined") {
