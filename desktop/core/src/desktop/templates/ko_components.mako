@@ -15,6 +15,7 @@
 ## limitations under the License.
 
 <%namespace name="koBreadCrumbs" file="/ko_components/ko_breadcrumbs.mako" />
+<%namespace name="koCatalogEntriesTable" file="/ko_components/ko_catalog_entries_table.mako" />
 <%namespace name="koContextPopover" file="/ko_components/ko_context_popover.mako" />
 <%namespace name="koDropDown" file="/ko_components/ko_drop_down.mako" />
 <%namespace name="koFavoriteApp" file="/ko_components/ko_favorite_app.mako" />
@@ -28,6 +29,7 @@
 
 <%def name="all()">
   ${ koBreadCrumbs.breadCrumbs() }
+  ${ koCatalogEntriesTable.catalogEntriesTable() }
   ${ koContextPopover.contextPopover() }
   ${ koDropDown.dropDown() }
   ${ koFavoriteApp.favoriteApp() }

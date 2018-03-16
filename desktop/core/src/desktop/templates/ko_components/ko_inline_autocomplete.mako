@@ -54,7 +54,6 @@ from desktop.views import _ko
         </ul>
       </div>
     </div>
-
   </script>
 
   <script type="text/javascript">
@@ -382,15 +381,18 @@ from desktop.views import _ko
 
         if (self.lastParseResult.suggestFacetValues) {
           var facetValues = ko.unwrap(self.knownFacetValues);
-          if (facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()]) {
-            getSortedFacets(facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()]).forEach(function (value) {
+          if (facetValues && facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()]) {
+            var matchedFacets = facetValues[self.lastParseResult.suggestFacetValues.toLowerCase()];
+            getSortedFacets(matchedFacets).forEach(function (value) {
               if (value.toLowerCase().indexOf(partialLower) === 0) {
                 var fullValue = nonPartial + partial + value.substring(partial.length, value.length);
-                if (partial.length) {
-                  facetSuggestions.push({ label: '<b>' + partial + '</b>' + value.substring(partial.length), value: fullValue});
-                } else {
-                  facetSuggestions.push({ label: value, value: fullValue});
+
+                var label = partial.length ? '<b>' + partial + '</b>' + value.substring(partial.length) : value;
+
+                if (matchedFacets[value] !== -1) {
+                  label += ' (' + matchedFacets[value] + ')';
                 }
+                facetSuggestions.push({ label: label, value: fullValue });
                 newSuggestions.push(fullValue);
               }
             });

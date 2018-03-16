@@ -85,7 +85,7 @@ var CancellablePromise = (function () {
       ApiHelper.getInstance().cancelActiveRequest(self.request);
     }
 
-    if (self.state() === 'pending' && self.deferred.reject) {
+    if (self.state && self.state() === 'pending' && self.deferred.reject) {
       self.deferred.reject();
     }
 
@@ -157,6 +157,7 @@ var ApiHelper = (function () {
   var SOLR_FIELDS_API = '/indexer/api/index/list/';
   var DASHBOARD_TERMS_API = '/dashboard/get_terms';
   var DASHBOARD_STATS_API = '/dashboard/get_stats';
+  var FORMAT_SQL_API = '/notebook/api/format';
 
   var SEARCH_API = '/desktop/api/search/entities';
   var INTERACTIVE_SEARCH_API = '/desktop/api/search/entities_interactive';
@@ -371,12 +372,12 @@ var ApiHelper = (function () {
         }
       }
 
-      if (! options.silenceErrors) {
+      if (!options || !options.silenceErrors) {
         hueUtils.logError(errorResponse);
         $(document).trigger("error", errorMessage);
       }
 
-      if (options.errorCallback) {
+      if (options && options.errorCallback) {
         options.errorCallback(errorMessage);
       }
       return errorMessage;
@@ -402,7 +403,7 @@ var ApiHelper = (function () {
     return $.post(url, data, function (data) {
       if (self.successResponseIsError(data)) {
         self.assistErrorCallback(options)(data);
-      } else if (typeof options.successCallback !== 'undefined') {
+      } else if (options && options.successCallback) {
         options.successCallback(data);
       }
     })
@@ -971,13 +972,14 @@ var ApiHelper = (function () {
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    * @param {boolean} [options.fetchContents]
-   *
    * @param {number} options.uuid
+   *
+   * @return {CancellablePromise}
    */
   ApiHelper.prototype.fetchDocument = function (options) {
     var self = this;
-    var promise = $.Deferred();
-    $.ajax({
+    var deferred = $.Deferred();
+    var request = $.ajax({
       url: DOCUMENTS_API,
       data: {
         uuid: options.uuid,
@@ -985,18 +987,18 @@ var ApiHelper = (function () {
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
-          promise.resolve(data)
+          deferred.resolve(data)
         } else {
-          promise.reject(self.assistErrorCallback({
+          deferred.reject(self.assistErrorCallback({
             silenceErrors: options.silenceErrors
           }));
         }
       }
     })
     .fail(function (errorResponse) {
-      promise.reject(self.assistErrorHandler(errorResponse))
+      deferred.reject(self.assistErrorHandler(errorResponse))
     });
-    return promise;
+    return new CancellablePromise(deferred, request);
   };
 
   /**
@@ -1452,12 +1454,62 @@ var ApiHelper = (function () {
   };
 
   /**
+   * Checks the status for the given snippet ID
+   *
+   * @param {Object} options
+   * @param {Object} options.notebookJson
+   * @param {Object} options.snippetJson
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @return {CancellablePromise}
+   */
+  ApiHelper.prototype.whenAvailable = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+    var cancellablePromises = [];
+
+    var waitTimeout = -1;
+
+    deferred.fail(function () {
+      window.clearTimeout(waitTimeout);
+    });
+
+    var waitForAvailable = function () {
+      var request = self.simplePost('/notebook/api/check_status', {
+        notebook: options.notebookJson,
+        snippet: options.snippetJson
+      }, {
+        silenceErrors: options.silenceErrors
+      }).done(function (response) {
+        if (response && response.query_status && response.query_status.status) {
+          var status = response.query_status.status;
+          if (status === 'available') {
+            deferred.resolve();
+          } else if (status === 'running' || status === 'starting' || status === 'waiting') {
+            waitTimeout = window.setTimeout(function () {
+              waitForAvailable();
+            }, 500);
+          } else {
+            deferred.reject();
+          }
+        }
+      }).fail(deferred.reject);
+
+      cancellablePromises.push(new CancellablePromise(request, request));
+    };
+
+    waitForAvailable();
+    return new CancellablePromise(deferred, undefined, cancellablePromises);
+  };
+
+  /**
    * Fetches samples for the given source and path
    *
    * @param {Object} options
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.sourceType
+   * @param {number} [options.sampleCount] - Default 100
    * @param {string[]} options.path
    *
    * @return {CancellablePromise}
@@ -1466,21 +1518,76 @@ var ApiHelper = (function () {
     var self = this;
     var deferred = $.Deferred();
 
-    var request = self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
+    var cancellablePromises = [];
+
+    var snippetJson;
+    var notebookJson;
+
+    var cancelled = false;
+
+    var cancelQuery = function () {
+      cancelled = true;
+      if (snippetJson) {
+        self.simplePost('/notebook/api/cancel_statement', {
+          notebook: notebookJson || {},
+          snippet: snippetJson
+        }, { silenceErrors:  options.silenceErrors });
+      }
+    };
+
+    self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
       notebook: {},
       snippet: ko.mapping.toJSON({
         type: options.sourceType
-      })
+      }),
+      async: true
     }, {
-      silenceErrors: options.silenceErrors,
-      successCallback: function (data) {
-        data.hueTimestamp = Date.now();
-        deferred.resolve(data);
-      },
-      errorCallback: deferred.reject
-    }).done().fail(deferred.reject);
+      silenceErrors: options.silenceErrors
+    }).done(function (sampleResponse) {
+      if (sampleResponse.history_uuid) {
+        self.fetchDocument({
+          uuid: sampleResponse.history_uuid,
+          fetchContents: true
+        }).done(function (docResponse) {
+          if (docResponse.data && docResponse.data.snippets && docResponse.data.snippets.length === 1) {
+            notebookJson = JSON.stringify(docResponse.data);
+            snippetJson = JSON.stringify(docResponse.data.snippets[0]);
 
-    return new CancellablePromise(deferred, request);
+            // The promise might get cancelled before we've received the document needed to actually cancel it
+            if (cancelled) {
+              cancelQuery();
+              return;
+            }
+
+            cancellablePromises.push(self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
+              var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
+                notebook: notebookJson,
+                snippet: snippetJson,
+                rows: options.sampleCount || 100,
+                startOver: 'false'
+              }, {
+                silenceErrors:  options.silenceErrors
+              }).done(function (sampleResponse) {
+                var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
+                data.hueTimestamp = Date.now();
+                deferred.resolve(data);
+              }).fail(deferred.reject);
+              cancellablePromises.push(resultRequest, resultRequest);
+            }).fail(deferred.reject));
+          } else {
+            deferred.reject();
+          }
+        }).fail(deferred.reject);
+      } else {
+        deferred.reject();
+      }
+    }).fail(deferred.reject);
+
+    cancellablePromises.push({
+      cancel: cancelQuery
+    });
+
+    return new CancellablePromise(deferred, undefined, cancellablePromises);
   };
 
   /**
@@ -1787,10 +1894,25 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, request);
   };
 
-  ApiHelper.prototype.formatSql = function (statements) {
-    return $.post("/notebook/api/format", {
-      statements: statements
+  /**
+   *
+   * @param {Object} options
+   * @param {string} options.statements
+   * @param {boolean} [options.silenceErrors]
+   */
+  ApiHelper.prototype.formatSql = function (options) {
+    var self = this;
+    var deferred = $.Deferred();
+
+    var request = self.simplePost(FORMAT_SQL_API, {
+      statements: options.statements
+    }, {
+      silenceErrors: options.silenceErrors,
+      successCallback: deferred.resolve,
+      errorCallback: deferred.reject
     });
+
+    return new CancellablePromise(deferred, request);
   };
 
   /**

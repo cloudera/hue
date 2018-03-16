@@ -4809,7 +4809,23 @@
                 bottom: endCoordinates.pageY + editor.renderer.lineHeight
               };
 
-              if (token.parseLocation && !token.notFound) {
+              if (token.parseLocation && token.parseLocation.identifierChain && !token.notFound) {
+                // Database, table and field
+                var path = $.map(token.parseLocation.identifierChain, function (identifier) {
+                  return identifier.name;
+                });
+                DataCatalog.getEntry({sourceType: snippet.type(), path: path}).done(function (entry) {
+                  huePubSub.publish('context.popover.show', {
+                    data: {
+                      type: 'catalogEntry',
+                      catalogEntry: entry
+                    },
+                    pinEnabled: true,
+                    source: source
+                  });
+                });
+              } else if (token.parseLocation && !token.notFound) {
+                // Asterisk, function etc.
                 huePubSub.publish('context.popover.show', {
                   data: token.parseLocation,
                   sourceType: snippet.type(),

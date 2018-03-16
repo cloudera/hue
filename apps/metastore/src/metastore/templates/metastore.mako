@@ -265,7 +265,7 @@ ${ components.menubar(is_embeddable) }
         <tr>
           <td data-bind="text: $index() + 1"></td>
           <!-- ko foreach: $data -->
-            <td data-bind="text: $data"></td>
+            <td data-bind="html: $data"></td>
           <!-- /ko -->
         </tr>
       <!-- /ko -->
@@ -412,6 +412,7 @@ ${ components.menubar(is_embeddable) }
     <thead>
     <tr>
       <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
+      <th>&nbsp;</th>
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
@@ -420,6 +421,7 @@ ${ components.menubar(is_embeddable) }
       <td width="1%" style="text-align: center">
         <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
       </td>
+      <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
       <td>
         <a href="javascript: void(0);" data-bind="text: catalogEntry.name, click: function () { $parent.setDatabase($data, function() { huePubSub.publish('metastore.url.change'); }) }"></a>
       </td>
@@ -466,7 +468,7 @@ ${ components.menubar(is_embeddable) }
             % endif
           </div>
         </div>
-        <div class="span6 tile">
+        <div class="span5 tile">
           <!-- ko if: $root.navigatorEnabled()  -->
           <h4>${ _('Tags') }</h4>
           <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {

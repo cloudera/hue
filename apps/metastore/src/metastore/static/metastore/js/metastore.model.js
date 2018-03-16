@@ -175,6 +175,25 @@ var MetastoreDatabase = (function () {
     });
   };
 
+  MetastoreDatabase.prototype.showContextPopover = function (entry, event, orientation) {
+    var $source = $(event.currentTarget || event.target);
+    var offset = $source.offset();
+    huePubSub.publish('context.popover.show', {
+      data: {
+        type: 'catalogEntry',
+        catalogEntry: entry.catalogEntry
+      },
+      orientation: orientation || 'right',
+      source: {
+        element: event.target,
+        left: offset.left,
+        top: offset.top - 2,
+        right: offset.left + (orientation === 'left' ? 0 : $source.width() + 1),
+        bottom: offset.top + $source.height() - 2
+      }
+    });
+  };
+
   return MetastoreDatabase;
 })();
 
@@ -311,8 +330,8 @@ var MetastoreTable = (function () {
     self.hasErrors(false);
     self.loading(true);
     self.metastoreTable.catalogEntry.getSample().done(function (sample) {
-      self.rows(sample.rows);
-      self.headers(sample.headers);
+      self.rows(sample.data);
+      self.headers($.map(sample.meta, function (meta) { return meta.name }));
       self.preview.rows(self.rows().slice(0, 3));
       self.preview.headers(self.headers());
     }).fail(function (message) {
@@ -567,12 +586,10 @@ var MetastoreTable = (function () {
     var offset = $source.offset();
     huePubSub.publish('context.popover.show', {
       data: {
-        type: 'table',
-        identifierChain: [{ name: entry.database.catalogEntry.name }, { name: entry.catalogEntry.name }]
+        type: 'catalogEntry',
+        catalogEntry: entry.catalogEntry
       },
       orientation: orientation || 'right',
-      sourceType: entry.catalogEntry.getSourceType(),
-      defaultDatabase: entry.database.catalogEntry.name,
       source: {
         element: event.target,
         left: offset.left,
@@ -637,12 +654,10 @@ var MetastoreColumn = (function () {
     var offset = $source.offset();
     huePubSub.publish('context.popover.show', {
       data: {
-        type: 'column',
-        identifierChain: [{ name: entry.table.database.catalogEntry.name }, { name: entry.table.catalogEntry.name }, { name: entry.catalogEntry.name }]
+        type: 'catalogEntry',
+        catalogEntry: entry.catalogEntry
       },
       orientation: 'right',
-      sourceType: entry.catalogEntry.getSourceType(),
-      defaultDatabase: entry.table.database.catalogEntry.name,
       source: {
         element: event.target,
         left: offset.left,
