@@ -209,7 +209,7 @@
 <script id="widget-template-gridster${ suffix }" type="text/html">
   <li>
     <!-- ko ifnot: widget -->
-    <div class="empty-gridster-widget card card-widget" data-bind="droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}, css: { 'query-builder': $root.isQueryBuilder }">
+    <div class="empty-gridster-widget card card-widget" data-bind="draggable: { data: $data, isEnabled: $root.isGridster() && !$root.isQueryBuilder(), options: getDraggableOptions({ data: $data, parent: $data }) }, droppable: { data: function(w) { showAddFacetDemiModal(w, $data); }, options: { greedy:true, hoverClass: 'droppable-hover' }}, css: { 'query-builder': $root.isQueryBuilder }">
       <h2 class="card-heading simple" title="${ _('Drag to move') }">
         ${ _('Empty widget') }
         <div class="inline pull-right margin-right-10" data-bind="visible: ($root.isEditing() || $root.isToolbarVisible()) && !$root.isQueryBuilder()">
