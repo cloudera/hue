@@ -222,7 +222,7 @@ class SQLDashboardApi(DashboardApi):
         'fields':
             dict([(col['name'], {
               'name': str(escape(col['name'])),
-              'type': str(col['type']),
+              'type': str(col['type']).lower(),
               'uniqueKey': col.get('primary_key') == 'true',
               # 'dynamicBase': False,
               'indexed': False,
