@@ -1781,7 +1781,7 @@ var NewTemplate = function (vm, initial) {
 
 
 var QueryResult = function (vm, initial) { // Similar to to Notebook Snippet
-  var self = this;
+  var self = this; // TODO remove 'vm'
 
   self.id = ko.observable(UUID());
   self.type = ko.mapping.fromJS(initial.type);

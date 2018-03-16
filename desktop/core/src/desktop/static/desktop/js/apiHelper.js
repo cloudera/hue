@@ -1455,6 +1455,7 @@ var ApiHelper = (function () {
 
   /**
    * Checks the status for the given snippet ID
+   * Note: similar to notebook and search check_status.
    *
    * @param {Object} options
    * @param {Object} options.notebookJson
@@ -1502,6 +1503,35 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, undefined, cancellablePromises);
   };
 
+  // This is the same as https://github.com/cloudera/hue/blob/master/desktop/libs/dashboard/src/dashboard/static/dashboard/js/search.ko.js#L1783
+  var QueryResult = function (vm, initial) { // Similar to to Notebook Snippet
+    var self = this;
+
+    self.id = ko.observable(UUID());
+    self.type = ko.mapping.fromJS(initial.type);
+    self.status = ko.observable(initial.status || 'running');
+    self.progress = ko.mapping.fromJS(initial.progress || 0);
+
+    self.hasResultset = ko.observable(true);
+
+    // UI
+    self.saveResultsModalVisible = ko.observable(false);
+
+    self.result = ko.mapping.fromJS(initial.result);
+    self.result.hasSomeResults = ko.computed(function () {
+      return self.hasResultset(); // && self.data().length > 0; // status() == 'available'
+    });
+    self.result.type = ko.observable('table');
+
+    self.getContext = function() {
+      return self;
+    }
+
+    self.asyncResult = function() {
+      return ko.mapping.toJS(self.result.result);
+    }
+  };
+
   /**
    * Fetches samples for the given source and path
    *
@@ -1520,16 +1550,15 @@ var ApiHelper = (function () {
 
     var cancellablePromises = [];
 
-    var snippetJson;
-    var notebookJson;
-
+    var notebookJson = null;
+    var snippetJson = null;
     var cancelled = false;
 
     var cancelQuery = function () {
       cancelled = true;
-      if (snippetJson) {
+      if (notebookJson) {
         self.simplePost('/notebook/api/cancel_statement', {
-          notebook: notebookJson || {},
+          notebook: notebookJson,
           snippet: snippetJson
         }, { silenceErrors:  options.silenceErrors });
       }
@@ -1544,40 +1573,34 @@ var ApiHelper = (function () {
     }, {
       silenceErrors: options.silenceErrors
     }).done(function (sampleResponse) {
-      if (sampleResponse.history_uuid) {
-        self.fetchDocument({
-          uuid: sampleResponse.history_uuid,
-          fetchContents: true
-        }).done(function (docResponse) {
-          if (docResponse.data && docResponse.data.snippets && docResponse.data.snippets.length === 1) {
-            notebookJson = JSON.stringify(docResponse.data);
-            snippetJson = JSON.stringify(docResponse.data.snippets[0]);
+      if (sampleResponse.status == 0) {
+        var queryResult = new QueryResult(self, {
+            type: options.sourceType,
+            result: sampleResponse.result,
+            status: 'running',
+            progress: 0,
+        });
 
-            // The promise might get cancelled before we've received the document needed to actually cancel it
-            if (cancelled) {
-              cancelQuery();
-              return;
-            }
+        notebookJson = ko.mapping.toJSON({type: queryResult.type()});
+        snippetJson = ko.mapping.toJSON(queryResult.getContext());
 
-            cancellablePromises.push(self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
-              var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
-                notebook: notebookJson,
-                snippet: snippetJson,
-                rows: options.sampleCount || 100,
-                startOver: 'false'
-              }, {
-                silenceErrors:  options.silenceErrors
-              }).done(function (sampleResponse) {
-                var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
-                data.hueTimestamp = Date.now();
-                deferred.resolve(data);
-              }).fail(deferred.reject);
-              cancellablePromises.push(resultRequest, resultRequest);
-            }).fail(deferred.reject));
-          } else {
-            deferred.reject();
-          }
-        }).fail(deferred.reject);
+        cancellablePromises.push(
+          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
+            var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
+              notebook: notebookJson,
+              snippet: snippetJson,
+              rows: options.sampleCount || 100,
+              startOver: 'false'
+            }, {
+              silenceErrors:  options.silenceErrors
+            }).done(function (sampleResponse) {
+              var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
+              data.hueTimestamp = Date.now();
+              deferred.resolve(data);
+            }).fail(deferred.reject);
+            cancellablePromises.push(resultRequest, resultRequest);
+          }).fail(deferred.reject)
+        );
       } else {
         deferred.reject();
       }
