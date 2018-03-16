@@ -489,7 +489,11 @@ var DataCatalog = (function () {
      */
     var reloadNavigatorMeta = function (dataCatalogEntry, apiOptions) {
       if (dataCatalogEntry.canHaveNavigatorMetadata()) {
-        return dataCatalogEntry.trackedPromise('navigatorMetaPromise', fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions));
+        return dataCatalogEntry.trackedPromise('navigatorMetaPromise', fetchAndSave('fetchNavigatorMetadata', 'navigatorMeta', dataCatalogEntry, apiOptions)).done(function (navigatorMeta) {
+          if (navigatorMeta && dataCatalogEntry.commentObservable) {
+            dataCatalogEntry.commentObservable(dataCatalogEntry.getResolvedComment());
+          }
+        });
       }
       dataCatalogEntry.navigatorMetaPromise = $.Deferred().reject();
       return dataCatalogEntry.navigatorMetaPromise;
@@ -568,6 +572,16 @@ var DataCatalog = (function () {
       self.name = self.path.length ? self.path[self.path.length - 1] : dataCatalog.sourceType;
 
       self.definition = definition;
+
+      if (!self.definition) {
+        if (self.path.length === 0) {
+          self.definition = { type: 'source' }
+        } else if (self.path.length === 1) {
+          self.definition = { type: 'database' }
+        } else if (self.path.length === 2) {
+          self.definition = { type: 'table' }
+        }
+      }
 
       self.reset();
     }
@@ -851,6 +865,9 @@ var DataCatalog = (function () {
               if (matchingChildEntry) {
                 matchingChildEntry.navigatorMeta = entity;
                 matchingChildEntry.navigatorMetaPromise = $.Deferred().resolve(matchingChildEntry.navigatorMeta).promise();
+                if (entity && matchingChildEntry.commentObservable) {
+                  matchingChildEntry.commentObservable(matchingChildEntry.getResolvedComment());
+                }
                 matchingChildEntry.saveLater();
               }
             });
@@ -998,6 +1015,20 @@ var DataCatalog = (function () {
         return self.navigatorMeta.description || self.navigatorMeta.originalDescription || ''
       }
       return self.sourceMeta && self.sourceMeta.comment || '';
+    };
+
+    /**
+     * This can be used to get an observable for the comment which will be updated once a comment has been
+     * resolved.
+     *
+     * @return {ko.observable}
+     */
+    DataCatalogEntry.prototype.getCommentObservable = function () {
+      var self = this;
+      if (!self.commentObservable) {
+        self.commentObservable = ko.observable(self.getResolvedComment());
+      }
+      return self.commentObservable;
     };
 
     /**
@@ -1420,17 +1451,31 @@ var DataCatalog = (function () {
      * Returns the type of the entry. It will be accurate once the source meta has been loaded or if loaded from
      * a parent entry via getChildren().
      *
-     * For complex entries the type definition is stripped to either 'array', 'map' or 'struct'
+     * The returned string is always lower case and for complex entries the type definition is stripped to
+     * either 'array', 'map' or 'struct'.
      *
      * @return {string}
      */
     DataCatalogEntry.prototype.getType = function () {
       var self = this;
-      var type = self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
+      var type = self.getRawType();
       if (type.indexOf('<') !== -1) {
         type = type.substring(0, type.indexOf('<'));
       }
-      return type;
+      return type.toLowerCase();
+    };
+
+    /**
+     * Returns the raw type of the entry. It will be accurate once the source meta has been loaded or if loaded from
+     * a parent entry via getChildren().
+     *
+     * For complex entries the type definition is the full version.
+     *
+     * @return {string}
+     */
+    DataCatalogEntry.prototype.getRawType = function () {
+      var self = this;
+      return self.sourceMeta && self.sourceMeta.type || self.definition.type || '';
     };
 
     /**

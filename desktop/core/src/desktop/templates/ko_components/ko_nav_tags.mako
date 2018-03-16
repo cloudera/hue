@@ -26,10 +26,11 @@ from django.utils.translation import ugettext as _
      <!-- ko if: loading -->
      <div style="width: 100%; height: 20px; left: 6px; top: 8px; position: relative;" data-bind="hueSpinner: { spin: loading }"></div>
      <!-- /ko -->
-     <div style="width: 100%" data-bind="ifnot: loading">
+     <!-- ko if: !loading() && (!readOnly || readOnly && currentTags().length) -->
+     <div class="hue-tags"  style="width: 100%" data-bind="ifnot: loading, css: { 'read-only-tags': readOnly }">
        <textarea style="width: 100%" data-bind="tagEditor: {
           placeholder: '${_ko('No tags')}',
-          readOnly: '${ not user.has_hue_permission(action="write", app="metadata") }' === 'True',
+          readOnly: readOnly,
           hasErrors: hasErrors,
           errorMessage: '${_ko("Tags could not be loaded.")}',
           setTags: currentTags,
@@ -39,7 +40,9 @@ from django.utils.translation import ugettext as _
           load: getSelectizeTags
         }"></textarea>
        <div class="selectize-error" style="display: none;"><i class="fa fa-exclamation-triangle"></i> <span class="message"></span></div>
+       <!-- /ko -->
      </div>
+     <!-- /ko -->
   </script>
 
   <script type="text/javascript">
@@ -60,6 +63,7 @@ from django.utils.translation import ugettext as _
         self.allTags = ko.observableArray();
 
         self.catalogEntry = params.catalogEntry;
+        self.readOnly = '${ not user.has_hue_permission(action="write", app="metadata") }' === 'True' || !!params.readOnly;
 
         self.getSelectizeTags = function (query, callback) {
           callback($.map(self.allTags(), function (tag) { return { value: tag, text: tag }}));
@@ -73,7 +77,7 @@ from django.utils.translation import ugettext as _
         self.loading(true);
         self.hasErrors(false);
 
-        var currentTagsPromise = self.catalogEntry.getNavigatorMeta().done(function (navigatorMeta) {
+        var currentTagsPromise = ko.unwrap(self.catalogEntry).getNavigatorMeta().done(function (navigatorMeta) {
           self.currentTags((navigatorMeta && navigatorMeta.tags) || []);
         }).fail(function () {
           self.hasErrors(true);
@@ -116,9 +120,9 @@ from django.utils.translation import ugettext as _
         self.loading(true);
         self.hasErrors(false);
 
-        var addTagsPromise = tagsToAdd.length > 0 ? self.catalogEntry.addNavigatorTags(tagsToAdd) : $.Deferred().resolve().promise();
+        var addTagsPromise = tagsToAdd.length > 0 ? ko.unwrap(self.catalogEntry).addNavigatorTags(tagsToAdd) : $.Deferred().resolve().promise();
 
-        var deleteTagsPromise = tagsToRemove.length > 0 ? self.catalogEntry.deleteNavigatorTags(tagsToRemove) : $.Deferred().resolve().promise();
+        var deleteTagsPromise = tagsToRemove.length > 0 ? ko.unwrap(self.catalogEntry).deleteNavigatorTags(tagsToRemove) : $.Deferred().resolve().promise();
 
         addTagsPromise.fail(function (error) {
           hueUtils.logError(error);
@@ -133,7 +137,7 @@ from django.utils.translation import ugettext as _
         $.when(addTagsPromise, deleteTagsPromise).done(function () {
           if (tagsToAdd.length || tagsToRemove.length) {
             DataCatalog.updateAllNavigatorTags(tagsToAdd, tagsToRemove);
-            self.catalogEntry.save();
+            ko.unwrap(self.catalogEntry).save();
           }
           self.loading(false);
           self.loadTags();
