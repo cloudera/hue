@@ -666,24 +666,23 @@ def _get_sample_data(db, database, table, column, async=False):
   response = {'status': -1}
 
   if sample_data:
+    response['status'] = 0
     if async:
       notebook = make_notebook(
           name=_('Table sample for `%(database)s`.`%(table)s`.`%(column)s`') % {'database': database, 'table': table, 'column': column},
           editor_type=db.server_name,
           statement=sample_data,
-          status='ready',
+          status='ready-execute',
+          skip_historify=True,
           is_task=False
       )
-      task = notebook.execute(request=MockedDjangoRequest(user=db.client.user), batch=False)
-      response['history_id'] = task['history_id']
-      response['history_uuid'] = task['history_uuid']
+      response['result'] = notebook.execute(request=MockedDjangoRequest(user=db.client.user), batch=False)
     else:
       sample = escape_rows(sample_data.rows(), nulls_only=True)
       if column:
         sample = set([row[0] for row in sample])
         sample = [[item] for item in sorted(list(sample))]
 
-      response['status'] = 0
       response['headers'] = sample_data.cols()
       response['full_headers'] = sample_data.full_cols()
       response['rows'] = sample
