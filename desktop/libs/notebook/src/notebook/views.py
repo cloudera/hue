@@ -66,7 +66,7 @@ def notebooks(request):
 
 @check_document_access_permission()
 def notebook(request, is_embeddable=False):
-  if not SHOW_NOTEBOOKS.get():
+  if not SHOW_NOTEBOOKS.get() or not request.user.has_hue_permission(action="access", app='notebook'):
     return serve_403_error(request)
 
   notebook_id = request.GET.get('notebook', request.GET.get('editor'))
