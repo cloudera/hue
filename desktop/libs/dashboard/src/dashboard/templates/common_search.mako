@@ -3149,7 +3149,7 @@ var getDraggableOptions = function (options) {
         huePubSub.publish('dashboard.widget.drag.start', {event: event, widget: options.data, gridsterWidget: options.parent});
       },
       'drag': function (event) {
-        huePubSub.publish('dashboard.widget.drag', {event: event, widgetHeight: options.data.gridsterHeight(), gridsterWidget: options.parent});
+        huePubSub.publish('dashboard.widget.drag', {event: event, widgetHeight: options.data.gridsterHeight ? options.data.gridsterHeight() : 6, gridsterWidget: options.parent});
       },
       'stop': function (event, ui) {
         huePubSub.publish('dashboard.widget.drag.stop', {event: event, widget: options.data, gridsterWidget: options.parent});
@@ -3157,7 +3157,7 @@ var getDraggableOptions = function (options) {
     };
     if (options.parent) { // extra options for an existing Gridster widget
       setup.appendTo = '.gridster';
-      setup.helper = function(){return '<div class="gridster-helper">' + (options.data.name() || '${ _ko('Empty widget')}') + '</div>'};
+      setup.helper = function(){return '<div class="gridster-helper">' + (options.data.name ? options.data.name() : '${ _ko('Empty widget')}') + '</div>'};
       setup.cursorAt = {
         top: 5,
         left: 5
