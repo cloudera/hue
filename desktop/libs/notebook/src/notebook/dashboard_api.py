@@ -153,13 +153,19 @@ class SQLDashboardApi(DashboardApi):
         sql = facet['properties']['statement']
     else:
       fields = Collection2.get_field_list(dashboard)
-      sql = "SELECT %(fields)s FROM %(sql_from)s" % {
+      order_by = ', '.join(['`%s` %s' % (f['name'], f['sort']['direction']) for f in dashboard['template']['fieldsAttributes'] if f['sort']['direction'] and f['name'] in fields])
+      sql = '''
+      SELECT %(fields)s
+      FROM %(sql_from)s
+      %(filters)s
+      %(order_by)s
+      %(limit)s''' % {
           'sql_from': sql_from,
-          'fields': ', '.join(['`%s` as `%s`' % (f, f) if f != '*' else '*' for f in fields])
+          'fields': ', '.join(['`%s` as `%s`' % (f, f) if f != '*' else '*' for f in fields]),
+          'filters': self._convert_filters_to_where(filters) if filters else '',
+          'order_by': 'ORDER BY %s' % order_by if order_by else '',
+          'limit': 'LIMIT %s' % dashboard['template']['rows'] or LIMIT
       }
-      if filters:
-        sql += ' ' + self._convert_filters_to_where(filters)
-      sql += ' LIMIT %s' % dashboard['template']['rows'] or LIMIT
 
     editor = make_notebook(
         name='Execute and watch',
