@@ -93,7 +93,7 @@ class TestMockedImpala:
       assert_equal(len(response.context[0]['page'].object_list), 1)
 
       # Test my query page
-      QueryHistory.objects.create(owner=user, design=impala_query, query='', last_state=QueryHistory.STATE.available.index)
+      QueryHistory.objects.create(owner=user, design=impala_query, query='', last_state=QueryHistory.STATE.available.value)
 
       resp = self.client.get('/impala/my_queries')
       assert_equal(len(resp.context[0]['q_page'].object_list), 1)

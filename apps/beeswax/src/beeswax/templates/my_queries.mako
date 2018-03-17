@@ -135,7 +135,7 @@ ${layout.menubar(section='my queries')}
             <td width="1%" data-row-selector-exclude="true">
               <div class="hue-checkbox runCheck fa"
                 data-edit-url="${ url(app_name + ':execute_design', design_id=query.design.id) }"
-                % if qcontext and query.last_state != models.QueryHistory.STATE.expired.index:
+                % if qcontext and query.last_state != models.QueryHistory.STATE.expired.value:
                   data-view-url="${ url(app_name + ':watch_query_history', query_history_id=query.id) }?context=${qcontext|u}"
                 % endif
                 data-row-selector-exclude="true"></div>

@@ -757,7 +757,7 @@ class HiveServer2Dbms(object):
       # We need to update the query in case it was fixed
       query_history.refresh_design(hql_query)
 
-    query_history.last_state = QueryHistory.STATE.submitted.index
+    query_history.last_state = QueryHistory.STATE.submitted.value
     query_history.save()
     query = query_history.design.get_design()
 
@@ -782,7 +782,7 @@ class HiveServer2Dbms(object):
           server_port='%(server_port)d' % self.client.query_server,
           server_name='%(server_name)s' % self.client.query_server,
           server_type=self.server_type,
-          last_state=QueryHistory.STATE.submitted.index,
+          last_state=QueryHistory.STATE.submitted.value,
           design=design,
           notify=query.query.get('email_notify', False),
           query_type=query.query['type'],

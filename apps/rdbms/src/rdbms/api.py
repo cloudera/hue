@@ -152,7 +152,7 @@ def execute_query(request, design_id=None):
       query_server = dbms.get_query_server_config(request.POST.get('server'))
       db = dbms.get(request.user, query_server)
       query_history = db.execute_query(query, design)
-      query_history.last_state = beeswax_models.QueryHistory.STATE.expired.index
+      query_history.last_state = beeswax_models.QueryHistory.STATE.expired.value
       query_history.save()
 
       try:

@@ -94,7 +94,7 @@ class UserProfile(models.Model):
 
   user = models.OneToOneField(auth_models.User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
-  creation_method = models.CharField(editable=True, null=False, max_length=64, default=str(CreationMethod.HUE))
+  creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE.name)
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
                                    help_text=_t('If this is users first login.'))
   last_activity = models.DateTimeField(auto_now=True, db_index=True)

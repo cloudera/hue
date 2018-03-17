@@ -1064,7 +1064,7 @@ def _update_query_state(query_history):
   Note that there is a transition from available/failed to expired. That occurs lazily
   when the user attempts to view results that have expired.
   """
-  if query_history.last_state <= models.QueryHistory.STATE.running.index:
+  if query_history.last_state <= models.QueryHistory.STATE.running.value:
     try:
       state_enum = dbms.get(query_history.owner, query_history.get_query_server_config()).get_state(query_history.get_handle())
       if state_enum is None:

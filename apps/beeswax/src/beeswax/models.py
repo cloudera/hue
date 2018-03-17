@@ -53,7 +53,14 @@ class QueryHistory(models.Model):
   """
   Holds metadata about all queries that have been executed.
   """
-  STATE = Enum('submitted', 'running', 'available', 'failed', 'expired')
+  #STATE = Enum('submitted', 'running', 'available', 'failed', 'expired')
+  class STATE(Enum):
+    submitted = 0
+    running = 1
+    available = 2
+    failed = 3
+    expired = 4
+
   SERVER_TYPE = ((BEESWAX, 'Beeswax'), (HIVE_SERVER2, 'Hive Server 2'),
                  (librdbms_dbms.MYSQL, 'MySQL'), (librdbms_dbms.POSTGRESQL, 'PostgreSQL'),
                  (librdbms_dbms.SQLITE, 'sqlite'), (librdbms_dbms.ORACLE, 'oracle'))
@@ -148,28 +155,28 @@ class QueryHistory(models.Model):
       return is_statement_finished
 
   def is_running(self):
-    return self.last_state in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index)
+    return self.last_state in (QueryHistory.STATE.running.value, QueryHistory.STATE.submitted.value)
 
   def is_success(self):
-    return self.last_state in (QueryHistory.STATE.available.index,)
+    return self.last_state in (QueryHistory.STATE.available.value,)
 
   def is_failure(self):
-    return self.last_state in (QueryHistory.STATE.expired.index, QueryHistory.STATE.failed.index)
+    return self.last_state in (QueryHistory.STATE.expired.value, QueryHistory.STATE.failed.value)
 
   def is_expired(self):
-    return self.last_state in (QueryHistory.STATE.expired.index,)
+    return self.last_state in (QueryHistory.STATE.expired.value,)
 
   def set_to_running(self):
-    self.last_state = QueryHistory.STATE.running.index
+    self.last_state = QueryHistory.STATE.running.value
 
   def set_to_failed(self):
-    self.last_state = QueryHistory.STATE.failed.index
+    self.last_state = QueryHistory.STATE.failed.value
 
   def set_to_available(self):
-    self.last_state = QueryHistory.STATE.available.index
+    self.last_state = QueryHistory.STATE.available.value
 
   def set_to_expired(self):
-    self.last_state = QueryHistory.STATE.expired.index
+    self.last_state = QueryHistory.STATE.expired.value
 
   def save(self, *args, **kwargs):
     """
@@ -239,7 +246,7 @@ class HiveServerQueryHistory(QueryHistory):
                                  modified_row_count=self.modified_row_count)
 
   def save_state(self, new_state):
-    self.last_state = new_state.index
+    self.last_state = new_state.value
     self.save()
 
   @classmethod
