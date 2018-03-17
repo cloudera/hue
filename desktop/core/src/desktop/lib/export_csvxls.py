@@ -41,11 +41,13 @@ def nullify(cell):
   return cell if cell is not None else "NULL"
 
 
-def encode_row(row, encoding=None):
+def encode_row(row, encoding=None, make_excel_links=False):
   encoded_row = []
   for cell in row:
     if isinstance(cell, six.string_types):
       cell = re.sub(ILLEGAL_CHARS, '?', cell)
+      if make_excel_links:
+        cell = re.sub('(https?://.+)', r'=HYPERLINK("\1")', cell, flags=re.IGNORECASE)
     cell = nullify(cell)
     if not isinstance(cell, numbers.Number):
       cell = smart_str(cell, encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
@@ -101,7 +103,7 @@ def create_generator(content_generator, format, encoding=None):
 
       # Write row data to workbook
       for row in _data:
-        worksheet.append(encode_row(row, encoding))
+        worksheet.append(encode_row(row, encoding, make_excel_links=True))
         row_ctr += 1
 
     yield xls_dataset(workbook).xls
