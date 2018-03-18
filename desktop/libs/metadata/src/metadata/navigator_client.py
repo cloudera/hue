@@ -394,16 +394,24 @@ class NavigatorApi(object):
       raise NavigatorApiException(e.message)
 
 
-  def update_entity(self, entity_id, **metadata):
+  def update_entity(self, entity, **metadata):
     """
     PUT /api/v3/entities/:id
     http://cloudera.github.io/navigator/apidocs/v3/path__v3_entities_-id-.html
     """
     try:
-      data = json.dumps(metadata)
-      return self._root.put('entities/%s' % entity_id, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
+      # Workarounds NAV-6187: if we don't re-send those, they would get erased.
+      properties = {
+        'name': entity['name'],
+        'description': entity['description'],
+        'properties': entity['properties'] or {},
+        'customProperties': entity['customProperties'] or {}
+      }
+      properties.update(metadata)
+      data = json.dumps(properties)
+      return self._root.put('entities/%(identity)s' % entity, params=self.__params, data=data, contenttype=_JSON_CONTENT_TYPE, allow_redirects=True, clear_cookies=True)
     except RestException, e:
-      msg = 'Failed to update entity %s: %s' % (entity_id, str(e))
+      msg = 'Failed to update entity %s: %s' % (entity['identity'], e)
       LOG.error(msg)
       raise NavigatorApiException(e.message)
 
@@ -450,7 +458,7 @@ class NavigatorApi(object):
     entity = self.get_entity(entity_id)
     new_tags = entity['tags'] or []
     new_tags.extend(tags)
-    return self.update_entity(entity_id, tags=new_tags)
+    return self.update_entity(entity, tags=new_tags)
 
 
   def delete_tags(self, entity_id, tags):
@@ -459,15 +467,15 @@ class NavigatorApi(object):
     for tag in tags:
       if tag in new_tags:
         new_tags.remove(tag)
-    return self.update_entity(entity_id, tags=new_tags)
+    return self.update_entity(entity, tags=new_tags)
 
 
   def update_properties(self, entity_id, properties, metadata=None):
+    entity = self.get_entity(entity_id)
     if metadata:
-      entity = self.get_entity(entity_id)
       properties['properties'] = entity['properties'] or {}
       properties['properties'].update(metadata)
-    return self.update_entity(entity_id, **properties)
+    return self.update_entity(entity, **properties)
 
 
   def delete_metadata_properties(self, entity_id, property_keys):
@@ -476,7 +484,7 @@ class NavigatorApi(object):
     for key in property_keys:
       if key in new_props:
         del new_props[key]
-    return self.update_entity(entity_id, properties=new_props)
+    return self.update_entity(entity, properties=new_props)
 
 
   def get_lineage(self, entity_id):
