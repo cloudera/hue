@@ -1,3 +1,0 @@
-include setup.py MANIFEST.in
-include LICENSE.GPL
-include LICENSE.PSF

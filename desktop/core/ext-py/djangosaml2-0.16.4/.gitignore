@@ -1,5 +1,0 @@
-*.pyc
-*.egg-info
-*.sqp
-build/
-dist/

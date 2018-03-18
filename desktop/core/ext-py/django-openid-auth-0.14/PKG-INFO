@@ -1,0 +1,28 @@
+Metadata-Version: 1.1
+Name: django-openid-auth
+Version: 0.14
+Summary: OpenID integration for django.contrib.auth
+Home-page: https://launchpad.net/django-openid-auth
+Author: Canonical Ltd
+Author-email: noreply@canonical.com
+License: BSD
+Download-URL: http://launchpad.net/django-openid-auth/trunk/0.14/+download/django-openid-auth-0.14.tar.gz
+Description: A library that can be used to add OpenID support to Django applications.
+        The library integrates with Django's built in authentication system, so
+        most applications require minimal changes to support OpenID llogin. The
+        library also includes the following features:
+          * Basic user details are transferred from the OpenID server via the
+            Simple Registration extension or Attribute Exchange extension.
+          * can be configured to use a fixed OpenID server URL, for use in SSO.
+          * supports the launchpad.net teams extension to get team membership
+            info.
+        
+Platform: any
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

@@ -1,0 +1,234 @@
+Changes
+=======
+
+0.16.11 (2017-12-25)
+----------
+- Dropped compatibility for Python < 2.7 and Django < 1.8.
+- Added a clean_attributes hook allowing backends to restructure attributes extracted from SAML response.
+- Log when fields are missing in a SAML response.
+- Log when attribute_mapping maps to nonexistent User fields.
+- Multiple compatibility fixes and other minor improvements and code cleanups
+
+Thanks to francoisfreitag, mhindery, charn, jdufresne
+
+0.16.10 (2017-10-02)
+-------------------
+- Bugfixes and internal refactorings.
+- Added support for custom USERNAME_FIELD on custom User models. Many thanks to francoisfreitag.
+
+0.16.9 (2017-09-19)
+-------------------
+- Bugfixes and minor improvements. Thanks to goetzk and AmbientLighter.
+- Added option SAML_LOGOUT_REQUEST_PREFERRED_BINDING
+- Added Django 1.11 to tox.
+
+0.16.4 (2017-09-11)
+-------------------
+- Added support for SHA-256 signing. Thanks to WebSpider.
+- Bugfixes. Thanks to justinsg and charn.
+- Error handling made more extensible. This will be further improved in next versions.
+
+0.16.1 (2017-07-15)
+-------------------
+- Bugfixes. Thanks to canni, AmbientLighter, cranti and logston.
+- request is now passed to authentication backend (introduced in Django 1.11). Thanks to terite.
+
+0.16.0 (2017-04-14)
+-------------------
+- Upgrade pysaml2 dependency to version 4.4.0 which fixes some serialization issues. Thanks to nakato for the report.
+- Added support for HTTP Redirect binding with signed authentication requests. Many thanks to liquidpele for this feature and other related refactorings.
+- The custom permission_denied.html template was removed in favor of standard PermissionDenied exception. Thanks to mhindery.
+
+0.15.0 (2016-12-18)
+-------------------
+- Python 3.5 support. Thanks to timheap.
+- Added support for callable user attributes. Thanks to andy-miracl and joetsoi.
+- Security improvement: "next" URL is now checked. thanks to flupzor.
+- Improved testability. Thanks to flupzor.
+- Other bugfixes and minor improvements. Thanks to jamaalscarlett, ws0w, jaywink and liquidpele.
+
+0.14.5 (2016-09-19)
+-------------------
+- Django 1.10 support. Thanks to inducer.
+- Various fixes and minor improvements. Thanks to ajsmilutin, ganiserb, inducer, grunichev, liquidpele and darbula
+
+0.14.4 (2016-03-29)
+-------------------
+- Fix compatibility issue with pysaml2-4.0.3+. Thanks to jimr and astoltz.
+- Fix Django 1.9 compatibility issue in templates. Thanks to nikoskal.
+
+0.14.3 (2016-03-18)
+-------------------
+- Upgraded to pysaml2-4.0.5.
+- Added 'ACS_DEFAULT_REDIRECT_URL' setting for default redirection after successful authentication. Thanks to ganiserb.
+
+0.14.2 (2016-03-11)
+-------------------
+- Released under the original 'djangosaml2' package name; abandoning the djangosaml2-knaperek fork.
+
+0.14.1 (2016-03-09)
+-------------------
+- Upgraded to pysaml2-4.0.4.
+
+0.14.0 (2016-01-28)
+-------------------
+- Upgrade to pysaml2-4.0.2. Thanks to kviktor
+- Django 1.9 support. Thanks to Jordi Gutiérrez Hermoso
+
+0.13.2 (2015-06-24)
+-------------------
+- Improved usage of standard Python logging.
+
+0.13.1 (2015-06-05)
+-------------------
+- Added support for djangosaml2 specific user model defined by SAML_USER_MODEL setting
+
+0.13.0 (2015-02-12)
+-------------------
+- Django 1.7 support. Thanks to Kamei Toshimitsu
+
+0.12.0 (2014-11-18)
+-------------------
+- Pysaml2 2.2.0 support. Thanks to Erick Tryzelaar
+
+0.11.0 (2014-06-15)
+-------------------
+- Django 1.5 custom user model support. Thanks to Jos van Velzen
+- Django 1.5 compatibility url template tag. Thanks to bula
+- Support Django 1.5 and 1.6. Thanks to David Evans and Justin Quick
+
+0.10.0 (2013-05-05)
+-------------------
+- Check that RelayState is not empty before redirecting into a loop. Thanks
+  to Sam Bull for reporting this issue.
+- In the global logout process, when the session is lost, report an error
+  message to the user and perform a local logout.
+
+0.9.2 (2013-04-19)
+------------------
+- Upgrade to pysaml2-0.4.3.
+
+0.9.1 (2013-01-29)
+------------------
+- Add a method to the authentication backend so it is possible
+  to customize the authorization based on SAML attributes.
+
+0.9.0 (2012-10-30)
+------------------
+- Add a signal for modifying the user just before saving it on
+  the update_user method of the authentication backend.
+
+0.8.1 (2012-10-29)
+------------------
+- Trim the SAML attributes before setting them to the Django objects
+  if they are too long. This fixes a crash with MySQL.
+
+0.8.0 (2012-10-25)
+------------------
+- Allow to use different attributes besides 'username' to look for
+  existing users.
+
+0.7.0 (2012-10-19)
+------------------
+- Add a setting to decide if the user should be redirected to the
+  next view or shown an authorization error when the user tries to
+  login twice.
+
+0.6.1 (2012-09-03)
+------------------
+- Remove Django from our dependencies
+- Restore support for Django 1.3
+
+0.6.0 (2012-08-29)
+------------------
+- Add tox support configured to run the tests with Python 2.6 and 2.7
+- Fix some dependencies and sdist generation. Lorenzo Gil
+- Allow defining a logout redirect url in the settings. Lorenzo Gil
+- Add some logging calls to improve debugging. Lorenzo Gil
+- Add support for custom conf loading function. Sam Bull.
+- Make the tests more robust and easier to run when djangosaml2 is
+  included in a Django project. Sam Bull.
+- Make sure the profile is not None before saving it. Bug reported by
+  Leif Johansson
+
+0.5.0 (2012-05-22)
+------------------
+- Allow defining custom config loaders. They can be dynamic depending on
+  the request.
+- Do not automatically add the authentication backend. This way
+  we allow other people to add their own backends.
+- Support for additional attributes other than the ones that get mapped
+  into the User model. Those attributes get stored in the UserProfile model.
+
+0.4.2 (2012-03-23)
+------------------
+- Fix a crash in the idplist templatetag about using an old pysaml2 function
+- Added a test for the previous crash
+
+0.4.1 (2012-03-19)
+------------------
+- Upgrade pysaml2 dependency to version 0.4.1
+
+0.4.0 (2012-03-18)
+------------------
+- Upgrade pysaml2 dependency to version 0.4.0 (update our tests as a result
+  of this)
+- Add logging calls to make debugging easier
+- Use the Django configured logger in pysaml2
+
+0.3.3 (2012-02-14)
+------------------
+- Freeze the version of pysaml2 since we are not (yet!) compatible with
+  version 0.4.0
+
+0.3.2 (2011-12-13)
+------------------
+- Avoid a crash when reading the SAML attribute that maps to the Django
+  username
+
+0.3.1 (2011-12-01)
+------------------
+- Load the config in the render method of the idplist templatetag to
+  make it more flexible and reentrant.
+
+0.3.0 (2011-11-30)
+------------------
+- Templatetag to get the list of available idps.
+- Allow to map the same SAML attribute into several Django field.
+
+0.2.4 (2011-11-29)
+------------------
+- Fix restructured text bugs that made pypi page looks bad.
+
+0.2.3 (2011-06-14)
+------------------
+- Set a unusable password when the user is created for the first time
+
+0.2.2 (2011-06-07)
+------------------
+- Prevent infinite loop when going to the /saml2/login/ endpoint and the user
+  is already logged in and the settings.LOGIN_REDIRECT_URL is (badly) pointing
+  to /saml2/login.
+
+0.2.1 (2011-05-09)
+------------------
+- If no next parameter is supplied to the login view, use the
+  settings.LOGIN_REDIRECT_URL as default
+
+0.2.0 (2011-04-26)
+------------------
+- Python 2.4 compatible if the elementtree library is installed
+- Allow post processing after the authentication phase by using
+  Django signals.
+
+0.1.1 (2011-04-18)
+------------------
+- Simple view to echo SAML attributes
+- Improve documentation
+- Change default behaviour when a new user is created. Now their attributes
+  are filled this first time
+- Allow to set a next page after the logout
+
+0.1.0 (2011-03-16)
+------------------
+- Emancipation from the pysaml package

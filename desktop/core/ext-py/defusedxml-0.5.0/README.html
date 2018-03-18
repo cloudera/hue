@@ -1,0 +1,1359 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.12: http://docutils.sourceforge.net/" />
+<title>defusedxml -- defusing XML bombs and other exploits</title>
+<style type="text/css">
+
+/*
+Stylesheet for Docutils.
+Based on `blue_box.css` by Ian Bicking
+and `voidspace.css` by Ian Bicking, Michael Foord
+and `html4css1.css` 
+
+*/
+
+.borderless, table.borderless td, table.borderless th
+{
+	border: 0;
+}
+table.borderless td, table.borderless th
+{
+	padding: 0 0.5em 0 0 ! important;
+}
+.first
+{
+	margin-top: 0 ! important;
+}
+.last, .with-subtitle
+{
+	margin-bottom: 0 ! important;
+}
+.hidden
+{
+	display: none;
+}
+a.toc-backref
+{
+	color: black;
+	text-decoration: none;
+}
+blockquote.epigraph
+{
+	margin: 2em 5em;
+}
+dl.docutils dd
+{
+	margin-bottom: 0.5em;
+}
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"]
+{
+	overflow: hidden;
+}
+div.abstract
+{
+	margin: 2em 5em;
+}
+div.abstract p.topic-title
+{
+	font-weight: bold;
+	text-align: center;
+}
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning
+{
+	border: medium outset;
+	margin: 2em;
+	padding: 1em;
+}
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title
+{
+	font-family: sans-serif;
+	font-weight: bold;
+}
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title
+{
+	color: red;
+	font-family: sans-serif;
+	font-weight: bold;
+}
+div.dedication
+{
+	font-style: italic;
+	margin: 2em 5em;
+	text-align: center;
+}
+div.dedication p.topic-title
+{
+	font-style: normal;
+	font-weight: bold;
+}
+div.figure
+{
+	margin-left: 2em;
+	margin-right: 2em;
+}
+div.footer, div.header
+{
+	clear: both;
+	font-size: smaller;
+}
+div.line-block
+{
+	display: block;
+	margin-bottom: 1em;
+	margin-top: 1em;
+}
+div.line-block div.line-block
+{
+	margin-bottom: 0;
+	margin-left: 1.5em;
+	margin-top: 0;
+}
+div.sidebar
+{
+	background-color: #ffffee;
+	border: medium outset;
+	clear: right;
+	float: right;
+	margin: 0 0 0.5em 1em;
+	padding: 1em;
+	width: 40%;
+}
+div.sidebar p.rubric
+{
+	font-family: sans-serif;
+	font-size: medium;
+}
+div.system-messages
+{
+	margin: 5em;
+}
+div.system-messages h1
+{
+	color: red;
+}
+div.system-message
+{
+	border: medium outset;
+	padding: 1em;
+}
+div.system-message p.system-message-title
+{
+	color: red;
+	font-weight: bold;
+}
+div.topic
+{
+	margin: 2em;
+}
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle
+{
+	margin-top: 0.4em;
+}
+h1.title
+{
+	text-align: center;
+}
+h2.subtitle
+{
+	text-align: center;
+}
+hr.docutils
+{
+	width: 75%;
+}
+img.align-left, .figure.align-left, object.align-left
+{
+	clear: left;
+	float: left;
+	margin-right: 1em;
+}
+img.align-right, .figure.align-right, object.align-right
+{
+	clear: right;
+	float: right;
+	margin-left: 1em;
+}
+img.align-center, .figure.align-center, object.align-center
+{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.align-left
+{
+	text-align: left;
+}
+.align-center
+{
+	clear: both;
+	text-align: center;
+}
+.align-right
+{
+	text-align: right;
+}
+div.align-right
+{
+	text-align: inherit;
+}
+ol.simple, ul.simple
+{
+	margin-bottom: 1em;
+}
+ol.arabic
+{
+	list-style: decimal;
+}
+ol.loweralpha
+{
+	list-style: lower-alpha;
+}
+ol.upperalpha
+{
+	list-style: upper-alpha;
+}
+ol.lowerroman
+{
+	list-style: lower-roman;
+}
+ol.upperroman
+{
+	list-style: upper-roman;
+}
+p.attribution
+{
+	margin-left: 50%;
+	text-align: right;
+}
+p.caption
+{
+	font-style: italic;
+}
+p.credits
+{
+	font-size: smaller;
+	font-style: italic;
+}
+p.label
+{
+	white-space: nowrap;
+}
+p.rubric
+{
+	color: maroon;
+	font-size: larger;
+	font-weight: bold;
+	text-align: center;
+}
+p.sidebar-title
+{
+	font-family: sans-serif;
+	font-size: larger;
+	font-weight: bold;
+}
+p.sidebar-subtitle
+{
+	font-family: sans-serif;
+	font-weight: bold;
+}
+p.topic-title
+{
+	font-weight: bold;
+}
+pre.address
+{
+	font: inherit;
+	margin-bottom: 0;
+	margin-top: 0;
+}
+pre.literal-block, pre.doctest-block, pre.math
+{
+	margin-left: 2em;
+	margin-right: 2em;
+	background-color: #eeeeee;
+
+}
+span.classifier
+{
+	font-family: sans-serif;
+	font-style: oblique;
+}
+span.classifier-delimiter
+{
+	font-family: sans-serif;
+	font-weight: bold;
+}
+span.interpreted
+{
+	font-family: sans-serif;
+}
+span.option
+{
+	white-space: nowrap;
+}
+span.pre
+{
+	white-space: pre;
+}
+span.problematic
+{
+	color: red;
+}
+span.section-subtitle
+{
+	font-size: 80%;
+}
+table.citation
+{
+	border-left: solid 1px gray;
+	margin-left: 1px;
+}
+table.docinfo
+{
+	margin: 2em 4em;
+}
+table.docutils
+{
+	margin-bottom: 0.5em;
+	margin-top: 0.5em;
+}
+table.footnote
+{
+	border-left: solid 1px black;
+	margin-left: 1px;
+}
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th
+{
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	vertical-align: top;
+}
+table.docutils th.field-name, table.docinfo th.docinfo-name
+{
+	font-weight: bold;
+	padding-left: 0;
+	text-align: left;
+	white-space: nowrap;
+}
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils
+{
+	font-size: 100%;
+}
+ul.auto-toc
+{
+	list-style-type: none;
+}
+body
+{
+	font-family: Arial, sans-serif;
+	margin-left: auto;
+	margin-right: auto;
+	width: 800px;
+}
+em, i
+{
+	font-family: Times New Roman, Times, serif;
+}
+a.target
+{
+	color: blue;
+}
+a.target
+{
+	color: blue;
+}
+a.toc-backref
+{
+	color: black;
+	text-decoration: none;
+}
+a.toc-backref:hover
+{
+	background-color: inherit;
+}
+a:hover
+{
+	background-color: #cccccc;
+}
+div.attention, div.caution, div.danger, div.error, div.hint,
+div.important, div.note, div.tip, div.warning
+{
+	padding: 3px;
+	width: 80%;
+}
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title
+{
+	display: block;
+	margin: 0;
+	text-align: center;
+}
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title
+{
+	display: block;
+	font-family: sans-serif;
+	margin: 0;
+	text-align: center;
+}
+h1.title
+{
+	text-align: center;
+}
+table.footnote
+{
+	padding-left: 0.5ex;
+}
+table.citation
+{
+	padding-left: 0.5ex;
+}
+pre.literal-block, pre.doctest-block
+{
+	padding: 5px;
+}
+h1 tt, h2 tt, h3 tt, h4 tt, h5 tt, h6 tt
+{
+	font-size: 100%;
+}
+code, tt
+{
+	color: #000066;
+}
+p
+{
+	text-align: justify;
+}
+dt
+{
+	font-weight: bold;
+}
+tt.literal
+{
+	background-color: #eeeeee;
+}
+h1
+{
+	border-bottom: solid 1px black;
+	padding-top: 20px;
+}
+caption
+{
+	margin-bottom: 0.4em;
+	font-weight: bold;
+	font-size: 120%;
+}
+
+</style>
+</head>
+<body>
+<div class="document" id="defusedxml-defusing-xml-bombs-and-other-exploits">
+<h1 class="title">defusedxml -- defusing XML bombs and other exploits</h1>
+
+<blockquote>
+&quot;It's just XML, what could probably go wrong?&quot;</blockquote>
+<p>Christian Heimes &lt;<a class="reference external" href="mailto:christian&#64;python.org">christian&#64;python.org</a>&gt;</p>
+<div class="section" id="synopsis">
+<h1><a class="toc-backref" href="#id2">Synopsis</a></h1>
+<p>The results of an attack on a vulnerable XML library can be fairly dramatic.
+With just a few hundred <strong>Bytes</strong> of XML data an attacker can occupy several
+<strong>Gigabytes</strong> of memory within <strong>seconds</strong>. An attacker can also keep
+CPUs busy for a long time with a small to medium size request. Under some
+circumstances it is even possible to access local files on your
+server, to circumvent a firewall, or to abuse services to rebound attacks to
+third parties.</p>
+<p>The attacks use and abuse less common features of XML and its parsers. The
+majority of developers are unacquainted with features such as processing
+instructions and entity expansions that XML inherited from SGML. At best
+they know about <tt class="docutils literal">&lt;!DOCTYPE&gt;</tt> from experience with HTML but they are not
+aware that a document type definition (DTD) can generate an HTTP request
+or load a file from the file system.</p>
+<p>None of the issues is new. They have been known for a long time. Billion
+laughs was first reported in 2003. Nevertheless some XML libraries and
+applications are still vulnerable and even heavy users of XML are
+surprised by these features. It's hard to say whom to blame for the
+situation. It's too short sighted to shift all blame on XML parsers and
+XML libraries for using insecure default settings. After all they
+properly implement XML specifications. Application developers must not rely
+that a library is always configured for security and potential harmful data
+by default.</p>
+<div class="contents topic" id="table-of-contents">
+<p class="topic-title first">Table of Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#synopsis" id="id2">Synopsis</a></li>
+<li><a class="reference internal" href="#attack-vectors" id="id3">Attack vectors</a><ul>
+<li><a class="reference internal" href="#billion-laughs-exponential-entity-expansion" id="id4">billion laughs / exponential entity expansion</a></li>
+<li><a class="reference internal" href="#quadratic-blowup-entity-expansion" id="id5">quadratic blowup entity expansion</a></li>
+<li><a class="reference internal" href="#external-entity-expansion-remote" id="id6">external entity expansion (remote)</a></li>
+<li><a class="reference internal" href="#external-entity-expansion-local-file" id="id7">external entity expansion (local file)</a></li>
+<li><a class="reference internal" href="#dtd-retrieval" id="id8">DTD retrieval</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#python-xml-libraries" id="id9">Python XML Libraries</a><ul>
+<li><a class="reference internal" href="#settings-in-standard-library" id="id10">Settings in standard library</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defusedxml" id="id11">defusedxml</a><ul>
+<li><a class="reference internal" href="#defusedxml-package" id="id12">defusedxml (package)</a></li>
+<li><a class="reference internal" href="#defusedxml-celementtree" id="id13">defusedxml.cElementTree</a></li>
+<li><a class="reference internal" href="#defusedxml-elementtree" id="id14">defusedxml.ElementTree</a></li>
+<li><a class="reference internal" href="#defusedxml-expatreader" id="id15">defusedxml.expatreader</a></li>
+<li><a class="reference internal" href="#defusedxml-sax" id="id16">defusedxml.sax</a></li>
+<li><a class="reference internal" href="#defusedxml-expatbuilder" id="id17">defusedxml.expatbuilder</a></li>
+<li><a class="reference internal" href="#defusedxml-minidom" id="id18">defusedxml.minidom</a></li>
+<li><a class="reference internal" href="#defusedxml-pulldom" id="id19">defusedxml.pulldom</a></li>
+<li><a class="reference internal" href="#defusedxml-xmlrpc" id="id20">defusedxml.xmlrpc</a></li>
+<li><a class="reference internal" href="#defusedxml-lxml" id="id21">defusedxml.lxml</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defusedexpat" id="id22">defusedexpat</a><ul>
+<li><a class="reference internal" href="#modifications-in-expat" id="id23">Modifications in expat</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-to-avoid-xml-vulnerabilities" id="id24">How to avoid XML vulnerabilities</a><ul>
+<li><a class="reference internal" href="#best-practices" id="id25">Best practices</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#other-things-to-consider" id="id26">Other things to consider</a><ul>
+<li><a class="reference internal" href="#attribute-blowup-hash-collision-attack" id="id27">attribute blowup / hash collision attack</a></li>
+<li><a class="reference internal" href="#decompression-bomb" id="id28">decompression bomb</a></li>
+<li><a class="reference internal" href="#processing-instruction" id="id29">Processing Instruction</a></li>
+<li><a class="reference internal" href="#other-dtd-features" id="id30">Other DTD features</a></li>
+<li><a class="reference internal" href="#xpath" id="id31">XPath</a></li>
+<li><a class="reference internal" href="#xpath-injection-attacks" id="id32">XPath injection attacks</a></li>
+<li><a class="reference internal" href="#xinclude" id="id33">XInclude</a></li>
+<li><a class="reference internal" href="#xmlschema-location" id="id34">XMLSchema location</a></li>
+<li><a class="reference internal" href="#xsl-transformation" id="id35">XSL Transformation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#related-cves" id="id36">Related CVEs</a></li>
+<li><a class="reference internal" href="#other-languages-frameworks" id="id37">Other languages / frameworks</a><ul>
+<li><a class="reference internal" href="#perl" id="id38">Perl</a></li>
+<li><a class="reference internal" href="#ruby" id="id39">Ruby</a></li>
+<li><a class="reference internal" href="#php" id="id40">PHP</a></li>
+<li><a class="reference internal" href="#c-net-mono" id="id41">C# / .NET / Mono</a></li>
+<li><a class="reference internal" href="#java" id="id42">Java</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#todo" id="id43">TODO</a></li>
+<li><a class="reference internal" href="#license" id="id44">License</a></li>
+<li><a class="reference internal" href="#acknowledgements" id="id45">Acknowledgements</a></li>
+<li><a class="reference internal" href="#references" id="id46">References</a></li>
+<li><a class="reference internal" href="#changelog" id="id47">Changelog</a><ul>
+<li><a class="reference internal" href="#defusedxml-0-5-0-rc1" id="id48">defusedxml 0.5.0.rc1</a></li>
+<li><a class="reference internal" href="#defusedxml-0-4-1" id="id49">defusedxml 0.4.1</a></li>
+<li><a class="reference internal" href="#defusedxml-0-4" id="id50">defusedxml 0.4</a></li>
+<li><a class="reference internal" href="#defusedxml-0-3" id="id51">defusedxml 0.3</a></li>
+<li><a class="reference internal" href="#defusedxml-0-2" id="id52">defusedxml 0.2</a></li>
+<li><a class="reference internal" href="#defusedxml-0-1" id="id53">defusedxml 0.1</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="attack-vectors">
+<h1><a class="toc-backref" href="#id3">Attack vectors</a></h1>
+<div class="section" id="billion-laughs-exponential-entity-expansion">
+<h2><a class="toc-backref" href="#id4">billion laughs / exponential entity expansion</a></h2>
+<p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Billion_laughs">Billion Laughs</a> attack -- also known as exponential entity expansion --
+uses multiple levels of nested entities. The original example uses 9 levels
+of 10 expansions in each level to expand the string <tt class="docutils literal">lol</tt> to a string of
+3 * 10 <sup>9</sup> bytes, hence the name &quot;billion laughs&quot;. The resulting string
+occupies 3 GB (2.79 GiB) of memory; intermediate strings require additional
+memory. Because most parsers don't cache the intermediate step for every
+expansion it is repeated over and over again. It increases the CPU load even
+more.</p>
+<p>An XML document of just a few hundred bytes can disrupt all services on a
+machine within seconds.</p>
+<p>Example XML:</p>
+<pre class="literal-block">
+&lt;!DOCTYPE xmlbomb [
+&lt;!ENTITY a &quot;1234567890&quot; &gt;
+&lt;!ENTITY b &quot;&amp;a;&amp;a;&amp;a;&amp;a;&amp;a;&amp;a;&amp;a;&amp;a;&quot;&gt;
+&lt;!ENTITY c &quot;&amp;b;&amp;b;&amp;b;&amp;b;&amp;b;&amp;b;&amp;b;&amp;b;&quot;&gt;
+&lt;!ENTITY d &quot;&amp;c;&amp;c;&amp;c;&amp;c;&amp;c;&amp;c;&amp;c;&amp;c;&quot;&gt;
+]&gt;
+&lt;bomb&gt;&amp;d;&lt;/bomb&gt;
+</pre>
+</div>
+<div class="section" id="quadratic-blowup-entity-expansion">
+<h2><a class="toc-backref" href="#id5">quadratic blowup entity expansion</a></h2>
+<p>A quadratic blowup attack is similar to a <a class="reference external" href="http://en.wikipedia.org/wiki/Billion_laughs">Billion Laughs</a> attack; it abuses
+entity expansion, too. Instead of nested entities it repeats one large entity
+with a couple of thousand chars over and over again. The attack isn't as
+efficient as the exponential case but it avoids triggering countermeasures of
+parsers against heavily nested entities. Some parsers limit the depth and
+breadth of a single entity but not the total amount of expanded text
+throughout an entire XML document.</p>
+<p>A medium-sized XML document with a couple of hundred kilobytes can require a
+couple of hundred MB to several GB of memory. When the attack is combined
+with some level of nested expansion an attacker is able to achieve a higher
+ratio of success.</p>
+<pre class="literal-block">
+&lt;!DOCTYPE bomb [
+&lt;!ENTITY a &quot;xxxxxxx... a couple of ten thousand chars&quot;&gt;
+]&gt;
+&lt;bomb&gt;&amp;a;&amp;a;&amp;a;... repeat&lt;/bomb&gt;
+</pre>
+</div>
+<div class="section" id="external-entity-expansion-remote">
+<h2><a class="toc-backref" href="#id6">external entity expansion (remote)</a></h2>
+<p>Entity declarations can contain more than just text for replacement. They can
+also point to external resources by public identifiers or system identifiers.
+System identifiers are standard URIs. When the URI is a URL (e.g. a
+<tt class="docutils literal"><span class="pre">http://</span></tt> locator) some parsers download the resource from the remote
+location and embed them into the XML document verbatim.</p>
+<p>Simple example of a parsed external entity:</p>
+<pre class="literal-block">
+&lt;!DOCTYPE external [
+&lt;!ENTITY ee SYSTEM &quot;http://www.python.org/some.xml&quot;&gt;
+]&gt;
+&lt;root&gt;&amp;ee;&lt;/root&gt;
+</pre>
+<p>The case of parsed external entities works only for valid XML content. The
+XML standard also supports unparsed external entities with a
+<tt class="docutils literal">NData declaration</tt>.</p>
+<p>External entity expansion opens the door to plenty of exploits. An attacker
+can abuse a vulnerable XML library and application to rebound and forward
+network requests with the IP address of the server. It highly depends
+on the parser and the application what kind of exploit is possible. For
+example:</p>
+<ul class="simple">
+<li>An attacker can circumvent firewalls and gain access to restricted
+resources as all the requests are made from an internal and trustworthy
+IP address, not from the outside.</li>
+<li>An attacker can abuse a service to attack, spy on or DoS your servers but
+also third party services. The attack is disguised with the IP address of
+the server and the attacker is able to utilize the high bandwidth of a big
+machine.</li>
+<li>An attacker can exhaust additional resources on the machine, e.g. with
+requests to a service that doesn't respond or responds with very large
+files.</li>
+<li>An attacker may gain knowledge, when, how often and from which IP address
+a XML document is accessed.</li>
+<li>An attacker could send mail from inside your network if the URL handler
+supports <tt class="docutils literal"><span class="pre">smtp://</span></tt> URIs.</li>
+</ul>
+</div>
+<div class="section" id="external-entity-expansion-local-file">
+<h2><a class="toc-backref" href="#id7">external entity expansion (local file)</a></h2>
+<p>External entities with references to local files are a sub-case of external
+entity expansion. It's listed as an extra attack because it deserves extra
+attention. Some XML libraries such as lxml disable network access by default
+but still allow entity expansion with local file access by default. Local
+files are either referenced with a <tt class="docutils literal"><span class="pre">file://</span></tt> URL or by a file path (either
+relative or absolute).</p>
+<p>An attacker may be able to access and download all files that can be read by
+the application process. This may include critical configuration files, too.</p>
+<pre class="literal-block">
+&lt;!DOCTYPE external [
+&lt;!ENTITY ee SYSTEM &quot;file:///PATH/TO/simple.xml&quot;&gt;
+]&gt;
+&lt;root&gt;&amp;ee;&lt;/root&gt;
+</pre>
+</div>
+<div class="section" id="dtd-retrieval">
+<h2><a class="toc-backref" href="#id8">DTD retrieval</a></h2>
+<p>This case is similar to external entity expansion, too. Some XML libraries
+like Python's xml.dom.pulldom retrieve document type definitions from remote
+or local locations. Several attack scenarios from the external entity case
+apply to this issue as well.</p>
+<pre class="literal-block">
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;
+  &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+&lt;html&gt;
+    &lt;head/&gt;
+    &lt;body&gt;text&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+</div>
+</div>
+<div class="section" id="python-xml-libraries">
+<h1><a class="toc-backref" href="#id9">Python XML Libraries</a></h1>
+<table border="1" class="docutils">
+<caption>vulnerabilities and features</caption>
+<colgroup>
+<col width="31%" />
+<col width="9%" />
+<col width="10%" />
+<col width="10%" />
+<col width="9%" />
+<col width="10%" />
+<col width="10%" />
+<col width="10%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">kind</th>
+<th class="head">sax</th>
+<th class="head">etree</th>
+<th class="head">minidom</th>
+<th class="head">pulldom</th>
+<th class="head">xmlrpc</th>
+<th class="head">lxml</th>
+<th class="head">genshi</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>billion laughs</td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td>False (1)</td>
+<td>False (5)</td>
+</tr>
+<tr><td>quadratic blowup</td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td><strong>True</strong></td>
+<td>False (5)</td>
+</tr>
+<tr><td>external entity expansion (remote)</td>
+<td><strong>True</strong></td>
+<td>False (3)</td>
+<td>False (4)</td>
+<td><strong>True</strong></td>
+<td>false</td>
+<td>False (1)</td>
+<td>False (5)</td>
+</tr>
+<tr><td>external entity expansion (local file)</td>
+<td><strong>True</strong></td>
+<td>False (3)</td>
+<td>False (4)</td>
+<td><strong>True</strong></td>
+<td>false</td>
+<td><strong>True</strong></td>
+<td>False (5)</td>
+</tr>
+<tr><td>DTD retrieval</td>
+<td><strong>True</strong></td>
+<td>False</td>
+<td>False</td>
+<td><strong>True</strong></td>
+<td>false</td>
+<td>False (1)</td>
+<td>False</td>
+</tr>
+<tr><td>gzip bomb</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td><strong>True</strong></td>
+<td><strong>partly</strong> (2)</td>
+<td>False</td>
+</tr>
+<tr><td>xpath support (7)</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td><strong>True</strong></td>
+<td>False</td>
+</tr>
+<tr><td>xsl(t) support (7)</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td><strong>True</strong></td>
+<td>False</td>
+</tr>
+<tr><td>xinclude support (7)</td>
+<td>False</td>
+<td><strong>True</strong> (6)</td>
+<td>False</td>
+<td>False</td>
+<td>False</td>
+<td><strong>True</strong> (6)</td>
+<td><strong>True</strong></td>
+</tr>
+<tr><td>C library</td>
+<td>expat</td>
+<td>expat</td>
+<td>expat</td>
+<td>expat</td>
+<td>expat</td>
+<td>libxml2</td>
+<td>expat</td>
+</tr>
+</tbody>
+</table>
+<ol class="arabic simple">
+<li>Lxml is protected against billion laughs attacks and doesn't do network
+lookups by default.</li>
+<li>libxml2 and lxml are not directly vulnerable to gzip decompression bombs
+but they don't protect you against them either.</li>
+<li>xml.etree doesn't expand entities and raises a ParserError when an entity
+occurs.</li>
+<li>minidom doesn't expand entities and simply returns the unexpanded entity
+verbatim.</li>
+<li>genshi.input of genshi 0.6 doesn't support entity expansion and raises a
+ParserError when an entity occurs.</li>
+<li>Library has (limited) XInclude support but requires an additional step to
+process inclusion.</li>
+<li>These are features but they may introduce exploitable holes, see
+<a class="reference internal" href="#other-things-to-consider">Other things to consider</a></li>
+</ol>
+<div class="section" id="settings-in-standard-library">
+<h2><a class="toc-backref" href="#id10">Settings in standard library</a></h2>
+<div class="section" id="xml-sax-handler-features">
+<h3>xml.sax.handler Features</h3>
+<dl class="docutils">
+<dt>feature_external_ges (<a class="reference external" href="http://xml.org/sax/features/external-general-entities">http://xml.org/sax/features/external-general-entities</a>)</dt>
+<dd>disables external entity expansion</dd>
+<dt>feature_external_pes (<a class="reference external" href="http://xml.org/sax/features/external-parameter-entities">http://xml.org/sax/features/external-parameter-entities</a>)</dt>
+<dd>the option is ignored and doesn't modify any functionality</dd>
+</dl>
+</div>
+<div class="section" id="dom-xml-dom-xmlbuilder-options">
+<h3>DOM xml.dom.xmlbuilder.Options</h3>
+<dl class="docutils">
+<dt>external_parameter_entities</dt>
+<dd>ignored</dd>
+<dt>external_general_entities</dt>
+<dd>ignored</dd>
+<dt>external_dtd_subset</dt>
+<dd>ignored</dd>
+<dt>entities</dt>
+<dd>unsure</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="section" id="defusedxml">
+<h1><a class="toc-backref" href="#id11">defusedxml</a></h1>
+<p>The <a class="reference external" href="https://bitbucket.org/tiran/defusedxml">defusedxml package</a> (<a class="reference external" href="https://pypi.python.org/pypi/defusedxml">defusedxml on PyPI</a>)
+contains several Python-only workarounds and fixes
+for denial of service and other vulnerabilities in Python's XML libraries.
+In order to benefit from the protection you just have to import and use the
+listed functions / classes from the right defusedxml module instead of the
+original module. Merely <a class="reference internal" href="#defusedxml-xmlrpc">defusedxml.xmlrpc</a> is implemented as monkey patch.</p>
+<p>Instead of:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from xml.etree.ElementTree import parse
+&gt;&gt;&gt; et = parse(xmlfile)
+</pre>
+<p>alter code to:</p>
+<pre class="literal-block">
+&gt;&gt;&gt; from defusedxml.ElementTree import parse
+&gt;&gt;&gt; et = parse(xmlfile)
+</pre>
+<p>Additionally the package has an <strong>untested</strong> function to monkey patch
+all stdlib modules with <tt class="docutils literal">defusedxml.defuse_stdlib()</tt>.</p>
+<p>All functions and parser classes accept three additional keyword arguments.
+They return either the same objects as the original functions or compatible
+subclasses.</p>
+<dl class="docutils">
+<dt>forbid_dtd (default: False)</dt>
+<dd>disallow XML with a <tt class="docutils literal">&lt;!DOCTYPE&gt;</tt> processing instruction and raise a
+<em>DTDForbidden</em> exception when a DTD processing instruction is found.</dd>
+<dt>forbid_entities (default: True)</dt>
+<dd>disallow XML with <tt class="docutils literal">&lt;!ENTITY&gt;</tt> declarations inside the DTD and raise an
+<em>EntitiesForbidden</em> exception when an entity is declared.</dd>
+<dt>forbid_external (default: True)</dt>
+<dd>disallow any access to remote or local resources in external entities
+or DTD and raising an <em>ExternalReferenceForbidden</em> exception when a DTD
+or entity references an external resource.</dd>
+</dl>
+<div class="section" id="defusedxml-package">
+<h2><a class="toc-backref" href="#id12">defusedxml (package)</a></h2>
+<p>DefusedXmlException, DTDForbidden, EntitiesForbidden,
+ExternalReferenceForbidden, NotSupportedError</p>
+<p>defuse_stdlib() (<em>experimental</em>)</p>
+</div>
+<div class="section" id="defusedxml-celementtree">
+<h2><a class="toc-backref" href="#id13">defusedxml.cElementTree</a></h2>
+<p>parse(), iterparse(), fromstring(), XMLParser</p>
+</div>
+<div class="section" id="defusedxml-elementtree">
+<h2><a class="toc-backref" href="#id14">defusedxml.ElementTree</a></h2>
+<p>parse(), iterparse(), fromstring(), XMLParser</p>
+</div>
+<div class="section" id="defusedxml-expatreader">
+<h2><a class="toc-backref" href="#id15">defusedxml.expatreader</a></h2>
+<p>create_parser(), DefusedExpatParser</p>
+</div>
+<div class="section" id="defusedxml-sax">
+<h2><a class="toc-backref" href="#id16">defusedxml.sax</a></h2>
+<p>parse(), parseString(), create_parser()</p>
+</div>
+<div class="section" id="defusedxml-expatbuilder">
+<h2><a class="toc-backref" href="#id17">defusedxml.expatbuilder</a></h2>
+<p>parse(), parseString(), DefusedExpatBuilder, DefusedExpatBuilderNS</p>
+</div>
+<div class="section" id="defusedxml-minidom">
+<h2><a class="toc-backref" href="#id18">defusedxml.minidom</a></h2>
+<p>parse(), parseString()</p>
+</div>
+<div class="section" id="defusedxml-pulldom">
+<h2><a class="toc-backref" href="#id19">defusedxml.pulldom</a></h2>
+<p>parse(), parseString()</p>
+</div>
+<div class="section" id="defusedxml-xmlrpc">
+<h2><a class="toc-backref" href="#id20">defusedxml.xmlrpc</a></h2>
+<p>The fix is implemented as monkey patch for the stdlib's xmlrpc package (3.x)
+or xmlrpclib module (2.x). The function <cite>monkey_patch()</cite> enables the fixes,
+<cite>unmonkey_patch()</cite> removes the patch and puts the code in its former state.</p>
+<p>The monkey patch protects against XML related attacks as well as
+decompression bombs and excessively large requests or responses. The default
+setting is 30 MB for requests, responses and gzip decompression. You can
+modify the default by changing the module variable <cite>MAX_DATA</cite>. A value of
+<cite>-1</cite> disables the limit.</p>
+</div>
+<div class="section" id="defusedxml-lxml">
+<h2><a class="toc-backref" href="#id21">defusedxml.lxml</a></h2>
+<p>The module acts as an <em>example</em> how you could protect code that uses
+lxml.etree. It implements a custom Element class that filters out
+Entity instances, a custom parser factory and a thread local storage for
+parser instances. It also has a check_docinfo() function which inspects
+a tree for internal or external DTDs and entity declarations. In order to
+check for entities lxml &gt; 3.0 is required.</p>
+<p>parse(), fromstring()
+RestrictedElement, GlobalParserTLS, getDefaultParser(), check_docinfo()</p>
+</div>
+</div>
+<div class="section" id="defusedexpat">
+<h1><a class="toc-backref" href="#id22">defusedexpat</a></h1>
+<p>The <a class="reference external" href="https://bitbucket.org/tiran/defusedexpat">defusedexpat package</a> (<a class="reference external" href="https://pypi.python.org/pypi/defusedexpat">defusedexpat on PyPI</a>)
+comes with binary extensions and a
+<a class="reference external" href="https://bitbucket.org/tiran/expat">modified expat</a> libary instead of the standard <a class="reference external" href="http://expat.sourceforge.net/">expat parser</a>. It's
+basically a stand-alone version of the patches for Python's standard
+library C extensions.</p>
+<div class="section" id="modifications-in-expat">
+<h2><a class="toc-backref" href="#id23">Modifications in expat</a></h2>
+<p>new definitions:</p>
+<pre class="literal-block">
+XML_BOMB_PROTECTION
+XML_DEFAULT_MAX_ENTITY_INDIRECTIONS
+XML_DEFAULT_MAX_ENTITY_EXPANSIONS
+XML_DEFAULT_RESET_DTD
+</pre>
+<p>new XML_FeatureEnum members:</p>
+<pre class="literal-block">
+XML_FEATURE_MAX_ENTITY_INDIRECTIONS
+XML_FEATURE_MAX_ENTITY_EXPANSIONS
+XML_FEATURE_IGNORE_DTD
+</pre>
+<p>new XML_Error members:</p>
+<pre class="literal-block">
+XML_ERROR_ENTITY_INDIRECTIONS
+XML_ERROR_ENTITY_EXPANSION
+</pre>
+<p>new API functions:</p>
+<pre class="literal-block">
+int XML_GetFeature(XML_Parser parser,
+                   enum XML_FeatureEnum feature,
+                   long *value);
+int XML_SetFeature(XML_Parser parser,
+                   enum XML_FeatureEnum feature,
+                   long value);
+int XML_GetFeatureDefault(enum XML_FeatureEnum feature,
+                          long *value);
+int XML_SetFeatureDefault(enum XML_FeatureEnum feature,
+                          long value);
+</pre>
+<dl class="docutils">
+<dt>XML_FEATURE_MAX_ENTITY_INDIRECTIONS</dt>
+<dd><p class="first">Limit the amount of indirections that are allowed to occur during the
+expansion of a nested entity. A counter starts when an entity reference
+is encountered. It resets after the entity is fully expanded. The limit
+protects the parser against exponential entity expansion attacks (aka
+billion laughs attack). When the limit is exceeded the parser stops and
+fails with <cite>XML_ERROR_ENTITY_INDIRECTIONS</cite>.
+A value of 0 disables the protection.</p>
+<dl class="last docutils">
+<dt>Supported range</dt>
+<dd>0 .. UINT_MAX</dd>
+<dt>Default</dt>
+<dd>40</dd>
+</dl>
+</dd>
+<dt>XML_FEATURE_MAX_ENTITY_EXPANSIONS</dt>
+<dd><p class="first">Limit the total length of all entity expansions throughout the entire
+document. The lengths of all entities are accumulated in a parser variable.
+The setting protects against quadratic blowup attacks (lots of expansions
+of a large entity declaration). When the sum of all entities exceeds
+the limit, the parser stops and fails with <cite>XML_ERROR_ENTITY_EXPANSION</cite>.
+A value of 0 disables the protection.</p>
+<dl class="last docutils">
+<dt>Supported range</dt>
+<dd>0 .. UINT_MAX</dd>
+<dt>Default</dt>
+<dd>8 MiB</dd>
+</dl>
+</dd>
+<dt>XML_FEATURE_RESET_DTD</dt>
+<dd><p class="first">Reset all DTD information after the &lt;!DOCTYPE&gt; block has been parsed. When
+the flag is set (default: false) all DTD information after the
+endDoctypeDeclHandler has been called. The flag can be set inside the
+endDoctypeDeclHandler. Without DTD information any entity reference in
+the document body leads to <cite>XML_ERROR_UNDEFINED_ENTITY</cite>.</p>
+<dl class="last docutils">
+<dt>Supported range</dt>
+<dd>0, 1</dd>
+<dt>Default</dt>
+<dd>0</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="how-to-avoid-xml-vulnerabilities">
+<h1><a class="toc-backref" href="#id24">How to avoid XML vulnerabilities</a></h1>
+<div class="section" id="best-practices">
+<h2><a class="toc-backref" href="#id25">Best practices</a></h2>
+<ul class="simple">
+<li>Don't allow DTDs</li>
+<li>Don't expand entities</li>
+<li>Don't resolve externals</li>
+<li>Limit parse depth</li>
+<li>Limit total input size</li>
+<li>Limit parse time</li>
+<li>Favor a SAX or iterparse-like parser for potential large data</li>
+<li>Validate and properly quote arguments to XSL transformations and
+XPath queries</li>
+<li>Don't use XPath expression from untrusted sources</li>
+<li>Don't apply XSL transformations that come untrusted sources</li>
+</ul>
+<p>(based on Brad Hill's <a class="reference external" href="https://www.isecpartners.com/media/12976/iSEC-HILL-Attacking-XML-Security-bh07.pdf">Attacking XML Security</a>)</p>
+</div>
+</div>
+<div class="section" id="other-things-to-consider">
+<h1><a class="toc-backref" href="#id26">Other things to consider</a></h1>
+<p>XML, XML parsers and processing libraries have more features and possible
+issue that could lead to DoS vulnerabilities or security exploits in
+applications. I have compiled an incomplete list of theoretical issues that
+need further research and more attention. The list is deliberately pessimistic
+and a bit paranoid, too. It contains things that might go wrong under daffy
+circumstances.</p>
+<div class="section" id="attribute-blowup-hash-collision-attack">
+<h2><a class="toc-backref" href="#id27">attribute blowup / hash collision attack</a></h2>
+<p>XML parsers may use an algorithm with quadratic runtime O(n <sup>2</sup>) to
+handle attributes and namespaces. If it uses hash tables (dictionaries) to
+store attributes and namespaces the implementation may be vulnerable to
+hash collision attacks, thus reducing the performance to O(n <sup>2</sup>) again.
+In either case an attacker is able to forge a denial of service attack with
+an XML document that contains thousands upon thousands of attributes in
+a single node.</p>
+<p>I haven't researched yet if expat, pyexpat or libxml2 are vulnerable.</p>
+</div>
+<div class="section" id="decompression-bomb">
+<h2><a class="toc-backref" href="#id28">decompression bomb</a></h2>
+<p>The issue of decompression bombs (aka <a class="reference external" href="http://en.wikipedia.org/wiki/Zip_bomb">ZIP bomb</a>) apply to all XML libraries
+that can parse compressed XML stream like gzipped HTTP streams or LZMA-ed
+files. For an attacker it can reduce the amount of transmitted data by three
+magnitudes or more. Gzip is able to compress 1 GiB zeros to roughly 1 MB,
+lzma is even better:</p>
+<pre class="literal-block">
+$ dd if=/dev/zero bs=1M count=1024 | gzip &gt; zeros.gz
+$ dd if=/dev/zero bs=1M count=1024 | lzma -z &gt; zeros.xy
+$ ls -sh zeros.*
+1020K zeros.gz
+ 148K zeros.xy
+</pre>
+<p>None of Python's standard XML libraries decompress streams except for
+<tt class="docutils literal">xmlrpclib</tt>. The module is vulnerable &lt;<a class="reference external" href="http://bugs.python.org/issue16043">http://bugs.python.org/issue16043</a>&gt;
+to decompression bombs.</p>
+<p>lxml can load and process compressed data through libxml2 transparently.
+libxml2 can handle even very large blobs of compressed data efficiently
+without using too much memory. But it doesn't protect applications from
+decompression bombs. A carefully written SAX or iterparse-like approach can
+be safe.</p>
+</div>
+<div class="section" id="processing-instruction">
+<h2><a class="toc-backref" href="#id29">Processing Instruction</a></h2>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Processing_Instruction">PI</a>'s like:</p>
+<pre class="literal-block">
+&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;style.xsl&quot;?&gt;
+</pre>
+<p>may impose more threats for XML processing. It depends if and how a
+processor handles processing instructions. The issue of URL retrieval with
+network or local file access apply to processing instructions, too.</p>
+</div>
+<div class="section" id="other-dtd-features">
+<h2><a class="toc-backref" href="#id30">Other DTD features</a></h2>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/Document_Type_Definition">DTD</a> has more features like <tt class="docutils literal">&lt;!NOTATION&gt;</tt>. I haven't researched how
+these features may be a security threat.</p>
+</div>
+<div class="section" id="xpath">
+<h2><a class="toc-backref" href="#id31">XPath</a></h2>
+<p>XPath statements may introduce DoS vulnerabilities. Code should never execute
+queries from untrusted sources. An attacker may also be able to create a XML
+document that makes certain XPath queries costly or resource hungry.</p>
+</div>
+<div class="section" id="xpath-injection-attacks">
+<h2><a class="toc-backref" href="#id32">XPath injection attacks</a></h2>
+<p>XPath injeciton attacks pretty much work like SQL injection attacks.
+Arguments to XPath queries must be quoted and validated properly, especially
+when they are taken from the user. The page <a class="reference external" href="http://www.ibm.com/developerworks/xml/library/x-xpathinjection/index.html">Avoid the dangers of XPath injection</a>
+list some ramifications of XPath injections.</p>
+<p>Python's standard library doesn't have XPath support. Lxml supports
+parameterized XPath queries which does proper quoting. You just have to use
+its xpath() method correctly:</p>
+<pre class="literal-block">
+# DON'T
+&gt;&gt;&gt; tree.xpath(&quot;/tag[&#64;id='%s']&quot; % value)
+
+# instead do
+&gt;&gt;&gt; tree.xpath(&quot;/tag[&#64;id=$tagid]&quot;, tagid=name)
+</pre>
+</div>
+<div class="section" id="xinclude">
+<h2><a class="toc-backref" href="#id33">XInclude</a></h2>
+<p><a class="reference external" href="http://www.w3.org/TR/xinclude/#include_element">XML Inclusion</a> is another way to load and include external files:</p>
+<pre class="literal-block">
+&lt;root xmlns:xi=&quot;http://www.w3.org/2001/XInclude&quot;&gt;
+  &lt;xi:include href=&quot;filename.txt&quot; parse=&quot;text&quot; /&gt;
+&lt;/root&gt;
+</pre>
+<p>This feature should be disabled when XML files from an untrusted source are
+processed. Some Python XML libraries and libxml2 support XInclude but don't
+have an option to sandbox inclusion and limit it to allowed directories.</p>
+</div>
+<div class="section" id="xmlschema-location">
+<h2><a class="toc-backref" href="#id34">XMLSchema location</a></h2>
+<p>A validating XML parser may download schema files from the information in a
+<tt class="docutils literal">xsi:schemaLocation</tt> attribute.</p>
+<pre class="literal-block">
+&lt;ead xmlns=&quot;urn:isbn:1-931666-22-9&quot;
+     xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+     xsi:schemaLocation=&quot;urn:isbn:1-931666-22-9 http://www.loc.gov/ead/ead.xsd&quot;&gt;
+&lt;/ead&gt;
+</pre>
+</div>
+<div class="section" id="xsl-transformation">
+<h2><a class="toc-backref" href="#id35">XSL Transformation</a></h2>
+<p>You should keep in mind that XSLT is a Turing complete language. Never
+process XSLT code from unknown or untrusted source! XSLT processors may
+allow you to interact with external resources in ways you can't even imagine.
+Some processors even support extensions that allow read/write access to file
+system, access to JRE objects or scripting with Jython.</p>
+<p>Example from <a class="reference external" href="https://www.isecpartners.com/media/12976/iSEC-HILL-Attacking-XML-Security-bh07.pdf">Attacking XML Security</a> for Xalan-J:</p>
+<pre class="literal-block">
+&lt;xsl:stylesheet version=&quot;1.0&quot;
+ xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;
+ xmlns:rt=&quot;http://xml.apache.org/xalan/java/java.lang.Runtime&quot;
+ xmlns:ob=&quot;http://xml.apache.org/xalan/java/java.lang.Object&quot;
+ exclude-result-prefixes= &quot;rt ob&quot;&gt;
+ &lt;xsl:template match=&quot;/&quot;&gt;
+   &lt;xsl:variable name=&quot;runtimeObject&quot; select=&quot;rt:getRuntime()&quot;/&gt;
+   &lt;xsl:variable name=&quot;command&quot;
+     select=&quot;rt:exec($runtimeObject, &amp;apos;c:\Windows\system32\cmd.exe&amp;apos;)&quot;/&gt;
+   &lt;xsl:variable name=&quot;commandAsString&quot; select=&quot;ob:toString($command)&quot;/&gt;
+   &lt;xsl:value-of select=&quot;$commandAsString&quot;/&gt;
+ &lt;/xsl:template&gt;
+&lt;/xsl:stylesheet&gt;
+</pre>
+</div>
+</div>
+<div class="section" id="related-cves">
+<h1><a class="toc-backref" href="#id36">Related CVEs</a></h1>
+<dl class="docutils">
+<dt>CVE-2013-1664</dt>
+<dd>Unrestricted entity expansion induces DoS vulnerabilities in Python XML
+libraries (XML bomb)</dd>
+<dt>CVE-2013-1665</dt>
+<dd>External entity expansion in Python XML libraries inflicts potential
+security flaws and DoS vulnerabilities</dd>
+</dl>
+</div>
+<div class="section" id="other-languages-frameworks">
+<h1><a class="toc-backref" href="#id37">Other languages / frameworks</a></h1>
+<p>Several other programming languages and frameworks are vulnerable as well. A
+couple of them are affected by the fact that libxml2 up to 2.9.0 has no
+protection against quadratic blowup attacks. Most of them have potential
+dangerous default settings for entity expansion and external entities, too.</p>
+<div class="section" id="perl">
+<h2><a class="toc-backref" href="#id38">Perl</a></h2>
+<p>Perl's XML::Simple is vulnerable to quadratic entity expansion and external
+entity expansion (both local and remote).</p>
+</div>
+<div class="section" id="ruby">
+<h2><a class="toc-backref" href="#id39">Ruby</a></h2>
+<p>Ruby's REXML document parser is vulnerable to entity expansion attacks
+(both quadratic and exponential) but it doesn't do external entity
+expansion by default. In order to counteract entity expansion you have to
+disable the feature:</p>
+<pre class="literal-block">
+REXML::Document.entity_expansion_limit = 0
+</pre>
+<p>libxml-ruby and hpricot don't expand entities in their default configuration.</p>
+</div>
+<div class="section" id="php">
+<h2><a class="toc-backref" href="#id40">PHP</a></h2>
+<p>PHP's SimpleXML API is vulnerable to quadratic entity expansion and loads
+entites from local and remote resources. The option <tt class="docutils literal">LIBXML_NONET</tt> disables
+network access but still allows local file access. <tt class="docutils literal">LIBXML_NOENT</tt> seems to
+have no effect on entity expansion in PHP 5.4.6.</p>
+</div>
+<div class="section" id="c-net-mono">
+<h2><a class="toc-backref" href="#id41">C# / .NET / Mono</a></h2>
+<p>Information in <a class="reference external" href="http://msdn.microsoft.com/en-us/magazine/ee335713.aspx">XML DoS and Defenses (MSDN)</a> suggest that .NET is
+vulnerable with its default settings. The article contains code snippets
+how to create a secure XML reader:</p>
+<pre class="literal-block">
+XmlReaderSettings settings = new XmlReaderSettings();
+settings.ProhibitDtd = false;
+settings.MaxCharactersFromEntities = 1024;
+settings.XmlResolver = null;
+XmlReader reader = XmlReader.Create(stream, settings);
+</pre>
+</div>
+<div class="section" id="java">
+<h2><a class="toc-backref" href="#id42">Java</a></h2>
+<p>Untested. The documentation of Xerces and its <a class="reference external" href="http://xerces.apache.org/xerces2-j/javadocs/xerces2/org/apache/xerces/util/SecurityManager.html">Xerces SecurityMananger</a>
+sounds like Xerces is also vulnerable to billion laugh attacks with its
+default settings. It also does entity resolving when an
+<tt class="docutils literal">org.xml.sax.EntityResolver</tt> is configured. I'm not yet sure about the
+default setting here.</p>
+<p>Java specialists suggest to have a custom builder factory:</p>
+<pre class="literal-block">
+DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+builderFactory.setXIncludeAware(False);
+builderFactory.setExpandEntityReferences(False);
+builderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, True);
+# either
+builderFactory.setFeature(&quot;http://apache.org/xml/features/disallow-doctype-decl&quot;, True);
+# or if you need DTDs
+builderFactory.setFeature(&quot;http://xml.org/sax/features/external-general-entities&quot;, False);
+builderFactory.setFeature(&quot;http://xml.org/sax/features/external-parameter-entities&quot;, False);
+builderFactory.setFeature(&quot;http://apache.org/xml/features/nonvalidating/load-external-dtd&quot;, False);
+builderFactory.setFeature(&quot;http://apache.org/xml/features/nonvalidating/load-dtd-grammar&quot;, False);
+</pre>
+</div>
+</div>
+<div class="section" id="todo">
+<h1><a class="toc-backref" href="#id43">TODO</a></h1>
+<ul class="simple">
+<li>DOM: Use xml.dom.xmlbuilder options for entity handling</li>
+<li>SAX: take feature_external_ges and feature_external_pes (?) into account</li>
+<li>test experimental monkey patching of stdlib modules</li>
+<li>improve documentation</li>
+</ul>
+</div>
+<div class="section" id="license">
+<h1><a class="toc-backref" href="#id44">License</a></h1>
+<p>Copyright (c) 2013-2017 by Christian Heimes &lt;<a class="reference external" href="mailto:christian&#64;python.org">christian&#64;python.org</a>&gt;</p>
+<p>Licensed to PSF under a Contributor Agreement.</p>
+<p>See <a class="reference external" href="http://www.python.org/psf/license">http://www.python.org/psf/license</a> for licensing details.</p>
+</div>
+<div class="section" id="acknowledgements">
+<h1><a class="toc-backref" href="#id45">Acknowledgements</a></h1>
+<dl class="docutils">
+<dt>Brett Cannon (Python Core developer)</dt>
+<dd>review and code cleanup</dd>
+<dt>Antoine Pitrou (Python Core developer)</dt>
+<dd>code review</dd>
+<dt>Aaron Patterson, Ben Murphy and Michael Koziarski (Ruby community)</dt>
+<dd>Many thanks to Aaron, Ben and Michael from the Ruby community for their
+report and assistance.</dd>
+<dt>Thierry Carrez (OpenStack)</dt>
+<dd>Many thanks to Thierry for his report to the Python Security Response
+Team on behalf of the OpenStack security team.</dd>
+<dt>Carl Meyer (Django)</dt>
+<dd>Many thanks to Carl for his report to PSRT on behalf of the Django security
+team.</dd>
+<dt>Daniel Veillard (libxml2)</dt>
+<dd>Many thanks to Daniel for his insight and assistance with libxml2.</dd>
+<dt>semantics GmbH (<a class="reference external" href="http://www.semantics.de/">http://www.semantics.de/</a>)</dt>
+<dd>Many thanks to my employer semantics for letting me work on the issue
+during working hours as part of semantics's open source initiative.</dd>
+</dl>
+</div>
+<div class="section" id="references">
+<h1><a class="toc-backref" href="#id46">References</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="http://msdn.microsoft.com/en-us/magazine/ee335713.aspx">XML DoS and Defenses (MSDN)</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Billion_laughs">Billion Laughs</a> on Wikipedia</li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Zip_bomb">ZIP bomb</a> on Wikipedia</li>
+<li><a class="reference external" href="http://www.ibm.com/developerworks/xml/library/x-tipcfsx/index.html">Configure SAX parsers for secure processing</a></li>
+<li><a class="reference external" href="https://www.owasp.org/index.php/Testing_for_XML_Injection_(OWASP-DV-008)">Testing for XML Injection</a></li>
+</ul>
+</div>
+<div class="section" id="changelog">
+<h1><a class="toc-backref" href="#id47">Changelog</a></h1>
+<div class="section" id="defusedxml-0-5-0-rc1">
+<h2><a class="toc-backref" href="#id48">defusedxml 0.5.0.rc1</a></h2>
+<p><em>Release date: 28-Jan-2017</em></p>
+<ul class="simple">
+<li>Add compatibility with Python 3.6</li>
+<li>Drop support for Python 2.6, 3.1, 3.2, 3.3</li>
+<li>Fix lxml tests (XMLSyntaxError: Detected an entity reference loop)</li>
+</ul>
+</div>
+<div class="section" id="defusedxml-0-4-1">
+<h2><a class="toc-backref" href="#id49">defusedxml 0.4.1</a></h2>
+<p><em>Release date: 28-Mar-2013</em></p>
+<ul class="simple">
+<li>Add more demo exploits, e.g. python_external.py and Xalan XSLT demos.</li>
+<li>Improved documentation.</li>
+</ul>
+</div>
+<div class="section" id="defusedxml-0-4">
+<h2><a class="toc-backref" href="#id50">defusedxml 0.4</a></h2>
+<p><em>Release date: 25-Feb-2013</em></p>
+<ul class="simple">
+<li>As per <a class="reference external" href="http://seclists.org/oss-sec/2013/q1/340">http://seclists.org/oss-sec/2013/q1/340</a> please REJECT
+CVE-2013-0278, CVE-2013-0279 and CVE-2013-0280 and use CVE-2013-1664,
+CVE-2013-1665 for OpenStack/etc.</li>
+<li>Add missing parser_list argument to sax.make_parser(). The argument is
+ignored, though. (thanks to Florian Apolloner)</li>
+<li>Add demo exploit for external entity attack on Python's SAX parser, XML-RPC
+and WebDAV.</li>
+</ul>
+</div>
+<div class="section" id="defusedxml-0-3">
+<h2><a class="toc-backref" href="#id51">defusedxml 0.3</a></h2>
+<p><em>Release date: 19-Feb-2013</em></p>
+<ul class="simple">
+<li>Improve documentation</li>
+</ul>
+</div>
+<div class="section" id="defusedxml-0-2">
+<h2><a class="toc-backref" href="#id52">defusedxml 0.2</a></h2>
+<p><em>Release date: 15-Feb-2013</em></p>
+<ul class="simple">
+<li>Rename ExternalEntitiesForbidden to ExternalReferenceForbidden</li>
+<li>Rename defusedxml.lxml.check_dtd() to check_docinfo()</li>
+<li>Unify argument names in callbacks</li>
+<li>Add arguments and formatted representation to exceptions</li>
+<li>Add forbid_external argument to all functions and classs</li>
+<li>More tests</li>
+<li>LOTS of documentation</li>
+<li>Add example code for other languages (Ruby, Perl, PHP) and parsers (Genshi)</li>
+<li>Add protection against XML and gzip attacks to xmlrpclib</li>
+</ul>
+</div>
+<div class="section" id="defusedxml-0-1">
+<h2><a class="toc-backref" href="#id53">defusedxml 0.1</a></h2>
+<p><em>Release date: 08-Feb-2013</em></p>
+<ul class="simple">
+<li>Initial and internal release for PSRT review</li>
+</ul>
+</div>
+</div>
+</div>
+</body>
+</html>
