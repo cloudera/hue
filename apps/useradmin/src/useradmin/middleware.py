@@ -54,7 +54,7 @@ class LdapSynchronizationMiddleware(object):
     if not user or not user.is_authenticated():
       return
 
-    if not User.objects.filter(username=user.username, userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+    if not User.objects.filter(username=user.username, userprofile__creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists():
       LOG.warn("User %s is not an Ldap user" % user.username)
       return
 

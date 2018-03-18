@@ -149,7 +149,7 @@ ${layout.menubar(section='my queries')}
               <code>${ collapse_whitespace(query.query) }</code>
               % endif
             </td>
-            <td width="9%">${models.QueryHistory.STATE[query.last_state]}</td>
+            <td width="9%">${query.last_state}</td>
           </tr>
         % endfor
         </tbody>

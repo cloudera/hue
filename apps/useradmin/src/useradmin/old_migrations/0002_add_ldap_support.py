@@ -27,7 +27,7 @@ class Migration(DataMigration):
 
         # Adding field 'UserProfile.creation_method'
         try:
-          db.add_column('useradmin_userprofile', 'creation_method', self.gf('django.db.models.fields.CharField')(max_length=64, default=str(UserProfile.CreationMethod.HUE)), keep_default=False)
+          db.add_column('useradmin_userprofile', 'creation_method', self.gf('django.db.models.fields.CharField')(max_length=64, default=UserProfile.CreationMethod.HUE.name), keep_default=False)
         except Exception:
           # It's possible that we could run into an error here, because this
           # table may have been migrated from Cloudera Enterprise, in which case

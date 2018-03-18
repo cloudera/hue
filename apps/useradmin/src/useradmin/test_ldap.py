@@ -420,7 +420,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       assert_true(larry.first_name == 'Larry')
       assert_true(larry.last_name == 'Stooge')
       assert_true(larry.email == 'larry@stooges.com')
-      assert_true(get_profile(larry).creation_method == str(UserProfile.CreationMethod.EXTERNAL))
+      assert_true(get_profile(larry).creation_method == UserProfile.CreationMethod.EXTERNAL.name)
 
       # Should be a noop
       sync_ldap_users(ldap_access.CACHED_LDAP_CONN)
@@ -433,7 +433,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       hue_user = User.objects.create(username='otherguy', first_name='Different', last_name='Guy')
       import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'otherguy', sync_groups=False, import_by_dn=False)
       hue_user = User.objects.get(username='otherguy')
-      assert_equal(get_profile(hue_user).creation_method, str(UserProfile.CreationMethod.HUE))
+      assert_equal(get_profile(hue_user).creation_method, UserProfile.CreationMethod.HUE.name)
       assert_equal(hue_user.first_name, 'Different')
 
       # Make sure LDAP groups exist or they won't sync
@@ -445,7 +445,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       assert_equal(curly.first_name, 'Curly')
       assert_equal(curly.last_name, 'Stooge')
       assert_equal(curly.email, 'curly@stooges.com')
-      assert_equal(get_profile(curly).creation_method, str(UserProfile.CreationMethod.EXTERNAL))
+      assert_equal(get_profile(curly).creation_method, UserProfile.CreationMethod.EXTERNAL.name)
       assert_equal(2, curly.groups.all().count(), curly.groups.all())
 
       reset_all_users()

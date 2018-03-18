@@ -48,7 +48,7 @@ class OpenIDBackend(_OpenIDBackend):
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False
 
-    if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+    if not UserProfile.objects.filter(creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists():
       # If there are no external users already in the system, the first one will
       # become a superuser
       is_super = True
@@ -58,7 +58,7 @@ class OpenIDBackend(_OpenIDBackend):
       # user, we should do the safe thing and turn off superuser privs.
       user = User.objects.get(username=user.username)
       existing_profile = get_profile(user)
-      if existing_profile.creation_method == str(UserProfile.CreationMethod.EXTERNAL):
+      if existing_profile.creation_method == UserProfile.CreationMethod.EXTERNAL.name:
         is_super = user.is_superuser
 
 
@@ -90,4 +90,4 @@ class OpenIDBackend(_OpenIDBackend):
   @classmethod
   def is_first_login_ever(cls):
     """ Return true if no external user has ever logged in to Desktop yet. """
-    return not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists()
+    return not UserProfile.objects.filter(creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists()

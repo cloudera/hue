@@ -766,7 +766,7 @@ def sync_ldap_users(connection, failed_users=None):
   group at the same time. Each must be a separate operation. If neither a user,
   nor a group is provided, all users and groups will be synced.
   """
-  users = User.objects.filter(userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).all()
+  users = User.objects.filter(userprofile__creation_method=UserProfile.CreationMethod.EXTERNAL.name).all()
   for user in users:
     _import_ldap_users(connection, user.username, failed_users=failed_users)
   return users
@@ -912,7 +912,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
 
       user, created = ldap_access.get_or_create_ldap_user(username=ldap_info['username'])
       profile = get_profile(user)
-      if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
+      if not created and profile.creation_method == UserProfile.CreationMethod.HUE.name:
         # This is a Hue user, and shouldn't be overwritten
         LOG.warn(_('There was a naming conflict while importing user %(username)s') % {
           'username': ldap_info['username']
@@ -932,7 +932,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
       if 'email' in ldap_info:
         user.email = ldap_info['email']
 
-      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL.name
       profile.save()
       user.save()
       imported_users.append(user)

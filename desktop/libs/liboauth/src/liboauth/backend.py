@@ -58,7 +58,7 @@ class OAuthBackend(DesktopBackendBase):
         user = User.objects.get(username=username)
     except User.DoesNotExist:
 
-      if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+      if not UserProfile.objects.filter(creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists():
         is_super = True
       else:
         is_super = False
@@ -87,7 +87,7 @@ class OAuthBackend(DesktopBackendBase):
   @classmethod
   def is_first_login_ever(cls):
     """ Return true if no external user has ever logged in to Desktop yet. """
-    return not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists()
+    return not UserProfile.objects.filter(creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists()
   
 
   @classmethod

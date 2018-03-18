@@ -138,7 +138,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     resp = self.client.get('/beeswax/query_history')
     history = resp.context[0]['page'].object_list[0]
     last_state = history.last_state
-    assert_true(beeswax.models.QueryHistory.STATE[last_state] in (state,) + extra_states)
+    assert_true(last_state in (state,) + extra_states)
     return history.id
 
 
@@ -209,7 +209,7 @@ for x in sys.stdin:
 
     resp = self.client.get('/beeswax/query_history')
     history = resp.context[0]['page'].object_list[0]
-    assert_equal(beeswax.models.QueryHistory.STATE[history.last_state], beeswax.models.QueryHistory.STATE.expired)
+    assert_equal(history.last_state, beeswax.models.QueryHistory.STATE.expired)
 
 
   def test_basic_flow(self):

@@ -443,7 +443,7 @@ class LdapBackend(object):
 
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False
-    if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+    if not UserProfile.objects.filter(creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists():
       # If there are no LDAP users already in the system, the first one will
       # become a superuser
       is_super = True
@@ -453,7 +453,7 @@ class LdapBackend(object):
       # user, we should do the safe thing and turn off superuser privs.
       existing_user = User.objects.get(**username_filter_kwargs)
       existing_profile = get_profile(existing_user)
-      if existing_profile.creation_method == str(UserProfile.CreationMethod.EXTERNAL):
+      if existing_profile.creation_method == UserProfile.CreationMethod.EXTERNAL.name:
         is_super = User.objects.get(**username_filter_kwargs).is_superuser
     elif not desktop.conf.LDAP.CREATE_USERS_ON_LOGIN.get():
       LOG.warn("Create users when they login with their LDAP credentials is turned off")

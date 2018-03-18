@@ -133,7 +133,7 @@ ${ layout.menubar(section='history') }
                     % endif
                   </td>
                   <td>${query.owner}</td>
-                  <td>${models.QueryHistory.STATE[query.last_state]}</td>
+                  <td>${query.last_state}</td>
                   <td>
                     % if query.last_state not in (models.QueryHistory.STATE.expired.value, models.QueryHistory.STATE.failed.value):
                       <a href="${ url(app_name + ':watch_query_history', query_history_id=query.id) }" data-row-selector="true">${_('Results')}</a>

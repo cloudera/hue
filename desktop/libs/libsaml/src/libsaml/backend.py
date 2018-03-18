@@ -71,7 +71,7 @@ class SAML2Backend(_Saml2Backend):
   def update_user(self, user, attributes, attribute_mapping, force_save=False):
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False
-    if not UserProfile.objects.filter(creation_method=str(UserProfile.CreationMethod.EXTERNAL)).exists():
+    if not UserProfile.objects.filter(creation_method=UserProfile.CreationMethod.EXTERNAL.name).exists():
       # If there are no LDAP users already in the system, the first one will
       # become a superuser
       is_super = True
@@ -82,7 +82,7 @@ class SAML2Backend(_Saml2Backend):
         # privileges. However, if there's a naming conflict with a non-external
         # user, we should do the safe thing and turn off superuser privs.
         existing_profile = get_profile(user)
-        if existing_profile.creation_method == str(UserProfile.CreationMethod.EXTERNAL):
+        if existing_profile.creation_method == UserProfile.CreationMethod.EXTERNAL.name:
           is_super = user.is_superuser
 
     user = super(SAML2Backend, self).update_user(user, attributes, attribute_mapping, force_save)
