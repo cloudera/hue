@@ -90,6 +90,9 @@ from desktop.views import _ko
               <!-- ko if: catalogEntry.isPrimaryKey() -->
               &nbsp;<i title="${ _("Primary Key") }"class="fa fa-key"></i>
               <!-- /ko -->
+              <!-- ko if: popularity -->
+              &nbsp;<i data-bind="attr: { 'title': '${ _ko("Popularity") }: ' + popularity() + '%' }" class="fa fa-star-o"></i>
+              <!-- /ko -->
             </a>
           </td>
           <td width="10%" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
@@ -149,6 +152,7 @@ from desktop.views import _ko
       function SampleEnrichedEntry(catalogEntry, onClick) {
         var self = this;
         self.catalogEntry = catalogEntry;
+        self.popularity = ko.observable();
         self.firstSample = ko.observable();
         self.secondSample = ko.observable();
         self.onClick = onClick;
@@ -280,6 +284,31 @@ from desktop.views import _ko
 
           self.cancellablePromises.push(navMetaPromise);
           self.cancellablePromises.push(childPromise);
+
+          self.cancellablePromises.push(self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (popularEntries) {
+            if (popularEntries.length) {
+              childPromise.done(function () {
+                var entryIndex = {};
+                self.entries().forEach(function (entry) {
+                  entryIndex[entry.catalogEntry.name] = entry;
+                });
+
+                var totalCount = 0;
+                var popularityToApply = [];
+                popularEntries.forEach(function (popularEntry) {
+                  if (entryIndex[popularEntry.name] && popularEntry.navOptPopularity && popularEntry.navOptPopularity.selectColumn && popularEntry.navOptPopularity.selectColumn.columnCount > 0) {
+                    totalCount += popularEntry.navOptPopularity.selectColumn.columnCount;
+                    popularityToApply.push(function () {
+                      entryIndex[popularEntry.name].popularity(Math.round(100 * popularEntry.navOptPopularity.selectColumn.columnCount / totalCount))
+                    });
+                  }
+                });
+                while (popularityToApply.length) {
+                  popularityToApply.pop()();
+                }
+              });
+            }
+          }));
 
           if (self.catalogEntry.isTableOrView() || self.catalogEntry.isField()) {
             self.loadingSamples(true);
