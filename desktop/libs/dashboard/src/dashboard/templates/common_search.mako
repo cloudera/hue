@@ -3162,6 +3162,7 @@ var getDraggableOptions = function (options) {
         top: 5,
         left: 5
       };
+      setup.handle = 'h2';
     }
     return setup
   }
