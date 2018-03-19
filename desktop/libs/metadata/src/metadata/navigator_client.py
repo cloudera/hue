@@ -113,7 +113,7 @@ class NavigatorApi(object):
   """
   http://cloudera.github.io/navigator/apidocs/v3/index.html
   """
-  DEFAULT_SEARCH_FIELDS = (('originalName', 1), ('originalDescription', 1), ('name', 10), ('description', 3), ('tags', 5))
+  DEFAULT_SEARCH_FIELDS = (('originalName', 3), ('originalDescription', 1), ('name', 10), ('description', 3), ('tags', 5))
 
   def __init__(self, user=None):
     self._api_url = '%s/%s' % (NAVIGATOR.API_URL.get().strip('/'), VERSION)
@@ -505,7 +505,11 @@ class NavigatorApi(object):
 
 
   def _get_boosted_term(self, term):
-    return 'OR'.join(['(%s:*%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS])
+    return 'OR'.join(
+      ['(%s:*%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS] + # Matching fields
+      ['(%s:[* TO *])' % field for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS] # Important fields that are not null
+      # Could add certain customProperties and properties
+    )
 
   def _clean_path(self, path):
     return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))
