@@ -113,6 +113,7 @@ class NavigatorApi(object):
   """
   http://cloudera.github.io/navigator/apidocs/v3/index.html
   """
+  DEFAULT_SEARCH_FIELDS = (('originalName', 1), ('originalDescription', 1), ('name', 10), ('description', 3), ('tags', 5))
 
   def __init__(self, user=None):
     self._api_url = '%s/%s' % (NAVIGATOR.API_URL.get().strip('/'), VERSION)
@@ -150,11 +151,8 @@ class NavigatorApi(object):
     Solr edismax query parser syntax.
 
     :param query_s: a query string of search terms (e.g. - sales quarterly);
-      Currently the search will perform an OR boolean search for all terms (split on whitespace), against a whitelist
-      of search_fields.
+      Currently the search will perform an OR boolean search for all terms (split on whitespace), against a whitelist of search_fields.
     """
-    search_fields = ('originalName', 'originalDescription', 'name', 'description', 'tags')
-
     sources = filters.get('sources', [])
     default_entity_types, entity_types = self._get_types_from_sources(sources)
 
@@ -175,7 +173,7 @@ class NavigatorApi(object):
               if '.' in term:
                 parent, term = term.rsplit('.', 1)
                 user_filters.append('parentPath:"/%s"' % parent.replace('.', '/'))
-            query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
+            query_clauses.append(self._get_boosted_term(term))
           else:
             name, val = term.split(':')
             if val:
@@ -258,7 +256,7 @@ class NavigatorApi(object):
       query = []
       for term in search_terms:
         if ':' not in term:
-          query.append(term)
+          query.append(self._get_boosted_term(term))
         else:
           name, val = term.split(':')
           if val: # Allow to type non default types, e.g for SQL: type:FIEL*
@@ -505,6 +503,9 @@ class NavigatorApi(object):
       LOG.error(msg)
       raise NavigatorApiException(e.message)
 
+
+  def _get_boosted_term(self, term):
+    return 'OR'.join(['(%s:*%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS])
 
   def _clean_path(self, path):
     return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))
