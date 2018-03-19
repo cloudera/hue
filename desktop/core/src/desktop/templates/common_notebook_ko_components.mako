@@ -184,7 +184,7 @@ except ImportError, e:
           <a class="download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"
           % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
           title="${ _('Download first %s rows or %s MB as CSV') % ( DOWNLOAD_ROW_LIMIT.get(), DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 ) }"
-          % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get():
+          % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
           title="${ _('Download first %s MB as CSV') % DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 }"
           % else:
           title="${ _('Download first %s rows as CSV') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }"
@@ -197,7 +197,7 @@ except ImportError, e:
           <a class="download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"
           % if hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get() >= 0 and hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
           title="${ _('Download first %s rows or %s MB as XLS') % ( DOWNLOAD_ROW_LIMIT.get(), DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 ) }"
-          % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get():
+          % elif hasattr(DOWNLOAD_BYTES_LIMIT, 'get') and DOWNLOAD_BYTES_LIMIT.get() >= 0:
           title="${ _('Download first %s MB as XLS') % DOWNLOAD_BYTES_LIMIT.get() / 1024 / 1024 }"
           % else:
           title="${ _('Download first %s rows as XLS') % (hasattr(DOWNLOAD_ROW_LIMIT, 'get') and DOWNLOAD_ROW_LIMIT.get()) }"
