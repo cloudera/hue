@@ -297,7 +297,19 @@ from metadata.conf import has_navigator
   <script type="text/html" id="context-catalog-entry-title">
     <div class="hue-popover-title">
       <i class="hue-popover-title-icon fa muted" data-bind="css: catalogEntry() && catalogEntry().isView() ? 'fa-eye' : 'fa-table'"></i>
-      <span class="hue-popover-title-text" data-bind="foreach: breadCrumbs"><!-- ko ifnot: isActive --><a href="javascript: void(0);" data-bind="click: makeActive, text: name"></a>.<!-- /ko --><!-- ko if: isActive --><span data-bind="text: name"></span><!-- /ko --></span>
+      <span class="hue-popover-title-text" data-bind="foreach: breadCrumbs">
+        <!-- ko ifnot: isActive --><div><a href="javascript: void(0);" data-bind="click: makeActive, text: name"></a>.</div><!-- /ko -->
+        <!-- ko if: isActive -->
+        <div>
+          <span data-bind="text: name"></span>
+          <!-- ko with: catalogEntry -->
+          <!-- ko if: isField() -->
+          (<span data-bind="text: getType()"></span>) <i class="fa fa-key" data-bind="visible: definition.primary_key === 'true'"></i>
+          <!-- /ko -->
+          <!-- /ko -->
+        </div>
+        <!-- /ko -->
+      </span>
       <div class="hue-popover-title-actions">
         <!-- ko hueSpinner: { spin: loading, inline: true } --><!-- /ko -->
         <a class="pointer inactive-action" title="${ _('Refresh') }" data-bind="visible: !loading(), click: refresh"><i class="fa fa-fw fa-refresh"></i></a>
@@ -327,22 +339,6 @@ from metadata.conf import has_navigator
             <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true } }"></div>
             <!-- /ko -->
           %endif
-
-          <!-- ko if: isField() -->
-          <div class="context-popover-attributes">
-            <div class="context-popover-attribute"><div>${ _('Type') }</div> <div data-bind="text: getType(), attr: { 'title': getRawType() }"></div></div>
-            <!-- ko with: analysis -->
-            <!-- ko with: stats -->
-            <!-- ko if: typeof distinct_count !== 'undefined' -->
-            <div class="context-popover-attribute"><div>${ _('Distinct') }</div> <div data-bind="text: distinct_count"></div></div>
-            <!-- /ko -->
-            <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko if: definition.primary_key === 'true' -->
-            <div class="context-popover-attribute"><div>${ _('Primary Key') }</div></div>
-            <!-- /ko -->
-          </div>
-          <!-- /ko -->
 
           <!-- ko if: isView() && $parent.viewSql() -->
           <a href="javascript:void(0);" style="text-align: right; margin-bottom: 5px;" data-bind="toggle: $parent.viewSqlVisible, text: $parent.viewSqlVisible() ? '${ _ko('Show columns')}' : '${ _ko('Show view SQL')}'"></a>
@@ -426,6 +422,7 @@ from metadata.conf import has_navigator
                 name: catalogEntry.path[i],
                 isActive: i === catalogEntry.path.length - 1,
                 path: catalogEntry.path.slice(0, i + 1),
+                catalogEntry: self.catalogEntry,
                 makeActive: function () {
                   self.catalogEntry().dataCatalog.getEntry({ path: this.path }).done(self.catalogEntry);
                 }
