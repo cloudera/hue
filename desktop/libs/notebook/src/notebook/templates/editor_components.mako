@@ -2592,6 +2592,7 @@ function togglePresentation(value) {};
         });
 
         // fills in missing values
+        var longest = 0;
         var allXValues = [];
         _datum.forEach(function (d) {
           d.values.forEach(function (val) {
@@ -2612,7 +2613,23 @@ function togglePresentation(value) {};
               d.values.push(zeroObj)
             }
           });
+          if (d.values.length > longest) {
+            longest = d.values.length;
+          }
         });
+
+
+        // this is to avoid D3 js errors when the data the user is trying to display is bogus
+        if (allXValues.length < longest) {
+          _datum.forEach(function (d) {
+            for (var i = d.values.length; i < longest; i++) {
+              var zeroObj = jQuery.extend({}, d.values[0]);
+              zeroObj.y = 0;
+              zeroObj.x = '';
+              d.values.push(zeroObj)
+            }
+          });
+        }
 
         if (rawDatum.snippet.chartLimit()) {
           _datum = _datum.slice(0, rawDatum.snippet.chartLimit());
@@ -2636,7 +2653,6 @@ function togglePresentation(value) {};
             });
           });
         }
-
       }
       else {
         rawDatum.snippet.result.meta().forEach(function (meta) {
