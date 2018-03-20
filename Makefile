@@ -162,6 +162,7 @@ INSTALL_CORE_FILES = \
 	ext \
 	tools/app_reg \
 	tools/virtual-bootstrap \
+	tools/enable-python27.sh \
 	tools/relocatable.sh \
 	VERS* LICENSE* README*
 

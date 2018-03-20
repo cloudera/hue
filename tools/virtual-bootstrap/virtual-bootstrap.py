@@ -1712,6 +1712,9 @@ def fixup_egg_link(filename):
     if os.path.abspath(link) != link:
         logger.debug('Link in %s already relative' % filename)
         return
+    # filename = /container.ubuntu1604/output/cdh/hue/hue-3.9.0+cdh6.x+0/build/env/local/lib/python2.7/site-packages/liboozie.egg-link
+    # link =     /container.ubuntu1604/output/cdh/hue/hue-3.9.0+cdh6.x+0/desktop/libs/liboozie/src
+    # new_link = ../../../../../../desktop/libs/liboozie/src
     new_link = make_relative_path(filename, link)
     logger.notify('Rewriting link %s in %s as %s' % (link, filename, new_link))
     with open(filename, 'w') as f:
@@ -1742,7 +1745,11 @@ def make_relative_path(source, dest, dest_is_directory=True):
     while dest_parts and source_parts and dest_parts[0] == source_parts[0]:
         dest_parts.pop(0)
         source_parts.pop(0)
-    full_parts = ['..']*len(source_parts) + dest_parts
+    full_parts = ""
+    if '/local/' in source:
+        full_parts = ['..']*(len(source_parts)-1) + dest_parts
+    else:
+        full_parts = ['..']*len(source_parts) + dest_parts
     if not dest_is_directory:
         full_parts.append(dest_filename)
     if not full_parts:
