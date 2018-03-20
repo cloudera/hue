@@ -3146,18 +3146,36 @@ var getDraggableOptions = function (options) {
     var setup = {
       'start': function (event, ui) {
         $(ui.helper).css('z-index', '999999');
-        huePubSub.publish('dashboard.widget.drag.start', {event: event, widget: options.data, gridsterWidget: options.parent});
+        huePubSub.publish('dashboard.widget.drag.start', {
+          event: event,
+          widget: options.data,
+          gridsterWidget: options.parent
+        });
+        $(this).data('startingScrollTop', $('.page-content').scrollTop());
       },
-      'drag': function (event) {
-        huePubSub.publish('dashboard.widget.drag', {event: event, widgetHeight: options.data.gridsterHeight ? options.data.gridsterHeight() : 6, gridsterWidget: options.parent});
+      'drag': function (event, ui) {
+        huePubSub.publish('dashboard.widget.drag', {
+          event: event,
+          widgetHeight: options.data.gridsterHeight ? options.data.gridsterHeight() : 6,
+          gridsterWidget: options.parent
+        });
+        if (options.parent) {
+          ui.position.top += $('.page-content').scrollTop() - parseInt($(this).data('startingScrollTop'));
+        }
       },
       'stop': function (event, ui) {
-        huePubSub.publish('dashboard.widget.drag.stop', {event: event, widget: options.data, gridsterWidget: options.parent});
+        huePubSub.publish('dashboard.widget.drag.stop', {
+          event: event,
+          widget: options.data,
+          gridsterWidget: options.parent
+        });
       },
     };
     if (options.parent) { // extra options for an existing Gridster widget
       setup.appendTo = '.gridster';
-      setup.helper = function(){return '<div class="gridster-helper">' + (options.data.name ? options.data.name() : '${ _ko('Empty widget')}') + '</div>'};
+      setup.helper = function () {
+        return '<div class="gridster-helper">' + (options.data.name ? options.data.name() : '${ _ko('Empty widget')}') + '</div>'
+      };
       setup.cursorAt = {
         top: 5,
         left: 5
@@ -3169,7 +3187,7 @@ var getDraggableOptions = function (options) {
   else {
     return {
       'start': function (event, ui) {
-        lastWindowScrollPosition = $(window).scrollTop();
+        lastWindowScrollPosition = $('.page-content').scrollTop();
         $('.card-body').slideUp('fast');
         if (options && options.start) {
           options.start();
@@ -3177,7 +3195,7 @@ var getDraggableOptions = function (options) {
       },
       'stop': function (event, ui) {
         $('.card-body').slideDown('fast', function () {
-          $(window).scrollTop(lastWindowScrollPosition)
+          $('.page-content').scrollTop(lastWindowScrollPosition)
         });
         if (options && options.stop) {
           options.stop();
