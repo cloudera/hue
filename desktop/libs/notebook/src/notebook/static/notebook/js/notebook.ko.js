@@ -2953,6 +2953,7 @@ var EditorViewModel = (function() {
               }
             });
             _snippet = new Snippet(self, _notebook, {type: _notebook.initialType, statement_raw: _statement.join('\n'), result: {}, name: _title.join('\n'), variables: ko.mapping.toJS(_variables)}, skipSession=true);
+            _snippet.variables = _notebook.snippets()[0].variables;
             _snippet.init();
             _notebook.presentationSnippets()[sql_statement.hashCode()] = _snippet;
           }
