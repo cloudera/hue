@@ -4484,7 +4484,7 @@ $(document).ready(function () {
     })
   });
 
-  $('#searchComponents').parents('.embeddable').droppable({
+  $('#searchComponents .dashboard').droppable({
     accept: '.draggable-widget, .draggableText, .card-widget',
     drop: function( event, ui ) {
       if (searchViewModel.isGridster() && !searchViewModel.isQueryBuilder()) {
