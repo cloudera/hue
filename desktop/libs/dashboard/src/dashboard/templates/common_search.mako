@@ -1166,12 +1166,19 @@ ${ dashboard.layout_skeleton(suffix='search') }
   ${ _('Showing') }
   <span data-bind="text: ($data.response.start + 1)"></span>
   ${ _('to') }
+  <!-- ko if: $root.collection.supportAnalytics() && $data.response.start == 0 && $data.response.numFound > ($parent.template ? $parent : $root.collection).template.rows() -->
+    <span class="spinedit-cnt">
+      <input type="text" data-bind="spinedit: ($parent.template ? $parent : $root.collection).template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
+    </span>
+  <!-- /ko -->
+  <!-- ko if: !($root.collection.supportAnalytics() && $data.response.start == 0 && $data.response.numFound > ($parent.template ? $parent : $root.collection).template.rows()) -->
   <span data-bind="text: Math.min(($data.response.start + ($parent.template ? $parent : $root.collection).template.rows()), $data.response.numFound)"></span>
+  <!-- /ko -->
   ${ _('of') }
   <span data-bind="text: $data.response.numFound"></span>
   ${ _(' results') }
 
-  <span data-bind="visible: $root.isEditing()">
+  <span data-bind="visible: $root.isEditing() && !$root.collection.supportAnalytics()">
     - ${ _('Show') }
     <span class="spinedit-cnt">
       <input type="text" data-bind="spinedit: ($parent.template ? $parent : $root.collection).template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
