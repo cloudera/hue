@@ -895,7 +895,7 @@ class SolrApi(object):
   def _get_aggregate_function(cls, facet):
     f = facet['aggregate']
 
-    if f['formula']:
+    if f['function'] == 'formula':
       return f['formula']
     elif f['function'] == 'field':
       return f['value']

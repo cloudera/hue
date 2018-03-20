@@ -457,7 +457,7 @@ var FieldAnalysis = function (vm, fieldName, fieldType) {
       }
     } else {
       if (self.terms.data().length == 0) {
-         self.getTerms();
+        self.getTerms();
       }
     }
   }
@@ -743,14 +743,22 @@ var Collection = function (vm, collection) {
     } else {
       return facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : ALPHA_HIT_OPTIONS;
     }
-  }
+  };
 
   // Very top facet
   self._addObservablesToFacet = function(facet, vm) {
     if (facet.properties && facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
-      facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
-        var _field = self.getTemplateField(facet.properties.facets_form.field(), self.template.fieldsAttributes());
-        return self._get_field_operations(_field, facet);
+    	
+      // count not possible on hit-widget
+    	
+      facet.properties.facets_form.aggregate.metrics = HIT_OPTIONS;//ko.computed(function() {
+//        var _field = self.getTemplateField(facet.properties.facets_form.field(), self.template.fieldsAttributes());
+//        return self._get_field_operations(_field, facet);
+//      });
+
+      // Here we could weight the fields
+      facet.properties.facets_form.aggregate.facetFieldsNames = ko.computed(function() {
+        return self._getCompatibleMetricFields(facet.properties.facets_form);
       });
 
       facet.properties.facets_form.isEditing = ko.observable(true);
@@ -867,15 +875,34 @@ var Collection = function (vm, collection) {
         vm.search();
       });
 
-      nestedFacet.aggregate.metrics = ko.computed(function() {
-        var _field = self.getTemplateField(nestedFacet.field(), self.template.fieldsAttributes());
-        return self._get_field_operations(_field, facet);
+      nestedFacet.aggregate.metrics = HIT_OPTIONS;//ko.computed(function() {
+//        var _field = self.getTemplateField(nestedFacet.field(), self.template.fieldsAttributes());
+//        return self._get_field_operations(_field, facet);
+//      });
+      
+      nestedFacet.aggregate.facetFieldsNames = ko.computed(function() {
+        return self._getCompatibleMetricFields(nestedFacet);
       });
     }
 
     nestedFacet.isEditing = ko.observable(false);
   }
 
+  self._getCompatibleMetricFields = function(nestedFacet) {
+  	 if (['avg', 'sum', 'median', 'percentile', 'stddev', 'variance'].indexOf(nestedFacet.aggregate.function()) != -1) {
+   	   return $.grep(self.template.fieldsAttributes(), function(field) {
+   	     return isNumericColumn(field.type()) || isDateTimeColumn(field.type());
+   	   })
+   	   //function (field) {
+   	     //return field.name();
+   	   .sort(function (a, b) {
+   	     return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
+   	   });
+   	 } else {
+  	   return self.template.facetFieldsNames();
+  	 }
+  };
+  
   self.facets = ko.mapping.fromJS(collection.facets);
 
   $.each(self.facets(), function (index, facet) {
@@ -1072,11 +1099,15 @@ var Collection = function (vm, collection) {
       'type': ko.mapping.toJS(facet.properties.facets_form.type),
       'isEditing': false
     });
-    pivot.aggregate.metrics = ko.computed(function() {
-      var _field = self.getTemplateField(pivot.field(), self.template.fieldsAttributes());
-      return self._get_field_operations(_field, facet);
-    });
+    pivot.aggregate.metrics = HIT_OPTIONS; //ko.computed(function() {
+//      var _field = self.getTemplateField(pivot.field(), self.template.fieldsAttributes());
+//      return self._get_field_operations(_field, facet);
+//    });
 
+    pivot.aggregate.facetFieldsNames = ko.computed(function() {
+      return self._getCompatibleMetricFields(pivot);
+    });
+    
     facet.properties.facets_form.field(null);
     facet.properties.facets_form.limit(5);
     facet.properties.facets_form.mincount(1);
@@ -1190,7 +1221,8 @@ var Collection = function (vm, collection) {
   });
 
   self.template.facetFieldsNames = ko.computed(function () {
-    return ['formula'].concat(self.template.fieldsNames());
+//    return self.template.fieldsNames();
+	  return self.template.fieldsAttributes();
   });
 
   self.template.sortedGeogFieldsNames = ko.computed(function () {
