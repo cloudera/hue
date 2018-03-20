@@ -33,7 +33,7 @@ class Migration(SchemaMigration):
         db.create_table(u'django_openid_auth_useropenid', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('claimed_id', self.gf('django.db.models.fields.TextField')(unique=True, max_length=2047)),
+            ('claimed_id', self.gf('django.db.models.fields.TextField')(max_length=2047)),
             ('display_id', self.gf('django.db.models.fields.TextField')(max_length=2047)),
         ))
         db.send_create_signal(u'django_openid_auth', ['UserOpenID'])

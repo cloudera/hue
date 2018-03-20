@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
             name='UserOpenID',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('claimed_id', models.TextField(unique=True, max_length=2047)),
+                ('claimed_id', models.TextField(max_length=2047)),
                 ('display_id', models.TextField(max_length=2047)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],

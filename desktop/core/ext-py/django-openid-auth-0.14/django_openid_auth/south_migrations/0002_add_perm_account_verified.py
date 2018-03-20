@@ -83,7 +83,7 @@ class Migration(DataMigration):
         },
         u'django_openid_auth.useropenid': {
             'Meta': {'object_name': 'UserOpenID'},
-            'claimed_id': ('django.db.models.fields.TextField', [], {'unique': 'True', 'max_length': '2047'}),
+            'claimed_id': ('django.db.models.fields.TextField', [], {'max_length': '2047'}),
             'display_id': ('django.db.models.fields.TextField', [], {'max_length': '2047'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
