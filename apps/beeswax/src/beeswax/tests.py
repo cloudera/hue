@@ -198,7 +198,7 @@ for x in sys.stdin:
       SELECT MIN(foo), MAX(foo), SUM(foo) FROM test;
     """
     wait_for_query_to_finish(self.client, _make_query(self.client, QUERY, local=False, database=self.db_name), max=180.0)
-    self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
+    self._verify_query_state(beeswax.models.QueryHistory.STATE.available.value)
 
     # Make sure expired query states are lazily updated.
     resp = self.client.get('/beeswax/query_history')
@@ -209,7 +209,7 @@ for x in sys.stdin:
 
     resp = self.client.get('/beeswax/query_history')
     history = resp.context[0]['page'].object_list[0]
-    assert_equal(history.last_state, beeswax.models.QueryHistory.STATE.expired)
+    assert_equal(history.last_state, beeswax.models.QueryHistory.STATE.expired.value)
 
 
   def test_basic_flow(self):
@@ -229,14 +229,14 @@ for x in sys.stdin:
 
     # Check that we report this query as "running" (this query should take a little while).
     if not is_hive_on_spark():
-      self._verify_query_state(beeswax.models.QueryHistory.STATE.running, beeswax.models.QueryHistory.STATE.available)
+      self._verify_query_state(beeswax.models.QueryHistory.STATE.running.value, beeswax.models.QueryHistory.STATE.available.value)
 
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     content = fetch_query_result_data(self.client, response)
 
     assert_equal([0, 255, 32640], content["results"][0], content["results"][0])
     assert_equal(['INT_TYPE', 'INT_TYPE', 'BIGINT_TYPE'], [col['type'] for col in content["columns"]])
-    self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
+    self._verify_query_state(beeswax.models.QueryHistory.STATE.available.value)
 
     # Query multi-page request
     QUERY = """
@@ -413,7 +413,7 @@ for x in sys.stdin:
     assert_true("ParseException line" in json.loads(resp.content)["message"])
 
     # Watch page will fail as operationHandle=None
-    self._verify_query_state(beeswax.models.QueryHistory.STATE.failed)
+    self._verify_query_state(beeswax.models.QueryHistory.STATE.failed.value)
 
 
   def test_sync_query_exec(self):
