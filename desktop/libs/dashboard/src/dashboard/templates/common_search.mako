@@ -3902,7 +3902,7 @@ $(document).ready(function () {
         isOverSelf = tempDraggableGridsterWidget !== null && tempDraggableGridsterWidget.widgetId() === dimensions.widgetId;
         if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey) {
           overlaps = true;
-          if (!isEmptyWidget && !isOverSelf) {
+          if (!isOverSelf) {
             var sidesWidth = Math.floor(dimensions.sizex / 3);
             var centerWidth = dimensions.sizex - sidesWidth * 2;
             var sidesHeight = Math.floor(dimensions.sizey / 3);
@@ -3935,6 +3935,15 @@ $(document).ready(function () {
 
             overlapZone = overlapZoneTopDown + overlapZoneSideToSide;
 
+            if (isEmptyWidget) {
+              if (coords.row < dimensions.row + 1) {
+                overlapZone = 'N';
+              }
+              else {
+                overlapZone = '';
+              }
+            }
+
             if (['NW', 'W', 'SW'].indexOf(overlapZone) > -1) {
               if (!$widget.attr('data-original-col')) {
                 $widget.attr('data-original-col', $widget.attr('data-col'));
@@ -3965,7 +3974,7 @@ $(document).ready(function () {
               $huePreviewHolder.attr('data-sizex', dimensions.sizex);
               $huePreviewHolder.attr('data-sizey', 1);
             }
-            else {
+            else if (['NE', 'E', 'SE'].indexOf(overlapZone) > -1) {
               if (!$widget.attr('data-original-sizex')) {
                 $widget.attr('data-original-sizex', $widget.attr('data-sizex'));
                 $widget.attr('data-sizex', dimensions.sizex - 1);
@@ -3975,11 +3984,17 @@ $(document).ready(function () {
               $huePreviewHolder.attr('data-sizex', 1);
               $huePreviewHolder.attr('data-sizey', dimensions.sizey);
             }
-            $huePreviewHolder.attr('data-overlapzone', overlapZone);
-            $huePreviewHolder.attr('data-widgetid', $widget.attr('data-widgetid'));
-            $huePreviewHolder.attr('data-widgetrow', $widget.attr('data-previous-row'));
-            $huePreviewHolder.attr('data-widgetcol', $widget.attr('data-previous-col'));
-            skipRestoreOnStop = false;
+            if (overlapZone !== '') {
+              $huePreviewHolder.attr('data-overlapzone', overlapZone);
+              $huePreviewHolder.attr('data-widgetid', $widget.attr('data-widgetid'));
+              $huePreviewHolder.attr('data-widgetrow', $widget.attr('data-previous-row'));
+              $huePreviewHolder.attr('data-widgetcol', $widget.attr('data-previous-col'));
+              skipRestoreOnStop = false;
+            }
+            else {
+              skipRestoreOnStop = true;
+              restoreWidgetSizes();
+            }
           }
           else {
             skipRestoreOnStop = true;
