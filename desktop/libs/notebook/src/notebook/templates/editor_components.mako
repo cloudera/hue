@@ -1234,7 +1234,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <span class="muted add-on" data-bind="text: name"></span>
           <!-- /ko -->
           <!-- ko if: path() -->
-          <a href="javascript:void(0);" data-bind="click: $root.showContextPopover"> <span class="muted add-on" data-bind="text: name"></span></a>
+          <a href="javascript:void(0);" data-bind="click: $root.showContextPopover" style="float: left"> <span class="muted add-on" data-bind="text: name"></span></a>
           <!-- /ko -->
           <!-- ko if: meta.type() == 'text' -->
             <!-- ko if: meta.placeholder() -->
