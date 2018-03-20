@@ -790,6 +790,8 @@ from metadata.conf import has_navigator
 
         self.disposals = [];
 
+        self.catalogEntry = data.catalogEntry;
+
         self.data = ko.observable({
           details: data,
           loading: ko.observable(false),
@@ -816,8 +818,7 @@ from metadata.conf import has_navigator
             label: '${ _("Terms") }',
             template: 'context-popover-collection-terms-details',
             templateData: self.data
-          },
-          {
+          }, {
             id: 'stats',
             label: '${ _("Stats") }',
             template: 'context-popover-collection-stats-details',
@@ -829,7 +830,7 @@ from metadata.conf import has_navigator
         var showInAssistPubSub = huePubSub.subscribe('context.popover.show.in.assist', function () {
           huePubSub.publish('assist.db.highlight', {
             sourceType: 'solr',
-            path: $.map(data.identifierChain, function (identifier){ return identifier.name; })
+            path: self.catalogEntry.path
           });
         });
         self.disposals.push(function () {
@@ -842,8 +843,8 @@ from metadata.conf import has_navigator
         self.data().terms.data.removeAll();
         self.data().loadingTerms(true);
         self.apiHelper.fetchDashboardTerms({
-          collectionName: self.data().details.identifierChain[1].name,
-          fieldName: self.data().details.identifierChain[2].name,
+          collectionName: self.catalogEntry.path[1],
+          fieldName: self.catalogEntry.path[2],
           prefix: self.data().terms.prefix(),
           engine: 'solr',
           successCallback: function (data) {
@@ -864,15 +865,15 @@ from metadata.conf import has_navigator
         self.data().terms.data.removeAll();
         self.data().loadingStats(true);
         self.data().statsSupported(true);
-        var fieldName = self.data().details.identifierChain[2].name;
+        var fieldName = self.catalogEntry.path[2];
         self.apiHelper.fetchDashboardStats({
-          collectionName: self.data().details.identifierChain[1].name,
+          collectionName: self.catalogEntry.path[1],
           fieldName: fieldName,
           engine: 'solr',
           successCallback: function (data) {
             if (data.stats.stats.stats_fields[fieldName] != null) {
               $.each(data.stats.stats.stats_fields[fieldName], function (key, val) {
-                self.data().stats.data.push({'key': key, 'val': val});
+                self.data().stats.data.push({ 'key': key, 'val': val });
               });
             }
           },
@@ -1151,6 +1152,11 @@ from metadata.conf import has_navigator
         self.isCollection = params.data.type === 'collection';
         self.isCatalogEntry = !!params.data.catalogEntry;
 
+        if (self.isCatalogEntry && params.data.catalogEntry.getSourceType() === 'solr' && params.data.catalogEntry.isField()) {
+          self.isCollection = true;
+          self.isCatalogEntry = false;
+        }
+
         self.showInAssistEnabled = (typeof params.showInAssistEnabled !== 'undefined' ? params.showInAssistEnabled : true)
                 && (self.isDocument || self.isCollection || self.isCatalogEntry);
         self.openInDashboardEnabled = self.isCatalogEntry && params.data.catalogEntry.path.length <= 2;
@@ -1182,7 +1188,7 @@ from metadata.conf import has_navigator
           self.titleTemplate = 'context-catalog-doc-title';
         } else if (self.isCollection) {
           self.contents = new CollectionContextTabs(self.data);
-          self.title = self.data.identifierChain[1].name + '.' + self.data.identifierChain[2].name;
+          self.title = self.data.catalogEntry.path.slice(1).join('.');
           self.iconClass = 'fa-search';
         } else {
           self.title = '';
