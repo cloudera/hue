@@ -4149,6 +4149,7 @@ $(document).ready(function () {
   }, 'dashboard');
 
   huePubSub.subscribeOnce('gridster.added.widget', function () {
+    $(window).trigger('resize');
     if (searchViewModel.isQueryBuilder()) {
       $gridster.disable_resize();
     }
