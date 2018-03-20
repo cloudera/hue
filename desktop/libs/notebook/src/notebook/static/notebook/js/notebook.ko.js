@@ -726,6 +726,7 @@ var EditorViewModel = (function() {
         }
         variableValues[variable.name()].value = variable.value();
         variableValues[variable.name()].sampleUser = variable.sampleUser();
+        variableValues[variable.name()].catalogEntry = variable.catalogEntry;
         return variableValues;
       }, self.variableValues);
       if (needsMore) {
@@ -746,6 +747,7 @@ var EditorViewModel = (function() {
         variable.sampleUser(self.variableValues[item.name] ? self.variableValues[item.name].sampleUser : []);
         variable.type(self.variableValues[item.name] ? self.variableValues[item.name].type || 'text' : 'text');
         variable.path(self.variableValues[item.name] ? self.variableValues[item.name].path || '' : '');
+        variable.catalogEntry = self.variableValues[item.name] && self.variableValues[item.name].catalogEntry;
       });
     });
     huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
@@ -769,12 +771,9 @@ var EditorViewModel = (function() {
         variables[variable.name] = variable;
         return variables;
       }, {});
-      var fUpdateVariableSample = function (path, variable, sample) {
-        if (!self.variableValues[variable.name()]) {
-          self.variableValues[variable.name()] = { sampleUser: [] };
-        }
-        var variablesValues = self.variableValues[variable.name()];
-        var type = sample.full_headers[0].type;
+      var fUpdateVariableSample = function (variable, sample) {
+        var variablesValues = {}
+        var type = sample.meta[0].type;
         switch (type) {
           case 'TIMESTAMP_TYPE':
             variablesValues.type = 'datetime-local';
@@ -805,7 +804,6 @@ var EditorViewModel = (function() {
             variablesValues.type = 'text';
             variablesValues.step = '';
         }
-        variable.path(variablesValues.path = path);
         variable.type(variablesValues.type);
         variable.step(variablesValues.step);
       };
@@ -813,11 +811,14 @@ var EditorViewModel = (function() {
         if (oVariables[variable.name()]) {
           DataCatalog.getEntry({ sourceType: sourceType, path: oVariables[variable.name()].path })
           .done(function (entry) {
-            entry.getSample({ silenceErrors: true }).then(fUpdateVariableSample.bind(self, oVariables[variable.name()].path, variable));
+            var path = oVariables[variable.name()].path
+            variable.path(path);
+            variable.catalogEntry = entry;
+            entry.getSample({ silenceErrors: true }).then(fUpdateVariableSample.bind(self, variable));
           });
         } else {
-          fUpdateVariableSample([variable.name()], variable, {
-            full_headers: [
+          fUpdateVariableSample(variable, {
+            meta: [
               { type: 'text' }
             ],
             rows: []
@@ -3399,8 +3400,8 @@ var EditorViewModel = (function() {
       var offset = $source.offset();
       huePubSub.publish('context.popover.show', {
         data: {
-          type: 'column',
-          identifierChain: field.path().map(function (path) { return { name: path }; })
+          type: 'catalogEntry',
+          catalogEntry: field.catalogEntry
         },
         showInAssistEnabled: true,
         sourceType: self.editorType(),
