@@ -13,10 +13,16 @@ function run_python() {
 }
 
 for binpath in ${python_vers[@]}; do
-  if [[ $binpath == "/opt/rh/python27"* ]]; then
-    . /opt/rh/python27/enable
+  pybin="$binpath/python2.7"
+  if [ ! -e $pybin ]; then
+    continue
   fi
-  out=$(run_python $binpath/python2.7)
+  if [[ $binpath == "/opt/rh/python27"* ]]; then
+    if [ -f "/opt/rh/python27/enable" ]; then
+      . /opt/rh/python27/enable
+    fi
+  fi
+  out=$(run_python $pybin)
   if [ $out -eq 1 ]; then
     export PATH=$binpath:$PATH
     python27_exists=1
@@ -26,5 +32,4 @@ done
 
 if [ $python27_exists -eq 0 ]; then
   echo "ERROR: Unable to find python 2.7 installation"
-  exit 1
 fi
