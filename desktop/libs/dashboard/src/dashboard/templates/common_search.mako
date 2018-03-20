@@ -872,6 +872,16 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="grid-chart-settings">
 <!-- ko if: $parent.widgetType() == 'resultset-widget' -->
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: [ko.HUE_CHARTS.TYPES.TIMELINECHART, ko.HUE_CHARTS.TYPES.BARCHART].indexOf(chartType()) >= 0">
+    <li class="nav-header">${_('Chart Type')}</li>
+  </ul>
+  <div data-bind="visible: [ko.HUE_CHARTS.TYPES.TIMELINECHART, ko.HUE_CHARTS.TYPES.BARCHART].indexOf(chartType()) >= 0">
+    <select class="input-medium" data-bind="options: $root.timelineChartTypes,
+                 optionsText: 'label',
+                 optionsValue: 'value',
+                 value: $root.collection.template.chartSettings.chartSelectorType">
+    </select>
+  </div>
   <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
     <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
     <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
@@ -1329,7 +1339,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
         }
       },
       onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); } }"
+      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); },
+      type: $root.collection.getFacetById($parent.id()).properties.timelineChartType }"
     />
     <div class="clearfix"></div>
     <!-- /ko -->
@@ -1357,7 +1368,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
             <i class="fa fa-superscript fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.COUNTER"></i>
             % endif
             <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-            <i class="hcha hcha-line-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" style="display: none;"></i>
             <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" style="display: none;"></i>
             <i class="fa fa-fw fa-line-chart" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" style="display: none;"></i>
             <i class="hcha hcha-map-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" style="display: none;"></i>
@@ -1381,12 +1391,6 @@ ${ dashboard.layout_skeleton(suffix='search') }
                  data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)"
-                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.LINECHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
-                <i class="hcha hcha-line-chart fa-fw"></i> ${_('Lines')}
               </a>
             </li>
             <li>
@@ -1590,7 +1594,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
                 }
               },
               onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet2({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); } }"
+              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); },
+              type: $root.collection.getFacetById($parent.id()).properties.timelineChartType }"
             />
             <div class="clearfix"></div>
           <!-- /ko -->
@@ -1604,7 +1609,8 @@ ${ dashboard.layout_skeleton(suffix='search') }
               onClick: function(d) {
                 $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
               },
-              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); } }"
+              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false); huePubSub.publish('gridster.autoheight'); },
+              type: $root.collection.getFacetById($parent.id()).properties.timelineChartType }"
             />
             <div class="clearfix"></div>
           <!-- /ko -->
@@ -1684,7 +1690,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
                 transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
 
           <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
-                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, type: $root.collection.template.chartSettings.chartSelectorType},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
 
           <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                 transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
@@ -1761,6 +1767,16 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </select>
         </div>
       <!-- /ko -->
+      <!-- ko if: ['bar', 'line'].indexOf(properties.timelineChartType()) >= 0 -->
+      <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+        <span class="facet-field-label">${ _('Chart Type') }</span>
+        <select class="input-small" data-bind="options: $root.timelineChartTypes,
+                     optionsText: 'label',
+                     optionsValue: 'value',
+                     value: properties.timelineChartType">
+        </select>
+      </div>
+       <!-- /ko -->
 
       <!-- ko if: properties.canRange -->
         <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">

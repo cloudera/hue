@@ -1258,7 +1258,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
 <script type="text/html" id="snippet-chart-settings${ suffix }">
   <div>
-    <!-- ko if: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
+    <!-- ko if: chartType() != '' && [ko.HUE_CHARTS.TYPES.TIMELINECHART, ko.HUE_CHARTS.TYPES.BARCHART].indexOf(chartType()) >= 0  -->
     <ul class="nav nav-list" style="border: none; background-color: #FFF">
       <li class="nav-header">${_('type')}</li>
     </ul>
@@ -1512,7 +1512,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
                 <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {skipWindowResize: true, datum: {counts: result.data, sorting: chartSorting(), snippet: $data, limit: chartLimit()}, fqs: ko.observableArray([]), hideSelection: true,
-                      transformer: editorMultiSerieDataTransformer, stacked: false, showLegend: true, isPivot: typeof chartXPivot() !== 'undefined'},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+                      transformer: editorMultiSerieDataTransformer, stacked: false, showLegend: true, isPivot: typeof chartXPivot() !== 'undefined', type: chartTimelineType},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
                 <!-- /ko -->
 
                 <!-- ko if: chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
@@ -1854,7 +1854,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <div class="dropdown">
       <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }" >
         <i class="hcha fa-fw hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" title="${ _('Bars') }"></i>
-        <i class="hcha fa-fw hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" title="${ _('Lines') }"></i>
         <i class="hcha fa-fw hcha-timeline-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" title="${ _('Time') }"></i>
         <i class="hcha fa-fw hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" title="${ _('Pie') }"></i>
         <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" title="${ _('Scatter') }"></i>
@@ -1869,11 +1868,6 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <li>
           <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
             <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
-            <i class="hcha hcha-line-chart"></i> ${_('Lines')}
           </a>
         </li>
         <li data-bind="visible: result.cleanedDateTimeMeta().length > 0">

@@ -28,6 +28,10 @@ var EditorViewModel = (function() {
   var Result = function (snippet, result) {
     var self = this;
 
+    snippet = $.extend(snippet, snippet.chartType == 'lines' && { // Retire line chart
+        chartType: 'bars',
+        chartTimelineType: 'line'
+    });
     self.id = ko.observable(typeof result.id != "undefined" && result.id != null ? result.id : UUID());
     self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'table');
     self.hasResultset = ko.observable(typeof result.hasResultset != "undefined" && result.hasResultset != null ? result.hasResultset : true)

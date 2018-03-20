@@ -604,8 +604,13 @@ var Collection = function (vm, collection) {
     }
   });
 
+  collection.template.chartSettings = $.extend(collection.template.chartSettings, collection.template.chartSettings.chartType == 'lines' && { // Retire line chart
+    chartType: 'bars',
+    chartSelectorType: 'line'
+  });
   collection.template.chartSettings = $.extend({
     chartType: 'bars',
+    chartSelectorType: 'bar',
     chartSorting: 'none',
     chartScatterGroup: null,
     chartScatterSize: null,

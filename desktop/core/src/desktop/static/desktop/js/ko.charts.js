@@ -158,13 +158,38 @@
 
   ko.bindingHandlers.barChart = {
     init: function (element, valueAccessor) {
-      window.setTimeout(function () {
-        barChartBuilder(element, valueAccessor(), false);
-      }, 0);
+      var _options = ko.unwrap(valueAccessor());
+      if (_options.type && _options.type() == "line"){
+        window.setTimeout(function(){
+          lineChartBuilder(element, valueAccessor(), false);
+        }, 0);
+        $(element).data("type", "line");
+      }
+      else {
+        window.setTimeout(function(){
+          barChartBuilder(element, valueAccessor(), false);
+        }, 0);
+        $(element).data("type", "bar");
+      }
     },
     update: function (element, valueAccessor) {
-      var _options = valueAccessor();
-
+      var _options = ko.unwrap(valueAccessor());
+      if (_options.type && _options.type() != $(element).data("type")){
+        if ($(element).find("svg").length > 0) {
+          $(element).find("svg").remove();
+        }
+        if (_options.type() == "line"){
+          window.setTimeout(function(){
+            lineChartBuilder(element, valueAccessor(), false);
+          }, 0);
+        }
+        else {
+          window.setTimeout(function(){
+            barChartBuilder(element, valueAccessor(), false);
+          }, 0);
+        }
+        $(element).data("type", _options.type());
+      }
       var _datum = _options.transformer(_options.datum);
       var _chart = $(element).data("chart");
 
@@ -979,7 +1004,7 @@
           }
         }).call(_chart);
 
-      if (_chart.selectBars) {
+      if (_chart.selectBars && options.fqs) {
         var _field = (typeof options.field == "function") ? options.field() : options.field;
         $.each(options.fqs(), function (cnt, item) {
           if (item.id() == options.datum.widget_id) {
