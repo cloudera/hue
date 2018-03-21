@@ -750,7 +750,15 @@ var EditorViewModel = (function() {
         variable.catalogEntry = self.variableValues[item.name] && self.variableValues[item.name].catalogEntry;
       });
     });
+
+    var activeSourcePromises = [];
     huePubSub.subscribe('ace.sql.location.worker.message', function (e) {
+      while (activeSourcePromises.length) {
+        var promise = activeSourcePromises.pop();
+        if (promise.cancel) {
+          promise.cancel();
+        }
+      }
       var variables = e.data.locations.reduce(function (variables, location) {
         var re = /\${(\w*)\=?([^{}]*)}/g;
         if (location.type === 'variable' && location.colRef) {
@@ -771,32 +779,37 @@ var EditorViewModel = (function() {
         variables[variable.name] = variable;
         return variables;
       }, {});
-      var fUpdateVariableSample = function (variable, sample) {
-        var variablesValues = {}
-        var type = sample.meta[0].type;
+      var updateVariableType = function (variable, sourceMeta) {
+        var type;
+        if (sourceMeta && sourceMeta.type) {
+          type = sourceMeta.type.toLowerCase();
+        } else {
+          type = 'string';
+        }
+        var variablesValues = {};
         switch (type) {
-          case 'TIMESTAMP_TYPE':
+          case 'timestamp':
             variablesValues.type = 'datetime-local';
             variablesValues.step = '1';
             break;
-          case 'DECIMAL_TYPE':
-          case 'DOUBLE_TYPE':
-          case 'FLOAT_TYPE':
+          case 'decimal':
+          case 'double':
+          case 'float':
             variablesValues.type = 'number';
             variablesValues.step = 'any';
             break;
-          case 'INT_TYPE':
-          case 'SMALLINT_TYPE':
-          case 'TINYINT_TYPE':
-          case 'BIGINT_TYPE':
+          case 'int':
+          case 'smallint':
+          case 'tinyint':
+          case 'bigint':
             variablesValues.type = 'number';
             variablesValues.step = '1';
             break;
-          case 'DATE_TYPE':
+          case 'date':
             variablesValues.type = 'date';
             variablesValues.step = '';
             break;
-          case 'BOOLEAN_TYPE':
+          case 'boolean':
             variablesValues.type = 'checkbox';
             variablesValues.step = '';
             break;
@@ -809,19 +822,19 @@ var EditorViewModel = (function() {
       };
       self.variables().forEach(function (variable) {
         if (oVariables[variable.name()]) {
-          DataCatalog.getEntry({ sourceType: sourceType, path: oVariables[variable.name()].path })
-          .done(function (entry) {
-            var path = oVariables[variable.name()].path
+          DataCatalog.getEntry({ sourceType: sourceType, path: oVariables[variable.name()].path }).done(function (entry) {
+            var path = oVariables[variable.name()].path;
             variable.path(path);
             variable.catalogEntry = entry;
-            entry.getSample({ silenceErrors: true }).then(fUpdateVariableSample.bind(self, variable));
+
+            activeSourcePromises.push(entry.getSourceMeta({
+              silenceErrors: true,
+              cancellable: true
+            }).then(updateVariableType.bind(self, variable)));
           });
         } else {
-          fUpdateVariableSample(variable, {
-            meta: [
-              { type: 'text' }
-            ],
-            rows: []
+          updateVariableType([variable.name()], variable, {
+            type: 'text'
           });
         }
       });
