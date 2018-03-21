@@ -29,7 +29,7 @@ def content_generator(header, data):
 
 def test_export_csv():
   headers = ["x", "y"]
-  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
+  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None], ["http://gethue.com", "http://gethue.com"] ]
 
   # Check CSV
   generator = create_generator(content_generator(headers, data), "csv")
@@ -42,7 +42,7 @@ def test_export_csv():
 
 def test_export_xls():
   headers = ["x", "y"]
-  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
+  data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None], ["http://gethue.com", "http://gethue.com"] ]
   sheet = [headers] + data
 
   # Check XLS
@@ -50,7 +50,7 @@ def test_export_xls():
   response = make_response(generator, "xls", "foo")
   assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
 
-  expected_data = [[cell is not None and cell or "NULL" for cell in row] for row in sheet]
+  expected_data = [[cell is not None and cell.replace("http://gethue.com", '=HYPERLINK("http://gethue.com")') or "NULL" for cell in row] for row in sheet]
   sheet_data = _read_xls_sheet_data(response)
 
   assert_equal(expected_data, sheet_data)

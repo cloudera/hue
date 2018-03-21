@@ -47,7 +47,7 @@ def encode_row(row, encoding=None, make_excel_links=False):
     if isinstance(cell, six.string_types):
       cell = re.sub(ILLEGAL_CHARS, '?', cell)
       if make_excel_links:
-        cell = re.sub('(https?://.+)', r'=HYPERLINK("\1")', cell, flags=re.IGNORECASE)
+        cell = re.compile('(https?://.+)', re.IGNORECASE).sub(r'=HYPERLINK("\1")', cell)
     cell = nullify(cell)
     if not isinstance(cell, numbers.Number):
       cell = smart_str(cell, encoding or i18n.get_site_encoding(), strings_only=True, errors='replace')
