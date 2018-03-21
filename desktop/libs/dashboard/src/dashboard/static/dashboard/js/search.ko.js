@@ -865,7 +865,7 @@ var Collection = function (vm, collection) {
       });
 
       nestedFacet.aggregate.metrics = ko.computed(function() {
-        var _field = self.getTemplateField(nestedFacet.field(), vm.collection.template.fieldsAttributes());
+        var _field = self.getTemplateField(nestedFacet.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
       });
     }
