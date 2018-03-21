@@ -254,93 +254,95 @@ from desktop.views import _ko
           return result;
         };
 
-        if (self.catalogEntry.isField() && !self.catalogEntry.isComplex()) {
-          self.loading(true);
-          self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (samples) {
-            if (samples.data && samples.data.length) {
-              self.columnSamples(samples.data);
-            }
-          }).fail(function () {
-            self.hasErrors(true);
-          }).always(function () {
-            self.loading(false);
-          }));
-        } else {
-          self.loading(true);
-          var onClick = function (sampleEnrichedEntry) {
-            params.onClick(sampleEnrichedEntry.catalogEntry);
-          };
-          var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
-            self.entries($.map(childEntries, function (entry) { return new SampleEnrichedEntry(entry, onClick) }));
-          }).fail(function () {
-            self.hasErrors(true);
-          }).always(function () {
-            self.loading(false);
-          });
+        self.loading(true);
 
-          var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true }).always(function () {
-            self.loadingNav(false);
-          });
+        window.setTimeout(function () {
+          if (self.catalogEntry.isField() && !self.catalogEntry.isComplex()) {
+            self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (samples) {
+              if (samples.data && samples.data.length) {
+                self.columnSamples(samples.data);
+              }
+            }).fail(function () {
+              self.hasErrors(true);
+            }).always(function () {
+              self.loading(false);
+            }));
+          } else {
+            var onClick = function (sampleEnrichedEntry) {
+              params.onClick(sampleEnrichedEntry.catalogEntry);
+            };
+            var childPromise = self.catalogEntry.getChildren({ silenceErrors: true, cancellable: true }).done(function (childEntries) {
+              self.entries($.map(childEntries, function (entry) { return new SampleEnrichedEntry(entry, onClick) }));
+            }).fail(function () {
+              self.hasErrors(true);
+            }).always(function () {
+              self.loading(false);
+            });
 
-          self.cancellablePromises.push(navMetaPromise);
-          self.cancellablePromises.push(childPromise);
+            var navMetaPromise = self.catalogEntry.loadNavigatorMetaForChildren({ silenceErrors: true, cancellable: true }).always(function () {
+              self.loadingNav(false);
+            });
 
-          self.cancellablePromises.push(self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (popularEntries) {
-            if (popularEntries.length) {
-              childPromise.done(function () {
-                var entryIndex = {};
-                self.entries().forEach(function (entry) {
-                  entryIndex[entry.catalogEntry.name] = entry;
-                });
+            self.cancellablePromises.push(navMetaPromise);
+            self.cancellablePromises.push(childPromise);
 
-                var totalCount = 0;
-                var popularityToApply = [];
-                popularEntries.forEach(function (popularEntry) {
-                  if (entryIndex[popularEntry.name] && popularEntry.navOptPopularity && popularEntry.navOptPopularity.selectColumn && popularEntry.navOptPopularity.selectColumn.columnCount > 0) {
-                    totalCount += popularEntry.navOptPopularity.selectColumn.columnCount;
-                    popularityToApply.push(function () {
-                      entryIndex[popularEntry.name].popularity(Math.round(100 * popularEntry.navOptPopularity.selectColumn.columnCount / totalCount))
-                    });
-                  }
-                });
-                while (popularityToApply.length) {
-                  popularityToApply.pop()();
-                }
-              });
-            }
-          }));
-
-          if (self.catalogEntry.isTableOrView() || self.catalogEntry.isField()) {
-            self.loadingSamples(true);
-            self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (sample) {
-              childPromise.done(function () {
-                if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
+            self.cancellablePromises.push(self.catalogEntry.loadNavOptPopularityForChildren({ silenceErrors: true, cancellable: true }).done(function (popularEntries) {
+              if (popularEntries.length) {
+                childPromise.done(function () {
                   var entryIndex = {};
                   self.entries().forEach(function (entry) {
                     entryIndex[entry.catalogEntry.name] = entry;
                   });
-                  for (var i = 0; i < sample.meta.length; i++) {
-                    var name = sample.meta[i].name;
-                    if (name.toLowerCase().indexOf(self.catalogEntry.name.toLowerCase() + '.') === 0) {
-                      name = name.substring(self.catalogEntry.name.length + 1);
+
+                  var totalCount = 0;
+                  var popularityToApply = [];
+                  popularEntries.forEach(function (popularEntry) {
+                    if (entryIndex[popularEntry.name] && popularEntry.navOptPopularity && popularEntry.navOptPopularity.selectColumn && popularEntry.navOptPopularity.selectColumn.columnCount > 0) {
+                      totalCount += popularEntry.navOptPopularity.selectColumn.columnCount;
+                      popularityToApply.push(function () {
+                        entryIndex[popularEntry.name].popularity(Math.round(100 * popularEntry.navOptPopularity.selectColumn.columnCount / totalCount))
+                      });
                     }
-                    var sampleEntry = entryIndex[name];
-                    if (sampleEntry) {
-                      sampleEntry.firstSample(sample.data[0][i]);
-                      if (sample.data.length > 1) {
-                        sampleEntry.secondSample(sample.data[1][i])
+                  });
+                  while (popularityToApply.length) {
+                    popularityToApply.pop()();
+                  }
+                });
+              }
+            }));
+
+            if (self.catalogEntry.isTableOrView() || self.catalogEntry.isField()) {
+              self.loadingSamples(true);
+              self.cancellablePromises.push(self.catalogEntry.getSample({ silenceErrors: true, cancellable: true }).done(function (sample) {
+                childPromise.done(function () {
+                  if (sample.meta && sample.meta.length && sample.data && sample.data.length) {
+                    var entryIndex = {};
+                    self.entries().forEach(function (entry) {
+                      entryIndex[entry.catalogEntry.name] = entry;
+                    });
+                    for (var i = 0; i < sample.meta.length; i++) {
+                      var name = sample.meta[i].name;
+                      if (name.toLowerCase().indexOf(self.catalogEntry.name.toLowerCase() + '.') === 0) {
+                        name = name.substring(self.catalogEntry.name.length + 1);
+                      }
+                      var sampleEntry = entryIndex[name];
+                      if (sampleEntry) {
+                        sampleEntry.firstSample(sample.data[0][i]);
+                        if (sample.data.length > 1) {
+                          sampleEntry.secondSample(sample.data[1][i])
+                        }
                       }
                     }
                   }
-                }
-              }).always(function () {
+                }).always(function () {
+                  self.loadingSamples(false);
+                })
+              }).fail(function () {
                 self.loadingSamples(false);
-              })
-            }).fail(function () {
-              self.loadingSamples(false);
-            }));
+              }));
+            }
           }
-        }
+        }, 100)
       }
 
       CatalogEntriesList.prototype.dispose = function () {
