@@ -2254,11 +2254,11 @@ function togglePresentation(value) {};
               snippetEl.find('.snippet-grid-settings').css({
                 "height": vm.isPresentationMode() || !vm.editorMode() ? '330px' : Math.max(100, Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)))+ 'px'
               });
-              snippetEl.find('.result-settings').animate({
+              snippetEl.find('.result-settings').css({
                 'marginTop': margin
               });
             }
-            snippetEl.find('.snippet-actions').animate({
+            snippetEl.find('.snippet-actions').css({
               'marginTop': margin + 25
             });
           }, 100);
@@ -2322,14 +2322,11 @@ function togglePresentation(value) {};
     var _colSel = $resultTable.find("tr th:nth-child(" + (_col.index() + 1) + ")");
     if (_colSel.length > 0) {
       $resultTable.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
-      $resultTable.parent().animate({
-        scrollLeft: _colSel.position().left + $resultTable.parent().scrollLeft() - $resultTable.parent().offset().left - 30
-      }, 300, function(){
-        $resultTable.data('scrollToCol', _col.index());
-        $resultTable.data('scrollToRow', null);
-        $resultTable.data('scrollAnimate', true);
-        $resultTable.parent().trigger('scroll');
-      });
+      $resultTable.parent().scrollLeft(_colSel.position().left + $resultTable.parent().scrollLeft() - $resultTable.parent().offset().left - 30);
+      $resultTable.data('scrollToCol', _col.index());
+      $resultTable.data('scrollToRow', null);
+      $resultTable.data('scrollAnimate', true);
+      $resultTable.parent().trigger('scroll');
     }
   }
 
@@ -3695,10 +3692,10 @@ function togglePresentation(value) {};
           "line-height": (_dtElement.height() - 30) + "px"
         });
         if (initial) {
-          $('#snippet_' + snippet.id()).find('.result-settings').animate({
+          $('#snippet_' + snippet.id()).find('.result-settings').css({
             'marginTop': 0
           });
-          $('#snippet_' + snippet.id()).find('.snippet-actions').animate({
+          $('#snippet_' + snippet.id()).find('.snippet-actions').css({
             'marginTop': 0
           });
           huePubSub.publish('resize.leaflet.map');

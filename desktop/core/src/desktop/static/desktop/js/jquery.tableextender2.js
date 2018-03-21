@@ -125,15 +125,7 @@
       hideSubscription.remove();
     });
 
-    var lastHeight = -1, currentHeight;
     var adjustSizes = function () {
-      currentHeight = self.$parent.height();
-      if (currentHeight != lastHeight) {
-        self.firstColumnInner.height(self.$parent.get(0).scrollHeight);
-        self.firstColumn.height(currentHeight);
-        lastHeight = currentHeight;
-      }
-
       if (self.lastHeaderWidth !== self.$parent.width()) {
         self.lastHeaderWidth = self.$parent.width();
         self.headerRowContainer.width(self.lastHeaderWidth);
@@ -238,14 +230,17 @@
     var pos = self.options.stickToTopPosition;
     var topPos = 0;
     var firstColTopPos = 0;
-    if (typeof pos === 'function'){
+    if (typeof pos === 'function') {
       pos = pos();
     }
+    var isFixed = false;
     if (pos > -1) {
       if (self.$element.offset().top < pos) {
         topPos = pos;
+        isFixed = true;
       } else {
         topPos = self.$element.offset().top;
+        isFixed = false;
       }
       firstColTopPos = self.$element.offset().top;
     } else if (self.options.clonedContainerPosition == 'absolute') {
@@ -255,10 +250,31 @@
       topPos = self.$parent.offset().top;
       firstColTopPos = topPos;
     }
-    self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
-    self.firstColumn.css("top", firstColTopPos + "px");
-    self.headerRowContainer.css("top", topPos + "px");
-    self.firstColumnTopCell.css("top", topPos + "px");
+
+    if (pos > -1) {
+      var fixCSS = {
+        "top": "",
+        "left": self.$parent.position().left + "px",
+        "position": "absolute"
+      };
+      self.firstColumn.css(fixCSS);
+      if (isFixed) {
+        fixCSS = {
+          "top": topPos + "px",
+          "left": "",
+          "position": "fixed"
+        };
+      }
+      self.firstColumnTopCell.css(fixCSS);
+      self.headerRowContainer.css(fixCSS);
+    }
+    else {
+      self.firstColumn.scrollTop(self.$mainScrollable.scrollTop());
+      self.firstColumn.css("top", firstColTopPos + "px");
+      self.headerRowContainer.css("top", topPos + "px");
+      self.firstColumnTopCell.css("top", topPos + "px");
+    }
+
   };
 
   Plugin.prototype.drawHeader = function () {
@@ -424,9 +440,9 @@
     firstColumn.css("position", self.options.clonedContainerPosition || "fixed");
 
     firstColumnInner.appendTo(firstColumn);
-    firstColumn.appendTo(self.$parent);
+    firstColumn.insertAfter(self.$element.prev());
 
-    firstColumnTopCell.appendTo(self.$parent);
+    firstColumnTopCell.insertAfter(firstColumn);
 
     self.firstColumnInner = firstColumnInner;
     self.firstColumnTopCell = firstColumnTopCell;
