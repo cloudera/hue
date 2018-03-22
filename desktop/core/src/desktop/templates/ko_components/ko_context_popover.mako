@@ -304,7 +304,9 @@ from metadata.conf import has_navigator
           <span data-bind="text: name"></span>
           <!-- ko with: catalogEntry -->
           <!-- ko if: isField() -->
-          (<span data-bind="text: getType()"></span>) <i class="fa fa-key" data-bind="visible: definition.primary_key === 'true'"></i>
+          (<span data-bind="text: getType()"></span>)
+          <i class="fa fa-key" title="${ _('Primary Key') }" data-bind="visible: isPrimaryKey()"></i>
+          <i class="fa fa-key" title="${ _('Partition Key') }" data-bind="visible: isPartitionKey()"></i>
           <!-- /ko -->
           <!-- /ko -->
         </div>
