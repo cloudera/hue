@@ -258,9 +258,9 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko if: $root.canSave() -->
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu pull-right">
           <li>
-            <a class="pointer" title="${ _ko('Wether to open in presentation or editor mode by default') }" data-bind="click: function() { isPresentationModeDefault(!isPresentationModeDefault()); }">
+            <a class="pointer" title="${ _ko('Whether to open in presentation or editor mode by default') }" data-bind="click: function() { isPresentationModeDefault(!isPresentationModeDefault()); }">
               <i class="fa" data-bind="css: {'fa-toggle-on': isPresentationModeDefault(), 'fa-toggle-off': !isPresentationModeDefault()}"></i> ${ _('Open as presentation') }
             </a>
           </li>
@@ -289,7 +289,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
         <!-- ko if: $root.canSave -->
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu pull-right">
           <li>
             <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
               <i class="fa fa-fw fa-save"></i> ${ _('Save as...') }
@@ -305,7 +305,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
         <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
           <i class="fa fa-fw fa-ellipsis-v"></i>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu pull-right">
           <li>
           <!-- ko if: editorMode -->
             <a href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }">
@@ -1201,7 +1201,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
       <span class="caret"></span>
     </a>
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu pull-right">
       <li>
         <a class="pointer" rel="tooltip" data-placement="bottom" data-bind="click: function() { $root.selectedNotebook().isHidingCode(! $root.isHidingCode()); }, attr: { 'title': $root.isHidingCode() ? '${ _ko('Show the logic') }' : '${ _ko('Hide the logic') }' }">
           <i class="fa fa-fw" data-bind="css: { 'fa-expand': $root.isHidingCode(), 'fa-compress': ! $root.isHidingCode() }"></i>
