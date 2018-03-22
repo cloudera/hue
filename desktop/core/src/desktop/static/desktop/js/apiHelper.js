@@ -1503,33 +1503,21 @@ var ApiHelper = (function () {
     return new CancellablePromise(deferred, undefined, cancellablePromises);
   };
 
-  // This is the same as https://github.com/cloudera/hue/blob/master/desktop/libs/dashboard/src/dashboard/static/dashboard/js/search.ko.js#L1783
-  var QueryResult = function (vm, initial) { // Similar to to Notebook Snippet
+  /**
+   * Wrapper around the response from the Query API
+   *
+   * @param {string} sourceType
+   * @param {Object} response
+   *
+   * @constructor
+   */
+  var QueryResult = function (sourceType, response) {
     var self = this;
-
-    self.id = ko.observable(UUID());
-    self.type = ko.mapping.fromJS(initial.type);
-    self.status = ko.observable(initial.status || 'running');
-    self.progress = ko.mapping.fromJS(initial.progress || 0);
-
-    self.hasResultset = ko.observable(true);
-
-    // UI
-    self.saveResultsModalVisible = ko.observable(false);
-
-    self.result = ko.mapping.fromJS(initial.result);
-    self.result.hasSomeResults = ko.computed(function () {
-      return self.hasResultset(); // && self.data().length > 0; // status() == 'available'
-    });
-    self.result.type = ko.observable('table');
-
-    self.getContext = function() {
-      return self;
-    }
-
-    self.asyncResult = function() {
-      return ko.mapping.toJS(self.result.result);
-    }
+    self.id = UUID();
+    self.type = sourceType;
+    self.status = response.status || 'running';
+    self.result = response.result;
+    self.result.type = 'table';
   };
 
   /**
@@ -1566,44 +1554,36 @@ var ApiHelper = (function () {
 
     self.simplePost(SAMPLE_API_PREFIX + options.path.join('/'), {
       notebook: {},
-      snippet: ko.mapping.toJSON({
+      snippet: JSON.stringify({
         type: options.sourceType
       }),
       async: true
     }, {
       silenceErrors: options.silenceErrors
     }).done(function (sampleResponse) {
-      if (sampleResponse.status == 0) {
-        var queryResult = new QueryResult(self, {
-            type: options.sourceType,
-            result: sampleResponse.result,
-            status: 'running',
-            progress: 0,
-        });
+      var queryResult = new QueryResult(options.sourceType, sampleResponse);
 
-        notebookJson = ko.mapping.toJSON({type: queryResult.type()});
-        snippetJson = ko.mapping.toJSON(queryResult.getContext());
+      notebookJson = JSON.stringify({ type: options.sourceType });
+      snippetJson = JSON.stringify(queryResult);
 
-        cancellablePromises.push(
-          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
-            var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
-              notebook: notebookJson,
-              snippet: snippetJson,
-              rows: options.sampleCount || 100,
-              startOver: 'false'
-            }, {
-              silenceErrors:  options.silenceErrors
-            }).done(function (sampleResponse) {
-              var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
-              data.hueTimestamp = Date.now();
-              deferred.resolve(data);
-            }).fail(deferred.reject);
-            cancellablePromises.push(resultRequest, resultRequest);
-          }).fail(deferred.reject)
-        );
-      } else {
-        deferred.reject();
-      }
+      cancellablePromises.push(
+        self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
+          var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
+            notebook: notebookJson,
+            snippet: snippetJson,
+            rows: options.sampleCount || 100,
+            startOver: 'false'
+          }, {
+            silenceErrors:  options.silenceErrors
+          }).done(function (sampleResponse) {
+            var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
+            data.hueTimestamp = Date.now();
+            deferred.resolve(data);
+          }).fail(deferred.reject);
+
+          cancellablePromises.push(resultRequest, resultRequest);
+        }).fail(deferred.reject)
+      );
     }).fail(deferred.reject);
 
     cancellablePromises.push({
