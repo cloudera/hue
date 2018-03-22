@@ -1337,6 +1337,16 @@ MEMORY_PROFILER = Config(
   type=coerce_bool,
   default=False)
 
+def get_instrumentation_default():
+  """If django_debug_mode is True, this is automatically enabled"""
+  return DJANGO_DEBUG_MODE.get()
+
+INSTRUMENTATION = Config(
+  key='instrumentation',
+  help=_('Enable or disable instrumentation. If django_debug_mode is True, this is automatically enabled.'),
+  type=coerce_bool,
+  dynamic_default=get_instrumentation_default)
+
 
 AUDIT_EVENT_LOG_DIR = Config(
   key="audit_event_log_dir",

@@ -20,6 +20,7 @@
 # Local customizations are done by symlinking a file
 # as local_settings.py.
 
+import gc
 import logging
 import os
 import pkg_resources
@@ -507,6 +508,9 @@ if desktop.conf.MEMORY_PROFILER.get():
   MEMORY_PROFILER = hpy()
   MEMORY_PROFILER.setrelheap()
 
+# Instrumentation
+if desktop.conf.INSTRUMENTATION.get():
+  gc.set_debug(gc.DEBUG_UNCOLLECTABLE | gc.DEBUG_OBJECTS)
 
 if not desktop.conf.DATABASE_LOGGING.get():
   def disable_database_logging():
