@@ -301,6 +301,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
 
       <!-- ko template: { ifnot: editorMode() || isPresentationMode(), name: 'notebook-actions' }--><!-- /ko -->
 
+      <!-- ko ifnot: isPresentationMode() -->
       <div class="dropdown pull-right margin-left-10">
         <a class="btn" data-toggle="dropdown" href="javascript: void(0)">
           <i class="fa fa-fw fa-ellipsis-v"></i>
@@ -346,6 +347,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           </li>
         </ul>
       </div>
+      <!-- /ko -->
     % endif
   </div>
 </script>
