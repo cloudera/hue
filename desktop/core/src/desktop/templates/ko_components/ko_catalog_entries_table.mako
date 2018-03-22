@@ -90,6 +90,9 @@ from desktop.views import _ko
               <!-- ko if: catalogEntry.isPrimaryKey() -->
               &nbsp;<i title="${ _("Primary Key") }"class="fa fa-key"></i>
               <!-- /ko -->
+              <!-- ko if: catalogEntry.isPartitionKey() -->
+              &nbsp;<i title="${ _("Partition Key") }"class="fa fa-key"></i>
+              <!-- /ko -->
               <!-- ko if: popularity -->
               &nbsp;<i data-bind="attr: { 'title': '${ _ko("Popularity") }: ' + popularity() + '%' }" class="fa fa-star-o"></i>
               <!-- /ko -->
