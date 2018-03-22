@@ -398,23 +398,6 @@ from desktop.views import _ko
         }
       };
 
-      var labelPrioritySort = function (a, b) {
-        var aLabelMatchIndex = a.label.indexOf('<em>');
-        var bLabelMatchIndex = b.label.indexOf('<em>');
-        if (aLabelMatchIndex === 0 && bLabelMatchIndex !== 0) {
-          return -1;
-        } else if (aLabelMatchIndex !== 0 && bLabelMatchIndex === 0) {
-          return 1;
-        } else if (aLabelMatchIndex !== -1 && bLabelMatchIndex === -1) {
-          return -1;
-        } else if (aLabelMatchIndex === -1 && bLabelMatchIndex !== -1) {
-          return 1;
-        } else if (aLabelMatchIndex !== -1 && bLabelMatchIndex !== -1) {
-          return aLabelMatchIndex - bLabelMatchIndex;
-        }
-        return a.originalIndex - b.originalIndex;
-      };
-
       GlobalSearch.prototype.fetchResults = function (querySpec) {
         var self = this;
         self.cancelRunningRequests();
@@ -451,7 +434,6 @@ from desktop.views import _ko
             weight: 3
           };
 
-          var i = 0;
           data.results.forEach(function (doc) {
             if (doc.hue_name.indexOf('.') !== 0) {
               docCategory.result.push({
@@ -461,14 +443,12 @@ from desktop.views import _ko
                   source: 'globalSearch'
                 },
                 type: 'document',
-                data: doc,
-                originalIndex: i++
+                data: doc
               })
             }
           });
 
           if (docCategory.result.length) {
-            docCategory.result.sort(labelPrioritySort);
             docCategory.topMatches = docCategory.result.slice(0, 6);
             categories.push(docCategory);
           }
@@ -546,7 +526,6 @@ from desktop.views import _ko
             Object.keys(newCategories).forEach(function (key) {
               var category = newCategories[key];
               if (category.result.length) {
-                category.result.sort(labelPrioritySort);
                 category.topMatches = category.result.slice(0, 6);
                 categories.push(category);
               }
