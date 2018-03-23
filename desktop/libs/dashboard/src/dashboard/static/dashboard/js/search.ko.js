@@ -879,10 +879,10 @@ var Collection = function (vm, collection) {
 //        var _field = self.getTemplateField(nestedFacet.field(), self.template.fieldsAttributes());
 //        return self._get_field_operations(_field, facet);
 //      });
-      
-      nestedFacet.aggregate.facetFieldsNames = ko.computed(function() {
+
+      nestedFacet.aggregate.facetFieldsNames = ko.computed(function () {
         return self._getCompatibleMetricFields(nestedFacet);
-      });
+      }).extend({ trackArrayChanges: true });
     }
 
     nestedFacet.isEditing = ko.observable(false);
