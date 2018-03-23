@@ -2171,9 +2171,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <input type="number" class="input-mini" data-bind="value: percentile"/>
       <!-- /ko -->
 
-      ##<select data-bind="options: facetFieldsNames, value: $parent.field, optionsCaption: '${ _ko('Field...') }', selectize: facetFieldsNames" class="hit-options input-small" style="margin-bottom: 0"></select>
-      <select data-bind="selectize: facetFieldsNames, value: $parent.field, optionsValue: 'name', optionsText: 'name', optionsCaption: '${ _ko('Field...') }'"></select>
-      ##<select data-bind="browserAwareSelectize: facetFieldsNames, value: $parent.field"></select>
+      <select data-bind="selectize: facetFieldsNames, value: $parent.field, optionsValue: 'name', optionsText: 'name', optionsCaption: '${ _ko('Field...') }'" class="hit-options input-small" style="margin-bottom: 0"></select>
 
       <div class="clearfix"></div>
       <br/>
