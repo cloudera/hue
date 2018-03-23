@@ -385,8 +385,11 @@ var ApiHelper = (function () {
   };
 
   ApiHelper.prototype.cancelActiveRequest = function (request) {
-    if (typeof request !== 'undefined' && request !== null && request.readyState < 4) {
-      request.abort();
+    if (typeof request !== 'undefined' && request !== null) {
+      var readyState = request.getReadyState ? request.getReadyState() : request.readyState;
+      if (readyState < 4) {
+        request.abort();
+      }
     }
   };
 
@@ -400,14 +403,35 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.simplePost = function (url, data, options) {
     var self = this;
-    return $.post(url, data, function (data) {
+    var deferred = $.Deferred();
+
+    var request = $.post(url, data, function (data) {
       if (self.successResponseIsError(data)) {
-        self.assistErrorCallback(options)(data);
-      } else if (options && options.successCallback) {
+        deferred.reject(self.assistErrorCallback(options)(data));
+        return;
+      }
+      if (options && options.successCallback) {
         options.successCallback(data);
       }
+      deferred.resolve(data);
     })
     .fail(self.assistErrorCallback(options));
+
+    request.fail(function (data) {
+      deferred.reject(self.assistErrorCallback(options)(data));
+    });
+
+    var promise = deferred.promise();
+
+    promise.getReadyState = function () {
+      return request.readyState;
+    };
+
+    promise.abort = function () {
+      request.abort();
+    };
+
+    return promise;
   };
 
   /**
@@ -1516,7 +1540,7 @@ var ApiHelper = (function () {
     self.id = UUID();
     self.type = sourceType;
     self.status = response.status || 'running';
-    self.result = response.result;
+    self.result = response.result || {};
     self.result.type = 'table';
   };
 

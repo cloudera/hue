@@ -3249,6 +3249,38 @@ function togglePresentation(value) {};
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
+      var attachEntryResolver = function (location, sourceType) {
+        location.resolveCatalogEntry = function(options) {
+          if (!options) {
+            options = {};
+          }
+          if (location.resolvePathPromise && !location.resolvePathPromise.cancelled) {
+            DataCatalog.applyCancellable(location.resolvePathPromise, options);
+            return location.resolvePathPromise;
+          }
+
+          if (!location.identifierChain) {
+            if (!location.resolvePathPromise) {
+              location.resolvePathPromise = $.Deferred().reject().promise();
+            }
+            return location.resolvePathPromise;
+          }
+
+          var promise = SqlUtils.resolveCatalogEntry({
+            sourceType: sourceType,
+            cancellable: options.cancellable,
+            cachedOnly: options.cachedOnly,
+            identifierChain: location.identifierChain,
+            tables: location.tables
+          });
+
+          if (!options.cachedOnly) {
+            location.resolvePathPromise = promise;
+          }
+          return promise;
+        }
+      };
+
 
       % if not IS_EMBEDDED.get():
         if (window.Worker) {
@@ -3285,6 +3317,11 @@ function togglePresentation(value) {};
             if (e.data.ping) {
               aceSqlLocationWorker.isReady = true;
             } else {
+              if (e.data.locations) {
+                e.data.locations.forEach(function (location) {
+                  attachEntryResolver(location, e.data.sourceType);
+                })
+              }
               huePubSub.publish('ace.sql.location.worker.message', e);
             }
           };
@@ -3302,6 +3339,11 @@ function togglePresentation(value) {};
 
         window.addEventListener("message", function (event) {
           if (event.data.locationWorkerResponse) {
+            if (event.data.locationWorkerResponse.locations) {
+              event.data.locationWorkerResponse.locations.forEach(function (location) {
+                attachEntryResolver(location, event.data.locationWorkerResponse.sourceType);
+              })
+            }
             huePubSub.publish('ace.sql.location.worker.message', { data: event.data.locationWorkerResponse });
           }
           if (event.data.syntaxWorkerResponse) {
