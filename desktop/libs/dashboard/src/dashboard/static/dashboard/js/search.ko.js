@@ -44,6 +44,7 @@ function loadSearchLayout(viewModel, json_layout) {
           properties: widget.properties,
           offset: widget.offset,
           loading: true,
+          gridsterHeight: viewModel.draggableWidgets[widget.widgetType].gridsterHeight() || 6,
           vm: viewModel
         }));
       });
@@ -56,18 +57,15 @@ function loadSearchLayout(viewModel, json_layout) {
   viewModel.columns(_columns);
 }
 
-function loadDashboardLayout(viewModel, grister_layout) {
-  $.each(grister_layout, function(index, item) {
+function loadDashboardLayout(viewModel, gridster_layout) {
+  $.each(gridster_layout, function(index, item) {
     viewModel.gridItems.push(
       ko.mapping.fromJS({
         col: parseInt(item.col),
         row: parseInt(item.row),
         size_x: parseInt(item.size_x),
         size_y: parseInt(item.size_y),
-        widget: item.widget ? viewModel.getWidgetById(item.widget.id) : null,
-        callback: function (el) {
-          $('.gridster ul').data('gridster').move_widget(el, 1, 1);
-        }
+        widget: item.widget ? viewModel.getWidgetById(item.widget.id) : null
       }));
   });
 }
