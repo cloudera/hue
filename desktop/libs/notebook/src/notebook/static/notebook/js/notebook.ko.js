@@ -763,6 +763,8 @@ var EditorViewModel = (function() {
         var re = /\${(\w*)\=?([^{}]*)}/g;
         if (location.type === 'variable' && location.colRef) {
           var column = location.colRef.identifierChain;
+          // TODO: This should support multiple tables, i.e. SELECT * FROM web_logs, customers WHERE id = ${id}
+          //       use "location.resolveCatalogEntry({ cancellable: true });"
           var identifierChain = location.colRef.tables[0].identifierChain.slice().concat(column);
           var value = re.exec(location.value);
           variables.push({
@@ -833,7 +835,7 @@ var EditorViewModel = (function() {
             }).then(updateVariableType.bind(self, variable)));
           });
         } else {
-          updateVariableType([variable.name()], variable, {
+          updateVariableType(variable, {
             type: 'text'
           });
         }

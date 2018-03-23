@@ -110,6 +110,125 @@ var SqlUtils = (function () {
     });
   };
 
+  var identifierChainToPath = function (identifierChain) {
+    return $.map(identifierChain, function (identifier) {
+      return identifier.name
+    })
+  };
+
+  /**
+   *
+   * @param {Object} options
+   * @param {Object[]} [options.identifierChain]
+   * @param {Object[]} [options.tables]
+   * @param {String} options.sourceType
+   * @param {Object} [options.cancellable]
+   * @param {Object} [options.cachedOnly]
+   *
+   * @return {CancellablePromise}
+   */
+  var resolveCatalogEntry = function (options) {
+    var cancellablePromises = [];
+    var deferred = $.Deferred();
+    var promise = new CancellablePromise(deferred, undefined, cancellablePromises);
+    DataCatalog.applyCancellable(promise, options);
+
+    if (!options.identifierChain) {
+      deferred.reject();
+      return promise;
+    }
+
+    var findInTree = function (currentEntry, fieldsToGo) {
+      if (fieldsToGo.length === 0) {
+        deferred.reject();
+        return;
+      }
+
+      var nextField;
+      if (currentEntry.getType() === 'map') {
+        nextField = 'value';
+      } else if (currentEntry.getType() === 'array') {
+        nextField = 'item';
+      } else {
+        nextField = fieldsToGo.shift();
+      }
+
+      cancellablePromises.push(currentEntry.getChildren({
+        cancellable: options.cancellable,
+        cachedOnly: options.cachedOnly,
+        silenceErrors: true
+      }).done(function (childEntries) {
+        var foundEntry = undefined;
+        childEntries.some(function (childEntry) {
+          if (SqlUtils.identifierEquals(childEntry.name, nextField)) {
+            foundEntry = childEntry;
+            return true;
+          }
+        });
+        if (foundEntry && fieldsToGo.length) {
+          findInTree(foundEntry, fieldsToGo);
+        } else if (foundEntry) {
+          deferred.resolve(foundEntry);
+        } else {
+          deferred.reject();
+        }
+      }).fail(deferred.reject))
+    };
+
+    var findTable = function (tablesToGo) {
+      if (tablesToGo.length === 0) {
+        deferred.reject();
+        return;
+      }
+
+      var nextTable = tablesToGo.pop();
+      if (typeof nextTable.subQuery !== 'undefined') {
+        findTable(tablesToGo);
+        return;
+      }
+
+      cancellablePromises.push(DataCatalog.getChildren({
+        sourceType: options.sourceType,
+        path: SqlUtils.identifierChainToPath(nextTable.identifierChain),
+        cachedOnly: options && options.cachedOnly,
+        cancellable: options && options.cancellable,
+        silenceErrors: true
+      }).done(function (childEntries) {
+        var foundEntry = undefined;
+        childEntries.some(function (childEntry) {
+          if (SqlUtils.identifierEquals(childEntry.name, options.identifierChain[0].name)) {
+            foundEntry = childEntry;
+            return true;
+          }
+        });
+
+        if (foundEntry && options.identifierChain.length > 1) {
+          findInTree(foundEntry, SqlUtils.identifierChainToPath(options.identifierChain.slice(1)));
+        } else if (foundEntry) {
+          deferred.resolve(foundEntry);
+        } else {
+          findTable(tablesToGo)
+        }
+      }).fail(deferred.reject));
+    };
+
+    if (options.tables) {
+      findTable(options.tables.concat())
+    } else {
+      DataCatalog.getEntry({
+        sourceType: options.sourceType,
+        path: [],
+        cachedOnly: options && options.cachedOnly,
+        cancellable: options && options.cancellable,
+        silenceErrors: true
+      }).done(function (entry) {
+        findInTree(entry, SqlUtils.identifierChainToPath(options.identifierChain))
+      })
+    }
+
+    return promise;
+  };
+
   return {
     autocompleteFilter : autocompleteFilter,
     backTickIfNeeded: function (sourceType, identifier) {
@@ -137,6 +256,8 @@ var SqlUtils = (function () {
     identifierEquals: function (a, b) {
       return a && b && a.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase() === b.replace(/^\s*`/, '').replace(/`\s*$/, '').toLowerCase();
     },
-    sortSuggestions: sortSuggestions
+    sortSuggestions: sortSuggestions,
+    resolveCatalogEntry: resolveCatalogEntry,
+    identifierChainToPath: identifierChainToPath
   }
 })();

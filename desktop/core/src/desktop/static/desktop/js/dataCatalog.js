@@ -2054,7 +2054,9 @@ var DataCatalog = (function () {
 
       disableCache: function () {
         cacheEnabled = false;
-      }
+      },
+
+      applyCancellable: applyCancellable
     };
   })();
 })();

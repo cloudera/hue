@@ -4053,7 +4053,7 @@
             } else if (location.tables) {
               location.tables.some(function (table) {
                 if (table.identifierChain && table.identifierChain.length === 1 && table.identifierChain[0].name) {
-                  possibleAlias = aliasIndex[table.identifierChain[0].name.toLowerCase()]
+                  possibleAlias = aliasIndex[table.identifierChain[0].name.toLowerCase()];
                   return possibleAlias;
                 }
                 return false;
@@ -4182,7 +4182,7 @@
         };
 
         // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
-        while(activeTokens.length > 0) {
+        while (activeTokens.length > 0) {
           delete activeTokens.pop().parseLocation;
         }
 
@@ -4811,11 +4811,7 @@
               };
 
               if (token.parseLocation && token.parseLocation.identifierChain && !token.notFound) {
-                // Database, table and field
-                var path = $.map(token.parseLocation.identifierChain, function (identifier) {
-                  return identifier.name;
-                });
-                DataCatalog.getEntry({sourceType: snippet.type(), path: path}).done(function (entry) {
+                token.parseLocation.resolveCatalogEntry().done(function (entry) {
                   huePubSub.publish('context.popover.show', {
                     data: {
                       type: 'catalogEntry',
@@ -4824,6 +4820,8 @@
                     pinEnabled: true,
                     source: source
                   });
+                }).fail(function () {
+                  token.notFound = true;
                 });
               } else if (token.parseLocation && !token.notFound) {
                 // Asterisk, function etc.
