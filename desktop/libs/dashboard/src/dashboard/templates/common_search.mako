@@ -4199,6 +4199,7 @@ $(document).ready(function () {
           $gridster.remove_empty_cells(1, i, 12, 1);
         }
       }
+      huePubSub.publish('gridster.sync.model');
     }
   }, 'dashboard');
 

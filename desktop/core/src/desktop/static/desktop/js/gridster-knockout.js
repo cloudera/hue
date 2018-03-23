@@ -122,6 +122,12 @@ ko.bindingHandlers.gridster = {
       }
     };
 
+    var syncSub = huePubSub.subscribe('gridster.sync.model', syncPositionsToModel);
+
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      syncSub.remove();
+    });
+
     // Just in case the consumer set up their own resize handler, we need to chain the calls
     var oldOnResize = gridster.options.resize.stop;
     gridster.options.resize.stop = function (event, ui, $widget) {
