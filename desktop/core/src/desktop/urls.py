@@ -33,7 +33,7 @@ import desktop.lib.metrics.file_reporter
 desktop.lib.metrics.file_reporter.start_file_reporter()
 
 from django.conf import settings
-from django.conf.urls import include, patterns
+from django.conf.urls import include, patterns, url
 from django.contrib import admin
 
 from desktop import appmanager
@@ -225,3 +225,9 @@ for x in dynamic_patterns:
   logging.debug("Dynamic pattern: %s" % (x,))
 for x in static_patterns:
   logging.debug("Static pattern: %s" % (x,))
+
+if settings.DEBUG:
+  import debug_toolbar
+  urlpatterns += patterns('',
+    url(r'^__debug__/', include(debug_toolbar.urls)),
+  )
