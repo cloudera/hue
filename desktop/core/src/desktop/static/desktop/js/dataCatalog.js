@@ -1605,7 +1605,8 @@ var DataCatalog = (function () {
     };
 
     /**
-     * Gets the sample for the entry. It will fetch it if not cached or if the refresh option is set.
+     * Gets the sample for the entry, if unknown it will first check if any parent table already has the sample. It
+     * will fetch it if not cached or if the refresh option is set.
      *
      * @param {Object} [options]
      * @param {boolean} [options.silenceErrors] - Default false
@@ -1617,6 +1618,58 @@ var DataCatalog = (function () {
      */
     DataCatalogEntry.prototype.getSample = function (options) {
       var self = this;
+
+      // Check if parent has a sample that we can reuse
+      if (!self.samplePromise && self.isColumn()) {
+        var deferred = $.Deferred();
+        var cancellablePromises = [];
+
+        var revertToSpecific = function () {
+          if (options && options.cachedOnly) {
+            deferred.reject();
+          } else {
+            cancellablePromises.push(applyCancellable(reloadSample(self, options), options).done(deferred.resolve).fail(deferred.reject));
+          }
+        };
+
+        self.dataCatalog.getEntry({ path: self.path.slice(0, 2), definition: { type: 'table' } }).done(function (tableEntry) {
+          if (tableEntry && tableEntry.samplePromise) {
+            cancellablePromises.push(applyCancellable(tableEntry.samplePromise, options));
+
+            tableEntry.samplePromise.done(function (parentSample) {
+              var colSample = {
+                hueTimestamp: parentSample.hueTimestamp,
+                has_more: parentSample.has_more,
+                type: parentSample.type,
+                data: [],
+                meta: []
+              };
+              if (parentSample.meta) {
+                for (var i = 0; i < parentSample.meta.length; i++) {
+                  if (parentSample.meta[i].name.toLowerCase() === self.name.toLowerCase()) {
+                    colSample.meta[0] = parentSample.meta[i];
+                    parentSample.data.forEach(function (parentRow) {
+                      colSample.data.push([parentRow[i]]);
+                    });
+                    break;
+                  }
+                }
+              }
+              if (colSample.meta.length) {
+                self.sample = colSample;
+                deferred.resolve(self.sample);
+              } else {
+                revertToSpecific();
+              }
+            }).fail(revertToSpecific);
+          } else {
+            revertToSpecific();
+          }
+        }).fail(revertToSpecific);
+
+        return applyCancellable(self.trackedPromise('samplePromise', new CancellablePromise(deferred, undefined, cancellablePromises)), options);
+      }
+
       if (options && options.cachedOnly) {
         return applyCancellable(self.samplePromise, options) || $.Deferred().reject(false).promise();
       }
