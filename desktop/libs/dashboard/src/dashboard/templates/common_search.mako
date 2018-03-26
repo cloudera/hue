@@ -1564,7 +1564,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
         <!-- ko if: widgetType() == 'hit-widget' -->
           <!-- ko with: $parent -->
-            <!-- ko if: counts().length > 0 -->
+            <!-- ko if: counts().length > 0 && $root.collection.getFacetById($parent.id()) -->
               <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts(), properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
             <!-- /ko -->
           <!-- /ko -->
@@ -2042,7 +2042,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 
 
 <script type="text/html" id="hit-widget">
-  <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
+  <div class="widget-spinner" data-bind="visible: !$root.hasRetrievedResults()">
     <i class="fa fa-spinner fa-spin"></i>
   </div>
 
@@ -2059,7 +2059,9 @@ ${ dashboard.layout_skeleton(suffix='search') }
       % endif
     </div>
 
+    <!-- ko if: $root.collection.getFacetById($parent.id()) -->
     <span class="big-counter" data-bind="template: { name: 'counter-form', data: {counts: counts(), properties: $root.collection.getFacetById($parent.id()).properties }}"></span>
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 </script>
