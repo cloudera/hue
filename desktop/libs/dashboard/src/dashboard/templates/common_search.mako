@@ -4076,11 +4076,15 @@ $(document).ready(function () {
     }
   }
 
-  var widgetGridWidth = parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width);
+  var widgetGridWidth = null;
 
-  huePubSub.subscribe('dashboard.window.resize', function () {
-    widgetGridWidth = parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width);
-  }, 'dashboard');
+  var setWidgetGridWidth = function () {
+    // turns out Gridster generates CSS either with single or double quotes depending on the browser
+    widgetGridWidth = typeof hueUtils.getStyleFromCSSClass('[data-sizex="1"]') !== 'undefined' ? parseInt(hueUtils.getStyleFromCSSClass('[data-sizex="1"]').width) : parseInt(hueUtils.getStyleFromCSSClass("[data-sizex='1']").width);
+  }
+
+  setWidgetGridWidth();
+  huePubSub.subscribe('dashboard.window.resize', setWidgetGridWidth, 'dashboard');
 
   function restoreWidgetSizes() {
     $('li.gs-w').each(function () {
