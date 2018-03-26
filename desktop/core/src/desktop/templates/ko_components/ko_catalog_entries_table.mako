@@ -129,7 +129,7 @@ from desktop.views import _ko
         </thead>
         <tbody data-bind="foreach: filteredColumnSamples">
           <tr>
-            <td class="sample-column" data-bind="html: $data, attr: { 'title': $data }"></td>
+            <td class="sample-column" data-bind="html: $data, attr: { 'title': hueUtils.html2text($data) }"></td>
           </tr>
         </tbody>
         <!-- ko if: filteredColumnSamples().length === 0 -->
