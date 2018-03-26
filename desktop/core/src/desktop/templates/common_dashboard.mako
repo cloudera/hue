@@ -109,7 +109,7 @@
 
 <%def name="layout_skeleton(suffix='')">
   <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
-  <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
+    <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
     <img src="${ static('desktop/art/hint_arrow.png') }" alt="${ _('Hint arrow') }" />
   </div>
 
@@ -117,6 +117,13 @@
     <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
     <img src="${ static('desktop/art/hint_arrow_horiz_flipped.png') }" alt="${ _('Hint arrow') }" />
   </div>
+
+  <!-- ko if: $root.isGridster -->
+  <div id="emptyDashboardEditing" data-bind="visible: $root.gridItems().length === 0 && columns().length > 0">
+    <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${_('Drag any of the top widgets inside your dashboard')}</div>
+    <img src="${ static('desktop/art/hint_arrow.png') }" alt="${ _('Hint arrow') }" />
+  </div>
+  <!-- /ko -->
 
 
   <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
