@@ -310,7 +310,8 @@ class LoginAndPermissionMiddleware(object):
       if app_accessed and \
           app_accessed not in ("desktop", "home", "home2", "about", "hue", "editor", "notebook", "indexer", "404", "500", "403") and \
           not (request.user.has_hue_permission(action="access", app=app_accessed) or
-               request.user.has_hue_permission(action=access_view, app=app_accessed)):
+               request.user.has_hue_permission(action=access_view, app=app_accessed)) and \
+          not (app_accessed == '__debug__' and desktop.conf.DJANGO_DEBUG_MODE):
         access_log(request, 'permission denied', level=access_log_level)
         return PopupException(
             _("You do not have permission to access the %(app_name)s application.") % {'app_name': app_accessed.capitalize()}, error_code=401).response(request)
