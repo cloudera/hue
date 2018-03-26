@@ -116,6 +116,7 @@ Checked-in frontend third party dependencies
 |Codemirror|3.11|MIT|https://github.com/codemirror/CodeMirror|
 |D3|3.5.2+4.4.4|BSD|https://github.com/d3/d3|
 |Dropzone.js|4.3.0|MIT|https://github.com/enyo/dropzone|
+|django-debug-toolbar|1.3.2|BSD|https://pypi.python.org/pypi/django-debug-toolbar/1.3.2|
 |filesize.js|3.2.1|BSD|https://github.com/avoidwork/filesize.js|
 |FileUploader|?|MIT|https://github.com/FineUploader/fine-uploader|
 |Freshereditor|?|None|https://github.com/mquan/freshereditor|
