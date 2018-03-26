@@ -77,7 +77,7 @@ var CancellablePromise = (function () {
 
   CancellablePromise.prototype.cancel = function () {
     var self = this;
-    if (self.cancelPrevented) {
+    if (self.cancelPrevented || self.cancelled || self.state() !== 'pending') {
       return;
     }
     self.cancelled = true;
