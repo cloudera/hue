@@ -71,6 +71,8 @@ ko.bindingHandlers.gridster = {
         });
       ko.applyBindingsToDescendants(childBindingContext, addedWidget.get(0));
 
+      huePubSub.publish('gridster.added.widget', addedWidget);
+
       return addedWidget;
     };
 
@@ -93,7 +95,6 @@ ko.bindingHandlers.gridster = {
         switch (change.status) {
           case 'added':
             var addedWidget = addWidget(change.value);
-            huePubSub.publish('gridster.added.widget', addedWidget);
             if (change.value.callback) {
               ko.unwrap(change.value.callback)(addedWidget);
             }
