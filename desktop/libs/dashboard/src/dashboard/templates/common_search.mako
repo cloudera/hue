@@ -4271,6 +4271,7 @@ $(document).ready(function () {
 
       if (tempDraggable) {
         if (tempDraggableGridsterWidget) {
+          autoResizeSiblings(tempDraggableGridsterWidget, true);
           if (dimensions.overlap) {
             resizeAndMove(tempDraggableGridsterWidget, dimensions.sizex, dimensions.col, dimensions.row);
           }
@@ -4310,7 +4311,7 @@ $(document).ready(function () {
 
   }, 'dashboard');
 
-  huePubSub.subscribe('gridster.remove', function (gridElement) {
+  function autoResizeSiblings(gridElement, skipRemoveFromGrid) {
     // resize the siblings to the max of the avail space
     var siblings = [];
     searchViewModel.gridItems().forEach(function (siblingWidget) {
@@ -4330,9 +4331,13 @@ $(document).ready(function () {
       $gridster.move_widget($(widget.gridsterElement), newCol, widget.row());
       widget.col(newCol);
     }
-    searchViewModel.gridItems.remove(gridElement);
+    if (!skipRemoveFromGrid) {
+      searchViewModel.gridItems.remove(gridElement);
+    }
     huePubSub.publish('gridster.clean.whitespace');
-  }, 'dashboard')
+  }
+
+  huePubSub.subscribe('gridster.remove', autoResizeSiblings, 'dashboard')
 
   huePubSub.subscribe('gridster.remove.widget', function (widgetId) {
     if (searchViewModel.isGridster()) {
