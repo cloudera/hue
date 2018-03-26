@@ -451,8 +451,10 @@ from metadata.conf import has_navigator
         var viewSqlDeferred = $.Deferred().done(self.viewSql);
         self.activePromises.push(viewSqlDeferred.promise());
 
-        self.activePromises.push(self.catalogEntry().getSourceMeta({ cancellable: true }).done().fail(function () {
+        self.activePromises.push(self.catalogEntry().getSourceMeta({ cancellable: true }).fail(function () {
           self.hasErrors(true);
+        }).always(function () {
+          self.loading(false);
         }));
 
         if (self.catalogEntry().getSourceType() === 'impala' || self.catalogEntry().getSourceType() === 'hive') {
@@ -487,7 +489,6 @@ from metadata.conf import has_navigator
 
         $.when.apply($, self.activePromises).always(function () {
           self.activePromises.length = 0;
-          self.loading(false);
         })
       };
 
