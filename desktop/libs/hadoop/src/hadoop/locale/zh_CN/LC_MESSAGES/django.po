@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:44-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -191,15 +191,15 @@ msgstr "无 YARN 群集可用。"
 msgid "No Resource Manager are available."
 msgstr "无可用资源管理器。"
 
-#: src/hadoop/yarn/resource_manager_api.py:135
+#: src/hadoop/yarn/resource_manager_api.py:139
 msgid "YARN did not return any token field."
 msgstr "YARN 未返回任何令牌字段。"
 
-#: src/hadoop/yarn/resource_manager_api.py:162
+#: src/hadoop/yarn/resource_manager_api.py:166
 #, python-format
 msgid "YARN RM returned a failed response: %s"
 msgstr "YARN RM 返回失败的响应：%s"
 
-#: src/hadoop/yarn/spark_history_server_api.py:47
+#: src/hadoop/yarn/spark_history_server_api.py:53
 msgid "No Spark History Server is available."
 msgstr "无 Spark 历史记录服务器可用。"

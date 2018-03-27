@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:44-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -193,15 +193,15 @@ msgstr "YARN-Cluster ist nicht verfügbar."
 msgid "No Resource Manager are available."
 msgstr "Es ist kein Resource Manager verfügbar."
 
-#: src/hadoop/yarn/resource_manager_api.py:135
+#: src/hadoop/yarn/resource_manager_api.py:139
 msgid "YARN did not return any token field."
 msgstr "YARN gab keine Token-Felder aus."
 
-#: src/hadoop/yarn/resource_manager_api.py:162
+#: src/hadoop/yarn/resource_manager_api.py:166
 #, python-format
 msgid "YARN RM returned a failed response: %s"
 msgstr "YARN RM gab eine Fehlermeldung zurück: %s"
 
-#: src/hadoop/yarn/spark_history_server_api.py:47
+#: src/hadoop/yarn/spark_history_server_api.py:53
 msgid "No Spark History Server is available."
 msgstr "Kein Spark-Verlaufsserver verfügbar."

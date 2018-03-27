@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -348,7 +348,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "利用可能なログがありません。"
 
-#: src/pig/templates/app.mako:554 src/pig/templates/app.mako:1113
+#: src/pig/templates/app.mako:554 src/pig/templates/app.mako:1106
 msgid "Running"
 msgstr "実行中"
 
@@ -467,30 +467,30 @@ msgstr "実行を停止します。"
 msgid "Saved"
 msgstr "保存済み"
 
-#: src/pig/templates/app.mako:1106
+#: src/pig/templates/app.mako:1099
 msgid "Saving"
 msgstr "保存中"
 
-#: src/pig/templates/app.mako:1117
+#: src/pig/templates/app.mako:1110
 msgid "has been saved correctly."
 msgstr "が正しく保存されました。"
 
-#: src/pig/templates/app.mako:1385
+#: src/pig/templates/app.mako:1378
 msgid "Did you know?"
 msgstr "便利な使い方"
 
-#: src/pig/templates/app.mako:1392
+#: src/pig/templates/app.mako:1385
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Pig パラメータおよびオプションの名前と値。例："
 
-#: src/pig/templates/app.mako:1399
+#: src/pig/templates/app.mako:1392
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Hadoop プロパティの名前と値。例："
 
-#: src/pig/templates/app.mako:1406
+#: src/pig/templates/app.mako:1399
 msgid "Include files or compressed files"
 msgstr "ファイルまたは圧縮ファイルを含める"
 
-#: src/pig/templates/app.mako:1415
+#: src/pig/templates/app.mako:1408
 msgid "You have unsaved changes in this pig script."
 msgstr "この Pig スクリプトには未保存の変更があります。"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/beeswax/api.py:166 src/beeswax/api.py:285 src/beeswax/api.py:316
-#: src/beeswax/api.py:383 src/beeswax/api.py:443 src/beeswax/api.py:472
-#: src/beeswax/api.py:521 src/beeswax/api.py:587 src/beeswax/api.py:634
-#: src/beeswax/api.py:750 src/beeswax/views.py:600
+#: src/beeswax/api.py:173 src/beeswax/api.py:292 src/beeswax/api.py:323
+#: src/beeswax/api.py:390 src/beeswax/api.py:450 src/beeswax/api.py:479
+#: src/beeswax/api.py:528 src/beeswax/api.py:594 src/beeswax/api.py:641
+#: src/beeswax/api.py:769 src/beeswax/views.py:600
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/beeswax/api.py:260
+#: src/beeswax/api.py:267
 #, python-format
 msgid ""
 "Bad status for request %s:\n"
@@ -33,78 +33,83 @@ msgstr ""
 "잘못된 %s 요청 상태:\n"
 "%s"
 
-#: src/beeswax/api.py:365
+#: src/beeswax/api.py:372
 msgid "There was an error with your query."
 msgstr "쿼리에 오류가 있습니다."
 
-#: src/beeswax/api.py:415 src/beeswax/api.py:430
+#: src/beeswax/api.py:422 src/beeswax/api.py:437
 msgid "A GET request is required."
 msgstr "GET 요청이 필요합니다."
 
-#: src/beeswax/api.py:475 src/beeswax/api.py:524 src/beeswax/api.py:590
+#: src/beeswax/api.py:482 src/beeswax/api.py:531 src/beeswax/api.py:597
 #, python-format
 msgid "This query is %(state)s. Results unavailable."
 msgstr "이 쿼리는 %(state)s 상태이므로 결과를 볼 수 없습니다."
 
-#: src/beeswax/api.py:497 src/beeswax/api.py:563 src/beeswax/api.py:619
+#: src/beeswax/api.py:504 src/beeswax/api.py:570 src/beeswax/api.py:626
 #, python-format
 msgid "The result could not be saved: %s."
 msgstr "결과를 저장할 수 없음: %s."
 
-#: src/beeswax/api.py:542 src/beeswax/api.py:605
+#: src/beeswax/api.py:549 src/beeswax/api.py:612
 #, python-format
 msgid "Cannot find query handle and state: %s"
 msgstr "쿼리 핸들 및 상태를 찾을 수 없음: %s"
 
-#: src/beeswax/api.py:551
+#: src/beeswax/api.py:558
 msgid "The target path is a directory"
 msgstr "대상 경로가 디렉토리입니다."
 
-#: src/beeswax/api.py:672
+#: src/beeswax/api.py:671
+#, python-format
+msgid "Table sample for `%(database)s`.`%(table)s`.`%(column)s`"
+msgstr "`%(database)s`.`%(table)s`.`%(column)s`의 테이블 샘플"
+
+#: src/beeswax/api.py:691
 msgid "Failed to get sample data."
 msgstr "샘플 데이터를 가져올 수 없습니다."
 
-#: src/beeswax/api.py:689
+#: src/beeswax/api.py:708
 msgid "Failed to get indexes."
 msgstr "인덱스를 가져올 수 없습니다."
 
-#: src/beeswax/api.py:705
+#: src/beeswax/api.py:724
 msgid "Failed to get settings."
 msgstr "설정을 가져올 수 없습니다."
 
-#: src/beeswax/api.py:723
+#: src/beeswax/api.py:742
 msgid "Failed to get functions."
 msgstr "함수를 가져올 수 없습니다."
 
-#: src/beeswax/api.py:815
+#: src/beeswax/api.py:834
 msgid "Could not find session or no open sessions found."
 msgstr "세션을 찾을 수 없거나 열린 세션을 찾을 수 없습니다."
 
-#: src/beeswax/api.py:834
+#: src/beeswax/api.py:853
 msgid ""
 "Session does not exist or you do not have permissions to close the "
 "session."
 msgstr "세션이 없거나 세션을 닫을 권한이 없습니다."
 
-#: src/beeswax/api.py:839
+#: src/beeswax/api.py:858
 msgid "Session successfully closed."
 msgstr "세션을 성공적으로 닫았습니다."
 
-#: src/beeswax/api.py:852
+#: src/beeswax/api.py:871
 msgid "Problem accessing table metadata"
 msgstr "테이블 메타데이터를 액세스하는 중 오류 발생"
 
-#: src/beeswax/api.py:899
+#: src/beeswax/api.py:918
 msgid ""
 "Failed to authenticate to query server, check authentication "
 "configurations."
 msgstr "쿼리 서버에 인증할 수 없습니다. 인증 구성을 확인하십시오."
 
-#: src/beeswax/api.py:903
+#: src/beeswax/api.py:922
 msgid "Unable to access databases, Query Server or Metastore may be down."
 msgstr "데이터베이스에 액세스할 수 없습니다. 쿼리 서버 또는 Metastore가 작동하지 않을 수 있습니다."
 
-#: src/beeswax/api.py:906
+#: src/beeswax/api.py:925
 msgid "No databases are available. Permissions could be missing."
 msgstr "데이터베이스를 사용할 수 없습니다. 권한이 없습니다."
 
@@ -343,7 +348,7 @@ msgstr "새 디자인으로 저장할 이름을 변경합니다."
 
 #: src/beeswax/forms.py:49 src/beeswax/forms.py:222 src/beeswax/forms.py:312
 #: src/beeswax/forms.py:442 src/beeswax/templates/execute.mako:668
-#: src/beeswax/templates/execute.mako:2452
+#: src/beeswax/templates/execute.mako:2451
 #: src/beeswax/templates/list_designs.mako:86
 #: src/beeswax/templates/list_trashed_designs.mako:70
 msgid "Description"
@@ -774,72 +779,72 @@ msgstr "테이블 %(table)s 로드 중 오류 발생: 작업 시간이 초과되
 msgid "Error loading table %(table)s: %(error)s."
 msgstr "테이블 %(table)s 로드 중 오류 발생: %(error)s."
 
-#: src/beeswax/server/dbms.py:178
+#: src/beeswax/server/dbms.py:181
 #, python-format
 msgid "Failed to execute alter database statement: %s"
 msgstr "데이터베이스 변경 명령문을 실행할 수 없음: %s"
 
-#: src/beeswax/server/dbms.py:228
+#: src/beeswax/server/dbms.py:231
 #, python-format
 msgid "Failed to find the table: %s"
 msgstr "테이블을 찾을 수 없음: %s"
 
-#: src/beeswax/server/dbms.py:250
+#: src/beeswax/server/dbms.py:253
 #, python-format
 msgid "Failed to execute alter table statement: %s"
 msgstr "대체 테이블 명령문을 실행할 수 없음: %s"
 
-#: src/beeswax/server/dbms.py:285
+#: src/beeswax/server/dbms.py:288
 #, python-format
 msgid "Failed to execute alter column statement: %s"
 msgstr "대체 열 명령문을 실행할 수 없음: %s"
 
-#: src/beeswax/server/dbms.py:343
+#: src/beeswax/server/dbms.py:346
 msgid ""
 "Failed to close session, session handle may already be closed or timed "
 "out."
 msgstr "세션을 닫을 수 없습니다. 세션 핸들이 이미 닫혔거나 시간이 초과되었습니다."
 
-#: src/beeswax/server/dbms.py:622
+#: src/beeswax/server/dbms.py:628
 #, python-format
 msgid "Only SELECT statements can be saved. Provided query: %(query)s"
 msgstr "SELECT 문만 저장할 수 있습니다. 제공된 쿼리: %(query)s"
 
-#: src/beeswax/server/dbms.py:684
+#: src/beeswax/server/dbms.py:690
 #, python-format
 msgid "Saved query results as new table %(table)s."
 msgstr "쿼리 결과를 새 테이블 %(table)s(으)로 저장했습니다."
 
-#: src/beeswax/server/dbms.py:792
+#: src/beeswax/server/dbms.py:798
 #, python-format
 msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
 msgstr "서버가 쿼리 ID %(id)d [%(query)s]에 대해 잘못된 핸들을 반환하는 중..."
 
-#: src/beeswax/server/dbms.py:841
+#: src/beeswax/server/dbms.py:847
 #, python-format
 msgid "Query did not return exactly one partition result: %s"
 msgstr "쿼리가 정확히 하나의 파티션 결과를 반환하지 않음: %s"
 
-#: src/beeswax/server/dbms.py:948
+#: src/beeswax/server/dbms.py:986
 #, python-format
 msgid "Could not retrieve logs: %s."
 msgstr "로그를 검색할 수 없음: %s."
 
-#: src/beeswax/server/dbms.py:951
+#: src/beeswax/server/dbms.py:989
 msgid "Unknown exception."
 msgstr "알 수 없는 예외입니다."
 
-#: src/beeswax/server/hive_server2_lib.py:567
+#: src/beeswax/server/hive_server2_lib.py:569
 #, python-format
 msgid "%s server authentication not supported. Valid are %s."
 msgstr "%s 서버 인증이 지원되지 않습니다. %s이(가) 유효합니다."
 
-#: src/beeswax/server/hive_server2_lib.py:760
+#: src/beeswax/server/hive_server2_lib.py:762
 #, python-format
 msgid "%(query)s returned more than 1 row"
 msgstr "%(query)s에서 2개 이상의 행을 반환함"
 
-#: src/beeswax/server/hive_server2_lib.py:1015
+#: src/beeswax/server/hive_server2_lib.py:1017
 #, python-format
 msgid "Failed to determine partition keys for Impala table: `%s`.`%s`"
 msgstr "Impala 테이블에 대한 파티션 키를 결정할 수 없음: `%s`.`%s`"
@@ -896,9 +901,9 @@ msgid "Value"
 msgstr "값"
 
 #: src/beeswax/templates/configuration.mako:65
-#: src/beeswax/templates/execute.mako:1327
-#: src/beeswax/templates/execute.mako:2140
-#: src/beeswax/templates/execute.mako:2170
+#: src/beeswax/templates/execute.mako:1326
+#: src/beeswax/templates/execute.mako:2139
+#: src/beeswax/templates/execute.mako:2169
 #: src/beeswax/templates/list_designs.mako:175
 #: src/beeswax/templates/list_history.mako:191
 #: src/beeswax/templates/list_trashed_designs.mako:154
@@ -909,9 +914,9 @@ msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
 #: src/beeswax/templates/configuration.mako:66
-#: src/beeswax/templates/execute.mako:1331
-#: src/beeswax/templates/execute.mako:2141
-#: src/beeswax/templates/execute.mako:2171
+#: src/beeswax/templates/execute.mako:1330
+#: src/beeswax/templates/execute.mako:2140
+#: src/beeswax/templates/execute.mako:2170
 #: src/beeswax/templates/list_designs.mako:176
 #: src/beeswax/templates/list_history.mako:195
 #: src/beeswax/templates/list_trashed_designs.mako:155
@@ -1047,7 +1052,7 @@ msgid ""
 msgstr "데이터베이스를 기본 위치(보통 Hive가 제어)에 저장"
 
 #: src/beeswax/templates/create_database.mako:159
-#: src/beeswax/templates/execute.mako:1786
+#: src/beeswax/templates/execute.mako:1785
 msgid "This field is required."
 msgstr "이 필드는 필수 항목입니다."
 
@@ -1064,7 +1069,7 @@ msgstr "뒤로"
 #: src/beeswax/templates/create_database.mako:170
 #: src/beeswax/templates/create_table_manually.mako:385
 #: src/beeswax/templates/execute.mako:327
-#: src/beeswax/templates/execute.mako:1335
+#: src/beeswax/templates/execute.mako:1334
 #: src/beeswax/templates/import_wizard_choose_delimiter.mako:163
 #: src/beeswax/templates/import_wizard_choose_file.mako:166
 #: src/beeswax/templates/list_history.mako:199
@@ -1370,15 +1375,15 @@ msgstr "char 값 길이(1~255)"
 msgid "Length of varchar value (1~65355)"
 msgstr "varchar 값 길이(1~65355)"
 
-#: src/beeswax/templates/create_table_manually.mako:639
+#: src/beeswax/templates/create_table_manually.mako:641
 msgid "Type your field terminator here"
 msgstr "여기에 필드 터미네이터 입력"
 
-#: src/beeswax/templates/create_table_manually.mako:648
+#: src/beeswax/templates/create_table_manually.mako:650
 msgid "Type your collection terminator here"
 msgstr "여기에 수집 터미네이터 입력"
 
-#: src/beeswax/templates/create_table_manually.mako:657
+#: src/beeswax/templates/create_table_manually.mako:659
 msgid "Type your map key terminator here"
 msgstr "여기에 Map 키 터미네이터 입력"
 
@@ -1438,7 +1443,7 @@ msgstr "UDF"
 
 #: src/beeswax/templates/execute.mako:156
 #: src/beeswax/templates/execute.mako:661
-#: src/beeswax/templates/execute.mako:2449
+#: src/beeswax/templates/execute.mako:2448
 #: src/beeswax/templates/list_designs.mako:85
 #: src/beeswax/templates/list_history.mako:115
 #: src/beeswax/templates/list_trashed_designs.mako:69
@@ -1530,7 +1535,7 @@ msgid "You can highlight and run a fragment of a query"
 msgstr "쿼리 단편을 강조 표시하고 실행할 수 있음"
 
 #: src/beeswax/templates/execute.mako:278
-#: src/beeswax/templates/execute.mako:1792
+#: src/beeswax/templates/execute.mako:1791
 msgid "Query name"
 msgstr "쿼리 이름"
 
@@ -1884,83 +1889,83 @@ msgstr "올바르지 않은 쿼리"
 msgid "Query requires a select or an aggregate."
 msgstr "쿼리에 선택 또는 집계가 필요합니다."
 
-#: src/beeswax/templates/execute.mako:1160
+#: src/beeswax/templates/execute.mako:1159
 msgid "There was a problem loading the stats."
 msgstr "상태를 로드하는 중에 문제가 발생했습니다."
 
-#: src/beeswax/templates/execute.mako:1328
+#: src/beeswax/templates/execute.mako:1327
 #: src/beeswax/templates/list_history.mako:192
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "_START_ to _END_ of _TOTAL_ 항목 표시"
 
-#: src/beeswax/templates/execute.mako:1329
+#: src/beeswax/templates/execute.mako:1328
 #: src/beeswax/templates/list_history.mako:193
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "0~0개(전체 0개 중) 항목 표시"
 
-#: src/beeswax/templates/execute.mako:1330
+#: src/beeswax/templates/execute.mako:1329
 #: src/beeswax/templates/list_history.mako:194
 msgid "(filtered from _MAX_ total entries)"
 msgstr "(총 _MAX_ 항목에서 필터링됨)"
 
-#: src/beeswax/templates/execute.mako:1333
+#: src/beeswax/templates/execute.mako:1332
 #: src/beeswax/templates/list_history.mako:197
 msgid "First"
 msgstr "처음"
 
-#: src/beeswax/templates/execute.mako:1334
+#: src/beeswax/templates/execute.mako:1333
 #: src/beeswax/templates/list_history.mako:198
 msgid "Last"
 msgstr "마지막"
 
-#: src/beeswax/templates/execute.mako:1336
+#: src/beeswax/templates/execute.mako:1335
 #: src/beeswax/templates/import_wizard_choose_delimiter.mako:162
 #: src/beeswax/templates/import_wizard_define_columns.mako:168
 #: src/beeswax/templates/list_history.mako:200
 msgid "Previous"
 msgstr "이전"
 
-#: src/beeswax/templates/execute.mako:1352
+#: src/beeswax/templates/execute.mako:1351
 msgid "See results..."
 msgstr "결과 보기..."
 
-#: src/beeswax/templates/execute.mako:1521
+#: src/beeswax/templates/execute.mako:1520
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "예: SELECT * FROM 테이블 이름 또는 Ctrl + space 누르기"
 
-#: src/beeswax/templates/execute.mako:1524
+#: src/beeswax/templates/execute.mako:1523
 msgid "Press \"tab\", then \"enter\"."
 msgstr "\"tab\", \"enter\"를 차례로 누르십시오."
 
-#: src/beeswax/templates/execute.mako:1775
+#: src/beeswax/templates/execute.mako:1774
 msgid ""
 "Results exceeds maximum number of columns permitted by Excel, will "
 "truncate results to 255 columns."
 msgstr "결과가 Excel에서 허용하는 최대 열 수를 초과하므로, 255개 열로 결과가 잘립니다."
 
-#: src/beeswax/templates/execute.mako:1799
+#: src/beeswax/templates/execute.mako:1798
 msgid "Empty description"
 msgstr "설명 없음"
 
-#: src/beeswax/templates/execute.mako:1876
+#: src/beeswax/templates/execute.mako:1875
 #: src/beeswax/templates/watch_results.mako:588
 msgid "Please select the latitude and longitude columns."
 msgstr "위도와 경로 열을 선택하십시오."
 
-#: src/beeswax/templates/execute.mako:1897
+#: src/beeswax/templates/execute.mako:1896
 #: src/beeswax/templates/watch_results.mako:615
 msgid "Please select the columns you would like to see in this chart."
 msgstr "이 차트에 표시할 열을 선택하십시오."
 
-#: src/beeswax/templates/execute.mako:1956
+#: src/beeswax/templates/execute.mako:1955
 msgid "MR Job"
 msgstr "MR Job"
 
-#: src/beeswax/templates/execute.mako:1957
+#: src/beeswax/templates/execute.mako:1956
 msgid "MR Jobs"
 msgstr "MR Job"
 
-#: src/beeswax/templates/execute.mako:2183
+#: src/beeswax/templates/execute.mako:2182
 #: src/beeswax/templates/watch_results.mako:242
 #: src/beeswax/templates/watch_results.mako:250
 #: src/beeswax/templates/watch_results.mako:260
@@ -1969,50 +1974,50 @@ msgstr "MR Job"
 msgid "Please select a column"
 msgstr "열을 선택하십시오."
 
-#: src/beeswax/templates/execute.mako:2285
+#: src/beeswax/templates/execute.mako:2284
 msgid "No query provided to save."
 msgstr "저장할 쿼리를 제공하지 않았습니다."
 
-#: src/beeswax/templates/execute.mako:2415
+#: src/beeswax/templates/execute.mako:2414
 msgid "Server error occurred: "
 msgstr "서버 오류 발생: "
 
-#: src/beeswax/templates/execute.mako:2420
+#: src/beeswax/templates/execute.mako:2419
 msgid "Hue server is probably down."
 msgstr "Hue 서버가 작동하지 않을 수 있습니다."
 
-#: src/beeswax/templates/execute.mako:2422
+#: src/beeswax/templates/execute.mako:2421
 msgid "Unmanageable server error occurred: "
 msgstr "관리할 수 없는 서버 오류 발생: "
 
-#: src/beeswax/templates/execute.mako:2428
+#: src/beeswax/templates/execute.mako:2427
 msgid "Query saved."
 msgstr "쿼리가 저장되었습니다."
 
-#: src/beeswax/templates/execute.mako:2432
+#: src/beeswax/templates/execute.mako:2431
 msgid "Could not save design"
 msgstr "디자인을 저장할 수 없음"
 
-#: src/beeswax/templates/execute.mako:2466
+#: src/beeswax/templates/execute.mako:2465
 msgid "Could not save results"
 msgstr "결과를 저장할 수 없음"
 
-#: src/beeswax/templates/execute.mako:2473
+#: src/beeswax/templates/execute.mako:2472
 msgid "Problem: "
 msgstr "문제: "
 
-#: src/beeswax/templates/execute.mako:2476
+#: src/beeswax/templates/execute.mako:2475
 msgid "Query canceled!"
 msgstr "쿼리가 취소되었습니다!"
 
-#: src/beeswax/templates/execute.mako:2507
-#: src/beeswax/templates/execute.mako:2515
+#: src/beeswax/templates/execute.mako:2506
+#: src/beeswax/templates/execute.mako:2514
 #: src/beeswax/templates/watch_results.mako:126
 msgid "Did you know?"
 msgstr "유용한 정보"
 
-#: src/beeswax/templates/execute.mako:2570
-#: src/beeswax/templates/execute.mako:2577
+#: src/beeswax/templates/execute.mako:2569
+#: src/beeswax/templates/execute.mako:2576
 msgid ""
 "Missing some tables? In order to update the list of tables/metadata seen "
 "by Impala, execute one of these queries:"
@@ -2065,7 +2070,7 @@ msgstr "한 자여야 하는 열 구분 기호를 입력합니다. 특수 문자
 msgid "Table preview"
 msgstr "테이블 미리 보기"
 
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:221
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:223
 msgid "Type your delimiter here"
 msgstr "여기에 구분 기호 입력"
 
@@ -2502,6 +2507,3 @@ msgstr "이름 또는 디렉토리가 필요합니다."
 #: src/beeswax/templates/watch_results.mako:502
 msgid "Download results from the left."
 msgstr "왼쪽에서 결과를 다운로드합니다."
-
-#~ msgid "Query did not return exactly one partition result"
-#~ msgstr ""

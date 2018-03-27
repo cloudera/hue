@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:44-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -191,15 +191,15 @@ msgstr "YARN クラスターが利用できません。"
 msgid "No Resource Manager are available."
 msgstr "Resource Manager が利用できません。"
 
-#: src/hadoop/yarn/resource_manager_api.py:135
+#: src/hadoop/yarn/resource_manager_api.py:139
 msgid "YARN did not return any token field."
 msgstr "YARN がトークンフィールドを返しませんでした。"
 
-#: src/hadoop/yarn/resource_manager_api.py:162
+#: src/hadoop/yarn/resource_manager_api.py:166
 #, python-format
 msgid "YARN RM returned a failed response: %s"
 msgstr "YARN RM が失敗した応答 %s を返しました"
 
-#: src/hadoop/yarn/spark_history_server_api.py:47
+#: src/hadoop/yarn/spark_history_server_api.py:53
 msgid "No Spark History Server is available."
 msgstr "Spark 履歴サーバーが利用できません。"

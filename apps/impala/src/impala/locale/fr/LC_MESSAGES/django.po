@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -21,16 +21,16 @@ msgstr ""
 msgid "Successfully invalidated metadata"
 msgstr "Métadonnées invalidées avec succès"
 
-#: src/impala/api.py:65
+#: src/impala/api.py:64
 #, python-format
 msgid "Successfully refreshed metadata for `%s`.`%s`"
 msgstr "Métadonnées actualisées avec succès pour '%s'.'%s'"
 
-#: src/impala/api.py:80
+#: src/impala/api.py:79
 msgid "get_exec_summary requires a valid query_history_id"
 msgstr "get_exec_summary exige un query_history_id valable"
 
-#: src/impala/api.py:102
+#: src/impala/api.py:101
 msgid "get_runtime_profile requires a valid query_history_id"
 msgstr "get_runtime_profile requiert un query_history_id valable"
 
@@ -91,11 +91,11 @@ msgstr ""
 msgid ""
 "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
 "if Impala does not do any work (compute or send back results) for that "
-"session within QUERY_TIMEOUT_S seconds. Default: 1 hour."
+"session within SESSION_TIMEOUT_S seconds. Default: 30 min."
 msgstr ""
-"Si SESSION_TIMEOUT_S > 0, la session expire (est annulée) "
-"si Impala n'effectue aucune tâche (calcul ou renvoi de résultats) pour cette "
-"session dans un délai de QUERY_TIMEOUT_S secondes. Valeur par défaut : 1 heure."
+"Si SESSION_TIMEOUT_S > 0, la session expire (est annulée) "
+"si Impala n'effectue aucune tâche (calcul ou renvoi de résultats) pour cette"
+"session dans un délai de SESSION_TIMEOUT_S secondes. Valeur par défaut : 30 min"
 
 #: src/impala/conf.py:102
 msgid ""

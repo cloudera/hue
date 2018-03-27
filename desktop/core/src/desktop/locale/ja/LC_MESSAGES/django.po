@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:43-0800\n"
+"POT-Creation-Date: 2018-03-07 10:03-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -66,19 +66,27 @@ msgstr "update_document には uuid が必要です"
 msgid "delete_document requires uuid"
 msgstr "delete_document には uuid が必要です"
 
+#: src/desktop/api2.py:372
+msgid "copy_document requires uuid"
+msgstr "copy_document には uuid が必要です"
+
 #: src/desktop/api2.py:377
+msgid "Directory copy is not supported"
+msgstr "ディレクトリコピーはサポートされていません"
+
+#: src/desktop/api2.py:441
 msgid "restore_document requires comma separated uuids"
 msgstr "restore_document には、カンマ区切りの uuid が必要です"
 
-#: src/desktop/api2.py:400
+#: src/desktop/api2.py:464
 msgid "share_document requires uuid and perms_dict"
 msgstr "share_document には uuid と perms_dict が必要です"
 
-#: src/desktop/api2.py:494
+#: src/desktop/api2.py:558
 msgid "Failed to import documents, the file does not contain valid JSON."
 msgstr "ドキュメントのインポートに失敗しました。有効な JSON がファイルに含まれていません。"
 
-#: src/desktop/api2.py:498
+#: src/desktop/api2.py:562
 msgid ""
 "Failed to import documents, the file does not contain the expected JSON "
 "schema for Hue documents."
@@ -86,11 +94,11 @@ msgstr ""
 "ドキュメントのインポートに失敗しました。Hue ドキュメントに対して想定される JSON スキーマが"
 "ファイルに含まれていません。"
 
-#: src/desktop/api2.py:621 src/desktop/api2.py:652
+#: src/desktop/api2.py:685 src/desktop/api2.py:716
 msgid "Navigator not enabled"
 msgstr "Navigator が有効になっていません"
 
-#: src/desktop/api2.py:774
+#: src/desktop/api2.py:838
 #, python-format
 msgid "Cannot import document, dependency with UUID: %s not found."
 msgstr "ドキュメントをインポートできません。UUID %s との依存関係が見つかりません。"
@@ -100,60 +108,80 @@ msgid "load_apps has already been called."
 msgstr "load_apps はすでに呼び出されています。"
 
 #: src/desktop/conf.py:133
+msgid ""
+"If set to true, CherryPy will be used. Otherwise, Gunicorn will be used "
+"as the webserver."
+msgstr ""
+"true に設定すると、CherryPy が使用されます。それ以外の場合は、Gunicorn が Web サーバーとして"
+"使用されます。"
+
+#: src/desktop/conf.py:139
+msgid "Gunicorn work class: gevent or evenlet, gthread or sync."
+msgstr "Gunicorn の作業クラス：gevent または evenlet、gthread または sync。"
+
+#: src/desktop/conf.py:145
+msgid ""
+"The number of Gunicorn worker processes. If not specified, it uses: "
+"(number of CPU * 2) + 1."
+msgstr ""
+"Gunicorn ワーカープロセスの数。指定されていない場合は、 "
+"(CPU 数 * 2) + 1 が使用されます。"
+
+#: src/desktop/conf.py:151
 msgid "HTTP host to bind to."
 msgstr "バインド先の HTTP ホストです。"
 
-#: src/desktop/conf.py:139
+#: src/desktop/conf.py:157
 msgid "HTTP port to bind to."
 msgstr "バインド先の HTTP ポートです。"
 
-#: src/desktop/conf.py:145
+#: src/desktop/conf.py:163
 msgid "HTTP methods the server will be allowed to service."
 msgstr "サーバーで処理できる HTTP メソッドです。"
 
-#: src/desktop/conf.py:152
+#: src/desktop/conf.py:170
 msgid "A comma-separated list of available Hue load balancers."
 msgstr "利用可能な Hue ロードバランサのカンマ区切りのリストです。"
 
-#: src/desktop/conf.py:159
+#: src/desktop/conf.py:177
 msgid "X-Frame-Options HTTP header value."
 msgstr "X-Frame オプションの HTTP ヘッダー値です。"
 
-#: src/desktop/conf.py:165
+#: src/desktop/conf.py:183
 msgid "Filename of SSL Certificate"
 msgstr "SSL 証明書のファイル名"
 
-#: src/desktop/conf.py:171
+#: src/desktop/conf.py:189
 msgid "Filename of SSL RSA Private Key"
 msgstr "SSL RSA 秘密鍵のファイル名"
 
-#: src/desktop/conf.py:177
+#: src/desktop/conf.py:195
 msgid "Filename of SSL Certificate Chain"
 msgstr "SSL 証明書チェーンのファイル名"
 
-#: src/desktop/conf.py:183
+#: src/desktop/conf.py:201
 msgid "List of allowed and disallowed ciphers"
 msgstr "使用できる暗号と使用できない暗号のリスト"
 
-#: src/desktop/conf.py:205
+#: src/desktop/conf.py:223
 msgid "SSL password of the certificate"
 msgstr "証明書の SSL パスワード"
 
-#: src/desktop/conf.py:210
+#: src/desktop/conf.py:228
 msgid ""
 "Execute this script to produce the SSL password. This will be used when "
 "`ssl_password` is not set."
 msgstr "このスクリプトを実行して SSL パスワードを作成します。これは ssl_password が設定されていない場合に利用されます。"
 
-#: src/desktop/conf.py:216
+#: src/desktop/conf.py:234
 msgid "Path to default Certificate Authority certificates."
 msgstr "デフォルトの認証局証明書へのパスです。"
 
-#: src/desktop/conf.py:222
+#: src/desktop/conf.py:240
 msgid "Choose whether Hue should validate certificates received from the server."
 msgstr "サーバーから受け取った証明書を Hue で検証するかどうかを選択します。"
 
-#: src/desktop/conf.py:228
+#: src/desktop/conf.py:246
 msgid ""
 "Strict-Transport-Security: max-age=31536000 This is a HTTP response "
 "header, Once a supported browser receives this header that browser will "
@@ -165,7 +193,7 @@ msgstr ""
 "このヘッダーを受け取ると、指定されたドメインへのすべての通信に HTTPS を"
 "使用します。"
 
-#: src/desktop/conf.py:234
+#: src/desktop/conf.py:252
 msgid ""
 "Strict-Transport-Security: This is a HTTP response header, Once a "
 "supported browser receives this header that browser will prevent any "
@@ -177,7 +205,7 @@ msgstr ""
 "このヘッダーを受け取ると、指定されたドメインへのすべての通信に HTTPS を"
 "使用します。"
 
-#: src/desktop/conf.py:240 src/desktop/conf.py:252
+#: src/desktop/conf.py:258 src/desktop/conf.py:270
 msgid ""
 "X-Content-Type-Options: nosniff This is a HTTP response header feature "
 "that helps prevent attacks based on MIME-type confusion."
@@ -185,7 +213,7 @@ msgstr ""
 "X-Content-Type-Options: nosniff MIME タイプの問題を悪用した攻撃を防ぐための "
 "HTTP 応答ヘッダー機能です。"
 
-#: src/desktop/conf.py:246
+#: src/desktop/conf.py:264
 msgid ""
 "X-Xss-Protection: \"1; mode=block\" This is a HTTP response header "
 "feature to force XSS protection."
@@ -193,15 +221,15 @@ msgstr ""
 "X-Xss-Protection: \"1; mode=block\" XSS 保護を強制的に適用する "
 "HTTP 応答ヘッダー機能です。"
 
-#: src/desktop/conf.py:264
+#: src/desktop/conf.py:282
 msgid "If all non-SSL requests should be permanently redirected to SSL."
 msgstr "すべての非 SSL 要求を SSL にリダイレクトするかどうかの指定です。"
 
-#: src/desktop/conf.py:270
+#: src/desktop/conf.py:288
 msgid "If all non-SSL requests should be permanently redirected to this SSL host."
 msgstr "すべての非 SSL 要求をこの SSL ホストにリダイレクトするかどうかの指定です。"
 
-#: src/desktop/conf.py:276
+#: src/desktop/conf.py:294
 msgid ""
 "Comma separated list of strings representing the host/domain names that "
 "the Hue server can not serve https."
@@ -209,7 +237,7 @@ msgstr ""
 "Hue Server が https に対応できないホスト／ドメイン名を表す文字列のカンマ区切り"
 "リストです。"
 
-#: src/desktop/conf.py:283
+#: src/desktop/conf.py:301
 msgid ""
 "LDAP password of the hue user used for LDAP authentications. For example "
 "for LDAP Authentication with HiveServer2/Impala."
@@ -217,13 +245,13 @@ msgstr ""
 "LDAP 認証で使用する Hue ユーザーの LDAP パスワードです。たとえば、HiveServer2／Impala の LDAP "
 "認証で使用します。"
 
-#: src/desktop/conf.py:290
+#: src/desktop/conf.py:308
 msgid ""
 "Execute this script to produce the LDAP password. This will be used when "
 "`ldap_password` is not set."
 msgstr "このスクリプトを実行して LDAP パスワードを作成します。これは ldap_password が設定されていない場合に利用されます。"
 
-#: src/desktop/conf.py:298
+#: src/desktop/conf.py:316
 msgid ""
 "LDAP username of the hue user used for LDAP authentications. For example "
 "for LDAP Authentication with HiveServer2/Impala."
@@ -231,13 +259,13 @@ msgstr ""
 "LDAP 認証で使用する Hue ユーザーの LDAP ユーザー名です。たとえば、HiveServer2／Impala の LDAP "
 "認証で使用します。"
 
-#: src/desktop/conf.py:308
+#: src/desktop/conf.py:326
 msgid ""
 "Auth username of the hue user used for authentications. For example for "
 "LDAP Authentication with HiveServer2/Impala."
 msgstr "認証で使用する Hue ユーザーの Auth ユーザー名です。たとえば、HiveServer2/Impala の LDAP 認証で使用します。"
 
-#: src/desktop/conf.py:334
+#: src/desktop/conf.py:352
 msgid ""
 "LDAP/PAM/.. password of the hue user used for authentications. Inactive "
 "if empty. For example for LDAP Authentication with HiveServer2/Impala."
@@ -245,13 +273,13 @@ msgstr ""
 "認証で使用する Hue ユーザーの LDAP/PAM/.. "
 "パスワードです。空の場合、アクティブになりません。たとえば、HiveServer2／Impala の LDAP 認証で使用します。"
 
-#: src/desktop/conf.py:340
+#: src/desktop/conf.py:358
 msgid ""
 "Execute this script to produce the auth password. This will be used when "
 "`auth_password` is not set."
 msgstr "このスクリプトを実行して認証パスワードを作成します。これは auth_password が設定されていない場合に利用されます。"
 
-#: src/desktop/conf.py:347
+#: src/desktop/conf.py:365
 msgid ""
 "If set to false, runcpserver will not actually start the web server.  "
 "Used if Apache is being used as a WSGI container."
@@ -259,25 +287,25 @@ msgstr ""
 "false に設定すると、runcpserver からは Web サーバーが起動しなくなります。WSGI コンテナとして Apache "
 "を使用している場合に使用されます。"
 
-#: src/desktop/conf.py:353
+#: src/desktop/conf.py:371
 msgid "Number of threads used by the CherryPy web server."
 msgstr "CherryPy Web サーバーで使用するスレッドの数です。"
 
-#: src/desktop/conf.py:359
+#: src/desktop/conf.py:377
 msgid "Used in hashing algorithms for sessions."
 msgstr "セッションのハッシュアルゴリズムで使用します。"
 
-#: src/desktop/conf.py:364
+#: src/desktop/conf.py:382
 msgid ""
 "Execute this script to produce the Django secret key. This will be used "
 "when `secret_key` is not set."
 msgstr "このスクリプトを実行して Django 秘密鍵を作成します。これは secret_key が設定されていない場合に利用されます。"
 
-#: src/desktop/conf.py:371
+#: src/desktop/conf.py:389
 msgid "Number of user access to remember per view per user."
 msgstr "ユーザーごとのビュー単位で記録されるユーザーアクセス数です。"
 
-#: src/desktop/conf.py:377
+#: src/desktop/conf.py:395
 msgid ""
 "Help improve Hue with anonymous usage analytics.Use Google Analytics to "
 "see how many times an application or specific section of an application "
@@ -286,7 +314,7 @@ msgstr ""
 "匿名の使用分析によって Hue の品質向上にご協力ください。Hue では Google Analytics "
 "を使用して、アプリケーションやアプリケーションの特定のセクションが何回使用されているかを把握します。それ以上のことはありません。"
 
-#: src/desktop/conf.py:384
+#: src/desktop/conf.py:402
 msgid ""
 "Tile layer server URL for the Leaflet map charts. Read more on "
 "http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile"
@@ -298,11 +326,11 @@ msgstr ""
 "タイルドメインは、'secure_content_security_policy' 設定パラメーターの "
 "img-src セクションにも追加してください。"
 
-#: src/desktop/conf.py:390
+#: src/desktop/conf.py:408
 msgid "The copyright message for the specified Leaflet maps Tile Layer"
 msgstr "指定された Leaflet Maps タイルレイヤーの著作権メッセージ"
 
-#: src/desktop/conf.py:395
+#: src/desktop/conf.py:413
 msgid ""
 "All the map options, accordingly to "
 "http://leafletjs.com/reference-0.7.7.html#map-options. To change CRS, "
@@ -311,18 +339,18 @@ msgstr "<Hi_break/>すべてのマップオプション"
 "（http://leafletjs.com/reference-0.7.7.html#map-options を参照）。CRS を変更するには、"
 "名前（「EPSG4326」など）を使用します。"
 
-#: src/desktop/conf.py:401
+#: src/desktop/conf.py:419
 msgid ""
 "All the tile layer options, accordingly to "
 "http://leafletjs.com/reference-0.7.7.html#tilelayer"
 msgstr "<Hi_break/>すべてのタイルレイヤーオプション"
 "（http://leafletjs.com/reference-0.7.7.html#tilelayer を参照）"
 
-#: src/desktop/conf.py:407
+#: src/desktop/conf.py:425
 msgid "Use poll(2) in Hue thrift pool."
 msgstr "Hue Thrift プールで poll(2) を使用します。"
 
-#: src/desktop/conf.py:414
+#: src/desktop/conf.py:432
 msgid ""
 "Comma-separated list of Django middleware classes to use. See "
 "https://docs.djangoproject.com/en/1.4/ref/middleware/ for more details on"
@@ -331,7 +359,7 @@ msgstr ""
 "使用する Django Middleware クラスのカンマ区切りのリストです。Django の Middleware "
 "の詳細については、https://docs.djangoproject.com/en/1.4/ref/middleware/ を参照してください。"
 
-#: src/desktop/conf.py:422
+#: src/desktop/conf.py:440
 msgid ""
 "Comma-separated list of regular expressions, which match the redirect "
 "URL.For example, to restrict to your local domain and FQDN, the following"
@@ -340,109 +368,109 @@ msgstr ""
 "リダイレクト URL "
 "に一致する正規表現のカンマ区切りのリストです。たとえば、ローカルドメインとFQDNに制限する場合、「^\\/.*$,^http:\\/\\/www.mydomain.com\\/.*$」という値を使用できます。"
 
-#: src/desktop/conf.py:430
+#: src/desktop/conf.py:448
 msgid "Enable X-Forwarded-Host header if the load balancer requires it."
 msgstr "ロードバランサーで必要とされる場合、 X-Forwarded-Host ヘッダーを有効化します。"
 
-#: src/desktop/conf.py:436
+#: src/desktop/conf.py:454
 msgid ""
 "Support for HTTPS termination at the load-balancer level with "
 "SECURE_PROXY_SSL_HEADER."
 msgstr "SECURE_PROXY_SSL_HEADER を使用したロードバランサレベルで HTTPS 終端をサポートします。"
 
-#: src/desktop/conf.py:444
+#: src/desktop/conf.py:462
 msgid "Comma separated list of apps to not load at server startup."
 msgstr "サーバー起動時にロードしないアプリのカンマ区切りのリストです。"
 
-#: src/desktop/conf.py:449
+#: src/desktop/conf.py:467
 msgid "Id of the cluster where Hue is located."
 msgstr "Hue が配置されているクラスタの ID です。"
 
-#: src/desktop/conf.py:455
+#: src/desktop/conf.py:473
 msgid "To set to true in combination when using Hue demo backend."
 msgstr "Hue デモバックエンドの使用時に組み合わせて true に設定する方法。"
 
-#: src/desktop/conf.py:462
+#: src/desktop/conf.py:480
 msgid "Use this file to parse and redact log message."
 msgstr "このファイルを使用してログメッセージを解析および編集します。"
 
-#: src/desktop/conf.py:471
+#: src/desktop/conf.py:489
 msgid ""
 "Comma separated list of strings representing the host/domain names that "
 "the Hue server can serve."
 msgstr "Hue Server が対応できるホスト／ドメイン名を表す文字列のカンマ区切りリストです。"
 
-#: src/desktop/conf.py:478
+#: src/desktop/conf.py:496
 msgid "Timeout in seconds for REST calls."
 msgstr "REST コールのタイムアウト時間（秒）。"
 
-#: src/desktop/conf.py:489
+#: src/desktop/conf.py:507
 msgid "Base URL to Interface Remote Server"
 msgstr "インターフェイスリモートサーバーへのベース URL"
 
-#: src/desktop/conf.py:495
+#: src/desktop/conf.py:513
 msgid "Base URL to Interface API"
 msgstr "インターフェイス API へのベース URL"
 
-#: src/desktop/conf.py:501
+#: src/desktop/conf.py:519
 msgid "The Client ID of the Interface application."
 msgstr "インターフェイスアプリケーションのクライアント ID です。"
 
-#: src/desktop/conf.py:507
+#: src/desktop/conf.py:525
 msgid "The Client Secret of the Interface application."
 msgstr "インターフェイスアプリケーションのクライアントシークレットです。"
 
-#: src/desktop/conf.py:560
+#: src/desktop/conf.py:578
 msgid "Configuration options for connecting to an external SMTP server."
 msgstr "外部 SMTP サーバーに接続するための設定オプションです。"
 
-#: src/desktop/conf.py:564
+#: src/desktop/conf.py:582
 msgid "The SMTP server for email notification delivery."
 msgstr "電子メール通知配信用の SMTP サーバーです。"
 
-#: src/desktop/conf.py:571
+#: src/desktop/conf.py:589
 msgid "The SMTP server port."
 msgstr "SMTP サーバーポートです。"
 
-#: src/desktop/conf.py:578
+#: src/desktop/conf.py:596
 msgid "The username for the SMTP host."
 msgstr "SMTP ホストのユーザー名です。"
 
-#: src/desktop/conf.py:585
+#: src/desktop/conf.py:603
 msgid "The password for the SMTP user."
 msgstr "SMTP ユーザーのパスワードです。"
 
-#: src/desktop/conf.py:593
+#: src/desktop/conf.py:611
 msgid ""
 "Execute this script to produce the SMTP user password. This will be used "
 "when the SMTP `password` is not set."
 msgstr "このスクリプトを実行して SMTP ユーザーパスワードを作成します。これは SMTP の password が設定されていない場合に利用されます。"
 
-#: src/desktop/conf.py:601
+#: src/desktop/conf.py:619
 msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
 msgstr "SMTP サーバーとの送受信で TLS（セキュア）接続を使用するかどうかの指定です。"
 
-#: src/desktop/conf.py:608
+#: src/desktop/conf.py:626
 msgid "Default email address to use for various automated notifications from Hue."
 msgstr "Hue からのさまざまな自動通知で使用するデフォルトの電子メールアドレスです。"
 
-#: src/desktop/conf.py:617
+#: src/desktop/conf.py:635
 msgid "Configuration options for metrics"
 msgstr "測定値の設定オプション"
 
-#: src/desktop/conf.py:621
+#: src/desktop/conf.py:639
 msgid "Enable metrics URL \"desktop/metrics\""
 msgstr "測定値 URL \"desktop/metrics\" を有効にします"
 
-#: src/desktop/conf.py:626
+#: src/desktop/conf.py:644
 msgid "If specified, Hue will write metrics to this file"
 msgstr "指定されている場合、Hue は測定値をこのファイルに書き込みます。"
 
-#: src/desktop/conf.py:630
+#: src/desktop/conf.py:648
 msgid "Time in milliseconds on how frequently to collect metrics"
 msgstr "測定値を収集する周期をミリ秒で示した時間"
 
-#: src/desktop/conf.py:638
+#: src/desktop/conf.py:656
 msgid ""
 "Configuration options for specifying the Desktop Database.\n"
 "          For more info, see "
@@ -452,19 +480,19 @@ msgstr ""
 "          詳細については、以下を参照してください。"
 "http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine"
 
-#: src/desktop/conf.py:643
+#: src/desktop/conf.py:661
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "postgresql_psycopg2、mysql、sqlite3 などのデータベースエンジンです。"
 
-#: src/desktop/conf.py:649
+#: src/desktop/conf.py:667
 msgid "Database name, or path to DB if using sqlite3."
 msgstr "データベース名。splite3 を使用している場合は DB へのパスです。"
 
-#: src/desktop/conf.py:655
+#: src/desktop/conf.py:673
 msgid "Database username."
 msgstr "データベースのユーザー名です。"
 
-#: src/desktop/conf.py:661
+#: src/desktop/conf.py:679
 msgid ""
 "Database schema, to be used only when public schema is revoked in "
 "postgres."
@@ -472,33 +500,33 @@ msgstr ""
 "Postgres で公開スキーマが取り消されたときのみに使用されるデータベース"
 "スキーマです。"
 
-#: src/desktop/conf.py:667
+#: src/desktop/conf.py:685
 msgid "Database password."
 msgstr "データベースのパスワードです。"
 
-#: src/desktop/conf.py:674
+#: src/desktop/conf.py:692
 msgid ""
 "Execute this script to produce the database password. This will be used "
 "when `password` is not set."
 msgstr "このスクリプトを実行してデータベースパスワードを作成します。これは password が設定されていない場合に利用されます。"
 
-#: src/desktop/conf.py:681
+#: src/desktop/conf.py:699
 msgid "Database host."
 msgstr "データベースのホストです。"
 
-#: src/desktop/conf.py:687
+#: src/desktop/conf.py:705
 msgid "Database port."
 msgstr "データベースのポートです。"
 
-#: src/desktop/conf.py:693
+#: src/desktop/conf.py:711
 msgid "Database options to send to the server when connecting."
 msgstr "接続時にサーバーに送信するデータベースオプションです。"
 
-#: src/desktop/conf.py:699
+#: src/desktop/conf.py:717
 msgid "The CONN_MAX_AGE parameter controls db connections persistency in seconds."
 msgstr "CONN_MAX_AGE パラメータで DB 接続の持続時間（秒数）を制御します。"
 
-#: src/desktop/conf.py:708
+#: src/desktop/conf.py:726
 msgid ""
 "Configuration options for specifying the Desktop session.\n"
 "          For more info, see "
@@ -508,7 +536,7 @@ msgstr ""
 "          詳細については、以下を参照してください。"
 "https://docs.djangoproject.com/en/1.4/topics/http/sessions/"
 
-#: src/desktop/conf.py:713
+#: src/desktop/conf.py:731
 msgid ""
 "The name of the cookie to use for sessions.This can have any value that "
 "is not used by the other cookie names in your application."
@@ -516,29 +544,29 @@ msgstr ""
 "セッションに使用する cookie の名前です。アプリケーションで他の cookie に使用していない"
 "任意の値を指定できます。"
 
-#: src/desktop/conf.py:720
+#: src/desktop/conf.py:738
 msgid ""
 "The cookie containing the users' session ID will expire after this amount"
 " of time in seconds."
 msgstr "ユーザーのセッション ID を保持する cookie は、所定の時間（秒）で期限切れになります。"
 
-#: src/desktop/conf.py:726
+#: src/desktop/conf.py:744
 msgid ""
 "The cookie containing the users' session ID will be secure. This should "
 "only be enabled with HTTPS."
 msgstr "ユーザーのセッション ID を保持する cookie はセキュリティ保護されます。これは必ず HTTPS のみで使用可能にする必要があります。"
 
-#: src/desktop/conf.py:732
+#: src/desktop/conf.py:750
 msgid "The cookie containing the users' session ID will use the HTTP only flag."
 msgstr "ユーザーのセッション ID を保持する cookie は、HTTP 専用フラグを使用します。"
 
-#: src/desktop/conf.py:738
+#: src/desktop/conf.py:756
 msgid ""
 "Use session-length cookies. Logs out the user when she closes the browser"
 " window."
 msgstr "セッションの長さの cookie を使用します。ユーザーがブラウザウィンドウを閉じたらログアウトさせます。"
 
-#: src/desktop/conf.py:744
+#: src/desktop/conf.py:762
 msgid ""
 "If set, limits the number of concurrent user sessions. 1 represents 1 "
 "session per user. Default: 0 (unlimited sessions per user)"
@@ -546,33 +574,33 @@ msgstr ""
 "設定すると、同時に実行できるユーザーセッションの数が制限されます。1 は、"
 "1 ユーザーにつき 1 セッションの実行を表します。デフォルト：0（ユーザーごとのセッション数の制限なし）"
 
-#: src/desktop/conf.py:753
+#: src/desktop/conf.py:771
 msgid ""
 "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
 msgstr "セキュアな Hadoop クラスタを構築するために Hue の Kerberos 統合を\n          指定する設定オプションです。"
 
-#: src/desktop/conf.py:758
+#: src/desktop/conf.py:776
 msgid "Path to a Kerberos keytab file containing Hue's service credentials."
 msgstr "Hue のサービス資格情報を保存している Kerberos keytab ファイルのパスです。"
 
-#: src/desktop/conf.py:763
+#: src/desktop/conf.py:781
 msgid "Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."
 msgstr "Hue の Kerberos プリンシパル名。普通は 'hue/hostname.foo.com' です。"
 
-#: src/desktop/conf.py:768
+#: src/desktop/conf.py:786
 msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Hue がその keytab を更新する時間間隔です（単位は秒）。"
 
-#: src/desktop/conf.py:773
+#: src/desktop/conf.py:791
 msgid "Path to keep Kerberos credentials cached."
 msgstr "キャッシュされている Kerberos 資格情報を維持するパスです。"
 
-#: src/desktop/conf.py:780
+#: src/desktop/conf.py:798
 msgid "Path to Kerberos 'kinit' command."
 msgstr "Kerberos の kinit コマンドへのパスです。"
 
-#: src/desktop/conf.py:786
+#: src/desktop/conf.py:804
 msgid ""
 "Mutual authentication from the server, attaches HTTP GSSAPI/Kerberos "
 "Authentication to the given Request object"
@@ -580,7 +608,7 @@ msgstr ""
 "サーバーからの相互認証です。指定された要求オブジェクトに "
 "HTTP GSSAPI/Kerberos 認証をアタッチします"
 
-#: src/desktop/conf.py:795
+#: src/desktop/conf.py:813
 msgid ""
 "This property specifies the maximum size of the receive buffer in bytes "
 "in thrift sasl communication."
@@ -588,35 +616,35 @@ msgstr ""
 "このプロパティで Thrift の SASL 通信における受信バッファの最大サイズ（バイト）を"
 "指定します。"
 
-#: src/desktop/conf.py:803
+#: src/desktop/conf.py:821
 msgid "Time zone name."
 msgstr "タイムゾーン名です。"
 
-#: src/desktop/conf.py:810
+#: src/desktop/conf.py:828
 msgid "Default system-wide unicode encoding."
 msgstr "システム規模でのデフォルトの Unicode エンコードです。"
 
-#: src/desktop/conf.py:817
+#: src/desktop/conf.py:835
 msgid "Username to run servers as."
 msgstr "サーバーを実行するユーザー名です。"
 
-#: src/desktop/conf.py:823
+#: src/desktop/conf.py:841
 msgid "Group to run servers as."
 msgstr "サーバーを実行するグループです。"
 
-#: src/desktop/conf.py:829
+#: src/desktop/conf.py:847
 msgid "This should be the user running hue webserver"
 msgstr "これは、Hue Web サーバーを実行しているユーザーにする必要があります"
 
-#: src/desktop/conf.py:835
+#: src/desktop/conf.py:853
 msgid "This should be the hdfs super user"
 msgstr "HDFS スーパーユーザーであることが必要です"
 
-#: src/desktop/conf.py:841
+#: src/desktop/conf.py:859
 msgid "Customizations to the UI."
 msgstr "UI のカスタマイズです。"
 
-#: src/desktop/conf.py:845
+#: src/desktop/conf.py:863
 msgid ""
 "Top banner HTML code. This code will be placed in the navigation bar so "
 "that it will reside at the top of the page in a fixed position. One "
@@ -625,27 +653,27 @@ msgstr ""
 "トップバナー HTML コードです。このコードはナビゲーションバーに配置され、ページ上部の固定位置に常駐するようになります。共通値の 1 つは "
 "`<img src=\"http://www.example.com/example.gif\" />` です。"
 
-#: src/desktop/conf.py:850
+#: src/desktop/conf.py:868
 msgid ""
 "The login splash HTML code. This code will be placed in the login page, "
 "useful for security warning messages."
 msgstr "ログインスプラッシュ HTML コードです。このコードはログインページに配置され、セキュリティ警告メッセージのために役立ちます。"
 
-#: src/desktop/conf.py:855
+#: src/desktop/conf.py:873
 msgid ""
 "The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
 "to 0 it disables the cache."
 msgstr "assist/autocomplete/etc コールのためのキャッシュ TTL（ミリ秒）です。0 に設定すると、キャッシュが無効になります。"
 
-#: src/desktop/conf.py:858
+#: src/desktop/conf.py:876
 msgid "SVG code to replace the default Hue logo in the top bar and sign in screen"
 msgstr "上部バーとサインイン画面のデフォルトの Hue ロゴを差し替える SVG コードです。"
 
-#: src/desktop/conf.py:863
+#: src/desktop/conf.py:881
 msgid "Configuration options for user authentication into the web application."
 msgstr "Web アプリケーションへのユーザー認証の設定オプション"
 
-#: src/desktop/conf.py:868
+#: src/desktop/conf.py:886
 msgid ""
 "Authentication backend.  Common settings are "
 "django.contrib.auth.backends.ModelBackend (fully Django backend), "
@@ -659,17 +687,17 @@ msgstr ""
 "バックエンド）、desktop.auth.backend.AllowAllBackend（全員を許可）、desktop.auth.backend.AllowFirstUserDjangoBackend（最初のログイン以降は"
 " Django およびユーザーマネージャを使用）です。カンマ区切りリストを指定して優先度を示すことで、複数の認証バックエンドがサポートされます。"
 
-#: src/desktop/conf.py:875
+#: src/desktop/conf.py:893
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "User オブジェクトに対する余計なアクセサメソッドを定義するクラスです。"
 
-#: src/desktop/conf.py:878
+#: src/desktop/conf.py:896
 msgid ""
 "The service to use when querying PAM. The service usually corresponds to "
 "a single filename in /etc/pam.d"
 msgstr "PAM のクエリ時に使用するサービスです。このサービスは、通常、/etc/pam.d で 1 つのファイル名に対応しています"
 
-#: src/desktop/conf.py:882
+#: src/desktop/conf.py:900
 msgid ""
 "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
 "the normalized name of the header that contains the remote user. The HTTP"
@@ -684,35 +712,35 @@ msgstr ""
 "プレフィックスを名前に追加する方法で、キーに変換されます。したがって、たとえば、ヘッダーが、Remote-User "
 "である場合、HTTP_REMOTE_USER として設定されます。"
 
-#: src/desktop/conf.py:889 src/desktop/conf.py:989
+#: src/desktop/conf.py:907 src/desktop/conf.py:1007
 msgid "Ignore the case of usernames when searching for existing users in Hue."
 msgstr "Hue で既存のユーザーを検索する場合、ユーザー名の大／小文字を無視します。"
 
-#: src/desktop/conf.py:893
+#: src/desktop/conf.py:911
 msgid "Force usernames to lowercase when creating new users."
 msgstr "新規ユーザーを作成する場合、ユーザー名を強制的に小文字にします。"
 
-#: src/desktop/conf.py:897
+#: src/desktop/conf.py:915
 msgid "Force usernames to uppercase when creating new users."
 msgstr "新規ユーザーを作成する場合、ユーザー名を強制的に大文字にします。"
 
-#: src/desktop/conf.py:901
+#: src/desktop/conf.py:919
 msgid ""
 "Users will expire after they have not logged in for 'n' amount of "
 "seconds.A negative number means that users will never expire."
 msgstr "ユーザーが 'n' 秒間ログインしないと有効期限が切れます。負の数値はユーザーの有効期限が切れないことを意味します。"
 
-#: src/desktop/conf.py:906
+#: src/desktop/conf.py:924
 msgid "Apply 'expires_after' to superusers."
 msgstr "'expires_after' をスーパーユーザーに適用します。"
 
-#: src/desktop/conf.py:910
+#: src/desktop/conf.py:928
 msgid ""
 "Users will automatically be logged out after 'n' seconds of inactivity.A "
 "negative number means that idle sessions will not be timed out."
 msgstr "n 秒間操作がないと、ユーザーは自動的にログアウトされます。負の数値は、アイドルセッションがタイムアウトしないことを表します。"
 
-#: src/desktop/conf.py:916
+#: src/desktop/conf.py:934
 msgid ""
 "When set to true this will allow you to specify a password for the user "
 "when you create the user and then force them to change their password "
@@ -722,19 +750,19 @@ msgstr ""
 "に設定されている場合、管理者は、ユーザーの作成時にユーザーのパスワードを指定し、初回ログイン時にパスワードの変更をユーザーに強制できるようになります。デフォルト値は"
 " false です。"
 
-#: src/desktop/conf.py:924
+#: src/desktop/conf.py:942
 msgid ""
 "Number of login attempts allowed before a record is created for failed "
 "logins"
 msgstr "失敗したログインの記録を作成するまで許容されるログイン試行回数"
 
-#: src/desktop/conf.py:930
+#: src/desktop/conf.py:948
 msgid ""
 "After number of allowed login attempts are exceeded, do we lock out this "
 "IP and optionally user agent?"
 msgstr "許容されるログイン試行回数を超えたら、この IP をロックアウトし、必要に応じてユーザーエージェントもロックアウトしますか？"
 
-#: src/desktop/conf.py:936
+#: src/desktop/conf.py:954
 msgid ""
 "If set, defines period of inactivity in hours after which failed logins "
 "will be forgotten.A value of 0 or None will disable this check. Default: "
@@ -744,11 +772,11 @@ msgstr ""
 "定義します。値が 0 または None の場合、このチェックは"
 "無効になります。デフォルト：None"
 
-#: src/desktop/conf.py:944
+#: src/desktop/conf.py:962
 msgid "If True, lock out based on IP and browser user agent"
 msgstr "True の場合、IP およびブラウザーユーザーエージェントに基づいてロックアウトします"
 
-#: src/desktop/conf.py:950
+#: src/desktop/conf.py:968
 msgid ""
 "If True, lock out based on an IP address AND a user agent.This means "
 "requests from different user agents but from the same IP are treated "
@@ -757,11 +785,11 @@ msgstr ""
 "True である場合、IP アドレスとユーザーエージェントに基づいてロックされます。つまり、同じ IP "
 "からの要求であっても、異なるユーザーエージェントからの要求であった場合、この要求は異なるものとして処理されます。"
 
-#: src/desktop/conf.py:957
+#: src/desktop/conf.py:975
 msgid "If True, lock out based on IP and user"
 msgstr "True の場合、IP およびユーザーに基づいてロックアウトします"
 
-#: src/desktop/conf.py:963
+#: src/desktop/conf.py:981
 msgid ""
 "If True, it will look for the IP address from the header defined at "
 "reverse_proxy_header."
@@ -769,7 +797,7 @@ msgstr ""
 "True の場合、reverse_proxy_header で定義されたヘッダーから IP アドレスが"
 "検索されます。"
 
-#: src/desktop/conf.py:969
+#: src/desktop/conf.py:987
 msgid ""
 "If behind_reverse_proxy is True, it will look for the IP address from "
 "this header. Default: HTTP_X_FORWARDED_FOR"
@@ -777,49 +805,49 @@ msgstr ""
 "behind_reverse_proxy が True の場合、このヘッダーから IP アドレスが検索されます。"
 "デフォルト：HTTP_X_FORWARDED_FOR"
 
-#: src/desktop/conf.py:978
+#: src/desktop/conf.py:996
 msgid "Configuration options for LDAP connectivity."
 msgstr "LDAP 接続の設定オプションです。"
 
-#: src/desktop/conf.py:981
+#: src/desktop/conf.py:999
 msgid "Create users when they login with their LDAP credentials."
 msgstr "各自の LDAP 資格情報を使用してログインする場合は、ユーザーを作成します。"
 
-#: src/desktop/conf.py:985
+#: src/desktop/conf.py:1003
 msgid "Synchronize a users groups when they login."
 msgstr "ユーザーグループをログイン時に同期します。"
 
-#: src/desktop/conf.py:993
+#: src/desktop/conf.py:1011
 msgid "Force usernames to lowercase when creating new users from LDAP."
 msgstr "LDAP から新規ユーザーを作成する場合、ユーザー名を強制的に小文字にします。"
 
-#: src/desktop/conf.py:997
+#: src/desktop/conf.py:1015
 msgid "Force usernames to uppercase when creating new users from LDAP."
 msgstr "LDAP から新規ユーザーを作成する場合、ユーザー名を強制的に大文字にします。"
 
-#: src/desktop/conf.py:1001
+#: src/desktop/conf.py:1019
 msgid ""
 "Choose which kind of subgrouping to use: nested or suboordinate "
 "(deprecated)."
 msgstr "使用するサブグループの種類（ネストまたは従属（非推奨））を選択します。"
 
-#: src/desktop/conf.py:1005
+#: src/desktop/conf.py:1023
 msgid "Define the number of levels to search for nested members."
 msgstr "ネストされたメンバーを検索するためにレベル数を定義します。"
 
-#: src/desktop/conf.py:1009 src/desktop/conf.py:1067
+#: src/desktop/conf.py:1027 src/desktop/conf.py:1085
 msgid "Whether or not to follow referrals."
 msgstr "参照に従うかどうか。"
 
-#: src/desktop/conf.py:1016 src/desktop/conf.py:1080
+#: src/desktop/conf.py:1034 src/desktop/conf.py:1098
 msgid "Set to a value to enable python-ldap debugging."
 msgstr "値を設定して python-ldap デバッグを有効にします。"
 
-#: src/desktop/conf.py:1020 src/desktop/conf.py:1084
+#: src/desktop/conf.py:1038 src/desktop/conf.py:1102
 msgid "Sets the debug level within the underlying LDAP C lib."
 msgstr "基本 LDAP C lib 内のデバッグレベルを設定します。"
 
-#: src/desktop/conf.py:1024 src/desktop/conf.py:1088
+#: src/desktop/conf.py:1042 src/desktop/conf.py:1106
 msgid ""
 "Possible values for trace_level are 0 for no logging, 1 for only logging "
 "the method calls with arguments,2 for logging the method calls with "
@@ -829,27 +857,27 @@ msgstr ""
 "trace_level の有効値は "
 "0（ログを記録しない）、1（引数があるメソッドコールのみをログに記録する）、2（引数があり、完全な結果があるメソッドコールを記録する）、9（メソッドコールのトレースバックも記録する）です。"
 
-#: src/desktop/conf.py:1028
+#: src/desktop/conf.py:1046
 msgid "LDAP server record."
 msgstr "LDAP サーバーレコードです。"
 
-#: src/desktop/conf.py:1033 src/desktop/conf.py:1126
+#: src/desktop/conf.py:1051 src/desktop/conf.py:1144
 msgid "The base LDAP distinguished name to use for LDAP search."
 msgstr "LDAP 検索で使用する基本的な LDAP 識別名です。"
 
-#: src/desktop/conf.py:1036 src/desktop/conf.py:1129
+#: src/desktop/conf.py:1054 src/desktop/conf.py:1147
 msgid "The NT domain used for LDAP authentication."
 msgstr "LDAP 認証に使用する NT ドメインです。"
 
-#: src/desktop/conf.py:1039 src/desktop/conf.py:1132
+#: src/desktop/conf.py:1057 src/desktop/conf.py:1150
 msgid "The LDAP URL to connect to."
 msgstr "接続先の LDAP URL。"
 
-#: src/desktop/conf.py:1043 src/desktop/conf.py:1136
+#: src/desktop/conf.py:1061 src/desktop/conf.py:1154
 msgid "Use StartTLS when communicating with LDAP server."
 msgstr "LDAP サーバーとの通信時に StartTLS を使用します。"
 
-#: src/desktop/conf.py:1046 src/desktop/conf.py:1139
+#: src/desktop/conf.py:1064 src/desktop/conf.py:1157
 msgid ""
 "A PEM-format file containing certificates for the CA's that Hue will "
 "trust for authentication over TLS. The certificate for the CA that signed"
@@ -861,19 +889,19 @@ msgstr ""
 "の証明書を含める必要があります。詳細については、http://www.openldap.org/doc/admin24/tls.html "
 "を参照してください。"
 
-#: src/desktop/conf.py:1049 src/desktop/conf.py:1142
+#: src/desktop/conf.py:1067 src/desktop/conf.py:1160
 msgid "A pattern to use for constructing LDAP usernames."
 msgstr "LDAP ユーザー名の設定時に利用するパターンです。"
 
-#: src/desktop/conf.py:1052 src/desktop/conf.py:1145
+#: src/desktop/conf.py:1070 src/desktop/conf.py:1163
 msgid "The distinguished name to bind as, when importing from LDAP."
 msgstr "LDAP からインポートするときに、バインドする識別名です。"
 
-#: src/desktop/conf.py:1056 src/desktop/conf.py:1149
+#: src/desktop/conf.py:1074 src/desktop/conf.py:1167
 msgid "The password for the bind user."
 msgstr "バインドユーザーのパスワードです。"
 
-#: src/desktop/conf.py:1061 src/desktop/conf.py:1154
+#: src/desktop/conf.py:1079 src/desktop/conf.py:1172
 msgid ""
 "Execute this script to produce the LDAP bind user password. This will be "
 "used when `bind_password` is not set."
@@ -881,27 +909,27 @@ msgstr ""
 "このスクリプトを実行して LDAP バインドユーザーパスワードを作成します。これは bind_password "
 "が設定されていない場合に利用されます。"
 
-#: src/desktop/conf.py:1065 src/desktop/conf.py:1158
+#: src/desktop/conf.py:1083 src/desktop/conf.py:1176
 msgid "Use search bind authentication."
 msgstr "検索バインド認証を使用します。"
 
-#: src/desktop/conf.py:1072 src/desktop/conf.py:1161
+#: src/desktop/conf.py:1090 src/desktop/conf.py:1179
 msgid "The test user name to use for LDAP search."
 msgstr "LDAP 検索で使用するテストユーザー名です。"
 
-#: src/desktop/conf.py:1075 src/desktop/conf.py:1164
+#: src/desktop/conf.py:1093 src/desktop/conf.py:1182
 msgid "The test group name to use for LDAP search."
 msgstr "LDAP 検索で使用するテストグループ名です。"
 
-#: src/desktop/conf.py:1093 src/desktop/conf.py:1168
+#: src/desktop/conf.py:1111 src/desktop/conf.py:1186
 msgid "Configuration for LDAP user schema and search."
 msgstr "LDAP ユーザースキーマと検索の設定です。"
 
-#: src/desktop/conf.py:1097 src/desktop/conf.py:1172
+#: src/desktop/conf.py:1115 src/desktop/conf.py:1190
 msgid "A base filter for use when searching for users."
 msgstr "ユーザーの検索時に使用する基本フィルターです。"
 
-#: src/desktop/conf.py:1100 src/desktop/conf.py:1175
+#: src/desktop/conf.py:1118 src/desktop/conf.py:1193
 msgid ""
 "The username attribute in the LDAP schema. Typically, this is "
 "'sAMAccountName' for AD and 'uid' for other LDAP systems."
@@ -909,87 +937,95 @@ msgstr ""
 "LDAP スキーマのユーザー名属性です。一般的にこの値は、AD の場合は 'sAMAccountName' であり、その他の LDAP "
 "システムの場合は 'uid' です。"
 
-#: src/desktop/conf.py:1108 src/desktop/conf.py:1182
+#: src/desktop/conf.py:1126 src/desktop/conf.py:1200
 msgid "Configuration for LDAP group schema and search."
 msgstr "LDAP グループスキーマと検索の設定です。"
 
-#: src/desktop/conf.py:1112 src/desktop/conf.py:1186
+#: src/desktop/conf.py:1130 src/desktop/conf.py:1204
 msgid "A base filter for use when searching for groups."
 msgstr "グループの検索時に使用する基本フィルターです。"
 
-#: src/desktop/conf.py:1115 src/desktop/conf.py:1189
+#: src/desktop/conf.py:1133 src/desktop/conf.py:1207
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
 msgstr "LDAP スキーマのグループ名属性です。一般的にこれは 'cn' です。"
 
-#: src/desktop/conf.py:1119 src/desktop/conf.py:1193
+#: src/desktop/conf.py:1137 src/desktop/conf.py:1211
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr "グループのメンバーを指定する LDAP 属性です。"
 
-#: src/desktop/conf.py:1200
+#: src/desktop/conf.py:1218
 msgid "Configuration options for Oauth 1.0 authentication"
 msgstr "Oauth 1.0 認証の設定オプション"
 
-#: src/desktop/conf.py:1204
+#: src/desktop/conf.py:1222
 msgid "The Consumer key of the application."
 msgstr "アプリケーションのコンシューマキーです。"
 
-#: src/desktop/conf.py:1211
+#: src/desktop/conf.py:1229
 msgid "The Consumer secret of the application."
 msgstr "アプリケーションのコンシューマシークレットです。"
 
-#: src/desktop/conf.py:1218
+#: src/desktop/conf.py:1236
 msgid "The Request token URL."
 msgstr "要求トークンの URL です。"
 
-#: src/desktop/conf.py:1225
+#: src/desktop/conf.py:1243
 msgid "The Access token URL."
 msgstr "アクセストークンの URL です。"
 
-#: src/desktop/conf.py:1232
+#: src/desktop/conf.py:1250
 msgid "The Authorize URL."
 msgstr "認証の URL です。"
 
-#: src/desktop/conf.py:1243
+#: src/desktop/conf.py:1261
 msgid "Paths on the local file system that users should be able to browse."
 msgstr "ユーザーが参照できるローカルファイルシステム上のパスです。"
 
-#: src/desktop/conf.py:1248
+#: src/desktop/conf.py:1266
 msgid "The path on the local filesystem."
 msgstr "ローカルファイルシステム上のパスです。"
 
-#: src/desktop/conf.py:1257
+#: src/desktop/conf.py:1275
 msgid "Link for 'feedback' tab."
 msgstr "［フィードバック］タブへのリンクです。"
 
-#: src/desktop/conf.py:1264
+#: src/desktop/conf.py:1282
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr "JavaScript からサーバーのログにデバッグメッセージを送信するかどうかの指定です。"
 
-#: src/desktop/conf.py:1271
+#: src/desktop/conf.py:1289
 msgid "Enable or disable database debug mode."
 msgstr "データベースのデバッグモードを有効または無効にします。"
 
-#: src/desktop/conf.py:1278
+#: src/desktop/conf.py:1296
 msgid "Administrators that should receive error emails."
 msgstr "エラー電子メールを受信する管理者です。"
 
-#: src/desktop/conf.py:1283
+#: src/desktop/conf.py:1301
 msgid "The full name of the admin."
 msgstr "管理者の姓名です。"
 
-#: src/desktop/conf.py:1286
+#: src/desktop/conf.py:1304
 msgid "The email address of the admin."
 msgstr "管理者の電子メールアドレスです。"
 
-#: src/desktop/conf.py:1290
+#: src/desktop/conf.py:1308
 msgid "Enable or disable Django debug mode."
 msgstr "Django のデバッグモードを有効化または無効化します。"
 
-#: src/desktop/conf.py:1298
+#: src/desktop/conf.py:1316
 msgid "Enable development mode, where notably static files are not cached."
 msgstr "開発モードが有効になります。その場合、静的ファイルがキャッシュされません。"
 
-#: src/desktop/conf.py:1303
+#: src/desktop/conf.py:1322
+msgid ""
+"Enable embedded development mode, where the page will be rendered inside "
+"a container div element."
+msgstr ""
+"組み込みの開発モードが有効になります。その場合は、コンテナの div 要素内に"
+"ページが表示されます。"
+
+#: src/desktop/conf.py:1327
 msgid ""
 "Enable or disable debugging information in the 500 internal server error "
 "response. Note that the debugging information may contain sensitive data."
@@ -999,37 +1035,41 @@ msgstr ""
 "の内部サーバーのエラー応答でデバッグ情報を有効化または無効化します。デバッグ情報には機密データが記録されていることがあります。django_debug_mode"
 " が true の場合は、この設定が自動的に有効になります。"
 
-#: src/desktop/conf.py:1312
+#: src/desktop/conf.py:1336
 msgid "Enable or disable memory profiling."
 msgstr "メモリプロファイルを有効化または無効化します。"
 
-#: src/desktop/conf.py:1319
+#: src/desktop/conf.py:1343
 msgid ""
 "The directory where to store the auditing logs. Auditing is disable if "
 "the value is empty."
 msgstr "監査ログを格納するディレクトリです。値が空の場合、監査は無効になります。"
 
-#: src/desktop/conf.py:1326
+#: src/desktop/conf.py:1350
 msgid "Size in KB/MB/GB for audit log to rollover."
 msgstr "ロールオーバーする監査ログのサイズ（KB／MB／GB 単位）です。"
 
-#: src/desktop/conf.py:1333
+#: src/desktop/conf.py:1357
 msgid "Email address that internal error messages should send as."
 msgstr "内部エラーメッセージが送信する電子メールアドレス。"
 
-#: src/desktop/conf.py:1339
+#: src/desktop/conf.py:1363
 msgid "The email backend to use."
 msgstr "使用する電子メールバックエンドです。"
 
-#: src/desktop/conf.py:1348
+#: src/desktop/conf.py:1372
 msgid "Choose whether to enable SQL syntax check or not."
 msgstr "SQL の構文チェックを有効にするかどうかを選択します。"
 
-#: src/desktop/conf.py:1355
+#: src/desktop/conf.py:1379
+msgid "Choose whether Hue is embedded or not."
+msgstr "Hue を埋め込むかどうかを選択します。"
+
+#: src/desktop/conf.py:1386
 msgid "Enable the improved editor autocomplete dropdown."
 msgstr "機能が向上したエディタのオートコンプリートドロップダウンを有効にします。"
 
-#: src/desktop/conf.py:1362
+#: src/desktop/conf.py:1393
 msgid ""
 "Timeout value in ms for autocomplete of columns, tables, values etc. 0 = "
 "disabled."
@@ -1037,11 +1077,11 @@ msgstr ""
 "列、テーブル、値などのオートコンプリートのタイムアウト値（ミリ秒）。"
 "0 = 無効。"
 
-#: src/desktop/conf.py:1369
+#: src/desktop/conf.py:1400
 msgid "Choose whether to show the new SQL editor."
 msgstr "新しい SQL エディターを表示するかどうかを選択します。"
 
-#: src/desktop/conf.py:1374
+#: src/desktop/conf.py:1405
 msgid ""
 "Global setting to allow or disable end user downloads in all Hue (e.g. "
 "Query result in editors and dashboard, file in File Browser browsers...)."
@@ -1049,63 +1089,63 @@ msgstr ""
 "Hue 全体で、エンドユーザーのダウンロードを有効または無効にするグローバル設定です（例："
 "エディタとダッシュボードでのクエリの結果、File Browser でのファイルのダウンロードなど）。"
 
-#: src/desktop/conf.py:1387
+#: src/desktop/conf.py:1418
 msgid "Choose whether to show extended left and right panels."
 msgstr "左右の拡張パネルを表示するかどうかを選択します。"
 
-#: src/desktop/conf.py:1394
+#: src/desktop/conf.py:1425
 msgid "Enable saved default configurations for Hive, Impala, Spark, and Oozie."
 msgstr "Hive、Impala、Spark、および Oozie を対象として、保存済みのデフォルト設定を有効化します。"
 
-#: src/desktop/conf.py:1401
+#: src/desktop/conf.py:1432
 msgid "Choose whether to use new charting library across the whole Hue."
 msgstr "Hue 全体で、新しいチャートライブラリを使用するかどうかを選択します。"
 
-#: src/desktop/conf.py:1409
+#: src/desktop/conf.py:1440
 msgid "Choose whether to enable the new Hue 4 interface."
 msgstr "新しい Hue 4 インターフェイスを有効にするかどうかを選択します。"
 
-#: src/desktop/conf.py:1416
+#: src/desktop/conf.py:1447
 msgid "Choose whether to still allow users to enable the old Hue 3 interface."
 msgstr "ユーザーが、以前の Hue 3 インターフェイスを使用し続けられるようにするかどうかを選択します。"
 
-#: src/desktop/conf.py:1443
+#: src/desktop/conf.py:1478
 msgid "Name of the cluster to show to the user."
 msgstr "ユーザーに表示されるクラスタの名前です。"
 
-#: src/desktop/conf.py:1447
+#: src/desktop/conf.py:1482
 msgid "Type of cluster, e.g. local ini, CM API, Dataeng, Arcus, BigQuery, Presto."
 msgstr "クラスタのタイプです（例：ローカルの ini、CM API、Dataeng、Arcus、BigQuery、Presto）。"
 
-#: src/desktop/conf.py:1453
+#: src/desktop/conf.py:1488
 msgid "List of cluster instances of the cluster (optional)."
 msgstr "クラスタのクラスタインスタンスのリストです（オプション）。"
 
-#: src/desktop/conf.py:1473
+#: src/desktop/conf.py:1508
 msgid "If you set bind_password, then you must set bind_dn."
 msgstr "bind_password を設定する場合は、bind_dn を設定する必要があります。"
 
-#: src/desktop/conf.py:1476
+#: src/desktop/conf.py:1511
 msgid "If you set bind_dn, then you must set bind_password."
 msgstr "bind_dn を設定する場合は、bind_password を設定する必要があります。"
 
-#: src/desktop/conf.py:1482
+#: src/desktop/conf.py:1517
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr "LDAP の設定は部分的です。LDAP URL を指定する必要があります。"
 
-#: src/desktop/conf.py:1488
+#: src/desktop/conf.py:1523
 msgid ""
 "LDAP is only partially configured. An NT Domain or username search "
 "pattern must be provided."
 msgstr "LDAP の設定は部分的です。NT ドメインまたはユーザー名の検索パターンを指定する必要があります。"
 
-#: src/desktop/conf.py:1494
+#: src/desktop/conf.py:1529
 msgid ""
 "The LDAP username pattern should contain the special<username> "
 "replacement string for authentication."
 msgstr "LDAP ユーザー名パターンには、認証のために特殊な <username> 置換文字列を含める必要があります。"
 
-#: src/desktop/conf.py:1517
+#: src/desktop/conf.py:1552
 msgid ""
 "We recommend MySQL InnoDB engine over\n"
 "                                                      MyISAM which does "
@@ -1115,7 +1155,7 @@ msgstr ""
 "                                                      MyISAM では"
 "トランザクションがサポートされません。"
 
-#: src/desktop/conf.py:1521
+#: src/desktop/conf.py:1556
 msgid ""
 "All tables in the database must be of the same\n"
 "                                                      storage engine type"
@@ -1125,7 +1165,7 @@ msgstr ""
 "                                                      テーブルで同じにする必要が"
 "あります（InnoDB をお勧めします）。"
 
-#: src/desktop/conf.py:1526
+#: src/desktop/conf.py:1561
 msgid ""
 "SQLite is only recommended for development environments. It might cause "
 "the \"Database is locked\" error. Migrating to MySQL, Oracle or "
@@ -1135,7 +1175,7 @@ msgstr ""
 "は、開発環境に限定して推奨されています。「データベースがロックされました」エラーを引き起こす可能性があります。MySQL、Oracle、または "
 "PostgreSQL に移行することを強くお勧めします。"
 
-#: src/desktop/conf.py:1547
+#: src/desktop/conf.py:1582
 #, python-format
 msgid ""
 "south_migrationhistory table seems to be corrupted or incomplete.\n"
@@ -1146,26 +1186,26 @@ msgstr ""
 "                                                        %s エントリが"
 "テーブルにありません：%s"
 
-#: src/desktop/conf.py:1564
+#: src/desktop/conf.py:1599
 msgid ""
 "Secret key should be configured as a random string. All sessions will be "
 "lost on restart"
 msgstr "秘密鍵はランダムな文字列として設定する必要があります。再起動時にすべてのセッションが失われます"
 
-#: src/desktop/conf.py:1570
+#: src/desktop/conf.py:1605
 msgid "SSL private key file should be set to enable HTTPS."
 msgstr "HTTPS を有効化するには、SSL 秘密鍵ファイルを設定する必要があります。"
 
-#: src/desktop/conf.py:1576
+#: src/desktop/conf.py:1611
 msgid "Encoding not supported."
 msgstr "サポートされていないエンコードです。"
 
-#: src/desktop/conf.py:1585
+#: src/desktop/conf.py:1620
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr "keytab には 0600 のパーミッションが必要です（%o を持つこと）。"
 
-#: src/desktop/conf.py:1604
+#: src/desktop/conf.py:1639
 msgid ""
 "Email notifications is disabled for Workflows and Jobs as SMTP server is "
 "localhost."
@@ -1173,7 +1213,7 @@ msgstr ""
 "localhost が SMTP サーバーであるため、Workflow およびジョブに対する電子メール通知は"
 "無効になります。"
 
-#: src/desktop/conf.py:1614
+#: src/desktop/conf.py:1649
 msgid ""
 "Character set of <i>search</i> field in <i>desktop_document2</i> table is"
 " not UTF-8. </br><b>NOTE:</b> Configure the database for character set "
@@ -1202,22 +1242,22 @@ msgstr "この操作を実行するには、スーパーユーザーであるこ
 msgid "Job %(id)s does not exist"
 msgstr "ジョブ %(id)s が存在しません"
 
-#: src/desktop/middleware.py:234
+#: src/desktop/middleware.py:235
 #, python-format
 msgid "%(module)s isn't a middleware module."
 msgstr "%(module)s はミドルウェアモジュールではありません。"
 
-#: src/desktop/middleware.py:239
+#: src/desktop/middleware.py:240
 #, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\"."
 msgstr "ミドルウェア \"%(module)s\" のインポートでエラー \"%(error)s\" が発生しました。"
 
-#: src/desktop/middleware.py:243
+#: src/desktop/middleware.py:244
 #, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
 msgstr "ミドルウェアモジュール \"%(module)s\" では \"%(class)s\" クラスを定義しません。"
 
-#: src/desktop/middleware.py:255
+#: src/desktop/middleware.py:256
 #, python-format
 msgid ""
 "AppSpecificMiddleware module \"%(module)s\" has a process_request "
@@ -1226,12 +1266,12 @@ msgstr ""
 "AppSpecificMiddleware モジュール \"%(module)s\" には、実行不可能な process_request "
 "関数が含まれています。"
 
-#: src/desktop/middleware.py:318
+#: src/desktop/middleware.py:319
 #, python-format
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr "%(app_name)s アプリケーションにアクセスするパーミッションがありません。"
 
-#: src/desktop/middleware.py:688
+#: src/desktop/middleware.py:693
 #, python-format
 msgid "Redirect to %s is not allowed."
 msgstr "%s にはリダイレクトできません。"
@@ -1266,11 +1306,11 @@ msgstr "パーミッションが拒否されました。%(username)s はドキ�
 msgid "Document %(id)s does not exist"
 msgstr "ドキュメント %(id)s が存在しません"
 
-#: src/desktop/models.py:601 src/desktop/models.py:1059
+#: src/desktop/models.py:601 src/desktop/models.py:1058
 #: src/desktop/templates/common_import_export.mako:80
-#: src/desktop/templates/document_browser.mako:174
-#: src/desktop/templates/document_browser.mako:479
-#: src/desktop/templates/ko_components/ko_context_popover.mako:77
+#: src/desktop/templates/document_browser.mako:177
+#: src/desktop/templates/document_browser.mako:485
+#: src/desktop/templates/ko_components/ko_context_popover.mako:80
 msgid "Owner"
 msgstr "所有者"
 
@@ -1287,7 +1327,7 @@ msgid "Schema version"
 msgstr "スキーマのバージョン"
 
 #: src/desktop/models.py:673 src/desktop/models.py:679
-#: src/desktop/models.py:1309 src/desktop/models.py:1320
+#: src/desktop/models.py:1308 src/desktop/models.py:1319
 msgid "Document does not exist or you don't have the permission to access it."
 msgstr "ドキュメントが存在しないか、ダッシュボードにアクセスするパーミッションがありません。"
 
@@ -1300,231 +1340,242 @@ msgstr "ドキュメントコピーメソッドには、content_object argument 
 msgid "Only %s permissions are supported, not %s."
 msgstr "%s パーミッションのみがサポートされています。%s はサポートされていません。"
 
-#: src/desktop/models.py:969
+#: src/desktop/models.py:968
 #, python-format
 msgid "Document with UUID %s not found."
 msgstr "UUID %s のドキュメントが見つかりません。"
 
-#: src/desktop/models.py:1015
+#: src/desktop/models.py:1014
 #, python-format
 msgid "Requested invalid path for user %s: %s"
 msgstr "ユーザー %s：%s の無効なパスを要求しました"
 
-#: src/desktop/models.py:1017
+#: src/desktop/models.py:1016
 #, python-format
 msgid "Duplicate documents found for user %s at path: %s"
 msgstr "パス %s でユーザー %s に対して重複ドキュメントが見つかりました"
 
-#: src/desktop/models.py:1059
+#: src/desktop/models.py:1058
 msgid "Creator."
 msgstr "作成者。"
 
-#: src/desktop/models.py:1063
+#: src/desktop/models.py:1062
 msgid "Type of document, e.g. Hive query, Oozie workflow, Search Dashboard..."
 msgstr "ドキュメントのタイプ（Hive クエリ、Oozie Workflow、検索ダッシュボードなど）"
 
-#: src/desktop/models.py:1067
+#: src/desktop/models.py:1066
 msgid "Searchable text for the document."
 msgstr "ドキュメントの検索可能なテキストです。"
 
-#: src/desktop/models.py:1070
+#: src/desktop/models.py:1069
 msgid "Time last modified"
 msgstr "最終変更時刻"
 
-#: src/desktop/models.py:1071
+#: src/desktop/models.py:1070
 msgid "Document version"
 msgstr "ドキュメントのバージョン"
 
-#: src/desktop/models.py:1073
+#: src/desktop/models.py:1072
 msgid "If managed under the cover by Hue and never by the user"
 msgstr "ユーザーではなく、Hue の制御下で管理されている場合"
 
-#: src/desktop/models.py:1074
+#: src/desktop/models.py:1073
 msgid "True if trashed"
 msgstr "ゴミ箱に移動すると True に設定されます"
 
-#: src/desktop/models.py:1227
+#: src/desktop/models.py:1226
 #, python-format
 msgid "Cannot create or modify directory with name: %s"
 msgstr "名前 %s でディレクトリを作成または変更できません"
 
-#: src/desktop/models.py:1231
+#: src/desktop/models.py:1230
 #, python-format
 msgid ""
 "Cannot save document %s under parent directory %s due to circular "
 "dependency"
 msgstr "循環依存のために、親ディレクトリ %s の下にドキュメント %s を保存できません"
 
-#: src/desktop/models.py:1244
+#: src/desktop/models.py:1243
 #, python-format
 msgid "Target with UUID %s is not a directory"
 msgstr "UUID %s のターゲットは、ディレクトリではありません"
 
-#: src/desktop/models.py:1336
+#: src/desktop/models.py:1335
 #, python-format
 msgid "Failed to share document: %s"
 msgstr "ドキュメントの共有に失敗しました：%s"
 
-#: src/desktop/models.py:1347
+#: src/desktop/models.py:1346
 #, python-format
 msgid "Invalid permission type: %s"
 msgstr "無効なパーミッションタイプ：%s"
 
-#: src/desktop/models.py:1608
+#: src/desktop/models.py:1607
 msgid "No permission to any app."
 msgstr "アプリに対するパーミッションがありません。"
 
-#: src/desktop/models.py:1636 src/desktop/templates/error.mako:45
-#: src/desktop/templates/hue.mako:566
+#: src/desktop/models.py:1635 src/desktop/templates/error.mako:45
+#: src/desktop/templates/hue.mako:645
 msgid "Home"
 msgstr "ホーム"
 
-#: src/desktop/models.py:1637 src/desktop/templates/assist.mako:1966
-#: src/desktop/templates/hue.mako:113 src/desktop/templates/hue.mako:1494
-#: src/desktop/templates/ko_components/ko_global_search.mako:307
+#: src/desktop/models.py:1636 src/desktop/templates/assist.mako:1990
+#: src/desktop/templates/hue.mako:177 src/desktop/templates/hue.mako:1708
+#: src/desktop/templates/ko_components/ko_global_search.mako:358
 msgid "Documents"
 msgstr "ドキュメント"
 
-#: src/desktop/models.py:1657 src/desktop/models.py:1682
+#: src/desktop/models.py:1656 src/desktop/models.py:1681
 msgid "Query"
 msgstr "クエリ"
 
-#: src/desktop/models.py:1658
+#: src/desktop/models.py:1657
 #, python-format
 msgid "%s Query"
 msgstr "%s クエリ"
 
-#: src/desktop/models.py:1672 src/desktop/models.py:1673
-#: src/desktop/templates/common_header.mako:421
-#: src/desktop/templates/common_header.mako:425
-#: src/desktop/templates/common_header.mako:429
-#: src/desktop/templates/common_header_footer_components.mako:95
-#: src/desktop/templates/document_browser.mako:342
-#: src/desktop/templates/document_browser.mako:343
-#: src/desktop/templates/hue.mako:557
+#: src/desktop/models.py:1671 src/desktop/models.py:1672
+#: src/desktop/templates/common_header.mako:449
+#: src/desktop/templates/common_header.mako:453
+#: src/desktop/templates/common_header.mako:457
+#: src/desktop/templates/common_header_m.mako:86
+#: src/desktop/templates/document_browser.mako:345
+#: src/desktop/templates/document_browser.mako:346
+#: src/desktop/templates/global_js_constants.mako:100
+#: src/desktop/templates/hue.mako:636
 msgid "Notebook"
 msgstr "ノートブック"
 
-#: src/desktop/models.py:1681 src/desktop/templates/hue.mako:556
-#: src/desktop/templates/hue.mako:1463
+#: src/desktop/models.py:1680 src/desktop/templates/hue.mako:635
+#: src/desktop/templates/hue.mako:1677
 msgid "Editor"
 msgstr "エディタ"
 
-#: src/desktop/models.py:1697 src/desktop/models.py:1698
-#: src/desktop/models.py:1754 src/desktop/templates/common_dashboard.mako:134
-#: src/desktop/templates/common_header.mako:519
-#: src/desktop/templates/common_notebook_ko_components.mako:200
-#: src/desktop/templates/document_browser.mako:374
-#: src/desktop/templates/hue.mako:559
-#: src/desktop/templates/ko_components/ko_context_popover.mako:37
-msgid "Dashboard"
-msgstr "ダッシュボード"
-
-#: src/desktop/models.py:1704
+#: src/desktop/models.py:1699
 #, python-format
 msgid "%s Dashboard"
 msgstr "%s ダッシュボード"
 
-#: src/desktop/models.py:1717 src/desktop/models.py:1719
-#: src/desktop/templates/ko_components/ko_context_popover.mako:358
+#: src/desktop/models.py:1710
+msgid "Report"
+msgstr "レポート"
+
+#: src/desktop/models.py:1716 src/desktop/models.py:1717
+#: src/desktop/models.py:1767 src/desktop/templates/common_dashboard.mako:140
+#: src/desktop/templates/common_header.mako:547
+#: src/desktop/templates/common_notebook_ko_components.mako:200
+#: src/desktop/templates/common_notebook_ko_components.mako:258
+#: src/desktop/templates/document_browser.mako:377
+#: src/desktop/templates/hue.mako:638
+#: src/desktop/templates/ko_components/ko_context_popover.mako:38
+msgid "Dashboard"
+msgstr "ダッシュボード"
+
+#: src/desktop/models.py:1730 src/desktop/models.py:1732
+#: src/desktop/templates/ko_components/ko_context_popover.mako:363
 msgid "Files"
 msgstr "ファイル"
 
-#: src/desktop/models.py:1718 src/desktop/models.py:1727
-#: src/desktop/models.py:1736 src/desktop/models.py:1745
-#: src/desktop/models.py:1783 src/desktop/models.py:1792
-#: src/desktop/models.py:1801 src/desktop/models.py:1810
-#: src/desktop/templates/ko_components/ko_context_popover.mako:349
-#: src/desktop/templates/ko_components/ko_global_search.mako:388
+#: src/desktop/models.py:1731 src/desktop/models.py:1740
+#: src/desktop/models.py:1749 src/desktop/models.py:1758
+#: src/desktop/models.py:1799 src/desktop/models.py:1808
+#: src/desktop/models.py:1817 src/desktop/models.py:1826
+#: src/desktop/templates/ko_components/ko_context_popover.mako:354
 msgid "Browse"
 msgstr "参照"
 
-#: src/desktop/models.py:1726 src/desktop/models.py:1728
-#: src/desktop/templates/assist.mako:1905
+#: src/desktop/models.py:1739 src/desktop/models.py:1741
+#: src/desktop/templates/assist.mako:1928
 msgid "S3"
 msgstr "S3"
 
-#: src/desktop/models.py:1735 src/desktop/models.py:1737
-#: src/desktop/templates/assist.mako:1918
+#: src/desktop/models.py:1748 src/desktop/models.py:1750
+#: src/desktop/templates/assist.mako:1941
 msgid "ADLS"
 msgstr "ADLS"
 
-#: src/desktop/models.py:1744 src/desktop/models.py:1746
-#: src/desktop/templates/assist.mako:883 src/desktop/templates/assist.mako:892
-#: src/desktop/templates/assist.mako:2257
-#: src/desktop/templates/common_header_footer_components.mako:199
-#: src/desktop/templates/ko_components/ko_global_search.mako:302
+#: src/desktop/models.py:1757 src/desktop/models.py:1759
+#: src/desktop/templates/assist.mako:890 src/desktop/templates/assist.mako:899
+#: src/desktop/templates/assist.mako:2286
+#: src/desktop/templates/global_js_constants.mako:68
+#: src/desktop/templates/ko_components/ko_global_search.mako:353
 msgid "Tables"
 msgstr "テーブル"
 
-#: src/desktop/models.py:1753 src/desktop/models.py:1755
-#: src/desktop/templates/common_header.mako:525
-#: src/desktop/templates/common_header.mako:528
-#: src/desktop/templates/hue.mako:570 src/desktop/templates/hue.mako:572
+#: src/desktop/models.py:1766 src/desktop/models.py:1768
+#: src/desktop/templates/assist.mako:893 src/desktop/templates/assist.mako:1957
+#: src/desktop/templates/assist.mako:2283
+#: src/desktop/templates/common_header.mako:553
+#: src/desktop/templates/common_header.mako:556
+#: src/desktop/templates/hue.mako:649 src/desktop/templates/hue.mako:651
 msgid "Indexes"
 msgstr "インデックス"
 
-#: src/desktop/models.py:1763 src/desktop/models.py:1764
-#: src/desktop/models.py:1765 src/desktop/models.py:1773
-#: src/desktop/models.py:1774 src/desktop/models.py:1775
-#: src/desktop/templates/hue.mako:251
-#: src/desktop/templates/ko_components/ko_job_browser_links.mako:30
+#: src/desktop/models.py:1776 src/desktop/models.py:1777
+#: src/desktop/models.py:1778 src/desktop/models.py:1784
+#: src/desktop/templates/hue.mako:316
+#: src/desktop/templates/ko_components/ko_job_browser_links.mako:32
 msgid "Jobs"
 msgstr "ジョブ"
 
-#: src/desktop/models.py:1782 src/desktop/models.py:1784
-#: src/desktop/templates/assist.mako:1953
-#: src/desktop/templates/common_header.mako:455
+#: src/desktop/models.py:1784 src/desktop/templates/hue.mako:321
+#: src/desktop/templates/ko_components/ko_job_browser_links.mako:32
+msgid "Queries"
+msgstr "クエリ"
+
+#: src/desktop/models.py:1798 src/desktop/models.py:1800
+#: src/desktop/templates/assist.mako:1976
+#: src/desktop/templates/common_header.mako:483
 msgid "HBase"
 msgstr "HBase"
 
-#: src/desktop/models.py:1791 src/desktop/models.py:1793
+#: src/desktop/models.py:1807 src/desktop/models.py:1809
 msgid "Security"
 msgstr "セキュリティ"
 
-#: src/desktop/models.py:1800 src/desktop/models.py:1802
-#: src/desktop/templates/hue.mako:596
+#: src/desktop/models.py:1816 src/desktop/models.py:1818
+#: src/desktop/templates/hue.mako:676
 msgid "Sqoop"
 msgstr "Sqoop"
 
-#: src/desktop/models.py:1809 src/desktop/templates/hue.mako:1510
+#: src/desktop/models.py:1825 src/desktop/templates/hue.mako:1724
 msgid "Browsers"
 msgstr "ブラウザ"
 
-#: src/desktop/models.py:1821 src/desktop/models.py:1823
-#: src/desktop/templates/document_browser.mako:357
-#: src/desktop/templates/home.mako:140 src/desktop/templates/hue.mako:560
+#: src/desktop/models.py:1837 src/desktop/models.py:1839
+#: src/desktop/templates/document_browser.mako:360
+#: src/desktop/templates/home.mako:140 src/desktop/templates/hue.mako:639
 msgid "Workflow"
 msgstr "Workflow"
 
-#: src/desktop/models.py:1822 src/desktop/models.py:1827
-#: src/desktop/models.py:1828 src/desktop/models.py:1829
-#: src/desktop/models.py:1834 src/desktop/models.py:1844
-#: src/desktop/templates/assist.mako:2920
-#: src/desktop/templates/document_browser.mako:362
-#: src/desktop/templates/hue.mako:561
+#: src/desktop/models.py:1838 src/desktop/models.py:1843
+#: src/desktop/models.py:1844 src/desktop/models.py:1845
+#: src/desktop/models.py:1850 src/desktop/models.py:1860
+#: src/desktop/templates/assist.mako:3069
+#: src/desktop/templates/document_browser.mako:365
+#: src/desktop/templates/hue.mako:640
 msgid "Schedule"
 msgstr "スケジュール"
 
-#: src/desktop/models.py:1833 src/desktop/models.py:1835
-#: src/desktop/templates/document_browser.mako:367
-#: src/desktop/templates/home.mako:142 src/desktop/templates/hue.mako:562
+#: src/desktop/models.py:1849 src/desktop/models.py:1851
+#: src/desktop/templates/document_browser.mako:370
+#: src/desktop/templates/home.mako:142 src/desktop/templates/hue.mako:641
 msgid "Bundle"
 msgstr "Bundle"
 
-#: src/desktop/models.py:1843
+#: src/desktop/models.py:1859
 msgid "Scheduler"
 msgstr "スケジューラ"
 
-#: src/desktop/models.py:1869
+#: src/desktop/models.py:1885
 msgid "Other Apps"
 msgstr "その他のアプリ"
 
-#: src/desktop/models.py:1870
-#: src/desktop/templates/common_notebook_ko_components.mako:625
+#: src/desktop/models.py:1886
+#: src/desktop/templates/common_notebook_ko_components.mako:783
 #, fuzzy
 msgid "Other"
-msgstr "その他PacteraSourceChangedPacteraSourceChanged"
+msgstr "その他"
 
 #: src/desktop/settings.py:84
 msgid "German"
@@ -1562,32 +1613,32 @@ msgstr "ポルトガル語（ブラジル）"
 msgid "Simplified Chinese"
 msgstr "簡体字中国語"
 
-#: src/desktop/settings.py:502
+#: src/desktop/settings.py:505
 #, python-format
 msgid "SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s"
 msgstr "REQUESTS_CA_BUNDLE で指定された SSL 証明書が存在していません：%s"
 
-#: src/desktop/views.py:169 src/desktop/views.py:185 src/desktop/views.py:265
-#: src/desktop/views.py:288 src/desktop/views.py:300 src/desktop/views.py:591
-#: src/desktop/views.py:626 src/desktop/views.py:636
+#: src/desktop/views.py:178 src/desktop/views.py:195 src/desktop/views.py:275
+#: src/desktop/views.py:298 src/desktop/views.py:310 src/desktop/views.py:613
+#: src/desktop/views.py:648 src/desktop/views.py:658
 msgid "You must be a superuser."
 msgstr "スーパーユーザーであることが必要です。"
 
-#: src/desktop/views.py:177
+#: src/desktop/views.py:186
 msgid "No logs found!"
 msgstr "ログが見つかりません。"
 
-#: src/desktop/views.py:218
+#: src/desktop/views.py:228
 msgid "No logs found."
 msgstr "ログが見つかりません。"
 
-#: src/desktop/views.py:303
+#: src/desktop/views.py:313
 msgid ""
 "You must enable the memory profiler via the memory_profiler config in the"
 " hue.ini."
 msgstr "hue.ini で memory_profiler コンフィグを使用してメモリプロファイラを有効にする必要があります。"
 
-#: src/desktop/views.py:486
+#: src/desktop/views.py:508
 #, python-format
 msgid ""
 "You are accessing an older version of Hue, please switch to the latest "
@@ -1595,7 +1646,7 @@ msgid ""
 msgstr "<Hi_break/>以前のバージョンの Hue にアクセスしています。最新バージョン %s に"
 "切り替えてください。"
 
-#: src/desktop/views.py:490
+#: src/desktop/views.py:512
 #, python-format
 msgid ""
 "You are accessing a non-optimized Hue, please switch to one of the "
@@ -1604,30 +1655,42 @@ msgstr ""
 "アクセスしている Hue は最適化されていません。利用可能ないずれかのアドレス %s に"
 "切り替えてください"
 
-#: src/desktop/auth/forms.py:44
+#: src/desktop/auth/forms.py:49
+msgid "Local"
+msgstr "ローカル"
+
+#: src/desktop/auth/forms.py:59
 msgid "Invalid username or password"
 msgstr "無効なユーザー名またはパスワード"
 
-#: src/desktop/auth/forms.py:45
+#: src/desktop/auth/forms.py:60
 msgid "Account deactivated. Please contact an administrator."
 msgstr "アカウントが非アクティブ化されました。管理者に連絡してください。"
 
-#: src/desktop/auth/forms.py:48
+#: src/desktop/auth/forms.py:63
 msgid "Username"
 msgstr "ユーザー名"
 
-#: src/desktop/auth/forms.py:49 src/desktop/auth/forms.py:121
+#: src/desktop/auth/forms.py:64 src/desktop/auth/forms.py:149
 msgid "Password"
 msgstr "パスワード"
 
-#: src/desktop/auth/forms.py:74
+#: src/desktop/auth/forms.py:89
 #, python-format
 msgid ""
 "Account deactivated. Please contact an <a "
 "href=\"mailto:%s\">administrator</a>."
 msgstr "アカウントが非アクティブ化されました。<a href=\"mailto:%s\">管理者</a>に連絡してください。"
 
-#: src/desktop/auth/views.py:248 src/desktop/auth/views.py:265
+#: src/desktop/auth/forms.py:101
+msgid "Login as"
+msgstr "ログイン名"
+
+#: src/desktop/auth/forms.py:101
+msgid "Login as username"
+msgstr "ログインユーザー名"
+
+#: src/desktop/auth/views.py:243 src/desktop/auth/views.py:260
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr "OAuth プロバイダーからの無効な応答：%s"
@@ -1768,7 +1831,7 @@ msgstr "\"error\" メソッドは実装されていません"
 msgid "Can't replace %s pattern since host is null."
 msgstr "ホストが null のため、%s パターンを置き換えできません。"
 
-#: src/desktop/lib/thrift_util.py:389
+#: src/desktop/lib/thrift_util.py:390
 msgid "Increase the sasl_max_buffer value in hue.ini"
 msgstr "hue.ini の sasl_max_buffer の値を大きくしてください"
 
@@ -1889,9 +1952,13 @@ msgstr "Desktop 向けの CherryPy Server です。"
 msgid "starting server with options:"
 msgstr "次のオプションでサーバーを起動中："
 
-#: src/desktop/management/commands/runcpserver.py:33
+#: src/desktop/management/commands/runcpserver.py:34
 msgid "Web server for Hue."
 msgstr "Hue の Web サーバーです。"
+
+#: src/desktop/management/commands/rungunicornserver.py:41
+msgid "Gunicorn Web server for Hue."
+msgstr "Hue の Gunicorn Web サーバーです。"
 
 #: src/desktop/management/commands/runpylint.py:28
 msgid ""
@@ -1953,7 +2020,7 @@ msgstr "戻る"
 #: src/desktop/templates/403.mako:40 src/desktop/templates/404.mako:43
 #, fuzzy
 msgid "or"
-msgstr "またはPacteraSourceChangedPacteraSourceChanged"
+msgstr "または"
 
 #: src/desktop/templates/403.mako:40 src/desktop/templates/404.mako:43
 msgid "go to My documents"
@@ -2037,7 +2104,7 @@ msgid "Hue icon"
 msgstr "Hue アイコン"
 
 #: src/desktop/templates/about_layout.mako:36
-#: src/desktop/templates/common_header.mako:347
+#: src/desktop/templates/common_header.mako:375
 msgid "About Hue"
 msgstr "Hue のバージョン情報"
 
@@ -2056,12 +2123,17 @@ msgid "Server Logs"
 msgstr "サーバーのログ"
 
 #: src/desktop/templates/about_layout.mako:50
-#: src/desktop/templates/hue.mako:595 src/desktop/templates/threads.mako:25
+#: src/desktop/templates/hue.mako:674 src/desktop/templates/threads.mako:25
 msgid "Threads"
 msgstr "スレッド"
 
+#: src/desktop/templates/about_layout.mako:53
+#: src/desktop/templates/hue.mako:675 src/desktop/templates/metrics.mako:34
+msgid "Metrics"
+msgstr "測定値"
+
 #: src/desktop/templates/actionbar.mako:31
-#: src/desktop/templates/common_notebook_ko_components.mako:512
+#: src/desktop/templates/common_notebook_ko_components.mako:540
 msgid "Search..."
 msgstr "検索..."
 
@@ -2074,218 +2146,218 @@ msgid "The table has no columns"
 msgstr "テーブルに列がありません"
 
 #: src/desktop/templates/assist.mako:75 src/desktop/templates/assist.mako:89
-#: src/desktop/templates/assist.mako:100 src/desktop/templates/assist.mako:187
-#: src/desktop/templates/assist.mako:211 src/desktop/templates/assist.mako:226
-#: src/desktop/templates/assist.mako:246 src/desktop/templates/assist.mako:675
+#: src/desktop/templates/assist.mako:100 src/desktop/templates/assist.mako:189
+#: src/desktop/templates/assist.mako:213 src/desktop/templates/assist.mako:228
+#: src/desktop/templates/assist.mako:248 src/desktop/templates/assist.mako:682
 msgid "Show details"
 msgstr "詳細を表示"
 
-#: src/desktop/templates/assist.mako:78 src/desktop/templates/assist.mako:212
-#: src/desktop/templates/document_browser.mako:515
+#: src/desktop/templates/assist.mako:78 src/desktop/templates/assist.mako:214
+#: src/desktop/templates/document_browser.mako:521
 msgid "Open"
 msgstr "開く"
 
 #: src/desktop/templates/assist.mako:83 src/desktop/templates/assist.mako:91
-#: src/desktop/templates/assist.mako:105 src/desktop/templates/assist.mako:173
+#: src/desktop/templates/assist.mako:106 src/desktop/templates/assist.mako:175
 msgid "Open in Browser"
 msgstr "ブラウザで開く"
 
-#: src/desktop/templates/assist.mako:94 src/desktop/templates/assist.mako:116
+#: src/desktop/templates/assist.mako:94 src/desktop/templates/assist.mako:118
 msgid "Open in Dashboard"
 msgstr "ダッシュボードで開く"
 
-#: src/desktop/templates/assist.mako:102 src/desktop/templates/assist.mako:178
+#: src/desktop/templates/assist.mako:102 src/desktop/templates/assist.mako:180
 msgid "Insert at cursor"
 msgstr "カーソルの位置に挿入"
 
-#: src/desktop/templates/assist.mako:110
+#: src/desktop/templates/assist.mako:112
 msgid "Open in Editor"
 msgstr "エディタで開く"
 
-#: src/desktop/templates/assist.mako:133 src/desktop/templates/home.mako:193
+#: src/desktop/templates/assist.mako:135 src/desktop/templates/home.mako:193
 msgid "Project"
 msgstr "プロジェクト"
 
-#: src/desktop/templates/assist.mako:135
+#: src/desktop/templates/assist.mako:137
 msgid "Select"
 msgstr "選択"
 
-#: src/desktop/templates/assist.mako:136
+#: src/desktop/templates/assist.mako:138
 msgid "Select distinct"
 msgstr "個別に選択"
 
-#: src/desktop/templates/assist.mako:141
+#: src/desktop/templates/assist.mako:143
 msgid "Aggregate"
 msgstr "集計"
 
-#: src/desktop/templates/assist.mako:143
+#: src/desktop/templates/assist.mako:145
 #, fuzzy
 msgid "Count"
-msgstr "カウントPacteraSourceChangedPacteraSourceChanged"
+msgstr "カウント"
 
-#: src/desktop/templates/assist.mako:144
+#: src/desktop/templates/assist.mako:146
 msgid "Count distinct"
 msgstr "個別にカウント"
 
-#: src/desktop/templates/assist.mako:145
+#: src/desktop/templates/assist.mako:147
 msgid "Sum"
 msgstr "合計"
 
-#: src/desktop/templates/assist.mako:146
+#: src/desktop/templates/assist.mako:148
 #, fuzzy
 msgid "Minimum"
-msgstr "最小PacteraSourceChangedPacteraSourceChanged"
+msgstr "最小"
 
-#: src/desktop/templates/assist.mako:147
+#: src/desktop/templates/assist.mako:149
 msgid "Maximum"
 msgstr "最大"
 
-#: src/desktop/templates/assist.mako:148
+#: src/desktop/templates/assist.mako:150
 msgid "Average"
 msgstr "平均"
 
-#: src/desktop/templates/assist.mako:153 src/desktop/templates/assist.mako:799
+#: src/desktop/templates/assist.mako:155 src/desktop/templates/assist.mako:806
 msgid "Filter"
 msgstr "フィルター"
 
-#: src/desktop/templates/assist.mako:155
+#: src/desktop/templates/assist.mako:157
 msgid "Is null"
 msgstr "null である"
 
-#: src/desktop/templates/assist.mako:156
+#: src/desktop/templates/assist.mako:158
 msgid "Is not null"
 msgstr "null でない"
 
-#: src/desktop/templates/assist.mako:157
+#: src/desktop/templates/assist.mako:159
 msgid "Equal to"
 msgstr "等しい"
 
-#: src/desktop/templates/assist.mako:158
+#: src/desktop/templates/assist.mako:160
 msgid "Not equal to"
 msgstr "等しくない"
 
-#: src/desktop/templates/assist.mako:159
+#: src/desktop/templates/assist.mako:161
 msgid "Greater than"
 msgstr "より大きい"
 
-#: src/desktop/templates/assist.mako:160
+#: src/desktop/templates/assist.mako:162
 msgid "Less than"
 msgstr "より小さい"
 
-#: src/desktop/templates/assist.mako:164
+#: src/desktop/templates/assist.mako:166
 msgid "Order"
 msgstr "順序"
 
-#: src/desktop/templates/assist.mako:166
+#: src/desktop/templates/assist.mako:168
 msgid "Ascending"
 msgstr "昇順"
 
-#: src/desktop/templates/assist.mako:167
+#: src/desktop/templates/assist.mako:169
 msgid "Descending"
 msgstr "降順"
 
-#: src/desktop/templates/assist.mako:175
+#: src/desktop/templates/assist.mako:177
 msgid "Open in Importer"
 msgstr "Importer で開く"
 
-#: src/desktop/templates/assist.mako:184
+#: src/desktop/templates/assist.mako:186
 msgid "Open folder"
 msgstr "フォルダを開く"
 
-#: src/desktop/templates/assist.mako:188
+#: src/desktop/templates/assist.mako:190
 msgid "Open document"
 msgstr "ドキュメントを開く"
 
-#: src/desktop/templates/assist.mako:194
+#: src/desktop/templates/assist.mako:196
 msgid "Open cluster"
 msgstr "クラスタを開く"
 
-#: src/desktop/templates/assist.mako:197
+#: src/desktop/templates/assist.mako:199
 msgid "Open in HBase"
 msgstr "HBase で開く"
 
-#: src/desktop/templates/assist.mako:216 src/desktop/templates/assist.mako:235
-#: src/desktop/templates/assist.mako:257
-#: src/desktop/templates/common_header_footer_components.mako:197
+#: src/desktop/templates/assist.mako:218 src/desktop/templates/assist.mako:237
+#: src/desktop/templates/assist.mako:259
+#: src/desktop/templates/global_js_constants.mako:66
 msgid "Popular"
 msgstr "人気順"
 
-#: src/desktop/templates/assist.mako:268
-#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:88
+#: src/desktop/templates/assist.mako:270
+#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:86
 msgid "No columns found"
 msgstr "列が見つかりません"
 
-#: src/desktop/templates/assist.mako:268
+#: src/desktop/templates/assist.mako:270
 msgid "No tables found"
 msgstr "テーブルが見つかりません"
 
-#: src/desktop/templates/assist.mako:268 src/desktop/templates/assist.mako:405
-#: src/desktop/templates/assist.mako:570 src/desktop/templates/assist.mako:628
-#: src/desktop/templates/assist.mako:861
+#: src/desktop/templates/assist.mako:270 src/desktop/templates/assist.mako:407
+#: src/desktop/templates/assist.mako:572 src/desktop/templates/assist.mako:630
+#: src/desktop/templates/assist.mako:868
 msgid "No results found"
 msgstr "結果が見つかりません"
 
-#: src/desktop/templates/assist.mako:287
+#: src/desktop/templates/assist.mako:289
 msgid "Error loading columns."
 msgstr "列のロード中にエラーが発生しました。"
 
-#: src/desktop/templates/assist.mako:290
+#: src/desktop/templates/assist.mako:292
 msgid "Error loading fields."
 msgstr "フィールドのロード中にエラーが発生しました。"
 
-#: src/desktop/templates/assist.mako:343 src/desktop/templates/assist.mako:479
+#: src/desktop/templates/assist.mako:345 src/desktop/templates/assist.mako:481
 msgid "Size"
 msgstr "サイズ"
 
-#: src/desktop/templates/assist.mako:344 src/desktop/templates/assist.mako:484
+#: src/desktop/templates/assist.mako:346 src/desktop/templates/assist.mako:486
 msgid "Permissions"
 msgstr "パーミッション"
 
-#: src/desktop/templates/assist.mako:355 src/desktop/templates/assist.mako:423
-#: src/desktop/templates/assist.mako:505 src/desktop/templates/assist.mako:520
-#: src/desktop/templates/assist.mako:645 src/desktop/templates/assist.mako:699
+#: src/desktop/templates/assist.mako:357 src/desktop/templates/assist.mako:425
+#: src/desktop/templates/assist.mako:507 src/desktop/templates/assist.mako:522
+#: src/desktop/templates/assist.mako:647 src/desktop/templates/assist.mako:706
 msgid "Manual refresh"
 msgstr "手動更新"
 
-#: src/desktop/templates/assist.mako:379 src/desktop/templates/assist.mako:544
-#: src/desktop/templates/assist.mako:602 src/desktop/templates/assist.mako:668
-#: src/desktop/templates/ko_components/ko_context_popover.mako:279
-#: src/desktop/templates/ko_components/ko_inline_autocomplete.mako:57
+#: src/desktop/templates/assist.mako:381 src/desktop/templates/assist.mako:546
+#: src/desktop/templates/assist.mako:604 src/desktop/templates/assist.mako:670
+#: src/desktop/templates/ko_components/ko_context_popover.mako:284
+#: src/desktop/templates/ko_components/ko_inline_autocomplete.mako:83
 msgid "Filter..."
 msgstr "フィルタ..."
 
-#: src/desktop/templates/assist.mako:388 src/desktop/templates/assist.mako:553
-#: src/desktop/templates/assist.mako:611
-#: src/desktop/templates/ko_components/ko_context_popover.mako:655
-#: src/desktop/templates/ko_components/ko_context_popover.mako:665
-#: src/desktop/templates/ko_components/ko_context_popover.mako:684
-#: src/desktop/templates/ko_components/ko_context_popover.mako:902
-#: src/desktop/templates/ko_components/ko_context_popover.mako:930
-#: src/desktop/templates/ko_components/ko_context_popover.mako:1061
-#: src/desktop/templates/ko_components/ko_context_popover.mako:1098
-#: src/desktop/templates/ko_components/ko_context_popover.mako:1119
+#: src/desktop/templates/assist.mako:390 src/desktop/templates/assist.mako:555
+#: src/desktop/templates/assist.mako:613
+#: src/desktop/templates/ko_components/ko_context_popover.mako:700
+#: src/desktop/templates/ko_components/ko_context_popover.mako:710
+#: src/desktop/templates/ko_components/ko_context_popover.mako:729
+#: src/desktop/templates/ko_components/ko_context_popover.mako:941
+#: src/desktop/templates/ko_components/ko_context_popover.mako:970
+#: src/desktop/templates/ko_components/ko_context_popover.mako:1100
+#: src/desktop/templates/ko_components/ko_context_popover.mako:1137
+#: src/desktop/templates/ko_components/ko_context_popover.mako:1158
 msgid "Details"
 msgstr "詳細"
 
-#: src/desktop/templates/assist.mako:405 src/desktop/templates/assist.mako:464
-#: src/desktop/templates/assist.mako:570 src/desktop/templates/assist.mako:628
-#: src/desktop/templates/assist.mako:685
+#: src/desktop/templates/assist.mako:407 src/desktop/templates/assist.mako:466
+#: src/desktop/templates/assist.mako:572 src/desktop/templates/assist.mako:630
+#: src/desktop/templates/assist.mako:692
 msgid "Empty directory"
 msgstr "空のディレクトリ"
 
-#: src/desktop/templates/assist.mako:411 src/desktop/templates/assist.mako:470
-#: src/desktop/templates/assist.mako:576 src/desktop/templates/assist.mako:634
-#: src/desktop/templates/assist.mako:691 src/desktop/templates/assist.mako:751
+#: src/desktop/templates/assist.mako:413 src/desktop/templates/assist.mako:472
+#: src/desktop/templates/assist.mako:578 src/desktop/templates/assist.mako:636
+#: src/desktop/templates/assist.mako:698 src/desktop/templates/assist.mako:758
 msgid "Error loading contents."
 msgstr "コンテンツのロード中にエラーが発生しました。"
 
-#: src/desktop/templates/assist.mako:481
+#: src/desktop/templates/assist.mako:483
 msgid "User"
 msgstr "ユーザー"
 
-#: src/desktop/templates/assist.mako:482
-#: src/desktop/templates/common_share.mako:35
-#: src/desktop/templates/common_share.mako:46
+#: src/desktop/templates/assist.mako:484
+#: src/desktop/templates/common_share.mako:51
+#: src/desktop/templates/common_share.mako:61
 #: src/desktop/templates/common_share2.mako:35
 #: src/desktop/templates/common_share2.mako:46
 #: src/desktop/templates/document_browser.mako:58
@@ -2293,238 +2365,235 @@ msgstr "ユーザー"
 msgid "Group"
 msgstr "グループ"
 
-#: src/desktop/templates/assist.mako:485
+#: src/desktop/templates/assist.mako:487
 msgid "Date"
 msgstr "日付"
 
-#: src/desktop/templates/assist.mako:502 src/desktop/templates/assist.mako:503
-#: src/desktop/templates/assist.mako:517 src/desktop/templates/assist.mako:518
+#: src/desktop/templates/assist.mako:504 src/desktop/templates/assist.mako:505
+#: src/desktop/templates/assist.mako:519 src/desktop/templates/assist.mako:520
 msgid "Upload file"
 msgstr "ファイルをアップロード"
 
-#: src/desktop/templates/assist.mako:714
+#: src/desktop/templates/assist.mako:676
+msgid "No documents found"
+msgstr "ドキュメントが見つかりません"
+
+#: src/desktop/templates/assist.mako:721
 msgid "Clusters"
 msgstr "クラスタ"
 
-#: src/desktop/templates/assist.mako:739
+#: src/desktop/templates/assist.mako:746
 msgid "No clusters available."
 msgstr "利用可能なクラスタがありません。"
 
-#: src/desktop/templates/assist.mako:742
+#: src/desktop/templates/assist.mako:749
 msgid "No tables available."
 msgstr "利用可能なテーブルがありません。"
 
-#: src/desktop/templates/assist.mako:760 src/desktop/templates/assist.mako:841
+#: src/desktop/templates/assist.mako:767 src/desktop/templates/assist.mako:848
 msgid "Sources"
 msgstr "ソース"
 
-#: src/desktop/templates/assist.mako:779
+#: src/desktop/templates/assist.mako:786
 msgid "Clear cache"
 msgstr "キャッシュをクリア"
 
-#: src/desktop/templates/assist.mako:783
+#: src/desktop/templates/assist.mako:790
 msgid "Perform incremental metadata update"
 msgstr "増分メタデータ更新を実行"
 
-#: src/desktop/templates/assist.mako:785
+#: src/desktop/templates/assist.mako:792
 msgid "This will sync missing tables in Hive."
 msgstr "この処理は、Hive に不足しているテーブルを同期します。"
 
-#: src/desktop/templates/assist.mako:788
+#: src/desktop/templates/assist.mako:795
 msgid "Invalidate all metadata and rebuild index"
 msgstr "すべてのメタデータを無効化して、インデックスを再作成します"
 
-#: src/desktop/templates/assist.mako:790
+#: src/desktop/templates/assist.mako:797
 msgid "WARNING: This can be both resource and time-intensive."
 msgstr "警告：この処理では、リソースと時間の両方がかなり必要になる可能性があります。"
 
-#: src/desktop/templates/assist.mako:791 src/desktop/templates/assist.mako:821
-#: src/desktop/templates/assist.mako:824 src/desktop/templates/assist.mako:828
+#: src/desktop/templates/assist.mako:798 src/desktop/templates/assist.mako:828
+#: src/desktop/templates/assist.mako:831 src/desktop/templates/assist.mako:835
 msgid "Refresh"
 msgstr "更新"
 
-#: src/desktop/templates/assist.mako:804 src/desktop/templates/assist.mako:805
+#: src/desktop/templates/assist.mako:811 src/desktop/templates/assist.mako:812
 msgid "Create table"
 msgstr "テーブルを作成"
 
-#: src/desktop/templates/assist.mako:810
+#: src/desktop/templates/assist.mako:817
 msgid "Create database"
 msgstr "データベースを作成"
 
-#: src/desktop/templates/assist.mako:816 src/desktop/templates/assist.mako:817
+#: src/desktop/templates/assist.mako:823 src/desktop/templates/assist.mako:824
 msgid "Create index"
 msgstr "インデックスを作成"
 
-#: src/desktop/templates/assist.mako:837
-#: src/desktop/templates/common_header_footer_components.mako:192
-#: src/desktop/templates/ko_components/ko_global_search.mako:303
+#: src/desktop/templates/assist.mako:844
+#: src/desktop/templates/global_js_constants.mako:61
+#: src/desktop/templates/ko_components/ko_global_search.mako:354
 msgid "Databases"
 msgstr "データベース"
 
-#: src/desktop/templates/assist.mako:872
+#: src/desktop/templates/assist.mako:879
 msgid "Error loading databases."
 msgstr "データベースのロード中にエラーが発生しました。"
 
-#: src/desktop/templates/assist.mako:875
+#: src/desktop/templates/assist.mako:882
 msgid "No databases found."
 msgstr "データベースが見つかりません。"
 
-#: src/desktop/templates/assist.mako:886 src/desktop/templates/assist.mako:1934
-#: src/desktop/templates/assist.mako:2254
-msgid "Collections"
-msgstr "コレクション"
-
-#: src/desktop/templates/assist.mako:893
-#: src/desktop/templates/ko_components/ko_global_search.mako:306
+#: src/desktop/templates/assist.mako:900
+#: src/desktop/templates/ko_components/ko_global_search.mako:357
 msgid "Views"
 msgstr "ビュー"
 
-#: src/desktop/templates/assist.mako:897 src/desktop/templates/assist.mako:900
-#: src/desktop/templates/assist.mako:903 src/desktop/templates/assist.mako:905
+#: src/desktop/templates/assist.mako:904 src/desktop/templates/assist.mako:907
+#: src/desktop/templates/assist.mako:910 src/desktop/templates/assist.mako:912
 msgid "Sort"
 msgstr "ソート"
 
-#: src/desktop/templates/assist.mako:910
+#: src/desktop/templates/assist.mako:917
 msgid "Default"
 msgstr "デフォルト値"
 
-#: src/desktop/templates/assist.mako:915
+#: src/desktop/templates/assist.mako:922
 msgid "Alphabetical"
 msgstr "アルファベット順"
 
-#: src/desktop/templates/assist.mako:921
+#: src/desktop/templates/assist.mako:928
 msgid "Popularity"
 msgstr "使用率"
 
-#: src/desktop/templates/assist.mako:948
+#: src/desktop/templates/assist.mako:955
 msgid "Error loading tables."
 msgstr "テーブルのロード中にエラーが発生しました。"
 
-#: src/desktop/templates/assist.mako:1840
-#: src/desktop/templates/assist_m.mako:110
-#: src/desktop/templates/common_header_footer_components.mako:162
-#: src/desktop/templates/common_header_m.mako:120
+#: src/desktop/templates/assist.mako:1863
+#: src/desktop/templates/assist_m.mako:112
 msgid "There was a problem loading the databases"
 msgstr "データベースのロード中に問題が発生しました"
 
-#: src/desktop/templates/assist.mako:1841
+#: src/desktop/templates/assist.mako:1864
 msgid "There was a problem loading the table preview"
 msgstr "テーブルプレビューのロード中に問題が発生しました"
 
-#: src/desktop/templates/assist.mako:1844
-msgid "There was a problem loading the collections"
-msgstr "コレクションのロード中に問題が発生しました"
+#: src/desktop/templates/assist.mako:1867
+msgid "There was a problem loading the indexes"
+msgstr "インデックスのロード中に問題が発生しました"
 
-#: src/desktop/templates/assist.mako:1845
-msgid "There was a problem loading the collection preview"
-msgstr "コレクションプレビューのロード中に問題が発生しました"
+#: src/desktop/templates/assist.mako:1868
+msgid "There was a problem loading the index preview"
+msgstr "インデックスプレビューのロード中に問題が発生しました"
 
-#: src/desktop/templates/assist.mako:1870
-#: src/desktop/templates/assist.mako:2008
+#: src/desktop/templates/assist.mako:1893
+#: src/desktop/templates/assist.mako:2037
 msgid "SQL"
 msgstr "SQL"
 
-#: src/desktop/templates/assist.mako:1892
+#: src/desktop/templates/assist.mako:1915
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/desktop/templates/assist.mako:1990
+#: src/desktop/templates/assist.mako:2019
 msgid "Git"
 msgstr "Git"
 
-#: src/desktop/templates/assist.mako:2088
+#: src/desktop/templates/assist.mako:2117
 msgid "No functions found. "
 msgstr "関数が見つかりません。"
 
-#: src/desktop/templates/assist.mako:2259
+#: src/desktop/templates/assist.mako:2288
 msgid "Statement"
 msgstr "ステートメント"
 
-#: src/desktop/templates/assist.mako:2281
-msgid "No collections selected."
-msgstr "コレクションが選択されていません。"
+#: src/desktop/templates/assist.mako:2310
+msgid "No indexes selected."
+msgstr "インデックスが選択されていません。"
 
-#: src/desktop/templates/assist.mako:2284
+#: src/desktop/templates/assist.mako:2313
 msgid "No tables identified."
 msgstr "テーブルを識別できません。"
 
-#: src/desktop/templates/assist.mako:2289
+#: src/desktop/templates/assist.mako:2318
 msgid "No entries found."
 msgstr "エントリが見つかりません。"
 
-#: src/desktop/templates/assist.mako:2310
+#: src/desktop/templates/assist.mako:2340
 msgid "Suggestions"
 msgstr "提案"
 
-#: src/desktop/templates/assist.mako:2313
+#: src/desktop/templates/assist.mako:2343
 msgid "Select a query or start typing to get optimization hints."
 msgstr "最適化のヒントを取得するには、クエリを選択するか入力を開始してください。"
 
-#: src/desktop/templates/assist.mako:2316
+#: src/desktop/templates/assist.mako:2346
 msgid "No optimizations identified."
 msgstr "最適化を識別できません。"
 
-#: src/desktop/templates/assist.mako:2324
+#: src/desktop/templates/assist.mako:2354
 msgid "Add filter"
 msgstr "フィルタを追加"
 
-#: src/desktop/templates/assist.mako:2333
+#: src/desktop/templates/assist.mako:2363
 msgid "Add table "
 msgstr "テーブルを追加"
 
-#: src/desktop/templates/assist.mako:2333
-#: src/desktop/templates/document_browser.mako:272
-#: src/desktop/templates/document_browser.mako:274
+#: src/desktop/templates/assist.mako:2363
+#: src/desktop/templates/document_browser.mako:275
+#: src/desktop/templates/document_browser.mako:277
 msgid "and"
 msgstr "および"
 
-#: src/desktop/templates/assist.mako:2334
+#: src/desktop/templates/assist.mako:2364
 msgid "Improve Analysis"
 msgstr "分析を向上"
 
-#: src/desktop/templates/assist.mako:2708
+#: src/desktop/templates/assist.mako:2856
 msgid "Query needs to be saved."
 msgstr "クエリを保存する必要があります。"
 
-#: src/desktop/templates/assist.mako:2712
+#: src/desktop/templates/assist.mako:2860
 msgid "Save changes"
 msgstr "変更を保存"
 
-#: src/desktop/templates/assist.mako:2715
-#: src/desktop/templates/common_dashboard.mako:332
+#: src/desktop/templates/assist.mako:2863
 #: src/desktop/templates/common_dashboard.mako:338
+#: src/desktop/templates/common_dashboard.mako:344
 msgid "Start"
 msgstr "開始"
 
-#: src/desktop/templates/assist.mako:2719
+#: src/desktop/templates/assist.mako:2867
 msgid "View"
 msgstr "表示"
 
-#: src/desktop/templates/assist.mako:2722
+#: src/desktop/templates/assist.mako:2870
 msgid "Running"
 msgstr "実行中"
 
-#: src/desktop/templates/assist.mako:2725
+#: src/desktop/templates/assist.mako:2873
 msgid "Stopped"
 msgstr "停止しました"
 
-#: src/desktop/templates/assist.mako:2918
-#: src/desktop/templates/assist.mako:2921
+#: src/desktop/templates/assist.mako:3067
+#: src/desktop/templates/assist.mako:3070
 msgid "Assistant"
 msgstr "アシスト"
 
-#: src/desktop/templates/assist.mako:2919
-#: src/desktop/templates/common_header_footer_components.mako:194
+#: src/desktop/templates/assist.mako:3068
+#: src/desktop/templates/global_js_constants.mako:63
 msgid "Functions"
 msgstr "関数"
 
 #: src/desktop/templates/assist_m.mako:24
-#: src/desktop/templates/common_header_m.mako:320
-#: src/desktop/templates/ko_components/ko_context_popover.mako:33
+#: src/desktop/templates/common_header_m.mako:332
+#: src/desktop/templates/ko_components/ko_context_popover.mako:34
 msgid "Assist"
 msgstr "アシスト"
 
-#: src/desktop/templates/assist_m.mako:111
+#: src/desktop/templates/assist_m.mako:113
 msgid "There was a problem loading the table preview."
 msgstr "テーブルプレビューをロード中に問題が発生しました。"
 
@@ -2545,814 +2614,466 @@ msgstr "現在の値："
 msgid "All OK. Configuration check passed."
 msgstr "すべて OK です。設定の確認が正常に終了しました。"
 
-#: src/desktop/templates/common_dashboard.mako:49
+#: src/desktop/templates/common_dashboard.mako:53
 msgid "LAYOUT"
 msgstr "レイアウト"
 
-#: src/desktop/templates/common_dashboard.mako:50
+#: src/desktop/templates/common_dashboard.mako:55
 msgid "Dynamic dashboard: multiple interconnected widgets"
 msgstr "動的なダッシュボード：相互に連結した複数のウィジェット"
 
-#: src/desktop/templates/common_dashboard.mako:57
-msgid ""
-"Query Builder: Single widget for easily analysing data in multiple "
-"dimensions"
-msgstr ""
-"Query Builder：複数の寸法のデータの分析を簡単に行うためのウィジェット"
-""
+#: src/desktop/templates/common_dashboard.mako:62
+msgid "Explore with multiple interconnected widgets"
+msgstr "相互に連結した複数のウィジェットを使用して確認"
 
-#: src/desktop/templates/common_dashboard.mako:64
-msgid ""
-"Report: static dashboard with multiple widgets executing independent "
-"queries"
-msgstr ""
-"レポート：個別のクエリを実行する複数のウィジェットが含まれた静的な "
-"ダッシュボード"
+#: src/desktop/templates/common_dashboard.mako:69
+msgid "Query Builder to slice and dice dimensions"
+msgstr "寸法をスライスアンドダイスする Query Builder"
 
-#: src/desktop/templates/common_dashboard.mako:72
+#: src/desktop/templates/common_dashboard.mako:75
 msgid "Empty dashboard that can be used as a starting point"
 msgstr "最初に使用する空のダッシュボード"
 
-#: src/desktop/templates/common_dashboard.mako:82
+#: src/desktop/templates/common_dashboard.mako:87
 msgid "RESULTS"
 msgstr "結果"
 
-#: src/desktop/templates/common_dashboard.mako:92
+#: src/desktop/templates/common_dashboard.mako:97
 msgid "WIDGETS"
 msgstr "ウィジェット"
 
-#: src/desktop/templates/common_dashboard.mako:105
+#: src/desktop/templates/common_dashboard.mako:111
 msgid "Click on the pencil to get started with your dashboard!"
 msgstr "鉛筆をクリックしてダッシュボードを開始します。"
 
-#: src/desktop/templates/common_dashboard.mako:106
-#: src/desktop/templates/common_dashboard.mako:111
-#: src/desktop/templates/common_dashboard.mako:249
+#: src/desktop/templates/common_dashboard.mako:112
+#: src/desktop/templates/common_dashboard.mako:117
+#: src/desktop/templates/common_dashboard.mako:255
 msgid "Hint arrow"
 msgstr "ヒントの矢印"
 
-#: src/desktop/templates/common_dashboard.mako:110
+#: src/desktop/templates/common_dashboard.mako:116
 msgid "Pick an index and Click on a layout to start your dashboard!"
 msgstr "インデックスを選択して、レイアウトをクリックしてダッシュボードを開始します。"
 
-#: src/desktop/templates/common_dashboard.mako:120
+#: src/desktop/templates/common_dashboard.mako:126
 msgid "Blank"
 msgstr "空白"
 
-#: src/desktop/templates/common_dashboard.mako:148
+#: src/desktop/templates/common_dashboard.mako:155
+msgid "Explore"
+msgstr "確認"
+
+#: src/desktop/templates/common_dashboard.mako:169
 msgid "Query Builder"
 msgstr "Query Builder"
 
-#: src/desktop/templates/common_dashboard.mako:160
-msgid "Report"
-msgstr "レポート"
-
-#: src/desktop/templates/common_dashboard.mako:174
-msgid "Drag a widget here"
-msgstr "ここにウィジェットをドラッグ"
-
-#: src/desktop/templates/common_dashboard.mako:191
+#: src/desktop/templates/common_dashboard.mako:194
 msgid "Reload this definition"
 msgstr "この定義を再ロード"
 
-#: src/desktop/templates/common_dashboard.mako:191
+#: src/desktop/templates/common_dashboard.mako:194
 msgid "Update the definition"
 msgstr "定義を更新"
 
-#: src/desktop/templates/common_dashboard.mako:194
+#: src/desktop/templates/common_dashboard.mako:197
 msgid "Close this definition"
 msgstr "この定義を閉じる"
 
-#: src/desktop/templates/common_dashboard.mako:225
+#: src/desktop/templates/common_dashboard.mako:213
+msgid "Empty widget"
+msgstr "空のウィジェット"
+
+#: src/desktop/templates/common_dashboard.mako:231
 msgid "Make column smaller"
 msgstr "列を小さくする"
 
-#: src/desktop/templates/common_dashboard.mako:226
+#: src/desktop/templates/common_dashboard.mako:232
 msgid "Make column larger"
 msgstr "列を大きくする"
 
-#: src/desktop/templates/common_dashboard.mako:227
+#: src/desktop/templates/common_dashboard.mako:233
 msgid "Add a column to the right"
 msgstr "右に列を追加"
 
-#: src/desktop/templates/common_dashboard.mako:228
+#: src/desktop/templates/common_dashboard.mako:234
 msgid "Remove this column"
 msgstr "この列を削除"
 
-#: src/desktop/templates/common_dashboard.mako:231
+#: src/desktop/templates/common_dashboard.mako:237
 msgid "Move column to the right"
 msgstr "右に列を移動"
 
-#: src/desktop/templates/common_dashboard.mako:232
+#: src/desktop/templates/common_dashboard.mako:238
 msgid "Add a column to the left"
 msgstr "左に列を追加"
 
-#: src/desktop/templates/common_dashboard.mako:233
+#: src/desktop/templates/common_dashboard.mako:239
 msgid "Move column to the left"
 msgstr "左に列を移動"
 
-#: src/desktop/templates/common_dashboard.mako:250
+#: src/desktop/templates/common_dashboard.mako:256
 msgid "Drag any of the widgets inside your empty row"
 msgstr "いずれかのウィジェットを空の行内にドラッグ"
 
-#: src/desktop/templates/common_dashboard.mako:255
+#: src/desktop/templates/common_dashboard.mako:261
 msgid "Row"
 msgstr "行"
 
-#: src/desktop/templates/common_dashboard.mako:333
-#: src/desktop/templates/common_dashboard.mako:338
+#: src/desktop/templates/common_dashboard.mako:339
+#: src/desktop/templates/common_dashboard.mako:344
 #, fuzzy
 msgid "End"
-msgstr "終了PacteraSourceChangedPacteraSourceChanged"
+msgstr "終了"
 
-#: src/desktop/templates/common_dashboard.mako:334
-#: src/desktop/templates/common_dashboard.mako:338
+#: src/desktop/templates/common_dashboard.mako:340
+#: src/desktop/templates/common_dashboard.mako:344
 msgid "Interval"
 msgstr "間隔"
 
-#: src/desktop/templates/common_dashboard.mako:335
+#: src/desktop/templates/common_dashboard.mako:341
 msgid "Switch to custom format"
 msgstr "カスタムフォーマットに切り替え"
 
-#: src/desktop/templates/common_dashboard.mako:336
+#: src/desktop/templates/common_dashboard.mako:342
 msgid "Switch to date pickers"
 msgstr "日付ピッカーに切り替え"
 
-#: src/desktop/templates/common_dashboard.mako:337
+#: src/desktop/templates/common_dashboard.mako:343
 msgid "e.g."
 msgstr "たとえば、"
 
-#: src/desktop/templates/common_dashboard.mako:338
+#: src/desktop/templates/common_dashboard.mako:344
 msgid "Read more..."
 msgstr "詳細を読み取り..."
 
-#: src/desktop/templates/common_header.mako:265
+#: src/desktop/templates/common_header.mako:277
 msgid "Manage HDFS"
 msgstr "HDFS を管理"
 
-#: src/desktop/templates/common_header.mako:266
-#: src/desktop/templates/hue.mako:565
-#: src/desktop/templates/ko_components/ko_context_popover.mako:49
+#: src/desktop/templates/common_header.mako:278
+#: src/desktop/templates/hue.mako:644
+#: src/desktop/templates/ko_components/ko_context_popover.mako:52
 msgid "File Browser"
 msgstr "File Browser"
 
-#: src/desktop/templates/common_header.mako:271
-#: src/desktop/templates/common_header.mako:272
+#: src/desktop/templates/common_header.mako:283
+#: src/desktop/templates/common_header.mako:284
 msgid "File Browsers"
 msgstr "File Browser"
 
-#: src/desktop/templates/common_header.mako:276
-#: src/desktop/templates/common_header.mako:285
+#: src/desktop/templates/common_header.mako:288
+#: src/desktop/templates/common_header.mako:304
 msgid "HDFS Browser"
 msgstr "HDFS Browser"
 
-#: src/desktop/templates/common_header.mako:279
-#: src/desktop/templates/common_header.mako:291
+#: src/desktop/templates/common_header.mako:292
+#: src/desktop/templates/common_header.mako:310
 msgid "S3 Browser"
 msgstr "S3 Browser"
 
-#: src/desktop/templates/common_header.mako:300
-#: src/desktop/templates/common_header.mako:303
+#: src/desktop/templates/common_header.mako:297
+#: src/desktop/templates/common_header.mako:317
+msgid "ADLS Browser"
+msgstr "ADLS Browser"
+
+#: src/desktop/templates/common_header.mako:326
+#: src/desktop/templates/common_header.mako:329
 msgid "Manage jobs"
 msgstr "ジョブを管理"
 
-#: src/desktop/templates/common_header.mako:300
-#: src/desktop/templates/common_header.mako:301
-#: src/desktop/templates/common_header.mako:304
-#: src/desktop/templates/common_header.mako:306
-#: src/desktop/templates/hue.mako:564
+#: src/desktop/templates/common_header.mako:326
+#: src/desktop/templates/common_header.mako:327
+#: src/desktop/templates/common_header.mako:330
+#: src/desktop/templates/common_header.mako:332
+#: src/desktop/templates/hue.mako:643
 msgid "Job Browser"
 msgstr "Job Browser"
 
-#: src/desktop/templates/common_header.mako:314
-msgid "Administration"
-msgstr "管理"
-
-#: src/desktop/templates/common_header.mako:322
-#: src/desktop/templates/hue.mako:219
+#: src/desktop/templates/common_header.mako:349
+#: src/desktop/templates/hue.mako:283
 msgid "View Profile"
 msgstr "プロファイルを表示"
 
-#: src/desktop/templates/common_header.mako:324
-#: src/desktop/templates/hue.mako:219
+#: src/desktop/templates/common_header.mako:351
+#: src/desktop/templates/hue.mako:283
 msgid "Edit Profile"
 msgstr "プロファイルを編集"
 
-#: src/desktop/templates/common_header.mako:329
-#: src/desktop/templates/hue.mako:222
+#: src/desktop/templates/common_header.mako:356
+#: src/desktop/templates/hue.mako:286
 msgid "Manage Users"
 msgstr "ユーザーを管理"
 
-#: src/desktop/templates/common_header.mako:332
+#: src/desktop/templates/common_header.mako:360
 msgid "Switch to Hue 4"
 msgstr "Hue 4 に切り替え"
 
-#: src/desktop/templates/common_header.mako:340
+#: src/desktop/templates/common_header.mako:368
 msgid "Documentation"
 msgstr "ドキュメント"
 
-#: src/desktop/templates/common_header.mako:342
-#: src/desktop/templates/common_header_m.mako:334
-#: src/desktop/templates/hue.mako:233
+#: src/desktop/templates/common_header.mako:370
+#: src/desktop/templates/common_header_m.mako:346
+#: src/desktop/templates/hue.mako:297
 msgid "Sign out"
 msgstr "サインアウト"
 
-#: src/desktop/templates/common_header.mako:354
+#: src/desktop/templates/common_header.mako:382
 #: src/desktop/templates/common_home.mako:47
-#: src/desktop/templates/document_browser.mako:451
-#: src/desktop/templates/document_browser.mako:458
+#: src/desktop/templates/document_browser.mako:457
+#: src/desktop/templates/document_browser.mako:464
 #: src/desktop/templates/home.mako:94
 msgid "My documents"
 msgstr "マイドキュメント"
 
-#: src/desktop/templates/common_header.mako:360
+#: src/desktop/templates/common_header.mako:388
 msgid "Query data"
 msgstr "クエリデータ"
 
-#: src/desktop/templates/common_header.mako:364
-#: src/desktop/templates/common_header.mako:366
-#: src/desktop/templates/common_header.mako:398
-#: src/desktop/templates/common_header.mako:400
-#: src/desktop/templates/common_header_m.mako:323
+#: src/desktop/templates/common_header.mako:392
+#: src/desktop/templates/common_header.mako:394
+#: src/desktop/templates/common_header.mako:426
+#: src/desktop/templates/common_header.mako:428
+#: src/desktop/templates/common_header_m.mako:335
 msgid "Hive"
 msgstr "Hive"
 
-#: src/desktop/templates/common_header.mako:371
-#: src/desktop/templates/common_header.mako:373
-#: src/desktop/templates/common_header.mako:404
-#: src/desktop/templates/common_header.mako:406
-#: src/desktop/templates/common_header_m.mako:328
+#: src/desktop/templates/common_header.mako:399
+#: src/desktop/templates/common_header.mako:401
+#: src/desktop/templates/common_header.mako:432
+#: src/desktop/templates/common_header.mako:434
+#: src/desktop/templates/common_header_m.mako:340
 msgid "Impala"
 msgstr "Impala"
 
-#: src/desktop/templates/common_header.mako:378
-#: src/desktop/templates/common_header.mako:380
+#: src/desktop/templates/common_header.mako:406
+#: src/desktop/templates/common_header.mako:408
 msgid "DBQuery icon"
 msgstr "DBQuery アイコン"
 
-#: src/desktop/templates/common_header.mako:378
-#: src/desktop/templates/common_header.mako:380
+#: src/desktop/templates/common_header.mako:406
+#: src/desktop/templates/common_header.mako:408
 msgid "DB Query"
 msgstr "DB クエリ"
 
-#: src/desktop/templates/common_header.mako:385
-#: src/desktop/templates/common_header.mako:387
+#: src/desktop/templates/common_header.mako:413
+#: src/desktop/templates/common_header.mako:415
 msgid "Pig"
 msgstr "Pig"
 
-#: src/desktop/templates/common_header.mako:391
-#: src/desktop/templates/hue.mako:597
+#: src/desktop/templates/common_header.mako:419
+#: src/desktop/templates/hue.mako:677
 msgid "Job Designer"
 msgstr "Job Designer"
 
-#: src/desktop/templates/common_header.mako:421
-#: src/desktop/templates/common_header.mako:426
-#: src/desktop/templates/common_header.mako:430
+#: src/desktop/templates/common_header.mako:449
+#: src/desktop/templates/common_header.mako:454
+#: src/desktop/templates/common_header.mako:458
 msgid "Notebooks"
 msgstr "ノートブック"
 
-#: src/desktop/templates/common_header.mako:449
+#: src/desktop/templates/common_header.mako:477
 msgid "Manage data"
 msgstr "データを管理"
 
-#: src/desktop/templates/common_header.mako:452
-#: src/desktop/templates/common_header.mako:548
-#: src/desktop/templates/common_header.mako:551
+#: src/desktop/templates/common_header.mako:480
+#: src/desktop/templates/common_header.mako:576
+#: src/desktop/templates/common_header.mako:579
 msgid "Metastore icon"
 msgstr "Metastore アイコン"
 
-#: src/desktop/templates/common_header.mako:452
+#: src/desktop/templates/common_header.mako:480
 msgid "Metastore Tables"
 msgstr "Metastore テーブル"
 
-#: src/desktop/templates/common_header.mako:455
+#: src/desktop/templates/common_header.mako:483
 #, fuzzy
 msgid "HBase icon"
-msgstr "HBase アイコンPacteraSourceChangedPacteraSourceChanged"
+msgstr "HBase アイコン"
 
-#: src/desktop/templates/common_header.mako:458
+#: src/desktop/templates/common_header.mako:486
 msgid "Sqoop icon"
 msgstr "Sqoop アイコン"
 
-#: src/desktop/templates/common_header.mako:458
+#: src/desktop/templates/common_header.mako:486
 msgid "Sqoop Transfer"
 msgstr "Sqoop による転送"
 
-#: src/desktop/templates/common_header.mako:461
+#: src/desktop/templates/common_header.mako:489
 msgid "ZooKeeper icon"
 msgstr "ZooKeeper アイコン"
 
-#: src/desktop/templates/common_header.mako:461
+#: src/desktop/templates/common_header.mako:489
 msgid "ZooKeeper"
 msgstr "ZooKeeper"
 
-#: src/desktop/templates/common_header.mako:470
+#: src/desktop/templates/common_header.mako:498
 msgid "Schedule with Oozie"
 msgstr "Oozie でスケジュール"
 
-#: src/desktop/templates/common_header.mako:473
+#: src/desktop/templates/common_header.mako:501
 msgid "Oozie dashboard icon"
 msgstr "Oozie ダッシュボードアイコン"
 
-#: src/desktop/templates/common_header.mako:473
-#: src/desktop/templates/common_header.mako:520
+#: src/desktop/templates/common_header.mako:501
+#: src/desktop/templates/common_header.mako:548
 msgid "Dashboards"
 msgstr "ダッシュボード"
 
-#: src/desktop/templates/common_header.mako:475
-#: src/desktop/templates/common_header.mako:486
-#: src/desktop/templates/common_header.mako:495
-#: src/desktop/templates/document_browser.mako:357
+#: src/desktop/templates/common_header.mako:503
+#: src/desktop/templates/common_header.mako:514
+#: src/desktop/templates/common_header.mako:523
 #: src/desktop/templates/home.mako:140
 msgid "Oozie workflow icon"
 msgstr "Oozie Workflow アイコン"
 
-#: src/desktop/templates/common_header.mako:475
-#: src/desktop/templates/common_header.mako:486
-#: src/desktop/templates/common_header.mako:495
-#: src/desktop/templates/hue.mako:258
+#: src/desktop/templates/common_header.mako:503
+#: src/desktop/templates/common_header.mako:514
+#: src/desktop/templates/common_header.mako:523
+#: src/desktop/templates/hue.mako:325
 msgid "Workflows"
 msgstr "Workflow"
 
-#: src/desktop/templates/common_header.mako:476
-#: src/desktop/templates/common_header.mako:487
-#: src/desktop/templates/common_header.mako:496
-#: src/desktop/templates/document_browser.mako:362
+#: src/desktop/templates/common_header.mako:504
+#: src/desktop/templates/common_header.mako:515
+#: src/desktop/templates/common_header.mako:524
 #: src/desktop/templates/home.mako:141
 msgid "Oozie coordinator icon"
 msgstr "Oozie Coordinator アイコン"
 
-#: src/desktop/templates/common_header.mako:476
-#: src/desktop/templates/common_header.mako:487
-#: src/desktop/templates/common_header.mako:496
+#: src/desktop/templates/common_header.mako:504
+#: src/desktop/templates/common_header.mako:515
+#: src/desktop/templates/common_header.mako:524
 msgid "Coordinators"
 msgstr "Coordinator"
 
-#: src/desktop/templates/common_header.mako:477
+#: src/desktop/templates/common_header.mako:505
 msgid "Oozie bundles icon"
 msgstr "Oozie Bundle アイコン"
 
-#: src/desktop/templates/common_header.mako:477
-#: src/desktop/templates/common_header.mako:488
-#: src/desktop/templates/common_header.mako:497
+#: src/desktop/templates/common_header.mako:505
+#: src/desktop/templates/common_header.mako:516
+#: src/desktop/templates/common_header.mako:525
 msgid "Bundles"
 msgstr "Bundle"
 
-#: src/desktop/templates/common_header.mako:484
-#: src/desktop/templates/common_header.mako:493
+#: src/desktop/templates/common_header.mako:512
+#: src/desktop/templates/common_header.mako:521
 msgid "Oozie editor icon"
 msgstr "Oozie Editor アイコン"
 
-#: src/desktop/templates/common_header.mako:484
-#: src/desktop/templates/common_header.mako:493
+#: src/desktop/templates/common_header.mako:512
+#: src/desktop/templates/common_header.mako:521
 msgid "Editors"
 msgstr "エディタ"
 
-#: src/desktop/templates/common_header.mako:488
-#: src/desktop/templates/common_header.mako:497
-#: src/desktop/templates/document_browser.mako:367
+#: src/desktop/templates/common_header.mako:516
+#: src/desktop/templates/common_header.mako:525
 #: src/desktop/templates/home.mako:142
 msgid "Oozie bundle icon"
 msgstr "Oozie Bundle アイコン"
 
-#: src/desktop/templates/common_header.mako:511
-#: src/desktop/templates/common_header.mako:515
-#: src/desktop/templates/document_browser.mako:373
+#: src/desktop/templates/common_header.mako:539
+#: src/desktop/templates/common_header.mako:543
+#: src/desktop/templates/document_browser.mako:376
 msgid "Solr Search"
 msgstr "Solr 検索"
 
-#: src/desktop/templates/common_header.mako:511
-#: src/desktop/templates/common_header.mako:516
-#: src/desktop/templates/common_header_m.mako:332
+#: src/desktop/templates/common_header.mako:539
+#: src/desktop/templates/common_header.mako:544
+#: src/desktop/templates/common_header_m.mako:344
 #: src/desktop/templates/config_ko_components.mako:108
-#: src/desktop/templates/document_browser.mako:305
-#: src/desktop/templates/hue.mako:568
+#: src/desktop/templates/document_browser.mako:308
+#: src/desktop/templates/hue.mako:647
 #, fuzzy
 msgid "Search"
-msgstr "検索PacteraSourceChangedPacteraSourceChanged"
+msgstr "検索"
 
-#: src/desktop/templates/common_header.mako:526
-#: src/desktop/templates/common_notebook_ko_components.mako:271
+#: src/desktop/templates/common_header.mako:554
+#: src/desktop/templates/common_notebook_ko_components.mako:276
 msgid "Index"
 msgstr "インデックス"
 
-#: src/desktop/templates/common_header.mako:534
+#: src/desktop/templates/common_header.mako:562
 msgid "Collection icon"
 msgstr "コレクションアイコン"
 
-#: src/desktop/templates/common_header.mako:545
+#: src/desktop/templates/common_header.mako:573
 msgid "Hadoop Security"
 msgstr "Hadoop セキュリティ"
 
-#: src/desktop/templates/common_header.mako:548
+#: src/desktop/templates/common_header.mako:576
 msgid "Hive Tables"
 msgstr "Hive テーブル"
 
-#: src/desktop/templates/common_header.mako:551
+#: src/desktop/templates/common_header.mako:579
 msgid "Hive Tables v2"
 msgstr "Hive テーブル v2"
 
-#: src/desktop/templates/common_header.mako:554
+#: src/desktop/templates/common_header.mako:582
 msgid "Solr Collections"
 msgstr "Solr コレクション"
 
-#: src/desktop/templates/common_header.mako:556
+#: src/desktop/templates/common_header.mako:584
 msgid "File ACLs"
 msgstr "ファイル ACL"
 
-#: src/desktop/templates/common_header.mako:562
+#: src/desktop/templates/common_header.mako:590
 msgid "Other apps"
 msgstr "その他のアプリケーション"
 
-#: src/desktop/templates/common_header.mako:565
+#: src/desktop/templates/common_header.mako:593
 msgid "App icon"
 msgstr "アプリアイコン"
 
-#: src/desktop/templates/common_header.mako:578
-#: src/desktop/templates/hue.mako:73
+#: src/desktop/templates/common_header.mako:606
+#: src/desktop/templates/hue.mako:135
 msgid "Feedback"
 msgstr "フィードバック"
 
-#: src/desktop/templates/common_header.mako:599
-#: src/desktop/templates/common_header_footer_components.mako:501
-#: src/desktop/templates/common_header_footer_components.mako:512
+#: src/desktop/templates/common_header.mako:627
+#: src/desktop/templates/common_header_footer_components.mako:287
+#: src/desktop/templates/common_header_footer_components.mako:298
 #: src/desktop/templates/common_import_export.mako:32
 #: src/desktop/templates/common_import_export.mako:56
 #: src/desktop/templates/common_import_export.mako:95
 #: src/desktop/templates/common_notebook_ko_components.mako:54
 #: src/desktop/templates/common_notebook_ko_components.mako:73
 #: src/desktop/templates/common_notebook_ko_components.mako:219
-#: src/desktop/templates/common_notebook_ko_components.mako:312
-#: src/desktop/templates/common_share.mako:23
+#: src/desktop/templates/common_notebook_ko_components.mako:320
+#: src/desktop/templates/common_share.mako:39
 #: src/desktop/templates/common_share2.mako:23
 #: src/desktop/templates/document_browser.mako:42
-#: src/desktop/templates/document_browser.mako:100
-#: src/desktop/templates/document_browser.mako:110
-#: src/desktop/templates/document_browser.mako:127
-#: src/desktop/templates/document_browser.mako:150
-#: src/desktop/templates/document_browser.mako:189
-#: src/desktop/templates/document_browser.mako:198
-#: src/desktop/templates/document_browser.mako:216
-#: src/desktop/templates/document_browser.mako:233
-#: src/desktop/templates/document_browser.mako:253
-#: src/desktop/templates/document_browser.mako:284
+#: src/desktop/templates/document_browser.mako:103
+#: src/desktop/templates/document_browser.mako:113
+#: src/desktop/templates/document_browser.mako:130
+#: src/desktop/templates/document_browser.mako:153
+#: src/desktop/templates/document_browser.mako:192
+#: src/desktop/templates/document_browser.mako:201
+#: src/desktop/templates/document_browser.mako:219
+#: src/desktop/templates/document_browser.mako:236
+#: src/desktop/templates/document_browser.mako:256
+#: src/desktop/templates/document_browser.mako:287
 #: src/desktop/templates/home.mako:229 src/desktop/templates/home.mako:303
 #: src/desktop/templates/home.mako:325
 #: src/desktop/templates/ko_components/ko_history_panel.mako:122
 msgid "Close"
 msgstr "閉じる"
 
-#: src/desktop/templates/common_header_footer_components.mako:91
-#: src/desktop/templates/common_header_footer_components.mako:189
-msgid "All"
-msgstr "すべて"
-
-#: src/desktop/templates/common_header_footer_components.mako:92
-#: src/desktop/templates/common_notebook_ko_components.mako:245
-msgid "Directory"
-msgstr "ディレクトリ"
-
-#: src/desktop/templates/common_header_footer_components.mako:93
-msgid "Pig Design"
-msgstr "Pig 設計"
-
-#: src/desktop/templates/common_header_footer_components.mako:94
-msgid "Job Design"
-msgstr "ジョブ設計"
-
-#: src/desktop/templates/common_header_footer_components.mako:96
-#: src/desktop/templates/document_browser.mako:366
-#: src/desktop/templates/document_browser.mako:367
-msgid "Oozie Bundle"
-msgstr "Oozie Bundle"
-
-#: src/desktop/templates/common_header_footer_components.mako:97
-#: src/desktop/templates/document_browser.mako:361
-msgid "Oozie Schedule"
-msgstr "Oozie スケジュール"
-
-#: src/desktop/templates/common_header_footer_components.mako:97
-#: src/desktop/templates/document_browser.mako:362
-msgid "Oozie Coordinator"
-msgstr "Oozie Coordinator"
-
-#: src/desktop/templates/common_header_footer_components.mako:98
-#: src/desktop/templates/document_browser.mako:356
-#: src/desktop/templates/document_browser.mako:357
-msgid "Oozie Workflow"
-msgstr "Oozie Workflow"
-
-#: src/desktop/templates/common_header_footer_components.mako:99
-#: src/desktop/templates/document_browser.mako:313
-#: src/desktop/templates/document_browser.mako:320
-#: src/desktop/templates/home.mako:125
-msgid "Hive Query"
-msgstr "Hive クエリ"
-
-#: src/desktop/templates/common_header_footer_components.mako:100
-#: src/desktop/templates/document_browser.mako:326
-#: src/desktop/templates/document_browser.mako:333
-#: src/desktop/templates/home.mako:128
-msgid "Impala Query"
-msgstr "Impala クエリ"
-
-#: src/desktop/templates/common_header_footer_components.mako:101
-msgid "Search Dashboard"
-msgstr "検索ダッシュボード"
-
-#: src/desktop/templates/common_header_footer_components.mako:102
-msgid "MapReduce Job"
-msgstr "MapReduce ジョブ"
-
-#: src/desktop/templates/common_header_footer_components.mako:103
-msgid "Import Job"
-msgstr "ジョブをインポート"
-
-#: src/desktop/templates/common_header_footer_components.mako:104
-#: src/desktop/templates/home.mako:134
-msgid "Spark Job"
-msgstr "Spark Job"
-
-#: src/desktop/templates/common_header_footer_components.mako:105
-msgid "Java Job"
-msgstr "Java ジョブ"
-
-#: src/desktop/templates/common_header_footer_components.mako:106
-#: src/desktop/templates/document_browser.mako:349
-#: src/desktop/templates/document_browser.mako:350
-#: src/desktop/templates/home.mako:131
-msgid "Pig Script"
-msgstr "Pig スクリプト"
-
-#: src/desktop/templates/common_header_footer_components.mako:107
-msgid "Shell Script"
-msgstr "Shell スクリプト"
-
-#: src/desktop/templates/common_header_footer_components.mako:108
-msgid "DistCp Job"
-msgstr "DistCp ジョブ"
-
-#: src/desktop/templates/common_header_footer_components.mako:113
-msgid "Did you mean"
-msgstr "確認"
-
-#: src/desktop/templates/common_header_footer_components.mako:114
-msgid "Expected end of statement"
-msgstr "想定されるステートメントの終わり"
-
-#: src/desktop/templates/common_header_footer_components.mako:115
-msgid "Ignore this type of error"
-msgstr "このタイプのエラーを無視"
-
-#: src/desktop/templates/common_header_footer_components.mako:116
-msgid "Could not find"
-msgstr "見つかりませんでした"
-
-#: src/desktop/templates/common_header_footer_components.mako:123
-#: src/desktop/templates/common_header_m.mako:83
-#: src/desktop/templates/error.mako:42
-msgid "Back"
-msgstr "戻る"
-
-#: src/desktop/templates/common_header_footer_components.mako:124
-#: src/desktop/templates/common_header_m.mako:84
-msgid "Select this folder"
-msgstr "このフォルダーを選択"
-
-#: src/desktop/templates/common_header_footer_components.mako:125
-#: src/desktop/templates/common_header_footer_components.mako:137
-#: src/desktop/templates/common_header_m.mako:85
-#: src/desktop/templates/common_header_m.mako:97
-msgid "Create folder"
-msgstr "フォルダーを作成"
-
-#: src/desktop/templates/common_header_footer_components.mako:126
-#: src/desktop/templates/common_header_footer_components.mako:138
-#: src/desktop/templates/common_header_m.mako:86
-#: src/desktop/templates/common_header_m.mako:98
-msgid "Folder name"
-msgstr "フォルダー名"
-
-#: src/desktop/templates/common_header_footer_components.mako:127
-#: src/desktop/templates/common_header_footer_components.mako:139
-#: src/desktop/templates/common_header_m.mako:87
-#: src/desktop/templates/common_header_m.mako:99
-#: src/desktop/templates/common_import_export.mako:37
-#: src/desktop/templates/common_notebook_ko_components.mako:283
-#: src/desktop/templates/document_browser.mako:123
-#: src/desktop/templates/document_browser.mako:205
-#: src/desktop/templates/document_browser.mako:223
-#: src/desktop/templates/document_browser.mako:244
-#: src/desktop/templates/document_browser.mako:287
-#: src/desktop/templates/home.mako:247 src/desktop/templates/home.mako:317
-msgid "Cancel"
-msgstr "キャンセル"
-
-#: src/desktop/templates/common_header_footer_components.mako:128
-#: src/desktop/templates/common_header_m.mako:88
-msgid "The file has not been found"
-msgstr "ファイルが見つかりません"
-
-#: src/desktop/templates/common_header_footer_components.mako:129
-#: src/desktop/templates/common_header_m.mako:89
-msgid "Upload a file"
-msgstr "ファイルをアップロード"
-
-#: src/desktop/templates/common_header_footer_components.mako:130
-#: src/desktop/templates/common_header_m.mako:90
-msgid "Failed"
-msgstr "失敗しました"
-
-#: src/desktop/templates/common_header_footer_components.mako:145
-#: src/desktop/templates/common_header_m.mako:105
-msgid "Go to column:"
-msgstr "列に移動："
-
-#: src/desktop/templates/common_header_footer_components.mako:146
-#: src/desktop/templates/common_header_m.mako:106
-msgid "column name..."
-msgstr "列名..."
-
-#: src/desktop/templates/common_header_footer_components.mako:147
-#: src/desktop/templates/common_header_m.mako:107
-msgid "Lock this row"
-msgstr "この行をロック"
-
-#: src/desktop/templates/common_header_footer_components.mako:148
-#: src/desktop/templates/common_header_m.mako:108
-msgid "Unlock this row"
-msgstr "この行をロック解除"
-
-#: src/desktop/templates/common_header_footer_components.mako:149
-#: src/desktop/templates/common_header_m.mako:109
-msgid "Show row details"
-msgstr "行の詳細を表示"
-
-#: src/desktop/templates/common_header_footer_components.mako:163
-#: src/desktop/templates/common_header_m.mako:121
-msgid "There was a problem loading the preview"
-msgstr "プレビューのロード中に問題が発生しました"
-
-#: src/desktop/templates/common_header_footer_components.mako:171
-msgid "Cancel upload"
-msgstr "アップロードをキャンセル"
-
-#: src/desktop/templates/common_header_footer_components.mako:172
-msgid "The upload has been canceled"
-msgstr "アップロードがキャンセルされました"
-
-#: src/desktop/templates/common_header_footer_components.mako:173
-msgid "uploaded successfully"
-msgstr "正常にアップロードしました"
-
-#: src/desktop/templates/common_header_footer_components.mako:180
-#: src/desktop/templates/common_home.mako:84
-msgid "An error occurred refreshing the table stats. Please try again."
-msgstr "テーブルの統計を更新中にエラーが発生しました。再試行してください。"
-
-#: src/desktop/templates/common_header_footer_components.mako:181
-#: src/desktop/templates/common_home.mako:85
-msgid "There was a problem loading the databases. Please try again."
-msgstr "データベースのロード中に問題が発生しました。再試行してください。"
-
-#: src/desktop/templates/common_header_footer_components.mako:182
-#: src/desktop/templates/common_home.mako:86
-msgid "There was a problem loading the table preview. Please try again."
-msgstr "テーブルプレビューのロード中に問題が発生しました。再試行してください。"
-
-#: src/desktop/templates/common_header_footer_components.mako:190
-#: src/desktop/templates/ko_components/ko_context_popover.mako:325
-#: src/desktop/templates/ko_components/ko_context_popover.mako:675
-#: src/desktop/templates/ko_components/ko_global_search.mako:304
-#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:28
-msgid "Columns"
-msgstr "列"
-
-#: src/desktop/templates/common_header_footer_components.mako:191
-msgid "CTEs"
-msgstr "CTE"
-
-#: src/desktop/templates/common_header_footer_components.mako:193
-msgid "Field"
-msgstr "フィールド"
-
-#: src/desktop/templates/common_header_footer_components.mako:195
-msgid "Identifiers"
-msgstr "識別子"
-
-#: src/desktop/templates/common_header_footer_components.mako:196
-msgid "Keywords"
-msgstr "キーワード"
-
-#: src/desktop/templates/common_header_footer_components.mako:198
-msgid "Samples"
-msgstr "例"
-
-#: src/desktop/templates/common_header_footer_components.mako:200
-msgid "UDFs"
-msgstr "UDF"
-
-#: src/desktop/templates/common_header_footer_components.mako:201
-msgid "Options"
-msgstr "オプション"
-
-#: src/desktop/templates/common_header_footer_components.mako:202
-msgid "Variables"
-msgstr "変数"
-
-#: src/desktop/templates/common_header_footer_components.mako:205
-msgid "aggregate"
-msgstr "集計"
-
-#: src/desktop/templates/common_header_footer_components.mako:206
-msgid "alias"
-msgstr "エイリアス"
-
-#: src/desktop/templates/common_header_footer_components.mako:207
-msgid "cte"
-msgstr "CTE"
-
-#: src/desktop/templates/common_header_footer_components.mako:208
-msgid "database"
-msgstr "データベース"
-
-#: src/desktop/templates/common_header_footer_components.mako:209
-msgid "filter"
-msgstr "フィルタ"
-
-#: src/desktop/templates/common_header_footer_components.mako:210
-msgid "group by"
-msgstr "グループ化"
-
-#: src/desktop/templates/common_header_footer_components.mako:211
-msgid "join"
-msgstr "結合"
-
-#: src/desktop/templates/common_header_footer_components.mako:212
-msgid "condition"
-msgstr "条件"
-
-#: src/desktop/templates/common_header_footer_components.mako:213
-msgid "keyword"
-msgstr "キーワード"
-
-#: src/desktop/templates/common_header_footer_components.mako:214
-msgid "order by"
-msgstr "順序"
-
-#: src/desktop/templates/common_header_footer_components.mako:215
-msgid "table"
-msgstr "テーブル"
-
-#: src/desktop/templates/common_header_footer_components.mako:216
-msgid "sample"
-msgstr "サンプル"
-
-#: src/desktop/templates/common_header_footer_components.mako:217
-msgid "variable"
-msgstr "変数"
-
-#: src/desktop/templates/common_header_footer_components.mako:218
-msgid "view"
-msgstr "ビュー"
-
-#: src/desktop/templates/common_header_footer_components.mako:219
-msgid "virtual"
-msgstr "仮想"
-
-#: src/desktop/templates/common_header_footer_components.mako:226
-msgid "Insert value here"
-msgstr "ここに値を挿入"
-
-#: src/desktop/templates/common_header_footer_components.mako:227
-msgid "Query requires a select or aggregate."
-msgstr "クエリでは、選択または集計が必要です。"
-
-#: src/desktop/templates/common_header_footer_components.mako:233
-msgid "Error while copying results."
-msgstr "結果のコピー中にエラーが発生しました。"
-
-#: src/desktop/templates/common_header_footer_components.mako:234
-msgid "result(s) copied to the clipboard"
-msgstr "クリップボードに結果をコピーしました"
-
-#: src/desktop/templates/common_header_footer_components.mako:240
-msgid "Choose..."
-msgstr "選択..."
-
-#: src/desktop/templates/common_header_footer_components.mako:490
+#: src/desktop/templates/common_header_footer_components.mako:276
 msgid "Upload progress"
 msgstr "アップロードの進行状況"
 
-#: src/desktop/templates/common_header_footer_components.mako:502
+#: src/desktop/templates/common_header_footer_components.mako:288
 msgid "Choose a file"
 msgstr "ファイルを選択"
 
-#: src/desktop/templates/common_header_footer_components.mako:513
+#: src/desktop/templates/common_header_footer_components.mako:299
 msgid "Row details"
 msgstr "行の詳細"
 
-#: src/desktop/templates/common_header_footer_components.mako:532
+#: src/desktop/templates/common_header_footer_components.mako:318
 msgid ""
 "An error occurred while saving your default Hue preference. Please try "
 "again..."
@@ -3360,12 +3081,224 @@ msgstr ""
 "Hue のデフォルトの設定を保存中にエラーが発生しました。"
 "再試行してください..."
 
-#: src/desktop/templates/common_header_footer_components.mako:650
+#: src/desktop/templates/common_header_footer_components.mako:436
 msgid "You have signed in successfully!"
 msgstr "正常にサインインしました。"
 
-#: src/desktop/templates/common_header_m.mako:315
-#: src/desktop/templates/login.mako:75 src/desktop/templates/login.mako:149
+#: src/desktop/templates/common_header_m.mako:82
+#: src/desktop/templates/common_notebook_ko_components.mako:248
+#: src/desktop/templates/global_js_constants.mako:58
+#: src/desktop/templates/global_js_constants.mako:96
+msgid "All"
+msgstr "すべて"
+
+#: src/desktop/templates/common_header_m.mako:83
+#: src/desktop/templates/global_js_constants.mako:97
+msgid "Directory"
+msgstr "ディレクトリ"
+
+#: src/desktop/templates/common_header_m.mako:84
+#: src/desktop/templates/global_js_constants.mako:98
+msgid "Pig Design"
+msgstr "Pig 設計"
+
+#: src/desktop/templates/common_header_m.mako:85
+#: src/desktop/templates/global_js_constants.mako:99
+msgid "Job Design"
+msgstr "ジョブ設計"
+
+#: src/desktop/templates/common_header_m.mako:87
+#: src/desktop/templates/document_browser.mako:369
+#: src/desktop/templates/document_browser.mako:370
+#: src/desktop/templates/global_js_constants.mako:101
+msgid "Oozie Bundle"
+msgstr "Oozie Bundle"
+
+#: src/desktop/templates/common_header_m.mako:88
+#: src/desktop/templates/document_browser.mako:364
+#: src/desktop/templates/global_js_constants.mako:102
+msgid "Oozie Schedule"
+msgstr "Oozie スケジュール"
+
+#: src/desktop/templates/common_header_m.mako:88
+#: src/desktop/templates/document_browser.mako:365
+#: src/desktop/templates/global_js_constants.mako:102
+msgid "Oozie Coordinator"
+msgstr "Oozie Coordinator"
+
+#: src/desktop/templates/common_header_m.mako:89
+#: src/desktop/templates/document_browser.mako:359
+#: src/desktop/templates/document_browser.mako:360
+#: src/desktop/templates/global_js_constants.mako:103
+msgid "Oozie Workflow"
+msgstr "Oozie Workflow"
+
+#: src/desktop/templates/common_header_m.mako:90
+#: src/desktop/templates/document_browser.mako:316
+#: src/desktop/templates/document_browser.mako:323
+#: src/desktop/templates/global_js_constants.mako:104
+#: src/desktop/templates/home.mako:125
+msgid "Hive Query"
+msgstr "Hive クエリ"
+
+#: src/desktop/templates/common_header_m.mako:91
+#: src/desktop/templates/document_browser.mako:329
+#: src/desktop/templates/document_browser.mako:336
+#: src/desktop/templates/global_js_constants.mako:105
+#: src/desktop/templates/home.mako:128
+msgid "Impala Query"
+msgstr "Impala クエリ"
+
+#: src/desktop/templates/common_header_m.mako:92
+#: src/desktop/templates/global_js_constants.mako:106
+msgid "Search Dashboard"
+msgstr "検索ダッシュボード"
+
+#: src/desktop/templates/common_header_m.mako:93
+#: src/desktop/templates/global_js_constants.mako:107
+msgid "MapReduce Job"
+msgstr "MapReduce ジョブ"
+
+#: src/desktop/templates/common_header_m.mako:94
+#: src/desktop/templates/global_js_constants.mako:108
+msgid "Import Job"
+msgstr "ジョブをインポート"
+
+#: src/desktop/templates/common_header_m.mako:95
+#: src/desktop/templates/global_js_constants.mako:109
+#: src/desktop/templates/home.mako:134
+msgid "Spark Job"
+msgstr "Spark Job"
+
+#: src/desktop/templates/common_header_m.mako:96
+#: src/desktop/templates/global_js_constants.mako:110
+msgid "Java Job"
+msgstr "Java ジョブ"
+
+#: src/desktop/templates/common_header_m.mako:97
+#: src/desktop/templates/document_browser.mako:352
+#: src/desktop/templates/document_browser.mako:353
+#: src/desktop/templates/global_js_constants.mako:111
+#: src/desktop/templates/home.mako:131
+msgid "Pig Script"
+msgstr "Pig スクリプト"
+
+#: src/desktop/templates/common_header_m.mako:98
+#: src/desktop/templates/global_js_constants.mako:112
+msgid "Shell Script"
+msgstr "Shell スクリプト"
+
+#: src/desktop/templates/common_header_m.mako:99
+#: src/desktop/templates/global_js_constants.mako:113
+msgid "DistCp Job"
+msgstr "DistCp ジョブ"
+
+#: src/desktop/templates/common_header_m.mako:102
+#: src/desktop/templates/common_header_m.mako:119
+#: src/desktop/templates/global_js_constants.mako:121
+#: src/desktop/templates/global_js_constants.mako:138
+msgid "Go to column:"
+msgstr "列に移動："
+
+#: src/desktop/templates/common_header_m.mako:103
+#: src/desktop/templates/common_header_m.mako:120
+#: src/desktop/templates/global_js_constants.mako:122
+#: src/desktop/templates/global_js_constants.mako:139
+msgid "column name..."
+msgstr "列名..."
+
+#: src/desktop/templates/common_header_m.mako:104
+#: src/desktop/templates/common_header_m.mako:121
+#: src/desktop/templates/global_js_constants.mako:123
+#: src/desktop/templates/global_js_constants.mako:140
+msgid "Lock this row"
+msgstr "この行をロック"
+
+#: src/desktop/templates/common_header_m.mako:105
+#: src/desktop/templates/common_header_m.mako:122
+#: src/desktop/templates/global_js_constants.mako:124
+#: src/desktop/templates/global_js_constants.mako:141
+msgid "Unlock this row"
+msgstr "この行をロック解除"
+
+#: src/desktop/templates/common_header_m.mako:106
+#: src/desktop/templates/common_header_m.mako:123
+#: src/desktop/templates/global_js_constants.mako:125
+#: src/desktop/templates/global_js_constants.mako:142
+msgid "Show row details"
+msgstr "行の詳細を表示"
+
+#: src/desktop/templates/common_header_m.mako:109
+#: src/desktop/templates/error.mako:42
+#: src/desktop/templates/global_js_constants.mako:128
+msgid "Back"
+msgstr "戻る"
+
+#: src/desktop/templates/common_header_m.mako:110
+#: src/desktop/templates/global_js_constants.mako:129
+msgid "Select this folder"
+msgstr "このフォルダーを選択"
+
+#: src/desktop/templates/common_header_m.mako:111
+#: src/desktop/templates/global_js_constants.mako:130
+msgid "Create folder"
+msgstr "フォルダーを作成"
+
+#: src/desktop/templates/common_header_m.mako:112
+#: src/desktop/templates/global_js_constants.mako:131
+msgid "Folder name"
+msgstr "フォルダー名"
+
+#: src/desktop/templates/common_header_m.mako:113
+#: src/desktop/templates/common_import_export.mako:37
+#: src/desktop/templates/common_notebook_ko_components.mako:291
+#: src/desktop/templates/document_browser.mako:126
+#: src/desktop/templates/document_browser.mako:208
+#: src/desktop/templates/document_browser.mako:226
+#: src/desktop/templates/document_browser.mako:247
+#: src/desktop/templates/document_browser.mako:290
+#: src/desktop/templates/global_js_constants.mako:132
+#: src/desktop/templates/home.mako:247 src/desktop/templates/home.mako:317
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: src/desktop/templates/common_header_m.mako:114
+#: src/desktop/templates/global_js_constants.mako:133
+msgid "The file has not been found"
+msgstr "ファイルが見つかりません"
+
+#: src/desktop/templates/common_header_m.mako:115
+#: src/desktop/templates/global_js_constants.mako:134
+msgid "Upload a file"
+msgstr "ファイルをアップロード"
+
+#: src/desktop/templates/common_header_m.mako:116
+#: src/desktop/templates/global_js_constants.mako:135
+msgid "Failed"
+msgstr "失敗しました"
+
+#: src/desktop/templates/common_header_m.mako:126
+#: src/desktop/templates/global_js_constants.mako:151
+msgid "Did you mean"
+msgstr "確認"
+
+#: src/desktop/templates/common_header_m.mako:127
+#: src/desktop/templates/global_js_constants.mako:152
+msgid "Expected end of statement"
+msgstr "想定されるステートメントの終わり"
+
+#: src/desktop/templates/common_header_m.mako:128
+#: src/desktop/templates/global_js_constants.mako:153
+msgid "Ignore this type of error"
+msgstr "このタイプのエラーを無視"
+
+#: src/desktop/templates/common_header_m.mako:129
+#: src/desktop/templates/global_js_constants.mako:154
+msgid "Could not find"
+msgstr "見つかりませんでした"
+
+#: src/desktop/templates/common_header_m.mako:327
+#: src/desktop/templates/login.mako:79 src/desktop/templates/login.mako:165
 #: src/desktop/templates/login_modal.mako:29
 #: src/desktop/templates/unsupported.mako:84
 msgid "Hue logo"
@@ -3376,83 +3309,97 @@ msgstr "Hue ロゴ"
 msgid "Home icon"
 msgstr "ホームアイコン"
 
-#: src/desktop/templates/common_home.mako:81
+#: src/desktop/templates/common_home.mako:77
 msgid "An error occurred fetching the table details. Please try again."
 msgstr "テーブルの詳細をフェッチ中にエラーが発生しました。再試行してください。"
 
-#: src/desktop/templates/common_home.mako:82
+#: src/desktop/templates/common_home.mako:78
 msgid "An error occurred fetching the table fields. Please try again."
 msgstr "テーブルのフィールドをフェッチ中にエラーが発生しました。再試行してください。"
 
-#: src/desktop/templates/common_home.mako:83
+#: src/desktop/templates/common_home.mako:79
 msgid "An error occurred fetching the table sample. Please try again."
 msgstr "テーブルのサンプルをフェッチ中にエラーが発生しました。再試行してください。"
 
+#: src/desktop/templates/common_home.mako:80
+#: src/desktop/templates/global_js_constants.mako:145
+msgid "An error occurred refreshing the table stats. Please try again."
+msgstr "テーブルの統計を更新中にエラーが発生しました。再試行してください。"
+
+#: src/desktop/templates/common_home.mako:81
+msgid "There was a problem loading the databases. Please try again."
+msgstr "データベースのロード中に問題が発生しました。再試行してください。"
+
+#: src/desktop/templates/common_home.mako:82
+msgid "There was a problem loading the table preview. Please try again."
+msgstr "テーブルプレビューのロード中に問題が発生しました。再試行してください。"
+
 #: src/desktop/templates/common_import_export.mako:33
 #: src/desktop/templates/common_import_export.mako:57
-#: src/desktop/templates/document_browser.mako:111
-#: src/desktop/templates/document_browser.mako:151
+#: src/desktop/templates/document_browser.mako:114
+#: src/desktop/templates/document_browser.mako:154
 msgid "Import Hue documents"
 msgstr "Hue ドキュメントをインポート"
 
 #: src/desktop/templates/common_import_export.mako:38
-#: src/desktop/templates/document_browser.mako:124
-#: src/desktop/templates/document_browser.mako:426
+#: src/desktop/templates/document_browser.mako:127
+#: src/desktop/templates/document_browser.mako:432
 msgid "Import"
 msgstr "インポート"
 
 #: src/desktop/templates/common_import_export.mako:42
-#: src/desktop/templates/document_browser.mako:133
+#: src/desktop/templates/document_browser.mako:136
 msgid "Select json file"
 msgstr "JSON ファイルを選択"
 
 #: src/desktop/templates/common_import_export.mako:43
-#: src/desktop/templates/document_browser.mako:134
+#: src/desktop/templates/document_browser.mako:137
 msgid "Change"
 msgstr "変更"
 
 #: src/desktop/templates/common_import_export.mako:65
-#: src/desktop/templates/document_browser.mako:159
+#: src/desktop/templates/document_browser.mako:162
 msgid "Imported: "
 msgstr "インポート： "
 
 #: src/desktop/templates/common_import_export.mako:66
-#: src/desktop/templates/document_browser.mako:160
+#: src/desktop/templates/document_browser.mako:163
 msgid "Created: "
 msgstr "作成： "
 
 #: src/desktop/templates/common_import_export.mako:67
-#: src/desktop/templates/document_browser.mako:161
+#: src/desktop/templates/document_browser.mako:164
 msgid "Updated: "
 msgstr "更新： "
 
 #: src/desktop/templates/common_import_export.mako:71
-#: src/desktop/templates/document_browser.mako:165
+#: src/desktop/templates/document_browser.mako:168
 msgid "Show Details"
 msgstr "詳細を表示"
 
 #: src/desktop/templates/common_import_export.mako:74
-#: src/desktop/templates/document_browser.mako:168
+#: src/desktop/templates/document_browser.mako:171
 msgid "Hide Details"
 msgstr "詳細を非表示"
 
 #: src/desktop/templates/common_import_export.mako:78
 #: src/desktop/templates/config_ko_components.mako:509
 #: src/desktop/templates/config_ko_components.mako:514
-#: src/desktop/templates/document_browser.mako:172
-#: src/desktop/templates/document_browser.mako:475
-#: src/desktop/templates/home.mako:190
-#: src/desktop/templates/ko_components/ko_context_popover.mako:331
-#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:50
-#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:53
+#: src/desktop/templates/document_browser.mako:175
+#: src/desktop/templates/document_browser.mako:481
+#: src/desktop/templates/home.mako:190 src/desktop/templates/metrics.mako:122
+#: src/desktop/templates/metrics.mako:140
+#: src/desktop/templates/ko_components/ko_context_popover.mako:336
+#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:48
+#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:51
 msgid "Name"
 msgstr "名前"
 
 #: src/desktop/templates/common_import_export.mako:79
-#: src/desktop/templates/document_browser.mako:173
-#: src/desktop/templates/document_browser.mako:478
-#: src/desktop/templates/ko_components/ko_context_popover.mako:86
-#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:56
+#: src/desktop/templates/document_browser.mako:176
+#: src/desktop/templates/document_browser.mako:484
+#: src/desktop/templates/ko_components/ko_context_popover.mako:89
+#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:54
 msgid "Type"
 msgstr "タイプ"
 
@@ -3507,70 +3454,75 @@ msgid "Clipboard"
 msgstr "クリップボード"
 
 #: src/desktop/templates/common_notebook_ko_components.mako:199
-msgid "Explore result in a dashboard"
-msgstr "結果をダッシュボードで確認"
+msgid "Visually explore the result"
+msgstr "結果を視覚的に確認"
 
 #: src/desktop/templates/common_notebook_ko_components.mako:205
-msgid "Save the result in a file, a new table..."
-msgstr "結果をファイルと新しいテーブルに保存..."
+msgid "Export the result into a file, an index, a new table..."
+msgstr "結果をファイル、インデックス、新しいテーブルにエクスポート..."
 
 #: src/desktop/templates/common_notebook_ko_components.mako:206
-#: src/desktop/templates/common_notebook_ko_components.mako:284
-msgid "Save"
-msgstr "保存"
+#: src/desktop/templates/common_notebook_ko_components.mako:292
+#: src/desktop/templates/document_browser.mako:429
+msgid "Export"
+msgstr "エクスポート"
 
 #: src/desktop/templates/common_notebook_ko_components.mako:220
-msgid "Save query result in a"
-msgstr "クエリの結果を保存"
+msgid "Export the query result in a"
+msgstr "クエリ結果を次の形式でエクスポート"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:230
-#, python-format
-msgid "File (first %s rows)"
-msgstr "ファイル（最初の %s 行）"
+#: src/desktop/templates/common_notebook_ko_components.mako:226
+msgid "File"
+msgstr "ファイル"
 
 #: src/desktop/templates/common_notebook_ko_components.mako:233
+#, python-format
+msgid "First %s rows"
+msgstr "最初の %s 行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:236
 msgid "Path to CSV file"
 msgstr "CSV ファイルへのパス"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:237
-#: src/desktop/templates/common_notebook_ko_components.mako:636
+#: src/desktop/templates/common_notebook_ko_components.mako:240
+#: src/desktop/templates/common_notebook_ko_components.mako:794
 msgid "Overwrite"
 msgstr "上書き"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:248
+#: src/desktop/templates/common_notebook_ko_components.mako:251
 msgid "Path to empty directory"
 msgstr "空のディレクトリへのパス"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:259
-#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:54
+#: src/desktop/templates/common_notebook_ko_components.mako:264
+#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:52
 msgid "Table"
 msgstr "テーブル"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:262
+#: src/desktop/templates/common_notebook_ko_components.mako:267
 msgid "Only alphanumeric and underscore characters"
 msgstr "アルファベット、数字、アンダースコアのみ使用できます"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:262
+#: src/desktop/templates/common_notebook_ko_components.mako:267
 msgid "Table name or <database>.<table>"
 msgstr "テーブル名または <database>.<table>"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:274
+#: src/desktop/templates/common_notebook_ko_components.mako:282
 msgid "Index name"
 msgstr "インデックス名"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:291
+#: src/desktop/templates/common_notebook_ko_components.mako:299
 msgid "Your download is being prepared"
 msgstr "ダウンロードの準備をしています"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:294
+#: src/desktop/templates/common_notebook_ko_components.mako:302
 msgid "Your downloaded results have been truncated"
 msgstr "ダウンロードした結果は一部切り捨てられています"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:299
+#: src/desktop/templates/common_notebook_ko_components.mako:307
 msgid "Please wait, it might take a while..."
 msgstr "しばらくお待ちください..."
 
-#: src/desktop/templates/common_notebook_ko_components.mako:302
+#: src/desktop/templates/common_notebook_ko_components.mako:310
 msgid ""
 "The number of resulting rows was too big to be downloaded and the "
 "resulting file has been truncated to"
@@ -3578,415 +3530,590 @@ msgstr ""
 "行数が多すぎて、すべての結果をダウンロードできません。ダウンロードしたファイルは"
 ""
 
-#: src/desktop/templates/common_notebook_ko_components.mako:304
+#: src/desktop/templates/common_notebook_ko_components.mako:312
 msgid "rows."
 msgstr "行までで切り捨てられています。"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:309
+#: src/desktop/templates/common_notebook_ko_components.mako:317
 msgid "Cancel Download"
 msgstr "ダウンロードをキャンセル"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:514
+#: src/desktop/templates/common_notebook_ko_components.mako:528
+msgid "Syntax"
+msgstr "構文"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:533
+msgid "Keyboard Shortcuts"
+msgstr "キーボードショートカット"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:544
 msgid "No matches found for your search."
 msgstr "検索に一致するものが見つかりません。"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:525
+#: src/desktop/templates/common_notebook_ko_components.mako:556
 msgid "Windows/Linux"
 msgstr "Windows/Linux"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:526
+#: src/desktop/templates/common_notebook_ko_components.mako:557
 msgid "Mac"
 msgstr "Mac"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:527
+#: src/desktop/templates/common_notebook_ko_components.mako:558
 msgid "Action"
 msgstr "アクション"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:551
+#: src/desktop/templates/common_notebook_ko_components.mako:577
+msgid "Comments"
+msgstr "コメント"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:582
+msgid "Click"
+msgstr "クリック"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:587
+msgid "Multi Query"
+msgstr "複数のクエリ"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:592
+#: src/desktop/templates/global_js_constants.mako:71
+msgid "Variables"
+msgstr "変数"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:598
+msgid "A comment is text that is not executed. It can be of two types:"
+msgstr "コメントとは、実行されないテキストです。次の 2 種類のコメントが用意されています。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:601
+msgid "Single Line"
+msgstr "単一行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:603
+msgid "-- Comment"
+msgstr "-- コメント"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:611
+msgid "Multi Line"
+msgstr "複数行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:613
+msgid ""
+"/* Multi Line\n"
+"  Comment */"
+msgstr ""
+"/* 複数行\n"
+"  コメント */"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:625
+msgid "Double Click"
+msgstr "ダブルクリック"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:626
+msgid "Double clicking the row number selects all rows."
+msgstr "行番号をダブルクリックすると、すべての行が選択されます。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:629
+msgid "Drag & Drop"
+msgstr "ドラッグアンドドロップ"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:630
+msgid ""
+"Dragging and dropping a table name from the assistant onto the editor "
+"inserts sample queries in the editor."
+msgstr ""
+"アシストからエディタにテーブル名をドラッグアンドドロップすると、"
+"サンプルクエリがエディタに挿入されます。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:633
+msgid "Right Click"
+msgstr "右クリック"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:634
+msgid ""
+"Right clicking on an element of a query will bring up the appropriate "
+"browser for that element."
+msgstr ""
+"クエリの要素を右クリックすると、その要素に適したブラウザが"
+"起動します。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:635
+msgid "Clickable items are highlighted on mouse hover."
+msgstr "マウスカーソルを置くと、クリック可能なアイテムが強調表示されます。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:636
+msgid "e.g.: function, column, table names, SELECT *"
+msgstr "例：関数、列、テーブル名、SELECT *"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:639
+msgid "Single Click"
+msgstr "シングルクリック"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:640
+msgid "Single clicking the row number selects the whole row."
+msgstr "行番号をシングルクリックすると、行全体が選択されます。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:645
+msgid ""
+"Multiple queries can be embedded in a single editor and separated via "
+"semicolon."
+msgstr ""
+"単一のエディタに複数のクエリを埋め込み、セミコロンで区切ることが"
+"できます。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:646
+msgid "The cursor points to the query that will be executed."
+msgstr "カーソルは、実行されるクエリを指します。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:648
+msgid ""
+"select * from customers;\n"
+"select * from web_logs;"
+msgstr ""
+"select * from customers;\n"
+"select * from web_logs;"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:656
+msgid ""
+"Variables are used to easily configure parameters in a query. They can be"
+" of two types:"
+msgstr ""
+"変数は、クエリでパラメーターを簡単に設定するために使用されます。次の 2 種類のクエリが"
+"用意されています。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:659
+msgid "Single Valued"
+msgstr "単一値"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:659
+msgid "${variable_name}"
+msgstr "${variable_name}"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:661
+msgid "select * from web_logs where country_code = \"${country_code}\""
+msgstr "select * from web_logs where country_code = \"${country_code}\""
+
+#: src/desktop/templates/common_notebook_ko_components.mako:667
+msgid "The variable can have a default value."
+msgstr "この変数にはデフォルト値を指定できます。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:669
+msgid "select * from web_logs where country_code = \"${country_code=US}\""
+msgstr "select * from web_logs where country_code = \"${country_code=US}\""
+
+#: src/desktop/templates/common_notebook_ko_components.mako:677
+msgid "Multi Valued"
+msgstr "複数値"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:677
+msgid "${variable_name=variable_value1, variable_value2,...}"
+msgstr "${variable_name=variable_value1, variable_value2,...}"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:679
+msgid "select * from web_logs where country_code = \"${country_code=CA, FR, US}\""
+msgstr "select * from web_logs where country_code = \"${country_code=CA, FR, US}\""
+
+#: src/desktop/templates/common_notebook_ko_components.mako:685
+msgid "The displayed text can be changed."
+msgstr "表示されるテキストを変更できます。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:687
+msgid ""
+"select * from web_logs where country_code = \"${country_code=CA(Canada), "
+"FR(France), US(United States)}\""
+msgstr ""
+"select * from web_logs where country_code = \"${country_code=CA(Canada), "
+"FR(France), US(United States)}\""
+
+#: src/desktop/templates/common_notebook_ko_components.mako:709
 msgid "Line Operations"
 msgstr "行操作"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:552
+#: src/desktop/templates/common_notebook_ko_components.mako:710
 msgid "Remove line"
 msgstr "行を削除"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:553
+#: src/desktop/templates/common_notebook_ko_components.mako:711
 msgid "Copy lines down"
 msgstr "行を下にコピー"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:554
+#: src/desktop/templates/common_notebook_ko_components.mako:712
 msgid "Copy lines up"
 msgstr "行を上にコピー"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:555
+#: src/desktop/templates/common_notebook_ko_components.mako:713
 msgid "Move lines down"
 msgstr "行を下へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:556
+#: src/desktop/templates/common_notebook_ko_components.mako:714
 msgid "Move lines up"
 msgstr "行を上へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:557
+#: src/desktop/templates/common_notebook_ko_components.mako:715
 msgid "Remove to line end"
 msgstr "行の末尾まで削除"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:558
+#: src/desktop/templates/common_notebook_ko_components.mako:716
 msgid "Remove to line start"
 msgstr "行の先頭まで削除"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:559
+#: src/desktop/templates/common_notebook_ko_components.mako:717
 msgid "Remove word left"
 msgstr "左の単語を削除"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:560
+#: src/desktop/templates/common_notebook_ko_components.mako:718
 msgid "Remove word right"
 msgstr "右の単語を削除"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:561
+#: src/desktop/templates/common_notebook_ko_components.mako:719
 msgid "Split line"
 msgstr "行を分割"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:563
+#: src/desktop/templates/common_notebook_ko_components.mako:721
 #, fuzzy
 msgid "Selection"
-msgstr "選択PacteraSourceChangedPacteraSourceChanged"
+msgstr "選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:564
+#: src/desktop/templates/common_notebook_ko_components.mako:722
 #: src/desktop/templates/config_ko_components.mako:109
 msgid "Select all"
 msgstr "すべて選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:565
+#: src/desktop/templates/common_notebook_ko_components.mako:723
 msgid "Select left"
 msgstr "左を選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:566
+#: src/desktop/templates/common_notebook_ko_components.mako:724
 msgid "Select right"
 msgstr "右を選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:567
+#: src/desktop/templates/common_notebook_ko_components.mako:725
 msgid "Select word left"
 msgstr "左の単語を選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:568
+#: src/desktop/templates/common_notebook_ko_components.mako:726
 msgid "Select word right"
 msgstr "右の単語を選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:569
+#: src/desktop/templates/common_notebook_ko_components.mako:727
 msgid "Select line start"
 msgstr "行の先頭を選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:570
+#: src/desktop/templates/common_notebook_ko_components.mako:728
 msgid "Select line end"
 msgstr "行の末尾を選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:571
+#: src/desktop/templates/common_notebook_ko_components.mako:729
 msgid "Select to line end"
 msgstr "行の末尾まで選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:572
+#: src/desktop/templates/common_notebook_ko_components.mako:730
 msgid "Select to line start"
 msgstr "行の先頭まで選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:573
+#: src/desktop/templates/common_notebook_ko_components.mako:731
 msgid "Select up"
 msgstr "上に選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:574
+#: src/desktop/templates/common_notebook_ko_components.mako:732
 msgid "Select down"
 msgstr "下に選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:575
+#: src/desktop/templates/common_notebook_ko_components.mako:733
 msgid "Select page up"
 msgstr "ページを上に選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:576
+#: src/desktop/templates/common_notebook_ko_components.mako:734
 msgid "Select page down"
 msgstr "ページを下に選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:577
+#: src/desktop/templates/common_notebook_ko_components.mako:735
 msgid "Select to start"
 msgstr "先頭まで選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:578
+#: src/desktop/templates/common_notebook_ko_components.mako:736
 #, fuzzy
 msgid "Select to end"
-msgstr "末尾まで選択PacteraSourceChangedPacteraSourceChanged"
+msgstr "末尾まで選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:579
+#: src/desktop/templates/common_notebook_ko_components.mako:737
 msgid "Duplicate selection"
 msgstr "選択を複製"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:580
+#: src/desktop/templates/common_notebook_ko_components.mako:738
 msgid "Select to matching bracket"
 msgstr "一致するかっこまで選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:582
+#: src/desktop/templates/common_notebook_ko_components.mako:740
 msgid "Multi-cursor"
 msgstr "マルチカーソル"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:583
+#: src/desktop/templates/common_notebook_ko_components.mako:741
 msgid "Add multi-cursor above"
 msgstr "マルチカーソルを上に追加"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:584
+#: src/desktop/templates/common_notebook_ko_components.mako:742
 msgid "Add multi-cursor below"
 msgstr "マルチカーソルを下に追加"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:585
+#: src/desktop/templates/common_notebook_ko_components.mako:743
 msgid "Add next occurrence to multi-selection"
 msgstr "複数の選択に次のオカレンスを追加"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:586
+#: src/desktop/templates/common_notebook_ko_components.mako:744
 msgid "Add previous occurrence to multi-selection"
 msgstr "複数の選択に前のオカレンスを追加"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:587
+#: src/desktop/templates/common_notebook_ko_components.mako:745
 msgid "Move multicursor from current line to the line above"
 msgstr "現在の行から上の行へマルチカーソルを移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:588
+#: src/desktop/templates/common_notebook_ko_components.mako:746
 msgid "Move multicursor from current line to the line below"
 msgstr "現在の行から下の行へマルチカーソルを移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:589
+#: src/desktop/templates/common_notebook_ko_components.mako:747
 msgid "Remove current occurrence from multi-selection and move to next"
 msgstr "複数の選択から現在のオカレンスを削除し、次へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:590
+#: src/desktop/templates/common_notebook_ko_components.mako:748
 msgid "Remove current occurrence from multi-selection and move to previous"
 msgstr "複数の選択から現在のオカレンスを削除し、前へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:591
+#: src/desktop/templates/common_notebook_ko_components.mako:749
 msgid "Select all from multi-selection"
 msgstr "複数の選択からすべてを選択"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:593
+#: src/desktop/templates/common_notebook_ko_components.mako:751
 msgid "Go to"
 msgstr "移動先"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:594
+#: src/desktop/templates/common_notebook_ko_components.mako:752
 msgid "Go to left"
 msgstr "左に移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:595
+#: src/desktop/templates/common_notebook_ko_components.mako:753
 msgid "Go to right"
 msgstr "右へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:596
+#: src/desktop/templates/common_notebook_ko_components.mako:754
 msgid "Go to word left"
 msgstr "左の単語に移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:597
+#: src/desktop/templates/common_notebook_ko_components.mako:755
 msgid "Go to word right"
 msgstr "右の単語へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:598
+#: src/desktop/templates/common_notebook_ko_components.mako:756
 msgid "Go line up"
 msgstr "上の行へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:599
+#: src/desktop/templates/common_notebook_ko_components.mako:757
 msgid "Go line down"
 msgstr "下の行へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:600
+#: src/desktop/templates/common_notebook_ko_components.mako:758
 msgid "Go to line start"
 msgstr "行の先頭まで移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:601
+#: src/desktop/templates/common_notebook_ko_components.mako:759
 msgid "Go to line end"
 msgstr "行の末尾まで移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:602
+#: src/desktop/templates/common_notebook_ko_components.mako:760
 msgid "Go to page up"
 msgstr "ページの上へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:603
+#: src/desktop/templates/common_notebook_ko_components.mako:761
 msgid "Go to page down"
 msgstr "ページの下へ移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:604
+#: src/desktop/templates/common_notebook_ko_components.mako:762
 msgid "Go to start"
 msgstr "先頭まで移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:605
+#: src/desktop/templates/common_notebook_ko_components.mako:763
 msgid "Go to end"
 msgstr "末尾まで移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:606
+#: src/desktop/templates/common_notebook_ko_components.mako:764
 msgid "Go to line"
 msgstr "行に移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:607
+#: src/desktop/templates/common_notebook_ko_components.mako:765
 msgid "Scroll line down"
 msgstr "下の行へスクロール"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:608
+#: src/desktop/templates/common_notebook_ko_components.mako:766
 msgid "Scroll line up"
 msgstr "上の行へスクロール"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:609
+#: src/desktop/templates/common_notebook_ko_components.mako:767
 msgid "Go to matching bracket"
 msgstr "一致するかっこまで移動"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:610
+#: src/desktop/templates/common_notebook_ko_components.mako:768
 msgid "Scroll page down"
 msgstr "下のページへスクロール"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:611
+#: src/desktop/templates/common_notebook_ko_components.mako:769
 msgid "Scroll page up"
 msgstr "上のページへスクロール"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:613
+#: src/desktop/templates/common_notebook_ko_components.mako:771
 msgid "Find/Replace"
 msgstr "検索／置換"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:614
+#: src/desktop/templates/common_notebook_ko_components.mako:772
 msgid "Find"
 msgstr "検索"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:615
+#: src/desktop/templates/common_notebook_ko_components.mako:773
 msgid "Replace"
 msgstr "置換"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:616
+#: src/desktop/templates/common_notebook_ko_components.mako:774
 msgid "Find next"
 msgstr "次を検索"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:617
+#: src/desktop/templates/common_notebook_ko_components.mako:775
 msgid "Find previous"
 msgstr "前を検索"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:619
+#: src/desktop/templates/common_notebook_ko_components.mako:777
 msgid "Folding"
 msgstr "折りたたみ"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:620
+#: src/desktop/templates/common_notebook_ko_components.mako:778
 msgid "Fold selection"
 msgstr "選択を折りたたみ"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:621
+#: src/desktop/templates/common_notebook_ko_components.mako:779
 msgid "Unfold"
 msgstr "展開"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:622
+#: src/desktop/templates/common_notebook_ko_components.mako:780
 msgid "Fold all"
 msgstr "すべてを折りたたむ"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:623
+#: src/desktop/templates/common_notebook_ko_components.mako:781
 msgid "Unfold all"
 msgstr "すべてを展開"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:626
+#: src/desktop/templates/common_notebook_ko_components.mako:784
 msgid "Autocomplete when Live Autocompletion is off"
 msgstr "Live Autocompletion がオフの場合にオートコンプリートを使用"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:627
+#: src/desktop/templates/common_notebook_ko_components.mako:785
 msgid "Format selection or all"
 msgstr "選択したフォーマットまたはすべて"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:628
+#: src/desktop/templates/common_notebook_ko_components.mako:786
 msgid "Indent"
 msgstr "インデント"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:629
+#: src/desktop/templates/common_notebook_ko_components.mako:787
 msgid "Outdent"
 msgstr "インデントを戻す"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:630
+#: src/desktop/templates/common_notebook_ko_components.mako:788
 msgid "Undo"
 msgstr "取り消し"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:631
+#: src/desktop/templates/common_notebook_ko_components.mako:789
 msgid "Redo"
 msgstr "再実行"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:632
+#: src/desktop/templates/common_notebook_ko_components.mako:790
 msgid "Toggle comment"
 msgstr "コメントを切り替え"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:633
+#: src/desktop/templates/common_notebook_ko_components.mako:791
 msgid "Transpose letters"
 msgstr "大文字 / 小文字の切り替え"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:634
+#: src/desktop/templates/common_notebook_ko_components.mako:792
 msgid "Change to lower case"
 msgstr "小文字に変更"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:635
+#: src/desktop/templates/common_notebook_ko_components.mako:793
 msgid "Change to upper case"
 msgstr "大文字に変更"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:637
+#: src/desktop/templates/common_notebook_ko_components.mako:795
 msgid "Macros replay"
 msgstr "マクロの再実行"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:638
+#: src/desktop/templates/common_notebook_ko_components.mako:796
 msgid "Macros recording"
 msgstr "マクロの記録中"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:639
-#: src/desktop/templates/document_browser.mako:508
+#: src/desktop/templates/common_notebook_ko_components.mako:797
+#: src/desktop/templates/document_browser.mako:514
 msgid "Delete"
 msgstr "削除"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:640
+#: src/desktop/templates/common_notebook_ko_components.mako:798
 msgid "Center selection"
 msgstr "選択を中央揃え"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:643
+#: src/desktop/templates/common_notebook_ko_components.mako:801
 msgid "Settings"
 msgstr "設定"
 
-#: src/desktop/templates/common_notebook_ko_components.mako:644
+#: src/desktop/templates/common_notebook_ko_components.mako:802
 msgid "Show the settings menu"
 msgstr "設定メニューを表示"
 
-#: src/desktop/templates/common_share.mako:24
+#: src/desktop/templates/common_share.mako:31
+#: src/desktop/templates/ko_components/ko_global_search.mako:116
+msgid "No match found"
+msgstr "一致するものが見つかりません"
+
+#: src/desktop/templates/common_share.mako:40
 #: src/desktop/templates/common_share2.mako:24
 msgid "Sharing settings"
 msgstr "共有設定"
 
-#: src/desktop/templates/common_share.mako:29
-#: src/desktop/templates/common_share.mako:61
+#: src/desktop/templates/common_share.mako:45
+#: src/desktop/templates/common_share.mako:76
 #: src/desktop/templates/common_share2.mako:29
 #: src/desktop/templates/common_share2.mako:61
 #: src/desktop/templates/document_browser.mako:49
-#: src/desktop/templates/document_browser.mako:89
-#: src/desktop/templates/document_browser.mako:92
+#: src/desktop/templates/document_browser.mako:90
+#: src/desktop/templates/document_browser.mako:95
 msgid "Read"
 msgstr "読み取り"
 
-#: src/desktop/templates/common_share.mako:30
+#: src/desktop/templates/common_share.mako:46
 #: src/desktop/templates/common_share2.mako:30
 #: src/desktop/templates/document_browser.mako:50
 msgid "The document is not shared for read."
 msgstr "ドキュメントは、閲覧目的では共有されていません。"
 
-#: src/desktop/templates/common_share.mako:40
-#: src/desktop/templates/common_share.mako:62
+#: src/desktop/templates/common_share.mako:55
+#: src/desktop/templates/common_share.mako:77
 #: src/desktop/templates/common_share2.mako:40
 #: src/desktop/templates/common_share2.mako:62
 msgid "Read and Modify"
 msgstr "読み取りと変更"
 
-#: src/desktop/templates/common_share.mako:41
+#: src/desktop/templates/common_share.mako:56
 #: src/desktop/templates/common_share2.mako:41
 msgid "The document is not shared for read and modify."
 msgstr "ドキュメントは、閲覧および変更目的では共有されていません。"
 
-#: src/desktop/templates/common_share.mako:54
+#: src/desktop/templates/common_share.mako:69
 #: src/desktop/templates/common_share2.mako:54
-#: src/desktop/templates/document_browser.mako:87
+#: src/desktop/templates/document_browser.mako:88
 msgid "Type a username or a group name"
 msgstr "ユーザー名またはグループ名を入力します"
 
-#: src/desktop/templates/common_share.mako:69
+#: src/desktop/templates/common_share.mako:84
 #: src/desktop/templates/common_share2.mako:69
 msgid "Done"
 msgstr "完了"
 
 #: src/desktop/templates/common_tree.mako:54
+#: src/desktop/templates/ko_components/ko_global_search.mako:75
 msgid "Show more..."
 msgstr "さらに表示..."
 
@@ -4010,6 +4137,9 @@ msgstr "ファイルへのパス。hdfs://localhost:8020/user/hue など"
 
 #: src/desktop/templates/config_ko_components.mako:413
 #: src/desktop/templates/config_ko_components.mako:516
+#: src/desktop/templates/hue_ace_autocompleter.mako:253
+#: src/desktop/templates/metrics.mako:123
+#: src/desktop/templates/metrics.mako:141
 msgid "Value"
 msgstr "値"
 
@@ -4031,8 +4161,8 @@ msgid "Sharing"
 msgstr "共有"
 
 #: src/desktop/templates/document_browser.mako:64
-#: src/desktop/templates/document_browser.mako:89
-#: src/desktop/templates/document_browser.mako:93
+#: src/desktop/templates/document_browser.mako:90
+#: src/desktop/templates/document_browser.mako:96
 msgid "Modify"
 msgstr "変更"
 
@@ -4044,148 +4174,132 @@ msgstr "ドキュメントは、変更目的では共有されていません。
 msgid "There was an error loading the document."
 msgstr "ドキュメントのロード中にエラーが発生しました。"
 
-#: src/desktop/templates/document_browser.mako:116
+#: src/desktop/templates/document_browser.mako:119
 msgid "Importing..."
 msgstr "インポートしています..."
 
-#: src/desktop/templates/document_browser.mako:117
+#: src/desktop/templates/document_browser.mako:120
 msgid "Import complete!"
 msgstr "インポートが完了しました。"
 
-#: src/desktop/templates/document_browser.mako:118
+#: src/desktop/templates/document_browser.mako:121
 msgid "Import failed!"
 msgstr "インポートに失敗しました。"
 
-#: src/desktop/templates/document_browser.mako:199
+#: src/desktop/templates/document_browser.mako:202
 msgid "Create Directory"
 msgstr "ディレクトリの作成"
 
-#: src/desktop/templates/document_browser.mako:202
-#: src/desktop/templates/document_browser.mako:220
+#: src/desktop/templates/document_browser.mako:205
+#: src/desktop/templates/document_browser.mako:223
 msgid "Directory name"
 msgstr "ディレクトリ名"
 
-#: src/desktop/templates/document_browser.mako:206
+#: src/desktop/templates/document_browser.mako:209
 msgid "Create"
 msgstr "作成"
 
-#: src/desktop/templates/document_browser.mako:217
+#: src/desktop/templates/document_browser.mako:220
 msgid "Rename Directory"
 msgstr "ディレクトリの名前を変更"
 
-#: src/desktop/templates/document_browser.mako:224
-#: src/desktop/templates/document_browser.mako:513
+#: src/desktop/templates/document_browser.mako:227
+#: src/desktop/templates/document_browser.mako:519
 msgid "Rename"
 msgstr "名前の変更"
 
-#: src/desktop/templates/document_browser.mako:235
+#: src/desktop/templates/document_browser.mako:238
 msgid "Restore these document(s) to Home directory?"
 msgstr "これらのドキュメントをホームディレクトリに復元しますか？"
 
-#: src/desktop/templates/document_browser.mako:245
-#: src/desktop/templates/document_browser.mako:288
+#: src/desktop/templates/document_browser.mako:248
+#: src/desktop/templates/document_browser.mako:291
 #: src/desktop/templates/home.mako:333
 #: src/desktop/templates/ko_components/ko_history_panel.mako:130
 msgid "Yes"
 msgstr "はい"
 
-#: src/desktop/templates/document_browser.mako:255
-#: src/desktop/templates/document_browser.mako:489
+#: src/desktop/templates/document_browser.mako:258
+#: src/desktop/templates/document_browser.mako:495
 msgid "The trash is empty"
 msgstr "ゴミ箱は空です"
 
-#: src/desktop/templates/document_browser.mako:258
+#: src/desktop/templates/document_browser.mako:261
 msgid "Do you really want to delete the following document(s)?"
 msgstr "次のドキュメントを削除してもよろしいですか?"
 
-#: src/desktop/templates/document_browser.mako:269
+#: src/desktop/templates/document_browser.mako:272
 msgid "used by"
 msgstr "使用："
 
-#: src/desktop/templates/document_browser.mako:274
+#: src/desktop/templates/document_browser.mako:277
 #, fuzzy
 msgid "other"
-msgstr "その他PacteraSourceChangedPacteraSourceChanged"
+msgstr "その他"
 
-#: src/desktop/templates/document_browser.mako:301
+#: src/desktop/templates/document_browser.mako:304
 msgid "Search for name, description, etc..."
 msgstr "名前、説明などを検索..."
 
-#: src/desktop/templates/document_browser.mako:309
+#: src/desktop/templates/document_browser.mako:312
 #: src/desktop/templates/home.mako:122
 msgid "New document"
 msgstr "新しいドキュメント"
 
-#: src/desktop/templates/document_browser.mako:320
-#: src/desktop/templates/home.mako:125
-msgid "Hive icon"
-msgstr "Hive アイコン"
-
-#: src/desktop/templates/document_browser.mako:333
-#: src/desktop/templates/home.mako:128
-msgid "Impala icon"
-msgstr "Impala アイコン"
-
-#: src/desktop/templates/document_browser.mako:350
-#: src/desktop/templates/home.mako:131
-msgid "Pig icon"
-msgstr "Pig アイコン"
-
-#: src/desktop/templates/document_browser.mako:374
-msgid "Search icon"
-msgstr "検索アイコン"
-
-#: src/desktop/templates/document_browser.mako:380
+#: src/desktop/templates/document_browser.mako:383
 msgid "New folder"
 msgstr "新規フォルダー"
 
-#: src/desktop/templates/document_browser.mako:388
-#: src/desktop/templates/document_browser.mako:521
+#: src/desktop/templates/document_browser.mako:391
+#: src/desktop/templates/document_browser.mako:527
 msgid "Share"
 msgstr "共有"
 
-#: src/desktop/templates/document_browser.mako:395
-#: src/desktop/templates/document_browser.mako:431
+#: src/desktop/templates/document_browser.mako:398
+#: src/desktop/templates/document_browser.mako:437
 msgid "Empty trash"
 msgstr "ゴミ箱を空にする"
 
-#: src/desktop/templates/document_browser.mako:400
-#: src/desktop/templates/document_browser.mako:458
-#: src/desktop/templates/document_browser.mako:462
+#: src/desktop/templates/document_browser.mako:403
+#: src/desktop/templates/document_browser.mako:464
+#: src/desktop/templates/document_browser.mako:468
 msgid "Trash"
 msgstr "ゴミ箱"
 
-#: src/desktop/templates/document_browser.mako:412
-msgid "Rename folder"
-msgstr "フォルダーの名前を変更"
+#: src/desktop/templates/document_browser.mako:415
+msgid "Copy"
+msgstr "コピー"
 
-#: src/desktop/templates/document_browser.mako:416
+#: src/desktop/templates/document_browser.mako:419
 msgid "Restore to Home "
 msgstr "ホームに復元する"
 
-#: src/desktop/templates/document_browser.mako:423
+#: src/desktop/templates/document_browser.mako:426
+msgid "Rename folder"
+msgstr "フォルダーの名前を変更"
+
+#: src/desktop/templates/document_browser.mako:429
 msgid "Export all or selected documents"
 msgstr "すべてまたは選択したドキュメントをエクスポート"
 
-#: src/desktop/templates/document_browser.mako:423
-msgid "Export"
-msgstr "エクスポート"
-
-#: src/desktop/templates/document_browser.mako:454
+#: src/desktop/templates/document_browser.mako:460
 msgid "Result for"
 msgstr "次の結果"
 
-#: src/desktop/templates/document_browser.mako:477
+#: src/desktop/templates/document_browser.mako:483
 #: src/desktop/templates/home.mako:191
+#: src/desktop/templates/ko_components/ko_context_popover.mako:95
+#: src/desktop/templates/ko_components/ko_context_popover.mako:120
+#: src/desktop/templates/ko_components/ko_context_popover.mako:206
 msgid "Description"
 msgstr "説明"
 
-#: src/desktop/templates/document_browser.mako:480
+#: src/desktop/templates/document_browser.mako:486
 #: src/desktop/templates/home.mako:192
 msgid "Last Modified"
 msgstr "前回の変更"
 
-#: src/desktop/templates/document_browser.mako:486
+#: src/desktop/templates/document_browser.mako:492
 msgid ""
 "The current folder is empty, you can add a new document or folder form "
 "the top right menu"
@@ -4193,36 +4307,36 @@ msgstr ""
 "現在のフォルダーは空です。新しいドキュメントまたはフォルダーを右上のメニューから"
 "追加できます"
 
-#: src/desktop/templates/document_browser.mako:492
+#: src/desktop/templates/document_browser.mako:498
 msgid "No documents found matching your query"
 msgstr "クエリに一致するドキュメントが見つかりません"
 
-#: src/desktop/templates/document_browser.mako:495
+#: src/desktop/templates/document_browser.mako:501
 msgid "There was an error loading the documents"
 msgstr "ドキュメントのロード中にエラーが発生しました"
 
-#: src/desktop/templates/document_browser.mako:509
+#: src/desktop/templates/document_browser.mako:515
 msgid "Restore to Home"
 msgstr "ホームに復元する"
 
-#: src/desktop/templates/document_browser.mako:516
+#: src/desktop/templates/document_browser.mako:522
 msgid "Download"
 msgstr "ダウンロード"
 
-#: src/desktop/templates/document_browser.mako:518
+#: src/desktop/templates/document_browser.mako:524
 msgid "Move to trash"
 msgstr "ゴミ箱に移動"
 
-#: src/desktop/templates/document_browser.mako:520
+#: src/desktop/templates/document_browser.mako:526
 msgid "Delete forever"
 msgstr "完全に削除"
 
-#: src/desktop/templates/document_browser.mako:674
-#: src/desktop/templates/document_browser.mako:677
+#: src/desktop/templates/document_browser.mako:680
+#: src/desktop/templates/document_browser.mako:683
 msgid "selected"
 msgstr "選択済み"
 
-#: src/desktop/templates/document_browser.mako:674
+#: src/desktop/templates/document_browser.mako:680
 msgid "shared ignored"
 msgstr "共有が無視されました"
 
@@ -4247,6 +4361,134 @@ msgstr "デフォルト："
 msgid "Error!"
 msgstr "エラーが発生しました。"
 
+#: src/desktop/templates/global_js_constants.mako:59
+#: src/desktop/templates/ko_components/ko_context_popover.mako:330
+#: src/desktop/templates/ko_components/ko_context_popover.mako:720
+#: src/desktop/templates/ko_components/ko_global_search.mako:355
+#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:28
+msgid "Columns"
+msgstr "列"
+
+#: src/desktop/templates/global_js_constants.mako:60
+msgid "CTEs"
+msgstr "CTE"
+
+#: src/desktop/templates/global_js_constants.mako:62
+msgid "Field"
+msgstr "フィールド"
+
+#: src/desktop/templates/global_js_constants.mako:64
+msgid "Identifiers"
+msgstr "識別子"
+
+#: src/desktop/templates/global_js_constants.mako:65
+msgid "Keywords"
+msgstr "キーワード"
+
+#: src/desktop/templates/global_js_constants.mako:67
+msgid "Samples"
+msgstr "例"
+
+#: src/desktop/templates/global_js_constants.mako:69
+msgid "UDFs"
+msgstr "UDF"
+
+#: src/desktop/templates/global_js_constants.mako:70
+msgid "Options"
+msgstr "オプション"
+
+#: src/desktop/templates/global_js_constants.mako:74
+msgid "aggregate"
+msgstr "集計"
+
+#: src/desktop/templates/global_js_constants.mako:75
+msgid "alias"
+msgstr "エイリアス"
+
+#: src/desktop/templates/global_js_constants.mako:76
+msgid "cte"
+msgstr "CTE"
+
+#: src/desktop/templates/global_js_constants.mako:77
+msgid "database"
+msgstr "データベース"
+
+#: src/desktop/templates/global_js_constants.mako:78
+msgid "filter"
+msgstr "フィルタ"
+
+#: src/desktop/templates/global_js_constants.mako:79
+msgid "group by"
+msgstr "グループ化"
+
+#: src/desktop/templates/global_js_constants.mako:80
+msgid "join"
+msgstr "結合"
+
+#: src/desktop/templates/global_js_constants.mako:81
+msgid "condition"
+msgstr "条件"
+
+#: src/desktop/templates/global_js_constants.mako:82
+msgid "keyword"
+msgstr "キーワード"
+
+#: src/desktop/templates/global_js_constants.mako:83
+msgid "order by"
+msgstr "順序"
+
+#: src/desktop/templates/global_js_constants.mako:84
+msgid "table"
+msgstr "テーブル"
+
+#: src/desktop/templates/global_js_constants.mako:85
+msgid "sample"
+msgstr "サンプル"
+
+#: src/desktop/templates/global_js_constants.mako:86
+msgid "variable"
+msgstr "変数"
+
+#: src/desktop/templates/global_js_constants.mako:87
+msgid "view"
+msgstr "ビュー"
+
+#: src/desktop/templates/global_js_constants.mako:88
+msgid "virtual"
+msgstr "仮想"
+
+#: src/desktop/templates/global_js_constants.mako:92
+msgid "Error while copying results."
+msgstr "結果のコピー中にエラーが発生しました。"
+
+#: src/desktop/templates/global_js_constants.mako:93
+msgid "result(s) copied to the clipboard"
+msgstr "クリップボードに結果をコピーしました"
+
+#: src/desktop/templates/global_js_constants.mako:116
+msgid "Cancel upload"
+msgstr "アップロードをキャンセル"
+
+#: src/desktop/templates/global_js_constants.mako:117
+msgid "The upload has been canceled"
+msgstr "アップロードがキャンセルされました"
+
+#: src/desktop/templates/global_js_constants.mako:118
+msgid "uploaded successfully"
+msgstr "正常にアップロードしました"
+
+#: src/desktop/templates/global_js_constants.mako:148
+msgid "Choose..."
+msgstr "選択..."
+
+#: src/desktop/templates/global_js_constants.mako:157
+msgid "Insert value here"
+msgstr "ここに値を挿入"
+
+#: src/desktop/templates/global_js_constants.mako:158
+msgid "Query requires a select or aggregate."
+msgstr "クエリでは、選択または集計が必要です。"
+
 #: src/desktop/templates/home.mako:24 src/desktop/templates/home2.mako:27
 msgid "Welcome Home"
 msgstr "お帰りなさい"
@@ -4258,6 +4500,18 @@ msgstr "新しいホーム"
 #: src/desktop/templates/home.mako:120
 msgid "Actions"
 msgstr "アクション"
+
+#: src/desktop/templates/home.mako:125
+msgid "Hive icon"
+msgstr "Hive アイコン"
+
+#: src/desktop/templates/home.mako:128
+msgid "Impala icon"
+msgstr "Impala アイコン"
+
+#: src/desktop/templates/home.mako:131
+msgid "Pig icon"
+msgstr "Pig アイコン"
 
 #: src/desktop/templates/home.mako:134
 msgid "Spark icon"
@@ -4304,7 +4558,7 @@ msgid "Page"
 msgstr "ページ"
 
 #: src/desktop/templates/home.mako:203
-#: src/desktop/templates/ko_components/ko_context_popover.mako:835
+#: src/desktop/templates/ko_components/ko_context_popover.mako:874
 msgid "of"
 msgstr "／"
 
@@ -4383,157 +4637,153 @@ msgstr "プロジェクトが正常に更新されました。"
 msgid "Toggle Assist"
 msgstr "アシストを切り替え"
 
-#: src/desktop/templates/hue.mako:127
+#: src/desktop/templates/hue.mako:191
 msgid "More"
 msgstr "詳細"
 
-#: src/desktop/templates/hue.mako:219
+#: src/desktop/templates/hue.mako:283
 msgid "My Profile"
 msgstr "マイプロファイル"
 
-#: src/desktop/templates/hue.mako:225
+#: src/desktop/templates/hue.mako:289
 msgid "Switch to Hue 3"
 msgstr "Hue 3 に切り替え"
 
-#: src/desktop/templates/hue.mako:227 src/desktop/templates/hue.mako:591
+#: src/desktop/templates/hue.mako:291 src/desktop/templates/hue.mako:670
 msgid "Help"
 msgstr "ヘルプ"
 
-#: src/desktop/templates/hue.mako:228
+#: src/desktop/templates/hue.mako:292
 msgid "Welcome Tour"
 msgstr "ツアーへようこそ"
 
-#: src/desktop/templates/hue.mako:230
+#: src/desktop/templates/hue.mako:294
 msgid "Hue Administration"
 msgstr "Hue の管理"
 
-#: src/desktop/templates/hue.mako:249
+#: src/desktop/templates/hue.mako:313
 msgid "Open Job Browser"
 msgstr "Job Browser を開く"
 
-#: src/desktop/templates/hue.mako:255
-msgid "Queries"
-msgstr "クエリ"
-
-#: src/desktop/templates/hue.mako:259
+#: src/desktop/templates/hue.mako:326
 msgid "Schedules"
 msgstr "スケジュール"
 
-#: src/desktop/templates/hue.mako:292
+#: src/desktop/templates/hue.mako:362
 msgid "Import data wizard"
 msgstr "データのインポートウィザード"
 
-#: src/desktop/templates/hue.mako:293
+#: src/desktop/templates/hue.mako:363
 msgid "Click or Drop files here"
 msgstr "ここをクリックするかファイルをドロップ"
 
-#: src/desktop/templates/hue.mako:299 src/desktop/templates/hue.mako:384
+#: src/desktop/templates/hue.mako:369 src/desktop/templates/hue.mako:455
 msgid "Show Assist"
 msgstr "アシストを表示"
 
-#: src/desktop/templates/hue.mako:300 src/desktop/templates/hue.mako:385
+#: src/desktop/templates/hue.mako:370 src/desktop/templates/hue.mako:456
 msgid "Hide Assist"
 msgstr "アシストを非表示"
 
-#: src/desktop/templates/hue.mako:398
+#: src/desktop/templates/hue.mako:469
 #, fuzzy
 msgid "Session"
 msgstr "セッション"
 
-#: src/desktop/templates/hue.mako:407
+#: src/desktop/templates/hue.mako:478
 msgid "There are currently no information about the sessions."
 msgstr "現在、セッションについての情報はありません。"
 
-#: src/desktop/templates/hue.mako:558
-#: src/desktop/templates/ko_components/ko_context_popover.mako:42
+#: src/desktop/templates/hue.mako:637
+#: src/desktop/templates/ko_components/ko_context_popover.mako:44
 msgid "Table Browser"
 msgstr "Table Browser"
 
-#: src/desktop/templates/hue.mako:563
+#: src/desktop/templates/hue.mako:642
 msgid "Oozie"
 msgstr "Oozie"
 
-#: src/desktop/templates/hue.mako:567
+#: src/desktop/templates/hue.mako:646
 msgid "Indexer"
 msgstr "Indexer"
 
-#: src/desktop/templates/hue.mako:574
+#: src/desktop/templates/hue.mako:653
 msgid "Importer"
 msgstr "Importer"
 
-#: src/desktop/templates/hue.mako:575
+#: src/desktop/templates/hue.mako:654
 msgid "User Admin - Users"
 msgstr "ユーザー管理 - ユーザー"
 
-#: src/desktop/templates/hue.mako:576
+#: src/desktop/templates/hue.mako:655
 msgid "User Admin - Groups"
 msgstr "ユーザー管理 - グループ"
 
-#: src/desktop/templates/hue.mako:577
+#: src/desktop/templates/hue.mako:656
 msgid "User Admin - New Group"
 msgstr "ユーザー管理 - 新規グループ"
 
-#: src/desktop/templates/hue.mako:578
+#: src/desktop/templates/hue.mako:657
 msgid "User Admin - Edit Group"
 msgstr "ユーザー管理 - グループを編集"
 
-#: src/desktop/templates/hue.mako:579
+#: src/desktop/templates/hue.mako:658
 msgid "User Admin - Permissions"
 msgstr "ユーザー管理 - パーミッション"
 
-#: src/desktop/templates/hue.mako:580
+#: src/desktop/templates/hue.mako:659
 msgid "User Admin - Edit Permission"
 msgstr "ユーザー管理 - パーミッションを編集"
 
-#: src/desktop/templates/hue.mako:581
+#: src/desktop/templates/hue.mako:660
 msgid "User Admin - Configurations"
 msgstr "ユーザー管理 - 設定"
 
-#: src/desktop/templates/hue.mako:582
+#: src/desktop/templates/hue.mako:661
 msgid "User Admin - New User"
 msgstr "ユーザー管理 - 新規ユーザー"
 
-#: src/desktop/templates/hue.mako:583
+#: src/desktop/templates/hue.mako:662
 msgid "User Admin - Add LDAP User"
 msgstr "ユーザー管理 - LDAP ユーザーを追加"
 
-#: src/desktop/templates/hue.mako:584
+#: src/desktop/templates/hue.mako:663
 msgid "User Admin - Edit User"
 msgstr "ユーザー管理 - ユーザーを編集"
 
-#: src/desktop/templates/hue.mako:585
+#: src/desktop/templates/hue.mako:664
 msgid "User Admin - Add LDAP Groups"
 msgstr "ユーザー管理 - LDAP グループを追加"
 
-#: src/desktop/templates/hue.mako:586
+#: src/desktop/templates/hue.mako:665
 msgid "HBase Browser"
 msgstr "HBase Browser"
 
-#: src/desktop/templates/hue.mako:587 src/desktop/templates/hue.mako:589
+#: src/desktop/templates/hue.mako:666 src/desktop/templates/hue.mako:668
 msgid "Security - Hive"
 msgstr "セキュリティ - Hive"
 
-#: src/desktop/templates/hue.mako:588
+#: src/desktop/templates/hue.mako:667
 msgid "Security - HDFS"
 msgstr "セキュリティ - HDFS"
 
-#: src/desktop/templates/hue.mako:590
+#: src/desktop/templates/hue.mako:669
 msgid "Security - SOLR"
 msgstr "セキュリティ - SOLR"
 
-#: src/desktop/templates/hue.mako:592
+#: src/desktop/templates/hue.mako:671
 msgid "Admin Wizard"
 msgstr "管理ウィザード"
 
-#: src/desktop/templates/hue.mako:593
+#: src/desktop/templates/hue.mako:672
 msgid "Logs"
 msgstr "ログ"
 
-#: src/desktop/templates/hue.mako:594
+#: src/desktop/templates/hue.mako:673
 msgid "Dump Configuration"
 msgstr "設定をダンプ"
 
-#: src/desktop/templates/hue.mako:885
+#: src/desktop/templates/hue.mako:1036
 msgid ""
 "It looks like you are offline or an unknown error happened. Please "
 "refresh the page."
@@ -4541,45 +4791,57 @@ msgstr ""
 "オフラインであるか、不明なエラーが発生した可能性があります。"
 "ページを更新してください。"
 
-#: src/desktop/templates/hue.mako:1341
+#: src/desktop/templates/hue.mako:1553
 msgid "Add more..."
 msgstr "詳細を追加..."
 
-#: src/desktop/templates/hue.mako:1487
+#: src/desktop/templates/hue.mako:1701
 msgid "Apps"
 msgstr "アプリ"
 
-#: src/desktop/templates/hue_ace_autocompleter.mako:122
+#: src/desktop/templates/hue.mako:1894 src/desktop/templates/login.mako:167
+msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
+msgstr "Hue および Hue のロゴは Cloudera, Inc. の商標です。"
+
+#: src/desktop/templates/hue_ace_autocompleter.mako:152
+#: src/desktop/templates/hue_ace_autocompleter.mako:671
 msgid "Partition key"
 msgstr "パーティションキー"
 
-#: src/desktop/templates/hue_ace_autocompleter.mako:125
+#: src/desktop/templates/hue_ace_autocompleter.mako:155
+#: src/desktop/templates/hue_ace_autocompleter.mako:674
 msgid "Primary key"
 msgstr "プライマリキー"
 
-#: src/desktop/templates/hue_ace_autocompleter.mako:158
+#: src/desktop/templates/hue_ace_autocompleter.mako:203
 msgid "Popular join"
 msgstr "よく使用する結合"
 
-#: src/desktop/templates/hue_ace_autocompleter.mako:174
+#: src/desktop/templates/hue_ace_autocompleter.mako:219
 msgid "Popular join condition"
 msgstr "よく使用する結合条件"
 
-#: src/desktop/templates/hue_ace_autocompleter.mako:190
+#: src/desktop/templates/hue_ace_autocompleter.mako:235
 msgid "Popular aggregate"
 msgstr "よく使用する集計"
 
-#: src/desktop/templates/hue_ace_autocompleter.mako:216
+#: src/desktop/templates/hue_ace_autocompleter.mako:270
+#: src/desktop/templates/hue_ace_autocompleter.mako:286
 msgid "Popular group by"
 msgstr "よく使用するグループ化"
 
-#: src/desktop/templates/hue_ace_autocompleter.mako:232
+#: src/desktop/templates/hue_ace_autocompleter.mako:295
+#: src/desktop/templates/hue_ace_autocompleter.mako:311
 msgid "Popular order by"
 msgstr "よく使用する順序"
 
-#: src/desktop/templates/hue_ace_autocompleter.mako:248
+#: src/desktop/templates/hue_ace_autocompleter.mako:320
 msgid "Popular filter"
 msgstr "よく使用するフィルタ"
+
+#: src/desktop/templates/hue_ace_autocompleter.mako:686
+msgid "No description"
+msgstr "説明なし"
 
 #: src/desktop/templates/ko_editor.mako:24
 msgid "I'm an editor"
@@ -4593,35 +4855,31 @@ msgstr "メタストア"
 msgid "Welcome to Hue"
 msgstr "Hue へようこそ"
 
-#: src/desktop/templates/login.mako:54
+#: src/desktop/templates/login.mako:58
 msgid "Go to gethue.com"
 msgstr "gethue.com へ移動"
 
-#: src/desktop/templates/login.mako:82
+#: src/desktop/templates/login.mako:86
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
 msgstr "今回は初回ログインであるため、ユーザー名とパスワードを指定してください。これらの値は、決して忘れないようにしてください。なぜなら、"
 
-#: src/desktop/templates/login.mako:83
+#: src/desktop/templates/login.mako:87
 msgid "they will become your Hue superuser credentials."
 msgstr "これらの値は、Hue スーパーユーザーの資格情報になるからです。"
 
-#: src/desktop/templates/login.mako:131
+#: src/desktop/templates/login.mako:147
 msgid "Create Account"
 msgstr "アカウントを作成"
 
-#: src/desktop/templates/login.mako:133
+#: src/desktop/templates/login.mako:149
 msgid "Sign In"
 msgstr "サインイン"
 
-#: src/desktop/templates/login.mako:149
+#: src/desktop/templates/login.mako:165
 msgid "Powered by"
 msgstr "提供元"
-
-#: src/desktop/templates/login.mako:151
-msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
-msgstr "Hue および Hue のロゴは Cloudera, Inc. の商標です。"
 
 #: src/desktop/templates/login_modal.mako:32
 msgid "Your session expired and your current action requires to"
@@ -4663,6 +4921,15 @@ msgstr "ログをラップ"
 msgid "Download entire log as zip"
 msgstr "ログ全体を zip としてダウンロード"
 
+#: src/desktop/templates/metrics.mako:114
+msgid "Filter metrics..."
+msgstr "測定値のフィルタ..."
+
+#: src/desktop/templates/metrics.mako:128
+#: src/desktop/templates/metrics.mako:155
+msgid "There are no metrics matching your filter"
+msgstr "フィルタに一致する測定値がありません"
+
 #: src/desktop/templates/popup_error.mako:42
 msgid "More Info"
 msgstr "詳細情報"
@@ -4682,208 +4949,194 @@ msgid ""
 "the latest"
 msgstr "古いブラウザが実行されている可能性があります。最新のブラウザにアップグレードすることをお勧めします"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:33
+#: src/desktop/templates/ko_components/ko_context_popover.mako:34
 msgid "Show in Assist..."
 msgstr "アシストで表示..."
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:37
+#: src/desktop/templates/ko_components/ko_context_popover.mako:38
 msgid "Open in Dashboard..."
 msgstr "ダッシュボードで開く..."
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:42
+#: src/desktop/templates/ko_components/ko_context_popover.mako:44
 msgid "Open in Table Browser..."
 msgstr "Table Browser で開く..."
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:46
+#: src/desktop/templates/ko_components/ko_context_popover.mako:49
 msgid "Replace the editor content..."
 msgstr "エディターの内容を置き換え..."
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:46
+#: src/desktop/templates/ko_components/ko_context_popover.mako:49
 msgid "Insert in the editor"
 msgstr "エディターで挿入"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:49
+#: src/desktop/templates/ko_components/ko_context_popover.mako:52
 msgid "Open in File Browser..."
 msgstr "File Browser で開く..."
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:54
+#: src/desktop/templates/ko_components/ko_context_popover.mako:57
 msgid "Expand to selected columns"
 msgstr "選択した列に展開"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:57
+#: src/desktop/templates/ko_components/ko_context_popover.mako:60
 msgid "Expand to all columns"
 msgstr "すべての列に展開"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:75
+#: src/desktop/templates/ko_components/ko_context_popover.mako:78
 msgid "Properties"
 msgstr "プロパティ"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:80
+#: src/desktop/templates/ko_components/ko_context_popover.mako:83
 msgid "Created"
 msgstr "作成済み"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:83
+#: src/desktop/templates/ko_components/ko_context_popover.mako:86
 msgid "Format"
 msgstr "フォーマット"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:87
+#: src/desktop/templates/ko_components/ko_context_popover.mako:90
 msgid "Managed"
 msgstr "管理"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:87
+#: src/desktop/templates/ko_components/ko_context_popover.mako:90
 msgid "External"
 msgstr "外部"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:92
-#: src/desktop/templates/ko_components/ko_context_popover.mako:117
-#: src/desktop/templates/ko_components/ko_context_popover.mako:203
-msgid "Comment"
-msgstr "コメント"
-
-#: src/desktop/templates/ko_components/ko_context_popover.mako:97
-#: src/desktop/templates/ko_components/ko_context_popover.mako:122
-#: src/desktop/templates/ko_components/ko_context_popover.mako:206
+#: src/desktop/templates/ko_components/ko_context_popover.mako:100
+#: src/desktop/templates/ko_components/ko_context_popover.mako:125
+#: src/desktop/templates/ko_components/ko_context_popover.mako:210
 msgid "Tags"
 msgstr "タグ"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:102
+#: src/desktop/templates/ko_components/ko_context_popover.mako:105
 msgid "View SQL"
 msgstr "SQL を表示"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:105
+#: src/desktop/templates/ko_components/ko_context_popover.mako:108
 msgid "Click to copy"
 msgstr "クリックしてコピー"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:151
+#: src/desktop/templates/ko_components/ko_context_popover.mako:154
 msgid "The selected table has no data."
 msgstr "選択したテーブルにデータがありません。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:229
+#: src/desktop/templates/ko_components/ko_context_popover.mako:234
 msgid "This field does not support stats"
 msgstr "このフィールドは統計をサポートしていません"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:230
+#: src/desktop/templates/ko_components/ko_context_popover.mako:235
 msgid "There are no stats to be shown"
 msgstr "表示する統計はありません。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:248
+#: src/desktop/templates/ko_components/ko_context_popover.mako:253
 msgid "Not available"
 msgstr "利用できません"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:283
+#: src/desktop/templates/ko_components/ko_context_popover.mako:288
 msgid "There are no terms to be shown"
 msgstr "表示する単語はありません。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:310
+#: src/desktop/templates/ko_components/ko_context_popover.mako:315
 msgid "Could not find details for the function"
 msgstr "関数の詳細が見つかりませんでした"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:342
-#: src/desktop/templates/ko_components/ko_context_popover.mako:732
-#: src/desktop/templates/ko_components/ko_global_search.mako:305
+#: src/desktop/templates/ko_components/ko_context_popover.mako:347
+#: src/desktop/templates/ko_components/ko_context_popover.mako:777
+#: src/desktop/templates/ko_components/ko_global_search.mako:356
 msgid "Partitions"
 msgstr "パーティション"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:347
+#: src/desktop/templates/ko_components/ko_context_popover.mako:352
 msgid "Values"
 msgstr "値"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:348
+#: src/desktop/templates/ko_components/ko_context_popover.mako:353
 #, fuzzy
 msgid "Spec"
-msgstr "仕様PacteraSourceChangedPacteraSourceChanged"
+msgstr "仕様"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:358
+#: src/desktop/templates/ko_components/ko_context_popover.mako:363
 msgid "Data"
 msgstr "データ"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:401
+#: src/desktop/templates/ko_components/ko_context_popover.mako:411
 msgid "Contents"
 msgstr "コンテンツ"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:451
+#: src/desktop/templates/ko_components/ko_context_popover.mako:461
 msgid "Insert "
 msgstr "カーソルの位置に"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:451
+#: src/desktop/templates/ko_components/ko_context_popover.mako:461
 msgid " sample query"
 msgstr "サンプルクエリを"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:451
+#: src/desktop/templates/ko_components/ko_context_popover.mako:461
 msgid "at cursor"
 msgstr "挿入"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:639
-#: src/desktop/templates/ko_components/ko_context_popover.mako:697
+#: src/desktop/templates/ko_components/ko_context_popover.mako:684
+#: src/desktop/templates/ko_components/ko_context_popover.mako:742
 msgid "Sample"
 msgstr "サンプル"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:642
-#: src/desktop/templates/ko_components/ko_context_popover.mako:700
+#: src/desktop/templates/ko_components/ko_context_popover.mako:687
+#: src/desktop/templates/ko_components/ko_context_popover.mako:745
 msgid "There was a problem loading the samples."
 msgstr "サンプルのロード中に問題が発生しました。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:658
+#: src/desktop/templates/ko_components/ko_context_popover.mako:703
 msgid "There was a problem loading the column details."
 msgstr "列の詳細のロード中に問題が発生しました。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:668
+#: src/desktop/templates/ko_components/ko_context_popover.mako:713
 msgid "There was a problem loading the details."
 msgstr "詳細のロード中に問題が発生しました。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:678
+#: src/desktop/templates/ko_components/ko_context_popover.mako:723
 msgid "There was a problem loading the columns."
 msgstr "列のロード中に問題が発生しました。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:687
+#: src/desktop/templates/ko_components/ko_context_popover.mako:732
 msgid "There was a problem loading the table details."
 msgstr "テーブルの詳細のロード中に問題が発生しました。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:711
-#: src/desktop/templates/ko_components/ko_context_popover.mako:723
+#: src/desktop/templates/ko_components/ko_context_popover.mako:756
+#: src/desktop/templates/ko_components/ko_context_popover.mako:768
 msgid "Analysis"
 msgstr "分析"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:714
+#: src/desktop/templates/ko_components/ko_context_popover.mako:759
 msgid "There was a problem loading the column analysis."
 msgstr "列の分析のロード中に問題が発生しました。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:726
+#: src/desktop/templates/ko_components/ko_context_popover.mako:771
 msgid "There was a problem loading the table analysis."
 msgstr "テーブルの分析のロード中に問題が発生しました。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:735
+#: src/desktop/templates/ko_components/ko_context_popover.mako:780
 msgid "There was a problem loading the table partitions."
 msgstr "テーブルのパーティションのロード中に問題が発生しました。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:834
-#: src/desktop/templates/ko_components/ko_global_search.mako:46
+#: src/desktop/templates/ko_components/ko_context_popover.mako:873
+#: src/desktop/templates/ko_components/ko_global_search.mako:50
 msgid "No results found."
 msgstr "結果が見つかりません。"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:898
+#: src/desktop/templates/ko_components/ko_context_popover.mako:937
 msgid "Could not load"
 msgstr "ロードできませんでした"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:1222
+#: src/desktop/templates/ko_components/ko_context_popover.mako:1261
 msgid "Terms"
 msgstr "単語"
 
-#: src/desktop/templates/ko_components/ko_context_popover.mako:1228
+#: src/desktop/templates/ko_components/ko_context_popover.mako:1267
 msgid "Stats"
 msgstr "統計"
 
-#: src/desktop/templates/ko_components/ko_drop_down.mako:79
+#: src/desktop/templates/ko_components/ko_drop_down.mako:159
 msgid "Selected entry"
 msgstr "選択済みのエントリ"
-
-#: src/desktop/templates/ko_components/ko_global_search.mako:101
-msgid "No match found"
-msgstr "一致するものが見つかりません"
-
-#: src/desktop/templates/ko_components/ko_global_search.mako:308
-msgid "Applications"
-msgstr "アプリケーション"
 
 #: src/desktop/templates/ko_components/ko_history_panel.mako:28
 msgid "Task history"
@@ -4918,133 +5171,27 @@ msgstr "履歴のクリアを確認"
 msgid "Are you sure you want to clear the task history?"
 msgstr "タスクの履歴をクリアしてもよろしいですか?"
 
-#: src/desktop/templates/ko_components/ko_history_panel.mako:157
-#: src/desktop/templates/ko_components/ko_history_panel.mako:163
+#: src/desktop/templates/ko_components/ko_history_panel.mako:160
+#: src/desktop/templates/ko_components/ko_history_panel.mako:166
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "例：SELECT * FROM テーブル名、または CTRL キーを押したまま Space キーを押す"
 
-#: src/desktop/templates/ko_components/ko_job_browser_links.mako:29
+#: src/desktop/templates/ko_components/ko_job_browser_links.mako:31
 msgid "Job browser"
 msgstr "Job Browser"
 
-#: src/desktop/templates/ko_components/ko_job_browser_links.mako:32
+#: src/desktop/templates/ko_components/ko_job_browser_links.mako:34
 msgid "Jobs preview"
 msgstr "ジョブプレビュー"
 
-#: src/desktop/templates/ko_components/ko_nav_tags.mako:160
-msgid "Can't add tags without an entity."
-msgstr "エンティティなしでは、タグを追加できません。"
-
-#: src/desktop/templates/ko_components/ko_nav_tags.mako:192
+#: src/desktop/templates/ko_components/ko_nav_tags.mako:125
 msgid "Could not add tags, see the server log for details."
 msgstr "タグを追加できませんでした。詳細はサーバーログを参照してください。"
 
-#: src/desktop/templates/ko_components/ko_nav_tags.mako:196
+#: src/desktop/templates/ko_components/ko_nav_tags.mako:130
 msgid "Could not remove tags, see the server log for details."
 msgstr "タグを削除できませんでした。詳細はサーバーログを参照してください。"
 
-#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:74
+#: src/desktop/templates/ko_components/ko_sql_columns_table.mako:72
 msgid "Show sample"
 msgstr "サンプルを表示"
-
-#~ msgid "Choose whether to use the new global search or not."
-#~ msgstr ""
-
-#~ msgid "Choose whether to use the new context popover or not."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You are accessing a non-optimized "
-#~ "Hue, please switch to one of the"
-#~ " available addresses"
-#~ msgstr ""
-
-#~ msgid "Open in File Browser"
-#~ msgstr ""
-
-#~ msgid "Modified"
-#~ msgstr ""
-
-#~ msgid "Show cores"
-#~ msgstr ""
-
-#~ msgid "Collection name..."
-#~ msgstr ""
-
-#~ msgid "No available fields."
-#~ msgstr ""
-
-#~ msgid "No available collections."
-#~ msgstr ""
-
-#~ msgid "Database name..."
-#~ msgstr ""
-
-#~ msgid "Table name..."
-#~ msgstr ""
-
-#~ msgid "Query needs to be saved first."
-#~ msgstr ""
-
-#~ msgid "No recent match found"
-#~ msgstr ""
-
-#~ msgid "Search "
-#~ msgstr ""
-
-#~ msgid " tables"
-#~ msgstr ""
-
-#~ msgid " files"
-#~ msgstr ""
-
-#~ msgid "Search result"
-#~ msgstr ""
-
-#~ msgid "Error searching, see logs for details."
-#~ msgstr ""
-
-#~ msgid "No result found."
-#~ msgstr ""
-
-#~ msgid "Cluster"
-#~ msgstr ""
-
-#~ msgid "Region"
-#~ msgstr ""
-
-#~ msgid "One column layout"
-#~ msgstr ""
-
-#~ msgid "Grid results"
-#~ msgstr ""
-
-#~ msgid "Job Browser 2"
-#~ msgstr ""
-
-#~ msgid "Results copied successfully to the clipboard"
-#~ msgstr ""
-
-#~ msgid "Copy the displayed results in your clipboard"
-#~ msgstr ""
-
-#~ msgid "Import documents"
-#~ msgstr ""
-
-#~ msgid "Show trash"
-#~ msgstr ""
-
-#~ msgid "Check Configuration"
-#~ msgstr ""
-
-#~ msgid "Sessions"
-#~ msgstr ""
-
-#~ msgid "Mini job browser"
-#~ msgstr ""
-
-#~ msgid "Search data and saved documents..."
-#~ msgstr ""
-
-#~ msgid "Filter columns..."
-#~ msgstr ""
