@@ -3905,11 +3905,7 @@ function togglePresentation(value) {};
       }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('editor.chart.shown', function (snippet) {
-        hueUtils.waitForRendered('#snippet_' + snippet.id() + ' .chart:visible', function (el) {
-          return el.length > 0
-        }, function () {
-          resizeToggleResultSettings(snippet, true);
-        });
+        resizeToggleResultSettings(snippet, true);
       }, HUE_PUB_SUB_EDITOR_ID);
 
       $(document).on("forceChartDraw", function (e, snippet) {
