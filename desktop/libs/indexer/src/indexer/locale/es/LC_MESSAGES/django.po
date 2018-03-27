@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:44-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -78,11 +78,11 @@ msgstr "Fuente %s no compatible"
 msgid "Path %(path)s is not a file"
 msgstr "La ruta %(path)s no es un archivo"
 
-#: src/indexer/api3.py:220 src/indexer/controller.py:248
+#: src/indexer/api3.py:244 src/indexer/controller.py:248
 msgid "File size is too large to handle!"
 msgstr "¡El tamaño del archivo es demasiado grande!"
 
-#: src/indexer/api3.py:288
+#: src/indexer/api3.py:331
 #, python-format
 msgid "Creating database %(name)s"
 msgstr "Creando base de datos %(name)s"
@@ -161,7 +161,7 @@ msgid "Error in copying Solr configurations: %s"
 msgstr "Error al copiar configuraciones de Solr: %s"
 
 #: src/indexer/controller.py:175 src/indexer/controller.py:217
-#: src/indexer/solr_client.py:183
+#: src/indexer/solr_client.py:193
 msgid "Error in deleting Solr configurations."
 msgstr "Error al eliminar configuraciones de Solr."
 
@@ -171,7 +171,7 @@ msgstr ""
 "No se ha podido crear la colección. Para obtener más información, "
 "compruebe los registros de error."
 
-#: src/indexer/controller.py:183 src/indexer/solr_client.py:286
+#: src/indexer/controller.py:183 src/indexer/solr_client.py:302
 #, python-format
 msgid ""
 "Instance directory %s already exists! Please remove it from the file "
@@ -195,7 +195,7 @@ msgstr ""
 msgid "Could not update index. Unknown type %s"
 msgstr "No se ha podido actualizar el índice. Tipo desconocido %s"
 
-#: src/indexer/controller.py:267 src/indexer/controller.py:292
+#: src/indexer/controller.py:267
 msgid "Could not update index. Check error logs for more info."
 msgstr ""
 "No se ha podido actualizar el índice. Para obtener más información, "
@@ -208,7 +208,11 @@ msgstr ""
 "No se ha podido actualizar el índice. La estrategia de indexación %s no "
 "es compatible."
 
-#: src/indexer/controller.py:296
+#: src/indexer/controller.py:294
+msgid "Could not index the data. Check error logs for more info."
+msgstr "No se pudieron indexar los datos. Para obtener más información, compruebe los registros de error."
+
+#: src/indexer/controller.py:298
 #, python-format
 msgid "Could not update index: %s"
 msgstr "No se ha podido actualizar el índice: %s"
@@ -258,32 +262,32 @@ msgstr "¡Alias creado o modificado!"
 msgid "Solr server could not be contacted properly: %s"
 msgstr "No se ha podido contactar debidamente con el servidor Solr: %s"
 
-#: src/indexer/solr_client.py:102
+#: src/indexer/solr_client.py:103
 #, python-format
 msgid "Solr does not have any predefined (secure: %s) configSets: %s"
 msgstr "Solr no tiene configSets predefinidos (seguros: %s): %s"
 
-#: src/indexer/solr_client.py:166
+#: src/indexer/solr_client.py:176
 msgid "Cannot remove non-Solr cloud cores."
 msgstr "No se pueden eliminar los núcleos que no sean de la nube de Solr."
 
-#: src/indexer/solr_client.py:186
+#: src/indexer/solr_client.py:196
 #, python-format
 msgid "Could not remove collection: %(message)s"
 msgstr "No se ha podido quitar la colección: %(message)s."
 
-#: src/indexer/solr_client.py:276
+#: src/indexer/solr_client.py:291
 #, python-format
 msgid "Could not create index: %s"
 msgstr "No se ha podido crear el índice: %s."
 
-#: src/indexer/solr_client.py:298
+#: src/indexer/solr_client.py:314
 msgid "Could not create index. Check error logs for more info."
 msgstr ""
 "No se ha podido crear el índice. Para obtener más información, compruebe "
 "los registros de error."
 
-#: src/indexer/solr_client.py:353
+#: src/indexer/solr_client.py:369
 #, python-format
 msgid "Error in getting schema information for index '%s'"
 msgstr "Error al obtener la información del esquema para el índice '%s'"
@@ -331,18 +335,18 @@ msgid "Host"
 msgstr "Host"
 
 #: src/indexer/indexers/morphline_operations.py:82
-#: src/indexer/templates/importer.mako:231
+#: src/indexer/templates/importer.mako:230
 #: src/indexer/templates/indexer.mako:235
 msgid "Path"
 msgstr "Ruta"
 
 #: src/indexer/indexers/morphline_operations.py:83
-#: src/indexer/templates/importer.mako:268
+#: src/indexer/templates/importer.mako:267
 msgid "Port"
 msgstr "Puerto"
 
 #: src/indexer/indexers/morphline_operations.py:84
-#: src/indexer/templates/importer.mako:333
+#: src/indexer/templates/importer.mako:332
 #: src/indexer/templates/indexer.mako:247
 msgid "Query"
 msgstr "Consulta"
@@ -440,7 +444,7 @@ msgstr "Índices"
 
 #: src/indexer/templates/collections.mako:98
 #: src/indexer/templates/collections.mako:116
-#: src/indexer/templates/importer.mako:810
+#: src/indexer/templates/importer.mako:817
 #: src/indexer/templates/indexes.mako:182
 #: src/indexer/templates/indexes.mako:203
 #: src/indexer/templates/indexes.mako:220
@@ -453,7 +457,7 @@ msgstr "¿Está seguro de que desea eliminar los siguientes índices?"
 
 #: src/indexer/templates/collections.mako:107
 #: src/indexer/templates/collections.mako:123
-#: src/indexer/templates/importer.mako:817
+#: src/indexer/templates/importer.mako:824
 #: src/indexer/templates/indexes.mako:248
 msgid "Cancel"
 msgstr "Cancelar"
@@ -496,7 +500,7 @@ msgid "Show cores"
 msgstr "Mostrar núcleos"
 
 #: src/indexer/templates/collections.mako:167
-#: src/indexer/templates/importer.mako:195
+#: src/indexer/templates/importer.mako:194
 #: src/indexer/templates/indexes.mako:250
 msgid "Create"
 msgstr "Crear"
@@ -517,15 +521,15 @@ msgstr "uno o más."
 #: src/indexer/templates/collections.mako:233
 #: src/indexer/templates/collections.mako:295
 #: src/indexer/templates/collections.mako:376
-#: src/indexer/templates/importer.mako:409
-#: src/indexer/templates/importer.mako:411
-#: src/indexer/templates/importer.mako:414
-#: src/indexer/templates/importer.mako:828
-#: src/indexer/templates/importer.mako:877
+#: src/indexer/templates/importer.mako:416
+#: src/indexer/templates/importer.mako:418
+#: src/indexer/templates/importer.mako:421
+#: src/indexer/templates/importer.mako:835
+#: src/indexer/templates/importer.mako:884
 #: src/indexer/templates/indexer.mako:253
 #: src/indexer/templates/indexer.mako:373
 #: src/indexer/templates/indexes.mako:269
-#: src/indexer/templates/indexes.mako:372
+#: src/indexer/templates/indexes.mako:384
 msgid "Name"
 msgstr "Nombre"
 
@@ -542,7 +546,7 @@ msgstr "Anterior"
 
 #: src/indexer/templates/collections.mako:219
 #: src/indexer/templates/collections.mako:432
-#: src/indexer/templates/importer.mako:788
+#: src/indexer/templates/importer.mako:795
 #: src/indexer/templates/indexer.mako:334
 #: src/indexer/templates/indexer.mako:340
 msgid "Next"
@@ -598,15 +602,15 @@ msgstr "Expresión de configuración de Morphlines"
 
 #: src/indexer/templates/collections.mako:296
 #: src/indexer/templates/collections.mako:377
-#: src/indexer/templates/importer.mako:211
-#: src/indexer/templates/importer.mako:404
-#: src/indexer/templates/importer.mako:832
-#: src/indexer/templates/importer.mako:881
-#: src/indexer/templates/importer.mako:886
+#: src/indexer/templates/importer.mako:210
+#: src/indexer/templates/importer.mako:411
+#: src/indexer/templates/importer.mako:839
+#: src/indexer/templates/importer.mako:888
+#: src/indexer/templates/importer.mako:893
 #: src/indexer/templates/indexer.mako:229
 #: src/indexer/templates/indexer.mako:376
 #: src/indexer/templates/indexes.mako:270
-#: src/indexer/templates/indexes.mako:373
+#: src/indexer/templates/indexes.mako:385
 msgid "Type"
 msgstr "Tipo"
 
@@ -617,21 +621,21 @@ msgstr "ID"
 
 #: src/indexer/templates/collections.mako:298
 #: src/indexer/templates/collections.mako:379
-#: src/indexer/templates/importer.mako:897
+#: src/indexer/templates/importer.mako:904
 #: src/indexer/templates/indexer.mako:390
-#: src/indexer/templates/indexes.mako:374
+#: src/indexer/templates/indexes.mako:388
 msgid "Required"
 msgstr "Obligatorio"
 
 #: src/indexer/templates/collections.mako:299
 #: src/indexer/templates/collections.mako:380
-#: src/indexer/templates/indexes.mako:376
+#: src/indexer/templates/indexes.mako:386
 msgid "Indexed"
 msgstr "Indexado"
 
 #: src/indexer/templates/collections.mako:300
 #: src/indexer/templates/collections.mako:381
-#: src/indexer/templates/indexes.mako:375
+#: src/indexer/templates/indexes.mako:387
 msgid "Stored"
 msgstr "Almacenado"
 
@@ -694,24 +698,24 @@ msgid "Upload data"
 msgstr "Cargar datos"
 
 #: src/indexer/templates/importer.mako:31
-#: src/indexer/templates/importer.mako:86
+#: src/indexer/templates/importer.mako:85
 msgid "Importer"
 msgstr "Importador"
 
-#: src/indexer/templates/importer.mako:90
+#: src/indexer/templates/importer.mako:89
 msgid "Import to index"
 msgstr "Importar en índice"
 
-#: src/indexer/templates/importer.mako:93
+#: src/indexer/templates/importer.mako:92
 msgid "Import to table"
 msgstr "Importar en tabla"
 
-#: src/indexer/templates/importer.mako:96
+#: src/indexer/templates/importer.mako:95
 msgid "Create a new database"
 msgstr "Crear una nueva base de datos"
 
-#: src/indexer/templates/importer.mako:108
-#: src/indexer/templates/importer.mako:119
+#: src/indexer/templates/importer.mako:107
+#: src/indexer/templates/importer.mako:118
 #: src/indexer/templates/indexer.mako:122
 #: src/indexer/templates/indexer.mako:133
 #: src/indexer/templates/indexes.mako:110
@@ -719,516 +723,516 @@ msgstr "Crear una nueva base de datos"
 msgid "Toggle Assist"
 msgstr "Activar/desactivar ayuda"
 
-#: src/indexer/templates/importer.mako:154
+#: src/indexer/templates/importer.mako:153
 #: src/indexer/templates/indexer.mako:168
 msgid "Go to Step 1"
 msgstr "Ir a paso 1"
 
-#: src/indexer/templates/importer.mako:169
+#: src/indexer/templates/importer.mako:168
 msgid "Pick data from "
 msgstr "Seleccionar datos de "
 
-#: src/indexer/templates/importer.mako:172
+#: src/indexer/templates/importer.mako:171
 msgid "No source data"
 msgstr "No hay datos de origen"
 
-#: src/indexer/templates/importer.mako:180
+#: src/indexer/templates/importer.mako:179
 #: src/indexer/templates/indexer.mako:184
 msgid "Go to Step 2"
 msgstr "Ir a paso 2"
 
-#: src/indexer/templates/importer.mako:192
+#: src/indexer/templates/importer.mako:191
 msgid "Move it to "
 msgstr "Mover a "
 
-#: src/indexer/templates/importer.mako:207
-#: src/indexer/templates/indexes.mako:409
+#: src/indexer/templates/importer.mako:206
+#: src/indexer/templates/indexes.mako:437
 msgid "Source"
 msgstr "Origen"
 
-#: src/indexer/templates/importer.mako:216
+#: src/indexer/templates/importer.mako:215
 msgid "Mode"
 msgstr "Modo"
 
-#: src/indexer/templates/importer.mako:218
+#: src/indexer/templates/importer.mako:217
 msgid "Custom"
 msgstr "Personalizado"
 
-#: src/indexer/templates/importer.mako:221
+#: src/indexer/templates/importer.mako:220
 msgid "Configured"
 msgstr "Configurado"
 
-#: src/indexer/templates/importer.mako:227
+#: src/indexer/templates/importer.mako:226
 msgid "No source is needed for creating a database."
 msgstr "Para crear una base de datos, no se necesita ningún origen."
 
-#: src/indexer/templates/importer.mako:232
+#: src/indexer/templates/importer.mako:231
 msgid "Click or drag from the assist"
 msgstr "Haga clic o arrastre desde el asistente."
 
-#: src/indexer/templates/importer.mako:235
-#: src/indexer/templates/importer.mako:427
-#: src/indexer/templates/importer.mako:590
-#: src/indexer/templates/importer.mako:799
+#: src/indexer/templates/importer.mako:234
+#: src/indexer/templates/importer.mako:434
+#: src/indexer/templates/importer.mako:597
+#: src/indexer/templates/importer.mako:806
 #: src/indexer/templates/indexer.mako:351
 #: src/indexer/templates/indexer.mako:354
 msgid "Open"
 msgstr "Abrir"
 
-#: src/indexer/templates/importer.mako:245
+#: src/indexer/templates/importer.mako:244
 msgid "Driver"
 msgstr "Controlador"
 
-#: src/indexer/templates/importer.mako:253
+#: src/indexer/templates/importer.mako:252
 msgid "Hostname"
 msgstr "Nombre de host"
 
-#: src/indexer/templates/importer.mako:254
+#: src/indexer/templates/importer.mako:253
 msgid "Enter host/ip here eg. mysql.domain.com or 123.123.123.123"
 msgstr "Introduzca el host o IP aquí, p. ej., mysql.domain.com o 123.123.123.123."
 
-#: src/indexer/templates/importer.mako:260
+#: src/indexer/templates/importer.mako:259
 msgid "JDBC Driver"
 msgstr "Controlador JDBC"
 
-#: src/indexer/templates/importer.mako:269
+#: src/indexer/templates/importer.mako:268
 msgid "Enter port number here eg. 3306"
 msgstr "Introduzca el número de puerto aquí, p. ej., 3306."
 
-#: src/indexer/templates/importer.mako:274
+#: src/indexer/templates/importer.mako:273
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: src/indexer/templates/importer.mako:275
+#: src/indexer/templates/importer.mako:274
 msgid "Enter username here"
 msgstr "Introduzca el nombre de usuario aquí."
 
-#: src/indexer/templates/importer.mako:280
+#: src/indexer/templates/importer.mako:279
 msgid "Password"
 msgstr "Contraseña"
 
-#: src/indexer/templates/importer.mako:281
+#: src/indexer/templates/importer.mako:280
 msgid "Enter password here"
 msgstr "Introduzca la contraseña aquí."
 
-#: src/indexer/templates/importer.mako:288
+#: src/indexer/templates/importer.mako:287
 msgid "Test Connection"
 msgstr "Comprobar la conexión"
 
-#: src/indexer/templates/importer.mako:296
+#: src/indexer/templates/importer.mako:295
 msgid "Options"
 msgstr "Opciones"
 
-#: src/indexer/templates/importer.mako:304
+#: src/indexer/templates/importer.mako:303
 msgid "Database Name"
 msgstr "Nombre de base de datos"
 
-#: src/indexer/templates/importer.mako:313
+#: src/indexer/templates/importer.mako:312
 msgid "Table Name"
 msgstr "Nombre de tabla"
 
-#: src/indexer/templates/importer.mako:318
+#: src/indexer/templates/importer.mako:317
 msgid "All Tables"
 msgstr "Todas las tablas"
 
-#: src/indexer/templates/importer.mako:327
+#: src/indexer/templates/importer.mako:326
 #: src/indexer/templates/indexer.mako:241
 msgid "Table"
 msgstr "Tabla"
 
-#: src/indexer/templates/importer.mako:328
+#: src/indexer/templates/importer.mako:327
 msgid "Table name or <database>.<table>"
 msgstr "Nombre de tabla o <database>.<table>"
 
-#: src/indexer/templates/importer.mako:334
-msgid "Search your documents..."
-msgstr "Buscar documentos..."
-
-#: src/indexer/templates/importer.mako:344
+#: src/indexer/templates/importer.mako:348
 msgid "Guessing format..."
 msgstr "Determinando formato..."
 
-#: src/indexer/templates/importer.mako:347
-#: src/indexer/templates/importer.mako:439
-#: src/indexer/templates/importer.mako:693
+#: src/indexer/templates/importer.mako:351
+#: src/indexer/templates/importer.mako:446
+#: src/indexer/templates/importer.mako:700
 #: src/indexer/templates/indexer.mako:269
 msgid "Format"
 msgstr "Dar formato"
 
-#: src/indexer/templates/importer.mako:350
+#: src/indexer/templates/importer.mako:354
 #: src/indexer/templates/indexer.mako:272
 msgid "File Type"
 msgstr "Tipo de archivo"
 
-#: src/indexer/templates/importer.mako:366
+#: src/indexer/templates/importer.mako:370
 msgid "Generating preview..."
 msgstr "Generando vista previa..."
 
-#: src/indexer/templates/importer.mako:369
+#: src/indexer/templates/importer.mako:373
 #: src/indexer/templates/indexer.mako:296
 msgid "Preview"
 msgstr "Vista previa"
 
-#: src/indexer/templates/importer.mako:401
-#: src/indexer/templates/indexes.mako:408
+#: src/indexer/templates/importer.mako:375
+msgid "Add sample data"
+msgstr "Agregar datos de ejemplo"
+
+#: src/indexer/templates/importer.mako:408
+#: src/indexer/templates/indexes.mako:436
 msgid "Destination"
 msgstr "Destino"
 
-#: src/indexer/templates/importer.mako:411
+#: src/indexer/templates/importer.mako:418
 msgid "Directory must not exist in the path"
 msgstr "El directorio no debe existir en la ruta."
 
-#: src/indexer/templates/importer.mako:417
+#: src/indexer/templates/importer.mako:424
 msgid "Only alphanumeric and underscore characters"
 msgstr "Solo caracteres alfanuméricos y guiones bajos"
 
-#: src/indexer/templates/importer.mako:423
+#: src/indexer/templates/importer.mako:430
 msgid "Empty name or invalid characters"
 msgstr "El nombre está vacío o incluye caracteres no válidos."
 
-#: src/indexer/templates/importer.mako:426
+#: src/indexer/templates/importer.mako:433
 msgid "Already existing"
 msgstr "Ya existente"
 
-#: src/indexer/templates/importer.mako:436
-#: src/indexer/templates/importer.mako:578
-#: src/indexer/templates/importer.mako:650
-#: src/indexer/templates/importer.mako:758
-#: src/indexer/templates/indexes.mako:355
+#: src/indexer/templates/importer.mako:443
+#: src/indexer/templates/importer.mako:585
+#: src/indexer/templates/importer.mako:657
+#: src/indexer/templates/importer.mako:765
+#: src/indexer/templates/indexes.mako:367
 msgid "Properties"
 msgstr "Propiedades"
 
-#: src/indexer/templates/importer.mako:446
+#: src/indexer/templates/importer.mako:453
 msgid "Store in Default location"
 msgstr "Almacenar en ubicación predeterminada"
 
-#: src/indexer/templates/importer.mako:451
-#: src/indexer/templates/importer.mako:768
+#: src/indexer/templates/importer.mako:458
+#: src/indexer/templates/importer.mako:775
 msgid "External location"
 msgstr "Ubicación externa"
 
-#: src/indexer/templates/importer.mako:457
-#: src/indexer/templates/importer.mako:610
-#: src/indexer/templates/importer.mako:679
+#: src/indexer/templates/importer.mako:464
+#: src/indexer/templates/importer.mako:617
+#: src/indexer/templates/importer.mako:686
 msgid "Extras"
 msgstr "Adicionales"
 
-#: src/indexer/templates/importer.mako:458
-#: src/indexer/templates/importer.mako:611
-#: src/indexer/templates/importer.mako:680
+#: src/indexer/templates/importer.mako:465
+#: src/indexer/templates/importer.mako:618
+#: src/indexer/templates/importer.mako:687
 msgid "Show extra properties"
 msgstr "Mostrar propiedades adicionales"
 
-#: src/indexer/templates/importer.mako:467
+#: src/indexer/templates/importer.mako:474
 msgid "Import data"
 msgstr "Importar datos"
 
-#: src/indexer/templates/importer.mako:471
-#: src/indexer/templates/importer.mako:472
-#: src/indexer/templates/importer.mako:760
-#: src/indexer/templates/importer.mako:761
+#: src/indexer/templates/importer.mako:478
+#: src/indexer/templates/importer.mako:479
+#: src/indexer/templates/importer.mako:767
+#: src/indexer/templates/importer.mako:768
 msgid "Description"
 msgstr "Descripción"
 
-#: src/indexer/templates/importer.mako:477
-#: src/indexer/templates/importer.mako:640
+#: src/indexer/templates/importer.mako:484
+#: src/indexer/templates/importer.mako:647
 msgid "Use first row as header"
 msgstr "Utilizar la primera fila como encabezado"
 
-#: src/indexer/templates/importer.mako:482
+#: src/indexer/templates/importer.mako:489
 msgid "Custom char delimiters"
 msgstr "Delimitadores de caracteres personalizados"
 
-#: src/indexer/templates/importer.mako:486
+#: src/indexer/templates/importer.mako:493
 msgid "Field"
 msgstr "Campo"
 
-#: src/indexer/templates/importer.mako:489
+#: src/indexer/templates/importer.mako:496
 msgid "Array, Map"
 msgstr "Matriz, Map"
 
-#: src/indexer/templates/importer.mako:492
+#: src/indexer/templates/importer.mako:499
 msgid "Struct"
 msgstr "Estructura"
 
-#: src/indexer/templates/importer.mako:499
+#: src/indexer/templates/importer.mako:506
 msgid "Regexp"
 msgstr "Regexp"
 
-#: src/indexer/templates/importer.mako:505
+#: src/indexer/templates/importer.mako:512
 msgid "Primary keys"
 msgstr "Claves principales"
 
-#: src/indexer/templates/importer.mako:511
+#: src/indexer/templates/importer.mako:518
 msgid "Partitions"
 msgstr "Particiones"
 
-#: src/indexer/templates/importer.mako:520
+#: src/indexer/templates/importer.mako:527
 msgid "Add Partition"
 msgstr "Añadir partición"
 
-#: src/indexer/templates/importer.mako:520
-#: src/indexer/templates/importer.mako:567
+#: src/indexer/templates/importer.mako:527
+#: src/indexer/templates/importer.mako:574
 msgid "Add partition"
 msgstr "Añadir partición"
 
-#: src/indexer/templates/importer.mako:555
+#: src/indexer/templates/importer.mako:562
 msgid "Add value"
 msgstr "Añadir valor"
 
-#: src/indexer/templates/importer.mako:561
+#: src/indexer/templates/importer.mako:568
 msgid "Add column"
 msgstr "Añadir columna"
 
-#: src/indexer/templates/importer.mako:582
+#: src/indexer/templates/importer.mako:589
 msgid "Execute a cluster job to index a large dataset."
 msgstr "Ejecute un job de clúster para indizar un dataset grande."
 
-#: src/indexer/templates/importer.mako:583
+#: src/indexer/templates/importer.mako:590
 msgid "Index with a job"
 msgstr "Indizar con un job"
 
-#: src/indexer/templates/importer.mako:586
-#: src/indexer/templates/importer.mako:658
+#: src/indexer/templates/importer.mako:593
+#: src/indexer/templates/importer.mako:665
 msgid "Libs"
 msgstr "Bibliotecas"
 
-#: src/indexer/templates/importer.mako:598
+#: src/indexer/templates/importer.mako:605
 msgid "Primary key"
 msgstr "Clave principal"
 
-#: src/indexer/templates/importer.mako:604
+#: src/indexer/templates/importer.mako:611
 msgid "Default field"
 msgstr "Campo predeterminado"
 
-#: src/indexer/templates/importer.mako:619
+#: src/indexer/templates/importer.mako:626
 msgid "Config set"
 msgstr "Configurar conjunto"
 
-#: src/indexer/templates/importer.mako:625
+#: src/indexer/templates/importer.mako:632
 msgid "Num shards"
 msgstr "Fragmentos de números"
 
-#: src/indexer/templates/importer.mako:631
+#: src/indexer/templates/importer.mako:638
 msgid "Replication factor"
 msgstr "Factor de replicación"
 
-#: src/indexer/templates/importer.mako:652
+#: src/indexer/templates/importer.mako:659
 msgid "Mappers"
 msgstr "Mappers"
 
-#: src/indexer/templates/importer.mako:663
+#: src/indexer/templates/importer.mako:670
 msgid "Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue"
 msgstr "Ruta al archivo, p. ej., hdfs://localhost:8020/user/hue/file.hue"
 
-#: src/indexer/templates/importer.mako:688
+#: src/indexer/templates/importer.mako:695
 msgid "Split By"
 msgstr "Dividir por"
 
-#: src/indexer/templates/importer.mako:698
-#: src/indexer/templates/importer.mako:715
+#: src/indexer/templates/importer.mako:705
+#: src/indexer/templates/importer.mako:722
 #: src/indexer/templates/indexer.mako:282
 #: src/indexer/templates/indexes.mako:296
-#: src/indexer/templates/indexes.mako:330
+#: src/indexer/templates/indexes.mako:342
 msgid "Fields"
 msgstr "Campos"
 
-#: src/indexer/templates/importer.mako:701
+#: src/indexer/templates/importer.mako:708
 msgid "Line"
 msgstr "Línea"
 
-#: src/indexer/templates/importer.mako:704
+#: src/indexer/templates/importer.mako:711
 msgid "Optionally Enclosed By"
 msgstr "Adjuntado opcionalmente por"
 
-#: src/indexer/templates/importer.mako:735
+#: src/indexer/templates/importer.mako:742
 msgid "Add Field"
 msgstr "Añadir campo"
 
-#: src/indexer/templates/importer.mako:765
+#: src/indexer/templates/importer.mako:772
 msgid "Default location"
 msgstr "Ubicación predeterminada"
 
-#: src/indexer/templates/importer.mako:783
+#: src/indexer/templates/importer.mako:790
 msgid "Back"
 msgstr "Volver"
 
-#: src/indexer/templates/importer.mako:794
+#: src/indexer/templates/importer.mako:801
 msgid "Submit"
 msgstr "Enviar"
 
-#: src/indexer/templates/importer.mako:800
+#: src/indexer/templates/importer.mako:807
 msgid "Check status"
 msgstr "Comprobar el estado"
 
-#: src/indexer/templates/importer.mako:811
+#: src/indexer/templates/importer.mako:818
 msgid "Write or paste comma separated field names"
 msgstr "Escriba o pegue nombres de campos separados por comas"
 
-#: src/indexer/templates/importer.mako:814
+#: src/indexer/templates/importer.mako:821
 msgid "e.g. id, name, salary"
 msgstr "p. ej., ID, nombre o sueldo"
 
-#: src/indexer/templates/importer.mako:818
+#: src/indexer/templates/importer.mako:825
 msgid "Change field names"
 msgstr "Cambiar nombres de campos"
 
-#: src/indexer/templates/importer.mako:829
-#: src/indexer/templates/importer.mako:878
+#: src/indexer/templates/importer.mako:836
+#: src/indexer/templates/importer.mako:885
 #: src/indexer/templates/indexer.mako:374
 msgid "Field name"
 msgstr "Nombre de campo"
 
-#: src/indexer/templates/importer.mako:841
+#: src/indexer/templates/importer.mako:848
 msgid "Length"
 msgstr "Longitud"
 
-#: src/indexer/templates/importer.mako:843
+#: src/indexer/templates/importer.mako:850
 msgid "Precision"
 msgstr "Precisión"
 
-#: src/indexer/templates/importer.mako:844
+#: src/indexer/templates/importer.mako:851
 msgid "Scale"
 msgstr "Escala"
 
-#: src/indexer/templates/importer.mako:849
+#: src/indexer/templates/importer.mako:856
 msgid "Value"
 msgstr "Valor"
 
-#: src/indexer/templates/importer.mako:850
+#: src/indexer/templates/importer.mako:857
 msgid "Partition value"
 msgstr "Valor de partición"
 
-#: src/indexer/templates/importer.mako:855
-#: src/indexer/templates/importer.mako:890
+#: src/indexer/templates/importer.mako:862
+#: src/indexer/templates/importer.mako:897
 msgid "Show field properties"
 msgstr "Mostrar propiedades de campo"
 
-#: src/indexer/templates/importer.mako:858
+#: src/indexer/templates/importer.mako:865
 msgid "Field comment"
 msgstr "Comentario de campo"
 
-#: src/indexer/templates/importer.mako:878
+#: src/indexer/templates/importer.mako:885
 msgid "Only alphanumeric and underscore characters and not _version_"
 msgstr "Tan solo se permiten caracteres alfanuméricos y guiones bajos, no _version_."
 
-#: src/indexer/templates/importer.mako:887
+#: src/indexer/templates/importer.mako:894
 msgid "Field Type"
 msgstr "Tipo de campo"
 
-#: src/indexer/templates/importer.mako:894
+#: src/indexer/templates/importer.mako:901
 #: src/indexer/templates/indexer.mako:384
 msgid "Unique"
 msgstr "Único"
 
-#: src/indexer/templates/importer.mako:901
+#: src/indexer/templates/importer.mako:908
 msgid "Keep"
 msgstr "Mantener"
 
-#: src/indexer/templates/importer.mako:907
-#: src/indexer/templates/importer.mako:917
+#: src/indexer/templates/importer.mako:914
+#: src/indexer/templates/importer.mako:924
 #: src/indexer/templates/indexer.mako:394
 #: src/indexer/templates/indexer.mako:400
 msgid "Add Operation"
 msgstr "Añadir operación"
 
-#: src/indexer/templates/importer.mako:907
+#: src/indexer/templates/importer.mako:914
 #: src/indexer/templates/indexer.mako:394
 msgid "Operation"
 msgstr "Operación"
 
-#: src/indexer/templates/importer.mako:917
+#: src/indexer/templates/importer.mako:924
 #: src/indexer/templates/indexer.mako:400
 msgid "Operation to"
 msgstr "Operación para"
 
-#: src/indexer/templates/importer.mako:932
+#: src/indexer/templates/importer.mako:939
 msgid "No sample to be shown"
 msgstr "No hay ejemplos que mostrar."
 
-#: src/indexer/templates/importer.mako:943
+#: src/indexer/templates/importer.mako:950
 #: src/indexer/templates/indexer.mako:409
 msgid "Number of expected fields"
 msgstr "Número de campos esperados"
 
-#: src/indexer/templates/importer.mako:947
+#: src/indexer/templates/importer.mako:954
 #: src/indexer/templates/indexer.mako:413
 msgid "Remove"
 msgstr "Quitar"
 
-#: src/indexer/templates/importer.mako:986
+#: src/indexer/templates/importer.mako:993
 #: src/indexer/templates/indexer.mako:445
 msgid "Remove Pair"
 msgstr "Eliminar par"
 
-#: src/indexer/templates/importer.mako:989
+#: src/indexer/templates/importer.mako:996
 #: src/indexer/templates/indexer.mako:448
 msgid "Add Pair"
 msgstr "Añadir par"
 
-#: src/indexer/templates/importer.mako:1005
+#: src/indexer/templates/importer.mako:1012
 #: src/indexer/templates/indexer.mako:471
 msgid "generated"
 msgstr "generado"
 
-#: src/indexer/templates/importer.mako:1407
+#: src/indexer/templates/importer.mako:1414
 msgid "Connection Failed: "
 msgstr "Error de conexión: "
 
-#: src/indexer/templates/importer.mako:1795
+#: src/indexer/templates/importer.mako:1810
 msgid "Comma (,)"
 msgstr "Coma (,)"
 
-#: src/indexer/templates/importer.mako:1796
+#: src/indexer/templates/importer.mako:1811
 msgid "^Tab (\t)"
 msgstr "^Tabulador (\t)"
 
-#: src/indexer/templates/importer.mako:1797
+#: src/indexer/templates/importer.mako:1812
 msgid "New line"
 msgstr "Nueva línea"
 
-#: src/indexer/templates/importer.mako:1798
+#: src/indexer/templates/importer.mako:1813
 msgid "Pipe"
 msgstr "Barra"
 
-#: src/indexer/templates/importer.mako:1799
+#: src/indexer/templates/importer.mako:1814
 msgid "Double Quote"
 msgstr "Comillas dobles"
 
-#: src/indexer/templates/importer.mako:1800
+#: src/indexer/templates/importer.mako:1815
 msgid "Single Quote"
 msgstr "Comillas simples"
 
-#: src/indexer/templates/importer.mako:1801
+#: src/indexer/templates/importer.mako:1816
 msgid "^0"
 msgstr "^0"
 
-#: src/indexer/templates/importer.mako:1802
+#: src/indexer/templates/importer.mako:1817
 msgid "^A (\\001)"
 msgstr "^A (\\001)"
 
-#: src/indexer/templates/importer.mako:1803
+#: src/indexer/templates/importer.mako:1818
 msgid "^B (\\002)"
 msgstr "^B (\\002)"
 
-#: src/indexer/templates/importer.mako:1804
+#: src/indexer/templates/importer.mako:1819
 msgid "^C (\\003)"
 msgstr "^C (\\003)"
 
-#: src/indexer/templates/importer.mako:1805
+#: src/indexer/templates/importer.mako:1820
 msgid "^A (\\x01)"
 msgstr "^A (\\x01)"
 
-#: src/indexer/templates/importer.mako:1941
+#: src/indexer/templates/importer.mako:1958
 msgid "Creation success."
 msgstr "Se ha creado correctamente."
 
-#: src/indexer/templates/importer.mako:1958
-#: src/indexer/templates/importer.mako:1964
+#: src/indexer/templates/importer.mako:1975
+#: src/indexer/templates/importer.mako:1981
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "Ejemplo: SELECT * FROM nombre de tabla o pulse Ctrl + espacio"
 
-#: src/indexer/templates/importer.mako:1970
+#: src/indexer/templates/importer.mako:1987
 msgid ""
 "Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT "
 "--target-dir hdfs://localhost:8020/user/foo -m 1"
@@ -1236,15 +1240,19 @@ msgstr ""
 "Ejemplo: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT "
 "--target-dir hdfs://localhost:8020/user/foo -m 1"
 
-#: src/indexer/templates/importer.mako:2029
+#: src/indexer/templates/importer.mako:2054
 msgid "Task submitted"
 msgstr "Tarea enviada"
 
-#: src/indexer/templates/importer.mako:2035
+#: src/indexer/templates/importer.mako:2060
 msgid "Creation success"
 msgstr "Se ha creado correctamente."
 
-#: src/indexer/templates/importer.mako:2039
+#: src/indexer/templates/importer.mako:2062
+msgid "Skipped records: "
+msgstr "Registros omitidos: "
+
+#: src/indexer/templates/importer.mako:2067
 msgid "Error importing"
 msgstr "Error en la importación"
 
@@ -1359,75 +1367,84 @@ msgid "Overview"
 msgstr "Información general"
 
 #: src/indexer/templates/indexes.mako:297
-#: src/indexer/templates/indexes.mako:338
+#: src/indexer/templates/indexes.mako:350
 msgid "Sample"
 msgstr "Ejemplo"
 
-#: src/indexer/templates/indexes.mako:307
+#: src/indexer/templates/indexes.mako:308
 msgid "Search for a field..."
 msgstr "Buscar por un campo..."
 
-#: src/indexer/templates/indexes.mako:319
-#: src/indexer/templates/indexes.mako:348
+#: src/indexer/templates/indexes.mako:320
+#: src/indexer/templates/indexes.mako:360
 msgid "The index does not contain any data."
 msgstr "El índice no contiene datos."
 
-#: src/indexer/templates/indexes.mako:333
-#: src/indexer/templates/indexes.mako:344
+#: src/indexer/templates/indexes.mako:331
+msgid "The config could not be retrieved."
+msgstr "No se ha podido recuperar la configuración."
+
+#: src/indexer/templates/indexes.mako:345
+#: src/indexer/templates/indexes.mako:356
 msgid "View more..."
 msgstr "Ver más..."
 
-#: src/indexer/templates/indexes.mako:357
+#: src/indexer/templates/indexes.mako:369
 msgid "Unique Key"
 msgstr "Clave única"
 
-#: src/indexer/templates/indexes.mako:377
+#: src/indexer/templates/indexes.mako:389
 msgid "Multivalued"
 msgstr "Con multivalores"
 
-#: src/indexer/templates/indexes.mako:404
+#: src/indexer/templates/indexes.mako:390
+msgid "Term Vectors"
+msgstr "Vectores de términos"
+
+#: src/indexer/templates/indexes.mako:391
+msgid "Tokenized"
+msgstr "Convertido en token"
+
+#: src/indexer/templates/indexes.mako:392
+msgid "Term Positions"
+msgstr "Posiciones de términos"
+
+#: src/indexer/templates/indexes.mako:393
+msgid "Term Offsets"
+msgstr "Desplazamientos de términos"
+
+#: src/indexer/templates/indexes.mako:394
+msgid "Omit Norms"
+msgstr "Omitir normas"
+
+#: src/indexer/templates/indexes.mako:395
+msgid "Omit TermFreq and Positions"
+msgstr "Omitir términos frecuentes y posiciones"
+
+#: src/indexer/templates/indexes.mako:396
+msgid "Sort Missing Last"
+msgstr "Falta el último en ordenación"
+
+#: src/indexer/templates/indexes.mako:397
+msgid "DocValues"
+msgstr "Valores documento"
+
+#: src/indexer/templates/indexes.mako:432
 msgid "Copy Fields"
 msgstr "Copiar campos"
 
-#: src/indexer/templates/indexes.mako:424
+#: src/indexer/templates/indexes.mako:452
 msgid "Dynamic Fields"
 msgstr "Campos dinámicos"
 
-#: src/indexer/templates/indexes.mako:629
+#: src/indexer/templates/indexes.mako:676
 msgid "No data available"
 msgstr "No hay datos disponibles"
 
-#: src/indexer/templates/indexes.mako:630
+#: src/indexer/templates/indexes.mako:677
 msgid "No matching records"
 msgstr "No hay registros coincidentes"
 
-#: src/indexer/templates/indexes.mako:854
+#: src/indexer/templates/indexes.mako:901
 msgid "The specified index has not been found"
 msgstr "No se ha encontrado el índice especificado."
-
-#~ msgid "Could not update index."
-#~ msgstr ""
-
-#~ msgid "Adding data to the existing "
-#~ msgstr ""
-
-#~ msgid "Prefix filter..."
-#~ msgstr ""
-
-#~ msgid "Terms"
-#~ msgstr ""
-
-#~ msgid "Stats"
-#~ msgstr ""
-
-#~ msgid "There are no terms to be shown"
-#~ msgstr ""
-
-#~ msgid "This field does not support stats"
-#~ msgstr ""
-
-#~ msgid "There are no stats to be shown"
-#~ msgstr ""
-
-#~ msgid "Not available"
-#~ msgstr ""

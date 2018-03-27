@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:44-0800\n"
+"POT-Creation-Date: 2018-03-07 10:03-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -25,15 +25,15 @@ msgstr "Una entrada para cada cuenta AWS"
 msgid "Information about single AWS account"
 msgstr "Información sobre una única cuenta AWS"
 
-#: src/aws/conf.py:104
+#: src/aws/conf.py:103
 msgid "Execute this script to produce the AWS access key ID."
 msgstr "Ejecute esta secuencia de comandos para generar el ID de clave de acceso de AWS."
 
-#: src/aws/conf.py:116
+#: src/aws/conf.py:115
 msgid "Execute this script to produce the AWS secret access key."
 msgstr "Ejecute esta secuencia de comandos para generar la clave de acceso secreta de AWS."
 
-#: src/aws/conf.py:124
+#: src/aws/conf.py:123
 msgid ""
 "Allow to use environment sources of credentials (environment variables, "
 "EC2 profile)."
@@ -41,27 +41,27 @@ msgstr ""
 "Permita el uso de orígenes de entorno de credenciales (variables de entorno, "
 "perfil de EC2)."
 
-#: src/aws/conf.py:135
+#: src/aws/conf.py:134
 msgid "Alternate address for the S3 endpoint."
 msgstr "Dirección alternativa para el extremo de S3."
 
-#: src/aws/conf.py:141
+#: src/aws/conf.py:140
 msgid "Proxy address to use for the S3 connection."
 msgstr "Dirección del proxy que se usará para la conexión S3."
 
-#: src/aws/conf.py:147
+#: src/aws/conf.py:146
 msgid "Proxy port to use for the S3 connection."
 msgstr "Puerto del proxy que se usará para la conexión S3."
 
-#: src/aws/conf.py:153
+#: src/aws/conf.py:152
 msgid "Proxy user to use for the S3 connection."
 msgstr "Usuario del proxy que se usará para la conexión S3."
 
-#: src/aws/conf.py:159
+#: src/aws/conf.py:158
 msgid "Proxy password to use for the S3 connection."
 msgstr "Contraseña del proxy que se usará para la conexión S3."
 
-#: src/aws/conf.py:201
+#: src/aws/conf.py:200
 msgid "Failed to connect to S3, check your AWS credentials."
 msgstr "No se ha podido establecer la conexión con S3, compruebe sus credenciales de AWS."
 

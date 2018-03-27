@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:44-0800\n"
+"POT-Creation-Date: 2018-03-07 10:03-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -25,15 +25,15 @@ msgstr "每个 AWS 帐户 1 个条目"
 msgid "Information about single AWS account"
 msgstr "有关单个 AWS 帐户的信息"
 
-#: src/aws/conf.py:104
+#: src/aws/conf.py:103
 msgid "Execute this script to produce the AWS access key ID."
 msgstr "执行此脚本以生成 AWS 访问密钥 ID。"
 
-#: src/aws/conf.py:116
+#: src/aws/conf.py:115
 msgid "Execute this script to produce the AWS secret access key."
 msgstr "执行此脚本以生成 AWS 机密访问密钥。"
 
-#: src/aws/conf.py:124
+#: src/aws/conf.py:123
 msgid ""
 "Allow to use environment sources of credentials (environment variables, "
 "EC2 profile)."
@@ -41,27 +41,27 @@ msgstr ""
 "允许使用环境中的凭据源（环境变量、"
 "EC2 配置文件）。"
 
-#: src/aws/conf.py:135
+#: src/aws/conf.py:134
 msgid "Alternate address for the S3 endpoint."
 msgstr "S3 端点的备用地址。"
 
-#: src/aws/conf.py:141
+#: src/aws/conf.py:140
 msgid "Proxy address to use for the S3 connection."
 msgstr "用于 S3 连接的代理地址。"
 
-#: src/aws/conf.py:147
+#: src/aws/conf.py:146
 msgid "Proxy port to use for the S3 connection."
 msgstr "用于 S3 连接的代理端口。"
 
-#: src/aws/conf.py:153
+#: src/aws/conf.py:152
 msgid "Proxy user to use for the S3 connection."
 msgstr "用于 S3 连接的代理用户。"
 
-#: src/aws/conf.py:159
+#: src/aws/conf.py:158
 msgid "Proxy password to use for the S3 connection."
 msgstr "用于 S3 连接的代理密码。"
 
-#: src/aws/conf.py:201
+#: src/aws/conf.py:200
 msgid "Failed to connect to S3, check your AWS credentials."
 msgstr "无法连接到 S3，请检查您的 AWS 凭据。"
 

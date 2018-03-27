@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/beeswax/api.py:166 src/beeswax/api.py:285 src/beeswax/api.py:316
-#: src/beeswax/api.py:383 src/beeswax/api.py:443 src/beeswax/api.py:472
-#: src/beeswax/api.py:521 src/beeswax/api.py:587 src/beeswax/api.py:634
-#: src/beeswax/api.py:750 src/beeswax/views.py:600
+#: src/beeswax/api.py:173 src/beeswax/api.py:292 src/beeswax/api.py:323
+#: src/beeswax/api.py:390 src/beeswax/api.py:450 src/beeswax/api.py:479
+#: src/beeswax/api.py:528 src/beeswax/api.py:594 src/beeswax/api.py:641
+#: src/beeswax/api.py:769 src/beeswax/views.py:600
 msgid "A POST request is required."
 msgstr "需要 POST 请求。"
 
-#: src/beeswax/api.py:260
+#: src/beeswax/api.py:267
 #, python-format
 msgid ""
 "Bad status for request %s:\n"
@@ -33,78 +33,83 @@ msgstr ""
 "请求 %s 的状态错误：\n"
 "%s"
 
-#: src/beeswax/api.py:365
+#: src/beeswax/api.py:372
 msgid "There was an error with your query."
 msgstr "您的查询存在错误。"
 
-#: src/beeswax/api.py:415 src/beeswax/api.py:430
+#: src/beeswax/api.py:422 src/beeswax/api.py:437
 msgid "A GET request is required."
 msgstr "需要 GET 请求。"
 
-#: src/beeswax/api.py:475 src/beeswax/api.py:524 src/beeswax/api.py:590
+#: src/beeswax/api.py:482 src/beeswax/api.py:531 src/beeswax/api.py:597
 #, python-format
 msgid "This query is %(state)s. Results unavailable."
 msgstr "此查询为 %(state)s。结果不可用。"
 
-#: src/beeswax/api.py:497 src/beeswax/api.py:563 src/beeswax/api.py:619
+#: src/beeswax/api.py:504 src/beeswax/api.py:570 src/beeswax/api.py:626
 #, python-format
 msgid "The result could not be saved: %s."
 msgstr "无法保存结果：%s。"
 
-#: src/beeswax/api.py:542 src/beeswax/api.py:605
+#: src/beeswax/api.py:549 src/beeswax/api.py:612
 #, python-format
 msgid "Cannot find query handle and state: %s"
 msgstr "无法找到查询句柄和状态：%s"
 
-#: src/beeswax/api.py:551
+#: src/beeswax/api.py:558
 msgid "The target path is a directory"
 msgstr "目标路径是一个目录"
 
-#: src/beeswax/api.py:672
+#: src/beeswax/api.py:671
+#, python-format
+msgid "Table sample for `%(database)s`.`%(table)s`.`%(column)s`"
+msgstr "表示例：`%(database)s`.`%(table)s`.`%(column)s`"
+
+#: src/beeswax/api.py:691
 msgid "Failed to get sample data."
 msgstr "无法获取示例数据"
 
-#: src/beeswax/api.py:689
+#: src/beeswax/api.py:708
 msgid "Failed to get indexes."
 msgstr "无法获取索引。"
 
-#: src/beeswax/api.py:705
+#: src/beeswax/api.py:724
 msgid "Failed to get settings."
 msgstr "无法获取设置。"
 
-#: src/beeswax/api.py:723
+#: src/beeswax/api.py:742
 msgid "Failed to get functions."
 msgstr "无法获取函数。"
 
-#: src/beeswax/api.py:815
+#: src/beeswax/api.py:834
 msgid "Could not find session or no open sessions found."
 msgstr "找不到会话或打开会话。"
 
-#: src/beeswax/api.py:834
+#: src/beeswax/api.py:853
 msgid ""
 "Session does not exist or you do not have permissions to close the "
 "session."
 msgstr "会话不存在或您没有关闭会话的权限。"
 
-#: src/beeswax/api.py:839
+#: src/beeswax/api.py:858
 msgid "Session successfully closed."
 msgstr "会话已成功关闭。"
 
-#: src/beeswax/api.py:852
+#: src/beeswax/api.py:871
 msgid "Problem accessing table metadata"
 msgstr "访问表元数据时出现问题"
 
-#: src/beeswax/api.py:899
+#: src/beeswax/api.py:918
 msgid ""
 "Failed to authenticate to query server, check authentication "
 "configurations."
 msgstr "无法对查询服务器进行验证，请检查身份验证配置。"
 
-#: src/beeswax/api.py:903
+#: src/beeswax/api.py:922
 msgid "Unable to access databases, Query Server or Metastore may be down."
 msgstr "无法访问数据库，查询服务器或元存储可能关闭。"
 
-#: src/beeswax/api.py:906
+#: src/beeswax/api.py:925
 msgid "No databases are available. Permissions could be missing."
 msgstr "无可用数据库。可能缺少权限。"
 
@@ -337,7 +342,7 @@ msgstr "更改名称以将其另存为新设计。"
 
 #: src/beeswax/forms.py:49 src/beeswax/forms.py:222 src/beeswax/forms.py:312
 #: src/beeswax/forms.py:442 src/beeswax/templates/execute.mako:668
-#: src/beeswax/templates/execute.mako:2452
+#: src/beeswax/templates/execute.mako:2451
 #: src/beeswax/templates/list_designs.mako:86
 #: src/beeswax/templates/list_trashed_designs.mako:70
 msgid "Description"
@@ -768,72 +773,72 @@ msgstr "加载表 %(table)s 时出错：操作超时。"
 msgid "Error loading table %(table)s: %(error)s."
 msgstr "加载表 %(table)s 时出错：%(error)s。"
 
-#: src/beeswax/server/dbms.py:178
+#: src/beeswax/server/dbms.py:181
 #, python-format
 msgid "Failed to execute alter database statement: %s"
 msgstr "无法执行 alter database 语句：%s"
 
-#: src/beeswax/server/dbms.py:228
+#: src/beeswax/server/dbms.py:231
 #, python-format
 msgid "Failed to find the table: %s"
 msgstr "找不到表：%s"
 
-#: src/beeswax/server/dbms.py:250
+#: src/beeswax/server/dbms.py:253
 #, python-format
 msgid "Failed to execute alter table statement: %s"
 msgstr "无法执行 alter table 语句：%s"
 
-#: src/beeswax/server/dbms.py:285
+#: src/beeswax/server/dbms.py:288
 #, python-format
 msgid "Failed to execute alter column statement: %s"
 msgstr "无法执行 alter column 语句：%s"
 
-#: src/beeswax/server/dbms.py:343
+#: src/beeswax/server/dbms.py:346
 msgid ""
 "Failed to close session, session handle may already be closed or timed "
 "out."
 msgstr "无法关闭会话，会话句柄可能关闭或超时。"
 
-#: src/beeswax/server/dbms.py:622
+#: src/beeswax/server/dbms.py:628
 #, python-format
 msgid "Only SELECT statements can be saved. Provided query: %(query)s"
 msgstr "仅可保存 SELECT 语句。提供的查询；%(query)s"
 
-#: src/beeswax/server/dbms.py:684
+#: src/beeswax/server/dbms.py:690
 #, python-format
 msgid "Saved query results as new table %(table)s."
 msgstr "已将查询结果另存为新表 %(table)s。"
 
-#: src/beeswax/server/dbms.py:792
+#: src/beeswax/server/dbms.py:798
 #, python-format
 msgid "Server returning invalid handle for query id %(id)d [%(query)s]..."
 msgstr "服务器返回查询 id %(id)d [%(query)s] 无效手柄..."
 
-#: src/beeswax/server/dbms.py:841
+#: src/beeswax/server/dbms.py:847
 #, python-format
 msgid "Query did not return exactly one partition result: %s"
 msgstr "查询未精确返回一个分区结果：%s"
 
-#: src/beeswax/server/dbms.py:948
+#: src/beeswax/server/dbms.py:986
 #, python-format
 msgid "Could not retrieve logs: %s."
 msgstr "无法检索日志：%s。"
 
-#: src/beeswax/server/dbms.py:951
+#: src/beeswax/server/dbms.py:989
 msgid "Unknown exception."
 msgstr "未知异常。"
 
-#: src/beeswax/server/hive_server2_lib.py:567
+#: src/beeswax/server/hive_server2_lib.py:569
 #, python-format
 msgid "%s server authentication not supported. Valid are %s."
 msgstr "不支持 %s 服务器身份验证。%s 有效。"
 
-#: src/beeswax/server/hive_server2_lib.py:760
+#: src/beeswax/server/hive_server2_lib.py:762
 #, python-format
 msgid "%(query)s returned more than 1 row"
 msgstr "返回的 %(query)s 超过 1 行"
 
-#: src/beeswax/server/hive_server2_lib.py:1015
+#: src/beeswax/server/hive_server2_lib.py:1017
 #, python-format
 msgid "Failed to determine partition keys for Impala table: `%s`.`%s`"
 msgstr "无法确定 Impala 表的分区键：`%s`.`%s`"
@@ -890,9 +895,9 @@ msgid "Value"
 msgstr "值"
 
 #: src/beeswax/templates/configuration.mako:65
-#: src/beeswax/templates/execute.mako:1327
-#: src/beeswax/templates/execute.mako:2140
-#: src/beeswax/templates/execute.mako:2170
+#: src/beeswax/templates/execute.mako:1326
+#: src/beeswax/templates/execute.mako:2139
+#: src/beeswax/templates/execute.mako:2169
 #: src/beeswax/templates/list_designs.mako:175
 #: src/beeswax/templates/list_history.mako:191
 #: src/beeswax/templates/list_trashed_designs.mako:154
@@ -903,9 +908,9 @@ msgid "No data available"
 msgstr "没有可用数据"
 
 #: src/beeswax/templates/configuration.mako:66
-#: src/beeswax/templates/execute.mako:1331
-#: src/beeswax/templates/execute.mako:2141
-#: src/beeswax/templates/execute.mako:2171
+#: src/beeswax/templates/execute.mako:1330
+#: src/beeswax/templates/execute.mako:2140
+#: src/beeswax/templates/execute.mako:2170
 #: src/beeswax/templates/list_designs.mako:176
 #: src/beeswax/templates/list_history.mako:195
 #: src/beeswax/templates/list_trashed_designs.mako:155
@@ -1037,7 +1042,7 @@ msgid ""
 msgstr "将数据库存储在默认位置（由 Hive 控制，通常"
 
 #: src/beeswax/templates/create_database.mako:159
-#: src/beeswax/templates/execute.mako:1786
+#: src/beeswax/templates/execute.mako:1785
 msgid "This field is required."
 msgstr "此字段为必填字段。"
 
@@ -1054,7 +1059,7 @@ msgstr "返回"
 #: src/beeswax/templates/create_database.mako:170
 #: src/beeswax/templates/create_table_manually.mako:385
 #: src/beeswax/templates/execute.mako:327
-#: src/beeswax/templates/execute.mako:1335
+#: src/beeswax/templates/execute.mako:1334
 #: src/beeswax/templates/import_wizard_choose_delimiter.mako:163
 #: src/beeswax/templates/import_wizard_choose_file.mako:166
 #: src/beeswax/templates/list_history.mako:199
@@ -1354,15 +1359,15 @@ msgstr "char 值的长度 (1~255)"
 msgid "Length of varchar value (1~65355)"
 msgstr "varchar 值的长度 (1~65355)"
 
-#: src/beeswax/templates/create_table_manually.mako:639
+#: src/beeswax/templates/create_table_manually.mako:641
 msgid "Type your field terminator here"
 msgstr "在此处输入您的字段终止符"
 
-#: src/beeswax/templates/create_table_manually.mako:648
+#: src/beeswax/templates/create_table_manually.mako:650
 msgid "Type your collection terminator here"
 msgstr "在此处输入您的集合终止符"
 
-#: src/beeswax/templates/create_table_manually.mako:657
+#: src/beeswax/templates/create_table_manually.mako:659
 msgid "Type your map key terminator here"
 msgstr "在此处输入您的 Map 键终止符"
 
@@ -1422,7 +1427,7 @@ msgstr "UDF"
 
 #: src/beeswax/templates/execute.mako:156
 #: src/beeswax/templates/execute.mako:661
-#: src/beeswax/templates/execute.mako:2449
+#: src/beeswax/templates/execute.mako:2448
 #: src/beeswax/templates/list_designs.mako:85
 #: src/beeswax/templates/list_history.mako:115
 #: src/beeswax/templates/list_trashed_designs.mako:69
@@ -1512,7 +1517,7 @@ msgid "You can highlight and run a fragment of a query"
 msgstr "您可以突出显示并运行查询片段"
 
 #: src/beeswax/templates/execute.mako:278
-#: src/beeswax/templates/execute.mako:1792
+#: src/beeswax/templates/execute.mako:1791
 msgid "Query name"
 msgstr "查询名称"
 
@@ -1866,83 +1871,83 @@ msgstr "查询无效"
 msgid "Query requires a select or an aggregate."
 msgstr "查询需要选择或聚合。"
 
-#: src/beeswax/templates/execute.mako:1160
+#: src/beeswax/templates/execute.mako:1159
 msgid "There was a problem loading the stats."
 msgstr "加载状态时出现问题。"
 
-#: src/beeswax/templates/execute.mako:1328
+#: src/beeswax/templates/execute.mako:1327
 #: src/beeswax/templates/list_history.mako:192
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
 
-#: src/beeswax/templates/execute.mako:1329
+#: src/beeswax/templates/execute.mako:1328
 #: src/beeswax/templates/list_history.mako:193
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "显示 0－0，共 0 个条目"
 
-#: src/beeswax/templates/execute.mako:1330
+#: src/beeswax/templates/execute.mako:1329
 #: src/beeswax/templates/list_history.mako:194
 msgid "(filtered from _MAX_ total entries)"
 msgstr "（已从 _MAX_ 个总条目中过滤）"
 
-#: src/beeswax/templates/execute.mako:1333
+#: src/beeswax/templates/execute.mako:1332
 #: src/beeswax/templates/list_history.mako:197
 msgid "First"
 msgstr "第一个"
 
-#: src/beeswax/templates/execute.mako:1334
+#: src/beeswax/templates/execute.mako:1333
 #: src/beeswax/templates/list_history.mako:198
 msgid "Last"
 msgstr "最后一个"
 
-#: src/beeswax/templates/execute.mako:1336
+#: src/beeswax/templates/execute.mako:1335
 #: src/beeswax/templates/import_wizard_choose_delimiter.mako:162
 #: src/beeswax/templates/import_wizard_define_columns.mako:168
 #: src/beeswax/templates/list_history.mako:200
 msgid "Previous"
 msgstr "上一页"
 
-#: src/beeswax/templates/execute.mako:1352
+#: src/beeswax/templates/execute.mako:1351
 msgid "See results..."
 msgstr "请查看结果..."
 
-#: src/beeswax/templates/execute.mako:1521
+#: src/beeswax/templates/execute.mako:1520
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
 
-#: src/beeswax/templates/execute.mako:1524
+#: src/beeswax/templates/execute.mako:1523
 msgid "Press \"tab\", then \"enter\"."
 msgstr "按“tab”键，再按“enter”。"
 
-#: src/beeswax/templates/execute.mako:1775
+#: src/beeswax/templates/execute.mako:1774
 msgid ""
 "Results exceeds maximum number of columns permitted by Excel, will "
 "truncate results to 255 columns."
 msgstr "结果超过 Excel 允许的最大列数，将结果截断为 255 列。"
 
-#: src/beeswax/templates/execute.mako:1799
+#: src/beeswax/templates/execute.mako:1798
 msgid "Empty description"
 msgstr "空描述"
 
-#: src/beeswax/templates/execute.mako:1876
+#: src/beeswax/templates/execute.mako:1875
 #: src/beeswax/templates/watch_results.mako:588
 msgid "Please select the latitude and longitude columns."
 msgstr "请选择纬度列和经度列。"
 
-#: src/beeswax/templates/execute.mako:1897
+#: src/beeswax/templates/execute.mako:1896
 #: src/beeswax/templates/watch_results.mako:615
 msgid "Please select the columns you would like to see in this chart."
 msgstr "请选择您想要在此图表中查看的列。"
 
-#: src/beeswax/templates/execute.mako:1956
+#: src/beeswax/templates/execute.mako:1955
 msgid "MR Job"
 msgstr "MR 作业"
 
-#: src/beeswax/templates/execute.mako:1957
+#: src/beeswax/templates/execute.mako:1956
 msgid "MR Jobs"
 msgstr "MR 作业"
 
-#: src/beeswax/templates/execute.mako:2183
+#: src/beeswax/templates/execute.mako:2182
 #: src/beeswax/templates/watch_results.mako:242
 #: src/beeswax/templates/watch_results.mako:250
 #: src/beeswax/templates/watch_results.mako:260
@@ -1951,50 +1956,50 @@ msgstr "MR 作业"
 msgid "Please select a column"
 msgstr "请选择一列"
 
-#: src/beeswax/templates/execute.mako:2285
+#: src/beeswax/templates/execute.mako:2284
 msgid "No query provided to save."
 msgstr "没有提供要保存的查询。"
 
-#: src/beeswax/templates/execute.mako:2415
+#: src/beeswax/templates/execute.mako:2414
 msgid "Server error occurred: "
 msgstr "出现服务器错误： "
 
-#: src/beeswax/templates/execute.mako:2420
+#: src/beeswax/templates/execute.mako:2419
 msgid "Hue server is probably down."
 msgstr "Hue 服务器可能会关闭。"
 
-#: src/beeswax/templates/execute.mako:2422
+#: src/beeswax/templates/execute.mako:2421
 msgid "Unmanageable server error occurred: "
 msgstr "出现无法管理的服务器错误： "
 
-#: src/beeswax/templates/execute.mako:2428
+#: src/beeswax/templates/execute.mako:2427
 msgid "Query saved."
 msgstr "已保存查询。"
 
-#: src/beeswax/templates/execute.mako:2432
+#: src/beeswax/templates/execute.mako:2431
 msgid "Could not save design"
 msgstr "无法保存设计"
 
-#: src/beeswax/templates/execute.mako:2466
+#: src/beeswax/templates/execute.mako:2465
 msgid "Could not save results"
 msgstr "无法保存结果"
 
-#: src/beeswax/templates/execute.mako:2473
+#: src/beeswax/templates/execute.mako:2472
 msgid "Problem: "
 msgstr "问题： "
 
-#: src/beeswax/templates/execute.mako:2476
+#: src/beeswax/templates/execute.mako:2475
 msgid "Query canceled!"
 msgstr "已取消查询！"
 
-#: src/beeswax/templates/execute.mako:2507
-#: src/beeswax/templates/execute.mako:2515
+#: src/beeswax/templates/execute.mako:2506
+#: src/beeswax/templates/execute.mako:2514
 #: src/beeswax/templates/watch_results.mako:126
 msgid "Did you know?"
 msgstr "您知道吗？"
 
-#: src/beeswax/templates/execute.mako:2570
-#: src/beeswax/templates/execute.mako:2577
+#: src/beeswax/templates/execute.mako:2569
+#: src/beeswax/templates/execute.mako:2576
 msgid ""
 "Missing some tables? In order to update the list of tables/metadata seen "
 "by Impala, execute one of these queries:"
@@ -2047,7 +2052,7 @@ msgstr "\"输入列分隔符，该分隔符必须是单个字符。对于特殊�
 msgid "Table preview"
 msgstr "表预览"
 
-#: src/beeswax/templates/import_wizard_choose_delimiter.mako:221
+#: src/beeswax/templates/import_wizard_choose_delimiter.mako:223
 msgid "Type your delimiter here"
 msgstr "在此处键入您的分隔符"
 
@@ -2484,6 +2489,3 @@ msgstr "需要名称或目录。"
 #: src/beeswax/templates/watch_results.mako:502
 msgid "Download results from the left."
 msgstr "从左侧下载结果。"
-
-#~ msgid "Query did not return exactly one partition result"
-#~ msgstr ""
