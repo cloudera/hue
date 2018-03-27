@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,48 +17,48 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/dashboard/api.py:64
+#: src/dashboard/api.py:65
 msgid "Error while accessing Solr"
 msgstr "访问 Solr 时出错"
 
-#: src/dashboard/api.py:68 src/dashboard/views.py:229
+#: src/dashboard/api.py:69 src/dashboard/views.py:231
 msgid "There is no collection to search."
 msgstr "没有要搜索的集合。"
 
-#: src/dashboard/api.py:78 src/dashboard/views.py:264
-#: src/dashboard/views.py:277
+#: src/dashboard/api.py:79 src/dashboard/views.py:266
+#: src/dashboard/views.py:279
 msgid "POST request required."
 msgstr "需要 POST 请求。"
 
-#: src/dashboard/api.py:159
+#: src/dashboard/api.py:161
 msgid "No document was returned by Solr."
 msgstr "Solr 没有返回任何文档。"
 
-#: src/dashboard/api.py:161
+#: src/dashboard/api.py:163
 msgid "This document does not have any index id."
 msgstr "此文档没有任何索引 ID。"
 
-#: src/dashboard/api.py:175
+#: src/dashboard/api.py:177
 msgid "Permission to edit the document denied"
 msgstr "编辑文档的权限被拒绝"
 
-#: src/dashboard/api.py:196
+#: src/dashboard/api.py:198
 msgid "Document successfully updated."
 msgstr "文档已成功更新。"
 
-#: src/dashboard/api.py:200
+#: src/dashboard/api.py:202
 msgid "Document has no modifications to change."
 msgstr "文档没有要更改的修订内容。"
 
-#: src/dashboard/api.py:234
+#: src/dashboard/api.py:236
 msgid "This field type does not support stats"
 msgstr "此字段类型不支持统计数据"
 
-#: src/dashboard/api.py:267 src/dashboard/templates/common_search.mako:2383
+#: src/dashboard/api.py:274 src/dashboard/templates/common_search.mako:2532
 msgid "This field does not support stats"
 msgstr "此字段不支持统计数据"
 
-#: src/dashboard/api.py:295
+#: src/dashboard/api.py:304
 #, python-format
 msgid "Could not download search results: %s"
 msgstr "无法下载搜索结果：%s"
@@ -80,19 +80,23 @@ msgid "Activate the static report layout (beta)."
 msgstr "激活静态报告布局（测试版）。"
 
 #: src/dashboard/conf.py:63
-msgid "Activate the new grid layout system (beta)."
-msgstr "激活新网格布局系统（测试版）。"
+msgid "Activate the new grid layout system."
+msgstr "激活新网格布局系统。"
 
-#: src/dashboard/conf.py:97
+#: src/dashboard/conf.py:70
+msgid "Activate the widget filter and comparison (beta)."
+msgstr "激活小工具筛选和比较功能（测试版）。"
+
+#: src/dashboard/conf.py:103
 msgid "Index (Solr)"
 msgstr "索引 (Solr)"
 
-#: src/dashboard/conf.py:105
+#: src/dashboard/conf.py:111
 #, python-format
 msgid "Table (%s)"
 msgstr "表 (%s)"
 
-#: src/dashboard/conf.py:122
+#: src/dashboard/conf.py:128
 msgid ""
 "Name of the interface to use as query engine for the dashboard, e.g. "
 "solr, sql."
@@ -100,11 +104,11 @@ msgstr ""
 "用作控制面板查询引擎的接口名称，例如 "
 "solr、sql。"
 
-#: src/dashboard/conf.py:126
+#: src/dashboard/conf.py:132
 msgid "Support analytics facets or not."
 msgstr "是否支持分析方面。"
 
-#: src/dashboard/conf.py:132
+#: src/dashboard/conf.py:138
 msgid "Support nested documents or not."
 msgstr "是否支持嵌套文档。"
 
@@ -113,7 +117,7 @@ msgstr "是否支持嵌套文档。"
 msgid "Dashboard does not exist or you don't have the permission to access it."
 msgstr "控制面板不存在或您没有访问权限。"
 
-#: src/dashboard/models.py:673
+#: src/dashboard/models.py:736
 msgid ""
 "The Solr schema requires an id field for performing the result "
 "highlighting"
@@ -121,7 +125,7 @@ msgstr ""
 "Solr 架构需要一个 ID 字段以执行结果"
 "突出显示"
 
-#: src/dashboard/views.py:227
+#: src/dashboard/views.py:229
 msgid "Page saved !"
 msgstr "页面已保存！"
 
@@ -136,8 +140,8 @@ msgstr "控制面板"
 
 #: src/dashboard/templates/common_admin_collections.mako:30
 #: src/dashboard/templates/common_admin_collections.mako:43
-#: src/dashboard/templates/common_search.mako:187
-#: src/dashboard/templates/common_search.mako:194
+#: src/dashboard/templates/common_search.mako:186
+#: src/dashboard/templates/common_search.mako:193
 msgid "Dashboards"
 msgstr "控制面板"
 
@@ -155,12 +159,11 @@ msgid "Copy"
 msgstr "复制"
 
 #: src/dashboard/templates/common_admin_collections.mako:61
-#: src/dashboard/templates/common_search.mako:2006
 msgid "Delete"
 msgstr "删除"
 
 #: src/dashboard/templates/common_admin_collections.mako:67
-#: src/dashboard/templates/common_search.mako:157
+#: src/dashboard/templates/common_search.mako:200
 msgid "Share"
 msgstr "共享"
 
@@ -193,11 +196,12 @@ msgid "one or more."
 msgstr "一个或多个。"
 
 #: src/dashboard/templates/common_admin_collections.mako:115
+#: src/dashboard/templates/common_search.mako:2871
 msgid "Name"
 msgstr "名称"
 
 #: src/dashboard/templates/common_admin_collections.mako:116
-#: src/dashboard/templates/common_search.mako:2481
+#: src/dashboard/templates/common_search.mako:2645
 msgid "Description"
 msgstr "描述"
 
@@ -210,6 +214,7 @@ msgid "Click to edit"
 msgstr "单击以编辑"
 
 #: src/dashboard/templates/common_admin_collections.mako:147
+#: src/dashboard/templates/common_search.mako:2864
 msgid "Close"
 msgstr "关闭"
 
@@ -222,6 +227,7 @@ msgid "Are you sure you want to delete the selected dashboards?"
 msgstr "是否确定要删除选定控制面板？"
 
 #: src/dashboard/templates/common_admin_collections.mako:154
+#: src/dashboard/templates/common_search.mako:2879
 msgid "Cancel"
 msgstr "取消"
 
@@ -246,907 +252,964 @@ msgid "index"
 msgstr "索引"
 
 #: src/dashboard/templates/common_search.mako:85
-#: src/dashboard/templates/common_search.mako:2475
+#: src/dashboard/templates/common_search.mako:2639
 msgid "Table name or <database>.<table>"
 msgstr "表名或 <database>.<table>"
 
-#: src/dashboard/templates/common_search.mako:141
+#: src/dashboard/templates/common_search.mako:144
+msgid "Add widget"
+msgstr "添加小工具"
+
+#: src/dashboard/templates/common_search.mako:151
 msgid "Edit"
 msgstr "编辑"
 
-#: src/dashboard/templates/common_search.mako:145
-msgid "Save"
-msgstr "保存"
-
-#: src/dashboard/templates/common_search.mako:145
+#: src/dashboard/templates/common_search.mako:159
 msgid "Saving..."
 msgstr "正在保存..."
 
-#: src/dashboard/templates/common_search.mako:163
-msgid "Player mode"
-msgstr "播放机模式"
+#: src/dashboard/templates/common_search.mako:165
+msgid "Save as..."
+msgstr "另存为..."
 
-#: src/dashboard/templates/common_search.mako:170
-#: src/dashboard/templates/common_search.mako:415
-msgid "Settings"
-msgstr "设置"
-
-#: src/dashboard/templates/common_search.mako:175
-msgid "Saved Queries"
-msgstr "保存的查询"
-
-#: src/dashboard/templates/common_search.mako:181
+#: src/dashboard/templates/common_search.mako:180
 msgid "New"
 msgstr "新建"
 
-#: src/dashboard/templates/common_search.mako:211
-#: src/dashboard/templates/common_search.mako:1302
+#: src/dashboard/templates/common_search.mako:206
+msgid "Player mode"
+msgstr "播放机模式"
+
+#: src/dashboard/templates/common_search.mako:213
+#: src/dashboard/templates/common_search.mako:438
+msgid "Settings"
+msgstr "设置"
+
+#: src/dashboard/templates/common_search.mako:218
+msgid "Saved Queries"
+msgstr "保存的查询"
+
+#: src/dashboard/templates/common_search.mako:234
+#: src/dashboard/templates/common_search.mako:1331
 msgid "Grid"
 msgstr "网格"
 
-#: src/dashboard/templates/common_search.mako:221
-#: src/dashboard/templates/common_search.mako:899
+#: src/dashboard/templates/common_search.mako:244
+#: src/dashboard/templates/common_search.mako:915
 msgid "HTML"
 msgstr "HTML"
 
-#: src/dashboard/templates/common_search.mako:230
+#: src/dashboard/templates/common_search.mako:253
 msgid "Filter Bar"
 msgstr "筛选器栏"
 
-#: src/dashboard/templates/common_search.mako:239
-#: src/dashboard/templates/common_search.mako:1358
+#: src/dashboard/templates/common_search.mako:262
+#: src/dashboard/templates/common_search.mako:1397
 msgid "Marker Map"
 msgstr "Marker Map"
 
-#: src/dashboard/templates/common_search.mako:249
+#: src/dashboard/templates/common_search.mako:272
+#: src/dashboard/templates/common_search.mako:1359
 msgid "Counter"
 msgstr "计数器"
 
-#: src/dashboard/templates/common_search.mako:260
-#: src/dashboard/templates/common_search.mako:268
+#: src/dashboard/templates/common_search.mako:283
+#: src/dashboard/templates/common_search.mako:291
 msgid "Text Facet"
 msgstr "文本方面"
 
-#: src/dashboard/templates/common_search.mako:276
-#: src/dashboard/templates/common_search.mako:284
+#: src/dashboard/templates/common_search.mako:299
+#: src/dashboard/templates/common_search.mako:307
 msgid "Pie Chart"
 msgstr "圆形统计图"
 
-#: src/dashboard/templates/common_search.mako:293
+#: src/dashboard/templates/common_search.mako:316
 msgid "Bar Chart"
 msgstr "条形图"
 
-#: src/dashboard/templates/common_search.mako:302
+#: src/dashboard/templates/common_search.mako:325
 msgid "Chart"
 msgstr "图表"
 
-#: src/dashboard/templates/common_search.mako:311
+#: src/dashboard/templates/common_search.mako:334
 msgid "Line Chart"
 msgstr "线形图"
 
-#: src/dashboard/templates/common_search.mako:319
-#: src/dashboard/templates/common_search.mako:327
+#: src/dashboard/templates/common_search.mako:342
+#: src/dashboard/templates/common_search.mako:350
 msgid "Tree"
 msgstr "树形"
 
-#: src/dashboard/templates/common_search.mako:336
+#: src/dashboard/templates/common_search.mako:359
 msgid "Heatmap"
 msgstr "Heatmap"
 
-#: src/dashboard/templates/common_search.mako:344
-#: src/dashboard/templates/common_search.mako:352
-#: src/dashboard/templates/common_search.mako:1346
+#: src/dashboard/templates/common_search.mako:367
+#: src/dashboard/templates/common_search.mako:375
+#: src/dashboard/templates/common_search.mako:1385
 msgid "Timeline"
 msgstr "时间线"
 
-#: src/dashboard/templates/common_search.mako:360
-#: src/dashboard/templates/common_search.mako:368
-#: src/dashboard/templates/common_search.mako:1352
+#: src/dashboard/templates/common_search.mako:383
+#: src/dashboard/templates/common_search.mako:391
+#: src/dashboard/templates/common_search.mako:1391
 msgid "Gradient Map"
 msgstr "Gradient Map"
 
-#: src/dashboard/templates/common_search.mako:378
-#: src/dashboard/templates/common_search.mako:1477
+#: src/dashboard/templates/common_search.mako:401
+#: src/dashboard/templates/common_search.mako:1516
 msgid "Document"
 msgstr "文档"
 
-#: src/dashboard/templates/common_search.mako:389
+#: src/dashboard/templates/common_search.mako:412
 msgid "Hue logo"
 msgstr "Hue 徽标"
 
-#: src/dashboard/templates/common_search.mako:408
+#: src/dashboard/templates/common_search.mako:431
 msgid "This is an empty widget."
 msgstr "这是空白小工具。"
 
-#: src/dashboard/templates/common_search.mako:420
-#: src/dashboard/templates/common_search.mako:2055
-#: src/dashboard/templates/common_search.mako:2648
+#: src/dashboard/templates/common_search.mako:443
+#: src/dashboard/templates/common_search.mako:2200
+#: src/dashboard/templates/common_search.mako:2812
 msgid "Type"
 msgstr "类型"
 
-#: src/dashboard/templates/common_search.mako:421
-#: src/dashboard/templates/common_search.mako:2056
+#: src/dashboard/templates/common_search.mako:444
+#: src/dashboard/templates/common_search.mako:2201
 msgid "Toggle how to group the values"
 msgstr "切换如何对值进行分组"
 
-#: src/dashboard/templates/common_search.mako:423
-#: src/dashboard/templates/common_search.mako:2058
+#: src/dashboard/templates/common_search.mako:446
+#: src/dashboard/templates/common_search.mako:2203
 msgid "range"
 msgstr "范围"
 
-#: src/dashboard/templates/common_search.mako:424
-#: src/dashboard/templates/common_search.mako:2059
+#: src/dashboard/templates/common_search.mako:447
+#: src/dashboard/templates/common_search.mako:2204
 msgid "range & up"
 msgstr "范围和向上"
 
-#: src/dashboard/templates/common_search.mako:425
-#: src/dashboard/templates/common_search.mako:2060
+#: src/dashboard/templates/common_search.mako:448
+#: src/dashboard/templates/common_search.mako:2205
 msgid "field"
 msgstr "字段"
 
-#: src/dashboard/templates/common_search.mako:430
-#: src/dashboard/templates/common_search.mako:901
-#: src/dashboard/templates/common_search.mako:2023
+#: src/dashboard/templates/common_search.mako:453
+#: src/dashboard/templates/common_search.mako:917
+#: src/dashboard/templates/common_search.mako:2148
 msgid "Sorting"
 msgstr "排序"
 
-#: src/dashboard/templates/common_search.mako:431
-#: src/dashboard/templates/common_search.mako:2024
+#: src/dashboard/templates/common_search.mako:454
+#: src/dashboard/templates/common_search.mako:2149
 msgid "Toggle sort order"
 msgstr "切换排序顺序"
 
-#: src/dashboard/templates/common_search.mako:433
-#: src/dashboard/templates/common_search.mako:2026
+#: src/dashboard/templates/common_search.mako:456
+#: src/dashboard/templates/common_search.mako:2151
 msgid "descending"
 msgstr "降序"
 
-#: src/dashboard/templates/common_search.mako:434
-#: src/dashboard/templates/common_search.mako:2027
+#: src/dashboard/templates/common_search.mako:457
+#: src/dashboard/templates/common_search.mako:2152
 msgid "ascending"
 msgstr "升序"
 
-#: src/dashboard/templates/common_search.mako:442
-#: src/dashboard/templates/common_search.mako:471
-#: src/dashboard/templates/common_search.mako:534
-#: src/dashboard/templates/common_search.mako:1836
-#: src/dashboard/templates/common_search.mako:1936
-#: src/dashboard/templates/common_search.mako:2035
-#: src/dashboard/templates/common_search.mako:2214
+#: src/dashboard/templates/common_search.mako:465
+#: src/dashboard/templates/common_search.mako:494
+#: src/dashboard/templates/common_search.mako:557
+#: src/dashboard/templates/common_search.mako:1885
+#: src/dashboard/templates/common_search.mako:1985
+#: src/dashboard/templates/common_search.mako:2160
+#: src/dashboard/templates/common_search.mako:2363
 msgid "Limit"
 msgstr "限制"
 
-#: src/dashboard/templates/common_search.mako:451
-#: src/dashboard/templates/common_search.mako:543
-#: src/dashboard/templates/common_search.mako:1845
-#: src/dashboard/templates/common_search.mako:1944
-#: src/dashboard/templates/common_search.mako:2044
-#: src/dashboard/templates/common_search.mako:2223
+#: src/dashboard/templates/common_search.mako:474
+#: src/dashboard/templates/common_search.mako:566
+#: src/dashboard/templates/common_search.mako:1894
+#: src/dashboard/templates/common_search.mako:1993
+#: src/dashboard/templates/common_search.mako:2169
+#: src/dashboard/templates/common_search.mako:2372
 msgid "Min Count"
 msgstr "最小计数"
 
-#: src/dashboard/templates/common_search.mako:482
-#: src/dashboard/templates/common_search.mako:2275
+#: src/dashboard/templates/common_search.mako:505
+#: src/dashboard/templates/common_search.mako:2424
 msgid "Scope"
 msgstr "范围"
 
-#: src/dashboard/templates/common_search.mako:485
-#: src/dashboard/templates/common_search.mako:2278
+#: src/dashboard/templates/common_search.mako:508
+#: src/dashboard/templates/common_search.mako:2427
 msgid "World"
 msgstr "世界"
 
-#: src/dashboard/templates/common_search.mako:486
-#: src/dashboard/templates/common_search.mako:2279
+#: src/dashboard/templates/common_search.mako:509
+#: src/dashboard/templates/common_search.mako:2428
 msgid "Europe"
 msgstr "欧洲"
 
-#: src/dashboard/templates/common_search.mako:487
-#: src/dashboard/templates/common_search.mako:2280
+#: src/dashboard/templates/common_search.mako:510
+#: src/dashboard/templates/common_search.mako:2429
 msgid "Australia"
 msgstr "澳大利亚"
 
-#: src/dashboard/templates/common_search.mako:488
-#: src/dashboard/templates/common_search.mako:2281
+#: src/dashboard/templates/common_search.mako:511
+#: src/dashboard/templates/common_search.mako:2430
 msgid "Brazil"
 msgstr "巴西"
 
-#: src/dashboard/templates/common_search.mako:489
-#: src/dashboard/templates/common_search.mako:2282
+#: src/dashboard/templates/common_search.mako:512
+#: src/dashboard/templates/common_search.mako:2431
 msgid "Canada"
 msgstr "加拿大"
 
-#: src/dashboard/templates/common_search.mako:490
-#: src/dashboard/templates/common_search.mako:2283
+#: src/dashboard/templates/common_search.mako:513
+#: src/dashboard/templates/common_search.mako:2432
 msgid "China"
 msgstr "中国"
 
-#: src/dashboard/templates/common_search.mako:491
-#: src/dashboard/templates/common_search.mako:2284
+#: src/dashboard/templates/common_search.mako:514
+#: src/dashboard/templates/common_search.mako:2433
 msgid "France"
 msgstr "法国"
 
-#: src/dashboard/templates/common_search.mako:492
-#: src/dashboard/templates/common_search.mako:2285
+#: src/dashboard/templates/common_search.mako:515
+#: src/dashboard/templates/common_search.mako:2434
 msgid "Germany"
 msgstr "德国"
 
-#: src/dashboard/templates/common_search.mako:493
-#: src/dashboard/templates/common_search.mako:2286
+#: src/dashboard/templates/common_search.mako:516
+#: src/dashboard/templates/common_search.mako:2435
 msgid "Italy"
 msgstr "意大利"
 
-#: src/dashboard/templates/common_search.mako:494
-#: src/dashboard/templates/common_search.mako:2287
+#: src/dashboard/templates/common_search.mako:517
+#: src/dashboard/templates/common_search.mako:2436
 msgid "Japan"
 msgstr "日本"
 
-#: src/dashboard/templates/common_search.mako:495
-#: src/dashboard/templates/common_search.mako:2288
+#: src/dashboard/templates/common_search.mako:518
+#: src/dashboard/templates/common_search.mako:2437
 msgid "UK"
 msgstr "英国"
 
-#: src/dashboard/templates/common_search.mako:496
-#: src/dashboard/templates/common_search.mako:2289
+#: src/dashboard/templates/common_search.mako:519
+#: src/dashboard/templates/common_search.mako:2438
 msgid "USA"
 msgstr "美国"
 
-#: src/dashboard/templates/common_search.mako:507
+#: src/dashboard/templates/common_search.mako:530
 msgid "Add a dimension"
 msgstr "添加尺寸"
 
-#: src/dashboard/templates/common_search.mako:514
+#: src/dashboard/templates/common_search.mako:537
 msgid "Field"
 msgstr "字段"
 
-#: src/dashboard/templates/common_search.mako:524
+#: src/dashboard/templates/common_search.mako:547
 msgid "Metric"
 msgstr "指标"
 
-#: src/dashboard/templates/common_search.mako:565
+#: src/dashboard/templates/common_search.mako:588
 msgid "Domain"
 msgstr "域"
 
-#: src/dashboard/templates/common_search.mako:567
+#: src/dashboard/templates/common_search.mako:590
 msgid "Parent"
 msgstr "父项"
 
-#: src/dashboard/templates/common_search.mako:569
+#: src/dashboard/templates/common_search.mako:592
 msgid "Children"
 msgstr "子项"
 
-#: src/dashboard/templates/common_search.mako:613
-#: src/dashboard/templates/common_search.mako:2010
+#: src/dashboard/templates/common_search.mako:617
+#: src/dashboard/templates/common_search.mako:2228
 msgid "Add"
 msgstr "添加"
 
 #: src/dashboard/templates/common_search.mako:647
 #: src/dashboard/templates/common_search.mako:686
 #: src/dashboard/templates/common_search.mako:708
-#: src/dashboard/templates/common_search.mako:750
-#: src/dashboard/templates/common_search.mako:789
-#: src/dashboard/templates/common_search.mako:811
-#: src/dashboard/templates/common_search.mako:2367
+#: src/dashboard/templates/common_search.mako:762
+#: src/dashboard/templates/common_search.mako:805
+#: src/dashboard/templates/common_search.mako:827
+#: src/dashboard/templates/common_search.mako:2516
 msgid "Exclude this value"
 msgstr "排除此值"
 
 #: src/dashboard/templates/common_search.mako:666
-#: src/dashboard/templates/common_search.mako:769
+#: src/dashboard/templates/common_search.mako:781
 msgid "Show more..."
 msgstr "显示更多..."
 
 #: src/dashboard/templates/common_search.mako:671
-#: src/dashboard/templates/common_search.mako:774
+#: src/dashboard/templates/common_search.mako:786
 msgid "Show more"
 msgstr "显示更多"
 
 #: src/dashboard/templates/common_search.mako:675
-#: src/dashboard/templates/common_search.mako:778
+#: src/dashboard/templates/common_search.mako:790
 msgid "less..."
 msgstr "更少..."
 
-#: src/dashboard/templates/common_search.mako:850
+#: src/dashboard/templates/common_search.mako:866
 msgid "x-axis"
 msgstr "X 轴"
 
-#: src/dashboard/templates/common_search.mako:851
+#: src/dashboard/templates/common_search.mako:867
 msgid "region"
 msgstr "区域"
 
-#: src/dashboard/templates/common_search.mako:852
+#: src/dashboard/templates/common_search.mako:868
 msgid "latitude"
 msgstr "纬度"
 
-#: src/dashboard/templates/common_search.mako:853
+#: src/dashboard/templates/common_search.mako:869
 msgid "legend"
 msgstr "图例"
 
-#: src/dashboard/templates/common_search.mako:860
+#: src/dashboard/templates/common_search.mako:876
 msgid "y-axis"
 msgstr "Y 轴"
 
-#: src/dashboard/templates/common_search.mako:861
+#: src/dashboard/templates/common_search.mako:877
 msgid "longitude"
 msgstr "经度"
 
-#: src/dashboard/templates/common_search.mako:862
+#: src/dashboard/templates/common_search.mako:878
 msgid "value"
 msgstr "值"
 
-#: src/dashboard/templates/common_search.mako:875
+#: src/dashboard/templates/common_search.mako:891
 msgid "label"
 msgstr "标签"
 
-#: src/dashboard/templates/common_search.mako:883
+#: src/dashboard/templates/common_search.mako:899
 msgid "sorting"
 msgstr "排序"
 
-#: src/dashboard/templates/common_search.mako:886
+#: src/dashboard/templates/common_search.mako:902
 msgid "No sorting"
 msgstr "不排序"
 
-#: src/dashboard/templates/common_search.mako:887
+#: src/dashboard/templates/common_search.mako:903
 msgid "Sort ascending"
 msgstr "升序排序"
 
-#: src/dashboard/templates/common_search.mako:888
+#: src/dashboard/templates/common_search.mako:904
 msgid "Sort descending"
 msgstr "降序排序"
 
-#: src/dashboard/templates/common_search.mako:898
+#: src/dashboard/templates/common_search.mako:914
 msgid "Editor"
 msgstr "编辑器"
 
-#: src/dashboard/templates/common_search.mako:900
+#: src/dashboard/templates/common_search.mako:916
 msgid "CSS & JS"
 msgstr "CSS 和 JS"
 
-#: src/dashboard/templates/common_search.mako:912
-#: src/dashboard/templates/common_search.mako:946
+#: src/dashboard/templates/common_search.mako:928
+#: src/dashboard/templates/common_search.mako:962
 msgid "Available Fields"
 msgstr "可用字段"
 
-#: src/dashboard/templates/common_search.mako:914
-#: src/dashboard/templates/common_search.mako:948
+#: src/dashboard/templates/common_search.mako:930
+#: src/dashboard/templates/common_search.mako:964
 msgid "Click on this button to add the field"
 msgstr "单击此按钮以添加字段"
 
-#: src/dashboard/templates/common_search.mako:918
-#: src/dashboard/templates/common_search.mako:952
+#: src/dashboard/templates/common_search.mako:934
+#: src/dashboard/templates/common_search.mako:968
 msgid "Available Functions"
 msgstr "可用函数"
 
-#: src/dashboard/templates/common_search.mako:920
+#: src/dashboard/templates/common_search.mako:936
 msgid "Formats date or timestamp in DD-MM-YYYY"
 msgstr "将日期或时间戳格式设置为 DD-MM-YYYY"
 
-#: src/dashboard/templates/common_search.mako:921
+#: src/dashboard/templates/common_search.mako:937
 msgid "Formats date or timestamp in HH:mm:ss"
 msgstr "将日期或时间戳格式设置为 HH:mm:ss"
 
-#: src/dashboard/templates/common_search.mako:922
+#: src/dashboard/templates/common_search.mako:938
 msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
 msgstr "将日期或时间戳格式设置为 DD-MM-YYYY HH:mm:ss"
 
-#: src/dashboard/templates/common_search.mako:923
-#: src/dashboard/templates/common_search.mako:957
+#: src/dashboard/templates/common_search.mako:939
+#: src/dashboard/templates/common_search.mako:973
 msgid "Formats a date in the full format"
 msgstr "将日期格式设置为全格式"
 
-#: src/dashboard/templates/common_search.mako:924
-#: src/dashboard/templates/common_search.mako:958
+#: src/dashboard/templates/common_search.mako:940
+#: src/dashboard/templates/common_search.mako:974
 msgid "Formats a date as a Unix timestamp"
 msgstr "将日期格式设置为 Unix 时间戳"
 
-#: src/dashboard/templates/common_search.mako:925
+#: src/dashboard/templates/common_search.mako:941
 msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
 msgstr "将 Unix 时间戳格式设置为 N 秒、N 分钟、N 天...之前"
 
-#: src/dashboard/templates/common_search.mako:926
-#: src/dashboard/templates/common_search.mako:960
+#: src/dashboard/templates/common_search.mako:942
+#: src/dashboard/templates/common_search.mako:976
 msgid "Downloads and embed the file in the browser"
 msgstr "在浏览器中下载并嵌入文件"
 
-#: src/dashboard/templates/common_search.mako:927
-#: src/dashboard/templates/common_search.mako:961
+#: src/dashboard/templates/common_search.mako:943
+#: src/dashboard/templates/common_search.mako:977
 msgid "Downloads the linked file"
 msgstr "下载已链接文件"
 
-#: src/dashboard/templates/common_search.mako:928
-#: src/dashboard/templates/common_search.mako:962
+#: src/dashboard/templates/common_search.mako:944
+#: src/dashboard/templates/common_search.mako:978
 msgid "Preview file in File Browser"
 msgstr "在 File Browser 中预览文件"
 
-#: src/dashboard/templates/common_search.mako:929
-#: src/dashboard/templates/common_search.mako:963
+#: src/dashboard/templates/common_search.mako:945
+#: src/dashboard/templates/common_search.mako:979
 msgid "Truncate a value after 100 characters"
 msgstr "截断 100 个字符之后的值"
 
-#: src/dashboard/templates/common_search.mako:930
-#: src/dashboard/templates/common_search.mako:964
+#: src/dashboard/templates/common_search.mako:946
+#: src/dashboard/templates/common_search.mako:980
 msgid "Truncate a value after 250 characters"
 msgstr "截断 250 个字符之后的值"
 
-#: src/dashboard/templates/common_search.mako:931
-#: src/dashboard/templates/common_search.mako:965
+#: src/dashboard/templates/common_search.mako:947
+#: src/dashboard/templates/common_search.mako:981
 msgid "Truncate a value after 500 characters"
 msgstr "截断 500 个字符之后的值"
 
-#: src/dashboard/templates/common_search.mako:933
-#: src/dashboard/templates/common_search.mako:967
+#: src/dashboard/templates/common_search.mako:949
+#: src/dashboard/templates/common_search.mako:983
 msgid "Click on this button to add the function"
 msgstr "单击此按钮以添加函数"
 
-#: src/dashboard/templates/common_search.mako:954
+#: src/dashboard/templates/common_search.mako:970
 msgid "Formats a date in the DD-MM-YYYY format"
 msgstr "将日期格式设置为 DD-MM-YYYY 格式"
 
-#: src/dashboard/templates/common_search.mako:955
+#: src/dashboard/templates/common_search.mako:971
 msgid "Formats a date in the HH:mm:ss format"
 msgstr "将日期格式设置为 HH:mm:ss 格式"
 
-#: src/dashboard/templates/common_search.mako:956
+#: src/dashboard/templates/common_search.mako:972
 msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
 msgstr "将日期格式设置为 DD-MM-YYYY HH:mm:ss 格式"
 
-#: src/dashboard/templates/common_search.mako:959
+#: src/dashboard/templates/common_search.mako:975
 msgid "Shows the relative time"
 msgstr "显示相对时间"
 
-#: src/dashboard/templates/common_search.mako:991
-#: src/dashboard/templates/common_search.mako:1462
+#: src/dashboard/templates/common_search.mako:1007
+#: src/dashboard/templates/common_search.mako:1501
 msgid "Your search did not match any documents."
 msgstr "您的搜索与所有文档均不匹配。"
 
-#: src/dashboard/templates/common_search.mako:1036
+#: src/dashboard/templates/common_search.mako:1052
 msgid "Edit this document"
 msgstr "编辑此文档"
 
-#: src/dashboard/templates/common_search.mako:1039
+#: src/dashboard/templates/common_search.mako:1055
 msgid "Undo changes"
 msgstr "撤消更改"
 
-#: src/dashboard/templates/common_search.mako:1042
+#: src/dashboard/templates/common_search.mako:1058
 msgid "Update this document"
 msgstr "更新此文档"
 
-#: src/dashboard/templates/common_search.mako:1045
+#: src/dashboard/templates/common_search.mako:1061
 msgid "Show original document"
 msgstr "显示原始文档"
 
-#: src/dashboard/templates/common_search.mako:1075
+#: src/dashboard/templates/common_search.mako:1098
 msgid "Child Documents"
 msgstr "子文档"
 
-#: src/dashboard/templates/common_search.mako:1108
-#: src/dashboard/templates/common_search.mako:1109
+#: src/dashboard/templates/common_search.mako:1131
+#: src/dashboard/templates/common_search.mako:1132
 msgid "Click to sort"
 msgstr "单击以排序"
 
-#: src/dashboard/templates/common_search.mako:1112
+#: src/dashboard/templates/common_search.mako:1135
 msgid "Move to the left"
 msgstr "移至左侧"
 
-#: src/dashboard/templates/common_search.mako:1115
+#: src/dashboard/templates/common_search.mako:1138
 msgid "Move to the right"
 msgstr "移至右侧"
 
-#: src/dashboard/templates/common_search.mako:1125
+#: src/dashboard/templates/common_search.mako:1148
 msgid "Previous"
 msgstr "上一页"
 
-#: src/dashboard/templates/common_search.mako:1133
+#: src/dashboard/templates/common_search.mako:1156
 msgid "Showing"
 msgstr "正在显示"
 
-#: src/dashboard/templates/common_search.mako:1135
+#: src/dashboard/templates/common_search.mako:1158
 msgid "to"
 msgstr "至"
 
-#: src/dashboard/templates/common_search.mako:1137
+#: src/dashboard/templates/common_search.mako:1160
 msgid "of"
 msgstr "的"
 
-#: src/dashboard/templates/common_search.mako:1139
+#: src/dashboard/templates/common_search.mako:1162
 msgid " results"
 msgstr " 结果"
 
-#: src/dashboard/templates/common_search.mako:1142
+#: src/dashboard/templates/common_search.mako:1165
 msgid "Show"
 msgstr "显示"
 
-#: src/dashboard/templates/common_search.mako:1146
+#: src/dashboard/templates/common_search.mako:1169
 msgid "results per page"
 msgstr "每个页面的结果"
 
-#: src/dashboard/templates/common_search.mako:1149
+#: src/dashboard/templates/common_search.mako:1173
+msgid "Show similar records based on the selected fields"
+msgstr "根据选定字段显示相似记录"
+
+#: src/dashboard/templates/common_search.mako:1174
+msgid "More like this"
+msgstr "更多此类记录"
+
+#: src/dashboard/templates/common_search.mako:1178
 msgid "Next"
 msgstr "下一页"
 
-#: src/dashboard/templates/common_search.mako:1175
-#: src/dashboard/templates/common_search.mako:1224
-#: src/dashboard/templates/common_search.mako:1682
+#: src/dashboard/templates/common_search.mako:1204
+#: src/dashboard/templates/common_search.mako:1253
+#: src/dashboard/templates/common_search.mako:1731
 msgid "Chart Type"
 msgstr "图表类型"
 
-#: src/dashboard/templates/common_search.mako:1181
-#: src/dashboard/templates/common_search.mako:1230
-#: src/dashboard/templates/common_search.mako:1690
-#: src/dashboard/templates/common_search.mako:2655
+#: src/dashboard/templates/common_search.mako:1210
+#: src/dashboard/templates/common_search.mako:1259
+#: src/dashboard/templates/common_search.mako:1739
+#: src/dashboard/templates/common_search.mako:2819
 msgid "Interval"
 msgstr "间隔"
 
-#: src/dashboard/templates/common_search.mako:1188
-#: src/dashboard/templates/common_search.mako:1237
-#: src/dashboard/templates/common_search.mako:1263
-#: src/dashboard/templates/common_search.mako:1701
-#: src/dashboard/templates/common_search.mako:1730
+#: src/dashboard/templates/common_search.mako:1217
+#: src/dashboard/templates/common_search.mako:1266
+#: src/dashboard/templates/common_search.mako:1292
+#: src/dashboard/templates/common_search.mako:1750
+#: src/dashboard/templates/common_search.mako:1779
 msgid "Zoom"
 msgstr "缩放"
 
-#: src/dashboard/templates/common_search.mako:1189
-#: src/dashboard/templates/common_search.mako:1238
-#: src/dashboard/templates/common_search.mako:1264
-#: src/dashboard/templates/common_search.mako:1702
-#: src/dashboard/templates/common_search.mako:1731
+#: src/dashboard/templates/common_search.mako:1218
+#: src/dashboard/templates/common_search.mako:1267
+#: src/dashboard/templates/common_search.mako:1293
+#: src/dashboard/templates/common_search.mako:1751
+#: src/dashboard/templates/common_search.mako:1780
 msgid "reset"
 msgstr "重置"
 
-#: src/dashboard/templates/common_search.mako:1190
-#: src/dashboard/templates/common_search.mako:2795
-#: src/dashboard/templates/common_search.mako:2808
-#: src/dashboard/templates/common_search.mako:2824
+#: src/dashboard/templates/common_search.mako:1219
+#: src/dashboard/templates/common_search.mako:2976
+#: src/dashboard/templates/common_search.mako:2989
+#: src/dashboard/templates/common_search.mako:3005
 msgid "Group by"
 msgstr "分组依据"
 
-#: src/dashboard/templates/common_search.mako:1327
-#: src/dashboard/templates/common_search.mako:3529
+#: src/dashboard/templates/common_search.mako:1366
+#: src/dashboard/templates/common_search.mako:3715
 msgid "Bars"
 msgstr "条"
 
-#: src/dashboard/templates/common_search.mako:1333
-#: src/dashboard/templates/common_search.mako:3525
+#: src/dashboard/templates/common_search.mako:1372
+#: src/dashboard/templates/common_search.mako:3711
 msgid "Lines"
 msgstr "线"
 
-#: src/dashboard/templates/common_search.mako:1339
+#: src/dashboard/templates/common_search.mako:1378
 msgid "Pie"
 msgstr "圆形"
 
-#: src/dashboard/templates/common_search.mako:1396
+#: src/dashboard/templates/common_search.mako:1435
 msgid "Download first rows as CSV"
 msgstr "将前几行下载为 CSV"
 
-#: src/dashboard/templates/common_search.mako:1397
+#: src/dashboard/templates/common_search.mako:1436
 msgid "CSV"
 msgstr "CSV"
 
-#: src/dashboard/templates/common_search.mako:1401
+#: src/dashboard/templates/common_search.mako:1440
 msgid "Download first rows as XLS"
 msgstr "以 XLS 格式下载第一行"
 
-#: src/dashboard/templates/common_search.mako:1402
+#: src/dashboard/templates/common_search.mako:1441
 msgid "Excel"
 msgstr "Excel"
 
-#: src/dashboard/templates/common_search.mako:1406
+#: src/dashboard/templates/common_search.mako:1445
 msgid "Download first rows as JSON"
 msgstr "以 JSON 格式下载第一行"
 
-#: src/dashboard/templates/common_search.mako:1407
+#: src/dashboard/templates/common_search.mako:1446
 msgid "JSON"
 msgstr "JSON"
 
-#: src/dashboard/templates/common_search.mako:1427
-#: src/dashboard/templates/common_search.mako:2435
+#: src/dashboard/templates/common_search.mako:1466
+#: src/dashboard/templates/common_search.mako:2593
 msgid "Filter fields"
 msgstr "筛选字段"
 
-#: src/dashboard/templates/common_search.mako:1429
-#: src/dashboard/templates/common_search.mako:2614
+#: src/dashboard/templates/common_search.mako:1468
+#: src/dashboard/templates/common_search.mako:2778
 msgid "All"
 msgstr "所有"
 
-#: src/dashboard/templates/common_search.mako:1429
+#: src/dashboard/templates/common_search.mako:1468
 msgid "Current"
 msgstr "当前"
 
-#: src/dashboard/templates/common_search.mako:1437
+#: src/dashboard/templates/common_search.mako:1476
 msgid "Field Name"
 msgstr "字段名称"
 
-#: src/dashboard/templates/common_search.mako:1440
+#: src/dashboard/templates/common_search.mako:1479
 msgid "No matches."
 msgstr "没有匹配项。"
 
-#: src/dashboard/templates/common_search.mako:1506
+#: src/dashboard/templates/common_search.mako:1545
 msgid "Please select the chart parameters on the left."
 msgstr "请在左侧选择图表参数。"
 
-#: src/dashboard/templates/common_search.mako:1820
+#: src/dashboard/templates/common_search.mako:1869
 msgid "Selected dimensions"
 msgstr "所选尺寸"
 
-#: src/dashboard/templates/common_search.mako:1920
-#: src/dashboard/templates/common_search.mako:2198
+#: src/dashboard/templates/common_search.mako:1969
+#: src/dashboard/templates/common_search.mako:2347
 msgid "Selected dimension"
 msgstr "所选尺寸"
 
-#: src/dashboard/templates/common_search.mako:2028
+#: src/dashboard/templates/common_search.mako:2053
+msgid "Filter"
+msgstr "筛选"
+
+#: src/dashboard/templates/common_search.mako:2060
+msgid "Query"
+msgstr "查询"
+
+#: src/dashboard/templates/common_search.mako:2089
+msgid "Compare"
+msgstr "比较"
+
+#: src/dashboard/templates/common_search.mako:2096
+msgid "Cohorts"
+msgstr "同期群"
+
+#: src/dashboard/templates/common_search.mako:2107
+msgid "Percentage"
+msgstr "百分比"
+
+#: src/dashboard/templates/common_search.mako:2113
+msgid "Both values"
+msgstr "双值"
+
+#: src/dashboard/templates/common_search.mako:2153
 msgid "default"
 msgstr "默认"
 
-#: src/dashboard/templates/common_search.mako:2090
+#: src/dashboard/templates/common_search.mako:2188
+msgid "Multi select"
+msgstr "多选"
+
+#: src/dashboard/templates/common_search.mako:2223
+msgid "Remove"
+msgstr "删除"
+
+#: src/dashboard/templates/common_search.mako:2239
 msgid "There are currently no filters applied."
 msgstr "当前未应用筛选器。"
 
-#: src/dashboard/templates/common_search.mako:2103
-#: src/dashboard/templates/common_search.mako:2126
-#: src/dashboard/templates/common_search.mako:2165
+#: src/dashboard/templates/common_search.mako:2252
+#: src/dashboard/templates/common_search.mako:2275
+#: src/dashboard/templates/common_search.mako:2314
 msgid "selected"
 msgstr "已选择"
 
-#: src/dashboard/templates/common_search.mako:2108
-#: src/dashboard/templates/common_search.mako:2143
+#: src/dashboard/templates/common_search.mako:2257
+#: src/dashboard/templates/common_search.mako:2292
 msgid "excluded"
 msgstr "已排除"
 
-#: src/dashboard/templates/common_search.mako:2135
+#: src/dashboard/templates/common_search.mako:2284
 msgid "Until"
 msgstr "直至"
 
-#: src/dashboard/templates/common_search.mako:2171
+#: src/dashboard/templates/common_search.mako:2320
 msgid "TO"
 msgstr "至"
 
-#: src/dashboard/templates/common_search.mako:2316
+#: src/dashboard/templates/common_search.mako:2465
 msgid "Latitude"
 msgstr "纬度"
 
-#: src/dashboard/templates/common_search.mako:2320
+#: src/dashboard/templates/common_search.mako:2469
 msgid "Longitude"
 msgstr "经度"
 
-#: src/dashboard/templates/common_search.mako:2324
+#: src/dashboard/templates/common_search.mako:2473
 msgid "Label"
 msgstr "标签"
 
-#: src/dashboard/templates/common_search.mako:2346
+#: src/dashboard/templates/common_search.mako:2495
 msgid "Prefix filter..."
 msgstr "前缀筛选..."
 
-#: src/dashboard/templates/common_search.mako:2347
+#: src/dashboard/templates/common_search.mako:2496
 msgid "Field name..."
 msgstr "字段名称..."
 
-#: src/dashboard/templates/common_search.mako:2350
+#: src/dashboard/templates/common_search.mako:2499
 msgid "Terms"
 msgstr "术语"
 
-#: src/dashboard/templates/common_search.mako:2351
+#: src/dashboard/templates/common_search.mako:2500
 msgid "Stats"
 msgstr "统计数据"
 
-#: src/dashboard/templates/common_search.mako:2358
+#: src/dashboard/templates/common_search.mako:2507
 msgid "There are no terms to be shown"
 msgstr "没有要显示的术语"
 
-#: src/dashboard/templates/common_search.mako:2364
+#: src/dashboard/templates/common_search.mako:2513
 msgid "Select this value"
 msgstr "选择此值"
 
-#: src/dashboard/templates/common_search.mako:2384
+#: src/dashboard/templates/common_search.mako:2533
 msgid "There are no stats to be shown"
 msgstr "没有要显示的统计数据"
 
-#: src/dashboard/templates/common_search.mako:2402
+#: src/dashboard/templates/common_search.mako:2551
 msgid "Not available"
 msgstr "不可用"
 
-#: src/dashboard/templates/common_search.mako:2446
+#: src/dashboard/templates/common_search.mako:2600
+msgid "Show Details"
+msgstr "显示详细信息"
+
+#: src/dashboard/templates/common_search.mako:2607
 msgid "There are no fields matching your search term."
 msgstr "没有与您的搜索词匹配的字段。"
 
-#: src/dashboard/templates/common_search.mako:2460
+#: src/dashboard/templates/common_search.mako:2621
 msgid "General settings"
 msgstr "常规设置"
 
-#: src/dashboard/templates/common_search.mako:2465
-#: src/dashboard/templates/common_search.mako:2473
+#: src/dashboard/templates/common_search.mako:2626
+#: src/dashboard/templates/common_search.mako:2637
 msgid "Solr index"
 msgstr "Solr 索引"
 
-#: src/dashboard/templates/common_search.mako:2489
+#: src/dashboard/templates/common_search.mako:2653
 msgid "Autocomplete"
 msgstr "自动完成"
 
-#: src/dashboard/templates/common_search.mako:2494
+#: src/dashboard/templates/common_search.mako:2658
 msgid "Dictionary"
 msgstr "字典"
 
-#: src/dashboard/templates/common_search.mako:2494
+#: src/dashboard/templates/common_search.mako:2658
 msgid "Dictionary name or blank for default"
 msgstr "字典名称或默认为空"
 
-#: src/dashboard/templates/common_search.mako:2501
+#: src/dashboard/templates/common_search.mako:2665
 msgid "Nested documents"
 msgstr "嵌套文档"
 
-#: src/dashboard/templates/common_search.mako:2506
+#: src/dashboard/templates/common_search.mako:2670
 msgid "Schema"
 msgstr "架构"
 
-#: src/dashboard/templates/common_search.mako:2532
+#: src/dashboard/templates/common_search.mako:2696
 msgid "Query definitions"
 msgstr "查询定义"
 
-#: src/dashboard/templates/common_search.mako:2534
+#: src/dashboard/templates/common_search.mako:2698
 msgid "Add current query as..."
 msgstr "将当前查询添加为..."
 
-#: src/dashboard/templates/common_search.mako:2535
+#: src/dashboard/templates/common_search.mako:2699
 msgid "Click on this button to add the current query as a new definition"
 msgstr "单击此按钮以将当前查询添加为新定义"
 
-#: src/dashboard/templates/common_search.mako:2553
+#: src/dashboard/templates/common_search.mako:2717
 msgid "There are currently no query definitions."
 msgstr "当前无查询定义。"
 
-#: src/dashboard/templates/common_search.mako:2586
+#: src/dashboard/templates/common_search.mako:2750
 msgid "Level"
 msgstr "级别"
 
-#: src/dashboard/templates/common_search.mako:2595
-#: src/dashboard/templates/common_search.mako:2603
+#: src/dashboard/templates/common_search.mako:2759
+#: src/dashboard/templates/common_search.mako:2767
 msgid "Time Settings"
 msgstr "时间设置"
 
-#: src/dashboard/templates/common_search.mako:2615
+#: src/dashboard/templates/common_search.mako:2779
 msgid "Past 5 Minutes"
 msgstr "过去 5 分钟"
 
-#: src/dashboard/templates/common_search.mako:2616
+#: src/dashboard/templates/common_search.mako:2780
 msgid "Past 30 Minutes"
 msgstr "过去 30 分钟"
 
-#: src/dashboard/templates/common_search.mako:2617
+#: src/dashboard/templates/common_search.mako:2781
 msgid "Past 1 Hour"
 msgstr "过去 1 小时"
 
-#: src/dashboard/templates/common_search.mako:2618
+#: src/dashboard/templates/common_search.mako:2782
 msgid "Past 12 Hours"
 msgstr "过去 12 小时"
 
-#: src/dashboard/templates/common_search.mako:2619
+#: src/dashboard/templates/common_search.mako:2783
 msgid "Past day"
 msgstr "过去 1 天"
 
-#: src/dashboard/templates/common_search.mako:2620
+#: src/dashboard/templates/common_search.mako:2784
 msgid "Past 2 days"
 msgstr "过去 2 天"
 
-#: src/dashboard/templates/common_search.mako:2621
+#: src/dashboard/templates/common_search.mako:2785
 msgid "Past 7 days"
 msgstr "过去 7 天"
 
-#: src/dashboard/templates/common_search.mako:2622
+#: src/dashboard/templates/common_search.mako:2786
 msgid "Past 1 Month"
 msgstr "过去 1 个月"
 
-#: src/dashboard/templates/common_search.mako:2623
+#: src/dashboard/templates/common_search.mako:2787
 msgid "Past 3 Months"
 msgstr "过去 3 个月"
 
-#: src/dashboard/templates/common_search.mako:2624
+#: src/dashboard/templates/common_search.mako:2788
 msgid "Past Year"
 msgstr "过去 1 年"
 
-#: src/dashboard/templates/common_search.mako:2625
+#: src/dashboard/templates/common_search.mako:2789
 msgid "Past 2 Years"
 msgstr "过去 2 年"
 
-#: src/dashboard/templates/common_search.mako:2626
+#: src/dashboard/templates/common_search.mako:2790
 msgid "Past 10 Years"
 msgstr "过去 10 年"
 
-#: src/dashboard/templates/common_search.mako:2638
+#: src/dashboard/templates/common_search.mako:2802
 msgid "Time settings"
 msgstr "时间设置"
 
-#: src/dashboard/templates/common_search.mako:2642
+#: src/dashboard/templates/common_search.mako:2806
 msgid "Date/time field"
 msgstr "日期/时间字段"
 
-#: src/dashboard/templates/common_search.mako:2650
+#: src/dashboard/templates/common_search.mako:2814
 msgid "Rolling"
 msgstr "滚动"
 
-#: src/dashboard/templates/common_search.mako:2651
+#: src/dashboard/templates/common_search.mako:2815
 msgid "Fixed"
 msgstr "固定"
 
-#: src/dashboard/templates/common_search.mako:2661
+#: src/dashboard/templates/common_search.mako:2825
 msgid "Start date/time"
 msgstr "开始日期/时间"
 
-#: src/dashboard/templates/common_search.mako:2667
+#: src/dashboard/templates/common_search.mako:2831
 msgid "End date/time"
 msgstr "结束日期/时间"
 
-#: src/dashboard/templates/common_search.mako:2676
-#: src/dashboard/templates/common_search.mako:2685
+#: src/dashboard/templates/common_search.mako:2840
+#: src/dashboard/templates/common_search.mako:2849
 msgid "Auto-refresh every"
 msgstr "自动刷新间隔"
 
-#: src/dashboard/templates/common_search.mako:2676
-#: src/dashboard/templates/common_search.mako:2685
+#: src/dashboard/templates/common_search.mako:2840
+#: src/dashboard/templates/common_search.mako:2849
 msgid "seconds"
 msgstr "秒"
 
-#: src/dashboard/templates/common_search.mako:2702
+#: src/dashboard/templates/common_search.mako:2865
+msgid "Save dashboard as..."
+msgstr "将仪表板另存为..."
+
+#: src/dashboard/templates/common_search.mako:2880
+msgid "Save"
+msgstr "保存"
+
+#: src/dashboard/templates/common_search.mako:2887
 msgid "Nested schema"
 msgstr "嵌套架构"
 
-#: src/dashboard/templates/common_search.mako:2797
-#: src/dashboard/templates/common_search.mako:2810
-#: src/dashboard/templates/common_search.mako:2819
-#: src/dashboard/templates/common_search.mako:2826
+#: src/dashboard/templates/common_search.mako:2978
+#: src/dashboard/templates/common_search.mako:2991
+#: src/dashboard/templates/common_search.mako:3000
+#: src/dashboard/templates/common_search.mako:3007
 msgid "Unique"
 msgstr "唯一"
 
-#: src/dashboard/templates/common_search.mako:2798
+#: src/dashboard/templates/common_search.mako:2979
 msgid "Average"
 msgstr "平均值"
 
-#: src/dashboard/templates/common_search.mako:2799
+#: src/dashboard/templates/common_search.mako:2980
 msgid "Sum"
 msgstr "总和"
 
-#: src/dashboard/templates/common_search.mako:2800
-#: src/dashboard/templates/common_search.mako:2811
-#: src/dashboard/templates/common_search.mako:2820
-#: src/dashboard/templates/common_search.mako:2827
+#: src/dashboard/templates/common_search.mako:2981
+#: src/dashboard/templates/common_search.mako:2992
+#: src/dashboard/templates/common_search.mako:3001
+#: src/dashboard/templates/common_search.mako:3008
 msgid "Min"
 msgstr "最小"
 
-#: src/dashboard/templates/common_search.mako:2801
-#: src/dashboard/templates/common_search.mako:2812
-#: src/dashboard/templates/common_search.mako:2821
-#: src/dashboard/templates/common_search.mako:2828
+#: src/dashboard/templates/common_search.mako:2982
+#: src/dashboard/templates/common_search.mako:2993
+#: src/dashboard/templates/common_search.mako:3002
+#: src/dashboard/templates/common_search.mako:3009
 msgid "Max"
 msgstr "最大"
 
-#: src/dashboard/templates/common_search.mako:2802
-#: src/dashboard/templates/common_search.mako:2813
+#: src/dashboard/templates/common_search.mako:2983
+#: src/dashboard/templates/common_search.mako:2994
 msgid "Median"
 msgstr "中值"
 
-#: src/dashboard/templates/common_search.mako:2803
-#: src/dashboard/templates/common_search.mako:2814
-msgid "Percentiles"
+#: src/dashboard/templates/common_search.mako:2984
+#: src/dashboard/templates/common_search.mako:2995
+msgid "Percentile"
 msgstr "百分位"
 
-#: src/dashboard/templates/common_search.mako:2804
+#: src/dashboard/templates/common_search.mako:2985
 msgid "Stddev"
 msgstr "Stddev"
 
-#: src/dashboard/templates/common_search.mako:2805
+#: src/dashboard/templates/common_search.mako:2986
 msgid "Variance"
 msgstr "差异"
 
-#: src/dashboard/templates/common_search.mako:2992
-#: src/dashboard/templates/common_search.mako:3040
+#: src/dashboard/templates/common_search.mako:3185
+#: src/dashboard/templates/common_search.mako:3233
 msgid "Up"
 msgstr "多"
 
-#: src/dashboard/templates/common_search.mako:2992
-#: src/dashboard/templates/common_search.mako:3040
+#: src/dashboard/templates/common_search.mako:3185
+#: src/dashboard/templates/common_search.mako:3233
 msgid "Less"
 msgstr "少"
 
-#: src/dashboard/templates/common_search.mako:3117
+#: src/dashboard/templates/common_search.mako:3310
 msgid "Total"
 msgstr "总计"
 
-#: src/dashboard/templates/common_search.mako:4045
+#: src/dashboard/templates/common_search.mako:4658
 msgid ""
 "Result highlighting is unavailable: the collection does not have an index"
 " field"
@@ -1179,33 +1242,3 @@ msgstr "创建"
 #: src/dashboard/templates/no_collections.mako:54
 msgid "new index"
 msgstr "新索引"
-
-#~ msgid "General Settings"
-#~ msgstr ""
-
-#~ msgid "Query Definitions"
-#~ msgstr ""
-
-#~ msgid "Select one"
-#~ msgstr ""
-
-#~ msgid "Add formula operation"
-#~ msgstr ""
-
-#~ msgid "Click on this button to add the currenty query as a new definition"
-#~ msgstr ""
-
-#~ msgid "Count"
-#~ msgstr ""
-
-#~ msgid "Unique Count"
-#~ msgstr ""
-
-#~ msgid "Multiply"
-#~ msgstr ""
-
-#~ msgid "Substract"
-#~ msgstr ""
-
-#~ msgid "Substract dates"
-#~ msgstr ""

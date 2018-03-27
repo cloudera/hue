@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -187,19 +187,21 @@ msgstr "개체 검색 자동 완성의 한 호출에서 가져올 최대 항목 
 msgid "Enable to search HDFS, S3 files."
 msgstr "HDFS, S3 파일 검색을 설정합니다."
 
-#: src/metadata/navigator_api.py:420 src/metadata/navigator_api.py:446
+#: src/metadata/navigator_api.py:422 src/metadata/navigator_api.py:448
 msgid ""
 "add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
 "empty list of tags"
 msgstr "add_tags에는 빈 태그 목록이 아닌 'id' 매개변수 및 'tags' 매개변수가 필요함"
 
-#: src/metadata/navigator_api.py:472
+#: src/metadata/navigator_api.py:475
 msgid ""
-"update_properties requires an 'id' parameter and 'properties' parameter "
-"that is a non-empty dict"
-msgstr "update_properties에는 빈 사전이 아닌 'id' 매개변수 및 'properties' 매개변수가 필요함"
+"update_properties requires an 'id' parameter and 'properties' or "
+"'metadata' parameters that are non-empty dicts"
+msgstr ""
+"update_properties에는 빈 사전이 아닌 'id' 매개 변수 및 'properties' 또는 "
+"'metadata' 매개 변수가 필요함"
 
-#: src/metadata/navigator_api.py:498
+#: src/metadata/navigator_api.py:501
 msgid ""
 "update_properties requires an 'id' parameter and 'keys' parameter that is"
 " a non-empty list"
@@ -210,7 +212,7 @@ msgstr "update_properties에는 빈 목록이 아닌 'id' 매개변수 및 'keys
 msgid "No error message, please check the logs."
 msgstr "오류 메시지가 없습니다. 로그를 확인하십시오."
 
-#: src/metadata/navigator_client.py:222 src/metadata/navigator_client.py:295
+#: src/metadata/navigator_client.py:225 src/metadata/navigator_client.py:300
 msgid "Failed to authenticate."
 msgstr "인증하지 못했습니다."
 

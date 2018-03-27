@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -348,7 +348,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "没有可用日志。"
 
-#: src/pig/templates/app.mako:554 src/pig/templates/app.mako:1113
+#: src/pig/templates/app.mako:554 src/pig/templates/app.mako:1106
 msgid "Running"
 msgstr "正在运行"
 
@@ -467,30 +467,30 @@ msgstr "停止执行。"
 msgid "Saved"
 msgstr "已保存"
 
-#: src/pig/templates/app.mako:1106
+#: src/pig/templates/app.mako:1099
 msgid "Saving"
 msgstr "正在保存"
 
-#: src/pig/templates/app.mako:1117
+#: src/pig/templates/app.mako:1110
 msgid "has been saved correctly."
 msgstr "已正确保存。"
 
-#: src/pig/templates/app.mako:1385
+#: src/pig/templates/app.mako:1378
 msgid "Did you know?"
 msgstr "您知道吗？"
 
-#: src/pig/templates/app.mako:1392
+#: src/pig/templates/app.mako:1385
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Pig 参数和选项的名称和值，如"
 
-#: src/pig/templates/app.mako:1399
+#: src/pig/templates/app.mako:1392
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Hadoop 属性的名称和值，如"
 
-#: src/pig/templates/app.mako:1406
+#: src/pig/templates/app.mako:1399
 msgid "Include files or compressed files"
 msgstr "包括文件或压缩文件"
 
-#: src/pig/templates/app.mako:1415
+#: src/pig/templates/app.mako:1408
 msgid "You have unsaved changes in this pig script."
 msgstr "您尚未保存此 Pig 脚本中的更改。"

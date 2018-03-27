@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -187,19 +187,21 @@ msgstr "在对象搜索自动完成中一次调用可获取的最大项数。"
 msgid "Enable to search HDFS, S3 files."
 msgstr "启用以搜索 HDFS、S3 文件。"
 
-#: src/metadata/navigator_api.py:420 src/metadata/navigator_api.py:446
+#: src/metadata/navigator_api.py:422 src/metadata/navigator_api.py:448
 msgid ""
 "add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
 "empty list of tags"
 msgstr "add_tags 需要一个 'id' 参数和 'tags' 参数，即，标记的非空列表"
 
-#: src/metadata/navigator_api.py:472
+#: src/metadata/navigator_api.py:475
 msgid ""
-"update_properties requires an 'id' parameter and 'properties' parameter "
-"that is a non-empty dict"
-msgstr "update_properties 需要一个 'id' 参数和 'properties' 参数，即，非空目录"
+"update_properties requires an 'id' parameter and 'properties' or "
+"'metadata' parameters that are non-empty dicts"
+msgstr ""
+"update_properties 需要“id”参数以及“properties”或"
+"“metadata”参数，并且这些参数为非空目录"
 
-#: src/metadata/navigator_api.py:498
+#: src/metadata/navigator_api.py:501
 msgid ""
 "update_properties requires an 'id' parameter and 'keys' parameter that is"
 " a non-empty list"
@@ -210,7 +212,7 @@ msgstr "update_properties 需要一个 'id' 参数和 'keys' 参数，即，非�
 msgid "No error message, please check the logs."
 msgstr "无错误消息，请检查日志。"
 
-#: src/metadata/navigator_client.py:222 src/metadata/navigator_client.py:295
+#: src/metadata/navigator_client.py:225 src/metadata/navigator_client.py:300
 msgid "Failed to authenticate."
 msgstr "身份验证失败。"
 

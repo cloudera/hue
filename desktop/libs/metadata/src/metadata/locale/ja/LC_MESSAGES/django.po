@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -185,19 +185,21 @@ msgstr "オブジェクト検索のオートコンプリートの 1 回のコー
 msgid "Enable to search HDFS, S3 files."
 msgstr "HDFS の S3 ファイルの検索を有効にします。"
 
-#: src/metadata/navigator_api.py:420 src/metadata/navigator_api.py:446
+#: src/metadata/navigator_api.py:422 src/metadata/navigator_api.py:448
 msgid ""
 "add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
 "empty list of tags"
 msgstr "add_tags には、'id' パラメーターと 'tags' パラメーターが指定された、空ではないタグリストが必要です"
 
-#: src/metadata/navigator_api.py:472
+#: src/metadata/navigator_api.py:475
 msgid ""
-"update_properties requires an 'id' parameter and 'properties' parameter "
-"that is a non-empty dict"
-msgstr "update_properties には、id パラメーターと properties パラメーターが指定された空ではない dict が必要です"
+"update_properties requires an 'id' parameter and 'properties' or "
+"'metadata' parameters that are non-empty dicts"
+msgstr ""
+"update_properties には、id パラメーターと properties パラメーターまたは "
+"metadata パラメーターが指定された空ではない dict が必要です"
 
-#: src/metadata/navigator_api.py:498
+#: src/metadata/navigator_api.py:501
 msgid ""
 "update_properties requires an 'id' parameter and 'keys' parameter that is"
 " a non-empty list"
@@ -208,7 +210,7 @@ msgstr "update_properties には、id パラメーターと keys パラメータ
 msgid "No error message, please check the logs."
 msgstr "エラーメッセージがありません。ログを確認してください。"
 
-#: src/metadata/navigator_client.py:222 src/metadata/navigator_client.py:295
+#: src/metadata/navigator_client.py:225 src/metadata/navigator_client.py:300
 msgid "Failed to authenticate."
 msgstr "認証に失敗しました。"
 
