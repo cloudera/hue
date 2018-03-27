@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:44-0800\n"
+"POT-Creation-Date: 2018-03-07 10:03-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -25,15 +25,15 @@ msgstr "각 AWS 계정마다 하나의 항목"
 msgid "Information about single AWS account"
 msgstr "단일 AWS 계정에 대한 정보"
 
-#: src/aws/conf.py:104
+#: src/aws/conf.py:103
 msgid "Execute this script to produce the AWS access key ID."
 msgstr "AWS 액세스 키 ID를 생성하려면 이 스크립트를 실행합니다."
 
-#: src/aws/conf.py:116
+#: src/aws/conf.py:115
 msgid "Execute this script to produce the AWS secret access key."
 msgstr "AWS 암호 액세스 키를 생성하려면 이 스크립트를 실행합니다."
 
-#: src/aws/conf.py:124
+#: src/aws/conf.py:123
 msgid ""
 "Allow to use environment sources of credentials (environment variables, "
 "EC2 profile)."
@@ -41,27 +41,27 @@ msgstr ""
 "자격 증명의 환경 소스 사용을 허용합니다(환경 변수, "
 "EC2 프로필)."
 
-#: src/aws/conf.py:135
+#: src/aws/conf.py:134
 msgid "Alternate address for the S3 endpoint."
 msgstr "S3 끝점에 대한 대체 주소입니다."
 
-#: src/aws/conf.py:141
+#: src/aws/conf.py:140
 msgid "Proxy address to use for the S3 connection."
 msgstr "S3 연결에 사용할 프록시 주소입니다."
 
-#: src/aws/conf.py:147
+#: src/aws/conf.py:146
 msgid "Proxy port to use for the S3 connection."
 msgstr "S3 연결에 사용할 프록시 포트입니다."
 
-#: src/aws/conf.py:153
+#: src/aws/conf.py:152
 msgid "Proxy user to use for the S3 connection."
 msgstr "S3 연결에 사용할 프록시 사용자입니다."
 
-#: src/aws/conf.py:159
+#: src/aws/conf.py:158
 msgid "Proxy password to use for the S3 connection."
 msgstr "S3 연결에 사용할 프록시 암호입니다."
 
-#: src/aws/conf.py:201
+#: src/aws/conf.py:200
 msgid "Failed to connect to S3, check your AWS credentials."
 msgstr "S3에 연결하지 못했습니다. AWS 자격 증명을 확인하십시오."
 

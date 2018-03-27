@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:05-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -1167,27 +1167,27 @@ msgstr " chargé avec succès."
 msgid "Drop files here to upload"
 msgstr "Déposer ici les fichiers à charger"
 
-#: src/filebrowser/templates/listdir_components.mako:2174
+#: src/filebrowser/templates/listdir_components.mako:2173
 msgid "User is required."
 msgstr "L'utilisateur est requis."
 
-#: src/filebrowser/templates/listdir_components.mako:2179
+#: src/filebrowser/templates/listdir_components.mako:2178
 msgid "Group is required."
 msgstr "Un groupe est requis."
 
-#: src/filebrowser/templates/listdir_components.mako:2185
+#: src/filebrowser/templates/listdir_components.mako:2184
 msgid "Specify another group."
 msgstr "Indiquez un autre groupe."
 
-#: src/filebrowser/templates/listdir_components.mako:2193
+#: src/filebrowser/templates/listdir_components.mako:2192
 msgid "Specify another user."
 msgstr "Indiquez un autre utilisateur."
 
-#: src/filebrowser/templates/listdir_components.mako:2312
+#: src/filebrowser/templates/listdir_components.mako:2311
 msgid "Workflow submitted."
 msgstr "Workflow envoyé."
 
-#: src/filebrowser/templates/listdir_components.mako:2455
+#: src/filebrowser/templates/listdir_components.mako:2454
 msgid ""
 "Did you know? You can use the tab key or CTRL + Space to autocomplete "
 "file and folder names"
@@ -1196,46 +1196,10 @@ msgstr ""
 "combinaison de touches CTRL + Espace pour renseigner automatiquement les "
 "noms de dossier et de fichier"
 
-#: src/filebrowser/templates/listdir_components.mako:2465
+#: src/filebrowser/templates/listdir_components.mako:2464
 msgid "There was a problem with your request."
 msgstr "Un problème est survenu avec votre requête."
 
 #: src/filebrowser/templates/saveas.mako:20
 msgid "Save File As..."
 msgstr "Enregistrer le fichier sous…"
-
-#~ msgid "No \"%(sep)s\" allowed in the filename %(name)s.sep"
-#~ msgstr ""
-
-#~ msgid "Could not extract contents of file."
-#~ msgstr ""
-
-#~ msgid "Could not interpret archive type."
-#~ msgstr ""
-
-#~ msgid "View History"
-#~ msgstr ""
-
-#~ msgid "History"
-#~ msgstr ""
-
-#~ msgid "Files"
-#~ msgstr ""
-
-#~ msgid "Archive"
-#~ msgstr ""
-
-#~ msgid "Zip/Tgz/Bz2 file"
-#~ msgstr ""
-
-#~ msgid "Upload and extract in"
-#~ msgstr ""
-
-#~ msgid "Clear history..."
-#~ msgstr ""
-
-#~ msgid "Drop the archives here to upload and extract them"
-#~ msgstr ""
-
-#~ msgid "Select ZIP, TGZ or BZ2 files"
-#~ msgstr ""

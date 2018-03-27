@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:44-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,31 +17,32 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/libsolr/api.py:335 src/libsolr/api.py:347 src/libsolr/api.py:358
-#: src/libsolr/api.py:369 src/libsolr/api.py:383 src/libsolr/api.py:402
-#: src/libsolr/api.py:414 src/libsolr/api.py:429 src/libsolr/api.py:455
-#: src/libsolr/api.py:467 src/libsolr/api.py:481 src/libsolr/api.py:504
-#: src/libsolr/api.py:522 src/libsolr/api.py:539 src/libsolr/api.py:558
-#: src/libsolr/api.py:578 src/libsolr/api.py:588 src/libsolr/api.py:598
-#: src/libsolr/api.py:609 src/libsolr/api.py:620 src/libsolr/api.py:633
-#: src/libsolr/api.py:643 src/libsolr/api.py:653 src/libsolr/api.py:675
-#: src/libsolr/api.py:691 src/libsolr/api.py:703 src/libsolr/api.py:722
-#: src/libsolr/api.py:734 src/libsolr/api.py:749 src/libsolr/api.py:787
-#: src/libsolr/api.py:809 src/libsolr/api.py:828 src/libsolr/api.py:1005
+#: src/libsolr/api.py:369 src/libsolr/api.py:381 src/libsolr/api.py:392
+#: src/libsolr/api.py:403 src/libsolr/api.py:414 src/libsolr/api.py:428
+#: src/libsolr/api.py:447 src/libsolr/api.py:459 src/libsolr/api.py:474
+#: src/libsolr/api.py:500 src/libsolr/api.py:512 src/libsolr/api.py:526
+#: src/libsolr/api.py:549 src/libsolr/api.py:567 src/libsolr/api.py:584
+#: src/libsolr/api.py:603 src/libsolr/api.py:623 src/libsolr/api.py:633
+#: src/libsolr/api.py:643 src/libsolr/api.py:654 src/libsolr/api.py:665
+#: src/libsolr/api.py:678 src/libsolr/api.py:688 src/libsolr/api.py:707
+#: src/libsolr/api.py:729 src/libsolr/api.py:745 src/libsolr/api.py:757
+#: src/libsolr/api.py:776 src/libsolr/api.py:788 src/libsolr/api.py:803
+#: src/libsolr/api.py:841 src/libsolr/api.py:863 src/libsolr/api.py:882
+#: src/libsolr/api.py:1064
 msgid "Error while accessing Solr"
 msgstr ""
 
-#: src/libsolr/api.py:451
+#: src/libsolr/api.py:496
 #, python-format
 msgid "Collection could not be created: %(failure)s"
 msgstr ""
 
-#: src/libsolr/api.py:518
+#: src/libsolr/api.py:563
 #, python-format
 msgid "Could not create or edit alias: %s"
 msgstr ""
 
-#: src/libsolr/api.py:535
+#: src/libsolr/api.py:580
 #, python-format
 msgid ""
 "Could not delete alias. Check response:\n"

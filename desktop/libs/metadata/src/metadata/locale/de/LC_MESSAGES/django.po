@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-04 10:45-0800\n"
+"POT-Creation-Date: 2018-03-07 10:04-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -187,7 +187,7 @@ msgstr "Maximale Anzahl von Elementen, die in einem Aufruf in Objektsuche-Autove
 msgid "Enable to search HDFS, S3 files."
 msgstr "Die Suche nach HDFS-, S3-Dateien aktivieren."
 
-#: src/metadata/navigator_api.py:420 src/metadata/navigator_api.py:446
+#: src/metadata/navigator_api.py:422 src/metadata/navigator_api.py:448
 msgid ""
 "add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
 "empty list of tags"
@@ -195,15 +195,15 @@ msgstr ""
 "add_tags erfordert die Parameter \"id\" und \"tags\", die aus einer nicht"
 " leeren Liste von Tags bestehen"
 
-#: src/metadata/navigator_api.py:472
+#: src/metadata/navigator_api.py:475
 msgid ""
-"update_properties requires an 'id' parameter and 'properties' parameter "
-"that is a non-empty dict"
+"update_properties requires an 'id' parameter and 'properties' or "
+"'metadata' parameters that are non-empty dicts"
 msgstr ""
-"update_properties erfordert die Parameter \"id\" und \"properties\", die "
-"aus einem nicht leeren Wörterbuch bestehen"
+"update_properties erfordert einen 'id'-Parameter und 'properties' oder "
+"'metadata'-Parameter, die aus einem nicht leeren Wörterbuch bestehen"
 
-#: src/metadata/navigator_api.py:498
+#: src/metadata/navigator_api.py:501
 msgid ""
 "update_properties requires an 'id' parameter and 'keys' parameter that is"
 " a non-empty list"
@@ -216,7 +216,7 @@ msgstr ""
 msgid "No error message, please check the logs."
 msgstr "Keine Fehlermeldung. Überprüfen Sie die Protokolle."
 
-#: src/metadata/navigator_client.py:222 src/metadata/navigator_client.py:295
+#: src/metadata/navigator_client.py:225 src/metadata/navigator_client.py:300
 msgid "Failed to authenticate."
 msgstr "Fehler bei der Authentifizierung."
 
