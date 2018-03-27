@@ -520,6 +520,52 @@
     }
   };
 
+  ko.bindingHandlers.multiLineEllipsis = {
+    after: ['text', 'value'],
+    init: function (element, valueAccessor) { },
+    update: function (element, valueAccessor) {
+      var originalContent;
+      var lastKnownOffsetHeight;
+      var lastKnownOffsetWidth;
+
+      var checkOverflow = function () {
+        if (!originalContent) {
+          originalContent = element.textContent;
+        }
+
+        lastKnownOffsetHeight = element.offsetHeight;
+        lastKnownOffsetWidth = element.offsetWidth;
+
+        var overflowing = false;
+        while (element.offsetHeight < element.scrollHeight || element.offsetWidth < element.scrollWidth) {
+          overflowing = true;
+          var lastSpaceIndex = element.textContent.lastIndexOf(' ');
+          if (lastSpaceIndex !== -1) {
+            element.textContent = element.textContent.substring(0, lastSpaceIndex) + '...';
+          } else {
+            break;
+          }
+        }
+        if (typeof valueAccessor() === 'function') {
+          valueAccessor()(overflowing);
+        }
+      };
+
+      window.setTimeout(checkOverflow, 0);
+
+      var sizeCheckInterval = window.setInterval(function () {
+        if (element.offsetWidth !== lastKnownOffsetWidth || element.offsetHeight !== lastKnownOffsetHeight) {
+          element.textContent = originalContent;
+          checkOverflow();
+        }
+      }, 500);
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        window.clearInterval(sizeCheckInterval);
+      });
+    }
+  };
+
   ko.bindingHandlers.toggleOverflow = {
     render: function ($element, options) {
       if (hueUtils.isOverflowing($element.find('.toggle-overflow'))) {
