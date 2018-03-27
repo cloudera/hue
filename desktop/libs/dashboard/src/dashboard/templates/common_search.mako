@@ -2171,12 +2171,14 @@ ${ dashboard.layout_skeleton(suffix='search') }
       <input type="number" class="input-mini" data-bind="value: percentile"/>
       <!-- /ko -->
 
+      <!-- ko if: $data.function() != 'formula' -->
       <select data-bind="selectize: facetFieldsNames, value: $parent.field, optionsValue: 'name', optionsText: 'name', optionsCaption: '${ _ko('Field...') }'" class="hit-options input-small" style="margin-bottom: 0"></select>
+      <!-- /ko -->
 
       <div class="clearfix"></div>
       <br/>
 
-      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: plain_formula, parsedValue: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true, mode: $root.collection.engine() } }, visible: $data.function() == 'formula'" class="margin-bottom-10"></div>
+      <div data-bind="component: { name: 'hue-simple-ace-editor', params: { value: plain_formula, parsedValue: formula, autocomplete: { type: 'solrFormula', support: { fields: $root.collection.template.fieldsAttributes } }, singleLine: true, mode: $root.collection.engine() } }, visible: $data.function() == 'formula'" class="margin-bottom-10" style="min-width: 300px"></div>
 
       <!-- ko if: $parents[1].widgetType() != 'hit-widget' -->
         <div class="facet-field-cnt">

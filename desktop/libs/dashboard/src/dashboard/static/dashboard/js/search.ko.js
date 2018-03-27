@@ -630,7 +630,7 @@ var Collection = function (vm, collection) {
     });
   }
 
-  self.template.fields = ko.computed(function () {
+  self.template.fields = ko.pureComputed(function () {
     var _fields = [];
     $.each(self.template.fieldsAttributes(), function (index, field) {
       var position = self.template.fieldsSelected.indexOf(field.name());
@@ -639,22 +639,21 @@ var Collection = function (vm, collection) {
       }
     });
     return _fields;
- });
+  });
 
- self.template.fieldsNames = ko.computed(function () {
-   return $.map(self.template.fieldsAttributes(), function(field) {
-     return field.name();
-   }).sort(function (a, b) {
-     return a.toLowerCase().localeCompare(b.toLowerCase());
-   });
- });
+  self.template.fieldsNames = ko.computed(function () {
+    return $.map(self.template.fieldsAttributes(), function(field) {
+      return field.name();
+    }).sort(function (a, b) {
+      return a.toLowerCase().localeCompare(b.toLowerCase());
+    });
+  });
 
- self.template.facetFieldsNames = ko.computed(function () {
-//	    return self.template.fieldsNames();
-  return self.template.fieldsAttributes();
- });
+  self.template.facetFieldsNames = ko.pureComputed(function () {
+    return self.template.fieldsAttributes();
+  });
 
-  self.template.fieldsSelected.subscribe(function () {
+ self.template.fieldsSelected.subscribe(function () {
     vm.search();
     if (self.template.moreLikeThis) {
       self.template.moreLikeThis(false);
@@ -757,21 +756,17 @@ var Collection = function (vm, collection) {
     return _field;
   };
 
-  self._get_field_operations = function(field, facet) {console.log(field);
+  self._get_field_operations = function(field, facet) {
     if (! field) {
       return HIT_OPTIONS;
-    } else if (isNumericColumn(field.type())) {
-      return NUMERIC_HIT_OPTIONS;
-    } else if (isDateTimeColumn(field.type())) {
-      return DATETIME_HIT_OPTIONS;
     } else {
-      return facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : ALPHA_HIT_OPTIONS;
+      return facet.widgetType() == 'hit-widget' ? ALPHA_HIT_COUNTER_OPTIONS : HIT_OPTIONS;
     }
   };
 
   // Very top facet
   self._addObservablesToFacet = function(facet, vm) {
-    if (facet.properties && facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+    	
+    if (facet.properties && facet.properties.facets_form && facet.properties.facets_form.aggregate) { // Only Solr 5+
       facet.properties.facets_form.aggregate.metrics = ko.computed(function() {
         var _field = self.getTemplateField(facet.properties.facets_form.field(), self.template.fieldsAttributes());
         return self._get_field_operations(_field, facet);
@@ -912,17 +907,17 @@ var Collection = function (vm, collection) {
   self._getCompatibleMetricFields = function(nestedFacet) {
     var fields = null;
 
-  	if (['avg', 'sum', 'median', 'percentile', 'stddev', 'variance'].indexOf(nestedFacet.aggregate.function()) != -1) {
-  	  fields = $.grep(self.template.fieldsAttributes(), function(field) {
-   	    return isNumericColumn(field.type()) || isDateTimeColumn(field.type());
-   	  })
-   	} else {
-   	  fields = self.template.facetFieldsNames();
-  	}
+    if (['avg', 'sum', 'median', 'percentile', 'stddev', 'variance'].indexOf(nestedFacet.aggregate.function()) != -1) {
+      fields = $.grep(self.template.fieldsAttributes(), function(field) {
+        return isNumericColumn(field.type()) || isDateTimeColumn(field.type());
+      })
+    } else {
+      fields = self.template.facetFieldsNames();
+    }
 
-  	return fields.sort(function (a, b) {
-   	  return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
- 	});
+    return fields.sort(function (a, b) {
+      return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
+   });
   };
 
   self.facets = ko.mapping.fromJS(collection.facets);
@@ -1129,7 +1124,7 @@ var Collection = function (vm, collection) {
     pivot.aggregate.facetFieldsNames = ko.computed(function() {
       return self._getCompatibleMetricFields(pivot);
     }).extend({ trackArrayChanges: true });
-    
+
     facet.properties.facets_form.field(null);
     facet.properties.facets_form.limit(5);
     facet.properties.facets_form.mincount(1);
