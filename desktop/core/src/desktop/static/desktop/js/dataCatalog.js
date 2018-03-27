@@ -18,7 +18,7 @@ var DataCatalog = (function () {
 
   var STORAGE_POSTFIX = LOGGED_USERNAME; // TODO: Add flag for embedded mode
 
-  var DATA_CATALOG_VERSION = 2;
+  var DATA_CATALOG_VERSION = 3;
 
   var cacheEnabled = true;
 
@@ -861,7 +861,7 @@ var DataCatalog = (function () {
             });
 
             result.entities.forEach(function (entity) {
-              var matchingChildEntry = childEntryIndex[(entity.name || entity.originalName).toLowerCase()];
+              var matchingChildEntry = childEntryIndex[(entity.original_name || entity.originalName).toLowerCase()];
               if (matchingChildEntry) {
                 matchingChildEntry.navigatorMeta = entity;
                 matchingChildEntry.navigatorMetaPromise = $.Deferred().resolve(matchingChildEntry.navigatorMeta).promise();
@@ -1110,6 +1110,12 @@ var DataCatalog = (function () {
       var deferred = $.Deferred();
 
       if (self.canHaveNavigatorMetadata()) {
+        if (self.navigatorMeta === {} || (self.navigatorMeta && typeof self.navigatorMeta.identity === 'undefined')) {
+          if (!apiOptions) {
+            apiOptions = {};
+          }
+          apiOptions.refreshCache = true;
+        }
         self.getNavigatorMeta(apiOptions).done(function (navigatorMeta) {
           if (navigatorMeta) {
             ApiHelper.getInstance().updateNavigatorMetadata({
