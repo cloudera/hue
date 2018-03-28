@@ -34,6 +34,7 @@ from django.utils.translation import ugettext as _
           hasErrors: hasErrors,
           errorMessage: '${_ko("Tags could not be loaded.")}',
           setTags: currentTags,
+          overflowEllipsis: overflowEllipsis,
           onSave: saveTags.bind($data),
           validRegExp: '^[a-zA-z0-9_\-]{1,50}$',
           invalidMessage: '${_ko("Tags can only contain 1 to 50 alphanumeric characters, '_' or '-'.")}',
@@ -63,6 +64,7 @@ from django.utils.translation import ugettext as _
         self.allTags = ko.observableArray();
 
         self.catalogEntry = params.catalogEntry;
+        self.overflowEllipsis = params.overflowEllipsis;
         self.readOnly = '${ not user.has_hue_permission(action="write", app="metadata") }' === 'True' || !!params.readOnly;
 
         self.getSelectizeTags = function (query, callback) {

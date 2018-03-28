@@ -463,7 +463,14 @@
         }
       };
 
+      var sizeCheckInterval = -1;
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        window.clearInterval(sizeCheckInterval);
+      });
+
       var showEdit = function () {
+        window.clearInterval(sizeCheckInterval);
         optionsBeforeEdit = options.setTags().concat();
         options.options = $.map(options.setTags(), function (value) { return { value: value, text: value } });
         currentSelectize = $element.selectize(options)[0].selectize;
@@ -486,7 +493,41 @@
         }, 0);
       };
 
+      var lastKnownOffsetWidth = -1;
+      var lastKnownOffsetHeight = -1;
+
+      var addReadOnlyTagsTillOverflow = function ($readOnlyInner) {
+        $readOnlyInner.empty();
+        var tagElements = [];
+        options.setTags().forEach(function (tag) {
+          tagElements.push($('<div>').text(tag).appendTo($readOnlyInner));
+        });
+
+        if (! options.readOnly && !options.hasErrors()) {
+          $('<i>').addClass('fa fa-edit selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
+          $readOnlyInner.click(function () {
+            showEdit();
+          });
+        }
+
+        if (!options.overflowEllipsis) {
+          return;
+        }
+
+        if ($readOnlyInner[0].offsetHeight < $readOnlyInner[0].scrollHeight || $readOnlyInner[0].offsetWidth < $readOnlyInner[0].scrollWidth && tagElements.length) {
+          tagElements[tagElements.length - 1].after($('<div>').addClass('hue-tag-overflow').text('...'));
+        }
+
+        while (tagElements.length && ($readOnlyInner[0].offsetHeight < $readOnlyInner[0].scrollHeight || $readOnlyInner[0].offsetWidth < $readOnlyInner[0].scrollWidth)) {
+          tagElements.pop().remove();
+        }
+
+        lastKnownOffsetWidth = $readOnlyInner[0].offsetWidth;
+        lastKnownOffsetHeight = $readOnlyInner[0].offsetHeight;
+      };
+
       var showReadOnly = function () {
+        window.clearInterval(sizeCheckInterval);
         $(document).off('click', saveOnClickOutside);
         $(document).off('keyup', hideOnEscape);
         if (currentSelectize) {
@@ -497,21 +538,30 @@
         $readOnlyContainer.empty();
         var $readOnlyInner = $('<div>').addClass('selectize-input items not-full has-options has-items').appendTo($readOnlyContainer);
         if (options.setTags().length > 0) {
-          options.setTags().forEach(function (tag) {
-            $('<div>').text(tag).appendTo($readOnlyInner);
-          });
-        } else if (options.hasErrors()) {
-          $('<span>').addClass('selectize-no-tags').text(options.errorMessage).appendTo($readOnlyInner);
+          addReadOnlyTagsTillOverflow($readOnlyInner);
+          if (options.overflowEllipsis) {
+            sizeCheckInterval = window.setInterval(function () {
+              if ($readOnlyInner[0].offsetWidth !== lastKnownOffsetWidth || $readOnlyInner[0].offsetHeight !== lastKnownOffsetHeight) {
+                addReadOnlyTagsTillOverflow($readOnlyInner);
+              }
+            }, 500);
+          }
         } else {
-          $('<span>').addClass('selectize-no-tags').text(options.placeholder).appendTo($readOnlyInner);
+          if (options.hasErrors()) {
+            $('<span>').addClass('selectize-no-tags').text(options.errorMessage).appendTo($readOnlyInner);
+          } else {
+            $('<span>').addClass('selectize-no-tags').text(options.placeholder).appendTo($readOnlyInner);
+          }
+
+          if (! options.readOnly && !options.hasErrors()) {
+            $('<i>').addClass('fa fa-edit selectize-edit pointer').attr('title', HUE_I18n.selectize.editTags).appendTo($readOnlyInner);
+            $readOnlyInner.click(function () {
+              showEdit();
+            });
+          }
         }
 
-        if (! options.readOnly && !options.hasErrors()) {
-          $('<i>').addClass('fa fa-edit selectize-edit pointer').appendTo($readOnlyInner);
-          $readOnlyInner.click(function () {
-            showEdit();
-          });
-        }
+        $readOnlyContainer.attr('title', options.setTags().join(', '));
 
         $readOnlyContainer.show();
       };

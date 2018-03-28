@@ -338,7 +338,7 @@ from metadata.conf import has_navigator
 
           %if has_navigator(user):
             <!-- ko if: getSourceType() === 'hive' || getSourceType() === 'impala' -->
-            <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true } }"></div>
+            <div data-bind="component: { name: 'nav-tags', params: { catalogEntry: $data, readOnly: true, overflowEllipsis: true } }"></div>
             <!-- /ko -->
           %endif
 

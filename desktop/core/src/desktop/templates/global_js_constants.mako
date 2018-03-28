@@ -145,7 +145,8 @@
       errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}'
     },
     selectize: {
-      choose: "${ _('Choose...') }"
+      choose: "${ _('Choose...') }",
+      editTags: "${ _('Edit tags') }"
     },
     syntaxChecker: {
       didYouMean: '${_('Did you mean')}',
