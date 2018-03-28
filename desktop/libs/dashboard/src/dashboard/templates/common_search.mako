@@ -2200,14 +2200,15 @@ ${ dashboard.layout_skeleton(suffix='search') }
           </span>
         </div>
 
-        <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count'">
-          <span class="spinedit-cnt">
-            <span class="facet-field-label facet-field-label-fixed-width">
-              ${ _('Min Count') }
-            </span>
-            <input type="text" class="input-medium" data-bind="spinedit: $parent.mincount"/>
-          </span>
-        </div>
+##        <div class="facet-field-cnt" data-bind="visible: $data.function() == 'count'">
+##          <span class="spinedit-cnt">
+##            <span class="facet-field-label facet-field-label-fixed-width">
+##              ${ _('Min Count') }
+##            </span>
+##            <input type="text" class="input-medium" data-bind="spinedit: $parent.mincount"/>
+##          </span>
+##        </div>
+
 ##        <!-- ko if: $parentContext.$data.type() == 'field' && $parents[1].widgetType() != 'timeline-widget' && $parents[1].widgetType() != 'gradient-map-widget' && $parents[1].widgetType() != 'leafletmap-widget' && $parents[1].widgetType() != 'tree2-widget' -->
 ##          <div class="facet-field-cnt" data-bind="visible: $parent == $parentContext.$parentContext.$data.properties.facets()[0] && $root.collection.engine() == 'solr'"> <!-- visible on first element only -->
 ##            <span class="spinedit-cnt">
@@ -2218,6 +2219,7 @@ ${ dashboard.layout_skeleton(suffix='search') }
 ##            </span>
 ##          </div>
 ##        <!-- /ko -->
+
         <!-- ko if: $parentContext.$data.type() == 'field' -->
         <div class="facet-field-cnt" data-bind="visible: $parent == $parentContext.$parentContext.$data.properties.facets()[0]"> <!-- visible on first element only -->
           <span class="spinedit-cnt">
