@@ -763,26 +763,15 @@ var EditorViewModel = (function() {
           promise.cancel();
         }
       }
-      var variables = e.data.locations.reduce(function (variables, location) {
-        var re = /\${(\w*)\=?([^{}]*)}/g;
-        if (location.type === 'variable' && location.colRef) {
-          var column = location.colRef.identifierChain;
-          // TODO: This should support multiple tables, i.e. SELECT * FROM web_logs, customers WHERE id = ${id}
-          //       use "location.resolveCatalogEntry({ cancellable: true });"
-          var identifierChain = location.colRef.tables[0].identifierChain.slice().concat(column);
-          var value = re.exec(location.value);
-          variables.push({
-            path: identifierChain.map(function (identifier) {
-              return identifier.name;
-            }),
-            name: value[1]
-          });
-        }
-        return variables;
-      }, []);
       var sourceType = self.type();
-      var oVariables = variables.reduce(function (variables, variable) {
-        variables[variable.name] = variable;
+      var oLocations = e.data.locations
+      .filter(function (location) {
+        return location.type === 'variable' && location.colRef;
+      })
+      .reduce(function (variables, location) {
+        var re = /\${(\w*)\=?([^{}]*)}/g;
+        var name = re.exec(location.value)[1];
+        variables[name] = location;
         return variables;
       }, {});
       var updateVariableType = function (variable, sourceMeta) {
@@ -827,17 +816,16 @@ var EditorViewModel = (function() {
         variable.step(variablesValues.step);
       };
       self.variables().forEach(function (variable) {
-        if (oVariables[variable.name()]) {
-          DataCatalog.getEntry({ sourceType: sourceType, path: oVariables[variable.name()].path }).done(function (entry) {
-            var path = oVariables[variable.name()].path;
-            variable.path(path);
+        if (oLocations[variable.name()]) {
+          activeSourcePromises.push(oLocations[variable.name()].resolveCatalogEntry({ cancellable: true }).done(function (entry) {
+            variable.path(entry.path.join('.'));
             variable.catalogEntry = entry;
 
             activeSourcePromises.push(entry.getSourceMeta({
               silenceErrors: true,
               cancellable: true
             }).then(updateVariableType.bind(self, variable)));
-          });
+          }));
         } else {
           updateVariableType(variable, {
             type: 'text'

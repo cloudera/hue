@@ -1240,10 +1240,10 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
           <!-- /ko -->
           <!-- ko if: meta.type() == 'text' -->
             <!-- ko if: meta.placeholder() -->
-              <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }">
+              <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, placeholder: meta.placeholder() || '${ _ko('Variable value') }' }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
             <!-- /ko -->
             <!-- ko ifnot: meta.placeholder() -->
-              <input class="input-medium" type="text" data-bind="value: value, attr: { type: type, step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }">
+              <input class="input-medium" type="text" data-bind="value: value, attr: { type: type() || 'text', step: step }, valueUpdate: 'afterkeydown', event: { 'keydown': $parent.onKeydownInVariable }, autogrowInput: { minWidth: 150, maxWidth: 270, comfortZone: 15 }">
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko if: meta.type() == 'select' -->
@@ -3253,7 +3253,7 @@ function togglePresentation(value) {};
             return location.resolvePathPromise;
           }
 
-          if (!location.identifierChain) {
+          if (!location.identifierChain && !location.colRef && !location.colRef.identifierChain) {
             if (!location.resolvePathPromise) {
               location.resolvePathPromise = $.Deferred().reject().promise();
             }
@@ -3264,8 +3264,8 @@ function togglePresentation(value) {};
             sourceType: sourceType,
             cancellable: options.cancellable,
             cachedOnly: options.cachedOnly,
-            identifierChain: location.identifierChain,
-            tables: location.tables
+            identifierChain: location.identifierChain || location.colRef.identifierChain,
+            tables: location.tables || (location.colRef && location.colRef.tables)
           });
 
           if (!options.cachedOnly) {
