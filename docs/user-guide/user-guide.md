@@ -253,27 +253,43 @@ When you have multiple statements it's enough to put the cursor in the statement
 ![image](images/note.jpg) **Note**: Under the logs panel, you can view any
 MapReduce or [Impala jobs](#impala-queries) that the query generated.
 
-### Downloading and Saving Query Results
+### Downloading and Exporting Query Results
 
-![image](images/important.jpg) **Important**:
+To get things started, press the export icon, the bottom last element of the action bar to the top left of the results. There are several ways you can export results of a query. 
 
--   You can only save results to a file when the results were generated
-    by a MapReduce job.
--   This is the preferred way to save when the result is large (for
-    example \> 1M rows).
+![image](images/note.jpg) Two of them offer great scalability:
+1.  Export to an empty folder on your cluster's file system. This exports the results using multiple files. In the export icon, choose Export and then All.
+2.  Export to a table. You can choose an already existing table or a new one. In the export icon, choose Export and then Table.
 
-1.  Do any of the following to download or save the query results:
-    -   Click **Download as CSV** to download the results in a
-        comma-separated values file suitable for use in other
-        applications.
-    -   Click **Download as XLS** to download the results in a Microsoft
-        Office Excel worksheet file.
-    -   Click **Save** to save the results in a table or HDFS file.
-        -   To save the results in a new table, select **In a new
-            table**, enter a table name, and then click **Save**.
-        -   To save the results in an HDFS file, select **In an HDFS
-            directory**, enter a path and then click **Save**. You can
-            then download the file with [File Browser](../filebrowser.html).
+![image](images/note.jpg) Two of them offer limited scalability:
+1.  Export to a file on your cluster's file systems. This exports the results to a single file. In the export icon, choose Export and then First XXX.
+2.  Download to your computer as a CSV or XLS. This exports the results to a single file in comma-separated values or Microsoft Office Excel format. In the export icon, choose Download as CSV or Download as XLS.
+
+Download and export options with limited scalability can be limited in the number of rows or bytes transferred using the following options respectively in your hue.ini:
+<pre>
+[beeswax]
+# A limit to the number of rows that can be downloaded from a query before it is truncated.
+# A value of -1 means there will be no limit.
+download_row_limit=-1
+
+# A limit to the number of bytes that can be downloaded from a query before it is truncated.
+# A value of -1 means there will be no limit.
+download_bytes_limit=-1
+</pre>
+
+In addition, it is possible to disable the download and export feature in the editor, dashboard, as well as in the file browser with the following option in your hue.ini:
+<pre>
+[desktop]
+# Global setting to allow or disable end user downloads in all Hue.
+# e.g. Query result in Editors and Dashboards, file in File Browser...
+enable_download=false
+</pre>
+
+The download feature in the file browser can be disabled separately with the following options in your hue.ini:
+<pre>
+[filebrowser]
+show_download_button=false
+</pre>
 
 <a id="advancedQuerySettings"></a>
 ### Advanced Query Settings
