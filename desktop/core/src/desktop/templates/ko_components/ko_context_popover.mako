@@ -363,12 +363,12 @@ from metadata.conf import has_navigator
             <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
           </a>
           % if HAS_SQL_ENABLED.get():
-            <a class="inactive-action pointer" data-bind="visible: popover.openInDashboardEnabled, click: openInDashboard">
+            <a class="inactive-action pointer" data-bind="visible: openActionsEnabled, click: openInDashboard">
               <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
             </a>
           % endif
           % if not IS_EMBEDDED.get():
-            <!-- ko if: catalogEntry().getSourceType() !== 'solr' && popover.openInTableBrowserEnabled -->
+            <!-- ko if: catalogEntry().getSourceType() !== 'solr' && openActionsEnabled() -->
             <a class="inactive-action pointer" data-bind="click: openInTableBrowser">
               <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
             </a>
@@ -413,6 +413,10 @@ from metadata.conf import has_navigator
         self.commentOverflowing = ko.observable();
         self.viewSql = ko.observable();
         self.viewSqlVisible = ko.observable(false);
+
+        self.openActionsEnabled = ko.pureComputed(function () {
+          return self.catalogEntry() && self.catalogEntry().path.length <= 2;
+        });
 
         self.catalogEntry.subscribe(self.load.bind(self));
 
@@ -1172,7 +1176,7 @@ from metadata.conf import has_navigator
         self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isHdfs && !self.isCatalogEntry;
 
         if (self.isCatalogEntry) {
-          self.contents = new DataCatalogContext({ popover: self, catalogEntry: params.data.catalogEntry })
+          self.contents = new DataCatalogContext({ popover: self, catalogEntry: params.data.catalogEntry });
           self.titleTemplate = 'context-catalog-entry-title';
           self.contentsTemplate = 'context-catalog-entry-contents';
         } else if (self.isFunction) {
