@@ -135,6 +135,15 @@ def home2(request, is_embeddable=False):
   })
 
 
+def catalog(request, is_embeddable=False):
+  apps = appmanager.get_apps_dict(request.user)
+
+  return render('catalog.mako', request, {
+    'apps': apps,
+    'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
+
 def home_embeddable(request):
   return home2(request, True)
 

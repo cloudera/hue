@@ -74,6 +74,7 @@ else:
   )
 
 dynamic_patterns += patterns('desktop.views',
+  (r'^catalog/?$','catalog'),
   (r'^logs$', 'log_view'),
   (r'^desktop/log_analytics$', 'log_analytics'),
   (r'^desktop/log_js_error$', 'log_js_error'),
