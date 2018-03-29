@@ -1756,10 +1756,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="render-properties${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.properties, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko if: $data.properties -->
+  <!-- ko if: !$root.isMini() -->
   <form class="form-search">
     <input type="text" data-bind="clearable: $parent.propertiesFilter, valueUpdate: 'afterkeydown'" class="input-xlarge search-query" placeholder="${_('Text Filter')}">
   </form>
   <br>
+  <!-- /ko -->
   <table id="jobbrowserJobPropertiesTable" class="table table-condensed">
     <thead>
     <tr>
