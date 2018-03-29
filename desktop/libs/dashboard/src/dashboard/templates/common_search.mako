@@ -3936,7 +3936,7 @@ $(document).ready(function () {
         if (coords.col >= dimensions.col && coords.row >= dimensions.row && coords.col < dimensions.col + dimensions.sizex && coords.row < dimensions.row + dimensions.sizey) {
           overlaps = true;
           if (!isOverSelf) {
-            var sidesWidth = Math.floor(dimensions.sizex / 3);
+            var sidesWidth = Math.min(Math.floor(dimensions.sizex / 3), 1);
             var centerWidth = dimensions.sizex - sidesWidth * 2;
             var sidesHeight = Math.floor(dimensions.sizey / 3);
             var centerHeight = dimensions.sizey - sidesHeight * 2;
