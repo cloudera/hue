@@ -554,6 +554,8 @@ var MetastoreTable = (function () {
     var self = this;
     if (!self.loading()) {
       self.loading(true);
+      self.samples.loaded(false);
+      self.partitions.loaded(false);
       // Clear will publish when done
       self.catalogEntry.clear(self.catalogEntry.getSourceType() === 'impala' ? 'invalidate' : 'cache');
     }
