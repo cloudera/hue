@@ -3945,7 +3945,7 @@ $(document).ready(function () {
             if (coords.col < dimensions.col + sidesWidth) {
               overlapZoneSideToSide = 'W';
             }
-            else if (coords.col >= (dimensions.col + sidesWidth) && coords.col < (dimensions.col + sidesWidth + centerWidth)) {
+            else if (coords.col >= (dimensions.col + sidesWidth) && coords.col <= (dimensions.col + sidesWidth + centerWidth)) {
               overlapZoneSideToSide = '';
             }
             else {
@@ -3955,7 +3955,7 @@ $(document).ready(function () {
             if (coords.row < dimensions.row + sidesHeight) {
               overlapZoneTopDown = 'N';
             }
-            else if (coords.row >= (dimensions.row + sidesHeight) && coords.row < (dimensions.row + sidesHeight + centerHeight)) {
+            else if (coords.row >= (dimensions.row + sidesHeight) && coords.row <= (dimensions.row + sidesHeight + centerHeight)) {
               overlapZoneTopDown = '';
             }
             else {
@@ -4213,7 +4213,10 @@ $(document).ready(function () {
         if (dimensions.overlap === 'N') {
           dimensions.row = dimensions.widgetRow;
         }
-        else if (dimensions.overlap !== 'S') {
+        else if (dimensions.overlap === 'S') {
+          dimensions.row = dimensions.row + 1;
+        }
+        else {
           var collindingWidgets = [];
           searchViewModel.gridItems().forEach(function (existingWidget) {
             var existingWidgetRow = parseInt($(existingWidget.gridsterElement).attr('data-row'));
