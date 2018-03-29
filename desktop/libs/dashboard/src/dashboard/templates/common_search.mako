@@ -3918,16 +3918,16 @@ $(document).ready(function () {
       row: Math.ceil((options.event.pageY - $('.gridster').offset().top) / (WIDGET_BASE_HEIGHT + 10))
     }
     var $huePreviewHolder = $('.hue-preview-holder');
-    if (coords.row > 0 && coords.col > 0 && coords.col < 13) {
+    if (coords.row > 0 && coords.col > 0 && coords.col <= 13) {
       var overlaps = false;
       var isEmptyWidget = false;
       var isOverSelf = false;
       $('li.gs-w').each(function () {
         var dimensions = {
-          col: parseInt($(this).attr('data-previous-col')),
-          row: parseInt($(this).attr('data-previous-row')),
-          sizex: parseInt($(this).attr('data-previous-sizex')),
-          sizey: parseInt($(this).attr('data-previous-sizey')),
+          col: parseInt($(this).attr('data-original-col') || $(this).attr('data-previous-col')),
+          row: parseInt($(this).attr('data-original-row') || $(this).attr('data-previous-row')),
+          sizex: parseInt($(this).attr('data-original-sizex') || $(this).attr('data-previous-sizex')),
+          sizey: parseInt($(this).attr('data-original-sizey') || $(this).attr('data-previous-sizey')),
           widgetId: parseInt($(this).attr('data-widgetid'))
         }
         var $widget = $(this);
@@ -3945,15 +3945,18 @@ $(document).ready(function () {
             if (coords.col < dimensions.col + sidesWidth) {
               overlapZoneSideToSide = 'W';
             }
-            else if (coords.col >= (dimensions.col + sidesWidth) && coords.col <= (dimensions.col + sidesWidth + centerWidth)) {
+            else if (coords.col >= (dimensions.col + sidesWidth) && coords.col < (dimensions.col + sidesWidth + centerWidth)) {
               overlapZoneSideToSide = '';
             }
             else {
               overlapZoneSideToSide = 'E';
             }
 
-            if (coords.row <= (dimensions.row + sidesHeight + centerHeight)) {
+             if (coords.row < dimensions.row + sidesHeight) {
               overlapZoneTopDown = 'N';
+            }
+            else if (coords.row >= (dimensions.row + sidesHeight) && coords.row < (dimensions.row + sidesHeight + centerHeight)) {
+              overlapZoneTopDown = '';
             }
             else {
               overlapZoneTopDown = 'S';
@@ -3983,7 +3986,7 @@ $(document).ready(function () {
                 // shifts left the widget right next to it on the left
                 $('li.gs-w[data-row='+ $widget.attr('data-row') +']').each(function (idx, sibling) {
                   var $sibling = $(sibling);
-                  if (parseInt($sibling.data('widget-id')) !== parseInt($widget.data('widget-id')) && parseInt($sibling.attr('data-col')) + parseInt($sibling.attr('data-sizex')) === parseInt($widget.attr('data-original-col'))) {
+                  if (parseInt($sibling.data('widgetid')) !== parseInt($widget.data('widgetid')) && parseInt($sibling.attr('data-col')) + parseInt($sibling.attr('data-sizex')) === parseInt($widget.attr('data-original-col'))) {
                     $sibling.attr('data-original-sizex', $sibling.attr('data-sizex'));
                     $sibling.attr('data-sizex', parseInt($sibling.attr('data-sizex')) - 1);
                   }
@@ -3998,18 +4001,22 @@ $(document).ready(function () {
               if (!$widget.attr('data-original-row')) {
                 $widget.attr('data-original-row', $widget.attr('data-row'));
                 $widget.attr('data-row', dimensions.row + 1);
+                $widget.attr('data-original-sizey', $widget.attr('data-sizey'));
+                $widget.attr('data-sizey', dimensions.sizey - 1);
                 // shifts down the other widgets
                 $('li.gs-w[data-row='+ $widget.attr('data-original-row') +']').each(function (idx, sibling) {
                   var $sibling = $(sibling);
-                  if (parseInt($sibling.data('widget-id')) !== parseInt($widget.data('widget-id'))) {
+                  if (parseInt($sibling.data('widgetid')) !== parseInt($widget.data('widgetid'))) {
                     $sibling.attr('data-original-row', $sibling.attr('data-row'));
-                    $sibling.attr('data-row', dimensions.row + 1);
+                    $sibling.attr('data-row', parseInt($sibling.attr('data-row')) + 1);
+                    $sibling.attr('data-original-sizey', $sibling.attr('data-sizey'));
+                    $sibling.attr('data-sizey', parseInt($sibling.attr('data-sizey')) - 1);
                   }
                 });
                 // shifts up the other widgets that come before this one
                 $('li.gs-w').each(function (idx, sibling) {
                   var $sibling = $(sibling);
-                  if (parseInt($sibling.data('widget-id')) !== parseInt($widget.data('widget-id')) && parseInt($sibling.attr('data-row')) + parseInt($sibling.attr('data-sizey')) === parseInt($widget.attr('data-original-row'))) {
+                  if (parseInt($sibling.data('widgetid')) !== parseInt($widget.data('widgetid')) && parseInt($sibling.attr('data-row')) + parseInt($sibling.attr('data-sizey')) === parseInt($widget.attr('data-original-row'))) {
                     $sibling.attr('data-original-sizey', $sibling.attr('data-sizey'));
                     $sibling.attr('data-sizey', parseInt($sibling.attr('data-sizey')) - 1);
                   }
@@ -4024,11 +4031,21 @@ $(document).ready(function () {
               if (!$widget.attr('data-original-sizey')) {
                 $widget.attr('data-original-sizey', $widget.attr('data-sizey'));
                 $widget.attr('data-sizey', dimensions.sizey - 1);
+                // shifts up the siblings
+                $('li.gs-w[data-row='+ parseInt($widget.attr('data-row')) +']').each(function (idx, sibling) {
+                  var $sibling = $(sibling);
+                  if (parseInt($sibling.data('widgetid')) !== parseInt($widget.data('widgetid'))) {
+                    $sibling.attr('data-original-sizey', $sibling.attr('data-sizey'));
+                    $sibling.attr('data-sizey', parseInt($sibling.attr('data-sizey')) - 1);
+                  }
+                });
                 // shifts down the other widgets that come after this one
                 $('li.gs-w[data-row='+ (parseInt($widget.attr('data-row')) + parseInt($widget.attr('data-original-sizey'))) +']').each(function (idx, sibling) {
                   var $sibling = $(sibling);
                   $sibling.attr('data-original-row', $sibling.attr('data-row'));
                   $sibling.attr('data-row', parseInt($sibling.attr('data-row')) + 1);
+                  $sibling.attr('data-original-sizey', $sibling.attr('data-sizey'));
+                  $sibling.attr('data-sizey', parseInt($sibling.attr('data-sizey')) - 1);
                 });
               }
               $huePreviewHolder.attr('data-col', 1);
