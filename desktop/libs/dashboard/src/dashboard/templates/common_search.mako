@@ -3952,11 +3952,8 @@ $(document).ready(function () {
               overlapZoneSideToSide = 'E';
             }
 
-            if (coords.row < dimensions.row + sidesHeight) {
+            if (coords.row <= (dimensions.row + sidesHeight + centerHeight)) {
               overlapZoneTopDown = 'N';
-            }
-            else if (coords.row >= (dimensions.row + sidesHeight) && coords.row <= (dimensions.row + sidesHeight + centerHeight)) {
-              overlapZoneTopDown = '';
             }
             else {
               overlapZoneTopDown = 'S';
@@ -3981,20 +3978,44 @@ $(document).ready(function () {
               if (!$widget.attr('data-original-col')) {
                 $widget.attr('data-original-col', $widget.attr('data-col'));
                 $widget.attr('data-col', dimensions.col + 1);
+                $widget.attr('data-original-sizex', $widget.attr('data-sizex'));
+                $widget.attr('data-sizex', dimensions.sizex - 1);
+                // shifts left the widget right next to it on the left
+                $('li.gs-w[data-row='+ $widget.attr('data-row') +']').each(function (idx, sibling) {
+                  var $sibling = $(sibling);
+                  if (parseInt($sibling.data('widget-id')) !== parseInt($widget.data('widget-id')) && parseInt($sibling.attr('data-col')) + parseInt($sibling.attr('data-sizex')) === parseInt($widget.attr('data-original-col'))) {
+                    $sibling.attr('data-original-sizex', $sibling.attr('data-sizex'));
+                    $sibling.attr('data-sizex', parseInt($sibling.attr('data-sizex')) - 1);
+                  }
+                });
               }
-              $huePreviewHolder.attr('data-col', dimensions.col);
+              if (dimensions.col > 1) {
+                $huePreviewHolder.attr('data-col', dimensions.col - 1);
+                $huePreviewHolder.attr('data-sizex', 2);
+              }
+              else {
+                $huePreviewHolder.attr('data-col', dimensions.col);
+                $huePreviewHolder.attr('data-sizex', 1);
+              }
               $huePreviewHolder.attr('data-row', dimensions.row);
-              $huePreviewHolder.attr('data-sizex', 1);
               $huePreviewHolder.attr('data-sizey', dimensions.sizey);
             }
             else if (overlapZone === 'N') {
               if (!$widget.attr('data-original-row')) {
                 $widget.attr('data-original-row', $widget.attr('data-row'));
                 $widget.attr('data-row', dimensions.row + 1);
+                // shifts down the other widgets
+                $('li.gs-w[data-row='+ $widget.attr('data-original-row') +']').each(function (idx, sibling) {
+                  var $sibling = $(sibling);
+                  if (parseInt($sibling.data('widget-id')) !== parseInt($widget.data('widget-id'))) {
+                    $sibling.attr('data-original-row', $sibling.attr('data-row'));
+                    $sibling.attr('data-row', dimensions.row + 1);
+                  }
+                });
               }
-              $huePreviewHolder.attr('data-col', dimensions.col);
+              $huePreviewHolder.attr('data-col', 1);
               $huePreviewHolder.attr('data-row', dimensions.row);
-              $huePreviewHolder.attr('data-sizex', dimensions.sizex);
+              $huePreviewHolder.attr('data-sizex', 12);
               $huePreviewHolder.attr('data-sizey', 1);
             }
             else if (overlapZone === 'S') {
@@ -4002,19 +4023,25 @@ $(document).ready(function () {
                 $widget.attr('data-original-sizey', $widget.attr('data-sizey'));
                 $widget.attr('data-sizey', dimensions.sizey - 1);
               }
-              $huePreviewHolder.attr('data-col', dimensions.col);
+              $huePreviewHolder.attr('data-col', 1);
               $huePreviewHolder.attr('data-row', dimensions.row + dimensions.sizey - 1);
-              $huePreviewHolder.attr('data-sizex', dimensions.sizex);
+              $huePreviewHolder.attr('data-sizex', 12);
               $huePreviewHolder.attr('data-sizey', 1);
             }
             else if (['NE', 'E', 'SE'].indexOf(overlapZone) > -1) {
               if (!$widget.attr('data-original-sizex')) {
                 $widget.attr('data-original-sizex', $widget.attr('data-sizex'));
                 $widget.attr('data-sizex', dimensions.sizex - 1);
+                // shifts right the widget right next to it on the right
+                var $sibling = $('li.gs-w[data-row='+ $widget.attr('data-row') +'][data-col='+ (parseInt($widget.attr('data-col')) + parseInt($widget.attr('data-original-sizex'))) +']');
+                $sibling.attr('data-original-col', $sibling.attr('data-col'));
+                $sibling.attr('data-col', parseInt($sibling.attr('data-col')) + 1);
+                $sibling.attr('data-original-sizex', $sibling.attr('data-sizex'));
+                $sibling.attr('data-sizex', parseInt($sibling.attr('data-sizex')) - 1);
               }
               $huePreviewHolder.attr('data-col', dimensions.col + dimensions.sizex - 1);
               $huePreviewHolder.attr('data-row', dimensions.row);
-              $huePreviewHolder.attr('data-sizex', 1);
+              $huePreviewHolder.attr('data-sizex', parseInt($huePreviewHolder.attr('data-col')) === 12 ? 1 : 2);
               $huePreviewHolder.attr('data-sizey', dimensions.sizey);
             }
             if (overlapZone !== '') {
