@@ -3989,14 +3989,8 @@ $(document).ready(function () {
                   }
                 });
               }
-              if (dimensions.col > 1) {
-                $huePreviewHolder.attr('data-col', dimensions.col - 1);
-                $huePreviewHolder.attr('data-sizex', 2);
-              }
-              else {
-                $huePreviewHolder.attr('data-col', dimensions.col);
-                $huePreviewHolder.attr('data-sizex', 1);
-              }
+              $huePreviewHolder.attr('data-col', dimensions.col > 1 ? dimensions.col - 1 : dimensions.col);
+              $huePreviewHolder.attr('data-sizex', dimensions.col > 1 ? 2 : 1);
               $huePreviewHolder.attr('data-row', dimensions.row);
               $huePreviewHolder.attr('data-sizey', dimensions.sizey);
             }
@@ -4012,21 +4006,35 @@ $(document).ready(function () {
                     $sibling.attr('data-row', dimensions.row + 1);
                   }
                 });
+                // shifts up the other widgets that come before this one
+                $('li.gs-w').each(function (idx, sibling) {
+                  var $sibling = $(sibling);
+                  if (parseInt($sibling.data('widget-id')) !== parseInt($widget.data('widget-id')) && parseInt($sibling.attr('data-row')) + parseInt($sibling.attr('data-sizey')) === parseInt($widget.attr('data-original-row'))) {
+                    $sibling.attr('data-original-sizey', $sibling.attr('data-sizey'));
+                    $sibling.attr('data-sizey', parseInt($sibling.attr('data-sizey')) - 1);
+                  }
+                });
               }
               $huePreviewHolder.attr('data-col', 1);
-              $huePreviewHolder.attr('data-row', dimensions.row);
+              $huePreviewHolder.attr('data-row', dimensions.row > 1 ? dimensions.row - 1 : dimensions.row);
               $huePreviewHolder.attr('data-sizex', 12);
-              $huePreviewHolder.attr('data-sizey', 1);
+              $huePreviewHolder.attr('data-sizey', dimensions.row > 1 ? 2: 1);
             }
             else if (overlapZone === 'S') {
               if (!$widget.attr('data-original-sizey')) {
                 $widget.attr('data-original-sizey', $widget.attr('data-sizey'));
                 $widget.attr('data-sizey', dimensions.sizey - 1);
+                // shifts down the other widgets that come after this one
+                $('li.gs-w[data-row='+ (parseInt($widget.attr('data-row')) + parseInt($widget.attr('data-original-sizey'))) +']').each(function (idx, sibling) {
+                  var $sibling = $(sibling);
+                  $sibling.attr('data-original-row', $sibling.attr('data-row'));
+                  $sibling.attr('data-row', parseInt($sibling.attr('data-row')) + 1);
+                });
               }
               $huePreviewHolder.attr('data-col', 1);
               $huePreviewHolder.attr('data-row', dimensions.row + dimensions.sizey - 1);
               $huePreviewHolder.attr('data-sizex', 12);
-              $huePreviewHolder.attr('data-sizey', 1);
+              $huePreviewHolder.attr('data-sizey', 2);
             }
             else if (['NE', 'E', 'SE'].indexOf(overlapZone) > -1) {
               if (!$widget.attr('data-original-sizex')) {
