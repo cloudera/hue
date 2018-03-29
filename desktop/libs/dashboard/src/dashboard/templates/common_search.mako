@@ -4036,61 +4036,7 @@ $(document).ready(function () {
         }
       });
       $huePreviewHolder.show();
-      if (!overlaps) {
-        restoreWidgetSizes();
 
-        // find out avail space
-        var availCoords = {
-          col: coords.col,
-          row: coords.row,
-          sizex: 1,
-          sizey: 1
-        }
-
-        // find left border
-        for (var i = coords.col; i >= 1; i--) {
-          if ($gridster.is_empty(i, coords.row)) {
-            availCoords.col = i;
-          }
-        }
-        // find right border
-        for (var i = coords.col; i <= 12; i++) {
-          if ($gridster.is_empty(i, coords.row)) {
-            availCoords.sizex = i - availCoords.col + 1;
-          }
-        }
-
-        // find top border
-        for (var i = coords.row; i >= 1; i--) {
-          if ($gridster.is_empty(coords.col, i)) {
-            availCoords.row = i;
-          }
-        }
-
-        // find bottom border
-        // get the end of the grid, makes no sense to iterate till max rows
-        var maxRow = 1;
-        $('li.gs-w').each(function () {
-          var $widget = $(this);
-          if (parseInt($widget.attr('data-previous-row')) + parseInt($widget.attr('data-previous-sizey')) - 1 > maxRow) {
-            maxRow = parseInt($widget.attr('data-previous-row')) + parseInt($widget.attr('data-previous-sizey')) - 1;
-          }
-        });
-        for (var i = coords.row; i <= maxRow; i++) {
-          if ($gridster.is_empty(coords.col, i)) {
-            availCoords.sizey = i - availCoords.row + 1;
-          }
-        }
-
-        $huePreviewHolder.attr('data-col', availCoords.col);
-        $huePreviewHolder.attr('data-row', availCoords.row);
-        $huePreviewHolder.attr('data-sizex', availCoords.sizex);
-        $huePreviewHolder.attr('data-sizey', availCoords.sizey);
-        $huePreviewHolder.removeAttr('data-overlapzone');
-        $huePreviewHolder.removeAttr('data-widgetid');
-        $huePreviewHolder.removeAttr('data-widgetrow');
-        $huePreviewHolder.removeAttr('data-widgetcol');
-      }
       if (isEmptyWidget || isOverSelf) {
         $huePreviewHolder.hide();
       }
