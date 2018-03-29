@@ -532,29 +532,6 @@ from metadata.conf import has_navigator
         huePubSub.publish('context.popover.hide');
       };
 
-      var HALF_SIZE_LIMIT_X = 130;
-      var HALF_SIZE_LIMIT_Y = 100;
-      var HALF_ARROW = 6;
-
-      var preventHide = false;
-
-      var hidePopover = function () {
-        if (! preventHide) {
-          if ($('#contextPopover').length > 0) {
-            ko.cleanNode($('#contextPopover')[0]);
-            $('#contextPopover').remove();
-            $(document).off('click', hideOnClickOutside);
-            huePubSub.publish('context.popover.hidden');
-          }
-        }
-      };
-
-      var hideOnClickOutside = function (event) {
-        if (jQuery.contains(document, event.target) && !$.contains($('#contextPopover')[0], event.target) && ($('.modal')[0].length === 0 || !$.contains($('.modal')[0], event.target))) {
-          hidePopover();
-        }
-      };
-
       function AsteriskData(data, sourceType, defaultDatabase) {
         var self = this;
         self.loading = ko.observable(true);
@@ -898,6 +875,23 @@ from metadata.conf import has_navigator
         var self = this;
         while (self.disposals.length) {
           self.disposals.pop()();
+        }
+      };
+
+      var HALF_SIZE_LIMIT_X = 130;
+      var HALF_SIZE_LIMIT_Y = 100;
+      var HALF_ARROW = 6;
+
+      var preventHide = false;
+
+      var hidePopover = function () {
+        if (! preventHide) {
+          if ($('#contextPopover').length > 0) {
+            ko.cleanNode($('#contextPopover')[0]);
+            $('#contextPopover').remove();
+            $(document).off('click.context');
+            huePubSub.publish('context.popover.hidden');
+          }
         }
       };
 
@@ -1246,11 +1240,16 @@ from metadata.conf import has_navigator
         });
 
         window.setTimeout(function() {
-          $(document).on('click', hideOnClickOutside);
+          $(document).off('click.context');
+          $(document).on('click.context', function (event) {
+            if (jQuery.contains(document, event.target) && !$.contains($('#contextPopover')[0], event.target) && ($('.modal')[0].length === 0 || !$.contains($('.modal')[0], event.target))) {
+              hidePopover();
+            }
+          });
         }, 0);
 
         self.disposals.push(function () {
-          $(document).off('click', hideOnClickOutside);
+          $(document).off('click.context');
         })
       }
 

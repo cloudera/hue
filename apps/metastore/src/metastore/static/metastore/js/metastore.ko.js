@@ -225,7 +225,7 @@ var MetastoreViewModel = (function () {
       self.catalogEntry(entry);
       entry.getChildren().done(function (databaseEntries) {
         self.databases($.map(databaseEntries, function (databaseEntry) {
-          return new MetastoreDatabase({ catalogEntry: databaseEntry, optimizerEnabled: self.optimizerEnabled });
+          return new MetastoreDatabase({ catalogEntry: databaseEntry, optimizerEnabled: self.optimizerEnabled, metastoreViewModel: self });
         }));
         deferred.resolve();
       }).fail(deferred.reject);
@@ -352,18 +352,17 @@ var MetastoreViewModel = (function () {
         self.setDatabaseByName(path[1]);
         break;
       case 'table':
-        huePubSub.subscribe('metastore.loaded.table', function(){
-          hueUtils.waitForRendered('a[href="#overview"]', function(el){ return el.is(':visible') }, function(){
-            $('a[href="#overview"]').click();
-          });
+
+        huePubSub.subscribe('metastore.loaded.table', function() {
+          self.currentTab('overview');
         }, 'metastore');
         self.loadTableDef({
           name: path[2],
           database: path[1]
         }, function(){
           if (path.length > 3 && path[3] === 'partitions'){
-            huePubSub.subscribe('metastore.loaded.partitions', function(){
-              $('a[href="#partitions"]').click();
+            huePubSub.subscribe('metastore.loaded.partitions', function() {
+              self.currentTab('partitions');
             }, 'metastore');
           }
         });

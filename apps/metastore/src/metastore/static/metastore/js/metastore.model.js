@@ -19,12 +19,14 @@ var MetastoreDatabase = (function () {
    * @param {object} options
    * @param {DataCatalogEntry} options.catalogEntry
    * @param {observable} options.optimizerEnabled
+   * @param {MetastoreViewModel} options.metastoreViewModel;
    * @constructor
    */
   function MetastoreDatabase(options) {
     var self = this;
     self.apiHelper = ApiHelper.getInstance();
     self.catalogEntry = options.catalogEntry;
+    self.metastoreViewModel = options.metastoreViewModel;
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -168,11 +170,7 @@ var MetastoreDatabase = (function () {
     if (callback) {
       callback();
     }
-    hueUtils.waitForRendered('a[href="#overview"]', function(el){ return el.is(':visible') }, function(){
-      window.setTimeout(function(){
-        $('a[href="#overview"]').click();
-      }, 0);
-    });
+    self.metastoreViewModel.currentTab('overview');
   };
 
   MetastoreDatabase.prototype.showContextPopover = function (entry, event, orientation) {
