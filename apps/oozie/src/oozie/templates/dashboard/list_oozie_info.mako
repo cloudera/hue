@@ -34,6 +34,9 @@ ${ layout.menubar(section='oozie', dashboard=True) }
   .oozie-info .tab-content {
     padding: 0 !important;
   }
+  .oozie-info .dataTables_wrapper table tbody tr, .oozie-info table th {
+    background-color: #FFFFFF;
+  }
 </style>
 
 
@@ -244,7 +247,8 @@ ${ layout.menubar(section='oozie', dashboard=True) }
         "oLanguage": {
            "sEmptyTable": "${_('No data available')}",
            "sZeroRecords": "${_('No matching records')}",
-        }
+        },
+        "asStripeClasses": []
    });
   var metricsTables = [];
 % if metrics:
@@ -261,7 +265,8 @@ ${ layout.menubar(section='oozie', dashboard=True) }
         "oLanguage": {
            "sEmptyTable": "${_('No data available')}",
            "sZeroRecords": "${_('No matching records')}",
-        }
+        },
+        "asStripeClasses": []
       });
      metricsTables.push(_table);
    });
@@ -283,7 +288,8 @@ ${ layout.menubar(section='oozie', dashboard=True) }
             "oLanguage": {
                 "sEmptyTable": "${_('No data available')}",
                 "sZeroRecords": "${_('No matching records')}"
-            }
+            },
+            "asStripeClasses": []
         });
         $("#intrumentationTable-${ category }-${ index } th").removeClass();
         instrumentationTables.push(table);
