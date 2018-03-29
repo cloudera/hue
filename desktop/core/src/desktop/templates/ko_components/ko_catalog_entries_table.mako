@@ -84,7 +84,7 @@ from desktop.views import _ko
         <!-- ko if: filteredEntries().length -->
         <tbody data-bind="foreach: filteredEntries">
         <tr>
-          <td width="10%" data-bind="attr: { 'title': catalogEntry.name + ' - ${ _ko("Click for more details") }' }">
+          <td class="name-column" data-bind="attr: { 'title': catalogEntry.name + ' - ${ _ko("Click for more details") }' }">
             <a href="javascript: void(0);" data-bind="click: onClick">
               <span data-bind="text: catalogEntry.name"></span>
               <!-- ko if: catalogEntry.isPrimaryKey() -->
@@ -98,10 +98,10 @@ from desktop.views import _ko
               <!-- /ko -->
             </a>
           </td>
-          <td width="10%" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
-          <td width="30%" data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
-          <td width="25%" class="sample-column" data-bind="html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }"></td>
-          <td width="25%" class="sample-column" data-bind="html: secondSample, attr: { 'title': hueUtils.html2text(secondSample()) }"></td>
+          <td class="type-column" data-bind="text: catalogEntry.getType(), attr: { 'title': catalogEntry.getRawType() }"></td>
+          <td class="comment-column" data-bind="text: catalogEntry.getCommentObservable(), attr: { 'title': catalogEntry.getCommentObservable() }"></td>
+          <td class="sample-column" data-bind="html: firstSample, attr: { 'title': hueUtils.html2text(firstSample()) }"></td>
+          <td class="sample-column" data-bind="html: secondSample, attr: { 'title': hueUtils.html2text(secondSample()) }"></td>
         </tr>
         </tbody>
         <!-- /ko -->
