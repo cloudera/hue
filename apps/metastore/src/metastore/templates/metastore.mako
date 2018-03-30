@@ -285,6 +285,11 @@ ${ components.menubar(is_embeddable) }
       <div>${ _('View') }</div>
       <!-- /ko -->
       <!-- ko ifnot: is_view -->
+      <span data-bind="visible: partition_keys.length" style="display: none;">
+        <a class="pointer" data-bind="click: function() { $root.currentTab('partitions'); $('.page-content').scrollTop(0); }">
+          ${ _("Partitioned") }
+        </a>
+      </span>
       <div>${ _('Table') }</div>
       <!-- /ko -->
     </div>

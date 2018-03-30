@@ -895,20 +895,21 @@ specify:
 hbase_clusters::
   Comma-separated list of HBase Thrift servers for clusters in the format of "(name|host:port)".
 
-### Configuration Validation
-
-Hue can detect certain invalid configuration.
-
-To view the configuration of a running Hue instance, navigate to
-`http://myserver:8888/hue/dump_config`, also accessible through the About
-application.
-
 
 # Administration
 
 Now that you've installed and started Hue, you can feel free to skip ahead
 to the <<usage,Using Hue>> section. Administrators may want to refer to this
 section for more details about managing and operating a Hue installation.
+
+
+## Configuration Validation
+
+Hue can detect certain invalid configuration.
+
+To view the configuration of a running Hue instance, navigate to
+`http://myserver:8888/hue/dump_config`, also accessible through the About
+application.
 
 
 ## Server Logs
@@ -924,7 +925,6 @@ Read more on the [Threads and Metrics pages
 Threads page can be very helpful in debugging purposes. It includes a daemonic thread and the thread objects serving concurrent requests. The host name, thread name identifier and current stack frame of each are displayed. Those are useful when Hue “hangs”, sometimes in case of a request too CPU intensive. There is also a REST API to get the dump of Threads using 'desktop/debug/threads'
 
 ## Metrics
-
 
 Read more on the [Threads and Metrics pages
  blog post](http://gethue.com/easier-administration-of-hue-with-the-new-threads-and-metrics-pages/)
