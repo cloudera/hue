@@ -505,11 +505,11 @@ class NavigatorApi(object):
 
 
   def _get_boosted_term(self, term):
-    return 'OR'.join(
-      ['(%s:*%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS] + # Matching fields
-      ['(%s:[* TO *])' % field for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS] # Important fields that are not null
+    return 'AND'.join([
+      '(%s)' % 'OR'.join(['(%s:*%s*^%s)' % (field, term, weight) for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS]),  # Matching fields
+      '(%s)' % 'OR'.join(['(%s:[* TO *])' % field for (field, weight) in NavigatorApi.DEFAULT_SEARCH_FIELDS]) # Boost entities with enriched fields
       # Could add certain customProperties and properties
-    )
+    ])
 
   def _clean_path(self, path):
     return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))

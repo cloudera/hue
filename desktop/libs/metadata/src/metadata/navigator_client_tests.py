@@ -173,7 +173,7 @@ class TestNavigatorClient(NavigatorClientTest):
       cluster_filter = '%s'
 
     assert_equal(
-        cluster_filter % '((originalName:*cases*^3)OR(originalDescription:*cases*^1)OR(name:*cases*^10)OR(description:*cases*^3)OR(tags:*cases*^5)OR(originalName:[* TO *])OR(originalDescription:[* TO *])OR(name:[* TO *])OR(description:[* TO *])OR(tags:[* TO *])) AND (*) AND ((type:TABLE)OR(type:VIEW)) AND (sourceType:HIVE OR sourceType:IMPALA)',
+        cluster_filter % '(((originalName:*cases*^3)OR(originalDescription:*cases*^1)OR(name:*cases*^10)OR(description:*cases*^3)OR(tags:*cases*^5))AND((originalName:[* TO *])OR(originalDescription:[* TO *])OR(name:[* TO *])OR(description:[* TO *])OR(tags:[* TO *]))) AND (*) AND ((type:TABLE)OR(type:VIEW)) AND (sourceType:HIVE OR sourceType:IMPALA)',
         self.api.search_entities(query_s='cases', sources=['hive'])[0][1]
     )
 
