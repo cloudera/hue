@@ -32,8 +32,8 @@ DEVTOOLS += \
 .PHONY: $(DEVTOOLS)
 $(DEVTOOLS):
 	@echo "--- Installing development tool: $@"
-	$(ENV_EASY_INSTALL) -f http://archive.cloudera.com/desktop-sdk-python-packages/ \
-	   -H pypi.python.org,archive.cloudera.com $(SETUPTOOLS_OPTS) $(subst ],,$(subst [,==,$@))
+	$(ENV_EASY_INSTALL) -f http://archive.cloudera.com/desktop-sdk-python-packages/ -i https://pypi.infra.cloudera.com/api/pypi/pypi-public/simple/ \
+	   -H archive.cloudera.com,pypi.infra.cloudera.com,pypi.python.org $(SETUPTOOLS_OPTS) $(subst ],,$(subst [,==,$@))
 
 $(BLD_DIR):
 	@mkdir -p $@
