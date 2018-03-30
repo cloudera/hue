@@ -1591,7 +1591,7 @@ var ApiHelper = (function () {
       snippetJson = JSON.stringify(queryResult);
 
       if (sampleResponse && sampleResponse.rows) { // Sync results
-        var data = { data: sampleResponse.rows, meta: sampleResponse.full_headers};
+        var data = { data: sampleResponse.rows, meta: sampleResponse.full_headers };
         data.hueTimestamp = Date.now();
         deferred.resolve(data);
       } else {

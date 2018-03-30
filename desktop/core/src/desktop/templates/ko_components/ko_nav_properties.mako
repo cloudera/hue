@@ -67,7 +67,9 @@ from django.utils.translation import ugettext as _
           var newProps = [];
           if (navigatorMeta.properties) {
             Object.keys(navigatorMeta.properties).forEach(function (key) {
-              newProps.push(new NavProperty(key, navigatorMeta.properties[key]));
+              if (!key.startsWith('__cloudera_internal')) {
+                newProps.push(new NavProperty(key, navigatorMeta.properties[key]));
+              }
             });
             newProps.sort(function (a, b) {
               return a.key.localeCompare(b.key);
