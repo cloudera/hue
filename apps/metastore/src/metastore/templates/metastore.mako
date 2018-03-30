@@ -122,12 +122,9 @@ ${ components.menubar(is_embeddable) }
       <tr>
         <th width="2%">&nbsp;</th>
         <th width="2%" class="no-sort">&nbsp;</th>
-        <th width="17%">${_('Name')}</th>
-        <th width="15%">${_('Type')}</th>
-        <!-- ko if: $root.optimizerEnabled  -->
-          <th width="15%">${_('Popularity')}</th>
-        <!-- /ko -->
-        <th width="50%" class="metastore-description-col">${_('Description')}</th>
+        <th width="20%">${_('Name')}</th>
+        <th width="10%">${_('Type')}</th>
+        <th width="66%" class="metastore-description-col">${_('Description')}</th>
       </tr>
       </thead>
       <tbody data-bind="hueach: { data: $data, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
@@ -136,20 +133,25 @@ ${ components.menubar(is_embeddable) }
           <td><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
           <td title="${ _("Scroll to the column") }">
             <!-- ko if: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
-            <span data-bind="text: catalogEntry.name"></span> <i class="fa fa-key" data-bind="visible: catalogEntry.isPrimaryKey()"></i>
+            <span data-bind="text: catalogEntry.name"></span>
+            <!-- ko if: $root.optimizerEnabled() && popularity()  -->
+            &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + popularity() + '%' }"></i>
+            <!-- /ko -->
+            <i class="fa fa-key" title="${ _("Primary key") }" data-bind="visible: catalogEntry.isPrimaryKey()"></i>
+            <i class="fa fa-key" title="${ _("Partition key") }" data-bind="visible: catalogEntry.isPartitionKey()"></i>
             <!-- /ko -->
             <!-- ko ifnot: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
-            <a href="javascript:void(0)" class="column-selector" data-bind="click: $root.scrollToColumn"><span data-bind="text: catalogEntry.name"></span> <i class="fa fa-key" data-bind="visible: catalogEntry.isPrimaryKey()"></i></a>
+            <a href="javascript:void(0)" class="column-selector" data-bind="click: $root.scrollToColumn">
+              <span data-bind="text: catalogEntry.name"></span>
+              <!-- ko if: $root.optimizerEnabled() && popularity()  -->
+              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + popularity() + '%' }"></i>
+              <!-- /ko -->
+              <i class="fa fa-key" title="${ _("Primary key") }" data-bind="visible: catalogEntry.isPrimaryKey()"></i>
+              <i class="fa fa-key" title="${ _("Partition key") }" data-bind="visible: catalogEntry.isPartitionKey()"></i>
+            </a>
             <!-- /ko -->
           </td>
           <td data-bind="text: catalogEntry.getType()"></td>
-          <!-- ko if: $root.optimizerEnabled  -->
-          <td>
-            <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: { 'title': popularity() }">
-              <div class="bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : popularity() + '%' }"></div>
-            </div>
-          </td>
-          <!-- /ko -->
           <td class="metastore-description-col" >
             <!-- ko ifnot: table.isView() -->
             <!-- ko template: 'metastore-td-description' --><!-- /ko -->
@@ -577,13 +579,11 @@ ${ components.menubar(is_embeddable) }
         <tr>
           <th width="1%" style="text-align: center" class="vertical-align-middle"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
           <th>&nbsp;</th>
-          <th width="30%">${ _('Table Name') }</th>
-          <th class="metastore-description-col" width="48%">${ _('Description') }</th>
+          <th width="20%">${ _('Name') }</th>
+          <th class="metastore-description-col" width="69%">${ _('Description') }</th>
           <!-- ko if: $root.optimizerEnabled  -->
-          <th width="10%">${ _('Popularity') }</th>
           <th width="10%">${ _('Columns') }</th>
           <!-- /ko -->
-          <th width="1%">${ _('Type') }</th>
         </tr>
         </thead>
         <tbody data-bind="hueach: { data: filteredTables, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 277, scrollUp: true }">
@@ -593,44 +593,40 @@ ${ components.menubar(is_embeddable) }
             </td>
             <td width="1%"><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
             <td>
-              <a class="tableLink" href="javascript:void(0);" data-bind="text: catalogEntry.name, click: function() { $parent.setTable($data, function() { huePubSub.publish('metastore.url.change'); }) }"></a>
+              <a class="tableLink" href="javascript:void(0);" data-bind="click: function() { $parent.setTable($data, function() { huePubSub.publish('metastore.url.change'); }) }">
+                <!-- ko ifnot: $root.optimizerEnabled && optimizerStats() -->
+                <!-- ko if: catalogEntry.isTable() -->
+                  <i class="fa fa-fw fa-table" title="${ _('Table') }"></i>
+                <!-- /ko -->
+                <!-- ko if: catalogEntry.isView() -->
+                  <i class="fa fa-fw fa-eye" title="${ _('View') }"></i>
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- ko if: $root.optimizerEnabled && optimizerStats() -->
+                <!-- ko if: optimizerStats().is_fact -->
+                  <i class="fa fa-fw fa-database" title="${ _('Fact table') }"></i>
+                <!-- /ko -->
+                <!-- ko ifnot: optimizerStats().is_fact -->
+                  <i class="fa fa-fw fa-calendar" title="${ _('Dimension table') }"></i>
+                <!-- /ko -->
+                <!-- /ko -->
+                <span data-bind="text: catalogEntry.name"></span>
+                <!-- ko if: $root.optimizerEnabled() && optimizerStats() && optimizerStats().popularity  -->
+              &nbsp;<i class="fa fa-star-o" data-bind="attr: { 'title': '${_ko('Popularity')}' + ': ' + optimizerStats().popularity}() + '%' }"></i>
+                <!-- /ko -->
+              </a>
             </td>
             <td class="metastore-description-col" data-bind="attr: { title: hueUtils.html2text(commentWithoutNewLines()) }">
               <!-- ko template: 'metastore-td-description' --><!-- /ko -->
             </td>
             <!-- ko if: $root.optimizerEnabled -->
               <!-- ko if: optimizerStats() -->
-              <td>
-                <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': optimizerStats().popularity}">
-                  <div class="bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : optimizerStats().popularity + '%' }"></div>
-                </div>
-              </td>
               <td data-bind="text: optimizerStats().column_count"></td>
               <!-- /ko -->
             <!-- ko ifnot: optimizerStats() -->
               <td></td>
-              <td></td>
             <!-- /ko -->
             <!-- /ko -->
-
-            <td class="center">
-              <!-- ko ifnot: $root.optimizerEnabled && optimizerStats() -->
-                <!-- ko if: catalogEntry.isTable() -->
-                  <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
-                <!-- /ko -->
-                <!-- ko if: catalogEntry.isView() -->
-                  <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
-                <!-- /ko -->
-              <!-- /ko -->
-              <!-- ko if: $root.optimizerEnabled && optimizerStats() -->
-                <!-- ko if: optimizerStats().is_fact -->
-                  <i class="fa fa-fw muted fa-database" title="${ _('Fact table') }"></i>
-                <!-- /ko -->
-                <!-- ko ifnot: optimizerStats().is_fact -->
-                  <i class="fa fa-fw muted fa-calendar" title="${ _('Dimension table') }"></i>
-                <!-- /ko -->
-              <!-- /ko -->
-            </td>
           </tr>
         </tbody>
       </table>
