@@ -396,7 +396,7 @@ class Workflow(Job):
 
     for node in self.nodes:
       if 'document' in node.data['type']:
-        for param in node.data['properties']['parameters']:
+        for param in node.data['properties']['arguments'] if node.data['type'] == 'java-document' else node.data['properties']['parameters']:
           if param['value'] and '=' in param['value']:
             name, val = param['value'].split('=', 1)
             parameters[name] = val
