@@ -22,7 +22,7 @@ $.fn.extend({
     tree.addClass("tree");
     tree.find('li').has("ul").each(function () {
       var branch = $(this);
-      branch.prepend("<i class='indicator fa fa-fw " + closedClass + "'></i>");
+      branch.prepend("<i class='indicator fa fa-fw " + openedClass + "'></i>");
       branch.addClass('branch');
       branch.on('click', function (e) {
         if (this == e.target) {
@@ -35,7 +35,6 @@ $.fn.extend({
           });
         }
       });
-      branch.children().children().toggle();
     });
     tree.find('li').not(":has(ul)").each(function () {
       var branch = $(this);

@@ -24,6 +24,15 @@ $(document).ready(function () {
     if (![13, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
       window.clearTimeout(tocTimeout);
       tocTimeout = window.setTimeout(function () {
+        $('.highlight').each(function () {
+          $(this).replaceWith(this.childNodes);
+        });
+        $('.toc li a').highlight($tocFilter.val(), {
+          bold: true,
+          class: "highlight",
+          ignoreCase: true,
+          wholeWord: false
+        });
         $('.toc li').each(function () {
           if ($(this).text().toLowerCase().indexOf($tocFilter.val().toLowerCase()) > -1) {
             $(this).show();
@@ -35,8 +44,8 @@ $(document).ready(function () {
       }, 300);
     }
   });
-  $(window).on('hashchange', function(){
+  $(window).on('hashchange', function () {
     $('.toc a.highlighted').removeClass('highlighted');
-    $('.toc a[href="'+ window.location.hash +'"]').addClass('highlighted');
+    $('.toc a[href="' + window.location.hash + '"]').addClass('highlighted');
   });
 });

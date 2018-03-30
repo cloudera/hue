@@ -1103,6 +1103,7 @@ and greatest in build technologies.
 
 <script src="../js/jquery.min.js"></script>
 <script src="../js/jquery.treed.js"></script>
+<script src="../js/jquery.highlight.js"></script>
 <script src="../js/hue-docs.js"></script>
 
 
