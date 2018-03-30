@@ -1590,24 +1590,30 @@ var ApiHelper = (function () {
       notebookJson = JSON.stringify({ type: options.sourceType });
       snippetJson = JSON.stringify(queryResult);
 
-      cancellablePromises.push(
-        self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
-          var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
-            notebook: notebookJson,
-            snippet: snippetJson,
-            rows: options.sampleCount || 100,
-            startOver: 'false'
-          }, {
-            silenceErrors:  options.silenceErrors
-          }).done(function (sampleResponse) {
-            var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
-            data.hueTimestamp = Date.now();
-            deferred.resolve(data);
-          }).fail(deferred.reject);
+      if (sampleResponse && sampleResponse.rows) { // Sync results
+        var data = { data: sampleResponse.rows, meta: sampleResponse.full_headers};
+        data.hueTimestamp = Date.now();
+        deferred.resolve(data);
+      } else {
+        cancellablePromises.push(
+          self.whenAvailable({ notebookJson: notebookJson, snippetJson: snippetJson, silenceErrors: options.silenceErrors }).done(function () {
+            var resultRequest = self.simplePost('/notebook/api/fetch_result_data', {
+              notebook: notebookJson,
+              snippet: snippetJson,
+              rows: options.sampleCount || 100,
+              startOver: 'false'
+            }, {
+              silenceErrors: options.silenceErrors
+            }).done(function (sampleResponse) {
+              var data = (sampleResponse && sampleResponse.result) || { data: [], meta: [] };
+              data.hueTimestamp = Date.now();
+              deferred.resolve(data);
+            }).fail(deferred.reject);
 
-          cancellablePromises.push(resultRequest, resultRequest);
-        }).fail(deferred.reject)
-      );
+            cancellablePromises.push(resultRequest, resultRequest);
+          }).fail(deferred.reject)
+        );
+      }
     }).fail(deferred.reject);
 
     cancellablePromises.push({
